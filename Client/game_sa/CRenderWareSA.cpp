@@ -388,10 +388,6 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
-
-            // CClumpModelInfo::SetClump will increment CTxdStore reference count.
-            // We must remove it again to avoid TXD leaks.
-            CTxdStore_RemoveRef(pModelInfoInterface->usTextureDictionary);
             RpClumpDestroy(pOldClump);
         }
     }

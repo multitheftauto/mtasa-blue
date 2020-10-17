@@ -12,9 +12,11 @@
 
 #include "StdInc.h"
 
+#define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20677"
+
 void CLuaCameraDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Cam get funcs
         {"getCamera", GetCamera},
         {"getCameraViewMode", GetCameraViewMode},
@@ -39,10 +41,8 @@ void CLuaCameraDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaCameraDefs::AddClass(lua_State* luaVM)
@@ -333,6 +333,9 @@ int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
     {
         CClientEntity* pTarget;
         argStream.ReadUserData(pTarget);
+
+        if (pTarget->GetType() != CCLIENTPLAYER)
+            MinClientReqCheck(argStream, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
 
         if (!argStream.HasErrors())
         {

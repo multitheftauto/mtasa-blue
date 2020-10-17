@@ -135,10 +135,8 @@ void CServerList::Pulse()
     // Store the new number of scanned servers
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
-#if MTA_DEBUG
     // OutputDebugLine ( SString ( "[Browser] %08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned,
     // m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
-#endif
 
     if (m_nScanned + m_nSkipped == m_Servers.size())
     {
@@ -472,7 +470,7 @@ void CServerListItem::Query()
 
 bool CServerListItem::ParseQuery()
 {
-    SQueryInfo info = queryReceiver.GetServerResponse(uiMasterServerSaysRestrictions);
+    SQueryInfo info = queryReceiver.GetServerResponse();
     if (!info.containingInfo)
         return false;
 
@@ -480,19 +478,41 @@ bool CServerListItem::ParseQuery()
     strHost = inet_ntoa(Address);
 
     nPing = info.pingTime;
-    strGameName = info.gameName;
-    strName = info.serverName;
-    strGameMode = info.gameType;
-    strMap = info.mapName;
-    strVersion = info.versionText;
-    bPassworded = info.isPassworded;
-    bSerials = info.serials;
-    nPlayers = info.players;
-    nMaxPlayers = info.playerSlot;
+
+    // Only use info from server query if master list allows it
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_NAME) == false)
+        strGameName = info.gameName;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_NAME) == false)
+        strName = info.serverName;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_MODE) == false)
+        strGameMode = info.gameType;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAP_NAME) == false)
+        strMap = info.mapName;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_VERSION) == false)
+        strVersion = info.versionText;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_PASSWORDED_FLAG) == false)
+        bPassworded = info.isPassworded;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERIALS_FLAG) == false)
+        bSerials = info.serials;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
+        nPlayers = info.players;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
+        nMaxPlayers = info.playerSlot;
+
     m_iBuildType = info.buildType;
     m_iBuildNumber = info.buildNum;
     m_usHttpPort = info.httpPort;
-    vecPlayers = info.playersPool;
+
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
+        vecPlayers = info.playersPool;
 
     bScanned = true;
 

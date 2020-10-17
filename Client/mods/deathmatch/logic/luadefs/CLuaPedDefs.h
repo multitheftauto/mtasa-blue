@@ -24,9 +24,9 @@ public:
     LUA_DECLARE(GetPedVoice);
     LUA_DECLARE(SetPedVoice);
     LUA_DECLARE(GetPedTarget);
-    LUA_DECLARE(GetPedTargetStart);
-    LUA_DECLARE(GetPedTargetEnd);
-    LUA_DECLARE(GetPedTargetCollision);
+    LUA_DECLARE_OOP(GetPedTargetStart);
+    LUA_DECLARE_OOP(GetPedTargetEnd);
+    LUA_DECLARE_OOP(GetPedTargetCollision);
     LUA_DECLARE(GetPedWeaponSlot);
     LUA_DECLARE(GetPedWeapon);
     LUA_DECLARE(GetPedAmmoInClip);
@@ -73,7 +73,7 @@ public:
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedMoveAnim);
-    LUA_DECLARE(SetPedArmor);
+    static bool SetPedArmor(CClientPed* const ped, const float armor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
     LUA_DECLARE(IsPedReloadingWeapon);
@@ -82,7 +82,7 @@ public:
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
-    LUA_DECLARE(SetPedFightingStyle);
+    static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);

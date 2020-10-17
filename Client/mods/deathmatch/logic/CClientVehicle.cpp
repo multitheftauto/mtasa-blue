@@ -135,6 +135,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bEnableHeliBladeCollisions = true;
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
+    m_fWheelScale = 1.0f;
 
     for (unsigned int i = 0; i < MAX_WINDOWS; ++i)
     {
@@ -170,6 +171,9 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not yet been streamed in
     m_bJustStreamedIn = false;
+
+    // We've not changed the wheel scale
+    m_bWheelScaleChanged = false;
 }
 
 CClientVehicle::~CClientVehicle()
@@ -2829,9 +2833,23 @@ void CClientVehicle::Create()
             if (m_bHasCustomHandling)
                 ApplyHandling();
         }
+
+        // Applying wheel upgrades can change these values.
+        // We should keep track of the original values to restore them
+        bool  bPreviousWheelScaleChanged = m_bWheelScaleChanged;
+        float fPreviousWheelScale = m_fWheelScale;
+
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if (m_pUpgrades)
             m_pUpgrades->ReAddAll();
+
+        // Restore custom wheel scale
+        if (bPreviousWheelScaleChanged)
+        {
+            m_pVehicle->SetWheelScale(fPreviousWheelScale);
+            m_fWheelScale = fPreviousWheelScale;
+            m_bWheelScaleChanged = true;
+        }
 
         if (m_ComponentData.empty())
         {
@@ -2987,14 +3005,19 @@ void CClientVehicle::Destroy()
         {
             // Only remove him physically. Don't let the ped update us
             pPed->InternalRemoveFromVehicle(m_pVehicle);
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE))
+                pPed->SetWarpInToVehicleRequired(true);
         }
 
         // Remove all the passengers physically
+        bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
         for (unsigned int i = 0; i < 8; i++)
         {
-            if (m_pPassengers[i])
+            CClientPed* pPassenger = m_pPassengers[i];
+            if (pPassenger)
             {
-                m_pPassengers[i]->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->SetWarpInToVehicleRequired(bWarpInToVehicleRequired);
             }
         }
 
@@ -3604,11 +3627,32 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+    switch (m_usModel)
+    {
+        case VT_BAGGAGE:
+        case VT_BANDITO:
+        case VT_BFINJECT:
+        case VT_CADDY:
+        case VT_DOZER:
+        case VT_FORKLIFT:
+        case VT_KART:
+        case VT_MOWER:
+        case VT_QUAD:
+        case VT_RCBANDIT:
+        case VT_RCCAM:
+        case VT_RCGOBLIN:
+        case VT_RCRAIDER:
+        case VT_RCTIGER:
+        case VT_TRACTOR:
+        case VT_VORTEX:
+            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
-    // Keep the bonet and boot intact
-    ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+            // Keep the bonet and boot intact
+            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
+            break;
+        default:
+            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+    }
 }
 
 void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ)
@@ -4957,4 +5001,40 @@ bool CClientVehicle::IsWindowOpen(uchar ucWindow)
         return m_bWindowOpen[ucWindow];
     }
     return false;
+}
+
+void CClientVehicle::SetWheelScale(float fWheelScale)
+{
+    if (m_pVehicle)
+    {
+        m_pVehicle->SetWheelScale(fWheelScale);
+    }
+    m_fWheelScale = fWheelScale;
+
+    m_bWheelScaleChanged = true;
+}
+
+float CClientVehicle::GetWheelScale()
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetWheelScale();
+    }
+    return m_fWheelScale;
+}
+
+// This function is meant to be called after GTA resets wheel scale
+// (i.e. after installing a wheel upgrade)
+void CClientVehicle::ResetWheelScale()
+{
+    assert(m_pUpgrades);
+
+    // The calculation of the default wheel scale is based on original GTA code at functions
+    // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
+    if (m_pUpgrades->GetSlotState(12) != 0)
+        m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE);
+    else
+        m_fWheelScale = 1.0f;
+
+    m_bWheelScaleChanged = false;
 }

@@ -643,8 +643,8 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
             BitStream.Read(&aim);
 
             // Read out the driveby direction
-            unsigned char ucDriveByAim;
-            BitStream.Read(ucDriveByAim);
+            eVehicleAimDirection ucDriveByAim;
+            BitStream.Read(*reinterpret_cast<char*>(&ucDriveByAim));
 
             // Set the aim data (immediately if in vehicle, otherwize delayed/interpolated)
             if (pVehicle)
@@ -781,7 +781,7 @@ void CNetAPI::WriteKeysync(CClientPed* pPlayerModel, NetBitStreamInterface& BitS
 
                 // Write the driveby direction
                 CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData();
-                BitStream.Write(pShotsyncData->m_cInVehicleAimDirection);
+                BitStream.Write(static_cast<char>(pShotsyncData->m_cInVehicleAimDirection));
             }
         }
         else
@@ -946,7 +946,7 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
             BitStream.Read(&aim);
 
             // Interpolate the aiming
-            pPlayer->SetAimInterpolated(TICK_RATE_AIM, rotation.data.fRotation, aim.data.fArm, flags.data.bAkimboTargetUp, 0);
+            pPlayer->SetAimInterpolated(TICK_RATE_AIM, rotation.data.fRotation, aim.data.fArm, flags.data.bAkimboTargetUp, eVehicleAimDirection::FORWARDS);
 
             // Read the aim data only if he's shooting or aiming
             if (aim.isFull())
@@ -1505,9 +1505,10 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             // Read out the driveby direction
             SDrivebyDirectionSync driveby;
             BitStream.Read(&driveby);
+            eVehicleAimDirection ucDirection = static_cast<eVehicleAimDirection>(driveby.data.ucDirection);
 
             // Set the aiming
-            pPlayer->SetAimingData(TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, driveby.data.ucDirection, &aim.data.vecOrigin, false);
+            pPlayer->SetAimingData(TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, ucDirection, &aim.data.vecOrigin, false);
         }
         else
         {
@@ -1748,7 +1749,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
             // Sync driveby direction
             CShotSyncData*        pShotsyncData = g_pMultiplayer->GetLocalShotSyncData();
             SDrivebyDirectionSync driveby;
-            driveby.data.ucDirection = static_cast<unsigned char>(pShotsyncData->m_cInVehicleAimDirection);
+            driveby.data.ucDirection = pShotsyncData->m_cInVehicleAimDirection;
             BitStream.Write(&driveby);
         }
     }
@@ -2001,11 +2002,11 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
     {
         // Write our target
         ElementID      ID = INVALID_ELEMENT_ID;
-        CClientPlayer* pPlayer = pCamera->GetFocusedPlayer();
-        if (!pPlayer)
-            pPlayer = g_pClientGame->GetLocalPlayer();
-        if (!pPlayer->IsLocalEntity())
-            ID = pPlayer->GetID();
+        CClientEntity* pTarget = pCamera->GetTargetEntity();
+        if (!pTarget)
+            pTarget = g_pClientGame->GetLocalPlayer();
+        if (!pTarget->IsLocalEntity())
+            ID = pTarget->GetID();
 
         BitStream.Write(ID);
     }

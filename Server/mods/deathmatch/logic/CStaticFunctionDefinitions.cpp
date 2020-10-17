@@ -246,6 +246,9 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
 
 bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 {
+    if (!pElement->CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = pElement->IterBegin();
     while (iter != pElement->IterEnd())
@@ -1342,12 +1345,12 @@ bool CStaticFunctionDefinitions::SetElementVisibleTo(CElement* pElement, CElemen
     {
         CPerPlayerEntity* pEntity = static_cast<CPerPlayerEntity*>(pElement);
         if (bVisible)
-            pEntity->AddVisibleToReference(pReference);
+            return pEntity->AddVisibleToReference(pReference);
         else
-            pEntity->RemoveVisibleToReference(pReference);
+            return pEntity->RemoveVisibleToReference(pReference);
     }
 
-    return true;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition)
@@ -1450,18 +1453,7 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
     assert(pElement);
     assert(pAttachedToElement);
 
-    // Check the elements we are attaching are not already connected
-    std::set<CElement*> history;
-    for (CElement* pCurrent = pAttachedToElement; pCurrent; pCurrent = pCurrent->GetAttachedToElement())
-    {
-        if (pCurrent == pElement)
-            return false;
-        if (MapContains(history, pCurrent))
-            break;            // This should not be possible, but you never know
-        MapInsert(history, pCurrent);
-    }
-
-    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && pElement->GetDimension() == pAttachedToElement->GetDimension())
+    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && !pAttachedToElement->IsAttachedToElement(pElement) && pElement->GetDimension() == pAttachedToElement->GetDimension())
     {
         pElement->SetAttachedOffsets(vecPosition, vecRotation);
         ConvertDegreesToRadians(vecRotation);
@@ -1923,14 +1915,6 @@ const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer
     assert(pPlayer);
 
     return pPlayer->GetPlayerVersion();
-}
-
-bool CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel)
-{
-    assert(pPlayer);
-
-    uiLevel = pPlayer->GetScriptDebugLevel();
-    return true;
 }
 
 bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* szName)
@@ -4506,20 +4490,27 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
         if (!pTarget)
             pTarget = pPlayer;
 
-        // Make sure our target is a player element
-        if (pTarget->GetType() == CElement::PLAYER)
+        // Make sure our target is supported
+        switch (pTarget->GetType())
         {
-            pCamera->SetMode(CAMERAMODE_PLAYER);
-            pCamera->SetTarget(pTarget);
-            pCamera->SetRoll(0.0f);
-            pCamera->SetFOV(70.0f);
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+            {
+                pCamera->SetMode(CAMERAMODE_PLAYER);
+                pCamera->SetTarget(pTarget);
+                pCamera->SetRoll(0.0f);
+                pCamera->SetFOV(70.0f);
 
-            CBitStream BitStream;
-            if (pPlayer->GetBitStreamVersion() >= 0x5E)
-                BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
-            BitStream.pBitStream->Write(pTarget->GetID());
-            pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
-            return true;
+                CBitStream BitStream;
+                if (pPlayer->GetBitStreamVersion() >= 0x5E)
+                    BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+                BitStream.pBitStream->Write(pTarget->GetID());
+                pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
+                return true;
+            }
+            default:
+                return false;
         }
     }
 
@@ -5233,19 +5224,6 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CVehicle* pVehicle, float& fSpeed
 
     const CVector& vecVelocity = pVehicle->GetVelocity();
     fSpeed = vecVelocity.Length();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrack(CVehicle* pVehicle, uchar& ucTrack)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-    else if (pVehicle->IsDerailed())
-        return false;
-
-    ucTrack = pVehicle->GetTrainTrack();
     return true;
 }
 
@@ -7165,25 +7143,6 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CVehicle* pVehicle, float fSpeed)
     BitStream.pBitStream->Write(fSpeed);
 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_SPEED, *BitStream.pBitStream));
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetTrainTrack(CVehicle* pVehicle, uchar ucTrack)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-    else if (pVehicle->IsDerailed())
-        return false;
-
-    pVehicle->SetTrainTrack(ucTrack);
-
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(ucTrack);
-
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
 
     return true;
 }

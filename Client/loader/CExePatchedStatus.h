@@ -49,7 +49,6 @@ SString           GetPatchExeAdminReason(bool bUseExeCopy, const SExePatchedStat
 uint64            GetExeFileSize(bool bUseExeCopy);
 bool              CopyExe();
 SString           GetExePathFilename(bool bUseExeCopy);
-bool              ShouldForceUseExeCopy();
 SString           GetUsingExePathFilename();
 bool              GetPatchRequirementAltModules();
 EPatchResult      UpdatePatchStatusNvightmare(const SString& strGTAEXEPath, EPatchMode mode);

@@ -173,6 +173,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_FASTSPRINT] = false;
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
+    m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
@@ -189,6 +190,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_GlitchNames["fastsprint"] = GLITCH_FASTSPRINT;
     m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
     m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
+    m_GlitchNames["kickoutofvehicle_onmodelreplace"] = GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE;
 
     m_bCloudsEnabled = true;
 
@@ -529,6 +531,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pBuildingRemovalManager = new CBuildingRemovalManager;
 
     m_pCustomWeaponManager = new CCustomWeaponManager();
+
+    m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
@@ -3673,7 +3677,7 @@ void CGame::Packet_CameraSync(CCameraSyncPacket& Packet)
         }
         else
         {
-            CPlayer* pTarget = GetElementFromId<CPlayer>(Packet.m_TargetID);
+            CElement* pTarget = GetElementFromId<CElement>(Packet.m_TargetID);
             if (!pTarget)
                 pTarget = pPlayer;
 
