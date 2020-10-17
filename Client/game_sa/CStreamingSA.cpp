@@ -220,7 +220,7 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 
 void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
 {
-    unsigned int uiStreamHandlerID = ms_aAchiveInfo[ucArhiveID].uiStreamHandleId;
+    unsigned int uiStreamHandlerID = ms_aAchiveInfo[ucArhiveID].uiStreamHandleId >> 24;
     if (!uiStreamHandlerID)
         return;
 
