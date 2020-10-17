@@ -25,6 +25,7 @@
 #include "ltable.h"
 #include "ltm.h"
 #include "lvm.h"
+#include "lvector.h" /*LUA-VEC*/
 
 
 
@@ -118,6 +119,51 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
         return;
       }
       /* else will try the tag method */
+    }
+    /* LUA-VEC TODO - if LUA_VEC_SIZE gets changed this code will break  */
+    else if (ttisvec(t)) { /* LUA-VEC -- vec[idx] operator */
+      /* issue: "index" may not be the correct arg for luaG_typeerror in here */
+      if (ttisnumber(key) &&   /* acessing vec by a number? */
+          (nvalue(key) >= 1 && nvalue(key) <= LUA_VEC_SIZE)) {  /* index is between 1-LUA_VEC_SIZE? */
+        TValue res;
+        setnvalue(&res, vvalue(t)->vec[cast_int(nvalue(key))-1]);
+        setobj2s(L, val, &res);
+        return;
+      }
+      else if (ttisstring(key)) {  /* acessing vec by a string? */
+        if (tsvalue(key)->len == 1) {
+          /* accessing by a single component, such as vec.x */
+          TValue res;
+          switch (*getstr(tsvalue(key))) {
+            case 'x':  setnvalue(&res, vvalue(t)->vec[0]); break;
+            case 'y':  setnvalue(&res, vvalue(t)->vec[1]); break;
+            case 'z':  setnvalue(&res, vvalue(t)->vec[2]); break;
+            case 'w':  setnvalue(&res, vvalue(t)->vec[3]); break;
+            default:   luaG_typeerror(L, t, "index");
+          }
+          setobj2s(L, val, &res);
+          return;
+        }
+        else if (tsvalue(key)->len <= LUA_VEC_SIZE) {
+          /* accessing by swizzling, such as vec.xy, vec.xxyz etc. */
+          TValue res;
+          float v[LUA_VEC_SIZE] = {0};
+          unsigned int i;
+          for (i = 0; i < tsvalue(key)->len; ++i) {
+            switch (getstr(tsvalue(key))[i]) {
+              case 'x':  v[i] = vvalue(t)->vec[0]; break;
+              case 'y':  v[i] = vvalue(t)->vec[1]; break;
+              case 'z':  v[i] = vvalue(t)->vec[2]; break;
+              case 'w':  v[i] = vvalue(t)->vec[3]; break;
+              default:   luaG_typeerror(L, t, "index");
+            }
+          }
+          setvvalue(L, &res, luaVec_new(L, v[0], v[1], v[2], v[3]));
+          setobj2s(L, val, &res);
+          return;
+        }
+      }
+      luaG_typeerror(L, t, "index");
     }
     else if (ttisnil(tm = luaT_gettmbyobj(L, t, TM_INDEX)))
       luaG_typeerror(L, t, "index");
@@ -367,10 +413,26 @@ static void Arith (lua_State *L, StkId ra, const TValue *rb,
         if (ttisnumber(rb) && ttisnumber(rc)) { \
           lua_Number nb = nvalue(rb), nc = nvalue(rc); \
           setnvalue(ra, op(nb, nc)); \
-        } \
-        else \
+       /* LUA-VEC add vector arithmetic operators */ \
+       } else if (ttisvec(rb) && ttisvec(rc) && (tm==TM_ADD || tm==TM_SUB || tm==TM_MUL || tm==TM_DIV || tm==TM_POW)) { \
+          /* vector (add/sub/mul/div/pow) vector */ \
+          const float* nb = vvalue(rb)->vec; \
+          const float* nc = vvalue(rc)->vec; \
+          setvvalue(L, ra, luaVec_new(L, (float)op(nb[0], nc[0]), (float)op(nb[1], nc[1]), (float)op(nb[2], nc[2]), (float)op(nb[3], nc[3]))); \
+        } else if (ttisvec(rb) && ttisnumber(rc) && (tm==TM_MUL || tm==TM_DIV || tm==TM_POW)) { \
+          /* vector (mul/div/pow) scalar */ \
+          const float* nb = vvalue(rb)->vec; \
+          lua_Number nc = nvalue(rc); \
+          setvvalue(L, ra, luaVec_new(L, (float)op(nb[0], nc), (float)op(nb[1], nc), (float)op(nb[2], nc), (float)op(nb[3], nc))); \
+        } else if (ttisnumber(rb) && ttisvec(rc) && tm==TM_MUL) { \
+          /* scalar (mul) vector */ \
+          lua_Number nb = nvalue(rb); \
+          const float* nc = vvalue(rc)->vec; \
+          setvvalue(L, ra, luaVec_new(L, (float)op(nb, nc[0]), (float)op(nb, nc[1]), (float)op(nb, nc[2]), (float)op(nb, nc[3]))); \
+        } else \
           Protect(Arith(L, ra, rb, rc, tm)); \
       }
+
 
 
 
@@ -500,8 +562,10 @@ void luaV_execute (lua_State *L, int nexeccalls) {
         if (ttisnumber(rb)) {
           lua_Number nb = nvalue(rb);
           setnvalue(ra, luai_numunm(nb));
-        }
-        else {
+        } else if (ttisvec(rb)) { /* LUA-VEC - added unary negate */
+          const float *vb = vvalue(rb)->vec;
+          setvvalue(L, ra, luaVec_new(L, -vb[0], -vb[1], -vb[2], -vb[3]));
+        } else {
           Protect(Arith(L, ra, rb, rb, TM_UNM));
         }
         continue;
@@ -520,6 +584,11 @@ void luaV_execute (lua_State *L, int nexeccalls) {
           }
           case LUA_TSTRING: {
             setnvalue(ra, cast_num(tsvalue(rb)->len));
+            break;
+          }
+          /* LUA-VEC -- #vec operator */
+          case LUA_TVEC: {
+            setnvalue(ra, 4);
             break;
           }
           default: {  /* try metamethod */
