@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-0.00000"
+#define MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20677"
 
 void CLuaCameraDefs::LoadFunctions()
 {
