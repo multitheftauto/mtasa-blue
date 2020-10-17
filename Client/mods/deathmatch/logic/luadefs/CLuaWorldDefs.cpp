@@ -1,21 +1,125 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/lua/CLuaFunctionDefs.World.cpp
- *  PURPOSE:     Lua function definitions class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 
-#define MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
-#define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
-#define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
-#define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS        "1.5.4-9.11413"
+void CLuaWorldDefs::LoadFunctions()
+{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // World get functions
+        {"getTime", GetTime},
+        {"getRoofPosition", GetRoofPosition},
+        {"getGroundPosition", GetGroundPosition},
+        {"processLineOfSight", ProcessLineOfSight},
+        {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
+        {"getScreenFromWorldPosition", GetScreenFromWorldPosition},
+        {"getWeather", GetWeather},
+        {"getZoneName", GetZoneName},
+        {"getGravity", GetGravity},
+        {"getGameSpeed", GetGameSpeed},
+        {"getMinuteDuration", GetMinuteDuration},
+        {"getWaveHeight", GetWaveHeight},
+        {"getGaragePosition", GetGaragePosition},
+        {"getGarageSize", GetGarageSize},
+        {"getGarageBoundingBox", GetGarageBoundingBox},
+        {"getBlurLevel", GetBlurLevel},
+        {"getTrafficLightState", GetTrafficLightState},
+        {"areTrafficLightsLocked", AreTrafficLightsLocked},
+        {"getSkyGradient", GetSkyGradient},
+        {"getHeatHaze", GetHeatHaze},
+        {"getJetpackMaxHeight", GetJetpackMaxHeight},
+        {"getWindVelocity", GetWindVelocity},
+        {"getInteriorSoundsEnabled", GetInteriorSoundsEnabled},
+        {"getInteriorFurnitureEnabled", GetInteriorFurnitureEnabled},
+        {"getFarClipDistance", GetFarClipDistance},
+        {"getNearClipDistance", GetNearClipDistance},
+        {"getVehiclesLODDistance", GetVehiclesLODDistance},
+        {"getPedsLODDistance", GetPedsLODDistance},
+        {"getFogDistance", GetFogDistance},
+        {"getSunColor", GetSunColor},
+        {"getSunSize", GetSunSize},
+        {"getAircraftMaxHeight", GetAircraftMaxHeight},
+        {"getAircraftMaxVelocity", GetAircraftMaxVelocity},
+        {"getOcclusionsEnabled", GetOcclusionsEnabled},
+        {"getCloudsEnabled", GetCloudsEnabled},
+        {"getRainLevel", GetRainLevel},
+        {"getMoonSize", GetMoonSize},
+        {"getFPSLimit", GetFPSLimit},
+        {"getBirdsEnabled", GetBirdsEnabled},
+        {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
+        {"isLineOfSightClear", IsLineOfSightClear},
+        {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
+        {"isGarageOpen", IsGarageOpen},
 
-int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
+        // World set funcs
+        {"setTime", SetTime},
+        {"setSkyGradient", SetSkyGradient},
+        {"setHeatHaze", SetHeatHaze},
+        {"setWeather", SetWeather},
+        {"setWeatherBlended", SetWeatherBlended},
+        {"setGravity", SetGravity},
+        {"setGameSpeed", SetGameSpeed},
+        {"setWaveHeight", SetWaveHeight},
+        {"setMinuteDuration", SetMinuteDuration},
+        {"setGarageOpen", SetGarageOpen},
+        {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
+        {"setBlurLevel", SetBlurLevel},
+        {"resetBlurLevel", ResetBlurLevel},
+        {"setJetpackMaxHeight", SetJetpackMaxHeight},
+        {"setCloudsEnabled", SetCloudsEnabled},
+        {"setTrafficLightState", SetTrafficLightState},
+        {"setTrafficLightsLocked", SetTrafficLightsLocked},
+        {"setWindVelocity", SetWindVelocity},
+        {"setInteriorSoundsEnabled", SetInteriorSoundsEnabled},
+        {"setInteriorFurnitureEnabled", SetInteriorFurnitureEnabled},
+        {"setRainLevel", SetRainLevel},
+        {"setFarClipDistance", SetFarClipDistance},
+        {"setNearClipDistance", SetNearClipDistance},
+        {"setVehiclesLODDistance", SetVehiclesLODDistance},
+        {"setPedsLODDistance", SetPedsLODDistance},
+        {"setFogDistance", SetFogDistance},
+        {"setSunColor", SetSunColor},
+        {"setSunSize", SetSunSize},
+        {"setAircraftMaxHeight", SetAircraftMaxHeight},
+        {"setAircraftMaxVelocity", SetAircraftMaxVelocity},
+        {"setOcclusionsEnabled", SetOcclusionsEnabled},
+        {"setBirdsEnabled", SetBirdsEnabled},
+        {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
+        {"setMoonSize", SetMoonSize},
+        {"setFPSLimit", SetFPSLimit},
+        {"removeWorldModel", RemoveWorldBuilding},
+        {"restoreAllWorldModels", RestoreWorldBuildings},
+        {"restoreWorldModel", RestoreWorldBuilding},
+        {"createSWATRope", CreateSWATRope},
+        {"createExplosion", CreateExplosion},
+
+        // World reset funcs
+        {"resetSkyGradient", ResetSkyGradient},
+        {"resetHeatHaze", ResetHeatHaze},
+        {"resetWindVelocity", ResetWindVelocity},
+        {"resetRainLevel", ResetRainLevel},
+        {"resetFarClipDistance", ResetFarClipDistance},
+        {"resetNearClipDistance", ResetNearClipDistance},
+        {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
+        {"resetPedsLODDistance", ResetPedsLODDistance},
+        {"resetFogDistance", ResetFogDistance},
+        {"resetSunColor", ResetSunColor},
+        {"resetSunSize", ResetSunSize},
+        {"resetMoonSize", ResetMoonSize},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
+}
+
+int CLuaWorldDefs::CreateExplosion(lua_State* luaVM)
 {
     //  bool createExplosion ( float x, float y, float z, int type [, bool makeSound = true, float camShake = -1.0, bool damaging = true ] )
     CVector vecPosition;
@@ -46,7 +150,7 @@ int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetTime_(lua_State* luaVM)
+int CLuaWorldDefs::GetTime(lua_State* luaVM)
 {
     // Get the time
     unsigned char ucHour, ucMinute;
@@ -63,7 +167,7 @@ int CLuaFunctionDefs::GetTime_(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetGroundPosition(lua_State* luaVM)
+int CLuaWorldDefs::GetGroundPosition(lua_State* luaVM)
 {
     //  float getGroundPosition ( float x, float y, float z )
     CVector vecStart;
@@ -86,7 +190,7 @@ int CLuaFunctionDefs::GetGroundPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetRoofPosition(lua_State* luaVM)
+int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
 {
     //  float getRoofPosition ( float x, float y, float z )
     CVector vecStart;
@@ -98,7 +202,7 @@ int CLuaFunctionDefs::GetRoofPosition(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     // Get the ground position and return it
-    bool bOutResult;
+    bool  bOutResult;
     float fRoof = g_pGame->GetWorld()->FindRoofZFor3DCoord(&vecStart, &bOutResult);
     if (bOutResult)
     {
@@ -111,7 +215,7 @@ int CLuaFunctionDefs::GetRoofPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ProcessLineOfSight(lua_State* luaVM)
+int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
 {
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
     //  float endZ,
@@ -217,7 +321,7 @@ int CLuaFunctionDefs::ProcessLineOfSight(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::IsLineOfSightClear(lua_State* luaVM)
+int CLuaWorldDefs::IsLineOfSightClear(lua_State* luaVM)
 {
     // bool isLineOfSightClear ( float startX,
     //    float startY,
@@ -267,7 +371,7 @@ int CLuaFunctionDefs::IsLineOfSightClear(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetWorldFromScreenPosition(lua_State* luaVM)
+int CLuaWorldDefs::GetWorldFromScreenPosition(lua_State* luaVM)
 {
     //  float, float, float getWorldFromScreenPosition ( float x, float y, float depth )
     CVector vecScreen;
@@ -293,7 +397,7 @@ int CLuaFunctionDefs::GetWorldFromScreenPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetScreenFromWorldPosition(lua_State* luaVM)
+int CLuaWorldDefs::GetScreenFromWorldPosition(lua_State* luaVM)
 {
     //  float float getScreenFromWorldPosition ( float x, float y, float z, [ float edgeTolerance=0, bool relative=true ] )
     CVector vecWorld;
@@ -323,7 +427,7 @@ int CLuaFunctionDefs::GetScreenFromWorldPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetWeather(lua_State* luaVM)
+int CLuaWorldDefs::GetWeather(lua_State* luaVM)
 {
     unsigned char ucWeather, ucWeatherBlendingTo;
     if (CStaticFunctionDefinitions::GetWeather(ucWeather, ucWeatherBlendingTo))
@@ -342,7 +446,7 @@ int CLuaFunctionDefs::GetWeather(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetZoneName(lua_State* luaVM)
+int CLuaWorldDefs::GetZoneName(lua_State* luaVM)
 {
     //  string getZoneName ( float x, float y, float z, [bool citiesonly=false] )
     CVector vecPosition;
@@ -368,7 +472,7 @@ int CLuaFunctionDefs::GetZoneName(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetGravity(lua_State* luaVM)
+int CLuaWorldDefs::GetGravity(lua_State* luaVM)
 {
     float fGravity;
     if (CStaticFunctionDefinitions::GetGravity(fGravity))
@@ -381,7 +485,7 @@ int CLuaFunctionDefs::GetGravity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetGameSpeed(lua_State* luaVM)
+int CLuaWorldDefs::GetGameSpeed(lua_State* luaVM)
 {
     float fSpeed;
     if (CStaticFunctionDefinitions::GetGameSpeed(fSpeed))
@@ -394,7 +498,7 @@ int CLuaFunctionDefs::GetGameSpeed(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetMinuteDuration(lua_State* luaVM)
+int CLuaWorldDefs::GetMinuteDuration(lua_State* luaVM)
 {
     unsigned long ulDelay;
     if (CStaticFunctionDefinitions::GetMinuteDuration(ulDelay))
@@ -407,7 +511,7 @@ int CLuaFunctionDefs::GetMinuteDuration(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetWaveHeight(lua_State* luaVM)
+int CLuaWorldDefs::GetWaveHeight(lua_State* luaVM)
 {
     float fHeight;
     if (CStaticFunctionDefinitions::GetWaveHeight(fHeight))
@@ -420,7 +524,7 @@ int CLuaFunctionDefs::GetWaveHeight(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::IsGarageOpen(lua_State* luaVM)
+int CLuaWorldDefs::IsGarageOpen(lua_State* luaVM)
 {
     //  bool isGarageOpen ( int garageID )
     int iGarageID;
@@ -445,7 +549,7 @@ int CLuaFunctionDefs::IsGarageOpen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetGaragePosition(lua_State* luaVM)
+int CLuaWorldDefs::GetGaragePosition(lua_State* luaVM)
 {
     //  float, float, float getGaragePosition ( int garageID )
     int iGarageID;
@@ -472,7 +576,7 @@ int CLuaFunctionDefs::GetGaragePosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetGarageSize(lua_State* luaVM)
+int CLuaWorldDefs::GetGarageSize(lua_State* luaVM)
 {
     //  float, float, float getGarageSize ( int garageID )
     int iGarageID;
@@ -501,7 +605,7 @@ int CLuaFunctionDefs::GetGarageSize(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetGarageBoundingBox(lua_State* luaVM)
+int CLuaWorldDefs::GetGarageBoundingBox(lua_State* luaVM)
 {
     //  float, float, float, float getGarageBoundingBox ( int garageID )
     int iGarageID;
@@ -532,25 +636,25 @@ int CLuaFunctionDefs::GetGarageBoundingBox(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetTrafficLightState(lua_State* luaVM)
+int CLuaWorldDefs::GetTrafficLightState(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetTrafficLightState());
     return 1;
 }
 
-int CLuaFunctionDefs::AreTrafficLightsLocked(lua_State* luaVM)
+int CLuaWorldDefs::AreTrafficLightsLocked(lua_State* luaVM)
 {
     lua_pushboolean(luaVM, g_pMultiplayer->GetTrafficLightsLocked());
     return 1;
 }
 
-int CLuaFunctionDefs::GetBlurLevel(lua_State* luaVM)
+int CLuaWorldDefs::GetBlurLevel(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pGame->GetBlurLevel());
     return 1;
 }
 
-int CLuaFunctionDefs::SetBlurLevel(lua_State* luaVM)
+int CLuaWorldDefs::SetBlurLevel(lua_State* luaVM)
 {
     //  bool setBlurLevel ( int level )
     int iLevel;
@@ -574,14 +678,14 @@ int CLuaFunctionDefs::SetBlurLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetBlurLevel(lua_State* luaVM)
+int CLuaWorldDefs::ResetBlurLevel(lua_State* luaVM)
 {
     g_pGame->SetBlurLevel(36);
     lua_pushboolean(luaVM, true);
     return 1;
 }
 
-int CLuaFunctionDefs::SetTime(lua_State* luaVM)
+int CLuaWorldDefs::SetTime(lua_State* luaVM)
 {
     //  bool setTime ( int hour, int minute )
     int iHour;
@@ -608,7 +712,7 @@ int CLuaFunctionDefs::SetTime(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetSkyGradient(lua_State* luaVM)
+int CLuaWorldDefs::GetSkyGradient(lua_State* luaVM)
 {
     unsigned char ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
     CStaticFunctionDefinitions::GetSkyGradient(ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB);
@@ -622,7 +726,7 @@ int CLuaFunctionDefs::GetSkyGradient(lua_State* luaVM)
     return 6;
 }
 
-int CLuaFunctionDefs::SetSkyGradient(lua_State* luaVM)
+int CLuaWorldDefs::SetSkyGradient(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
@@ -653,7 +757,7 @@ int CLuaFunctionDefs::SetSkyGradient(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetSkyGradient(lua_State* luaVM)
+int CLuaWorldDefs::ResetSkyGradient(lua_State* luaVM)
 {
     if (CStaticFunctionDefinitions::ResetSkyGradient())
     {
@@ -664,7 +768,7 @@ int CLuaFunctionDefs::ResetSkyGradient(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetHeatHaze(lua_State* luaVM)
+int CLuaWorldDefs::GetHeatHaze(lua_State* luaVM)
 {
     SHeatHazeSettings settings;
     CStaticFunctionDefinitions::GetHeatHaze(settings);
@@ -681,7 +785,7 @@ int CLuaFunctionDefs::GetHeatHaze(lua_State* luaVM)
     return 9;
 }
 
-int CLuaFunctionDefs::SetHeatHaze(lua_State* luaVM)
+int CLuaWorldDefs::SetHeatHaze(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
@@ -713,7 +817,7 @@ int CLuaFunctionDefs::SetHeatHaze(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetHeatHaze(lua_State* luaVM)
+int CLuaWorldDefs::ResetHeatHaze(lua_State* luaVM)
 {
     if (CStaticFunctionDefinitions::ResetHeatHaze())
     {
@@ -724,7 +828,7 @@ int CLuaFunctionDefs::ResetHeatHaze(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetWeather(lua_State* luaVM)
+int CLuaWorldDefs::SetWeather(lua_State* luaVM)
 {
     //  bool setWeather ( int weatherID )
     int iWeatherID;
@@ -749,7 +853,7 @@ int CLuaFunctionDefs::SetWeather(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetWeatherBlended(lua_State* luaVM)
+int CLuaWorldDefs::SetWeatherBlended(lua_State* luaVM)
 {
     //  bool setWeatherBlended ( int weatherID )
     int iWeatherID;
@@ -774,7 +878,7 @@ int CLuaFunctionDefs::SetWeatherBlended(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetGravity(lua_State* luaVM)
+int CLuaWorldDefs::SetGravity(lua_State* luaVM)
 {
     //  bool setGravity ( float level )
     float fGravity;
@@ -797,7 +901,7 @@ int CLuaFunctionDefs::SetGravity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetGameSpeed(lua_State* luaVM)
+int CLuaWorldDefs::SetGameSpeed(lua_State* luaVM)
 {
     //  bool setGameSpeed ( float value )
     float fSpeed;
@@ -820,7 +924,7 @@ int CLuaFunctionDefs::SetGameSpeed(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetMinuteDuration(lua_State* luaVM)
+int CLuaWorldDefs::SetMinuteDuration(lua_State* luaVM)
 {
     //  bool setMinuteDuration ( int milliseconds )
     int iMilliseconds;
@@ -843,7 +947,7 @@ int CLuaFunctionDefs::SetMinuteDuration(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetWaveHeight(lua_State* luaVM)
+int CLuaWorldDefs::SetWaveHeight(lua_State* luaVM)
 {
     //  bool setWaveHeight ( float height )
     float fHeight;
@@ -866,7 +970,7 @@ int CLuaFunctionDefs::SetWaveHeight(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetGarageOpen(lua_State* luaVM)
+int CLuaWorldDefs::SetGarageOpen(lua_State* luaVM)
 {
     //  bool setGarageOpen ( int garageID, bool open )
     int  iGarageID;
@@ -891,7 +995,7 @@ int CLuaFunctionDefs::SetGarageOpen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetJetpackMaxHeight(lua_State* luaVM)
+int CLuaWorldDefs::SetJetpackMaxHeight(lua_State* luaVM)
 {
     //  bool setJetpackMaxHeight ( float Height )
     float fHeight;
@@ -914,7 +1018,7 @@ int CLuaFunctionDefs::SetJetpackMaxHeight(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::RemoveWorldBuilding(lua_State* luaVM)
+int CLuaWorldDefs::RemoveWorldBuilding(lua_State* luaVM)
 {
     int              iModelToRemove;
     CVector          vecPosition;
@@ -950,7 +1054,7 @@ int CLuaFunctionDefs::RemoveWorldBuilding(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::RestoreWorldBuildings(lua_State* luaVM)
+int CLuaWorldDefs::RestoreWorldBuildings(lua_State* luaVM)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -970,7 +1074,7 @@ int CLuaFunctionDefs::RestoreWorldBuildings(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::RestoreWorldBuilding(lua_State* luaVM)
+int CLuaWorldDefs::RestoreWorldBuilding(lua_State* luaVM)
 {
     int              iModelToRestore;
     CVector          vecPosition;
@@ -1006,7 +1110,7 @@ int CLuaFunctionDefs::RestoreWorldBuilding(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetAircraftMaxHeight(lua_State* luaVM)
+int CLuaWorldDefs::SetAircraftMaxHeight(lua_State* luaVM)
 {
     //  bool setAircraftMaxHeight ( float Height )
     float fHeight;
@@ -1029,7 +1133,7 @@ int CLuaFunctionDefs::SetAircraftMaxHeight(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetAircraftMaxVelocity(lua_State* luaVM)
+int CLuaWorldDefs::SetAircraftMaxVelocity(lua_State* luaVM)
 {
     //  bool setAircraftMaxVelocity ( float fVelocity )
     float fVelocity;
@@ -1052,7 +1156,7 @@ int CLuaFunctionDefs::SetAircraftMaxVelocity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetOcclusionsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
 {
     //  bool setOcclusionsEnabled ( bool enabled )
     bool bEnabled;
@@ -1075,7 +1179,7 @@ int CLuaFunctionDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::IsWorldSpecialPropertyEnabled(lua_State* luaVM)
+int CLuaWorldDefs::IsWorldSpecialPropertyEnabled(lua_State* luaVM)
 {
     //  bool isWorldSpecialPropertyEnabled ( string propname )
     SString strPropName;
@@ -1096,7 +1200,7 @@ int CLuaFunctionDefs::IsWorldSpecialPropertyEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetWorldSpecialPropertyEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetWorldSpecialPropertyEnabled(lua_State* luaVM)
 {
     //  bool setWorldSpecialPropertyEnabled ( string propname, bool enable )
     SString strPropName;
@@ -1121,7 +1225,7 @@ int CLuaFunctionDefs::SetWorldSpecialPropertyEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetCloudsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)
 {
     //  bool setCloudsEnabled ( bool enabled )
     bool bEnabled;
@@ -1144,37 +1248,37 @@ int CLuaFunctionDefs::SetCloudsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetJetpackMaxHeight(lua_State* luaVM)
+int CLuaWorldDefs::GetJetpackMaxHeight(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pGame->GetWorld()->GetJetpackMaxHeight());
     return 1;
 }
 
-int CLuaFunctionDefs::GetAircraftMaxHeight(lua_State* luaVM)
+int CLuaWorldDefs::GetAircraftMaxHeight(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pGame->GetWorld()->GetAircraftMaxHeight());
     return 1;
 }
 
-int CLuaFunctionDefs::GetAircraftMaxVelocity(lua_State* luaVM)
+int CLuaWorldDefs::GetAircraftMaxVelocity(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pGame->GetWorld()->GetAircraftMaxVelocity());
     return 1;
 }
 
-int CLuaFunctionDefs::GetOcclusionsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::GetOcclusionsEnabled(lua_State* luaVM)
 {
     lua_pushboolean(luaVM, g_pGame->GetWorld()->GetOcclusionsEnabled());
     return 1;
 }
 
-int CLuaFunctionDefs::GetCloudsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::GetCloudsEnabled(lua_State* luaVM)
 {
     lua_pushboolean(luaVM, CStaticFunctionDefinitions::GetCloudsEnabled());
     return 1;
 }
 
-int CLuaFunctionDefs::SetTrafficLightState(lua_State* luaVM)
+int CLuaWorldDefs::SetTrafficLightState(lua_State* luaVM)
 {
     //  bool setTrafficLightState ( int state )
     //  bool setTrafficLightState ( string state )
@@ -1246,7 +1350,7 @@ int CLuaFunctionDefs::SetTrafficLightState(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetTrafficLightsLocked(lua_State* luaVM)
+int CLuaWorldDefs::SetTrafficLightsLocked(lua_State* luaVM)
 {
     //  bool setTrafficLightsLocked ( bool bLocked )
     bool bLocked;
@@ -1269,7 +1373,7 @@ int CLuaFunctionDefs::SetTrafficLightsLocked(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetWindVelocity(lua_State* luaVM)
+int CLuaWorldDefs::GetWindVelocity(lua_State* luaVM)
 {
     float fX, fY, fZ;
 
@@ -1285,7 +1389,7 @@ int CLuaFunctionDefs::GetWindVelocity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetWindVelocity(lua_State* luaVM)
+int CLuaWorldDefs::SetWindVelocity(lua_State* luaVM)
 {
     //  bool setWindVelocity ( float velocityX, float velocityY, float velocityZ )
     CVector vecVelocity;
@@ -1308,7 +1412,7 @@ int CLuaFunctionDefs::SetWindVelocity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetWindVelocity(lua_State* luaVM)
+int CLuaWorldDefs::ResetWindVelocity(lua_State* luaVM)
 {
     if (CStaticFunctionDefinitions::RestoreWindVelocity())
     {
@@ -1320,13 +1424,13 @@ int CLuaFunctionDefs::ResetWindVelocity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetInteriorSoundsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::GetInteriorSoundsEnabled(lua_State* luaVM)
 {
     lua_pushboolean(luaVM, g_pMultiplayer->GetInteriorSoundsEnabled());
     return 1;
 }
 
-int CLuaFunctionDefs::SetInteriorSoundsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetInteriorSoundsEnabled(lua_State* luaVM)
 {
     //  bool setInteriorSoundsEnabled ( bool enabled )
     bool bEnabled;
@@ -1348,7 +1452,7 @@ int CLuaFunctionDefs::SetInteriorSoundsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetInteriorFurnitureEnabled(lua_State* luaVM)
+int CLuaWorldDefs::GetInteriorFurnitureEnabled(lua_State* luaVM)
 {
     //  bool getInteriorFurnitureEnabled ( int roomId )
     char cRoomId;
@@ -1371,7 +1475,7 @@ int CLuaFunctionDefs::GetInteriorFurnitureEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetInteriorFurnitureEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetInteriorFurnitureEnabled(lua_State* luaVM)
 {
     //  bool setInteriorFurnitureEnabled ( int roomId, bool enabled )
     char cRoomId;
@@ -1397,13 +1501,13 @@ int CLuaFunctionDefs::SetInteriorFurnitureEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetRainLevel(lua_State* luaVM)
+int CLuaWorldDefs::GetRainLevel(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pGame->GetWeather()->GetAmountOfRain());
     return 1;
 }
 
-int CLuaFunctionDefs::SetRainLevel(lua_State* luaVM)
+int CLuaWorldDefs::SetRainLevel(lua_State* luaVM)
 {
     //  bool setRainLevel ( float amount )
     float fRainLevel;
@@ -1428,7 +1532,7 @@ int CLuaFunctionDefs::SetRainLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetRainLevel(lua_State* luaVM)
+int CLuaWorldDefs::ResetRainLevel(lua_State* luaVM)
 {
     g_pGame->GetWeather()->ResetAmountOfRain();
 
@@ -1436,13 +1540,13 @@ int CLuaFunctionDefs::ResetRainLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetFarClipDistance(lua_State* luaVM)
+int CLuaWorldDefs::GetFarClipDistance(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetFarClipDistance());
     return 1;
 }
 
-int CLuaFunctionDefs::SetFarClipDistance(lua_State* luaVM)
+int CLuaWorldDefs::SetFarClipDistance(lua_State* luaVM)
 {
     //  bool setFarClipDistance ( float distance )
     float fDistance;
@@ -1464,7 +1568,7 @@ int CLuaFunctionDefs::SetFarClipDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetPedTargetingMarkerEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetPedTargetingMarkerEnabled(lua_State* luaVM)
 {
     //  bool setPedTargetingMarkerEnabled ( enabled )
     bool bEnabled;
@@ -1486,14 +1590,14 @@ int CLuaFunctionDefs::SetPedTargetingMarkerEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::IsPedTargetingMarkerEnabled(lua_State* luaVM)
+int CLuaWorldDefs::IsPedTargetingMarkerEnabled(lua_State* luaVM)
 {
     //  bool isPedTargetingMarkerEnabled ( )
     lua_pushboolean(luaVM, g_pMultiplayer->IsPedTargetingMarkerEnabled());
     return 1;
 }
 
-int CLuaFunctionDefs::ResetFarClipDistance(lua_State* luaVM)
+int CLuaWorldDefs::ResetFarClipDistance(lua_State* luaVM)
 {
     g_pMultiplayer->RestoreFarClipDistance();
 
@@ -1501,13 +1605,13 @@ int CLuaFunctionDefs::ResetFarClipDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetNearClipDistance(lua_State* luaVM)
+int CLuaWorldDefs::GetNearClipDistance(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetNearClipDistance());
     return 1;
 }
 
-int CLuaFunctionDefs::SetNearClipDistance(lua_State* luaVM)
+int CLuaWorldDefs::SetNearClipDistance(lua_State* luaVM)
 {
     //  bool setNearClipDistance ( float distance )
     float fDistance;
@@ -1529,7 +1633,7 @@ int CLuaFunctionDefs::SetNearClipDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetNearClipDistance(lua_State* luaVM)
+int CLuaWorldDefs::ResetNearClipDistance(lua_State* luaVM)
 {
     g_pMultiplayer->RestoreNearClipDistance();
 
@@ -1537,7 +1641,7 @@ int CLuaFunctionDefs::ResetNearClipDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetVehiclesLODDistance(lua_State* luaVM)
+int CLuaWorldDefs::GetVehiclesLODDistance(lua_State* luaVM)
 {
     //  float float getVehiclesLODDistance ( )
     float fVehiclesDistance, fTrainsPlanesDistance;
@@ -1548,7 +1652,7 @@ int CLuaFunctionDefs::GetVehiclesLODDistance(lua_State* luaVM)
     return 2;
 }
 
-int CLuaFunctionDefs::SetVehiclesLODDistance(lua_State* luaVM)
+int CLuaWorldDefs::SetVehiclesLODDistance(lua_State* luaVM)
 {
     //  bool setVehiclesLODDistance ( float vehiclesDistance, float trainsAndPlanesDistance = vehiclesDistance * 2.14 )
     float fVehiclesDistance, fTrainsPlanesDistance;
@@ -1573,54 +1677,54 @@ int CLuaFunctionDefs::SetVehiclesLODDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetVehiclesLODDistance(lua_State* luaVM)
+int CLuaWorldDefs::ResetVehiclesLODDistance(lua_State* luaVM)
 {
     g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
     lua_pushboolean(luaVM, true);
     return 1;
 }
 
-int CLuaFunctionDefs::GetPedsLODDistance(lua_State* luaVM) 
-{  
+int CLuaWorldDefs::GetPedsLODDistance(lua_State* luaVM)
+{
     lua_pushnumber(luaVM, g_pGame->GetSettings()->GetPedsLODDistance());
-    return 1; 
-}
- 
-int CLuaFunctionDefs::SetPedsLODDistance(lua_State* luaVM) 
-{ 
-    float fPedsDistance; 
- 
-    CScriptArgReader argStream(luaVM); 
-    argStream.ReadNumber(fPedsDistance); 
- 
-    if (!argStream.HasErrors()) 
-    {
-        fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f);
-        g_pGame->GetSettings()->SetPedsLODDistance(fPedsDistance, true); 
-        lua_pushboolean(luaVM, true);
-        return 1; 
-    } 
-    else 
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage()); 
- 
-    lua_pushboolean(luaVM, false); 
-    return 1; 
-}
- 
-int CLuaFunctionDefs::ResetPedsLODDistance(lua_State* luaVM) 
-{ 
-    g_pGame->GetSettings()->ResetPedsLODDistance(true); 
-    lua_pushboolean(luaVM, true); 
-    return 1; 
+    return 1;
 }
 
-int CLuaFunctionDefs::GetFogDistance(lua_State* luaVM)
+int CLuaWorldDefs::SetPedsLODDistance(lua_State* luaVM)
+{
+    float fPedsDistance;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(fPedsDistance);
+
+    if (!argStream.HasErrors())
+    {
+        fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f);
+        g_pGame->GetSettings()->SetPedsLODDistance(fPedsDistance, true);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::ResetPedsLODDistance(lua_State* luaVM)
+{
+    g_pGame->GetSettings()->ResetPedsLODDistance(true);
+    lua_pushboolean(luaVM, true);
+    return 1;
+}
+
+int CLuaWorldDefs::GetFogDistance(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetFogDistance());
     return 1;
 }
 
-int CLuaFunctionDefs::SetFogDistance(lua_State* luaVM)
+int CLuaWorldDefs::SetFogDistance(lua_State* luaVM)
 {
     //  bool setFogDistance ( float distance )
     float fDistance;
@@ -1642,7 +1746,7 @@ int CLuaFunctionDefs::SetFogDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetFogDistance(lua_State* luaVM)
+int CLuaWorldDefs::ResetFogDistance(lua_State* luaVM)
 {
     g_pMultiplayer->RestoreFogDistance();
 
@@ -1650,7 +1754,7 @@ int CLuaFunctionDefs::ResetFogDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetSunColor(lua_State* luaVM)
+int CLuaWorldDefs::GetSunColor(lua_State* luaVM)
 {
     unsigned char ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
 
@@ -1666,7 +1770,7 @@ int CLuaFunctionDefs::GetSunColor(lua_State* luaVM)
     return 6;
 }
 
-int CLuaFunctionDefs::SetSunColor(lua_State* luaVM)
+int CLuaWorldDefs::SetSunColor(lua_State* luaVM)
 {
     //  bool setSunColor ( int coreRed, int coreGreen, int coreBlue, int coronaRed, int coronaGreen, int coronaBlue )
     int iCoreRed;
@@ -1695,7 +1799,7 @@ int CLuaFunctionDefs::SetSunColor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetSunColor(lua_State* luaVM)
+int CLuaWorldDefs::ResetSunColor(lua_State* luaVM)
 {
     g_pMultiplayer->ResetSunColor();
 
@@ -1703,13 +1807,13 @@ int CLuaFunctionDefs::ResetSunColor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetSunSize(lua_State* luaVM)
+int CLuaWorldDefs::GetSunSize(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetSunSize());
     return 1;
 }
 
-int CLuaFunctionDefs::SetSunSize(lua_State* luaVM)
+int CLuaWorldDefs::SetSunSize(lua_State* luaVM)
 {
     //  bool setSunSize ( float size )
     float fSize;
@@ -1731,7 +1835,7 @@ int CLuaFunctionDefs::SetSunSize(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ResetSunSize(lua_State* luaVM)
+int CLuaWorldDefs::ResetSunSize(lua_State* luaVM)
 {
     g_pMultiplayer->ResetSunSize();
 
@@ -1739,7 +1843,7 @@ int CLuaFunctionDefs::ResetSunSize(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::CreateSWATRope(lua_State* luaVM)
+int CLuaWorldDefs::CreateSWATRope(lua_State* luaVM)
 {
     CVector          vecPosition;
     DWORD            dwDuration = 0;
@@ -1763,7 +1867,7 @@ int CLuaFunctionDefs::CreateSWATRope(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetBirdsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::SetBirdsEnabled(lua_State* luaVM)
 {
     bool             bEnabled = false;
     CScriptArgReader argStream(luaVM);
@@ -1785,7 +1889,7 @@ int CLuaFunctionDefs::SetBirdsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetBirdsEnabled(lua_State* luaVM)
+int CLuaWorldDefs::GetBirdsEnabled(lua_State* luaVM)
 {
     if (CStaticFunctionDefinitions::GetBirdsEnabled())
     {
@@ -1796,7 +1900,7 @@ int CLuaFunctionDefs::GetBirdsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetMoonSize(lua_State* luaVM)
+int CLuaWorldDefs::SetMoonSize(lua_State* luaVM)
 {
     int iSize;
 
@@ -1818,20 +1922,20 @@ int CLuaFunctionDefs::SetMoonSize(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetMoonSize(lua_State* luaVM)
+int CLuaWorldDefs::GetMoonSize(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetMoonSize());
     return 1;
 }
 
-int CLuaFunctionDefs::ResetMoonSize(lua_State* luaVM)
+int CLuaWorldDefs::ResetMoonSize(lua_State* luaVM)
 {
     g_pMultiplayer->ResetMoonSize();
     lua_pushboolean(luaVM, true);
     return 1;
 }
 
-int CLuaFunctionDefs::SetFPSLimit(lua_State* luaVM)
+int CLuaWorldDefs::SetFPSLimit(lua_State* luaVM)
 {
     // bool setFPSLimit ( int fpsLimit )
     int iLimit;
@@ -1854,255 +1958,13 @@ int CLuaFunctionDefs::SetFPSLimit(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetFPSLimit(lua_State* luaVM)
+int CLuaWorldDefs::GetFPSLimit(lua_State* luaVM)
 {
     int iLimit;
     if (CStaticFunctionDefinitions::GetFPSLimit(iLimit))
     {
         lua_pushnumber(luaVM, iLimit);
         return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-// Call a function on a remote server
-int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
-{
-    //  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string
-    //  postData, bool bPostBinary, arguments... ] ) bool fetchRemote ( string URL [, table options ], callback callbackFunction[, table callbackArguments ] )
-    CScriptArgReader    argStream(luaVM);
-    SString             strURL;
-    SHttpRequestOptions httpRequestOptions;
-    SString             strQueueName;
-    CLuaFunctionRef     iLuaFunction;
-    CLuaArguments       callbackArguments;
-
-    argStream.ReadString(strURL);
-    if (!argStream.NextIsTable())
-    {
-        if (argStream.NextIsString())
-            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used");
-        argStream.ReadIfNextIsString(strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
-        argStream.ReadIfNextIsNumber(httpRequestOptions.uiConnectionAttempts, 10);
-        if (argStream.NextIsNumber())
-            MinClientReqCheck(argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used");
-        argStream.ReadIfNextIsNumber(httpRequestOptions.uiConnectTimeoutMs, 10000);
-        argStream.ReadFunction(iLuaFunction);
-        argStream.ReadString(httpRequestOptions.strPostData, "");
-        argStream.ReadBool(httpRequestOptions.bPostBinary, false);
-        argStream.ReadLuaArguments(callbackArguments);
-        argStream.ReadFunctionComplete();
-
-        if (!argStream.HasErrors())
-        {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                httpRequestOptions.bIsLegacy = true;
-                CRemoteCall* pRemoteCall = g_pClientGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
-                
-                lua_pushuserdata(luaVM, pRemoteCall);
-                return 1;
-            }
-        }
-    }
-    else
-    {
-        CStringMap optionsMap;
-
-        argStream.ReadStringMap(optionsMap);
-        argStream.ReadFunction(iLuaFunction);
-        if (argStream.NextIsTable())
-            argStream.ReadLuaArgumentsTable(callbackArguments);
-        argStream.ReadFunctionComplete();
-
-        optionsMap.ReadNumber("connectionAttempts", httpRequestOptions.uiConnectionAttempts, 10);
-        optionsMap.ReadNumber("connectTimeout", httpRequestOptions.uiConnectTimeoutMs, 10000);
-        optionsMap.ReadString("method", httpRequestOptions.strRequestMethod, "");
-        optionsMap.ReadString("queueName", strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
-        optionsMap.ReadString("postData", httpRequestOptions.strPostData, "");
-        optionsMap.ReadBool("postIsBinary", httpRequestOptions.bPostBinary, false);
-        optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
-        optionsMap.ReadString("username", httpRequestOptions.strUsername, "");
-        optionsMap.ReadString("password", httpRequestOptions.strPassword, "");
-        optionsMap.ReadStringMap("headers", httpRequestOptions.requestHeaders);
-        optionsMap.ReadStringMap("formFields", httpRequestOptions.formFields);
-
-        if (httpRequestOptions.formFields.empty())
-            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
-        else
-            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS, "'formFields' is being used");
-
-        if (!argStream.HasErrors())
-        {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                CRemoteCall* pRemoteCall = g_pClientGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
-                
-                lua_pushuserdata(luaVM, pRemoteCall);
-                return 1;
-            }
-        }
-    }
-
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-// table getRemoteRequests([resource theResource = nil])
-int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
-{
-    CScriptArgReader argStream(luaVM);
-    CResource*       pResource = nullptr;
-    CLuaMain*        pLuaMain = nullptr;
-    int              iIndex = 0;
-
-    argStream.ReadUserData(pResource, NULL);
-
-    // Grab virtual machine
-    if (pResource)
-        pLuaMain = pResource->GetVM();
-
-    lua_newtable(luaVM);
-    for (const auto& request : g_pClientGame->GetRemoteCalls()->GetCalls())
-    {
-        if(!pLuaMain || request->GetVM() == pLuaMain)
-        {
-            lua_pushnumber(luaVM, ++iIndex);
-            lua_pushuserdata(luaVM, request);
-            lua_settable(luaVM, -3);
-        }
-    }
-
-    return 1;
-}
-
-// table getRemoteRequestInfo(element theRequest[, number postDataLength = 0[, bool includeHeaders = false]])
-int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
-{
-    CScriptArgReader argStream(luaVM);
-    CLuaArguments    info, requestedHeaders;
-    CRemoteCall*     pRemoteCall = nullptr;
-    CResource*       pThisResource = g_pClientGame->GetResourceManager()->GetResourceFromLuaState(luaVM);
-    int              iPostDataLength = 0;
-    bool             bIncludeHeaders = false;
-
-    argStream.ReadUserData(pRemoteCall);
-    argStream.ReadNumber(iPostDataLength, 0);
-    argStream.ReadBool(bIncludeHeaders, false);
-
-    if (!argStream.HasErrors())
-    {
-        CResource* pResource = nullptr;
-        if (pRemoteCall->GetVM())
-            pResource = pRemoteCall->GetVM()->GetResource();
-        
-        bool bExtendedInfo = (pResource == pThisResource);
-        
-        info.PushString("type");
-        info.PushString((pRemoteCall->IsFetch() ? "fetch" : "call"));
-
-        // remove query_string from url when bExtendedInfo isn't set
-        SString sURL = pRemoteCall->GetURL();
-
-        if (!bExtendedInfo)
-            sURL = sURL.ReplaceI("%3F", "?").Replace("#", "?").SplitLeft("?");
-
-        info.PushString("url");
-        info.PushString(sURL);
-
-        info.PushString("queue");
-        info.PushString(pRemoteCall->GetQueueName());
-        
-        info.PushString("resource");
-        
-        if (pResource)
-            info.PushResource(pResource);
-        else
-            info.PushBoolean(false);
-
-        info.PushString("start");
-        info.PushNumber(static_cast<double>(pRemoteCall->GetStartTime()));
-
-        if (bExtendedInfo)
-        {
-            if (iPostDataLength == -1 || iPostDataLength > 0)
-            {
-                info.PushString("postData");
-                const SString& sPostData = pRemoteCall->GetOptions().strPostData;
-                if (iPostDataLength > 0 && iPostDataLength < static_cast<int>(sPostData.length()))
-                    info.PushString(sPostData.SubStr(0, iPostDataLength));
-                else
-                    info.PushString(sPostData);
-            }
-
-            // requested headers
-            if (bIncludeHeaders)
-            {
-                info.PushString("headers");
-
-                for (auto const& header : pRemoteCall->GetOptions().requestHeaders)
-                {
-                    requestedHeaders.PushString(header.first);
-                    requestedHeaders.PushString(header.second);
-                }
-
-                info.PushTable(&requestedHeaders);
-            }
-        }
-
-        info.PushString("method");
-        info.PushString((pRemoteCall->GetOptions().strRequestMethod.length() >= 1 ? pRemoteCall->GetOptions().strRequestMethod.ToUpper().c_str() : "POST"));
-
-        info.PushString("connectionAttempts");
-        info.PushNumber(pRemoteCall->GetOptions().uiConnectionAttempts);
-
-        info.PushString("connectionTimeout");
-        info.PushNumber(pRemoteCall->GetOptions().uiConnectTimeoutMs);
-
-        // download info
-        const SDownloadStatus downloadInfo = pRemoteCall->GetDownloadStatus();
-
-        info.PushString("bytesReceived");
-        info.PushNumber(downloadInfo.uiBytesReceived);
-
-        info.PushString("bytesTotal");
-        info.PushNumber(downloadInfo.uiContentLength);
-
-        info.PushString("currentAttempt");
-        info.PushNumber(downloadInfo.uiAttemptNumber);
-
-        info.PushAsTable(luaVM);
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-// bool abortRemoteRequest(element theRequest)
-int CLuaFunctionDefs::AbortRemoteRequest(lua_State* luaVM)
-{
-    CScriptArgReader argStream(luaVM);
-    CRemoteCall*     pRemoteCall = nullptr;
-
-    argStream.ReadUserData(pRemoteCall);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pRemoteCall->CancelDownload());
-        g_pClientGame->GetRemoteCalls()->Remove(pRemoteCall);
-        return 1;
-    }
-    else
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
 
     lua_pushboolean(luaVM, false);
