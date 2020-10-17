@@ -148,7 +148,6 @@ void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID,
     pItemInfo->sizeInBlocks = usSize;
     pItemInfo->nextInImg = uiNextInImg;
     // TODO CHANGE THIS INFO FOR PREV MODEL
-    pItemInfo->nextInImg = -1;
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)

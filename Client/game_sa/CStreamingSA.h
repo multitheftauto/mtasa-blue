@@ -48,7 +48,7 @@ struct CArchiveInfo
 class CStreamingSA : public CStreaming
 {
 private:
-    static CArchiveInfo* GetArchiveInfo(uint id) { return ms_aAchiveInfo[id]; };
+    static CArchiveInfo* GetArchiveInfo(uint id) { return &ms_aAchiveInfo[id]; };
 public:
     void RequestModel(DWORD dwModelID, DWORD dwFlags);
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
