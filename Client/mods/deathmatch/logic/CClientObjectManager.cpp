@@ -351,6 +351,22 @@ void CClientObjectManager::RestreamObjects(unsigned short usModel)
     }
 }
 
+void CClientObjectManager::RestreamAllObjects()
+{
+    for (uint i = 0; i < m_Objects.size(); i++)
+    {
+        CClientObject* pObject = m_Objects[i];
+
+        // Streamed in and same model ID?
+        if (pObject->IsStreamedIn())
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pObject->StreamOutForABit();
+        }
+    }
+}
+
 void CClientObjectManager::RemoveFromLists(CClientObject* pObject)
 {
     if (m_bCanRemoveFromList)

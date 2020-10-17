@@ -126,6 +126,31 @@ void CClientPedManager::RestreamPeds(unsigned short usModel)
         }
     }
 }
+
+void CClientPedManager::RestreamAllPeds()
+{
+    // Store the affected vehicles
+    CClientPed*                              pPed;
+    std::vector<CClientPed*>::const_iterator iter = IterBegin();
+    for (; iter != IterEnd(); iter++)
+    {
+        pPed = *iter;
+
+        // Streamed in and same vehicle ID?
+        if (pPed->IsStreamedIn())
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pPed->StreamOutForABit();
+            // Hack fix for Players not unloading.
+            if (IS_PLAYER(pPed))
+            {
+                pPed->SetModel(0, true);
+            }
+        }
+    }
+}
+
 void CClientPedManager::RestreamWeapon(unsigned short usModel)
 {
     eWeaponSlot eSlot = (eWeaponSlot)GetWeaponSlotFromModel(usModel);

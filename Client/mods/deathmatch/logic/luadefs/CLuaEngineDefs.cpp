@@ -46,7 +46,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
-        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties}
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineRestreamWorld", EngineRestreamWorld},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1974,5 +1975,24 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 
     pGroup->RestoreDefault();
     lua_pushboolean(luaVM, true);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRestreamWorld(lua_State* luaVM)
+{
+    for (unsigned int uiModelID = 0; uiModelID <= 26316; uiModelID++)
+    {
+        g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
+    }
+    m_pManager->GetObjectManager()->RestreamAllObjects();
+    m_pManager->GetVehicleManager()->RestreamAllVehicles();
+    m_pManager->GetPedManager()->RestreamAllPeds();
+
+    typedef int(__cdecl * Function_ReInitStreaming)();
+    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
+
+    reinitStreaming();
+
+    lua_pushnil(luaVM);
     return 1;
 }

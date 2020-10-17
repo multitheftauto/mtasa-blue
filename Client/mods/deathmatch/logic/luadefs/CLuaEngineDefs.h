@@ -57,6 +57,7 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
+    LUA_DECLARE(EngineRestreamWorld)
 
 private:
     static void AddEngineColClass(lua_State* luaVM);
