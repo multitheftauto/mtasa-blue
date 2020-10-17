@@ -169,7 +169,7 @@ CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
 unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 {
     // Get internal IMG id
-    // By default gta sa uses 5 of 8 IMG archives
+    // By default gta sa uses 6 of 8 IMG archives
     uchar ucArchiveId = -1;
     for (int i = 6; i < 8; i++)
     {

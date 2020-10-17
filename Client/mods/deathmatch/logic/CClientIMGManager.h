@@ -4,7 +4,7 @@
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CClientIMGManager.h
- *  PURPOSE:     .img container odel manager class
+ *  PURPOSE:     .img container manager class
  *
  *****************************************************************************/
 

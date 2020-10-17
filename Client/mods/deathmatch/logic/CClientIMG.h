@@ -4,7 +4,7 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/shared_logic/CClientIMG.h
-*  PURPOSE:     IMG manager class header
+*  PURPOSE:     IMG container class header
 
 *
 *****************************************************************************/
