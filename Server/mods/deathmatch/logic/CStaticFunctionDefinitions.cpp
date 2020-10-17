@@ -24,7 +24,6 @@ static CMapManager*          m_pMapManager;
 static CBlipManager*         m_pBlipManager;
 static CRadarAreaManager*    m_pRadarAreaManager;
 static CTeamManager*         m_pTeamManager;
-static CTrainTrackManager*   m_pTrainTrackManager;
 static CClock*               m_pClock;
 static CEvents*              m_pEvents;
 static CElementDeleter*      m_pElementDeleter;
@@ -35,6 +34,8 @@ static CBanManager*          m_pBanManager;
 static CPedManager*          m_pPedManager;
 static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
+
+static shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \

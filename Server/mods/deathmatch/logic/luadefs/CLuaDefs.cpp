@@ -44,12 +44,13 @@ CElement*                  CLuaDefs::m_pRootElement = NULL;
 CScriptDebugging*          CLuaDefs::m_pScriptDebugging = NULL;
 CVehicleManager*           CLuaDefs::m_pVehicleManager = NULL;
 CTeamManager*              CLuaDefs::m_pTeamManager = NULL;
-CTrainTrackManager*        CLuaDefs::m_pTrainTrackManager = NULL;
 CAccountManager*           CLuaDefs::m_pAccountManager = NULL;
 CColManager*               CLuaDefs::m_pColManager = NULL;
 CResourceManager*          CLuaDefs::m_pResourceManager = NULL;
 CAccessControlListManager* CLuaDefs::m_pACLManager = NULL;
 CMainConfig*               CLuaDefs::m_pMainConfig = NULL;
+
+shared_ptr<CTrainTrackManager> CLuaDefs::m_pTrainTrackManager = NULL;
 
 void CLuaDefs::Initialize(CGame* pGame)
 {

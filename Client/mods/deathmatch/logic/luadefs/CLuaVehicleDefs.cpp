@@ -1367,7 +1367,7 @@ int CLuaVehicleDefs::GetTrainSpeed(lua_State* luaVM)
     return 1;
 }
 
-std::variant<uchar, bool> CLuaVehicleDefs::GetTrainTrack(CClientVehicle* pVehicle)
+std::variant<CClientTrainTrack*, bool> CLuaVehicleDefs::GetTrainTrack(CClientVehicle* pVehicle)
 {
     if (pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN)
         return false;
@@ -2321,11 +2321,8 @@ int CLuaVehicleDefs::SetTrainSpeed(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack)
+bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, CClientTrainTrack* pTrack)
 {
-    if (ucTrack > 3)
-        throw new std::invalid_argument("Invalid track number range (0-3)");
-
     if (pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
@@ -2333,7 +2330,7 @@ bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack)
         return false;
     }
 
-    pVehicle->SetTrainTrack(ucTrack);
+    pVehicle->SetTrainTrack(pTrack);
     return true;
 }
 

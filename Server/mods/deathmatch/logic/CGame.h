@@ -253,7 +253,6 @@ public:
     CCustomWeaponManager*            GetCustomWeaponManager() { return m_pCustomWeaponManager; }
     CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
-    CTrainTrackManager*              GetTrainTrackManager() { return m_pTrainTrackManager; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
 
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
@@ -536,7 +535,6 @@ private:
     CClock*                    m_pClock;
     CBanManager*               m_pBanManager;
     CTeamManager*              m_pTeamManager;
-    CTrainTrackManager*        m_pTrainTrackManager;
     CCommandLineParser         m_CommandLineParser;
     CRegisteredCommands*       m_pRegisteredCommands;
     CDatabaseManager*          m_pDatabaseManager;

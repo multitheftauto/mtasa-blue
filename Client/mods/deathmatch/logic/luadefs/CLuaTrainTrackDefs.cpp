@@ -10,30 +10,6 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-void CLuaTrainTrackDefs::LoadFunctions()
-{
-    CLuaCFunctions::AddFunction("getTrackNodeCount", GetTrackNodeCount);
-    CLuaCFunctions::AddFunction("getTrackNodePosition", GetTrackNodePosition);
-    CLuaCFunctions::AddFunction("getTrackLength", GetTrackLength);
-
-    CLuaCFunctions::AddFunction("getDefaultTrack", GetDefaultTrack);
-}
-
-void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
-{
-    lua_newclass(luaVM);
-
-    lua_classfunction(luaVM, "getNodeCount", "getTrackNodeCount");
-    lua_classfunction(luaVM, "getNodePosition", "getTrackNodePosition");
-    lua_classfunction(luaVM, "getLength", "getTrackLength");
-
-    lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
-
-    lua_classvariable(luaVM, "length", nullptr, "getTrackLength");
-
-    lua_registerclass(luaVM, "TrainTrack", "Element");
-}
-
 int CLuaTrainTrackDefs::GetTrackNodeCount(lua_State* luaVM)
 {
     CClientTrainTrack* pTrack;
@@ -97,32 +73,4 @@ int CLuaTrainTrackDefs::GetTrackLength(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
-}
-
-int CLuaTrainTrackDefs::GetDefaultTrack(lua_State* luaVM)
-{
-	uint trackId;
-
-	CScriptArgReader argStream(luaVM);
-	argStream.ReadNumber(trackId);
-
-	if (!argStream.HasErrors())
-	{
-        if (trackId <= 3)
-        {
-            CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->GetTrainTrackByIndex(trackId);
-            if (pTrainTrack)
-            {
-                lua_pushelement(luaVM, pTrainTrack);
-                return 1;
-            }
-        }
-        else
-            argStream.SetCustomError("Bad default track id (0-3)");
-	}
-	else
-		m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-	lua_pushboolean(luaVM, false);
-	return 1;
 }

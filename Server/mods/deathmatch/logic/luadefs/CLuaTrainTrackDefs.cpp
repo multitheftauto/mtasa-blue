@@ -10,32 +10,6 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-void CLuaTrainTrackDefs::LoadFunctions()
-{
-    CLuaCFunctions::AddFunction("createTrack", CreateTrack);
-    CLuaCFunctions::AddFunction("getDefaultTrack", GetDefaultTrack);
-
-    CLuaCFunctions::AddFunction("getTrackNodePosition", GetTrackNodePosition);
-    CLuaCFunctions::AddFunction("setTrackNodePosition", SetTrackNodePosition);
-
-    CLuaCFunctions::AddFunction("getTrackNodeCount", GetTrackNodeCount);
-}
-
-void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
-{
-    lua_newclass(luaVM);
-
-    lua_classfunction(luaVM, "create", "createTrack");
-    lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
-
-    lua_classfunction(luaVM, "getNodePosition", "getTrackNodePosition");
-    lua_classfunction(luaVM, "setNodePosition", "setTrackNodePosition");
-
-    lua_classfunction(luaVM, "getNodeCount", "getTrackNodeCount");
-
-    lua_registerclass(luaVM, "TrainTrack", "Element");
-}
-
 int CLuaTrainTrackDefs::CreateTrack(lua_State* luaVM)
 {
 //  train-track createTrack ( table nodes, bool linkNodes )
@@ -68,34 +42,6 @@ int CLuaTrainTrackDefs::CreateTrack(lua_State* luaVM)
                 }
             }
         }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaTrainTrackDefs::GetDefaultTrack(lua_State* luaVM)
-{
-    uint trackId;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(trackId);
-
-    if (!argStream.HasErrors())
-    {
-        if (trackId <= 3)
-        {
-            CTrainTrack* pTrainTrack = g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackId);
-            if (pTrainTrack)
-            {
-                lua_pushelement(luaVM, pTrainTrack);
-                return 1;
-            }
-        }
-        else
-            argStream.SetCustomError("Bad default track id (0-3)");
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

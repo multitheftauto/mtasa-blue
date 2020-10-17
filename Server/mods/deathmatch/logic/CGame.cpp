@@ -323,7 +323,6 @@ CGame::~CGame()
     SAFE_DELETE(m_pWeaponStatsManager);
     SAFE_DELETE(m_pBuildingRemovalManager);
     SAFE_DELETE(m_pCustomWeaponManager);
-    SAFE_DELETE(m_pTrainTrackManager);
     SAFE_DELETE(m_pFunctionUseLogger);
     SAFE_DELETE(m_pOpenPortsTester);
     SAFE_DELETE(m_pMasterServerAnnouncer);
@@ -530,7 +529,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pWeaponStatsManager = new CWeaponStatManager();
     m_pBuildingRemovalManager = new CBuildingRemovalManager;
     m_pCustomWeaponManager = new CCustomWeaponManager ();
-    m_pTrainTrackManager = new CTrainTrackManager();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 

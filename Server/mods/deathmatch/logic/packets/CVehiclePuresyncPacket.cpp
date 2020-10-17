@@ -531,7 +531,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                     else
                     {
                         BitStream.WriteBit(false);            // isn't default track
-                        BitStream.Write(pTrainTrack->GetID());
+                        BitStream.Write(trainTrack->GetID());
                     }
 
                     // In 1.6 we can move this under bDirection for neatness. We can't do it right now because of backwards compat.

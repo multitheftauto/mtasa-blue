@@ -80,12 +80,13 @@ protected:
     static CScriptDebugging*          m_pScriptDebugging;
     static CVehicleManager*           m_pVehicleManager;
     static CTeamManager*              m_pTeamManager;
-    static CTrainTrackManager*        m_pTrainTrackManager;
     static CAccountManager*           m_pAccountManager;
     static CColManager*               m_pColManager;
     static CResourceManager*          m_pResourceManager;
     static CAccessControlListManager* m_pACLManager;
     static CMainConfig*               m_pMainConfig;
+
+    static shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
 
 protected:
     // Old style: Only warn on failure. This should

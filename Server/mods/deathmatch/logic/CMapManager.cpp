@@ -265,7 +265,7 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     marker.Set("Water");
 
     // Add the water polys to the packet
-    CTrainTrackManager* pTrainTrackManager = g_pGame->GetTrainTrackManager();
+    shared_ptr<CTrainTrackManager> pTrainTrackManager = g_pGame->GetTrainTrackManager();
     for (auto& pTrainTrack : pTrainTrackManager->GetTracks())
     {
         if (!pTrainTrack->IsDefault())
