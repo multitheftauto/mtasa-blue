@@ -329,7 +329,7 @@ const char* CLuaClassDefs::GetElementClass(CElement* pElement)
             return "Marker";
         case CElement::TEAM:
             return "Team";
-        case CElement::TRAINTRACK:
+        case CElement::TRAIN_TRACK:
             return "TrainTrack";
         case CElement::PED:
             return "Ped";

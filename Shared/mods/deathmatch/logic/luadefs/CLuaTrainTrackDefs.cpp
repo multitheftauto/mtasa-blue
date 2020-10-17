@@ -22,19 +22,36 @@ TrainTrackManager CLuaTrainTrackDefs::GetManager()
 #endif
 }
 
+CResource* CLuaTrainTrackDefs::GetResource(lua_State* L)
+{
+#ifdef MTA_CLIENT
+    auto game = g_pClientGame;
+#else
+    auto game = g_pGame;
+#endif
+    return game->GetLuaManager()->GetVirtualMachine(L)->GetResource();
+}
+
 void CLuaTrainTrackDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("getDefaultTrack", ArgumentParser<GetDefaultTrack>);
-
-    CLuaCFunctions::AddFunction("getTrackNodeCount", ArgumentParser<GetTrackNodeCount>);
-    CLuaCFunctions::AddFunction("getTrackNodePosition", ArgumentParser<GetTrackNodePosition>);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"getDefaultTrack", ArgumentParser<GetDefaultTrack>},
 
 #ifdef MTA_CLIENT
-    CLuaCFunctions::AddFunction("getTrackLength", GetTrackLength);
+        {"getTrackLength", ArgumentParser<GetTrackLength>},
 #else
-    CLuaCFunctions::AddFunction("createTrack", CreateTrack);
-    CLuaCFunctions::AddFunction("setTrackNodePosition", SetTrackNodePosition);
+        {"createTrack", ArgumentParser<CreateTrack>},
 #endif
+
+        {"getTrackNodeCount", ArgumentParser<GetTrackNodeCount>},
+        {"getTrackNodePosition", ArgumentParser<GetTrackNodePosition>},
+
+        {"setTrackNodePosition", ArgumentParser<SetTrackNodePosition>},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
@@ -43,24 +60,16 @@ void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
 
-
-#ifdef MTA_CLIENT
     lua_classfunction(luaVM, "getNodeCount", "getTrackNodeCount");
     lua_classfunction(luaVM, "getNodePosition", "getTrackNodePosition");
-    lua_classfunction(luaVM, "getLength", "getTrackLength");
 
-    lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
-
-    lua_classvariable(luaVM, "length", nullptr, "getTrackLength");
-#else
-
-    lua_classfunction(luaVM, "create", "createTrack");
-    lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
-
-    lua_classfunction(luaVM, "getNodePosition", "getTrackNodePosition");
     lua_classfunction(luaVM, "setNodePosition", "setTrackNodePosition");
 
-    lua_classfunction(luaVM, "getNodeCount", "getTrackNodeCount");
+#ifdef MTA_CLIENT
+    lua_classfunction(luaVM, "getLength", "getTrackLength");
+    lua_classvariable(luaVM, "length", nullptr, "getTrackLength");
+#else
+    lua_classfunction(luaVM, "create", "createTrack");
 #endif
 
     lua_registerclass(luaVM, "TrainTrack", "Element");
@@ -85,3 +94,29 @@ std::tuple<float, float, float> CLuaTrainTrackDefs::GetTrackNodePosition(TrainTr
     track->GetNodePosition(nodeIndex, position);
     return {position.fX, position.fY, position.fZ};
 }
+
+bool CLuaTrainTrackDefs::SetTrackNodePosition(TrainTrack track, uint nodeIndex, CVector position)
+{
+    return track->SetNodePosition(nodeIndex, position);
+}
+
+#ifdef MTA_CLIENT
+float CLuaTrainTrackDefs::GetTrackLength(TrainTrack track)
+{
+    return track->GetLength();
+}
+#else
+TrainTrack CLuaTrainTrackDefs::CreateTrack(lua_State* L, std::vector<CVector> nodes, bool linkNodes)
+{
+    if (nodes.size() < 2)
+        throw std::invalid_argument("Please provide at least two nodes");
+
+    auto pResource = GetResource(L);
+    auto pTrainTrack = CStaticFunctionDefinitions::CreateTrainTrack(pResource, nodes, linkNodes);
+    auto pGroup = pResource->GetElementGroup();
+    if (pGroup)
+        pGroup->Add(pTrainTrack);
+
+    return pTrainTrack;
+}
+#endif

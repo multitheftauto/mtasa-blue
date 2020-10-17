@@ -12165,16 +12165,15 @@ CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 }
 
 
-CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, const std::vector<CLuaVector3D*>& nodes, bool linkLastNodes)
+CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, const std::vector<CVector>& nodes, bool linkLastNodes)
 {
     auto pTrainTrackManager = g_pGame->GetTrainTrackManager();
 
     // Convert vector of vectors to vector of track nodes
     std::vector<STrackNode> trackNodes;
+    trackNodes.reserve(nodes.size());
     for (auto& node : nodes)
-    {
-        trackNodes.push_back(STrackNode(*node));
-    }
+        trackNodes.push_back(STrackNode(node));
 
     // Create track
     auto pTrainTrack = pTrainTrackManager->CreateTrainTrack(trackNodes, linkLastNodes, pResource->GetDynamicElementRoot());

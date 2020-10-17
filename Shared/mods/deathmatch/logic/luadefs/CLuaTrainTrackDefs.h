@@ -28,15 +28,17 @@ public:
     static TrainTrack GetDefaultTrack(uchar trackID);
     static int        GetTrackNodeCount(TrainTrack track);
 
-    static std::tuple<float, float, float> CLuaTrainTrackDefs::GetTrackNodePosition(TrainTrack track, uint nodeIndex);
+    static std::tuple<float, float, float> GetTrackNodePosition(TrainTrack track, uint nodeIndex);
+
+    static bool SetTrackNodePosition(TrainTrack track, uint nodeIndex, CVector position);
 
 #ifdef MTA_CLIENT
-    LUA_DECLARE(GetTrackLength);
+    static float GetTrackLength(TrainTrack track);
 #else
-    LUA_DECLARE(CreateTrack);
-    LUA_DECLARE(SetTrackNodePosition);
+    static TrainTrack CreateTrack(lua_State* L, std::vector<CVector> nodes, bool linkNodes);
 #endif
 
 private:
+    static CResource*        GetResource(lua_State* L);
     static TrainTrackManager GetManager();
 };
