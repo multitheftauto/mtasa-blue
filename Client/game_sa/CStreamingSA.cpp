@@ -12,6 +12,10 @@
 #include "StdInc.h"
 #include "Fileapi.h"
 
+CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
+HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;
+CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])ARRAY_StreamHandlersInfo;
+
 namespace
 {
     //
@@ -143,40 +147,23 @@ void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID,
     pItemInfo->offsetInBlocks = uiOffset;
     pItemInfo->sizeInBlocks = usSize;
     pItemInfo->nextInImg = uiNextInImg;
+    // TODO CHANGE THIS INFO FOR PREV MODEL
+    pItemInfo->nextInImg = -1;
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
 {
-    CStreamingInfo* pItemInfo = (CStreamingInfo*)(ARRAY_StreamModelInfo);
-    return pItemInfo + id;
+    return &ms_aInfoForModel[id];
 }
 
-bool CStreamingSA::SetModelStreamInfo(ushort id, uchar ucArchiveId, ushort usOffestInBlocks, ushort usSizeInBlocks)
-{
-    CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
-    pItemInfo->archiveId = ucArchiveId;
-    pItemInfo->offsetInBlocks = usOffestInBlocks;
-    pItemInfo->sizeInBlocks = usSizeInBlocks;
-    // TODO CHANGE THIS INFO FOR PREV MODEL
-    pItemInfo->nextInImg = -1;
-    return true;
-}
-
-CStreamHandlerInfo* CStreamingSA::GetStreamingHandlerInfo(uint id)
-{
-    CStreamHandlerInfo* pHandlerInfo = (CStreamHandlerInfo*)(ARRAY_StreamHandlersInfo);
-    return pHandlerInfo + id;
-}
-
-
-unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
+unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 {
     // Get internal IMG id
-    // By default gta sa has 8 IMG archives
-    uchar ucArchiveId = 0;
-    for (int i = 0; i < 8; i++)
+    // By default gta sa uses 5 of 8 IMG archives
+    uchar ucArchiveId = -1;
+    for (int i = 6; i < 8; i++)
     {
-        CStreamHandlerInfo* info = GetStreamingHandlerInfo(i);
+        CArchiveInfo* info = GetArchiveInfo(i);
         if (!info->uiStreamHandleId)
         {
             ucArchiveId = i;
@@ -184,7 +171,7 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
         }
     }
 
-    if (ucArchiveId == 0)
+    if (ucArchiveId == -1)
         return -1;
 
     // Get free stream handler id
@@ -193,7 +180,7 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
     
     for (unsigned char ID = 0; ID < VAR_StreamHandlersMaxCount; ++ID)
     {
-        HANDLE hFile = *(HANDLE*)(ARRAY_StreamHandlers + (ID * sizeof(HANDLE)));
+        HANDLE hFile = m_aStreamingHandlers[ID];
         if (!hFile)
         {
             ucStreamID = ID;
@@ -213,17 +200,24 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
         return -1;
 
     // Register stream handler
-    void* streamHandlerPos = (void*)(ARRAY_StreamHandlers + ucStreamID * sizeof(HANDLE));
-    MemPutFast(streamHandlerPos, hFile);
+    m_aStreamingHandlers[ucStreamID] = hFile;
 
     // Register archive data
-    CStreamHandlerInfo* pNewArchiveInfo = GetStreamingHandlerInfo(ucArchiveId);
-    pNewArchiveInfo->uiStreamHandleId = (ucStreamID << 24);
+    GetArchiveInfo(ucArchiveId)->uiStreamHandleId = (ucStreamID << 24);
 
     return ucArchiveId;
 }
 
-void CStreamingSA::RemoveStreamHandler(unsigned char ucArhiveID)
+void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
 {
-    return;
+    CArchiveInfo* pArchiveInfo = GetArchiveInfo(ucArhiveID);
+
+    unsigned int  uiStreamHandlerID = pArchiveInfo->uiStreamHandleId;
+    if (!uiStreamHandlerID)
+        return;
+
+    pArchiveInfo->uiStreamHandleId = 0;
+
+    CloseHandle(m_aStreamingHandlers[uiStreamHandlerID]);
+    m_aStreamingHandlers[uiStreamHandlerID] = NULL;
 }

@@ -13,10 +13,8 @@
 
 #include <game/CStreaming.h>
 #include "Common.h"
-#include "Fileapi.h"
 
 // Shoud be changed to interfaces
-#define ARRAY_StreamHandlers                         0x8E4010 // [32]
 #define ARRAY_StreamHandlersNames                    0x8E4098 // [32][64]
 #define ARRAY_StreamHandlersInfo                     0x8E48D8 // [8][0x30]
 
@@ -25,6 +23,7 @@
 #define VAR_StreamHandlersMaxCount                   32
 #define VAR_StreamHandlerCreateFlags                 0x8E3FE0
 #define VAR_StreamHandlersMaxCount                   32
+#define VAR_MaxArchives                              8
 
 #define FUNC_CStreaming__RequestModel                0x4087E0
 #define FUNC_LoadAllRequestedModels                  0x40EA10
@@ -37,7 +36,7 @@
 #define FUNC_CStreaming_RemoveImages                 0x4066B3 // Remove all IMG`s from streaming
 #define FUNC_CStreaming_RemoveImage                  0x4068A0
 
-struct CStreamHandlerInfo
+struct CArchiveInfo
 {
     char szName[40];
     BYTE bUnknow = 1; // Only in player.img is 0. Maybe, it is DWORD value
@@ -49,9 +48,8 @@ struct CStreamHandlerInfo
 class CStreamingSA : public CStreaming
 {
 private:
-    CStreamHandlerInfo* GetStreamingHandlerInfo(uint id);
+    static CArchiveInfo* GetArchiveInfo(uint id) { return ms_aAchiveInfo[id]; };
 public:
-    bool SetModelStreamInfo(ushort id, uchar ucArchiveId, ushort usOffestInBlocks, ushort usSizeInBlocks);
     void RequestModel(DWORD dwModelID, DWORD dwFlags);
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
     BOOL HasModelLoaded(DWORD dwModelID);
@@ -59,6 +57,11 @@ public:
 
     void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
     CStreamingInfo* GetStreamingInfoFromModelId(uint id);
-    unsigned char   AddStreamHandler(const char* szFilePath);
-    void            RemoveStreamHandler(unsigned char ucStreamHandler);
+    unsigned char   AddArchive(const char* szFilePath);
+    void            RemoveArchive(unsigned char ucStreamHandler);
+
+private:
+    static CStreamingInfo (&ms_aInfoForModel)[26316];
+    static HANDLE (&m_aStreamingHandlers)[32];
+    static CArchiveInfo (&ms_aAchiveInfo)[8];
 };

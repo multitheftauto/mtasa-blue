@@ -159,7 +159,7 @@ bool CClientIMG::StreamEnable()
         return false;
 
     m_pRestoreData.reserve(m_uiFilesCount);
-    m_ucArchiveID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
+    m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(*m_strFilename);
     return IsStreamed();
 }
 
@@ -181,7 +181,7 @@ bool CClientIMG::StreamDisable()
 
     m_pRestoreData.clear();
 
-    g_pGame->GetStreaming()->RemoveStreamHandler(m_ucArchiveID);
+    g_pGame->GetStreaming()->RemoveArchive(m_ucArchiveID);
     m_ucArchiveID = INVALID_ARCHIVE_ID;
     return true;
 }
