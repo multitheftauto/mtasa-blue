@@ -88,7 +88,7 @@ inline eEntityType GetClassType(class CTeam*)
 }
 inline eEntityType GetClassType(class CTrainTrack*)
 {
-    return CElement::TRAINTRACK;
+    return CElement::TRAIN_TRACK;
 }
 inline eEntityType GetClassType(class CPed*)
 {

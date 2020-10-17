@@ -3990,7 +3990,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::TRAINTRACK:
+                case CClientGame::TRAIN_TRACK:
                 {
                     std::uint32_t numNodes;
                     bool linkLastNode;

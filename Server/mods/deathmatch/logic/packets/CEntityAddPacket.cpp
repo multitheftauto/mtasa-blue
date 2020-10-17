@@ -1051,7 +1051,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::TRAINTRACK:
+                case CElement::TRAIN_TRACK:
                 {
                     auto pTrack = static_cast<CTrainTrack*>(pElement);
 

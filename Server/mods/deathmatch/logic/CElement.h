@@ -78,10 +78,9 @@ public:
         WATER,
         WEAPON,
         POINTLIGHTS_UNUSED,
-        TRAINTRACK,
         DATABASE_CONNECTION,
-        TRAIN_TRACK,
         ROOT,
+        TRAIN_TRACK,
         UNKNOWN,
     };
 

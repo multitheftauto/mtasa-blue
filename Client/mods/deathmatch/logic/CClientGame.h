@@ -121,7 +121,9 @@ public:
         WATER,
         WEAPON,
         POINTLIGHTS,
-        TRAINTRACK,
+        DATABASE_CONNECTION_UNUSED,
+        ROOT_UNUSED,
+        TRAIN_TRACK,
         UNKNOWN,
     };
 
