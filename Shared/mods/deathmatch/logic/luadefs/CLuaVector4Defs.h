@@ -30,6 +30,7 @@ public:
     LUA_DECLARE(GetNormalized);
     LUA_DECLARE(Normalize);
     LUA_DECLARE(Dot);
+    LUA_DECLARE(Cross);
 
     LUA_DECLARE(ToString);
 

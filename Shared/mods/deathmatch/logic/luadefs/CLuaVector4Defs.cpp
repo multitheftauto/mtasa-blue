@@ -32,6 +32,7 @@ void CLuaVector4Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", Create);
     lua_classfunction(luaVM, "normalize", Normalize);
     lua_classfunction(luaVM, "dot", Dot);
+    lua_classfunction(luaVM, "cross", Cross);
 
     lua_classfunction(luaVM, "getLength", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", GetLengthSquared);
@@ -59,6 +60,7 @@ void CLuaVector4Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "", Create);
     lua_classfunction(luaVM, "normalize", "", Normalize);
     lua_classfunction(luaVM, "dot", "", Dot);
+    lua_classfunction(luaVM, "cross", "", Cross);
 
     lua_classfunction(luaVM, "getLength", "", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", "", GetLengthSquared);
@@ -279,6 +281,43 @@ int CLuaVector4Defs::Normalize(lua_State* luaVM)
     {
         pVector->Normalize();
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+/*void CrossProduct(const CVector* param)
+    {
+        float _fX = fX, _fY = fY, _fZ = fZ;
+        fX = _fY * param->fZ - param->fY * _fZ;
+        fY = _fZ * param->fX - param->fZ * _fX;
+        fZ = _fX * param->fY - param->fX * _fY;
+    }*/
+
+int CLuaVector4Defs::Cross(lua_State* luaVM)
+{
+    CLuaVector4D* pVector1 = NULL;
+    CLuaVector4D* pVector2 = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVector1);
+    argStream.ReadUserData(pVector2);
+
+    if (!argStream.HasErrors())
+    {
+        float _fX = pVector1->fX, _fY = pVector1->fY, _fZ = pVector1->fZ;
+        lua_pushvector(luaVM, CVector4D{
+            _fY * pVector2->fZ - pVector2->fY * _fZ,
+            _fZ * pVector2->fX - pVector2->fZ * _fX,
+            _fX * pVector2->fY - pVector2->fX * _fY,
+            0.0f
+        });
         return 1;
     }
     else
