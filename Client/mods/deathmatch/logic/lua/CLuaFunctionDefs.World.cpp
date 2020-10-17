@@ -106,6 +106,7 @@ int CLuaFunctionDefs::GetRoofPosition(lua_State* luaVM)
         }
     }
     else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Return false
