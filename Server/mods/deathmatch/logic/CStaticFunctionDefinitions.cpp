@@ -4228,10 +4228,6 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            // Remove jetpack now so it doesn't stay on (#9522#c25612)
-            if (pPed->HasJetPack())
-                pPed->SetHasJetPack(false);
-
             // Remove choking state
             if (pPed->IsChoking())
                 pPed->SetChoking(false);
@@ -4242,6 +4238,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
             CBitStream BitStream;
             if (!blockName.empty() && !animName.empty())
             {
+                // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                if (pPed->HasJetPack())
+                    pPed->SetHasJetPack(false);
+
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(iTime);
