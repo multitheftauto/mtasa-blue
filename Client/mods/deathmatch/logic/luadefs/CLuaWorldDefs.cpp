@@ -2,130 +2,125 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaWorldDefs.cpp
- *  PURPOSE:     Lua drawing definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // Explosion funcs
-        {"createExplosion", CLuaWorldDefs::CreateExplosion},
-
         // World get functions
-        {"getTime", CLuaWorldDefs::GetTime_},
-        {"getGroundPosition", CLuaWorldDefs::GetGroundPosition},
-        {"processLineOfSight", CLuaWorldDefs::ProcessLineOfSight},
-        {"getWorldFromScreenPosition", CLuaWorldDefs::GetWorldFromScreenPosition},
-        {"getScreenFromWorldPosition", CLuaWorldDefs::GetScreenFromWorldPosition},
-        {"getWeather", CLuaWorldDefs::GetWeather},
-        {"getZoneName", CLuaWorldDefs::GetZoneName},
-        {"getGravity", CLuaWorldDefs::GetGravity},
-        {"getGameSpeed", CLuaWorldDefs::GetGameSpeed},
-        {"getMinuteDuration", CLuaWorldDefs::GetMinuteDuration},
-        {"getWaveHeight", CLuaWorldDefs::GetWaveHeight},
-        {"getGaragePosition", CLuaWorldDefs::GetGaragePosition},
-        {"getGarageSize", CLuaWorldDefs::GetGarageSize},
-        {"getGarageBoundingBox", CLuaWorldDefs::GetGarageBoundingBox},
-        {"getBlurLevel", CLuaWorldDefs::GetBlurLevel},
-        {"getTrafficLightState", CLuaWorldDefs::GetTrafficLightState},
-        {"areTrafficLightsLocked", CLuaWorldDefs::AreTrafficLightsLocked},
-        {"getSkyGradient", CLuaWorldDefs::GetSkyGradient},
-        {"getHeatHaze", CLuaWorldDefs::GetHeatHaze},
-        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
-        {"getJetpackMaxHeight", CLuaWorldDefs::GetJetpackMaxHeight},
-        {"getWindVelocity", CLuaWorldDefs::GetWindVelocity},
-        {"getInteriorSoundsEnabled", CLuaWorldDefs::GetInteriorSoundsEnabled},
-        {"getInteriorFurnitureEnabled", CLuaWorldDefs::GetInteriorFurnitureEnabled},
-        {"getFarClipDistance", CLuaWorldDefs::GetFarClipDistance},
-        {"getNearClipDistance", CLuaWorldDefs::GetNearClipDistance},
-        {"getVehiclesLODDistance", CLuaWorldDefs::GetVehiclesLODDistance},
-        {"getPedsLODDistance", CLuaWorldDefs::GetPedsLODDistance},
-        {"getFogDistance", CLuaWorldDefs::GetFogDistance},
-        {"getSunColor", CLuaWorldDefs::GetSunColor},
-        {"getSunSize", CLuaWorldDefs::GetSunSize},
-        {"getAircraftMaxHeight", CLuaWorldDefs::GetAircraftMaxHeight},
-        {"getAircraftMaxVelocity", CLuaWorldDefs::GetAircraftMaxVelocity},
-        {"getOcclusionsEnabled", CLuaWorldDefs::GetOcclusionsEnabled},
-        {"getCloudsEnabled", CLuaWorldDefs::GetCloudsEnabled},
-        {"getRainLevel", CLuaWorldDefs::GetRainLevel},
-        {"getMoonSize", CLuaWorldDefs::GetMoonSize},
-        {"getFPSLimit", CLuaWorldDefs::GetFPSLimit},
-        {"getBirdsEnabled", CLuaWorldDefs::GetBirdsEnabled},
-        {"isPedTargetingMarkerEnabled", CLuaWorldDefs::IsPedTargetingMarkerEnabled},
-        {"isLineOfSightClear", CLuaWorldDefs::IsLineOfSightClear},
-        {"isWorldSpecialPropertyEnabled", CLuaWorldDefs::IsWorldSpecialPropertyEnabled},
-        {"isGarageOpen", CLuaWorldDefs::IsGarageOpen},
+        {"getTime", GetTime},
+        {"getRoofPosition", GetRoofPosition},
+        {"getGroundPosition", GetGroundPosition},
+        {"processLineOfSight", ProcessLineOfSight},
+        {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
+        {"getScreenFromWorldPosition", GetScreenFromWorldPosition},
+        {"getWeather", GetWeather},
+        {"getZoneName", GetZoneName},
+        {"getGravity", GetGravity},
+        {"getGameSpeed", GetGameSpeed},
+        {"getMinuteDuration", GetMinuteDuration},
+        {"getWaveHeight", GetWaveHeight},
+        {"getGaragePosition", GetGaragePosition},
+        {"getGarageSize", GetGarageSize},
+        {"getGarageBoundingBox", GetGarageBoundingBox},
+        {"getBlurLevel", GetBlurLevel},
+        {"getTrafficLightState", GetTrafficLightState},
+        {"areTrafficLightsLocked", AreTrafficLightsLocked},
+        {"getSkyGradient", GetSkyGradient},
+        {"getHeatHaze", GetHeatHaze},
+        {"getJetpackMaxHeight", GetJetpackMaxHeight},
+        {"getWindVelocity", GetWindVelocity},
+        {"getInteriorSoundsEnabled", GetInteriorSoundsEnabled},
+        {"getInteriorFurnitureEnabled", GetInteriorFurnitureEnabled},
+        {"getFarClipDistance", GetFarClipDistance},
+        {"getNearClipDistance", GetNearClipDistance},
+        {"getVehiclesLODDistance", GetVehiclesLODDistance},
+        {"getPedsLODDistance", GetPedsLODDistance},
+        {"getFogDistance", GetFogDistance},
+        {"getSunColor", GetSunColor},
+        {"getSunSize", GetSunSize},
+        {"getAircraftMaxHeight", GetAircraftMaxHeight},
+        {"getAircraftMaxVelocity", GetAircraftMaxVelocity},
+        {"getOcclusionsEnabled", GetOcclusionsEnabled},
+        {"getCloudsEnabled", GetCloudsEnabled},
+        {"getRainLevel", GetRainLevel},
+        {"getMoonSize", GetMoonSize},
+        {"getFPSLimit", GetFPSLimit},
+        {"getBirdsEnabled", GetBirdsEnabled},
+        {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
+        {"isLineOfSightClear", IsLineOfSightClear},
+        {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
+        {"isGarageOpen", IsGarageOpen},
 
         // World set funcs
-        {"setTime", CLuaWorldDefs::SetTime},
-        {"setSkyGradient", CLuaWorldDefs::SetSkyGradient},
-        {"setHeatHaze", CLuaWorldDefs::SetHeatHaze},
+        {"setTime", SetTime},
         {"setColorFilter", ArgumentParser<SetColorFilter>},
-        {"setWeather", CLuaWorldDefs::SetWeather},
-        {"setWeatherBlended", CLuaWorldDefs::SetWeatherBlended},
-        {"setGravity", CLuaWorldDefs::SetGravity},
-        {"setGameSpeed", CLuaWorldDefs::SetGameSpeed},
-        {"setWaveHeight", CLuaWorldDefs::SetWaveHeight},
-        {"setMinuteDuration", CLuaWorldDefs::SetMinuteDuration},
-        {"setGarageOpen", CLuaWorldDefs::SetGarageOpen},
-        {"setWorldSpecialPropertyEnabled", CLuaWorldDefs::SetWorldSpecialPropertyEnabled},
-        {"setBlurLevel", CLuaWorldDefs::SetBlurLevel},
-        {"resetBlurLevel", CLuaWorldDefs::ResetBlurLevel},
-        {"setJetpackMaxHeight", CLuaWorldDefs::SetJetpackMaxHeight},
-        {"setCloudsEnabled", CLuaWorldDefs::SetCloudsEnabled},
-        {"setTrafficLightState", CLuaWorldDefs::SetTrafficLightState},
-        {"setTrafficLightsLocked", CLuaWorldDefs::SetTrafficLightsLocked},
-        {"setWindVelocity", CLuaWorldDefs::SetWindVelocity},
-        {"setInteriorSoundsEnabled", CLuaWorldDefs::SetInteriorSoundsEnabled},
-        {"setInteriorFurnitureEnabled", CLuaWorldDefs::SetInteriorFurnitureEnabled},
-        {"setRainLevel", CLuaWorldDefs::SetRainLevel},
-        {"setFarClipDistance", CLuaWorldDefs::SetFarClipDistance},
-        {"setNearClipDistance", CLuaWorldDefs::SetNearClipDistance},
-        {"setVehiclesLODDistance", CLuaWorldDefs::SetVehiclesLODDistance},
-        {"setPedsLODDistance", CLuaWorldDefs::SetPedsLODDistance},
-        {"setFogDistance", CLuaWorldDefs::SetFogDistance},
-        {"setSunColor", CLuaWorldDefs::SetSunColor},
-        {"setSunSize", CLuaWorldDefs::SetSunSize},
-        {"setAircraftMaxHeight", CLuaWorldDefs::SetAircraftMaxHeight},
-        {"setAircraftMaxVelocity", CLuaWorldDefs::SetAircraftMaxVelocity},
-        {"setOcclusionsEnabled", CLuaWorldDefs::SetOcclusionsEnabled},
-        {"setBirdsEnabled", CLuaWorldDefs::SetBirdsEnabled},
-        {"setPedTargetingMarkerEnabled", CLuaWorldDefs::SetPedTargetingMarkerEnabled},
-        {"setMoonSize", CLuaWorldDefs::SetMoonSize},
-        {"setFPSLimit", CLuaWorldDefs::SetFPSLimit},
-        {"removeWorldModel", CLuaWorldDefs::RemoveWorldBuilding},
-        {"restoreAllWorldModels", CLuaWorldDefs::RestoreWorldBuildings},
-        {"restoreWorldModel", CLuaWorldDefs::RestoreWorldBuilding},
-        {"createSWATRope", CLuaWorldDefs::CreateSWATRope},
+        {"setSkyGradient", SetSkyGradient},
+        {"setHeatHaze", SetHeatHaze},
+        {"setWeather", SetWeather},
+        {"setWeatherBlended", SetWeatherBlended},
+        {"setGravity", SetGravity},
+        {"setGameSpeed", SetGameSpeed},
+        {"setWaveHeight", SetWaveHeight},
+        {"setMinuteDuration", SetMinuteDuration},
+        {"setGarageOpen", SetGarageOpen},
+        {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
+        {"setBlurLevel", SetBlurLevel},
+        {"resetBlurLevel", ResetBlurLevel},
+        {"setJetpackMaxHeight", SetJetpackMaxHeight},
+        {"setCloudsEnabled", SetCloudsEnabled},
+        {"setTrafficLightState", SetTrafficLightState},
+        {"setTrafficLightsLocked", SetTrafficLightsLocked},
+        {"setWindVelocity", SetWindVelocity},
+        {"setInteriorSoundsEnabled", SetInteriorSoundsEnabled},
+        {"setInteriorFurnitureEnabled", SetInteriorFurnitureEnabled},
+        {"setRainLevel", SetRainLevel},
+        {"setFarClipDistance", SetFarClipDistance},
+        {"setNearClipDistance", SetNearClipDistance},
+        {"setVehiclesLODDistance", SetVehiclesLODDistance},
+        {"setPedsLODDistance", SetPedsLODDistance},
+        {"setFogDistance", SetFogDistance},
+        {"setSunColor", SetSunColor},
+        {"setSunSize", SetSunSize},
+        {"setAircraftMaxHeight", SetAircraftMaxHeight},
+        {"setAircraftMaxVelocity", SetAircraftMaxVelocity},
+        {"setOcclusionsEnabled", SetOcclusionsEnabled},
+        {"setBirdsEnabled", SetBirdsEnabled},
+        {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
+        {"setMoonSize", SetMoonSize},
+        {"setFPSLimit", SetFPSLimit},
+        {"removeWorldModel", RemoveWorldBuilding},
+        {"restoreAllWorldModels", RestoreWorldBuildings},
+        {"restoreWorldModel", RestoreWorldBuilding},
+        {"createSWATRope", CreateSWATRope},
+        {"createExplosion", CreateExplosion},
 
         // World reset funcs
-        {"resetSkyGradient", CLuaWorldDefs::ResetSkyGradient},
-        {"resetHeatHaze", CLuaWorldDefs::ResetHeatHaze},
-        {"resetWindVelocity", CLuaWorldDefs::ResetWindVelocity},
-        {"resetRainLevel", CLuaWorldDefs::ResetRainLevel},
-        {"resetFarClipDistance", CLuaWorldDefs::ResetFarClipDistance},
-        {"resetNearClipDistance", CLuaWorldDefs::ResetNearClipDistance},
-        {"resetVehiclesLODDistance", CLuaWorldDefs::ResetVehiclesLODDistance},
-        {"resetPedsLODDistance", CLuaWorldDefs::ResetPedsLODDistance},
-        {"resetFogDistance", CLuaWorldDefs::ResetFogDistance},
-        {"resetSunColor", CLuaWorldDefs::ResetSunColor},
-        {"resetSunSize", CLuaWorldDefs::ResetSunSize},
-        {"resetMoonSize", CLuaWorldDefs::ResetMoonSize},
+        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
+        {"resetSkyGradient", ResetSkyGradient},
+        {"resetHeatHaze", ResetHeatHaze},
+        {"resetWindVelocity", ResetWindVelocity},
+        {"resetRainLevel", ResetRainLevel},
+        {"resetFarClipDistance", ResetFarClipDistance},
+        {"resetNearClipDistance", ResetNearClipDistance},
+        {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
+        {"resetPedsLODDistance", ResetPedsLODDistance},
+        {"resetFogDistance", ResetFogDistance},
+        {"resetSunColor", ResetSunColor},
+        {"resetSunSize", ResetSunSize},
+        {"resetMoonSize", ResetMoonSize},
     };
 
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
 }
-
 
 int CLuaWorldDefs::CreateExplosion(lua_State* luaVM)
 {
@@ -158,7 +153,7 @@ int CLuaWorldDefs::CreateExplosion(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::GetTime_(lua_State* luaVM)
+int CLuaWorldDefs::GetTime(lua_State* luaVM)
 {
     // Get the time
     unsigned char ucHour, ucMinute;
@@ -198,6 +193,31 @@ int CLuaWorldDefs::GetGroundPosition(lua_State* luaVM)
     return 1;
 }
 
+int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
+{
+    //  float getRoofPosition ( float x, float y, float z )
+    CVector vecStart;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(vecStart);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    // Get the ground position and return it
+    bool  bOutResult;
+    float fRoof = g_pGame->GetWorld()->FindRoofZFor3DCoord(&vecStart, &bOutResult);
+    if (bOutResult)
+    {
+        lua_pushnumber(luaVM, fRoof);
+        return 1;
+    }
+
+    // Return false
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
 {
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
@@ -208,7 +228,7 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     CVector           vecStart;
     CVector           vecEnd;
     SLineOfSightFlags flags;
-    CClientEntity* pIgnoredElement;
+    CClientEntity*    pIgnoredElement;
     bool              bIncludeBuildingInfo;
 
     CScriptArgReader argStream(luaVM);
@@ -228,13 +248,13 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CEntity* pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
-        CColPoint* pColPoint = NULL;
-        CClientEntity* pColEntity = NULL;
+        CEntity*                   pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
+        CColPoint*                 pColPoint = NULL;
+        CClientEntity*             pColEntity = NULL;
         bool                       bCollision;
         SLineOfSightBuildingResult buildingResult;
         if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, pIgnoredEntity,
-            bIncludeBuildingInfo ? &buildingResult : NULL))
+                                                           bIncludeBuildingInfo ? &buildingResult : NULL))
         {
             // Got a collision?
             CVector vecColPosition;
@@ -323,7 +343,7 @@ int CLuaWorldDefs::IsLineOfSightClear(lua_State* luaVM)
     CVector           vecStart;
     CVector           vecEnd;
     SLineOfSightFlags flags;
-    CClientEntity* pIgnoredElement;
+    CClientEntity*    pIgnoredElement;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecStart);

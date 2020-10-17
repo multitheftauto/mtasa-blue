@@ -242,7 +242,7 @@ void CLuaManager::LoadCFunctions()
         {"getBodyPartName", CLuaFunctionDefs::GetBodyPartName},
         {"getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex},
         {"getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes},
-        {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},        
+        {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},
 
         // Cursor funcs
         {"getCursorPosition", CLuaFunctionDefs::GetCursorPosition},
@@ -254,7 +254,7 @@ void CLuaManager::LoadCFunctions()
 
         // Util functions
         {"getValidPedModels", CLuaFunctionDefs::GetValidPedModels},
-        {"downloadFile", CLuaFunctionDefs::DownloadFile},        
+        {"downloadFile", CLuaFunctionDefs::DownloadFile},
 
         // Input functions
         {"bindKey", CLuaFunctionDefs::BindKey},
@@ -286,10 +286,6 @@ void CLuaManager::LoadCFunctions()
         {"getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode},
         {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
         {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
-        {"fetchRemote", CLuaFunctionDefs::FetchRemote},
-        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
-        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
-        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
 
         // Version functions
         {"getVersion", CLuaFunctionDefs::GetVersion},
@@ -335,6 +331,7 @@ void CLuaManager::LoadCFunctions()
     CLuaVehicleDefs::LoadFunctions();
     CLuaWaterDefs::LoadFunctions();
     CLuaWeaponDefs::LoadFunctions();
+    CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
 }

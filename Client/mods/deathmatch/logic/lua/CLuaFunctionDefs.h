@@ -62,7 +62,7 @@ public:
     LUA_DECLARE(GetBodyPartName);
     LUA_DECLARE(GetClothesByTypeIndex);
     LUA_DECLARE(GetTypeIndexFromClothes);
-    LUA_DECLARE(GetClothesTypeName);   
+    LUA_DECLARE(GetClothesTypeName);
 
     // Cursor funcs
     LUA_DECLARE(GetCursorPosition);
@@ -78,11 +78,6 @@ public:
     LUA_DECLARE(GetValidPedModels);
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);
-
-    LUA_DECLARE(FetchRemote);
-    LUA_DECLARE(GetRemoteRequests);
-    LUA_DECLARE(GetRemoteRequestInfo);
-    LUA_DECLARE(AbortRemoteRequest);
 
     // Input functions
     LUA_DECLARE(BindKey);

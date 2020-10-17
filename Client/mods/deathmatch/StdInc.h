@@ -122,6 +122,7 @@
 #include <luadefs/CLuaEngineDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
+#include <luadefs/CLuaNetworkDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
 #include <luadefs/CLuaPointLightDefs.h>
 #include <luadefs/CLuaPedDefs.h>

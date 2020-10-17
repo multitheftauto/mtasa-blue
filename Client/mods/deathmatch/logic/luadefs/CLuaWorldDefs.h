@@ -2,8 +2,6 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaDrawingDefs.cpp
- *  PURPOSE:     Lua drawing definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -14,18 +12,16 @@
 #include <variant>
 #include <utility>
 #include <optional>
+#include "CLuaDefs.h"
 
 class CLuaWorldDefs : public CLuaDefs
 {
 public:
     static void LoadFunctions();
 
-    // Explosion functions
-    LUA_DECLARE(CreateExplosion);
-
-    // World functions
-    LUA_DECLARE(GetTime_);
+    LUA_DECLARE(GetTime);
     LUA_DECLARE(GetGroundPosition);
+    LUA_DECLARE(GetRoofPosition);
     LUA_DECLARE(ProcessLineOfSight);
     LUA_DECLARE(IsLineOfSightClear);
     LUA_DECLARE(GetWorldFromScreenPosition);
@@ -117,12 +113,11 @@ public:
     LUA_DECLARE(GetMoonSize);
     LUA_DECLARE(ResetMoonSize);
     LUA_DECLARE(SetFPSLimit);
-    LUA_DECLARE(GetFPSLimit);    
+    LUA_DECLARE(GetFPSLimit);
+    
+    LUA_DECLARE(CreateExplosion);
 
     static bool ResetColorFilter(lua_State* const luaVM);
     static bool SetColorFilter(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
         uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha);
-
-private:
-    
 };
