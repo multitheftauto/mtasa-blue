@@ -158,7 +158,6 @@ bool CClientIMG::StreamEnable()
     if (IsStreamed())
         return false;
 
-    m_pRestoreData.reserve(m_uiFilesCount);
     m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(*m_strFilename);
     return IsStreamed();
 }
@@ -168,19 +167,20 @@ bool CClientIMG::StreamDisable()
     if (!IsStreamed())
         return false;
 
-    for (unsigned int i = 0; i < m_pRestoreData.size(); i++ )
+    // Unlink all models
+    std::list<tLinkedModelRestoreInfo*>::iterator inter = m_pRestoreData.begin();
+    for (; inter != m_pRestoreData.end(); inter++)
     {
-        tLinkedModelRestoreInfo* pRestoreData = m_pRestoreData[i];
-        if (pRestoreData)
-        {
-            g_pGame->GetStreaming()->SetStreamingInfoForModelId(pRestoreData->uiModelID, pRestoreData->ucStreamID, pRestoreData->uiOffset,
-                                                                pRestoreData->usSize);
-            delete pRestoreData;
-        }
+        tLinkedModelRestoreInfo* pRestoreData = *inter;
+
+        g_pGame->GetStreaming()->SetStreamingInfoForModelId(pRestoreData->uiModelID, pRestoreData->ucStreamID, pRestoreData->uiOffset,
+                                                            pRestoreData->usSize);
+        delete pRestoreData;
     }
 
     m_pRestoreData.clear();
 
+    // Remove archive from streaming
     g_pGame->GetStreaming()->RemoveArchive(m_ucArchiveID);
     m_ucArchiveID = INVALID_ARCHIVE_ID;
     return true;
@@ -212,14 +212,15 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, unsigned int uiFileID)
 
 bool CClientIMG::UnlinkModel(unsigned int uiModelID)
 {
-    for (unsigned int i = 0; i < m_pRestoreData.size(); i++)
+    std::list<tLinkedModelRestoreInfo*>::iterator inter = m_pRestoreData.begin();
+    for (; inter != m_pRestoreData.end(); inter++)
     {
-        if (m_pRestoreData[i]->uiModelID == uiModelID)
+        tLinkedModelRestoreInfo* pRestoreData = *inter;
+        if (pRestoreData->uiModelID == uiModelID)
         {
-            tLinkedModelRestoreInfo* pRestoreData = m_pRestoreData[i];
             g_pGame->GetStreaming()->SetStreamingInfoForModelId(uiModelID, pRestoreData->ucStreamID, pRestoreData->uiOffset, pRestoreData->usSize);
+            m_pRestoreData.remove(pRestoreData);
             delete pRestoreData;
-            m_pRestoreData.erase(m_pRestoreData.begin() + i);
             return true;
         }
     }
