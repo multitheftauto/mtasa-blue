@@ -1619,3 +1619,11 @@ namespace eObjectGroup
         SMASHABLE,
     };
 }
+
+enum class eCollisionShape
+{
+    BOX,
+    SPHERE,
+    TRIANGLE,
+    VERTEX,
+};

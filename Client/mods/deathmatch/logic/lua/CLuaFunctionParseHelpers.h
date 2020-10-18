@@ -63,6 +63,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM_CLASS(eCollisionShape);
 
 class CRemoteCall;
 
@@ -102,15 +103,6 @@ enum eJSONPrettyType
     JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
 };
 DECLARE_ENUM(eJSONPrettyType);
-
-enum class eCollisionShape
-{
-    BOX,
-    SPHERE,
-    TRIANGLE,
-    VERTEX,
-};
-DECLARE_ENUM_CLASS(eCollisionShape);
 
 enum class eCollisionKey
 {
