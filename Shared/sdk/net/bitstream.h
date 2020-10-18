@@ -353,7 +353,11 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x06B,
+    Unk = 0x06A,
+
+    // Add player element for onClientChatMessage (#138)
+    // 2017-07-04 0x06B 8c7095599c6d54784692bf93a1e6c7f56392c323
+    OnClientChatMessage_PlayerSource,
 
     // Add bShallow argument for server-side water as well (#240)
     // 2018-08-05 0x06C 1321b538559efe6d70deb5b784c2d392d52658f5

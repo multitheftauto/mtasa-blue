@@ -1345,7 +1345,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         // Read the client's ID
         int iNumberOfBytesUsed;
 
-        if (bitStream.Version() >= 0x06B)
+        if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
             ElementID ClientID;
             bitStream.Read(ClientID);
