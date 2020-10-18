@@ -353,7 +353,7 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x067,
+    Unk = 0x066,
 
     //
     // 1.5.0 RELEASED - 2015-07-15
@@ -370,6 +370,10 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.5.3 RELEASED - 2016-10-20
     //
+
+    // Fix player nametag unicode characters missing on player join
+    // 2016-12-09 0x067 2e582453b476c1183bd9fae5363a7cffdb531834
+    UnicodeNametags,
 
     // Add -1 parameter to setElementDimension (only to objects) (#111)
     // 2017-02-22 0x068 2e319aa823929360da9e1f48c7eb233f1d6f29e5
