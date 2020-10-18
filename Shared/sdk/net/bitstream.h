@@ -355,13 +355,42 @@ enum class eBitStreamVersion : unsigned short
 {
     Unk = 0x06A,
 
+    //
+    // 1.5.0 RELEASED - 2015-07-15
+    //
+
+    //
+    // 1.5.1 RELEASED - 2015-11-05
+    //
+
+    //
+    // 1.5.2 RELEASED - 2016-01-24
+    //
+
+    //
+    // 1.5.3 RELEASED - 2016-10-20
+    //
+
+    //
+    // 1.5.4 RELEASED - 2017-04-17
+    //
+
     // Add player element for onClientChatMessage (#138)
     // 2017-07-04 0x06B 8c7095599c6d54784692bf93a1e6c7f56392c323
     OnClientChatMessage_PlayerSource,
 
+    //
+    // 1.5.5 RELEASED - 2017-08-07
+    //
+
     // Add bShallow argument for server-side water as well (#240)
     // 2018-08-05 0x06C 1321b538559efe6d70deb5b784c2d392d52658f5
     Water_bShallow_ServerSide,
+
+    //
+    // 1.5.6 RELEASED - 2018-09-07
+    // 1.5.7 RELEASED - 2019-08-31
+    //
 
     // Add option to disable spawning components by setVehicleDoorState
     // 2019-10-11 0x06D e79d97195439f70ac66ece1859152b4c4896af31
