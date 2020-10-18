@@ -353,7 +353,7 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x065,
+    Unk = 0x064,
 
     //
     // 1.5.0 RELEASED - 2015-07-15
@@ -366,6 +366,10 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.5.2 RELEASED - 2016-01-24
     //
+
+    // Add blend parameter to setPedAnimation (#62)
+    // 2016-09-05 0x065 f51983c3e3385b4de8d754e11efe329acaee9301
+    SetPedAnimation_Blend,
 
     // Update net module version
     // 2016-09-24 0x066 3de7e5bd2d425747617a24350f2974e02cddc6dc
