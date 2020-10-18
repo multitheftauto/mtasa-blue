@@ -353,10 +353,18 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x063,
+    Unk = 0x062,
 
     //
-    // 1.5.0 RELEASED - 2015-07-15
+    // 1.5.0 UNSTABLE - 2015-01-17
+    //
+
+    // Add "quickstand" to setGlitchEnabled
+    // 2015-07-13 0x063 209837dcdc30d267519abc12e1361a1d18cd1553
+    QuickStandGlitch,
+
+    //
+    // 1.5.0 RC RELEASED - 2015-07-15
     //
 
     //

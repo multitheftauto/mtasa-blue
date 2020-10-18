@@ -1945,7 +1945,7 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
         else
             data4.bBadDrivebyHitboxes = 0;
-        if (bitStream.Version() >= 0x063)
+        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
         else
             data5.bQuickStand = 0;
@@ -1967,12 +1967,12 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
         if (bitStream.Version() >= 0x059)
             bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
-        if (bitStream.Version() >= 0x063)
+        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
 
         //// Example for adding item:
-        // if ( bitStream.Version() >= 0x999 )
-        //     bitStream.WriteBits ( reinterpret_cast < const char* > ( &data9 ), BITCOUNT9 );
+        // if (bitStream.Can(eBitStreamVersion::YourGlitch))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
     }
 
     struct
