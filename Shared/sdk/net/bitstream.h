@@ -353,7 +353,11 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x06F,
+    Unk = 0x06D,
+
+    // Increment BitStream version for Discord update (#1330)
+    // 2020-03-27 0x06E a0ce68f284487ba636e839b06c103bc2442d95e0
+    Discord_InitialImplementation,
 
     // Add analog control sync for accelerate and brake_reverse (#1164)
     // 2020-04-02 0x06F 41e36cc67520dded2a5203727a726c4261c65e31

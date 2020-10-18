@@ -899,7 +899,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
                 m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
+                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
         // Unsubscribe all the players
@@ -3357,7 +3357,7 @@ bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, 
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        if (pPlayer->GetBitStreamVersion() < 0x06E)
+        if (!pPlayer->CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
             return false;
 
         CBitStream bitStream;
@@ -10032,7 +10032,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     assert(szText);
 
     RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
-    
+
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
