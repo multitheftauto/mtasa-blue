@@ -353,7 +353,7 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x069,
+    Unk = 0x068,
 
     //
     // 1.5.0 RELEASED - 2015-07-15
@@ -370,6 +370,10 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.5.3 RELEASED - 2016-10-20
     //
+
+    // Add support for more special detections
+    // 2017-02-26 0x069 9b6187b3c2eaa655624254f8d83acb35b31243e7
+    MoreSpecialDetections_Nice69,
 
     // Add option to enable fakelag command for testing sync issues
     // 2017-03-08 0x06A a99fa0afa3b55e84f15aed335ab542520f39126d
