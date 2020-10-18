@@ -449,12 +449,6 @@ enum class eBitStreamVersion : unsigned short
     Latest,
 };
 
-// This is a temporary check during the introduction of eBitStreamVersion.
-// We only check it server-side because static_assert is not available for all client projects.
-#ifndef MTA_CLIENT
-static_assert(static_cast<unsigned short>(eBitStreamVersion::Latest) == 0x070);
-#endif
-
 class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion
 {
     NetBitStreamInterface(const NetBitStreamInterface&);
