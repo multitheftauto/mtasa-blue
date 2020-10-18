@@ -381,8 +381,11 @@ protected:
 
 public:
     virtual operator NetBitStreamInterface&() { return *this; }
+
+private:
     virtual unsigned short Version() const = 0;
 
+public:
     bool Can(eBitStreamVersion query) {
         return static_cast<eBitStreamVersion>(Version()) >= query;
     }
