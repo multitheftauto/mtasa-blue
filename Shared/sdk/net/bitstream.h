@@ -353,7 +353,11 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x06D,
+    Unk = 0x06C,
+
+    // Add option to disable spawning components by setVehicleDoorState
+    // 2019-10-11 0x06D e79d97195439f70ac66ece1859152b4c4896af31
+    SetVehicleDoorState_SpawnFlyingComponent,
 
     // Increment BitStream version for Discord update (#1330)
     // 2020-03-27 0x06E a0ce68f284487ba636e839b06c103bc2442d95e0
