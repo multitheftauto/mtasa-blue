@@ -391,7 +391,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->InitVoice(bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate);
 
     // Get fakelag command enabled
-    if (bitStream.Version() >= 0x06A)
+    if (bitStream.Can(eBitStreamVersion::FakeLagCommand))
     {
         if (bitStream.ReadBit())
             g_pCore->SetFakeLagCommandEnabled(true);
