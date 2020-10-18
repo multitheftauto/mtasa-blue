@@ -131,3 +131,16 @@ void CClientPickupManager::RestreamPickups(unsigned short usModel)
         }
     }
 }
+
+void CClientPickupManager::RestreamAllPickups()
+{
+    for (std::list<CClientPickup*>::const_iterator iter = IterBegin(); iter != IterEnd(); iter++)
+    {
+        CClientPickup* pPickup = *iter;
+
+        if (pPickup->IsStreamedIn())
+        {
+            pPickup->StreamOutForABit();
+        }
+    }
+}

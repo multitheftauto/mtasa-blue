@@ -5841,6 +5841,9 @@ void CClientGame::ResetMapInfo()
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
+
+    // Reload world
+    RestreamWorld();
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -6960,6 +6963,23 @@ void CClientGame::RestreamModel(unsigned short usModel)
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+}
+
+void CClientGame::RestreamWorld()
+{
+    for (unsigned int uiModelID = 0; uiModelID <= 26316; uiModelID++)
+    {
+        g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
+    }
+    m_pManager->GetObjectManager()->RestreamAllObjects();
+    m_pManager->GetVehicleManager()->RestreamAllVehicles();
+    m_pManager->GetPedManager()->RestreamAllPeds();
+    m_pManager->GetPickupManager()->RestreamAllPickups();
+
+    typedef int(__cdecl * Function_ReInitStreaming)();
+    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
+
+    reinitStreaming();
 }
 
 void CClientGame::TriggerDiscordJoin(SString strSecret)
