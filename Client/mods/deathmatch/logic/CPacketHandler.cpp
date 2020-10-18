@@ -5171,7 +5171,7 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
         bitStream.Read(ucAllowBadDrivebyHitboxesFix);
 
     uchar ucAllowShotgunDamageFix = 0;
-    if (bitStream.Version() >= 0x64)
+    if (bitStream.Can(eBitStreamVersion::ShotgunDamageFix))
         bitStream.Read(ucAllowShotgunDamageFix);
 
     SMiscGameSettings miscGameSettings;

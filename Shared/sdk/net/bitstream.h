@@ -353,7 +353,7 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x064,
+    Unk = 0x063,
 
     //
     // 1.5.0 RELEASED - 2015-07-15
@@ -362,6 +362,10 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.5.1 RELEASED - 2015-11-05
     //
+
+    // Update fix #9038 (bugged shotgun with bullet sync) to only work if all connected clients support it
+    // 2015-10-17 0x064 edbc6d37a734914b7349c693edf9a087a5a78a3d
+    ShotgunDamageFix,
 
     //
     // 1.5.2 RELEASED - 2016-01-24
