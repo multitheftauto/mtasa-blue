@@ -355,6 +355,10 @@ enum class eBitStreamVersion : unsigned short
 {
     Unk = 0x06F,
 
+    // Add analog control sync for accelerate and brake_reverse (#1164)
+    // 2020-04-02 0x06F 41e36cc67520dded2a5203727a726c4261c65e31
+    AnalogControlSync_AccelBrakeReverse,
+
     //
     // 1.5.8 RELEASED - 2020-10-11
     //

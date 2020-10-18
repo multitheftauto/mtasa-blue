@@ -872,7 +872,7 @@ struct SFullKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (bitStream.ReadBit())
             {
@@ -906,7 +906,7 @@ struct SFullKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
             {
@@ -961,7 +961,7 @@ struct SSmallKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (bitStream.ReadBit())
             {
@@ -995,7 +995,7 @@ struct SSmallKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
             {
