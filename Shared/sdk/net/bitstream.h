@@ -353,7 +353,7 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x066,
+    Unk = 0x065,
 
     //
     // 1.5.0 RELEASED - 2015-07-15
@@ -366,6 +366,10 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.5.2 RELEASED - 2016-01-24
     //
+
+    // Update net module version
+    // 2016-09-24 0x066 3de7e5bd2d425747617a24350f2974e02cddc6dc
+    NetUpdate_0x09E,
 
     //
     // 1.5.3 RELEASED - 2016-10-20
