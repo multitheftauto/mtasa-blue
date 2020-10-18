@@ -353,7 +353,11 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x06C,
+    Unk = 0x06B,
+
+    // Add bShallow argument for server-side water as well (#240)
+    // 2018-08-05 0x06C 1321b538559efe6d70deb5b784c2d392d52658f5
+    Water_bShallow_ServerSide,
 
     // Add option to disable spawning components by setVehicleDoorState
     // 2019-10-11 0x06D e79d97195439f70ac66ece1859152b4c4896af31

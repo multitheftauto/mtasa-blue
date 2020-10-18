@@ -3969,7 +3969,7 @@ retry:
                     }
 
                     bool bShallow = false;
-                    if (bitStream.Version() >= 0x06C)
+                    if (bitStream.Can(eBitStreamVersion::Water_bShallow_ServerSide))
                         bitStream.ReadBit(bShallow);
 
                     CClientWater* pWater = NULL;
@@ -5228,7 +5228,7 @@ void CPacketHandler::Packet_PedTask(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
 {
     uint8 flags;
-    
+
     if (!bitStream.Read(flags))
         return;
 
