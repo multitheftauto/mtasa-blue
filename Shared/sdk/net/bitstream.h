@@ -353,7 +353,7 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x068,
+    Unk = 0x067,
 
     //
     // 1.5.0 RELEASED - 2015-07-15
@@ -370,6 +370,10 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.5.3 RELEASED - 2016-10-20
     //
+
+    // Add -1 parameter to setElementDimension (only to objects) (#111)
+    // 2017-02-22 0x068 2e319aa823929360da9e1f48c7eb233f1d6f29e5
+    DimensionOmnipresence,
 
     // Add support for more special detections
     // 2017-02-26 0x069 9b6187b3c2eaa655624254f8d83acb35b31243e7

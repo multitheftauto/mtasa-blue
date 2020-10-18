@@ -226,7 +226,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteBit(bIsDoubleSided);
 
                     // Visible in all dimensions
-                    if (BitStream.Version() >= 0x068)
+                    if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                     {
                         bool bIsVisibleInAllDimensions = pObject->IsVisibleInAllDimensions();
                         BitStream.WriteBit(bIsVisibleInAllDimensions);

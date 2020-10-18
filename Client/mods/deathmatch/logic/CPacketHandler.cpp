@@ -2903,7 +2903,7 @@ retry:
                         if (bitStream.ReadBit())
                             pObject->SetDoubleSided(true);
 
-                        if (bitStream.Version() >= 0x068)
+                        if (bitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                             if (bitStream.ReadBit())
                                 pObject->SetVisibleInAllDimensions(true);
 
