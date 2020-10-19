@@ -63,7 +63,7 @@ public:
     LUA_DECLARE(IsTrainDerailable);
     LUA_DECLARE(GetTrainDirection);
     LUA_DECLARE(GetTrainSpeed);
-    LUA_DECLARE(GetTrainTrack);
+    static std::variant<uchar, bool> GetTrainTrack(CClientVehicle* pVehicle);
     LUA_DECLARE(GetTrainPosition);
     LUA_DECLARE(IsTrainChainEngine);
     LUA_DECLARE_OOP(GetVehicleGravity);
@@ -120,7 +120,7 @@ public:
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
     LUA_DECLARE(SetTrainSpeed);
-    LUA_DECLARE(SetTrainTrack);
+    static bool SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack);
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleGravity);
     LUA_DECLARE(SetVehicleHeadLightColor);

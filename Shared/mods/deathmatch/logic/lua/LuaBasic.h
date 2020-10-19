@@ -80,6 +80,12 @@ namespace lua
         return 1;
     }
 
+    inline int Push(lua_State* L, const CLuaArguments& args)
+    {
+        args.PushAsTable(L);
+        return 1;
+    }
+
     template <typename... Ts>
     int Push(lua_State* L, const std::variant<Ts...>&& val)
     {

@@ -2714,17 +2714,6 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CClientVehicle& Vehicle, float& f
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetTrainTrack(CClientVehicle& Vehicle, uchar& ucTrack)
-{
-    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
-        return false;
-    else if (Vehicle.IsDerailed())
-        return false;
-
-    ucTrack = Vehicle.GetTrainTrack();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetTrainPosition(CClientVehicle& Vehicle, float& fPosition)
 {
     if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
@@ -3361,17 +3350,6 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CClientVehicle& Vehicle, float fS
         return false;
 
     Vehicle.SetTrainSpeed(fSpeed);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetTrainTrack(CClientVehicle& Vehicle, uchar ucTrack)
-{
-    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
-        return false;
-    else if (Vehicle.IsDerailed())
-        return false;
-
-    Vehicle.SetTrainTrack(ucTrack);
     return true;
 }
 
@@ -4848,9 +4826,6 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
 {
     assert(pEntity);
 
-    // Save our current target for later
-    CClientEntity* pPreviousTarget = m_pCamera->GetTargetEntity();
-
     switch (pEntity->GetType())
     {
         case CCLIENTPLAYER:
@@ -4868,6 +4843,12 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
                 // Put the focus on that player
                 m_pCamera->SetFocus(pPlayer, MODE_CAM_ON_A_STRING, false);
             }
+            break;
+        }
+        case CCLIENTPED:
+        case CCLIENTVEHICLE:
+        {
+            m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
             break;
         }
         default:

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CTrainSA.h"
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
@@ -1581,7 +1582,7 @@ static DWORD CONTINUE_CTrain__ProcessControl = 0x6F8FE5;
 // 0xC37FEC; float RailTrackLength[NUM_TRACKS]
 static float* RailTrackLength = reinterpret_cast<float*>(0xC37FEC);
 
-static void _cdecl WrapTrainRailDistance(CVehicleSAInterface* train)
+static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
 {
     // Check if the train is driving on a valid rail track (id < NUM_TRACKS)
     if (train->m_ucRailTrackID >= 4)
