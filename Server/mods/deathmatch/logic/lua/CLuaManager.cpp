@@ -265,12 +265,6 @@ void CLuaManager::LoadCFunctions()
         CLuaCFunctions::AddFunction ( "setAccountPassword", CLuaFunctionDefinitions::SetAccountPassword },
         */
 
-        {"callRemote", CLuaFunctionDefs::CallRemote},
-        {"fetchRemote", CLuaFunctionDefs::FetchRemote},
-        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
-        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
-        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
-
         // Misc funcs
         {"resetMapInfo", CLuaFunctionDefs::ResetMapInfo},
         {"getServerPort", CLuaFunctionDefs::GetServerPort},
@@ -375,6 +369,7 @@ void CLuaManager::LoadCFunctions()
     CLuaElementDefs::LoadFunctions();
     CLuaHandlingDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
+    CLuaNetworkDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();
     CLuaPedDefs::LoadFunctions();
     CLuaPickupDefs::LoadFunctions();
