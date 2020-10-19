@@ -532,6 +532,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
+    m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
     {
@@ -3675,7 +3677,7 @@ void CGame::Packet_CameraSync(CCameraSyncPacket& Packet)
         }
         else
         {
-            CPlayer* pTarget = GetElementFromId<CPlayer>(Packet.m_TargetID);
+            CElement* pTarget = GetElementFromId<CElement>(Packet.m_TargetID);
             if (!pTarget)
                 pTarget = pPlayer;
 

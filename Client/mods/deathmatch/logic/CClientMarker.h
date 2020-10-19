@@ -94,6 +94,7 @@ private:
     CClientMarkerManager* m_pMarkerManager;
     CClientMarkerCommon*  m_pMarker;
 
+    CVector             m_vecPosition;
     static unsigned int m_uiStreamedInMarkers;
 
     CClientColShape* m_pCollision;
