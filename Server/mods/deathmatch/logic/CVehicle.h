@@ -367,7 +367,7 @@ private:
     CVector        m_vecTurnSpeed;
     float          m_fHealth;
     float          m_fLastSyncedHealthHealth;
-    bool           m_bLastSyncedIsInWater;
+    bool           m_bLastSyncedIsInWater = false;
     CTickCount     m_llBlowTime;
     CTickCount     m_llIdleTime;
 
