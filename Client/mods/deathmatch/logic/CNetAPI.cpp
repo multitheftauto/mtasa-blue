@@ -1981,7 +1981,11 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
     {
         // Write our target
         ElementID      ID = INVALID_ELEMENT_ID;
-        CClientEntity* pTarget = pCamera->GetTargetEntity();
+        CClientEntity* pTarget = pCamera->GetFocusedPlayer();
+
+        if (!pTarget)
+            pTarget = pCamera->GetTargetEntity();
+
         if (!pTarget)
             pTarget = g_pClientGame->GetLocalPlayer();
         if (!pTarget->IsLocalEntity())

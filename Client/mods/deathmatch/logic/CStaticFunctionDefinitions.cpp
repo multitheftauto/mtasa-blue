@@ -4848,6 +4848,9 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
         case CCLIENTPED:
         case CCLIENTVEHICLE:
         {
+            // Reset camera focus and remove all references
+            m_pCamera->SetFocusToLocalPlayer();
+            // Put the focus on entity
             m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
             break;
         }
