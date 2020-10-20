@@ -73,8 +73,48 @@ struct tHandlingDataSA
     float fSuspensionAntiDiveMultiplier;            // +196
 
     float fCollisionDamageMultiplier;            // +200
+    union
+    {
+        unsigned int uiModelFlags;            // +204
+        struct
+        {
+            unsigned int m_bIsVan : 1;
+            unsigned int m_bIsBus : 1;
+            unsigned int m_bIsLow : 1;
+            unsigned int m_bIsBig : 1;
+            unsigned int m_bReverseBonnet : 1;
+            unsigned int m_bHangingBoot : 1;
+            unsigned int m_bTailgateBoot : 1;
+            unsigned int m_bNoswingBoot : 1;
 
-    unsigned int uiModelFlags;                   // +204
+            unsigned int m_bNoDoors : 1;
+            unsigned int m_bTandemSeats : 1;
+            unsigned int m_bSitInBoat : 1;
+            unsigned int m_bConvertible : 1;
+            unsigned int m_bNoExhaust : 1;
+            unsigned int m_bDoubleExhaust : 1;
+            unsigned int m_bNo1fpsLookBehind : 1;
+            unsigned int m_bForceDoorCheck : 1;
+
+            unsigned int m_bAxleFNotlit : 1;
+            unsigned int m_bAxleFSolid : 1;
+            unsigned int m_bAxleFMcpherson : 1;
+            unsigned int m_bAxleFReverse : 1;
+            unsigned int m_bAxleRNotlit : 1;
+            unsigned int m_bAxleRSolid : 1;
+            unsigned int m_bAxleRMcpherson : 1;
+            unsigned int m_bAxleRReverse : 1;
+
+            unsigned int m_bIsBike : 1;
+            unsigned int m_bIsHeli : 1;
+            unsigned int m_bIsPlane : 1;
+            unsigned int m_bIsBoat : 1;
+            unsigned int m_bBouncePanels : 1;
+            unsigned int m_bDoubleRwheels : 1;
+            unsigned int m_bForceGroundClearance : 1;
+            unsigned int m_bIsHatchback : 1;
+        };
+    };
     unsigned int uiHandlingFlags;                // +208
     float        fSeatOffsetDistance;            // +212
     unsigned int uiMonetary;                     // +216

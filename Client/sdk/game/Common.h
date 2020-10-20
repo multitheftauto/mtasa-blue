@@ -1518,28 +1518,32 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
-enum eVehicleDummies
+namespace eVehicleDummy
 {
-    LIGHT_FRONT_MAIN = 0,
-    LIGHT_REAR_MAIN,
-    LIGHT_FRONT_SECONDARY,
-    LIGHT_REAR_SECONDARY,
-    SEAT_FRONT,
-    SEAT_REAR,
-    EXHAUST,
-    ENGINE,
-    GAS_CAP,
-    TRAILER_ATTACH,
-    HAND_REST,
-    EXHAUST_SECONDARY,
-    WING_AIRTRAIL,
-    VEH_GUN,
-    VEH_UNKNOWNDUMMY,
+    enum e
+    {
+        LIGHT_FRONT_MAIN = 0,
+        LIGHT_REAR_MAIN,
+        LIGHT_FRONT_SECONDARY,
+        LIGHT_REAR_SECONDARY,
+        SEAT_FRONT,
+        SEAT_REAR,
+        EXHAUST,
+        ENGINE,
+        GAS_CAP,
+        TRAILER_ATTACH,
+        HAND_REST,
+        EXHAUST_SECONDARY,
+        WING_AIRTRAIL,
+        VEH_GUN,
+        VEH_UNKNOWNDUMMY,
+        TOTAL_INTERNAL = 15,
 
-    // Anything above is not part of GTA
-    EXHAUST_LEFT,
-    EXHAUST_RIGHT,
-    VEHICLE_TOTAL_MTA_DUMMIES
+        // custom dummies for MTA, not part of GTA
+        EXHAUST_LEFT = 15,
+        EXHAUST_RIGHT = 16,
+        TOTAL = 17
+    };
 };
 
 enum class eResizableVehicleWheelGroup

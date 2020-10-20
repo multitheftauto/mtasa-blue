@@ -254,13 +254,13 @@ bool CWorldSA::TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSp
     }
 }
 
-void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ)
+void ConvertMatrixToEulerAngles(const CMatrixSAInterface& matrixPadded, float& fX, float& fY, float& fZ)
 {
     // Convert the given matrix to a padded matrix
-    // CMatrix_Padded matrixPadded ( Matrix );
+    // CMatrixSAInterface matrixPadded ( Matrix );
 
     // Grab its pointer and call gta's func
-    const CMatrix_Padded* pMatrixPadded = &matrixPadded;
+    const CMatrixSAInterface* pMatrixPadded = &matrixPadded;
     DWORD                 dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
 
     float* pfX = &fX;

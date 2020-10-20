@@ -16,6 +16,7 @@
 #include <game/CEntity.h>
 #include <CMatrix.h>
 #include <CMatrix_Pad.h>
+#include "CMatrixSA.h"
 #include <CVector2D.h>
 #include <CVector.h>
 
@@ -120,7 +121,7 @@ class CPlaceableSAInterface            // 20 bytes
 {
 public:
     CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
+    CMatrixSAInterface*         matrix;
 };
 
 class CEntitySAInterface
@@ -226,6 +227,9 @@ public:
         return -1;
     }
 
+    inline CVector& GetRight() { return Placeable.matrix->vRight; }
+    inline CVector& GetForward() { return Placeable.matrix->vFront; }
+    inline CVector& GetUp() { return Placeable.matrix->vUp; }
     inline CVector& GetPosition() { return Placeable.matrix ? Placeable.matrix->vPos : Placeable.m_transform.m_translate; }
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");

@@ -136,7 +136,6 @@ public:
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
-    void SetVehicleAddExhaustParticlesHandler(VehicleAddExhaustParticlesHandler* pHandler);
     void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
 
     void  AllowMouseMovement(bool bAllow);

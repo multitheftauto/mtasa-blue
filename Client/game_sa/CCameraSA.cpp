@@ -14,7 +14,7 @@
  * \todo Need to add other TakeControl functions
  */
 
-auto g_TheCamera = *reinterpret_cast<CCameraSAInterface*>(0xB6F028);
+CCameraSAInterface& CCameraSA::g_TheCamera = *reinterpret_cast<CCameraSAInterface*>(0xB6F028);
 
 unsigned long CCameraSA::FUNC_RwFrameGetLTM;
 static bool   bCameraClipObjects;
@@ -248,7 +248,7 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 {
     DEBUG_TRACE("CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )");
     // CCameraSAInterface * pCamInterface = this->GetInterface();
-    CMatrix_Padded* pCamMatrix = &this->GetInterface()->m_cameraMatrix;            // ->Placeable.matrix;
+    CMatrixSAInterface* pCamMatrix = &this->GetInterface()->m_cameraMatrix;            // ->Placeable.matrix;
     if (pCamMatrix)
     {
         matrix->vFront = pCamMatrix->vFront;
@@ -272,7 +272,7 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 VOID CCameraSA::SetMatrix(CMatrix* matrix)
 {
     DEBUG_TRACE("VOID CCameraSA::SetMatrix ( CMatrix * matrix )");
-    CMatrix_Padded* pCamMatrix = this->GetInterface()->Placeable.matrix;
+    CMatrixSAInterface* pCamMatrix = this->GetInterface()->Placeable.matrix;
     if (pCamMatrix)
     {
         pCamMatrix->vFront = matrix->vFront;

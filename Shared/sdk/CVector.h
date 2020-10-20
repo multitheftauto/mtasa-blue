@@ -49,6 +49,7 @@ public:
         this->fZ = vec.fZ;
     }
 
+    inline bool IsZero() { return fX == 0.0f && fY == 0.0f && fZ == 0.0f; }
     float Normalize()
     {
         float t = sqrt(fX * fX + fY * fY + fZ * fZ);

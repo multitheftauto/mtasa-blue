@@ -347,13 +347,13 @@ void CPhysicalSA::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
 float CPhysicalSA::GetLighting()
 {
     CPhysicalSAInterface* pInterface = (CPhysicalSAInterface*)this->GetInterface();
-    return pInterface->m_fLighting;
+    return pInterface->m_fContactSurfaceBrightness;
 }
 
 void CPhysicalSA::SetLighting(float fLighting)
 {
     CPhysicalSAInterface* pInterface = (CPhysicalSAInterface*)this->GetInterface();
-    pInterface->m_fLighting = fLighting;
+    pInterface->m_fContactSurfaceBrightness = fLighting;
 }
 
 void CPhysicalSA::SetFrozen(bool bFrozen)

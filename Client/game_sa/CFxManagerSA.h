@@ -54,6 +54,8 @@ public:
     int                      iCurrentMatrix;               // 0x88
     RwMatrix*                apmatMatrices[8];             // 0x8C
     CFxMemoryPoolSAInterface fxMemoryPool;                 // 0xAC
+
+    CFxSystemSAInterface* CreateFxSystem(char* name, RwV3d* position, RwMatrix* objectMatrix, bool ignoreBoundingChecks);
 };
 static_assert(sizeof(CFxManagerSAInterface) == 0xB8, "Invalid size for CFxManagerSAInterface");
 
@@ -73,6 +75,8 @@ public:
     CFxSystemSA* GetFxSystem(CFxSystemSAInterface* pFxSystemSAInterface);
     void         AddToList(CFxSystemSAInterface* pFxSystemSAInterface, CFxSystemSA* pFxSystemSA);
     void         RemoveFromList(CFxSystemSA* pFxSystemSA);
+
+    static CFxManagerSAInterface& g_fxMan;
 
 private:
     CFxManagerSAInterface*                            m_pInterface;

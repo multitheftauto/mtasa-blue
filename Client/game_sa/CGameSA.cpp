@@ -202,6 +202,8 @@ CGameSA::CGameSA()
 
     CEntitySAInterface::StaticSetHooks();
     CPhysicalSAInterface::StaticSetHooks();
+    CVehicleSAInterface::StaticSetHooks();
+    CAutomobileSAInterface::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();

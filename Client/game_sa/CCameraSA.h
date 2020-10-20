@@ -86,15 +86,28 @@ public:
 class CCameraSAInterface
 {
 public:
-    // CPlaceable
-    CPlaceableSAInterface Placeable;
-    // End CPlaceable
-
+    // Some of these members are positioned incorrectly, so
+    // the union is used for properly accessing Placeable member.
+    // This class inherits from CPlaceableSAInterface, and
+    // CPlaceableSAInterface has a virtual table at top.
+    // TODO: Fix incorrect names and get rid of the union.
+    union
+    {
+        struct
+        {
+            char padding[20];
+            bool m_bAboveGroundTrainNodesLoaded;
+            bool m_bBelowGroundTrainNodesLoaded;
+            bool m_bCamDirectlyBehind;
+            bool m_bCamDirectlyInFront;
+        };
+        struct
+        {
+            unsigned int          vtable;
+            CPlaceableSAInterface Placeable;
+        };
+    };
     // move these out the class, have decided to set up a mirrored enumerated type thingy at the top
-    bool          m_bAboveGroundTrainNodesLoaded;
-    bool          m_bBelowGroundTrainNodesLoaded;
-    bool          m_bCamDirectlyBehind;
-    bool          m_bCamDirectlyInFront;
     bool          m_bCameraJustRestored;
     bool          m_bcutsceneFinished;
     bool          m_bCullZoneChecksOn;
@@ -330,21 +343,21 @@ public:
 //  protected:
 #if 0
     // Original
-    CMatrix_Padded m_cameraMatrix;
-    CMatrix_Padded m_cameraMatrixOld;
-    CMatrix_Padded m_viewMatrix;
-    CMatrix_Padded m_matInverse;
-    CMatrix_Padded m_matMirrorInverse;
-    CMatrix_Padded m_matMirror;
+    CMatrixSAInterface m_cameraMatrix;
+    CMatrixSAInterface m_cameraMatrixOld;
+    CMatrixSAInterface m_viewMatrix;
+    CMatrixSAInterface m_matInverse;
+    CMatrixSAInterface m_matMirrorInverse;
+    CMatrixSAInterface m_matMirror;
 #else
     // Looks more likely to be this
-    CMatrix_Padded m_cameraMatrix;
+    CMatrixSAInterface m_cameraMatrix;
     int            unk1[2];
-    CMatrix_Padded m_cameraMatrixOld;
+    CMatrixSAInterface m_cameraMatrixOld;
     int            unk2[2];
-    CMatrix_Padded m_viewMatrix;
+    CMatrixSAInterface m_viewMatrix;
     int            unk3[2];
-    CMatrix_Padded m_matInverse;
+    CMatrixSAInterface m_matInverse;
     int            unk4[26];
 #endif
 
@@ -390,8 +403,6 @@ public:
     inline CVector& GetPosition() { return Placeable.matrix ? Placeable.matrix->vPos : Placeable.m_transform.m_translate; }
 };
 // static_assert(sizeof(CCameraSAInterface) == 0xD78, "Invalid size for CCameraSAInterface");
-
- extern CCameraSAInterface& g_TheCamera;
 
 class CCameraSA : public CCamera
 {
@@ -442,6 +453,8 @@ public:
     void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);
     float     GetShakeForce();
+
+    static CCameraSAInterface& g_TheCamera;
 
 private:
     static unsigned long FUNC_RwFrameGetLTM;

@@ -3578,7 +3578,7 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummy::e eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3600,21 +3600,21 @@ bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummy::e eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
         auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
         {
-            vecPosition = *pModelInfo->GetVehicleDummyPosition(eDummies);
+            vecPosition = pModelInfo->GetVehicleDummyPosition(eDummies);
             return true;
         }
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(CClientVehicle* pVehicle, unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(CClientVehicle* pVehicle, unsigned short usModel, eVehicleDummy::e eDummy, CVector& vecPosition)
 {
     if (pVehicle)
     {
@@ -3625,14 +3625,8 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(CClientVehicle* pV
             return true;
         }
 
-        if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(pVehicle->GetModel(), EXHAUST, vecPosition))
-        {
-            if (eDummy == EXHAUST_RIGHT)
-            {
-                vecPosition.fX *= -1;
-            }
+        if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(pVehicle->GetModel(), eVehicleDummy::e::EXHAUST, vecPosition))
             return true;
-        }
     }
 
     return CStaticFunctionDefinitions::GetVehicleModelDummyPosition(usModel, eDummy, vecPosition);
@@ -3659,7 +3653,7 @@ bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned sh
         auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
         {
-            vecPosition = *pModelInfo->GetVehicleExhaustFumesPosition();
+            vecPosition = pModelInfo->GetVehicleExhaustFumesPosition();
             return true;
         }
     }

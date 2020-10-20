@@ -326,9 +326,27 @@ class CAutoPilot
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
-/**
- * \todo GAME RELEASE: Update CVehicleSAInterface
- */
+
+namespace eVehicleClass
+{
+    enum
+    {
+        NONE = -1,
+        AUTOMOBILE = 0,
+        MTRUCK,
+        QUAD,
+        HELI,
+        PLANE,
+        BOAT,
+        TRAIN,
+        FAKE_HELI,
+        FAKE_PLANE,
+        BIKE,
+        BMX,
+        TRAILER
+    };
+};
+
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
@@ -430,14 +448,16 @@ public:
     RwTexture* m_pCustomPlateTexture;
 
     // 1420
-    BYTE Padding225[4];
+    CVehicleSAInterface* field_58C;
 
     // 1424
-    BYTE m_type;            // 0 = car/plane, 5 = boat, 6 = train, 9 = bike
+    unsigned char m_nVehicleClass;               // see eVehicleClass
+    unsigned int  m_nVehicleSubClass;            // see eVehicleClass
+    short         m_nPreviousRemapTxd;
+    short         m_nRemapTxd;
+    RwTexture*    m_pRemapTexture;
 
-    // 1425
-    BYTE Padding226[15];
-
+    static void StaticSetHooks();
     void AddExhaustParticles();
 };
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
@@ -445,7 +465,6 @@ static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAI
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
-
 private:
     CDamageManagerSA*                m_pDamageManager;
     CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity;

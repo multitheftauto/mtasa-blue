@@ -103,8 +103,8 @@ public:
     CVector                   m_vecUnk;                                   // 280
     uint32                    m_pad4;                                     // 292
     class CPtrNodeDoubleLink* m_pControlCodeNodeLink;                     // 296
-    float                     m_fLighting;                                // 300
-    float                     m_fLighting2;                               // 304
+    float                     m_fContactSurfaceBrightness;                                // 300
+    float                     m_fDynamicLighting;                               // 304
     class CShadowDataSA*      m_pShadowData;                              // 308
 
     CRect*      GetBoundRect_(CRect* pRect);

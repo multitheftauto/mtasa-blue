@@ -40,6 +40,12 @@
 #define FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT   ( 1 / 256.f )
 #define FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT ( 1 / 64.f )
 
+enum class eFxSystemPlayStatus
+{
+    FX_PLAYING = 0,
+    FX_STOPPED = 1
+};
+
 class CAEFireAudioEntitySAInterface
 {
 public:
@@ -51,7 +57,9 @@ public:
 };
 static_assert(sizeof(CAEFireAudioEntitySAInterface) == 0x88, "Invalid size for CAEFireAudioEntitySAInterface");
 
+class CFxPrtMult;
 class CFxSystemBPSAInterface;
+
 class CFxSystemSAInterface            // Internal SA Name: FxSystem_c
 {
 public:
@@ -78,6 +86,20 @@ public:
     void*                         pSphere;                       // 0x74
     void**                        ppParticleEmitters;            // 0x78 (Array of particle emitters, amount is defined by the blueprint)
     CAEFireAudioEntitySAInterface audioEntity;                   // 0x7C
+
+    CFxSystemSAInterface();
+    ~CFxSystemSAInterface();
+    void Play();
+    void Pause();
+    void Stop();
+    void PlayAndKill();
+    void Kill();
+    void AttachToBone(CEntitySAInterface* entity, int boneId);
+    void AddParticle(RwV3d* position, RwV3d* velocity, float arg2, CFxPrtMult* prtMult, float arg4, float brightness, float arg6, unsigned char arg7);
+    void AddParticle(RwMatrixTag* transform, RwV3d* position, float arg2, CFxPrtMult* prtMult, float arg4, float arg5, float arg6, unsigned char arg7);
+    void SetConstTime(unsigned char arg0, float amount);
+    eFxSystemPlayStatus GetPlayStatus();
+    void SetLocalParticles(unsigned char enable);
 };
 static_assert(sizeof(CFxSystemSAInterface) == 0x104, "Invalid size for CFxSystemSAInterface");
 

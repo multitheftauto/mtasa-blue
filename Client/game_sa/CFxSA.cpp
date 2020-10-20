@@ -11,6 +11,23 @@
 
 #include "StdInc.h"
 
+CFxSAInterface& CFxSA::g_fx = *(CFxSAInterface*)0xA9AE00;
+
+CFxPrtMult::CFxPrtMult()
+{
+    ((void(__thiscall*)(CFxPrtMult*))0x4AB270)(this);
+}
+
+CFxPrtMult::CFxPrtMult(float red, float green, float blue, float alpha, float size, float arg5, float lastFactor)
+{
+    ((void(__thiscall*)(CFxPrtMult*, float, float, float, float, float, float, float))0x4AB290)(this, red, green, blue, alpha, size, arg5, lastFactor);
+}
+
+void CFxPrtMult::SetUp(float red, float green, float blue, float alpha, float size, float arg5, float lastFactor)
+{
+    ((void(__thiscall*)(CFxPrtMult*, float, float, float, float, float, float, float))0x4AB2D0)(this, red, green, blue, alpha, size, arg5, lastFactor);
+}
+
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
     CVector* pvecPosition = &vecPosition;

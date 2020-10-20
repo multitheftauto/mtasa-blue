@@ -3854,7 +3854,7 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
     // bool setVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy, float x, float y, float z )
     CClientVehicle* pVehicle = nullptr;
     unsigned short  usModel;
-    eVehicleDummies eDummy;
+    eVehicleDummy::e eDummy;
     CVector         vecPosition;
 
     CScriptArgReader argStream(luaVM);
@@ -3898,7 +3898,7 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
     // float, float, float getVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy )
     CClientVehicle* pVehicle = nullptr;
     unsigned short  usModel = 0;
-    eVehicleDummies eDummy = LIGHT_FRONT_MAIN;
+    eVehicleDummy::e eDummy = eVehicleDummy::e::LIGHT_FRONT_MAIN;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsNumber())
@@ -3936,7 +3936,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
     // float, float, float getVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy )
     CClientVehicle* pVehicle = nullptr;
     unsigned short  usModel;
-    eVehicleDummies eDummy;
+    eVehicleDummy::e eDummy;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsNumber())

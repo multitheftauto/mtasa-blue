@@ -125,6 +125,11 @@ struct SVehicleComponentData
     bool    m_bVisible;
 };
 class CClientProjectile;
+struct SVehicleDummy
+{
+    bool    bSet = false;
+    CVector vecPosition;
+};
 
 class CClientVehicle : public CClientStreamElement
 {
@@ -133,13 +138,6 @@ class CClientVehicle : public CClientStreamElement
     friend class CClientPed;
     friend class CClientVehicleManager;
     friend class CClientGame;            // TEMP HACK
-
-    struct SVehicleDummy
-    {
-        bool    bSet;
-        CVector vecPosition;
-    };
-
 protected:            // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
                       // cleaned up.
     CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2);
@@ -490,9 +488,6 @@ public:
     bool SetComponentScale(const SString& vehicleComponent, CVector vecScale, EComponentBaseType base = EComponentBase::PARENT);
     bool GetComponentScale(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType base = EComponentBase::PARENT);
 
-    void                                               SetDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition);
-    CVector*                                           GetDummyPosition(eVehicleDummies eDummy);
-
     bool                                               SetComponentVisible(const SString& vehicleComponent, bool bVisible);
     bool                                               GetComponentVisible(const SString& vehicleComponent, bool& bVisible);
     std::map<SString, SVehicleComponentData>::iterator ComponentsBegin() { return m_ComponentData.begin(); }
@@ -507,6 +502,9 @@ public:
     float GetWheelScale();
     void  SetWheelScale(float fWheelScale);
     void  ResetWheelScale();
+
+    void     SetDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition);
+    CVector* GetDummyPosition(eVehicleDummy::e eDummy);
 
     bool OnVehicleFallThroughMap();
 
@@ -696,9 +694,9 @@ public:
     unsigned long  m_ulLastSyncTime;
     const char*    m_szLastSyncType;
 #endif
-    SLastSyncedVehData*                      m_LastSyncedData;
-    SSirenInfo                               m_tSirenBeaconInfo;
-    std::map<SString, SVehicleComponentData> m_ComponentData;
-    bool                                     m_bAsyncLoadingDisabled;
-    std::array<SVehicleDummy, VEHICLE_TOTAL_MTA_DUMMIES> m_arrDummies = {0};
+    SLastSyncedVehData*                                  m_LastSyncedData;
+    SSirenInfo                                           m_tSirenBeaconInfo;
+    std::map<SString, SVehicleComponentData>             m_ComponentData;
+    bool                                                 m_bAsyncLoadingDisabled;
+    std::array<SVehicleDummy, eVehicleDummy::e::TOTAL> m_arrDummies = {0};
 };

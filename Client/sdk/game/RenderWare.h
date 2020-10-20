@@ -72,17 +72,20 @@ struct RwSphere
     RwV3d position;
     float radius;
 };
-struct RwMatrix
-{                                  // 16-byte padded
-    RwV3d        right;            // 0
-    unsigned int flags;            // 12
-    RwV3d        up;               // 16
-    unsigned int pad1;             // 28
-    RwV3d        at;               // 32
-    unsigned int pad2;             // 44
-    RwV3d        pos;              // 48
-    unsigned int pad3;             // 60
+struct RwMatrixTag
+{
+    /* These are padded to be 16 byte quantities per line */
+    RwV3d         right;
+    std::uint32_t flags;
+    RwV3d         up;
+    std::uint32_t pad1;
+    RwV3d         at;
+    std::uint32_t pad2;
+    RwV3d         pos;
+    std::uint32_t pad3;
 };
+
+typedef RwMatrixTag RwMatrix;
 
 // RenderWare enumerations
 enum RwPrimitiveType
@@ -143,6 +146,13 @@ enum RpLightFlags
 };
 
 // RenderWare/plugin base types
+struct RwRGBAReal
+{
+    float red;   /**< red component */
+    float green; /**< green component */
+    float blue;  /**< blue component */
+    float alpha; /**< alpha component */
+};
 struct RwObject
 {
     unsigned char type;
@@ -151,6 +161,10 @@ struct RwObject
     unsigned char privateFlags;
     void*         parent;            // should be RwFrame with RpClump
 };
+
+#define rwObjectGetParent(object) (((const RwObject*)(object))->parent)
+#define rwObjectSetParent(c, p)   (((RwObject*)(c))->parent) = (void*)(p)
+
 struct RwVertex
 {
     RwV3d        position;
@@ -181,6 +195,10 @@ struct RwFrame
     unsigned char pluginData[8];                               // padding
     char          szName[RW_FRAME_NAME_LENGTH + 1];            // name (as stored in the frame extension)
 };
+
+#define RwFrameGetMatrixMacro(_f) (&(_f)->modelling)
+#define RwFrameGetMatrix(_f)      RwFrameGetMatrixMacro(_f)
+
 struct RwTexDictionary
 {
     RwObject    object;

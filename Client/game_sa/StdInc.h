@@ -118,3 +118,7 @@
 #include "CBuoyancySA.h"
 #include "CEventGroupSA.h"
 #include "CTrainSA.h"
+#include "CMatrixSA.h"
+#include "CGeneralSA.h"
+#include "CWaterLevelSA.h"
+#include "List_c.h"

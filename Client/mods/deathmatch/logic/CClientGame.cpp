@@ -283,11 +283,11 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
-    g_pMultiplayer->SetVehicleAddExhaustParticlesHandler(CClientGame::StaticVehicleAddExhaustParticlesHandler);
     g_pMultiplayer->SetVehicleWeaponHitHandler(CClientGame::StaticVehicleWeaponHitHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
+    g_pGame->SetVehicleAddExhaustParticlesHandler(CClientGame::StaticVehicleAddExhaustParticlesHandler);
     g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
     g_pCore->SetMessageProcessor(CClientGame::StaticProcessMessage);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(CClientGame::StaticKeyStrokeHandler);
@@ -450,11 +450,11 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
-    g_pMultiplayer->SetVehicleAddExhaustParticlesHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
+    g_pGame->SetVehicleAddExhaustParticlesHandler(nullptr);
     g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
     g_pCore->SetMessageProcessor(NULL);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(NULL);
@@ -3863,9 +3863,9 @@ void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
     return g_pClientGame->PedStepHandler(pPed, bFoot);
 }
 
-void CClientGame::StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector** pLeftFumesPosition, CVector** pRightFumesPosition)
+void CClientGame::StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition)
 {
-    g_pClientGame->VehicleAddExhaustParticlesHandler(pInterface, pLeftFumesPosition, pRightFumesPosition);
+    g_pClientGame->VehicleAddExhaustParticlesHandler(pInterface, leftFumesPosition, rightFumesPosition);
 }
 
 void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
@@ -7085,34 +7085,26 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
     }
 }
 
-void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector** pLeftFumesPosition, CVector** pRightFumesPosition)
+void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition)
 {
-    CPools*                    pPools = g_pGame->GetPools();
-    SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
-    if (pVehicleClientEntity)
+    CPools*                    pools = g_pGame->GetPools();
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
+    if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
     {
-        CClientVehicle* pVehicle = reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
-        if (pVehicle)
-        {
-            CModelInfo* pModelInfo = pVehicle->GetModelInfo();
-            if (!pModelInfo)
-            {
-                return;
-            }
-
-            *pLeftFumesPosition = pVehicle->GetDummyPosition(EXHAUST_LEFT);
-            *pRightFumesPosition = pVehicle->GetDummyPosition(EXHAUST_RIGHT);
-            if (!(*pLeftFumesPosition))
-            {
-                *pLeftFumesPosition = pModelInfo->GetVehicleDummyPosition(EXHAUST);
-            }
-
-            if (!(*pRightFumesPosition))
-            {
-                *pRightFumesPosition = pModelInfo->GetVehicleDummyPosition(EXHAUST);
-                (*pRightFumesPosition)->fX *= -1;
-            }
-        }
+        auto        vehicle = static_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+        CModelInfo* modelInfo = vehicle->GetModelInfo();
+        if (!modelInfo)
+            return;
+        CVector* leftPos = vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT);
+        if (leftPos)
+            leftFumesPosition = *leftPos;
+        else
+            leftFumesPosition = modelInfo->GetVehicleDummyPosition(eVehicleDummy::e::EXHAUST_LEFT);
+        CVector* rightPos = vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT);
+        if (rightPos)
+            rightFumesPosition = *rightPos;
+        else
+            rightFumesPosition = modelInfo->GetVehicleDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT);
     }
 }
 

@@ -426,10 +426,12 @@ public:
     void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
     void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
+    void SetVehicleAddExhaustParticlesHandler(VehicleAddExhaustParticlesHandler* pHandler) { m_pVehicleAddExhaustParticlesHandler = pHandler; }
 
-    PreWeaponFireHandler*   m_pPreWeaponFireHandler;
-    PostWeaponFireHandler*  m_pPostWeaponFireHandler;
-    TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
+    PreWeaponFireHandler*              m_pPreWeaponFireHandler = nullptr;
+    PostWeaponFireHandler*             m_pPostWeaponFireHandler = nullptr;
+    TaskSimpleBeHitHandler*            m_pTaskSimpleBeHitHandler = nullptr;
+    VehicleAddExhaustParticlesHandler* m_pVehicleAddExhaustParticlesHandler = nullptr;
 
 private:
     CPools*                         m_pPools;

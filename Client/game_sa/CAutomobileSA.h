@@ -97,6 +97,8 @@ public:
 };
 static_assert(sizeof(CBouncingPanelSAInterface) == 0x20, "Invalid size for CBouncingPanelSAInterface");
 
+class CFxSystemSAInterface;
+
 class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
@@ -181,11 +183,14 @@ public:
     char                      field_963;
     float                     field_964;
     int                       field_968[4];
-    void*                     pNitroParticle[2];
+    CFxSystemSAInterface*     m_exhaustNitroFxSystem[2];
     char                      field_980;
     char                      field_981;
     short                     field_982;
     float                     field_984;
+
+    static void StaticSetHooks();
+    void DoNitroEffect(float power);
 };
 static_assert(sizeof(CAutomobileSAInterface) == 0x988, "Invalid size for CAutomobileSAInterface");
 

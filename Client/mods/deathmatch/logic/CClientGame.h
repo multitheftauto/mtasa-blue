@@ -539,7 +539,7 @@ private:
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
     static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
-    static void StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector** pLeftFumesPosition, CVector** pRightFumesPosition);
+    static void StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition);
     static void StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
@@ -632,7 +632,7 @@ public:
     void InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed);
 
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
-    void VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector** pLeftFumesPosition, CVector** pRightFumesPosition);
+    void VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition);
     void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
 private:

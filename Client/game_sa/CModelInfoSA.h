@@ -18,6 +18,7 @@
 #include "CRenderWareSA.h"
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
+class CVehicleModelInfoSAInterface;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
@@ -217,6 +218,8 @@ public:
     // +726 = Word array as referenced in CVehicleModelInfo::GetVehicleUpgrade(int)
     // +762 = Array of WORD containing something relative to paintjobs
     // +772 = Anim file index
+
+    CVehicleModelInfoSAInterface* AsVehicleModelInfoPtr() { return reinterpret_cast<CVehicleModelInfoSAInterface*>(this); }
 };
 
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
@@ -278,15 +281,13 @@ protected:
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::unordered_map<std::uint32_t, std::map<eVehicleDummy::e, CVector>> ms_ModelDefaultDummiesPosition;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
-    static CBaseModelInfoSAInterface** ms_modelInfoPtrs;
-
     CModelInfoSA();
     CModelInfoSA(DWORD dwModelID);
 
@@ -351,10 +352,10 @@ public:
     unsigned int GetNumRemaps();
     void*        GetVehicleSuspensionData();
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
-    CVector*     GetVehicleExhaustFumesPosition() override;
+    CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
-    CVector*     GetVehicleDummyPosition(eVehicleDummies eDummy) override;
-    void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
+    CVector      GetVehicleDummyPosition(eVehicleDummy::e eDummy) override;
+    void         SetVehicleDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
     float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) override;

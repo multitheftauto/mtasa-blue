@@ -13,6 +13,7 @@
 
 #include <game/CBike.h>
 #include "CVehicleSA.h"
+#include "CMatrixSA.h"
 
 #define FUNC_CBike_PlaceOnRoadProperly              0x6BEEB0
 
@@ -49,10 +50,11 @@ static_assert(sizeof(CRideAnimDataSAInterface) == 0x1C, "Invalid size for CRideA
 
 class CBikeSAInterface : public CVehicleSAInterface
 {
+public:
     RwFrame*                 m_aBikeNodes[eBikeNode::NUM_NODES];
     bool                     m_bLeanMatrixCalculated;
     char                     _pad0[3];
-    char                     m_mLeanMatrix[0x48];            // Change the type to CMatrixSAInterface after merging #1673
+    CMatrixSAInterface       m_mLeanMatrix;
     unsigned char            m_nDamageFlags;
     char                     field_615[27];
     CVector                  field_630;
@@ -64,7 +66,7 @@ class CBikeSAInterface : public CVehicleSAInterface
     CColPointSAInterface     m_anWheelColPoint[4];
     float                    m_wheelsDistancesToGround1[4];
     float                    field_720[4];
-    float                    field_730[4];
+    float                    m_wheelCollisionState[4];
     float                    field_740;
     int                      m_anWheelSurfaceType[2];
     char                     field_74C[2];

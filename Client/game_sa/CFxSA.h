@@ -12,6 +12,8 @@
 #pragma once
 
 #include <game/CFx.h>
+#include "CFxSystemSA.h"
+#include "List_c.h"
 
 #define FUNC_CFx_AddBlood                  0x49eb00
 #define FUNC_CFx_AddWood                   0x49ee10
@@ -34,10 +36,59 @@
 #define FUNC_CFx_TriggerBulletSplash       0x4a10e0
 #define FUNC_CFx_TriggerFootSplash         0x4a1150
 
+enum class eFxQuality : unsigned int
+{
+    LOW,
+    MEDIUM,
+    HIGH,
+    VERY_HIGH
+};
+
+class CFxPrtMult
+{
+public:
+    RwRGBAReal m_color;
+    float      m_fSize;
+    float      field_14;
+    float      m_fLife;
+
+    CFxPrtMult();
+    CFxPrtMult(float red, float green, float blue, float alpha, float size, float arg5, float lastFactor);
+    void SetUp(float red, float green, float blue, float alpha, float size, float arg5, float lastFactor);
+};
+static_assert(sizeof(CFxPrtMult) == 0x1C, "Invalid size for CFxPrtMult");
+
 class CFxSAInterface
 {
 public:
+    CFxSystemSAInterface* m_pPrtBlood;
+    CFxSystemSAInterface* m_pPrtBoatsplash;
+    CFxSystemSAInterface* m_pPrtBubble;
+    CFxSystemSAInterface* m_pPrtCardebris;
+    CFxSystemSAInterface* m_pPrtCollisionsmoke;
+    CFxSystemSAInterface* m_pPrtGunshell;
+    CFxSystemSAInterface* m_pPrtSand;
+    CFxSystemSAInterface* m_pPrtSand2;
+    CFxSystemSAInterface* m_pPrtSmoke_huge;
+    CFxSystemSAInterface* m_pPrtSmokeII3expand;
+    CFxSystemSAInterface* m_pPrtSpark;
+    CFxSystemSAInterface* m_pPrtSpark2;
+    CFxSystemSAInterface* m_pPrtSplash;
+    CFxSystemSAInterface* m_pPrtWake;
+    CFxSystemSAInterface* m_pPrtWatersplash;
+    CFxSystemSAInterface* m_pPrtWheeldirt;
+    CFxSystemSAInterface* m_pPrtGlass;
+    TList_c<ListItem_c>   m_entityFxList;
+    unsigned int          m_nBloodPoolsCount;
+    eFxQuality            m_fxQuality;
+    unsigned int          m_nVerticesCount2;
+    unsigned int          m_nVerticesCount;
+    unsigned int          m_nTransformRenderFlags;
+    RwRaster*             m_pRasterToRender;
+    RwMatrix*             m_pTransformLTM;
+    void*                 m_pVerts;
 };
+static_assert(sizeof(CFxSAInterface) == 0x70, "Invalid size for CFxSAInterface");
 
 class CFxSA : public CFx
 {
@@ -60,6 +111,7 @@ public:
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
 
+    static CFxSAInterface& g_fx;
 private:
     CFxSAInterface* m_pInterface;
 };

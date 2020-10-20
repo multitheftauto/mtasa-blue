@@ -84,10 +84,12 @@ typedef void(InRenderer)();
 #include <windows.h>
 
 enum eEntityType;
+class CVehicleSAInterface;
 
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)();
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
+typedef void(VehicleAddExhaustParticlesHandler)(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition);
 
 enum eGameVersion
 {
@@ -248,6 +250,7 @@ public:
     virtual void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) = 0;
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
+    virtual void SetVehicleAddExhaustParticlesHandler(VehicleAddExhaustParticlesHandler* pHandler) = 0;
 
     virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
 };

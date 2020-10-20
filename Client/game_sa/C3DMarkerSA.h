@@ -28,8 +28,7 @@
 class C3DMarkerSAInterface
 {
 public:
-    CMatrix_Padded m_mat;                    // local space to world space transform // 0
-    DWORD          dwPad, dwPad2;            // not sure why we need these, it appears to be this way though (eAi)  // 64/68
+    CMatrixSAInterface m_mat;                    // local space to world space transform // 0
     RpClump*       m_pRwObject;              // 72
     DWORD*         m_pMaterial;              // 76
 

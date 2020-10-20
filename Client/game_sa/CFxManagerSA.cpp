@@ -11,6 +11,14 @@
 
 #include "StdInc.h"
 
+CFxManagerSAInterface& CFxManagerSA::g_fxMan = *(CFxManagerSAInterface*)0xA9AE80;
+
+CFxSystemSAInterface* CFxManagerSAInterface::CreateFxSystem(char* name, RwV3d* position, RwMatrix* objectMatrix, bool ignoreBoundingChecks)
+{
+    return ((CFxSystemSAInterface * (__thiscall*)(CFxManagerSAInterface*, char*, RwV3d*, RwMatrix*, bool))0x4A9BE0)(this, name, position, objectMatrix,
+                                                                                                                             ignoreBoundingChecks);
+}
+
 CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
                                         bool bSoundEnable)
 {

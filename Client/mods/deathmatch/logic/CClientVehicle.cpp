@@ -4671,29 +4671,6 @@ bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector&
     return false;
 }
 
-
-void CClientVehicle::SetDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
-{
-    if (eDummy == EXHAUST)
-    {
-        SetDummyPosition(EXHAUST_LEFT, vecPosition);
-        SetDummyPosition(EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
-        return;
-    }
-    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
-    vehicleDummy.bSet = true;
-    vehicleDummy.vecPosition = vecPosition;
-}
-
-CVector* CClientVehicle::GetDummyPosition(eVehicleDummies eDummy)
-{
-    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
-    if (vehicleDummy.bSet)
-    {
-        return &vehicleDummy.vecPosition;
-    }
-    return nullptr;
-}
 bool CClientVehicle::ResetComponentScale(const SString& vehicleComponent)
 {
     // set our rotation on the model
@@ -5058,4 +5035,31 @@ void CClientVehicle::ResetWheelScale()
         m_fWheelScale = 1.0f;
 
     m_bWheelScaleChanged = false;
+}
+
+void CClientVehicle::SetDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition)
+{
+    if (eDummy == eVehicleDummy::e::EXHAUST)
+    {
+        SetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT, vecPosition);
+        SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
+        return;
+    }
+    else if (eDummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].bSet)
+    {
+        SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
+    }
+    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
+    vehicleDummy.bSet = true;
+    vehicleDummy.vecPosition = vecPosition;
+}
+
+CVector* CClientVehicle::GetDummyPosition(eVehicleDummy::e eDummy)
+{
+    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
+    if (vehicleDummy.bSet)
+    {
+        return &vehicleDummy.vecPosition;
+    }
+    return nullptr;
 }

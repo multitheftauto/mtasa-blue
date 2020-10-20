@@ -17,12 +17,12 @@ extern CGameSA* pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                          CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                                 CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, BYTE>                                                  CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<std::uint32_t, std::map<eVehicleDummy::e, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::unordered_map<DWORD, unsigned short>                              CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                     CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -930,35 +930,42 @@ void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
     return pOrigSuspensionLines;
 }
 
-CVector* CModelInfoSA::GetVehicleExhaustFumesPosition()
+CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
 {
-    return GetVehicleDummyPosition(eVehicleDummies::EXHAUST);
+    return GetVehicleDummyPosition(eVehicleDummy::e::EXHAUST);
 }
 
 void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
 {
-    return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
+    return SetVehicleDummyPosition(eVehicleDummy::e::EXHAUST, vecPosition);
 }
 
-CVector* CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
+CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummy::e eDummy)
 {
-    // There are only 15 dummies in GTA.
-    if (!IsVehicle() || eDummy > VEH_UNKNOWNDUMMY)
-    {
-        static CVector vecDefaultPosition = CVector();
-        return &vecDefaultPosition;
-    }
+    if (!IsVehicle())
+        return CVector();
+
+    // There are only 15 dummies in GTA, but we have hacked 2 more
+    // for exhaust fumes, and that makes it 17.
+    auto           pVehicleModel = m_pInterface->AsVehicleModelInfoPtr();
+    const CVector& exhaustPos = pVehicleModel->pVisualInfo->vecDummies[eVehicleDummy::e::EXHAUST];
+    if (eDummy == eVehicleDummy::e::EXHAUST_LEFT)
+        return exhaustPos;
+    else if (eDummy == eVehicleDummy::e::EXHAUST_RIGHT)
+        return {exhaustPos.fX * -1, exhaustPos.fY, exhaustPos.fZ};
+
+    // There are only 15 dummies in GTA, but we have hacked 2 more
+    // for exhaust fumes, and that makes it 17.
 
     // Request model load right now if not loaded yet (#9897)
     if (!IsLoaded())
         Request(BLOCKING, "GetVehicleDummyPosition");
 
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return &pVehicleModel->pVisualInfo->vecDummies[eDummy];
+    return pVehicleModel->pVisualInfo->vecDummies[eDummy];
 }
 
 
-void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
+void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition)
 {
     if (!IsVehicle())
         return;
@@ -971,7 +978,7 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<eVehicleDummies, CVector>()});
+        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<eVehicleDummy::e, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         m_pInterface->usNumberOfRefs++;
     }

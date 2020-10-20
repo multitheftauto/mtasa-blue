@@ -21,6 +21,75 @@ static ushort                 ms_usFxEmitterSavedFadeNearDistance = 0;
 static float                  ms_fFxSystemUpdateCullDistMultiplier = FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT;
 static float                  ms_fFxCreateParticleCullDistMultiplier = FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT;
 
+CFxSystemSAInterface::CFxSystemSAInterface()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AAF00)(this);
+}
+
+CFxSystemSAInterface::~CFxSystemSAInterface()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA260)(this);
+}
+
+void CFxSystemSAInterface::Play()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA2F0)(this);
+}
+
+void CFxSystemSAInterface::Pause()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA370)(this);
+}
+
+void CFxSystemSAInterface::Stop()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA390)(this);
+}
+
+void CFxSystemSAInterface::PlayAndKill()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA3D0)(this);
+}
+
+void CFxSystemSAInterface::Kill()
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA3F0)(this);
+}
+
+void CFxSystemSAInterface::AttachToBone(CEntitySAInterface* entity, int boneId)
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*, CEntitySAInterface*, int))0x4AA400)(this, entity, boneId);
+}
+
+void CFxSystemSAInterface::AddParticle(RwV3d* position, RwV3d* velocity, float arg2, CFxPrtMult* prtMult, float arg4, float brightness, float arg6,
+                                       unsigned char arg8)
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*, RwV3d*, RwV3d*, float, CFxPrtMult*, float, float, float, unsigned char))0x4AA440)(
+        this, position, velocity, arg2, prtMult, arg4, brightness, arg6, arg8);
+}
+
+void CFxSystemSAInterface::AddParticle(RwMatrixTag* transform, RwV3d* position, float arg2, CFxPrtMult* prtMult, float arg4, float arg5, float arg6,
+                                       unsigned char arg7)
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*, RwMatrixTag*, RwV3d*, float, CFxPrtMult*, float, float, float, unsigned char))0x4AA540)(
+        this, transform, position, arg2, prtMult, arg4, arg5, arg6, arg7);
+}
+
+void CFxSystemSAInterface::SetConstTime(unsigned char arg0, float amount)
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*, unsigned char, float))0x4AA6C0)(this, arg0, amount);
+}
+
+eFxSystemPlayStatus CFxSystemSAInterface::GetPlayStatus()
+{
+    return ((eFxSystemPlayStatus(__thiscall*)(CFxSystemSAInterface*))0x4AA900)(this);
+}
+
+void CFxSystemSAInterface::SetLocalParticles(unsigned char enable)
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*, unsigned char))0x4AA910)(this, enable);
+}
+
 CFxSystemSA::CFxSystemSA(CFxSystemSAInterface* pInterface)
 {
     m_pInterface = pInterface;
