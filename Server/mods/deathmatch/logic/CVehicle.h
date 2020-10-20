@@ -23,8 +23,6 @@ class CVehicle;
 #define MAX_VEHICLE_SEATS 9
 #define DEFAULT_VEHICLE_HEALTH 1000
 #define MAX_VEHICLE_HEALTH 10000
-#define DEFAULT_IS_IN_WATER false
-
 enum eWheelStatus
 {
     DT_WHEEL_INTACT = 0,
