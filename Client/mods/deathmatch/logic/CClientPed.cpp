@@ -2378,7 +2378,6 @@ eMovementState CClientPed::GetMovementState()
         else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0)
             return MOVEMENTSTATE_JUMP;
 
-        // Is he entering a vehicle?
         else if (IsEnteringVehicle())
             return MOVEMENTSTATE_UNKNOWN;
 
@@ -2422,10 +2421,8 @@ eMovementState CClientPed::GetMovementState()
         }
     }
 
-    // Do we have a player, and are we in a car?
     if (m_pPlayerPed && GetRealOccupiedVehicle())
     {
-        // Is he leaving a vehicle?
         if (IsLeavingVehicle())
             return MOVEMENTSTATE_UNKNOWN;
     }
