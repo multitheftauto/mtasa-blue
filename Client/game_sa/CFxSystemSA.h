@@ -100,6 +100,7 @@ public:
     void SetConstTime(unsigned char arg0, float amount);
     eFxSystemPlayStatus GetPlayStatus();
     void SetLocalParticles(unsigned char enable);
+    void SetOffsetPos(RwV3d* pos);
 };
 static_assert(sizeof(CFxSystemSAInterface) == 0x104, "Invalid size for CFxSystemSAInterface");
 

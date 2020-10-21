@@ -2837,6 +2837,8 @@ void CClientVehicle::Create()
         if (m_pUpgrades)
             m_pUpgrades->ReAddAll();
 
+        SetAllDummyPositionsInternal();
+
         // Restore custom wheel scale
         if (bPreviousWheelScaleChanged)
         {
@@ -5037,29 +5039,59 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-void CClientVehicle::SetDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition)
+void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& vecPosition)
 {
-    if (eDummy == eVehicleDummy::e::EXHAUST)
+    if (dummy == eVehicleDummy::e::EXHAUST)
     {
         SetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT, vecPosition);
         SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
         return;
     }
-    else if (eDummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].bSet)
+    else if (dummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].bSet)
     {
         SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
     }
-    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
+    SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
     vehicleDummy.bSet = true;
     vehicleDummy.vecPosition = vecPosition;
+    SetDummyPositionInternal(dummy, vecPosition);
 }
 
-CVector* CClientVehicle::GetDummyPosition(eVehicleDummy::e eDummy)
+CVector* CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy)
 {
-    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
+    SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
     if (vehicleDummy.bSet)
     {
         return &vehicleDummy.vecPosition;
     }
     return nullptr;
+}
+
+void CClientVehicle::SetAllDummyPositionsInternal()
+{
+    for (size_t i = 0; i < m_arrDummies.size(); i++)
+    {
+        const SVehicleDummy& dummy = m_arrDummies[i];
+        if (dummy.bSet)
+            SetDummyPositionInternal(static_cast<eVehicleDummy::e>(i), dummy.vecPosition);
+    }
+}
+
+void CClientVehicle::SetDummyPositionInternal(eVehicleDummy::e dummy, const CVector& vecPosition)
+{
+    if (!m_pVehicle)
+        return;
+    switch (GetVehicleType())
+    {
+        case CLIENTVEHICLE_BIKE:
+        case CLIENTVEHICLE_BOAT:
+        case CLIENTVEHICLE_TRAIN:
+            return;
+    }
+    auto automobileInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pVehicle->GetInterface());
+    auto automobile = g_pGame->GetAutomobile(automobileInterface);
+    if (dummy == eVehicleDummy::e::EXHAUST_LEFT)
+        automobile->SetNitroFxSystemPosition(0, vecPosition);
+    else if (dummy == eVehicleDummy::e::EXHAUST_RIGHT)
+        automobile->SetNitroFxSystemPosition(1, vecPosition);
 }

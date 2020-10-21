@@ -135,7 +135,6 @@ namespace
 
 CVehicleSA::CVehicleSA() : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0.0f, 0.0f, -1.0f), m_HeadLightColor(SColorRGBA(255, 255, 255, 255))
 {
-    assert(0);            // Never used ?
 }
 
 void CVehicleSAInterface::StaticSetHooks()
@@ -480,9 +479,11 @@ void CVehicleSA::Init()
 CVehicleSA::~CVehicleSA()
 {
     DEBUG_TRACE("CVehicleSA::~CVehicleSA()");
+    if (!m_pInterface)
+        return;
     if (!this->BeingDeleted)
     {
-        if ((DWORD)m_pInterface->vtbl != VTBL_CPlaceable)
+        if ((DWORD) m_pInterface->vtbl != VTBL_CPlaceable)
         {
             GetVehicleInterface()->m_pVehicle = NULL;
 

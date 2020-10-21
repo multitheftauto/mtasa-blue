@@ -307,8 +307,11 @@ public:
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
-    CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
+    CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+
+    std::unique_ptr<CAutomobile> GetAutomobile(CAutomobileSAInterface* pInterface);
+
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()

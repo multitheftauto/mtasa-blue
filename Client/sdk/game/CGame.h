@@ -80,7 +80,7 @@ typedef void(InRenderer)();
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
 #include "CObjectGroupPhysicalProperties.h"
-
+#include "CAutomobile.h"
 #include <windows.h>
 
 enum eEntityType;
@@ -172,6 +172,8 @@ public:
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
+
+    virtual std::unique_ptr<CAutomobile> GetAutomobile(CAutomobileSAInterface* pInterface) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;

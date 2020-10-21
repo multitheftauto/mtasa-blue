@@ -293,6 +293,11 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
         return NULL;
 }
 
+std::unique_ptr<CAutomobile> CGameSA::GetAutomobile(CAutomobileSAInterface* pInterface)
+{
+    return std::make_unique<CAutomobileSA>(pInterface);
+}
+
 VOID CGameSA::Pause(bool bPaused)
 {
     *VAR_GamePaused = bPaused;

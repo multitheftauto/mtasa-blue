@@ -90,6 +90,11 @@ void CFxSystemSAInterface::SetLocalParticles(unsigned char enable)
     ((void(__thiscall*)(CFxSystemSAInterface*, unsigned char))0x4AA910)(this, enable);
 }
 
+void CFxSystemSAInterface::SetOffsetPos(RwV3d* pos)
+{
+    ((void(__thiscall*)(CFxSystemSAInterface*, RwV3d*))0x4AA660)(this, pos);
+}
+
 CFxSystemSA::CFxSystemSA(CFxSystemSAInterface* pInterface)
 {
     m_pInterface = pInterface;

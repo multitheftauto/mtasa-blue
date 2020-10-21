@@ -97,34 +97,16 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
 CAutomobileSA::CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)
 {
     DEBUG_TRACE("CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
-    /*  if(this->internalInterface)
-        {
-            // create the actual vehicle
-            DWORD dwFunc = FUNC_CAutomobileContructor;
-            DWORD dwThis = (DWORD)this->internalInterface;
-            _asm
-            {
-                mov     ecx, dwThis
-                push    MISSION_VEHICLE
-                push    dwModelID
-                call    dwFunc
-            }
 
-            this->SetEntityStatus(STATUS_ABANDONED); // so it actually shows up in the world
-
-            pGame->GetWorld()->Add((CEntitySA *)this);
-    */
-    // create our mirror classes
+    m_automobileInterface = static_cast<CAutomobileSAInterface*>(this->GetInterface());
     for (int i = 0; i < MAX_DOORS; i++)
-        this->door[i] = new CDoorSA(&((CAutomobileSAInterface*)this->GetInterface())->m_doors[i]);
-    /*}
-     */
+    {
+        this->door[i] = new CDoorSA(&m_automobileInterface->m_doors[i]);
+    }
 }
 
-CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* automobile)
+CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* automobile) : m_automobileInterface(automobile), door{}
 {
-    DEBUG_TRACE("CAutomobileSA::CAutomobileSA( CAutomobileSAInterface * automobile )");
-    // just so it can be passed on to CVehicle
 }
 
 CAutomobileSA::~CAutomobileSA()
@@ -674,4 +656,11 @@ CDoor* CAutomobileSA::GetDoor(eDoors doorID)
 {
     DEBUG_TRACE("CDoor * CAutomobileSA::GetDoor(eDoors doorID)");
     return this->door[doorID];
+}
+
+void CAutomobileSA::SetNitroFxSystemPosition(int id, const CVector& position)
+{
+    auto nitroFxSystem = m_automobileInterface->m_exhaustNitroFxSystem[id];
+    if (nitroFxSystem)
+        nitroFxSystem->SetOffsetPos((RwV3d*)&position);
 }

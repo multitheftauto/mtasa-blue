@@ -197,11 +197,11 @@ static_assert(sizeof(CAutomobileSAInterface) == 0x988, "Invalid size for CAutomo
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {
 private:
-    //  CAutomobileSAInterface      * internalInterface;
-
-    CDoorSA* door[MAX_DOORS];
+    CAutomobileSAInterface* m_automobileInterface = nullptr;
+    CDoorSA*                door[MAX_DOORS] = {};
 
 public:
+    CAutomobileSA() {}
     CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
     CAutomobileSA(CAutomobileSAInterface* automobile);
     ~CAutomobileSA();
@@ -243,4 +243,5 @@ public:
     CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown);
 
     CDoor* GetDoor(eDoors doorID);
+    void   SetNitroFxSystemPosition(int id, const CVector& position);
 };
