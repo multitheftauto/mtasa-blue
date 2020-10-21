@@ -268,8 +268,8 @@ public:
 
     void GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates);
 
-    CPlayer* GetJackingPlayer() { return m_pJackingPlayer; }
-    void     SetJackingPlayer(CPlayer* pPlayer);
+    CPed* GetJackingPed() { return m_pJackingPed; }
+    void  SetJackingPed(CPed* pPed);
 
     bool IsInWater() { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
@@ -394,7 +394,7 @@ private:
     bool                  m_bSmokeTrail;
     unsigned char         m_ucAlpha;
     bool                  m_bInWater;
-    CPlayer*              m_pJackingPlayer;
+    CPed*                 m_pJackingPed;
     SColor                m_HeadLightColor;
     bool                  m_bHeliSearchLightVisible;
 
