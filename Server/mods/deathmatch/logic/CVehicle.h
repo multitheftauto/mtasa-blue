@@ -136,6 +136,8 @@ struct SSirenInfo
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
 };
 
+class CTrainTrack;
+
 class CVehicle : public CElement
 {
     friend class CPlayer;
@@ -290,8 +292,8 @@ public:
     float GetTrainPosition() { return m_fTrainPosition; }
     void  SetTrainPosition(float fPosition) { m_fTrainPosition = fPosition; }
 
-    uchar GetTrainTrack() { return m_ucTrackID; }
-    void  SetTrainTrack(uchar ucTrack) { m_ucTrackID = ucTrack; }
+    CTrainTrack* GetTrainTrack() { return m_pTrainTrack; }
+    void         SetTrainTrack(CTrainTrack* pTrainTrack) { m_pTrainTrack = pTrainTrack; }
 
     SColor GetHeadLightColor() { return m_HeadLightColor; }
     void   SetHeadLightColor(const SColor color) { m_HeadLightColor = color; }
@@ -404,7 +406,8 @@ private:
     bool  m_bTrainDirection;
     float m_fTrainSpeed;
     float m_fTrainPosition;
-    uchar m_ucTrackID;
+
+    CTrainTrack* m_pTrainTrack = nullptr;
 
     // Used to remember where this vehicle spawns
     CVector       m_vecRespawnPosition;

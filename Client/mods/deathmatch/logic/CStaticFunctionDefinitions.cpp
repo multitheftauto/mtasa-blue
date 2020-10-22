@@ -928,6 +928,9 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, con
 
 bool CStaticFunctionDefinitions::DestroyElement(CClientEntity& Entity)
 {
+    if (!Entity.CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = Entity.IterBegin();
     while (iter != Entity.IterEnd())
@@ -1314,19 +1317,8 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
 {
     RUN_CHILDREN(AttachElements(**iter, AttachedToEntity, vecPosition, vecRotation))
 
-    // Check the elements we are attaching are not already connected
-    std::set<CClientEntity*> history;
-    for (CClientEntity* pCurrent = &AttachedToEntity; pCurrent; pCurrent = pCurrent->GetAttachedTo())
-    {
-        if (pCurrent == &Entity)
-            return false;
-        if (MapContains(history, pCurrent))
-            break;            // This should not be possible, but you never know
-        MapInsert(history, pCurrent);
-    }
-
     // Can these elements be attached?
-    if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && Entity.GetDimension() == AttachedToEntity.GetDimension())
+    if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && !AttachedToEntity.IsAttachedToElement(&Entity) && Entity.GetDimension() == AttachedToEntity.GetDimension())
     {
         ConvertDegreesToRadians(vecRotation);
 
@@ -2722,17 +2714,6 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CClientVehicle& Vehicle, float& f
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetTrainTrack(CClientVehicle& Vehicle, uchar& ucTrack)
-{
-    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
-        return false;
-    else if (Vehicle.IsDerailed())
-        return false;
-
-    ucTrack = Vehicle.GetTrainTrack();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetTrainPosition(CClientVehicle& Vehicle, float& fPosition)
 {
     if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
@@ -3369,17 +3350,6 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CClientVehicle& Vehicle, float fS
         return false;
 
     Vehicle.SetTrainSpeed(fSpeed);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetTrainTrack(CClientVehicle& Vehicle, uchar ucTrack)
-{
-    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
-        return false;
-    else if (Vehicle.IsDerailed())
-        return false;
-
-    Vehicle.SetTrainTrack(ucTrack);
     return true;
 }
 

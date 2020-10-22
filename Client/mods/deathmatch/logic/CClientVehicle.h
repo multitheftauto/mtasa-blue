@@ -496,6 +496,7 @@ public:
 
     float GetWheelScale();
     void  SetWheelScale(float fWheelScale);
+    void  ResetWheelScale();
 
     bool OnVehicleFallThroughMap();
 
@@ -621,6 +622,7 @@ protected:
     float m_fTrainPosition;
     uchar m_ucTrackID;
     bool  m_bJustStreamedIn;
+    bool  m_bWheelScaleChanged;
 
     // Time dependent error compensation interpolation
     struct
