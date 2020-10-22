@@ -456,7 +456,7 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         m_pSyncer = pPlayer;
 
         // Check if we are in an enter/exit action
-        // We need to abort the process by warping the ped in or out, because the syncer changed
+        // We need to complete the process by warping the ped in or out, because the syncer changed
         unsigned int uiAction = GetVehicleAction();
         switch (uiAction)
         {

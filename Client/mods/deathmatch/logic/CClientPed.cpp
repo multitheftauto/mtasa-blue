@@ -2756,8 +2756,8 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         // Not in a vehicle?
         else
         {
-            // Not the local player?
-            if (!m_bIsLocalPlayer)
+            // Not the local player or ped we sync?
+            if (!m_bIsLocalPlayer && !IsSyncing())
             {
                 // Force the player in/out?
                 if (m_bForceGettingIn)
@@ -6938,23 +6938,6 @@ void CClientPed::UpdateVehicleInOut()
                 ResetVehicleInOut();
                 m_bNoNewVehicleTask = true;
                 m_NoNewVehicleTaskReasonID = ReasonID;
-            }
-            else
-            {
-                // Are we a ped?
-                if (!IsLocalPlayer() && pInOutVehicle)
-                {
-                    // Cancel the entering task if the vehicle is too far away
-                    // This is only necessary to do for peds as players seem to abort the entering task after 50 m
-                    CVector vecPosition;
-                    CVector vecVehiclePosition;
-                    GetPosition(vecPosition);
-                    pInOutVehicle->GetPosition(vecVehiclePosition);
-                    if (DistanceBetweenPoints3D(vecPosition, vecVehiclePosition) > 50.0f)
-                    {
-                        KillTask(TASK_PRIORITY_PRIMARY, true);
-                    }
-                }
             }
         }
     }

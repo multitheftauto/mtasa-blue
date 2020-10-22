@@ -2760,6 +2760,49 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 if (pSendPlayer->GetBitStreamVersion() < 0x070)
                                 {
                                     bValidPed = false;
+
+                                    // Check if we have already started a vehicle action
+                                    // This would happen if an incompatible player joins after the sequence started
+                                    // We need to complete the process by warping the ped in or out
+                                    unsigned int uiAction = pPed->GetVehicleAction();
+                                    switch (uiAction)
+                                    {
+                                        case CPed::VEHICLEACTION_ENTERING:
+                                        {
+                                            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
+                                            unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                            // Does it have an occupant and is the occupant us?
+                                            if (pVehicle && (pPed == pVehicle->GetOccupant(ucOccupiedSeat)))
+                                            {
+                                                // Warp us into vehicle
+                                                CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, ucOccupiedSeat);
+                                            }
+                                        }
+
+                                        case CPed::VEHICLEACTION_EXITING:
+                                        {
+                                            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
+                                            unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                            // Does it have an occupant and is the occupant us?
+                                            if (pVehicle && (pPed == pVehicle->GetOccupant(ucOccupiedSeat)))
+                                            {
+                                                // Warp us out of vehicle
+                                                CStaticFunctionDefinitions::RemovePedFromVehicle(pPed);
+                                            }
+                                        }
+
+                                        case CPed::VEHICLEACTION_JACKING:
+                                        {
+                                            CVehicle* pVehicle = pPed->GetJackingVehicle();
+                                            if (pVehicle)
+                                            {
+                                                // Warp us into vehicle in drivers seat
+                                                // This will warp the existing driver out and reset both our and the jacked peds vehicle action
+                                                CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, 0);
+                                            }
+                                        }
+                                    }
+
                                     break;
                                 }
                             }
