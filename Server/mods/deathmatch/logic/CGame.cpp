@@ -2721,6 +2721,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                 CPed* pPed = static_cast<CPed*>(pPedElement);
                 bool  bValidPed = false;
                 bool  bValidVehicle = false;
+                CSendList sendListIncompatiblePlayers;
 
                 // Grab the vehicle with the chosen ID
                 ElementID VehicleID = Packet.GetVehicleID();
@@ -2747,6 +2748,31 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         {
                             bValidPed = true;
                         }
+                        switch (ucAction)
+                        {
+                            // Check if we are finishing a jacking sequence
+                            case VEHICLE_NOTIFY_JACK:
+                            case VEHICLE_NOTIFY_JACK_ABORT:
+                            {
+                                // Are we jacking a ped?
+                                CPed* pJacked = pVehicle->GetOccupant(0);
+                                if (pJacked && !pJacked->IsPlayer())
+                                {
+                                    // Check that all clients have a compatible bitstream
+                                    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+                                    {
+                                        CPlayer* pSendPlayer = *iter;
+                                        if (pSendPlayer->GetBitStreamVersion() < 0x070)
+                                        {
+                                            if (pSendPlayer->IsJoined())
+                                                // Store this player as incompatible for later
+                                                // This happens because the player joined during a player jacking a ped
+                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     else
                     {
@@ -2761,51 +2787,25 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 CPlayer* pSendPlayer = *iter;
                                 if (pSendPlayer->GetBitStreamVersion() < 0x070)
                                 {
-                                    bValidPed = false;
-
-                                    // Check if we have already started a vehicle action
-                                    // This would happen if an incompatible player joins after the sequence started
-                                    // We need to complete the process by warping the ped in or out
-                                    unsigned int uiAction = pPed->GetVehicleAction();
-                                    switch (uiAction)
+                                    switch (ucAction)
                                     {
-                                        case CPed::VEHICLEACTION_ENTERING:
+                                        // Is he requesting to start enter/exit then reject it
+                                        case VEHICLE_REQUEST_IN:
+                                        case VEHICLE_REQUEST_OUT:
+                                        case VEHICLE_NOTIFY_FELL_OFF:
                                         {
-                                            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
-                                            unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
-                                            // Does it have an occupant and is the occupant us?
-                                            if (pVehicle && (pPed == pVehicle->GetOccupant(ucOccupiedSeat)))
-                                            {
-                                                // Warp us into vehicle
-                                                CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, ucOccupiedSeat);
-                                            }
+                                            bValidPed = false;
+                                            break;
                                         }
-
-                                        case CPed::VEHICLEACTION_EXITING:
+                                        // Otherwise allow it to move on
+                                        default:
                                         {
-                                            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
-                                            unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
-                                            // Does it have an occupant and is the occupant us?
-                                            if (pVehicle && (pPed == pVehicle->GetOccupant(ucOccupiedSeat)))
-                                            {
-                                                // Warp us out of vehicle
-                                                CStaticFunctionDefinitions::RemovePedFromVehicle(pPed);
-                                            }
-                                        }
-
-                                        case CPed::VEHICLEACTION_JACKING:
-                                        {
-                                            CVehicle* pVehicle = pPed->GetJackingVehicle();
-                                            if (pVehicle)
-                                            {
-                                                // Warp us into vehicle in drivers seat
-                                                // This will warp the existing driver out and reset both our and the jacked peds vehicle action
-                                                CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, 0);
-                                            }
+                                            if (pSendPlayer->IsJoined())
+                                                // Store this player as incompatible for later
+                                                // This happens because the player joined during a ped enter/exit
+                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
                                         }
                                     }
-
-                                    break;
                                 }
                             }
                         }
@@ -3186,6 +3186,12 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
                                     Reply.SetDoorAngle(fDoorAngle);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                    if (!sendListIncompatiblePlayers.empty())
+                                    {
+                                        CBitStream BitStream;
+                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                    }
                                 }
                             }
 
@@ -3263,6 +3269,13 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     // Tell everyone he can start exiting the vehicle
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                    if (!sendListIncompatiblePlayers.empty())
+                                    {
+                                        // Warp the ped out of the vehicle manually for incompatible players
+                                        CBitStream BitStream;
+                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                    }
 
                                     // Call the ped->vehicle event
                                     CLuaArguments Arguments;
@@ -3291,14 +3304,14 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         // Vehicle out aborted notification?
                         case VEHICLE_NOTIFY_OUT_ABORT:
                         {
-                            // Is he entering?
+                            // Is he exiting?
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                             {
                                 // Is he the occupant?
                                 unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
-                                    // Mark that he's in no vehicle
+                                    // Mark that he's no longer exiting
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                                     // Tell everyone he's in (they should warp him in)
@@ -3445,6 +3458,16 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     Arguments2.PushBoolean(false);            // jacked
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
                                 }
+
+                                if (!sendListIncompatiblePlayers.empty())
+                                    {
+                                        // Warp the ped into the vehicle manually for incompatible players
+                                        CBitStream BitStream;
+                                        BitStream.pBitStream->Write(pVehicle->GetID());
+                                        BitStream.pBitStream->Write((unsigned char)0);
+                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                    }
                             }
 
                             break;
@@ -3488,6 +3511,14 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         // Tell everyone to get the jacked person out
                                         CVehicleInOutPacket JackedReply(pJacked->GetID(), VehicleID, 0, VEHICLE_NOTIFY_OUT_RETURN);
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
+
+                                        if (!sendListIncompatiblePlayers.empty())
+                                        {
+                                            // Warp the ped out of the vehicle manually for incompatible players
+                                            CBitStream BitStream;
+                                            BitStream.pBitStream->Write(pJacked->GetSyncTimeContext());
+                                            m_pPlayerManager->Broadcast(CElementRPCPacket(pJacked, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                        }
                                     }
                                     pJacked->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                 }
