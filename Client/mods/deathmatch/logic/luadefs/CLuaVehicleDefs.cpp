@@ -81,6 +81,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponentVisible", GetVehicleComponentVisible},
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
+        {"getVehicleDummyVisible", ArgumentParser<GetVehicleDummyVisible>},
         {"getVehicleDummyPosition", ArgumentParser<GetVehicleDummyPosition>},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
@@ -139,6 +140,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled},
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
+        {"setVehicleDummyVisible", ArgumentParser<SetVehicleDummyVisible>},
         {"setVehicleDummyPosition", ArgumentParser<SetVehicleDummyPosition>},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
@@ -3849,6 +3851,17 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::SetVehicleDummyVisible(CClientVehicle* const vehicle, eVehicleDummy::e dummy, bool visible)
+{
+    vehicle->SetDummyVisible(dummy, visible);
+    return true;
+}
+
+bool CLuaVehicleDefs::GetVehicleDummyVisible(CClientVehicle* const vehicle, eVehicleDummy::e dummy)
+{
+    return vehicle->IsDummyVisible(dummy);
 }
 
 bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy, CVector position)

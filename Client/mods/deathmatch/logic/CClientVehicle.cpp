@@ -5041,20 +5041,20 @@ void CClientVehicle::ResetWheelScale()
 
 void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& position)
 {
-    if (dummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].bSet)
+    if (dummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].m_set)
         SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {position.fX * -1, position.fY, position.fZ});
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
-    vehicleDummy.bSet = true;
-    vehicleDummy.vecPosition = position;
+    vehicleDummy.m_set = true;
+    vehicleDummy.m_position = position;
     SetDummyPositionInternal(dummy, position);
 }
 
 bool CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy, CVector& position)
 {
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
-    if (vehicleDummy.bSet)
+    if (vehicleDummy.m_set)
     {
-        position = vehicleDummy.vecPosition;
+        position = vehicleDummy.m_position;
         return true;
     }
     if (dummy != eVehicleDummy::e::EXHAUST_LEFT && dummy != eVehicleDummy::e::EXHAUST_RIGHT)
@@ -5081,8 +5081,8 @@ void CClientVehicle::SetAllDummyPositionsInternal()
     for (size_t i = 0; i < m_arrDummies.size(); i++)
     {
         const SVehicleDummy& dummy = m_arrDummies[i];
-        if (dummy.bSet)
-            SetDummyPositionInternal(static_cast<eVehicleDummy::e>(i), dummy.vecPosition);
+        if (dummy.m_set)
+            SetDummyPositionInternal(static_cast<eVehicleDummy::e>(i), dummy.m_position);
     }
 }
 

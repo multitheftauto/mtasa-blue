@@ -135,6 +135,8 @@ public:
     LUA_DECLARE(SetHeliBladeCollisionsEnabled);
     LUA_DECLARE(SetVehicleWindowOpen);
 
+    static bool                        SetVehicleDummyVisible(CClientVehicle* const vehicle, eVehicleDummy::e dummy, bool visible);
+    static bool                        GetVehicleDummyVisible(CClientVehicle* const vehicle, eVehicleDummy::e dummy);
     static bool                        SetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy, CVector position);
     static std::variant<CVector, bool> GetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy);
 

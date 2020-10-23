@@ -3863,9 +3863,10 @@ void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
     return g_pClientGame->PedStepHandler(pPed, bFoot);
 }
 
-void CClientGame::StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition)
+void CClientGame::StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition,
+                                                          bool& leftFumesVisible, bool& rightFumesVisible)
 {
-    g_pClientGame->VehicleAddExhaustParticlesHandler(pInterface, leftFumesPosition, rightFumesPosition);
+    g_pClientGame->VehicleAddExhaustParticlesHandler(pInterface, leftFumesPosition, rightFumesPosition, leftFumesVisible, rightFumesVisible);
 }
 
 void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
@@ -7085,7 +7086,8 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
     }
 }
 
-void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition)
+void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& leftFumesPosition, CVector& rightFumesPosition,
+                                                    bool& leftFumesVisible, bool& rightFumesVisible)
 {
     CPools*                    pools = g_pGame->GetPools();
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
@@ -7094,6 +7096,8 @@ void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterf
         auto vehicle = static_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
         vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT, leftFumesPosition);
         vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, rightFumesPosition);
+        leftFumesVisible = vehicle->IsDummyVisible(eVehicleDummy::e::EXHAUST_LEFT);
+        rightFumesVisible = vehicle->IsDummyVisible(eVehicleDummy::e::EXHAUST_RIGHT);
     }
 }
 

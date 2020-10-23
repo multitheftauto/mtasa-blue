@@ -127,8 +127,9 @@ struct SVehicleComponentData
 class CClientProjectile;
 struct SVehicleDummy
 {
-    bool    bSet = false;
-    CVector vecPosition;
+    bool    m_set = false;
+    bool    m_visible = true;
+    CVector m_position;
 };
 
 class CClientVehicle : public CClientStreamElement
@@ -503,10 +504,12 @@ public:
     void  SetWheelScale(float fWheelScale);
     void  ResetWheelScale();
 
-    void     SetDummyPosition(eVehicleDummy::e dummy, const CVector& position);
-    bool     GetDummyPosition(eVehicleDummy::e dummy, CVector& position);
-    void     SetAllDummyPositionsInternal();
-    void     SetDummyPositionInternal(eVehicleDummy::e dummy, const CVector& vecPosition);
+    void SetDummyVisible(eVehicleDummy::e dummy, bool visible) { m_arrDummies[dummy].m_visible = visible; }
+    bool IsDummyVisible(eVehicleDummy::e dummy) { return m_arrDummies[dummy].m_visible; }
+    void SetDummyPosition(eVehicleDummy::e dummy, const CVector& position);
+    bool GetDummyPosition(eVehicleDummy::e dummy, CVector& position);
+    void SetAllDummyPositionsInternal();
+    void SetDummyPositionInternal(eVehicleDummy::e dummy, const CVector& vecPosition);
 
     bool OnVehicleFallThroughMap();
 
@@ -685,10 +688,11 @@ protected:
     CTickCount m_LastPushedTime;
     uint       m_uiForceLocalZCounter;
 
-    bool                           m_bEnableHeliBladeCollisions;
-    CMatrix                        m_matCreate;
-    unsigned char                  m_ucFellThroughMapCount;
-    SFixedArray<bool, MAX_WINDOWS> m_bWindowOpen;
+    bool                                               m_bEnableHeliBladeCollisions;
+    CMatrix                                            m_matCreate;
+    unsigned char                                      m_ucFellThroughMapCount;
+    SFixedArray<bool, MAX_WINDOWS>                     m_bWindowOpen;
+    std::array<SVehicleDummy, eVehicleDummy::e::TOTAL> m_arrDummies = {0};
 
 public:
 #ifdef MTA_DEBUG
@@ -696,9 +700,8 @@ public:
     unsigned long  m_ulLastSyncTime;
     const char*    m_szLastSyncType;
 #endif
-    SLastSyncedVehData*                                  m_LastSyncedData;
-    SSirenInfo                                           m_tSirenBeaconInfo;
-    std::map<SString, SVehicleComponentData>             m_ComponentData;
-    bool                                                 m_bAsyncLoadingDisabled;
-    std::array<SVehicleDummy, eVehicleDummy::e::TOTAL> m_arrDummies = {0};
+    SLastSyncedVehData*                      m_LastSyncedData;
+    SSirenInfo                               m_tSirenBeaconInfo;
+    std::map<SString, SVehicleComponentData> m_ComponentData;
+    bool                                     m_bAsyncLoadingDisabled;
 };

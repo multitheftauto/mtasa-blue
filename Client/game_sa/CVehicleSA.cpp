@@ -144,7 +144,6 @@ void CVehicleSAInterface::StaticSetHooks()
 
 void CVehicleSAInterface::AddExhaustParticles()
 {
-    //((void(__thiscall*)(CVehicle*))0x6DE240)(this);
     if (bOffscreen)
         return;
     unsigned int& CTimer_m_FrameCounter = *(unsigned int*)0xB7CB4C;
@@ -154,12 +153,12 @@ void CVehicleSAInterface::AddExhaustParticles()
         return;
     }
     auto    pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(CModelInfoSAInterface::GetModelInfo(m_nModelIndex));
-
     CVector firstExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
     CVector secondExhaustPos = firstExhaustPos;
     secondExhaustPos.fX *= -1.0f;
+    bool leftFumesVisible = true, rightFumesVisible = true;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
-        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustPos, secondExhaustPos);
+        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustPos, secondExhaustPos, leftFumesVisible, rightFumesVisible);
     CMatrixSAInterface entityMatrix(*(CMatrixSAInterface*)Placeable.matrix);
     bool               bHasDoubleExhaust = pHandlingData->m_bDoubleExhaust;
     if (m_nVehicleSubClass == eVehicleClass::BIKE)
@@ -186,6 +185,8 @@ void CVehicleSAInterface::AddExhaustParticles()
                 break;
         }
     }
+    if (!rightFumesVisible)
+        bHasDoubleExhaust = false;
     if (!firstExhaustPos.IsZero())
     {
         CVector vecParticleVelocity;
@@ -227,15 +228,18 @@ void CVehicleSAInterface::AddExhaustParticles()
             std::int32_t numExhausts = 2;
             for (std::int32_t i = 0; i < 2; i++)
             {
-                CFxSystemSAInterface* pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
-                if (bFirstExhaustSubmergedInWater)
+                if (leftFumesVisible)
                 {
-                    fxPrt.m_color.alpha = particleAlpha * 0.5f;
-                    fxPrt.m_fSize = 0.6f;
-                    pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtBubble;
+                    CFxSystemSAInterface* pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
+                    if (bFirstExhaustSubmergedInWater)
+                    {
+                        fxPrt.m_color.alpha = particleAlpha * 0.5f;
+                        fxPrt.m_fSize = 0.6f;
+                        pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtBubble;
+                    }
+                    pFirstExhaustFxSystem->AddParticle((RwV3d*)&firstExhaustPos, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness,
+                                                       0.6f, 0);
                 }
-                pFirstExhaustFxSystem->AddParticle((RwV3d*)&firstExhaustPos, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness,
-                                                   0.6f, 0);
                 if (bHasDoubleExhaust)
                 {
                     CFxSystemSAInterface* pSecondExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
@@ -250,7 +254,7 @@ void CVehicleSAInterface::AddExhaustParticles()
                 }
                 if (m_fGasPedal > 0.5f && m_nCurrentGear < 3)
                 {
-                    if (rand() & 1)
+                    if ((rand() & 1) && leftFumesVisible)
                     {
                         CFxSystemSAInterface* pSecondaryExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                         if (bFirstExhaustSubmergedInWater)
