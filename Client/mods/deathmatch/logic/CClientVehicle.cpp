@@ -5090,9 +5090,10 @@ bool CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy, CVector& position)
     }
     if (dummy != eVehicleDummy::e::EXHAUST_LEFT && dummy != eVehicleDummy::e::EXHAUST_RIGHT)
         return false;
-    CVector exhaustPos;
-    if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(GetModel(), eVehicleModelDummy::e::EXHAUST, exhaustPos))
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(GetModel());
+    if (modelInfo)
     {
+        CVector exhaustPos = modelInfo->GetVehicleDummyPosition(eVehicleModelDummy::e::EXHAUST);
         if (dummy == eVehicleDummy::e::EXHAUST_LEFT)
         {
             position = exhaustPos;

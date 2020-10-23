@@ -82,7 +82,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleDummyPosition", ArgumentParser<GetVehicleDummyPosition>},
-        {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
+        {"getVehicleModelDummyPosition", ArgumentParser<GetVehicleModelDummyPosition>},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
 
@@ -140,7 +140,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleDummyPosition", ArgumentParser<SetVehicleDummyPosition>},
-        {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
+        {"setVehicleModelDummyPosition", ArgumentParser<SetVehicleModelDummyPosition>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
     };
@@ -223,7 +223,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades");
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getModelExhaustFumesPosition", OOP_GetVehicleModelExhaustFumesPosition);
-    lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
+    lua_classfunction(luaVM, "getVehicleModelDummyPosition", ArgumentParser<OOP_GetVehicleModelDummyPosition>);
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
 
@@ -3865,124 +3865,41 @@ std::variant<CVector, bool> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehi
     return false;
 }
 
-int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
+bool CLuaVehicleDefs::SetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant, eVehicleModelDummy::e dummy, CVector position)
 {
-    // bool setVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy, float x, float y, float z )
-    CClientVehicle* pVehicle = nullptr;
-    unsigned short  usModel;
-    eVehicleModelDummy::e dummy;
-    CVector         vecPosition;
-
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsNumber())
-    {
-        argStream.ReadNumber(usModel);
-    }
+    CClientVehicle* vehicle = nullptr;
+    unsigned short  modelId = 0;
+    if (std::holds_alternative<unsigned short>(variant))
+        modelId = std::get<unsigned short>(variant);
     else
+        vehicle = std::get<CClientVehicle* const>(variant);
+    CModelInfo* modelInfo = vehicle ? g_pGame->GetModelInfo(vehicle->GetModel()) : g_pGame->GetModelInfo(modelId);
+    if (modelInfo)
     {
-        argStream.ReadUserData(pVehicle);
+        modelInfo->SetVehicleDummyPosition(dummy, position);
+        return true;
     }
-    argStream.ReadEnumString(dummy);
-    argStream.ReadVector3D(vecPosition);
-
-    if (!argStream.HasErrors())
-    {
-        if (pVehicle)
-        {
-            if (CStaticFunctionDefinitions::SetVehicleModelDummyPosition(pVehicle->GetModel(), dummy, vecPosition))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-        {
-            if (CStaticFunctionDefinitions::SetVehicleModelDummyPosition(usModel, dummy, vecPosition))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
+std::variant<bool, CVector> CLuaVehicleDefs::GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant, eVehicleModelDummy::e dummy)
 {
-    // float, float, float getVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy )
-    CClientVehicle* pVehicle = nullptr;
-    unsigned short  usModel = 0;
-    eVehicleModelDummy::e eDummy = eVehicleModelDummy::e::LIGHT_FRONT_MAIN;
-
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsNumber())
-    {
-        argStream.ReadNumber(usModel);
-    }
-    else
-    {
-        argStream.ReadUserData(pVehicle);
-    }
-    argStream.ReadEnumString(eDummy);
-
-    if (!argStream.HasErrors())
-    {
-        CVector vecPosition;
-
-        bool bPositionAcquired = CStaticFunctionDefinitions::GetVehicleModelDummyPosition(pVehicle, usModel, eDummy, vecPosition);
-        if (bPositionAcquired)
-        {
-            lua_pushnumber(luaVM, vecPosition.fX);
-            lua_pushnumber(luaVM, vecPosition.fY);
-            lua_pushnumber(luaVM, vecPosition.fZ);
-            return 3;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return OOP_GetVehicleModelDummyPosition(variant, dummy);
 }
 
-int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant,
+                                                                              eVehicleModelDummy::e                               dummy)
 {
-    // float, float, float getVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy )
-    CClientVehicle* pVehicle = nullptr;
-    unsigned short  usModel;
-    eVehicleModelDummy::e eDummy;
-
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsNumber())
-    {
-        argStream.ReadNumber(usModel);
-    }
+    CClientVehicle* vehicle = nullptr;
+    unsigned short  modelId = 0;
+    if (std::holds_alternative<unsigned short>(variant))
+        modelId = std::get<unsigned short>(variant);
     else
-    {
-        argStream.ReadUserData(pVehicle);
-    }
-    argStream.ReadEnumString(eDummy);
-
-    if (!argStream.HasErrors())
-    {
-        CVector vecPosition;
-
-        bool bPositionAcquired = CStaticFunctionDefinitions::GetVehicleModelDummyPosition(pVehicle, usModel, eDummy, vecPosition);
-        if (bPositionAcquired)
-        {
-            lua_pushvector(luaVM, vecPosition);
-            return 3;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        vehicle = std::get<CClientVehicle* const>(variant);
+    CModelInfo* modelInfo = vehicle ? g_pGame->GetModelInfo(vehicle->GetModel()) : g_pGame->GetModelInfo(modelId);
+    if (modelInfo)
+        return modelInfo->GetVehicleDummyPosition(dummy);
+    return false;
 }
 
 int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)

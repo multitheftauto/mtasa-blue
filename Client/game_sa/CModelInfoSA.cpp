@@ -953,7 +953,6 @@ CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleModelDummy::e eDummy)
     return pVehicleModel->pVisualInfo->vecDummies[eDummy];
 }
 
-
 void CModelInfoSA::SetVehicleDummyPosition(eVehicleModelDummy::e eDummy, const CVector& vecPosition)
 {
     if (!IsVehicle())

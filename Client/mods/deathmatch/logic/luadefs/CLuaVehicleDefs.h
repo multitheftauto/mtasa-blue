@@ -139,10 +139,11 @@ public:
     static bool                        GetVehicleDummyVisible(CClientVehicle* const vehicle, eVehicleDummy::e dummy);
     static bool                        SetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy, CVector position);
     static std::variant<CVector, bool> GetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy);
+    static bool SetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant, eVehicleModelDummy::e dummy, CVector position);
+    static std::variant<bool, CVector> GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant, eVehicleModelDummy::e dummy);
+    static std::variant<bool, CVector> OOP_GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant,
+                                                                                         eVehicleModelDummy::e                               dummy);
 
-    LUA_DECLARE(SetVehicleModelDummyPosition);
-    LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
-    
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
