@@ -3857,11 +3857,11 @@ bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* const vehicle, eVe
     return true;
 }
 
-std::variant<CVector, bool> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy)
+std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy)
 {
     CVector position;
     if (vehicle->GetDummyPosition(dummy, position))
-        return position;
+        return std::tuple{position.fX, position.fY, position.fZ};
     return false;
 }
 
@@ -3882,9 +3882,16 @@ bool CLuaVehicleDefs::SetVehicleModelDummyPosition(std::variant<unsigned short, 
     return false;
 }
 
-std::variant<bool, CVector> CLuaVehicleDefs::GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant, eVehicleModelDummy::e dummy)
+std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant,
+                                                                                                  eVehicleModelDummy::e                               dummy)
 {
-    return OOP_GetVehicleModelDummyPosition(variant, dummy);
+    std::variant<bool, CVector> theVariant = OOP_GetVehicleModelDummyPosition(std::move(variant), dummy);
+    if (std::holds_alternative<CVector>(theVariant))
+    {
+        CVector position = std::get<CVector>(theVariant);
+        return std::tuple{position.fX, position.fY, position.fZ};
+    }
+    return std::get<bool>(theVariant);
 }
 
 std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(std::variant<unsigned short, CClientVehicle* const> variant,
