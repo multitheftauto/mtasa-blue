@@ -6975,10 +6975,7 @@ void CClientGame::RestreamWorld()
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
-    typedef int(__cdecl * Function_ReInitStreaming)();
-    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
-
-    reinitStreaming();
+    g_pGame->GetStreaming()->ReinitStreaming();
 }
 
 void CClientGame::TriggerDiscordJoin(SString strSecret)
