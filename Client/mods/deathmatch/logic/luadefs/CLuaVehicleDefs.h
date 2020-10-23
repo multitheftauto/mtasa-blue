@@ -143,7 +143,7 @@ public:
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
-    static bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> variant, std::optional<unsigned char> variant2);
+    static bool SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> variant, std::optional<unsigned char> variant2);
     static float GetVehicleWheelScale(CClientVehicle* const pVehicle);
     static bool SetVehicleWheelScale(CClientVehicle* const pVehicle, const float fWheelScale);
     static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
