@@ -5842,7 +5842,6 @@ void CClientGame::ResetMapInfo()
         }
     }
 
-    // Reload world
     RestreamWorld();
 }
 
