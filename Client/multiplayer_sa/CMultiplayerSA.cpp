@@ -1503,6 +1503,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleDamage();
     InitHooks_VehicleLights();
     InitHooks_VehicleWeapons();
+
+    InitHooks_Streaming();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
