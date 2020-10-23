@@ -19,6 +19,11 @@ CFxSystemSAInterface* CFxManagerSAInterface::CreateFxSystem(char* name, RwV3d* p
                                                                                                                              ignoreBoundingChecks);
 }
 
+void CFxManagerSAInterface::DestroyFxSystem(CFxSystemSAInterface* system)
+{
+    ((void(__thiscall*)(CFxManagerSAInterface*, CFxSystemSAInterface*))0x4A9810)(this, system);
+}
+
 CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
                                         bool bSoundEnable)
 {

@@ -156,9 +156,9 @@ void CVehicleSAInterface::AddExhaustParticles()
     CVector firstExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
     CVector secondExhaustPos = firstExhaustPos;
     secondExhaustPos.fX *= -1.0f;
-    bool leftFumesVisible = true, rightFumesVisible = true;
+    bool rightFumesVisible = true, leftFumesVisible = true;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
-        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustPos, secondExhaustPos, leftFumesVisible, rightFumesVisible);
+        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustPos, secondExhaustPos, rightFumesVisible, leftFumesVisible);
     CMatrixSAInterface entityMatrix(*(CMatrixSAInterface*)Placeable.matrix);
     bool               bHasDoubleExhaust = pHandlingData->m_bDoubleExhaust;
     if (m_nVehicleSubClass == eVehicleClass::BIKE)
@@ -185,7 +185,7 @@ void CVehicleSAInterface::AddExhaustParticles()
                 break;
         }
     }
-    if (!rightFumesVisible)
+    if (!leftFumesVisible)
         bHasDoubleExhaust = false;
     if (!firstExhaustPos.IsZero())
     {
@@ -228,7 +228,7 @@ void CVehicleSAInterface::AddExhaustParticles()
             std::int32_t numExhausts = 2;
             for (std::int32_t i = 0; i < 2; i++)
             {
-                if (leftFumesVisible)
+                if (rightFumesVisible)
                 {
                     CFxSystemSAInterface* pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                     if (bFirstExhaustSubmergedInWater)
@@ -254,7 +254,7 @@ void CVehicleSAInterface::AddExhaustParticles()
                 }
                 if (m_fGasPedal > 0.5f && m_nCurrentGear < 3)
                 {
-                    if ((rand() & 1) && leftFumesVisible)
+                    if ((rand() & 1) && rightFumesVisible)
                     {
                         CFxSystemSAInterface* pSecondaryExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                         if (bFirstExhaustSubmergedInWater)

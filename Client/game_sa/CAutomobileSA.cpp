@@ -24,7 +24,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
     secondExhaustPosition.fX *= -1.0f;
     bool leftFumesVisible = true, rightFumesVisible = true;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
-        pGame->m_pVehicleAddExhaustParticlesHandler(this, exhaustPosition, secondExhaustPosition, leftFumesVisible, rightFumesVisible);
+        pGame->m_pVehicleAddExhaustParticlesHandler(this, exhaustPosition, secondExhaustPosition, rightFumesVisible, leftFumesVisible);
     bool  firstExhaustSubmergedInWater = false;
     bool  secondExhaustSubmergedInWater = false;
     float level = 0.0f;
@@ -48,7 +48,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
     }
     RwFrame*              frame = reinterpret_cast<RwFrame*>(rwObjectGetParent(m_pRwObject));
     RwMatrix*             rwMatrix = RwFrameGetMatrix(frame);
-    if (leftFumesVisible)
+    if (rightFumesVisible)
     {
         CFxSystemSAInterface* firstExhaustFxSystem = m_exhaustNitroFxSystem[0];
         if (firstExhaustFxSystem)
@@ -71,7 +71,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
             }
         }
     }
-    if (pHandlingData->m_bDoubleExhaust && rightFumesVisible)
+    if (pHandlingData->m_bDoubleExhaust && leftFumesVisible)
     {
         CFxSystemSAInterface* secondExhaustFxSystem = m_exhaustNitroFxSystem[1];
         if (secondExhaustFxSystem)
@@ -667,4 +667,18 @@ void CAutomobileSA::SetNitroFxSystemPosition(int id, const CVector& position)
     auto nitroFxSystem = m_automobileInterface->m_exhaustNitroFxSystem[id];
     if (nitroFxSystem)
         nitroFxSystem->SetOffsetPos((RwV3d*)&position);
+}
+
+void CAutomobileSA::SetNitroFxSystemVisible(int id, bool visible)
+{
+    if (!visible)
+    {
+        auto nitroFxSystem = m_automobileInterface->m_exhaustNitroFxSystem[id];
+        if (nitroFxSystem)
+        {
+            nitroFxSystem->Kill();
+            CFxManagerSA::g_fxMan.DestroyFxSystem(nitroFxSystem);
+            m_automobileInterface->m_exhaustNitroFxSystem[id] = nullptr;
+        }
+    }
 }

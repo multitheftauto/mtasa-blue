@@ -56,6 +56,7 @@ public:
     CFxMemoryPoolSAInterface fxMemoryPool;                 // 0xAC
 
     CFxSystemSAInterface* CreateFxSystem(char* name, RwV3d* position, RwMatrix* objectMatrix, bool ignoreBoundingChecks);
+    void                  DestroyFxSystem(CFxSystemSAInterface* system);
 };
 static_assert(sizeof(CFxManagerSAInterface) == 0xB8, "Invalid size for CFxManagerSAInterface");
 

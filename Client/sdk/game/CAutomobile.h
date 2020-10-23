@@ -60,4 +60,5 @@ public:
 
     virtual CDoor* GetDoor(eDoors doorID) = 0;
     virtual void   SetNitroFxSystemPosition(int id, const CVector& position) = 0;
+    virtual void   SetNitroFxSystemVisible(int id, bool visible) = 0;
 };

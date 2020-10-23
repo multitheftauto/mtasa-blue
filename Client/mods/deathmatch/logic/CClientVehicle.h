@@ -504,7 +504,10 @@ public:
     void  SetWheelScale(float fWheelScale);
     void  ResetWheelScale();
 
-    void SetDummyVisible(eVehicleDummy::e dummy, bool visible) { m_arrDummies[dummy].m_visible = visible; }
+    bool IsAutoMobile();
+
+    void SetDummyVisible(eVehicleDummy::e dummy, bool visible);
+    void SetDummyVisibleInternal(eVehicleDummy::e dummy, bool visible);
     bool IsDummyVisible(eVehicleDummy::e dummy) { return m_arrDummies[dummy].m_visible; }
     void SetDummyPosition(eVehicleDummy::e dummy, const CVector& position);
     bool GetDummyPosition(eVehicleDummy::e dummy, CVector& position);

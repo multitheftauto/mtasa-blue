@@ -244,4 +244,5 @@ public:
 
     CDoor* GetDoor(eDoors doorID);
     void   SetNitroFxSystemPosition(int id, const CVector& position);
+    void   SetNitroFxSystemVisible(int id, bool visible);
 };
