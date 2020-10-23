@@ -758,10 +758,8 @@ void CClientVehicleManager::RestreamAllVehicles()
     if (m_StreamedIn.empty())
         return;
 
-    for (uint i = 0; i < m_List.size(); i++)
+    for (auto& vehicle : m_List)
     {
-        CClientVehicle* pVehicle = m_List[i];
-
         // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn())
         {
