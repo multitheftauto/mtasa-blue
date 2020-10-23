@@ -353,9 +353,8 @@ void CClientObjectManager::RestreamObjects(unsigned short usModel)
 
 void CClientObjectManager::RestreamAllObjects()
 {
-    for (uint i = 0; i < m_Objects.size(); i++)
+    for (auto& object : m_Objects)
     {
-        CClientObject* pObject = m_Objects[i];
 
         // Streamed in and same model ID?
         if (pObject->IsStreamedIn())
