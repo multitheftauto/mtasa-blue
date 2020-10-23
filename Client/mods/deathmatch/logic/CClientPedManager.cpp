@@ -129,7 +129,7 @@ void CClientPedManager::RestreamPeds(unsigned short usModel)
 
 void CClientPedManager::RestreamAllPeds()
 {
-    for (auto& ped: m_List)
+    for (auto& pPed: m_List)
     {
 
         // Streamed in and same vehicle ID?
