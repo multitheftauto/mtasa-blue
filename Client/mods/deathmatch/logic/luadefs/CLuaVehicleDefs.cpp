@@ -81,6 +81,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponentVisible", GetVehicleComponentVisible},
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
+        {"getVehicleDummyPosition", ArgumentParser<GetVehicleDummyPosition>},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
@@ -138,7 +139,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled},
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
-        {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition },
+        {"setVehicleDummyPosition", ArgumentParser<SetVehicleDummyPosition>},
+        {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
     };
@@ -3849,12 +3851,26 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
     return 1;
 }
 
+bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy, CVector position)
+{
+    vehicle->SetDummyPosition(dummy, position);
+    return true;
+}
+
+std::variant<CVector, bool> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy)
+{
+    CVector position;
+    if (vehicle->GetDummyPosition(dummy, position))
+        return position;
+    return false;
+}
+
 int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // bool setVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy, float x, float y, float z )
     CClientVehicle* pVehicle = nullptr;
     unsigned short  usModel;
-    eVehicleDummy::e eDummy;
+    eVehicleModelDummy::e dummy;
     CVector         vecPosition;
 
     CScriptArgReader argStream(luaVM);
@@ -3866,20 +3882,22 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
     {
         argStream.ReadUserData(pVehicle);
     }
-    argStream.ReadEnumString(eDummy);
+    argStream.ReadEnumString(dummy);
     argStream.ReadVector3D(vecPosition);
 
     if (!argStream.HasErrors())
     {
         if (pVehicle)
         {
-            pVehicle->SetDummyPosition(eDummy, vecPosition);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            if (CStaticFunctionDefinitions::SetVehicleModelDummyPosition(pVehicle->GetModel(), dummy, vecPosition))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
         else
         {
-            if (CStaticFunctionDefinitions::SetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
+            if (CStaticFunctionDefinitions::SetVehicleModelDummyPosition(usModel, dummy, vecPosition))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -3898,7 +3916,7 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
     // float, float, float getVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy )
     CClientVehicle* pVehicle = nullptr;
     unsigned short  usModel = 0;
-    eVehicleDummy::e eDummy = eVehicleDummy::e::LIGHT_FRONT_MAIN;
+    eVehicleModelDummy::e eDummy = eVehicleModelDummy::e::LIGHT_FRONT_MAIN;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsNumber())
@@ -3936,7 +3954,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
     // float, float, float getVehicleModelDummyPosition ( int modelID/CClientVehicle * pVehicle, vehicle-dummy dummy )
     CClientVehicle* pVehicle = nullptr;
     unsigned short  usModel;
-    eVehicleDummy::e eDummy;
+    eVehicleModelDummy::e eDummy;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsNumber())

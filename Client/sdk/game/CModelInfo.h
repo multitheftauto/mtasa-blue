@@ -151,8 +151,8 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
-    virtual CVector      GetVehicleDummyPosition(eVehicleDummy::e eDummy) = 0;
-    virtual void         SetVehicleDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition) = 0;
+    virtual CVector      GetVehicleDummyPosition(eVehicleModelDummy::e eDummy) = 0;
+    virtual void         SetVehicleDummyPosition(eVehicleModelDummy::e eDummy, const CVector& vecPosition) = 0;
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
     virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;
     virtual void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;

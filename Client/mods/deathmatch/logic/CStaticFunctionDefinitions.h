@@ -223,9 +223,9 @@ public:
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
     static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
     static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
-    static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummy::e eDummy, CVector& vecPosition);
-    static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummy::e eDummy, CVector& vecPosition);
-    static bool            GetVehicleModelDummyPosition(CClientVehicle* pVehicle, unsigned short usModel, eVehicleDummy::e eDummy, CVector& vecPosition);
+    static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleModelDummy::e eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleModelDummy::e eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyPosition(CClientVehicle* pVehicle, unsigned short usModel, eVehicleModelDummy::e eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);

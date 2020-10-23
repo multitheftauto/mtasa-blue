@@ -155,7 +155,7 @@ void CVehicleSAInterface::AddExhaustParticles()
     }
     auto    pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(CModelInfoSAInterface::GetModelInfo(m_nModelIndex));
 
-    CVector firstExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleDummy::e::EXHAUST];
+    CVector firstExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
     CVector secondExhaustPos = firstExhaustPos;
     secondExhaustPos.fX *= -1.0f;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
@@ -177,7 +177,7 @@ void CVehicleSAInterface::AddExhaustParticles()
                 if (!m_comp1 || m_comp1 == 1)
                 {
                     if (!pGame->m_pVehicleAddExhaustParticlesHandler)
-                        secondExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleDummy::e::EXHAUST_SECONDARY];
+                        secondExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST_SECONDARY];
                 }
                 break;
             case VT_BF400:

@@ -7091,23 +7091,11 @@ void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterf
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
     if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
     {
-        auto        vehicle = static_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
-        CModelInfo* modelInfo = vehicle->GetModelInfo();
-        if (!modelInfo)
-            return;
-        CVector* leftPos = vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT);
-        if (leftPos)
-            leftFumesPosition = *leftPos;
-        else
-            leftFumesPosition = modelInfo->GetVehicleDummyPosition(eVehicleDummy::e::EXHAUST_LEFT);
-        CVector* rightPos = vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT);
-        if (rightPos)
-            rightFumesPosition = *rightPos;
-        else
-            rightFumesPosition = modelInfo->GetVehicleDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT);
+        auto vehicle = static_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+        vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT, leftFumesPosition);
+        vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, rightFumesPosition);
     }
 }
-
 
 void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 {

@@ -135,9 +135,12 @@ public:
     LUA_DECLARE(SetHeliBladeCollisionsEnabled);
     LUA_DECLARE(SetVehicleWindowOpen);
 
+    static bool                        SetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy, CVector position);
+    static std::variant<CVector, bool> GetVehicleDummyPosition(CClientVehicle* const vehicle, eVehicleDummy::e dummy);
+
     LUA_DECLARE(SetVehicleModelDummyPosition);
     LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
-
+    
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 

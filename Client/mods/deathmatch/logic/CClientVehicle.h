@@ -503,8 +503,8 @@ public:
     void  SetWheelScale(float fWheelScale);
     void  ResetWheelScale();
 
-    void     SetDummyPosition(eVehicleDummy::e dummy, const CVector& vecPosition);
-    CVector* GetDummyPosition(eVehicleDummy::e dummy);
+    void     SetDummyPosition(eVehicleDummy::e dummy, const CVector& position);
+    bool     GetDummyPosition(eVehicleDummy::e dummy, CVector& position);
     void     SetAllDummyPositionsInternal();
     void     SetDummyPositionInternal(eVehicleDummy::e dummy, const CVector& vecPosition);
 

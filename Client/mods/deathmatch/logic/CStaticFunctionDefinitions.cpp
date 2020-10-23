@@ -3578,7 +3578,7 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummy::e eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleModelDummy::e eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3586,21 +3586,13 @@ bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usM
         if (pModelInfo)
         {
             pModelInfo->SetVehicleDummyPosition(eDummies, vecPosition);
-            CClientVehicleManager* pVehicleManager = m_pManager->GetVehicleManager();
-            for (auto it = pVehicleManager->IterBegin(); it != pVehicleManager->IterEnd(); ++it)
-            {
-                if ((*it)->GetModel() == usModel)
-                {
-                    (*it)->SetDummyPosition(eDummies, vecPosition);
-                }
-            }
             return true;
         }
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummy::e eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleModelDummy::e eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3614,18 +3606,12 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(CClientVehicle* pVehicle, unsigned short usModel, eVehicleDummy::e eDummy, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(CClientVehicle* pVehicle, unsigned short usModel, eVehicleModelDummy::e eDummy,
+                                                              CVector& vecPosition)
 {
     if (pVehicle)
     {
-        CVector* pPosition = pVehicle->GetDummyPosition(eDummy);
-        if (pPosition)
-        {
-            vecPosition = *pPosition;
-            return true;
-        }
-
-        if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(pVehicle->GetModel(), eVehicleDummy::e::EXHAUST, vecPosition))
+        if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(pVehicle->GetModel(), eVehicleModelDummy::e::EXHAUST, vecPosition))
             return true;
     }
 

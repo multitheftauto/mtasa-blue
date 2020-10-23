@@ -281,7 +281,7 @@ protected:
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<std::uint32_t, std::map<eVehicleDummy::e, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::unordered_map<std::uint32_t, std::map<eVehicleModelDummy::e, CVector>> ms_ModelDefaultDummiesPosition;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
@@ -354,8 +354,8 @@ public:
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
-    CVector      GetVehicleDummyPosition(eVehicleDummy::e eDummy) override;
-    void         SetVehicleDummyPosition(eVehicleDummy::e eDummy, const CVector& vecPosition) override;
+    CVector      GetVehicleDummyPosition(eVehicleModelDummy::e eDummy) override;
+    void         SetVehicleDummyPosition(eVehicleModelDummy::e eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
     float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) override;

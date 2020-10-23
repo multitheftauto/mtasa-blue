@@ -1518,7 +1518,7 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
-namespace eVehicleDummy
+namespace eVehicleModelDummy
 {
     enum e
     {
@@ -1537,12 +1537,17 @@ namespace eVehicleDummy
         WING_AIRTRAIL,
         VEH_GUN,
         VEH_UNKNOWNDUMMY,
-        TOTAL_INTERNAL = 15,
+        TOTAL
+    };
+};
 
-        // custom dummies for MTA, not part of GTA
-        EXHAUST_LEFT = 15,
-        EXHAUST_RIGHT = 16,
-        TOTAL = 17
+namespace eVehicleDummy
+{
+    enum e
+    {
+        EXHAUST_LEFT = 0,
+        EXHAUST_RIGHT,
+        TOTAL
     };
 };
 

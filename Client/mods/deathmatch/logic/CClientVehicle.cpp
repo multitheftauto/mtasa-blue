@@ -5039,32 +5039,41 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& vecPosition)
+void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& position)
 {
-    if (dummy == eVehicleDummy::e::EXHAUST)
-    {
-        SetDummyPosition(eVehicleDummy::e::EXHAUST_LEFT, vecPosition);
-        SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
-        return;
-    }
-    else if (dummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].bSet)
-    {
-        SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
-    }
+    if (dummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].bSet)
+        SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {position.fX * -1, position.fY, position.fZ});
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
     vehicleDummy.bSet = true;
-    vehicleDummy.vecPosition = vecPosition;
-    SetDummyPositionInternal(dummy, vecPosition);
+    vehicleDummy.vecPosition = position;
+    SetDummyPositionInternal(dummy, position);
 }
 
-CVector* CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy)
+bool CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy, CVector& position)
 {
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
     if (vehicleDummy.bSet)
     {
-        return &vehicleDummy.vecPosition;
+        position = vehicleDummy.vecPosition;
+        return true;
     }
-    return nullptr;
+    if (dummy != eVehicleDummy::e::EXHAUST_LEFT && dummy != eVehicleDummy::e::EXHAUST_RIGHT)
+        return false;
+    CVector exhaustPos;
+    if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(GetModel(), eVehicleModelDummy::e::EXHAUST, exhaustPos))
+    {
+        if (dummy == eVehicleDummy::e::EXHAUST_LEFT)
+        {
+            position = exhaustPos;
+            return true;
+        }
+        else if (dummy == eVehicleDummy::e::EXHAUST_RIGHT)
+        {
+            position = CVector(exhaustPos.fX * -1, exhaustPos.fY, exhaustPos.fZ);
+            return true;
+        }
+    }
+    return false;
 }
 
 void CClientVehicle::SetAllDummyPositionsInternal()

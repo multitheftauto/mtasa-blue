@@ -56,6 +56,7 @@ DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
+DECLARE_ENUM(eVehicleModelDummy::e);
 DECLARE_ENUM(eVehicleDummy::e);
 DECLARE_ENUM_CLASS(eResizableVehicleWheelGroup);
 DECLARE_ENUM(eSurfaceProperties);
@@ -404,6 +405,10 @@ inline SString GetClassTypeName(CLuaMatrix*)
 inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 {
     return "primitive-type";
+}
+inline SString GetClassTypeName(eVehicleModelDummy::e*)
+{
+    return "vehicle-model-dummy";
 }
 inline SString GetClassTypeName(eVehicleDummy::e*)
 {

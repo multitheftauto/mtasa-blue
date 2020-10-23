@@ -47,7 +47,6 @@ public:
     virtual bool  IsDoorReady(eDoorsSA Door) = 0;
     virtual bool  IsInAir() = 0;
     virtual bool  IsOpenTopCar() = 0;
-    // virtual void                    PlaceOnRoadProperly ( void ) = 0;
     virtual void       PlayCarHorn() = 0;
     virtual void       PopBoot() = 0;
     virtual void       PopBootUsingPhysics() = 0;
@@ -57,7 +56,6 @@ public:
     virtual void       SetRandomDamage(bool bUnknown) = 0;
     virtual void       SetTaxiLight(bool bState) = 0;
     virtual void       SetTotalDamage(bool bUnknown) = 0;
-    //virtual void       SetTowLink(CVehicle* pVehicle, bool bRemoveAdd) = 0;
     virtual CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown) = 0;
 
     virtual CDoor* GetDoor(eDoors doorID) = 0;

@@ -19,7 +19,7 @@ void CAutomobileSAInterface::StaticSetHooks()
 void CAutomobileSAInterface::DoNitroEffect(float power)
 {
     auto    modelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->AsVehicleModelInfoPtr();
-    CVector exhaustPosition = modelInfo->pVisualInfo->vecDummies[eVehicleDummy::e::EXHAUST];
+    CVector exhaustPosition = modelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
     CVector secondExhaustPosition = exhaustPosition;
     secondExhaustPosition.fX *= -1.0f;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
