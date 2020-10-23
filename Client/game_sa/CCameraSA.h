@@ -352,13 +352,10 @@ public:
 #else
     // Looks more likely to be this
     CMatrixSAInterface m_cameraMatrix;
-    int            unk1[2];
     CMatrixSAInterface m_cameraMatrixOld;
-    int            unk2[2];
     CMatrixSAInterface m_viewMatrix;
-    int            unk3[2];
     CMatrixSAInterface m_matInverse;
-    int            unk4[26];
+    int            unk4[24];
 #endif
 
     CVector m_vecFrustumNormals[4];
