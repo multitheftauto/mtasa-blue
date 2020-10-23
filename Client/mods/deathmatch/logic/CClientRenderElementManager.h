@@ -30,7 +30,7 @@ public:
                                        uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                        ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
     CClientShader*       CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
-                                      bool bLayered, bool bDebug, int iTypeMask);
+                                      bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
     CClientRenderTarget* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
     CClientScreenSource* CreateScreenSource(uint uiSizeX, uint uiSizeY);
     CClientWebBrowser*   CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
