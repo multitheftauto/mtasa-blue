@@ -13,7 +13,7 @@
 
 void CLuaObjectDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Object create/destroy funcs
         {"createObject", CreateObject},
 
@@ -29,10 +29,8 @@ void CLuaObjectDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaObjectDefs::AddClass(lua_State* luaVM)
