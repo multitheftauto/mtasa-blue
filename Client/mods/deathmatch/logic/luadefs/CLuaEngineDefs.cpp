@@ -1978,10 +1978,8 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineRestreamWorld(lua_State* luaVM)
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
     g_pClientGame->RestreamWorld();
-
-    lua_pushnil(luaVM);
-    return 1;
+    return true;
 }
