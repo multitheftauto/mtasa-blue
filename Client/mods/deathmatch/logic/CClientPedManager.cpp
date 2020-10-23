@@ -129,12 +129,8 @@ void CClientPedManager::RestreamPeds(unsigned short usModel)
 
 void CClientPedManager::RestreamAllPeds()
 {
-    // Store the affected vehicles
-    CClientPed*                              pPed;
-    std::vector<CClientPed*>::const_iterator iter = IterBegin();
-    for (; iter != IterEnd(); iter++)
+    for (auto& ped: m_List)
     {
-        pPed = *iter;
 
         // Streamed in and same vehicle ID?
         if (pPed->IsStreamedIn())
