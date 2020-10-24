@@ -666,6 +666,10 @@ void CAutomobileSA::SetNitroFxSystemPosition(int id, const CVector& position)
 
 void CAutomobileSA::SetNitroFxSystemVisible(int id, bool visible)
 {
+    // CAutomobileSAInterface::DoNitroEffect will recreate the fx system
+    // if it's not there when vehicle->IsDummyVisible returns true, and
+    // that's why we don't need to create the fx system here when
+    // "visible" parameter is true.
     if (!visible)
     {
         auto nitroFxSystem = m_automobileInterface->m_exhaustNitroFxSystem[id];
