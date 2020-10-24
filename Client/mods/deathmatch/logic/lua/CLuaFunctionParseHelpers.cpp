@@ -583,8 +583,8 @@ ADD_ENUM(eVehicleModelDummy::e::VEH_UNKNOWNDUMMY, "veh_unknowndummy")
 IMPLEMENT_ENUM_END("vehicle-model-dummy")
 
 IMPLEMENT_ENUM_BEGIN(eVehicleDummy::e)
-ADD_ENUM(eVehicleDummy::e::EXHAUST_LEFT, "exhaust_left")
-ADD_ENUM(eVehicleDummy::e::EXHAUST_RIGHT, "exhaust_right")
+ADD_ENUM(eVehicleDummy::e::EXHAUST_1, "exhaust1")
+ADD_ENUM(eVehicleDummy::e::EXHAUST_2, "exhaust2")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)

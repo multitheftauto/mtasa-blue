@@ -5063,17 +5063,17 @@ void CClientVehicle::SetDummyVisibleInternal(eVehicleDummy::e dummy, bool visibl
         return;
     auto automobileInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pVehicle->GetInterface());
     auto automobile = g_pGame->GetAutomobile(automobileInterface);
-    if (dummy == eVehicleDummy::e::EXHAUST_LEFT)
-        automobile->SetNitroFxSystemVisible(1, visible);
-    else if (dummy == eVehicleDummy::e::EXHAUST_RIGHT)
+    if (dummy == eVehicleDummy::e::EXHAUST_1)
         automobile->SetNitroFxSystemVisible(0, visible);
+    else if (dummy == eVehicleDummy::e::EXHAUST_2)
+        automobile->SetNitroFxSystemVisible(1, visible);
 }
 
 
 void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& position)
 {
-    if (dummy == eVehicleDummy::e::EXHAUST_LEFT && !m_arrDummies[eVehicleDummy::e::EXHAUST_RIGHT].m_set)
-        SetDummyPosition(eVehicleDummy::e::EXHAUST_RIGHT, {position.fX * -1, position.fY, position.fZ});
+    if (dummy == eVehicleDummy::e::EXHAUST_2 && !m_arrDummies[eVehicleDummy::e::EXHAUST_1].m_set)
+        SetDummyPosition(eVehicleDummy::e::EXHAUST_1, {position.fX * -1, position.fY, position.fZ});
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
     vehicleDummy.m_set = true;
     vehicleDummy.m_position = position;
@@ -5088,18 +5088,18 @@ bool CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy, CVector& position)
         position = vehicleDummy.m_position;
         return true;
     }
-    if (dummy != eVehicleDummy::e::EXHAUST_LEFT && dummy != eVehicleDummy::e::EXHAUST_RIGHT)
+    if (dummy != eVehicleDummy::e::EXHAUST_1 && dummy != eVehicleDummy::e::EXHAUST_2)
         return false;
     CModelInfo* modelInfo = g_pGame->GetModelInfo(GetModel());
     if (modelInfo)
     {
         CVector exhaustPos = modelInfo->GetVehicleDummyPosition(eVehicleModelDummy::e::EXHAUST);
-        if (dummy == eVehicleDummy::e::EXHAUST_LEFT)
+        if (dummy == eVehicleDummy::e::EXHAUST_1)
         {
             position = exhaustPos;
             return true;
         }
-        else if (dummy == eVehicleDummy::e::EXHAUST_RIGHT)
+        else if (dummy == eVehicleDummy::e::EXHAUST_2)
         {
             position = CVector(exhaustPos.fX * -1, exhaustPos.fY, exhaustPos.fZ);
             return true;
@@ -5124,8 +5124,8 @@ void CClientVehicle::SetDummyPositionInternal(eVehicleDummy::e dummy, const CVec
         return;
     auto automobileInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pVehicle->GetInterface());
     auto automobile = g_pGame->GetAutomobile(automobileInterface);
-    if (dummy == eVehicleDummy::e::EXHAUST_LEFT)
-        automobile->SetNitroFxSystemPosition(1, vecPosition);
-    else if (dummy == eVehicleDummy::e::EXHAUST_RIGHT)
+    if (dummy == eVehicleDummy::e::EXHAUST_1)
         automobile->SetNitroFxSystemPosition(0, vecPosition);
+    else if (dummy == eVehicleDummy::e::EXHAUST_2)
+        automobile->SetNitroFxSystemPosition(1, vecPosition);
 }

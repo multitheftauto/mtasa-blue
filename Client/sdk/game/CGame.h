@@ -89,8 +89,8 @@ class CVehicleSAInterface;
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)();
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
-typedef void(VehicleAddExhaustParticlesHandler)(CVehicleSAInterface* pInterface, CVector& rightFumesPosition, CVector& leftFumesPosition,
-                                                bool& leftFumesVisible, bool& rightFumesVisible);
+typedef void(VehicleAddExhaustParticlesHandler)(CVehicleSAInterface* pInterface, CVector& exhaust1FumesPosition, CVector& exhaust2FumesPosition,
+                                                bool& exhaust1Visible, bool& exhaust2Visible);
 
 enum eGameVersion
 {

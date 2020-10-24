@@ -22,9 +22,9 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
     CVector exhaustPosition = modelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
     CVector secondExhaustPosition = exhaustPosition;
     secondExhaustPosition.fX *= -1.0f;
-    bool leftFumesVisible = true, rightFumesVisible = true;
+    bool secondExhaustVisible = true, firstExhaustVisible = true;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
-        pGame->m_pVehicleAddExhaustParticlesHandler(this, exhaustPosition, secondExhaustPosition, rightFumesVisible, leftFumesVisible);
+        pGame->m_pVehicleAddExhaustParticlesHandler(this, exhaustPosition, secondExhaustPosition, firstExhaustVisible, secondExhaustVisible);
     bool  firstExhaustSubmergedInWater = false;
     bool  secondExhaustSubmergedInWater = false;
     float level = 0.0f;
@@ -48,7 +48,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
     }
     RwFrame*              frame = reinterpret_cast<RwFrame*>(rwObjectGetParent(m_pRwObject));
     RwMatrix*             rwMatrix = RwFrameGetMatrix(frame);
-    if (rightFumesVisible)
+    if (firstExhaustVisible)
     {
         CFxSystemSAInterface* firstExhaustFxSystem = m_exhaustNitroFxSystem[0];
         if (firstExhaustFxSystem)
@@ -71,7 +71,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
             }
         }
     }
-    if (pHandlingData->m_bDoubleExhaust && leftFumesVisible)
+    if (pHandlingData->m_bDoubleExhaust && secondExhaustVisible)
     {
         CFxSystemSAInterface* secondExhaustFxSystem = m_exhaustNitroFxSystem[1];
         if (secondExhaustFxSystem)

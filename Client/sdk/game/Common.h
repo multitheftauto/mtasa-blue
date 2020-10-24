@@ -1545,8 +1545,8 @@ namespace eVehicleDummy
 {
     enum e
     {
-        EXHAUST_LEFT = 0,
-        EXHAUST_RIGHT,
+        EXHAUST_1 = 0,
+        EXHAUST_2,
         TOTAL
     };
 };
