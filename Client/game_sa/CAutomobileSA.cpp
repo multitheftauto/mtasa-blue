@@ -105,21 +105,16 @@ CAutomobileSA::CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation,
     m_automobileInterface = static_cast<CAutomobileSAInterface*>(this->GetInterface());
     for (int i = 0; i < MAX_DOORS; i++)
     {
-        this->door[i] = new CDoorSA(&m_automobileInterface->m_doors[i]);
+        this->door[i].SetInterface(&m_automobileInterface->m_doors[i]);
     }
 }
 
-CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* automobile) : m_automobileInterface(automobile), door{}
+CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* automobile) : m_automobileInterface(automobile)
 {
 }
 
 CAutomobileSA::~CAutomobileSA()
 {
-    for (int i = 0; i < MAX_DOORS; i++)
-    {
-        if (this->door[i])
-            delete this->door[i];
-    }
 }
 
 bool CAutomobileSA::BurstTyre(DWORD dwTyreID)
@@ -659,7 +654,7 @@ CPhysical* CAutomobileSA::SpawnFlyingComponent(int iCarNodeIndex, int iUnknown)
 CDoor* CAutomobileSA::GetDoor(eDoors doorID)
 {
     DEBUG_TRACE("CDoor * CAutomobileSA::GetDoor(eDoors doorID)");
-    return this->door[doorID];
+    return &this->door[doorID];
 }
 
 void CAutomobileSA::SetNitroFxSystemPosition(int id, const CVector& position)

@@ -198,7 +198,7 @@ class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {
 private:
     CAutomobileSAInterface* m_automobileInterface = nullptr;
-    CDoorSA*                door[MAX_DOORS] = {};
+    CDoorSA                 door[MAX_DOORS];
 
 public:
     CAutomobileSA() {}
