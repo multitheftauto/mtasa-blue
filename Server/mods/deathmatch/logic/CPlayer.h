@@ -25,6 +25,7 @@ class CPlayer;
 #include "packets/CPlayerStatsPacket.h"
 class CKeyBinds;
 class CPlayerCamera;
+enum class eVehicleAimDirection : unsigned char;
 
 enum eVoiceState
 {
@@ -93,6 +94,7 @@ public:
     void               SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
     unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
     void               SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
+    bool               CanBitStream(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(m_usBitStreamVersion) >= query; }
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
     bool               ShouldIgnoreMinClientVersionChecks();
@@ -121,8 +123,8 @@ public:
     void           SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
     float          GetAimDirection() { return m_fAimDirection; };
     void           SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
-    unsigned char  GetDriveByDirection() { return m_ucDriveByDirection; };
-    void           SetDriveByDirection(unsigned char ucDirection) { m_ucDriveByDirection = ucDirection; };
+    eVehicleAimDirection GetDriveByDirection() { return m_ucDriveByDirection; };
+    void           SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
     bool           IsAkimboArmUp() { return m_bAkimboArmUp; };
     void           SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
 
@@ -372,7 +374,7 @@ private:
     CVector       m_vecSniperSource;
     CVector       m_vecTargetting;
     float         m_fAimDirection;
-    unsigned char m_ucDriveByDirection;
+    eVehicleAimDirection m_ucDriveByDirection;
 
     bool m_bAkimboArmUp;
 

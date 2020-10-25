@@ -128,13 +128,13 @@ workspace "MTASA"
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"
+		include "vendor/freetype"
 		include "vendor/jpeg-9b"
 		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
-		include "vendor/discordgsdk"
 	end
 
 	filter {}

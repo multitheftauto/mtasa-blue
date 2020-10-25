@@ -72,10 +72,9 @@ CLuaMain::~CLuaMain()
     delete m_pLuaTimerManager;
 
     // Eventually delete the XML files the LUA script didn't
-    list<CXMLFile*>::iterator iterXML = m_XMLFiles.begin();
-    for (; iterXML != m_XMLFiles.end(); ++iterXML)
+    for (auto& xmlFile : m_XMLFiles)
     {
-        delete *iterXML;
+        delete xmlFile;
     }
 
     // Eventually delete the text displays the LUA script didn't
@@ -418,8 +417,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
-    return xmlNode;
+    auto xmlStringNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)

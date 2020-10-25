@@ -7,6 +7,9 @@ ENV AS_BUILDAGENT 0
 # Set default target platform to 64-bits
 ENV BUILD_BITS 64
 
+# This is important for using apt-get
+USER root
+
 # Install dependencies to install the latest gcc
 RUN apt-get update && \
     apt-get install -y software-properties-common wget && \
