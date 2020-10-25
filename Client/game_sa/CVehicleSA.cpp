@@ -186,7 +186,7 @@ void CVehicleSAInterface::AddExhaustParticles()
                 break;
         }
     }
-    hasDoubleExhaust = secondExhaustDummy.m_visibleSet ? secondExhaustDummy.m_visible : pHandlingData->m_bDoubleExhaust;
+    hasDoubleExhaust = secondExhaustDummy.m_visibleSet ? secondExhaustDummy.m_visible : hasDoubleExhaust;
     if (!firstExhaustDummy.m_position.IsZero())
     {
         CVector vecParticleVelocity;
