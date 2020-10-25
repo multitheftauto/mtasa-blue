@@ -446,7 +446,8 @@ enum class eBitStreamVersion : unsigned short
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
-    Latest = AnalogControlSync_AccelBrakeReverse - 1,
+    Next,
+    Latest = Next - 1,
 };
 
 class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion
