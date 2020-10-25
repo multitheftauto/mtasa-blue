@@ -9,7 +9,7 @@ local DISCORD_VENDOR = "vendor/discordgsdk"
 
 -- Change these to update the version
 local DISCORD_TAG = "v2020-11-02_21-48-56"
-local DISCORD_HASH = "4CCEEED0D8B41BDC67C44A6DDCCCF42288AF933E1F7284C591327178C391AA39"
+local DISCORD_HASH = "4cceeed0d8b41bdc67c44a6ddcccf42288af933e1f7284c591327178c391aa39"
 
 newaction {
 	trigger = "install_discord",

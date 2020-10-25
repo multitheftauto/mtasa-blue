@@ -387,11 +387,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
     m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
 
-    m_pDiscordCheck = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Enable Discord Rich Presence"), true));
-    m_pDiscordCheck->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
-    m_pDiscordCheck->GetPosition(vecTemp, false);
-    m_pDiscordCheck->AutoSize(NULL, 20.0f);
-
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1528,11 +1523,6 @@ void CSettings::UpdateVideoTab()
     bool bAllowServerTransferBoxControl;
     CVARS_GET("allow_server_control_transferbox", bAllowServerTransferBoxControl);
     m_pCheckBoxAllowTransferBoxControl->SetSelected(bAllowServerTransferBoxControl);
-
-    // Enable Discord Rich Presence
-    bool discordRichPresence;
-    CVARS_GET("discord_rich_presence", discordRichPresence);
-    m_pDiscordCheck->SetSelected(discordRichPresence);
 
     // Allow external sounds
     bool bAllowExternalSoundsEnabled;
@@ -3369,15 +3359,6 @@ void CSettings::SaveData()
     // Allow transfer box control
     bool bAllowServerTransferBoxControl = m_pCheckBoxAllowTransferBoxControl->GetSelected();
     CVARS_SET("allow_server_control_transferbox", bAllowServerTransferBoxControl);
-
-    // Discord Rich Presence
-    bool discordRichPresence;
-    CVARS_GET("discord_rich_presence", discordRichPresence);
-    if (discordRichPresence != m_pDiscordCheck->GetSelected())
-    {
-        CVARS_SET("discord_rich_presence", m_pDiscordCheck->GetSelected());
-        g_pCore->GetDiscordManager()->Disconnect();
-    }
 
     // Allow external sounds
     bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();

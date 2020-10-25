@@ -35,12 +35,6 @@ class CLuaFunctionDefs
 public:
     static void Initialize(class CLuaManager* pLuaManager, class CGame* pClientGame);
 
-    LUA_DECLARE(CallRemote);
-    LUA_DECLARE(FetchRemote);
-    LUA_DECLARE(GetRemoteRequests);
-    LUA_DECLARE(GetRemoteRequestInfo);
-    LUA_DECLARE(AbortRemoteRequest);
-
     // Event functions
     LUA_DECLARE(AddEvent);
     LUA_DECLARE(AddEventHandler);

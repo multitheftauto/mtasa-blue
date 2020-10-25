@@ -121,6 +121,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_FASTSPRINT] = false;
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
+    m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -1066,7 +1067,7 @@ void CClientGame::DoPulses()
             m_bWaitingForLocalConnect = false;
 
             // Assume local server has the same bitstream version
-            g_pNet->SetServerBitStreamVersion(MTA_DM_BITSTREAM_VERSION);
+            g_pNet->SetServerBitStreamVersion(static_cast<unsigned short>(MTA_DM_BITSTREAM_VERSION));
 
             // Run the game normally.
             StartGame(m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType);
@@ -1793,7 +1794,7 @@ void CClientGame::UpdateVehicleInOut()
             }
 
             // Are we supposed to be in a vehicle? But aren't?
-            if (pOccupiedVehicle && !pVehicle)
+            if (pOccupiedVehicle && !pVehicle && !m_pLocalPlayer->IsWarpInToVehicleRequired())
             {
                 // Jax: this happens when we try to warp into a streamed out vehicle, including when we use CClientVehicle::StreamInNow
                 // ..maybe we need a different way to detect bike falls?
@@ -2310,6 +2311,11 @@ void CClientGame::SetAllDimensions(unsigned short usDimension)
     m_pManager->GetWaterManager()->SetDimension(usDimension);
     m_pNametags->SetDimension(usDimension);
     m_pCamera->SetDimension(usDimension);
+}
+
+void CClientGame::SetAllInteriors(unsigned char ucInterior)
+{
+    m_pNametags->m_ucInterior = ucInterior;
 }
 
 bool CClientGame::StaticKeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey)
@@ -3049,7 +3055,7 @@ void CClientGame::DrawPlayerDetails(CClientPlayer* pPlayer)
     pPlayer->GetAim(fAimX, fAimY);
     const CVector& vecAimSource = pPlayer->GetAimSource();
     const CVector& vecAimTarget = pPlayer->GetAimTarget();
-    unsigned char  ucDrivebyAim = pPlayer->GetVehicleAimAnim();
+    eVehicleAimDirection ucDrivebyAim = pPlayer->GetVehicleAimAnim();
 
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, true);
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x90DE1212, false);
@@ -3218,7 +3224,7 @@ void CClientGame::UpdateMimics()
             m_pLocalPlayer->GetShotData(&vecOrigin, &vecTarget);
             float fAimX = pShotSync->m_fArmDirectionX;
             float fAimY = pShotSync->m_fArmDirectionY;
-            char  cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
+            eVehicleAimDirection cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
             bool  bAkimboUp = g_pMultiplayer->GetAkimboTargetUp();
 
             /*
@@ -3556,7 +3562,6 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetAlphaTransparencies();
-    g_pGame->ResetModelTimes();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
@@ -3697,7 +3702,7 @@ CAnimBlendAssociationSAInterface* CClientGame::StaticAddAnimationAndSyncHandler(
 }
 
 bool CClientGame::StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
-                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID)
+                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, eAnimID animID)
 {
     return g_pClientGame->AssocGroupCopyAnimationHandler(pAnimAssoc, pClump, pAnimAssocGroup, animID);
 }
@@ -4027,7 +4032,7 @@ CAnimBlendAssociationSAInterface* CClientGame::AddAnimationAndSyncHandler(RpClum
 }
 
 bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssocInterface, RpClump* pClump,
-                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID)
+                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, eAnimID animID)
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
@@ -4046,9 +4051,9 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                           SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
-    int iGroupID = pAnimAssocGroup->GetGroupID();
+    eAnimGroup iGroupID = pAnimAssocGroup->GetGroupID();
 
-    if (iGroupID == -1 || pAnimAssocGroup->GetAnimBlock() == nullptr)
+    if (iGroupID == eAnimGroup::ANIM_GROUP_NONE || pAnimAssocGroup->GetAnimBlock() == nullptr)
     {
         g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
                           SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
@@ -4063,14 +4068,17 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if (pClientPed != nullptr)
     {
         std::unique_ptr<CAnimBlendHierarchy> pAnimHierarchy = nullptr;
-        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK &&
+            animID != eAnimID::ANIM_ID_WEAPON_CROUCH)
         {
             // check for idle animation
-            if (animID == 3)
+            if (animID == eAnimID::ANIM_ID_IDLE)
             {
-                if ((iGroupID == 0) || (iGroupID >= 54 && iGroupID <= 70) || (iGroupID >= 118))
+                if (iGroupID == eAnimGroup::ANIM_GROUP_DEFAULT ||
+                    (iGroupID >= eAnimGroup::ANIM_GROUP_PLAYER && iGroupID <= eAnimGroup::ANIM_GROUP_PLAYERJETPACK) || iGroupID >= eAnimGroup::ANIM_GROUP_MAN)
                 {
-                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(0, 55);
+                    auto pDuckAnimStaticAssoc =
+                        pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
                     pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
                     isCustomAnimationToPlay = true;
                 }
@@ -5682,8 +5690,9 @@ void CClientGame::ResetMapInfo()
     m_pCamera->SetFocusToLocalPlayer();
     g_pGame->GetSettings()->ResetFieldOfViewFromScript();
 
-    // Dimension
+    // Dimension and interiors
     SetAllDimensions(0);
+    SetAllInteriors(0);
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);

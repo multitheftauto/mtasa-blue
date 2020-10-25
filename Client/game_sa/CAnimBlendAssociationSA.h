@@ -96,8 +96,8 @@ public:
     void                                 AllocateAnimBlendNodeArray(int count);
     void                                 FreeAnimBlendNodeArray();
     CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }
-    AssocGroupId                         GetAnimGroup() { return (AssocGroupId)m_pInterface->sAnimGroup; }
-    AnimationId                          GetAnimID() { return (AnimationId)m_pInterface->sAnimID; }
+    eAnimGroup                           GetAnimGroup() { return static_cast<eAnimGroup>(m_pInterface->sAnimGroup); }
+    eAnimID                              GetAnimID() { return static_cast <eAnimID>(m_pInterface->sAnimID); }
     std::unique_ptr<CAnimBlendHierarchy> GetAnimHierarchy();
 
     float GetBlendAmount() { return m_pInterface->fBlendAmount; }

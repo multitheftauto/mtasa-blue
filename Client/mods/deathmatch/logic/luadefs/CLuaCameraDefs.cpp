@@ -14,7 +14,7 @@
 
 void CLuaCameraDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Cam get funcs
         {"getCamera", GetCamera},
         {"getCameraViewMode", GetCameraViewMode},
@@ -39,10 +39,8 @@ void CLuaCameraDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaCameraDefs::AddClass(lua_State* luaVM)
