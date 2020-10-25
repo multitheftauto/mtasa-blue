@@ -412,11 +412,15 @@ void CClientCamera::SetFocusToLocalPlayer()
     // Restore the camera
     SetFocusToLocalPlayerImpl();
 
+    Reset();
+}
+
+void CClientCamera::Reset()
+{
     // Remove stream reference from the previous target
     if (m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass())
         static_cast<CClientStreamElement*>((CClientEntity*)m_pFocusedEntity)->RemoveStreamReference();
 
-    // Reset
     m_pFocusedPlayer = NULL;
     m_pFocusedEntity = NULL;
     m_pFocusedGameEntity = NULL;
