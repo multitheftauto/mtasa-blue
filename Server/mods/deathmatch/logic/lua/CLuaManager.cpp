@@ -155,7 +155,7 @@ CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
 
 void CLuaManager::LoadCFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
         {"removeEventHandler", CLuaFunctionDefs::RemoveEventHandler},
@@ -265,12 +265,6 @@ void CLuaManager::LoadCFunctions()
         CLuaCFunctions::AddFunction ( "setAccountPassword", CLuaFunctionDefinitions::SetAccountPassword },
         */
 
-        {"callRemote", CLuaFunctionDefs::CallRemote},
-        {"fetchRemote", CLuaFunctionDefs::FetchRemote},
-        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
-        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
-        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
-
         // Misc funcs
         {"resetMapInfo", CLuaFunctionDefs::ResetMapInfo},
         {"getServerPort", CLuaFunctionDefs::GetServerPort},
@@ -357,10 +351,8 @@ void CLuaManager::LoadCFunctions()
     };
 
     // Add all functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
     
     // Restricted functions
     CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
@@ -377,6 +369,7 @@ void CLuaManager::LoadCFunctions()
     CLuaElementDefs::LoadFunctions();
     CLuaHandlingDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
+    CLuaNetworkDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();
     CLuaPedDefs::LoadFunctions();
     CLuaPickupDefs::LoadFunctions();

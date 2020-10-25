@@ -348,6 +348,29 @@ public:
     }
 };
 
+// eBitStreamVersion allows us to track what BitStream version is being used without placing magic numbers everywhere.
+// It also helps us know what code branches can be removed when we increment a major version of MTA.
+// Make sure you only add new items to the end of the list, above the "Latest" entry.
+enum class eBitStreamVersion : unsigned short
+{
+    Unk = 0x06F,
+
+    //
+    // 1.5.8 RELEASED - 2020-10-11
+    //
+
+    // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
+    // Make sure you only add things above this comment.
+    Next,
+    Latest = Next - 1,
+};
+
+// This is a temporary check during the introduction of eBitStreamVersion.
+// We only check it server-side because static_assert is not available for all client projects.
+#ifndef MTA_CLIENT
+static_assert(static_cast<unsigned short>(eBitStreamVersion::Latest) == 0x06F);
+#endif
+
 class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion
 {
     NetBitStreamInterface(const NetBitStreamInterface&);
@@ -358,8 +381,12 @@ protected:
     virtual ~NetBitStreamInterface() { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
 
 public:
-    virtual                operator NetBitStreamInterface&() { return *this; }
+    virtual operator NetBitStreamInterface&() { return *this; }
     virtual unsigned short Version() const = 0;
+
+    bool Can(eBitStreamVersion query) {
+        return static_cast<eBitStreamVersion>(Version()) >= query;
+    }
 };
 
 // Interface for all sync structures

@@ -165,7 +165,6 @@ public:
                                                 CLuaArguments* pArgs = nullptr) = 0;
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...) = 0;
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename) = 0;
-    virtual int               GetQueueSizeFromConnection(SConnectionHandle connectionHandle) = 0;
 };
 
 CDatabaseManager* NewDatabaseManager();
