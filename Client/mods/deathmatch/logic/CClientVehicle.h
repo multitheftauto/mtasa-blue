@@ -125,12 +125,6 @@ struct SVehicleComponentData
     bool    m_bVisible;
 };
 class CClientProjectile;
-struct SVehicleDummy
-{
-    bool    m_set = false;
-    bool    m_visible = true;
-    CVector m_position;
-};
 
 class CClientVehicle : public CClientStreamElement
 {
@@ -506,13 +500,14 @@ public:
 
     bool IsAutoMobile();
 
-    void SetDummyVisible(eVehicleDummy::e dummy, bool visible);
-    void SetDummyVisibleInternal(eVehicleDummy::e dummy, bool visible);
-    bool IsDummyVisible(eVehicleDummy::e dummy) { return m_arrDummies[dummy].m_visible; }
-    void SetDummyPosition(eVehicleDummy::e dummy, const CVector& position);
-    bool GetDummyPosition(eVehicleDummy::e dummy, CVector& position);
-    void SetAllDummyPositionsInternal();
-    void SetDummyPositionInternal(eVehicleDummy::e dummy, const CVector& vecPosition);
+    SVehicleDummy& GetDummy(eVehicleDummy::e dummy) { return m_arrDummies[dummy]; }
+    void           SetDummyVisible(eVehicleDummy::e dummy, bool visible);
+    void           SetDummyVisibleInternal(eVehicleDummy::e dummy, bool visible);
+    bool           IsDummyVisible(eVehicleDummy::e dummy) { return m_arrDummies[dummy].m_visible; }
+    void           SetDummyPosition(eVehicleDummy::e dummy, const CVector& position);
+    bool           GetDummyPosition(eVehicleDummy::e dummy, CVector& position);
+    void           SetAllDummyPositionsInternal();
+    void           SetDummyPositionInternal(eVehicleDummy::e dummy, const CVector& vecPosition);
 
     bool OnVehicleFallThroughMap();
 

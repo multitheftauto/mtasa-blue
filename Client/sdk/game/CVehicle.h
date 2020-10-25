@@ -85,6 +85,14 @@ struct SVehicleFrame
     std::vector<RwFrame*> frameList;            // Frames from root to parent
 };
 
+struct SVehicleDummy
+{
+    bool    m_positionSet = false;
+    bool    m_visibleSet = false;
+    bool    m_visible = true;
+    CVector m_position;
+};
+
 class CVehicle : public virtual CPhysical
 {
 public:

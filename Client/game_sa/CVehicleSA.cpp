@@ -152,15 +152,16 @@ void CVehicleSAInterface::AddExhaustParticles()
     {
         return;
     }
-    auto    pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(CModelInfoSAInterface::GetModelInfo(m_nModelIndex));
-    CVector firstExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
-    CVector secondExhaustPos = firstExhaustPos;
-    secondExhaustPos.fX *= -1.0f;
-    bool firstExhaustVisible = true, secondExhaustVisible = true;
+    auto          modelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->AsVehicleModelInfoPtr();
+    SVehicleDummy firstExhaustDummy;
+    SVehicleDummy secondExhaustDummy;
+    firstExhaustDummy.m_position = modelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
+    secondExhaustDummy.m_position = firstExhaustDummy.m_position;
+    secondExhaustDummy.m_position.fX *= -1.0f;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
-        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustPos, secondExhaustPos, firstExhaustVisible, secondExhaustVisible);
+        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustDummy, secondExhaustDummy);
     CMatrixSAInterface entityMatrix(*(CMatrixSAInterface*)Placeable.matrix);
-    bool               bHasDoubleExhaust = pHandlingData->m_bDoubleExhaust;
+    bool               hasDoubleExhaust = pHandlingData->m_bDoubleExhaust;
     if (m_nVehicleSubClass == eVehicleClass::BIKE)
     {
         CBikeSAInterface* pBike = static_cast<CBikeSAInterface*>(this);
@@ -170,24 +171,23 @@ void CVehicleSAInterface::AddExhaustParticles()
         {
             case VT_FCR900:
                 if (pBike->m_comp1 == 1 || m_comp1 == 2)
-                    bHasDoubleExhaust = true;
+                    hasDoubleExhaust = true;
                 break;
             case VT_NRG500:
                 if (!m_comp1 || m_comp1 == 1)
                 {
-                    if (!pGame->m_pVehicleAddExhaustParticlesHandler)
-                        secondExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST_SECONDARY];
+                    if (!secondExhaustDummy.m_positionSet)
+                        secondExhaustDummy.m_position = modelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST_SECONDARY];
                 }
                 break;
             case VT_BF400:
                 if (m_comp1 == 2)
-                    bHasDoubleExhaust = true;
+                    hasDoubleExhaust = true;
                 break;
         }
     }
-    if (!secondExhaustVisible)
-        bHasDoubleExhaust = false;
-    if (!firstExhaustPos.IsZero())
+    hasDoubleExhaust = secondExhaustDummy.m_visibleSet ? secondExhaustDummy.m_visible : pHandlingData->m_bDoubleExhaust;
+    if (!firstExhaustDummy.m_position.IsZero())
     {
         CVector vecParticleVelocity;
         if (GetForward().DotProduct(&m_vecLinearVelocity) >= 0.05f)
@@ -199,20 +199,24 @@ void CVehicleSAInterface::AddExhaustParticles()
             static float randomFactor = CGeneralSA::GetRandomNumberInRange(-1.8f, -0.9f);
             vecParticleVelocity = GetForward() * randomFactor;
         }
-        firstExhaustPos = entityMatrix * firstExhaustPos;
+        firstExhaustDummy.m_position = entityMatrix * firstExhaustDummy.m_position;
         bool  bFirstExhaustSubmergedInWater = false;
         bool  bSecondExhaustSubmergedInWater = false;
         float pLevel = 0.0f;
-        if (bTouchingWater && CWaterLevelSA::GetWaterLevel(firstExhaustPos.fX, firstExhaustPos.fY, firstExhaustPos.fZ, &pLevel, true, nullptr) &&
-            pLevel >= firstExhaustPos.fZ)
+        if (bTouchingWater &&
+            CWaterLevelSA::GetWaterLevel(firstExhaustDummy.m_position.fX, firstExhaustDummy.m_position.fY, firstExhaustDummy.m_position.fZ, &pLevel, true,
+                                         nullptr) &&
+            pLevel >= firstExhaustDummy.m_position.fZ)
         {
             bFirstExhaustSubmergedInWater = true;
         }
-        if (bHasDoubleExhaust)
+        if (hasDoubleExhaust)
         {
-            secondExhaustPos = entityMatrix * secondExhaustPos;
-            if (bTouchingWater && CWaterLevelSA::GetWaterLevel(secondExhaustPos.fX, secondExhaustPos.fY, secondExhaustPos.fZ, &pLevel, true, nullptr) &&
-                pLevel >= secondExhaustPos.fZ)
+            secondExhaustDummy.m_position = entityMatrix * secondExhaustDummy.m_position;
+            if (bTouchingWater &&
+                CWaterLevelSA::GetWaterLevel(secondExhaustDummy.m_position.fX, secondExhaustDummy.m_position.fY, secondExhaustDummy.m_position.fZ, &pLevel,
+                                             true, nullptr) &&
+                pLevel >= secondExhaustDummy.m_position.fZ)
             {
                 bSecondExhaustSubmergedInWater = true;
             }
@@ -228,7 +232,7 @@ void CVehicleSAInterface::AddExhaustParticles()
             std::int32_t numExhausts = 2;
             for (std::int32_t i = 0; i < 2; i++)
             {
-                if (firstExhaustVisible)
+                if (firstExhaustDummy.m_visible)
                 {
                     CFxSystemSAInterface* pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                     if (bFirstExhaustSubmergedInWater)
@@ -237,10 +241,10 @@ void CVehicleSAInterface::AddExhaustParticles()
                         fxPrt.m_fSize = 0.6f;
                         pFirstExhaustFxSystem = CFxSA::g_fx.m_pPrtBubble;
                     }
-                    pFirstExhaustFxSystem->AddParticle((RwV3d*)&firstExhaustPos, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness,
-                                                       0.6f, 0);
+                    pFirstExhaustFxSystem->AddParticle((RwV3d*)&firstExhaustDummy.m_position, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
+                                                       m_fContactSurfaceBrightness, 0.6f, 0);
                 }
-                if (bHasDoubleExhaust)
+                if (hasDoubleExhaust)
                 {
                     CFxSystemSAInterface* pSecondExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                     if (bSecondExhaustSubmergedInWater)
@@ -249,14 +253,14 @@ void CVehicleSAInterface::AddExhaustParticles()
                         fxPrt.m_fSize = 0.6f;
                         pSecondExhaustFxSystem = CFxSA::g_fx.m_pPrtBubble;
                     }
-                    pSecondExhaustFxSystem->AddParticle((RwV3d*)&secondExhaustPos, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
+                    pSecondExhaustFxSystem->AddParticle((RwV3d*)&secondExhaustDummy.m_position, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
                                                         m_fContactSurfaceBrightness, 0.6f, 0);
                 }
                 if (m_fGasPedal > 0.5f && m_nCurrentGear < 3)
                 {
                     if ((rand() & 1))
                     {
-                        if (firstExhaustVisible)
+                        if (firstExhaustDummy.m_visible)
                         {
                             CFxSystemSAInterface* pSecondaryExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                             if (bFirstExhaustSubmergedInWater)
@@ -265,11 +269,11 @@ void CVehicleSAInterface::AddExhaustParticles()
                                 fxPrt.m_fSize = 0.6f;
                                 pSecondaryExhaustFxSystem = CFxSA::g_fx.m_pPrtBubble;
                             }
-                            pSecondaryExhaustFxSystem->AddParticle((RwV3d*)&firstExhaustPos, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
+                            pSecondaryExhaustFxSystem->AddParticle((RwV3d*)&firstExhaustDummy.m_position, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
                                                                    m_fContactSurfaceBrightness, 0.6f, 0);
                         }
                     }
-                    else if (bHasDoubleExhaust)
+                    else if (hasDoubleExhaust)
                     {
                         CFxSystemSAInterface* pSecondaryExhaustFxSystem = CFxSA::g_fx.m_pPrtSmokeII3expand;
                         if (bSecondExhaustSubmergedInWater)
@@ -278,7 +282,7 @@ void CVehicleSAInterface::AddExhaustParticles()
                             fxPrt.m_fSize = 0.6f;
                             pSecondaryExhaustFxSystem = CFxSA::g_fx.m_pPrtBubble;
                         }
-                        pSecondaryExhaustFxSystem->AddParticle((RwV3d*)&secondExhaustPos, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
+                        pSecondaryExhaustFxSystem->AddParticle((RwV3d*)&secondExhaustDummy.m_position, (RwV3d*)&vecParticleVelocity, 0.0f, &fxPrt, -1.0f,
                                                                m_fContactSurfaceBrightness, 0.6f, 0);
                     }
                 }

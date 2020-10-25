@@ -3863,10 +3863,9 @@ void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
     return g_pClientGame->PedStepHandler(pPed, bFoot);
 }
 
-void CClientGame::StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& exhaust1FumesPosition, CVector& exhaust2FumesPosition,
-                                                          bool& exhaust1Visible, bool& exhaust2Visible)
+void CClientGame::StaticVehicleAddExhaustParticlesHandler(CVehicleSAInterface* const pInterface, SVehicleDummy& exhaust1Dummy, SVehicleDummy& exhaust2Dummy)
 {
-    g_pClientGame->VehicleAddExhaustParticlesHandler(pInterface, exhaust1FumesPosition, exhaust2FumesPosition, exhaust1Visible, exhaust2Visible);
+    g_pClientGame->VehicleAddExhaustParticlesHandler(pInterface, exhaust1Dummy, exhaust2Dummy);
 }
 
 void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
@@ -7086,18 +7085,17 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
     }
 }
 
-void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* pInterface, CVector& exhaust1FumesPosition, CVector& exhaust2FumesPosition,
-                                                    bool& exhaust1Visible, bool& exhaust2Visible)
+void CClientGame::VehicleAddExhaustParticlesHandler(CVehicleSAInterface* const pInterface, SVehicleDummy& exhaust1Dummy, SVehicleDummy& exhaust2Dummy)
 {
     CPools*                    pools = g_pGame->GetPools();
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
     if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
     {
-        auto vehicle = static_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
-        vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_1, exhaust1FumesPosition);
-        vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_2, exhaust2FumesPosition);
-        exhaust1Visible = vehicle->IsDummyVisible(eVehicleDummy::e::EXHAUST_1);
-        exhaust2Visible = vehicle->IsDummyVisible(eVehicleDummy::e::EXHAUST_2);
+        CClientVehicle* vehicle = static_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+        exhaust1Dummy = vehicle->GetDummy(eVehicleDummy::e::EXHAUST_1);
+        exhaust2Dummy = vehicle->GetDummy(eVehicleDummy::e::EXHAUST_2);
+        vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_1, exhaust1Dummy.m_position);
+        vehicle->GetDummyPosition(eVehicleDummy::e::EXHAUST_2, exhaust2Dummy.m_position);
     }
 }
 

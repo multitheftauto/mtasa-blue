@@ -5054,6 +5054,7 @@ bool CClientVehicle::IsAutoMobile()
 void CClientVehicle::SetDummyVisible(eVehicleDummy::e dummy, bool visible)
 {
     m_arrDummies[dummy].m_visible = visible;
+    m_arrDummies[dummy].m_visibleSet = true;
     SetDummyVisibleInternal(dummy, visible);
 }
 
@@ -5072,10 +5073,10 @@ void CClientVehicle::SetDummyVisibleInternal(eVehicleDummy::e dummy, bool visibl
 
 void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& position)
 {
-    if (dummy == eVehicleDummy::e::EXHAUST_2 && !m_arrDummies[eVehicleDummy::e::EXHAUST_1].m_set)
+    if (dummy == eVehicleDummy::e::EXHAUST_2 && !m_arrDummies[eVehicleDummy::e::EXHAUST_1].m_positionSet)
         SetDummyPosition(eVehicleDummy::e::EXHAUST_1, {position.fX * -1, position.fY, position.fZ});
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
-    vehicleDummy.m_set = true;
+    vehicleDummy.m_positionSet = true;
     vehicleDummy.m_position = position;
     SetDummyPositionInternal(dummy, position);
 }
@@ -5083,7 +5084,7 @@ void CClientVehicle::SetDummyPosition(eVehicleDummy::e dummy, const CVector& pos
 bool CClientVehicle::GetDummyPosition(eVehicleDummy::e dummy, CVector& position)
 {
     SVehicleDummy& vehicleDummy = m_arrDummies[dummy];
-    if (vehicleDummy.m_set)
+    if (vehicleDummy.m_positionSet)
     {
         position = vehicleDummy.m_position;
         return true;
@@ -5113,7 +5114,7 @@ void CClientVehicle::SetAllDummyPositionsInternal()
     for (size_t i = 0; i < m_arrDummies.size(); i++)
     {
         const SVehicleDummy& dummy = m_arrDummies[i];
-        if (dummy.m_set && dummy.m_visible)
+        if (dummy.m_positionSet && dummy.m_visible)
             SetDummyPositionInternal(static_cast<eVehicleDummy::e>(i), dummy.m_position);
     }
 }

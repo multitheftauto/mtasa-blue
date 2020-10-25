@@ -18,37 +18,39 @@ void CAutomobileSAInterface::StaticSetHooks()
 
 void CAutomobileSAInterface::DoNitroEffect(float power)
 {
-    auto    modelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->AsVehicleModelInfoPtr();
-    CVector exhaustPosition = modelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
-    CVector secondExhaustPosition = exhaustPosition;
-    secondExhaustPosition.fX *= -1.0f;
-    bool secondExhaustVisible = true, firstExhaustVisible = true;
+    auto          modelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->AsVehicleModelInfoPtr();
+    SVehicleDummy firstExhaustDummy;
+    SVehicleDummy secondExhaustDummy;
+    firstExhaustDummy.m_position = modelInfo->pVisualInfo->vecDummies[eVehicleModelDummy::e::EXHAUST];
+    secondExhaustDummy.m_position = firstExhaustDummy.m_position;
+    secondExhaustDummy.m_position.fX *= -1.0f;
     if (pGame->m_pVehicleAddExhaustParticlesHandler)
-        pGame->m_pVehicleAddExhaustParticlesHandler(this, exhaustPosition, secondExhaustPosition, firstExhaustVisible, secondExhaustVisible);
+        pGame->m_pVehicleAddExhaustParticlesHandler(this, firstExhaustDummy, secondExhaustDummy);
+    bool  hasDoubleExhaust = secondExhaustDummy.m_visibleSet ? secondExhaustDummy.m_visible : pHandlingData->m_bDoubleExhaust;
     bool  firstExhaustSubmergedInWater = false;
     bool  secondExhaustSubmergedInWater = false;
     float level = 0.0f;
     if (bTouchingWater)
     {
-        CVector point = *Placeable.matrix * exhaustPosition;
+        CVector point = *Placeable.matrix * firstExhaustDummy.m_position;
         if (CWaterLevelSA::GetWaterLevel(point.fX, point.fY, point.fZ, &level, true, nullptr))
         {
             if (level >= point.fZ)
                 firstExhaustSubmergedInWater = true;
         }
     }
-    if (pHandlingData->m_bDoubleExhaust && !bTouchingWater)
+    if (hasDoubleExhaust && !bTouchingWater)
     {
-        CVector point = *Placeable.matrix * secondExhaustPosition;
+        CVector point = *Placeable.matrix * secondExhaustDummy.m_position;
         if (CWaterLevelSA::GetWaterLevel(point.fX, point.fY, point.fZ, &level, true, nullptr))
         {
             if (level >= point.fZ)
                 secondExhaustSubmergedInWater = true;
         }
     }
-    RwFrame*              frame = reinterpret_cast<RwFrame*>(rwObjectGetParent(m_pRwObject));
-    RwMatrix*             rwMatrix = RwFrameGetMatrix(frame);
-    if (firstExhaustVisible)
+    RwFrame*  frame = reinterpret_cast<RwFrame*>(rwObjectGetParent(m_pRwObject));
+    RwMatrix* rwMatrix = RwFrameGetMatrix(frame);
+    if (firstExhaustDummy.m_visible)
     {
         CFxSystemSAInterface* firstExhaustFxSystem = m_exhaustNitroFxSystem[0];
         if (firstExhaustFxSystem)
@@ -62,7 +64,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
         }
         else if (!firstExhaustSubmergedInWater && rwMatrix)
         {
-            firstExhaustFxSystem = CFxManagerSA::g_fxMan.CreateFxSystem("nitro", (RwV3d*)&exhaustPosition, rwMatrix, true);
+            firstExhaustFxSystem = CFxManagerSA::g_fxMan.CreateFxSystem("nitro", (RwV3d*)&firstExhaustDummy.m_position, rwMatrix, true);
             m_exhaustNitroFxSystem[0] = firstExhaustFxSystem;
             if (firstExhaustFxSystem)
             {
@@ -71,7 +73,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
             }
         }
     }
-    if (pHandlingData->m_bDoubleExhaust && secondExhaustVisible)
+    if (hasDoubleExhaust)
     {
         CFxSystemSAInterface* secondExhaustFxSystem = m_exhaustNitroFxSystem[1];
         if (secondExhaustFxSystem)
@@ -84,7 +86,7 @@ void CAutomobileSAInterface::DoNitroEffect(float power)
         }
         else if (!firstExhaustSubmergedInWater && rwMatrix)
         {
-            secondExhaustFxSystem = CFxManagerSA::g_fxMan.CreateFxSystem("nitro", (RwV3d*)&secondExhaustPosition, rwMatrix, true);
+            secondExhaustFxSystem = CFxManagerSA::g_fxMan.CreateFxSystem("nitro", (RwV3d*)&secondExhaustDummy.m_position, rwMatrix, true);
             m_exhaustNitroFxSystem[1] = secondExhaustFxSystem;
             if (secondExhaustFxSystem)
             {
