@@ -31,8 +31,6 @@ public:
     LUA_DECLARE(GUIIsMainMenuActive);
     LUA_DECLARE(GUIIsMTAWindowActive);
     LUA_DECLARE(GUIIsTransferBoxActive);
-    LUA_DECLARE(GUIIsTransferBoxEnabled);
-    LUA_DECLARE(GUISetTransferBoxEnabled);
     LUA_DECLARE(GUICreateWindow);
     LUA_DECLARE(GUICreateLabel);
     LUA_DECLARE(GUICreateButton);
@@ -160,6 +158,9 @@ public:
     LUA_DECLARE(GUIComboBoxSetOpen);
     LUA_DECLARE(GUIComboBoxIsOpen);
     LUA_DECLARE(GUIGetCursorType);
+
+    static bool GUIIsTransferBoxEnabled();
+    static bool GUISetTransferBoxEnabled(bool bEnabled);
 
 private:
     static void AddGuiElementClass(lua_State* luaVM);

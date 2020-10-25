@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{
     "chat_font",
@@ -49,8 +50,8 @@ void CLuaGUIDefs::LoadFunctions()
         {"isMainMenuActive", GUIIsMainMenuActive},
         {"isMTAWindowActive", GUIIsMTAWindowActive},
         {"isTransferBoxActive", GUIIsTransferBoxActive},
-        {"isTransferBoxEnabled", GUIIsTransferBoxEnabled},
-        {"setTransferBoxEnabled", GUISetTransferBoxEnabled},
+        {"isTransferBoxEnabled", ArgumentParser<GUIIsTransferBoxEnabled>},
+        {"setTransferBoxEnabled", ArgumentParser<GUISetTransferBoxEnabled>},
 
         {"guiCreateWindow", GUICreateWindow},
         {"guiCreateLabel", GUICreateLabel},
@@ -4064,36 +4065,20 @@ int CLuaGUIDefs::GUIGetCursorType(lua_State* luaVM)
     return 1;
 }
 
-int CLuaGUIDefs::GUISetTransferBoxEnabled(lua_State* luaVM)
+bool CLuaGUIDefs::GUISetTransferBoxEnabled(bool bEnabled)
 {
-    bool bEnabled;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bEnabled);
-
-    if (!argStream.HasErrors())
+    bool bAllowed = false;
+    g_pCore->GetCVars()->Get("allow_server_control_transferbox", bAllowed);
+    if (bAllowed && bEnabled != g_pClientGame->GetTransferBox()->IsEnabled())
     {
-        bool bAllowed = false;
-        g_pCore->GetCVars()->Get("allow_server_control_transferbox", bAllowed);
-        if (bAllowed)
-        {
-            g_pClientGame->GetTransferBox()->SetEnabled(bEnabled);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
+        g_pClientGame->GetTransferBox()->SetEnabled(bEnabled);
+        return true;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    return 1;
+    return false;
 }
 
-int CLuaGUIDefs::GUIIsTransferBoxEnabled(lua_State* luaVM)
+bool CLuaGUIDefs::GUIIsTransferBoxEnabled()
 {
-    lua_pushboolean(luaVM, g_pClientGame->GetTransferBox()->IsEnabled());
-    return 1;
+    return g_pClientGame->GetTransferBox()->IsEnabled();
 }
