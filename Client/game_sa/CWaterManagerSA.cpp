@@ -778,7 +778,7 @@ bool CWaterManagerSA::SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* p
 
 void CWaterManagerSA::SetOutsideWorldWaterLevel(float fLevel)
 {
-    // Outside world vertexes
+    // Outside world vertices
     MemPut<float>(0x6EFECC, fLevel);
     MemPut<float>(0x6EFF0C, fLevel);
     MemPut<float>(0x6EFF4A, fLevel);
