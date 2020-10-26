@@ -25,7 +25,6 @@ void OnModelLoaded(unsigned int uiModelID)
 //////////////////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CStreaming__ConvertBufferToObject  0x40CB88
 #define HOOKSIZE_CStreaming__ConvertBufferToObject 9
-static DWORD CONTINUE_CStreaming__ConvertBufferToObject = 0x40CB91;
 
 static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
 {
