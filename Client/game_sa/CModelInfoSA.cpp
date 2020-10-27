@@ -499,7 +499,7 @@ unsigned short CModelInfoSA::GetOriginalFlags()
     return 0;
 }
 
-void CModelInfoSA::SetFlags(unsigned int uiFlags)
+void CModelInfoSA::SetIdeObjsFlags(unsigned int uiFlags)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)

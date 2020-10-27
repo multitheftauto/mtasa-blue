@@ -2024,7 +2024,7 @@ int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo)
             {
-                pModelInfo->SetFlags(uiFlags);
+                pModelInfo->SetIdeObjsFlags(uiFlags);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
@@ -2052,11 +2052,11 @@ int CLuaEngineDefs::EngineResetModelFlags(lua_State* luaVM)
     CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
     {
-        float uiCurrentFlags = pModelInfo->GetFlags();
-        float uiOriginalFlags = pModelInfo->GetOriginalFlags();
-        if (uiOriginalFlags != uiCurrentFlags)
+        ushort usCurrentFlags = pModelInfo->GetFlags();
+        ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
+        if (usOriginalFlags != usCurrentFlags)
         {
-            pModelInfo->SetLODDistance(uiOriginalFlags, true);
+            pModelInfo->SetFlags(usOriginalFlags);
             lua_pushboolean(luaVM, true);
             return 1;
         }

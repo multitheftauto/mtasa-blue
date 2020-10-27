@@ -123,7 +123,8 @@ public:
     virtual BOOL           IsLoaded() = 0;
     virtual unsigned short GetFlags() = 0;
     virtual unsigned short GetOriginalFlags() = 0;
-    virtual void           SetFlags(unsigned int uiFlags) = 0;
+    virtual void           SetFlags(unsigned short usFlags) = 0;
+    virtual void           SetIdeObjsFlags(unsigned int uiFlags) = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
     virtual bool           IsValid() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
