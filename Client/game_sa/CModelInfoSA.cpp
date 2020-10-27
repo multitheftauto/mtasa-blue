@@ -511,7 +511,7 @@ void CModelInfoSA::SetIdeObjsFlags(unsigned int uiFlags)
 
     m_pInterface->usFlags = 0xC0;
     typedef char(__cdecl * Function_SetAtomicModelFlags)(CBaseModelInfoSAInterface * pInterface, unsigned int uiFlags);
-    Function_SetAtomicModelFlags setAtomicModelFlags = (Function_SetAtomicModelFlags)(FUNC_SetAtimicModelFlags);
+    Function_SetAtomicModelFlags setAtomicModelFlags = (Function_SetAtomicModelFlags)(FUNC_SetAtomicModelFlags);
 
     setAtomicModelFlags(m_pInterface, uiFlags);
 }

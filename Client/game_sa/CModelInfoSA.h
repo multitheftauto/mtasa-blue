@@ -37,7 +37,7 @@ class CPedModelInfoSAInterface;
 #define     CLASS_CText                     0xC1B340
 #define     FUNC_CText_Get                  0x6A0050
 #define     FUNC_SetBaseModelFlags          0x5B3AD0
-#define     FUNC_SetAtimicModelFlags        0x5B3B20
+#define     FUNC_SetAtomicModelFlags        0x5B3B20
 #define     FUNC_GetModelStreamFlags        0x4044E0
 #define     FUNC_GetBoundingBox             0x4082F0
 
