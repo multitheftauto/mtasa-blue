@@ -1004,7 +1004,6 @@ std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBoneR
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity && theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
         return std::make_tuple(yaw, pitch, roll);
-        //return std::make_tuple(ConvertRadiansToDegreesNoWrap(yaw), ConvertRadiansToDegreesNoWrap(pitch), ConvertRadiansToDegreesNoWrap(roll));
     return false;
 }
 
