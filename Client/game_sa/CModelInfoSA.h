@@ -219,6 +219,12 @@ public:
     // +772 = Anim file index
 };
 
+class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    TimeInfo timeInfo;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
