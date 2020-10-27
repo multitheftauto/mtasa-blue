@@ -2015,7 +2015,7 @@ int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(uiModelID);
     argStream.ReadNumber(uiFlags);
-    argStream.ReadBool(bTransform);
+    argStream.ReadBool(bTransform, false);
 
     if (!argStream.HasErrors())
     {
