@@ -117,4 +117,5 @@
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
 #include "CEventGroupSA.h"
+#include "CMatrixSA.h"
 #include "CTrainSA.h"
