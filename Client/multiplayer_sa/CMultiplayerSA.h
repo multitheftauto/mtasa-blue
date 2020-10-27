@@ -75,6 +75,7 @@ public:
     void                InitHooks_VehicleWeapons();
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
+    void                InitHooks_Streaming();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
