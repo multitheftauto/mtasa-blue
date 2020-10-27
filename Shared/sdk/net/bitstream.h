@@ -361,13 +361,14 @@ enum class eBitStreamVersion : unsigned short
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
-    Latest,
+    Next,
+    Latest = Next - 1,
 };
 
 // This is a temporary check during the introduction of eBitStreamVersion.
 // We only check it server-side because static_assert is not available for all client projects.
 #ifndef MTA_CLIENT
-static_assert(static_cast<unsigned short>(eBitStreamVersion::Latest) == 0x070);
+static_assert(static_cast<unsigned short>(eBitStreamVersion::Latest) == 0x06F);
 #endif
 
 class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion

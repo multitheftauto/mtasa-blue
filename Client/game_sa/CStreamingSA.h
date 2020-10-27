@@ -27,4 +27,5 @@ public:
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
+    void ReinitStreaming();
 };

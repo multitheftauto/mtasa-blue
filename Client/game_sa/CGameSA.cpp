@@ -16,6 +16,7 @@
 #include "D3DResourceSystemSA.h"
 #include "CFileLoaderSA.h"
 
+unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
 unsigned long* CGameSA::VAR_IsGameLoaded;

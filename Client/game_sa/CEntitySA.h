@@ -248,6 +248,8 @@ public:
     CEntitySAInterface* GetInterface() { return m_pInterface; };
     VOID                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
+    bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
+    void UpdateRpHAnim();
     VOID SetPosition(float fX, float fY, float fZ);
     VOID Teleport(float fX, float fY, float fZ);
     VOID ProcessControl();
@@ -311,6 +313,14 @@ public:
 
     unsigned long GetArrayID() { return m_ulArrayID; }
     void          SetArrayID(unsigned long ulID) { m_ulArrayID = ulID; }
+
+    RwMatrixTag* GetBoneRwMatrix(eBone boneId);
+    bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix);
+
+    bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);
+    bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
+    bool GetBonePosition(eBone boneId, CVector& position);
+    bool SetBonePosition(eBone boneId, const CVector& position);
 
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}
