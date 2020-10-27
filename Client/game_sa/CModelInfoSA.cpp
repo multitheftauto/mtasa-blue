@@ -496,7 +496,12 @@ unsigned short CModelInfoSA::GetOriginalFlags()
     if (MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
         return MapGet(ms_ModelDefaultFlagsMap, m_dwModelID);
 
-    return 0;
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return 0;
+
+    return m_pInterface->usFlags;
+}
 
 void CModelInfoSA::SetFlags(unsigned short usFlags)
 {
