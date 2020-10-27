@@ -4228,20 +4228,20 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            // Remove jetpack now so it doesn't stay on (#9522#c25612)
-            if (pPed->HasJetPack())
-                pPed->SetHasJetPack(false);
-
-            // Remove choking state
-            if (pPed->IsChoking())
-                pPed->SetChoking(false);
-
             // TODO: save their animation?
 
             // Tell the players
             CBitStream BitStream;
             if (!blockName.empty() && !animName.empty())
             {
+                // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                if (pPed->HasJetPack())
+                    pPed->SetHasJetPack(false);
+
+                // Remove choking state
+                if (pPed->IsChoking())
+                    pPed->SetChoking(false);
+
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(iTime);
@@ -4490,27 +4490,20 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
         if (!pTarget)
             pTarget = pPlayer;
 
-        // Make sure our target is supported
-        switch (pTarget->GetType())
+        // Make sure our target is a player element
+        if (pTarget->GetType() == CElement::PLAYER)
         {
-            case CElement::PLAYER:
-            case CElement::PED:
-            case CElement::VEHICLE:
-            {
-                pCamera->SetMode(CAMERAMODE_PLAYER);
-                pCamera->SetTarget(pTarget);
-                pCamera->SetRoll(0.0f);
-                pCamera->SetFOV(70.0f);
+            pCamera->SetMode(CAMERAMODE_PLAYER);
+            pCamera->SetTarget(pTarget);
+            pCamera->SetRoll(0.0f);
+            pCamera->SetFOV(70.0f);
 
-                CBitStream BitStream;
-                if (pPlayer->GetBitStreamVersion() >= 0x5E)
-                    BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
-                BitStream.pBitStream->Write(pTarget->GetID());
-                pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
-                return true;
-            }
-            default:
-                return false;
+            CBitStream BitStream;
+            if (pPlayer->GetBitStreamVersion() >= 0x5E)
+                BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+            BitStream.pBitStream->Write(pTarget->GetID());
+            pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
+            return true;
         }
     }
 

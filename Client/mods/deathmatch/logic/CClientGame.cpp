@@ -257,6 +257,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
+    g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
@@ -425,6 +426,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetChokingHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
+    g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
@@ -1067,7 +1069,7 @@ void CClientGame::DoPulses()
             m_bWaitingForLocalConnect = false;
 
             // Assume local server has the same bitstream version
-            g_pNet->SetServerBitStreamVersion(MTA_DM_BITSTREAM_VERSION);
+            g_pNet->SetServerBitStreamVersion(static_cast<unsigned short>(MTA_DM_BITSTREAM_VERSION));
 
             // Run the game normally.
             StartGame(m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType);
@@ -2952,6 +2954,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Game events
     m_Events.AddEvent("onClientPreRender", "", NULL, false);
+    m_Events.AddEvent("onClientPedsProcessed", "", NULL, false);
     m_Events.AddEvent("onClientHUDRender", "", NULL, false);
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
@@ -3813,6 +3816,11 @@ void CClientGame::StaticPostWorldProcessHandler()
     g_pClientGame->PostWorldProcessHandler();
 }
 
+void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
+{
+    g_pClientGame->PostWorldProcessPedsAfterPreRenderHandler();
+}
+
 void CClientGame::StaticPreFxRenderHandler()
 {
     g_pCore->OnPreFxRender();
@@ -4074,6 +4082,12 @@ void CClientGame::PostWorldProcessHandler()
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
+}
+
+void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
+{
+    CLuaArguments Arguments;
+    m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 }
 
 void CClientGame::IdleHandler()
@@ -6166,6 +6180,8 @@ void CClientGame::ResetMapInfo()
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
+
+    RestreamWorld();
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -7285,6 +7301,20 @@ void CClientGame::RestreamModel(unsigned short usModel)
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+}
+
+void CClientGame::RestreamWorld()
+{
+    for (unsigned int uiModelID = 0; uiModelID <= 26316; uiModelID++)
+    {
+        g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
+    }
+    m_pManager->GetObjectManager()->RestreamAllObjects();
+    m_pManager->GetVehicleManager()->RestreamAllVehicles();
+    m_pManager->GetPedManager()->RestreamAllPeds();
+    m_pManager->GetPickupManager()->RestreamAllPickups();
+
+    g_pGame->GetStreaming()->ReinitStreaming();
 }
 
 void CClientGame::TriggerDiscordJoin(SString strSecret)
