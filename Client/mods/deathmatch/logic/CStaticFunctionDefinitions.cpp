@@ -6630,18 +6630,6 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetColorFilter()
-{
-    g_pMultiplayer->ResetColorFilter();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
-{
-    g_pMultiplayer->SetColorFilter(dwPass0Color, dwPass1Color);
-    return true;
-}
-
 bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pMultiplayer->ResetHeatHaze();
