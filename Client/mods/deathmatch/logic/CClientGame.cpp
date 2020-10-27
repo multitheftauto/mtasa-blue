@@ -5755,8 +5755,6 @@ void CClientGame::ResetMapInfo()
 
     // Water-colour
     g_pMultiplayer->ResetWater();
-
-    // Color filter
     g_pMultiplayer->ResetColorFilter();
 
     // Water
