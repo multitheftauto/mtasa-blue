@@ -332,8 +332,8 @@ public:
     BOOL           DoIsLoaded();
     unsigned short GetFlags();
     unsigned short GetOriginalFlags();
-    void           SetIdeObjsFlags(unsigned int uiFlags);
-    void           SetFlags(unsigned short usFlags) { usFlags = usFlags; };
+    void           SetIdeFlags(unsigned int uiFlags);
+    void           SetFlags(unsigned short usFlags);
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();

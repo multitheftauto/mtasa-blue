@@ -497,9 +497,21 @@ unsigned short CModelInfoSA::GetOriginalFlags()
         return MapGet(ms_ModelDefaultFlagsMap, m_dwModelID);
 
     return 0;
+
+void CModelInfoSA::SetFlags(unsigned short usFlags)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return;
+
+    // Save default value if not done yet
+    if (!MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
+        MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
+
+    m_pInterface->usFlags = usFlags;
 }
 
-void CModelInfoSA::SetIdeObjsFlags(unsigned int uiFlags)
+void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)

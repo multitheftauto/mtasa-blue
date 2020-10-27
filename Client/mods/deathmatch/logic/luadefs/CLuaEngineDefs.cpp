@@ -2011,9 +2011,11 @@ int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
     // bool engineSetModelFlags ( int modelID, int flags )
     uint uiModelID;
     uint uiFlags;
+    bool bTransform;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(uiModelID);
     argStream.ReadNumber(uiFlags);
+    argStream.ReadBool(bTransform);
 
     if (!argStream.HasErrors())
     {
@@ -2022,7 +2024,11 @@ int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
             if (pModelInfo)
             {
-                pModelInfo->SetIdeObjsFlags(uiFlags);
+                if (bTransform)
+                    pModelInfo->SetIdeFlags(uiFlags);
+                else
+                    pModelInfo->SetFlags(uiFlags);
+
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
