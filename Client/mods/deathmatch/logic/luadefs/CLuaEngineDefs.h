@@ -47,8 +47,6 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
-    LUA_DECLARE(EngineSetModelVisibleTime);
-    LUA_DECLARE(EngineGetModelVisibleTime);
     LUA_DECLARE(EngineGetModelTextures);
     LUA_DECLARE(EngineSetSurfaceProperties);
     LUA_DECLARE(EngineGetSurfaceProperties);
@@ -60,6 +58,9 @@ public:
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
     static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
+    static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
+    static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

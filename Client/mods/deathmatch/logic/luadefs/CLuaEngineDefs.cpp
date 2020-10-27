@@ -38,8 +38,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelVisibleTime", EngineSetModelVisibleTime},
-        {"engineGetModelVisibleTime", EngineGetModelVisibleTime},
+        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
+        {"engineGetModelVisibleTime", ArgumentParser<EngineGetModelVisibleTime>},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
@@ -778,6 +778,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
     unsigned short usModelID = CModelNames::ResolveModelID(strModel);
     CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -1101,72 +1102,39 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
+bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff)
 {
-    // bool engineSetModelVisibleTime ( int/string modelID, int hourOn, int hourOff )
-    SString strModelId;
-    char cHourOn,cHourOff;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-    argStream.ReadNumber(cHourOn);
-    argStream.ReadNumber(cHourOff);
-
-    if (!argStream.HasErrors())
+    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
     {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
+        if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
         {
-            if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
-            {
-                lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
-                return 1;
-            }
+            return pModelInfo->SetTime(cHourOn, cHourOff);
         }
     }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
+std::variant<bool, std::tuple<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
 {
-    // int, int engineGetModelVisibleTime ( int/string modelID )
-    SString strModelId;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-
-    if (!argStream.HasErrors())
+    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
     {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
+        char cHourOn, cHourOff;
+        if (pModelInfo->GetTime(cHourOn, cHourOff))
         {
-            char cHourOn, cHourOff;
-            if (pModelInfo->GetTime(cHourOn, cHourOff))
-            {
-                lua_pushnumber(luaVM, cHourOn);
-                lua_pushnumber(luaVM, cHourOff);
-                return 2;
-            }
-            else // Model is incompatible, don't let confuse user.
-            {
-                lua_pushnumber(luaVM, 0);
-                lua_pushnumber(luaVM, 24);
-                return 2;
-            }
+            return std::tuple(cHourOn, cHourOff);
+        }
+        else // Model is incompatible, don't let confuse user.
+        {
+            return std::tuple(0, 24);
         }
     }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
