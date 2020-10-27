@@ -778,7 +778,6 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    
     unsigned short usModelID = CModelNames::ResolveModelID(strModel);
     CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
