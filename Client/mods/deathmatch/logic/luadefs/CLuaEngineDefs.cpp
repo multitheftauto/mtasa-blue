@@ -1979,17 +1979,16 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineGetModelFlags(lua_State* luaVM)
 {
-    // float engineGetModelFlags ( int/string modelID )
-    SString          strModelId;
+    // int engineGetModelFlags ( int modelID )
+    uint uiModelId;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
+    argStream.ReadNumber(uiModelId);
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelId);
-        if (usModelID < 20000)
+        if (uiModelId < 20000)
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
             if (pModelInfo)
             {
                 lua_pushnumber(luaVM, pModelInfo->GetFlags());
@@ -1997,7 +1996,7 @@ int CLuaEngineDefs::EngineGetModelFlags(lua_State* luaVM)
             }
         }
         else
-            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+            argStream.SetCustomError("Expected a valid model ID in range [0-19999] at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2009,19 +2008,18 @@ int CLuaEngineDefs::EngineGetModelFlags(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
 {
-    // bool engineSetModelFlags ( int/string modelID, int flags )
-    SString          strModelId;
-    unsigned int     uiFlags;
+    // bool engineSetModelFlags ( int modelID, int flags )
+    uint uiModelID;
+    uint uiFlags;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
+    argStream.ReadNumber(uiModelID);
     argStream.ReadNumber(uiFlags);
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelId);
-        if (usModelID < 20000)
+        if (uiModelID < 20000)
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
             if (pModelInfo)
             {
                 pModelInfo->SetIdeObjsFlags(uiFlags);
@@ -2030,7 +2028,7 @@ int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
             }
         }
         else
-            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+            argStream.SetCustomError("Expected a valid model ID in range [0-19999] at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2041,15 +2039,14 @@ int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineResetModelFlags(lua_State* luaVM)
 {
-    SString          strModel = "";
+    uint uiModelID;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModel);
+    argStream.ReadNumber(uiModelID);
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
-    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
     if (pModelInfo)
     {
         ushort usCurrentFlags = pModelInfo->GetFlags();
