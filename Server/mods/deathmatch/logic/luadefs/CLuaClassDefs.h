@@ -30,16 +30,15 @@ public:
 
     LUA_DECLARE(ToString);
 
-    static const char* GetObjectClass(void* pObject);
-    static const char* GetResourceClass(CResource* pResource);
-    static const char* GetTimerClass(CLuaTimer* pTimer);
-    static const char* GetXmlNodeClass(CXMLNode* pXmlNode);
-    static const char* GetACLClass(CAccessControlList* pACL);
-    static const char* GetACLGroupClass(CAccessControlListGroup* pACLGroup);
-    static const char* GetAccountClass(CAccount* pAccount);
-    static const char* GetTextDisplayClass(CTextDisplay* pDisplay);
-    static const char* GetTextItemClass(CTextItem* pItem);
-    static const char* GetBanClass(CBan* pBan);
-    static const char* GetQueryClass(CDbJobData* pJobData);
-    static const char* GetElementClass(CElement* pElement);
+    static constexpr const char* GetLuaClassName(CResource*) { return "Resource"; }
+    static constexpr const char* GetLuaClassName(CLuaTimer*) { return "Timer"; }
+    static constexpr const char* GetLuaClassName(CXMLNode*) { return "XML"; }
+    static constexpr const char* GetLuaClassName(CAccessControlList*) { return "ACL"; }
+    static constexpr const char* GetLuaClassName(CAccessControlListGroup*) { return "ACLGroup"; }
+    static constexpr const char* GetLuaClassName(CAccount*) { return "Account"; }
+    static constexpr const char* GetLuaClassName(CTextDisplay*) { return "TextDisplay"; }
+    static constexpr const char* GetLuaClassName(CTextItem*) { return "TextItem"; }
+    static constexpr const char* GetLuaClassName(CBan*) { return "Ban"; }
+    static constexpr const char* GetLuaClassName(CDbJobData*) { return "QueryHandle"; }
+    static const char* GetLuaClassName(CElement* pElement);
 };

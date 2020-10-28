@@ -31,9 +31,8 @@ public:
 
     static int ToString(lua_State* luaVM);
 
-    static const char* GetObjectClass(void* pObject);
-    static const char* GetResourceClass(CResource* pResource);
-    static const char* GetTimerClass(CLuaTimer* pTimer);
-    static const char* GetXmlNodeClass(CXMLNode* pXmlNode);
-    static const char* GetEntityClass(CClientEntity* pEntity);
+    static constexpr const char* GetLuaClassName(CResource*) { return "Resource"; }
+    static constexpr const char* GetLuaClassName(CLuaTimer*) { return "Timer"; }
+    static constexpr const char* GetLuaClassName(CXMLNode*) { return "XML"; }
+    static const char* GetLuaClassName(CClientEntity* pEntity);
 };

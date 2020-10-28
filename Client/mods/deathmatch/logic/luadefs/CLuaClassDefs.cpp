@@ -246,38 +246,10 @@ int CLuaClassDefs::ToString(lua_State* luaVM)
     return 0;
 }
 
-const char* CLuaClassDefs::GetObjectClass(void* pObject)
+const char* CLuaClassDefs::GetLuaClassName(CClientEntity* pEntity)
 {
-    if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pObject, NULL))
-        return GetEntityClass(pEntity);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pObject, NULL))
-        return GetResourceClass(pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pObject, NULL))
-        return GetXmlNodeClass(pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pObject, NULL))
-        return GetTimerClass(pTimer);
-    return NULL;
-}
-
-const char* CLuaClassDefs::GetResourceClass(CResource* pResource)
-{
-    return "Resource";
-}
-
-const char* CLuaClassDefs::GetTimerClass(CLuaTimer* pTimer)
-{
-    return "Timer";
-}
-
-const char* CLuaClassDefs::GetXmlNodeClass(CXMLNode* pXmlNode)
-{
-    return "XML";
-}
-
-// absolutely ugly, need a better way
-const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
-{
-    assert(pEntity);
+    // absolutely ugly, need a better way
+    dassert(pEntity);
     switch (pEntity->GetType())
     {
         case CCLIENTCAMERA:

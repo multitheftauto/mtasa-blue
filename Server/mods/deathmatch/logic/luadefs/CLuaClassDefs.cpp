@@ -244,105 +244,42 @@ int CLuaClassDefs::ToString(lua_State* luaVM)
     return 0;
 }
 
-const char* CLuaClassDefs::GetObjectClass(void* pObject)
-{
-    if (CElement* pElement = UserDataCast<CElement>((CElement*)NULL, pObject, NULL))
-        return GetElementClass(pElement);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pObject, NULL))
-        return GetResourceClass(pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pObject, NULL))
-        return GetXmlNodeClass(pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pObject, NULL))
-        return GetTimerClass(pTimer);
-    return NULL;
-}
-
-const char* CLuaClassDefs::GetResourceClass(CResource* pResource)
-{
-    return "Resource";
-}
-
-const char* CLuaClassDefs::GetTimerClass(CLuaTimer* pTimer)
-{
-    return "Timer";
-}
-
-const char* CLuaClassDefs::GetXmlNodeClass(CXMLNode* pXmlNode)
-{
-    return "XML";
-}
-
-const char* CLuaClassDefs::GetACLClass(CAccessControlList* pACL)
-{
-    return "ACL";
-}
-
-const char* CLuaClassDefs::GetACLGroupClass(CAccessControlListGroup* pACLGroup)
-{
-    return "ACLGroup";
-}
-
-const char* CLuaClassDefs::GetAccountClass(CAccount* pAccount)
-{
-    return "Account";
-}
-
-const char* CLuaClassDefs::GetTextDisplayClass(CTextDisplay* pDisplay)
-{
-    return "TextDisplay";
-}
-
-const char* CLuaClassDefs::GetTextItemClass(CTextItem* pItem)
-{
-    return "TextItem";
-}
-
-const char* CLuaClassDefs::GetBanClass(CBan* pBan)
-{
-    return "Ban";
-}
-
-const char* CLuaClassDefs::GetQueryClass(CDbJobData* pJobData)
-{
-    return "QueryHandle";
-}
-
 // absolutely ugly, need a better way
-const char* CLuaClassDefs::GetElementClass(CElement* pElement)
+const char* CLuaClassDefs::GetLuaClassName(CElement* pElement)
 {
-    assert(pElement);
+    dassert(pElement);
     switch (pElement->GetType())
     {
-        case CElement::PLAYER:
-            return "Player";
-        case CElement::VEHICLE:
-            return "Vehicle";
-        case CElement::BLIP:
-            return "Blip";
-        case CElement::OBJECT:
-            return "Object";
-        case CElement::PICKUP:
-            return "Pickup";
-        case CElement::RADAR_AREA:
-            return "RadarArea";
-        case CElement::MARKER:
-            return "Marker";
-        case CElement::TEAM:
-            return "Team";
-        case CElement::PED:
-            return "Ped";
-        case CElement::COLSHAPE:
-            return "ColShape";
-        case CElement::SCRIPTFILE:
-            return "File";
-        case CElement::WATER:
-            return "Water";
-        case CElement::WEAPON:
-            return "Weapon";
-        case CElement::DATABASE_CONNECTION:
-            return "Connection";
-        default:
-            break;
+    case CElement::PLAYER:
+        return "Player";
+    case CElement::VEHICLE:
+        return "Vehicle";
+    case CElement::BLIP:
+        return "Blip";
+    case CElement::OBJECT:
+        return "Object";
+    case CElement::PICKUP:
+        return "Pickup";
+    case CElement::RADAR_AREA:
+        return "RadarArea";
+    case CElement::MARKER:
+        return "Marker";
+    case CElement::TEAM:
+        return "Team";
+    case CElement::PED:
+        return "Ped";
+    case CElement::COLSHAPE:
+        return "ColShape";
+    case CElement::SCRIPTFILE:
+        return "File";
+    case CElement::WATER:
+        return "Water";
+    case CElement::WEAPON:
+        return "Weapon";
+    case CElement::DATABASE_CONNECTION:
+        return "Connection";
+    default:
+        break;
     }
     return "Element";
 }
