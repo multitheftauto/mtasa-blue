@@ -293,7 +293,7 @@ protected:
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                                        ms_ModelDefaultModelTimeInfo;
+    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
