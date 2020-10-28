@@ -2125,7 +2125,7 @@ int CLuaPlayerDefs::BanPlayer(lua_State* luaVM)
         CBan* pBan = NULL;
         if ((pBan = CStaticFunctionDefinitions::BanPlayer(pPlayer, bIP, bUsername, bSerial, pResponsible, strResponsible, strReason, tUnban)))
         {
-            lua_pushban(luaVM, pBan);
+            lua_pushobject(luaVM, pBan);
             return 1;
         }
     }

@@ -11716,7 +11716,7 @@ bool CStaticFunctionDefinitions::GetBans(lua_State* pLua)
     for (; iter != m_pBanManager->IterEnd(); iter++)
     {
         lua_pushnumber(pLua, ++uiIndex);
-        lua_pushban(pLua, *iter);
+        lua_pushobject(pLua, *iter);
         lua_settable(pLua, -3);
     }
     return true;

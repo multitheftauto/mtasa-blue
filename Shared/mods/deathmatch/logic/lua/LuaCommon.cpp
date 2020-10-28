@@ -143,7 +143,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CAccessControlListGroup* pACLGroup = UserDataCast<CAccessControlListGroup>((CAccessControlListGroup*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pACLGroup);
     else if (CBan* pBan = UserDataCast<CBan>((CBan*)NULL, pData, luaVM))
-        return lua_pushban(luaVM, pBan);
+        return lua_pushobject(luaVM, pBan);
     else if (CTextDisplay* pTextDisplay = UserDataCast<CTextDisplay>((CTextDisplay*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pTextDisplay);
     else if (CTextItem* pTextItem = UserDataCast<CTextItem>((CTextItem*)NULL, pData, luaVM))

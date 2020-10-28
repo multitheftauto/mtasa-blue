@@ -125,7 +125,7 @@ int CLuaBanDefs::AddBan(lua_State* luaVM)
         CBan* pBan = NULL;
         if ((pBan = CStaticFunctionDefinitions::AddBan(strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban)))
         {
-            lua_pushban(luaVM, pBan);
+            lua_pushobject(luaVM, pBan);
             return 1;
         }
     }
