@@ -1113,7 +1113,6 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHou
             return pModelInfo->SetTime(cHourOn, cHourOff);
         }
     }
-
     return false;
 }
 
