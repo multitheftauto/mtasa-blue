@@ -176,7 +176,7 @@ namespace lua
     template <typename T>
     typename std::enable_if_t<(std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
     {
-        lua_pushelement(L, val);
+        lua_pushobject(L, val);
         return 1;
     }
 

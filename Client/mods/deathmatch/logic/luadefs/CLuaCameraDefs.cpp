@@ -94,7 +94,7 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
     if (pCamera)
     {
-        lua_pushelement(luaVM, pCamera);
+        lua_pushobject(luaVM, pCamera);
         return 1;
     }
 
@@ -150,7 +150,7 @@ int CLuaCameraDefs::GetCameraTarget(lua_State* luaVM)
     CClientEntity* pTarget = CStaticFunctionDefinitions::GetCameraTarget();
     if (pTarget)
     {
-        lua_pushelement(luaVM, pTarget);
+        lua_pushobject(luaVM, pTarget);
         return 1;
     }
 

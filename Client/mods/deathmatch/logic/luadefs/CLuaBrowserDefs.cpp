@@ -155,7 +155,7 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
                 // Set our owner resource
                 pBrowserTexture->SetResource(pParentResource);
             }
-            lua_pushelement(luaVM, pBrowserTexture);
+            lua_pushobject(luaVM, pBrowserTexture);
             return 1;
         }
     }
@@ -929,7 +929,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
 
             if (pGUIElement)
             {
-                lua_pushelement(luaVM, pGUIElement);
+                lua_pushobject(luaVM, pGUIElement);
                 return 1;
             }
             else
@@ -959,7 +959,7 @@ int CLuaBrowserDefs::GUIGetBrowser(lua_State* luaVM)            // Or rather gui
         if (IS_GUI(pGUIElement) && pGUIElement->GetCGUIType() == CGUI_WEBBROWSER)
         {
             CClientGUIWebBrowser* pGUIBrowser = static_cast<CClientGUIWebBrowser*>(pGUIElement);
-            lua_pushelement(luaVM, pGUIBrowser->GetBrowser());
+            lua_pushobject(luaVM, pGUIBrowser->GetBrowser());
             return 1;
         }
     }

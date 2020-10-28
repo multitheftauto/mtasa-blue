@@ -291,7 +291,7 @@ void CElement::GetChildren(lua_State* pLua)
     {
         // Add it to the table
         lua_pushnumber(pLua, ++uiIndex);
-        lua_pushelement(pLua, *iter);
+        lua_pushobject(pLua, *iter);
         lua_settable(pLua, -3);
     }
 }
@@ -312,7 +312,7 @@ void CElement::GetChildrenByType(const char* szType, lua_State* pLua)
         {
             // Add it to the table
             lua_pushnumber(pLua, ++uiIndex);
-            lua_pushelement(pLua, *iter);
+            lua_pushobject(pLua, *iter);
             lua_settable(pLua, -3);
         }
     }
@@ -981,7 +981,7 @@ void CElement::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* pL
     {
         // Add it to the table
         lua_pushnumber(pLua, ++uiIndex);
-        lua_pushelement(pLua, this);
+        lua_pushobject(pLua, this);
         lua_settable(pLua, -3);
     }
 
@@ -1341,7 +1341,7 @@ void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* pLua)
 
             // Add it to the table
             lua_pushnumber(pLua, ++uiIndex);
-            lua_pushelement(pLua, pEntity);
+            lua_pushobject(pLua, pEntity);
             lua_settable(pLua, -3);
         }
     }

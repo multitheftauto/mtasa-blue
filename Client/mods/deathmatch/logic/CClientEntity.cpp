@@ -995,7 +995,7 @@ void CClientEntity::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_Stat
         {
             // Add it to the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, this);
+            lua_pushobject(luaVM, this);
             lua_settable(luaVM, -3);
         }
     }
@@ -1021,7 +1021,7 @@ void CClientEntity::GetChildren(lua_State* luaVM)
         {
             // Add it to the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, *iter);
+            lua_pushobject(luaVM, *iter);
             lua_settable(luaVM, -3);
         }
     }
@@ -1043,7 +1043,7 @@ void CClientEntity::GetChildrenByType(const char* szType, lua_State* luaVM)
         {
             // Add it to the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, *iter);
+            lua_pushobject(luaVM, *iter);
             lua_settable(luaVM, -3);
         }
     }
@@ -1426,7 +1426,7 @@ void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaV
                 {
                     // Add it to the table
                     lua_pushnumber(luaVM, ++uiIndex);
-                    lua_pushelement(luaVM, pEntity);
+                    lua_pushobject(luaVM, pEntity);
                     lua_settable(luaVM, -3);
                 }
             }

@@ -101,7 +101,7 @@ int CLuaPlayerDefs::GetLocalPlayer(lua_State* luaVM)
     CClientPlayer* pPlayer = CStaticFunctionDefinitions::GetLocalPlayer();
 
     // Return the local player
-    lua_pushelement(luaVM, pPlayer);
+    lua_pushobject(luaVM, pPlayer);
     return 1;
 }
 
@@ -146,7 +146,7 @@ int CLuaPlayerDefs::GetPlayerFromName(lua_State* luaVM)
         if (pPlayer)
         {
             // Return the player
-            lua_pushelement(luaVM, pPlayer);
+            lua_pushobject(luaVM, pPlayer);
             return 1;
         }
     }
@@ -269,7 +269,7 @@ int CLuaPlayerDefs::GetPlayerTeam(lua_State* luaVM)
         CClientTeam* pTeam = pPlayer->GetTeam();
         if (pTeam)
         {
-            lua_pushelement(luaVM, pTeam);
+            lua_pushobject(luaVM, pTeam);
             return 1;
         }
     }

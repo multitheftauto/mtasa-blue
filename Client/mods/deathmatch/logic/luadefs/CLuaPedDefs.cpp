@@ -460,7 +460,7 @@ int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)
         CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
-            lua_pushelement(luaVM, pVehicle);
+            lua_pushobject(luaVM, pVehicle);
             return 1;
         }
     }
@@ -599,7 +599,7 @@ int CLuaPedDefs::GetPedTarget(lua_State* luaVM)
         CClientEntity* pEntity = CStaticFunctionDefinitions::GetPedTarget(*pPed);
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua_pushobject(luaVM, pEntity);
             return 1;
         }
     }
@@ -926,7 +926,7 @@ int CLuaPedDefs::GetPedContactElement(lua_State* luaVM)
         CClientEntity* pEntity = pPed->GetContactEntity();
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua_pushobject(luaVM, pEntity);
             return 1;
         }
     }
@@ -2312,7 +2312,7 @@ int CLuaPedDefs::CreatePed(lua_State* luaVM)
                 if (pPed)
                 {
                     // Return it
-                    lua_pushelement(luaVM, pPed);
+                    lua_pushobject(luaVM, pPed);
                     return 1;
                 }
             }

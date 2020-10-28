@@ -102,7 +102,7 @@ int CLuaResourceDefs::Call(lua_State* luaVM)
                 lua_pushobject(targetLuaVM, pThisResource);
                 lua_setglobal(targetLuaVM, "sourceResource");
 
-                lua_pushelement(targetLuaVM, pThisResource->GetResourceEntity());
+                lua_pushobject(targetLuaVM, pThisResource->GetResourceEntity());
                 lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
                 // Call the exported function with the given name and the args
@@ -302,7 +302,7 @@ int CLuaResourceDefs::GetResourceRootElement(lua_State* luaVM)
             CClientEntity* pEntity = pResource->GetResourceEntity();
             if (pEntity)
             {
-                lua_pushelement(luaVM, pEntity);
+                lua_pushobject(luaVM, pEntity);
                 return 1;
             }
         }
@@ -340,7 +340,7 @@ int CLuaResourceDefs::GetResourceGUIElement(lua_State* luaVM)
         CClientEntity* pEntity = pResource->GetResourceGUIEntity();
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua_pushobject(luaVM, pEntity);
             return 1;
         }
     }
@@ -363,7 +363,7 @@ int CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM)
         CClientEntity* pEntity = pResource->GetResourceDynamicEntity();
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua_pushobject(luaVM, pEntity);
             return 1;
         }
         else

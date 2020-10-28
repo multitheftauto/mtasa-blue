@@ -228,7 +228,7 @@ int CLuaElementDefs::GetRootElement(lua_State* luaVM)
     CClientEntity* pRoot = CStaticFunctionDefinitions::GetRootElement();
 
     // Return the root element
-    lua_pushelement(luaVM, pRoot);
+    lua_pushobject(luaVM, pRoot);
     return 1;
 }
 
@@ -287,7 +287,7 @@ int CLuaElementDefs::GetElementByID(lua_State* luaVM)
         CClientEntity* pEntity = CStaticFunctionDefinitions::GetElementByID(strID.c_str(), uiIndex);
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua_pushobject(luaVM, pEntity);
             return 1;
         }
     }
@@ -313,7 +313,7 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
         CClientEntity* pEntity = CStaticFunctionDefinitions::GetElementByIndex(strType.c_str(), uiIndex);
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua_pushobject(luaVM, pEntity);
             return 1;
         }
     }
@@ -720,7 +720,7 @@ int CLuaElementDefs::GetElementChild(lua_State* luaVM)
         CClientEntity* pChild = CStaticFunctionDefinitions::GetElementChild(*pEntity, uiIndex);
         if (pChild)
         {
-            lua_pushelement(luaVM, pChild);
+            lua_pushobject(luaVM, pChild);
             return 1;
         }
     }
@@ -767,7 +767,7 @@ int CLuaElementDefs::GetElementParent(lua_State* luaVM)
         CClientEntity* pParent = pEntity->GetParent();
         if (pParent)
         {
-            lua_pushelement(luaVM, pParent);
+            lua_pushobject(luaVM, pParent);
             return 1;
         }
     }
@@ -935,7 +935,7 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
                     if (!(*iter)->IsBeingDeleted())
                     {
                         lua_pushnumber(luaVM, ++uiIndex);
-                        lua_pushelement(luaVM, *iter);
+                        lua_pushobject(luaVM, *iter);
                         lua_settable(luaVM, -3);
                     }
                 }
@@ -978,7 +978,7 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
             if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++index);
-                lua_pushelement(luaVM, entity);
+                lua_pushobject(luaVM, entity);
                 lua_settable(luaVM, -3);
             }
         }
@@ -1157,7 +1157,7 @@ int CLuaElementDefs::GetElementAttachedTo(lua_State* luaVM)
         CClientEntity* pEntityAttachedTo = CStaticFunctionDefinitions::GetElementAttachedTo(*pEntity);
         if (pEntityAttachedTo)
         {
-            lua_pushelement(luaVM, pEntityAttachedTo);
+            lua_pushobject(luaVM, pEntityAttachedTo);
             return 1;
         }
         else
@@ -1199,7 +1199,7 @@ int CLuaElementDefs::GetAttachedElements(lua_State* luaVM)
                 if (!pAttached->IsBeingDeleted())
                 {
                     lua_pushnumber(luaVM, i + 1);
-                    lua_pushelement(luaVM, pAttached);
+                    lua_pushobject(luaVM, pAttached);
                     lua_settable(luaVM, -3);
                 }
             }
@@ -1377,7 +1377,7 @@ int CLuaElementDefs::GetElementColShape(lua_State* luaVM)
         CClientEntity* pColShape = static_cast<CClientEntity*>(CStaticFunctionDefinitions::GetElementColShape(pEntity));
         if (pColShape)
         {
-            lua_pushelement(luaVM, pColShape);
+            lua_pushobject(luaVM, pColShape);
             return 1;
         }
     }
@@ -1654,7 +1654,7 @@ int CLuaElementDefs::CreateElement(lua_State* luaVM)
                     }
 
                     // Return it
-                    lua_pushelement(luaVM, pDummy);
+                    lua_pushobject(luaVM, pDummy);
                     return 1;
                 }
                 else
@@ -2452,7 +2452,7 @@ int CLuaElementDefs::GetLowLodElement(lua_State* luaVM)
         CClientEntity* pLowLodEntity;
         if (CStaticFunctionDefinitions::GetLowLodElement(*pEntity, pLowLodEntity))
         {
-            lua_pushelement(luaVM, pLowLodEntity);
+            lua_pushobject(luaVM, pLowLodEntity);
             return 1;
         }
     }

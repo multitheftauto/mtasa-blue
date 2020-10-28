@@ -194,10 +194,10 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     lua_pop(pState, 1);
 
                     // Set the "source", "this", "sourceResource" and "sourceResourceRoot" globals on that VM
-                    lua_pushelement(pState, pSource);
+                    lua_pushobject(pState, pSource);
                     lua_setglobal(pState, "source");
 
-                    lua_pushelement(pState, pThis);
+                    lua_pushobject(pState, pThis);
                     lua_setglobal(pState, "this");
 
                     CLuaMain*  pLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
@@ -207,7 +207,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                         lua_pushobject(pState, pSourceResource);
                         lua_setglobal(pState, "sourceResource");
 
-                        lua_pushelement(pState, pSourceResource->GetResourceRootElement());
+                        lua_pushobject(pState, pSourceResource->GetResourceRootElement());
                         lua_setglobal(pState, "sourceResourceRoot");
                     }
                     else
@@ -224,7 +224,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
 
                     if (pCaller)
                     {
-                        lua_pushelement(pState, pCaller);
+                        lua_pushobject(pState, pCaller);
                         lua_setglobal(pState, "client");
                     }
                     else

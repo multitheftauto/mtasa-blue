@@ -400,7 +400,7 @@ int CLuaPlayerDefs::GetPlayerFromName(lua_State* luaVM)
         if (pPlayer)
         {
             // Return the player
-            lua_pushelement(luaVM, pPlayer);
+            lua_pushobject(luaVM, pPlayer);
             return 1;
         }
     }
@@ -536,7 +536,7 @@ int CLuaPlayerDefs::GetAlivePlayers(lua_State* luaVM)
             if (pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, pPlayer);
+                lua_pushobject(luaVM, pPlayer);
                 lua_settable(luaVM, -3);
             }
         }
@@ -567,7 +567,7 @@ int CLuaPlayerDefs::GetDeadPlayers(lua_State* luaVM)
             if (pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, pPlayer);
+                lua_pushobject(luaVM, pPlayer);
                 lua_settable(luaVM, -3);
             }
         }
@@ -1303,7 +1303,7 @@ int CLuaPlayerDefs::GetPlayerTeam(lua_State* luaVM)
         CTeam* pTeam = CStaticFunctionDefinitions::GetPlayerTeam(pPlayer);
         if (pTeam)
         {
-            lua_pushelement(luaVM, pTeam);
+            lua_pushobject(luaVM, pTeam);
             return 1;
         }
     }
@@ -1342,7 +1342,7 @@ int CLuaPlayerDefs::GetRandomPlayer(lua_State* luaVM)
     CPlayer* pPlayer = CStaticFunctionDefinitions::GetRandomPlayer();
     if (pPlayer)
     {
-        lua_pushelement(luaVM, pPlayer);
+        lua_pushobject(luaVM, pPlayer);
         return 1;
     }
 

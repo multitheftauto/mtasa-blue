@@ -126,7 +126,7 @@ int CLuaAccountDefs::GetAccountPlayer(lua_State* luaVM)
         CClient* pClient = CStaticFunctionDefinitions::GetAccountPlayer(pAccount);
         if (pClient)
         {
-            lua_pushelement(luaVM, pClient->GetElement());
+            lua_pushobject(luaVM, pClient->GetElement());
             return 1;
         }
     }

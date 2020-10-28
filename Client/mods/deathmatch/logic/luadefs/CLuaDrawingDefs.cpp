@@ -1023,7 +1023,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                             // ElementGroup? **
                             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
                         }
-                        lua_pushelement(luaVM, pTexture);
+                        lua_pushobject(luaVM, pTexture);
                         return 1;
                     }
                     else
@@ -1041,7 +1041,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
                 }
-                lua_pushelement(luaVM, pTexture);
+                lua_pushobject(luaVM, pTexture);
                 return 1;
             }
             else
@@ -1053,7 +1053,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
                 }
-                lua_pushelement(luaVM, pTexture);
+                lua_pushobject(luaVM, pTexture);
                 return 1;
             }
         }
@@ -1160,7 +1160,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     if (pShader)
     {
         pShader->SetParent(pParentResource->GetResourceDynamicEntity());
-        lua_pushelement(luaVM, pShader);
+        lua_pushobject(luaVM, pShader);
         lua_pushstring(luaVM, strStatus);
         return 2;
     }
@@ -1197,7 +1197,7 @@ int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pRenderTarget->SetParent(pParentResource->GetResourceDynamicEntity());
 
-                lua_pushelement(luaVM, pRenderTarget);
+                lua_pushobject(luaVM, pRenderTarget);
                 return 1;
             }
         }
@@ -1230,7 +1230,7 @@ int CLuaDrawingDefs::DxCreateScreenSource(lua_State* luaVM)
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pScreenSource->SetParent(pParentResource->GetResourceDynamicEntity());
             }
-            lua_pushelement(luaVM, pScreenSource);
+            lua_pushobject(luaVM, pScreenSource);
             return 1;
         }
     }
@@ -1530,7 +1530,7 @@ int CLuaDrawingDefs::DxCreateFont(lua_State* luaVM)
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
                         // ElementGroup? **
                         pDxFont->SetParent(pParentResource->GetResourceDynamicEntity());
-                        lua_pushelement(luaVM, pDxFont);
+                        lua_pushobject(luaVM, pDxFont);
                         return 1;
                     }
 

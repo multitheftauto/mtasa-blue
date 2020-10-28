@@ -528,7 +528,7 @@ int CLuaEffectDefs::CreateEffect(lua_State* luaVM)
                 {
                     pFx->SetRotationDegrees(vecRotation);
                     pFx->SetDrawDistance(fDrawDistance);
-                    lua_pushelement(luaVM, pFx);
+                    lua_pushobject(luaVM, pFx);
                     return 1;
                 }
             }

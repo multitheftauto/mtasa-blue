@@ -100,7 +100,7 @@ int CLuaCameraDefs::getCameraTarget(lua_State* luaVM)
         CElement* pTarget = CStaticFunctionDefinitions::GetCameraTarget(pPlayer);
         if (pTarget)
         {
-            lua_pushelement(luaVM, pTarget);
+            lua_pushobject(luaVM, pTarget);
             return 1;
         }
     }

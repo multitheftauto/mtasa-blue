@@ -940,7 +940,7 @@ int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
             CElement* pElement = pResource->GetResourceRootElement();
             if (pElement)
             {
-                lua_pushelement(luaVM, pElement);
+                lua_pushobject(luaVM, pElement);
                 return 1;
             }
         }
@@ -982,7 +982,7 @@ int CLuaResourceDefs::getResourceDynamicElementRoot(lua_State* luaVM)
             CElement* pElement = pResource->GetDynamicElementRoot();
             if (pElement)
             {
-                lua_pushelement(luaVM, pElement);
+                lua_pushobject(luaVM, pElement);
                 return 1;
             }
         }
@@ -1013,7 +1013,7 @@ int CLuaResourceDefs::getResourceMapRootElement(lua_State* luaVM)
             CElement* pMapRoot = CStaticFunctionDefinitions::GetResourceMapRootElement(pResource, strMapName);
             if (pMapRoot)
             {
-                lua_pushelement(luaVM, pMapRoot);
+                lua_pushobject(luaVM, pMapRoot);
                 return 1;
             }
         }
@@ -1158,7 +1158,7 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                 lua_pushobject(targetLuaVM, resourceThis);
                 lua_setglobal(targetLuaVM, "sourceResource");
 
-                lua_pushelement(targetLuaVM, resourceThis->GetResourceRootElement());
+                lua_pushobject(targetLuaVM, resourceThis->GetResourceRootElement());
                 lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
                 if (pResource->CallExportedFunction(strFunctionName, args, returns, *resourceThis))

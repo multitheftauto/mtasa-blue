@@ -307,7 +307,7 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
                         pGroup->Add(pElement);
                     }
 
-                    lua_pushelement(luaVM, pElement);
+                    lua_pushobject(luaVM, pElement);
                     return 1;
                 }
             }

@@ -83,7 +83,7 @@ int CLuaSearchLightDefs::CreateSearchLight(lua_State* luaVM)
                 if (pGroup)
                     pGroup->Add(pLight);
 
-                lua_pushelement(luaVM, pLight);
+                lua_pushobject(luaVM, pLight);
                 return 1;
             }
         }

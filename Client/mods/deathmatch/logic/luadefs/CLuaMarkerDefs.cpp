@@ -95,7 +95,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
                         pGroup->Add((CClientEntity*)pMarker);
                     }
 
-                    lua_pushelement(luaVM, pMarker);
+                    lua_pushobject(luaVM, pMarker);
                     return 1;
                 }
             }

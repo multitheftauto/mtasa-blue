@@ -93,7 +93,7 @@ int CLuaRadarAreaDefs::CreateRadarArea(lua_State* luaVM)
                 {
                     pGroup->Add(pRadarArea);
                 }
-                lua_pushelement(luaVM, pRadarArea);
+                lua_pushobject(luaVM, pRadarArea);
                 return 1;
             }
         }

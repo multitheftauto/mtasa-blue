@@ -86,7 +86,7 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
             {
                 pGroup->Add(pWater);
             }
-            lua_pushelement(luaVM, pWater);
+            lua_pushobject(luaVM, pWater);
             return 1;
         }
     }

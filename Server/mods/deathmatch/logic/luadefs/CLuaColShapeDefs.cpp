@@ -128,7 +128,7 @@ int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
                     {
                         pGroup->Add(pShape);
                     }
-                    lua_pushelement(luaVM, pShape);
+                    lua_pushobject(luaVM, pShape);
                     return 1;
                 }
             }
@@ -174,7 +174,7 @@ int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
                     {
                         pGroup->Add(pShape);
                     }
-                    lua_pushelement(luaVM, pShape);
+                    lua_pushobject(luaVM, pShape);
                     return 1;
                 }
             }
@@ -216,7 +216,7 @@ int CLuaColShapeDefs::CreateColSphere(lua_State* luaVM)
                     {
                         pGroup->Add(pShape);
                     }
-                    lua_pushelement(luaVM, pShape);
+                    lua_pushobject(luaVM, pShape);
                     return 1;
                 }
             }
@@ -260,7 +260,7 @@ int CLuaColShapeDefs::CreateColRectangle(lua_State* luaVM)
                     {
                         pGroup->Add(pShape);
                     }
-                    lua_pushelement(luaVM, pShape);
+                    lua_pushobject(luaVM, pShape);
                     return 1;
                 }
             }
@@ -302,7 +302,7 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
                     {
                         pGroup->Add(pShape);
                     }
-                    lua_pushelement(luaVM, pShape);
+                    lua_pushobject(luaVM, pShape);
                     return 1;
                 }
             }
@@ -347,7 +347,7 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
                     {
                         pGroup->Add(pShape);
                     }
-                    lua_pushelement(luaVM, pShape);
+                    lua_pushobject(luaVM, pShape);
                     return 1;
                 }
             }

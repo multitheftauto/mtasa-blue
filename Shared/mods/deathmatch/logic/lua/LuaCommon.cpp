@@ -119,9 +119,9 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushobject(luaVM, *pMatrix);
 #else
     if (CElement* pEntity = UserDataCast<CElement>((CElement*)NULL, pData, NULL))
-        return lua_pushelement(luaVM, pEntity);
+        return lua_pushobject(luaVM, pEntity);
     if (CPlayer* pEntity = UserDataCast<CPlayer>((CPlayer*)NULL, pData, NULL))
-        return lua_pushelement(luaVM, pEntity);
+        return lua_pushobject(luaVM, pEntity);
     else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, NULL))
         return lua_pushobject(luaVM, pResource);
     else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, NULL))

@@ -174,7 +174,7 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
                         pCol->SetParent(pRoot);
 
                         // Return the created col model
-                        lua_pushelement(luaVM, pCol);
+                        lua_pushobject(luaVM, pCol);
                         return 1;
                     }
                     else
@@ -246,7 +246,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                         pDFF->SetParent(pRoot);
 
                         // Return the DFF
-                        lua_pushelement(luaVM, pDFF);
+                        lua_pushobject(luaVM, pDFF);
                         return 1;
                     }
                     else
@@ -320,7 +320,7 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                         pTXD->SetParent(pRoot);
 
                         // Return the TXD
-                        lua_pushelement(luaVM, pTXD);
+                        lua_pushobject(luaVM, pTXD);
                         return 1;
                     }
                     else
@@ -386,7 +386,7 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                     if (pIFP)
                     {
                         // Return the IFP element
-                        lua_pushelement(luaVM, pIFP.get());
+                        lua_pushobject(luaVM, pIFP.get());
                         return 1;
                     }
                     else
@@ -1179,7 +1179,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
         }
         lua_pushstring(luaVM, std::get<0>(pair).c_str());
-        lua_pushelement(luaVM, pTexture);
+        lua_pushobject(luaVM, pTexture);
         lua_settable(luaVM, -3);
     }
 

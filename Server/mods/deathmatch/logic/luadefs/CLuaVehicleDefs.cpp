@@ -316,7 +316,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
                         {
                             pGroup->Add(pVehicle);
                         }
-                        lua_pushelement(luaVM, pVehicle);
+                        lua_pushobject(luaVM, pVehicle);
                         return 1;
                     }
                 }
@@ -859,7 +859,7 @@ int CLuaVehicleDefs::GetVehicleOccupant(lua_State* luaVM)
         CPed* pPed = CStaticFunctionDefinitions::GetVehicleOccupant(pVehicle, uiSeat);
         if (pPed)
         {
-            lua_pushelement(luaVM, pPed);
+            lua_pushobject(luaVM, pPed);
             return 1;
         }
     }
@@ -899,7 +899,7 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
             if (pPed)
             {
                 lua_pushnumber(luaVM, ucSeat);
-                lua_pushelement(luaVM, pPed);
+                lua_pushobject(luaVM, pPed);
                 lua_settable(luaVM, -3);
             }
         }
@@ -924,7 +924,7 @@ int CLuaVehicleDefs::GetVehicleController(lua_State* luaVM)
         CPed* pPed = CStaticFunctionDefinitions::GetVehicleController(pVehicle);
         if (pPed)
         {
-            lua_pushelement(luaVM, pPed);
+            lua_pushobject(luaVM, pPed);
             return 1;
         }
     }
@@ -1385,7 +1385,7 @@ int CLuaVehicleDefs::GetVehicleTowedByVehicle(lua_State* luaVM)
         CVehicle* pTowedVehicle = pVehicle->GetTowedVehicle();
         if (pTowedVehicle)
         {
-            lua_pushelement(luaVM, pTowedVehicle);
+            lua_pushobject(luaVM, pTowedVehicle);
             return 1;
         }
     }
@@ -1408,7 +1408,7 @@ int CLuaVehicleDefs::GetVehicleTowingVehicle(lua_State* luaVM)
         CVehicle* pTowedByVehicle = pVehicle->GetTowedByVehicle();
         if (pTowedByVehicle)
         {
-            lua_pushelement(luaVM, pTowedByVehicle);
+            lua_pushobject(luaVM, pTowedByVehicle);
             return 1;
         }
     }
