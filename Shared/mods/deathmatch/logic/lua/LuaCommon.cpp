@@ -183,6 +183,24 @@ void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData)
 
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
+#ifdef MTA_CLIENT
+    if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, pEntity);
+    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, pResource);
+    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, pNode);
+    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, pTimer);
+    else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, *pVector);
+    else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, *pVector);
+    else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, *pVector);
+    else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
+        return lua_pushobject(luaVM, *pMatrix);
+#else
     if (CElement* pEntity = UserDataCast<CElement>((CElement*)NULL, pData, NULL))
         return lua_pushelement(luaVM, pEntity);
     if (CPlayer* pEntity = UserDataCast<CPlayer>((CPlayer*)NULL, pData, NULL))
@@ -214,8 +232,8 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CTextItem* pTextItem = UserDataCast<CTextItem>((CTextItem*)NULL, pData, luaVM))
         return lua_pushtextitem(luaVM, pTextItem);
     else if (CDbJobData* pQuery = UserDataCast<CDbJobData>((CDbJobData*)NULL, pData, luaVM))
-        return lua_pushquery(luaVM, pQuery);
-
+        return lua_pushobject(luaVM, pQuery);
+#endif
     lua_pushobject(luaVM, NULL, pData);
 }
 
