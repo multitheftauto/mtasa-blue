@@ -76,7 +76,31 @@ void lua_pushelement(lua_State* luaVM, CElement* pElement)
     lua_pushnil(luaVM);
 }
 
-void lua_pushacl(lua_State* luaVM, CAccessControlList* pACL)
+template<class T>
+void lua_pushobject(lua_State* luaVM, T* object)
+{
+    static_assert(!std::is_pointer_v<T> && !std::is_reference_v<T>, "T must be an object, not a pointer to a pointer, or something..");
+
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
+
+    using Decay_t = std::decay_t<T>;
+    if constexpr (std::is_same_v<T, CElement>)
+    {
+        if (object->IsBeingDeleted())
+            lua_pushboolean(luaVM, false);
+        else if (const auto ID = object->GetID(); ID != INVALID_ELEMENT_ID)
+            lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(ID.Value()));
+        else
+            lua_pushnil(luaVM); // Invalid element ID
+    }
+    else if constexpr (std::is_same_v<T, CXMLNode>)
+        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetID()));
+    else if constexpr (std::is_same_v<T, CDbJobData>)
+        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetId()));
+    else
+        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetScriptID()));
+}
+
 {
     const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetACLClass(pACL) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pACL->GetScriptID()));

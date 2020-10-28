@@ -54,7 +54,8 @@ class CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
 class CElement* lua_toelement(lua_State* luaVM, int iArgument);
 #endif
 
-
+template<class T>
+void lua_pushobject(lua_State* luaVM, T* object);
 
 // Lua push macros for our datatypes
 void lua_pushelement(lua_State* luaVM, class CElement* pElement);
