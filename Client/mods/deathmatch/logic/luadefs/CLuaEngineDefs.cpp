@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaEngineDefs::LoadFunctions()
 {
@@ -50,6 +51,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelFlags", EngineGetModelFlags},
         {"engineSetModelFlags", EngineSetModelFlags},
         {"engineResetModelFlags", EngineResetModelFlags},
+        {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1133,11 +1135,18 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
+    CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CResource* pParentResource = pLuaMain->GetResource();
+
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
         CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
                                                                                                          RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        if (pTexture)
+        {
+            pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+        }
         lua_pushstring(luaVM, std::get<0>(pair).c_str());
         lua_pushelement(luaVM, pTexture);
         lua_settable(luaVM, -3);
@@ -2067,4 +2076,10 @@ int CLuaEngineDefs::EngineResetModelFlags(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
+{
+    g_pClientGame->RestreamWorld();
+    return true;
 }

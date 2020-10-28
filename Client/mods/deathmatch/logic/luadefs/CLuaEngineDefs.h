@@ -60,7 +60,7 @@ public:
     LUA_DECLARE(EngineGetModelFlags);
     LUA_DECLARE(EngineSetModelFlags);
     LUA_DECLARE(EngineResetModelFlags);
-
+    static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);
