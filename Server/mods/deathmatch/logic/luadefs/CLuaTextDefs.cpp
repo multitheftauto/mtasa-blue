@@ -96,7 +96,7 @@ int CLuaTextDefs::textCreateDisplay(lua_State* luaVM)
     {
         // Create a text display and return it
         CTextDisplay* textDisplay = luaMain->CreateDisplay();
-        lua_pushtextdisplay(luaVM, textDisplay);
+        lua_pushobject(luaVM, textDisplay);
         return 1;
     }
 
