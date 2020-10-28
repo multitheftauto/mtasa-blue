@@ -57,10 +57,10 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
-    LUA_DECLARE(EngineGetModelFlags);
-    LUA_DECLARE(EngineSetModelFlags);
-    LUA_DECLARE(EngineResetModelFlags);
-    static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
+    static uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelID);
+    static bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, bool bIdeFlags = false);
+    static bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID);
+    static bool CLuaEngineDefs::EngineRestreamWorld();
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);
