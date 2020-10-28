@@ -51,29 +51,50 @@ CElement* lua_toelement(lua_State* luaVM, int iArgument)
     return NULL;
 }
 
-void lua_pushelement(lua_State* luaVM, CElement* pElement)
+void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false)
 {
-    if (pElement)
+    if (szClass == nullptr)
     {
-        if (pElement->IsBeingDeleted())
-        {
-            lua_pushboolean(luaVM, false);
-            return;
-        }
-
-        ElementID ID = pElement->GetID();
-        if (ID != INVALID_ELEMENT_ID)
-        {
-            const char* szClass = NULL;
-            if (IsOOPEnabledForVM(luaVM))
-                szClass = CLuaClassDefs::GetElementClass(pElement);
-
-            lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(ID.Value()));
-            return;
-        }
+        lua_pushlightuserdata(luaVM, pObject);
+        return;
     }
 
-    lua_pushnil(luaVM);
+    if (bSkipCache)
+    {
+        *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
+    }
+    else
+    {
+        // Lookup the userdata in the cache table
+        lua_pushstring(luaVM, "ud");
+        lua_rawget(luaVM, LUA_REGISTRYINDEX);
+
+        assert(lua_istable(luaVM, -1));
+
+        // First we want to check if we have a userdata for this already
+        lua_pushlightuserdata(luaVM, pObject);
+        lua_rawget(luaVM, -2);
+
+        if (lua_isnil(luaVM, -1))
+        {
+            lua_pop(luaVM, 1);
+
+            // we don't have it, create it
+            *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
+
+            // save in ud table
+            lua_pushlightuserdata(luaVM, pObject);
+            lua_pushvalue(luaVM, -2);
+            lua_rawset(luaVM, -4);
+        }
+
+        // userdata is already on the stack, just remove the table
+        lua_remove(luaVM, -2);
+    }
+
+    // Assign the class metatable
+    lua_getclass(luaVM, szClass);
+    lua_setmetatable(luaVM, -2);            // element
 }
 
 template<class T>
