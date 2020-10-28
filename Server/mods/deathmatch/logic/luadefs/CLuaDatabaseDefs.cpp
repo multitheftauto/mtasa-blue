@@ -371,7 +371,7 @@ int CLuaDatabaseDefs::DbQuery(lua_State* luaVM)
         }
         // Add debug info incase query result does not get collected
         pJobData->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
-        lua_pushquery(luaVM, pJobData);
+        lua_pushobject(luaVM, pJobData);
         return 1;
     }
     else
@@ -431,7 +431,7 @@ int CLuaDatabaseDefs::OOP_DbQuery(lua_State* luaVM)
         }
         // Add debug info incase query result does not get collected
         pJobData->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
-        lua_pushquery(luaVM, pJobData);
+        lua_pushobject(luaVM, pJobData);
         return 1;
     }
     else
