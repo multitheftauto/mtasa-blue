@@ -219,18 +219,10 @@ public:
     // +772 = Anim file index
 };
 
-struct TimeInfoSA
-{
-    TimeInfoSA(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
-    char  m_nTimeOn;
-    char  m_nTimeOff;
-    short m_wOtherTimeModel;
-};
-
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
-    TimeInfoSA timeInfo;
+    TimeInfo timeInfo;
 };
 
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
@@ -293,7 +285,7 @@ protected:
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<TimeInfoSA*, TimeInfoSA*>                                    ms_ModelDefaultModelTimeInfo;
+    static std::map<TimeInfo*, TimeInfo*>                                        ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
