@@ -523,7 +523,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
                                     m_pMapManager, &m_Events);
     m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager,
                               m_pBanManager, m_pACLManager);
-    m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
+    m_pMainConfig = new CMainConfig(m_pConsole);
     m_pRPCFunctions = new CRPCFunctions;
 
     m_pWeaponStatsManager = new CWeaponStatManager();

@@ -33,7 +33,7 @@ struct
     {26, "data/timecyc.dat"},
 };
 
-CMainConfig::CMainConfig(CConsole* pConsol) : CXMLConfig(NULL)
+CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
 {
     m_pConsole = pConsole;
     m_pRootNode = NULL;
