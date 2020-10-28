@@ -111,7 +111,7 @@ int CLuaMatrixDefs::Create(lua_State* luaVM)
         return 1;
     }
 
-    lua_pushmatrix(luaVM, matrix);
+    lua_pushobject(luaVM, matrix);
     return 1;
 }
 
@@ -219,7 +219,7 @@ int CLuaMatrixDefs::Inverse(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, pMatrix1->Inverse());
+        lua_pushobject(luaVM, pMatrix1->Inverse());
         return 1;
     }
     else
@@ -473,7 +473,7 @@ int CLuaMatrixDefs::Add(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 + *pMatrix2);
+        lua_pushobject(luaVM, *pMatrix1 + *pMatrix2);
         return 1;
     }
     else
@@ -496,7 +496,7 @@ int CLuaMatrixDefs::Sub(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 - *pMatrix2);
+        lua_pushobject(luaVM, *pMatrix1 - *pMatrix2);
         return 1;
     }
     else
@@ -519,7 +519,7 @@ int CLuaMatrixDefs::Mul(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 * *pMatrix2);
+        lua_pushobject(luaVM, *pMatrix1 * *pMatrix2);
         return 1;
     }
     else
@@ -542,7 +542,7 @@ int CLuaMatrixDefs::Div(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 / *pMatrix2);
+        lua_pushobject(luaVM, *pMatrix1 / *pMatrix2);
         return 1;
     }
     else

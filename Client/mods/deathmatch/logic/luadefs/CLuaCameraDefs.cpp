@@ -141,7 +141,7 @@ int CLuaCameraDefs::OOP_GetCameraMatrix(lua_State* luaVM)
     CMatrix matrix;
     m_pManager->GetCamera()->GetMatrix(matrix);
 
-    lua_pushmatrix(luaVM, matrix);
+    lua_pushobject(luaVM, matrix);
     return 1;
 }
 

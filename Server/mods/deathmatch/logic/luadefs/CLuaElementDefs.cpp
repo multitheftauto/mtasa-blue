@@ -689,7 +689,7 @@ int CLuaElementDefs::OOP_getElementMatrix(lua_State* luaVM)
         CMatrix matrix;
         pEntity->GetMatrix(matrix);
 
-        lua_pushmatrix(luaVM, matrix);
+        lua_pushobject(luaVM, matrix);
         return 1;
     }
     else

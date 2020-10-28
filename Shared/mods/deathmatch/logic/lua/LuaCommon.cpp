@@ -135,7 +135,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
-        return lua_pushmatrix(luaVM, *pMatrix);
+        return lua_pushobject(luaVM, *pMatrix);
     else if (CAccount* pAccount = UserDataCast<CAccount>((CAccount*)NULL, pData, luaVM))
         return lua_pushaccount(luaVM, pAccount);
     else if (CAccessControlList* pACL = UserDataCast<CAccessControlList>((CAccessControlList*)NULL, pData, luaVM))
@@ -175,7 +175,7 @@ void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
-void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
+void lua_pushobject(lua_State* luaVM, const CMatrix& matrix)
 {
     CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
     lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);

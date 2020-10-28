@@ -121,7 +121,7 @@ namespace lua
 
     inline int Push(lua_State* L, const CMatrix& value)
     {
-        lua_pushmatrix(L, value);
+        lua_pushobject(L, value);
         return 1;
     }
 
