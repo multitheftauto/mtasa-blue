@@ -12,7 +12,7 @@ class CLuaCFunctions;
 
 #pragma once
 
-#include "LuaCommon.h"
+#include <lua/LuaCommon.h>
 #include <string>
 
 class CLuaCFunction

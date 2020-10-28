@@ -12,6 +12,21 @@
 #include "StdInc.h"
 
 extern CGame* g_pGame;
+// Helper function so we dont clutter the code with the preporecessor
+static bool IsOOPEnabledForVM(lua_State* luaVM)
+{
+    #ifdef MTA_CLIENT
+    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    #else
+    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    #endif
+    return pLuaMain && pLuaMain->IsOOPEnabled();
+}
+
+#ifdef MTA_CLIENT
+using CElement = CCLientEntity;
+#endif
+
 
 // Lua push/pop macros for our datatypes
 CElement* lua_toelement(lua_State* luaVM, int iArgument)
@@ -50,8 +65,7 @@ void lua_pushelement(lua_State* luaVM, CElement* pElement)
         if (ID != INVALID_ELEMENT_ID)
         {
             const char* szClass = NULL;
-            CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-            if (pLuaMain && pLuaMain->IsOOPEnabled())
+            if (IsOOPEnabledForVM(luaVM))
                 szClass = CLuaClassDefs::GetElementClass(pElement);
 
             lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(ID.Value()));
@@ -64,101 +78,61 @@ void lua_pushelement(lua_State* luaVM, CElement* pElement)
 
 void lua_pushacl(lua_State* luaVM, CAccessControlList* pACL)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetACLClass(pACL);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetACLClass(pACL) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pACL->GetScriptID()));
 }
 
 void lua_pushaclgroup(lua_State* luaVM, CAccessControlListGroup* pGroup)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetACLGroupClass(pGroup);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetACLGroupClass(pGroup) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pGroup->GetScriptID()));
 }
 
 void lua_pushaccount(lua_State* luaVM, CAccount* pAccount)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetAccountClass(pAccount);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetAccountClass(pAccount) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pAccount->GetScriptID()));
 }
 
 void lua_pushresource(lua_State* luaVM, CResource* pResource)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetResourceClass(pResource);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetResourceClass(pResource) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pResource->GetScriptID()));
 }
 
 void lua_pushtextdisplay(lua_State* luaVM, CTextDisplay* pDisplay)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetTextDisplayClass(pDisplay);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetTextDisplayClass(pDisplay) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pDisplay->GetScriptID()));
 }
 
 void lua_pushtextitem(lua_State* luaVM, CTextItem* pItem)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetTextItemClass(pItem);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetTextItemClass(pItem) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pItem->GetScriptID()));
 }
 
 void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetTimerClass(pTimer);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetTimerClass(pTimer) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pTimer->GetScriptID()));
 }
 
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetXmlNodeClass(pElement);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetXmlNodeClass(pElement) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetID()));
 }
 
 void lua_pushban(lua_State* luaVM, CBan* pBan)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetBanClass(pBan);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetBanClass(pBan) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pBan->GetScriptID()));
 }
 
 void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetQueryClass(pJobData);
-
+    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetQueryClass(pJobData) : nullptr;
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pJobData->GetId()));
 }
 
@@ -272,24 +246,6 @@ void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
     CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
     lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-// Just do a type check vs LUA_TNONE before calling this, or bant
-const char* lua_makestring(lua_State* luaVM, int iArgument)
-{
-    if (lua_type(luaVM, iArgument) == LUA_TSTRING)
-    {
-        return lua_tostring(luaVM, iArgument);
-    }
-    lua_pushvalue(luaVM, iArgument);
-    lua_getglobal(luaVM, "tostring");
-    lua_pushvalue(luaVM, -2);
-    lua_call(luaVM, 1, 1);
-
-    const char* szString = lua_tostring(luaVM, -1);
-    lua_pop(luaVM, 2);
-
-    return szString;
 }
 
 void lua_initclasses(lua_State* luaVM)
@@ -414,103 +370,97 @@ void lua_registerstaticclass(lua_State* luaVM, const char* szName)
     lua_pop(luaVM, 2);
 }
 
+#ifdef MTA_CLIENT
+void lua_classfunction(lua_State* luaVM, const char* szFunction, lua_CFunction fn)
+#else
 void lua_classfunction(lua_State* luaVM, const char* szFunction, const char* szACLName, lua_CFunction fn)
+#endif
 {
-    if (fn)
-    {
-        lua_pushstring(luaVM, "__class");
-        lua_rawget(luaVM, -2);
+    if (!fn)
+        return;
+    
+    lua_pushstring(luaVM, "__class");
+    lua_rawget(luaVM, -2);
 
-        lua_pushstring(luaVM, szFunction);
-        lua_pushstring(luaVM, szFunction);
-        lua_pushstring(luaVM, szACLName);
-        lua_pushcclosure(luaVM, fn, 2);
-        lua_rawset(luaVM, -3);
+    lua_pushstring(luaVM, szFunction);
+    lua_pushstring(luaVM, szFunction);
+#ifdef MTA_CLIENT
+    lua_pushcclosure(luaVM, fn, 1);
+#else
+    lua_pushstring(luaVM, szACLName);
+    lua_pushcclosure(luaVM, fn, 2);
+#endif
+    lua_rawset(luaVM, -3);
 
-        lua_pop(luaVM, 1);
-    }
+    lua_pop(luaVM, 1);
+    
 }
 
 void lua_classfunction(lua_State* luaVM, const char* szFunction, const char* fn)
 {
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction(fn);
-    if (pFunction)
-    {
-        lua_classfunction(luaVM, szFunction, szFunction, pFunction->GetAddress());
-    }
-    else
-        dassert(false);
+    dassert(pFunction);
+#ifdef MTA_CLIENT
+    lua_classfunction(luaVM, szFunction, pFunction->GetFunctionAddress());
+#else
+    lua_classfunction(luaVM, szFunction, szFunction, pFunction->GetAddress());
+#endif
 }
 
-void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szACLNameSet, const char* szACLNameGet, lua_CFunction set, lua_CFunction get,
-                       bool bACLIgnore)
+#ifdef MTA_CLIENT
+void lua_classvariable(lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get)
+#else
+void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szACLNameSet, const char* szACLNameGet, lua_CFunction set, lua_CFunction get, bool bACLIgnore)
+#endif
 {
-    lua_pushstring(luaVM, "__set");
-    lua_rawget(luaVM, -2);
+    const auto setVariable = [luaVM, szVariable](const char* funcType, const char* szACLName, const auto& passedInFunction, const auto& alternativeFunction) {
+        lua_pushstring(luaVM, funcType);
+        lua_rawget(luaVM, -2);
 
-    if (!set)
-    {
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szACLNameSet);
-        lua_pushcclosure(luaVM, CLuaClassDefs::ReadOnly, 2);
-        lua_rawset(luaVM, -3);
-    }
-    else
-    {
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szACLNameSet);
-        lua_pushcclosure(luaVM, set, 2);
-        lua_rawset(luaVM, -3);
-    }
-    lua_pop(luaVM, 1);
-
-    // Get
-    lua_pushstring(luaVM, "__get");
-    lua_rawget(luaVM, -2);
-
-    if (!get)
-    {
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szACLNameGet);
-        lua_pushcclosure(luaVM, CLuaClassDefs::WriteOnly, 2);
-        lua_rawset(luaVM, -3);
-    }
-    else
-    {
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szVariable);
-        lua_pushstring(luaVM, szACLNameGet);
-        lua_pushcclosure(luaVM, get, 2);
-        lua_rawset(luaVM, -3);
-    }
-    lua_pop(luaVM, 1);
+        [luaVM, szVariable, szACLName](const auto& function) {
+            lua_pushstring(luaVM, szVariable);
+            lua_pushstring(luaVM, szVariable);
+        #ifdef MTA_CLIENT // Client doesnt need ACL name
+            lua_pushcclosure(luaVM, function, 1);
+        #else
+            lua_pushstring(luaVM, szACLName);
+            lua_pushcclosure(luaVM, function, 2);
+        #endif
+            lua_rawset(luaVM, -3);
+        }((passedInFunction) ? passedInFunction : alternativeFunction);
+        
+        lua_pop(luaVM, 1);
+    };
+#ifdef MTA_CLIENT
+    setVariable("__set", nullptr, set, CLuaClassDefs::ReadOnly);
+    setVariable("__get", nullptr, get, CLuaClassDefs::WriteOnly);
+#else
+    setVariable("__set", szACLNameSet, set, CLuaClassDefs::ReadOnly);
+    setVariable("__get", szACLNameGet, get, CLuaClassDefs::WriteOnly);
+#endif
 }
 
 void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* set, const char* get)
 {
-    lua_CFunction fnSet = NULL;
-    lua_CFunction fnGet = NULL;
+    const auto getAddress = [](const char* szFnName) -> lua_CFunction {
+        if (!szFnName)
+            return nullptr;
+        if (CLuaCFunction* pFn = CLuaCFunctions::GetFunction(szFnName))
+#ifdef MTA_CLIENT
+            return pFn->GetFunctionAddress();
+#else
+            return pFn->GetAddress();
+#endif
+        dassert("lua_classvariable function does not exist" && 0);     
+    };
 
-    if (set)
-    {
-        if (CLuaCFunction* pSet = CLuaCFunctions::GetFunction(set))
-            fnSet = pSet->GetAddress();
-        else
-            dassert(false);
-    }
+    if (lua_CFunction pFnSet = getAddress(set), pFnGet = getAddress(get); pFnGet || pFnSet)
+#ifdef MTA_CLIENT
+        lua_classvariable(luaVM, szVariable, pFnSet, pFnGet);
+#else
+        lua_classvariable(luaVM, szVariable, "", "", pFnSet, pFnGet, false);
 
-    if (get)
-    {
-        if (CLuaCFunction* pGet = CLuaCFunctions::GetFunction(get))
-            fnGet = pGet->GetAddress();
-        else
-            dassert(false);
-    }
-    if (fnSet || fnGet)
-        lua_classvariable(luaVM, szVariable, "", "", fnSet, fnGet, false);
+#endif
 }
 
 void lua_classmetamethod(lua_State* luaVM, const char* szName, lua_CFunction fn)

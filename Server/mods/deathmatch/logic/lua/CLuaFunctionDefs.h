@@ -20,7 +20,7 @@ class CColManager;
 class CAccessControlListManager;
 
 #pragma once
-#include "LuaCommon.h"
+#include <lua/LuaCommon.h>
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
 

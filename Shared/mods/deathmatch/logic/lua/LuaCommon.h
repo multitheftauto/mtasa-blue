@@ -22,8 +22,39 @@ CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
 #define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
 
+#ifdef MTA_CLIENT
+// Predeclarations of our classes
+class CClientColModel;
+class CClientColShape;
+class CScriptFile;
+class CClientDFF;
+class CClientEntity;
+class CClientGUIElement;
+class CClientMarker;
+class CClientObject;
+class CClientPed;
+class CClientPickup;
+class CClientPlayer;
+class CClientRadarMarker;
+class CClientTeam;
+class CClientTXD;
+class CClientVehicle;
+class CClientWater;
+class CClientWeapon;
+class CClientRadarArea;
+class CClientPointLights;
+class CLuaTimer;
+class CResource;
+class CXMLNode;
+
+// Lua pop macros for our datatypes
+class CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
+#else
 // Lua pop macros for our datatypes
 class CElement* lua_toelement(lua_State* luaVM, int iArgument);
+#endif
+
+
 
 // Lua push macros for our datatypes
 void lua_pushelement(lua_State* luaVM, class CElement* pElement);
@@ -44,9 +75,6 @@ void lua_pushvector(lua_State* luaVM, const CVector2D& vector);
 void lua_pushvector(lua_State* luaVM, const CVector& vector);
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector);
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
-
-// Converts any type to string
-const char* lua_makestring(lua_State* luaVM, int iArgument);
 
 // Internal use
 void lua_initclasses(lua_State* luaVM);
