@@ -1,0 +1,37 @@
+#pragma once
+#include "CVector.h"
+#include "CRenderWareSA.h"
+
+class CMatrixSAInterface
+{
+private:
+    // RwV3d-like:
+    CVector      m_right;
+    unsigned int flags;
+    CVector      m_forward;
+    unsigned int pad1;
+    CVector      m_up;
+    unsigned int pad2;
+    CVector      m_pos;
+    unsigned int pad3;
+
+public:
+    RwMatrixTag* m_pAttachMatrix = nullptr;
+    bool         m_bOwnsAttachedMatrix = false;            // do we need to delete attaching matrix at detaching
+
+    CMatrixSAInterface(CMatrixSAInterface const& matrix);
+    CMatrixSAInterface(RwMatrixTag* matrix, bool temporary);            // like previous + attach
+    ~CMatrixSAInterface();                                              // destructor detaches matrix if attached
+
+    void ConvertToEulerAngles(float& x, float& y, float& z, std::int32_t flags);
+    void ConvertFromEulerAngles(float x, float y, float z, std::int32_t flags);
+    void UpdateRW();
+    void SetTranslateOnly(CVector position) { m_pos = position; }
+    void SetMatrix(const CVector& right, const CVector& forward, const CVector& up, const CVector& pos)
+    {
+        m_right = right;
+        m_forward = forward;
+        m_up = up;
+        m_pos = pos;
+    }
+};

@@ -53,6 +53,7 @@ public:
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
+    void ReinitStreaming();
 
     void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
     CStreamingInfo* GetStreamingInfoFromModelId(uint id);

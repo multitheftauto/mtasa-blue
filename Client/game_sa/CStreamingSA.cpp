@@ -140,6 +140,14 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
     }
 }
 
+void CStreamingSA::ReinitStreaming()
+{
+    typedef int(__cdecl * Function_ReInitStreaming)();
+    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
+
+    reinitStreaming();
+}
+
 void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);

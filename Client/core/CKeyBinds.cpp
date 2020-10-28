@@ -505,6 +505,11 @@ void CKeyBinds::Add(CKeyBind* pKeyBind)
 
 void CKeyBinds::Remove(CKeyBind* pKeyBind)
 {
+    // If this is an active chatbox bind, delete it
+    // so it won't be called on next frame
+    if (m_pChatBoxBind == pKeyBind)
+        m_pChatBoxBind = nullptr;
+
     if (m_bProcessingKeyStroke)
         pKeyBind->beingDeleted = true;
     else

@@ -80,6 +80,12 @@ namespace lua
         return 1;
     }
 
+    inline int Push(lua_State* L, const CLuaArguments& args)
+    {
+        args.PushAsTable(L);
+        return 1;
+    }
+
     template <typename... Ts>
     int Push(lua_State* L, const std::variant<Ts...>&& val)
     {
@@ -110,6 +116,12 @@ namespace lua
     inline int Push(lua_State* L, const CVector4D& value)
     {
         lua_pushvector(L, value);
+        return 1;
+    }
+
+    inline int Push(lua_State* L, const CMatrix& value)
+    {
+        lua_pushmatrix(L, value);
         return 1;
     }
 

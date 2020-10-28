@@ -932,7 +932,7 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
 {
     Save();
     CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE added_ip = ?", SQLITE_TEXT, strIP.c_str());
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
 
     for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
     {

@@ -67,7 +67,7 @@ public:
     LUA_DECLARE(EngineImageGetFile)
     LUA_DECLARE(EngineImageLinkModel);
     LUA_DECLARE(EngineRestoreModelImage);
-
+    static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

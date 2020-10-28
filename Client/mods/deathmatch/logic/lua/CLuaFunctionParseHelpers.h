@@ -16,6 +16,7 @@
 enum eLuaType
 {
 };
+
 DECLARE_ENUM(eLuaType);
 DECLARE_ENUM(CGUIVerticalAlign);
 DECLARE_ENUM(CGUIHorizontalAlign);
