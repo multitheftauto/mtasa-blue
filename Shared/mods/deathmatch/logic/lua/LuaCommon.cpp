@@ -123,7 +123,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     if (CPlayer* pEntity = UserDataCast<CPlayer>((CPlayer*)NULL, pData, NULL))
         return lua_pushelement(luaVM, pEntity);
     else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, NULL))
-        return lua_pushresource(luaVM, pResource);
+        return lua_pushobject(luaVM, pResource);
     else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, NULL))
         return lua_pushobject(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
@@ -137,7 +137,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, *pMatrix);
     else if (CAccount* pAccount = UserDataCast<CAccount>((CAccount*)NULL, pData, luaVM))
-        return lua_pushaccount(luaVM, pAccount);
+        return lua_pushobject(luaVM, pAccount);
     else if (CAccessControlList* pACL = UserDataCast<CAccessControlList>((CAccessControlList*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pACL);
     else if (CAccessControlListGroup* pACLGroup = UserDataCast<CAccessControlListGroup>((CAccessControlListGroup*)NULL, pData, luaVM))

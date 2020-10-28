@@ -323,7 +323,7 @@ int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
             CAccount* pAccount = CStaticFunctionDefinitions::GetPlayerAccount(pElement);
             if (pAccount)
             {
-                lua_pushaccount(luaVM, pAccount);
+                lua_pushobject(luaVM, pAccount);
                 return 1;
             }
         }

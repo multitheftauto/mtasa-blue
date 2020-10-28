@@ -11241,7 +11241,7 @@ void CStaticFunctionDefinitions::GetAccounts(lua_State* pLua)
         if (pAccount->IsRegistered() && !pAccount->IsConsoleAccount())
         {
             lua_pushnumber(pLua, ++uiIndex);
-            lua_pushaccount(pLua, pAccount);
+            lua_pushobject(pLua, pAccount);
             lua_settable(pLua, -3);
         }
     }

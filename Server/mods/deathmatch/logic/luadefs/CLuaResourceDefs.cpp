@@ -157,7 +157,7 @@ int CLuaResourceDefs::createResource(lua_State* luaVM)
             argStream.SetCustomError(strStatus);
         else if (pNewResource)
         {
-            lua_pushresource(luaVM, pNewResource);
+            lua_pushobject(luaVM, pNewResource);
             return 1;
         }
     }
@@ -189,7 +189,7 @@ int CLuaResourceDefs::copyResource(lua_State* luaVM)
             argStream.SetCustomError(strStatus);
         else if (pNewResource)
         {
-            lua_pushresource(luaVM, pNewResource);
+            lua_pushobject(luaVM, pNewResource);
             return 1;
         }
     }
@@ -221,7 +221,7 @@ int CLuaResourceDefs::renameResource(lua_State* luaVM)
             argStream.SetCustomError(strStatus);
         else if (pNewResource)
         {
-            lua_pushresource(luaVM, pNewResource);
+            lua_pushobject(luaVM, pNewResource);
             return 1;
         }
     }
@@ -628,7 +628,7 @@ int CLuaResourceDefs::getThisResource(lua_State* luaVM)
     if (amain)
     {
         CResource* thisResource = amain->GetResource();
-        lua_pushresource(luaVM, thisResource);
+        lua_pushobject(luaVM, thisResource);
         return 1;
     }
     lua_pushboolean(luaVM, false);
@@ -647,7 +647,7 @@ int CLuaResourceDefs::getResourceFromName(lua_State* luaVM)
         CResource* pResource = m_pResourceManager->GetResource(strName);
         if (pResource)
         {
-            lua_pushresource(luaVM, pResource);
+            lua_pushobject(luaVM, pResource);
             return 1;
         }
     }
@@ -666,7 +666,7 @@ int CLuaResourceDefs::getResources(lua_State* luaVM)
     for (; iter != m_pResourceManager->IterEnd(); ++iter)
     {
         lua_pushnumber(luaVM, ++uiIndex);
-        lua_pushresource(luaVM, *iter);
+        lua_pushobject(luaVM, *iter);
         lua_settable(luaVM, -3);
     }
     return 1;
@@ -1155,7 +1155,7 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                 lua_pop(targetLuaVM, 1);
 
                 // Set the new values for the current sourceResource, and sourceResourceRoot
-                lua_pushresource(targetLuaVM, resourceThis);
+                lua_pushobject(targetLuaVM, resourceThis);
                 lua_setglobal(targetLuaVM, "sourceResource");
 
                 lua_pushelement(targetLuaVM, resourceThis->GetResourceRootElement());
