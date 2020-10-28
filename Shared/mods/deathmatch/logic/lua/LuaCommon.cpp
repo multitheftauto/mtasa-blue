@@ -139,9 +139,9 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CAccount* pAccount = UserDataCast<CAccount>((CAccount*)NULL, pData, luaVM))
         return lua_pushaccount(luaVM, pAccount);
     else if (CAccessControlList* pACL = UserDataCast<CAccessControlList>((CAccessControlList*)NULL, pData, luaVM))
-        return lua_pushacl(luaVM, pACL);
+        return lua_pushobject(luaVM, pACL);
     else if (CAccessControlListGroup* pACLGroup = UserDataCast<CAccessControlListGroup>((CAccessControlListGroup*)NULL, pData, luaVM))
-        return lua_pushaclgroup(luaVM, pACLGroup);
+        return lua_pushobject(luaVM, pACLGroup);
     else if (CBan* pBan = UserDataCast<CBan>((CBan*)NULL, pData, luaVM))
         return lua_pushban(luaVM, pBan);
     else if (CTextDisplay* pTextDisplay = UserDataCast<CTextDisplay>((CTextDisplay*)NULL, pData, luaVM))
@@ -152,52 +152,6 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushobject(luaVM, pQuery);
 #endif
     lua_pushobject(luaVM, NULL, pData);
-}
-
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache)
-{
-    if (szClass == nullptr)
-    {
-        lua_pushlightuserdata(luaVM, pObject);
-        return;
-    }
-
-    if (bSkipCache)
-    {
-        *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
-    }
-    else
-    {
-        // Lookup the userdata in the cache table
-        lua_pushstring(luaVM, "ud");
-        lua_rawget(luaVM, LUA_REGISTRYINDEX);
-
-        assert(lua_istable(luaVM, -1));
-
-        // First we want to check if we have a userdata for this already
-        lua_pushlightuserdata(luaVM, pObject);
-        lua_rawget(luaVM, -2);
-
-        if (lua_isnil(luaVM, -1))
-        {
-            lua_pop(luaVM, 1);
-
-            // we don't have it, create it
-            *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
-
-            // save in ud table
-            lua_pushlightuserdata(luaVM, pObject);
-            lua_pushvalue(luaVM, -2);
-            lua_rawset(luaVM, -4);
-        }
-
-        // userdata is already on the stack, just remove the table
-        lua_remove(luaVM, -2);
-    }
-
-    // Assign the class metatable
-    lua_getclass(luaVM, szClass);
-    lua_setmetatable(luaVM, -2);            // element
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
