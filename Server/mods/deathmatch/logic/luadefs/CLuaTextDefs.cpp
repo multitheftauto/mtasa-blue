@@ -186,7 +186,7 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
         if (luaMain)
         {
             CTextItem* pTextItem = luaMain->CreateTextItem(strText, fX, fY, (eTextPriority)iPriority, color, fScale, ucFormat, ucShadowAlpha);
-            lua_pushtextitem(luaVM, pTextItem);
+            lua_pushobject(luaVM, pTextItem);
             return 1;
         }
     }

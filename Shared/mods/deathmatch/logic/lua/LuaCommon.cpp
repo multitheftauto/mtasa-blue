@@ -147,7 +147,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CTextDisplay* pTextDisplay = UserDataCast<CTextDisplay>((CTextDisplay*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pTextDisplay);
     else if (CTextItem* pTextItem = UserDataCast<CTextItem>((CTextItem*)NULL, pData, luaVM))
-        return lua_pushtextitem(luaVM, pTextItem);
+        return lua_pushobject(luaVM, pTextItem);
     else if (CDbJobData* pQuery = UserDataCast<CDbJobData>((CDbJobData*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pQuery);
 #endif
