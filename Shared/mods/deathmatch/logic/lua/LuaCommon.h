@@ -57,23 +57,11 @@ class CElement* lua_toelement(lua_State* luaVM, int iArgument);
 template<class T>
 void lua_pushobject(lua_State* luaVM, T* object);
 
-// Lua push macros for our datatypes
-void lua_pushelement(lua_State* luaVM, class CElement* pElement);
-void lua_pushacl(lua_State* luaVM, class CAccessControlList* pACL);
-void lua_pushaclgroup(lua_State* luaVM, class CAccessControlListGroup* pACL);
-void lua_pushaccount(lua_State* luaVM, class CAccount* pAccount);
-void lua_pushresource(lua_State* luaVM, class CResource* pResource);
-void lua_pushtextdisplay(lua_State* luaVM, class CTextDisplay* pDisplay);
-void lua_pushtextitem(lua_State* luaVM, class CTextItem* pItem);
-void lua_pushtimer(lua_State* luaVM, class CLuaTimer* pTimer);
-void lua_pushxmlnode(lua_State* luaVM, class CXMLNode* pNode);
-void lua_pushban(lua_State* luaVM, class CBan* pBan);
-void lua_pushquery(lua_State* luaVM, class CDbJobData* pJobData);
 void lua_pushuserdata(lua_State* luaVM, void* value);
 void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
 
 #ifdef MTA_CLIENT
-void lua_pushobject(lua_State* luaVM, CClientEntity* element);
+void lua_pushobject(lua_State* luaVM, CClientEntity* player);
 #else
 void lua_pushobject(lua_State* luaVM, CElement* player);
 void lua_pushobject(lua_State* luaVM, CPlayer* player);

@@ -99,8 +99,14 @@ void lua_pushobject(lua_State* luaVM, T* object)
 
     const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
 
-    using Decay_t = std::decay_t<T>;
-    if constexpr (std::is_same_v<T, CElement>)
+    using Decayed_t = std::decay_t<T>;
+    if constexpr (std::is_same_v<Decayed_t, CXMLNode>) // XML node has GetID
+        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetID()));
+
+    else if constexpr (std::is_same_v<Decayed_t, CDbJobData>) // CDbJobData has GetId
+        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetId()));
+
+    else if constexpr (std::is_base_of_v<CElement, Decayed_t>) // Handle types that derive from CElement
     {
         if (object->IsBeingDeleted())
             lua_pushboolean(luaVM, false);
@@ -109,73 +115,14 @@ void lua_pushobject(lua_State* luaVM, T* object)
         else
             lua_pushnil(luaVM); // Invalid element ID
     }
-    else if constexpr (std::is_same_v<T, CXMLNode>)
-        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetID()));
-    else if constexpr (std::is_same_v<T, CDbJobData>)
-        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetId()));
+#ifndef MTA_CLIENT
+    // CClient needs special case, because it doesnt derive from CElement for whatever reason..
+    else if constexpr (std::is_base_of_v<CClient, Decayed_t>)
+        lua_pushobject<CElement>(luaVM, static_cast<CClient*>(object)->GetElement()); // Get the CElement, and call us
+#endif
     else
         lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetScriptID()));
 }
-
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetACLClass(pACL) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pACL->GetScriptID()));
-}
-
-void lua_pushaclgroup(lua_State* luaVM, CAccessControlListGroup* pGroup)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetACLGroupClass(pGroup) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pGroup->GetScriptID()));
-}
-
-void lua_pushaccount(lua_State* luaVM, CAccount* pAccount)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetAccountClass(pAccount) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pAccount->GetScriptID()));
-}
-
-void lua_pushresource(lua_State* luaVM, CResource* pResource)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetResourceClass(pResource) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pResource->GetScriptID()));
-}
-
-void lua_pushtextdisplay(lua_State* luaVM, CTextDisplay* pDisplay)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetTextDisplayClass(pDisplay) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pDisplay->GetScriptID()));
-}
-
-void lua_pushtextitem(lua_State* luaVM, CTextItem* pItem)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetTextItemClass(pItem) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pItem->GetScriptID()));
-}
-
-void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetTimerClass(pTimer) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pTimer->GetScriptID()));
-}
-
-void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetXmlNodeClass(pElement) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetID()));
-}
-
-void lua_pushban(lua_State* luaVM, CBan* pBan)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetBanClass(pBan) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pBan->GetScriptID()));
-}
-
-void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData)
-{
-    const char* szClass = IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetQueryClass(pJobData) : nullptr;
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pJobData->GetId()));
-}
-
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
 #ifdef MTA_CLIENT
