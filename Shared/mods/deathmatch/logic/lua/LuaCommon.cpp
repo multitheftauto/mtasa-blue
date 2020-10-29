@@ -11,24 +11,6 @@
 
 #include "StdInc.h"
 
-extern CGame* g_pGame;
-// Helper function so we dont clutter the code with the preporecessor
-static bool IsOOPEnabledForVM(lua_State* luaVM)
-{
-    #ifdef MTA_CLIENT
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    #else
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    #endif
-    return pLuaMain && pLuaMain->IsOOPEnabled();
-}
-
-template<class T>
-static const char* GetClassNameIfOOPEnabled(lua_State* luaVM, T* object)
-{
-    return IsOOPEnabledForVM(luaVM) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
-}
-
 // Lua push/pop macros for our datatypes
 CElement* lua_toelement(lua_State* luaVM, int iArgument)
 {
