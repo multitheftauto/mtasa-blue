@@ -99,7 +99,7 @@ int CLuaResourceDefs::Call(lua_State* luaVM)
                 lua_pop(targetLuaVM, 1);
 
                 // Set the new values for the current sourceResource, and sourceResourceRoot
-                lua_pushresource(targetLuaVM, pThisResource);
+                lua_pushobject(targetLuaVM, pThisResource);
                 lua_setglobal(targetLuaVM, "sourceResource");
 
                 lua_pushelement(targetLuaVM, pThisResource->GetResourceEntity());
@@ -150,7 +150,7 @@ int CLuaResourceDefs::GetThisResource(lua_State* luaVM)
         CResource* pThisResource = pLuaMain->GetResource();
         if (pThisResource)
         {
-            lua_pushresource(luaVM, pThisResource);
+            lua_pushobject(luaVM, pThisResource);
             return 1;
         }
     }
@@ -263,7 +263,7 @@ int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
         CResource* pResource = m_pResourceManager->GetResource(strResourceName);
         if (pResource)
         {
-            lua_pushresource(luaVM, pResource);
+            lua_pushobject(luaVM, pResource);
             return 1;
         }
     }

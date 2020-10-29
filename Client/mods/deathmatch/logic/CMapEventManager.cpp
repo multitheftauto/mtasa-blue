@@ -219,7 +219,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     CResource* pSourceResource = pLuaMain ? pLuaMain->GetResource() : NULL;
                     if (pSourceResource)
                     {
-                        lua_pushresource(pState, pSourceResource);
+                        lua_pushobject(pState, pSourceResource);
                         lua_setglobal(pState, "sourceResource");
 
                         lua_pushelement(pState, pSourceResource->GetResourceDynamicEntity());

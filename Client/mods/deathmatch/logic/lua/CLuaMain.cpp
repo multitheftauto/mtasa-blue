@@ -171,7 +171,7 @@ void CLuaMain::InitVM()
     lua_pushelement(m_luaVM, g_pClientGame->GetRootEntity());
     lua_setglobal(m_luaVM, "root");
 
-    lua_pushresource(m_luaVM, m_pResource);
+    lua_pushobject(m_luaVM, m_pResource);
     lua_setglobal(m_luaVM, "resource");
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceEntity());
