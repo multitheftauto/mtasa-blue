@@ -72,31 +72,43 @@ void lua_pushobject(lua_State* luaVM, T* object)
     static_assert(!std::is_pointer_v<T> && !std::is_reference_v<T>, "T must be an object, not a pointer to a pointer, or something..");
 
     const auto push = [luaVM, object](const auto& value) {
-        lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, object), (void*)reinterpret_cast<unsigned int*>(value))
+    #ifdef MTA_CLIENT
+        CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    #else
+        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    #endif
+        const auto className = (pLuaMain && pLuaMain->IsOOPEnabled()) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
+        lua_pushobject(luaVM, className, (void*)reinterpret_cast<unsigned int*>(value));
     };
+
+#ifdef MTA_CLIENT
+    using Element_t = CClientEntity;
+#else
+    using Element_t = CElement;
+#endif
 
     using Decayed_t = std::decay_t<T>;
     if constexpr (std::is_same_v<CXMLNode, Decayed_t>)
         push(object->GetID());
-
-    else if constexpr (std::is_same_v<CDbJobData, Decayed_t>)
-        push(object->GetId());
-
-    else if constexpr (std::is_base_of_v<CElement, Decayed_t>) // Handle types that derive from CElement
+    else if constexpr (std::is_base_of_v<Element_t, Decayed_t>) // Handle types that derive from 
     {
-        if (object->IsBeingDeleted())
+        auto element = static_cast<Element_t*>(object);
+        if (element->IsBeingDeleted())
             lua_pushboolean(luaVM, false);
-        else if (const auto ID = object->GetID(); ID != INVALID_ELEMENT_ID)
+        else if (const auto ID = element->GetID(); ID != INVALID_ELEMENT_ID)
             push(ID.Value());
         else
             lua_pushnil(luaVM); // Invalid element ID
     }
 #ifndef MTA_CLIENT
+    else if constexpr (std::is_same_v<CDbJobData, Decayed_t>)
+        push(object->GetId());
+
     else if constexpr (std::is_base_of_v<CClient, Decayed_t>) // Handle types deriving from CClient (such as CPlayer)
         lua_pushobject<CElement>(luaVM, static_cast<CClient*>(object)->GetElement()); // Get the underlaying element, and call us
 #endif
     else // Everything else should work with this. If not just add an std::is_same_v before this
-        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetScriptID()));
+        push(object->GetScriptID());
 }
 
 // Internal use

@@ -98,39 +98,6 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
     lua_setmetatable(luaVM, -2);            // element
 }
 
-template<class T>
-void lua_pushobject(lua_State* luaVM, T* object)
-{
-    static_assert(!std::is_pointer_v<T> && !std::is_reference_v<T>, "T must be an object, not a pointer to a pointer, or something..");
-
-    const auto push = [luaVM, object](const auto& value) {
-        lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, object), (void*)reinterpret_cast<unsigned int*>(value))
-    };
-
-    using Decayed_t = std::decay_t<T>;
-    if constexpr (std::is_same_v<CXMLNode, Decayed_t>)
-        push(object->GetID());
-
-    else if constexpr (std::is_same_v<CDbJobData, Decayed_t>)
-        push(object->GetId());
-
-    else if constexpr (std::is_base_of_v<CElement, Decayed_t>) // Handle types that derive from CElement
-    {
-        if (object->IsBeingDeleted())
-            lua_pushboolean(luaVM, false);
-        else if (const auto ID = object->GetID(); ID != INVALID_ELEMENT_ID)
-            push(ID.Value());
-        else
-            lua_pushnil(luaVM); // Invalid element ID
-    }
-#ifndef MTA_CLIENT
-    else if constexpr (std::is_base_of_v<CClient, Decayed_t>) // Handle types deriving from CClient (such as CPlayer)
-        lua_pushobject<CElement>(luaVM, static_cast<CClient*>(object)->GetElement()); // Get the underlaying element, and call us
-#endif
-    else // Everything else should work with this. If not just add an std::is_same_v before this
-        lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(object->GetScriptID()));
-}
-
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
 #ifdef MTA_CLIENT
