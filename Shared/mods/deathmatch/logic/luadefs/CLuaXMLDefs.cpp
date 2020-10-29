@@ -119,7 +119,7 @@ int CLuaXMLDefs::xmlCreateFile(lua_State* luaVM)
                         CXMLNode* pRootNode = xmlFile->CreateRootNode(strRootNodeName);
                         if (pRootNode)
                         {
-                            lua_pushxmlnode(luaVM, pRootNode);
+                            lua_pushobject(luaVM, pRootNode);
                             return 1;
                         }
                         // Destroy it if we failed
@@ -187,7 +187,7 @@ int CLuaXMLDefs::xmlLoadFile(lua_State* luaVM)
                             if (pRootNode)
                             {
                                 // Return the root node
-                                lua_pushxmlnode(luaVM, pRootNode);
+                                lua_pushobject(luaVM, pRootNode);
                                 return 1;
                             }
                         }
@@ -232,7 +232,7 @@ int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
 
         if (rootNode && rootNode->IsValid())
         {
-            lua_pushxmlnode(luaVM, rootNode);
+            lua_pushobject(luaVM, rootNode);
             return 1;
         }
         else
@@ -305,7 +305,7 @@ int CLuaXMLDefs::xmlCopyFile(lua_State* luaVM)
                                 // Copy the stuff from the given source node to the destination root
                                 if (pSourceNode->CopyChildrenInto(pNewRoot, true))
                                 {
-                                    lua_pushxmlnode(luaVM, pNewRoot);
+                                    lua_pushobject(luaVM, pNewRoot);
                                     return 1;
                                 }
                             }
@@ -395,7 +395,7 @@ int CLuaXMLDefs::xmlCreateChild(lua_State* luaVM)
         CXMLNode* pXMLSubNode = pNode->CreateSubNode(strChildName);
         if (pXMLSubNode)
         {
-            lua_pushxmlnode(luaVM, pXMLSubNode);
+            lua_pushobject(luaVM, pXMLSubNode);
             return 1;
         }
     }
@@ -450,7 +450,7 @@ int CLuaXMLDefs::xmlNodeFindChild(lua_State* luaVM)
         CXMLNode* pFoundNode = pNode->FindSubNode(strTagName, uiIndex);
         if (pFoundNode)
         {
-            lua_pushxmlnode(luaVM, pFoundNode);
+            lua_pushobject(luaVM, pFoundNode);
             return 1;
         }
     }
@@ -478,7 +478,7 @@ int CLuaXMLDefs::xmlNodeGetChildren(lua_State* luaVM)
             CXMLNode* pFoundNode = pNode->GetSubNode(uiIndex);
             if (pFoundNode)
             {
-                lua_pushxmlnode(luaVM, pFoundNode);
+                lua_pushobject(luaVM, pFoundNode);
                 return 1;
             }
         }
@@ -489,7 +489,7 @@ int CLuaXMLDefs::xmlNodeGetChildren(lua_State* luaVM)
             for (auto iter = pNode->ChildrenBegin(); iter != pNode->ChildrenEnd(); ++iter)
             {
                 lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushxmlnode(luaVM, *iter);
+                lua_pushobject(luaVM, *iter);
                 lua_settable(luaVM, -3);
             }
             return 1;
@@ -513,7 +513,7 @@ int CLuaXMLDefs::xmlNodeGetParent(lua_State* luaVM)
         CXMLNode* pParent = pNode->GetParent();
         if (pParent)
         {
-            lua_pushxmlnode(luaVM, pParent);
+            lua_pushobject(luaVM, pParent);
             return 1;
         }
     }

@@ -296,7 +296,7 @@ int CLuaResourceDefs::addResourceMap(lua_State* luaVM)
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap(pResource, strPath, strMetaName, usDimension, pLUA);
                         if (pXMLNode)
                         {
-                            lua_pushxmlnode(luaVM, pXMLNode);
+                            lua_pushobject(luaVM, pXMLNode);
                             return 1;
                         }
                     }
@@ -359,7 +359,7 @@ int CLuaResourceDefs::addResourceConfig(lua_State* luaVM)
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig(pResource, strPath, strConfigName, iType, pLUA);
                         if (pXMLNode)
                         {
-                            lua_pushxmlnode(luaVM, pXMLNode);
+                            lua_pushobject(luaVM, pXMLNode);
                             return 1;
                         }
                     }
@@ -810,7 +810,7 @@ int CLuaResourceDefs::getResourceConfig(lua_State* luaVM)
                     if (!pRootNode)
                         continue;
 
-                    lua_pushxmlnode(luaVM, pRootNode);
+                    lua_pushobject(luaVM, pRootNode);
                     return 1;
                 }
             }

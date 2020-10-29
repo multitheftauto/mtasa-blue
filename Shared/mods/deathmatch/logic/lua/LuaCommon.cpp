@@ -125,7 +125,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, NULL))
         return lua_pushresource(luaVM, pResource);
     else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, NULL))
-        return lua_pushxmlnode(luaVM, pNode);
+        return lua_pushobject(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
     else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))

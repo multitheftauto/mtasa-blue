@@ -201,7 +201,7 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
                             CXMLNode*            pNode = pConfig->GetRoot();
                             if (pNode)
                             {
-                                lua_pushxmlnode(luaVM, pNode);
+                                lua_pushobject(luaVM, pNode);
                                 return 1;
                             }
                         }
