@@ -431,7 +431,8 @@ void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* set
 #else
             return pFn->GetAddress();
 #endif
-        dassert("lua_classvariable function does not exist" && 0);     
+        dassert("lua_classvariable function does not exist" && 0);
+        return nullptr;
     };
 
     if (lua_CFunction pFnSet = getAddress(set), pFnGet = getAddress(get); pFnGet || pFnSet)
