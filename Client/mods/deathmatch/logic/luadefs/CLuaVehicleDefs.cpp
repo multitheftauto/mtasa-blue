@@ -711,7 +711,7 @@ int CLuaVehicleDefs::OOP_GetVehicleTurnVelocity(lua_State* luaVM)
         CVector vecTurnVelocity;
         pVehicle->GetTurnSpeed(vecTurnVelocity);
 
-        lua_pushvector(luaVM, vecTurnVelocity);
+        lua_pushobject(luaVM, vecTurnVelocity);
         return 1;
     }
     else
@@ -2399,7 +2399,7 @@ int CLuaVehicleDefs::OOP_GetVehicleGravity(lua_State* luaVM)
         CVector vecGravity;
         pVehicle->GetGravity(vecGravity);
 
-        lua_pushvector(luaVM, vecGravity);
+        lua_pushobject(luaVM, vecGravity);
         return 1;
     }
     else
@@ -3236,7 +3236,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentPosition(lua_State* luaVM)
             }
             else
             {
-                lua_pushvector(luaVM, vecPosition);
+                lua_pushobject(luaVM, vecPosition);
                 return 1;
             }
         }
@@ -3339,7 +3339,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentRotation(lua_State* luaVM)
             }
             else
             {
-                lua_pushvector(luaVM, vecRotation);
+                lua_pushobject(luaVM, vecRotation);
                 return 1;
             }
         }
@@ -3425,7 +3425,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentScale(lua_State* luaVM)
         CVector vecScale;
         if (pVehicle->GetComponentScale(strComponent, vecScale, outputBase))
         {
-            lua_pushvector(luaVM, vecScale);
+            lua_pushobject(luaVM, vecScale);
             return 1;
         }
     }
@@ -3953,7 +3953,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 
         if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
         {
-            lua_pushvector(luaVM, vecPosition);
+            lua_pushobject(luaVM, vecPosition);
             return 3;
         }
     }
@@ -4030,7 +4030,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 
         if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
         {
-            lua_pushvector(luaVM, vecPosition);
+            lua_pushobject(luaVM, vecPosition);
             return 1;
         }
     }

@@ -1939,7 +1939,7 @@ int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
         case eObjectGroup::Modifiable::BREAKVELOCITY:
         {
             CVector vecValue = g_GroupPropertiesGettersVector[eProperty](pGroup);
-            lua_pushvector(luaVM, vecValue);
+            lua_pushobject(luaVM, vecValue);
             return 1;
         }
         case eObjectGroup::Modifiable::COLDAMAGEEFFECT:

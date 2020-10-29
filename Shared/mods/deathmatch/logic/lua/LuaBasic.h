@@ -103,19 +103,19 @@ namespace lua
 
     inline int Push(lua_State* L, const CVector2D& value)
     {
-        lua_pushvector(L, value);
+        lua_pushobject(L, value);
         return 1;
     }
 
     inline int Push(lua_State* L, const CVector& value)
     {
-        lua_pushvector(L, value);
+        lua_pushobject(L, value);
         return 1;
     }
 
     inline int Push(lua_State* L, const CVector4D& value)
     {
-        lua_pushvector(L, value);
+        lua_pushobject(L, value);
         return 1;
     }
 

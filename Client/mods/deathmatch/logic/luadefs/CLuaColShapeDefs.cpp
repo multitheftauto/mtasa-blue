@@ -502,13 +502,13 @@ int CLuaColShapeDefs::OOP_GetColShapeSize(lua_State* luaVM)
         case COLSHAPE_RECTANGLE:
         {
             CVector2D size = static_cast<CClientColRectangle*>(pColShape)->GetSize();
-            lua_pushvector(luaVM, size);
+            lua_pushobject(luaVM, size);
             return 1;
         }
         case COLSHAPE_CUBOID:
         {
             CVector size = static_cast<CClientColCuboid*>(pColShape)->GetSize();
-            lua_pushvector(luaVM, size);
+            lua_pushobject(luaVM, size);
             return 1;
         }
         case COLSHAPE_TUBE:
@@ -631,7 +631,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
         for (auto iter = pColPolygon->IterBegin(); iter != pColPolygon->IterEnd(); ++iter)
         {
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushvector(luaVM, *iter);
+            lua_pushobject(luaVM, *iter);
             lua_settable(luaVM, -3);
         }
         return 1;
@@ -691,7 +691,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPointPosition(lua_State* luaVM)
         CVector2D          vecPoint;
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
-            lua_pushvector(luaVM, vecPoint);
+            lua_pushobject(luaVM, vecPoint);
         }
         else
         {

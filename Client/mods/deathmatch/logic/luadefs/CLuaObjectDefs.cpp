@@ -270,7 +270,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
 
                 CVector vecCenter;
                 pObject->GetCenterOfMass(vecCenter);
-                lua_pushvector(luaVM, vecCenter);
+                lua_pushobject(luaVM, vecCenter);
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_CENTEROFMASS));
 
                 lua_pushnumber(luaVM, pObject->GetBuoyancyConstant());

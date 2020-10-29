@@ -283,7 +283,7 @@ int CLuaSearchLightDefs::OOP_GetSearchLightStartPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pSearchLight->GetStartPosition());
+        lua_pushobject(luaVM, pSearchLight->GetStartPosition());
         return 1;
     }
     else
@@ -303,7 +303,7 @@ int CLuaSearchLightDefs::OOP_GetSearchLightEndPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pSearchLight->GetEndPosition());
+        lua_pushobject(luaVM, pSearchLight->GetEndPosition());
         return 1;
     }
     else

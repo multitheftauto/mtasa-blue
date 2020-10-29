@@ -586,7 +586,7 @@ int CLuaElementDefs::OOP_getElementPosition(lua_State* luaVM)
     {
         CVector vector = pElement->GetPosition();
 
-        lua_pushvector(luaVM, vector);
+        lua_pushobject(luaVM, vector);
         return 1;
     }
     else
@@ -745,7 +745,7 @@ int CLuaElementDefs::OOP_getElementRotation(lua_State* luaVM)
         vecRotation = matrix.GetRotation();
         ConvertRadiansToDegrees(vecRotation);
 
-        lua_pushvector(luaVM, vecRotation);
+        lua_pushobject(luaVM, vecRotation);
         return 1;
     }
     else
@@ -795,7 +795,7 @@ int CLuaElementDefs::OOP_getElementVelocity(lua_State* luaVM)
         CVector vecVelocity;
         CStaticFunctionDefinitions::GetElementVelocity(pElement, vecVelocity);
 
-        lua_pushvector(luaVM, vecVelocity);
+        lua_pushobject(luaVM, vecVelocity);
         return 1;
     }
     else
@@ -845,7 +845,7 @@ int CLuaElementDefs::OOP_getElementTurnVelocity(lua_State* luaVM)
         CVector vecTurnVelocity;
         CStaticFunctionDefinitions::GetElementTurnVelocity(pElement, vecTurnVelocity);
 
-        lua_pushvector(luaVM, vecTurnVelocity);
+        lua_pushobject(luaVM, vecTurnVelocity);
         return 1;
     }
     else

@@ -164,7 +164,7 @@ int CLuaRadarAreaDefs::OOP_GetRadarAreaSize(lua_State* luaVM)
         CVector2D vecSize;
         if (CStaticFunctionDefinitions::GetRadarAreaSize(pRadarArea, vecSize))
         {
-            lua_pushvector(luaVM, vecSize);
+            lua_pushobject(luaVM, vecSize);
             return 1;
         }
     }

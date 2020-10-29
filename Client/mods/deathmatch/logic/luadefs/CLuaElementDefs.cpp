@@ -468,7 +468,7 @@ int CLuaElementDefs::OOP_GetElementPosition(lua_State* luaVM)
         CVector vecPosition;
         pEntity->GetPosition(vecPosition);
 
-        lua_pushvector(luaVM, vecPosition);
+        lua_pushobject(luaVM, vecPosition);
         return 1;
     }
     else
@@ -525,7 +525,7 @@ int CLuaElementDefs::OOP_GetElementRotation(lua_State* luaVM)
         vecRotation = matrix.GetRotation();
         ConvertRadiansToDegrees(vecRotation);
 
-        lua_pushvector(luaVM, vecRotation);
+        lua_pushobject(luaVM, vecRotation);
         return 1;
     }
     else
@@ -575,7 +575,7 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
         CVector vecVelocity;
         CStaticFunctionDefinitions::GetElementVelocity(*pEntity, vecVelocity);
 
-        lua_pushvector(luaVM, vecVelocity);
+        lua_pushobject(luaVM, vecVelocity);
         return 1;
     }
     else
@@ -625,7 +625,7 @@ int CLuaElementDefs::OOP_GetElementTurnVelocity(lua_State* luaVM)
         CVector vecTurnVelocity;
         CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity);
 
-        lua_pushvector(luaVM, vecTurnVelocity);
+        lua_pushobject(luaVM, vecTurnVelocity);
         return 1;
     }
     else
@@ -1049,8 +1049,8 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
             }
             else
             {
-                lua_pushvector(luaVM, vecMin);
-                lua_pushvector(luaVM, vecMax);
+                lua_pushobject(luaVM, vecMin);
+                lua_pushobject(luaVM, vecMax);
                 return 2;
             }
         }

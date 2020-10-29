@@ -129,11 +129,11 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pTimer);
     else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua_pushobject(luaVM, *pVector);
     else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua_pushobject(luaVM, *pVector);
     else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua_pushobject(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, *pMatrix);
     else if (CAccount* pAccount = UserDataCast<CAccount>((CAccount*)NULL, pData, luaVM))
@@ -154,21 +154,21 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     lua_pushobject(luaVM, NULL, pData);
 }
 
-void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
+void lua_pushobject(lua_State* luaVM, const CVector4D& vector)
 {
     CLuaVector4D* pVector = new CLuaVector4D(vector);
     lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
-void lua_pushvector(lua_State* luaVM, const CVector& vector)
+void lua_pushobject(lua_State* luaVM, const CVector& vector)
 {
     CLuaVector3D* pVector = new CLuaVector3D(vector);
     lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
-void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
+void lua_pushobject(lua_State* luaVM, const CVector2D& vector)
 {
     CLuaVector2D* pVector = new CLuaVector2D(vector);
     lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);

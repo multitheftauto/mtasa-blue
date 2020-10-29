@@ -650,7 +650,7 @@ int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
 
     if (pPed->GetShotData(&vecStart))
     {
-        lua_pushvector(luaVM, vecStart);
+        lua_pushobject(luaVM, vecStart);
         return 1;
     }
 
@@ -697,7 +697,7 @@ int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
 
     if (pPed->GetShotData(nullptr, &vecEnd))
     {
-        lua_pushvector(luaVM, vecEnd);
+        lua_pushobject(luaVM, vecEnd);
         return 1;
     }
 
@@ -744,7 +744,7 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     CVector vecCollision;
     if (CStaticFunctionDefinitions::GetPedTargetCollision(*pPed, vecCollision))
     {
-        lua_pushvector(luaVM, vecCollision);
+        lua_pushobject(luaVM, vecCollision);
         return 1;
     }
 
@@ -1088,7 +1088,7 @@ int CLuaPedDefs::OOP_GetPedBonePosition(lua_State* luaVM)
             CVector vecPosition;
             if (CStaticFunctionDefinitions::GetPedBonePosition(*pPed, bone, vecPosition))
             {
-                lua_pushvector(luaVM, vecPosition);
+                lua_pushobject(luaVM, vecPosition);
                 return 1;
             }
         }

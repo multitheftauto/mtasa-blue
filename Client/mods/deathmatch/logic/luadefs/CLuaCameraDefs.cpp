@@ -541,7 +541,7 @@ int CLuaCameraDefs::OOP_GetCameraPosition(lua_State* luaVM)
     CVector vecPosition;
     m_pManager->GetCamera()->GetPosition(vecPosition);
 
-    lua_pushvector(luaVM, vecPosition);
+    lua_pushobject(luaVM, vecPosition);
     return 1;
 }
 
@@ -573,7 +573,7 @@ int CLuaCameraDefs::OOP_GetCameraRotation(lua_State* luaVM)
     CVector vecPosition;
     m_pManager->GetCamera()->GetRotationDegrees(vecPosition);
 
-    lua_pushvector(luaVM, vecPosition);
+    lua_pushobject(luaVM, vecPosition);
     return 1;
 }
 

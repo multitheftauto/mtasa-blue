@@ -1020,7 +1020,7 @@ int CLuaVehicleDefs::OOP_GetVehicleTurnVelocity(lua_State* luaVM)
         CVector vecTurnVelocity;
         if (CStaticFunctionDefinitions::GetVehicleTurnVelocity(pVehicle, vecTurnVelocity))
         {
-            lua_pushvector(luaVM, vecTurnVelocity);
+            lua_pushobject(luaVM, vecTurnVelocity);
             return 1;
         }
     }
@@ -2227,7 +2227,7 @@ int CLuaVehicleDefs::OOP_GetVehicleRespawnRotation(lua_State* luaVM)
         CVector vecRotationDegress;
         if (CStaticFunctionDefinitions::GetVehicleRespawnRotation(pElement, vecRotationDegress))
         {
-            lua_pushvector(luaVM, vecRotationDegress);
+            lua_pushobject(luaVM, vecRotationDegress);
 
             return 1;
         }
@@ -2251,7 +2251,7 @@ int CLuaVehicleDefs::OOP_GetVehicleRespawnPosition(lua_State* luaVM)
         CVector vecPosition;
         if (CStaticFunctionDefinitions::GetVehicleRespawnPosition(pElement, vecPosition))
         {
-            lua_pushvector(luaVM, vecPosition);
+            lua_pushobject(luaVM, vecPosition);
 
             return 1;
         }

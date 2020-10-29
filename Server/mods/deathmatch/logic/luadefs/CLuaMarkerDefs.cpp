@@ -242,7 +242,7 @@ int CLuaMarkerDefs::OOP_GetMarkerTarget(lua_State* luaVM)
         CVector vecPosition;
         if (CStaticFunctionDefinitions::GetMarkerTarget(pMarker, vecPosition))
         {
-            lua_pushvector(luaVM, vecPosition);
+            lua_pushobject(luaVM, vecPosition);
         }
         else
             lua_pushboolean(luaVM, false);

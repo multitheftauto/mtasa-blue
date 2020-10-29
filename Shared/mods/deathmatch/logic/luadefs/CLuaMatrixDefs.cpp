@@ -174,7 +174,7 @@ int CLuaMatrixDefs::TransformPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix1->TransformVector(vector));
+        lua_pushobject(luaVM, pMatrix1->TransformVector(vector));
         return 1;
     }
     else
@@ -198,7 +198,7 @@ int CLuaMatrixDefs::TransformDirection(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, *pMatrix1 * vector);
+        lua_pushobject(luaVM, *pMatrix1 * vector);
         return 1;
     }
     else
@@ -240,7 +240,7 @@ int CLuaMatrixDefs::GetPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vPos);
+        lua_pushobject(luaVM, pMatrix->vPos);
         return 1;
     }
     else
@@ -265,7 +265,7 @@ int CLuaMatrixDefs::GetRotation(lua_State* luaVM)
         vecRotation = pMatrix->GetRotation();
         ConvertRadiansToDegrees(vecRotation);
 
-        lua_pushvector(luaVM, vecRotation);
+        lua_pushobject(luaVM, vecRotation);
         return 1;
     }
     else
@@ -286,7 +286,7 @@ int CLuaMatrixDefs::GetForward(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vFront);
+        lua_pushobject(luaVM, pMatrix->vFront);
         return 1;
     }
     else
@@ -307,7 +307,7 @@ int CLuaMatrixDefs::GetRight(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vRight);
+        lua_pushobject(luaVM, pMatrix->vRight);
         return 1;
     }
     else
@@ -328,7 +328,7 @@ int CLuaMatrixDefs::GetUp(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vUp);
+        lua_pushobject(luaVM, pMatrix->vUp);
         return 1;
     }
     else
