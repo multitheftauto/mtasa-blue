@@ -138,6 +138,32 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     lua_pushobject(luaVM, NULL, (SArrayId)pData);
 }
 
+#ifdef MTA_CLIENT
+void lua_pushobject(lua_State* luaVM, CClientEntity* element)
+#else
+void lua_pushobject(lua_State* luaVM, CElement* element)
+#endif
+{
+    if (element->IsBeingDeleted())
+        lua_pushboolean(luaVM, false);
+    else if (const auto ID = element->GetID(); ID != INVALID_ELEMENT_ID)
+        lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, element), (SArrayId)ID.Value());
+    else
+        lua_pushnil(luaVM); // Invalid element ID
+}
+
+void lua_pushobject(lua_State* luaVM, CXMLNode* node)
+{
+    lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, node), (SArrayId)node->GetID());
+}
+
+#ifndef MTA_CLIENT
+void lua_pushobject(lua_State* luaVM, CDbJobData* jobdata)
+{
+    lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, jobdata), (SArrayId)jobdata->GetId());
+}
+#endif
+
 void lua_pushobject(lua_State* luaVM, const CVector4D& vector)
 {
     CLuaVector4D* pVector = new CLuaVector4D(vector);
