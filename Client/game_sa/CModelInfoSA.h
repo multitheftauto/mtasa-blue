@@ -222,6 +222,20 @@ public:
     CVehicleModelInfoSAInterface* AsVehicleModelInfoPtr() { return reinterpret_cast<CVehicleModelInfoSAInterface*>(this); }
 };
 
+struct CTimeInfoSAInterface
+{
+    CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
+    char  m_nTimeOn;
+    char  m_nTimeOff;
+    short m_wOtherTimeModel;
+};
+
+class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    CTimeInfoSAInterface timeInfo;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
@@ -271,21 +285,23 @@ enum eModelInfoType : unsigned char
 class CModelInfoSA : public CModelInfo
 {
 protected:
-    CBaseModelInfoSAInterface*                                                   m_pInterface;
-    DWORD                                                                        m_dwModelID;
-    DWORD                                                                        m_dwReferences;
-    DWORD                                                                        m_dwPendingInterfaceRef;
-    CColModel*                                                                   m_pCustomColModel;
-    CColModelSAInterface*                                                        m_pOriginalColModelInterface;
-    RpClump*                                                                     m_pCustomClump;
-    static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
-    static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
-    static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
+    CBaseModelInfoSAInterface* m_pInterface;
+    DWORD                      m_dwModelID;
+    DWORD                      m_dwReferences;
+    DWORD                      m_dwPendingInterfaceRef;
+    CColModel*                 m_pCustomColModel;
+    CColModelSAInterface*      m_pOriginalColModelInterface;
+    RpClump*                   m_pCustomClump;
+    
+    static std::map<unsigned short, int>                                               ms_RestreamTxdIDMap;
+    static std::map<DWORD, float>                                                      ms_ModelDefaultLodDistanceMap;
+    static std::map<DWORD, BYTE>                                                       ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleModelDummy::e, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
-    static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
-    bool                                                                         m_bAddedRefForCollision;
-    SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
+    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                      ms_ModelDefaultModelTimeInfo;
+    static std::unordered_map<DWORD, unsigned short>                                   ms_OriginalObjectPropertiesGroups;
+    static std::unordered_map<DWORD, std::pair<float, float>>                          ms_VehicleModelDefaultWheelSizes;
+    bool                                                                               m_bAddedRefForCollision;
+    SVehicleSupportedUpgrades                                                          m_ModelSupportedUpgrades;
 
 public:
     CModelInfoSA();
@@ -334,6 +350,9 @@ public:
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
+    bool           GetTime(char& cHourOn, char& cHourOff);
+    bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
