@@ -68,7 +68,7 @@ template<class T>
 const char* GetClassNameIfOOPEnabled(lua_State* luaVM, T* object)
 {
 #ifdef MTA_CLIENT
-    extern CClientGame* g_pGame;
+    extern CClientGame* g_pClientGame;
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
 #else
     extern CGame* g_pGame;
