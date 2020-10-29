@@ -23,11 +23,6 @@ static bool IsOOPEnabledForVM(lua_State* luaVM)
     return pLuaMain && pLuaMain->IsOOPEnabled();
 }
 
-#ifdef MTA_CLIENT
-using CElement = CCLientEntity;
-#endif
-
-
 // Lua push/pop macros for our datatypes
 CElement* lua_toelement(lua_State* luaVM, int iArgument)
 {
