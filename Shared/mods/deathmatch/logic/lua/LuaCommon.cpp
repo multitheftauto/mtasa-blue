@@ -34,17 +34,19 @@ CElement* lua_toelement(lua_State* luaVM, int iArgument)
     return NULL;
 }
 
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache)
+void lua_pushobject(lua_State* luaVM, const char* szClass, SArrayId id, bool bSkipCache)
 {
+    static_assert(sizeof(void*) >= sizeof(SArrayId));
+
     if (szClass == nullptr)
     {
-        lua_pushlightuserdata(luaVM, pObject);
+        lua_pushlightuserdata(luaVM, (void*)id);
         return;
     }
 
     if (bSkipCache)
     {
-        *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
+        *(SArrayId*)lua_newuserdata(luaVM, sizeof(SArrayId)) = id;
     }
     else
     {
@@ -55,7 +57,7 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
         assert(lua_istable(luaVM, -1));
 
         // First we want to check if we have a userdata for this already
-        lua_pushlightuserdata(luaVM, pObject);
+        lua_pushlightuserdata(luaVM, (void*)id);
         lua_rawget(luaVM, -2);
 
         if (lua_isnil(luaVM, -1))
@@ -63,10 +65,10 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
             lua_pop(luaVM, 1);
 
             // we don't have it, create it
-            *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
+            *(SArrayId*)lua_newuserdata(luaVM, sizeof(SArrayId)) = id;
 
             // save in ud table
-            lua_pushlightuserdata(luaVM, pObject);
+            lua_pushlightuserdata(luaVM, (void*)id);
             lua_pushvalue(luaVM, -2);
             lua_rawset(luaVM, -4);
         }
@@ -133,34 +135,34 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CDbJobData* pQuery = UserDataCast<CDbJobData>((CDbJobData*)NULL, pData, luaVM))
         return lua_pushobject(luaVM, pQuery);
 #endif
-    lua_pushobject(luaVM, NULL, pData);
+    lua_pushobject(luaVM, NULL, (SArrayId)pData);
 }
 
 void lua_pushobject(lua_State* luaVM, const CVector4D& vector)
 {
     CLuaVector4D* pVector = new CLuaVector4D(vector);
-    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
+    lua_pushobject(luaVM, "Vector4", pVector->GetScriptID(), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushobject(lua_State* luaVM, const CVector& vector)
 {
     CLuaVector3D* pVector = new CLuaVector3D(vector);
-    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
+    lua_pushobject(luaVM, "Vector3", pVector->GetScriptID(), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushobject(lua_State* luaVM, const CVector2D& vector)
 {
     CLuaVector2D* pVector = new CLuaVector2D(vector);
-    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
+    lua_pushobject(luaVM, "Vector2", pVector->GetScriptID(), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushobject(lua_State* luaVM, const CMatrix& matrix)
 {
     CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
-    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
+    lua_pushobject(luaVM, "Matrix", pMatrix->GetScriptID(), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
