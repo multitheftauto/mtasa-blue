@@ -138,60 +138,6 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     lua_pushobject(luaVM, NULL, (SArrayId)pData);
 }
 
-#ifdef MTA_CLIENT
-void lua_pushobject(lua_State* luaVM, CClientEntity* element)
-#else
-void lua_pushobject(lua_State* luaVM, CElement* element)
-#endif
-{
-    if (element->IsBeingDeleted())
-        lua_pushboolean(luaVM, false);
-    else if (const auto ID = element->GetID(); ID != INVALID_ELEMENT_ID)
-        lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, element), (SArrayId)ID.Value());
-    else
-        lua_pushnil(luaVM); // Invalid element ID
-}
-
-void lua_pushobject(lua_State* luaVM, CXMLNode* node)
-{
-    lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, node), (SArrayId)node->GetID());
-}
-
-#ifndef MTA_CLIENT
-void lua_pushobject(lua_State* luaVM, CDbJobData* jobdata)
-{
-    lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, jobdata), (SArrayId)jobdata->GetId());
-}
-#endif
-
-void lua_pushobject(lua_State* luaVM, const CVector4D& vector)
-{
-    CLuaVector4D* pVector = new CLuaVector4D(vector);
-    lua_pushobject(luaVM, "Vector4", pVector->GetScriptID(), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-void lua_pushobject(lua_State* luaVM, const CVector& vector)
-{
-    CLuaVector3D* pVector = new CLuaVector3D(vector);
-    lua_pushobject(luaVM, "Vector3", pVector->GetScriptID(), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-void lua_pushobject(lua_State* luaVM, const CVector2D& vector)
-{
-    CLuaVector2D* pVector = new CLuaVector2D(vector);
-    lua_pushobject(luaVM, "Vector2", pVector->GetScriptID(), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-void lua_pushobject(lua_State* luaVM, const CMatrix& matrix)
-{
-    CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
-    lua_pushobject(luaVM, "Matrix", pMatrix->GetScriptID(), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
 void lua_initclasses(lua_State* luaVM)
 {
     lua_newtable(luaVM);
@@ -418,3 +364,57 @@ void lua_classmetamethod(lua_State* luaVM, const char* szName, lua_CFunction fn)
         lua_rawset(luaVM, -3);
     }
 }
+
+void lua_pushobject(lua_State* luaVM, const CVector4D& vector)
+{
+    CLuaVector4D* pVector = new CLuaVector4D(vector);
+    lua_pushobject(luaVM, "Vector4", pVector->GetScriptID(), true);
+    lua_addtotalbytes(luaVM, sizeof(CLuaVector4D) + sizeof(void*) + 4);
+}
+
+void lua_pushobject(lua_State* luaVM, const CVector& vector)
+{
+    CLuaVector3D* pVector = new CLuaVector3D(vector);
+    lua_pushobject(luaVM, "Vector3", pVector->GetScriptID(), true);
+    lua_addtotalbytes(luaVM, sizeof(CLuaVector3D) + sizeof(void*) + 4);
+}
+
+void lua_pushobject(lua_State* luaVM, const CVector2D& vector)
+{
+    CLuaVector2D* pVector = new CLuaVector2D(vector);
+    lua_pushobject(luaVM, "Vector2", pVector->GetScriptID(), true);
+    lua_addtotalbytes(luaVM, sizeof(CLuaVector2D) + sizeof(void*) + 4);
+}
+
+void lua_pushobject(lua_State* luaVM, const CMatrix& matrix)
+{
+    CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
+    lua_pushobject(luaVM, "Matrix", pMatrix->GetScriptID(), true);
+    lua_addtotalbytes(luaVM, sizeof(CLuaMatrix) + sizeof(void*) + 4);
+}
+
+void lua_pushobject(lua_State* luaVM, CXMLNode* node)
+{
+    lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, node), (SArrayId)node->GetID());
+}
+
+#ifdef MTA_CLIENT
+void lua_pushobject(lua_State* luaVM, CClientEntity* element)
+#else
+void lua_pushobject(lua_State* luaVM, CElement* element)
+#endif
+{
+    if (element->IsBeingDeleted())
+        lua_pushboolean(luaVM, false);
+    else if (const auto ID = element->GetID(); ID != INVALID_ELEMENT_ID)
+        lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, element), (SArrayId)ID.Value());
+    else
+        lua_pushnil(luaVM); // Invalid element ID
+}
+
+#ifndef MTA_CLIENT
+void lua_pushobject(lua_State* luaVM, CDbJobData* jobdata)
+{
+    lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, jobdata), (SArrayId)jobdata->GetId());
+}
+#endif

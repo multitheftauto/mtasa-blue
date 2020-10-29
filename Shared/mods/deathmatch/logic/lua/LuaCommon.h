@@ -97,27 +97,8 @@ void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szA
 #endif
 
 // This one should only be used in LuaCommon
-void lua_pushobject(lua_State* luaVM, const char* szClass, SArrayId id, bool bSkipCache = false);
-
-// Public use:
-#ifdef MTA_CLIENT
-CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
-#else
-// Lua pop macros for our datatypes
-class CElement* lua_toelement(lua_State* luaVM, int iArgument);
-void lua_pushobject(lua_State* luaVM, CElement* element);
-void lua_pushobject(lua_State* luaVM, CDbJobData* jobdata);
-#endif
-
 void lua_pushuserdata(lua_State* luaVM, void* value);
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
-
 void lua_pushobject(lua_State* luaVM, const char* szClass, SArrayId id, bool bSkipCache = false);
-void lua_pushobject(lua_State* luaVM, const CVector2D& vector);
-void lua_pushobject(lua_State* luaVM, const CVector& vector);
-void lua_pushobject(lua_State* luaVM, const CVector4D& vector);
-void lua_pushobject(lua_State* luaVM, const CMatrix& matrix);
-void lua_pushobject(lua_State* luaVM, CXMLNode* node);
 
 // Only disable for CElement/CClientEntity as it needs special handling
 // Everything else will call the reload anyways, because it'll fail here (because it doesnt have `GetScriptID()`)
@@ -131,6 +112,19 @@ void lua_pushobject(lua_State* luaVM, T* object)
     static_assert(!std::is_pointer_v<T> && !std::is_reference_v<T>, "T must be an object, not a pointer to a pointer, or something..");
     lua_pushobject(luaVM, GetClassNameIfOOPEnabled(luaVM, object), (SArrayId)object->GetScriptID());
 }
+
+void lua_pushobject(lua_State* luaVM, CXMLNode* node);
+void lua_pushobject(lua_State* luaVM, const CVector4D& vector);
+void lua_pushobject(lua_State* luaVM, const CVector& vector);
+void lua_pushobject(lua_State* luaVM, const CVector2D& vector);
+void lua_pushobject(lua_State* luaVM, const CMatrix& matrix);
+
+#ifdef MTA_CLIENT
+void lua_pushobject(lua_State* luaVM, CClientEntity* element);
+#else
+void lua_pushobject(lua_State* luaVM, CDbJobData* jobdata);
+void lua_pushobject(lua_State* luaVM, CElement* element);
+#endif
 // Include the RPC functions enum
 #include "net/rpc_enums.h"
 
