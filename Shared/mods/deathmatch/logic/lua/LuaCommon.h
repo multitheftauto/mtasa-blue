@@ -60,12 +60,7 @@ void lua_pushobject(lua_State* luaVM, T* object);
 void lua_pushuserdata(lua_State* luaVM, void* value);
 void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
 
-#ifdef MTA_CLIENT
-void lua_pushobject(lua_State* luaVM, CClientEntity* player);
-#else
-void lua_pushobject(lua_State* luaVM, CElement* player);
-void lua_pushobject(lua_State* luaVM, CPlayer* player);
-#endif
+void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
 void lua_pushobject(lua_State* luaVM, const CVector2D& vector);
 void lua_pushobject(lua_State* luaVM, const CVector& vector);
 void lua_pushobject(lua_State* luaVM, const CVector4D& vector);

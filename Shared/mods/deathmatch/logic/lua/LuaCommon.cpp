@@ -52,7 +52,7 @@ CElement* lua_toelement(lua_State* luaVM, int iArgument)
     return NULL;
 }
 
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false)
+void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache)
 {
     if (szClass == nullptr)
     {
