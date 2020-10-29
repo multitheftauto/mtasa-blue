@@ -18,12 +18,23 @@ extern "C"
     #include "lauxlib.h"
 }
 
-CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
+#include "CIdArray.h"
+#include <type_traits>
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+
+// Public use:
+
+// Predeclarations of our classes
+class CLuaTimer;
+class CResource;
+class CXMLNode;
+class CLuaMatrix;
+class CLuaVector2D;
+class CLuaVector3D;
+class CLuaVector4D;
 
 #ifdef MTA_CLIENT
-// Predeclarations of our classes
+class CClientEntity;
 class CClientColModel;
 class CClientColShape;
 class CScriptFile;
@@ -43,20 +54,57 @@ class CClientWater;
 class CClientWeapon;
 class CClientRadarArea;
 class CClientPointLights;
-class CLuaTimer;
-class CResource;
-class CXMLNode;
 
-// Lua pop macros for our datatypes
-class CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
 #else
-// Lua pop macros for our datatypes
-class CElement* lua_toelement(lua_State* luaVM, int iArgument);
+class CElement;
+class CDbJobData;
+class CClient;
 #endif
 
-// Lua push macros for our datatypes
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+
+// Internal use functions
 template<class T>
-void lua_pushobject(lua_State* luaVM, T* object);
+const char* GetClassNameIfOOPEnabled(lua_State* luaVM, T* object)
+{
+#ifdef MTA_CLIENT
+    extern CClientGame* g_pGame;
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#else
+    extern CGame* g_pGame;
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#endif
+    return (pLuaMain && pLuaMain->IsOOPEnabled()) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
+}
+
+// Lua class things - creating a class, etc.. -
+void lua_initclasses(lua_State* luaVM);
+
+void lua_newclass(lua_State* luaVM);
+void lua_getclass(lua_State* luaVM, const char* szName);
+void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParent = NULL, bool bRegisterWithEnvironment = true);
+void lua_registerstaticclass(lua_State* luaVM, const char* szName);
+void lua_classfunction(lua_State* luaVM, const char* szFunction, const char* fn);
+void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* set, const char* get);
+void lua_classmetamethod(lua_State* luaVM, const char* szName, lua_CFunction fn);
+
+#ifdef MTA_CLIENT
+void lua_classfunction(lua_State* luaVM, const char* szFunction, lua_CFunction fn);
+void lua_classvariable(lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get);
+#else
+void lua_classfunction(lua_State* luaVM, const char* szFunction, const char* szACLName, lua_CFunction fn);
+void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szACLNameSet, const char* szACLNameGet, lua_CFunction set, lua_CFunction get, bool bACLIgnore = true);
+#endif
+
+// This one should only be used in LuaCommon
+void lua_pushobject(lua_State* luaVM, const char* szClass, SArrayId id, bool bSkipCache = false);
+
+// Public use:
+#ifdef MTA_CLIENT
+CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
+#else
+CElement* lua_toelement(lua_State* luaVM, int iArgument);
+#endif
 
 void lua_pushuserdata(lua_State* luaVM, void* value);
 void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
