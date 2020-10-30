@@ -22,6 +22,9 @@ extern "C"
 #include "luadefs/CLuaClassDefs.h"
 #include <type_traits>
 
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+
+CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 // Public use:
 
 // Predeclarations of our classes
@@ -60,8 +63,6 @@ class CElement;
 class CDbJobData;
 class CClient;
 #endif
-
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
 
 // Internal use functions
 template<class T>
