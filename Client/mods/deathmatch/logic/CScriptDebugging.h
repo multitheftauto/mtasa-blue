@@ -14,7 +14,7 @@
 #include <list>
 #include <stdio.h>
 
-#include "lua/LuaCommon.h"
+#include "lua/SLuaDebugInfo.h"
 
 class CLuaManager;
 

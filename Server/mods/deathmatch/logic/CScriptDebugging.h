@@ -13,6 +13,7 @@
 
 #include "lua/CLuaManager.h"
 #include "packets/CPacket.h"
+#include <lua/SLuaDebugInfo.h>
 #include <cstdio>
 #include <list>
 

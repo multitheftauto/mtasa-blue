@@ -8,6 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#include <lua/SLuaDebugInfo.h>
 
 class CDatabaseJobQueue;
 typedef uint            SDbConnectionId;

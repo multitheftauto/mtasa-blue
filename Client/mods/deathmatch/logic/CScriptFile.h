@@ -13,6 +13,7 @@
 #include "CClientEntity.h"
 #include <stdio.h>
 #include <string>
+#include <lua/SLuaDebugInfo.h>
 
 class CScriptFile : public CClientEntity
 {

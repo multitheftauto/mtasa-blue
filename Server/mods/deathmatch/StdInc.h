@@ -147,6 +147,7 @@ struct SAclRequest;
 #include "luadefs/CLuaWorldDefs.h"
 
 // Lua includes
+#include "lua/SLuaDebugInfo.h"
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
 #include "CEasingCurve.h"
