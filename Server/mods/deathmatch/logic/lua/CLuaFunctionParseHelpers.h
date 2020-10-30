@@ -11,6 +11,12 @@
 #include "CElementIDs.h"
 #include "CConsoleClient.h"
 
+#include "lua/CLuaMatrix.h"
+#include "lua/CLuaVector2.h"
+#include "lua/CLuaVector3.h"
+#include "lua/CLuaVector4.h"
+
+extern CGame* g_pGame;
 // Forward declare enum reflection stuff
 enum eLuaType
 {
@@ -50,7 +56,7 @@ DECLARE_ENUM(eHudComponent);
 
 // class -> class type
 typedef int        eEntityType;
-inline eEntityType GetClassType(CElement*)
+inline eEntityType GetClassType(class CElement*)
 {
     return -1;
 }
@@ -116,131 +122,131 @@ inline eEntityType GetClassType(class CCustomWeapon*)
 }
 
 // class -> class name
-inline SString GetClassTypeName(CElement*)
+inline SString GetClassTypeName(class CElement*)
 {
     return "element";
 }
-inline SString GetClassTypeName(CClient*)
+inline SString GetClassTypeName(class CClient*)
 {
     return "client";
 }
-inline SString GetClassTypeName(CPlayer*)
+inline SString GetClassTypeName(class CPlayer*)
 {
     return "player";
 }
-inline SString GetClassTypeName(CVehicle*)
+inline SString GetClassTypeName(class CVehicle*)
 {
     return "vehicle";
 }
-inline SString GetClassTypeName(CBlip*)
+inline SString GetClassTypeName(class CBlip*)
 {
     return "blip";
 }
-inline SString GetClassTypeName(CObject*)
+inline SString GetClassTypeName(class CObject*)
 {
     return "object";
 }
-inline SString GetClassTypeName(CPickup*)
+inline SString GetClassTypeName(class CPickup*)
 {
     return "pickup";
 }
-inline SString GetClassTypeName(CRadarArea*)
+inline SString GetClassTypeName(class CRadarArea*)
 {
     return "radararea";
 }
-inline SString GetClassTypeName(CMarker*)
+inline SString GetClassTypeName(class CMarker*)
 {
     return "marker";
 }
-inline SString GetClassTypeName(CTeam*)
+inline SString GetClassTypeName(class CTeam*)
 {
     return "team";
 }
-inline SString GetClassTypeName(CPed*)
+inline SString GetClassTypeName(class CPed*)
 {
     return "ped";
 }
-inline SString GetClassTypeName(CRemoteCall*)
+inline SString GetClassTypeName(class CRemoteCall*)
 {
     return "remotecall";
 }
-inline SString GetClassTypeName(CColShape*) {
+inline SString GetClassTypeName(class CColShape*) {
     return "colshape";
 }
-inline SString GetClassTypeName(CDummy*)
+inline SString GetClassTypeName(class CDummy*)
 {
     return "dummy";
 }
-inline SString GetClassTypeName(CScriptFile*)
+inline SString GetClassTypeName(class CScriptFile*)
 {
     return "scriptfile";
 }
-inline SString GetClassTypeName(CWater*)
+inline SString GetClassTypeName(class CWater*)
 {
     return "water";
 }
-inline SString GetClassTypeName(CDatabaseConnectionElement*)
+inline SString GetClassTypeName(class CDatabaseConnectionElement*)
 {
     return "db-connection";
 }
 
-inline SString GetClassTypeName(CResource*)
+inline SString GetClassTypeName(class CResource*)
 {
     return "resource-data";
 }
-inline SString GetClassTypeName(CXMLNode*)
+inline SString GetClassTypeName(class CXMLNode*)
 {
     return "xml-node";
 }
-inline SString GetClassTypeName(CLuaTimer*)
+inline SString GetClassTypeName(class CLuaTimer*)
 {
     return "lua-timer";
 }
-inline SString GetClassTypeName(CAccount*)
+inline SString GetClassTypeName(class CAccount*)
 {
     return "account";
 }
-inline SString GetClassTypeName(CDbJobData*)
+inline SString GetClassTypeName(class CDbJobData*)
 {
     return "db-query";
 }
-inline SString GetClassTypeName(CAccessControlList*)
+inline SString GetClassTypeName(class CAccessControlList*)
 {
     return "acl";
 }
-inline SString GetClassTypeName(CAccessControlListGroup*)
+inline SString GetClassTypeName(class CAccessControlListGroup*)
 {
     return "acl-group";
 }
-inline SString GetClassTypeName(CCustomWeapon*)
+inline SString GetClassTypeName(class CCustomWeapon*)
 {
     return "weapon";
 }
-inline SString GetClassTypeName(CBan*)
+inline SString GetClassTypeName(class CBan*)
 {
     return "ban";
 }
-inline SString GetClassTypeName(CTextItem*)
+inline SString GetClassTypeName(class CTextItem*)
 {
     return "text-item";
 }
-inline SString GetClassTypeName(CTextDisplay*)
+inline SString GetClassTypeName(class CTextDisplay*)
 {
     return "text-display";
 }
-inline SString GetClassTypeName(CLuaVector2D*)
+inline SString GetClassTypeName(class CLuaVector2D*)
 {
     return "vector2";
 }
-inline SString GetClassTypeName(CLuaVector3D*)
+inline SString GetClassTypeName(class CLuaVector3D*)
 {
     return "vector3";
 }
-inline SString GetClassTypeName(CLuaVector4D*)
+inline SString GetClassTypeName(class CLuaVector4D*)
 {
     return "vector4";
 }
-inline SString GetClassTypeName(CLuaMatrix*)
+inline SString GetClassTypeName(class CLuaMatrix*)
 {
     return "matrix";
 }
