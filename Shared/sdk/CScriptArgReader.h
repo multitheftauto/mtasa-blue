@@ -18,6 +18,8 @@
     #include "CScriptDebugging.h"
 #endif
 
+CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
+
 /////////////////////////////////////////////////////////////////////////
 //
 // CScriptArgReader
