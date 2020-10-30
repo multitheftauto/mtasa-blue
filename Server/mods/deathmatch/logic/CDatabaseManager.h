@@ -8,6 +8,8 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
 #include <lua/SLuaDebugInfo.h>
 
 class CDatabaseJobQueue;
@@ -190,7 +192,7 @@ public:
     virtual ~CDatabaseConnectionElement() {}
 
     // CElement
-    virtual void Unlink() { g_pGame->GetDatabaseManager()->Disconnect(m_Connection); }
+    virtual void Unlink();
 
     // CDatabaseConnectionElement
     SConnectionHandle GetConnectionHandle() { return m_Connection; }

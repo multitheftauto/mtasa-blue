@@ -733,3 +733,10 @@ SString CDbJobData::GetCommandStringForLog()
     }
     return command.strData;
 }
+
+
+void CDatabaseConnectionElement::Unlink()
+{
+    extern CGame* g_pGame;
+    g_pGame->GetDatabaseManager()->Disconnect(m_Connection);
+}

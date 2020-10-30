@@ -180,7 +180,7 @@ protected:
     long long          m_llLastTimeSaved;
     CConnectHistory    m_AccountProtect;
     SDbConnectionId    m_hDbConnection;
-    CDatabaseManager*  m_pDatabaseManager;
+    class CDatabaseManager*  m_pDatabaseManager;
     int                m_iAccounts;
     SString            m_strDbPathFilename;
 };

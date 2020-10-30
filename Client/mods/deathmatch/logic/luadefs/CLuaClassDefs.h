@@ -18,6 +18,8 @@ extern "C"
     #include "lauxlib.h"
 }
 
+#include "CLuaDefs.h"
+
 class CLuaClassDefs : public CLuaDefs
 {
 public:
