@@ -21,6 +21,7 @@ std::map<unsigned short, int>                                         CModelInfo
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
@@ -567,6 +568,51 @@ float CModelInfoSA::GetLODDistance()
         return m_pInterface->fLodDistanceUnscaled;
 
     return 0.0f;
+}
+
+bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+    
+    if (GetModelType() != MODEL_INFO_TYPE_TIME)
+        return false;
+
+    CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
+
+    if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
+        MapSet(ms_ModelDefaultModelTimeInfo, pTime, new CTimeInfoSAInterface(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
+
+    pTime->m_nTimeOn = cHourOn;
+    pTime->m_nTimeOff = cHourOff;
+    return true;
+}
+
+bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    if (GetModelType() != MODEL_INFO_TYPE_TIME)
+        return false;
+
+    CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
+
+    cHourOn = pTime->m_nTimeOn;
+    cHourOff = pTime->m_nTimeOff;
+    return true;
+}
+
+void CModelInfoSA::StaticResetModelTimes()
+{
+    for (auto const& x : ms_ModelDefaultModelTimeInfo)
+    {
+        x.first->m_nTimeOn = x.second->m_nTimeOn;
+        x.first->m_nTimeOff = x.second->m_nTimeOff;
+    }
+    ms_ModelDefaultModelTimeInfo.clear();
 }
 
 float CModelInfoSA::GetOriginalLODDistance()

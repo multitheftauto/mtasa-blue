@@ -141,3 +141,11 @@ CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
 {
     return &ms_aInfoForModel[id];
 }
+
+void CStreamingSA::ReinitStreaming()
+{
+    typedef int(__cdecl * Function_ReInitStreaming)();
+    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
+
+    reinitStreaming();
+}

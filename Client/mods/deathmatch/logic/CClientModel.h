@@ -29,12 +29,12 @@ public:
     CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType);
     ~CClientModel(void);
 
-    int                             GetModelID(void) { return m_iModelID; };
-    eClientModelType                GetModelType(void) { return m_eModelType; };
+    int                             GetModelID(void) const { return m_iModelID; };
+    eClientModelType                GetModelType(void) const { return m_eModelType; };
     bool                            Allocate(void);
     bool                            Deallocate(void);
     void                            SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
-    CResource*                      GetParentResource(void) { return m_pParentResource; }
+    CResource*                      GetParentResource(void) const { return m_pParentResource; }
 
 protected:
     CClientManager* m_pManager;

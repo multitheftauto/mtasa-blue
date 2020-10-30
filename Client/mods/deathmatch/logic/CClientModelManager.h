@@ -13,6 +13,7 @@ class CClientModelManager;
 #pragma once
 
 #include <list>
+#include <vector>
 #include "CClientModel.h"
 
 #define MAX_MODEL_ID 20000
@@ -34,8 +35,12 @@ public:
 
     CClientModel* FindModelByID(int iModelID);
 
+    std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientModelType type, const unsigned int minModelID = 0);
+
+
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
 private:
     CClientModel* m_Models[MAX_MODEL_ID];
+    unsigned int m_modelCount = 0;
 };

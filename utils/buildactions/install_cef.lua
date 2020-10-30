@@ -8,8 +8,8 @@ local CEF_URL_PREFIX = "http://opensource.spotify.com/cefbuilds/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "85.3.9+gb045a6e+chromium-85.0.4183.102"
-local CEF_HASH = "e7c1ef41b09c8de496ad7d0b3ef9220fad0ff10d0714b2251851a0061bd72a59"
+local CEF_VERSION = "86.0.18+gd3ead8b+chromium-86.0.4240.111"
+local CEF_HASH = "f97a1007a08234db0269180df834708ae74dfebb4102c60bb630db88658b6a9d"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
@@ -62,36 +62,35 @@ newaction {
 			CEF_HASH = ""
 		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
-			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.html")
+			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.json")
 			if result_str ~= "OK" or result_code ~= 200 then
 				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
 				return
 			end
 
-			local _, index = resource:find('Windows 32%-bit Builds.-data%-version="')
-			if not index then
-				errormsg("Could not find version string index.")
+			local meta, err = json.decode(resource)
+			if err then
+				errormsg("Could not parse json meta data:", err)
 				return
 			end
 
-			local version = resource:match("(.-)\">", index+1)
-			if not version then
-				errormsg("Could not get version string from index.")
-			end
+			local builds_by_version = table.filter(meta["windows32"]["versions"], function(build) return build.channel == "stable" end)
+			table.sort(builds_by_version, function(a, b) return a.cef_version > b.cef_version end)
+			local latest_build = builds_by_version[1]
 
-			if version == CEF_VERSION then
-				print(("CEF is already up to date (%s)"):format(version))
+			if latest_build.cef_version == CEF_VERSION then
+				print(("CEF is already up to date (%s)"):format(latest_build.cef_version))
 				return
 			end
 
-			io.write(("Does version '%s' look OK to you? (Y/n) "):format(version))
+			io.write(("Does version '%s' look OK to you? (Y/n) "):format(latest_build.cef_version))
 			local input = io.read():lower()
 			if not (input == "y" or input == "yes") then
 				errormsg("Aborting due to user request.")
 				return
 			end
 
-			CEF_VERSION = version
+			CEF_VERSION = latest_build.cef_version
 			CEF_HASH = ""
 		end
 

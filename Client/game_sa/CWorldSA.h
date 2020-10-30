@@ -68,6 +68,7 @@ public:
     BYTE  GetLevelFromPosition(CVector* vecPosition);
     float FindGroundZForPosition(float fX, float fY);
     float FindGroundZFor3DPosition(CVector* vecPosition);
+    float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult);
     void  LoadMapAroundPoint(CVector* vecPosition, float fRadius);
     bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags);
     bool  HasCollisionBeenLoaded(CVector* vecPosition);
@@ -93,7 +94,6 @@ public:
      * \todo Add ExtinguishAllCarFiresInArea (0x566950)
      * \todo Add FindLowestZForCoord (0x5697F0)
      * \todo Add FindNearestObjectOfType (see 0x46D5FD)
-     * \todo Add FindRoofZFor3DCoord (0x569750)
      * \todo Add GetIsLineOfSightClear (0x56A490)
      * \todo Add ProcessVerticalLine (0x5674E0)
      * \todo Add RemoveReferencesToDeletedObject (0x565510)

@@ -119,6 +119,12 @@ namespace lua
         return 1;
     }
 
+    inline int Push(lua_State* L, const CMatrix& value)
+    {
+        lua_pushmatrix(L, value);
+        return 1;
+    }
+
     template <typename T>
     int Push(lua_State* L, const std::vector<T>&& val)
     {
