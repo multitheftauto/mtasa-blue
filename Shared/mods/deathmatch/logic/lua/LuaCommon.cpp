@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 
+#include "CLuaVector2.h"
+#include "CLuaVector3.h"
+#include "CLuaVector4.h"
+#include "CLuaMatrix.h"
+
 // Lua push/pop macros for our datatypes
 CElement* lua_toelement(lua_State* luaVM, int iArgument)
 {
