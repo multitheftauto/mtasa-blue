@@ -847,6 +847,11 @@ void CGameSA::ResetModelFlags()
     CModelInfoSA::StaticResetFlags();
 }
 
+void CGameSA::ResetModelTimes()
+{
+    CModelInfoSA::StaticResetModelTimes();
+}
+
 void CGameSA::ResetAlphaTransparencies()
 {
     CModelInfoSA::StaticResetAlphaTransparencies();

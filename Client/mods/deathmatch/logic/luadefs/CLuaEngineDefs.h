@@ -61,6 +61,9 @@ public:
     static bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, bool bIdeFlags = false);
     static bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID);
     static bool CLuaEngineDefs::EngineRestreamWorld();
+    static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
+    static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
+    static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

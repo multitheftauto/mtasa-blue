@@ -230,6 +230,20 @@ public:
 };
 static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
 
+struct CTimeInfoSAInterface
+{
+    CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
+    char  m_nTimeOn;
+    char  m_nTimeOff;
+    short m_wOtherTimeModel;
+};
+
+class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    CTimeInfoSAInterface timeInfo;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
@@ -291,6 +305,7 @@ protected:
     static std::map<DWORD, unsigned short>                                       ms_ModelDefaultFlagsMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
@@ -347,6 +362,9 @@ public:
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
+    bool           GetTime(char& cHourOn, char& cHourOff);
+    bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();

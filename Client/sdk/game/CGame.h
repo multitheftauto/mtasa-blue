@@ -240,6 +240,7 @@ public:
     virtual void ResetModelFlags() = 0;
     virtual void ResetAlphaTransparencies() = 0;
     virtual void DisableVSync() = 0;
+    virtual void ResetModelTimes() = 0;
 
     virtual void  OnPedContextChange(CPed* pPedContext) = 0;
     virtual CPed* GetPedContext() = 0;

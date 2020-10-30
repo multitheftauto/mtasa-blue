@@ -38,6 +38,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
+        {"engineGetModelVisibleTime", ArgumentParser<EngineGetModelVisibleTime>},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
@@ -75,6 +77,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
+    lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -82,6 +85,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTextures", "engineGetModelTextures");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
+    lua_classfunction(luaVM, "getModelVisibleTime", "engineGetModelVisibleTime");
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
@@ -1103,6 +1107,40 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     // We failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff)
+{
+    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
+        {
+            return pModelInfo->SetTime(cHourOn, cHourOff);
+        }
+    }
+    return false;
+}
+
+std::variant<bool, std::tuple<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
+{
+    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        char cHourOn, cHourOff;
+        if (pModelInfo->GetTime(cHourOn, cHourOff))
+        {
+            return std::tuple(cHourOn, cHourOff);
+        }
+        else // Model is incompatible, don't let confuse user.
+        {
+            return std::tuple(0, 24);
+        }
+    }
+
+    return false;
 }
 
 int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
