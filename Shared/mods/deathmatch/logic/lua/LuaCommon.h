@@ -19,8 +19,8 @@ extern "C"
 }
 
 #include "CIdArray.h"
+#include "luadefs/CLuaClassDefs.h"
 #include <type_traits>
-
 
 // Public use:
 

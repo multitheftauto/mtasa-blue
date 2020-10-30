@@ -9,7 +9,6 @@
  *
  *****************************************************************************/
 #pragma once
-
 #include <limits>
 #include <type_traits>
 #include <cfloat>

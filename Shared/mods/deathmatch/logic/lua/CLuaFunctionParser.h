@@ -17,7 +17,8 @@ class CLuaArgument;
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
-#include "lua/CLuaFunctionRef.h"
+
+CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
 struct CLuaFunctionParserBase
 {
