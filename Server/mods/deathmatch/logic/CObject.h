@@ -71,6 +71,9 @@ public:
     CPlayer* GetSyncer() { return m_pSyncer; }
     void     SetSyncer(CPlayer* pPlayer);
 
+    float GetLastSyncedIsInWater() { return m_bLastSyncedIsInWater; };
+    void  setLastSyncedIsInWater(bool bIsInWater) { m_bLastSyncedIsInWater = bIsInWater; };
+
     bool     IsLowLod();
     bool     SetLowLodObject(CObject* pLowLodObject);
     CObject* GetLowLodObject();
@@ -103,4 +106,5 @@ protected:
 
 public:
     CPositionRotationAnimation* m_pMoveAnimation;
+    bool                        m_bLastSyncedIsInWater = false;
 };

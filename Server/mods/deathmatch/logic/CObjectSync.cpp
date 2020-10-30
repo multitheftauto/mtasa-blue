@@ -211,6 +211,15 @@ void CObjectSync::Packet_ObjectSync(CObjectSyncPacket& Packet)
                     if (pData->ucFlags & 0x4)
                         pObject->SetHealth(pData->fHealth);
 
+                    bool bInWater = pObject->IsInWater();
+                    if (bInWater != pObject->GetLastSyncedIsInWater())
+                    {
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(bInWater);
+                        pPed->CallEvent("onElementWaterInteract", Arguments);
+                    }
+                    pPed->setLastSyncedIsInWater(bInWater);
+
                     // Send this sync
                     pData->bSend = true;
                 }

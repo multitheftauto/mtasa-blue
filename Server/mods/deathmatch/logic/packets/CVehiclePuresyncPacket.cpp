@@ -155,11 +155,12 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 pVehicle->SetLastSyncedHealth(fHealth);
 
                 bool bInWater = pVehicle->IsInWater();
-                if (bInWater && bInWater != pVehicle->GetLastSyncedIsInWater())
+                if (bInWater != pVehicle->GetLastSyncedIsInWater())
                 {
                     // Call the event once in water
                     CLuaArguments Arguments;
-                    pVehicle->CallEvent("onVehicleDrown", Arguments);
+                    Arguments.PushBoolean(bInWater);
+                    pVehicle->CallEvent("onElementWaterInteract", Arguments);
                 }
                 pVehicle->setLastSyncedIsInWater(bInWater);
 

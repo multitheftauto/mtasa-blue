@@ -1549,7 +1549,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onVehicleEnter", "player, seat, jacked", NULL, false);
     m_Events.AddEvent("onVehicleExit", "player, seat, jacker", NULL, false);
     m_Events.AddEvent("onVehicleExplode", "", NULL, false);
-    m_Events.AddEvent("onVehicleDrown", "", nullptr, false);
+    m_Events.AddEvent("onElementWaterInteract", "bWaterInOrOut", nullptr, false);
 
     // Console events
     m_Events.AddEvent("onConsole", "text", NULL, false);

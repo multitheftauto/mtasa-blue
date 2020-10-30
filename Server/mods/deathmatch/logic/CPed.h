@@ -257,6 +257,8 @@ public:
 
     bool     IsSyncable() { return m_bSyncable; };
     void     SetSyncable(bool bSynced) { m_bSyncable = bSynced; };
+    float    GetLastSyncedIsInWater() { return m_bLastSyncedIsInWater; };
+    void     setLastSyncedIsInWater(bool bIsInWater) { m_bLastSyncedIsInWater = bIsInWater; };
     CPlayer* m_pSyncer;
 
     bool IsStealthAiming() { return m_bStealthAiming; }
@@ -312,4 +314,5 @@ protected:
 
 private:
     CPedManager* m_pPedManager;
+    bool         m_bLastSyncedIsInWater = false;
 };

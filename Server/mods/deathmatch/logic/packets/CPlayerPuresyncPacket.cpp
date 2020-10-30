@@ -263,6 +263,16 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
         }
 
+        bool bInWater = pSourcePlayer->IsInWater();
+        if (bInWater != pSourcePlayer->GetLastSyncedIsInWater())
+        {
+            // Call the event once in water
+            CLuaArguments Arguments;
+            Arguments.PushBoolean(bInWater);
+            pSourcePlayer->CallEvent("onElementWaterInteract", Arguments);
+        }
+        pSourcePlayer->setLastSyncedIsInWater(bInWater);
+
         // Success
         return true;
     }

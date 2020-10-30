@@ -251,6 +251,15 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
                     if (pData->ucFlags & 0x40 && pPlayer->GetBitStreamVersion() >= 0x55)
                         pPed->SetInWater(pData->bIsInWater);
 
+                    bool bInWater = pPed->IsInWater();
+                    if (bInWater != pPed->GetLastSyncedIsInWater())
+                    {
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(bInWater);
+                        pPed->CallEvent("onElementWaterInteract", Arguments);
+                    }
+                    pPed->setLastSyncedIsInWater(bInWater);
+
                     // Send this sync
                     pData->bSend = true;
                 }
