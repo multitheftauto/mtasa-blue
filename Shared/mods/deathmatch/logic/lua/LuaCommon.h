@@ -96,9 +96,19 @@ void lua_classfunction(lua_State* luaVM, const char* szFunction, const char* szA
 void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szACLNameSet, const char* szACLNameGet, lua_CFunction set, lua_CFunction get, bool bACLIgnore = true);
 #endif
 
+// Public things:
+
+// Helper
+#ifdef MTA_CLIENT
+CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
+#else
+CElement* lua_toelement(lua_State* luaVM, int iArgument);
+#endif
+
 // This one should only be used in LuaCommon
-void lua_pushuserdata(lua_State* luaVM, void* value);
 void lua_pushobject(lua_State* luaVM, const char* szClass, SArrayId id, bool bSkipCache = false);
+
+void lua_pushuserdata(lua_State* luaVM, void* value);
 
 // Only disable for CElement/CClientEntity as it needs special handling
 // Everything else will call the reload anyways, because it'll fail here (because it doesnt have `GetScriptID()`)
@@ -125,6 +135,8 @@ void lua_pushobject(lua_State* luaVM, CClientEntity* element);
 void lua_pushobject(lua_State* luaVM, CDbJobData* jobdata);
 void lua_pushobject(lua_State* luaVM, CElement* element);
 #endif
+
+
 // Include the RPC functions enum
 #include "net/rpc_enums.h"
 
