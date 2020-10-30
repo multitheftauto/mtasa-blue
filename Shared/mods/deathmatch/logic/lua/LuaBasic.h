@@ -9,16 +9,12 @@
 #pragma once
 #include <optional>
 #include <variant>
-
+#include "LuaCommon.h"
 /*
     Basic Lua operations:
         int Push(L, T value)
         T PopPrimitive(L, std::size_t stackIndex)
 */
-
-class CVector2D;
-class CVector;
-class CVector4D;
 
 namespace lua
 {
