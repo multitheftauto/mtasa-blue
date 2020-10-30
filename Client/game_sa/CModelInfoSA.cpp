@@ -576,7 +576,7 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
     if (!m_pInterface)
         return false;
     
-    if (GetModelType() != MODEL_INFO_TYPE_TIME)
+    if (GetModelType() != eModelInfoType::TIME)
         return false;
 
     CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
@@ -595,7 +595,7 @@ bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
     if (!m_pInterface)
         return false;
 
-    if (GetModelType() != MODEL_INFO_TYPE_TIME)
+    if (GetModelType() != eModelInfoType::TIME)
         return false;
 
     CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
