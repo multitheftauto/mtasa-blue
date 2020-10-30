@@ -9,6 +9,7 @@
  *
  *****************************************************************************/
 
+#include "net/rpc_enums.h"
 #include <StdInc.h>
 
 #include "CRPCFunctions.h"

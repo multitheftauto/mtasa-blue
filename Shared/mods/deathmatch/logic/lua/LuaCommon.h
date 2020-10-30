@@ -19,7 +19,6 @@ extern "C"
 }
 
 #include "CIdArray.h"
-#include "luadefs/CLuaClassDefs.h"
 #include <type_traits>
 
 #define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
@@ -31,6 +30,11 @@ CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 class CLuaTimer;
 class CResource;
 class CXMLNode;
+
+class CMatrix;
+class CVector2D;
+class CVector;
+class CVector4D;
 class CLuaMatrix;
 class CLuaVector2D;
 class CLuaVector3D;
@@ -57,7 +61,6 @@ class CClientWater;
 class CClientWeapon;
 class CClientRadarArea;
 class CClientPointLights;
-
 #else
 class CElement;
 class CDbJobData;
@@ -66,17 +69,7 @@ class CClient;
 
 // Internal use functions
 template<class T>
-const char* GetClassNameIfOOPEnabled(lua_State* luaVM, T* object)
-{
-#ifdef MTA_CLIENT
-    extern CClientGame* g_pClientGame;
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    extern CGame* g_pGame;
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    return (pLuaMain && pLuaMain->IsOOPEnabled()) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
-}
+const char* GetClassNameIfOOPEnabled(lua_State* luaVM, T* object);
 
 // Lua class things - creating a class, etc.. -
 void lua_initclasses(lua_State* luaVM);
@@ -106,10 +99,12 @@ CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
 CElement* lua_toelement(lua_State* luaVM, int iArgument);
 #endif
 
+void lua_pushuserdata(lua_State* luaVM, void* value);
+
+// pushobject section:
+
 // This one should only be used in LuaCommon
 void lua_pushobject(lua_State* luaVM, const char* szClass, SArrayId id, bool bSkipCache = false);
-
-void lua_pushuserdata(lua_State* luaVM, void* value);
 
 // Only disable for CElement/CClientEntity as it needs special handling
 // Everything else will call the reload anyways, because it'll fail here (because it doesnt have `GetScriptID()`)
@@ -138,35 +133,30 @@ void lua_pushobject(lua_State* luaVM, CElement* element);
 #endif
 
 
-// Include the RPC functions enum
-#include "net/rpc_enums.h"
 
+
+
+// Solve circular dependency between LuaBasic.h (is included in CLuaDefs) and LuaCommon.h
+// by declaring GetClassNameIfOOPEnabled on top, and then defining it here.. Hacky, but no better solution (yet)
+
+#include "luadefs/CLuaClassDefs.h"
+template<class T>
+const char* GetClassNameIfOOPEnabled(lua_State* luaVM, T* object)
+{
+#ifdef MTA_CLIENT
+    extern CClientGame* g_pClientGame;
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#else
+    extern CGame* g_pGame;
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#endif
+    return (pLuaMain && pLuaMain->IsOOPEnabled()) ? CLuaClassDefs::GetLuaClassName(object) : nullptr;
+}
+
+// Not even God knows what kind of evil enum this is...
 enum
 {
     AUDIO_FRONTEND,
     AUDIO_MISSION_PRELOAD,
     AUDIO_MISSION_PLAY
-};
-
-// Lua debug info for logging
-enum
-{
-    DEBUG_INFO_NONE,
-    DEBUG_INFO_FILE_AND_LINE,
-    DEBUG_INFO_SHORT_SRC,
-};
-
-#define INVALID_LINE_NUMBER (-1)
-
-struct SLuaDebugInfo
-{
-    SLuaDebugInfo() : iLine(INVALID_LINE_NUMBER), infoType(DEBUG_INFO_NONE) {}
-    SLuaDebugInfo(const SString& strFile, int iLine, const SString& strShortSrc = "")
-        : strFile(strFile), strShortSrc(strShortSrc), iLine(iLine), infoType(DEBUG_INFO_FILE_AND_LINE)
-    {
-    }
-    SString strFile;
-    SString strShortSrc;
-    int     iLine;
-    int     infoType;
 };

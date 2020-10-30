@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "net/rpc_enums.h"
+
 class CRPCFunctions;
 
 #define DECLARE_RPC(a) static void a ( class NetBitStreamInterface& bitStream );
