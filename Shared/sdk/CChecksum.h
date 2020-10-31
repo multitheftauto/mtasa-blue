@@ -12,11 +12,13 @@
 #ifndef __CChecksum_H
 #define __CChecksum_H
 
-// Depends on CMD5Hasher and CRCGenerator
+#include <variant>
 
+// Depends on CMD5Hasher and CRCGenerator
 class CChecksum
 {
 public:
+
     // Initialize to zeros
     CChecksum()
     {
@@ -29,12 +31,19 @@ public:
 
     bool operator!=(const CChecksum& other) const { return !operator==(other); }
 
-    // static generators
-    static CChecksum GenerateChecksumFromFile(const SString& strFilename)
+    // GenerateChecksumFromFile returns either a CChecksum or an error message.
+    static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
-        CMD5Hasher().Calculate(strFilename, result.md5);
+
+        if (!result.ulCRC)
+            return SString("CRC could not open file: %s", std::strerror(errno));
+
+        bool success = CMD5Hasher().Calculate(strFilename, result.md5);
+        if (!success)
+            return SString("MD5 could not open file: %s", std::strerror(errno));
+
         return result;
     }
 
