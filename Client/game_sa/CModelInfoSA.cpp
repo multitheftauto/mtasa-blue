@@ -1370,6 +1370,17 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
     SetVoice(sVoiceType, sVoiceID);
 }
 
+void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
+{
+    CStreamingInfo* pBaseModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseModelID);
+    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+
+    pTargetModelStreamingInfo->Reset();
+    pTargetModelStreamingInfo->archiveId = pBaseModelStreamigInfo->archiveId;
+    pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamigInfo->offsetInBlocks;
+    pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamigInfo->sizeInBlocks;
+}
+
 void CModelInfoSA::MakePedModel(char* szTexture)
 {
     // Create a new CPedModelInfo
@@ -1393,13 +1404,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
-    CStreamingInfo* pBaseModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseID);
-    CStreamingInfo* pTargetModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
-
-    pTargetModelStreamigInfo->Reset();
-    pTargetModelStreamigInfo->archiveId = pBaseModelStreamigInfo->archiveId;
-    pTargetModelStreamigInfo->offsetInBlocks = pBaseModelStreamigInfo->offsetInBlocks;
-    pTargetModelStreamigInfo->sizeInBlocks = pBaseModelStreamigInfo->sizeInBlocks;
+    CopyStreamingInfoFromModel(usBaseID);
 }
 
 void CModelInfoSA::DeallocateModel(void)
