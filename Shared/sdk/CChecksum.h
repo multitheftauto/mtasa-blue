@@ -47,6 +47,18 @@ public:
         return result;
     }
 
+    // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.
+    static CChecksum GenerateChecksumFromFileUnsafe(const SString& strFilename)
+    {
+        auto result = GenerateChecksumFromFile(strFilename);
+
+        // If it holds an error message, just return a default CChecksum
+        if (std::holds_alternative<std::string>(result))
+            return CChecksum();
+
+        return std::get<CChecksum>(result);
+    }
+
     static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, unsigned long ulLength)
     {
         CChecksum result;
