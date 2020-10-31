@@ -18,7 +18,6 @@
 class CChecksum
 {
 public:
-
     // Initialize to zeros
     CChecksum()
     {
