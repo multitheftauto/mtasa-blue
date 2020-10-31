@@ -47,6 +47,7 @@ public:
     }
 
     // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.
+    // If it's the latter, please leave a code comment somewhere explaining why. Otherwise we'll think it's just code that hasn't been migrated yet.
     static CChecksum GenerateChecksumFromFileUnsafe(const SString& strFilename)
     {
         auto result = GenerateChecksumFromFile(strFilename);
