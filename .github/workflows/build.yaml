@@ -94,7 +94,6 @@ jobs:
   macOS-release:
     name: macOS-release
     runs-on: macOS-latest
-    if: "false" # Temporarily disable macOS builds due to breakage caused by some GitHub Actions update
     steps:
       - name: Install MySQL
         run: brew install mysql
@@ -108,7 +107,6 @@ jobs:
   macOS-debug:
     name: macOS-debug
     runs-on: macOS-latest
-    if: "false" # Temporarily disable macOS builds due to breakage caused by some GitHub Actions update
     steps:
       - name: Install MySQL
         run: brew install mysql
