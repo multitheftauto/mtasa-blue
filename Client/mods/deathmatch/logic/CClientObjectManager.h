@@ -25,7 +25,7 @@ public:
 
     void DeleteAll();
 
-    const auto&           GetObjects() const { return m_Objects; };
+    const CMappedArray<CClientObject*>& GetObjects() const { return m_Objects; };
     unsigned int          Count() { return static_cast<unsigned int>(m_Objects.size()); };
     unsigned int          CountCreatedObjects() { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
     static CClientObject* Get(ElementID ID);
