@@ -1900,7 +1900,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_CHORUS fxChorusParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxChorusParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 7);
 
                             lua_pushnumber(luaVM, fxChorusParams.fWetDryMix);
                             lua_setfield(luaVM, -2, EnumToString(Chorus::WET_DRY_MIX));
@@ -1931,7 +1931,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_COMPRESSOR fxCompressorParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxCompressorParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 6);
 
                             lua_pushnumber(luaVM, fxCompressorParams.fGain);
                             lua_setfield(luaVM, -2, EnumToString(Compressor::GAIN));
@@ -1959,7 +1959,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_DISTORTION fxDistortionParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxDistortionParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 5);
 
                             lua_pushnumber(luaVM, fxDistortionParams.fGain);
                             lua_setfield(luaVM, -2, EnumToString(Distortion::GAIN));
@@ -1984,7 +1984,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_ECHO fxEchoParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxEchoParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 5);
 
                             lua_pushnumber(luaVM, fxEchoParams.fWetDryMix);
                             lua_setfield(luaVM, -2, EnumToString(Echo::WET_DRY_MIX));
@@ -2009,7 +2009,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_FLANGER fxFlangerParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxFlangerParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 7);
 
                             lua_pushnumber(luaVM, fxFlangerParams.fWetDryMix);
                             lua_setfield(luaVM, -2, EnumToString(Flanger::WET_DRY_MIX));
@@ -2040,7 +2040,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_GARGLE fxGargleParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxGargleParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 2);
 
                             lua_pushnumber(luaVM, fxGargleParams.dwRateHz);
                             lua_setfield(luaVM, -2, EnumToString(Gargle::RATE_HZ));
@@ -2056,7 +2056,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_I3DL2REVERB fxI3DL2ReverbParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxI3DL2ReverbParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 12);
 
                             lua_pushnumber(luaVM, fxI3DL2ReverbParams.lRoom);
                             lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::ROOM));
@@ -2102,7 +2102,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_PARAMEQ fxParameqParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxParameqParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 3);
 
                             lua_pushnumber(luaVM, fxParameqParams.fCenter);
                             lua_setfield(luaVM, -2, EnumToString(ParamEq::CENTER));
@@ -2121,7 +2121,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         BASS_DX8_REVERB fxReverbParams;
                         if (pSound->GetFxEffectParameters(eEffectType, &fxReverbParams))
                         {
-                            lua_newtable(luaVM);
+                            lua_createtable(luaVM, 0, 4);
 
                             lua_pushnumber(luaVM, fxReverbParams.fInGain);
                             lua_setfield(luaVM, -2, EnumToString(Reverb::IN_GAIN));
