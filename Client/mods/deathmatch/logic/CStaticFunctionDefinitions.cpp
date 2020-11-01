@@ -8247,30 +8247,6 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled(CClientPlayer& Player, co
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetSoundEffectParameters(CClientPlayer& Player, eSoundEffectType eEffectType, void* params)
-{
-    CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice)
-    {
-        if (pVoice->IsFxEffectEnabled(eEffectType))
-            if (pVoice->SetFxEffectParameters(eEffectType, params))
-                return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetSoundEffectParameters(CClientPlayer& Player, eSoundEffectType eEffectType, void* params)
-{
-    CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice)
-    {
-        if (pVoice->IsFxEffectEnabled(eEffectType))
-            if (pVoice->GetFxEffectParameters(eEffectType, params))
-                return true;
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::SetSoundPan(CClientPlayer& Player, float fPan)
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();
