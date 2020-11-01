@@ -13,14 +13,14 @@
 
 struct CStreamingInfo
 {
-    ushort prevId;
-    ushort nextId;
-    ushort nextInImg;
-    char   flg;
-    char   archiveId;
-    uint   offsetInBlocks;
-    uint   sizeInBlocks;
-    uint   loadState;
+    uint16 prevId;
+    uint16 nextId;
+    uint16 nextInImg;
+    uint8  flg;
+    uint8  archiveId;
+    uint32 offsetInBlocks;
+    uint32 sizeInBlocks;
+    uint32 loadState;
 
 public:
     void Reset()
