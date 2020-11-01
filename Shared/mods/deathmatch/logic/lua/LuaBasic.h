@@ -27,7 +27,6 @@ namespace lua
     template <typename T>
     inline T PopPrimitive(lua_State* L, std::size_t& index);
 
-
     // Push should push a value of type T to the Lua Stack
     // The return value must be the net amount of items pushed to the stack, which should
     // be 1 for most types (e.g. Push<int>) but may be any number for special cases
@@ -87,9 +86,9 @@ namespace lua
     }
 
     template <typename... Ts>
-    int Push(lua_State* L, const std::variant<Ts...>&& val)
+    int Push(lua_State* L, const std::variant<Ts...>& val)
     {
-        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
+        return std::visit([L](auto& value) -> int { return Push(L, std::move(value)); }, val);
     }
 
     template <typename T>
@@ -99,7 +98,7 @@ namespace lua
             return Push(L, val.value());
         else
             return Push(L, nullptr);
-     }
+    }
 
     inline int Push(lua_State* L, const CVector2D& value)
     {
@@ -126,11 +125,11 @@ namespace lua
     }
 
     template <typename T>
-    int Push(lua_State* L, const std::vector<T>&& val)
+    int Push(lua_State* L, const std::vector<T>& val)
     {
         lua_newtable(L);
         int i = 1;
-        for (auto&& v : val)
+        for (auto& v : val)
         {
             Push(L, i++);
             Push(L, v);
@@ -142,13 +141,13 @@ namespace lua
     }
 
     template <typename K, typename V>
-    int Push(lua_State* L, const std::unordered_map<K, V>&& val)
+    int Push(lua_State* L, const std::unordered_map<K, V>& val)
     {
         lua_newtable(L);
-        for (auto&& [k, v] : val)
+        for (auto& [k, v] : val)
         {
             Push(L, k);
-            Push(L, v);
+            Push<V>(L, v);
             lua_settable(L, -3);
         }
 
@@ -157,8 +156,8 @@ namespace lua
     }
 
     // Tuples can be used to return multiple results
-    template<typename... Ts>
-    int Push(lua_State* L, const std::tuple<Ts...>&& tuple)
+    template <typename... Ts>
+    int Push(lua_State* L, const std::tuple<Ts...>& tuple)
     {
         // Call Push on each element of the tuple
         std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
@@ -167,7 +166,7 @@ namespace lua
 
     // Overload for enum types only
     template <typename T>
-    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
+    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T& val)
     {
         return Push(L, EnumToString(val));
     }
@@ -180,4 +179,4 @@ namespace lua
         return 1;
     }
 
-}
+}            // namespace lua
