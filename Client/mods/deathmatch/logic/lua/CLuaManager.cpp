@@ -315,6 +315,7 @@ void CLuaManager::LoadCFunctions()
     CLuaFireDefs::LoadFunctions();
     CLuaGUIDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
+    CLuaNetworkDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();
     CLuaPedDefs::LoadFunctions();
     CLuaPickupDefs::LoadFunctions();

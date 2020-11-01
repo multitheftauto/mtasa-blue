@@ -899,7 +899,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
                 m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
+                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
         // Unsubscribe all the players
@@ -3357,7 +3357,7 @@ bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, 
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        if (pPlayer->GetBitStreamVersion() < 0x06E)
+        if (!pPlayer->CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
             return false;
 
         CBitStream bitStream;
@@ -4490,27 +4490,20 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
         if (!pTarget)
             pTarget = pPlayer;
 
-        // Make sure our target is supported
-        switch (pTarget->GetType())
+        // Make sure our target is a player element
+        if (pTarget->GetType() == CElement::PLAYER)
         {
-            case CElement::PLAYER:
-            case CElement::PED:
-            case CElement::VEHICLE:
-            {
-                pCamera->SetMode(CAMERAMODE_PLAYER);
-                pCamera->SetTarget(pTarget);
-                pCamera->SetRoll(0.0f);
-                pCamera->SetFOV(70.0f);
+            pCamera->SetMode(CAMERAMODE_PLAYER);
+            pCamera->SetTarget(pTarget);
+            pCamera->SetRoll(0.0f);
+            pCamera->SetFOV(70.0f);
 
-                CBitStream BitStream;
-                if (pPlayer->GetBitStreamVersion() >= 0x5E)
-                    BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
-                BitStream.pBitStream->Write(pTarget->GetID());
-                pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
-                return true;
-            }
-            default:
-                return false;
+            CBitStream BitStream;
+            if (pPlayer->GetBitStreamVersion() >= 0x5E)
+                BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+            BitStream.pBitStream->Write(pTarget->GetID());
+            pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
+            return true;
         }
     }
 
@@ -10039,7 +10032,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     assert(szText);
 
     RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
-    
+
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);

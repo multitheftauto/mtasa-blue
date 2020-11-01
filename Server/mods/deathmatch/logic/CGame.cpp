@@ -1242,7 +1242,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06E)
+    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
@@ -3677,7 +3677,7 @@ void CGame::Packet_CameraSync(CCameraSyncPacket& Packet)
         }
         else
         {
-            CElement* pTarget = GetElementFromId<CElement>(Packet.m_TargetID);
+            CPlayer* pTarget = GetElementFromId<CPlayer>(Packet.m_TargetID);
             if (!pTarget)
                 pTarget = pPlayer;
 

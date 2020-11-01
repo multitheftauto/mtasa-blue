@@ -63,6 +63,9 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
         CClientEntity* pEntity = CElementIDs::GetElement(targetID);
         if (pEntity)
         {
+            // Save our current target for later
+            CClientEntity* pPreviousTarget = m_pCamera->GetTargetEntity();
+
             switch (pEntity->GetType())
             {
                 case CCLIENTPLAYER:
@@ -78,12 +81,6 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
                         // Put the focus on that player
                         m_pCamera->SetFocus(pPlayer, MODE_CAM_ON_A_STRING, false);
                     }
-                    break;
-                }
-                case CCLIENTPED:
-                case CCLIENTVEHICLE:
-                {
-                    m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
                     break;
                 }
                 default:

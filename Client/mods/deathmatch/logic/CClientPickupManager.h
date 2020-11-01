@@ -43,6 +43,7 @@ public:
 
     static bool IsPickupLimitReached();
     void        RestreamPickups(unsigned short usModel);
+    void        RestreamAllPickups();
 
 private:
     CClientPickupManager(CClientManager* pManager);

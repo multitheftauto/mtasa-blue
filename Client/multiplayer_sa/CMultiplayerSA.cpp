@@ -285,6 +285,8 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
+const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
+const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
@@ -344,6 +346,7 @@ DrawRadarAreasHandler*      m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler*       m_pRender3DStuffHandler = NULL;
 PreWorldProcessHandler*     m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler*    m_pPostWorldProcessHandler = NULL;
+PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
 IdleHandler*                m_pIdleHandler = NULL;
 PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
@@ -503,6 +506,7 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
+void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -727,6 +731,7 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+    HookInstall(HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender, (DWORD)HOOK_Idle_CWorld_ProcessPedsAfterPreRender, 5);
 
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
@@ -1503,6 +1508,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleDamage();
     InitHooks_VehicleLights();
     InitHooks_VehicleWeapons();
+
+    InitHooks_Streaming();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -2213,6 +2220,11 @@ void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler)
 void CMultiplayerSA::SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler)
 {
     m_pPostWorldProcessHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler)
+{
+    m_postWorldProcessPedsAfterPreRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
@@ -6822,5 +6834,23 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
         fmul    kfTimeStepOriginal
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
+    }
+}
+
+
+void PostCWorld_ProcessPedsAfterPreRender()
+{
+    if (m_postWorldProcessPedsAfterPreRenderHandler)
+        m_postWorldProcessPedsAfterPreRenderHandler();
+}
+
+const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;
+void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
+{
+    __asm
+    {
+       call CWorld_ProcessPedsAfterPreRender
+       call PostCWorld_ProcessPedsAfterPreRender
+       jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
     }
 }

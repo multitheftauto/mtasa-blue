@@ -10,3 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+RwV3d& CPedIKSAInterface::XaxisIK = *(RwV3d*)0x8D232C;
+RwV3d& CPedIKSAInterface::YaxisIK = *(RwV3d*)0x8D2338;
+RwV3d& CPedIKSAInterface::ZaxisIK = *(RwV3d*)0x8D2344;
+
+void CPedIKSA::RotateTorso(void* bone, LimbOrientation* orientation, bool flag)
+{
+    auto CPedIKSA_RotateTorso = (void(__thiscall*)(CPedIKSAInterface*, void*, LimbOrientation*, bool))0x5FDDB0;
+    CPedIKSA_RotateTorso(internalInterface, bone, orientation, flag);
+}
