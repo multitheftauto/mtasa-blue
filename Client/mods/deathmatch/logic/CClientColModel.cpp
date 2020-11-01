@@ -164,5 +164,5 @@ void CClientColModel::UpdateVerticesCount()
     CColDataSA*           pColData = pInterface->pColData;
 
     if (pColData)
-        m_usVerticesCount = static_cast<unsigned short>(pColData->getNumVertices());
+        m_iVerticesCount = static_cast<unsigned short>(pColData->getNumVertices());
 }

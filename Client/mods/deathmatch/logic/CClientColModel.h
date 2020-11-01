@@ -26,7 +26,7 @@ public:
 
     bool           LoadCol(const SString& strFile, bool bIsRawData);
     bool           Load(bool isRaw, SString input);
-    unsigned short GetVerticesCount() const { return m_usVerticesCount; };
+    unsigned short GetVerticesCount() const { return m_iVerticesCount; };
     void           SetCollisionHasChanged(bool bChanged) { b_hasChanged = bChanged; };
     bool           HasChanged() const { return b_hasChanged; };
     bool           IsLoaded() { return m_pColModel != NULL; };
@@ -97,7 +97,7 @@ private:
     void InternalRestore(unsigned short usModel);
 
     class CClientColModelManager* m_pColModelManager;
-    unsigned short                m_usVerticesCount;
+    int                           m_iVerticesCount;
     CColModel*                    m_pColModel;
     std::list<unsigned short>     m_Replaced;
 
