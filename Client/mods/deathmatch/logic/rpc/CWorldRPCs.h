@@ -64,5 +64,4 @@ public:
     DECLARE_RPC(SetMoonSize);
     DECLARE_RPC(ResetMoonSize);
     DECLARE_RPC(SetSyncIntervals);
-    DECLARE_RPC(SetDiscordJoinParams);
 };
