@@ -41,6 +41,7 @@ public:
     bool        IsHardObjectLimitReached();
 
     void RestreamObjects(unsigned short usModel);
+    void RestreamAllObjects();
 
     void AddToList(CClientObject* pObject) { m_Objects.push_back(pObject); }
     void RemoveFromLists(CClientObject* pObject);

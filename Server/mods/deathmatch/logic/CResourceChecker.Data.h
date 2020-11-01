@@ -229,6 +229,7 @@ namespace
         {"engineGetModelTextures", "1.5.7-9.20416"},
         {"dxGetTextSize", "1.5.7-9.20447"},
         {"hasElementData", "1.5.7-9.20447"},
+        {"resetBlurLevel", "1.5.7-9.20450"},
         {"setVehicleModelWheelSize", "1.5.7-9.20642"},
         {"getVehicleModelWheelSize", "1.5.7-9.20642"},
         {"setVehicleWheelScale", "1.5.7-9.20642"},
