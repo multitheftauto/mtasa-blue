@@ -269,7 +269,5 @@ enum eElementRPCFunctions
     REMOVE_COLPOLYGON_POINT,
     UPDATE_COLPOLYGON_POINT,
   
-    SET_DISCORD_JOIN_PARAMETERS,
-
     NUM_RPC_FUNCS // Add above this line
 };

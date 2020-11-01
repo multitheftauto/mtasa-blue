@@ -111,7 +111,6 @@ struct SAclRequest;
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
-#include "packets/CDiscordJoinPacket.h"
 
 // has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
 #include "CRemoteCalls.h"
