@@ -38,5 +38,5 @@ public:
     int GetSize() { return m_List.size(); }
 
 private:
-    map<unsigned short, sPlayerStat> m_List;
+    std::map<unsigned short, sPlayerStat> m_List;
 };
