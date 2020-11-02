@@ -28,9 +28,9 @@ public:
     void Add(unsigned short usID, float fValue);
     void Remove(unsigned short usID, float fValue) { m_map.erase(usID); }
 
-    void Clear() noexcept { m_map.clear(); }
+    void   Clear() noexcept { m_map.clear(); }
     size_t GetSize() const noexcept { return m_map.size(); }
 
 private:
-    std::map<unsigned short, float> m_map; // id - value pairs
+    std::map<unsigned short, float> m_map;            // id - value pairs
 };
