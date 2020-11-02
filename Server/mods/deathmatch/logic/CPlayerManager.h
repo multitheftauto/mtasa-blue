@@ -66,7 +66,7 @@ private:
     void AddToList(CPlayer* pPlayer);
     void RemoveFromList(CPlayer* pPlayer);
 
-    class CScriptDebugging* m_pScriptDebugging;
+    class CScriptDebugging* m_pScriptDebugging = nullptr;
 
     CMappedList<CPlayer*>                 m_Players;
     std::map<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;

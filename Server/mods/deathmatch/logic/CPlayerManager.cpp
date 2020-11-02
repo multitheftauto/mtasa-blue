@@ -14,8 +14,6 @@
 
 CPlayerManager::CPlayerManager()
 {
-    // Init
-    m_pScriptDebugging = NULL;
     m_ZombieCheckTimer.SetUseModuleTickCount(true);
 }
 
