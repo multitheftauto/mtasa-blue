@@ -60,7 +60,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelCollisionProperties", ArgumentParser<EngineGetModelCollisionProperties>},
         {"engineGetModelCollisionData", EngineGetModelCollisionData},
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
-        {"engineUpdateModelCollisionBoundingBox", EngineUpdateModelCollisionBoundingBox },
+        {"engineUpdateModelCollisionBoundingBox", ArgumentParser<EngineUpdateModelCollisionBoundingBox>},
         {"isModelCollisionLoaded", ArgumentParser<IsModelCollisionLoaded> },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
@@ -2057,7 +2057,7 @@ CColModelSAInterface* GetModelCollisionInterface(ushort usModel)
     return false;
 }
 
-std::map<std::string, std::variant<float, int, CVector>> CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
+std::unordered_map<std::string, std::variant<float, int, CVector>> CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
 {
     CClientColModel* pCol = NULL;
     unsigned short   usModel = 0;
@@ -2078,7 +2078,7 @@ std::map<std::string, std::variant<float, int, CVector>> CLuaEngineDefs::EngineG
     if (pColModelSAInterface == nullptr)
         throw new std::invalid_argument("Invalid model or collision element");
 
-    std::map<std::string, std::variant<float, int, CVector>> map;
+    std::unordered_map<std::string, std::variant<float, int, CVector>> map;
     map["vecMin"] = pColModelSAInterface->boundingBox.vecMin;
     map["vecMax"] = pColModelSAInterface->boundingBox.vecMax;
     map["vecOffset"] = pColModelSAInterface->boundingBox.vecOffset;

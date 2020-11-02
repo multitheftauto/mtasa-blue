@@ -60,12 +60,11 @@ public:
     static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, std::tuple<char, char>>                  EngineGetModelVisibleTime(std::string strModelId);
-    static std::map<std::string, std::variant<float, int, CVector>> EngineGetModelCollisionProperties(lua_State* luaVM);
+    static std::unordered_map<std::string, std::variant<float, int, CVector>> EngineGetModelCollisionProperties(lua_State* luaVM);
     LUA_DECLARE(EngineGetModelCollisionData);
     LUA_DECLARE(EngineSetModelCollisionData);
-    LUA_DECLARE(EngineUpdateModelCollisionBoundingBox);
-    static bool IsModelCollisionLoaded(ushort usModel);
     static bool EngineUpdateModelCollisionBoundingBox(CClientColModel* pColModel, std::optional<CVector> vecCenter);
+    static bool IsModelCollisionLoaded(ushort usModel);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);
