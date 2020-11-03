@@ -146,48 +146,24 @@ void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
     m_JoinedPlayersMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
 }
 
-void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
-{
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
-    {
-        CPlayer* pPlayer = *iter;
-        pPlayer->UnsubscribeElementData(pElement, name);
-    }
-}
-
-void CPlayerManager::ClearElementData(CElement* pElement)
-{
-    for (auto pPlayer : m_Players)
-    {
-        pPlayer->UnsubscribeElementData(pElement);
-    }
-}
-
-void CPlayerManager::ResetAll()
-{
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
-    {
-        (*iter)->Reset();
-    }
-}
-
 void CPlayerManager::AddToList(CPlayer* pPlayer)
 {
-    for (std::list<CPlayer*>::const_iterator iter = m_Players.begin(); iter != m_Players.end(); iter++)
+    dassert(m_Players.find(pPlayer) == m_Players.end()); // Make sure he's not in the set already
+    m_Players.insert(pPlayer); // Before putting this into dassert, look at its definiton :-)
+
+    dassert(!MapFind(m_SocketPlayerMap, pPlayer->GetSocket()));
+    m_SocketPlayerMap[pPlayer->GetSocket()] = pPlayer;
+
+    dassert(m_SocketPlayerMap.size() == m_Players.size());
+
+    for (CPlayer* itPlayer : m_Players)
     {
         // Add other players to near/far lists
-        pPlayer->AddPlayerToDistLists(*iter);
+        pPlayer->AddPlayerToDistLists(itPlayer);
 
         // Add to other players near/far lists
-        (*iter)->AddPlayerToDistLists(pPlayer);
+        itPlayer->AddPlayerToDistLists(pPlayer);
     }
-
-    assert(!m_Players.Contains(pPlayer));
-    m_Players.push_back(pPlayer);
-    MapSet(m_SocketPlayerMap, pPlayer->GetSocket(), pPlayer);
-    assert(m_Players.size() == m_SocketPlayerMap.size());
 }
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
