@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
+
 namespace
 {
     //
@@ -133,6 +135,11 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
+}
+
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
+{
+    return &ms_aInfoForModel[id];
 }
 
 void CStreamingSA::ReinitStreaming()

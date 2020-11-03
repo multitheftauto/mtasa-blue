@@ -517,7 +517,12 @@ bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= 20000 && m_dwModelID < MODELINFO_MAX)
         return true;
-    return ppModelInfo[m_dwModelID] != 0;
+
+    if (!ppModelInfo[m_dwModelID])
+        return false;
+
+    auto sizeInBlocks = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks;
+    return sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -571,7 +576,7 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
     if (!m_pInterface)
         return false;
     
-    if (GetModelType() != MODEL_INFO_TYPE_TIME)
+    if (GetModelType() != eModelInfoType::TIME)
         return false;
 
     CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
@@ -590,7 +595,7 @@ bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
     if (!m_pInterface)
         return false;
 
-    if (GetModelType() != MODEL_INFO_TYPE_TIME)
+    if (GetModelType() != eModelInfoType::TIME)
         return false;
 
     CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
@@ -1166,15 +1171,15 @@ void CModelInfoSA::SetCustomModel(RpClump* pClump)
     {
         switch (GetModelType())
         {
-            case MODEL_INFO_TYPE_PED:
+            case eModelInfoType::PED:
                 return pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case MODEL_INFO_TYPE_WEAPON:
+            case eModelInfoType::WEAPON:
                 return pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case MODEL_INFO_TYPE_VEHICLE:
+            case eModelInfoType::VEHICLE:
                 return pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case MODEL_INFO_TYPE_ATOMIC:
-            case MODEL_INFO_TYPE_LOD_ATOMIC:
-            case MODEL_INFO_TYPE_TIME:
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
                 return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
         }
     }
@@ -1365,6 +1370,17 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
     SetVoice(sVoiceType, sVoiceID);
 }
 
+void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
+{
+    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseModelID);
+    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+
+    pTargetModelStreamingInfo->Reset();
+    pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
+    pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
+    pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
+}
+
 void CModelInfoSA::MakePedModel(char* szTexture)
 {
     // Create a new CPedModelInfo
@@ -1375,10 +1391,27 @@ void CModelInfoSA::MakePedModel(char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
+void CModelInfoSA::MakeObjectModel(ushort usBaseID)
+{
+    CBaseModelInfoSAInterface* m_pInterface = new CBaseModelInfoSAInterface();
+
+    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
+    m_pInterface->usNumberOfRefs = 0;
+    m_pInterface->pRwObject = nullptr;
+    m_pInterface->usUnknown = 65535;
+    m_pInterface->usDynamicIndex = 65535;
+
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    CopyStreamingInfoFromModel(usBaseID);
+}
+
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
     ppModelInfo[m_dwModelID] = nullptr;
+    pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
