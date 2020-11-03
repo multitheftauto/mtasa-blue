@@ -32,13 +32,12 @@ void CPlayerManager::PulseZombieCheck()
     // Only check once a second
     if (m_ZombieCheckTimer.Get() < 1000)
         return;
+
     m_ZombieCheckTimer.Reset();
 
-    for (std::list<CPlayer*>::const_iterator iter = m_Players.begin(); iter != m_Players.end(); iter++)
+    for (CPlayer* pPlayer : m_Players)
     {
-        CPlayer* pPlayer = *iter;
-
-        if (pPlayer->IsJoined() == false)
+        if (!pPlayer->IsJoined())
         {
             // Remove any players that have been connected for very long (90 sec) but haven't reached the verifying step
             if (pPlayer->GetTimeSinceConnected() > 90000)
