@@ -136,18 +136,14 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::vector<CPlayer*
     DoBroadcast(Packet, sendList);
 }
 
-// Send one packet to a list of players
-void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort, CPlayer*>& groupMap)
+void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
 {
-    DoBroadcast(Packet, groupMap);
-}
+    // Update min version
+    if (pPlayer->GetPlayerVersion() < m_LowestJoinedPlayerVersion || m_LowestJoinedPlayerVersion.empty())
+        m_LowestJoinedPlayerVersion = pPlayer->GetPlayerVersion();
+    g_pGame->CalculateMinClientRequirement();
 
-bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
-{
-    return (usPlayerModel == 0 || usPlayerModel == 1 || usPlayerModel == 2 || usPlayerModel == 7 ||
-            (usPlayerModel >= 9 && usPlayerModel != 208 && usPlayerModel != 149 && usPlayerModel != 119 && usPlayerModel != 86 && usPlayerModel != 74 &&
-             usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
-            (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
+    m_JoinedPlayersMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
 }
 
 void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
