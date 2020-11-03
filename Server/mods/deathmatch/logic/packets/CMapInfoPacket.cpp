@@ -136,7 +136,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     {
         BitStream.Write(m_WorldWaterLevelInfo.fNonSeaLevel);
     }
-    if (BitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideLevel))
+    if (BitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
     {
         BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
         if (m_WorldWaterLevelInfo.bOutsideLevelSet)
