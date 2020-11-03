@@ -32,7 +32,6 @@ public:
     void SetScriptDebugging(class CScriptDebugging* pScriptDebugging) { m_pScriptDebugging = pScriptDebugging; };
 
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
-    void     DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_Players.size()); }
     unsigned int CountJoined();

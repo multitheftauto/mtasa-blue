@@ -14,7 +14,9 @@
 
 CPlayerManager::~CPlayerManager()
 {
-    DeleteAll();
+    // Deallocate all players
+    for (CPlayer* pPlayer : m_Players)
+        delete pPlayer;
 }
 
 void CPlayerManager::DoPulse()
