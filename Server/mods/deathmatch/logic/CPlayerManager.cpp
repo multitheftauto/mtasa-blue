@@ -78,7 +78,7 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
 
 size_t CPlayerManager::CountJoined() const
 {
-    return std::accumulate(m_JoinedPlayersMap.begin(), m_JoinedPlayersMap.end(), 0,
+    return std::accumulate(m_JoinedByBitStreamVer.begin(), m_JoinedByBitStreamVer.end(), 0,
         [](const auto& count, const auto& pair) { return count + pair.second.size(); }
     );
 }
@@ -96,57 +96,24 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive) const
     return (iter == m_Players.end()) ? nullptr : *iter;
 }
 
-    // For each bitstream version, make and send a packet
-    typedef std::multimap<ushort, CPlayer*>::const_iterator mapIter;
-    mapIter                                                 m_it, s_it;
-    for (m_it = groupMap.begin(); m_it != groupMap.end(); m_it = s_it)
-    {
-        ushort usBitStreamVersion = (*m_it).first;
-
-        // Allocate a bitstream
-        NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream(usBitStreamVersion);
-
-        // Write the content
-        if (Packet.Write(*pBitStream))
-        {
-            g_pGame->SendPacketBatchBegin(Packet.GetPacketID(), pBitStream);
-
-            // For each player, send the packet
-            const pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
-            for (s_it = keyRange.first; s_it != keyRange.second; ++s_it)
-            {
-                CPlayer* pPlayer = s_it->second;
-                dassert(usBitStreamVersion == pPlayer->GetBitStreamVersion());
-                g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering());
-            }
-
-            g_pGame->SendPacketBatchEnd();
-        }
-        else
-        {
-            // Skip
-            const pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
-            for (s_it = keyRange.first; s_it != keyRange.second; ++s_it)
-            {
-            }
-        }
-
-        // Destroy the bitstream
-        g_pNetServer->DeallocateNetServerBitStream(pBitStream);
-    }
+void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip) const
+{
+    BroadcastJoinedIf(Packet,
+        [=](CPlayer* pPlayer) { return pPlayer != pSkip; });
 }
 
-// Send one packet to a list of players
-template <class T>
-static void DoBroadcast(const CPacket& Packet, const T& sendList)
+void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip) const
 {
-    // Group players by bitstream version
-    std::multimap<ushort, CPlayer*> groupMap;
-    for (typename T::const_iterator iter = sendList.begin(); iter != sendList.end(); ++iter)
-    {
-        CPlayer* pPlayer = *iter;
-        MapInsert(groupMap, pPlayer->GetBitStreamVersion(), pPlayer);
-    }
+    BroadcastJoinedIf(Packet,
+        [=](CPlayer* pPlayer) { return pPlayer != pSkip && pPlayer->GetDimension() == usDimension; });
+}
+
+// Used for subscriber based setElementData
+void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const std::string& name, CPlayer* pSkip) const
+{
+    BroadcastJoinedIf(Packet,
+        [=, &name](CPlayer* pPlayer) { return pPlayer != pSkip && pPlayer->IsSubscribed(pElement, name); });
+}
 
     DoBroadcast(Packet, groupMap);
 }

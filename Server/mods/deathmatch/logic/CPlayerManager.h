@@ -22,6 +22,37 @@ class CPlayerManager
 {
     friend class CPlayer;
 
+protected:
+    // Some protected typedefs for code readability
+    using BitStreamVersion = unsigned short;            // Todo: move this to it's appropriate place
+    using PlayersByBitStreamVersionMap = std::unordered_map<BitStreamVersion, std::vector<CPlayer*>>;
+
+public:
+    // Send one packet to a list of players
+    template <class T, class Pred_t>
+    static void BroadcastIf(const CPacket& Packet, const T& sendList, Pred_t&& pred)
+    {
+        if constexpr (std::is_base_of_v<PlayersByBitStreamVersionMap, T>) // Can we call it as is?
+            DoBroadcast(Packet, sendList, std::forward<Pred_t>(pred));
+
+        else // Sadly not, conversion needed..
+        {
+            // Group players by bitstream version
+            PlayersByBitStreamVersionMap groupMap;
+
+            for (CPlayer* pPlayer : sendList)
+                groupMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
+
+            DoBroadcast(Packet, groupMap, std::forward<Pred_t>(pred));
+        }
+    }
+
+    template <class T>
+    static void Broadcast(const CPacket& Packet, T&& sendList)
+    {
+        BroadcastIf(Packet, std::forward<T>(sendList), [](CPlayer*) { return true; });
+    }
+
 public:
     CPlayerManager() { m_ZombieCheckTimer.SetUseModuleTickCount(true); }
     ~CPlayerManager();
@@ -43,23 +74,80 @@ public:
     std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
-    void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
-    void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
-    void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
+    //
+    // Member broadcast functions
+    //
 
-    static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
-    static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);
-    static void Broadcast(const CPacket& Packet, const std::vector<CPlayer*>& sendList);
-    static void Broadcast(const CPacket& Packet, const std::multimap<ushort, CPlayer*>& groupMap);
+    // Alias to DoBroadcastIf with joined player map
+    template <class Predicate_t>
+    void BroadcastJoinedIf(const CPacket& Packet, Predicate_t&& Predicate) const
+    {
+        DoBroadcastIf(Packet, m_JoinedByBitStreamVer, std::forward<Predicate_t>(Predicate));
+    }
 
-    static bool IsValidPlayerModel(unsigned short usPlayerModel);
+    // Aliases to the above function with predefined predicates
+    void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = nullptr) const;
+    void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = nullptr) const;
+    void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const std::string& name, CPlayer* pSkip = nullptr) const;
 
+    // Subscriber based elementdata things
     void ClearElementData(CElement* pElement, const std::string& name);
     void ClearElementData(CElement* pElement);
 
-    void           ResetAll();
-    void           OnPlayerJoin(CPlayer* pPlayer);
-    const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
+    void ResetAll();
+    void OnPlayerJoin(CPlayer* pPlayer);
+
+    const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_LowestJoinedPlayerVersion; }
+private:
+
+    // Send one packet to a list of players, grouped by bitstream version
+    // The predicate works like any std function with a predicate:
+    // Eg.: It takes in a `CPlayer*` as its first (and only) argument
+    // And only if it (the predicate) returns true, the packet is sent to the player.
+    template<class Predicate_t>
+    static void DoBroadcastIf(const CPacket& Packet, const PlayersByBitStreamVersionMap& playersByBitStreamVer, Predicate_t predicate)
+    {
+        if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
+            return;
+
+        // Use the flags to determine how to send it
+        const auto reliability = Packet.GetNetServerReliability();
+        const auto priority = Packet.GetNetServerPriority();
+
+        // For each bitstream version, make and send a packet
+        for (auto&& [bsver, players] : playersByBitStreamVer)
+        {
+            // Allocate a bitstream
+            NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream(bsver);
+
+            if (Packet.Write(*pBitStream))
+            {
+                extern CGame* g_pGame;
+                g_pGame->SendPacketBatchBegin(Packet.GetPacketID(), pBitStream);
+
+                for (CPlayer* pPlayer : players)
+                {
+                    if (!predicate(pPlayer))
+                        continue;
+
+                    dassert(bsver == pPlayer->GetBitStreamVersion());
+                    g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, priority, reliability, Packet.GetPacketOrdering());
+                }
+
+                g_pGame->SendPacketBatchEnd();
+            }
+
+            // Destroy the bitstream
+            g_pNetServer->DeallocateNetServerBitStream(pBitStream);
+        }
+    }
+
+    // Wrapper around the above function so it can be called without a predicate
+    static void DoBroadcast(const CPacket& Packet, const PlayersByBitStreamVersionMap& playersByBitStreamVer)
+    {
+        DoBroadcast(Packet, playersByBitStreamVer,
+            [](CPlayer*) { return true; }); // Placeholder lambda
+    }
 
 private:
     void AddToList(CPlayer* pPlayer);
@@ -67,8 +155,9 @@ private:
 
     class CScriptDebugging* m_pScriptDebugging = nullptr;
 
-    CMappedList<CPlayer*>                 m_Players;
-    std::map<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;
-    CMtaVersion                           m_strLowestConnectedPlayerVersion;
-    CElapsedTime                          m_ZombieCheckTimer;
+    CFastHashSet<CPlayer*>                    m_Players; // All joined players
+    CFastHashMap<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;
+    PlayersByBitStreamVersionMap              m_JoinedByBitStreamVer; // Players joined into groups by bit stream version for easy packet sending
+    CMtaVersion                               m_LowestJoinedPlayerVersion;
+    CElapsedTime                              m_ZombieCheckTimer;
 };
