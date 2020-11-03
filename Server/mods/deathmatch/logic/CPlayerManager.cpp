@@ -115,25 +115,22 @@ void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pE
         [=, &name](CPlayer* pPlayer) { return pPlayer != pSkip && pPlayer->IsSubscribed(pElement, name); });
 }
 
-    DoBroadcast(Packet, groupMap);
+void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
+{
+    for (CPlayer* pPlayer : m_Players)
+        pPlayer->UnsubscribeElementData(pElement, name);
 }
 
-// Send one packet to a list of players
-void CPlayerManager::Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList)
+void CPlayerManager::ClearElementData(CElement* pElement)
 {
-    DoBroadcast(Packet, sendList);
+    for (CPlayer* pPlayer : m_Players)
+        pPlayer->UnsubscribeElementData(pElement);
 }
 
-// Send one packet to a list of players
-void CPlayerManager::Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList)
+void CPlayerManager::ResetAll()
 {
-    DoBroadcast(Packet, sendList);
-}
-
-// Send one packet to a list of players
-void CPlayerManager::Broadcast(const CPacket& Packet, const std::vector<CPlayer*>& sendList)
-{
-    DoBroadcast(Packet, sendList);
+    for (CPlayer* pPlayer : m_Players)
+        pPlayer->Reset();
 }
 
 void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)

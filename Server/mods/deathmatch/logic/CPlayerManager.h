@@ -61,6 +61,7 @@ public:
             usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
             (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
     }
+
 public:
     CPlayerManager() { m_ZombieCheckTimer.SetUseModuleTickCount(true); }
     ~CPlayerManager();
@@ -72,15 +73,14 @@ public:
 
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
 
-    unsigned int Count() { return static_cast<unsigned int>(m_Players.size()); }
-    unsigned int CountJoined();
-    bool         Exists(CPlayer* pPlayer);
+    size_t Count() const noexcept { return m_Players.size(); }
+    size_t CountJoined() const;
 
-    CPlayer* Get(const NetServerPlayerID& PlayerSocket);
-    CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
+    bool   Exists(CPlayer* pPlayer) const noexcept { return m_Players.find(pPlayer) != m_Players.end(); }
 
-    std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
-    std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
+    CPlayer* Get(const NetServerPlayerID& PlayerSocket) const noexcept { return MapFindRef(m_SocketPlayerMap, PlayerSocket); }
+    CPlayer* Get(const char* szNick, bool bCaseSensitive = false) const;
+
 
     //
     // Member broadcast functions
