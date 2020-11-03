@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <numeric>
+#include <random>
 #include "net/SimHeaders.h"
 
 CPlayerManager::~CPlayerManager()
@@ -94,6 +95,20 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive) const
             return stricmp(szNick, szPlayerNick) == 0; // Insensitive otherwise
     });
     return (iter == m_Players.end()) ? nullptr : *iter;
+}
+
+CPlayer* CPlayerManager::GetRandom() const noexcept
+{
+    // Optimized random player selection
+     std::mt19937 rndgen{ std::random_device{}() };
+
+    // Select a random player group
+    std::uniform_int_distribution<size_t> joinedDistribution(0, m_JoinedByBitStreamVer.CountUniqueVersions() - 1);
+    const auto it = std::next(m_JoinedByBitStreamVer.begin(), joinedDistribution(rndgen));
+
+    // Select a random player within it
+    std::uniform_int_distribution<size_t> playerGroupDistribution(0, it->second.size() - 1);
+    return it->second[playerGroupDistribution(rndgen)];
 }
 
 void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip) const

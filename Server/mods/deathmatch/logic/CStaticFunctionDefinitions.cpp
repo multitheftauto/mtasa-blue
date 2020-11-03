@@ -2782,30 +2782,7 @@ bool CStaticFunctionDefinitions::GetPlayerSourceIP(CPlayer* pPlayer, SString& st
 
 CPlayer* CStaticFunctionDefinitions::GetRandomPlayer()
 {
-    unsigned int uiJoinedCount = m_pPlayerManager->CountJoined();
-    if (uiJoinedCount > 0)
-    {
-        // Grab a random number between 0 and the joined count
-        unsigned int uiRandom = GetRandom(0, uiJoinedCount - 1);
-
-        // Grab the player with that index
-        unsigned int                   i = 0;
-        list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-        for (; iter != m_pPlayerManager->IterEnd(); iter++)
-        {
-            // Check status
-            if ((*iter)->IsJoined() && !(*iter)->IsBeingDeleted())
-            {
-                // This is the given index?
-                if (i++ == uiRandom)
-                {
-                    return *iter;
-                }
-            }
-        }
-    }
-
-    return NULL;
+    return m_pPlayerManager->GetRandom();
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMuted(CPlayer* pPlayer, bool& bMuted)

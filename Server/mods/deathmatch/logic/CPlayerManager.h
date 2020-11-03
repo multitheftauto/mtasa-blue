@@ -83,6 +83,9 @@ public:
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false) const;
 
 
+
+    CPlayer* GetRandom() const noexcept;
+
     //
     // Member broadcast functions
     //
