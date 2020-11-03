@@ -21,7 +21,7 @@ class CClientRadarMarker;
 
 #define RADAR_MARKER_LIMIT 63
 
-class CClientRadarMarker : public CClientEntity
+class CClientRadarMarker final : public CClientEntity
 {
     DECLARE_CLASS(CClientRadarMarker, CClientEntity)
     friend class CClientRadarMarkerManager;

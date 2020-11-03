@@ -11,7 +11,7 @@
 
 #pragma once
 
-class CClientColPolygon : public CClientColShape
+class CClientColPolygon final : public CClientColShape
 {
     DECLARE_CLASS(CClientColPolygon, CClientColShape)
 public:

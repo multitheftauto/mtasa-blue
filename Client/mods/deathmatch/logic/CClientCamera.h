@@ -29,7 +29,7 @@ namespace EFixedCameraMode
 }
 using EFixedCameraMode::EFixedCameraModeType;
 
-class CClientCamera : public CClientEntity
+class CClientCamera final : public CClientEntity
 {
     DECLARE_CLASS(CClientCamera, CClientEntity)
     friend class CClientManager;

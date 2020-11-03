@@ -13,7 +13,7 @@
 #include <list>
 #include "CClientEntity.h"
 
-class CClientColModel : public CClientEntity
+class CClientColModel final : public CClientEntity
 {
     DECLARE_CLASS(CClientColModel, CClientEntity)
 public:

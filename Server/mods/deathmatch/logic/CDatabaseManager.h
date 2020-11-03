@@ -177,7 +177,7 @@ CDatabaseManager* NewDatabaseManager();
 // TODO - Check it does not get synced to the client
 //
 ///////////////////////////////////////////////////////////////
-class CDatabaseConnectionElement : public CElement
+class CDatabaseConnectionElement final : public CElement
 {
 public:
     CDatabaseConnectionElement(CElement* pParent, SConnectionHandle connection) : CElement(pParent), m_Connection(connection)
