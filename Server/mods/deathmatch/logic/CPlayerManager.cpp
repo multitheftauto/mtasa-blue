@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <numeric>
 #include "net/SimHeaders.h"
 
 CPlayerManager::~CPlayerManager()
@@ -75,18 +76,12 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     return new CPlayer(this, m_pScriptDebugging, PlayerSocket); // Seems very safe
 }
 
-unsigned int CPlayerManager::CountJoined()
+size_t CPlayerManager::CountJoined() const
 {
-    // Count each ingame player
-    unsigned int                   uiCount = 0;
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
-    {
-        if ((*iter)->IsJoined())
-        {
-            ++uiCount;
-        }
-    }
+    return std::accumulate(m_JoinedPlayersMap.begin(), m_JoinedPlayersMap.end(), 0,
+        [](const auto& count, const auto& pair) { return count + pair.second.size(); }
+    );
+}
 
     // Return the count
     return uiCount;
