@@ -17,7 +17,7 @@ class CClientPickup;
 #include "CClientColShape.h"
 #include "CClientColCallback.h"
 
-class CClientPickup : public CClientStreamElement, private CClientColCallback
+class CClientPickup final : public CClientStreamElement, private CClientColCallback
 {
     DECLARE_CLASS(CClientPickup, CClientStreamElement)
     friend class CClientColShape;

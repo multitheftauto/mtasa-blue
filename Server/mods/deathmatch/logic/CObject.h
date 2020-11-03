@@ -19,7 +19,7 @@
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 
-class CObject final : public CElement
+class CObject : public CElement
 {
     friend class CPlayer;
 

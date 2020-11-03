@@ -12,7 +12,7 @@
 
 #include "CClientEntity.h"
 
-class CClientDummy : public CClientEntity
+class CClientDummy final : public CClientEntity
 {
     DECLARE_CLASS(CClientDummy, CClientEntity)
 public:

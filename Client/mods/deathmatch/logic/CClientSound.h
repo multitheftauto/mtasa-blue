@@ -17,7 +17,7 @@ class CBassAudio;
 #include "CClientEntity.h"
 #include "CSimulatedPlayPosition.h"
 
-class CClientSound : public CClientEntity
+class CClientSound final : public CClientEntity
 {
     DECLARE_CLASS(CClientSound, CClientEntity)
     friend class CClientSoundManager;
