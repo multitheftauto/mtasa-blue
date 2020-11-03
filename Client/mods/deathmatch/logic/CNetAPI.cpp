@@ -1762,7 +1762,7 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
     ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Version() >= 0x06F)
+    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -1813,7 +1813,7 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
     ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Version() >= 0x06F)
+    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -1981,11 +1981,11 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
     {
         // Write our target
         ElementID      ID = INVALID_ELEMENT_ID;
-        CClientEntity* pTarget = pCamera->GetTargetEntity();
-        if (!pTarget)
-            pTarget = g_pClientGame->GetLocalPlayer();
-        if (!pTarget->IsLocalEntity())
-            ID = pTarget->GetID();
+        CClientPlayer* pPlayer = pCamera->GetFocusedPlayer();
+        if (!pPlayer)
+            pPlayer = g_pClientGame->GetLocalPlayer();
+        if (!pPlayer->IsLocalEntity())
+            ID = pPlayer->GetID();
 
         BitStream.Write(ID);
     }

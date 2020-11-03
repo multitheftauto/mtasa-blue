@@ -16,6 +16,7 @@
 /**
  * Contains full positional data for a point
  */
+
 class CMatrix
 {
 public:
