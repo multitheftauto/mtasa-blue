@@ -202,36 +202,30 @@ void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
 CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle(CVehicle* pVehicle, float fMaxDistance)
 {
     // Grab the vehicle position
-    CVector vecVehiclePosition = pVehicle->GetPosition();
+    CVector vecPosition = pVehicle->GetPosition();
 
     // See if any players are close enough
-    CPlayer*                       pLastPlayerSyncing = NULL;
-    CPlayer*                       pPlayer = NULL;
-    list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); ++iter)
-    {
-        pPlayer = *iter;
-        // Is he joined?
-        if (pPlayer->IsJoined() && !pPlayer->IsBeingDeleted())
-        {
-            // He's near enough?
-            if (IsPointNearPoint3D(vecVehiclePosition, pPlayer->GetPosition(), fMaxDistance))
-            {
-                // Same dimension?
-                if (pPlayer->GetDimension() == pVehicle->GetDimension())
-                {
-                    // He syncs less vehicles than the previous player close enough?
-                    if (!pLastPlayerSyncing || pPlayer->CountSyncingVehicles() < pLastPlayerSyncing->CountSyncingVehicles())
-                    {
-                        pLastPlayerSyncing = pPlayer;
-                    }
-                }
-            }
-        }
-    }
+    CPlayer* pClosestAppliableSyncer = nullptr;
+    m_pPlayerManager->IterateJoined([=, &pClosestAppliableSyncer](CPlayer* pPlayer) {
+        // Make sure he isnt being deleted
+        if (pPlayer->IsBeingDeleted())
+            return;
+
+        // Same dimension?
+        if (pPlayer->GetDimension() != pVehicle->GetDimension())
+            return;
+
+        // He's near enough?
+        if (!IsPointNearPoint3D(vecPosition, pPlayer->GetPosition(), fMaxDistance))
+            return;
+
+        // Prefer a player that syncs less
+        if (!pClosestAppliableSyncer || pPlayer->CountSyncingVehicles() < pClosestAppliableSyncer->CountSyncingVehicles())
+            pClosestAppliableSyncer = pPlayer;
+    });
 
     // Return the player we found that syncs the least number of vehicles
-    return pLastPlayerSyncing;
+    return pClosestAppliableSyncer;
 }
 
 void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSyncPacket& Packet)

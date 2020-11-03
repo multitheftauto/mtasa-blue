@@ -212,11 +212,9 @@ void CResourceMapItem::LinkupElements()
         }
     }
 
-    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+    for (CPlayer* const pPlayer : m_pPlayerManager->GetAllPlayers())
     {
-        CPlayer* const pPlayer = *iter;
         const char*    szAttachToID = pPlayer->GetAttachToID();
-
         if (szAttachToID[0])
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);

@@ -82,7 +82,15 @@ public:
     CPlayer* Get(const NetServerPlayerID& PlayerSocket) const noexcept { return MapFindRef(m_SocketPlayerMap, PlayerSocket); }
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false) const;
 
+    const auto& GetAllPlayers() const noexcept { return m_Players; }
 
+    template<class UnaryFun_t>
+    void IterateJoined(UnaryFun_t UnaryFun) const noexcept
+    {
+        for (const auto& [k, players] : m_JoinedByBitStreamVer)
+            for (CPlayer* pPlayer : players)
+                UnaryFun(pPlayer);
+    }
 
     CPlayer* GetRandom() const noexcept;
 

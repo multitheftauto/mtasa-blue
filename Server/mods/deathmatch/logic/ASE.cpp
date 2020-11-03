@@ -293,35 +293,29 @@ std::string ASE::QueryFull()
     char     szTemp[256] = {'\0'};
     CPlayer* pPlayer = NULL;
 
-    list<CPlayer*>::const_iterator pIter = m_pPlayerManager->IterBegin();
-    for (; pIter != m_pPlayerManager->IterEnd(); pIter++)
-    {
-        pPlayer = *pIter;
-        if (pPlayer->IsJoined())
-        {
-            reply << ucFlags;
-            // nick
-            std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
-            if (strPlayerName.length() == 0)
-                strPlayerName = pPlayer->GetNick();
-            reply << (unsigned char)(strPlayerName.length() + 1);
-            reply << strPlayerName.c_str();
-            // team (skip)
-            reply << (unsigned char)1;
-            // skin (skip)
-            reply << (unsigned char)1;
-            // score
-            const std::string& strScore = pPlayer->GetAnnounceValue("score");
-            reply << (unsigned char)(strScore.length() + 1);
-            reply << strScore.c_str();
-            // ping
-            snprintf(szTemp, 255, "%u", pPlayer->GetPing());
-            reply << (unsigned char)(strlen(szTemp) + 1);
-            reply << szTemp;
-            // time (skip)
-            reply << (unsigned char)1;
-        }
-    }
+    m_pPlayerManager->IterateJoined([&](CPlayer* pPlayer) {
+        reply << ucFlags;
+        // nick
+        std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
+        if (strPlayerName.length() == 0)
+            strPlayerName = pPlayer->GetNick();
+        reply << (unsigned char)(strPlayerName.length() + 1);
+        reply << strPlayerName.c_str();
+        // team (skip)
+        reply << (unsigned char)1;
+        // skin (skip)
+        reply << (unsigned char)1;
+        // score
+        const std::string& strScore = pPlayer->GetAnnounceValue("score");
+        reply << (unsigned char)(strScore.length() + 1);
+        reply << strScore.c_str();
+        // ping
+        snprintf(szTemp, 255, "%u", pPlayer->GetPing());
+        reply << (unsigned char)(strlen(szTemp) + 1);
+        reply << szTemp;
+        // time (skip)
+        reply << (unsigned char)1;
+    });
 
     return reply.str();
 }
@@ -463,26 +457,20 @@ std::string ASE::QueryLight()
     int iBytesLeft = 1340 - (int)reply.tellp();
     int iPlayersLeft = iJoinedPlayers;
 
-    list<CPlayer*>::const_iterator pIter = m_pPlayerManager->IterBegin();
-    for (; pIter != m_pPlayerManager->IterEnd(); pIter++)
-    {
-        pPlayer = *pIter;
-        if (pPlayer->IsJoined())
-        {
-            // nick
-            std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
-            if (strPlayerName.length() == 0)
-                strPlayerName = pPlayer->GetNick();
+    m_pPlayerManager->IterateJoined([&](CPlayer* pPlayer) {
+        // nick
+        std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
+        if (strPlayerName.length() == 0)
+            strPlayerName = pPlayer->GetNick();
 
-            // Check if we can fit more names
-            iBytesLeft -= strPlayerName.length() + 1;
-            if (iBytesLeft < iPlayersLeft--)
-                strPlayerName = "";
+        // Check if we can fit more names
+        iBytesLeft -= strPlayerName.length() + 1;
+        if (iBytesLeft < iPlayersLeft--)
+            strPlayerName = "";
 
-            reply << (unsigned char)(strPlayerName.length() + 1);
-            reply << strPlayerName.c_str();
-        }
-    }
+        reply << (unsigned char)(strPlayerName.length() + 1);
+        reply << strPlayerName.c_str();
+    });
 
     return reply.str();
 }

@@ -524,24 +524,20 @@ int CLuaPlayerDefs::GetAlivePlayers(lua_State* luaVM)
     if (pLuaMain)
     {
         // Create a new table
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, m_pPlayerManager->Count(), 0);
 
         // Add all alive players
-        unsigned int uiIndex = 0;
-
-        for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
-        {
-            CPlayer* pPlayer = *iter;
-
-            if (pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
+        lua_Number index = 0;
+        m_pPlayerManager->IterateJoined([&](CPlayer* pPlayer) {
+            if (pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
             {
-                lua_pushnumber(luaVM, ++uiIndex);
+                lua_pushnumber(luaVM, ++index);
                 lua_pushelement(luaVM, pPlayer);
                 lua_settable(luaVM, -3);
             }
-        }
+        });
 
-        return 1;
+        return 1; // Only table remains on the stack
     }
 
     lua_pushboolean(luaVM, false);
@@ -555,24 +551,21 @@ int CLuaPlayerDefs::GetDeadPlayers(lua_State* luaVM)
     if (pLuaMain)
     {
         // Create a new table
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, m_pPlayerManager->Count(), 0);
 
         // Add all dead players
-        unsigned int uiIndex = 0;
+        lua_Number index = 0;
 
-        for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
-        {
-            CPlayer* pPlayer = *iter;
-
-            if (pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
+        m_pPlayerManager->IterateJoined([&](CPlayer* pPlayer) {
+            if (!pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
             {
-                lua_pushnumber(luaVM, ++uiIndex);
+                lua_pushnumber(luaVM, ++index);
                 lua_pushelement(luaVM, pPlayer);
                 lua_settable(luaVM, -3);
             }
-        }
+        });
 
-        return 1;
+        return 1; // Only table remains on the stack
     }
 
     lua_pushboolean(luaVM, false);

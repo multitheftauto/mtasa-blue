@@ -262,9 +262,8 @@ CGame::~CGame()
     CSimControl::EnableSimSystem(false);
 
     // Disconnect all players
-    std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
-        DisconnectPlayer(this, **iter, CPlayerDisconnectedPacket::SHUTDOWN);
+    for (CPlayer* pPlayer : m_pPlayerManager->GetAllPlayers())
+        DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SHUTDOWN);
 
     // Stop networking
     Stop();
@@ -1292,21 +1291,19 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     // Write all players connected right now to a playerlist packet except the one we got the ingame notice from
     CPlayerListPacket PlayerList;
+
     // Entity add packet might as well be generated
     CEntityAddPacket EntityPacket;
     PlayerList.SetShowInChat(false);
-    list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
+    for (CPlayer* pPlayer : m_pPlayerManager->GetAllPlayers())
     {
-        CPlayer* pPlayer = *iter;
-        if (&Player != *iter && (*iter)->IsJoined() && !(*iter)->IsBeingDeleted())
-        {
-            PlayerList.AddPlayer(*iter);
-        }
-        if (pPlayer != &Player)
-        {
-            EntityPacket.Add(pPlayer);
-        }
+        if (pPlayer == &Player) // Dont add us to the list
+            continue;
+
+        if (pPlayer->IsJoined() && !pPlayer->IsBeingDeleted())
+            PlayerList.AddPlayer(pPlayer);
+
+        EntityPacket.Add(pPlayer);
     }
 
     // Send it to the player we got this ingame notice from
@@ -1324,23 +1321,21 @@ void CGame::InitialDataStream(CPlayer& Player)
     marker.Set("SendBlips");
 
     // Send him the current info of the current players ( stats, clothes, etc )
-    iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
-    {
-        if (&Player != *iter && (*iter)->IsJoined())
-        {
-            CPlayerStatsPacket PlayerStats = *(*iter)->GetPlayerStatsPacket();
-            PlayerStats.SetSourceElement(*iter);
-            if (PlayerStats.GetSize() > 0)
-                Player.Send(PlayerStats);
+    m_pPlayerManager->IterateJoined([&](CPlayer* pPlayer) {
+        if (pPlayer == &Player)
+            return;
 
-            CPlayerClothesPacket PlayerClothes;
-            PlayerClothes.SetSourceElement(*iter);
-            PlayerClothes.Add((*iter)->GetClothes());
-            if (PlayerClothes.Count() > 0)
-                Player.Send(PlayerClothes);
-        }
-    }
+        CPlayerStatsPacket PlayerStats = *pPlayer->GetPlayerStatsPacket();
+        PlayerStats.SetSourceElement(pPlayer);
+        if (PlayerStats.GetSize() > 0)
+            Player.Send(PlayerStats);
+
+        CPlayerClothesPacket PlayerClothes;
+        PlayerClothes.SetSourceElement(pPlayer);
+        PlayerClothes.Add(pPlayer->GetClothes());
+        if (PlayerClothes.Count() > 0)
+            Player.Send(PlayerClothes);
+    });
 
     marker.Set("PlayerStats");
 
@@ -4386,19 +4381,17 @@ CMtaVersion CGame::CalculateMinClientRequirement()
             m_strPrevMinClientKickRequirement = strKickMin;
 
             // Do kicking
-            uint uiNumIncompatiblePlayers = 0;
-            for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
-            {
-                CPlayer* pPlayer = *iter;
-                if (strKickMin > pPlayer->GetPlayerVersion())
-                {
-                    CStaticFunctionDefinitions::RedirectPlayer(pPlayer, "", 0, NULL);
-                    uiNumIncompatiblePlayers++;
-                }
-            }
+            const auto& players = g_pGame->GetPlayerManager()->GetAllPlayers();
+            const auto  playersRedirectedCount = std::count_if(players.begin(), players.end(), [&strKickMin](CPlayer* pPlayer) {
+                if (strKickMin <= pPlayer->GetPlayerVersion())
+                    return false;
 
-            if (uiNumIncompatiblePlayers > 0)
-                CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin));
+                CStaticFunctionDefinitions::RedirectPlayer(pPlayer, "", 0, NULL);
+                return true;
+            });
+
+            if (playersRedirectedCount > 0)
+                CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", playersRedirectedCount, *strKickMin));
         }
     }
 

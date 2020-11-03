@@ -155,25 +155,20 @@ CPlayer* CObjectSync::FindPlayerCloseToObject(CObject* pObject, float fMaxDistan
     CVector vecPosition = pObject->GetPosition();
 
     // See if any players are close enough
-    CPlayer*                       pSyncer = NULL;
-    list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
-    {
-        CPlayer* pPlayer = *iter;
-        // Is he joined?
-        if (pPlayer->IsJoined())
-        {
-            // Is he near the object?
-            if (IsPointNearPoint3D(vecPosition, pPlayer->GetPosition(), fMaxDistance) && (pPlayer->GetDimension() == pObject->GetDimension()))
-            {
-                // Prefer a player that syncs less objects
-                if (!pSyncer || pPlayer->CountSyncingObjects() < pSyncer->CountSyncingObjects())
-                {
-                    pSyncer = pPlayer;
-                }
-            }
-        }
-    }
+    CPlayer* pSyncer = nullptr;
+    m_pPlayerManager->IterateJoined([=, &pSyncer](CPlayer* pPlayer) {
+        // Is he near the object?
+        if (!IsPointNearPoint3D(vecPosition, pPlayer->GetPosition(), fMaxDistance))
+            return;
+
+        // Same dimension?
+        if (pPlayer->GetDimension() != pObject->GetDimension())
+            return;
+
+        // Prefer a player that syncs less objects
+        if (!pSyncer || pPlayer->CountSyncingObjects() < pSyncer->CountSyncingObjects())
+            pSyncer = pPlayer;        
+    });
 
     // Return the player we found
     return pSyncer;

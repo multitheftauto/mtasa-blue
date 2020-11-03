@@ -11592,11 +11592,8 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
         bool bNickSet = false;
 
         // Loop through players to see if we should kick anyone
-        list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-        for (; iter != m_pPlayerManager->IterEnd(); iter++)
+        for (CPlayer* const pPlayer : m_pPlayerManager->GetAllPlayers())
         {
-            CPlayer* const pPlayer = *iter;
-
             // Default to not banning; if the IP, serial and username don't match, we don't want to kick the guy out
             bool bBan = false;
 
@@ -11654,7 +11651,7 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                     time_t                    Duration = pBan->GetBanTimeRemaining();
                     CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
                     pPlayer->Send(Packet);
-                    g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                    g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
                 }
             }
         }

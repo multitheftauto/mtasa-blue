@@ -167,12 +167,10 @@ void CMapManager::BroadcastMapInformation()
     m_pPlayerManager->BroadcastOnlyJoined(EntityPacket);
 
     // Tell each player individually about the per-player entities
-    list<CPlayer*>::const_iterator iterPlayers = m_pPlayerManager->IterBegin();
-    for (; iterPlayers != m_pPlayerManager->IterEnd(); iterPlayers++)
-    {
-        SendPerPlayerEntities(**iterPlayers);
-        SendBlips(**iterPlayers);
-    }
+    m_pPlayerManager->IterateJoined([this](CPlayer* pPlayer) {
+        SendPerPlayerEntities(*pPlayer);
+        SendBlips(*pPlayer);
+    });
 }
 
 void CMapManager::SendMapInformation(CPlayer& Player)
@@ -959,10 +957,8 @@ void CMapManager::LinkupElements()
         }
     }
 
-    list<CPlayer*>::const_iterator iterPlayers = m_pPlayerManager->IterBegin();
-    for (; iterPlayers != m_pPlayerManager->IterEnd(); iterPlayers++)
+    for (CPlayer* pPlayer : m_pPlayerManager->GetAllPlayers())
     {
-        CPlayer* pPlayer = *iterPlayers;
         // Link up all the attaching elements
         const char* szAttachToID = pPlayer->GetAttachToID();
         if (szAttachToID[0])

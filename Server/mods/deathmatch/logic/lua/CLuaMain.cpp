@@ -362,12 +362,8 @@ void CLuaMain::UnloadScript()
     m_pLuaTimerManager->RemoveAllTimers();
 
     // Delete all keybinds
-    list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); ++iter)
-    {
-        if ((*iter)->IsJoined())
-            (*iter)->GetKeyBinds()->RemoveAllKeys(this);
-    }
+    m_pPlayerManager->IterateJoined([this](CPlayer* pPlayer) {
+        pPlayer->GetKeyBinds()->RemoveAllKeys(this); });
 
     // End the lua vm
     if (m_luaVM)

@@ -158,33 +158,27 @@ CPlayer* CPedSync::FindPlayerCloseToPed(CPed* pPed, float fMaxDistance)
     CVector vecPedPosition = pPed->GetPosition();
 
     // See if any players are close enough
-    CPlayer*                       pLastPlayerSyncing = NULL;
-    CPlayer*                       pPlayer = NULL;
-    list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
-    {
-        pPlayer = *iter;
-        // Is he joined?
-        if (pPlayer->IsJoined())
-        {
-            // He's near enough?
-            if (IsPointNearPoint3D(vecPedPosition, pPlayer->GetPosition(), fMaxDistance))
-            {
-                // Same dimension?
-                if (pPlayer->GetDimension() == pPed->GetDimension())
-                {
-                    // He syncs less peds than the previous player close enough?
-                    if (!pLastPlayerSyncing || pPlayer->CountSyncingPeds() < pLastPlayerSyncing->CountSyncingPeds())
-                    {
-                        pLastPlayerSyncing = pPlayer;
-                    }
-                }
-            }
-        }
-    }
+    CPlayer* pClosestAppliableSyncer = nullptr;
+    m_pPlayerManager->IterateJoined([=, &pClosestAppliableSyncer](CPlayer* pPlayer) {
+        // Make sure he isnt being deleted
+        if (pPlayer->IsBeingDeleted())
+            return;
+        
+        // Same dimension?
+        if (pPlayer->GetDimension() != pPed->GetDimension())
+            return;
+
+        // He's near enough?
+        if (!IsPointNearPoint3D(vecPedPosition, pPlayer->GetPosition(), fMaxDistance))
+            return;
+
+        // Prefer a player that syncs less peds
+        if (!pClosestAppliableSyncer || pPlayer->CountSyncingPeds() < pClosestAppliableSyncer->CountSyncingPeds())
+            pClosestAppliableSyncer = pPlayer;
+    });
 
     // Return the player we found that syncs the least number of peds
-    return pLastPlayerSyncing;
+    return pClosestAppliableSyncer;
 }
 
 void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
