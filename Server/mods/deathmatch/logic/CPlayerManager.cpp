@@ -180,11 +180,15 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
 {
+    dassert(m_Players.find(pPlayer) != m_Players.end()); // Make sure he's not in the set already
     m_Players.erase(pPlayer);
+
+    dassert(MapFind(m_SocketPlayerMap, pPlayer->GetSocket())); // Make sure he was in the socket map as well
     m_SocketPlayerMap.erase(pPlayer->GetSocket());
+
     dassert(m_Players.size() == m_SocketPlayerMap.size());
 
-    if (auto* players = MapFind(m_JoinedPlayersMap, pPlayer->GetBitStreamVersion()))
+    if (auto* players = MapFind(m_JoinedByBitStreamVer, pPlayer->GetBitStreamVersion())) // May not be in this map though
         ListRemoveFirst(*players, pPlayer);
 
     for (CPlayer* itPlayer : m_Players)
