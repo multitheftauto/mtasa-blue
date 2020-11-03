@@ -54,6 +54,13 @@ public:
         BroadcastIf(Packet, std::forward<T>(sendList), [](CPlayer*) { return true; });
     }
 
+    static bool IsValidPlayerModel(unsigned short usPlayerModel)
+    {
+        return (usPlayerModel == 0 || usPlayerModel == 1 || usPlayerModel == 2 || usPlayerModel == 7 ||
+            (usPlayerModel >= 9 && usPlayerModel != 208 && usPlayerModel != 149 && usPlayerModel != 119 && usPlayerModel != 86 && usPlayerModel != 74 &&
+            usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
+            (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
+    }
 public:
     CPlayerManager() { m_ZombieCheckTimer.SetUseModuleTickCount(true); }
     ~CPlayerManager();
