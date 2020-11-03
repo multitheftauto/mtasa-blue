@@ -23,11 +23,8 @@ void CPlayerManager::DoPulse()
 {
     PulseZombieCheck();
 
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
-    {
-        (*iter)->DoPulse();
-    }
+    for (CPlayer* pPlayer : m_Players)
+        pPlayer->DoPulse();
 }
 
 void CPlayerManager::PulseZombieCheck()
