@@ -68,7 +68,7 @@ public:
     void DoPulse();
     void PulseZombieCheck();
 
-    void SetScriptDebugging(class CScriptDebugging* pScriptDebugging) { m_pScriptDebugging = pScriptDebugging; };
+    void SetScriptDebugging(class CScriptDebugging* pScriptDebugging) noexcept { m_pScriptDebugging = pScriptDebugging; };
 
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
 
