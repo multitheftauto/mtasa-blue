@@ -26,7 +26,7 @@ public:
 
     bool           LoadCol(const SString& strFile, bool bIsRawData);
     bool           Load(bool isRaw, SString input);
-    unsigned short GetVerticesCount() const { return m_iVerticesCount; };
+    int            GetVerticesCount() const { return m_iVerticesCount; };
     void           SetCollisionHasChanged(bool bChanged) { b_hasChanged = bChanged; };
     bool           HasChanged() const { return b_hasChanged; };
     bool           IsLoaded() { return m_pColModel != NULL; };

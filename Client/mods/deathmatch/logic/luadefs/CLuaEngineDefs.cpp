@@ -2411,21 +2411,21 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                     }
                     else
                     {
-                        unsigned short usNumVertices;
+                        int iNumVertices;
                         if (pCol)
                         {
-                            usNumVertices = pCol->GetVerticesCount();
+                            iNumVertices = pCol->GetVerticesCount();
                         }
                         else
                         {
-                            usNumVertices = pColData->getNumVertices();
+                            iNumVertices = pColData->getNumVertices();
                         }
 
                         CVector vec;
                         CompressedVector pVertex;
 
                         lua_newtable(luaVM);
-                        for (ushort i = 0; i < usNumVertices; i++)
+                        for (int i = 0; i < iNumVertices; i++)
                         {
                             lua_pushnumber(luaVM, i + 1);
                             lua_newtable(luaVM);
@@ -2543,7 +2543,7 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
         if (pColModelSAInterface)
         {
             CColDataSA* pColData = pColModelSAInterface->pColData;
-            ushort numVertices = pCol->GetVerticesCount();
+            int numVertices = pCol->GetVerticesCount();
             for (ushort i = 0; i != vecUncheckedShapeId.size(); i++) {
                 if (pColData->isValidIndex(eCollisionShape, vecUncheckedShapeId[i] - 1, numVertices))
                     vecShapeId.push_back(vecUncheckedShapeId[i] - 1);
