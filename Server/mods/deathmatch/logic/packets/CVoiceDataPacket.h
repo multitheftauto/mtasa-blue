@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CVoiceDataPacket : public CPacket
+class CVoiceDataPacket final : public CPacket
 {
 public:
     CVoiceDataPacket(CPlayer* pPlayer, const unsigned char* pbSrcBuffer, unsigned short usLength);

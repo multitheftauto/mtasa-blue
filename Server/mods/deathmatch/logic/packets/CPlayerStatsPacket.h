@@ -21,7 +21,7 @@ struct sPlayerStat
     float          value;
 };
 
-class CPlayerStatsPacket : public CPacket
+class CPlayerStatsPacket final : public CPacket
 {
 public:
     ~CPlayerStatsPacket();

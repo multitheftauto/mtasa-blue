@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CPlayerQuitPacket : public CPacket
+class CPlayerQuitPacket final : public CPacket
 {
 public:
     CPlayerQuitPacket();
