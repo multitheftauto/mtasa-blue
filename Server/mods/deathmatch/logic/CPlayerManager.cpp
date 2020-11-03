@@ -12,11 +12,6 @@
 #include "StdInc.h"
 #include "net/SimHeaders.h"
 
-CPlayerManager::CPlayerManager()
-{
-    m_ZombieCheckTimer.SetUseModuleTickCount(true);
-}
-
 CPlayerManager::~CPlayerManager()
 {
     DeleteAll();

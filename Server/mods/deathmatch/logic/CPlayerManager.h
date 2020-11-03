@@ -23,7 +23,7 @@ class CPlayerManager
     friend class CPlayer;
 
 public:
-    CPlayerManager();
+    CPlayerManager() { m_ZombieCheckTimer.SetUseModuleTickCount(true); }
     ~CPlayerManager();
 
     void DoPulse();
