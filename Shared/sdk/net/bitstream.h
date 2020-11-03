@@ -444,8 +444,9 @@ enum class eBitStreamVersion : unsigned short
     // 1.5.8 RELEASED - 2020-10-11
     //
 
-    // Allow change outside world water level
-    WaterLevel_ChangeOutsideLevel,
+    // setWaterLevel: add bIncludeWorldSeaLevel and bIncludeOutsideWorldLevel
+    // 2020-11-03 0x70
+    SetWaterLevel_ChangeOutsideLevel,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

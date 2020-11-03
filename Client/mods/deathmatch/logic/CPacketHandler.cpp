@@ -2238,7 +2238,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     {
         bitStream.Read(fNonSeaLevel);
     }
-    if (bitStream.Version() >= 0x07A)
+    if (bitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideLevel))
     {
         bitStream.ReadBit(bHasOutsideLevel);
         if (bHasOutsideLevel)
