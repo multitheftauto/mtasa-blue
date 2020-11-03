@@ -88,6 +88,12 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
+    // Deallocate all models that this resource allocated earlier
+    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
+
+    // Delete all the resource's locally created children (the server won't do that)
+    DeleteClientChildren();
+
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
     // Make sure we don't force the cursor on
     ShowCursor(false);
@@ -120,9 +126,6 @@ CResource::~CResource()
     // Destroy the gui root so all gui elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceGUIEntity);
     m_pResourceGUIEntity = NULL;
-
-    // Deallocate all models that this resource allocated earlier
-    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 
     // Undo all changes to water
     g_pGame->GetWaterManager()->UndoChanges(this);

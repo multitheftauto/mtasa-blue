@@ -28,4 +28,7 @@ public:
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
+    CStreamingInfo* GetStreamingInfoFromModelId(ushort id);
+private:
+    static CStreamingInfo (&ms_aInfoForModel)[26316];
 };
