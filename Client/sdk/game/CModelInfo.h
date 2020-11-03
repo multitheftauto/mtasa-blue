@@ -28,6 +28,17 @@ public:
     float   fRadius;
 };
 
+enum class eModelInfoType : unsigned char
+{
+    ATOMIC = 1,
+    TIME = 3,
+    WEAPON = 4,
+    CLUMP = 5,
+    VEHICLE = 6,
+    PED = 7,
+    LOD_ATOMIC = 8,
+};
+
 enum eVehicleUpgradePosn
 {
     VEHICLE_UPGRADE_POSN_BONET = 0,
@@ -101,6 +112,7 @@ class CModelInfo
 public:
     virtual class CBaseModelInfoSAInterface* GetInterface() = 0;
 
+    virtual eModelInfoType GetModelType() = 0;
     virtual DWORD GetModel() = 0;
     virtual bool  IsPlayerModel() = 0;
     virtual BOOL  IsBoat() = 0;
@@ -129,6 +141,8 @@ public:
     virtual float          GetOriginalLODDistance() = 0;
     virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
     virtual void           RestreamIPL() = 0;
+    virtual bool           GetTime(char& hourOn, char& hourOff) = 0;
+    virtual bool           SetTime(char hourOn, char hourOff) = 0;
 
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
@@ -177,6 +191,7 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
+    virtual void      MakeObjectModel(ushort usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;

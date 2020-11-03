@@ -391,7 +391,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->InitVoice(bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate);
 
     // Get fakelag command enabled
-    if (bitStream.Version() >= 0x06A)
+    if (bitStream.Can(eBitStreamVersion::FakeLagCommand))
     {
         if (bitStream.ReadBit())
             g_pCore->SetFakeLagCommandEnabled(true);
@@ -1345,7 +1345,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         // Read the client's ID
         int iNumberOfBytesUsed;
 
-        if (bitStream.Version() >= 0x06B)
+        if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
             ElementID ClientID;
             bitStream.Read(ClientID);
@@ -2917,7 +2917,7 @@ retry:
                         if (bitStream.ReadBit())
                             pObject->SetDoubleSided(true);
 
-                        if (bitStream.Version() >= 0x068)
+                        if (bitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                             if (bitStream.ReadBit())
                                 pObject->SetVisibleInAllDimensions(true);
 
@@ -3983,7 +3983,7 @@ retry:
                     }
 
                     bool bShallow = false;
-                    if (bitStream.Version() >= 0x06C)
+                    if (bitStream.Can(eBitStreamVersion::Water_bShallow_ServerSide))
                         bitStream.ReadBit(bShallow);
 
                     CClientWater* pWater = NULL;
@@ -5185,7 +5185,7 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
         bitStream.Read(ucAllowBadDrivebyHitboxesFix);
 
     uchar ucAllowShotgunDamageFix = 0;
-    if (bitStream.Version() >= 0x64)
+    if (bitStream.Can(eBitStreamVersion::ShotgunDamageFix))
         bitStream.Read(ucAllowShotgunDamageFix);
 
     SMiscGameSettings miscGameSettings;
@@ -5242,7 +5242,7 @@ void CPacketHandler::Packet_PedTask(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
 {
     uint8 flags;
-    
+
     if (!bitStream.Read(flags))
         return;
 

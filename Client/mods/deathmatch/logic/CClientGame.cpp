@@ -257,6 +257,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
+    g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
@@ -425,6 +426,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetChokingHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
+    g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
@@ -632,7 +634,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
-            if (g_pNet->GetServerBitStreamVersion() >= 0x06E)
+            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
             {
                 SString joinSecret = SStringX(szSecret);
                 pBitStream->WriteString<uchar>(joinSecret);
@@ -2860,6 +2862,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Game events
     m_Events.AddEvent("onClientPreRender", "", NULL, false);
+    m_Events.AddEvent("onClientPedsProcessed", "", NULL, false);
     m_Events.AddEvent("onClientHUDRender", "", NULL, false);
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
@@ -3560,6 +3563,7 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetAlphaTransparencies();
+    g_pGame->ResetModelTimes();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
@@ -3630,7 +3634,7 @@ void CClientGame::SetupGlobalLuaEvents()
         CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
         if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
             return;
-        
+
         // Call event now
         CLuaArguments args;
         args.PushString(clipboardText);
@@ -3719,6 +3723,11 @@ void CClientGame::StaticPreWorldProcessHandler()
 void CClientGame::StaticPostWorldProcessHandler()
 {
     g_pClientGame->PostWorldProcessHandler();
+}
+
+void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
+{
+    g_pClientGame->PostWorldProcessPedsAfterPreRenderHandler();
 }
 
 void CClientGame::StaticPreFxRenderHandler()
@@ -3964,6 +3973,12 @@ void CClientGame::PostWorldProcessHandler()
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
+}
+
+void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
+{
+    CLuaArguments Arguments;
+    m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 }
 
 void CClientGame::IdleHandler()
@@ -5841,6 +5856,8 @@ void CClientGame::ResetMapInfo()
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
+
+    RestreamWorld();
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -6962,9 +6979,23 @@ void CClientGame::RestreamModel(unsigned short usModel)
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
+void CClientGame::RestreamWorld()
+{
+    for (unsigned int uiModelID = 0; uiModelID <= 26316; uiModelID++)
+    {
+        g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
+    }
+    m_pManager->GetObjectManager()->RestreamAllObjects();
+    m_pManager->GetVehicleManager()->RestreamAllVehicles();
+    m_pManager->GetPedManager()->RestreamAllPeds();
+    m_pManager->GetPickupManager()->RestreamAllPickups();
+
+    g_pGame->GetStreaming()->ReinitStreaming();
+}
+
 void CClientGame::TriggerDiscordJoin(SString strSecret)
 {
-    if (g_pNet->GetServerBitStreamVersion() < 0x06E)
+    if (!g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
         return;
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -7118,7 +7149,7 @@ void CClientGame::UpdateDiscordState()
     uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
     SString state(std::to_string(playerCount));
 
-    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06E)
+    if (g_pCore->GetNetwork()->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
         state += "/" + std::to_string(playerSlot);
 
     state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
