@@ -45,6 +45,37 @@ public:
     virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
     virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
 
+    NetServerPacketReliability GetNetServerReliability() const noexcept
+    {
+        const auto flags = GetFlags();
+        if (flags & PACKET_RELIABLE)
+        {
+            if (flags & PACKET_SEQUENCED)
+                return PACKET_RELIABILITY_RELIABLE_ORDERED;
+            else
+                return PACKET_RELIABILITY_RELIABLE;
+        }
+        else
+        {
+            if (flags & PACKET_SEQUENCED)
+                return PACKET_RELIABILITY_UNRELIABLE_SEQUENCED;
+            else
+                return PACKET_RELIABILITY_UNRELIABLE;
+        }
+    }
+
+    NetServerPacketPriority GetNetServerPriority() const noexcept
+    {
+        const auto flags = GetFlags();
+        if (flags & PACKET_HIGH_PRIORITY)
+            return PACKET_PRIORITY_HIGH;
+
+        else if (flags & PACKET_LOW_PRIORITY)
+            return PACKET_PRIORITY_LOW;
+
+        return PACKET_PRIORITY_MEDIUM;
+    }
+
     void                     SetSourceElement(CElement* pSource) { m_pSourceElement = pSource; };
     CElement*                GetSourceElement() const { return m_pSourceElement; };
     CPlayer*                 GetSourcePlayer();
