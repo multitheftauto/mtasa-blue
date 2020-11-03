@@ -2261,26 +2261,16 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
                         pVehicle->m_ucLightStates[i] = Packet.m_damage.data.ucLightStates[i];
                 }
 
-                // Make a list of players to relay this packet to
-                CSendList                      sendList;
-                list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-                for (; iter != m_pPlayerManager->IterEnd(); iter++)
-                {
-                    CPlayer* pOther = *iter;
-                    if (pOther != pPlayer && pOther->IsJoined())
-                    {
-                        if (pOther->GetDimension() == pPlayer->GetDimension())
-                        {
-                            // Newer clients only need sync if vehicle has no driver
-                            if (pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant(0) == NULL)
-                            {
-                                sendList.push_back(pOther);
-                            }
-                        }
-                    }
-                }
+                m_pPlayerManager->BroadcastJoinedIf(Packet, [pPlayer, pVehicle](CPlayer* pOtherPlayer) {
+                    if (pOtherPlayer == pPlayer)
+                        return false;
 
-                CPlayerManager::Broadcast(Packet, sendList);
+                    if (pOtherPlayer->GetDimension() != pPlayer->GetDimension())
+                        return false;
+
+                    // Newer clients only need sync if vehicle has no driver
+                    return pOtherPlayer->GetBitStreamVersion() < 0x5D || !pVehicle->GetOccupant(0);
+                });
             }
         }
     }
@@ -2629,29 +2619,18 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
 
         if (bBroadcast)
         {
-            // Make a list of players to send this packet to
-            CSendList sendList;
-
-            // Loop through all the players
-            std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-            for (; iter != m_pPlayerManager->IterEnd(); iter++)
-            {
-                CPlayer* pSendPlayer = *iter;
-
+            // Broadcast to specific players
+            m_pPlayerManager->BroadcastJoinedIf(Packet, [vecPosition](CPlayer* pOtherPlayer) {
                 // We tell the reporter to create the explosion too
-                // Grab this player's camera position
+                // So no pPlayer == pOtherPlayer check
+
+                // Grab other players's camera position
                 CVector vecCameraPosition;
-                pSendPlayer->GetCamera()->GetPosition(vecCameraPosition);
+                pOtherPlayer->GetCamera()->GetPosition(vecCameraPosition);
 
                 // Is this players camera close enough to send?
-                if (IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE))
-                {
-                    // Send the packet to him
-                    sendList.push_back(pSendPlayer);
-                }
-            }
-
-            CPlayerManager::Broadcast(Packet, sendList);
+                return IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE);
+            });
         }
     }
 }
@@ -2670,31 +2649,18 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
                 vecPosition += pOriginSource->GetPosition();
         }
 
-        // Make a list of players to send this packet to
-        CSendList sendList;
-
-        // Loop through all the players
-        std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-        for (; iter != m_pPlayerManager->IterEnd(); iter++)
-        {
-            CPlayer* pSendPlayer = *iter;
-
+        m_pPlayerManager->BroadcastJoinedIf(Packet, [pPlayer, vecPosition](CPlayer* pOtherPlayer) {
             // Not the player we got the packet from?
-            if (pSendPlayer != pPlayer)
-            {
-                // Grab this player's camera position
-                CVector vecCameraPosition;
-                pSendPlayer->GetCamera()->GetPosition(vecCameraPosition);
+            if (pOtherPlayer == pPlayer)
+                return false;
 
-                // Is this players camera close enough to send?
-                if (IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_PROJECTILE_SYNC_DISTANCE))
-                {
-                    // Send the packet to him
-                    sendList.push_back(pSendPlayer);
-                }
-            }
-        }
-        CPlayerManager::Broadcast(Packet, sendList);
+            // Grab this player's camera position
+            CVector vecCameraPosition;
+            pOtherPlayer->GetCamera()->GetPosition(vecCameraPosition);
+
+            // Is this players camera close enough to send?
+            return IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_PROJECTILE_SYNC_DISTANCE);
+        });
     }
 }
 
