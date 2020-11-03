@@ -9161,7 +9161,7 @@ bool CStaticFunctionDefinitions::SetAllElementWaterLevel(float fLevel)
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel,  bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
+bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
     g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 
