@@ -19,7 +19,7 @@ class CTeam;
 
 #define MAX_TEAM_NAME 128
 
-class CTeam : public CElement
+class CTeam final : public CElement
 {
     friend class CTeamManager;
 

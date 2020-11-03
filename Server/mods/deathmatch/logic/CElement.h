@@ -44,7 +44,7 @@ typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
 // List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CElement*>, public CRefCountableST
+class CElementListSnapshot final : public std::vector<CElement*>, public CRefCountableST
 {
 };
 

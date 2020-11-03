@@ -27,7 +27,7 @@ struct STrackNode
     STrackNode() {}
 };
 
-class CTrainTrack : public CElement
+class CTrainTrack final : public CElement
 {
 public:
     CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
