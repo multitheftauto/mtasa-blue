@@ -23,6 +23,8 @@
     #pragma pop_macro("assert")
 #endif
 
+#include "SharedUtil.FastHashMap.h" // For empty and deleted keys
+
 namespace SharedUtil
 {
     ////////////////////////////////////////////////

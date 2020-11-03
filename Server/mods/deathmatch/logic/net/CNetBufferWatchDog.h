@@ -8,6 +8,12 @@
  *****************************************************************************/
 
 class CNetServerBuffer;
+class CThreadHandle;
+
+#pragma once
+
+#include <SharedUtil.Thread.h>
+
 
 //
 // Info about a queue

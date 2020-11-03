@@ -17,6 +17,7 @@ class CPlayerManager;
 #include "packets/CPacket.h"
 #include "CPlayer.h"
 #include "../Config.h"
+#include <net/CNetBufferWatchDog.h>
 
 class CPlayerManager
 {
@@ -145,7 +146,7 @@ private:
     // Wrapper around the above function so it can be called without a predicate
     static void DoBroadcast(const CPacket& Packet, const PlayersByBitStreamVersionMap& playersByBitStreamVer)
     {
-        DoBroadcast(Packet, playersByBitStreamVer,
+        DoBroadcastIf(Packet, playersByBitStreamVer,
             [](CPlayer*) { return true; }); // Placeholder lambda
     }
 
