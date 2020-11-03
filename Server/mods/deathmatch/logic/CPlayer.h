@@ -85,8 +85,8 @@ public:
     int                GetClientType() { return CClient::CLIENT_PLAYER; };
     unsigned long long GetTimeSinceConnected() { return m_ConnectedTimer.Get(); }
 
-    const char* GetNick() { return m_strNick; };
-    void        SetNick(const char* szNick);
+    const char* GetNick() { return m_strNick; }; // Todo: Return a const SString& here instead. Also, make this function a const
+    void        SetNick(const char* szNick); // Todo: change this to SString, then move SString into m_strNick. Move ctor needs to be added to SString..
 
     int                GetGameVersion() { return m_iGameVersion; };
     void               SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
