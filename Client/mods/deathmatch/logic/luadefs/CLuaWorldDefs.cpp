@@ -1974,13 +1974,13 @@ int CLuaWorldDefs::GetFPSLimit(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::ResetColorFilter(lua_State* const luaVM)
+bool CLuaWorldDefs::ResetColorFilter()
 {
     g_pMultiplayer->ResetColorFilter();
     return true;
 }
 
-bool CLuaWorldDefs::SetColorFilter(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
     uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha)
 {
     unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);

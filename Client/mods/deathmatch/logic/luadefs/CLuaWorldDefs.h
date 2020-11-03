@@ -8,10 +8,6 @@
  *****************************************************************************/
 
 #pragma once
-#include <optional>
-#include <variant>
-#include <utility>
-#include <optional>
 #include "CLuaDefs.h"
 
 class CLuaWorldDefs : public CLuaDefs
@@ -117,7 +113,7 @@ public:
 
     LUA_DECLARE(CreateExplosion);
 
-    static bool ResetColorFilter(lua_State* const luaVM);
-    static bool SetColorFilter(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+    static bool ResetColorFilter();
+    static bool SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
         uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha);
 };
