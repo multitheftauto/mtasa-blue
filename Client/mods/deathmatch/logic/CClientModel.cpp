@@ -28,27 +28,37 @@ CClientModel::~CClientModel(void)
     m_pModelManager->Remove(this);
 }
 
-bool CClientModel::Allocate(void)
+bool CClientModel::Allocate(ushort usParentID)
 {
     m_bAllocatedByUs = true;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
 
     // Allocate only on free IDs
-    if (!pModelInfo->IsValid())
+    if (pModelInfo->IsValid())
+        return false;
+
+    switch (m_eModelType)
     {
-        switch (m_eModelType)
-        {
-            case eClientModelType::PED:
-                pModelInfo->MakePedModel("PSYCHO");
-                break;
-            case eClientModelType::OBJECT:
-                pModelInfo->MakeObjectModel(1337);
-                break;
-            default:
-                return false;
-        }
-        return true;
+        case eClientModelType::PED:
+            pModelInfo->MakePedModel("PSYCHO");
+            break;
+        case eClientModelType::OBJECT:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeObjectModel(usParentID);
+                return true;
+            }
+            break;
+        case eClientModelType::VEHICLE:
+            if (g_pClientGame->GetVehicleManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeVehicleAutomobile(usParentID);
+                return true;
+            }
+            break;
+        default:
+            return false;
     }
     return false;
 }
@@ -61,64 +71,66 @@ bool CClientModel::Deallocate(void)
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
 
     // ModelInfo must be valid
-    if (pModelInfo->IsValid())
+    if (!pModelInfo->IsValid())
+        return false;
+
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+        for (auto iter = iterBegin; iter != iterEnd; iter++)
+        {
+            auto& element = **iter;
+
+            if (element.GetModel() != m_iModelID)
+                continue;
+
+            if (element.IsStreamedIn())
+                element.StreamOutForABit();
+
+            setElementModelLambda(element);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(m_iModelID);
+            Arguments.PushNumber(usParentID);
+            element.CallEvent("onClientElementModelChange", Arguments, true);
+        }
+    };
+
+    switch (m_eModelType)
     {
-        if (m_eModelType == eClientModelType::PED)
+        case eClientModelType::PED:
         {
             // If some ped is using this ID, change him to CJ
-            CClientPedManager*                       pPedManager = g_pClientGame->GetManager()->GetPedManager();
-            for (auto iter = pPedManager->IterBegin(); iter != pPedManager->IterEnd(); iter++)
-            {
-                CClientPed* pPed = *iter;
-                if (pPed->GetModel() == m_iModelID)
-                {
-                    if (pPed->IsStreamedIn())
-                    {
-                        pPed->StreamOutForABit();
-                    }
-                    pPed->SetModel(0);
+            CClientPedManager* pPedManager = g_pClientGame->GetManager()->GetPedManager();
 
-                    CLuaArguments Arguments;
-                    Arguments.PushNumber(m_iModelID);
-                    Arguments.PushNumber(0);
-                    pPed->CallEvent("onClientElementModelChange", Arguments, true);
-                }
-            }
+            unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
+            break;
         }
-        else if (m_eModelType == eClientModelType::OBJECT)
+        case eClientModelType::OBJECT:
         {
-            CClientObjectManager* pObjectManager = g_pClientGame->GetManager()->GetObjectManager();
-            for (auto* pObject : pObjectManager->GetObjects())
-            {
-                if (pObject->GetModel() == m_iModelID)
-                {
-                    if (pObject->IsStreamedIn())
-                    {
-                        pObject->StreamOutForABit();
-                    }
-                    pObject->SetModel(1337);
+            const auto& objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
+            unsigned short      usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
-                    CLuaArguments Arguments;
-                    Arguments.PushNumber(m_iModelID);
-                    Arguments.PushNumber(1337);
-                    pObject->CallEvent("onClientElementModelChange", Arguments, true);
-                }
-            }
-        }
+            unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
-        // Restore DFF/TXD
-        g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
-
-        // Restore COL (for non ped models)
-        if (m_eModelType != eClientModelType::PED)
-        {
+            // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
+            break;
         }
+        case eClientModelType::VEHICLE:
+        {
+            CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+            unsigned short         usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
-        pModelInfo->DeallocateModel();
-
-        this->SetParentResource(nullptr);
-        return true;
+            unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
+                                      [=](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
+            break;
+        }
     }
-    return false;
+
+    // Restore DFF/TXD
+    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
+
+    pModelInfo->DeallocateModel();
+
+    this->SetParentResource(nullptr);
+    return true;
 }

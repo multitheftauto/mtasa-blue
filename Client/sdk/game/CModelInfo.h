@@ -130,6 +130,7 @@ public:
 
     virtual char* GetNameIfVehicle() = 0;
 
+    virtual BYTE           GetVehicleType() = 0;
     virtual VOID           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual BYTE           GetLevelFromPosition(CVector* vecPosition) = 0;
     virtual BOOL           IsLoaded() = 0;
@@ -191,7 +192,8 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
-    virtual void      MakeObjectModel(ushort usBaseID) = 0;
+    virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
+    virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
@@ -202,4 +204,6 @@ public:
 
     // Vehicle towing functions
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
+
+    virtual unsigned int GetParentID() = 0;
 };
