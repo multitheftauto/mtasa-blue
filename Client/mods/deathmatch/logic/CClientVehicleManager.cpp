@@ -752,6 +752,24 @@ void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
     }
 }
 
+void CClientVehicleManager::RestreamAllVehicles()
+{
+    // This can speed up initial connect
+    if (m_StreamedIn.empty())
+        return;
+
+    for (auto& pVehicle: m_List)
+    {
+        // Streamed in and same vehicle ID?
+        if (pVehicle->IsStreamedIn())
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pVehicle->StreamOutForABit();
+        }
+    }
+}
+
 void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
 {
     for (uint i = 0; i < m_List.size(); i++)

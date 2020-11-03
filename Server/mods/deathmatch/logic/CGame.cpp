@@ -1242,7 +1242,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06E)
+    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted

@@ -219,6 +219,20 @@ public:
     // +772 = Anim file index
 };
 
+struct CTimeInfoSAInterface
+{
+    CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
+    char  m_nTimeOn;
+    char  m_nTimeOff;
+    short m_wOtherTimeModel;
+};
+
+class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    CTimeInfoSAInterface timeInfo;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
@@ -250,17 +264,6 @@ public:
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
 };
 
-enum eModelInfoType : unsigned char
-{
-    MODEL_INFO_TYPE_ATOMIC = 1,
-    MODEL_INFO_TYPE_TIME = 3,
-    MODEL_INFO_TYPE_WEAPON = 4,
-    MODEL_INFO_TYPE_CLUMP = 5,
-    MODEL_INFO_TYPE_VEHICLE = 6,
-    MODEL_INFO_TYPE_PED = 7,
-    MODEL_INFO_TYPE_LOD_ATOMIC = 8,
-};
-
 /**
  * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
  */
@@ -279,6 +282,7 @@ protected:
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
@@ -331,6 +335,9 @@ public:
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
+    bool           GetTime(char& cHourOn, char& cHourOff);
+    bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
@@ -378,7 +385,9 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
+    void CopyStreamingInfoFromModel(ushort usBaseModelID);
     void MakePedModel(char* szTexture);
+    void MakeObjectModel(ushort usBaseModelID);
     void DeallocateModel(void);
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
