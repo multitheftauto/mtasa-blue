@@ -65,15 +65,14 @@ void CPlayerManager::PulseZombieCheck()
 CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
 {
     // Check socket is free
-    CPlayer* pOtherPlayer = MapFindRef(m_SocketPlayerMap, PlayerSocket);
-    if (pOtherPlayer)
+    if (CPlayer* pOtherPlayer = Get(PlayerSocket))
     {
         CLogger::ErrorPrintf("Attempt to re-use existing connection for player '%s'\n", pOtherPlayer->GetName().c_str());
         return NULL;
     }
 
     // Create the new player
-    return new CPlayer(this, m_pScriptDebugging, PlayerSocket);
+    return new CPlayer(this, m_pScriptDebugging, PlayerSocket); // Seems very safe
 }
 
 unsigned int CPlayerManager::CountJoined()
