@@ -26,7 +26,7 @@ void CWaterRPCs::LoadFunctions()
 void CWaterRPCs::SetWorldWaterLevel(NetBitStreamInterface& bitStream)
 {
     float fLevel;
-    bool  bIncludeWorldNonSeaLevel = false;
+    bool  bIncludeWorldNonSeaLevel = true;
     bool  bIncludeWorldSeaLevel = true;
     bool  bIncludeOutsideWorldLevel = false;
 
