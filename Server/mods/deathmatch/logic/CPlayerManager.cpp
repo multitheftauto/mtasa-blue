@@ -168,27 +168,25 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
 {
-    m_Players.remove(pPlayer);
-    MapRemove(m_SocketPlayerMap, pPlayer->GetSocket());
-    assert(!m_Players.Contains(pPlayer));
-    assert(m_Players.size() == m_SocketPlayerMap.size());
+    m_Players.erase(pPlayer);
+    m_SocketPlayerMap.erase(pPlayer->GetSocket());
+    dassert(m_Players.size() == m_SocketPlayerMap.size());
 
-    m_strLowestConnectedPlayerVersion.clear();
-    for (std::list<CPlayer*>::const_iterator iter = m_Players.begin(); iter != m_Players.end(); iter++)
+    if (auto* players = MapFind(m_JoinedPlayersMap, pPlayer->GetBitStreamVersion()))
+        ListRemoveFirst(*players, pPlayer);
+
+    for (CPlayer* itPlayer : m_Players)
     {
         // Remove from other players near/far lists
-        (*iter)->RemovePlayerFromDistLists(pPlayer);
+        itPlayer->RemovePlayerFromDistLists(pPlayer);
 
-        // Update lowest player version
-        if ((*iter)->IsJoined() && ((*iter)->GetPlayerVersion() < m_strLowestConnectedPlayerVersion || m_strLowestConnectedPlayerVersion.empty()))
-            m_strLowestConnectedPlayerVersion = (*iter)->GetPlayerVersion();
+        // Find lowest player version
+        if (itPlayer->IsJoined())
+        {
+            if (pPlayer->GetPlayerVersion() < m_LowestJoinedPlayerVersion || m_LowestJoinedPlayerVersion.empty())
+                m_LowestJoinedPlayerVersion = pPlayer->GetPlayerVersion();
+        }
     }
-    g_pGame->CalculateMinClientRequirement();
-}
 
-void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
-{
-    if (pPlayer->GetPlayerVersion() < m_strLowestConnectedPlayerVersion || m_strLowestConnectedPlayerVersion.empty())
-        m_strLowestConnectedPlayerVersion = pPlayer->GetPlayerVersion();
     g_pGame->CalculateMinClientRequirement();
 }
