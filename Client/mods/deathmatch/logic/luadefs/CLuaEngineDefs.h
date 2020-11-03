@@ -58,7 +58,7 @@ public:
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
     static uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelID);
-    static bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, bool bIdeFlags = false);
+    static bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
     static bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID);
     static bool CLuaEngineDefs::EngineRestreamWorld();
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);

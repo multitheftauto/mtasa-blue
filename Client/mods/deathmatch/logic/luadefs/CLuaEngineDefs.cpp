@@ -2026,50 +2026,43 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
 {
-    if (uiModelId < 20000)
-    {
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
-        if (pModelInfo)
-        {
-            return pModelInfo->GetFlags();
-        }
-    }
-    throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
+
+    if (uiModelId >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    return pModelInfo->GetFlags();
 }
 
-bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, bool bIdeFlags)
+bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags)
 {
-    // bool engineSetModelFlags ( int modelID, int flags, bool isIde )
-  
-    if (uiModelID < 20000)
-    {
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-        if (pModelInfo)
-        {
-            if (bIdeFlags)
-                pModelInfo->SetIdeFlags(uiFlags);
-            else
-                pModelInfo->SetFlags(uiFlags);
+    // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
 
-            return true;
-        }
-    }
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
-    throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    if (bIdeFlags.value_or(false))
+        pModelInfo->SetIdeFlags(uiFlags);
+    else
+        pModelInfo->SetFlags(uiFlags);
+
+    return true; 
 }
 
 bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (pModelInfo)
+    if (!pModelInfo)
+        return false;
+
+    ushort usCurrentFlags = pModelInfo->GetFlags();
+    ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
+    if (usOriginalFlags != usCurrentFlags)
     {
-        ushort usCurrentFlags = pModelInfo->GetFlags();
-        ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
-        if (usOriginalFlags != usCurrentFlags)
-        {
-            pModelInfo->SetFlags(usOriginalFlags);
-            return true;
-        }
+        pModelInfo->SetFlags(usOriginalFlags);
+        return true;
     }
 
     return false;
