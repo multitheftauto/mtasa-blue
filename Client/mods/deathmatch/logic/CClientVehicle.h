@@ -125,7 +125,7 @@ struct SVehicleComponentData
 };
 class CClientProjectile;
 
-class CClientVehicle final : public CClientStreamElement
+class CClientVehicle : public CClientStreamElement
 {
     DECLARE_CLASS(CClientVehicle, CClientStreamElement)
     friend class CClientCamera;
