@@ -37,7 +37,17 @@ bool CClientModel::Allocate(void)
     // Allocate only on free IDs
     if (!pModelInfo->IsValid())
     {
-        pModelInfo->MakePedModel("PSYCHO");
+        switch (m_eModelType)
+        {
+            case eClientModelType::PED:
+                pModelInfo->MakePedModel("PSYCHO");
+                break;
+            case eClientModelType::OBJECT:
+                pModelInfo->MakeObjectModel(1337);
+                break;
+            default:
+                return false;
+        }
         return true;
     }
     return false;
@@ -53,20 +63,45 @@ bool CClientModel::Deallocate(void)
     // ModelInfo must be valid
     if (pModelInfo->IsValid())
     {
-        if (m_eModelType == CCLIENTMODELPED)
+        if (m_eModelType == eClientModelType::PED)
         {
             // If some ped is using this ID, change him to CJ
             CClientPedManager*                       pPedManager = g_pClientGame->GetManager()->GetPedManager();
-            std::vector<CClientPed*>::const_iterator iter = pPedManager->IterBegin();
-            for (; iter != pPedManager->IterEnd(); iter++)
+            for (auto iter = pPedManager->IterBegin(); iter != pPedManager->IterEnd(); iter++)
             {
-                if ((*iter)->GetModel() == m_iModelID)
+                CClientPed* pPed = *iter;
+                if (pPed->GetModel() == m_iModelID)
                 {
-                    if ((*iter)->IsStreamedIn())
+                    if (pPed->IsStreamedIn())
                     {
-                        (*iter)->StreamOutForABit();
+                        pPed->StreamOutForABit();
                     }
-                    (*iter)->SetModel(0);
+                    pPed->SetModel(0);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(m_iModelID);
+                    Arguments.PushNumber(0);
+                    pPed->CallEvent("onClientElementModelChange", Arguments, true);
+                }
+            }
+        }
+        else if (m_eModelType == eClientModelType::OBJECT)
+        {
+            CClientObjectManager* pObjectManager = g_pClientGame->GetManager()->GetObjectManager();
+            for (auto* pObject : pObjectManager->GetObjects())
+            {
+                if (pObject->GetModel() == m_iModelID)
+                {
+                    if (pObject->IsStreamedIn())
+                    {
+                        pObject->StreamOutForABit();
+                    }
+                    pObject->SetModel(1337);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(m_iModelID);
+                    Arguments.PushNumber(1337);
+                    pObject->CallEvent("onClientElementModelChange", Arguments, true);
                 }
             }
         }
@@ -75,7 +110,7 @@ bool CClientModel::Deallocate(void)
         g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
 
         // Restore COL (for non ped models)
-        if (m_eModelType != CCLIENTMODELPED)
+        if (m_eModelType != eClientModelType::PED)
         {
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
         }

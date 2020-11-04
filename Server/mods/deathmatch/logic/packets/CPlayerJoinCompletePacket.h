@@ -15,7 +15,7 @@
 #include "CPacket.h"
 #include <string.h>
 
-class CPlayerJoinCompletePacket : public CPacket
+class CPlayerJoinCompletePacket final : public CPacket
 {
 public:
     CPlayerJoinCompletePacket();
