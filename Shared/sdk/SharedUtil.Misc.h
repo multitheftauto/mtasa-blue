@@ -418,16 +418,11 @@ namespace SharedUtil
 
     // Remove all occurrences of item from itemList
     template <class T>
-    void ListRemove(std::deque<T>& itemList, const T& item)
+    bool ListRemove(std::deque<T>& list, const T& value)
     {
-        typename std::deque<T>::iterator it = itemList.begin();
-        while (it != itemList.end())
-        {
-            if (item == *it)
-                it = itemList.erase(it);
-            else
-                ++it;
-        }
+        const auto it = std::remove(list.begin(), list.end(), value);
+        list.erase(it, list.end());
+        return it != list.end();
     }
 
     //
