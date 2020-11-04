@@ -151,6 +151,7 @@ workspace "MTASA"
 
 		group "Vendor"
 		include "vendor/bcrypt"
+		include "vendor/fmt"
 		include "vendor/cryptopp"
 		include "vendor/curl"
 		include "vendor/ehs"
