@@ -161,7 +161,7 @@ void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
         m_LowestJoinedPlayerVersion = pPlayer->GetPlayerVersion();
     g_pGame->CalculateMinClientRequirement();
 
-    m_JoinedPlayersMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
+    m_JoinedByBitStreamVer[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
 }
 
 void CPlayerManager::AddToList(CPlayer* pPlayer)
