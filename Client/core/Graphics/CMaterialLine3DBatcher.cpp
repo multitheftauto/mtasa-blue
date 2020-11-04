@@ -178,7 +178,7 @@ void CMaterialLine3DBatcher::Flush()
     for (uint i = 0; i < uiNumLines; i++)
         m_LineList[i].pMaterial->Release();
 
-    ListClearAndReserve(m_LineList);
+    m_LineList.clear();
 
     if (g_pDeviceState->AdapterState.bRequiresClipping)
         m_pDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
