@@ -595,13 +595,13 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         switch (eModelType)
                         {
                             case eClientModelType::PED:
-                                usParentID = 7;
+                                usParentID = 7; // male01
                                 break;
                             case eClientModelType::OBJECT:
-                                usParentID = 1337;
+                                usParentID = 1337; // BinNt07_LA (trash can)
                                 break;
                             case eClientModelType::VEHICLE:
-                                usParentID = 400;
+                                usParentID = VT_LANDSTAL;
                                 break;
                             default:
                                 break;
