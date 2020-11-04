@@ -399,10 +399,14 @@ namespace SharedUtil
 
     // Remove item at index from itemList
     template <class T>
-    void ListRemoveIndex(std::vector<T>& itemList, uint index)
+    bool ListRemoveIndex(std::vector<T>& itemList, uint index)
     {
         if (index < itemList.size())
+        {
             itemList.erase(itemList.begin() + index);
+            return true;
+        }
+        return false;
     }
 
     // Append one list onto another
