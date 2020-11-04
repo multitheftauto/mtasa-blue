@@ -4408,7 +4408,7 @@ CFlyingHandlingEntry* CClientVehicle::GetFlyingHandlingData()
     {
         return m_pFlyingHandlingEntry;
     }
-    return NULL;
+    return nullptr;
 }
 
 CBoatHandlingEntry* CClientVehicle::GetBoatHandlingData()
