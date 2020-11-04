@@ -2835,50 +2835,22 @@ void CResource::SendNoClientCacheScripts(CPlayer* pPlayer)
     if (!IsClientScriptsOn())
         return;
 
-    std::vector<CPlayer*> vecPlayers;
+    // Create the packet
+    CResourceClientScriptsPacket Packet(this);
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        if (pResourceFile->GetType() != CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT)
+            continue;
 
-    // Send it to either a single player or all the players in the server.
+        auto pClientScript = static_cast<CResourceClientScriptItem*>(pResourceFile);
+        if (pClientScript->IsNoClientCache())
+            Packet.AddItem(pClientScript);
+    }
+
     if (pPlayer)
-        vecPlayers.push_back(pPlayer);
+        pPlayer->Send(Packet); // Send to specified player only
     else
-    {
-        std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin();
-
-        for (; iter != g_pGame->GetPlayerManager()->IterEnd(); ++iter)
-        {
-            vecPlayers.push_back(*iter);
-        }
-    }
-
-    if (!vecPlayers.empty())
-    {
-        // Decide what scripts to send
-        CResourceClientScriptsPacket Packet(this);
-        bool                         bEmptyPacket = true;
-
-        for (CResourceFile* pResourceFile : m_ResourceFiles)
-        {
-            if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT)
-            {
-                CResourceClientScriptItem* pClientScript = static_cast<CResourceClientScriptItem*>(pResourceFile);
-
-                if (pClientScript->IsNoClientCache() == true)
-                {
-                    Packet.AddItem(pClientScript);
-                    bEmptyPacket = false;
-                }
-            }
-        }
-
-        // Send them!
-        if (!bEmptyPacket)
-        {
-            for (std::vector<CPlayer*>::iterator iter = vecPlayers.begin(); iter != vecPlayers.end(); ++iter)
-            {
-                (*iter)->Send(Packet);
-            }
-        }
-    }
+        g_pGame->GetPlayerManager()->BroadcastAll(Packet);
 }
 
 bool CResource::UnzipResource()

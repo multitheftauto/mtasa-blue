@@ -27,6 +27,8 @@ public:
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
+    bool Empty() const noexcept { return m_vecItems.empty(); }
+
 private:
     std::vector<CResourceClientScriptItem*> m_vecItems;
     CResource*                              m_pResource;
