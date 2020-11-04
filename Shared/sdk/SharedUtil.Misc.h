@@ -375,17 +375,17 @@ namespace SharedUtil
     // std::vector helpers
     //
 
-    // Remove first occurrence of item from itemList
+    // Remove first occurrence of the given value
+    // Returns true the value was erased
     template <class T>
-    void ListRemoveFirst(std::vector<T>& itemList, const T& item)
+    bool ListRemoveFirst(std::vector<T>& list, const T& value)
     {
-        typename std::vector<T>::iterator it = itemList.begin();
-        for (; it != itemList.end(); ++it)
-            if (item == *it)
-            {
-                itemList.erase(it);
-                break;
-            }
+        if (const auto it = list.find(list.begin(), list.end(), item); it != list.end())
+        {
+            list.erase(it);
+            return true;
+        }
+        return false;
     }
 
     // Remove all occurrences of item from itemList
