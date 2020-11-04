@@ -44,7 +44,10 @@ public:
         }
     }
 
+    SString(std::string&& rhs) : std::string(std::move(rhs)) {}
     SString(const std::string& strText) : std::string(strText) {}
+
+    SString(std::string_view view) : std::string(view) {}
 
     SString& Format(const char* szFormat, ...)
     {
@@ -71,7 +74,8 @@ public:
 
     // Assignment
                 operator const char*() const { return c_str(); }            // Auto assign to const char* without using c_str()
-    const char* operator*()const { return c_str(); }
+    const char* operator*() const { return c_str(); }
+    operator std::string_view() const { return *this; }
 
     // Functions
     void           Split(const SString& strDelim, std::vector<SString>& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0) const;
