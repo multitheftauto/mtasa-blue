@@ -4430,7 +4430,7 @@ CBoatHandlingEntry* CClientVehicle::GetBoatHandlingData()
 CBikeHandlingEntry* CClientVehicle::GetBikeHandlingData()
 {
     if (m_eVehicleType != CLIENTVEHICLE_BIKE && m_eVehicleType != CLIENTVEHICLE_BMX)
-        return NULL;
+        return nullptr;
 
     if (m_pVehicle)
     {
