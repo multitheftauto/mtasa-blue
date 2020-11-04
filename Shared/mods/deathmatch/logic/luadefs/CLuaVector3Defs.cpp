@@ -34,6 +34,7 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "normalize", Normalize);
     lua_classfunction(luaVM, "cross", Cross);
     lua_classfunction(luaVM, "dot", Dot);
+    lua_classfunction(luaVM, "intersectsSegmentTriangle", ArgumentParser<IntersectsSegmentTriangle>);
 
     lua_classfunction(luaVM, "getLength", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", GetLengthSquared);
@@ -53,14 +54,14 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "length", NULL, GetLength);
     lua_classvariable(luaVM, "squaredLength", NULL, GetLengthSquared);
     lua_classvariable(luaVM, "normalized", NULL, GetNormalized);
-
-    lua_classfunction(luaVM, "intersectsSegmentTriangle", ArgumentParser<IntersectsSegmentTriangle>);
 #else
     // Server
     lua_classfunction(luaVM, "create", "", Create);
     lua_classfunction(luaVM, "normalize", "", Normalize);
     lua_classfunction(luaVM, "cross", "", Cross);
     lua_classfunction(luaVM, "dot", "", Dot);
+    lua_classfunction(luaVM, "intersectsSegmentTriangle", "", ArgumentParser<IntersectsSegmentTriangle>);
+
 
     lua_classfunction(luaVM, "getLength", "", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", "", GetLengthSquared);
@@ -80,8 +81,6 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "length", "", "", NULL, GetLength);
     lua_classvariable(luaVM, "squaredLength", "", "", NULL, GetLengthSquared);
     lua_classvariable(luaVM, "normalized", "", "", NULL, GetNormalized);
-
-    lua_classfunction(luaVM, "intersectsSegmentTriangle", "", ArgumentParser<IntersectsSegmentTriangle>);
 #endif
 
     lua_registerclass(luaVM, "Vector3");
