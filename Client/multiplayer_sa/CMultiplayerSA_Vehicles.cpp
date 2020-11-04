@@ -82,7 +82,7 @@ static tVehicleAudioSettings* __fastcall getVehicleSoundSettings()
     // Check if it is a custom model
     if (usModel < VT_LANDSTAL || usModel >= VT_MAX)
         usModel = pGameInterface->GetModelInfo(usModel)->GetParentID();
-    return (tVehicleAudioSettings*)0x860AF0 + (usModel - 400);
+    return (tVehicleAudioSettings*)0x860AF0 + (usModel - VT_LANDSTAL);
 }
 
 #define HOOKPOS_CAEVehicleAudioEntity__Initialise  0x4F77C1
