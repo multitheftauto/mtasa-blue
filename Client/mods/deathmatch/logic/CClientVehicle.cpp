@@ -4434,13 +4434,13 @@ CBikeHandlingEntry* CClientVehicle::GetBikeHandlingData()
 
     if (m_pVehicle)
     {
-        return dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
+        return reinterpret_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
     }
     else if (m_pBikeHandlingEntry)
     {
         return m_pBikeHandlingEntry;
     }
-    return NULL;
+    return nullptr;
 }
 
 CSphere CClientVehicle::GetWorldBoundingSphere()
