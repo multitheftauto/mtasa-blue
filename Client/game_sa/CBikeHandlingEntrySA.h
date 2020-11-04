@@ -17,7 +17,7 @@
 
 struct tBikeHandlingDataSA
 {
-    int iVehicleID;
+    int   iVehicleID;
     float fLeanFwdCOM;
     float fLeanFwdForce;
     float fLeanBackCOM;
@@ -44,18 +44,14 @@ public:
     // Constructor for original entries
     CBikeHandlingEntrySA(tBikeHandlingDataSA* pOriginal);
 
-    virtual ~CBikeHandlingEntrySA();
-
     // Use this to copy data from an another handling class to this
     void Assign(const CBikeHandlingEntry* pData);
 
     void Recalculate();
 
-    tBikeHandlingDataSA* GetInterface() { return m_pBikeHandlingSA; };
+    tBikeHandlingDataSA* GetInterface() { return m_pBikeHandlingSA.get(); };
 
 private:
-    tBikeHandlingDataSA* m_pBikeHandlingSA;
-    bool                 m_bDeleteInterface;
-
-    tBikeHandlingDataSA m_BikeHandling;
+    std::shared_ptr<tBikeHandlingDataSA> m_pBikeHandlingSA;
+    tBikeHandlingDataSA                  m_BikeHandling;
 };
