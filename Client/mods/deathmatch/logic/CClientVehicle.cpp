@@ -4418,13 +4418,13 @@ CBoatHandlingEntry* CClientVehicle::GetBoatHandlingData()
 
     if (m_pVehicle)
     {
-        return dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
+        return reinterpret_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
     }
     else if (m_pBoatHandlingEntry)
     {
         return m_pBoatHandlingEntry;
     }
-    return NULL;
+    return nullptr;
 }
 
 CBikeHandlingEntry* CClientVehicle::GetBikeHandlingData()
