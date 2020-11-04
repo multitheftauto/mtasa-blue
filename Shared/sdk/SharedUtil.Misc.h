@@ -390,16 +390,11 @@ namespace SharedUtil
 
     // Remove all occurrences of item from itemList
     template <class T>
-    void ListRemove(std::vector<T>& itemList, const T& item)
+    bool ListRemove(std::vector<T>& list, const T& value)
     {
-        typename std::vector<T>::iterator it = itemList.begin();
-        while (it != itemList.end())
-        {
-            if (item == *it)
-                it = itemList.erase(it);
-            else
-                ++it;
-        }
+        const auto it = std::remove(list.begin(), list.end(), value);
+        list.erase(it, list.end());
+        return it != list.end();
     }
 
     // Remove item at index from itemList
