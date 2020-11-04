@@ -10,6 +10,10 @@
 #include <optional>
 #include <variant>
 
+#include <CVector2D.h>
+#include <CVector.h>
+#include <CVector4D.h>
+
 /*
     Basic Lua operations:
         int Push(L, T value)
