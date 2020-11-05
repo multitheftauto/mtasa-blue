@@ -241,7 +241,7 @@ public:
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
 
-    uint AddTextureDictonarySlot();
+    uint AddTextureDictonarySlot(std::string strTxdName);
     void RemoveTextureDictonarySlot(unsigned int uiTxdId);
 
 private:

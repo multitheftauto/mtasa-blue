@@ -135,6 +135,6 @@ public:
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
 
-    virtual uint AddTextureDictonarySlot() = 0;
+    virtual uint AddTextureDictonarySlot(std::string strTxdName) = 0;
     virtual void RemoveTextureDictonarySlot(uint uiTxdID) = 0;
 };

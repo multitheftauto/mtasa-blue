@@ -1393,14 +1393,17 @@ int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
     return iOut;
 }
 
-unsigned int CPoolsSA::AddTextureDictonarySlot()
+unsigned int CPoolsSA::AddTextureDictonarySlot(std::string strTxdName)
 {
     CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->Allocate();
     if (!pTxd)
         return -1;
 
+    typedef uint(__cdecl * Function_TxdGatHashFromName)(char* strName);
+    Function_TxdGatHashFromName getHash = (Function_TxdGatHashFromName)(0x53CF30);
+
     pTxd->usUsagesCount = 0;
-    pTxd->hash = 0;
+    pTxd->hash = getHash(&strTxdName.at(0));
     pTxd->rwTexDictonary = nullptr;
     pTxd->usParentIndex = -1;
 

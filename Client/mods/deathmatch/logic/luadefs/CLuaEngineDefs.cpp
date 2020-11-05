@@ -2025,8 +2025,7 @@ uint CLuaEngineDefs::EngineRequestTXD(std::string strTxdName)
     strTxdName.resize(24);
 
     //uint uiNewTxdID = newTxd(strTxdName.data());
-    uint uiNewTxdID = g_pGame->GetPools()->AddTextureDictonarySlot();
-
+    uint uiNewTxdID = g_pGame->GetPools()->AddTextureDictonarySlot(strTxdName);
 
     return uiNewTxdID;
 }
@@ -2035,6 +2034,7 @@ uint CLuaEngineDefs::EngineRequestTXD(std::string strTxdName)
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
     g_pGame->GetPools()->RemoveTextureDictonarySlot(txdID);
+    g_pGame->GetStreaming()->GetStreamingInfoFromModelId(20000 + txdID)->Reset();
 
     return true;
 }
