@@ -26,6 +26,43 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
+union tIdeFlags
+{
+    struct
+    {
+        char bIsRoad : 1;
+        char bFlag2 : 1;
+        char bDrawLast : 1;
+        char bAddictive : 1;
+        char bFlag5 : 1;
+        char bFlag6 : 1;
+        char bNoZBufferWrite : 1;
+        char bDontReceiveShadows : 1;
+
+        char bFlag9 : 1;
+        char bIsGlassType1 : 1;
+        char bIsGlassType2 : 1;
+        char bIsGarageDoor : 1;
+        char bIsDamagable : 1;
+        char bIsTree : 1;
+        char bIsPalm : 1;
+        char bDontCollideWithFlyer : 1;
+
+        char bFlag17 : 1;
+        char bFlag18 : 1;
+        char bFlag19 : 1;
+        char bFlag20 : 1;
+        char bIsTag : 1;
+        char bDisableBackfaceCilling : 1;
+        char bIsBreakableStatue : 1;
+        char bFlag24 : 1;
+
+        char cPad : 8;
+    };
+    unsigned int uiFlags;
+};
+
+
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
@@ -527,11 +564,68 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
     if (!MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
-    m_pInterface->usFlags = 0xC0;
-    typedef char(__cdecl * Function_SetAtomicModelFlags)(CBaseModelInfoSAInterface * pInterface, unsigned int uiFlags);
-    Function_SetAtomicModelFlags setAtomicModelFlags = (Function_SetAtomicModelFlags)(FUNC_SetAtomicModelFlags);
+    tIdeFlags ideFlags;
+    ideFlags.uiFlags = uiFlags;
 
-    setAtomicModelFlags(m_pInterface, uiFlags);
+    // Default value
+    m_pInterface->usFlags = 0xC0; //  bIsBackfaceCulled and bIsLod
+
+    // setBaseModelInfoFlags
+    if (ideFlags.bDrawLast)
+    {
+        m_pInterface->bAlphaTransparency = true;
+        m_pInterface->bAdditiveRender = true;
+    }
+
+    m_pInterface->bAdditiveRender = ideFlags.bAddictive;
+    m_pInterface->bDontWriteZBuffer = ideFlags.bNoZBufferWrite;
+    m_pInterface->bDontCastShadowsOn = ideFlags.bDontReceiveShadows;
+    m_pInterface->bIsBackfaceCulled = !ideFlags.bDisableBackfaceCilling;
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::ATOMIC:
+        case eModelInfoType::TIME:
+        {
+            // SetAtomicModelInfoFlags
+            m_pInterface->bIsRoad = ideFlags.bIsRoad;
+
+            if (ideFlags.bIsGlassType1)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::GLASS_1;
+
+            if (ideFlags.bIsGlassType2)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::GLASS_2;
+
+            if (ideFlags.bIsGarageDoor)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::GARAGE_DOOR;
+
+            if (ideFlags.bIsTree)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::TREE;
+
+            if (ideFlags.bIsPalm)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::PALM;
+
+            m_pInterface->bDontCollideWithFlyer = ideFlags.bDontCollideWithFlyer;
+
+            if (ideFlags.bIsTag)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::TAG;
+
+            if (ideFlags.bIsBreakableStatue)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::BREAKABLE_STATUE;
+
+            if (ideFlags.bFlag24)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::UNKNOW_1;
+            break;
+        }
+        case eModelInfoType::CLUMP:
+        {
+            m_pInterface->bAdditiveRender = ideFlags.bFlag6;
+            break;
+        }
+        default:
+            break;
+    }
+
 }
 
 void CModelInfoSA::StaticResetFlags()
@@ -1307,7 +1401,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
         // FUNC_SetColModel resets bDoWeOwnTheColModel
         m_pInterface->bDoWeOwnTheColModel = false;
-        m_pInterface->bCollisionWasStreamedWithModel = false;
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;

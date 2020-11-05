@@ -139,6 +139,19 @@ class CVehicleModelInfo_SA_VTBL : public CClumpModelInfo_SA_VTBL
 {
 };
 
+enum class eModelSpecialTypes : char
+{
+    NONE = 0,
+    TREE = 1,
+    PALM = 2,
+    GLASS_1 = 4,
+    GLASS_2 = 5,
+    TAG = 6,
+    GARAGE_DOOR = 7,
+    UNKNOW_1 = 10,
+    BREAKABLE_STATUE = 11,
+};
+
 class CBaseModelInfoSAInterface
 {
 public:
@@ -159,23 +172,19 @@ public:
     {
         struct
         {
-            unsigned short bHasBeenPreRendered : 1;            // +18
-            unsigned short bAlphaTransparency : 1;
-            unsigned short bIsLod : 1;
-            unsigned short bDontWriteZBuffer : 1;
-            unsigned short bDontCastShadowsOn : 1;
-            unsigned short bDrawAdditive : 1;
-            unsigned short bDrawLast : 1;
-            unsigned short bDoWeOwnTheColModel : 1;
-
-            unsigned short dwUnknownFlag25 : 1;            // +19
-            unsigned short dwUnknownFlag26 : 1;
-            unsigned short dwUnknownFlag27 : 1;
-            unsigned short bSwaysInWind : 1;
-            unsigned short bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
-            unsigned short bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
-            unsigned short bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
-            unsigned short bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+            unsigned char      bHasBeenPreRendered : 1;            // we use this because we need to apply changes only once
+            unsigned char      bAlphaTransparency : 1;             // bDrawLast
+            unsigned char      bAdditiveRender : 1;
+            unsigned char      bDontWriteZBuffer : 1;
+            unsigned char      bDontCastShadowsOn : 1;
+            unsigned char      bDoWeOwnTheColModel : 1;
+            unsigned char      bIsBackfaceCulled : 1;
+            unsigned char      bIsLod : 1;
+            unsigned char      bIsRoad : 1;
+            unsigned char      bHasComplexHierarchy : 1;
+            unsigned char      bDontCollideWithFlyer : 1;
+            eModelSpecialTypes eSpecialModelType : 4;
+            unsigned char      bWetRoadReflection : 1;            // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
         };
 
         unsigned short usFlags;
