@@ -19,6 +19,14 @@
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
+struct CTextureDictonarySAInterface
+{
+    RwTexDictionary* rwTexDictonary;
+    unsigned short   usUsagesCount;
+    unsigned short   usParentIndex;
+    unsigned int     hash;
+};
+
 class CClientEntity;
 
 class CEntryInfoNodePoolSA : public CEntryInfoNodePool
@@ -72,6 +80,77 @@ public:
         m_nSize = 0;
         m_bOwnsAllocations = false;
     }
+
+    uint GetFreeSlot()
+    {
+        bool bLooped = false;
+        uint index = this->m_nFirstFree + 1;
+
+        while (true)
+        {
+            if (index >= this->m_nSize)
+            {
+                if (bLooped)
+                    return -1;
+
+                index = 0;
+                bLooped = true;
+            }
+
+            if (this->m_byteMap[index].bEmpty)
+            {
+                this->m_nFirstFree = index;
+                return index;
+            }
+            index++;
+        }
+
+        return -1;
+    };
+
+    B* Allocate()
+    {
+        uint index = this->GetFreeSlot();
+        if (index == -1)
+            return nullptr;
+
+        this->m_pObjects[index] = B();
+        this->m_byteMap[index].bEmpty = false;
+        this->m_byteMap[index].nId ^= index ^ (index + 1);
+
+        return &this->m_pObjects[index];
+    }
+
+    void Release(uint index)
+    {
+        this->m_byteMap[index].bEmpty = true;
+        this->m_byteMap[index].nId = 0;
+        if (index == this->m_nFirstFree)
+            --this->m_nFirstFree;
+    }
+
+    void Delete(uint index)
+    {
+        delete this->m_pObjects[index];
+        Release(index);
+    }
+
+    bool IsFreeAt(uint index) { return this->m_byteMap[index].bEmpty; }
+    bool IsContains(uint index)
+    {
+        if (this->m_nSize <= index)
+            return false;
+        return !IsFreeAt(index);
+    }
+
+    B* GetAt(uint index)
+    {
+        if (this->m_byteMap[index].bEmpty)
+            return nullptr;
+        return this->m_pObjects[index];
+    }
+
+    uint GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)this->m_pObjects) / sizeof(B); }
 };
 
 class CPoolsSA : public CPools
@@ -80,6 +159,7 @@ public:
     CPoolsSA();
     ~CPoolsSA();
 
+public:
     // Vehicles pool
     CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
     CVehicle* AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface);
@@ -161,6 +241,9 @@ public:
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
 
+    uint AddTextureDictonarySlot();
+    void RemoveTextureDictonarySlot(unsigned int uiTxdId);
+
 private:
     // Generic container for pools
     template <class T, class I, unsigned long MAX>
@@ -191,6 +274,7 @@ private:
     CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
     CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
     CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
+    CPoolSAInterface<CTextureDictonarySAInterface>**                 m_ppTxdPoolInterface;
 
     CBuildingSA*  Buildings[MAX_BUILDINGS];
     unsigned long m_ulBuildingCount;

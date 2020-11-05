@@ -19,6 +19,7 @@ CPoolsSA::CPoolsSA()
     m_ppPedPoolInterface = (CPoolSAInterface<CPedSAInterface>**)0xB74490;
     m_ppObjectPoolInterface = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
     m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
+    m_ppTxdPoolInterface = (CPoolSAInterface<CTextureDictonarySAInterface>**)0xC8800C;
 
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount = 0;
@@ -1390,4 +1391,31 @@ int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
     }
 
     return iOut;
+}
+
+unsigned int CPoolsSA::AddTextureDictonarySlot()
+{
+    CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->Allocate();
+    if (!pTxd)
+        return -1;
+
+    pTxd->usUsagesCount = 0;
+    pTxd->hash = 0;
+    pTxd->rwTexDictonary = nullptr;
+    pTxd->usParentIndex = -1;
+
+    return (*m_ppTxdPoolInterface)->GetObjectIndex(pTxd);
+}
+
+void CPoolsSA::RemoveTextureDictonarySlot(uint uiTxdId)
+{
+    if (!(*m_ppTxdPoolInterface)->IsContains(uiTxdId))
+        return;
+
+    typedef uint(__cdecl * Function_TxdReleaseSlot)(uint uiTxdId);
+    Function_TxdReleaseSlot freeTxdSlot = (Function_TxdReleaseSlot)(0x731E90);
+
+    freeTxdSlot(uiTxdId);
+
+    (*m_ppTxdPoolInterface)->Release(uiTxdId);
 }

@@ -51,6 +51,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
+        {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
+        {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2009,5 +2011,30 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
     g_pClientGame->RestreamWorld();
+    return true;
+}
+
+uint CLuaEngineDefs::EngineRequestTXD(std::string strTxdName)
+{
+    if (strTxdName.size() > 24)
+        throw std::invalid_argument("Over 24");
+
+    typedef uint(__cdecl * Function_TxdAllocate)( char* szName );
+    Function_TxdAllocate newTxd = (Function_TxdAllocate)(0x731C80);
+
+    strTxdName.resize(24);
+
+    //uint uiNewTxdID = newTxd(strTxdName.data());
+    uint uiNewTxdID = g_pGame->GetPools()->AddTextureDictonarySlot();
+
+
+    return uiNewTxdID;
+}
+
+
+bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
+{
+    g_pGame->GetPools()->RemoveTextureDictonarySlot(txdID);
+
     return true;
 }
