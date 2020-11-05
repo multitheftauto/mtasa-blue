@@ -46,15 +46,12 @@ public:
     // Constructor for original entries
     CFlyingHandlingEntrySA(tFlyingHandlingDataSA* pOriginal);
 
-    virtual ~CFlyingHandlingEntrySA();
-
     // Use this to copy data from an another handling class to this
     void Assign(const CFlyingHandlingEntry* pData);
 
-    tFlyingHandlingDataSA* GetInterface() { return m_pFlyingHandlingSA; };
+    tFlyingHandlingDataSA* GetInterface() { return m_pFlyingHandlingSA.get(); };
 
 private:
-    tFlyingHandlingDataSA* m_pFlyingHandlingSA;
-    bool             m_bDeleteInterface;
+    std::shared_ptr<tFlyingHandlingDataSA> m_pFlyingHandlingSA;
 };
 
