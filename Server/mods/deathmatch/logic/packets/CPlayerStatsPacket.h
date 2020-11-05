@@ -13,7 +13,6 @@
 
 #include "CPacket.h"
 #include <CVector.h>
-#include "../CPlayerStats.h"
 
 class CPlayerStatsPacket final : public CPacket
 {
