@@ -38,14 +38,11 @@ public:
     // Constructor for original entries
     CBoatHandlingEntrySA(tBoatHandlingDataSA* pOriginal);
 
-    virtual ~CBoatHandlingEntrySA();
-
     // Use this to copy data from an another handling class to this
     void Assign(const CBoatHandlingEntry* pData);
 
-    tBoatHandlingDataSA* GetInterface() { return m_pBoatHandlingSA; };
+    tBoatHandlingDataSA* GetInterface() { return m_pBoatHandlingSA.get(); };
 
 private:
-    tBoatHandlingDataSA* m_pBoatHandlingSA;
-    bool                 m_bDeleteInterface;
+    std::shared_ptr<tBoatHandlingDataSA> m_pBoatHandlingSA;
 };
