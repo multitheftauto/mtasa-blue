@@ -32,17 +32,11 @@ struct tBoatHandlingDataSA
 class CBoatHandlingEntrySA : public CBoatHandlingEntry
 {
 public:
-    // Constructor for creatable dummy entries
     CBoatHandlingEntrySA();
-
-    // Constructor for original entries
     CBoatHandlingEntrySA(tBoatHandlingDataSA* pOriginal);
-
-    // Use this to copy data from an another handling class to this
-    void Assign(const CBoatHandlingEntry* pData);
-
-    tBoatHandlingDataSA* GetInterface() { return m_pBoatHandlingSA.get(); };
+    void                 Assign(const CBoatHandlingEntry* pData);
+    tBoatHandlingDataSA* GetInterface() { return &m_pBoatHandlingSA; };
 
 private:
-    std::shared_ptr<tBoatHandlingDataSA> m_pBoatHandlingSA;
+    tBoatHandlingDataSA m_pBoatHandlingSA;
 };

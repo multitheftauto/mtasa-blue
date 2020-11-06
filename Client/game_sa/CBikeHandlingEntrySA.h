@@ -13,7 +13,6 @@
 
 #include <game/CBikeHandlingEntry.h>
 #include "Common.h"
-#define FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits 0x6F5290
 
 struct tBikeHandlingDataSA
 {
@@ -38,20 +37,13 @@ struct tBikeHandlingDataSA
 class CBikeHandlingEntrySA : public CBikeHandlingEntry
 {
 public:
-    // Constructor for creatable dummy entries
     CBikeHandlingEntrySA();
-
-    // Constructor for original entries
     CBikeHandlingEntrySA(tBikeHandlingDataSA* pOriginal);
-
-    // Use this to copy data from an another handling class to this
     void Assign(const CBikeHandlingEntry* pData);
-
     void Recalculate();
-
-    tBikeHandlingDataSA* GetInterface() { return m_pBikeHandlingSA.get(); };
+    tBikeHandlingDataSA* GetInterface() { return &m_pBikeHandlingSA; };
 
 private:
-    std::shared_ptr<tBikeHandlingDataSA> m_pBikeHandlingSA;
-    tBikeHandlingDataSA                  m_BikeHandling;
+    tBikeHandlingDataSA m_pBikeHandlingSA;
+    tBikeHandlingDataSA m_BikeHandling;
 };

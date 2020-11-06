@@ -14,7 +14,6 @@
 #include <game/CFlyingHandlingEntry.h>
 #include "Common.h"
 
-// sizeof(tFlyingHandlingDataSA) == 0x58
 struct tFlyingHandlingDataSA
 {
     int     iVehicleID;
@@ -40,18 +39,11 @@ struct tFlyingHandlingDataSA
 class CFlyingHandlingEntrySA : public CFlyingHandlingEntry
 {
 public:
-    // Constructor for creatable dummy entries
     CFlyingHandlingEntrySA();
-
-    // Constructor for original entries
     CFlyingHandlingEntrySA(tFlyingHandlingDataSA* pOriginal);
-
-    // Use this to copy data from an another handling class to this
-    void Assign(const CFlyingHandlingEntry* pData);
-
-    tFlyingHandlingDataSA* GetInterface() { return m_pFlyingHandlingSA.get(); };
+    void                   Assign(const CFlyingHandlingEntry* pData);
+    tFlyingHandlingDataSA* GetInterface() { return &m_pFlyingHandlingSA; };
 
 private:
-    std::shared_ptr<tFlyingHandlingDataSA> m_pFlyingHandlingSA;
+    tFlyingHandlingDataSA m_pFlyingHandlingSA;
 };
-

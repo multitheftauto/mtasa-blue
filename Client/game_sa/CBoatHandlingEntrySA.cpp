@@ -13,22 +13,16 @@
 
 CBoatHandlingEntrySA::CBoatHandlingEntrySA()
 {
-    // Create a new interface and zero it
-    m_pBoatHandlingSA = std::make_shared<tBoatHandlingDataSA>();
-    memset(m_pBoatHandlingSA.get(), 0, sizeof(tBoatHandlingDataSA));
+    memset(&m_pBoatHandlingSA, 0, sizeof(tBoatHandlingDataSA));
 }
 
 CBoatHandlingEntrySA::CBoatHandlingEntrySA(tBoatHandlingDataSA* pOriginal)
 {
-    // Store gta's pointer
-    m_pBoatHandlingSA = std::make_shared<tBoatHandlingDataSA>();
-    memcpy(m_pBoatHandlingSA.get(), pOriginal, sizeof(tBoatHandlingDataSA));
+    m_pBoatHandlingSA = *pOriginal;
 }
 
-// Apply the handlingdata from another data
 void CBoatHandlingEntrySA::Assign(const CBoatHandlingEntry* pData)
 {
-    // Copy the data
     const CBoatHandlingEntrySA* pEntrySA = static_cast<const CBoatHandlingEntrySA*>(pData);
     m_pBoatHandlingSA = pEntrySA->m_pBoatHandlingSA;
 }

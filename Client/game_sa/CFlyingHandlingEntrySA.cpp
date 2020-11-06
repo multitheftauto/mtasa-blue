@@ -13,22 +13,16 @@
 
 CFlyingHandlingEntrySA::CFlyingHandlingEntrySA()
 {
-    // Create a new interface and zero it
-    m_pFlyingHandlingSA = std::make_shared<tFlyingHandlingDataSA>();
-    memset(m_pFlyingHandlingSA.get(), 0, sizeof(tFlyingHandlingDataSA));
+    memset(&m_pFlyingHandlingSA, 0, sizeof(tFlyingHandlingDataSA));
 }
 
 CFlyingHandlingEntrySA::CFlyingHandlingEntrySA(tFlyingHandlingDataSA* pOriginal)
 {
-    // Store gta's pointer
-    m_pFlyingHandlingSA = std::make_shared<tFlyingHandlingDataSA>();
-    memcpy(m_pFlyingHandlingSA.get(), pOriginal, sizeof(tFlyingHandlingDataSA));
+    m_pFlyingHandlingSA = *pOriginal;
 }
 
-// Apply the handlingdata from another data
 void CFlyingHandlingEntrySA::Assign(const CFlyingHandlingEntry* pData)
 {
-    // Copy the data
     const CFlyingHandlingEntrySA* pEntrySA = static_cast<const CFlyingHandlingEntrySA*>(pData);
     m_pFlyingHandlingSA = pEntrySA->m_pFlyingHandlingSA;
 }
