@@ -148,7 +148,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInter
             else
             {
         
-                switch ((eVehicleModelTypes)pInterface->m_type)
+                switch ((eVehicleModelTypes)pInterface->m_nVehicleClass)
 	             {
                     case eVehicleModelTypes::BOAT:
                          pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
