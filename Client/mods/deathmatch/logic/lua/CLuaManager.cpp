@@ -334,5 +334,4 @@ void CLuaManager::LoadCFunctions()
     CLuaWeaponDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
-    CLuaWorldDefs::LoadFunctions();
 }
