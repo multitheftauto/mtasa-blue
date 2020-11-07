@@ -532,6 +532,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
+    m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
     {
@@ -1240,7 +1242,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06E)
+    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted

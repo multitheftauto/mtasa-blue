@@ -581,7 +581,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI, false);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -591,10 +591,12 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case Primitive3DVerticeSizes::VERT_XYZ:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                         static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF});
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                         static_cast<float>(vecTableContent[2]), static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -631,7 +633,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI, false);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -641,12 +643,15 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case Primitive3DVerticeSizes::VERT_XYZ_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF,
-                                                                 vecTableContent[3], vecTableContent[4]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                                 static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF,
+                                                                 static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2],
-                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3])), vecTableContent[4], vecTableContent[5]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                                 static_cast<float>(vecTableContent[2]),
+                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3])),
+                                                                 static_cast<float>(vecTableContent[4]), static_cast<float>(vecTableContent[5])});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -681,7 +686,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -691,10 +696,11 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case PrimitiveVerticeSizes::VERT_XY:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0, (DWORD)0xFFFFFFFF});
                 break;
             case PrimitiveVerticeSizes::VERT_XY_COLOR:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                         static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -731,7 +737,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -741,12 +747,14 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case PrimitiveVerticeSizes::VERT_XY_UV:
-                pVecVertices->push_back(
-                    PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF, vecTableContent[2], vecTableContent[3]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                                 (DWORD)0xFFFFFFFF, static_cast<float>(vecTableContent[2]),
+                                                                 static_cast<float>(vecTableContent[3])});
                 break;
             case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2])),
-                                                                 vecTableContent[3], vecTableContent[4]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2])),
+                                                                 static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -856,19 +864,27 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
 }
 
 CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(std::variant<CClientDxFont*, eFontType> variantFont, const std::string text, const std::optional<float> optWidth,
-                                             const std::optional<float> optScaleXY, const std::optional<float> optScaleY,
-                                             const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded)
+                                             const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak,
+                                             const std::optional<bool> optColorCoded)
 {
-    // float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default", bool wordBreak=false, bool
-    // colorCoded=false] )
+    // float, float dxGetTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
+    // bool wordBreak=false, bool colorCoded=false] )
     CGraphicsInterface* const graphics = g_pCore->GetGraphics();
 
     // resolve scale (use X as Y value, if optScaleY is empty)
     CVector2D scale(1.0f, 1.0f);
     if (optScaleXY.has_value())
     {
-        scale.fX = optScaleXY.value();
-        scale.fY = optScaleY.has_value() ? optScaleY.value() : scale.fX;
+        std::variant<CVector2D, float> scaleXY = optScaleXY.value();
+        if (std::holds_alternative<float>(scaleXY))
+        {
+            scale.fX = std::get<float>(scaleXY);
+            scale.fY = scale.fX;
+        }
+        else
+        {
+            scale = std::get<CVector2D>(scaleXY);
+        }
     }
 
     CVector2D vecSize;
@@ -1055,6 +1071,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     //  element dxCreateShader( string filepath / string raw_data [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
     //  "world,vehicle,object,other" ] )
     SString                      strFile;
+    EffectMacroList              macros;
     float                        fPriority;
     float                        fMaxDistance;
     bool                         bLayered;
@@ -1062,6 +1079,8 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strFile);
+    if (argStream.NextIsTable())
+        argStream.ReadPairTable(macros);
     argStream.ReadNumber(fPriority, 0.0f);
     argStream.ReadNumber(fMaxDistance, 0.0f);
     argStream.ReadBool(bLayered, false);
@@ -1136,7 +1155,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
     SString        strStatus;
     CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(strPath, strRootPath, bIsRawData, strStatus, fPriority,
-                                                                                                  fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+                                                                                                  fMaxDistance, bLayered, false, iEntityTypeMaskResult, macros);
 
     if (pShader)
     {

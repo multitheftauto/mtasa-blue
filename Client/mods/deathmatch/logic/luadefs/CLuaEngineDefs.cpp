@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaEngineDefs::LoadFunctions()
 {
@@ -37,6 +38,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
+        {"engineGetModelVisibleTime", ArgumentParser<EngineGetModelVisibleTime>},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
@@ -46,7 +49,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
-        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties}
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -70,6 +74,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
+    lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -77,6 +82,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTextures", "engineGetModelTextures");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
+    lua_classfunction(luaVM, "getModelVisibleTime", "engineGetModelVisibleTime");
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
@@ -513,6 +519,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
         ushort usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID)
         {
+            // Fixes vehicle dff leak problem with engineReplaceModel
             m_pDFFManager->RestoreModel(usModelID);
             if (pDFF->ReplaceModel(usModelID, bAlphaTransparency))
             {
@@ -560,10 +567,10 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 {
-    SString strModelType;
+    eClientModelType eModelType;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelType);
+    argStream.ReadEnumString(eModelType);
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -573,23 +580,34 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
         {
             if (!argStream.HasErrors())
             {
-                eClientModelType eModelType;
-                if (strModelType == "ped")
-                {
-                    eModelType = CCLIENTMODELPED;
-                }
-                else
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
                     CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
                     if (pModel == nullptr)
                         pModel = new CClientModel(m_pManager, iModelID, eModelType);
-                    pModel->Allocate();
+
+                    ushort usParentID = -1;
+
+                    if (argStream.NextIsNumber())
+                        argStream.ReadNumber(usParentID);
+                    else
+                    {
+                        switch (eModelType)
+                        {
+                            case eClientModelType::PED:
+                                usParentID = 7; // male01
+                                break;
+                            case eClientModelType::OBJECT:
+                                usParentID = 1337; // BinNt07_LA (trash can)
+                                break;
+                            case eClientModelType::VEHICLE:
+                                usParentID = VT_LANDSTAL;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    pModel->Allocate(usParentID);
                     pModel->SetParentResource(pResource);
 
                     lua_pushinteger(luaVM, iModelID);
@@ -1095,6 +1113,40 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     return 1;
 }
 
+bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff)
+{
+    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
+        {
+            return pModelInfo->SetTime(cHourOn, cHourOff);
+        }
+    }
+    return false;
+}
+
+std::variant<bool, std::tuple<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
+{
+    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        char cHourOn, cHourOff;
+        if (pModelInfo->GetTime(cHourOn, cHourOff))
+        {
+            return std::tuple(cHourOn, cHourOff);
+        }
+        else // Model is incompatible, don't let confuse user.
+        {
+            return std::tuple(0, 24);
+        }
+    }
+
+    return false;
+}
+
 int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
 {
     //  table engineGetModelTextures ( string/int modelName/modelID, string/table textureNames )
@@ -1125,11 +1177,18 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
+    CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CResource* pParentResource = pLuaMain->GetResource();
+
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
         CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
                                                                                                          RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        if (pTexture)
+        {
+            pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+        }
         lua_pushstring(luaVM, std::get<0>(pair).c_str());
         lua_pushelement(luaVM, pTexture);
         lua_settable(luaVM, -3);
@@ -1967,4 +2026,10 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
     pGroup->RestoreDefault();
     lua_pushboolean(luaVM, true);
     return 1;
+}
+
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
+{
+    g_pClientGame->RestreamWorld();
+    return true;
 }

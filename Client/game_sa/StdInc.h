@@ -20,6 +20,7 @@
 
 // SDK includes
 #include <core/CCoreInterface.h>
+#include <CRect.h>
 #include <net/CNet.h>
 #include <game/CGame.h>
 #include <game/CWanted.h>
@@ -116,3 +117,5 @@
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
 #include "CEventGroupSA.h"
+#include "CMatrixSA.h"
+#include "CTrainSA.h"

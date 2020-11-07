@@ -38,3 +38,20 @@ CBikeSA::CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned ch
         pGame->GetWorld()->Add((CEntitySA *)this);
     }*/
 }
+
+CBikeHandlingEntry* CBikeSA::GetBikeHandlingData()
+{
+    return m_pBikeHandlingData;
+}
+
+void CBikeSA::SetBikeHandlingData(CBikeHandlingEntry* pBikeHandling)
+{
+    m_pBikeHandlingData = static_cast<CBikeHandlingEntrySA*>(pBikeHandling);
+    GetBikeInterface()->pBikeHandlingData = m_pBikeHandlingData->GetInterface();
+    RecalculateBikeHandling();
+}
+
+void CBikeSA::RecalculateBikeHandling()
+{
+    m_pBikeHandlingData->Recalculate();
+}

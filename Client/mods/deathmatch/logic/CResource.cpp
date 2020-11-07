@@ -88,6 +88,12 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
+    // Deallocate all models that this resource allocated earlier
+    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
+
+    // Delete all the resource's locally created children (the server won't do that)
+    DeleteClientChildren();
+
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
     // Make sure we don't force the cursor on
     ShowCursor(false);
@@ -120,9 +126,6 @@ CResource::~CResource()
     // Destroy the gui root so all gui elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceGUIEntity);
     m_pResourceGUIEntity = NULL;
-
-    // Deallocate all models that this resource allocated earlier
-    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 
     // Undo all changes to water
     g_pGame->GetWaterManager()->UndoChanges(this);
@@ -322,7 +325,7 @@ void CResource::Load()
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
             {
             }
             else
@@ -470,13 +473,24 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
 {
-    // Compose message
-    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-    SString strGotMd5 = ConvertDataToHexString(CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()).md5.data, sizeof(MD5));
-    SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+    auto checksumResult = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
+
+    SString errorMessage;
+    if (std::holds_alternative<std::string>(checksumResult))
+        errorMessage = std::get<std::string>(checksumResult);
+    else
+    {
+        CChecksum checksum = std::get<CChecksum>(checksumResult);
+
+        // Compose message
+        uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
+        SString strGotMd5 = ConvertDataToHexString(checksum.md5.data, sizeof(MD5));
+        SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+        errorMessage = SString("Got size:%d MD5:%s, wanted MD5:%s", uiGotFileSize, *strGotMd5, *strWantedMd5);
+    }
+
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
-    SString strMessage =
-        SString("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
+    SString strMessage = SString("HTTP server file mismatch! (%s) %s [%s]", GetName(), *strFilename, *errorMessage);
 
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);

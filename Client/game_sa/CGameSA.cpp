@@ -16,6 +16,7 @@
 #include "D3DResourceSystemSA.h"
 #include "CFileLoaderSA.h"
 
+unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
 unsigned long* CGameSA::VAR_IsGameLoaded;
@@ -200,6 +201,8 @@ CGameSA::CGameSA()
     // Increase matrix array size
     MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);            // Default is 900
 
+    CEntitySAInterface::StaticSetHooks();
+    CPhysicalSAInterface::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();
@@ -471,6 +474,9 @@ void CGameSA::Reset()
         CModelInfoSA::RestoreAllObjectsPropertiesGroups();
         // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
         CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
+
+        // Restore vehicle model wheel sizes
+        CModelInfoSA::ResetAllVehiclesWheelSizes();
     }
 }
 
@@ -834,6 +840,11 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 void CGameSA::ResetModelLodDistances()
 {
     CModelInfoSA::StaticResetLodDistances();
+}
+
+void CGameSA::ResetModelTimes()
+{
+    CModelInfoSA::StaticResetModelTimes();
 }
 
 void CGameSA::ResetAlphaTransparencies()

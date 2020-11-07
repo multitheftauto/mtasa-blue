@@ -457,7 +457,16 @@ public:
 
     void                  ApplyHandling();
     CHandlingEntry*       GetHandlingData();
-    const CHandlingEntry* GetOriginalHandlingData() { return m_pOriginalHandlingEntry; }
+    const CHandlingEntry* GetOriginalHandlingData() { return m_pOriginalHandlingEntry; };
+
+    CFlyingHandlingEntry*       GetFlyingHandlingData();
+    const CFlyingHandlingEntry* GetOriginalFlyingHandlingData() { return m_pOriginalFlyingHandlingEntry; };
+
+    CBoatHandlingEntry*       GetBoatHandlingData();
+    const CBoatHandlingEntry* GetOriginalBoatHandlingData() { return m_pOriginalBoatHandlingEntry; };
+
+    CBikeHandlingEntry*       GetBikeHandlingData();
+    const CBikeHandlingEntry* GetOriginalBikeHandlingData() { return m_pOriginalBikeHandlingEntry; };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now() - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(); }
@@ -493,6 +502,10 @@ public:
     bool AreHeliBladeCollisionsEnabled() { return m_bEnableHeliBladeCollisions; }
 
     void SetHeliBladeCollisionsEnabled(bool bEnable) { m_bEnableHeliBladeCollisions = bEnable; }
+
+    float GetWheelScale();
+    void  SetWheelScale(float fWheelScale);
+    void  ResetWheelScale();
 
     bool OnVehicleFallThroughMap();
 
@@ -606,8 +619,15 @@ protected:
     float                                  m_fHeliRotorSpeed;
     const CHandlingEntry*                  m_pOriginalHandlingEntry;
     CHandlingEntry*                        m_pHandlingEntry;
+    const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry;
+    CFlyingHandlingEntry*                  m_pFlyingHandlingEntry;
+    const CBoatHandlingEntry*              m_pOriginalBoatHandlingEntry;
+    CBoatHandlingEntry*                    m_pBoatHandlingEntry;
+    const CBikeHandlingEntry*              m_pOriginalBikeHandlingEntry;
+    CBikeHandlingEntry*                    m_pBikeHandlingEntry;
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
+    float                                  m_fWheelScale;
 
     bool  m_bChainEngine;
     bool  m_bIsDerailed;
@@ -617,6 +637,7 @@ protected:
     float m_fTrainPosition;
     uchar m_ucTrackID;
     bool  m_bJustStreamedIn;
+    bool  m_bWheelScaleChanged;
 
     // Time dependent error compensation interpolation
     struct

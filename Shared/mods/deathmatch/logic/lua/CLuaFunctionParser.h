@@ -71,6 +71,8 @@ struct CLuaFunctionParserBase
             return "vector3";
         else if constexpr (std::is_same_v<T, CVector4D>)
             return "vector4";
+        else if constexpr (std::is_same_v<T, CMatrix>)
+            return "matrix";
         else if constexpr (std::is_same_v<T, SColor>)
             return "colour";
         else if constexpr (std::is_same_v<T, lua_State*>)
@@ -257,6 +259,16 @@ struct CLuaFunctionParserBase
             if (lua_isnumber(L, index) && lua_isnumber(L, index + 1) && lua_isnumber(L, index + 2) && lua_isnumber(L, index + 3))
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+        }
+        // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
+        if constexpr (std::is_same_v<T, CMatrix>)
+        {
+            for (int i = 0; i < sizeof(CMatrix)/sizeof(float); i++)
+            {
+                if (!lua_isnumber(L, index + i))
+                    return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+            }
+            return true;
         }
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
@@ -530,10 +542,50 @@ struct CLuaFunctionParserBase
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
                     return *pVec4D;
+                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
+                    return *pMatrix;
 
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
                 SetBadArgumentError(L, "vector4", index - 1, pValue, isLightUserData);
+                return T{};
+            }
+        }
+        else if constexpr (std::is_same_v<T, CMatrix>)
+        {
+            if (lua_isnumber(L, index))
+            {
+                CMatrix matrix;
+                matrix.vRight.fX = lua::PopPrimitive<float>(L, index);
+                matrix.vRight.fY = lua::PopPrimitive<float>(L, index);
+                matrix.vRight.fZ = lua::PopPrimitive<float>(L, index);
+                matrix.vFront.fX = lua::PopPrimitive<float>(L, index);
+                matrix.vFront.fY = lua::PopPrimitive<float>(L, index);
+                matrix.vFront.fZ = lua::PopPrimitive<float>(L, index);
+                matrix.vUp.fX = lua::PopPrimitive<float>(L, index);
+                matrix.vUp.fY = lua::PopPrimitive<float>(L, index);
+                matrix.vUp.fZ = lua::PopPrimitive<float>(L, index);
+                matrix.vPos.fX = lua::PopPrimitive<float>(L, index);
+                matrix.vPos.fY = lua::PopPrimitive<float>(L, index);
+                matrix.vPos.fZ = lua::PopPrimitive<float>(L, index);
+                return matrix;
+            }
+            else
+            {
+                int   iType = lua_type(L, index);
+                bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+                void* pValue = lua::PopPrimitive<void*>(L, index);
+                auto  cast = [isLightUserData, pValue, L](auto null) {
+                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
+                                           : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                };
+                // A vector4 may also be filled from a CLuaMatrix
+                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
+                    return *pMatrix;
+
+                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+                // underlying element is of a wrong type
+                SetBadArgumentError(L, "matrix", index - 1, pValue, isLightUserData);
                 return T{};
             }
         }
