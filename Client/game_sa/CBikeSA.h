@@ -58,7 +58,7 @@ public:
     unsigned char            m_nDamageFlags;
     char                     field_615[27];
     CVector                  field_630;
-    void*                    m_pBikeHandlingData;
+    tBikeHandlingDataSA*     m_pBikeHandlingData;
     CRideAnimDataSAInterface m_rideAnimData;
     unsigned char            m_anWheelDamageState[2];
     char                     field_65E;
@@ -110,11 +110,17 @@ static_assert(sizeof(CBikeSAInterface) == 0x814, "Invalid size for CBikeSAInterf
 
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
+private:
+    CBikeHandlingEntrySA* m_pBikeHandlingData;
 public:
     CBikeSA(){};
-
     CBikeSA(CBikeSAInterface* bike);
     CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    // void                    PlaceOnRoadProperly ( void );
+    CBikeSAInterface*   GetBikeInterface() { return (CBikeSAInterface*)m_pInterface; };
+
+    CBikeHandlingEntry* GetBikeHandlingData();
+    void                SetBikeHandlingData(CBikeHandlingEntry* pHandling);
+
+    void                RecalculateBikeHandling();
 };

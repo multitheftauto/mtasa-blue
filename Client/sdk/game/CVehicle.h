@@ -250,6 +250,9 @@ public:
     virtual CHandlingEntry* GetHandlingData() = 0;
     virtual void            SetHandlingData(CHandlingEntry* pHandling) = 0;
 
+    virtual CFlyingHandlingEntry* GetFlyingHandlingData() = 0;
+    virtual void                  SetFlyingHandlingData(CFlyingHandlingEntry* pHandling) = 0;
+
     virtual void BurstTyre(BYTE bTyre) = 0;
 
     virtual BYTE GetBikeWheelStatus(BYTE bWheel) = 0;

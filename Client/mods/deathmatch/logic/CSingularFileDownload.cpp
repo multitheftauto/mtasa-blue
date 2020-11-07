@@ -96,6 +96,6 @@ bool CSingularFileDownload::DoesClientAndServerChecksumMatch()
 
 CChecksum CSingularFileDownload::GenerateClientChecksum()
 {
-    m_LastClientChecksum = CChecksum::GenerateChecksumFromFile(m_strName);
+    m_LastClientChecksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strName);
     return m_LastClientChecksum;
 }

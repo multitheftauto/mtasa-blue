@@ -20,7 +20,7 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteBit(m_bColorCoded);
 
     // Write the client's ID
-    if (BitStream.Version() >= 0x06B)
+    if (BitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
     {
         BitStream.Write(GetSourceElement() ? GetSourceElement()->GetID() : INVALID_ELEMENT_ID);
     }

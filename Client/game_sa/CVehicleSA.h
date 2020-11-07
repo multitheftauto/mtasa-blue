@@ -469,6 +469,7 @@ private:
     CDamageManagerSA*                m_pDamageManager;
     CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity;
     CHandlingEntrySA*                m_pHandlingData;
+    CFlyingHandlingEntrySA*          m_pFlyingHandlingData;
     void*                            m_pSuspensionLines;
     bool                             m_bIsDerailable;
     unsigned char                    m_ucAlpha;
@@ -679,6 +680,9 @@ public:
 
     CHandlingEntry* GetHandlingData();
     void            SetHandlingData(CHandlingEntry* pHandling);
+
+    CFlyingHandlingEntry* GetFlyingHandlingData();
+    void                  SetFlyingHandlingData(CFlyingHandlingEntry* pHandling);
 
     void BurstTyre(BYTE bTyre);
 

@@ -391,7 +391,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->InitVoice(bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate);
 
     // Get fakelag command enabled
-    if (bitStream.Version() >= 0x06A)
+    if (bitStream.Can(eBitStreamVersion::FakeLagCommand))
     {
         if (bitStream.ReadBit())
             g_pCore->SetFakeLagCommandEnabled(true);
@@ -1345,7 +1345,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         // Read the client's ID
         int iNumberOfBytesUsed;
 
-        if (bitStream.Version() >= 0x06B)
+        if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
             ElementID ClientID;
             bitStream.Read(ClientID);
@@ -2230,18 +2230,32 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     float fSeaLevel = 0.0f;
     bool  bHasNonSeaLevel = false;
     float fNonSeaLevel = 0.0f;
+    bool  bHasOutsideLevel = false;
+    float fOutsideLevel = 0.0f;
     bitStream.Read(fSeaLevel);
     bitStream.ReadBit(bHasNonSeaLevel);
     if (bHasNonSeaLevel)
+    {
         bitStream.Read(fNonSeaLevel);
-
+    }
+    if (bitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
+    {
+        bitStream.ReadBit(bHasOutsideLevel);
+        if (bHasOutsideLevel)
+        {
+            bitStream.Read(fOutsideLevel);
+        }
+    }
     // Reset world water level to GTA default
     g_pClientGame->GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     // Apply world non-sea level (to all world water)
     if (bHasNonSeaLevel)
-        g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, NULL, true);
+        g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, nullptr, true, false, false);
+     // Apply outside world level (before -3000 and after 3000)
+    if (bHasOutsideLevel)
+        g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fOutsideLevel, nullptr, false, false, true);
     // Apply world sea level (to world sea level water only)
-    g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, NULL, false);
+    g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, nullptr, false, true, false);
 
     unsigned short usFPSLimit = 36;
     bitStream.ReadCompressed(usFPSLimit);
@@ -2903,7 +2917,7 @@ retry:
                         if (bitStream.ReadBit())
                             pObject->SetDoubleSided(true);
 
-                        if (bitStream.Version() >= 0x068)
+                        if (bitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                             if (bitStream.ReadBit())
                                 pObject->SetVisibleInAllDimensions(true);
 
@@ -3969,7 +3983,7 @@ retry:
                     }
 
                     bool bShallow = false;
-                    if (bitStream.Version() >= 0x06C)
+                    if (bitStream.Can(eBitStreamVersion::Water_bShallow_ServerSide))
                         bitStream.ReadBit(bShallow);
 
                     CClientWater* pWater = NULL;
@@ -5171,7 +5185,7 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
         bitStream.Read(ucAllowBadDrivebyHitboxesFix);
 
     uchar ucAllowShotgunDamageFix = 0;
-    if (bitStream.Version() >= 0x64)
+    if (bitStream.Can(eBitStreamVersion::ShotgunDamageFix))
         bitStream.Read(ucAllowShotgunDamageFix);
 
     SMiscGameSettings miscGameSettings;
@@ -5228,7 +5242,7 @@ void CPacketHandler::Packet_PedTask(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
 {
     uint8 flags;
-    
+
     if (!bitStream.Read(flags))
         return;
 

@@ -567,10 +567,10 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 {
-    SString strModelType;
+    eClientModelType eModelType;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelType);
+    argStream.ReadEnumString(eModelType);
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -580,23 +580,34 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
         {
             if (!argStream.HasErrors())
             {
-                eClientModelType eModelType;
-                if (strModelType == "ped")
-                {
-                    eModelType = CCLIENTMODELPED;
-                }
-                else
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
                     CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
                     if (pModel == nullptr)
                         pModel = new CClientModel(m_pManager, iModelID, eModelType);
-                    pModel->Allocate();
+
+                    ushort usParentID = -1;
+
+                    if (argStream.NextIsNumber())
+                        argStream.ReadNumber(usParentID);
+                    else
+                    {
+                        switch (eModelType)
+                        {
+                            case eClientModelType::PED:
+                                usParentID = 7; // male01
+                                break;
+                            case eClientModelType::OBJECT:
+                                usParentID = 1337; // BinNt07_LA (trash can)
+                                break;
+                            case eClientModelType::VEHICLE:
+                                usParentID = VT_LANDSTAL;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    pModel->Allocate(usParentID);
                     pModel->SetParentResource(pResource);
 
                     lua_pushinteger(luaVM, iModelID);

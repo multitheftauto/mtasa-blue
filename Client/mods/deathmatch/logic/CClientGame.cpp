@@ -636,7 +636,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
-            if (g_pNet->GetServerBitStreamVersion() >= 0x06E)
+            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
             {
                 SString joinSecret = SStringX(szSecret);
                 pBitStream->WriteString<uchar>(joinSecret);
@@ -3636,7 +3636,7 @@ void CClientGame::SetupGlobalLuaEvents()
         CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
         if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
             return;
-        
+
         // Call event now
         CLuaArguments args;
         args.PushString(clipboardText);
@@ -7002,7 +7002,7 @@ void CClientGame::RestreamWorld()
 
 void CClientGame::TriggerDiscordJoin(SString strSecret)
 {
-    if (g_pNet->GetServerBitStreamVersion() < 0x06E)
+    if (!g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
         return;
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -7170,7 +7170,7 @@ void CClientGame::UpdateDiscordState()
     uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
     SString state(std::to_string(playerCount));
 
-    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06E)
+    if (g_pCore->GetNetwork()->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
         state += "/" + std::to_string(playerSlot);
 
     state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
