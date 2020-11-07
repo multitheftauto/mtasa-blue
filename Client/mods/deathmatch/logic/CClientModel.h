@@ -19,6 +19,7 @@ enum class eClientModelType
 {
     PED,
     OBJECT,
+    VEHICLE,
 };
 
 class CClientModel
@@ -31,7 +32,7 @@ public:
 
     int                             GetModelID(void) const { return m_iModelID; };
     eClientModelType                GetModelType(void) const { return m_eModelType; };
-    bool                            Allocate(void);
+    bool                            Allocate(ushort usParentID);
     bool                            Deallocate(void);
     void                            SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
     CResource*                      GetParentResource(void) const { return m_pParentResource; }

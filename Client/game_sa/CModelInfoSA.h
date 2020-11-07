@@ -237,6 +237,8 @@ class CVehicleModelVisualInfoSAInterface            // Not sure about this name.
 {
 public:
     CVector vecDummies[15];
+    char m_sUpgrade[18];
+
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -262,6 +264,23 @@ public:
     unsigned int                        uiComponentRules;
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
+    char                                pad3[464];
+    char                                pDirtMaterial[64]; // *RwMaterial
+    char                                pad4[64];
+    char                                primColors[8];
+    char                                secondColors[8];
+    char                                treeColors[8];
+    char                                fourColors[8];
+    unsigned char                       ucNumOfColorVariations;
+    unsigned char                       ucLastColorVariation;
+    unsigned char                       ucPrimColor;
+    unsigned char                       ucSecColor;
+    unsigned char                       ucTertColor;
+    unsigned char                       ucQuatColor;
+    char                                upgrades[36];
+    char                                anRemapTXDs[8];
+    char                                pad5[2];
+    char                                pAnimBlock[4];
 };
 
 /**
@@ -273,6 +292,7 @@ class CModelInfoSA : public CModelInfo
 protected:
     CBaseModelInfoSAInterface*                                                   m_pInterface;
     DWORD                                                                        m_dwModelID;
+    DWORD                                                                        m_dwParentID;
     DWORD                                                                        m_dwReferences;
     DWORD                                                                        m_dwPendingInterfaceRef;
     CColModel*                                                                   m_pCustomColModel;
@@ -317,6 +337,7 @@ public:
 
     char* GetNameIfVehicle();
 
+    BYTE           GetVehicleType();
     VOID           Request(EModelRequestType requestType, const char* szTag);
     VOID           Remove();
     BYTE           GetLevelFromPosition(CVector* vecPosition);
@@ -385,10 +406,11 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void CopyStreamingInfoFromModel(ushort usBaseModelID);
     void MakePedModel(char* szTexture);
     void MakeObjectModel(ushort usBaseModelID);
+    void MakeVehicleAutomobile(ushort usBaseModelID);
     void DeallocateModel(void);
+    unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
@@ -404,5 +426,6 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
+    void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };

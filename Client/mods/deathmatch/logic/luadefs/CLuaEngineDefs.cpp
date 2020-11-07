@@ -585,7 +585,29 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                     CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
                     if (pModel == nullptr)
                         pModel = new CClientModel(m_pManager, iModelID, eModelType);
-                    pModel->Allocate();
+
+                    ushort usParentID = -1;
+
+                    if (argStream.NextIsNumber())
+                        argStream.ReadNumber(usParentID);
+                    else
+                    {
+                        switch (eModelType)
+                        {
+                            case eClientModelType::PED:
+                                usParentID = 7; // male01
+                                break;
+                            case eClientModelType::OBJECT:
+                                usParentID = 1337; // BinNt07_LA (trash can)
+                                break;
+                            case eClientModelType::VEHICLE:
+                                usParentID = VT_LANDSTAL;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    pModel->Allocate(usParentID);
                     pModel->SetParentResource(pResource);
 
                     lua_pushinteger(luaVM, iModelID);
