@@ -5770,6 +5770,7 @@ void CClientGame::ResetMapInfo()
 
     // Water-colour
     g_pMultiplayer->ResetWater();
+    g_pMultiplayer->ResetColorFilter();
 
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
