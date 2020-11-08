@@ -240,9 +240,9 @@ public:
             if (info.totalTime < 5000)
                 break;
             if (info.iEnterCount == info.iLeaveCount)
-                strStatus += SString("[%s %dms (calls:%d)]   ", *info.strName, info.totalTime / 1000, info.iEnterCount);
+                strStatus += SString("[{} {}ms (calls:{})]   ", *info.strName, info.totalTime / 1000, info.iEnterCount);
             else
-                strStatus += SString("[%s %dms (calls:%d/%d)]   ", *info.strName, info.totalTime / 1000, info.iEnterCount, info.iLeaveCount);
+                strStatus += SString("[{} {}ms (calls:{}/{})]   ", *info.strName, info.totalTime / 1000, info.iEnterCount, info.iLeaveCount);
         }
 
         if (!strStatus.empty())

@@ -666,14 +666,14 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
     {
         // Do anti-virus check soon
         SetApplicationSettingInt("noav-user-says-skip", 1);
-        strMessage += SString(" \nCode: %08X", uiErrorCode);
+        strMessage += SString(" \nCode: {:08X}", uiErrorCode);
         if (!strTroubleLink.empty())
-            strTroubleLink += SString("&neterrorcode=%08X", uiErrorCode);
+            strTroubleLink += SString("&neterrorcode={:08X}", uiErrorCode);
     }
     else if (bLinkRequiresErrorCode)
         strTroubleLink = "";            // No link if no error code
 
-    AddReportLog(7100, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
+    AddReportLog(7100, SString("Core - NetError ({}) ({})", *strTitle, *strMessage));
     ShowErrorMessageBox(strTitle, strMessage, strTroubleLink);
 }
 
@@ -702,8 +702,8 @@ bool CCore::CheckDiskSpace(uint uiResourcesPathMinMB, uint uiDataPathMinMB)
     SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace(uiResourcesPathMinMB, uiDataPathMinMB);
     if (!strDriveWithNoSpace.empty())
     {
-        SString strMessage(_("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace);
-        SString strTroubleLink(SString("low-disk-space&drive=%s", *strDriveWithNoSpace.Left(1)));
+        SString strMessage(_("MTA:SA cannot continue because drive {} does not have enough space."), *strDriveWithNoSpace);
+        SString strTroubleLink(SString("low-disk-space&drive={}", *strDriveWithNoSpace.Left(1)));
         g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CC43"), strMessage, strTroubleLink);
         return false;
     }
@@ -823,7 +823,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     SString strDllDirectory = GetSystemDllDirectory();
     if (CalcMTASAPath("mta").CompareI(strDllDirectory) == false)
     {
-        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath("mta")));
+        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'{}'  Path:'{}'", *strDllDirectory, *CalcMTASAPath("mta")));
         SetDllDirectory(CalcMTASAPath("mta"));
     }
 
@@ -840,7 +840,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if (m_Loader.IsOk() == false)
     {
-        SString strMessage("Error loading '%s' module!\n%s", *strName, *m_Loader.GetLastErrorMessage());
+        SString strMessage("Error loading '{}' module!\n{}", *strName, *m_Loader.GetLastErrorMessage());
         SString strType = "module-not-loadable&name=" + strModuleName;
 
         // Extra message if d3d9.dll exists
@@ -880,7 +880,7 @@ T* InitModule(CModuleLoader& m_Loader, const SString& strName, const SString& st
 
     if (pfnInit == NULL)
     {
-        MessageBoxUTF8(0, SString(_("%s module is incorrect!"), *strName), "Error" + _E("CC40"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        MessageBoxUTF8(0, SString(_("{} module is incorrect!"), *strName), "Error" + _E("CC40"), MB_OK | MB_ICONERROR | MB_TOPMOST);
         TerminateProcess(GetCurrentProcess(), 1);
     }
 
@@ -967,7 +967,7 @@ void CCore::CreateNetwork()
         // net.dll doesn't like our version number
         ulong ulNetModuleVersion = 0;
         pfnCheckCompatibility(1, &ulNetModuleVersion);
-        SString strMessage("Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
+        SString strMessage("Network module not compatible! (Expected 0x{:x}, got 0x{:x})", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
 #if !defined(MTA_DM_CONNECT_TO_PUBLIC)
         strMessage += "\n\n(Devs: Update source and run win-install-data.bat)";
 #endif
@@ -1202,7 +1202,7 @@ void CCore::DoPostFramePulse()
                         // Try to load the mod
                         if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
                         {
-                            SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
+                            SString strTemp(_("Error running mod specified in command line ('{}')"), szOptionValue);
                             ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
                         }
                     }
@@ -1667,7 +1667,7 @@ void CCore::UpdateRecentlyPlayed()
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
-            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
+            pServerBrowser->SetServerPassword(strHost + ":" + SString("{}", uiPort), m_pConnectManager->m_strLastPassword);
     }
     // Save our configuration file
     CCore::GetSingleton().SaveConfig();
@@ -1730,9 +1730,9 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Print new limits to the console
     if (bLogToConsole)
     {
-        SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
+        SString strStatus("Server FPS limit: {}", m_uiServerFrameRateLimit);
         if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
-            strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
+            strStatus += SString(" (Using {})", m_uiFrameRateLimit);
         CCore::GetSingleton().GetConsole()->Print(strStatus);
     }
 }
@@ -2032,12 +2032,12 @@ void CCore::OnEnterCrashZone(uint uiId)
 void CCore::LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId)
 {
     if (uiAddReportLogId)
-        AddReportLog(uiAddReportLogId, SString("%s - %s", szContext, szBody));
+        AddReportLog(uiAddReportLogId, SString("{} - {}", szContext, szBody));
 
     if (GetDebugIdEnabled(uiDebugId))
     {
         CCrashDumpWriter::LogEvent(szType, szContext, szBody);
-        OutputDebugLine(SString("[LogEvent] %d %s %s %s", uiDebugId, szType, szContext, szBody));
+        OutputDebugLine(SString("[LogEvent] {} {} {} {}", uiDebugId, szType, szContext, szBody));
     }
 }
 
@@ -2216,7 +2216,7 @@ void CCore::UpdateDummyProgress(int iValue, const char* szType)
     // Compose message with amount
     SString strMessage;
     if (m_iDummyProgressValue)
-        strMessage = SString("%d%s", m_iDummyProgressValue, *m_strDummyProgressType);
+        strMessage = SString("{}{}", m_iDummyProgressValue, *m_strDummyProgressType);
 
     CGraphics::GetSingleton().SetProgressMessage(strMessage);
 }

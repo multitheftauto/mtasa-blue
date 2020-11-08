@@ -210,7 +210,7 @@ bool CRenderTargetItem::ReadPixels(CBuffer& outBuffer, SString& strOutError)
         hr = m_pDevice->CreateOffscreenPlainSurface(Desc.Width, Desc.Height, Desc.Format, D3DPOOL_SYSTEMMEM, &m_pD3DReadSurface, NULL);
         if (FAILED(hr))
         {
-            strOutError = SString("CreateOffscreenPlainSurface failed (0x%08x)", hr);
+            strOutError = SString("CreateOffscreenPlainSurface failed (0x{:08x})", hr);
             return false;
         }
     }
@@ -219,7 +219,7 @@ bool CRenderTargetItem::ReadPixels(CBuffer& outBuffer, SString& strOutError)
     hr = m_pDevice->GetRenderTargetData(m_pD3DRenderTargetSurface, m_pD3DReadSurface);
     if (FAILED(hr))
     {
-        strOutError = SString("GetRenderTargetData failed (0x%08x)", hr);
+        strOutError = SString("GetRenderTargetData failed (0x{:08x})", hr);
         return false;
     }
 
@@ -228,7 +228,7 @@ bool CRenderTargetItem::ReadPixels(CBuffer& outBuffer, SString& strOutError)
     hr = m_pD3DReadSurface->LockRect(&LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
     if (FAILED(hr))
     {
-        strOutError = SString("LockRect failed (0x%08x)", hr);
+        strOutError = SString("LockRect failed (0x{:08x})", hr);
         return false;
     }
 

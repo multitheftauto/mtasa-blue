@@ -94,11 +94,11 @@ SString SharedUtil::GetTimeString(bool bDate, bool bMilliseconds, bool bLocal)
     // else
     //    GetSystemTime( &s );
 
-    SString strResult = SString("%02d:%02d:%02d", s.wHour, s.wMinute, s.wSecond);
+    SString strResult = SString("{:02}:{:02}:{:02}", s.wHour, s.wMinute, s.wSecond);
     if (bMilliseconds)
-        strResult += SString(".%03d", s.wMilliseconds);
+        strResult += SString(".{:03}", s.wMilliseconds);
     if (bDate)
-        strResult = SString("%02d-%02d-%02d ", s.wYear, s.wMonth, s.wDay) + strResult;
+        strResult = SString("{:02}-{:02}-{:02} ", s.wYear, s.wMonth, s.wDay) + strResult;
     return strResult;
 #else
     timeval now;
@@ -116,7 +116,7 @@ SString SharedUtil::GetTimeString(bool bDate, bool bMilliseconds, bool bLocal)
     if (!bMilliseconds)
         return outstr;
 
-    return SString("%s.%03d", outstr, now.tv_usec / 1000);
+    return SString("{}.{:03}", outstr, now.tv_usec / 1000);
 #endif
 }
 

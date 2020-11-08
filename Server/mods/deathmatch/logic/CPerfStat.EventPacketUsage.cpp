@@ -262,7 +262,7 @@ void CPerfStatEventPacketUsageImpl::GetStats(CPerfStatResult* pResult, const std
         int c = 0;
         row[c++] = strType;
         row[c++] = usage.strName;
-        row[c++] = SString("%d", (usage.iTotal + 4) / 5);
-        row[c++] = SString("%d", usage.iTotal);
+        row[c++] = SString("{}", (usage.iTotal + 4) / 5);
+        row[c++] = SString("{}", usage.iTotal);
     }
 }

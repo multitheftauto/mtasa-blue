@@ -25,7 +25,7 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
     {
         if (*pAnimGroup < eAnimGroup::ANIM_GROUP_PYTHON || *pAnimGroup > eAnimGroup::ANIM_GROUP_GOGGLES)
         {
-            LogEvent(533, "CopyAnimation", "Incorrect Group ID", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 533);
+            LogEvent(533, "CopyAnimation", "Incorrect Group ID", SString("GroupID = {} | AnimID = {}", *pAnimGroup, *pAnimId), 533);
 
             // switch to python anim group as it has 224 anim
             *pAnimGroup = eAnimGroup::ANIM_GROUP_PYTHON;
@@ -36,7 +36,7 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
     DWORD* pInterface = reinterpret_cast<DWORD*>(pGroup);
     if (pInterface < (DWORD*)0x250)
     {
-        LogEvent(534, "CopyAnimation", "Incorrect Group Interface", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 534);
+        LogEvent(534, "CopyAnimation", "Incorrect Group Interface", SString("GroupID = {} | AnimID = {}", *pAnimGroup, *pAnimId), 534);
 
         // switch to idle animation
         *pAnimGroup = eAnimGroup::ANIM_GROUP_DEFAULT;
@@ -66,7 +66,7 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
             }
 
             iUseAnimId = iNewAnimId;
-            LogEvent(534, "CopyAnimation", "", SString("Group:%d replaced id:%d with id:%d", pGroup->groupID, *pAnimId, iUseAnimId + pGroup->iIDOffset));
+            LogEvent(534, "CopyAnimation", "", SString("Group:{} replaced id:{} with id:{}", pGroup->groupID, *pAnimId, iUseAnimId + pGroup->iIDOffset));
         }
     }
 
@@ -84,7 +84,7 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
     {
         // Crash will occur at offset 003C51A8
         uint uiModelId = pGameInterface->GetPools()->GetModelIdFromClump(pRpClump);
-        LogEvent(818, "Model bad anim hierarchy", "GetAnimHierarchyFromSkinClump", SString("Corrupt model:%d", uiModelId), 5418);
+        LogEvent(818, "Model bad anim hierarchy", "GetAnimHierarchyFromSkinClump", SString("Corrupt model:{}", uiModelId), 5418);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "anim_hierarchy");

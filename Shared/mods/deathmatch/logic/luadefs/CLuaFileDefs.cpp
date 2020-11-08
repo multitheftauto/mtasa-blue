@@ -113,7 +113,7 @@ int CLuaFileDefs::File(lua_State* luaVM)
 #ifdef MTA_CLIENT
                         if (!g_pNet->ValidateBinaryFileName(strInputPath))
                         {
-                            argStream.SetCustomError(SString("Filename not allowed %s", *strInputPath), "File error");
+                            argStream.SetCustomError(SString("Filename not allowed {}", *strInputPath), "File error");
                             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
                             lua_pushboolean(luaVM, false);
                             return 1;
@@ -160,7 +160,7 @@ int CLuaFileDefs::File(lua_State* luaVM)
                         delete pFile;
 
                         // Output error
-                        argStream.SetCustomError(SString("unable to load file '%s'", *strInputPath));
+                        argStream.SetCustomError(SString("unable to load file '{}'", *strInputPath));
                     }
                 }
             }
@@ -242,7 +242,7 @@ int CLuaFileDefs::fileOpen(lua_State* luaVM)
                         delete pFile;
 
                         // Output error
-                        argStream.SetCustomError(SString("unable to load file '%s'", *strInputPath));
+                        argStream.SetCustomError(SString("unable to load file '{}'", *strInputPath));
                     }
                 }
             }
@@ -282,7 +282,7 @@ int CLuaFileDefs::fileCreate(lua_State* luaVM)
 #ifdef MTA_CLIENT
         if (!g_pNet->ValidateBinaryFileName(strInputPath))
         {
-            argStream.SetCustomError(SString("Filename not allowed %s", *strInputPath), "File error");
+            argStream.SetCustomError(SString("Filename not allowed {}", *strInputPath), "File error");
             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
             // Failed
@@ -345,7 +345,7 @@ int CLuaFileDefs::fileCreate(lua_State* luaVM)
                     delete pFile;
 
                     // Output error
-                    argStream.SetCustomError(SString("Unable to create %s", *strInputPath), "File error");
+                    argStream.SetCustomError(SString("Unable to create {}", *strInputPath), "File error");
                 }
             }
         }
@@ -420,7 +420,7 @@ int CLuaFileDefs::fileCopy(lua_State* luaVM)
 #ifdef MTA_CLIENT
         if (!g_pNet->ValidateBinaryFileName(strInputDestPath))
         {
-            argStream.SetCustomError(SString("Filename not allowed %s", *strInputDestPath), "File error");
+            argStream.SetCustomError(SString("Filename not allowed {}", *strInputDestPath), "File error");
             m_pScriptDebugging->LogError(luaVM, argStream.GetFullErrorMessage());
 
             lua_pushboolean(luaVM, false);
@@ -466,16 +466,16 @@ int CLuaFileDefs::fileCopy(lua_State* luaVM)
                         }
 
                         // Output error
-                        argStream.SetCustomError(SString("Unable to copy %s to %s", *strInputSrcPath, *strInputDestPath), "Operation failed");
+                        argStream.SetCustomError(SString("Unable to copy {} to {}", *strInputSrcPath, *strInputDestPath), "Operation failed");
                     }
                     else
                     {
-                        argStream.SetCustomError(SString("Destination file already exists (%s)", *strInputDestPath), "Operation failed");
+                        argStream.SetCustomError(SString("Destination file already exists ({})", *strInputDestPath), "Operation failed");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(SString("Source file doesn't exist (%s)", *strInputSrcPath), "Operation failed");
+                    argStream.SetCustomError(SString("Source file doesn't exist ({})", *strInputSrcPath), "Operation failed");
                 }
             }
         }
@@ -511,7 +511,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
 #ifdef MTA_CLIENT
         if (!g_pNet->ValidateBinaryFileName(strInputDestPath))
         {
-            argStream.SetCustomError(SString("Filename not allowed %s", *strInputDestPath), "File error");
+            argStream.SetCustomError(SString("Filename not allowed {}", *strInputDestPath), "File error");
             m_pScriptDebugging->LogError(luaVM, argStream.GetFullErrorMessage());
 
             lua_pushboolean(luaVM, false);
@@ -557,7 +557,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         }
 
                         // Output error
-                        m_pScriptDebugging->LogWarning(luaVM, SString("fileRename failed; unable to rename file (Error %d)", errorCode));
+                        m_pScriptDebugging->LogWarning(luaVM, SString("fileRename failed; unable to rename file (Error {})", errorCode));
                     }
                     else
                     {
@@ -869,9 +869,9 @@ int CLuaFileDefs::fileGetPath(lua_State* luaVM)
             if (pThisResource != pFileResource)
             {
 #ifdef MTA_CLIENT
-                strFilePath = SString(":%s/%s", pFileResource->GetName(), *strFilePath);
+                strFilePath = SString(":{}/{}", pFileResource->GetName(), *strFilePath);
 #else
-                strFilePath = SString(":%s/%s", *pFileResource->GetName(), *strFilePath);
+                strFilePath = SString(":{}/{}", *pFileResource->GetName(), *strFilePath);
 #endif
             }
 

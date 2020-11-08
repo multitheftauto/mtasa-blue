@@ -171,5 +171,5 @@ void CLuaFunctionRef::RemoveLuaFunctionRefsForVM(lua_State* luaVM)
         }
     }
     if (uiCount)
-        OutputDebugLine(SString("Server RemoveLuaFunctionRefsForVM: zeroed:%d  total:%d", uiCount, ms_AllRefList.size()));
+        OutputDebugLine(SString("Server RemoveLuaFunctionRefsForVM: zeroed:{}  total:{}", uiCount, ms_AllRefList.size()));
 }

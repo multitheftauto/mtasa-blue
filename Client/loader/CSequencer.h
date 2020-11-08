@@ -88,11 +88,11 @@ public:
 
     void CallFunction(const SString& strName)
     {
-        AddReportLog(1070, SString("CallFunction: %s", *strName));
+        AddReportLog(1070, SString("CallFunction: {}", *strName));
         if (PFNVOIDVOID* pfnCmdFunc = MapFind(m_FunctionMap, strName))
             SetVariable("LastResult", (m_pOuter->**pfnCmdFunc)());
         else
-            Log(SString("Unknown function: '%s'", *strName));
+            Log(SString("Unknown function: '{}'", *strName));
     }
 
     // Variables
@@ -104,13 +104,13 @@ public:
             MapSet(m_VariableMap, strName, strValue);
     }
 
-    void SetVariable(const SString& strName, int iValue) { SetVariable(strName, SString("%d", iValue)); }
+    void SetVariable(const SString& strName, int iValue) { SetVariable(strName, SString("{}", iValue)); }
 
     const SString& GetVariable(const SString& strName)
     {
         if (SString* pstrValue = MapFind(m_VariableMap, strName))
             return *pstrValue;
-        Log(SString("Unknown variable: '%s'", *strName));
+        Log(SString("Unknown variable: '{}'", *strName));
         static const SString strDummy;
         return strDummy;
     }
@@ -124,7 +124,7 @@ public:
             return iResult == 0;
         if (strOperand == "!=")
             return iResult != 0;
-        Log(SString("Unknown operator: '%s'", *strOperand));
+        Log(SString("Unknown operator: '{}'", *strOperand));
         return false;
     }
 
@@ -212,7 +212,7 @@ public:
         }
         else if (!IsLineLabel(strLine))
         {
-            Log(SString("Unknown command in: '%s'", *strLine));
+            Log(SString("Unknown command in: '{}'", *strLine));
         }
     }
 };

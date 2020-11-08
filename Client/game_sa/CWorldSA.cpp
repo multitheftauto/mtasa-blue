@@ -135,7 +135,7 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
         CEntitySAInterface* pInterface = pEntitySA->GetInterface();
         if ((DWORD)pInterface->vtbl == VTBL_CPlaceable)
         {
-            SString strMessage("Caller: %i ", CallerId);
+            SString strMessage("Caller: {} ", CallerId);
             LogEvent(506, "CWorld::Add ( CEntity * ) Crash", "", strMessage);
         }
         DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
@@ -155,7 +155,7 @@ void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
     DWORD dwFunction = FUNC_Add;
     if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
     {
-        SString strMessage("Caller: %i ", CallerId);
+        SString strMessage("Caller: {} ", CallerId);
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
     }
     _asm
@@ -177,7 +177,7 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
         CEntitySAInterface* pInterface = pEntitySA->GetInterface();
         if ((DWORD)pInterface->vtbl == VTBL_CPlaceable)
         {
-            SString strMessage("Caller: %i ", CallerId);
+            SString strMessage("Caller: {} ", CallerId);
             LogEvent(507, "CWorld::Remove ( CEntity * ) Crash", "", strMessage);
         }
         DWORD dwEntity = (DWORD)pInterface;
@@ -196,7 +196,7 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
     DEBUG_TRACE("VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )");
     if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
     {
-        SString strMessage("Caller: %i ", CallerId);
+        SString strMessage("Caller: {} ", CallerId);
         LogEvent(507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage);
     }
     DWORD dwFunction = FUNC_Remove;

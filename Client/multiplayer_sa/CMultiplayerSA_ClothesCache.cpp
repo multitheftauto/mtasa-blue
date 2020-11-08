@@ -143,7 +143,7 @@ public:
 #ifdef CLOTHES_REF_TEST
             if (pGeometry->refs < 21)
             {
-                AddReportLog(7521, SString("Clothes geometry refs below expected value: %d", pGeometry->refs));
+                AddReportLog(7521, SString("Clothes geometry refs below expected value: {}", pGeometry->refs));
                 pGeometry->refs = 21;
             }
             if (pGeometry->refs == 21)

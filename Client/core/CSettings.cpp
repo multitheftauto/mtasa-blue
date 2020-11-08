@@ -732,7 +732,7 @@ void CSettings::CreateGUI()
     m_pAnisotropic->GetPosition(vecTemp, false);
     m_pAnisotropic->SetSize(CVector2D(160.0f, 20.0f));
     m_pAnisotropic->GetSize(vecSize);
-    m_pAnisotropic->SetProperty("StepSize", SString("%1.2f", 1 / (float)m_iMaxAnisotropic));
+    m_pAnisotropic->SetProperty("StepSize", SString("{:1.2f}", 1 / (float)m_iMaxAnisotropic));
 
     m_pAnisotropicValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Off")));
     m_pAnisotropicValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
@@ -1078,7 +1078,7 @@ void CSettings::CreateGUI()
     m_pStreamingMemory->GetPosition(vecTemp);
     m_pStreamingMemory->SetSize(CVector2D(130.0f, 20.0f));
     m_pStreamingMemory->GetSize(vecSize);
-    m_pStreamingMemory->SetProperty("StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)));
+    m_pStreamingMemory->SetProperty("StepSize", SString("{:.07f}", 1.0 / (uiMaxMemory - uiMinMemory)));
 
     m_pStreamingMemoryMaxLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Max")));
     m_pStreamingMemoryMaxLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
@@ -1569,7 +1569,7 @@ void CSettings::UpdateVideoTab()
     int iVar = 0;
     CVARS_GET("mapalpha", iVar);
     int iAlphaPercent = ceil(((float)Clamp(0, iVar, 255) / 255) * 100);
-    m_pMapAlphaValueLabel->SetText(SString("%i%%", iAlphaPercent).c_str());
+    m_pMapAlphaValueLabel->SetText(SString("{}%", iAlphaPercent).c_str());
     float sbPos = (float)iAlphaPercent / 100.0f;
     m_pMapAlpha->SetScrollPosition(sbPos);
 }
@@ -1618,7 +1618,7 @@ void CSettings::PopulateResolutionComboBox()
         if (gameSettings->IsUnsafeResolution(vidModemInfo.width, vidModemInfo.height) && !bShowUnsafeResolutions)
             continue;
 
-        SString strMode("%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth);
+        SString strMode("{} x {} x {}", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth);
 
         if (vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE)
             m_pComboResolution->AddItem(strMode)->SetData((void*)vidMode);
@@ -3115,9 +3115,9 @@ void CSettings::LoadData()
         CVARS_GET("chat_scale", strVar);
         stringstream ss(strVar);
         ss >> strVar;
-        m_pChatScaleX->SetText(SString("%1.1f", atof(strVar.c_str())));
+        m_pChatScaleX->SetText(SString("{:1.1f}", atof(strVar.c_str())));
         ss >> strVar;
-        m_pChatScaleY->SetText(SString("%1.1f", atof(strVar.c_str())));
+        m_pChatScaleY->SetText(SString("{:1.1f}", atof(strVar.c_str())));
     }
     catch (...)
     {
@@ -4046,7 +4046,7 @@ bool CSettings::OnFieldOfViewChanged(CGUIElement* pElement)
 {
     int iFieldOfView = std::min<int>(4, (m_pFieldOfView->GetScrollPosition()) * (4 + 1)) * 5 + 70;
 
-    m_pFieldOfViewValueLabel->SetText(SString("%i", iFieldOfView).c_str());
+    m_pFieldOfViewValueLabel->SetText(SString("{}", iFieldOfView).c_str());
     return true;
 }
 
@@ -4054,7 +4054,7 @@ bool CSettings::OnDrawDistanceChanged(CGUIElement* pElement)
 {
     int iDrawDistance = (m_pDrawDistance->GetScrollPosition()) * 100;
 
-    m_pDrawDistanceValueLabel->SetText(SString("%i%%", iDrawDistance).c_str());
+    m_pDrawDistanceValueLabel->SetText(SString("{}%", iDrawDistance).c_str());
     return true;
 }
 
@@ -4062,7 +4062,7 @@ bool CSettings::OnBrightnessChanged(CGUIElement* pElement)
 {
     int iBrightness = (m_pBrightness->GetScrollPosition()) * 100;
 
-    m_pBrightnessValueLabel->SetText(SString("%i%%", iBrightness).c_str());
+    m_pBrightnessValueLabel->SetText(SString("{}%", iBrightness).c_str());
     return true;
 }
 
@@ -4072,7 +4072,7 @@ bool CSettings::OnAnisotropicChanged(CGUIElement* pElement)
 
     SString strLabel;
     if (iAnisotropic > 0)
-        strLabel = SString("%ix", 1 << iAnisotropic);
+        strLabel = SString("{}x", 1 << iAnisotropic);
     else
         strLabel = _("Off");
 
@@ -4084,14 +4084,14 @@ bool CSettings::OnMouseSensitivityChanged(CGUIElement* pElement)
 {
     int iMouseSensitivity = (m_pMouseSensitivity->GetScrollPosition()) * 100;
 
-    m_pLabelMouseSensitivityValue->SetText(SString("%i%%", iMouseSensitivity).c_str());
+    m_pLabelMouseSensitivityValue->SetText(SString("{}%", iMouseSensitivity).c_str());
     return true;
 }
 
 bool CSettings::OnVerticalAimSensitivityChanged(CGUIElement* pElement)
 {
     int iSensitivity = m_pVerticalAimSensitivity->GetScrollPosition() * 100;
-    m_pLabelVerticalAimSensitivityValue->SetText(SString("%i%%", iSensitivity));
+    m_pLabelVerticalAimSensitivityValue->SetText(SString("{}%", iSensitivity));
     return true;
 }
 
@@ -4099,14 +4099,14 @@ bool CSettings::OnMapAlphaChanged(CGUIElement* pElement)
 {
     int iAlpha = (m_pMapAlpha->GetScrollPosition()) * 100;
 
-    m_pMapAlphaValueLabel->SetText(SString("%i%%", iAlpha).c_str());
+    m_pMapAlphaValueLabel->SetText(SString("{}%", iAlpha).c_str());
     return true;
 }
 
 bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioMasterVolume->GetScrollPosition() * 100.0f;
-    m_pLabelMasterVolumeValue->SetText(SString("%i%%", iVolume).c_str());
+    m_pLabelMasterVolumeValue->SetText(SString("{}%", iVolume).c_str());
 
     CVARS_SET("mastervolume", m_pAudioMasterVolume->GetScrollPosition());
 
@@ -4121,7 +4121,7 @@ bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 bool CSettings::OnRadioVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioRadioVolume->GetScrollPosition() * 100.0f;
-    m_pLabelRadioVolumeValue->SetText(SString("%i%%", iVolume).c_str());
+    m_pLabelRadioVolumeValue->SetText(SString("{}%", iVolume).c_str());
 
     SetRadioVolume(m_pAudioRadioVolume->GetScrollPosition());
 
@@ -4131,7 +4131,7 @@ bool CSettings::OnRadioVolumeChanged(CGUIElement* pElement)
 bool CSettings::OnSFXVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioSFXVolume->GetScrollPosition() * 100.0f;
-    m_pLabelSFXVolumeValue->SetText(SString("%i%%", iVolume).c_str());
+    m_pLabelSFXVolumeValue->SetText(SString("{}%", iVolume).c_str());
 
     SetSFXVolume(m_pAudioSFXVolume->GetScrollPosition());
 
@@ -4141,7 +4141,7 @@ bool CSettings::OnSFXVolumeChanged(CGUIElement* pElement)
 bool CSettings::OnMTAVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioMTAVolume->GetScrollPosition() * 100.0f;
-    m_pLabelMTAVolumeValue->SetText(SString("%i%%", iVolume).c_str());
+    m_pLabelMTAVolumeValue->SetText(SString("{}%", iVolume).c_str());
 
     CVARS_SET("mtavolume", m_pAudioMTAVolume->GetScrollPosition());
 
@@ -4186,7 +4186,7 @@ bool CSettings::OnVoiceMuteMinimizedChanged(CGUIElement* pElement)
 bool CSettings::OnVoiceVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioVoiceVolume->GetScrollPosition() * 100.0f;
-    m_pLabelVoiceVolumeValue->SetText(SString("%i%%", iVolume).c_str());
+    m_pLabelVoiceVolumeValue->SetText(SString("{}%", iVolume).c_str());
 
     CVARS_SET("voicevolume", m_pAudioVoiceVolume->GetScrollPosition());
 
@@ -4202,7 +4202,7 @@ bool CSettings::OnChatRedChanged(CGUIElement* pElement)
     {
         if (pScrollBar == m_pChatRed[eType])
         {
-            m_pChatRedValue[eType]->SetText(SString("%i", iValue).c_str());
+            m_pChatRedValue[eType]->SetText(SString("{}", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
         }
@@ -4220,7 +4220,7 @@ bool CSettings::OnChatGreenChanged(CGUIElement* pElement)
     {
         if (pScrollBar == m_pChatGreen[eType])
         {
-            m_pChatGreenValue[eType]->SetText(SString("%i", iValue).c_str());
+            m_pChatGreenValue[eType]->SetText(SString("{}", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
         }
@@ -4238,7 +4238,7 @@ bool CSettings::OnChatBlueChanged(CGUIElement* pElement)
     {
         if (pScrollBar == m_pChatBlue[eType])
         {
-            m_pChatBlueValue[eType]->SetText(SString("%i", iValue).c_str());
+            m_pChatBlueValue[eType]->SetText(SString("{}", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
         }
@@ -4256,7 +4256,7 @@ bool CSettings::OnChatAlphaChanged(CGUIElement* pElement)
     {
         if (pScrollBar == m_pChatAlpha[eType])
         {
-            m_pChatAlphaValue[eType]->SetText(SString("%i", iValue).c_str());
+            m_pChatAlphaValue[eType]->SetText(SString("{}", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
         }

@@ -28,7 +28,7 @@ CTransferBox::CTransferBox()
     float fTransferBoxWidth = 0;
     for (int i = 0; i < Type::MAX_TYPES; i++)
         fTransferBoxWidth = std::max<float>(
-            fTransferBoxWidth, pGUI->GetTextExtent(m_strTransferText[i] + " " + SString(_("%s of %s"), "999.99 kB", "999.99 kB"), "default-bold-small"));
+            fTransferBoxWidth, pGUI->GetTextExtent(m_strTransferText[i] + " " + SString(_("{} of {}"), "999.99 kB", "999.99 kB"), "default-bold-small"));
     fTransferBoxWidth = std::max<float>(fTransferBoxWidth, pGUI->GetTextExtent(_("Disconnect to cancel download"), "default-normal"));
 
     // Add some padding to our text for the size of the window
@@ -65,7 +65,7 @@ CTransferBox::CTransferBox()
     // create the icons
     for (unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++)
     {
-        SString strIcon("cgui\\images\\transferset\\%u.png", i + 1);
+        SString strIcon("cgui\\images\\transferset\\{}.png", i + 1);
         m_pIcon[i] = pGUI->CreateStaticImage(m_pProgress);
         m_pIcon[i]->SetFrameEnabled(false);
         m_pIcon[i]->SetPosition(CVector2D(fTempX, ((TRANSFERBOX_PROGRESSHEIGHT) / 2) - (TRANSFERBOX_ICONSIZE / 2)));
@@ -116,7 +116,7 @@ void CTransferBox::SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransfer
     SString strDownloadSizeTotal = GetDataUnit(static_cast<unsigned long long>(m_dTotalSize));
 
     SString strBuffer = m_strTransferText[eTransferType] + " " +
-                        SString(_("%s of %s"), strDownloadSizeNow.c_str(),
+                        SString(_("{} of {}"), strDownloadSizeNow.c_str(),
                                 strDownloadSizeTotal.c_str());            // TRANSLATORS: This represents the download progress. E.g. "500 kB of 800 kB"
     m_pWindow->SetText(strBuffer);
 

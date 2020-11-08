@@ -330,7 +330,7 @@ int CLuaVector3Defs::ToString(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        SString string = SString("vector3: { x = %.3f, y = %.3f, z = %.3f }", pVector->fX, pVector->fY, pVector->fZ);
+        SString string = SString("vector3: { x = {:.3f}, y = {:.3f}, z = {:.3f} }", pVector->fX, pVector->fY, pVector->fZ);
         lua_pushstring(luaVM, string.c_str());
         return 1;
     }

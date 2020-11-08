@@ -87,7 +87,7 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
     }
 
     if (iSize < 0 || iSize > 25)
-        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got {}). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
@@ -151,7 +151,7 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
     }
 
     if (iSize < 0 || iSize > 25)
-        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got {}). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
@@ -318,7 +318,7 @@ int CLuaBlipDefs::SetBlipSize(lua_State* luaVM)
     argStream.ReadNumber(iSize);
 
     if (iSize < 0 || iSize > 25)
-        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got {}). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {

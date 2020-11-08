@@ -68,7 +68,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIFPRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "ifproot");
     m_pResourceIFPRoot->MakeSystemEntity();
 
-    m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
+    m_strResourceDirectoryPath = SString("{}/resources/{}", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
     m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(true);
@@ -169,7 +169,7 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
                                                   CChecksum serverChecksum, bool bAutoDownload)
 {
     // Create the resource file and add it to the list
-    SString strBuffer("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    SString strBuffer("{}\\resources\\{}\\{}", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
 
     // Reject duplicates
     if (g_pClientGame->GetResourceManager()->IsResourceFile(strBuffer))
@@ -190,7 +190,7 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
 CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiDownloadSize, CChecksum serverChecksum)
 {
     // Create the config file and add it to the list
-    SString strBuffer("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    SString strBuffer("{}\\resources\\{}\\{}", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
 
     // Reject duplicates
     if (g_pClientGame->GetResourceManager()->IsResourceFile(strBuffer))
@@ -420,13 +420,13 @@ SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SStrin
                 if (FileExists(strNewFilePath))
                 {
                     // If file exists in old and new, delete from old
-                    OutputDebugLine(SString("Deleting %s", *strOldFilePath));
+                    OutputDebugLine(SString("Deleting {}", *strOldFilePath));
                     FileDelete(strOldFilePath);
                 }
                 else
                 {
                     // If file exists in old only, move from old to new
-                    OutputDebugLine(SString("Moving %s to %s", *strOldFilePath, *strNewFilePath));
+                    OutputDebugLine(SString("Moving {} to {}", *strOldFilePath, *strNewFilePath));
                     MakeSureDirExists(strNewFilePath);
                     FileRename(strOldFilePath, strNewFilePath);
                 }
@@ -486,11 +486,11 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
         uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
         SString strGotMd5 = ConvertDataToHexString(checksum.md5.data, sizeof(MD5));
         SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
-        errorMessage = SString("Got size:%d MD5:%s, wanted MD5:%s", uiGotFileSize, *strGotMd5, *strWantedMd5);
+        errorMessage = SString("Got size:{} MD5:{}, wanted MD5:{}", uiGotFileSize, *strGotMd5, *strWantedMd5);
     }
 
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
-    SString strMessage = SString("HTTP server file mismatch! (%s) %s [%s]", GetName(), *strFilename, *errorMessage);
+    SString strMessage = SString("HTTP server file mismatch! ({}) {} [{}]", GetName(), *strFilename, *errorMessage);
 
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);

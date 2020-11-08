@@ -439,9 +439,9 @@ bool CLuaArgument::GetAsString(SString& strBuffer)
             break;
         case LUA_TNUMBER:
             if (m_Number == static_cast<int>(m_Number))
-                strBuffer = SString("%d", static_cast<int>(m_Number));
+                strBuffer = SString("{}", static_cast<int>(m_Number));
             else
-                strBuffer = SString("%f", m_Number);
+                strBuffer = SString("{:f}", m_Number);
 
             break;
         default:

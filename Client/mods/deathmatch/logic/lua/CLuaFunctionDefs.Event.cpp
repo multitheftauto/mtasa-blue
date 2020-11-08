@@ -83,7 +83,7 @@ int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)
             // Check if the handle is in use
             if (pEntity->GetEventManager()->HandleExists(pLuaMain, strName, iLuaFunction))
             {
-                argStream.SetCustomError(SString("'%s' with this function is already handled", *strName));
+                argStream.SetCustomError(SString("'{}' with this function is already handled", *strName));
             }
             else
             {

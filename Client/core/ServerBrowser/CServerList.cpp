@@ -135,7 +135,7 @@ void CServerList::Pulse()
     // Store the new number of scanned servers
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
-    // OutputDebugLine ( SString ( "[Browser] %08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned,
+    // OutputDebugLine ( SString ( "[Browser] {:08x}  Size: {}  m_nScanned:{}  m_nSkipped:{} [{}]  iNumQueries: {}", this, m_Servers.size(), m_nScanned,
     // m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
 
     if (m_nScanned + m_nSkipped == m_Servers.size())
@@ -235,7 +235,7 @@ void CServerListInternet::Pulse()
     if (m_iPass == 1)
     {
         // We are polling for the master server list (first pass)
-        m_strStatus = SString(_("Requesting master server list (%lu ms elapsed)"), ulTime);
+        m_strStatus = SString(_("Requesting master server list ({} ms elapsed)"), ulTime);
         m_strStatus2 = "";
         m_bUpdated = true;
 

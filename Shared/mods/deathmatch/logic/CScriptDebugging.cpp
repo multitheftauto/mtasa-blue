@@ -173,7 +173,7 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
 void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
                                  unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    SString strText = SString("%s%s", szPrePend, szMessage);
+    SString strText = SString("{}{}", szPrePend, szMessage);
 
     if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiMinimumDebugLevel <= 2)
         strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
@@ -316,9 +316,9 @@ SString CScriptDebugging::ComposeErrorMessage(const char* szPrePend, const SLuaD
     if (luaDebugInfo.infoType == DEBUG_INFO_FILE_AND_LINE)
     {
         if (luaDebugInfo.iLine == INVALID_LINE_NUMBER)
-            strText += SString("%s: ", *luaDebugInfo.strFile);
+            strText += SString("{}: ", *luaDebugInfo.strFile);
         else
-            strText += SString("%s:%d: ", *luaDebugInfo.strFile, luaDebugInfo.iLine);
+            strText += SString("{}:{}: ", *luaDebugInfo.strFile, luaDebugInfo.iLine);
     }
 
     // 3rd part
@@ -328,9 +328,9 @@ SString CScriptDebugging::ComposeErrorMessage(const char* szPrePend, const SLuaD
     if (!luaDebugInfo.strShortSrc.empty())
     {
         if (luaDebugInfo.strShortSrc.BeginsWith("["))
-            strText += SString(" %s", *luaDebugInfo.strShortSrc);
+            strText += SString(" {}", *luaDebugInfo.strShortSrc);
         else
-            strText += SString(" [%s]", *luaDebugInfo.strShortSrc);
+            strText += SString(" [{}]", *luaDebugInfo.strShortSrc);
     }
 
     return strText;

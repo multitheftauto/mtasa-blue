@@ -378,7 +378,7 @@ void _cdecl DoWait(HANDLE hHandle)
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
     if (dwResult == WAIT_TIMEOUT)
     {
-        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
+        AddReportLog(6211, SString("WaitForSingleObject timed out with {:08x} and {}ms", hHandle, dwWait));
         // This thread lock bug in GTA will have to be fixed one day.
         // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
 #if 0
@@ -571,7 +571,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
 {
     if (pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut)
     {
-        AddReportLog(8530, SString("IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL), 5);
+        AddReportLog(8530, SString("IsTaskSimpleCarFallOutValid fail - pTask->VTBL: {:08x}", pTask->VTBL), 5);
         return false;
     }
 
@@ -582,7 +582,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
         if (!pVehicle)
         {
             // Task looks valid, but vehicle is not recognised by MTA
-            AddReportLog(8531, SString("IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle), 5);
+            AddReportLog(8531, SString("IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: {:08x}", pTask->pVehicle), 5);
             pTask->pVehicle = NULL;
             return true;
         }
@@ -949,16 +949,16 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
 
         if (pNewFrameResult)
         {
-            SString strMsg("No frame for vehicle:%d  frameId:%d  (replaced with:%d  calledfrom:%08x)", iModelId, id, uiNewId, calledFrom);
-            AddReportLog(5412, SString("GetFrameFromId - %s", *strMsg));
+            SString strMsg("No frame for vehicle:{}  frameId:{}  (replaced with:{}  calledfrom:{:08x})", iModelId, id, uiNewId, calledFrom);
+            AddReportLog(5412, SString("GetFrameFromId - {}", *strMsg));
             LogEvent(5412, "Model frame warning", "GetFrameFromId", strMsg);
             return pNewFrameResult;
         }
     }
 
     // Couldn't find a replacement frame id
-    SString strMsg("No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom);
-    AddReportLog(5413, SString("GetFrameFromId - %s", *strMsg));
+    SString strMsg("No frame for vehicle:{}  frameId:{}  (calledfrom:{:08x})", iModelId, id, calledFrom);
+    AddReportLog(5413, SString("GetFrameFromId - {}", *strMsg));
     LogEvent(5413, "Model frame error", "GetFrameFromId", strMsg);
 
     return NULL;
@@ -1013,7 +1013,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
     if (!pModelInfo)
     {
         // Crash will occur at offset 00134131
-        LogEvent(814, "Model info missing", "CEntity_GetBoundRect", SString("No info for model:%d", usModelId), 5414);
+        LogEvent(814, "Model info missing", "CEntity_GetBoundRect", SString("No info for model:{}", usModelId), 5414);
         CArgMap argMap;
         argMap.Set("id", usModelId);
         argMap.Set("reason", "info");
@@ -1030,7 +1030,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
                                pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
                                pModelInfo->bCollisionWasStreamedWithModel, pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,
                                pStreamingInfo->loadState);
-            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
+            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:{} {}", usModelId, *strDetails), 5415);
             CArgMap argMap;
             argMap.Set("id", usModelId);
             argMap.Set("reason", "collision");
@@ -1275,7 +1275,7 @@ void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
     if (pModelInfo->GetInterface()->pRwObject == NULL)
     {
         // Crash will occur at offset 00349b7b
-        LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
+        LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:{}", uiModelId), 5416);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "createanim");
@@ -1356,7 +1356,7 @@ void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
         return;
     }
 
-    SString strContext("GTALOG Called from 0x%08x", dwCalledFrom);
+    SString strContext("GTALOG Called from 0x{:08x}", dwCalledFrom);
     LogEvent(6311, "printf", strContext, strMessage, 6311);
 
     // Check for known issues

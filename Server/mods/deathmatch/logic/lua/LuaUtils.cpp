@@ -21,12 +21,12 @@ SString GetDebugMessage(lua_State* luaVM)
         if (debugInfo.source[0] == '@')
         {
             SString strFile = ConformResourcePath(debugInfo.source);
-            strDebugMessage = SString("%s:%i", strFile.c_str(), debugInfo.currentline);
+            strDebugMessage = SString("{}:{}", strFile.c_str(), debugInfo.currentline);
         }
         else
         {
             SString strFile = debugInfo.short_src;
-            strDebugMessage = SString("%s:%i", strFile.c_str(), debugInfo.currentline);
+            strDebugMessage = SString("{}:{}", strFile.c_str(), debugInfo.currentline);
         }
     }
     return strDebugMessage;

@@ -169,7 +169,7 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect(const SString& strHost, const 
     // For stats
     SString strQueueName;
     GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
-    m_strStatsKeyHead = SString("dbcon sqlite [%s] ", *strQueueName);
+    m_strStatsKeyHead = SString("dbcon sqlite [{}] ", *strQueueName);
     UpdateStats();
 
     return pConnection;
@@ -199,8 +199,8 @@ void CDatabaseTypeSqlite::UpdateStats()
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("%d", iIndex++), 0, "Database connection: sqlite (shared)", *strShareKey,
-                                                        *SString("Share count: %d", pConnection->GetShareCount()), NULL);
+        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("{}", iIndex++), 0, "Database connection: sqlite (shared)", *strShareKey,
+                                                        *SString("Share count: {}", pConnection->GetShareCount()), NULL);
 
         // Update unshared map for the second part
         MapRemove(unsharedConnectionMap, pConnection);
@@ -212,7 +212,7 @@ void CDatabaseTypeSqlite::UpdateStats()
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("%d", iIndex++), 0, "Database connection: sqlite (unshared)",
-                                                        *pConnection->m_strOtherTag, *SString("Refs: %d", pConnection->GetShareCount()), NULL);
+        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("{}", iIndex++), 0, "Database connection: sqlite (unshared)",
+                                                        *pConnection->m_strOtherTag, *SString("Refs: {}", pConnection->GetShareCount()), NULL);
     }
 }

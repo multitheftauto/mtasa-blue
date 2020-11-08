@@ -93,7 +93,7 @@ int CLuaPointLightDefs::CreateLight(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -117,7 +117,7 @@ int CLuaPointLightDefs::GetLightType(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -141,7 +141,7 @@ int CLuaPointLightDefs::GetLightRadius(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -167,7 +167,7 @@ int CLuaPointLightDefs::GetLightColor(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -193,7 +193,7 @@ int CLuaPointLightDefs::GetLightDirection(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -218,7 +218,7 @@ int CLuaPointLightDefs::SetLightRadius(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -248,7 +248,7 @@ int CLuaPointLightDefs::SetLightColor(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -273,7 +273,7 @@ int CLuaPointLightDefs::SetLightDirection(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '{}' [{}]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
 
     lua_pushboolean(luaVM, false);
     return 1;

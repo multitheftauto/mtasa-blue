@@ -23,8 +23,8 @@ namespace
         CVehicleSA* pVehicleSA = (CVehicleSA*)data;
         RwFrame*    pFrame = RpGetFrame(pAtomic);
         pVehicleSA->AddComponent(pFrame, false);
-        // g_pCore->GetConsole()->Print ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
-        // OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
+        // g_pCore->GetConsole()->Print ( SString ( "Atomic:{:08x}  Frame:{:08x} {}", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
+        // OutputDebugLine ( SString ( "Atomic:{:08x}  Frame:{:08x} {}", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
         return true;
     }
 
@@ -33,9 +33,9 @@ namespace
         // get the clump's frame
         RwFrame* pFrame = RpGetFrame(pClump);
         // OutputDebugLine ( SStringX ( "--------------------------------" ) );
-        // OutputDebugLine ( SString ( "Clump:%08x  Frame:%08x %s", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
+        // OutputDebugLine ( SString ( "Clump:{:08x}  Frame:{:08x} {}", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
         // g_pCore->GetConsole()->Print ( SStringX ( "--------------------------------" ) );
-        // g_pCore->GetConsole()->Print ( SString ( "Clump:%08x  Frame:%08x %s", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
+        // g_pCore->GetConsole()->Print ( SString ( "Clump:{:08x}  Frame:{:08x} {}", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
         // Do for all atomics
         RpClumpForAllAtomics(pClump, ClumpDumpCB, pVehicleSA);
     }

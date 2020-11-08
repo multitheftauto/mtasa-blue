@@ -65,7 +65,7 @@ typedef float          FLOAT;            //  32
 #include "SString.h"
 #include "WString.h"
 
-#define _E(code) SString(" [%s]",code)
+#define _E(code) SString(" [{}]",code)
 
 #include "SharedUtil.Legacy.h"
 #include "SharedUtil.Map.h"

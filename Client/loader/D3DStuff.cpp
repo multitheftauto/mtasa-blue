@@ -99,7 +99,7 @@ bool NvOptimusDetect()
         NvAPI_GPU_GetSystemType(nvGPUHandle[i], &SystemType);
         NvAPI_GPU_GetGPUType(nvGPUHandle[i], &GpuType);
         NvAPI_GPU_GetFullName(nvGPUHandle[i], szName);
-        SString strStatus("NvAPI - GPU %d/%d - SystemType:%d GpuType:%d (%s)", i, uiGpuCount, SystemType, GpuType, szName);
+        SString strStatus("NvAPI - GPU {}/{} - SystemType:{} GpuType:{} ({})", i, uiGpuCount, SystemType, GpuType, szName);
 
         if (SystemType == NV_SYSTEM_TYPE_LAPTOP && GpuType == NV_SYSTEM_TYPE_DGPU)
         {
@@ -130,13 +130,13 @@ void BeginD3DStuff()
     }
 
     WriteDebugEvent("D3DStuff -------------------------");
-    WriteDebugEvent(SString("D3DStuff - Direct3DCreate9: 0x%08x", pD3D9));
+    WriteDebugEvent(SString("D3DStuff - Direct3DCreate9: 0x{:08x}", pD3D9));
 
     bool bDetectedOptimus = false;
     bool bDetectedNVidia = false;
     // Get info about each connected adapter
     uint uiNumAdapters = pD3D9->GetAdapterCount();
-    WriteDebugEvent(SString("D3DStuff - %d Adapters", uiNumAdapters));
+    WriteDebugEvent(SString("D3DStuff - {} Adapters", uiNumAdapters));
 
     for (uint i = 0; i < uiNumAdapters; i++)
     {
@@ -152,7 +152,7 @@ void BeginD3DStuff()
 
         if (FAILED(hr1) || FAILED(hr2) || FAILED(hr3))
         {
-            WriteDebugEvent(SString("D3DStuff %d Failed GetAdapterIdentifier(%x) GetAdapterDisplayMode(%x) GetDeviceCaps(%x) ", i, hr1, hr2, hr3));
+            WriteDebugEvent(SString("D3DStuff {} Failed GetAdapterIdentifier({:x}) GetAdapterDisplayMode({:x}) GetDeviceCaps({:x}) ", i, hr1, hr2, hr3));
             continue;
         }
 
@@ -160,22 +160,22 @@ void BeginD3DStuff()
         if (SStringX(Identifier.Driver).BeginsWithI("nv") && SStringX(Identifier.Description).BeginsWithI("Intel"))
         {
             bDetectedOptimus = true;
-            WriteDebugEvent(SString("D3DStuff %d - Detected Optimus Combo", i));
+            WriteDebugEvent(SString("D3DStuff {} - Detected Optimus Combo", i));
         }
         if (GetModuleHandle("nvd3d9wrap.dll") != NULL)
         {
             bDetectedOptimus = true;
-            WriteDebugEvent(SString("D3DStuff %d - Detected nvd3d9wrap", i));
+            WriteDebugEvent(SString("D3DStuff {} - Detected nvd3d9wrap", i));
         }
         if (SStringX(Identifier.Driver).BeginsWithI("nv"))
         {
             bDetectedNVidia = true;
         }
 
-        WriteDebugEvent(SString("D3DStuff %d Identifier - %s", i, *ToString(Identifier)));
-        WriteDebugEvent(SString("D3DStuff %d DisplayMode - %s", i, *ToString(DisplayMode)));
-        WriteDebugEvent(SString("D3DStuff %d  hMonitor:0x%08x  ModeCount:%d", i, hMonitor, ModeCount));
-        WriteDebugEvent(SString("D3DStuff %d Caps9 - %s ", i, *ToString(Caps9)));
+        WriteDebugEvent(SString("D3DStuff {} Identifier - {}", i, *ToString(Identifier)));
+        WriteDebugEvent(SString("D3DStuff {} DisplayMode - {}", i, *ToString(DisplayMode)));
+        WriteDebugEvent(SString("D3DStuff {}  hMonitor:0x{:08x}  ModeCount:{}", i, hMonitor, ModeCount));
+        WriteDebugEvent(SString("D3DStuff {} Caps9 - {} ", i, *ToString(Caps9)));
     }
 
     if (GetApplicationSettingInt("nvhacks", "optimus-force-detection"))

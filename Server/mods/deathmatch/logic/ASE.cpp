@@ -346,7 +346,7 @@ std::string ASE::QueryXfireLight()
 
     int     iJoinedPlayers = m_pPlayerManager->CountJoined();
     int     iMaxPlayers = m_pMainConfig->GetMaxPlayers();
-    SString strPlayerCount = SString("%d/%d", iJoinedPlayers, iMaxPlayers);
+    SString strPlayerCount = SString("{}/{}", iJoinedPlayers, iMaxPlayers);
 
     reply << "EYE3";
     // game
@@ -396,17 +396,17 @@ std::string ASE::QueryLight()
 
     int              iJoinedPlayers = m_pPlayerManager->CountJoined();
     int              iMaxPlayers = m_pMainConfig->GetMaxPlayers();
-    SString          strPlayerCount = SString("%d/%d", iJoinedPlayers, iMaxPlayers);
-    SString          strBuildType = SString("%d", MTASA_VERSION_TYPE);
-    SString          strBuildNumber = SString("%d", MTASA_VERSION_BUILD);
+    SString          strPlayerCount = SString("{}/{}", iJoinedPlayers, iMaxPlayers);
+    SString          strBuildType = SString("{}", MTASA_VERSION_TYPE);
+    SString          strBuildNumber = SString("{}", MTASA_VERSION_BUILD);
     SFixedString<32> strPingStatusFixed;
     SFixedString<32> strNetRouteFixed;
     g_pNetServer->GetPingStatus(&strPingStatusFixed);
     g_pNetServer->GetNetRoute(&strNetRouteFixed);
     SString strPingStatus = (const char*)strPingStatusFixed;
     SString strNetRoute = (const char*)strNetRouteFixed;
-    SString strUpTime("%d", (uint)(time(NULL) - m_tStartTime));
-    SString strHttpPort("%d", m_pMainConfig->GetHTTPPort());
+    SString strUpTime("{}", (uint)(time(NULL) - m_tStartTime));
+    SString strHttpPort("{}", m_pMainConfig->GetHTTPPort());
 
     uint uiExtraDataLength = (strPlayerCount.length() + 1 + strBuildType.length() + 1 + strBuildNumber.length() + 1 + strPingStatus.length() + 1 +
                               strNetRoute.length() + 1 + strUpTime.length() + 1 + strHttpPort.length() + 1);

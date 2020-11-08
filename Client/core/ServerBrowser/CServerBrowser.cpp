@@ -261,7 +261,7 @@ CServerBrowser::CServerBrowser()
         for (uint i = 0; i < NUMELMS(helpInfoList); i++)
         {
             CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pGeneralHelpWindow, ""));
-            pLabel->SetText(SString("  -   %s", helpInfoList[i].strDesc.c_str()));
+            pLabel->SetText(SString("  -   {}", helpInfoList[i].strDesc.c_str()));
             pLabel->SetPosition(CVector2D(helpInfoList[i].x + 20, helpInfoList[i].y + 5));
             pLabel->AutoSize();
         }
@@ -1060,11 +1060,11 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         const SString strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d", pServer->nPlayers, pServer->nMaxPlayers);
-        const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
+        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("{} / {}", pServer->nPlayers, pServer->nMaxPlayers);
+        const SString strPlayersSortKey = SString("{:04}-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
-        const SString strPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing);
-        const SString strPingSortKey = SString("%04d-", pServer->nPing) + pServer->strTieBreakSortKey;
+        const SString strPing = pServer->nPing == 9999 ? "" : SString("{}", pServer->nPing);
+        const SString strPingSortKey = SString("{:04}-", pServer->nPing) + pServer->strTieBreakSortKey;
 
         // The row index could change at any point here if list sorting is enabled
         iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hVersion[Type], strVersion, false, false, true, strVersionSortKey);
@@ -1274,7 +1274,7 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
     // If our password is empty, try and grab a saved password
     if (strPassword.empty())
     {
-        strPassword = GetServerPassword(strHost + ":" + SString("%u", usPort));
+        strPassword = GetServerPassword(strHost + ":" + SString("{}", usPort));
     }
 
     // Start the connect

@@ -91,7 +91,7 @@ int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)
                 // check if the handle is in use
                 if (pElement->GetEventManager()->HandleExists(pLuaMain, strName, iLuaFunction))
                 {
-                    argStream.SetCustomError(SString("'%s' with this function is already handled", *strName));
+                    argStream.SetCustomError(SString("'{}' with this function is already handled", *strName));
                 }
                 else
                 {
@@ -298,7 +298,7 @@ int CLuaFunctionDefs::TriggerLatentClientEvent(lua_State* luaVM)
             }
         }
 
-        markerLatentEvent.SetAndStoreString(SString("Get args (%d,%s)", sendList.size(), *strName));
+        markerLatentEvent.SetAndStoreString(SString("Get args ({},{})", sendList.size(), *strName));
 
         // Trigger it
         if (CStaticFunctionDefinitions::TriggerLatentClientEvent(sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId))

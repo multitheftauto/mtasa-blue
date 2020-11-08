@@ -247,7 +247,7 @@ void EventSet::maybeAddUncommonEvents ( const String& name )
 {
     if ( !d_addedUncommonEvents )
     {
-        Logger::getSingleton ().logEvent ( SString ( "** Adding uncommon events for a %s, to find missing event %s", getType ().c_str (), name.c_str() ), Informative);
+        Logger::getSingleton ().logEvent ( SString ( "** Adding uncommon events for a {}, to find missing event {}", getType ().c_str (), name.c_str() ), Informative);
         d_addedUncommonEvents = true;
         addUncommonEvents ();
 
@@ -258,7 +258,7 @@ void EventSet::maybeAddUncommonEvents ( const String& name )
         }
     }
 
-    Logger::getSingleton ().logEvent ( SString ( "** Trouble with %s, can't find event %s", getType ().c_str (), name.c_str() ), Informative);
+    Logger::getSingleton ().logEvent ( SString ( "** Trouble with {}, can't find event {}", getType ().c_str (), name.c_str() ), Informative);
 }
 
 

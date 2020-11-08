@@ -430,7 +430,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     }
 
     // Last (or only) HTTP server is internal
-    SString strInternalHTTPDownloadURL = SString("http://%s:%d", g_pNet->GetConnectedServer(), usHTTPDownloadPort);
+    SString strInternalHTTPDownloadURL = SString("http://{}:{}", g_pNet->GetConnectedServer(), usHTTPDownloadPort);
     g_pClientGame->GetResourceFileDownloadManager()->AddServer(strInternalHTTPDownloadURL, 1, EDownloadMode::RESOURCE_INITIAL_FILES_INTERNAL, 10, 10000);
 
     // Set appropriate server for stupid SingularFileDownloadManager
@@ -631,20 +631,20 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             int iSeconds = static_cast<int>(Duration);
 
             if (iDays)
-                strReason += SString(_tn("%d day", "%d days", iDays), iDays) += (iHours || iMins) ? " " : "";
+                strReason += SString(_tn("{} day", "{} days", iDays), iDays) += (iHours || iMins) ? " " : "";
             if (iHours)
-                strReason += SString(_tn("%d hour", "%d hours", iHours), iHours) += iMins ? " " : "";
+                strReason += SString(_tn("{} hour", "{} hours", iHours), iHours) += iMins ? " " : "";
             if (iMins)
-                strReason += SString(_tn("%d minute", "%d minutes", iMins), iMins) += iSeconds ? " " : "";
+                strReason += SString(_tn("{} minute", "{} minutes", iMins), iMins) += iSeconds ? " " : "";
             if (!iDays && !iHours && iSeconds)
-                strReason += SString(_tn("%d second", "%d seconds", iSeconds), iSeconds);
+                strReason += SString(_tn("{} second", "{} seconds", iSeconds), iSeconds);
         }
 
         // Display the error
         g_pCore->ShowErrorMessageBox(_("Disconnected") + strErrorCode, strReason, strTroubleLink);
     }
 
-    AddReportLog(7107, SString("Game - Disconnected (%s) (%s)", *strErrorCode, *strReason.Replace("\n", " ")));
+    AddReportLog(7107, SString("Game - Disconnected ({}) ({})", *strErrorCode, *strReason.Replace("\n", " ")));
 
     // Terminate the mod (disconnect first in case there were more packets after this one)
     g_pClientGame->m_bGracefulDisconnect = true;
@@ -747,7 +747,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
     if (!bJustJoined)
     {
         SString strInfo = CAntiCheat::GetInfo(strACInfo, strSDInfo);
-        g_pCore->GetConsole()->Print(SString("Server AC info: %s", *strInfo));
+        g_pCore->GetConsole()->Print(SString("Server AC info: {}", *strInfo));
         g_pClientGame->m_strACInfo = strInfo;
     }
 
@@ -1298,7 +1298,7 @@ void CPacketHandler::Packet_PlayerChangeNick(NetBitStreamInterface& bitStream)
         std::string strNick;
         g_pCore->GetCVars()->Get("nick", strNick);
         if (strNick == "Player")
-            g_pCore->GetCVars()->Set("nick", SString("Player%d", (rand() % 9000) + 1000));
+            g_pCore->GetCVars()->Set("nick", SString("Player{}", (rand() % 9000) + 1000));
     }
 
     /*
@@ -4952,7 +4952,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                             FileDelete(pDownloadableResource->GetName());
                             if (FileExists(pDownloadableResource->GetName()))
                             {
-                                SString strMessage("Unable to delete old file %s", *ConformResourcePath(pDownloadableResource->GetName()));
+                                SString strMessage("Unable to delete old file {}", *ConformResourcePath(pDownloadableResource->GetName()));
                                 g_pClientGame->TellServerSomethingImportant(1009, strMessage);
                             }
 
@@ -5301,7 +5301,7 @@ void CPacketHandler::EntityAddDebugNext(uint uiEntityIndex, int iReadOffset)
 ///////////////////////////////////////////////////////////////
 void CPacketHandler::RaiseEntityAddError(uint uiCode)
 {
-    SString strLine("ProtocolError %d", uiCode);
+    SString strLine("ProtocolError {}", uiCode);
     WriteDebugEvent(strLine);
     AddReportLog(8331, strLine);
 
@@ -5311,7 +5311,7 @@ void CPacketHandler::RaiseEntityAddError(uint uiCode)
         m_pEntityAddBitStream->SetReadOffsetAsBits(m_EntityAddReadOffsetStore[i]);
         SString strStatus = EntityAddDebugRead(*m_pEntityAddBitStream);
 
-        SString strLine("%d/%d Offset:%-6d %s", i, m_uiEntityAddNumEntities, m_EntityAddReadOffsetStore[i], *strStatus);
+        SString strLine("{}/{} Offset:{:<6} {}", i, m_uiEntityAddNumEntities, m_EntityAddReadOffsetStore[i], *strStatus);
         WriteDebugEvent(strLine);
         AddReportLog(8332, strLine);
     }
@@ -5412,7 +5412,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
             bitStream.Read(szName, usNameLength);
         }
 
-        strStatus += SString("NameLen:%d Name:'%s'", usNameLength, *SStringX(szName).Left(40));
+        strStatus += SString("NameLen:{} Name:'{}'", usNameLength, *SStringX(szName).Left(40));
         delete[] szName;
 
         return strStatus;

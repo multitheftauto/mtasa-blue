@@ -2333,7 +2333,7 @@ void CClientPed::ValidateRemoteWeapons()
         if (m_WeaponTypes[i] != slotWeaponType)
         {
             SString strPlayerName = ((CClientPlayer*)this)->GetNick();
-            AddReportLog(5430, SString("Mismatch in slot %d  Wanted type:%d  Got type:%d (%s)", i, m_WeaponTypes[i], slotWeaponType, *strPlayerName), 30);
+            AddReportLog(5430, SString("Mismatch in slot {}  Wanted type:{}  Got type:{} ({})", i, m_WeaponTypes[i], slotWeaponType, *strPlayerName), 30);
             bMismatch = true;
         }
     }
@@ -5757,9 +5757,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
         }
         else
         {
-            SString strMessage("%s %d (%s)", pBlock->GetName(), pBlock->GetIndex(), szAnimName);
+            SString strMessage("{} {} ({})", pBlock->GetName(), pBlock->GetIndex(), szAnimName);
             g_pCore->LogEvent(543, "Blocking anim load fail", "", strMessage);
-            AddReportLog(5431, SString("Failed to load animation %s", *strMessage));
+            AddReportLog(5431, SString("Failed to load animation {}", *strMessage));
             /*
                         // TODO: unload unreferenced blocks later on
                         g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
@@ -6333,7 +6333,7 @@ void CClientPed::HandleWaitingForGroundToLoad()
             SetFrozenWaitingForGroundToLoad(false);
 
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        status += (SString("  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist));
+        status += (SString("  GetDistanceFromGround:  fDist:{:2.2f}   fUseDist:{:2.2f}", fDist, fUseDist));
         #endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here)

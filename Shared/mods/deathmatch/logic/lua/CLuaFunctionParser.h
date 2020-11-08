@@ -96,7 +96,7 @@ struct CLuaFunctionParserBase
         switch (lua_type(L, index))
         {
             case LUA_TNUMBER:
-                return SString("number (%s)", lua_tostring(L, index));
+                return SString("number ({})", lua_tostring(L, index));
             case LUA_TSTRING:
             {
                 std::size_t iLen;
@@ -115,11 +115,11 @@ struct CLuaFunctionParserBase
                     return "string";
                 else
                 {
-                    return SString("string (\"%s\")", strValue.c_str());
+                    return SString("string (\"{}\")", strValue.c_str());
                 }
             }
             case LUA_TBOOLEAN:
-                return SString("boolean (%s)", lua_toboolean(L, index) == 1 ? "true" : "false");
+                return SString("boolean ({})", lua_toboolean(L, index) == 1 ? "true" : "false");
             case LUA_TNIL:
                 return "nil";
             case LUA_TNONE:
@@ -326,7 +326,7 @@ struct CLuaFunctionParserBase
     void SetBadArgumentError(lua_State* L, const SString& strExpected, int index, const SString& strReceived)
     {
         strError =
-            SString("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(), index, strReceived.c_str());
+            SString("Bad argument @ '{}' [Expected {} at argument {}, got {}]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(), index, strReceived.c_str());
     }
 
     // PopUnsafe pops a `T` from the stack at the specified index

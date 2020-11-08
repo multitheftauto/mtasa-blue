@@ -276,13 +276,13 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
 
         if (labs(calcedDelta) >= 1)
         {
-            row[c] = SString("%d KB", calcedDelta);
+            row[c] = SString("{} KB", calcedDelta);
             calcedDelta = 0;
         }
         c++;
 
-        row[c++] = SString("%d KB", calcedCurrent);
-        row[c++] = SString("%d KB", calcedMax);
+        row[c++] = SString("{} KB", calcedCurrent);
+        row[c++] = SString("{} KB", calcedMax);
 
         // Some extra 'all VM' things
         c += 4;
@@ -295,14 +295,14 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
         int ScreenSourceCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetScreenSourceCount();
         int WebBrowserCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetWebBrowserCount();
         TextItemCount = std::max(TextItemCount - 4, 0);            // Remove count for radar items
-        row[c++] = !TextItemCount ? "-" : SString("%d", TextItemCount);
-        row[c++] = !DxFontCount ? "-" : SString("%d", DxFontCount);
-        row[c++] = !GuiFontCount ? "-" : SString("%d", GuiFontCount);
-        row[c++] = !TextureCount ? "-" : SString("%d", TextureCount);
-        row[c++] = !ShaderCount ? "-" : SString("%d", ShaderCount);
-        row[c++] = !RenderTargetCount ? "-" : SString("%d", RenderTargetCount);
-        row[c++] = !ScreenSourceCount ? "-" : SString("%d", ScreenSourceCount);
-        row[c++] = !WebBrowserCount ? "-" : SString("%d", WebBrowserCount);
+        row[c++] = !TextItemCount ? "-" : SString("{}", TextItemCount);
+        row[c++] = !DxFontCount ? "-" : SString("{}", DxFontCount);
+        row[c++] = !GuiFontCount ? "-" : SString("{}", GuiFontCount);
+        row[c++] = !TextureCount ? "-" : SString("{}", TextureCount);
+        row[c++] = !ShaderCount ? "-" : SString("{}", ShaderCount);
+        row[c++] = !RenderTargetCount ? "-" : SString("{}", RenderTargetCount);
+        row[c++] = !ScreenSourceCount ? "-" : SString("{}", ScreenSourceCount);
+        row[c++] = !WebBrowserCount ? "-" : SString("{}", WebBrowserCount);
     }
 
     // For each VM
@@ -323,16 +323,16 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
 
         if (labs(LuaMainMemory.Delta) >= 1)
         {
-            row[c] = SString("%d KB", LuaMainMemory.Delta);
+            row[c] = SString("{} KB", LuaMainMemory.Delta);
             LuaMainMemory.Delta = 0;
         }
         c++;
 
-        row[c++] = SString("%d KB", LuaMainMemory.Current);
-        row[c++] = SString("%d KB", LuaMainMemory.Max);
-        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("%d", LuaMainMemory.OpenXMLFiles);
-        row[c++] = !LuaMainMemory.Refs ? "-" : SString("%d", LuaMainMemory.Refs);
-        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("%d", LuaMainMemory.TimerCount);
-        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("%d", LuaMainMemory.ElementCount);
+        row[c++] = SString("{} KB", LuaMainMemory.Current);
+        row[c++] = SString("{} KB", LuaMainMemory.Max);
+        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("{}", LuaMainMemory.OpenXMLFiles);
+        row[c++] = !LuaMainMemory.Refs ? "-" : SString("{}", LuaMainMemory.Refs);
+        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("{}", LuaMainMemory.TimerCount);
+        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("{}", LuaMainMemory.ElementCount);
     }
 }

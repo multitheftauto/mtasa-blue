@@ -329,7 +329,7 @@ bool CAccessControlListManager::CanObjectUseRight(const char* szObjectName, CAcc
         ClearReadCache();
 
     // Make unique key for this query
-    SString strKey("%s %s %d %d %d", szObjectName, szRightName, eObjectType, eRightType, bDefaultAccessRight);
+    SString strKey("{} {} {} {} {}", szObjectName, szRightName, eObjectType, eRightType, bDefaultAccessRight);
     // Check if this query has been done before
     bool* pResult = MapFind(m_ReadCacheMap, strKey);
     if (!pResult)

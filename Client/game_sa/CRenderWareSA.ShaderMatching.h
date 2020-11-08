@@ -142,13 +142,13 @@ public:
     void AppendAdditiveMatch(const SString& strTextureNameMatch)
     {
         m_MatchChain.AppendMatchType(strTextureNameMatch, true);
-        OutputDebug(SString("     Channel:%s appends additive %s (Match chain now:%s)", GetDebugTag(this), *strTextureNameMatch, GetDebugTag(m_MatchChain)));
+        OutputDebug(SString("     Channel:{} appends additive {} (Match chain now:{})", GetDebugTag(this), *strTextureNameMatch, GetDebugTag(m_MatchChain)));
     }
 
     void AppendSubtractiveMatch(const SString& strTextureNameMatch)
     {
         m_MatchChain.AppendMatchType(strTextureNameMatch, false);
-        OutputDebug(SString("     Channel:%s appends subtractive %s (Match chain now:%s)", GetDebugTag(this), *strTextureNameMatch, GetDebugTag(m_MatchChain)));
+        OutputDebug(SString("     Channel:{} appends subtractive {} (Match chain now:{})", GetDebugTag(this), *strTextureNameMatch, GetDebugTag(m_MatchChain)));
     }
 
     //////////////////////////////////////////////
@@ -158,7 +158,7 @@ public:
     {
     #ifdef SHADER_DEBUG_OUTPUT
         if (!MapContains(m_ShaderAndEntityList, key))
-            OutputDebug(SString("     +Channel:%s adds (ShaderEntity:%s)", GetDebugTag(this), GetDebugTag(key)));
+            OutputDebug(SString("     +Channel:{} adds (ShaderEntity:{})", GetDebugTag(this), GetDebugTag(key)));
     #endif
         MapInsert(m_ShaderAndEntityList, key);
     }
@@ -167,7 +167,7 @@ public:
     {
     #ifdef SHADER_DEBUG_OUTPUT
         if (MapContains(m_ShaderAndEntityList, key))
-            OutputDebug(SString("     -Channel:%s removes (ShaderEntity:%s)", GetDebugTag(this), GetDebugTag(key)));
+            OutputDebug(SString("     -Channel:{} removes (ShaderEntity:{})", GetDebugTag(this), GetDebugTag(key)));
     #endif
         MapRemove(m_ShaderAndEntityList, key);
     }
@@ -209,7 +209,7 @@ public:
     {
     #ifdef SHADER_DEBUG_OUTPUT
         if (!MapContains(m_MatchedTextureList, pTexNameInfo))
-            OutputDebug(SString("     +Channel:%s adds Tex:%s", GetDebugTag(this), GetDebugTag(pTexNameInfo)));
+            OutputDebug(SString("     +Channel:{} adds Tex:{}", GetDebugTag(this), GetDebugTag(pTexNameInfo)));
     #endif
         MapInsert(m_MatchedTextureList, pTexNameInfo);
     }
@@ -218,7 +218,7 @@ public:
     {
     #ifdef SHADER_DEBUG_OUTPUT
         if (MapContains(m_MatchedTextureList, pTexNameInfo))
-            OutputDebug(SString("     -Channel:%s removes Tex:%s", GetDebugTag(this), GetDebugTag(pTexNameInfo)));
+            OutputDebug(SString("     -Channel:{} removes Tex:{}", GetDebugTag(this), GetDebugTag(pTexNameInfo)));
     #endif
         MapRemove(m_MatchedTextureList, pTexNameInfo);
     }
@@ -230,7 +230,7 @@ public:
     {
     #ifdef SHADER_DEBUG_OUTPUT
         if (!(m_MatchChain == matchChain))
-            OutputDebug(SString("     Channel:%s SetMatchChain:%s", GetDebugTag(this), GetDebugTag(matchChain)));
+            OutputDebug(SString("     Channel:{} SetMatchChain:{}", GetDebugTag(this), GetDebugTag(matchChain)));
     #endif
         m_MatchChain = matchChain;
     }

@@ -139,7 +139,7 @@ void CCrashDumpWriter::UpdateCounters()
 {
     if (ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10)
     {
-        AddReportLog(9206, SString("InvalidParameterCount changed from %d to %d", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount));
+        AddReportLog(9206, SString("InvalidParameterCount changed from {} to {}", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount));
         ms_uiInvalidParameterCountLogged = ms_uiInvalidParameterCount;
     }
 }
@@ -263,7 +263,7 @@ LONG WINAPI CCrashDumpWriter::HandleExceptionHardWareBreakPoint(PEXCEPTION_POINT
                 if (address == dwBreakPointAddress)
                 {
                     LogEvent( "\n\nHandleExceptionHardWareBreakPoint", "Hardware Breakpoint HIT",
-                    SString("Exception Address: %p | Breakpoint Address: %p\n\n", ExceptionRecord->ExceptionAddress, dwBreakPointAddress));
+                    SString("Exception Address: {:p} | Breakpoint Address: {:p}\n\n", ExceptionRecord->ExceptionAddress, dwBreakPointAddress));
                     return EXCEPTION_CONTINUE_EXECUTION;
                 }
             }
@@ -313,17 +313,17 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
         time_t timeTemp;
         time(&timeTemp);
 
-        SString strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", NULL, -2));
+        SString strMTAVersionFull = SString("{}.{}", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", NULL, -2));
 
         SString strInfo;
-        strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
-        strInfo += SString("Time = %s", ctime(&timeTemp));
+        strInfo += SString("Version = {}\n", strMTAVersionFull.c_str());
+        strInfo += SString("Time = {}", ctime(&timeTemp));
 
-        strInfo += SString("Module = %s\n", pExceptionInformation->GetModulePathName());
+        strInfo += SString("Module = {}\n", pExceptionInformation->GetModulePathName());
 
         // Write the basic exception information
-        strInfo += SString("Code = 0x%08X\n", pExceptionInformation->GetCode());
-        strInfo += SString("Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset());
+        strInfo += SString("Code = 0x{:08X}\n", pExceptionInformation->GetCode());
+        strInfo += SString("Offset = 0x{:08X}\n\n", pExceptionInformation->GetAddressModuleOffset());
 
         // Write the register info
         strInfo += SString(
@@ -389,7 +389,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
             // Create the file
             HANDLE hFile = CreateFile(CalcMTASAPath("mta\\core.dmp"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (hFile == INVALID_HANDLE_VALUE)
-                AddReportLog(9203, SString("CCrashDumpWriter::DumpMiniDump - Could not create '%s'", *CalcMTASAPath("mta\\core.dmp")));
+                AddReportLog(9203, SString("CCrashDumpWriter::DumpMiniDump - Could not create '{}'", *CalcMTASAPath("mta\\core.dmp")));
 
             if (hFile != INVALID_HANDLE_VALUE)
             {
@@ -404,7 +404,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                                      (MINIDUMP_TYPE)(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, NULL, NULL);
 
                 if (!bResult)
-                    AddReportLog(9204, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError()));
+                    AddReportLog(9204, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed ({:08x})", GetLastError()));
                 else
                     WriteDebugEvent("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump succeeded");
 
@@ -425,7 +425,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 if (strModuleName.length() == 0)
                     strModuleName = "unknown";
 
-                SString strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", NULL, -2));
+                SString strMTAVersionFull = SString("{}.{}", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", NULL, -2));
                 SString strSerialPart = GetApplicationSetting("serial").substr(0, 5);
                 uint    uiServerIP = GetApplicationSettingInt("last-server-ip");
                 uint    uiServerPort = GetApplicationSettingInt("last-server-port");
@@ -454,7 +454,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 }
 
                 // Ensure filename parts match up with EDumpFileNameParts
-                SString strFilename("mta\\dumps\\private\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp", strMTAVersionFull.c_str(),
+                SString strFilename("mta\\dumps\\private\\client_{}_{}_{:08x}_{:x}_{}_{:08X}_{:04X}_{:03X}_{}_{:04}{:02}{:02}_{:02}{:02}.dmp", strMTAVersionFull.c_str(),
                                     strModuleName.c_str(), pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff,
                                     strPathCode.c_str(), uiServerIP, uiServerPort, uiServerDuration, strSerialPart.c_str(), SystemTime.wYear, SystemTime.wMonth,
                                     SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);
@@ -1111,7 +1111,7 @@ SString CCrashDumpWriter::GetCrashAvertedStatsSoFar()
     for (std::map<int, SCrashAvertedInfo>::iterator iter = ms_CrashAvertedMap.begin(); iter != ms_CrashAvertedMap.end(); ++iter)
     {
         strResult +=
-            SString("%d) Age:%5d Type:%2d Count:%d\n", iIndex++, ms_uiTickCountBase - iter->second.uiTickCount, iter->first, iter->second.uiUsageCount);
+            SString("{}) Age:{:5} Type:{:2} Count:{}\n", iIndex++, ms_uiTickCountBase - iter->second.uiTickCount, iter->first, iter->second.uiUsageCount);
     }
     return strResult;
 }

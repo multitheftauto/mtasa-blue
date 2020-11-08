@@ -619,7 +619,7 @@ public:
                 SetTypeError("non-none");
                 break;
             default:
-                outValue = SString("%s: %p", luaL_typename(m_luaVM, m_iIndex), lua_topointer(m_luaVM, m_iIndex));
+                outValue = SString("{}: {:p}", luaL_typename(m_luaVM, m_iIndex), lua_topointer(m_luaVM, m_iIndex));
                 break;
         }
 
@@ -1429,15 +1429,15 @@ public:
         ResolveErrorGotArgumentTypeAndValue();
 
         // Compose error message
-        SString strMessage("Expected %s at argument %d", *m_strErrorExpectedType, m_iErrorIndex);
+        SString strMessage("Expected {} at argument {}", *m_strErrorExpectedType, m_iErrorIndex);
 
         if (!m_strErrorGotArgumentType.empty())
         {
-            strMessage += SString(", got %s", *m_strErrorGotArgumentType);
+            strMessage += SString(", got {}", *m_strErrorGotArgumentType);
 
             // Append value if available
             if (!m_strErrorGotArgumentValue.empty())
-                strMessage += SString(" '%s'", *m_strErrorGotArgumentValue);
+                strMessage += SString(" '{}'", *m_strErrorGotArgumentValue);
         }
 
         return strMessage;
@@ -1478,7 +1478,7 @@ public:
     void SetVersionWarning(const char* szMinReq, const char* szSide, const char* szReason)
     {
         SetCustomWarning(
-            SString("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason));
+            SString("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least {} {} because {})", szSide, szMinReq, szReason));
     }
 
     //
@@ -1498,7 +1498,7 @@ public:
     //
     // Make full error message
     //
-    SString GetFullErrorMessage() { return SString("%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring(m_luaVM, lua_upvalueindex(1)), *GetErrorMessage()); }
+    SString GetFullErrorMessage() { return SString("{} @ '{}' [{}]", *m_strErrorCategory, lua_tostring(m_luaVM, lua_upvalueindex(1)), *GetErrorMessage()); }
 
     //
     // Set custom warning message

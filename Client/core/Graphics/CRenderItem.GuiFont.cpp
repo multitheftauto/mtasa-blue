@@ -89,7 +89,7 @@ void CGuiFontItem::CreateUnderlyingData(const SString& strFullFilePath, const SS
     // Find unused font name
     int iCounter = 0;
     do
-        m_strCEGUIFontName = SString("%s*%d*%d", *strFontName, uiSize, iCounter++);
+        m_strCEGUIFontName = SString("{}*{}*{}", *strFontName, uiSize, iCounter++);
     while (CCore::GetSingleton().GetGUI()->IsFontPresent(m_strCEGUIFontName));
 
     // Create the CEGUI font

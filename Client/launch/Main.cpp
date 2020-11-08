@@ -61,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         dwLoadLibraryError = GetLastError();
         if (hModule)
         {
-            AddReportLog(5712, SString("LoadLibrary '%s' succeeded on change to directory '%s'", *strLoaderDllFilename, *strMTASAPath));
+            AddReportLog(5712, SString("LoadLibrary '{}' succeeded on change to directory '{}'", *strLoaderDllFilename, *strMTASAPath));
         }
     }
 
@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         iReturnCode = 1;
         SString strError = GetSystemErrorMessage(dwLoadLibraryError);
-        SString strMessage("Failed to load: '%s'\n\n%s", *strLoaderDllPathFilename, *strError);
+        SString strMessage("Failed to load: '{}'\n\n{}", *strLoaderDllPathFilename, *strError);
         AddReportLog(5711, strMessage);
 
         // Error could be due to missing VC Redist.

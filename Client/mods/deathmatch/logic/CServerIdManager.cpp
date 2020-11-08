@@ -38,7 +38,7 @@ namespace
     {
         SString strMain, strCount;
         strText.Split("_", &strMain, &strCount);
-        return SString("%s_%d", *strMain, atoi(strCount) + 1);
+        return SString("{}_{}", *strMain, atoi(strCount) + 1);
     }
 }            // namespace
 

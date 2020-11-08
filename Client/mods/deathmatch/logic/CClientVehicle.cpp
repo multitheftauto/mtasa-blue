@@ -4545,7 +4545,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
             SetFrozenWaitingForGroundToLoad(false, true);
 
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        status += (SString("  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist));
+        status += (SString("  GetDistanceFromGround:  fDist:{:2.2f}   fUseDist:{:2.2f}", fDist, fUseDist));
         #endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here)

@@ -20,8 +20,8 @@ CLuaModule::CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* p
     // Set script debugging
     m_pScriptDebugging = pScriptDebugging;
     // set module path
-    m_szFileName = SString("%s", szFileName);
-    m_szShortFileName = SString("%s", szShortFileName);
+    m_szFileName = SString("{}", szFileName);
+    m_szShortFileName = SString("{}", szShortFileName);
     // set as uninitialised
     m_bInitialised = false;
 }
@@ -72,7 +72,7 @@ int CLuaModule::_LoadModule()
     SetCurrentDirectory(PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD));
     m_hModule = LoadLibrary(m_szFileName);
     if (m_hModule == NULL)
-        strError = SString("%d", GetLastError());
+        strError = SString("{}", GetLastError());
     SetCurrentDirectory(strSavedCurrentDirectory);
 #else
     m_hModule = dlopen(m_szFileName, RTLD_NOW);

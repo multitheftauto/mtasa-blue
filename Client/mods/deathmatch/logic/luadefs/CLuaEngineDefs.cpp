@@ -527,7 +527,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
                 return 1;
             }
             else
-                argStream.SetCustomError(SString("Model ID %d replace failed", usModelID));
+                argStream.SetCustomError(SString("Model ID {} replace failed", usModelID));
         }
         else
             argStream.SetCustomError("Expected valid model ID or name at argument 2");
@@ -738,7 +738,7 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
             }
         }
         else
-            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"{}\"", *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -772,7 +772,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
             }
         }
         else
-            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"{}\"", *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

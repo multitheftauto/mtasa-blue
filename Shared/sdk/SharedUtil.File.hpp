@@ -894,7 +894,7 @@ SString SharedUtil::MakeUniquePath(const SString& strInPathFilename)
     while (DirectoryExists(strTest) || FileExists(strTest))
 #endif
     {
-        strTest = SString("%s_%d%s", strBeforeUniqueChar.c_str(), iCount++, strAfterUniqueChar.c_str());
+        strTest = SString("{}_{}{}", strBeforeUniqueChar.c_str(), iCount++, strAfterUniqueChar.c_str());
     }
     return strTest;
 }

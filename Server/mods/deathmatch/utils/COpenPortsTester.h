@@ -24,11 +24,11 @@ public:
         // Construct URL
         ushort  usServerPort = g_pGame->GetConfig()->GetServerPort();
         ushort  usHTTPPort = g_pGame->GetConfig()->GetHTTPPort();
-        SString strURL(PORT_TESTER_URL "?simple=1&g=%u", usServerPort);
+        SString strURL(PORT_TESTER_URL "?simple=1&g={}", usServerPort);
 
         if (ASE::GetInstance())
         {
-            strURL += SString("&a=%u", usServerPort + 123);
+            strURL += SString("&a={}", usServerPort + 123);
         }
         else
         {
@@ -37,7 +37,7 @@ public:
 
         if (g_pGame->GetHTTPD())
         {
-            strURL += SString("&h=%u", usHTTPPort);
+            strURL += SString("&h={}", usHTTPPort);
         }
         else
         {
@@ -106,9 +106,9 @@ public:
 
                     SString strStatus;
                     if (strValue == "1")
-                        strStatus = SString("Port %u %s is open.", usPort, *strProtocol);
+                        strStatus = SString("Port {} {} is open.", usPort, *strProtocol);
                     else
-                        strStatus = SString("Port %u %s is closed. Players can not %s!", usPort, *strProtocol, *strAction);
+                        strStatus = SString("Port {} {} is closed. Players can not {}!", usPort, *strProtocol, *strAction);
 
                     // Output test result
                     CLogger::LogPrintfNoStamp("%s\n", *strStatus);

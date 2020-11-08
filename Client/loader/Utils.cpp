@@ -155,7 +155,7 @@ void WriteProcessMemoryChecked(HANDLE hProcess, void* dest, const void* src, uin
         _ReadProcessMemory(hProcess, dest, temp, numBytesToCheck, &numBytesRead);
         if (memcmp(temp, oldvalues, numBytesToCheck))
         {
-            WriteDebugEvent(SString("Failed to verify %d old bytes in process", size));
+            WriteDebugEvent(SString("Failed to verify {} old bytes in process", size));
             if (bStopIfOldIncorrect)
                 return;
         }
@@ -170,7 +170,7 @@ void WriteProcessMemoryChecked(HANDLE hProcess, void* dest, const void* src, uin
         SIZE_T numBytesRead = 0;
         _ReadProcessMemory(hProcess, dest, temp, numBytesToCheck, &numBytesRead);
         if (memcmp(temp, src, numBytesToCheck) || numBytesRead != numBytesToCheck)
-            WriteDebugEvent(SString("Failed to write %d bytes to process", size));
+            WriteDebugEvent(SString("Failed to write {} bytes to process", size));
     }
 
     DWORD oldProt2;
@@ -1178,8 +1178,8 @@ Return Value:
 void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
 {
     HideSplash();
-    AddReportLog(7115, SString("Loader - Request to elevate privileges (%s)", *strReason));
-    MessageBoxUTF8(NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason),
+    AddReportLog(7115, SString("Loader - Request to elevate privileges ({})", *strReason));
+    MessageBoxUTF8(NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '{}'\n\nPlease confirm in the next window."), *strReason),
                    "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
     ReleaseSingleInstanceMutex();
     ShellExecuteNonBlocking("runas", PathJoin(GetMTASAPath(), MTA_EXE_NAME), strCmdLine);
@@ -1280,7 +1280,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     else if (!bQuiet)
     {
         SString strError = GetSystemErrorMessage(dwLastError);
-        SString strMessage(_("Error loading %s module! (%s)"), *strFilename.ToLower(), *strError);
+        SString strMessage(_("Error loading {} module! ({})"), *strFilename.ToLower(), *strError);
         DisplayErrorMessageBox(strMessage, _E("CL38"), "module-not-loadable&name=" + ExtractBeforeExtension(strFilename));
     }
 
@@ -1380,7 +1380,7 @@ void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
         if (pfnTerminateProcess)
         {
             bool bResult = pfnTerminateProcess(dwProcessID, uiExitCode);
-            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, bResult));
+            AddReportLog(8070, SString("TerminateProcess {} result: {}", dwProcessID, bResult));
         }
         else
         {
@@ -1476,7 +1476,7 @@ bool CheckService(uint uiStage)
         if (pfnCheckService)
         {
             bool bResult = pfnCheckService(uiStage);
-            AddReportLog(8070, SString("CheckService %d result: %d", uiStage, bResult));
+            AddReportLog(8070, SString("CheckService {} result: {}", uiStage, bResult));
             return bResult;
         }
     }
@@ -1633,7 +1633,7 @@ void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDi
             SString filePathNameSrc = PathJoin(strPathHereSrc, fileListHere[i]);
             SString filePathNameDest = PathJoin(strPathHereDest, fileListHere[i]);
             if (bShowProgressDialog)
-                if (UpdateProgress((int)fUseProgress, 100, SString("...%s", *PathJoin(strPathHereBaseRel, fileListHere[i]))))
+                if (UpdateProgress((int)fUseProgress, 100, SString("...{}", *PathJoin(strPathHereBaseRel, fileListHere[i]))))
                     goto stop_copy;
 
             // Check enough disk space
@@ -1695,8 +1695,8 @@ void MaybeShowCopySettingsDialog()
         return;
 
     // Check if coreconfig.xml from previous version is present
-    SString strCurrentVersion = SString("%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR);
-    SString strPreviousVersion = SString("%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR - 1);
+    SString strCurrentVersion = SString("{}.{}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR);
+    SString strPreviousVersion = SString("{}.{}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR - 1);
     SString strPreviousPath = GetVersionRegistryValue(strPreviousVersion, "", "Last Run Location");
     if (strPreviousPath.empty())
         return;
@@ -1749,8 +1749,8 @@ bool CheckAndShowFileOpenFailureMessage()
     if (!strFilename.empty())
     {
         SetApplicationSetting("diagnostics", "gta-fopen-fail", "");
-        SString strMsg(_("GTA:SA had trouble opening the file '%s'"), *strFilename);
-        DisplayErrorMessageBox(strMsg, _E("CL31"), SString("gta-fopen-fail&name=%s", *strFilename));
+        SString strMsg(_("GTA:SA had trouble opening the file '{}'"), *strFilename);
+        DisplayErrorMessageBox(strMsg, _E("CL31"), SString("gta-fopen-fail&name={}", *strFilename));
         return true;
     }
     return false;
@@ -1771,8 +1771,8 @@ void CheckAndShowMissingFileMessage()
 
     if (!FileExists(strGTAPathFilename))
     {
-        SString strMsg(_("GTA:SA is missing the file '%s'."), *strFilename);
-        DisplayErrorMessageBox(strMsg, _E("CL36"), SString("gta-file-missing&name=%s", *strFilename));
+        SString strMsg(_("GTA:SA is missing the file '{}'."), *strFilename);
+        DisplayErrorMessageBox(strMsg, _E("CL36"), SString("gta-file-missing&name={}", *strFilename));
     }
 }
 
@@ -1797,9 +1797,9 @@ void CheckAndShowModelProblems()
     {
         SString strMsg;
         strMsg += _("GTA:SA had trouble loading a model.");
-        strMsg += SString(" (%d)\n\n", iModelId);
+        strMsg += SString(" ({})\n\n", iModelId);
         strMsg += _("If you recently modified gta3.img, then try reinstalling GTA:SA.");
-        DisplayErrorMessageBox(strMsg, _E("CL34"), SString("gta-model-fail&id=%d&reason=%s", iModelId, *strReason));
+        DisplayErrorMessageBox(strMsg, _E("CL34"), SString("gta-model-fail&id={}&reason={}", iModelId, *strReason));
     }
 }
 
@@ -1824,8 +1824,8 @@ void CheckAndShowUpgradeProblems()
     {
         SString strMsg;
         strMsg += _("GTA:SA had trouble adding an upgrade to a vehicle.");
-        strMsg += SString(" (%d)", iModelId);
-        DisplayErrorMessageBox(strMsg, _E("CL35"), SString("gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame));
+        strMsg += SString(" ({})", iModelId);
+        DisplayErrorMessageBox(strMsg, _E("CL35"), SString("gta-upgrade-fail&id={}&upgid={}&frame={}", iModelId, iUpgradeId, iFrame));
     }
 }
 
@@ -1842,8 +1842,8 @@ void CheckAndShowImgProblems()
     SetApplicationSetting("diagnostics", "img-file-corrupt", "");
     if (!strFilename.empty())
     {
-        SString strMsg(_("GTA:SA found errors in the file '%s'"), *strFilename);
-        DisplayErrorMessageBox(strMsg, _E("CL44"), SString("img-file-corrupt&name=%s", *strFilename));
+        SString strMsg(_("GTA:SA found errors in the file '{}'"), *strFilename);
+        DisplayErrorMessageBox(strMsg, _E("CL44"), SString("img-file-corrupt&name={}", *strFilename));
     }
 }
 
@@ -1863,7 +1863,7 @@ void* LoadFunction(const char* szLibName, const char* c, const char* a, const ch
         MapSet(libMap, szLibName, LoadLibrary(szLibName));
         phModule = MapFind(libMap, szLibName);
     }
-    SString strFunctionName("%s%s%s", a, b, c);
+    SString strFunctionName("{}{}{}", a, b, c);
     return static_cast<PVOID>(GetProcAddress(*phModule, strFunctionName));
 }
 
@@ -1894,7 +1894,7 @@ void BsodDetectionPreLaunch()
                 {
                     SYSTEMTIME s;
                     FileTimeToSystemTime(&findData.ftCreationTime, &s);
-                    SString strCreationTime("%02d-%02d-%02d %02d:%02d:%02d", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond);
+                    SString strCreationTime("{:02}-{:02}-{:02} {:02}:{:02}:{:02}", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond);
                     if (strCreationTime > strMinidumpTime)
                         strMinidumpTime = strCreationTime;
                 }
@@ -1930,7 +1930,7 @@ void BsodDetectionPreLaunch()
     // Log BSOD status
     SString strBsodTime = GetApplicationSetting("diagnostics", "user-confirmed-bsod-time");
     if (!strBsodTime.empty())
-        WriteDebugEvent(SString("User confirmed bsod time: %s", *strBsodTime));
+        WriteDebugEvent(SString("User confirmed bsod time: {}", *strBsodTime));
 }
 
 //////////////////////////////////////////////////////////
@@ -1984,7 +1984,7 @@ void ForbodenProgramsMessage()
         strMessage += "\n\n";
         strMessage += SString::Join("\n", foundList);
         DisplayErrorMessageBox(strMessage, _E("CL39"), "forboden-programs");
-        WriteDebugEventAndReport(6550, SString("Showed forboden programs list (%s)", *SString::Join(",", foundList)));
+        WriteDebugEventAndReport(6550, SString("Showed forboden programs list ({})", *SString::Join(",", foundList)));
     }
 }
 
@@ -2077,7 +2077,7 @@ void LogSettings()
         SString strValue = GetApplicationSetting(settings[i].szPath, settings[i].szName);
         if (!settings[i].bSkipIfZero || atoi(strValue) != 0)
         {
-            WriteDebugEvent(SString("%s.%s: %s %s", settings[i].szPath, settings[i].szName, *strValue, settings[i].szDesc));
+            WriteDebugEvent(SString("{}.{}: {} {}", settings[i].szPath, settings[i].szName, *strValue, settings[i].szDesc));
         }
     }
 
@@ -2086,7 +2086,7 @@ void LogSettings()
     {
         uint uiTimeNow = static_cast<uint>(time(NULL) / 3600LL);
         uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
-        WriteDebugEvent(SString("noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked));
+        WriteDebugEvent(SString("noav-last-asked-time-hours-delta: {}", uiHoursSinceLastAsked));
     }
 }
 

@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////
 SString CResource::GetAutoGroupName()
 {
-    return SString("autoGroup_%s", GetName().c_str());
+    return SString("autoGroup_{}", GetName().c_str());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ SString CResource::GetAutoGroupName()
 ///////////////////////////////////////////////////////////////
 SString CResource::GetAutoAclName()
 {
-    return SString("autoACL_%s", GetName().c_str());
+    return SString("autoACL_{}", GetName().c_str());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -207,10 +207,10 @@ bool CResource::HandleAclRequestListCommand(bool bDetail)
         {
             SString strStatus = request.bPending ? "pending" : request.bAccess ? "allow" : "deny";
             SString strOutput;
-            strOutput += SString("aclrequest: %s", GetName().c_str());
-            strOutput += SString(" [%s] for %s", *strStatus, *request.rightName.GetFullName());
+            strOutput += SString("aclrequest: {}", GetName().c_str());
+            strOutput += SString(" [{}] for {}", *strStatus, *request.rightName.GetFullName());
             if (!request.bPending)
-                strOutput += SString(" (by %s on %s)", *request.strWho, *request.strDate);
+                strOutput += SString(" (by {} on {})", *request.strWho, *request.strDate);
             CLogger::LogPrintf(strOutput + "\n");
         }
     }
@@ -218,8 +218,8 @@ bool CResource::HandleAclRequestListCommand(bool bDetail)
     if (!bDetail && uiNumTotal > 0)
     {
         SString strOutput;
-        strOutput += SString("aclrequest: %s", GetName().c_str());
-        strOutput += SString(" has %d aclrequest(s) of which %d are pending", uiNumTotal, uiNumPending);
+        strOutput += SString("aclrequest: {}", GetName().c_str());
+        strOutput += SString(" has {} aclrequest(s) of which {} are pending", uiNumTotal, uiNumPending);
         CLogger::LogPrintf(strOutput + "\n");
     }
 
@@ -280,8 +280,8 @@ bool CResource::HandleAclRequestChange(const CAclRightName& rightName, bool bAcc
     CommitAclRequest(currentRequest);
 
     SString strOutput;
-    strOutput += SString("aclrequest: %s", GetName().c_str());
-    strOutput += SString(" %s changed to %s (%s)", *rightName.GetFullName(), bAccess ? "allow" : "deny", *strWho);
+    strOutput += SString("aclrequest: {}", GetName().c_str());
+    strOutput += SString(" {} changed to {} ({})", *rightName.GetFullName(), bAccess ? "allow" : "deny", *strWho);
     CLogger::LogPrintf(strOutput + "\n");
     return true;
 }

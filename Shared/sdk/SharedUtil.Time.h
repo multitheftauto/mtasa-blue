@@ -274,7 +274,7 @@ namespace SharedUtil
             {
                 const SItem& itemPrev = itemList[i - 1];
                 const SItem& item = itemList[i];
-                strStatus += SString("[%0.2fms %s] ", (item.timeUs - itemPrev.timeUs) / 1000.f, item.szDesc);
+                strStatus += SString("[{:0.2f}ms {}] ", (item.timeUs - itemPrev.timeUs) / 1000.f, item.szDesc);
             }
             return strStatus;
         }

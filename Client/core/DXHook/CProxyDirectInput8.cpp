@@ -13,7 +13,7 @@
 
 CProxyDirectInput8::CProxyDirectInput8(IDirectInput8* pDevice)
 {
-    WriteDebugEvent(SString("CProxyDirectInput8::CProxyDirectInput8 %08x", this));
+    WriteDebugEvent(SString("CProxyDirectInput8::CProxyDirectInput8 {:08x}", this));
 
     // Initalize our local variable.
     m_pDevice = pDevice;
@@ -21,7 +21,7 @@ CProxyDirectInput8::CProxyDirectInput8(IDirectInput8* pDevice)
 
 CProxyDirectInput8::~CProxyDirectInput8()
 {
-    WriteDebugEvent(SString("CProxyDirectInput8::~CProxyDirectInput8 %08x", this));
+    WriteDebugEvent(SString("CProxyDirectInput8::~CProxyDirectInput8 {:08x}", this));
 }
 
 /*** IUnknown methods ***/

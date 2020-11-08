@@ -1090,12 +1090,12 @@ const SRegisterInfo* CEffectParameters::GetRegisterInfo(EStateGroup stateGroup, 
         for (uint i = 0; i < NUMELMS(BigRegisterInfoList); i++)
         {
             const SRegisterInfo& info = BigRegisterInfoList[i];
-            SString              strKey("%s.%s", info.szRegName, info.szGroupName);
+            SString              strKey("{}.{}", info.szRegName, info.szGroupName);
             MapSet(registerInfoMap, strKey.ToUpper(), info);
         }
     }
 
-    SString              strKey("%s.%s", *strName, *EnumToString(stateGroup));
+    SString              strKey("{}.{}", *strName, *EnumToString(stateGroup));
     const SRegisterInfo* pInfo = MapFind(registerInfoMap, strKey.ToUpper());
     return pInfo;
 }

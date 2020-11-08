@@ -87,12 +87,12 @@ SArrayId CIdArray::PopUniqueId(void* pObject, EIdClassType idClass)
         WriteErrorEvent("--------------------------------------------------------------------------------");
         WriteErrorEvent("-- Error section for: CIdArray::PopUniqueId");
         WriteErrorEvent("--------------------------------------------------------------------------------");
-        WriteErrorEvent(SString(" ulPhysicalIndex <= m_uiCapacity:   %s (must be false)", ulPhysicalIndex <= m_uiCapacity ? "true" : "false"));
-        WriteErrorEvent(SString(" CIdArray::m_IDStack:               %lu unused, %lu capacity", m_IDStack.GetUnusedAmount(), m_IDStack.GetCapacity()));
-        WriteErrorEvent(SString(" CIdArray::m_Elements:              %zu size, %u capacity", m_Elements.size(), m_Elements.capacity()));
-        WriteErrorEvent(SString(" CIdArray::m_uiPopIdCounter:        %u", m_uiPopIdCounter));
-        WriteErrorEvent(SString(" CIdArray::m_uiCapacity:            %u", m_uiCapacity));
-        WriteErrorEvent(SString(" ulPhysicalIndex:                   %lu", ulPhysicalIndex));
+        WriteErrorEvent(SString(" ulPhysicalIndex <= m_uiCapacity:   {} (must be false)", ulPhysicalIndex <= m_uiCapacity ? "true" : "false"));
+        WriteErrorEvent(SString(" CIdArray::m_IDStack:               {} unused, {} capacity", m_IDStack.GetUnusedAmount(), m_IDStack.GetCapacity()));
+        WriteErrorEvent(SString(" CIdArray::m_Elements:              {} size, {} capacity", m_Elements.size(), m_Elements.capacity()));
+        WriteErrorEvent(SString(" CIdArray::m_uiPopIdCounter:        {}", m_uiPopIdCounter));
+        WriteErrorEvent(SString(" CIdArray::m_uiCapacity:            {}", m_uiCapacity));
+        WriteErrorEvent(SString(" ulPhysicalIndex:                   {}", ulPhysicalIndex));
         WriteErrorEvent("--------------------------------------------------------------------------------");
         WriteErrorEvent("-- Dump: CIdArray::m_Elements");
         WriteErrorEvent("--------------------------------------------------------------------------------");
@@ -103,7 +103,7 @@ SArrayId CIdArray::PopUniqueId(void* pObject, EIdClassType idClass)
         for (SArrayId i = startIndex; i < stopIndex; ++i)
         {
             WriteErrorEvent(
-                SString(" [%lu] pObject = %p, idClass = %d (%s)", i, m_Elements[i].pObject, m_Elements[i].idClass, GetIdClassTypeName(m_Elements[i].idClass)));
+                SString(" [{}] pObject = {:p}, idClass = {} ({})", i, m_Elements[i].pObject, m_Elements[i].idClass, GetIdClassTypeName(m_Elements[i].idClass)));
         }
 
         WriteErrorEvent("--------------------------------------------------------------------------------");

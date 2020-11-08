@@ -315,9 +315,9 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats(CPerfStatResult* pResult, c
         SString* row = pResult->AddRow();
 
         int c = 0;
-        row[c++] = SString("%2.0f", fAgeSeconds);
+        row[c++] = SString("{:2.0f}", fAgeSeconds);
         row[c++] = info.resourceName;
-        row[c++] = SString("%2.3f", fCpuMs);
+        row[c++] = SString("{:2.3f}", fCpuMs);
         row[c++] = info.strQuery;
 
         if (--iMaxResults == 0)

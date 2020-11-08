@@ -296,13 +296,13 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
 
         if (labs(calcedDelta) >= 1)
         {
-            row[c] = SString("%d KB", calcedDelta);
+            row[c] = SString("{} KB", calcedDelta);
             calcedDelta = 0;
         }
         c++;
 
-        row[c++] = SString("%d KB", calcedCurrent);
-        row[c++] = SString("%d KB", calcedMax);
+        row[c++] = SString("{} KB", calcedCurrent);
+        row[c++] = SString("{} KB", calcedMax);
     }
 
     // For each lib
@@ -322,13 +322,13 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
 
         if (labs(LibMemory.Delta) >= 1)
         {
-            row[c] = SString("%d KB", LibMemory.Delta);
+            row[c] = SString("{} KB", LibMemory.Delta);
             LibMemory.Delta = 0;
         }
         c++;
 
-        row[c++] = SString("%d KB", LibMemory.Current);
-        row[c++] = SString("%d KB", LibMemory.Max);
+        row[c++] = SString("{} KB", LibMemory.Current);
+        row[c++] = SString("{} KB", LibMemory.Max);
 
         if (bMoreInfo)
         {
@@ -341,13 +341,13 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
                     unsigned long numgot = info.pfnGetAllocStats(0, stats, NUMELMS(stats));
                     if (numgot >= 9)
                     {
-                        row[c++] = SString("%d", stats[2]);
-                        row[c++] = SString("%d", stats[3]);
-                        row[c++] = SString("%d", stats[4]);
-                        row[c++] = SString("%d", stats[5]);
-                        row[c++] = SString("%d", stats[6]);
-                        row[c++] = SString("%d", stats[7]);
-                        row[c++] = SString("%d KB", (stats[8] + 1023) / 1024);
+                        row[c++] = SString("{}", stats[2]);
+                        row[c++] = SString("{}", stats[3]);
+                        row[c++] = SString("{}", stats[4]);
+                        row[c++] = SString("{}", stats[5]);
+                        row[c++] = SString("{}", stats[6]);
+                        row[c++] = SString("{}", stats[7]);
+                        row[c++] = SString("{} KB", (stats[8] + 1023) / 1024);
                     }
                     break;
                 }
@@ -365,7 +365,7 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
                     for (uint i = 0; i < numgot && i < 5; i++)
                     {
                         const SAllocTrackingTagInfo& info = stats[i];
-                        row[c++] = SString("[%d KB (%d) {%s}]", info.size / 1024, info.countAllocs, info.tag);
+                        row[c++] = SString("[{} KB ({}) {{}}]", info.size / 1024, info.countAllocs, info.tag);
                     }
                     break;
                 }

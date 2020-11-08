@@ -473,7 +473,7 @@ void CVersionUpdater::DoPulse()
             m_MasterConfig.master.interval.SetFromString("7d");
 
         time_t secondsSinceCheck = CDateTime::Now().ToSeconds() - m_VarConfig.master_lastCheckTime.ToSeconds();
-        OutputDebugLine(SString("[Updater] master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck),
+        OutputDebugLine(SString("[Updater] master timeSinceCheck: {}  time till next check: {}", (int)(secondsSinceCheck),
                                 (int)(m_MasterConfig.master.interval.ToSeconds() - secondsSinceCheck)));
 
         // Only check once a week
@@ -495,7 +495,7 @@ void CVersionUpdater::DoPulse()
             m_VarConfig.version_lastCheckTime.SetFromSeconds(0);
 
         time_t secondsSinceCheck = CDateTime::Now().ToSeconds() - m_VarConfig.version_lastCheckTime.ToSeconds();
-        OutputDebugLine(SString("[Updater] version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck),
+        OutputDebugLine(SString("[Updater] version timeSinceCheck: {}  time till next check: {}", (int)(secondsSinceCheck),
                                 (int)(m_MasterConfig.version.interval.ToSeconds() - secondsSinceCheck)));
 
         // Only check once a day
@@ -513,7 +513,7 @@ void CVersionUpdater::DoPulse()
         m_bCheckedTimeForNewsUpdate = true;
 
         time_t secondsSinceCheck = CDateTime::Now().ToSeconds() - m_VarConfig.news_lastCheckTime.ToSeconds();
-        OutputDebugLine(SString("[Updater] news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck),
+        OutputDebugLine(SString("[Updater] news timeSinceCheck: {}  time till next check: {}", (int)(secondsSinceCheck),
                                 (int)(m_MasterConfig.news.interval.ToSeconds() - secondsSinceCheck)));
 
         // Only check once an interval
@@ -652,7 +652,7 @@ void CVersionUpdater::InitiateSidegradeLaunch(const SString& strVersion, const S
     RunProgram(EUpdaterProgramType::SidegradeLaunch);
 
     m_strSidegradeVersion = strVersion;
-    m_strSidegradeHost = SString("%s:%d", *strIp, usPort);
+    m_strSidegradeHost = SString("{}:{}", *strIp, usPort);
     m_strSidegradeName = strName;
     m_strSidegradePassword = strPassword;
 }
@@ -794,7 +794,7 @@ SString CVersionUpdater::GetResumableSaveLocation(const SString& strFilename, co
 
     // Get a list of possible save places
     std::list<SString> saveLocationList;
-    GetSaveLocationList(saveLocationList, SString("%s-%s.tmp", *strFilename, *strMD5));
+    GetSaveLocationList(saveLocationList, SString("{}-{}.tmp", *strFilename, *strMD5));
 
     // First, find to find existing file to resume
     for (std::list<SString>::iterator iter = saveLocationList.begin(); iter != saveLocationList.end(); ++iter)
@@ -804,7 +804,7 @@ SString CVersionUpdater::GetResumableSaveLocation(const SString& strFilename, co
         if (FileExists(strSaveLocation) && FileAppend(strSaveLocation, "") && FileSize(strSaveLocation) < iFilesize)
         {
             AddReportLog(
-                5008, SString("GetResumableSaveLocation: Will resume download at %d/%d for %s", (int)FileSize(strSaveLocation), iFilesize, *strSaveLocation));
+                5008, SString("GetResumableSaveLocation: Will resume download at {}/{} for {}", (int)FileSize(strSaveLocation), iFilesize, *strSaveLocation));
             return strSaveLocation;
         }
     }
@@ -818,7 +818,7 @@ SString CVersionUpdater::GetResumableSaveLocation(const SString& strFilename, co
         if (FileSave(strSaveLocation, ""))
         {
             FileDelete(strSaveLocation);
-            AddReportLog(5009, SString("GetResumableSaveLocation: New download of %d for %s", iFilesize, *strSaveLocation));
+            AddReportLog(5009, SString("GetResumableSaveLocation: New download of {} for {}", iFilesize, *strSaveLocation));
             return strSaveLocation;
         }
     }
@@ -985,7 +985,7 @@ void CVersionUpdater::OnPossibleConfigProblem()
 void CVersionUpdater::RunProgram(EUpdaterProgramType strProgramName)
 {
     assert(IsMainThread());
-    OutputDebugLine(SString("[Updater] RunProgram %d", strProgramName));
+    OutputDebugLine(SString("[Updater] RunProgram {}", strProgramName));
 
     // Stop any running program
     while (shared.m_CurrentProgram != EUpdaterProgramType::None)
@@ -1074,7 +1074,7 @@ void* CVersionUpdater::ThreadProc()
             }
             catch (ExceptionQuitProgram)
             {
-                OutputDebugLine(SString("[Updater] Program terminated %d", shared.m_CurrentProgram));
+                OutputDebugLine(SString("[Updater] Program terminated {}", shared.m_CurrentProgram));
             }
             ResetEverything();
 
@@ -1120,7 +1120,7 @@ void CVersionUpdater::ProcessCommand(EUpdaterProgramType eProgramType)
     {
         if (programList[i].eProgramType == eProgramType)
         {
-            OutputDebugLine(SString("[Updater] ProcessCommand %d", eProgramType));
+            OutputDebugLine(SString("[Updater] ProcessCommand {}", eProgramType));
             (this->*(programList[i].pFunction))();
         }
     }
@@ -1520,7 +1520,7 @@ void CVersionUpdater::_CheckSidegradeRequirements()
         SLibVersionInfo versionInfo;
         if (GetLibVersionInfo(strCoreDll, &versionInfo))
         {
-            SString strVersion("%d.%d", versionInfo.dwProductVersionMS >> 16, versionInfo.dwProductVersionMS & 0xffff);
+            SString strVersion("{}.{}", versionInfo.dwProductVersionMS >> 16, versionInfo.dwProductVersionMS & 0xffff);
             if (strVersion != m_strSidegradeVersion)
                 bVersionMatch = false;
         }
@@ -1547,7 +1547,7 @@ void CVersionUpdater::_CheckSidegradeRequirements()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DoSidegradeLaunch()
 {
-    SString strURL("mtasa://%s:%s@%s", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost);
+    SString strURL("mtasa://{}:{}@{}", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost);
     SetOnQuitCommand("open", m_strSidegradePath, strURL);
     _ExitGame();
 }
@@ -1562,7 +1562,7 @@ void CVersionUpdater::_DoSidegradeLaunch()
 void CVersionUpdater::_DialogSidegradeDownloadQuestion()
 {
     GetQuestionBox().Reset();
-    GetQuestionBox().SetTitle(SString(_("MTA:SA %s required"), *m_strSidegradeVersion));
+    GetQuestionBox().SetTitle(SString(_("MTA:SA {} required"), *m_strSidegradeVersion));
     GetQuestionBox().SetMessage(SString(_("An updated version of MTA:SA %s is required to join the selected server.\n\n"
                                           "Do you want to download and install MTA:SA %s ?"),
                                         *m_strSidegradeVersion, *m_strSidegradeVersion));
@@ -1582,8 +1582,8 @@ void CVersionUpdater::_DialogSidegradeDownloadQuestion()
 void CVersionUpdater::_DialogSidegradeLaunchQuestion()
 {
     GetQuestionBox().Reset();
-    GetQuestionBox().SetTitle(SString(_("MTA:SA %s required"), *m_strSidegradeVersion));
-    GetQuestionBox().SetMessage(SString(_("Do you want to launch MTA:SA %s and connect to this server ?"), *m_strSidegradeVersion));
+    GetQuestionBox().SetTitle(SString(_("MTA:SA {} required"), *m_strSidegradeVersion));
+    GetQuestionBox().SetMessage(SString(_("Do you want to launch MTA:SA {} and connect to this server ?"), *m_strSidegradeVersion));
     GetQuestionBox().SetButton(0, _("No"));
     GetQuestionBox().SetButton(1, _("Yes"));
     GetQuestionBox().Show();
@@ -1600,7 +1600,7 @@ void CVersionUpdater::_DialogSidegradeLaunchQuestion()
 void CVersionUpdater::_DialogSidegradeQueryError()
 {
     GetQuestionBox().Reset();
-    GetQuestionBox().SetTitle(SString(_("MTA:SA %s required"), *m_strSidegradeVersion));
+    GetQuestionBox().SetTitle(SString(_("MTA:SA {} required"), *m_strSidegradeVersion));
     GetQuestionBox().SetMessage(_("It is not possible to connect at this time.\n\nPlease try later."));
     GetQuestionBox().SetButton(0, _("OK"));
     GetQuestionBox().Show();
@@ -1942,7 +1942,7 @@ void CVersionUpdater::_DialogUpdateResult()
             GetQuestionBox().Reset();
             GetQuestionBox().SetTitle(_("ERROR DOWNLOADING"));
             GetQuestionBox().SetMessage(_("The downloaded file appears to be incorrect."));
-            GetQuestionBox().SetOnLineHelpOption(SString("dl-incorrect&fname=%s", *m_JobInfo.strFilename));
+            GetQuestionBox().SetOnLineHelpOption(SString("dl-incorrect&fname={}", *m_JobInfo.strFilename));
             GetQuestionBox().Show();
             _PollAnyButton();
         }
@@ -2293,7 +2293,7 @@ void CVersionUpdater::_ProcessPatchFileQuery()
     if (!strReportSettingsFilter.empty() && m_MasterConfig.report.strFilter.empty())
     {
         SString strReportSettings =
-            SString("filter2@%s;min@%s;max@%s", strReportSettingsFilter.c_str(), strReportSettingsMin.c_str(), strReportSettingsMax.c_str());
+            SString("filter2@{};min@{};max@{}", strReportSettingsFilter.c_str(), strReportSettingsMin.c_str(), strReportSettingsMax.c_str());
         GetReportWrap()->SetSettings(strReportSettings);
     }
 
@@ -2399,7 +2399,7 @@ void CVersionUpdater::PostChangeMasterConfig()
     if (!m_MasterConfig.report.strFilter.empty())
     {
         SString strReportSettings =
-            SString("filter2@%s;min@%d;max@%d", *m_MasterConfig.report.strFilter, (int)m_MasterConfig.report.iMinSize, (int)m_MasterConfig.report.iMaxSize);
+            SString("filter2@{};min@{};max@{}", *m_MasterConfig.report.strFilter, (int)m_MasterConfig.report.iMinSize, (int)m_MasterConfig.report.iMaxSize);
         GetReportWrap()->SetSettings(strReportSettings);
     }
 }
@@ -2531,7 +2531,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
             if (m_JobInfo.serverList.size())
                 ListRemoveIndex(m_JobInfo.serverList, m_JobInfo.iCurrent--);
             m_ConditionMap.SetCondition("Download", "Fail", "Checksum");
-            AddReportLog(5003, SString("DoPollDownload: Checksum wrong for %s (Want:%d-%s Got:%d-%s)", m_JobInfo.strFilename.c_str(), (int)m_JobInfo.iFilesize,
+            AddReportLog(5003, SString("DoPollDownload: Checksum wrong for {} (Want:{}-{} Got:{}-{})", m_JobInfo.strFilename.c_str(), (int)m_JobInfo.iFilesize,
                                        m_JobInfo.strMD5.c_str(), uiSize, szMD5));
             return;
         }
@@ -2540,7 +2540,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
     // Check signature
     if (!CCore::GetSingleton().GetNetwork()->VerifySignature(pData, uiSize))
     {
-        AddReportLog(5006, SString("DoPollDownload: Signature wrong for %s (MD5: %s)", m_JobInfo.strFilename.c_str(), m_JobInfo.strMD5.c_str()));
+        AddReportLog(5006, SString("DoPollDownload: Signature wrong for {} (MD5: {})", m_JobInfo.strFilename.c_str(), m_JobInfo.strMD5.c_str()));
         m_ConditionMap.SetCondition("Download", "Fail", "Checksum");
         return;
     }
@@ -2564,7 +2564,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
                 break;
             }
 
-            AddReportLog(5004, SString("DoPollDownload: Unable to use the path %s", strSaveLocation.c_str()));
+            AddReportLog(5004, SString("DoPollDownload: Unable to use the path {}", strSaveLocation.c_str()));
         }
     }
 
@@ -2573,14 +2573,14 @@ void CVersionUpdater::_ProcessPatchFileDownload()
         if (m_JobInfo.serverList.size())
             ListRemoveIndex(m_JobInfo.serverList, m_JobInfo.iCurrent--);
         m_ConditionMap.SetCondition("Download", "Fail", "Saving");
-        AddReportLog(5005, SString("DoPollDownload: Unable to save the file %s (size %d)", m_JobInfo.strFilename.c_str(), uiSize));
+        AddReportLog(5005, SString("DoPollDownload: Unable to save the file {} (size {})", m_JobInfo.strFilename.c_str(), uiSize));
         return;
     }
     ////////////////////////
 
     m_JobInfo.strSaveLocation = strPathFilename;
     m_ConditionMap.SetCondition("Download", "Ok");
-    AddReportLog(2007, SString("DoPollDownload: Downloaded %s", m_JobInfo.strSaveLocation.c_str()));
+    AddReportLog(2007, SString("DoPollDownload: Downloaded {}", m_JobInfo.strSaveLocation.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2628,14 +2628,14 @@ void CVersionUpdater::_StartDownload()
                     CMD5Hasher::ConvertToHex(md5Result, szMD5);
                     if (m_JobInfo.strMD5 != szMD5)
                     {
-                        AddReportLog(5807, SString("StartDownload: Cached file reuse - Size correct, but md5 did not match (%s)", *strPathFilename));
+                        AddReportLog(5807, SString("StartDownload: Cached file reuse - Size correct, but md5 did not match ({})", *strPathFilename));
                         continue;
                     }
 
                     // Check signature
                     if (!CCore::GetSingleton().GetNetwork()->VerifySignature(buffer.GetData(), buffer.GetSize()))
                     {
-                        AddReportLog(5808, SString("StartDownload: Cached file reuse - Size and md5 correct, but signature incorrect (%s)", *strPathFilename));
+                        AddReportLog(5808, SString("StartDownload: Cached file reuse - Size and md5 correct, but signature incorrect ({})", *strPathFilename));
                         continue;
                     }
 
@@ -2643,7 +2643,7 @@ void CVersionUpdater::_StartDownload()
                     m_JobInfo.strSaveLocation = strPathFilename;
                     m_ConditionMap.SetCondition("ProcessResponse", "");
                     m_ConditionMap.SetCondition("Download", "Ok");
-                    AddReportLog(5809, SString("StartDownload: Cached file reuse - Size, md5 and signature correct (%s)", *strPathFilename));
+                    AddReportLog(5809, SString("StartDownload: Cached file reuse - Size, md5 and signature correct ({})", *strPathFilename));
                     return;
                 }
             }
@@ -2719,9 +2719,9 @@ int CVersionUpdater::_PollDownload()
                     }
                     if (m_JobInfo.bShowDownloadPercent)
                         GetQuestionBox().SetMessage(
-                            SString(_("%3d %% completed"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
+                            SString(_("{:3} {: c}ompleted"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
-                        GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000));
+                        GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  {:<3}"), m_JobInfo.iIdleTimeLeft / 1000));
                     else
                         GetQuestionBox().AppendMessage("");
                 }
@@ -3166,8 +3166,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
         *verInfoNcrypt.GetFileVersionString()                             //
     );
 
-    SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt("times-connected-editor"), GetApplicationSettingInt("times-connected"));
-    SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt("nvhacks", "optimus"), GetApplicationSettingInt("nvhacks", "optimus-startup-option"),
+    SString strConnectUsage = SString("{}_{}", GetApplicationSettingInt("times-connected-editor"), GetApplicationSettingInt("times-connected"));
+    SString strOptimusInfo = SString("{}_{}_{}", GetApplicationSettingInt("nvhacks", "optimus"), GetApplicationSettingInt("nvhacks", "optimus-startup-option"),
                                      GetApplicationSettingInt("nvhacks", "optimus-force-windowed"));
 
     // Make the query URL
@@ -3211,7 +3211,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     options.bResumeFile = true;
     GetHTTP()->QueueFile(strQueryURL, m_JobInfo.strResumableSaveLocation, this, StaticDownloadFinished, options);
     m_strLastQueryURL = strQueryURL;
-    OutputDebugLine(SString("[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size(), strQueryURL.c_str()));
+    OutputDebugLine(SString("[Updater] DoSendDownloadRequestToNextServer {}/{} {}", m_JobInfo.iCurrent, m_JobInfo.serverList.size(), strQueryURL.c_str()));
     return RES_OK;
 }
 
@@ -3265,7 +3265,7 @@ int CVersionUpdater::DoPollDownload()
     {
         m_llTimeStart = GetTickCount64_();
         m_JobInfo.uiBytesDownloaded = uiBytesDownloaded;
-        OutputDebugLine(SString("[Updater] uiBytesDownloaded:%d", uiBytesDownloaded));
+        OutputDebugLine(SString("[Updater] uiBytesDownloaded:{}", uiBytesDownloaded));
     }
 
     // Are we done yet?
@@ -3278,7 +3278,7 @@ int CVersionUpdater::DoPollDownload()
         if ((m_JobInfo.downloadStatus == EDownloadStatus::Failure) || m_JobInfo.iIdleTimeLeft < 0)
         {
             GetHTTP()->Reset();
-            AddReportLog(4002, SString("DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str(), m_JobInfo.iDownloadResultCode,
+            AddReportLog(4002, SString("DoPollDownload: Regular fail for {} (status:{}  time:{})", m_strLastQueryURL.c_str(), m_JobInfo.iDownloadResultCode,
                                        m_JobInfo.iIdleTime));
 
             m_ConditionMap.SetCondition("Download", "Fail");
@@ -3298,12 +3298,12 @@ int CVersionUpdater::DoPollDownload()
     if (!m_JobInfo.downloadBuffer.empty())
     {
         m_ConditionMap.SetCondition("Download", "Ok");
-        AddReportLog(2005, SString("DoPollDownload: Downloaded %d bytes from %s", m_JobInfo.downloadBuffer.size(), m_strLastQueryURL.c_str()));
+        AddReportLog(2005, SString("DoPollDownload: Downloaded {} bytes from {}", m_JobInfo.downloadBuffer.size(), m_strLastQueryURL.c_str()));
         return RES_OK;
     }
 
     m_ConditionMap.SetCondition("Download", "Fail");
-    AddReportLog(5007, SString("DoPollDownload: Fail for %s", m_strLastQueryURL.c_str()));
+    AddReportLog(5007, SString("DoPollDownload: Fail for {}", m_strLastQueryURL.c_str()));
     return RES_FAIL;
 }
 

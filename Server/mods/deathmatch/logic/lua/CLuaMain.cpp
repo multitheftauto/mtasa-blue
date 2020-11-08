@@ -250,7 +250,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
     uint        uiSize;
     if (!g_pRealNetServer->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename))
     {
-        SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename);
+        SString strMessage("{} is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename);
         g_pGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed: %s", *strMessage);
         return false;
     }
@@ -285,7 +285,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
             strUTFScript = std::string(cpBuffer, uiSize);
 
         // Run the script
-        if (CLuaMain::LuaLoadBuffer(m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString("@%s", *strNiceFilename)))
+        if (CLuaMain::LuaLoadBuffer(m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString("@{}", *strNiceFilename)))
         {
             // Print the error
             std::string strRes = lua_tostring(m_luaVM, -1);
@@ -553,16 +553,16 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
                 if (iPos >= 0)
                     strFilename = strFilename.substr(iPos + 1);
 
-                strText = SString("@%s:%d", strFilename.c_str(), debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined, iLuaFunction);
+                strText = SString("@{}:{}", strFilename.c_str(), debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined, iLuaFunction);
             }
             else
             {
-                strText = SString("@func_%d %s", iLuaFunction, debugInfo.short_src);
+                strText = SString("@func_{} {}", iLuaFunction, debugInfo.short_src);
             }
         }
         else
         {
-            strText = SString("@func_%d NULL", iLuaFunction);
+            strText = SString("@func_{} NULL", iLuaFunction);
         }
 
     #ifdef CHECK_FUNCTION_TAG

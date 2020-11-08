@@ -88,7 +88,7 @@ void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* 
     {
         uint deltaTimeMs = (GetTimeUs() - startTime) / 1000;
         if (deltaTimeMs > 2)
-            TIMING_DETAIL(SString("LoadAllRequestedModels( %d, %s ) took %d ms", bOnlyPriorityModels, szTag, deltaTimeMs));
+            TIMING_DETAIL(SString("LoadAllRequestedModels( {}, {} ) took {} ms", bOnlyPriorityModels, szTag, deltaTimeMs));
     }
 }
 

@@ -1391,7 +1391,7 @@ void CElement::_CheckEntitiesFromRoot(unsigned int uiTypeHash)
 
         if (mapResults2.find(pElement1) == mapResults2.end())
         {
-            OutputDebugString(SString("Server: 0x%08x  %s is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName().c_str()));
+            OutputDebugString(SString("Server: 0x{:08x}  {} is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName().c_str()));
         }
     }
 
@@ -1401,7 +1401,7 @@ void CElement::_CheckEntitiesFromRoot(unsigned int uiTypeHash)
 
         if (mapResults1.find(pElement2) == mapResults1.end())
         {
-            OutputDebugString(SString("Server: 0x%08x  %s is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName().c_str()));
+            OutputDebugString(SString("Server: 0x{:08x}  {} is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName().c_str()));
         }
     }
 
@@ -1422,7 +1422,7 @@ void CElement::_FindAllChildrenByTypeIndex(unsigned int uiTypeHash, std::map<CEl
         assert(this == CElementIDs::GetElement(ID));
         if (this->IsBeingDeleted())
             OutputDebugString(
-                SString("Server: 0x%08x  %s is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName().c_str()));
+                SString("Server: 0x{:08x}  {} is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName().c_str()));
     }
 
     // Call us on the children

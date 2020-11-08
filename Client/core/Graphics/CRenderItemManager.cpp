@@ -69,9 +69,9 @@ void CRenderItemManager::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewpo
     pDevice->GetDeviceCaps(&caps);
     int iMinor = caps.PixelShaderVersion & 0xFF;
     int iMajor = (caps.PixelShaderVersion & 0xFF00) >> 8;
-    m_strVideoCardPSVersion = SString("%d", iMajor);
+    m_strVideoCardPSVersion = SString("{}", iMajor);
     if (iMinor)
-        m_strVideoCardPSVersion += SString(".%d", iMinor);
+        m_strVideoCardPSVersion += SString(".{}", iMinor);
 
     UpdateMemoryUsage();
 

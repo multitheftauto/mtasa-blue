@@ -217,14 +217,14 @@ void PropertySet::maybeAddUncommonProperties ( const String& name )
     if ( g_UnknownPropertiesMap.find( getType () + name ) != g_UnknownPropertiesMap.end () )
     {
         // Early out on unknown type/property combo
-        Logger::getSingleton ().logEvent( SString ( "** Early out on unknown property %s-%s", getType ().c_str (), name.c_str () ), Informative);
+        Logger::getSingleton ().logEvent( SString ( "** Early out on unknown property {}-{}", getType ().c_str (), name.c_str () ), Informative);
         return;
     }
 
     if ( !d_addedUncommonProperties )
     {
         // Add uncommon properties for this object, to find missing property 'name'
-        Logger::getSingleton ().logEvent ( SString ( "** Adding uncommon properties for a %s, to find missing property %s", getType ().c_str (), name.c_str() ), Informative);
+        Logger::getSingleton ().logEvent ( SString ( "** Adding uncommon properties for a {}, to find missing property {}", getType ().c_str (), name.c_str() ), Informative);
         d_addedUncommonProperties = true;
         addUncommonProperties ();
 
@@ -237,7 +237,7 @@ void PropertySet::maybeAddUncommonProperties ( const String& name )
 
     // Add type / name to unknown properties list
     g_UnknownPropertiesMap[ getType() + name ] = 1;
-    Logger::getSingleton ().logEvent ( SString ( "** Unknown property %s-%s", getType ().c_str (), name.c_str () ), Informative);
+    Logger::getSingleton ().logEvent ( SString ( "** Unknown property {}-{}", getType ().c_str (), name.c_str () ), Informative);
     return;
 }
 

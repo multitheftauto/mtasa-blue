@@ -66,7 +66,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
             // Censor input for /login command
             if (!stricmp(szCommandBufferPointer, "login"))
             {
-                Arguments.PushString(SString("%s ***", szCommandBufferPointer));
+                Arguments.PushString(SString("{} ***", szCommandBufferPointer));
             }
             else
             {
@@ -376,7 +376,7 @@ void COMMAND_MessageTarget(const char* szCmdLine)
         const char* szNick = pTarget->GetNick();
         if (!szNick)
             return;
-        SString strParameters("%s %s", pTarget->GetNick(), szCmdLine);
+        SString strParameters("{} {}", pTarget->GetNick(), szCmdLine);
         g_pCore->GetCommands()->Execute("msg", strParameters);
     }
     else
@@ -671,7 +671,7 @@ void DumpPlayer(CClientPlayer* pPlayer, FILE* pFile)
 void COMMAND_DumpPlayers(const char* szCmdLine)
 {
     // Create a file to dump to
-    SString strBuffer("%s/dump_%i.txt", g_pClientGame->GetModRoot(), GetTickCount32());
+    SString strBuffer("{}/dump_{}.txt", g_pClientGame->GetModRoot(), GetTickCount32());
     FILE*   pFile = fopen(strBuffer, "w+");
     if (pFile)
     {

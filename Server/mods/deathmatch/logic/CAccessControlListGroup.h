@@ -36,7 +36,7 @@ public:
 
     virtual ~CAccessControlListGroupObject(){};
 
-    static SString GenerateKey(const char* szName, EObjectType eObjectType) { return SString("%s_%d", szName, (unsigned int)eObjectType); }
+    static SString GenerateKey(const char* szName, EObjectType eObjectType) { return SString("{}_{}", szName, (unsigned int)eObjectType); }
 
     const char*    GetObjectName() { return m_strName; };
     EObjectType    GetObjectType() { return m_eObjectType; };

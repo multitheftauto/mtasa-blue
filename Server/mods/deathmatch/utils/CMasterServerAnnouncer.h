@@ -237,13 +237,13 @@ public:
         SString      strAseMode = pMainConfig->GetSetting("ase");
         bool         bAseLanListen = pMainConfig->GetAseLanListenEnabled();
 
-        SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
-        SString strExtra("%d_%d_%d_%s_%d", 0, uiMaxPlayerCount, bPassworded, *strAseMode, bAseLanListen);
+        SString strVersion("{}.{}.{}-{}.{:05}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
+        SString strExtra("{}_{}_{}_{}_{}", 0, uiMaxPlayerCount, bPassworded, *strAseMode, bAseLanListen);
 
         SString strUrl = strInUrl;
-        strUrl = strUrl.Replace("%GAME%", SString("%u", usServerPort));
-        strUrl = strUrl.Replace("%ASE%", SString("%u", usServerPort + 123));
-        strUrl = strUrl.Replace("%HTTP%", SString("%u", usHTTPPort));
+        strUrl = strUrl.Replace("%GAME%", SString("{}", usServerPort));
+        strUrl = strUrl.Replace("%ASE%", SString("{}", usServerPort + 123));
+        strUrl = strUrl.Replace("%HTTP%", SString("{}", usHTTPPort));
         strUrl = strUrl.Replace("%VER%", strVersion);
         strUrl = strUrl.Replace("%EXTRA%", strExtra);
         strUrl = strUrl.Replace("%IP%", strServerIP);

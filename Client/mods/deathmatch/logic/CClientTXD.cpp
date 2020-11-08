@@ -185,7 +185,7 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
     {
         // See if previously shrunk result exists
         SString strLargeSha256 = GenerateSha256HexStringFromFile(m_strFilename);
-        SString strShrunkFilename = PathJoin(ExtractPath(m_strFilename), SString("_3_%s", *strLargeSha256.Left(32)));
+        SString strShrunkFilename = PathJoin(ExtractPath(m_strFilename), SString("_3_{}", *strLargeSha256.Left(32)));
         uint    uiShrunkSize = (uint)FileSize(strShrunkFilename);
         if (uiShrunkSize >= 128)
         {
@@ -220,7 +220,7 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             strOutFilename = strShrunkFilename;
             FileAppend(strShrunkFilename, SStringX("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 12));
             FileAppend(strShrunkFilename, GenerateSha256HexStringFromFile(strShrunkFilename));
-            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
+            AddReportLog(9400, SString("RightSized {}({}) from {} KB => {} KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
                                        (uint)FileSize(m_strFilename) / 1024, (uint)FileSize(strShrunkFilename) / 1024));
         }
         else

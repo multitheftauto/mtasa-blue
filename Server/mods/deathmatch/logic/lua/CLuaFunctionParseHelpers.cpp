@@ -518,7 +518,7 @@ eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource*
         return eResourceModifyScope::EVERY_RESOURCE;
 
     // Check if resource has right to modify only pOtherResource
-    const SString strRightName("ModifyOtherObjects.%s", pOtherResource->GetName().c_str());
+    const SString strRightName("ModifyOtherObjects.{}", pOtherResource->GetName().c_str());
 
     if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strRightName.c_str(), CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
         return eResourceModifyScope::SINGLE_RESOURCE;
@@ -532,7 +532,7 @@ eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource*
 void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource)
 {
     if (GetResourceModifyScope(pThisResource, pOtherResource) == eResourceModifyScope::NONE)
-        argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()), "Access denied");
+        argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource {} to access {}", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()), "Access denied");
 }
 
 //
@@ -572,7 +572,7 @@ void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisR
         --remainingElements;
     }
 
-    argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
+    argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource {} to access {}", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
 }
 
 //
@@ -598,6 +598,6 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
             }
         }
         argStream.SetCustomError(
-            SString("Database credentials protection denied resource %s to access %s", *pThisResource->GetName(), *pOtherResource->GetName()), "Access denied");
+            SString("Database credentials protection denied resource {} to access {}", *pThisResource->GetName(), *pOtherResource->GetName()), "Access denied");
     }
 }

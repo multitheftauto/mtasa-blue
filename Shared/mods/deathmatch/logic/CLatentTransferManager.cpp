@@ -129,7 +129,7 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
 
     m_uiNumSends = 0;
 #ifndef MTA_CLIENT
-    markerLatentEvent.SetAndStoreString(SString("BatchPrep (%d KB)", uiBitStreamBytesUsed / 1024));
+    markerLatentEvent.SetAndStoreString(SString("BatchPrep ({} KB)", uiBitStreamBytesUsed / 1024));
 #endif
 }
 
@@ -159,7 +159,7 @@ SSendHandle CLatentTransferManager::AddSend(NetPlayerID remoteId, ushort usBitSt
 void CLatentTransferManager::AddSendBatchEnd()
 {
 #ifndef MTA_CLIENT
-    markerLatentEvent.SetAndStoreString(SString("BatchEnd (%d sends)", m_uiNumSends));
+    markerLatentEvent.SetAndStoreString(SString("BatchEnd ({} sends)", m_uiNumSends));
 #endif
     assert(m_pBatchBufferRef);
     SAFE_DELETE(m_pBatchBufferRef);

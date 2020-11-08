@@ -230,7 +230,7 @@ CJoystickManager::CJoystickManager()
     DWORD               dwStatus = XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &Capabilities);
     if (dwStatus == ERROR_SUCCESS)
     {
-        WriteDebugEvent(SString("XInput device detected. Type:%d SubType:%d Flags:0x%04x", Capabilities.Type, Capabilities.SubType, Capabilities.Flags));
+        WriteDebugEvent(SString("XInput device detected. Type:{} SubType:{} Flags:0x{:04x}", Capabilities.Type, Capabilities.SubType, Capabilities.Flags));
         WriteDebugEvent(SString("XInput - wButtons:0x%04x  bLeftTrigger:0x%02x  bRightTrigger:0x%02x", Capabilities.Gamepad.wButtons,
                                 Capabilities.Gamepad.bLeftTrigger, Capabilities.Gamepad.bRightTrigger));
         WriteDebugEvent(SString("XInput - sThumbLX:0x%04x  sThumbLY:0x%04x  sThumbRX:0x%04x  sThumbRY:0x%04x", Capabilities.Gamepad.sThumbLX,
@@ -264,7 +264,7 @@ BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* 
 BOOL CJoystickManager::DoEnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance)
 {
     WriteDebugEvent(
-        SString("DInput EnumJoysticksCallback - guidProduct:%s  ProductName:%s", *GUIDToString(pdidInstance->guidProduct), pdidInstance->tszProductName));
+        SString("DInput EnumJoysticksCallback - guidProduct:{}  ProductName:{}", *GUIDToString(pdidInstance->guidProduct), pdidInstance->tszProductName));
 
     // Skip anything other than the perferred Joystick device as defined by the control panel.
     // Instead you could store all the enumerated Joysticks and let the user pick.
@@ -386,11 +386,11 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
                 m_DevInfo.axis[axisIndex].dwType = pdidoi->dwType;
 
                 m_DevInfo.iAxisCount++;
-                strStatus = SString("Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount);
+                strStatus = SString("Added axis index {}. lMin:{} lMax:{} (iAxisCount:{})", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount);
             }
             else
             {
-                strStatus = SString("Ignoring duplicate axis index %d", axisIndex);
+                strStatus = SString("Ignoring duplicate axis index {}", axisIndex);
             }
         }
         else
@@ -701,7 +701,7 @@ void CJoystickManager::ReadCurrentState()
         bool    bOutputStatus = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::JOYSTICK_0000) && !g_pCore->IsConnected();
         if (bOutputStatus)
         {
-            strStatus += SString("iSaturation:%d iDeadZone:%d\n", m_DevInfo.iSaturation, m_DevInfo.iDeadZone);
+            strStatus += SString("iSaturation:{} iDeadZone:{}\n", m_DevInfo.iSaturation, m_DevInfo.iDeadZone);
         }
 
         if (m_iAutoDeadZoneCounter)
@@ -742,7 +742,7 @@ void CJoystickManager::ReadCurrentState()
                     {
                         DeadZone = iAutoDeadZone * (1 / 100.f);
                         if (m_iAutoDeadZoneCounter == 1)
-                            WriteDebugEvent(SString("CJoystickManager - Changing deadzone for axis %d from %d to %d", a, m_DevInfo.iDeadZone, iAutoDeadZone));
+                            WriteDebugEvent(SString("CJoystickManager - Changing deadzone for axis {} from {} to {}", a, m_DevInfo.iDeadZone, iAutoDeadZone));
                     }
                 }
 
@@ -796,7 +796,7 @@ void CJoystickManager::ReadCurrentState()
             {
                 if (bOutputStatus)
                 {
-                    strStatus += SString("Axis:%d raw:%d\n", a, (&js.lX)[a]);
+                    strStatus += SString("Axis:{} raw:{}\n", a, (&js.lX)[a]);
                 }
             }
         }
@@ -1008,7 +1008,7 @@ bool CJoystickManager::IsXInputDeviceAttached()
         if (Capabilities.SubType < NUMELMS(subTypeNames))
             m_DevInfo.strProductName = subTypeNames[Capabilities.SubType];
         else
-            m_DevInfo.strProductName = SString("Subtype %d", Capabilities.SubType);
+            m_DevInfo.strProductName = SString("Subtype {}", Capabilities.SubType);
 
         m_DevInfo.strGuid = GUIDToString(m_DevInfo.guidProduct);
 

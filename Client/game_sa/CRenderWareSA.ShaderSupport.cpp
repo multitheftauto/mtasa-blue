@@ -313,7 +313,7 @@ void CRenderWareSA::SpecialAddedTexture(RwTexture* texture, const char* szTextur
     if (!szTextureName)
         szTextureName = texture->name;
 
-    OutputDebug(SString("Adding special texture %s", szTextureName));
+    OutputDebug(SString("Adding special texture {}", szTextureName));
 
     CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
 
@@ -336,7 +336,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
     if (!MapContains(m_SpecialTextures, pTex))
         return;
 
-    OutputDebug(SString("Removing special texture (%s)", pTex->name));
+    OutputDebug(SString("Removing special texture ({})", pTex->name));
 
     MapRemove(m_SpecialTextures, pTex);
 
@@ -346,7 +346,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
         STexInfo* pTexInfo = iter->second;
         if (pTexInfo->texTag == pTex)
         {
-            OutputDebug(SString("     %s", *pTexInfo->strTextureName));
+            OutputDebug(SString("     {}", *pTexInfo->strTextureName));
             OnTextureStreamOut(pTexInfo);
             DestroyTexInfo(pTexInfo);
             m_TexInfoMap.erase(iter++);
@@ -676,7 +676,7 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
     else if (dwAddrCalledFrom == ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName)
         strReplacementName = "custom_roadsign_text";
     else if (dwAddrCalledFrom > ADDR_CClothesBuilder_ConstructTextures_Start && dwAddrCalledFrom < ADDR_CClothesBuilder_ConstructTextures_End)
-        strReplacementName = SString("cj_ped_%s", szName);
+        strReplacementName = SString("cj_ped_{}", szName);
 
     if (!strReplacementName.empty())
         pGame->GetRenderWareSA()->SpecialAddedTexture(pTexture, strReplacementName);

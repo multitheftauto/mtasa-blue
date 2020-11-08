@@ -34,7 +34,7 @@ bool CRegistry::SetLastErrorMessage(const std::string& strLastErrorMessage, cons
 {
     m_strLastErrorMessage = strLastErrorMessage;
     m_strLastErrorQuery = strQuery;
-    OutputDebugLine(SString("[Database] %s [Query was:%s]", *m_strLastErrorMessage, *m_strLastErrorQuery));
+    OutputDebugLine(SString("[Database] {} [Query was:{}]", *m_strLastErrorMessage, *m_strLastErrorQuery));
     return false;
 }
 
@@ -445,21 +445,21 @@ bool CRegistry::Query(CRegistryResult* pResult, const char* szQuery, va_list vl)
                 case SQLITE_INTEGER:
                 {
                     int iValue = va_arg(vl, int);
-                    strParsedQuery += SString("%d", iValue);
+                    strParsedQuery += SString("{}", iValue);
                 }
                 break;
 
                 case SQLITE_INTEGER64:
                 {
                     long long int llValue = va_arg(vl, long long int);
-                    strParsedQuery += SString("%lld", llValue);
+                    strParsedQuery += SString("{}", llValue);
                 }
                 break;
 
                 case SQLITE_FLOAT:
                 {
                     double fValue = va_arg(vl, double);
-                    strParsedQuery += SString("%f", fValue);
+                    strParsedQuery += SString("{:f}", fValue);
                 }
                 break;
 
@@ -467,7 +467,7 @@ bool CRegistry::Query(CRegistryResult* pResult, const char* szQuery, va_list vl)
                 {
                     const char* szValue = va_arg(vl, const char*);
                     assert(szValue);
-                    strParsedQuery += SString("'%s'", SQLEscape(szValue, true, false).c_str());
+                    strParsedQuery += SString("'{}'", SQLEscape(szValue, true, false).c_str());
                 }
                 break;
 

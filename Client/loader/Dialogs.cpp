@@ -140,13 +140,13 @@ void InitDialogStrings(HWND hwndDialog, const SDialogItemInfo* dialogItems)
             if (!strItemText.EndsWith(szPrevText) && !SStringX(szPrevText).EndsWith(strItemText))
             {
                 OutputDebugLine(
-                    SString("Possible text mismatch for dialog item (idx:%d id:%d) '%s' (orig:'%s')", i, item.iItemId, item.szItemText, szPrevText));
+                    SString("Possible text mismatch for dialog item (idx:{} id:{}) '{}' (orig:'{}')", i, item.iItemId, item.szItemText, szPrevText));
             }
 #endif
             SetWindowTextW(hwndItem, FromUTF8(strItemText));
         }
         else
-            OutputDebugLine(SString("No dialog item for (idx:%d id:%d) '%s' ", i, item.iItemId, item.szItemText));
+            OutputDebugLine(SString("No dialog item for (idx:{} id:{}) '{}' ", i, item.iItemId, item.szItemText));
     }
 }
 

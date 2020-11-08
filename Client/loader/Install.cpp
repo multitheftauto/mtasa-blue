@@ -59,7 +59,7 @@ bool DoInstallFiles()
     // Clean backup dir
     if (!MkDir(strBakRoot))
     {
-        AddReportLog(5020, SString("InstallFiles: Couldn't make dir '%s'", strBakRoot.c_str()));
+        AddReportLog(5020, SString("InstallFiles: Couldn't make dir '{}'", strBakRoot.c_str()));
         return false;
     }
 
@@ -109,10 +109,10 @@ bool DoInstallFiles()
         {
             if (FileExists(item.strDestPathFilename))
             {
-                AddReportLog(5021, SString("InstallFiles: Couldn't backup '%s' to '%s'", *item.strDestPathFilename, *item.strBackupPathFilename));
+                AddReportLog(5021, SString("InstallFiles: Couldn't backup '{}' to '{}'", *item.strDestPathFilename, *item.strBackupPathFilename));
                 return false;
             }
-            AddReportLog(4023, SString("InstallFiles: Couldn't backup '%s' as it does not exist", *item.strDestPathFilename));
+            AddReportLog(4023, SString("InstallFiles: Couldn't backup '{}' as it does not exist", *item.strDestPathFilename));
         }
     }
 
@@ -127,7 +127,7 @@ bool DoInstallFiles()
             // If copy failed, check if we really need to copy the file
             if (GenerateSha256HexStringFromFile(item.strSrcPathFilename) != GenerateSha256HexStringFromFile(item.strDestPathFilename))
             {
-                AddReportLog(5022, SString("InstallFiles: Couldn't copy '%s' to '%s'", *item.strSrcPathFilename, *item.strDestPathFilename));
+                AddReportLog(5022, SString("InstallFiles: Couldn't copy '{}' to '{}'", *item.strSrcPathFilename, *item.strDestPathFilename));
                 bOk = false;
                 break;
             }
@@ -155,7 +155,7 @@ bool DoInstallFiles()
                 if (!--iRetryCount)
                 {
                     AddReportLog(5023,
-                                 SString("InstallFiles: Possible disaster restoring '%s' to '%s'", *item.strBackupPathFilename, *item.strDestPathFilename));
+                                 SString("InstallFiles: Possible disaster restoring '{}' to '{}'", *item.strBackupPathFilename, *item.strDestPathFilename));
                     bPossibleDisaster = true;
                     break;
                 }
@@ -306,7 +306,7 @@ SString CheckOnRestartCommand()
         }
         else
         {
-            AddReportLog(5052, SString("CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str()));
+            AddReportLog(5052, SString("CheckOnRestartCommand: Unknown restart command {}", strOperation.c_str()));
         }
     }
     return "no update";

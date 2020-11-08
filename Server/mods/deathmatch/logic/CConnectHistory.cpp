@@ -77,10 +77,10 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem(const string& strIP)
     const CConnectHistoryItem& historyItem = iter->second;
     if ( !historyItem.joinTimes.empty () )
     {
-        SString strInfo ( "IP:%s  ", strIP.c_str () );
+        SString strInfo ( "IP:{}  ", strIP.c_str () );
         for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
         {
-            strInfo += SString ( "%u  ", GetModuleTickCount64 () - historyItem.joinTimes[i] );
+            strInfo += SString ( "{}  ", GetModuleTickCount64 () - historyItem.joinTimes[i] );
         }
         strInfo += "\n";
         OutputDebugString ( strInfo );
@@ -165,11 +165,11 @@ SString CConnectHistory::DebugDump(long long llTickCountAdd)
     std::stringstream strOutput;
 
     long long llCurrentTime = GetModuleTickCount64();
-    strOutput << SString("CurrentTime: 0x%llx\n", llCurrentTime);
-    strOutput << SString("TimeLastRemoveExpired: 0x%llx\n", m_llTimeLastRemoveExpired);
-    strOutput << SString("HistoryItems: %d\n", m_HistoryItemMap.size());
-    strOutput << SString("TickCountAdd: 0x%llx\n", llTickCountAdd);
-    strOutput << SString("DebugTickCountOffset: 0x%llx\n", m_llDebugTickCountOffset);
+    strOutput << SString("CurrentTime: 0x{:x}\n", llCurrentTime);
+    strOutput << SString("TimeLastRemoveExpired: 0x{:x}\n", m_llTimeLastRemoveExpired);
+    strOutput << SString("HistoryItems: {}\n", m_HistoryItemMap.size());
+    strOutput << SString("TickCountAdd: 0x{:x}\n", llTickCountAdd);
+    strOutput << SString("DebugTickCountOffset: 0x{:x}\n", m_llDebugTickCountOffset);
 
     // Step through each IP's connect history
     for (HistoryItemMap::iterator mapIt = m_HistoryItemMap.begin(); mapIt != m_HistoryItemMap.end(); ++mapIt)
@@ -178,12 +178,12 @@ SString CConnectHistory::DebugDump(long long llTickCountAdd)
         const CConnectHistoryItem& historyItem = mapIt->second;
         if (!historyItem.joinTimes.empty())
         {
-            SString strInfo("IP:%s  ", strIP.c_str());
+            SString strInfo("IP:{}  ", strIP.c_str());
             for (unsigned int i = 0; i < historyItem.joinTimes.size(); i++)
             {
                 long long llTime = historyItem.joinTimes[i];
                 long long llAge = llCurrentTime - historyItem.joinTimes[i];
-                strInfo += SString("%lld(0x%llx)  ", llAge, llTime);
+                strInfo += SString("{}(0x{:x})  ", llAge, llTime);
             }
             strInfo += "\n";
             strOutput << strInfo;

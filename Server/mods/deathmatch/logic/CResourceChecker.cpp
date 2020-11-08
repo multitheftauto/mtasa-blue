@@ -328,11 +328,11 @@ void CResourceChecker::CheckMetaSourceForIssues(CXMLNode* pRootNode, const strin
         {
             SString strTemp = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
             if (m_strReqClientVersion > m_strMinClientFromMetaXml)
-                strTemp += SString("client %s because of '%s')", *m_strReqClientVersion, *m_strReqClientReason);
+                strTemp += SString("client {} because of '{}')", *m_strReqClientVersion, *m_strReqClientReason);
             else if (m_strReqServerVersion > m_strMinServerFromMetaXml)
-                strTemp += SString("server %s because of '%s')", *m_strReqServerVersion, *m_strReqServerReason);
+                strTemp += SString("server {} because of '{}')", *m_strReqServerVersion, *m_strReqServerReason);
 
-            CLogger::LogPrint(SString("WARNING: %s %s\n", strResourceName.c_str(), *strTemp));
+            CLogger::LogPrint(SString("WARNING: {} {}\n", strResourceName.c_str(), *strTemp));
         }
         else if (checkerMode == ECheckerMode::UPGRADE)
         {
@@ -438,8 +438,8 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
         if (bClientScript && IsLuaCompiledScript(strFileContents.c_str(), strFileContents.length()))
         {
             // Compiled client script with no version info
-            SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", strFileName.c_str());
-            CLogger::LogPrint(SString("ERROR: %s %s\n", strResourceName.c_str(), *strMessage));
+            SString strMessage("{} is invalid. Please re-compile at http://luac.mtasa.com/", strFileName.c_str());
+            CLogger::LogPrint(SString("ERROR: {} {}\n", strResourceName.c_str(), *strMessage));
         }
         return false;
     }
@@ -711,7 +711,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
                        bClientScript ? "Client" : "Server", strVersion.c_str());
     }
 
-    CLogger::LogPrint(SString("WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str(), strFileName.c_str(), ulLineNumber,
+    CLogger::LogPrint(SString("WARNING: {}/{}(Line {}) [{}] {}\n", strResourceName.c_str(), strFileName.c_str(), ulLineNumber,
                               bClientScript ? "Client" : "Server", *strTemp));
 }
 
@@ -819,7 +819,7 @@ bool CResourceChecker::RenameBackupFile(const string& strOrigFilename, const str
             CLogger::LogPrintf("Unable to rename %s to %s\n", strOrigFilename.c_str(), strBakFilename.c_str());
             return false;
         }
-        strBakFilename = strOrigFilename + strBakAppend + "_" + SString("%d", i + 1);
+        strBakFilename = strOrigFilename + strBakAppend + "_" + SString("{}", i + 1);
     }
     return true;
 }

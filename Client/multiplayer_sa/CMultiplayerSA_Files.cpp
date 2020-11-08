@@ -39,7 +39,7 @@ void OnMY_Rtl_fopen_Post(FILE* fh, DWORD calledFrom, const char* szFilename, con
                 return;
         }
 
-        AddReportLog(5321, SString("Rtl_fopen failed: called from:%08x  mode:%s  name:%s", calledFrom, szMode, *strFilename));
+        AddReportLog(5321, SString("Rtl_fopen failed: called from:{:08x}  mode:{}  name:{}", calledFrom, szMode, *strFilename));
         SetApplicationSetting("diagnostics", "gta-fopen-fail", strFilename);
     }
 }

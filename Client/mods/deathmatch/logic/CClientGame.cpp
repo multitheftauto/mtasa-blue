@@ -917,7 +917,7 @@ void CClientGame::DoPulsePostFrame()
                 vecPosition.fY += 0.03f;
                 pVehicle = *iter;
 
-                SString strBuffer("ID: %u (%s)", pVehicle->GetID(), pVehicle->GetNamePointer());
+                SString strBuffer("ID: {} ({})", pVehicle->GetID(), pVehicle->GetNamePointer());
 
                 m_pDisplayManager->DrawText2D(strBuffer, vecPosition, 1.0f, 0xFFFFFFFF);
             }
@@ -994,9 +994,9 @@ void CClientGame::DoPulses()
         if (uiLevel)
         {
             SString strPrefix = (uiInform == 2) ? "AC" : (uiInform == 1) ? "VF" : "SD";
-            SString strMessageCombo = SString("%s #%d %s", *strPrefix, uiLevel, strMessage.c_str()).TrimEnd(" ");
+            SString strMessageCombo = SString("{} #{} {}", *strPrefix, uiLevel, strMessage.c_str()).TrimEnd(" ");
             m_llLastTransgressionTime = GetTickCount64_();
-            AddReportLog(3100, strMessageCombo + SString(" (%d)", uiInform));
+            AddReportLog(3100, strMessageCombo + SString(" ({})", uiInform));
 
             if (uiInform > 0)
             {
@@ -1010,8 +1010,8 @@ void CClientGame::DoPulses()
             else
             {
                 // Otherwise, disconnect here
-                AddReportLog(7105, SString("Core - Kicked (%s)", *strMessageCombo));
-                g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( %s )"), *strMessageCombo),
+                AddReportLog(7105, SString("Core - Kicked ({})", *strMessageCombo));
+                g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( {} )"), *strMessageCombo),
                                         MB_BUTTON_OK | MB_ICON_ERROR);
                 g_pCore->GetModManager()->RequestUnload();
                 return;
@@ -2941,7 +2941,7 @@ void CClientGame::DrawFPS()
     }
     else
         x++;
-    SString strBuffer("FrameRate: %4.2f\n", fDisp);
+    SString strBuffer("FrameRate: {:4.2f}\n", fDisp);
 
     // Print it
     m_pDisplayManager->DrawText2D(strBuffer, CVector(0.76f, 0.23f, 0), 1.0f, 0xFFFFFFFF);
@@ -2971,48 +2971,48 @@ void CClientGame::DrawTasks(CClientPlayer* pPlayer)
         SString strSubOutput;
 
         pTask = man->GetTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
-        strOutput += SString("Physical Response: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Physical Response: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
-        strOutput += SString("Event Response Temp: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Event Response Temp: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-        strOutput += SString("Event Response Non-temp: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Event Response Non-temp: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTask(TASK_PRIORITY_PRIMARY);
-        strOutput += SString("Primary: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Primary: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTask(TASK_PRIORITY_DEFAULT);
-        strOutput += SString("Default: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Default: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTaskSecondary(TASK_SECONDARY_ATTACK);
-        strOutput += SString("Secondary Attack: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Secondary Attack: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTaskSecondary(TASK_SECONDARY_DUCK);
-        strOutput += SString("Secondary Duck: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Secondary Duck: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTaskSecondary(TASK_SECONDARY_SAY);
-        strOutput += SString("Secondary Say: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Secondary Say: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTaskSecondary(TASK_SECONDARY_FACIAL_COMPLEX);
-        strOutput += SString("Secondary Facial Complex: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Secondary Facial Complex: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM);
-        strOutput += SString("Secondary Partial Anim: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Secondary Partial Anim: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         pTask = man->GetTaskSecondary(TASK_SECONDARY_IK);
-        strOutput += SString("Secondary IK: %s\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
-        strSubOutput += SString("%s\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
+        strOutput += SString("Secondary IK: {}\n", pTask ? (pTask->GetTaskName()) : ("N/A"));
+        strSubOutput += SString("{}\n", pTask && pTask->GetSubTask() ? (pTask->GetSubTask()->GetTaskName()) : ("N/A"));
 
         m_pDisplayManager->DrawText2D(strOutput, CVector(0.05f, 0.5f, 0), 1.0f);
         m_pDisplayManager->DrawText2D(strSubOutput, CVector(0.5f, 0.5f, 0), 1.0f);
@@ -4053,7 +4053,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if ((DWORD)pAnimAssocGroupInterface < 0x250)
     {
         g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
-                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+                          SString("pAnimAssocGroupInterface = {:p} | AnimID = {}", pAnimAssocGroupInterface, animID), 542);
     }
 
     auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
@@ -4061,7 +4061,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
     {
         g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
-                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+                          SString("pAnimAssocGroupInterface = {:p} | AnimID = {}", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
     eAnimGroup iGroupID = pAnimAssocGroup->GetGroupID();
@@ -4069,7 +4069,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if (iGroupID == eAnimGroup::ANIM_GROUP_NONE || pAnimAssocGroup->GetAnimBlock() == nullptr)
     {
         g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
-                          SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
+                          SString("GetAnimBlock() = {:p} | GroupID = {}", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
         return false;
     }
 
@@ -4377,13 +4377,13 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
                 {
                     if (g_iDamageEventLimit == 0)
                     {
-                        AddReportLog(5501, SString("2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed));
+                        AddReportLog(5501, SString("2nd pass 1 for BulletSyncShot damage. weaponUsed:{}", weaponUsed));
                         return false;
                     }
                     g_iDamageEventLimit--;
                     if (!bBulletSyncWeapon)
                     {
-                        AddReportLog(5502, SString("BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed));
+                        AddReportLog(5502, SString("BulletSyncShot but not bBulletSyncWeapon. weaponUsed:{}", weaponUsed));
                         return false;
                     }
                 }
@@ -4391,7 +4391,7 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
                 {
                     if (bBulletSyncWeapon)
                     {
-                        AddReportLog(5503, SString("not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed));
+                        AddReportLog(5503, SString("not BulletSyncShot but bBulletSyncWeapon. weaponUsed:{}", weaponUsed));
                         return false;
                     }
                 }
@@ -6713,19 +6713,19 @@ bool CClientGame::IsUsingAlternatePulseOrder(bool bAdvanceDelayCounter)
 void CClientGame::OutputServerInfo()
 {
     SString strTotalOutput;
-    strTotalOutput += SString("Server info for %s", g_pNet->GetConnectedServer(true));
+    strTotalOutput += SString("Server info for {}", g_pNet->GetConnectedServer(true));
     strTotalOutput += "\n";
-    strTotalOutput += SString("Ver: %s\n", *GetServerVersionSortable());
-    strTotalOutput += SString("AC: %s\n", *m_strACInfo);
+    strTotalOutput += SString("Ver: {}\n", *GetServerVersionSortable());
+    strTotalOutput += SString("AC: {}\n", *m_strACInfo);
 
     {
         SString strVoice;
         if (m_pVoiceRecorder && m_pVoiceRecorder->IsEnabled())
-            strVoice += SString("Enabled - Sample rate:%d  Quality:%d", m_pVoiceRecorder->GetSampleRate(), m_pVoiceRecorder->GetSampleQuality());
+            strVoice += SString("Enabled - Sample rate:{}  Quality:{}", m_pVoiceRecorder->GetSampleRate(), m_pVoiceRecorder->GetSampleQuality());
         else
             strVoice += "Disabled";
 
-        strTotalOutput += SString("Voice: %s\n", *strVoice);
+        strTotalOutput += SString("Voice: {}\n", *strVoice);
     }
 
     {
@@ -6741,12 +6741,12 @@ void CClientGame::OutputServerInfo()
                 if (i < NUMELMS(szGlitchNames))
                     strEnabledGlitches += szGlitchNames[i];
                 else
-                    strEnabledGlitches += SString("Unknown(#%d)", i + 1);
+                    strEnabledGlitches += SString("Unknown(#{})", i + 1);
             }
         }
         if (strEnabledGlitches.empty())
             strEnabledGlitches = "None";
-        strTotalOutput += SString("Glitches: %s\n", *strEnabledGlitches);
+        strTotalOutput += SString("Glitches: {}\n", *strEnabledGlitches);
     }
 
     {
@@ -6756,21 +6756,21 @@ void CClientGame::OutputServerInfo()
             eWeaponType weaponType = *iter;
             if (!strEnabledBulletSync.empty())
                 strEnabledBulletSync += ",";
-            strEnabledBulletSync += SString("%d", weaponType);
+            strEnabledBulletSync += SString("{}", weaponType);
         }
         if (strEnabledBulletSync.empty())
             strEnabledBulletSync = "None";
-        strTotalOutput += SString("Bullet sync weapons: %s\n", *strEnabledBulletSync);
+        strTotalOutput += SString("Bullet sync weapons: {}\n", *strEnabledBulletSync);
     }
 
     {
         SString strVehExtrapolate;
         if (m_VehExtrapolateSettings.bEnabled)
-            strVehExtrapolate += SString("Amount:%d%%  (LimitMs:%d)", m_VehExtrapolateSettings.iScalePercent, m_VehExtrapolateSettings.iMaxMs);
+            strVehExtrapolate += SString("Amount:{}%  (LimitMs:{})", m_VehExtrapolateSettings.iScalePercent, m_VehExtrapolateSettings.iMaxMs);
         else
             strVehExtrapolate += "Disabled";
 
-        strTotalOutput += SString("Vehicle extrapolation: %s\n", *strVehExtrapolate);
+        strTotalOutput += SString("Vehicle extrapolation: {}\n", *strVehExtrapolate);
     }
 
     {
@@ -6779,14 +6779,14 @@ void CClientGame::OutputServerInfo()
                                 g_TickRateSettings.iPedSync, g_TickRateSettings.iUnoccupiedVehicle, g_TickRateSettings.iKeySyncRotation,
                                 g_TickRateSettings.iKeySyncAnalogMove);
 
-        strTotalOutput += SString("Tick rates: %s\n", *strTickRates);
+        strTotalOutput += SString("Tick rates: {}\n", *strTickRates);
     }
 
     {
         SString strSyncerDists;
-        strSyncerDists += SString("Ped:%d  UnoccupiedVehicle:%d ", g_TickRateSettings.iPedSyncerDistance, g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+        strSyncerDists += SString("Ped:{}  UnoccupiedVehicle:{} ", g_TickRateSettings.iPedSyncerDistance, g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
 
-        strTotalOutput += SString("Syncer distances: %s\n", *strSyncerDists);
+        strTotalOutput += SString("Syncer distances: {}\n", *strSyncerDists);
     }
 
     g_pCore->GetConsole()->Print(strTotalOutput);
@@ -6812,7 +6812,7 @@ void CClientGame::TellServerSomethingImportant(uint uiId, const SString& strMess
     }
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    pBitStream->WriteString(SString("%d,%s", uiId, *strMessage));
+    pBitStream->WriteString(SString("{},{}", uiId, *strMessage));
     g_pNet->SendPacket(PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE);
     g_pNet->DeallocateNetBitStream(pBitStream);
 }
@@ -6884,7 +6884,7 @@ void CClientGame::SetFileCacheRoot()
     {
         // Not sharing, so use current mod directory
         m_strFileCacheRoot = GetModRoot();
-        AddReportLog(7410, SString("CClientGame::SetFileCacheRoot - Not shared '%s'", *m_strFileCacheRoot));
+        AddReportLog(7410, SString("CClientGame::SetFileCacheRoot - Not shared '{}'", *m_strFileCacheRoot));
     }
     else
     {
@@ -6904,7 +6904,7 @@ void CClientGame::SetFileCacheRoot()
                     FileDelete(strTestFileName);
                     // Use shared directory
                     m_strFileCacheRoot = strFileCachePath;
-                    AddReportLog(7411, SString("CClientGame::SetFileCacheRoot - Is shared '%s'", *m_strFileCacheRoot));
+                    AddReportLog(7411, SString("CClientGame::SetFileCacheRoot - Is shared '{}'", *m_strFileCacheRoot));
                     return;
                 }
             }
@@ -6915,9 +6915,9 @@ void CClientGame::SetFileCacheRoot()
         SetCommonRegistryValue("", "File Cache Path", m_strFileCacheRoot);
 
         if (strFileCachePath.empty())
-            AddReportLog(7412, SString("CClientGame::SetFileCacheRoot - Initial setting '%s'", *m_strFileCacheRoot));
+            AddReportLog(7412, SString("CClientGame::SetFileCacheRoot - Initial setting '{}'", *m_strFileCacheRoot));
         else
-            AddReportLog(7413, SString("CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot));
+            AddReportLog(7413, SString("CClientGame::SetFileCacheRoot - Change shared from '{}' to '{}'", *strFileCachePath, *m_strFileCacheRoot));
     }
 }
 

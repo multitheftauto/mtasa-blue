@@ -159,9 +159,9 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
     {
         if (!m_strDefaultResourceName.empty())
         {
-            SString strWelcome("<a href='/%s/'>This is the page you want</a>", m_strDefaultResourceName.c_str());
+            SString strWelcome("<a href='/{}/'>This is the page you want</a>", m_strDefaultResourceName.c_str());
             ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
-            SString strNewURL("http://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str());
+            SString strNewURL("http://{}/{}/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str());
             ipoHttpResponse->oResponseHeaders["location"] = strNewURL.c_str();
             return HTTPRESPONSECODE_302_FOUND;
         }
@@ -180,7 +180,7 @@ ResponseCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipo
     if (m_WarnMessageTimer.Get() < 4000 && m_strWarnMessageForIp == ipoHttpRequest->GetAddress())
     {
         SString strMessage;
-        strMessage += SString("Your IP address ('%s') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str());
+        strMessage += SString("Your IP address ('{}') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str());
         strMessage += SString("<br/><a href='%s'>See here for more information</a>",
                               "https:"
                               "//mtasa.com/authserialhttp");
@@ -190,7 +190,7 @@ ResponseCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipo
 
     const char* szAuthenticateMessage = "Access denied, please login";
     ipoHttpResponse->SetBody(szAuthenticateMessage, strlen(szAuthenticateMessage));
-    SString strName("Basic realm=\"%s\"", g_pGame->GetConfig()->GetServerName().c_str());
+    SString strName("Basic realm=\"{}\"", g_pGame->GetConfig()->GetServerName().c_str());
     ipoHttpResponse->oResponseHeaders["WWW-Authenticate"] = strName.c_str();
     return HTTPRESPONSECODE_401_UNAUTHORIZED;
 }

@@ -33,7 +33,7 @@ void CClientEntityRefManager::AddEntityRefs(const char* szDebugInfo, ...)
         CClientEntity** ppEntity = va_arg(vl, CClientEntity**);
         if (ppEntity == NULL)
             break;
-        MapSet(ms_EntityRefListDebugInfo, ppEntity, SString("Index:%d Addr:0x%s", i, szDebugInfo));
+        MapSet(ms_EntityRefListDebugInfo, ppEntity, SString("Index:{} Addr:0x{}", i, szDebugInfo));
     }
     va_end(vl);
 #endif
@@ -106,7 +106,7 @@ void CClientEntityRefManager::OnEntityDelete(CClientEntity* pEntity)
 #ifdef MTA_DEBUG
         SString*    pstrDebugInfo = MapFind(ms_EntityRefListDebugInfo, ppPtr);
         const char* szDebugInfo = pstrDebugInfo ? **pstrDebugInfo : pEntity->GetClassName();
-        OutputDebugLine(SString("[EntityRef] Did null %s (%08x @ %08x)", szDebugInfo, pEntity, ppPtr));
+        OutputDebugLine(SString("[EntityRef] Did null {} ({:08x} @ {:08x})", szDebugInfo, pEntity, ppPtr));
 #endif
         // Check CClientEntityPtr size as we are going to manually poke it
         dassert(sizeof(CClientEntityPtr) == sizeof(CClientEntity*));

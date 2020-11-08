@@ -203,5 +203,5 @@ SString CNickGen::GetRandomNickname()
     srand((unsigned int)time(NULL));
     int iAdjective = rand() % NICKGEN_NUM_ADJECTIVES;
     int iNoun = rand() % NICKGEN_NUM_NOUNS;
-    return SString("%s%s%i", m_szAdjectives[iAdjective], m_szNouns[iNoun], rand() % 100);
+    return SString("{}{}{}", m_szAdjectives[iAdjective], m_szNouns[iNoun], rand() % 100);
 }

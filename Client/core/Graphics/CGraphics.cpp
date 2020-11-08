@@ -1358,7 +1358,7 @@ bool CGraphics::LoadStandardDXFonts()
         {
             SString strFileMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPathFilename);
             uint    uiFileSize = (uint)FileSize(strPathFilename);
-            AddReportLog(9442, SString("Problem with AddFontResourceEx [MD5:%s Size:%d] %s ", *strFileMd5, uiFileSize, *strPathFilename));
+            AddReportLog(9442, SString("Problem with AddFontResourceEx [MD5:{} Size:{}] {} ", *strFileMd5, uiFileSize, *strPathFilename));
             if (!FileExists(strPathFilename))
             {
                 BrowseToSolution("mta-datafiles-missing", EXIT_GAME_FIRST | ASK_GO_ONLINE, "Error loading MTA font " + m_FontResourceNames[i]);
@@ -1383,7 +1383,7 @@ bool CGraphics::LoadStandardDXFonts()
             }
         }
 
-        SString strMessage("Could not create Direct3D font '%s'", fontInfos[i].szName);
+        SString strMessage("Could not create Direct3D font '{}'", fontInfos[i].szName);
         WriteErrorEvent(strMessage);
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
     }
@@ -1425,7 +1425,7 @@ bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFon
     if (!SUCCEEDED(D3DXCreateFont(m_pDevice, uiHeight, 0, iWeight, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ulQuality, DEFAULT_PITCH | FF_DONTCARE,
                                   strFontName.c_str(), ppD3DXFont)))
     {
-        WriteErrorEvent(SString("Could not create Direct3D font '%s'", strFontName.c_str()));
+        WriteErrorEvent(SString("Could not create Direct3D font '{}'", strFontName.c_str()));
         bSuccess = false;
     }
 

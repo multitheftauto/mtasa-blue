@@ -331,8 +331,8 @@ void HandleResetSettings()
             }
             else
             {
-                AddReportLog(5054, SString("Delete gta_sa.set failed with '%s'", *strSettingsFilename));
-                MessageBoxUTF8(NULL, SString(_("File could not be deleted: '%s'"), *strSettingsFilename), "Error" + _E("CL09"),
+                AddReportLog(5054, SString("Delete gta_sa.set failed with '{}'", *strSettingsFilename));
+                MessageBoxUTF8(NULL, SString(_("File could not be deleted: '{}'"), *strSettingsFilename), "Error" + _E("CL09"),
                                MB_OK | MB_ICONWARNING | MB_TOPMOST);
             }
         }
@@ -456,7 +456,7 @@ void HandleCustomStartMessage()
             _("WARNING\n\n"
               "MTA:SA has detected unusual activity.\n"
               "Please run a virus scan to ensure your system is secure.\n\n");
-        strStartMessage += SString(_("The detected file was:  %s\n"), *strFilename);
+        strStartMessage += SString(_("The detected file was:  {}\n"), *strFilename);
     }
 
     DisplayErrorMessageBox(strStartMessage, _E("CL37"), strTrouble);
@@ -666,11 +666,11 @@ void CheckAntiVirusStatus()
     }
 
     // Dump results
-    SString strStatus("AV health: %s (%d)", *EnumToString(health), health);
+    SString strStatus("AV health: {} ({})", *EnumToString(health), health);
     for (uint i = 0; i < enabledList.size(); i++)
-        strStatus += SString(" [Ena%d:%s]", i, *enabledList[i]);
+        strStatus += SString(" [Ena{}:{}]", i, *enabledList[i]);
     for (uint i = 0; i < disabledList.size(); i++)
-        strStatus += SString(" [Dis%d:%s]", i, *disabledList[i]);
+        strStatus += SString(" [Dis{}:{}]", i, *disabledList[i]);
     WriteDebugEvent(strStatus);
 
     // Maybe show dialog if av not found
@@ -705,7 +705,7 @@ void CheckAntiVirusStatus()
                             if (libVersionInfo.strCompanyName.ContainsI(avProducts[i]) || libVersionInfo.strProductName.ContainsI(avProducts[i]))
                             {
                                 bEnableScaremongering = false;
-                                WriteDebugEvent(SString("AV (module) maybe found %s [%d](%s,%s)", *WStringX(szModulePathFileName).ToAnsi(), i,
+                                WriteDebugEvent(SString("AV (module) maybe found {} [{}]({},{})", *WStringX(szModulePathFileName).ToAnsi(), i,
                                                         *libVersionInfo.strCompanyName, *libVersionInfo.strProductName));
                             }
                         }
@@ -713,7 +713,7 @@ void CheckAntiVirusStatus()
                 }
 
                 if (bEnableScaremongering)
-                    WriteDebugEvent(SString("AV Searched %d dlls, but could not find av helper", cModules));
+                    WriteDebugEvent(SString("AV Searched {} dlls, but could not find av helper", cModules));
             }
 
             if (bEnableScaremongering)
@@ -785,14 +785,14 @@ void CheckDataFiles()
     // Check for client file
     if (!FileExists(PathJoin(strMTASAPath, CHECK_DM_CLIENT_NAME)))
     {
-        DisplayErrorMessageBox(SString(_("Load failed. Please ensure that %s is installed correctly."), CHECK_DM_CLIENT_NAME), _E("CL18"), "client-missing");
+        DisplayErrorMessageBox(SString(_("Load failed. Please ensure that {} is installed correctly."), CHECK_DM_CLIENT_NAME), _E("CL18"), "client-missing");
         return ExitProcess(EXIT_ERROR);
     }
 
     // Make sure the gta executable exists
     if (!FileExists(PathJoin(strGTAPath, MTA_GTAEXE_NAME)))
     {
-        DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str()), _E("CL20"), "gta_sa-missing");
+        DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in {}."), strGTAPath.c_str()), _E("CL20"), "gta_sa-missing");
         return ExitProcess(EXIT_ERROR);
     }
 
@@ -802,7 +802,7 @@ void CheckDataFiles()
     {
         if (FileExists(PathJoin(strGTAPath, dllCheckList[i])))
         {
-            DisplayErrorMessageBox(SString(_("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllCheckList[i]), _E("CL21"),
+            DisplayErrorMessageBox(SString(_("Load failed. {} exists in the GTA directory. Please delete before continuing."), dllCheckList[i]), _E("CL21"),
                                    "file-clash");
             return ExitProcess(EXIT_ERROR);
         }
@@ -811,7 +811,7 @@ void CheckDataFiles()
     // Check main exe has the correct name
     if (GetLaunchFilename().CompareI(MTA_EXE_NAME) == false)
     {
-        SString strMessage(_("Main file has an incorrect name (%s)"), *GetLaunchFilename());
+        SString strMessage(_("Main file has an incorrect name ({})"), *GetLaunchFilename());
         int     iResponse = MessageBoxUTF8(NULL, strMessage, _("Error") + _E("CL33"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST);
         ReleaseSingleInstanceMutex();
         if (iResponse == IDRETRY)
@@ -874,7 +874,7 @@ void CheckDataFiles()
     if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
     {
         SString fileHash = CMD5Hasher::CalculateHexString(filePath);
-        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: {})", *fileHash));
 
         ShowD3dDllDialog(g_hInstance, filePath);
         HideD3dDllDialog();
@@ -931,7 +931,7 @@ void CheckLibVersions()
             {
                 DisplayErrorMessageBox(SStringX(_("File version mismatch error."
                                                   " Reinstall MTA:SA if you experience problems.\n") +
-                                                SString("\n[%s %s/%s]\n", *strFilename, *strFileVersion, *strReqFileVersion)),
+                                                SString("\n[{} {}/{}]\n", *strFilename, *strFileVersion, *strReqFileVersion)),
                                        _E("CL40"), "bad-file-version");
                 break;
             }
@@ -940,7 +940,7 @@ void CheckLibVersions()
         {
             DisplayErrorMessageBox(SStringX(_("Some files are missing."
                                               " Reinstall MTA:SA if you experience problems.\n") +
-                                            SString("\n[%s]\n", *strFilename)),
+                                            SString("\n[{}]\n", *strFilename)),
                                    _E("CL41"), "missing-file");
             break;
         }
@@ -1109,7 +1109,7 @@ int LaunchGame(SString strCmdLine)
     // Add server connection after update to command line
     SString strPostUpdateConnect = GetPostUpdateConnect();
     if (!strPostUpdateConnect.empty() && strCmdLine.empty())
-        strCmdLine = SString("mtasa://%s", *strPostUpdateConnect);
+        strCmdLine = SString("mtasa://{}", *strPostUpdateConnect);
 
     WString wstrCmdLine = FromUTF8(strCmdLine);
 
@@ -1123,7 +1123,7 @@ int LaunchGame(SString strCmdLine)
                                                    FromUTF8(strMtaDir),            //    strMTASAPath\mta is used so pthreadVC2.dll can be found
                                                    &piLoadee, dwError, strErrorContext))
     {
-        WriteDebugEvent(SString("Loader - Process not created[%d (%s)]: %s", dwError, *strErrorContext, *strGTAEXEPath));
+        WriteDebugEvent(SString("Loader - Process not created[{} ({})]: {}", dwError, *strErrorContext, *strGTAEXEPath));
 
         if (dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin)
         {
@@ -1144,14 +1144,14 @@ int LaunchGame(SString strCmdLine)
         }
     }
 
-    WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
-    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
+    WriteDebugEvent(SString("Loader - Process created: {} {}", *strGTAEXEPath, *GetApplicationSetting("serial")));
+    WriteDebugEvent(SString("Loader - Process ID: {}, Thread ID: {}", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Inject the core into GTA
     SetDllDirectory(strMtaDir);
     SString strCoreDLL = PathJoin(strMTASAPath, "mta", MTA_DLL_NAME);
     RemoteLoadLibrary(piLoadee.hProcess, FromUTF8(strCoreDLL));
-    WriteDebugEvent(SString("Loader - Core injected: %s", *strCoreDLL));
+    WriteDebugEvent(SString("Loader - Core injected: {}", *strCoreDLL));
     AddReportLog(7103, "Loader - Core injected");
 
     // Clear previous on quit commands

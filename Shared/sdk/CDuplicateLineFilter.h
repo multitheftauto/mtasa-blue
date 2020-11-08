@@ -141,7 +141,7 @@ public:
         const SOutputLine& line = m_PendingOutput.front();
         outLine = line;
         if (line.uiDupCount > 1)
-            outLine += SString("  [DUP x%u]", line.uiDupCount);
+            outLine += SString("  [DUP x{}]", line.uiDupCount);
         m_PendingOutput.pop_front();
         return true;
     }

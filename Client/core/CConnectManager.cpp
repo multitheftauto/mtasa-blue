@@ -128,7 +128,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     SString strAddress = inet_ntoa(m_Address);
     if (m_usPort && !pNet->StartNetwork(strAddress, m_usPort, CVARS_GET_VALUE<bool>("packet_tag")))
     {
-        SString strBuffer(_("Connecting to %s at port %u failed!"), m_strHost.c_str(), m_usPort);
+        SString strBuffer(_("Connecting to {} at port {} failed!"), m_strHost.c_str(), m_usPort);
         CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Failed to connect
         return false;
     }
@@ -139,7 +139,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
 
     // Load server password
     if (m_strPassword.empty())
-        m_strPassword = CServerBrowser::GetSingletonPtr()->GetServerPassword(m_strHost + ":" + SString("%u", m_usPort));
+        m_strPassword = CServerBrowser::GetSingletonPtr()->GetServerPassword(m_strHost + ":" + SString("{}", m_usPort));
 
     // Start server version detection
     SAFE_DELETE(m_pServerItem);
@@ -149,9 +149,9 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     OpenServerFirewall(m_Address, CServerBrowser::GetSingletonPtr()->FindServerHttpPort(m_strHost, m_usPort), true);
 
     // Display the status box
-    SString strBuffer(_("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort);
+    SString strBuffer(_("Connecting to {}:{} ..."), m_strHost.c_str(), m_usPort);
     CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
-    WriteDebugEvent(SString("Connecting to %s:%u ...", m_strHost.c_str(), m_usPort));
+    WriteDebugEvent(SString("Connecting to {}:{} ...", m_strHost.c_str(), m_usPort));
 
     return true;
 }
@@ -370,7 +370,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             if (strModName != "")
             {
                 // Populate the arguments to pass it (-c host port nick)
-                SString strArguments("%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
+                SString strArguments("{} {}", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
@@ -423,7 +423,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             if (ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA)
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton().ShowNetErrorMessageBox(_("Error") + _E("CC33"), _("Bad server response (1)") + SString(" [%d]", ucPacketID));
+                CCore::GetSingleton().ShowNetErrorMessageBox(_("Error") + _E("CC33"), _("Bad server response (1)") + SString(" [{}]", ucPacketID));
                 g_pConnectManager->Abort();
             }
         }
@@ -481,7 +481,7 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SHttpRequestOptions options;
         options.uiConnectionAttempts = 1;
         options.uiConnectTimeoutMs = uiTimeOut;
-        SString strDummyUrl("http://%s:%d/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
+        SString strDummyUrl("http://{}:{}/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
     if (usHttpPort == 0 || bHighPriority)
@@ -490,7 +490,7 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SHttpRequestOptions options;
         options.uiConnectionAttempts = 1;
         options.uiConnectTimeoutMs = uiTimeOut;
-        SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
+        SString strDummyUrl("http://{}/mta_client_firewall_probe/", inet_ntoa(Address));
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
 }

@@ -695,14 +695,14 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
             CLuaArguments Arguments;
             Arguments.PushNumber(eventInfo.dNumber);
             CallEvent("onClientSoundFinishedDownload", Arguments, true);
-            OutputDebugLine(SString("[ClientSound] onClientSoundFinishedDownload %f", eventInfo.dNumber));
+            OutputDebugLine(SString("[ClientSound] onClientSoundFinishedDownload {:f}", eventInfo.dNumber));
         }
         else if (eventInfo.type == SOUND_EVENT_CHANGED_META)
         {
             CLuaArguments Arguments;
             Arguments.PushString(eventInfo.strString);
             CallEvent("onClientSoundChangedMeta", Arguments, true);
-            OutputDebugLine(SString("[ClientSound] onClientSoundChangedMeta %s", *eventInfo.strString));
+            OutputDebugLine(SString("[ClientSound] onClientSoundChangedMeta {}", *eventInfo.strString));
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
         {
@@ -714,7 +714,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
             Arguments.PushString(eventInfo.strError);
             CallEvent("onClientSoundStream", Arguments, true);
             OutputDebugLine(
-                SString("[ClientSound] onClientSoundStream %d %f %s %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString, *eventInfo.strError));
+                SString("[ClientSound] onClientSoundStream {} {:f} {} {}", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString, *eventInfo.strError));
         }
         else if (eventInfo.type == SOUND_EVENT_BEAT)
         {

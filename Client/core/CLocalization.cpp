@@ -55,7 +55,7 @@ SString CLocalization::ValidateLocale(SString strLocale)
 void CLocalization::SetCurrentLanguage(SString strLocale)
 {
     strLocale = ValidateLocale(strLocale);
-    WriteDebugEvent(SString("Localization set to '%s'", strLocale.c_str()));
+    WriteDebugEvent(SString("Localization set to '{}'", strLocale.c_str()));
 
     // Update our locale setting with full country code, now that we've matched it
     if (g_pCore)

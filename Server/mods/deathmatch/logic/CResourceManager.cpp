@@ -834,14 +834,14 @@ CResource* CResourceManager::CreateResource(const SString& strNewResourceName, c
     // Does the resource name already exist?
     if (GetResource(strNewResourceName) != NULL)
     {
-        strOutStatus = SString("CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName);
+        strOutStatus = SString("CreateResource - Could not create '{}' as the resource already exists\n", *strNewResourceName);
         return NULL;
     }
 
     // Is it a valid path?
     if (!IsValidFilePath(strRelResourceLocation) || !IsValidOrganizationPath(strNewOrganizationalPath))
     {
-        strOutStatus = SString("CreateResource - Could not create '%s' as the provided path is invalid", *strNewResourceName);
+        strOutStatus = SString("CreateResource - Could not create '{}' as the provided path is invalid", *strNewResourceName);
         return NULL;
     }
 
@@ -853,7 +853,7 @@ CResource* CResourceManager::CreateResource(const SString& strNewResourceName, c
     CXMLFile* pXML = g_pServerInterface->GetXML()->CreateXML(strMetaPath);
     if (!pXML)
     {
-        strOutStatus = SString("CreateResource - Could not create '%s'\n", *strMetaPath);
+        strOutStatus = SString("CreateResource - Could not create '{}'\n", *strMetaPath);
         return NULL;
     }
     else
@@ -863,7 +863,7 @@ CResource* CResourceManager::CreateResource(const SString& strNewResourceName, c
         if (!pXML->Write())
         {
             delete pXML;
-            strOutStatus = SString("CreateResource - Could not save '%s'\n", *strMetaPath);
+            strOutStatus = SString("CreateResource - Could not save '{}'\n", *strMetaPath);
             return NULL;
         }
 
@@ -903,28 +903,28 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
     // Is the source resource loaded
     if (!pSourceResource->IsLoaded())
     {
-        strOutStatus = SString("Could not copy '%s' as the resource is not loaded\n", *strSrcResourceName);
+        strOutStatus = SString("Could not copy '{}' as the resource is not loaded\n", *strSrcResourceName);
         return NULL;
     }
 
     // Does the resource name already exist?
     if (GetResource(strNewResourceName) != NULL)
     {
-        strOutStatus = SString("Could not copy '%s' as the resource '%s' already exists\n", *strSrcResourceName, *strNewResourceName);
+        strOutStatus = SString("Could not copy '{}' as the resource '{}' already exists\n", *strSrcResourceName, *strNewResourceName);
         return NULL;
     }
 
     // Does the destination directory already exist?
     if (FileExists(strDstResourceLocation) || DirectoryExists(strDstResourceLocation))
     {
-        strOutStatus = SString("Could not copy '%s' as the file/directory '%s' already exists\n", *strSrcResourceName, *strNewResourceName);
+        strOutStatus = SString("Could not copy '{}' as the file/directory '{}' already exists\n", *strSrcResourceName, *strNewResourceName);
         return NULL;
     }
 
     // Is it a valid path?
     if (!IsValidFilePath(strRelResourceLocation) || !IsValidOrganizationPath(strDstOrganizationalPath))
     {
-        strOutStatus = SString("Could not copy '%s' as the provided path is invalid", *strSrcResourceName);
+        strOutStatus = SString("Could not copy '{}' as the provided path is invalid", *strSrcResourceName);
         return NULL;
     }
 
@@ -948,7 +948,7 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
 
         if (!FileCopy(strSrcFileName, strDstFileName))
         {
-            strOutStatus = SString("Could not copy '%s' to '%s'\n", *strSrcFileName, *strDstFileName);
+            strOutStatus = SString("Could not copy '{}' to '{}'\n", *strSrcFileName, *strDstFileName);
             return NULL;
         }
     }
@@ -966,7 +966,7 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
 
         if (!FileCopy(strSrcFileName, strDstFileName))
         {
-            strOutStatus = SString("Could not copy '%s' to '%s'\n", *strSrcFileName, *strDstFileName);
+            strOutStatus = SString("Could not copy '{}' to '{}'\n", *strSrcFileName, *strDstFileName);
             return NULL;
         }
     }
@@ -975,7 +975,7 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
     MakeSureDirExists(strDstResourceLocation);
     if (!FileRename(strDstTemp, strDstResourceLocation))
     {
-        strOutStatus = SString("Could not rename '%s' to '%s'\n", *strDstTemp, *strDstResourceLocation);
+        strOutStatus = SString("Could not rename '{}' to '{}'\n", *strDstTemp, *strDstResourceLocation);
         return NULL;
     }
 
@@ -1015,28 +1015,28 @@ CResource* CResourceManager::RenameResource(CResource* pSourceResource, const SS
     // Is the source resource active
     if (pSourceResource->IsActive())
     {
-        strOutStatus = SString("Could not rename '%s' as the resource is running\n", *strSrcResourceName);
+        strOutStatus = SString("Could not rename '{}' as the resource is running\n", *strSrcResourceName);
         return NULL;
     }
 
     // Is the source resource loaded
     if (!pSourceResource->IsLoaded())
     {
-        strOutStatus = SString("Could not rename '%s' as the resource is not loaded\n", *strSrcResourceName);
+        strOutStatus = SString("Could not rename '{}' as the resource is not loaded\n", *strSrcResourceName);
         return NULL;
     }
 
     // Does the destination already exist?
     if (FileExists(strDstResourceLocation) || DirectoryExists(strDstResourceLocation))
     {
-        strOutStatus = SString("Could not rename to '%s' as the file/directory name already exists\n", *strNewResourceName);
+        strOutStatus = SString("Could not rename to '{}' as the file/directory name already exists\n", *strNewResourceName);
         return NULL;
     }
 
     // Is it a valid path?
     if (!IsValidFilePath(strRelResourceLocation) || !IsValidOrganizationPath(strDstOrganizationalPath))
     {
-        strOutStatus = SString("Could not rename to '%s' as the provided path is invalid", *strNewResourceName);
+        strOutStatus = SString("Could not rename to '{}' as the provided path is invalid", *strNewResourceName);
         return NULL;
     }
 
@@ -1047,7 +1047,7 @@ CResource* CResourceManager::RenameResource(CResource* pSourceResource, const SS
     MakeSureDirExists(strDstResourceLocation);
     if (!FileRename(strSrcResourceLocation, strDstResourceLocation))
     {
-        strOutStatus = SString("Could not rename '%s' to '%s'\n", *strSrcResourceLocation, *strDstResourceLocation);
+        strOutStatus = SString("Could not rename '{}' to '{}'\n", *strSrcResourceLocation, *strDstResourceLocation);
 
         // Panic reload
         CResource* pResource = Load(bIsZip, strSrcAbsPath, strSrcResourceName);
@@ -1074,7 +1074,7 @@ bool CResourceManager::DeleteResource(const SString& strResourceName, SString& s
     // Is the source resource present
     if (!pSourceResource)
     {
-        strOutStatus = SString("Could not delete '%s' as the resource could not be found\n", *strResourceName);
+        strOutStatus = SString("Could not delete '{}' as the resource could not be found\n", *strResourceName);
         return false;
     }
 
@@ -1088,7 +1088,7 @@ bool CResourceManager::DeleteResource(const SString& strResourceName, SString& s
     // Is the source resource active
     if (pSourceResource->IsActive())
     {
-        strOutStatus = SString("Could not delete '%s' as the resource is running\n", *strSrcResourceName);
+        strOutStatus = SString("Could not delete '{}' as the resource is running\n", *strSrcResourceName);
         return false;
     }
 
@@ -1296,7 +1296,7 @@ void CResourceManager::ReevaluateSyncMapElementDataOption()
 
     // Log change
     if (bBefore != bAfter)
-        CLogger::LogPrintf(SString("SyncMapElementData is now %s\n", bAfter ? "enabled" : "disabled"));
+        CLogger::LogPrintf(SString("SyncMapElementData is now {}\n", bAfter ? "enabled" : "disabled"));
 }
 
 /////////////////////////////////////////////////////////////////////////////

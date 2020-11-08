@@ -25,11 +25,11 @@ namespace
     void UpdateSettingsForReportLog()
     {
         UpdateMTAVersionApplicationSetting();
-        SetApplicationSetting("os-version", SString("%d.%d", GetOSVersion().dwMajor, GetOSVersion().dwMinor));
-        SetApplicationSetting("real-os-version", SString("%d.%d", GetRealOSVersion().dwMajor, GetRealOSVersion().dwMinor));
+        SetApplicationSetting("os-version", SString("{}.{}", GetOSVersion().dwMajor, GetOSVersion().dwMinor));
+        SetApplicationSetting("real-os-version", SString("{}.{}", GetRealOSVersion().dwMajor, GetRealOSVersion().dwMinor));
         SetApplicationSetting("is-admin", IsUserAdmin() ? "1" : "0");
         SetApplicationSettingInt("last-server-ip", 0);
-        SetApplicationSetting("real-os-build", SString("%d", GetRealOSVersion().dwBuild));
+        SetApplicationSetting("real-os-build", SString("{}", GetRealOSVersion().dwBuild));
     }
 
     // Comms between 'Admin' and 'User' processes
@@ -224,7 +224,7 @@ SString CInstallManager::Continue()
     // Initial report line
     DWORD   dwProcessId = GetCurrentProcessId();
     SString GotPathFrom = (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far") ? "registry" : "module location";
-    AddReportLog(1041, SString("* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetLaunchPathFilename().c_str(), GotPathFrom.c_str(),
+    AddReportLog(1041, SString("* Launch * pid:{} '{}' MTASAPath set from {} '{}'", dwProcessId, GetLaunchPathFilename().c_str(), GotPathFrom.c_str(),
                                GetMTASAPath().c_str()));
 
     // Run sequencer
@@ -237,9 +237,9 @@ SString CInstallManager::Continue()
     // Extract command line launch args
     SString strCommandLineOut;
     for (int i = 0; i < m_pSequencer->GetVariableInt("_argc"); i++)
-        strCommandLineOut += m_pSequencer->GetVariable(SString("_arg_%d", i)) + " ";
+        strCommandLineOut += m_pSequencer->GetVariable(SString("_arg_{}", i)) + " ";
 
-    AddReportLog(1060, SString("CInstallManager::Continue - return %s", *strCommandLineOut));
+    AddReportLog(1060, SString("CInstallManager::Continue - return {}", *strCommandLineOut));
     return *strCommandLineOut.TrimEnd(" ");
 }
 
@@ -252,7 +252,7 @@ SString CInstallManager::Continue()
 //////////////////////////////////////////////////////////
 void CInstallManager::RestoreSequencerFromSnapshot(const SString& strText)
 {
-    AddReportLog(1061, SString("CInstallManager::RestoreSequencerState %s", *strText));
+    AddReportLog(1061, SString("CInstallManager::RestoreSequencerState {}", *strText));
     std::vector<SString> parts;
     strText.Split(" ", parts);
 
@@ -273,7 +273,7 @@ void CInstallManager::RestoreSequencerFromSnapshot(const SString& strText)
         m_pSequencer->SetVariable("_argc", parts.size() - iFirstArg);
         for (uint i = iFirstArg; i < parts.size(); i++)
         {
-            m_pSequencer->SetVariable(SString("_arg_%d", i - iFirstArg), parts[i]);
+            m_pSequencer->SetVariable(SString("_arg_{}", i - iFirstArg), parts[i]);
         }
     }
 
@@ -305,7 +305,7 @@ SString CInstallManager::GetLauncherPathFilename()
 {
     SString strLocation = m_pSequencer->GetVariable(INSTALL_LOCATION);
     SString strResult = PathJoin(strLocation == "far" ? GetSystemCurrentDirectory() : GetMTASAPath(), MTA_EXE_NAME);
-    AddReportLog(1062, SString("GetLauncherPathFilename %s", *strResult));
+    AddReportLog(1062, SString("GetLauncherPathFilename {}", *strResult));
     return strResult;
 }
 
@@ -326,7 +326,7 @@ SString CInstallManager::_ChangeToAdmin()
     if (!IsUserAdmin())
     {
         MessageBoxUTF8(
-            NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *m_strAdminReason),
+            NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '{}'\n\nPlease confirm in the next window."), *m_strAdminReason),
             "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
         SetIsBlockingUserProcess();
         ReleaseSingleInstanceMutex();
@@ -341,7 +341,7 @@ SString CInstallManager::_ChangeToAdmin()
         }
         CreateSingleInstanceMutex();
         ClearIsBlockingUserProcess();
-        MessageBoxUTF8(NULL, SString(_("MTA:SA could not complete the following task:\n\n  '%s'\n"), *m_strAdminReason),
+        MessageBoxUTF8(NULL, SString(_("MTA:SA could not complete the following task:\n\n  '{}'\n"), *m_strAdminReason),
                        "Multi Theft Auto: San Andreas" + _E("CL01"), MB_OK | MB_ICONWARNING | MB_TOPMOST);
     }
     return "fail";
@@ -359,7 +359,7 @@ SString CInstallManager::_ChangeFromAdmin()
     if (IsUserAdmin() && IsBlockingUserProcess())
     {
         SendStringToUserProcess(GetSequencerSnapshot());
-        AddReportLog(1003, SString("CInstallManager::_ChangeToAdmin - exit(0) %s", ""));
+        AddReportLog(1003, SString("CInstallManager::_ChangeToAdmin - exit(0) {}", ""));
         ClearIsBlockingUserProcess();
         ExitProcess(0);
     }
@@ -428,7 +428,7 @@ SString CInstallManager::_CheckOnRestartCommand()
     }
     else if (!strResult.Contains("no update"))
     {
-        AddReportLog(4047, SString("_CheckOnRestartCommand: CheckOnRestartCommand returned %s", strResult.c_str()));
+        AddReportLog(4047, SString("_CheckOnRestartCommand: CheckOnRestartCommand returned {}", strResult.c_str()));
     }
 
     return "no_action";
@@ -493,9 +493,9 @@ SString CInstallManager::_InstallFiles()
     if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "no"))
     {
         if (!IsUserAdmin())
-            AddReportLog(3048, SString("_InstallFiles: Install - trying as admin %s", ""));
+            AddReportLog(3048, SString("_InstallFiles: Install - trying as admin {}", ""));
         else
-            AddReportLog(5049, SString("_InstallFiles: Couldn't install files %s", ""));
+            AddReportLog(5049, SString("_InstallFiles: Couldn't install files {}", ""));
 
         m_strAdminReason = _("Install updated MTA:SA files");
         return "fail";
@@ -503,7 +503,7 @@ SString CInstallManager::_InstallFiles()
     else
     {
         UpdateMTAVersionApplicationSetting();
-        AddReportLog(2050, SString("_InstallFiles: ok %s", ""));
+        AddReportLog(2050, SString("_InstallFiles: ok {}", ""));
         return "ok";
     }
 }
@@ -526,7 +526,7 @@ SString CInstallManager::_ShowCopyFailDialog()
 
 void ShowLayoutError(const SString& strExtraInfo)
 {
-    MessageBoxUTF8(0, SString(_("Multi Theft Auto has not been installed properly, please reinstall. %s"), *strExtraInfo), _("Error") + _E("CL03"),
+    MessageBoxUTF8(0, SString(_("Multi Theft Auto has not been installed properly, please reinstall. {}"), *strExtraInfo), _("Error") + _E("CL03"),
                    MB_OK | MB_ICONERROR | MB_TOPMOST);
     TerminateProcess(GetCurrentProcess(), 9);
 }
@@ -580,7 +580,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     SString strPatchBaseCurrentMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPatchBase);
     if (strPatchBaseCurrentMd5 != strPatchBaseMd5)
     {
-        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s' %d %s", *strPatchBase, (int)FileSize(strPatchBase), *strPatchBaseCurrentMd5));
+        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '{}' {} {}", *strPatchBase, (int)FileSize(strPatchBase), *strPatchBaseCurrentMd5));
         SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
         strMessage += "\n\n" + strPatchBase;
         BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
@@ -605,17 +605,17 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     {
         if (!IsUserAdmin())
         {
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) - trying as admin %s", result, *fileGenerator.GetErrorRecords()));
+            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed ({}) - trying as admin {}", result, *fileGenerator.GetErrorRecords()));
             m_strAdminReason = _("Patch GTA");
             return "fail";
         }
         else
         {
-            AddReportLog(5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
+            AddReportLog(5052, SString("_ProcessGtaVersionCheck: GenerateFile failed ({}) to generate '{}' {}", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
             SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
             strMessage += "\n\n" + strGtaExe;
-            strMessage += "\n\n" + _("Error") + SString(" %d", result);
-            BrowseToSolution(SString("gengta_error&code=%d", result), ASK_GO_ONLINE, strMessage);
+            strMessage += "\n\n" + _("Error") + SString(" {}", result);
+            BrowseToSolution(SString("gengta_error&code={}", result), ASK_GO_ONLINE, strMessage);
             return "quit";
         }
     }
@@ -752,8 +752,8 @@ SString CInstallManager::_ProcessLayoutChecks()
     SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace();
     if (!strDriveWithNoSpace.empty())
     {
-        SString strMessage(_("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace.Left(1));
-        BrowseToSolution(SString("low-disk-space&drive=%s", *strDriveWithNoSpace), ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
+        SString strMessage(_("MTA:SA cannot continue because drive {} does not have enough space."), *strDriveWithNoSpace.Left(1));
+        BrowseToSolution(SString("low-disk-space&drive={}", *strDriveWithNoSpace), ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
     }
 
     return "ok";
@@ -1052,7 +1052,7 @@ SString CInstallManager::_ProcessAppCompatChecks()
     WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
     if (!strUrlValue.empty())
     {
-        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        WriteDebugEvent(SString("GameUX ServiceLocation was '{}'", *ToUTF8(strUrlValue)));
         if (strUrlValue.ContainsI(L":"))
         {
             strUrlValue = L"disabled";            // Can be anything not containing `:`
@@ -1120,11 +1120,11 @@ SString CInstallManager::_InstallNewsItems()
         if (FileExists(PathJoin(strTargetDir, "files.xml")))
         {
             SetApplicationSettingInt("news-updated", 1);
-            AddReportLog(2051, SString("InstallNewsItems ok for '%s'", *strDate));
+            AddReportLog(2051, SString("InstallNewsItems ok for '{}'", *strDate));
         }
         else
         {
-            AddReportLog(4048, SString("InstallNewsItems failed with '%s' '%s' '%s'", *strDate, *strFileLocation, *strTargetDir));
+            AddReportLog(4048, SString("InstallNewsItems failed with '{}' '{}' '{}'", *strDate, *strFileLocation, *strTargetDir));
         }
     }
     return "ok";

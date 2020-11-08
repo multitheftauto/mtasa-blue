@@ -156,7 +156,7 @@ public:
             revisionInList[i] = -1;
 
         strHost = inet_ntoa(Address);
-        strName = SString("%s:%d", inet_ntoa(Address), usGamePort);
+        strName = SString("{}:{}", inet_ntoa(Address), usGamePort);
         strEndpoint = strName;
         strEndpointSortKey = SString("%02x%02x%02x%02x-%04x", Address.S_un.S_un_b.s_b1, Address.S_un.S_un_b.s_b2, Address.S_un.S_un_b.s_b3,
                                      Address.S_un.S_un_b.s_b4, usGamePort);
@@ -234,7 +234,7 @@ public:
     void PostChange()
     {
         // Update tie break sort key
-        strTieBreakSortKey = SString("%04d", uiTieBreakPosition);
+        strTieBreakSortKey = SString("{:04}", uiTieBreakPosition);
 
         // Update version sort key
         strVersionSortKey = strVersion;
@@ -245,7 +245,7 @@ public:
         if (isdigit((uchar)strVersionSortKey.Right(1)[0]))
             strVersionSortKey += 'z';
 
-        strVersionSortKey = SString("%s_%05d_", *strVersionSortKey, m_iBuildNumber);
+        strVersionSortKey = SString("{}_{:05}_", *strVersionSortKey, m_iBuildNumber);
 
         SString strTemp;
         for (uint i = 0; i < strVersionSortKey.length(); i++)

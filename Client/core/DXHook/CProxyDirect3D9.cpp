@@ -18,14 +18,14 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
 
 CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 {
-    WriteDebugEvent(SString("CProxyDirect3D9::CProxyDirect3D9 %08x", this));
+    WriteDebugEvent(SString("CProxyDirect3D9::CProxyDirect3D9 {:08x}", this));
     m_pDevice = pInterface;
     ms_CreatedDirect3D9List.push_back(m_pDevice);
 }
 
 CProxyDirect3D9::~CProxyDirect3D9()
 {
-    WriteDebugEvent(SString("CProxyDirect3D9::~CProxyDirect3D9 %08x", this));
+    WriteDebugEvent(SString("CProxyDirect3D9::~CProxyDirect3D9 {:08x}", this));
     ListRemove(ms_CreatedDirect3D9List, m_pDevice);
     m_pDevice = NULL;
 }
@@ -142,7 +142,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
 
     WriteDebugEvent("CProxyDirect3D9::CreateDevice");
 
-    WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", Adapter, DeviceType, BehaviorFlags));
+    WriteDebugEvent(SString("    Adapter:{}  DeviceType:{}  BehaviorFlags:0x{:x}", Adapter, DeviceType, BehaviorFlags));
 
     // Make sure DirectX Get calls will work
     BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
@@ -150,7 +150,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
                             pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
 
-    WriteDebugEvent(SString("    MultiSampleType:%d  Quality:%d", pPresentationParameters->MultiSampleType, pPresentationParameters->MultiSampleQuality));
+    WriteDebugEvent(SString("    MultiSampleType:{}  Quality:{}", pPresentationParameters->MultiSampleType, pPresentationParameters->MultiSampleQuality));
 
     WriteDebugEvent(SString("    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x",
                             pPresentationParameters->SwapEffect, pPresentationParameters->Windowed, pPresentationParameters->EnableAutoDepthStencil,
@@ -322,7 +322,7 @@ HRESULT CreateDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3
 
         if (hResult == D3D_OK)
         {
-            WriteDebugEvent(SString("   -- CreateDeviceInsist succeeded on try #%d", uiRetryCount + 1));
+            WriteDebugEvent(SString("   -- CreateDeviceInsist succeeded on try #{}", uiRetryCount + 1));
             break;
         }
         Sleep(1);
@@ -348,7 +348,7 @@ HRESULT DoCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTyp
         CreateDeviceInsist(2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     if (hResult == D3D_OK)
         return hResult;
-    WriteDebugEvent(SString("  CreateDevice failed #2: %08x", hResult));
+    WriteDebugEvent(SString("  CreateDevice failed #2: {:08x}", hResult));
     HRESULT hResultFail = hResult;
 
     // If create failed, try removing multisampling if enabled
@@ -360,7 +360,7 @@ HRESULT DoCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTyp
         hResult = CreateDeviceInsist(2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
         if (hResult == D3D_OK)
             return hResult;
-        WriteDebugEvent(SString("    CreateDevice failed #3: %08x", hResult));
+        WriteDebugEvent(SString("    CreateDevice failed #3: {:08x}", hResult));
     }
 
     // Run through different combinations
@@ -466,12 +466,12 @@ HRESULT DoCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTyp
         #else
                                     WriteDebugEvent("--------------------------------");
                                     WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
-                                    WriteDebugEvent(SString("        32 result: %08x", hResult));
+                                    WriteDebugEvent(SString("        32 result: {:08x}", hResult));
                                     hResult = -1;
         #endif
                                     if (hResult == D3D_OK)
                                     {
-                                        WriteDebugEvent(SString("      Pass #4 SUCCESS with: {Res:%d, Color:%d, Refresh:%d}", iRes, iColor, iRefresh));
+                                        WriteDebugEvent(SString("      Pass #4 SUCCESS with: {Res:{}, Color:{}, Refresh:{}}", iRes, iColor, iRefresh));
                                         WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
                                         if (iRes == 1)
                                         {
@@ -493,7 +493,7 @@ HRESULT DoCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceTyp
         }
     }
 failed:
-    WriteDebugEvent(SString("      Failed after %d creation attempts", ms_uiCreationAttempts));
+    WriteDebugEvent(SString("      Failed after {} creation attempts", ms_uiCreationAttempts));
 
     return hResultFail;
 }
@@ -514,7 +514,7 @@ SString GetByteDiffDesc(const void* pData1, const void* pData2, uint uiSize)
         uchar c2 = ((const uchar*)pData2)[i];
         if (c1 != c2)
         {
-            strResult += SString("[%d(%02x/%02x)]", i, c1, c2);
+            strResult += SString("[{}({:02x}/{:02x})]", i, c1, c2);
         }
     }
     return strResult;
@@ -531,11 +531,11 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
 {
     HRESULT hr;
 
-    WriteDebugEvent(SString("ModuleFileName - %s ", *GetLaunchPathFilename()));
+    WriteDebugEvent(SString("ModuleFileName - {} ", *GetLaunchPathFilename()));
 
     // Get caps that GTA got
     D3DCAPS9* pGTACaps9 = (D3DCAPS9*)0x00C9BF00;
-    WriteDebugEvent(SString("CapsReport GTACaps9 - %s ", *ToString(*pGTACaps9)));
+    WriteDebugEvent(SString("CapsReport GTACaps9 - {} ", *ToString(*pGTACaps9)));
 
     if (!pD3DDevice9)
         return;
@@ -545,7 +545,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
     pD3DDevice9->GetDirect3D(&pDirect3DOther);
     if (pDirect3DOther != pDirect3D)
     {
-        WriteDebugEvent(SString("IDirect3D9 differs: %x %x", pDirect3D, pDirect3DOther));
+        WriteDebugEvent(SString("IDirect3D9 differs: {:x} {:x}", pDirect3D, pDirect3DOther));
 
         if (pDirect3DOther)
         {
@@ -564,7 +564,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
             // Get caps from pDirect3DOther
             D3DCAPS9 D3DCaps9;
             hr = pDirect3DOther->GetDeviceCaps(Adapter, D3DDEVTYPE_HAL, &D3DCaps9);
-            WriteDebugEvent(SString("pDirect3DOther CapsReport Caps9 - %s ", *ToString(D3DCaps9)));
+            WriteDebugEvent(SString("pDirect3DOther CapsReport Caps9 - {} ", *ToString(D3DCaps9)));
         }
     }
 
@@ -573,12 +573,12 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
     // Get caps from D3D
     D3DCAPS9 D3DCaps9;
     hr = pDirect3D->GetDeviceCaps(Adapter, D3DDEVTYPE_HAL, &D3DCaps9);
-    WriteDebugEvent(SString("IDirect3D9 CapsReport Caps9 - %s ", *ToString(D3DCaps9)));
+    WriteDebugEvent(SString("IDirect3D9 CapsReport Caps9 - {} ", *ToString(D3DCaps9)));
 
     // Get caps from Device
     D3DCAPS9 DeviceCaps9;
     hr = pD3DDevice9->GetDeviceCaps(&DeviceCaps9);
-    WriteDebugEvent(SString("IDirect3DDevice9 CapsReport Caps9 - %s ", *ToString(DeviceCaps9)));
+    WriteDebugEvent(SString("IDirect3DDevice9 CapsReport Caps9 - {} ", *ToString(DeviceCaps9)));
 
     // Test caps
     struct
@@ -613,7 +613,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
             WriteDebugEvent(SString("CapsReport - CreateVertexDeclaration %d/%d [MISMATCH] (VertexType:%d) result: %x (Matches caps:%d)", i, uiNumItems,
                                     DeclTypesList[i].VertexType, hr, bMatchesCaps));
     }
-    WriteDebugEvent(SString("CapsReport - CreateVertexDeclarations MatchesCaps:%d/%d", uiNumMatchesCaps, uiNumItems));
+    WriteDebugEvent(SString("CapsReport - CreateVertexDeclarations MatchesCaps:{}/{}", uiNumMatchesCaps, uiNumItems));
 
     DWORD MaxActiveLights = std::min(DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights);
     pGTACaps9->MaxActiveLights = MaxActiveLights;
@@ -633,15 +633,15 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
     bool DeviceCapsSameAsGTACaps = memcmp(&DeviceCaps9, pGTACaps9, sizeof(D3DCAPS9)) == 0;
     bool DeviceCapsSameAsD3DCaps9 = memcmp(&DeviceCaps9, &D3DCaps9, sizeof(D3DCAPS9)) == 0;
 
-    WriteDebugEvent(SString("DeviceCaps==GTACaps:%d  DeviceCaps==D3DCaps9:%d", DeviceCapsSameAsGTACaps, DeviceCapsSameAsD3DCaps9));
+    WriteDebugEvent(SString("DeviceCaps==GTACaps:{}  DeviceCaps==D3DCaps9:{}", DeviceCapsSameAsGTACaps, DeviceCapsSameAsD3DCaps9));
 
     SString strDiffDesc1 = GetByteDiffDesc(&DeviceCaps9, pGTACaps9, sizeof(D3DCAPS9));
     if (!strDiffDesc1.empty())
-        WriteDebugEvent(SString("DeviceCaps==GTACaps diff:%s", *strDiffDesc1.Left(500)));
+        WriteDebugEvent(SString("DeviceCaps==GTACaps diff:{}", *strDiffDesc1.Left(500)));
 
     SString strDiffDesc2 = GetByteDiffDesc(&DeviceCaps9, &D3DCaps9, sizeof(D3DCAPS9));
     if (!strDiffDesc2.empty())
-        WriteDebugEvent(SString("DeviceCaps==D3DCaps9 diff:%s", *strDiffDesc2.Left(500)));
+        WriteDebugEvent(SString("DeviceCaps==D3DCaps9 diff:{}", *strDiffDesc2.Left(500)));
 
     if (bFixGTACaps && !DeviceCapsSameAsGTACaps)
     {
@@ -673,14 +673,14 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
     // Also check for invalid size
     if (pPresentationParameters->BackBufferWidth == 0)
     {
-        WriteDebugEvent(SString(" Passing through call #%d to CreateDevice because size is invalid", uiCreateCount));
+        WriteDebugEvent(SString(" Passing through call #{} to CreateDevice because size is invalid", uiCreateCount));
         return true;
     }
 
     // Also check for calls from other threads
     if (!IsMainThread())
     {
-        SString strMessage(" Passing through call #%d to CreateDevice because not main thread", uiCreateCount);
+        SString strMessage(" Passing through call #{} to CreateDevice because not main thread", uiCreateCount);
         WriteDebugEvent(strMessage);
         AddReportLog(8627, strMessage);
         return true;
@@ -688,7 +688,7 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
 
     if (++uiCreateCount == 1)
         return false;
-    WriteDebugEvent(SString(" Passing through call #%d to CreateDevice", uiCreateCount));
+    WriteDebugEvent(SString(" Passing through call #{} to CreateDevice", uiCreateCount));
     hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     return true;
 }
@@ -721,7 +721,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
     if (hResult != D3D_OK)
     {
         // Handle failure of initial create device call
-        WriteDebugEvent(SString("CreateDevice failed #0: %08x", hResult));
+        WriteDebugEvent(SString("CreateDevice failed #0: {:08x}", hResult));
 
         // Try create device again
         hResult = DoCreateDevice(pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
@@ -804,7 +804,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
         // Handle fatal error
         SString strMessage;
         strMessage += "There was a problem starting MTA:SA\n\n";
-        strMessage += SString("Direct3D CreateDevice error: %08x", hResult);
+        strMessage += SString("Direct3D CreateDevice error: {:08x}", hResult);
         BrowseToSolution("d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
     }
 
@@ -838,13 +838,13 @@ void CCore::OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
     if (uiPrevResult)
     {
         // Failed last time, so as a test for logging, try a create device with no modifications
-        WriteDebugEvent(SString("Previous CreateDevice failed with: %08x", uiPrevResult));
+        WriteDebugEvent(SString("Previous CreateDevice failed with: {:08x}", uiPrevResult));
         WriteDebugEvent("  Test unmodified:");
         WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
         IDirect3DDevice9* pReturnedDeviceInterface = NULL;
         HRESULT hResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &pReturnedDeviceInterface);
         SAFE_RELEASE(pReturnedDeviceInterface);
-        WriteDebugEvent(SString("  Unmodified result is: %08x", hResult));
+        WriteDebugEvent(SString("  Unmodified result is: {:08x}", hResult));
     }
 
     // Save original values for later
@@ -887,7 +887,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     WriteDebugEvent("CCore::OnPostCreateDevice - Alt startup used");
 
     if (hResult != D3D_OK)
-        WriteDebugEvent(SString("Initial CreateDevice failed: %08x", hResult));
+        WriteDebugEvent(SString("Initial CreateDevice failed: {:08x}", hResult));
     else
         WriteDebugEvent("Initial CreateDevice succeeded");
 
@@ -929,7 +929,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     }
 
     if (hResult != D3D_OK)
-        WriteDebugEvent(SString("MTA CreateDevice failed: %08x", hResult));
+        WriteDebugEvent(SString("MTA CreateDevice failed: {:08x}", hResult));
     else
         WriteDebugEvent("MTA CreateDevice succeeded");
 
@@ -1005,7 +1005,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         // Inform user
         SString strMessage;
         strMessage += "There was a problem starting MTA:SA\n\n";
-        strMessage += SString("Direct3D CreateDevice error: %08x", hResult);
+        strMessage += SString("Direct3D CreateDevice error: {:08x}", hResult);
         BrowseToSolution("d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
     }
 

@@ -820,7 +820,7 @@ void CDatabaseJobQueueImpl::LogResult(CDbJobData* pJobData)
     {
         if (m_LogLevel >= EJobLogLevel::ALL)
         {
-            SString strLine("%s: [%s] SUCCESS: Affected rows:%d [Query:%s]\n", *GetLocalTimeString(true, true), *pConnection->m_strLogTag,
+            SString strLine("{}: [{}] SUCCESS: Affected rows:{} [Query:{}]\n", *GetLocalTimeString(true, true), *pConnection->m_strLogTag,
                             pJobData->result.registryResult->uiNumAffectedRows, *pJobData->GetCommandStringForLog());
             LogString(strLine);
         }
@@ -833,7 +833,7 @@ void CDatabaseJobQueueImpl::LogResult(CDbJobData* pJobData)
             if (pJobData->result.bErrorSuppressed && m_LogLevel != EJobLogLevel::ALL)
                 return;
 
-            SString strLine("%s: [%s] FAIL: (%d) %s [Query:%s]\n", *GetLocalTimeString(true, true), *pConnection->m_strLogTag, pJobData->result.uiErrorCode,
+            SString strLine("{}: [{}] FAIL: ({}) {} [Query:{}]\n", *GetLocalTimeString(true, true), *pConnection->m_strLogTag, pJobData->result.uiErrorCode,
                             *pJobData->result.strReason, *pJobData->GetCommandStringForLog());
             LogString(strLine);
         }

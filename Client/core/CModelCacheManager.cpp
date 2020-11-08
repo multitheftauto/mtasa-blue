@@ -150,7 +150,7 @@ void CModelCacheManagerImpl::PreLoad()
     // Crashed during previous PreLoad?
     if (WatchDogIsSectionOpen(WD_SECTION_PRELOAD_UPGRADES))
     {
-        AddReportLog(8545, SString("PreLoad Upgrades - Crash detect - bSlowMethod:%d  iLowestUnsafeUpgrade:%d", bSlowMethod, iLowestUnsafeUpgrade));
+        AddReportLog(8545, SString("PreLoad Upgrades - Crash detect - bSlowMethod:{}  iLowestUnsafeUpgrade:{}", bSlowMethod, iLowestUnsafeUpgrade));
         iLowestUnsafeUpgrade = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID);
         bSlowMethod = 1;
         SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, iLowestUnsafeUpgrade);
@@ -181,10 +181,10 @@ void CModelCacheManagerImpl::PreLoad()
     int iPrevHiScore = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_HISCORE);
     SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_HISCORE, iLowestUnsafeUpgrade);
     if (iPrevHiScore > iLowestUnsafeUpgrade)
-        AddReportLog(8544, SString("PreLoad Upgrades - LowestUnsafeUpgrade fallen from %d to %d", iPrevHiScore, iLowestUnsafeUpgrade));
+        AddReportLog(8544, SString("PreLoad Upgrades - LowestUnsafeUpgrade fallen from {} to {}", iPrevHiScore, iLowestUnsafeUpgrade));
 
     CTickCount deltaTicks = CTickCount::Now() - startTicks;
-    OutputDebugLine(SString("CModelCacheManagerImpl::PreLoad completed in %d ms", deltaTicks.ToInt()));
+    OutputDebugLine(SString("CModelCacheManagerImpl::PreLoad completed in {} ms", deltaTicks.ToInt()));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
         SubModelRefCount(usModelId);
         pInfo->bIsModelCachedHere = false;
         MapRemove(currentCacheInfoMap, usModelId);
-        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheUnneeded)", usModelId));
+        OutputDebugLine(SString("[Cache] End caching model {}  (UncacheUnneeded)", usModelId));
     }
     else if (uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty())
     {
@@ -406,7 +406,7 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
         SubModelRefCount(usModelId);
         pInfo->bIsModelCachedHere = false;
         MapRemove(currentCacheInfoMap, usModelId);
-        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheNeeded)", usModelId));
+        OutputDebugLine(SString("[Cache] End caching model {}  (UncacheNeeded)", usModelId));
     }
 
     // Cache if room
@@ -419,7 +419,7 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
         assert(!pInfo->bIsModelCachedHere);
         AddModelRefCount(usModelId);
         pInfo->bIsModelCachedHere = true;
-        OutputDebugLine(SString("[Cache] Start caching model %d", usModelId));
+        OutputDebugLine(SString("[Cache] Start caching model {}", usModelId));
     }
 }
 
@@ -508,7 +508,7 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
                 SubModelRefCount(usModelId);
                 pInfo->bIsModelCachedHere = false;
                 MapRemove(cacheInfoMap, usModelId);
-                OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
+                OutputDebugLine(SString("[Cache] End caching model {}  (OnRestreamModel)", usModelId));
             }
         }
     }
@@ -518,6 +518,6 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
     {
         SubModelRefCount(usModelId);
         MapRemove(m_PermoLoadedModels, usModelId);
-        OutputDebugLine(SString("[Cache] End permo-caching model %d  (OnRestreamModel)", usModelId));
+        OutputDebugLine(SString("[Cache] End permo-caching model {}  (OnRestreamModel)", usModelId));
     }
 }

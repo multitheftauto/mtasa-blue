@@ -495,11 +495,11 @@ void CPerfStatRPCPacketUsageImpl::GetStats(CPerfStatResult* pResult, const std::
         int c = 0;
         // Turn "CRPCFunctions::PLAYER_WEAPON" into "64_Player_weapon"
         SString strPacketDesc = EnumToString((CRPCFunctions::eRPCFunctions)i).SplitRight("CRPCFunctions::", NULL, -1).ToLower();
-        row[c++] = SString("%d_", i) + strPacketDesc.Left(1).ToUpper() + strPacketDesc.SubStr(1);
+        row[c++] = SString("{}_", i) + strPacketDesc.Left(1).ToUpper() + strPacketDesc.SubStr(1);
 
         if (statInDelta.iCount)
         {
-            row[c++] = SString("%d", (statInDelta.iCount + 4) / 5);
+            row[c++] = SString("{}", (statInDelta.iCount + 4) / 5);
             row[c++] = CPerfStatManager::GetScaledByteString((statInDelta.iTotalBytes + 4) / 5);
             row[c++] = "n/a";
         }
@@ -544,7 +544,7 @@ void CPerfStatRPCPacketUsageImpl::GetStats(CPerfStatResult* pResult, const std::
         int c = 0;
         // Turn "SET_WEAPON_OWNER" into "64_Set_weapon_owner"
         SString strPacketDesc = EnumToString((eElementRPCFunctions)i).ToLower();
-        row[c++] = SString("%d_", i) + strPacketDesc.Left(1).ToUpper() + strPacketDesc.SubStr(1);
+        row[c++] = SString("{}_", i) + strPacketDesc.Left(1).ToUpper() + strPacketDesc.SubStr(1);
 
         row[c++] = "-";
         row[c++] = "-";
@@ -552,7 +552,7 @@ void CPerfStatRPCPacketUsageImpl::GetStats(CPerfStatResult* pResult, const std::
 
         if (statOutDelta.iCount)
         {
-            row[c++] = SString("%d", (statOutDelta.iCount + 4) / 5);
+            row[c++] = SString("{}", (statOutDelta.iCount + 4) / 5);
             row[c++] = CPerfStatManager::GetScaledByteString((statOutDelta.iTotalBytes + 4) / 5);
             row[c++] = "n/a";
         }

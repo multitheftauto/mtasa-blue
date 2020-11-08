@@ -187,7 +187,7 @@ SString CFileGenerator::GetErrorRecords()
     SString strStatus;
     for (const auto& item : m_errorInfoList)
     {
-        strStatus += SString("[%d-%s-%s]", item.code, *item.strContext, *item.strContext2);
+        strStatus += SString("[{}-{}-{}]", item.code, *item.strContext, *item.strContext2);
     }
     ClearErrorRecords();
     return strStatus;

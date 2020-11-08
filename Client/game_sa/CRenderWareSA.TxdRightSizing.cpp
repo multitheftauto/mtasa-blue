@@ -79,7 +79,7 @@ bool CRenderWareSA::RightSizeTxd(const SString& strInTxdFilename, const SString&
     // Log last error
     if (!strError.empty())
     {
-        AddReportLog(8430, SString("RightSizeTxd problem %s with '%s'", *strError, *strInTxdFilename), 10);
+        AddReportLog(8430, SString("RightSizeTxd problem {} with '{}'", *strError, *strInTxdFilename), 10);
     }
 
     //

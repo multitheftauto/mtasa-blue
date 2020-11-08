@@ -767,13 +767,13 @@ void CMemStats::CreateTables()
         table.SetColumnWidths("110,80:R,80:R");
         table.SetNumberColors("^1", strNumberColorsMtaVidMem);
         table.AddRow(HEADER1("MTA vid memory") "|" HEADER1("Change KB") "|" HEADER1("Using KB"));
-        table.AddRow(SString("FreeForMTA|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA),
+        table.AddRow(SString("FreeForMTA|^1~.{}|{}", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA),
                              *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA)));
-        table.AddRow(SString("Fonts|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts),
+        table.AddRow(SString("Fonts|^1~.{}|{}", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts),
                              *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts)));
-        table.AddRow(SString("Textures|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures),
+        table.AddRow(SString("Textures|^1~.{}|{}", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures),
                              *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures)));
-        table.AddRow(SString("RenderTargets|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets),
+        table.AddRow(SString("RenderTargets|^1~.{}|{}", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets),
                              *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByRenderTargets)));
     }
 
@@ -788,11 +788,11 @@ void CMemStats::CreateTables()
         table.SetColumnWidths("110,30:R,50:R,80:R");
         table.SetNumberColors("^1", strNumberColorsMtaVidMem);
         table.AddRow(HEADER1("GTA memory") "| |" HEADER1("Change KB") "|" HEADER1("Using KB"));
-        table.AddRow(SString("Process memory| | |%s", *FormatNumberWithCommas(m_MemStatsNow.iProcessMemSizeKB - m_MemStatsNow.iStreamingMemoryUsed / 1024)));
-        table.AddRow(SString("Streaming memory| |^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.iStreamingMemoryUsed / 1024),
+        table.AddRow(SString("Process memory| | |{}", *FormatNumberWithCommas(m_MemStatsNow.iProcessMemSizeKB - m_MemStatsNow.iStreamingMemoryUsed / 1024)));
+        table.AddRow(SString("Streaming memory| |^1~.{}|{}", *FormatNumberWithCommas(m_MemStatsDelta.iStreamingMemoryUsed / 1024),
                              *FormatNumberWithCommas(m_MemStatsNow.iStreamingMemoryUsed / 1024)));
         table.AddRow(
-            SString("|Total:|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.iProcessMemSizeKB), *FormatNumberWithCommas(m_MemStatsNow.iProcessMemSizeKB)));
+            SString("|Total:|^1~.{}|{}", *FormatNumberWithCommas(m_MemStatsDelta.iProcessMemSizeKB), *FormatNumberWithCommas(m_MemStatsNow.iProcessMemSizeKB)));
     }
 
     {
@@ -805,9 +805,9 @@ void CMemStats::CreateTables()
         CDxTable& table = m_TableList.back();
         table.SetColumnWidths("140,130:R");
         table.AddRow(HEADER1("GTA settings") "|" HEADER1("Setting KB"));
-        table.AddRow(SString("Video card installed memory|%s", *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoCard.iInstalledMemoryKB)));
-        table.AddRow(SString("Streaming memory limit|%s", *FormatNumberWithCommas(m_MemStatsNow.iStreamingMemoryAvailable / 1024)));
-        table.AddRow(SString("Process memory limit|%s", *FormatNumberWithCommas(m_MemStatsNow.iProcessTotalVirtualKB)));
+        table.AddRow(SString("Video card installed memory|{}", *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoCard.iInstalledMemoryKB)));
+        table.AddRow(SString("Streaming memory limit|{}", *FormatNumberWithCommas(m_MemStatsNow.iStreamingMemoryAvailable / 1024)));
+        table.AddRow(SString("Process memory limit|{}", *FormatNumberWithCommas(m_MemStatsNow.iProcessTotalVirtualKB)));
     }
 
     {
@@ -822,9 +822,9 @@ void CMemStats::CreateTables()
         table.SetColumnWidths("140,50:R,60:R");
         table.SetNumberColors("^1", strNumberColorsModels);
         table.AddRow(HEADER1("RW resources") "|" HEADER1("Change") "|" HEADER1("Count"));
-        table.AddRow(SString("Textures|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiTextures, m_MemStatsNow.rwResourceStats.uiTextures));
-        table.AddRow(SString("Rasters|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiRasters, m_MemStatsNow.rwResourceStats.uiRasters));
-        table.AddRow(SString("Geometries|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiGeometries, m_MemStatsNow.rwResourceStats.uiGeometries));
+        table.AddRow(SString("Textures|^1~.{}|{}", m_MemStatsDelta.rwResourceStats.uiTextures, m_MemStatsNow.rwResourceStats.uiTextures));
+        table.AddRow(SString("Rasters|^1~.{}|{}", m_MemStatsDelta.rwResourceStats.uiRasters, m_MemStatsNow.rwResourceStats.uiRasters));
+        table.AddRow(SString("Geometries|^1~.{}|{}", m_MemStatsDelta.rwResourceStats.uiGeometries, m_MemStatsNow.rwResourceStats.uiGeometries));
     }
 
     {
@@ -845,12 +845,12 @@ void CMemStats::CreateTables()
         table.SetNumberColors("^4", strNumberColorsLockStatic);
         table.SetNumberColors("^5", strNumberColorsGrey);
         table.AddRow(HEADER1("Clothes cache") "|" HEADER1("Change") "|" HEADER1("Count"));
-        table.AddRow(SString("Cache hit|^3~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheHit, m_MemStatsNow.clothesCacheStats.uiCacheHit));
-        table.AddRow(SString("Cache miss|^4~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheMiss, m_MemStatsNow.clothesCacheStats.uiCacheMiss));
+        table.AddRow(SString("Cache hit|^3~ {}|^5~.{}", m_MemStatsDelta.clothesCacheStats.uiCacheHit, m_MemStatsNow.clothesCacheStats.uiCacheHit));
+        table.AddRow(SString("Cache miss|^4~ {}|^5~.{}", m_MemStatsDelta.clothesCacheStats.uiCacheMiss, m_MemStatsNow.clothesCacheStats.uiCacheMiss));
         table.AddRow(SString("Clothes in use|^1~.%d|^0%d", m_MemStatsDelta.clothesCacheStats.uiNumTotal - m_MemStatsDelta.clothesCacheStats.uiNumUnused,
                              m_MemStatsNow.clothesCacheStats.uiNumTotal - m_MemStatsNow.clothesCacheStats.uiNumUnused));
-        table.AddRow(SString("Clothes ready for use|^1~.%d|%d", m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumUnused));
-        table.AddRow(SString("Old removed|^1~.%d|^5%d", m_MemStatsDelta.clothesCacheStats.uiNumRemoved, m_MemStatsNow.clothesCacheStats.uiNumRemoved));
+        table.AddRow(SString("Clothes ready for use|^1~.{}|{}", m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumUnused));
+        table.AddRow(SString("Old removed|^1~.{}|^5{}", m_MemStatsDelta.clothesCacheStats.uiNumRemoved, m_MemStatsNow.clothesCacheStats.uiNumRemoved));
     }
 
     {
@@ -887,22 +887,22 @@ void CMemStats::CreateTables()
         table.SetColumnWidths("90,50,50:R,60:R");
         table.SetNumberColors("^1", strNumberColorsModels);
         table.AddRow(HEADER1("Models in memory") "| |" HEADER1("Change") "|" HEADER1("Count"));
-        table.AddRow(SString("0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312));
-        table.AddRow(SString("313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317));
-        table.AddRow(SString("318-372|(Weapons)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372));
-        table.AddRow(SString("373-399| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399));
-        table.AddRow(SString("400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));
-        table.AddRow(SString("612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999));
-        table.AddRow(SString("1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193));
-        table.AddRow(SString("1194-19999|(World)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
+        table.AddRow(SString("0-312|(Players)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312));
+        table.AddRow(SString("313-317| |^1~.{}|{}", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317));
+        table.AddRow(SString("318-372|(Weapons)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372));
+        table.AddRow(SString("373-399| |^1~.{}|{}", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399));
+        table.AddRow(SString("400-611|(Vehicles)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));
+        table.AddRow(SString("612-999| |^1~.{}|{}", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999));
+        table.AddRow(SString("1000-1193|(Upgrades)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193));
+        table.AddRow(SString("1194-19999|(World)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
         table.AddRow(
-            SString("20000-24999|(Textures)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
+            SString("20000-24999|(Textures)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
         table.AddRow(SString("25000-25254|(Collisions)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
                              m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
-        table.AddRow(SString("25255-25510|(Ipls)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
-        table.AddRow(SString("25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
-        table.AddRow(SString("25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
-        table.AddRow(SString("|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
+        table.AddRow(SString("25255-25510|(Ipls)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
+        table.AddRow(SString("25511-25574|(Paths)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
+        table.AddRow(SString("25575-25754|(Anims)|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
+        table.AddRow(SString("|Total:|^1~.{}|{}", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
     }
 
     {
@@ -923,9 +923,9 @@ void CMemStats::CreateTables()
         table.AddRow(SString("World shader draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementMatches,
                              m_MemStatsNow.shaderReplacementStats.uiNumReplacementMatches));
         table.AddRow(
-            SString("World shader full setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersFullSetup, m_MemStatsNow.frameStats.iNumShadersFullSetup));
+            SString("World shader full setup|^1~ {}|{}", m_MemStatsDelta.frameStats.iNumShadersFullSetup, m_MemStatsNow.frameStats.iNumShadersFullSetup));
         table.AddRow(
-            SString("World shader reuse setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersReuseSetup, m_MemStatsNow.frameStats.iNumShadersReuseSetup));
+            SString("World shader reuse setup|^1~ {}|{}", m_MemStatsDelta.frameStats.iNumShadersReuseSetup, m_MemStatsNow.frameStats.iNumShadersReuseSetup));
         table.AddRow(SString("World texture total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalTextures,
                              m_MemStatsNow.shaderReplacementStats.uiTotalTextures));
         table.AddRow(SString("World shader total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalShaders,
@@ -975,7 +975,7 @@ void CMemStats::CreateTables()
             int     iCapacity = g_pCore->GetGame()->GetPools()->GetPoolCapacity((ePools)i);
             int     iUsedSpaces = g_pCore->GetGame()->GetPools()->GetNumberOfUsedSpaces((ePools)i);
             int     iUsedPercent = iUsedSpaces * 100 / iCapacity;
-            table.AddRow(SString("%s|%d|%d|%d%%", *strName, iCapacity, iUsedSpaces, iUsedPercent));
+            table.AddRow(SString("{}|{}|{}|{}%", *strName, iCapacity, iUsedSpaces, iUsedPercent));
         }
     }
 }

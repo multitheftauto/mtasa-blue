@@ -119,7 +119,7 @@ bool CResource::Load()
         g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
 
         // Show error
-        m_strFailureReason = SString("Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str());
+        m_strFailureReason = SString("Couldn't find meta.xml file for resource '{}'\n", m_strResourceName.c_str());
         CLogger::ErrorPrintf(m_strFailureReason);
         return false;
     }
@@ -257,9 +257,9 @@ bool CResource::Load()
         pMetaFile->GetLastError(strError);
 
         if (strError.empty())
-            m_strFailureReason = SString("Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str());
+            m_strFailureReason = SString("Couldn't parse meta file for resource '{}'\n", m_strResourceName.c_str());
         else
-            m_strFailureReason = SString("Couldn't parse meta file for resource '%s' [%s]\n", m_strResourceName.c_str(), strError.c_str());
+            m_strFailureReason = SString("Couldn't parse meta file for resource '{}' [{}]\n", m_strResourceName.c_str(), strError.c_str());
 
         CLogger::ErrorPrintf(m_strFailureReason.c_str());
 
@@ -491,7 +491,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
         if (!strBlockReason.empty())
         {
-            return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
+            return SString("file '{}' is blocked ({})", pResourceFile->GetName(), *strBlockReason);
         }
 
         // Copy file to http holding directory
@@ -506,7 +506,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
                 {
                     FileDelete(strCachedFilePath);
-                    return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
+                    return SString("ERROR: Resource '{}' client filename '{}' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                 }
 
                 CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
@@ -515,7 +515,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 {
                     if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
                     {
-                        return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                        return SString("Could not copy '{}' to '{}'\n", *strPath, *strCachedFilePath);
                     }
 
                     // If script is 'no client cache', make sure there is no trace of it in the output dir
@@ -633,12 +633,12 @@ void CResource::LogUpgradeWarnings()
 
     if (!GetCompatibilityStatus(strStatus))
     {
-        SString strReason = SString("WARNING: %s will not start as %s\n", m_strResourceName.c_str(), *strStatus);
+        SString strReason = SString("WARNING: {} will not start as {}\n", m_strResourceName.c_str(), *strStatus);
         CLogger::LogPrint(strReason);
     }
     else if (!strStatus.empty())
     {
-        SString strReason = SString("WARNING: %s requires upgrade as %s\n", m_strResourceName.c_str(), *strStatus);
+        SString strReason = SString("WARNING: {} requires upgrade as {}\n", m_strResourceName.c_str(), *strStatus);
         CLogger::LogPrint(strReason);
         CLogger::LogPrintf("Use the 'upgrade' command to perform a basic upgrade of resources.\n");
     }
@@ -665,7 +665,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     CMtaVersion strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
     if (m_strMinServerRequirement > strServerVersion)
     {
-        strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerRequirement);
+        strOutStatus = SString("this server version is too low ({} required)", *m_strMinServerRequirement);
         return false;
     }
 
@@ -681,13 +681,13 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     if (m_strMinClientReqFromSource > m_strMinClientFromMetaXml)
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-        strOutStatus += SString("client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason);
+        strOutStatus += SString("client {} because of '{}')", *m_strMinClientReqFromSource, *m_strMinClientReason);
         m_strMinClientRequirement = m_strMinClientReqFromSource;            // Apply higher version requirement
     }
     else if (m_strMinServerReqFromSource > m_strMinServerFromMetaXml)
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-        strOutStatus += SString("server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason);
+        strOutStatus += SString("server {} because of '{}')", *m_strMinServerReqFromSource, *m_strMinServerReason);
     }
 
     // See if any connected client are below min requirements
@@ -699,7 +699,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
 
         if (uiNumIncompatiblePlayers > 0)
         {
-            strOutStatus = SString("%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientRequirement);
+            strOutStatus = SString("{} connected player(s) below required client version {}", uiNumIncompatiblePlayers, *m_strMinClientRequirement);
             return false;
         }
     }
@@ -744,14 +744,14 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     if (!GetCompatibilityStatus(strStatus))
     {
-        m_strFailureReason = SString("Not starting resource %s as %s\n", m_strResourceName.c_str(), strStatus.c_str());
+        m_strFailureReason = SString("Not starting resource {} as {}\n", m_strResourceName.c_str(), strStatus.c_str());
         CLogger::LogPrint(m_strFailureReason);
         m_eState = EResourceState::Loaded;
         return false;
     }
     else if (!strStatus.empty())
     {
-        SString strReason = SString("WARNING: %s requires upgrade as %s\n", m_strResourceName.c_str(), *strStatus);
+        SString strReason = SString("WARNING: {} requires upgrade as {}\n", m_strResourceName.c_str(), *strStatus);
         CLogger::LogPrint(strReason);
         CLogger::LogPrintf("Use the 'upgrade' command to perform a basic upgrade of resources.\n");
     }
@@ -811,7 +811,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
         m_pDefaultElementGroup = nullptr;
 
         m_eState = EResourceState::Loaded;
-        m_strFailureReason = SString("Start up of resource %s cancelled by element id starvation", m_strResourceName.c_str());
+        m_strFailureReason = SString("Start up of resource {} cancelled by element id starvation", m_strResourceName.c_str());
         CLogger::LogPrintf("%s\n", m_strFailureReason.c_str());
         return false;
     }
@@ -843,7 +843,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
         if (!strBlockReason.empty())
         {
-            m_strFailureReason = SString("File '%s' is blocked (%s)", pResourceFile->GetName(), strBlockReason.c_str());
+            m_strFailureReason = SString("File '{}' is blocked ({})", pResourceFile->GetName(), strBlockReason.c_str());
             CLogger::LogPrintf("Failed to start resource '%s' - %s\n", GetName().c_str(), m_strFailureReason.c_str());
             bAbortStart = true;
         }
@@ -859,7 +859,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             if (!pResourceFile->Start())
             {
                 // Log it
-                m_strFailureReason = SString("Failed to start resource item %s which is required\n", pResourceFile->GetName());
+                m_strFailureReason = SString("Failed to start resource item {} which is required\n", pResourceFile->GetName());
                 CLogger::LogPrintf("Failed to start resource item %s in %s\n", pResourceFile->GetName(), m_strResourceName.c_str());
                 bAbortStart = true;
             }
@@ -1392,7 +1392,7 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                 }
                 else
                 {
-                    m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find html {} for resource {}\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
@@ -1480,7 +1480,7 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
                 }
                 else
                 {
-                    m_strFailureReason = SString("Couldn't find config %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find config {} for resource {}\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
@@ -1545,7 +1545,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                 }
                 else
                 {
-                    m_strFailureReason = SString("Couldn't find file %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find file {} for resource {}\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
@@ -1723,7 +1723,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                 }
                 else
                 {
-                    m_strFailureReason = SString("Couldn't find script %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find script {} for resource {}\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
@@ -1787,7 +1787,7 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
                 }
                 else
                 {
-                    m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find map {} for resource {}\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
@@ -2146,7 +2146,7 @@ bool CResource::LinkToIncludedResources()
             m_bLinked = false;
 
             if (m_strFailureReason.empty())
-                m_strFailureReason = SString("Failed to link to %s", pIncludedResources->GetName().c_str());
+                m_strFailureReason = SString("Failed to link to {}", pIncludedResources->GetName().c_str());
 #ifdef RESOURCE_DEBUG_MESSAGES
             CLogger::LogPrintf("  Links to %s .. FAILED\n", pIncludedResources->GetName().c_str());
 #endif
@@ -2187,8 +2187,8 @@ bool CResource::CheckIfStartable()
         }
 
         // Remember why we failed and return false
-        m_strCircularInclude = SString("%s %s", m_strResourceName.c_str(), szTrail);
-        m_strFailureReason = SString("Circular include error: %s", m_strCircularInclude.c_str());
+        m_strCircularInclude = SString("{} {}", m_strResourceName.c_str(), szTrail);
+        m_strFailureReason = SString("Circular include error: {}", m_strCircularInclude.c_str());
         return false;
     }
 
@@ -2446,7 +2446,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         if (!Exported.IsHTTPAccessible())
             return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
 
-        SString strResourceFuncName("%s.function.%s", m_strResourceName.c_str(), strFuncName.c_str());
+        SString strResourceFuncName("{}.function.{}", m_strResourceName.c_str(), strFuncName.c_str());
 
         // @@@@@ Deal with this the new way
         if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
@@ -2608,7 +2608,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         lua_setglobal(m_pVM->GetVM(), "user");
 
         // Set debug info in case error occurs in WriteToJSONString
-        g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(SLuaDebugInfo(m_strResourceName, INVALID_LINE_NUMBER, SString("[HTTP:%s]", strFuncName.c_str())));
+        g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(SLuaDebugInfo(m_strResourceName, INVALID_LINE_NUMBER, SString("[HTTP:{}]", strFuncName.c_str())));
 
         std::string strJSON;
         Returns.WriteToJSONString(strJSON, true);
@@ -2666,7 +2666,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
                     }
 
-                    SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pHtml->GetName());
+                    SString strResourceFileName("{}.file.{}", m_strResourceName.c_str(), pHtml->GetName());
                     if (g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                                     strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE,
                                                                     !pHtml->IsRestricted()))
@@ -2678,7 +2678,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 }
                 else
                 {
-                    SString err("Resource %s is not running.", m_strResourceName.c_str());
+                    SString err("Resource {} is not running.", m_strResourceName.c_str());
                     ipoHttpResponse->SetBody(err.c_str(), err.size());
                     return HTTPRESPONSECODE_401_UNAUTHORIZED;
                 }
@@ -2707,7 +2707,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 {
                     CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
 
-                    SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pResourceFile->GetName());
+                    SString strResourceFileName("{}.file.{}", m_strResourceName.c_str(), pResourceFile->GetName());
                     if (pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName.c_str(),
                                                        CAccessControlListRight::RIGHT_TYPE_RESOURCE, true) &&
                         pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
@@ -2724,7 +2724,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
         }
     }
 
-    SString err("Cannot find a resource file named '%s' in the resource %s.", strFile.c_str(), m_strResourceName.c_str());
+    SString err("Cannot find a resource file named '{}' in the resource {}.", strFile.c_str(), m_strResourceName.c_str());
     ipoHttpResponse->SetBody(err.c_str(), err.size());
     return HTTPRESPONSECODE_404_NOTFOUND;
 }

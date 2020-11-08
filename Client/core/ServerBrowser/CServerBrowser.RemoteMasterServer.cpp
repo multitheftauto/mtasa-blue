@@ -323,7 +323,7 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
     }
 
     OutputDebugLine(
-        SString("[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
+        SString("[Browser] {} servers ({} added, {} updated) from {}", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
     return true;
 }
 
@@ -511,9 +511,9 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
 
 #if MTA_DEBUG
     OutputDebugLine(
-        SString("[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
+        SString("[Browser] {} servers ({} added, {} updated) from {}", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
     for (std::map<SString, SItem>::iterator iter = totalMap.begin(); iter != totalMap.end(); ++iter)
-        OutputDebugLine(SString("[Browser] version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse));
+        OutputDebugLine(SString("[Browser] version '{}' - {} total  {} noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse));
 #endif
 
     return true;

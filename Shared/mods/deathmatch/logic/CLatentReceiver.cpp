@@ -50,7 +50,7 @@ CLatentReceiver::~CLatentReceiver()
 ///////////////////////////////////////////////////////////////
 void CLatentReceiver::OnReceiveError(const SString& strMessage)
 {
-    DoDisconnectRemote(m_RemoteId, SString("Latent receiver error (%s)", *strMessage));
+    DoDisconnectRemote(m_RemoteId, SString("Latent receiver error ({})", *strMessage));
 }
 
 ///////////////////////////////////////////////////////////////

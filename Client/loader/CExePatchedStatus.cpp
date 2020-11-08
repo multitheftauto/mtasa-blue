@@ -103,7 +103,7 @@ bool ShouldUseExeCopy()
     static SString strUseCopyReasonPrevious;
     if (strUseCopyReasonPrevious != strUseCopyReason)
     {
-        WriteDebugEventAndReport(3500, SString("Using proxy_sa because: %s", *strUseCopyReason));
+        WriteDebugEventAndReport(3500, SString("Using proxy_sa because: {}", *strUseCopyReason));
         strUseCopyReasonPrevious = strUseCopyReason;
     }
     return !strUseCopyReason.empty();
@@ -317,7 +317,7 @@ EPatchResult UpdatePatchStatusLargeMem(const SString& strGTAEXEPath, EPatchMode 
     else
     {
         WriteDebugEventAndReport(
-            9805, SString("Unable to set LARGE_ADDRESS_AWARE [FilePosition=0x%x Characteristics=0x%x]", fileOffsets.Characteristics, usCharacteristics));
+            9805, SString("Unable to set LARGE_ADDRESS_AWARE [FilePosition=0x{:x} Characteristics=0x{:x}]", fileOffsets.Characteristics, usCharacteristics));
     }
     return PATCH_SET_RESULT_OK;
 }
@@ -480,7 +480,7 @@ EPatchResult UpdatePatchStatusNvightmare(const SString& strGTAEXEPath, EPatchMod
         if (bReqExportTable == bHasExportTable && uiReqExportValue == uiExportValue)
         {
             if (bReqExportTable)
-                WriteDebugEvent(SString("Nvightmare patch:  Already applied ExportValue of %d", uiReqExportValue));
+                WriteDebugEvent(SString("Nvightmare patch:  Already applied ExportValue of {}", uiReqExportValue));
         }
         else
         {
@@ -496,7 +496,7 @@ EPatchResult UpdatePatchStatusNvightmare(const SString& strGTAEXEPath, EPatchMod
             // Write patches
             if (bReqExportTable != bHasExportTable)
             {
-                WriteDebugEvent(SString("Nvightmare patch: Changing HasExportTable to %d", bReqExportTable));
+                WriteDebugEvent(SString("Nvightmare patch: Changing HasExportTable to {}", bReqExportTable));
                 for (uint i = 0; i < NUMELMS(datumList); i++)
                 {
                     const SDataumRow& row = datumList[i];
@@ -512,7 +512,7 @@ EPatchResult UpdatePatchStatusNvightmare(const SString& strGTAEXEPath, EPatchMod
             // Write value
             if (uiReqExportValue != uiExportValue)
             {
-                WriteDebugEvent(SString("Nvightmare patch: Changing ExportValue to %d", uiReqExportValue));
+                WriteDebugEvent(SString("Nvightmare patch: Changing ExportValue to {}", uiReqExportValue));
                 uint uiFileOffset = bIsEUVersion ? valueItem.uiFileOffsetEU : valueItem.uiFileOffsetUS;
                 bFileError |= (fseek(fh, uiFileOffset, SEEK_SET) != 0);
                 bFileError |= (fwrite(&uiReqExportValue, sizeof(uiReqExportValue), 1, fh) != 1);
@@ -678,7 +678,7 @@ EPatchResult UpdatePatchStatusAltModules(const SString& strGTAEXEPath, EPatchMod
 
     if (uiNumOldNames + uiNumNewNames != 4)
     {
-        WriteDebugEventAndReport(9804, SString("UpdatePatchStatusAltModules: Can't find module names (%d,%d)", uiNumOldNames, uiNumNewNames));
+        WriteDebugEventAndReport(9804, SString("UpdatePatchStatusAltModules: Can't find module names ({},{})", uiNumOldNames, uiNumNewNames));
     }
 
     if ((mode == PATCH_SET_ON && uiNumOldNames > 0) || (mode == PATCH_SET_OFF && uiNumNewNames > 0))
@@ -711,7 +711,7 @@ EPatchResult UpdatePatchStatusAltModules(const SString& strGTAEXEPath, EPatchMod
         fclose(fh);
 
         if (mode == PATCH_SET_ON)
-            WriteDebugEvent(SString("UpdatePatchStatusAltModules: Now using alt modules (%d,%d)", uiNumOldNames, uiNumNewNames));
+            WriteDebugEvent(SString("UpdatePatchStatusAltModules: Now using alt modules ({},{})", uiNumOldNames, uiNumNewNames));
     }
 
     return PATCH_SET_RESULT_OK;
@@ -762,7 +762,7 @@ EPatchResult UpdatePatchStatusEntryPoint(const SString& strGTAEXEPath, EPatchMod
     else
     {
         WriteDebugEventAndReport(
-            9806, SString("Unable to set AddressOfEntryPoint [FilePosition=0x%x EntryPoint=0x%x]", fileOffsets.AddressOfEntryPoint, uiCurrentEntryPoint));
+            9806, SString("Unable to set AddressOfEntryPoint [FilePosition=0x{:x} EntryPoint=0x{:x}]", fileOffsets.AddressOfEntryPoint, uiCurrentEntryPoint));
     }
     return PATCH_SET_RESULT_OK;
 }

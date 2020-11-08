@@ -116,10 +116,10 @@ SString CAntiCheat::GetInfo(const SString &acInfo, const SString &sdInfo)
             {
                 if (!strAllowedFiles.empty())
                     strAllowedFiles += ",";
-                strAllowedFiles += SString("%d", i + 1);
+                strAllowedFiles += SString("{}", i + 1);
             }
         }
     }
 
-    return SString("[Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD);
+    return SString("[Allowed client files: {}] [Disabled AC: {}] [Enabled SD: {}]", *strAllowedFiles, *strDisabledAC, *strEnabledSD);
 }

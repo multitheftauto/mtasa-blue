@@ -153,7 +153,7 @@ void CPerfStatDebugInfoImpl::AddLine(const SString& strSection, const SString& s
 
     SLineInfo info;
     info.strSection = strSection;
-    info.strHead = SString("%s - %s", *GetLocalTimeString(true, true), *strSection);
+    info.strHead = SString("{} - {}", *GetLocalTimeString(true, true), *strSection);
     info.strData = strData;
     m_LineList.push_back(info);
 
@@ -195,7 +195,7 @@ void CPerfStatDebugInfoImpl::GetStats(CPerfStatResult* pResult, const std::map<S
         pResult->AddRow()[0] = "Filter all - View all data";
         for (std::set<SString>::iterator iter = sectionNames.begin(); iter != sectionNames.end(); ++iter)
         {
-            pResult->AddRow()[0] = SString("Filter %s - View only this data set", **iter);
+            pResult->AddRow()[0] = SString("Filter {} - View only this data set", **iter);
         }
         return;
     }

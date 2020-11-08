@@ -369,11 +369,11 @@ void CPerfStatPlayerPacketUsageImpl::GetPlayerPacketUsageStats(CPerfStatResult* 
 
         // Turn "PACKET_ID_PED_SYNC" into "64_Ped_sync"
         SString strPacketDesc = EnumToString((ePacketID)packetId).SplitRight("PACKET_ID", NULL, -1).ToLower();
-        row[c++] = SString("%d", packetId) + strPacketDesc.Left(2).ToUpper() + strPacketDesc.SubStr(2);
+        row[c++] = SString("{}", packetId) + strPacketDesc.Left(2).ToUpper() + strPacketDesc.SubStr(2);
 
         for (uint i = 0; i < TOP_COUNT; i++)
         {
-            OutputTimeSpanBlock(pResult, PacketUsage, i, flags, SString(".%d", i + 1), bDetail);
+            OutputTimeSpanBlock(pResult, PacketUsage, i, flags, SString(".{}", i + 1), bDetail);
         }
     }
 }
@@ -403,11 +403,11 @@ void CPerfStatPlayerPacketUsageImpl::OutputTimeSpanBlock(CPerfStatResult* pResul
             const CTimeSpan* p = timeSpanList[i];
             const CTopValue& value = (p->prev.data[0].uiPktsPerSec > p->acc.data[0].uiPktsPerSec) ? p->prev.data[iTopPos] : p->acc.data[iTopPos];
 
-            row[c++] = value.uiPktsPerSec ? SString("%d", value.uiPktsPerSec) : "-";
+            row[c++] = value.uiPktsPerSec ? SString("{}", value.uiPktsPerSec) : "-";
             if (bDetail)
             {
-                row[c++] = value.uiBytesInPerSec ? SString("%d", value.uiBytesInPerSec) : "-";
-                row[c++] = value.uiBytesOutPerSec ? SString("%d", value.uiBytesOutPerSec) : "-";
+                row[c++] = value.uiBytesInPerSec ? SString("{}", value.uiBytesInPerSec) : "-";
+                row[c++] = value.uiBytesOutPerSec ? SString("{}", value.uiBytesOutPerSec) : "-";
                 row[c++] = value.strSerial;
             }
             row[c++] = value.strName;

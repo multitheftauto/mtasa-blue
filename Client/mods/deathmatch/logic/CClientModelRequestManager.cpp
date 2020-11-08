@@ -109,7 +109,7 @@ bool CClientModelRequestManager::RequestBlocking(unsigned short usModelID, const
             pInfo->MakeCustomModel();
             return true;
         }
-        OutputDebugLine(SString("[Models] RequestBlocking failed for id %d", usModelID));
+        OutputDebugLine(SString("[Models] RequestBlocking failed for id {}", usModelID));
     }
 
     // Bad model ID probably.

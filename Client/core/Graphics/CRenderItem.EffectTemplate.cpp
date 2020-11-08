@@ -68,7 +68,7 @@ namespace
             // Check for illegal characters
             if (strPathFilename.Contains(".."))
             {
-                SString strMsg("[CIncludeManager: Illegal path %s]", *strPathFilename);
+                SString strMsg("[CIncludeManager: Illegal path {}]", *strPathFilename);
                 m_strReport += strMsg;
                 OutputDebugLine(SStringX("[Shader] ") + strMsg);
                 return E_FAIL;
@@ -78,7 +78,7 @@ namespace
             std::vector<char> buffer;
             if (!FileLoad(strPathFilename, buffer) || buffer.empty())
             {
-                SString strMsg("[CIncludeManager: Can't find %s]", *strPathFilename);
+                SString strMsg("[CIncludeManager: Can't find {}]", *strPathFilename);
                 m_strReport += strMsg;
                 OutputDebugLine(SStringX("[Shader] ") + strMsg);
                 return E_FAIL;
@@ -99,7 +99,7 @@ namespace
                 SString strMD5 = CMD5Hasher::CalculateHexString(pData, uiSize);
                 MapSet(m_FileMD5Map, ConformPathForSorting(strPathFilename), strMD5);
 
-                m_strReport += SString("[Loaded '%s' (%d bytes)]", *strPathFilename, uiSize);
+                m_strReport += SString("[Loaded '{}' ({} bytes)]", *strPathFilename, uiSize);
             }
 
             return S_OK;
@@ -252,7 +252,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     if (!m_pD3DEffect)
     {
         if (strOutStatus.empty())
-            strOutStatus = SString("[D3DXCreateEffectFromFile failed (%08x)%s]", m_CreateHResult, *IncludeManager.m_strReport);
+            strOutStatus = SString("[D3DXCreateEffectFromFile failed ({:08x}){}]", m_CreateHResult, *IncludeManager.m_strReport);
         return;
     }
 
@@ -282,7 +282,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
             // Update problem string
             D3DXTECHNIQUE_DESC TechniqueDesc;
             m_pD3DEffect->GetTechniqueDesc(hTemp, &TechniqueDesc);
-            strProblemInfo += SString("['%s' (%d/%d) failed (%08x)%s]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr, *strErrorExtra);
+            strProblemInfo += SString("['{}' ({}/{}) failed ({:08x}){}]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr, *strErrorExtra);
         }
 
         // Found valid technique
@@ -292,7 +292,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
         // Error if can't find a valid technique after 2nd attempt
         if (uiAttempt > 0)
         {
-            strOutStatus = SString("No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport);
+            strOutStatus = SString("No valid technique; [Techniques:{} {}]{}", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport);
             SAFE_RELEASE(m_pD3DEffect);
             return;
         }
@@ -463,7 +463,7 @@ bool CEffectTemplate::HaveFilesChanged()
             SString        strNewMD5 = CMD5Hasher::CalculateHexString(strPathFilename);
             if (strNewMD5 != strMD5)
             {
-                OutputDebugLine(SString("[Shader] %s file has changed from %s to %s", *strPathFilename, *strMD5, *strNewMD5));
+                OutputDebugLine(SString("[Shader] {} file has changed from {} to {}", *strPathFilename, *strMD5, *strNewMD5));
                 m_bHaveFilesChanged = true;
             }
         }

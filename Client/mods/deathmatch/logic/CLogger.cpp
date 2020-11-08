@@ -109,7 +109,7 @@ void CLogger::HandleLogPrint(bool bTimeStamp, const char* szPrePend, const char*
     string strOutputLong;
     if (bTimeStamp)
     {
-        strOutputLong = SString("[%s] ", *GetLocalTimeString(true));
+        strOutputLong = SString("[{}] ", *GetLocalTimeString(true));
     }
 
     // Build the final string

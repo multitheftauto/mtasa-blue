@@ -418,7 +418,7 @@ uint Font::getRequiredTextureSize(const String& glyph_set)
     }
 
     TIMEUS deltaTime = GetTimeUs () - startTime;
-    OutputDebugLine ( SString ( "[CEGUI] getRequiredTextureSize in %0.2fms", deltaTime / 1000.f ) );
+    OutputDebugLine ( SString ( "[CEGUI] getRequiredTextureSize in {:0.2f}ms", deltaTime / 1000.f ) );
 
     return size;
 }
@@ -433,11 +433,11 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 
     if ( !utilFontGlyphSet( glyph_set, size, buffer, glyph_images ) )
     {
-        OutputDebugLine ( SString ( "[CEGUI] Error - Could not fit font into texture of size %d", size ) );
+        OutputDebugLine ( SString ( "[CEGUI] Error - Could not fit font into texture of size {}", size ) );
     }
 
     TIMEUS deltaTime = GetTimeUs () - startTime;
-    OutputDebugLine ( SString ( "[CEGUI] createFontGlyphSet in %0.2fms", deltaTime / 1000.f ) );
+    OutputDebugLine ( SString ( "[CEGUI] createFontGlyphSet in {:0.2f}ms", deltaTime / 1000.f ) );
 }
 
 void* Font::loadGlyph ( unsigned long glyphID, bool bCacheSize ) //Only use this when font isnt loaded yet
@@ -1462,7 +1462,7 @@ GlyphPageInfo* Font::findGlyphPageInfo ( ulong ulGlyph, bool bScanSubFont )
 GlyphPageInfo* Font::addGlyphPageInfo ( ulong ulGlyph )
 {
     uint uiPageId = GlyphToGlyphPageId ( ulGlyph );
-    OutputDebugLine ( SString ( "[CEGUI] Adding glyph page 0x%08x  (glyph: 0x%08x)", uiPageId, ulGlyph ) );
+    OutputDebugLine ( SString ( "[CEGUI] Adding glyph page 0x{:08x}  (glyph: 0x{:08x})", uiPageId, ulGlyph ) );
     return &MapGet ( d_GlyphPageInfoMap, uiPageId );
 }
 
@@ -1573,7 +1573,7 @@ void Font::onClearRenderList ( void )
             TIMEUS startTime = GetTimeUs ();
             freeGlyphPage(iter->first);
             TIMEUS deltaTime = GetTimeUs () - startTime;
-            OutputDebugLine ( SString ( "[CEGUI] destroyImageset in %0.2fms", deltaTime / 1000.f ) );
+            OutputDebugLine ( SString ( "[CEGUI] destroyImageset in {:0.2f}ms", deltaTime / 1000.f ) );
             Logger::getSingleton().logEvent("Unloaded glyph page " + ss.str() + " for Font '" + d_name + "'");
             d_GlyphPageInfoMap.erase ( iter++ );
         }
@@ -1631,7 +1631,7 @@ void Font::rebuild ( void )
             TIMEUS startTime = GetTimeUs ();
             iter->second.glyph_images = addFontGlyphs(glyphset,ss.str());
             TIMEUS deltaTime = GetTimeUs () - startTime;
-            OutputDebugLine ( SString ( "[CEGUI] Made font with %d characters in %0.2fms", glyphset.size (), deltaTime / 1000.f ) );
+            OutputDebugLine ( SString ( "[CEGUI] Made font with {} characters in {:0.2f}ms", glyphset.size (), deltaTime / 1000.f ) );
             Logger::getSingleton().logEvent("Loaded glyph page " + ss.str() + " for Font '" + d_name + "'");
             iter->second.bWaitingToBeAdded = false;
         }

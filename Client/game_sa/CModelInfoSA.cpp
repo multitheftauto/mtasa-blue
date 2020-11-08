@@ -335,11 +335,11 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
             if (!pAnim)
             {
                 if (uiAnimId != 25714)
-                    LogEvent(505, "Model no anim", "", SString("%d (%d)", m_dwModelID, uiAnimId));
+                    LogEvent(505, "Model no anim", "", SString("{} ({})", m_dwModelID, uiAnimId));
             }
             else if (!pAnim->IsLoaded())
             {
-                OutputDebugLine(SString("[Models] Requesting anim file %d for model %d", uiAnimId, m_dwModelID));
+                OutputDebugLine(SString("[Models] Requesting anim file {} for model {}", uiAnimId, m_dwModelID));
                 pAnim->Request(requestType, szTag);
             }
         }
@@ -365,14 +365,14 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
             }
             if (!IsLoaded())
             {
-                AddReportLog(6641, SString("Blocking load fail: %d (%s)", m_dwModelID, szTag));
-                LogEvent(641, "Blocking load fail", "", SString("%d (%s)", m_dwModelID, szTag));
+                AddReportLog(6641, SString("Blocking load fail: {} ({})", m_dwModelID, szTag));
+                LogEvent(641, "Blocking load fail", "", SString("{} ({})", m_dwModelID, szTag));
                 dassert(0);
             }
             else
             {
-                AddReportLog(6642, SString("Blocking load: %d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount));
-                LogEvent(642, "Blocking load", "", SString("%d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount));
+                AddReportLog(6642, SString("Blocking load: {} ({}) (Took {} attempts)", m_dwModelID, szTag, iCount));
+                LogEvent(642, "Blocking load", "", SString("{} ({}) (Took {} attempts)", m_dwModelID, szTag, iCount));
             }
         }
     }

@@ -197,7 +197,7 @@ int CLuaXMLDefs::xmlLoadFile(lua_State* luaVM)
                             SString strError;
                             xmlFile->GetLastError(strError);
                             if (!strError.empty())
-                                argStream.SetCustomError(strError, SString("Unable to read XML file %s", strFileInput.c_str()));
+                                argStream.SetCustomError(strError, SString("Unable to read XML file {}", strFileInput.c_str()));
                         }
                         // Destroy it if we failed
                         pLuaMain->DestroyXML(xmlFile);
@@ -315,7 +315,7 @@ int CLuaXMLDefs::xmlCopyFile(lua_State* luaVM)
                         }
                     }
                     else
-                        argStream.SetCustomError(SString("Unable to copy XML file %s", strFile.c_str()), "Bad filepath");
+                        argStream.SetCustomError(SString("Unable to copy XML file {}", strFile.c_str()), "Bad filepath");
                 }
             }
         }

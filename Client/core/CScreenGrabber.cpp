@@ -224,7 +224,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
     hr = m_pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface);
     if (FAILED(hr))
     {
-        strOutError = SString("GetBackBuffer failed (0x%08x)", hr);
+        strOutError = SString("GetBackBuffer failed (0x{:08x})", hr);
         return false;
     }
 
@@ -250,7 +250,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
     hr = m_pDevice->StretchRect(pD3DBackBufferSurface, NULL, m_pScreenShotTemp->m_pD3DRenderTargetSurface, NULL, FilterType);
     if (FAILED(hr))
     {
-        strOutError = SString("StretchRect failed (0x%08x)", hr);
+        strOutError = SString("StretchRect failed (0x{:08x})", hr);
         return false;
     }
 

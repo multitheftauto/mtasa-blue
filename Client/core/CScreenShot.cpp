@@ -69,7 +69,7 @@ int CScreenShot::GetScreenShots()
     HANDLE           hFind;
     WIN32_FIND_DATAW fdFindData;
     // Create a search string
-    SString strScreenShotName("%s\\mta-screen*.png", &szScreenShotPath[0]);
+    SString strScreenShotName("{}\\mta-screen*.png", &szScreenShotPath[0]);
     // Find the first match
     hFind = FindFirstFileW(FromUTF8(strScreenShotName), &fdFindData);
     // Check if the first match failed
@@ -100,7 +100,7 @@ SString CScreenShot::GetValidScreenshotFilename()
 SString CScreenShot::GetScreenShotPath(int iNumber)
 {
     // Create a search string
-    SString          strScreenShotName("%s\\mta-screen*.png", &szScreenShotPath[0]);
+    SString          strScreenShotName("{}\\mta-screen*.png", &szScreenShotPath[0]);
     HANDLE           hFind;
     SString          strReturn = "";
     WIN32_FIND_DATAW fdFindData;
@@ -113,7 +113,7 @@ SString CScreenShot::GetScreenShotPath(int iNumber)
         if (iNumber == 1)
         {
             // We wanted the first file
-            strReturn = SString("%s\\%s", &szScreenShotPath[0], fdFindData.cFileName);
+            strReturn = SString("{}\\{}", &szScreenShotPath[0], fdFindData.cFileName);
         }
         else
         {
@@ -124,7 +124,7 @@ SString CScreenShot::GetScreenShotPath(int iNumber)
                 i++;
                 if (iNumber == i)
                 {
-                    strReturn = SString("%s\\%s", &szScreenShotPath[0], fdFindData.cFileName);
+                    strReturn = SString("{}\\{}", &szScreenShotPath[0], fdFindData.cFileName);
                     break;
                 }
             }

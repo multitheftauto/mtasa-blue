@@ -190,12 +190,12 @@ void CPerfStatServerTimingImpl::GetStats(CPerfStatResult* pResult, const std::ma
 
             int c = 0;
             row[c++] = SStringX(".") + itemName;
-            row[c++] = SString("%u", item.iCounter);
-            row[c++] = SString("%2.1f ms", item.fMs);
-            row[c++] = SString("%2.1f ms", item.fMsMax);
-            row[c++] = SString("%u", item.iCounterTotal);
-            row[c++] = SString("%2.1f ms", item.fMsTotal);
-            row[c++] = SString("%2.0f%%", item.fMsTotalPercent);
+            row[c++] = SString("{}", item.iCounter);
+            row[c++] = SString("{:2.1f} ms", item.fMs);
+            row[c++] = SString("{:2.1f} ms", item.fMsMax);
+            row[c++] = SString("{}", item.iCounterTotal);
+            row[c++] = SString("{:2.1f} ms", item.fMsTotal);
+            row[c++] = SString("{:2.0f}%", item.fMsTotalPercent);
         }
     }
 }

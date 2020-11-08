@@ -141,7 +141,7 @@ void CScriptDebugging::PrintLog(const char* szText)
     if (m_pLogFile)
     {
         // Log it, timestamped
-        SString strInput("[%s] %s\n", *GetLocalTimeString(true), szText);
+        SString strInput("[{}] {}\n", *GetLocalTimeString(true), szText);
         fwrite(strInput.c_str(), strInput.length(), 1, m_pLogFile);
     }
 }

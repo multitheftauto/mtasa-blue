@@ -299,7 +299,7 @@ void SharedUtil::SetOnQuitCommand(const SString& strOperation, const SString& st
                                   const SString& strShowCmd)
 {
     // Encode into a string and set a registry key
-    SString strValue("%s\t%s\t%s\t%s\t%s", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str());
+    SString strValue("{}\t{}\t{}\t{}\t{}", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str());
     SetRegistryValue("", "OnQuitCommand", strValue);
 }
 
@@ -311,8 +311,8 @@ void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString&
                                      const SString& strShowCmd)
 {
     // Encode into a string and set a registry key
-    SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
-    SString strValue("%s\t%s\t%s\t%s\t%s\t%s", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str(),
+    SString strVersion("{}.{}.{}-{}.{:05}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
+    SString strValue("{}\t{}\t{}\t{}\t{}\t{}", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str(),
                      strVersion.c_str());
     SetRegistryValue("", "OnRestartCommand", strValue);
 }
@@ -329,7 +329,7 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
     strOnRestartCommand.Split("\t", vecParts);
     if (vecParts.size() > 5 && vecParts[0].length())
     {
-        SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
+        SString strVersion("{}.{}.{}-{}.{:05}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
         if (vecParts[5] == strVersion)
         {
             strOperation = vecParts[0];
@@ -339,7 +339,7 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
             strShowCmd = vecParts[4];
             return true;
         }
-        AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
+        AddReportLog(4000, SString("OnRestartCommand disregarded due to version change {} -> {}", vecParts[5].c_str(), strVersion.c_str()));
     }
     return false;
 }
@@ -406,7 +406,7 @@ bool SharedUtil::RemoveApplicationSettingKey(const SString& strPath)
 //
 void SharedUtil::SetApplicationSettingInt(const SString& strPath, const SString& strName, int iValue)
 {
-    SetApplicationSetting(strPath, strName, SString("%d", iValue));
+    SetApplicationSetting(strPath, strName, SString("{}", iValue));
 }
 
 int SharedUtil::GetApplicationSettingInt(const SString& strPath, const SString& strName)
@@ -583,7 +583,7 @@ const SString& SharedUtil::GetProductVersion()
 {
     if (ms_strProductVersion.empty())
         ms_strProductVersion =
-            SString("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
+            SString("{}.{}.{}-{}.{:05}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
     return ms_strProductVersion;
 }
 
@@ -637,7 +637,7 @@ SString SharedUtil::GetClipboardText()
 //
 void SharedUtil::BrowseToSolution(const SString& strType, int iFlags, const SString& strMessageBoxMessage, const SString& strErrorCode)
 {
-    AddReportLog(3200, SString("Trouble %s", *strType));
+    AddReportLog(3200, SString("Trouble {}", *strType));
 
     // Put args into a string and save in the registry
     CArgMap argMap;
@@ -682,7 +682,7 @@ bool SharedUtil::ProcessPendingBrowseToSolution()
 
     ClearPendingBrowseToSolution();
 
-    SString strTitle("MTA: San Andreas %s   (CTRL+C to copy)", *strErrorCode);
+    SString strTitle("MTA: San Andreas {}   (CTRL+C to copy)", *strErrorCode);
     // Show message if set, ask question if required, and then launch URL
     if (iFlags & ASK_GO_ONLINE)
     {
@@ -772,7 +772,7 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
         SString strPathFilename = PathJoin(GetMTADataPath(), "report.log");
         MakeSureDirExists(strPathFilename);
 
-        SString strMessage("%u: %s %s [%s] - %s\n", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
+        SString strMessage("{}: {} {} [{}] - {}\n", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
                            GetReportLogProcessTag().c_str(), strText.c_str());
         FileAppend(strPathFilename, &strMessage.at(0), strMessage.length());
         OutputDebugLine(SStringX("[ReportLog] ") + strMessage);
@@ -839,7 +839,7 @@ SString SharedUtil::GetReportLogProcessTag()
         if (!IsGTAProcess())
         {
             // Use pid only for launcher
-            strResult = SString("%05d", pid);
+            strResult = SString("{:05}", pid);
         }
         else
         {
@@ -860,7 +860,7 @@ SString SharedUtil::GetReportLogProcessTag()
                 } while (Process32NextW(h, &pe));
             }
             CloseHandle(h);
-            strResult = SString("%05d-%05d", parentPid, pid);
+            strResult = SString("{:05}-{:05}", parentPid, pid);
         }
     }
     return strResult;
@@ -879,7 +879,7 @@ void WriteEvent(const char* szType, const SString& strText)
         return;
     }
     SString strPathFilename = CalcMTASAPath(PathJoin("mta", "logs", "logfile.txt"));
-    SString strMessage("%s - %s %s", *GetLocalTimeString(), szType, *strText);
+    SString strMessage("{} - {} {}", *GetLocalTimeString(), szType, *strText);
     FileAppend(strPathFilename, strMessage + "\n");
 #ifdef MTA_DEBUG
     OutputDebugLine(strMessage);
@@ -939,7 +939,7 @@ SString SharedUtil::GetSystemErrorMessage(uint uiError, bool bRemoveNewlines, bo
         strResult = strResult.Replace("\n", "").Replace("\r", "");
 
     if (bPrependCode)
-        strResult = SString("Error %u: %s", uiError, *strResult);
+        strResult = SString("Error {}: {}", uiError, *strResult);
 
     return strResult;
 }
@@ -1690,7 +1690,7 @@ namespace SharedUtil
     }
 
     // Insert a key int value
-    void CArgMap::Insert(const SString& strCmd, int iValue) { Insert(strCmd, SString("%d", iValue)); }
+    void CArgMap::Insert(const SString& strCmd, int iValue) { Insert(strCmd, SString("{}", iValue)); }
 
     // Insert a key string value
     void CArgMap::Insert(const SString& strCmd, const SString& strValue)

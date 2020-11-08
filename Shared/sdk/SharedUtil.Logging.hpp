@@ -110,7 +110,7 @@ namespace SharedUtil
         if (info.iCount > info.iHigh)
         {
             info.iHigh = info.iCount;
-            OutputDebugLine(SString("[InstanceCount] New high of %d for %s", info.iCount, *strName));
+            OutputDebugLine(SString("[InstanceCount] New high of {} for {}", info.iCount, *strName));
         }
     }
 
@@ -119,7 +119,7 @@ namespace SharedUtil
         SDebugCountInfo& info = MapGet(ms_DebugCountMap, strName);
         info.iCount--;
         if (info.iCount < 0)
-            OutputDebugLine(SString("[InstanceCount] Count is negative (%d) for %s", info.iCount, *strName));
+            OutputDebugLine(SString("[InstanceCount] Count is negative ({}) for {}", info.iCount, *strName));
     }
 }            // namespace SharedUtil
 
@@ -157,8 +157,8 @@ void SharedUtil::CycleFile(const SString& strPathFilename, uint uiCycleThreshKB,
             // Rename older files .1 .2 etc
             uint    uiNew = uiNumBackups - 1 - i;
             uint    uiOld = uiNumBackups - i;
-            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew) : "");
-            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld) : "");
+            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".{}", uiNew) : "");
+            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".{}", uiOld) : "");
 
             FileDelete(strFilenameOlder);
             FileRename(strFilenameNewer, strFilenameOlder);

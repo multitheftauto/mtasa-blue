@@ -233,7 +233,7 @@ void CDirect3DEvents9::CheckForScreenShot()
         }
         else
         {
-            g_pCore->GetConsole()->Print(_("Screenshot failed") + SString(" (%s)", *strError));
+            g_pCore->GetConsole()->Print(_("Screenshot failed") + SString(" ({})", *strError));
             strFileName = "";
         }
 
@@ -770,7 +770,7 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer(IDirect3DDevice9* pDevice, UINT Len
 
         if (hr != D3DERR_OUTOFVIDEOMEMORY || i > 0)
         {
-            SString strMessage("CreateVertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool);
+            SString strMessage("CreateVertexBuffer fail: hr:{:x} Length:{:x} Usage:{:x} FVF:{:x} Pool:{:x}", hr, Length, Usage, FVF, Pool);
             WriteDebugEvent(strMessage);
             AddReportLog(8610, strMessage);
             CCore::GetSingleton().LogEvent(610, "CreateVertexBuffer", "", strMessage);
@@ -805,7 +805,7 @@ HRESULT CDirect3DEvents9::CreateIndexBuffer(IDirect3DDevice9* pDevice, UINT Leng
 
         if (hr != D3DERR_OUTOFVIDEOMEMORY || i > 0)
         {
-            SString strMessage("CreateIndexBuffer fail: hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool);
+            SString strMessage("CreateIndexBuffer fail: hr:{:x} Length:{:x} Usage:{:x} Format:{:x} Pool:{:x}", hr, Length, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
             AddReportLog(8611, strMessage);
             CCore::GetSingleton().LogEvent(611, "CreateIndexBuffer", "", strMessage);
@@ -840,7 +840,7 @@ HRESULT CDirect3DEvents9::CreateTexture(IDirect3DDevice9* pDevice, UINT Width, U
 
         if (hr != D3DERR_OUTOFVIDEOMEMORY || i > 0)
         {
-            SString strMessage("CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool);
+            SString strMessage("CreateTexture fail: hr:{:x} W:{:x} H:{:x} L:{:x} Usage:{:x} Format:{:x} Pool:{:x}", hr, Width, Height, Levels, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
             AddReportLog(8612, strMessage);
             CCore::GetSingleton().LogEvent(612, "CreateTexture", "", strMessage);
@@ -944,10 +944,10 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration(IDirect3DDevice9* pDevice, CON
             if (element.Stream == 0xFF)
                 break;
 
-            strStatus += SString("[%d,%d,%d,%d,%d,%d]", element.Stream, element.Offset, element.Type, element.Method, element.Usage, element.UsageIndex);
+            strStatus += SString("[{},{},{},{},{},{}]", element.Stream, element.Offset, element.Type, element.Method, element.Usage, element.UsageIndex);
         }
 
-        SString strMessage("CreateVertexDecl fail: hr:%x %s", hr, *strStatus);
+        SString strMessage("CreateVertexDecl fail: hr:{:x} {}", hr, *strStatus);
         WriteDebugEvent(strMessage);
         AddReportLog(8613, strMessage);
         CCore::GetSingleton().LogEvent(613, "CreateVertexDecl", "", strMessage);

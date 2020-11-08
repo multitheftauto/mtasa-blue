@@ -18,7 +18,7 @@ CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
+    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 {:08x} (device: {:08x})", this, pDevice));
 
     // Set our wrapped device.
     m_pDevice = pDevice;
@@ -76,7 +76,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     // Clipping is required for some graphic configurations
     g_pDeviceState->AdapterState.bRequiresClipping = SStringX(adaptIdent.Description).Contains("Intel");
 
-    WriteDebugEvent(SString("*** Using adapter: %s (Mem:%d KB, MaxAnisotropy:%d)", (const char*)g_pDeviceState->AdapterState.Name,
+    WriteDebugEvent(SString("*** Using adapter: {} (Mem:{} KB, MaxAnisotropy:{})", (const char*)g_pDeviceState->AdapterState.Name,
                             g_pDeviceState->AdapterState.InstalledMemoryKB, g_pDeviceState->AdapterState.MaxAnisotropicSetting));
 
     // Give a default value for the streaming memory setting
@@ -89,7 +89,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this));
+    WriteDebugEvent(SString("CProxyDirect3DDevice9::~CProxyDirect3DDevice9 {:08x}", this));
     g_pDeviceState = NULL;
     g_pProxyDevice = NULL;
 }
@@ -204,7 +204,7 @@ HRESULT ResetDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDe
         hResult = pDevice->Reset(pPresentationParameters);
         if (hResult == D3D_OK)
         {
-            WriteDebugEvent(SString("   -- ResetDeviceInsist succeeded on try #%d", uiRetryCount + 1));
+            WriteDebugEvent(SString("   -- ResetDeviceInsist succeeded on try #{}", uiRetryCount + 1));
             break;
         }
         Sleep(100);
@@ -233,8 +233,8 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
     else if (FAILED(hResult))
     {
         // Handle failure of initial reset device call
-        g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail0:%08x", hResult));
-        WriteDebugEvent(SString("Reset failed #0: %08x", hResult));
+        g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail0:{:08x}", hResult));
+        WriteDebugEvent(SString("Reset failed #0: {:08x}", hResult));
 
         // Try reset device again
         hResult = ResetDeviceInsist(5, 1000, pDevice, pPresentationParameters);
@@ -243,8 +243,8 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
         if (FAILED(hResult))
         {
             // Record problem
-            g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail1:%08x", hResult));
-            WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail1:%08x", hResult));
+            g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail1:{:08x}", hResult));
+            WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail1:{:08x}", hResult));
 
             // Try with original presentation parameters
             *pPresentationParameters = presentationParametersOrig;
@@ -253,8 +253,8 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
             if (FAILED(hResult))
             {
                 // Record problem
-                g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail2:%08x", hResult));
-                WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail2:%08x", hResult));
+                g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail2:{:08x}", hResult));
+                WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail2:{:08x}", hResult));
 
                 // Prevent statup warning in loader
                 WatchDogCompletedSection("L3");
@@ -274,7 +274,7 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
                 // Handle fatal error
                 SString strMessage;
                 strMessage += "There was a problem resetting Direct3D\n\n";
-                strMessage += SString("Direct3DDevice9 Reset error: %08x", hResult);
+                strMessage += SString("Direct3DDevice9 Reset error: {:08x}", hResult);
                 BrowseToSolution("d3dresetdevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
                 // Won't get here as BrowseToSolution will terminate the process
             }
@@ -321,7 +321,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
                             pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
 
-    WriteDebugEvent(SString("    MultiSampleType:%d  Quality:%d", pPresentationParameters->MultiSampleType, pPresentationParameters->MultiSampleQuality));
+    WriteDebugEvent(SString("    MultiSampleType:{}  Quality:{}", pPresentationParameters->MultiSampleType, pPresentationParameters->MultiSampleQuality));
 
     WriteDebugEvent(SString("    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x",
                             pPresentationParameters->SwapEffect, pPresentationParameters->Windowed, pPresentationParameters->EnableAutoDepthStencil,
@@ -332,7 +332,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 
     const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
 
-    WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", parameters.AdapterOrdinal, parameters.DeviceType, parameters.BehaviorFlags));
+    WriteDebugEvent(SString("    Adapter:{}  DeviceType:{}  BehaviorFlags:0x{:x}", parameters.AdapterOrdinal, parameters.DeviceType, parameters.BehaviorFlags));
 
     return hResult;
 }

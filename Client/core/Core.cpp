@@ -27,10 +27,10 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
     if (dwReason == DLL_PROCESS_ATTACH)
     {
-        WriteDebugEvent(SString("DLL_PROCESS_ATTACH %08x", pvNothing));
+        WriteDebugEvent(SString("DLL_PROCESS_ATTACH {:08x}", pvNothing));
         if (IsGTAProcess())
         {
-            WriteDebugEvent(SString("ModuleFileName: %s", *GetLaunchPathFilename()));
+            WriteDebugEvent(SString("ModuleFileName: {}", *GetLaunchPathFilename()));
 
             AddUtf8FileHooks();
 
@@ -55,7 +55,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     }
     else if (dwReason == DLL_PROCESS_DETACH)
     {
-        WriteDebugEvent(SString("DLL_PROCESS_DETACH %08x", pvNothing));
+        WriteDebugEvent(SString("DLL_PROCESS_DETACH {:08x}", pvNothing));
         if (IsGTAProcess())
         {
             RemoveUtf8FileHooks();

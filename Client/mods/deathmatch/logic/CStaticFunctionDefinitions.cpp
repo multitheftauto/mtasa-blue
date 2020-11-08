@@ -215,8 +215,8 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
 
 bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)
 {
-    SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
-    SString strPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), pResource->GetName(), szFile);
+    SString strHTTPDownloadURLFull("{}/{}/{}", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
+    SString strPath("{}\\resources\\{}\\{}", g_pClientGame->GetFileCacheRoot(), pResource->GetName(), szFile);
 
     // Call SingularFileDownloadManager
     if (g_pClientGame->GetSingularFileDownloadManager())

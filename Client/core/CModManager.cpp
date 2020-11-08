@@ -108,7 +108,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     SString strDllDirectory = GetSystemDllDirectory();
     if (CalcMTASAPath("mta").CompareI(strDllDirectory) == false)
     {
-        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath("mta")));
+        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'{}'  Path:'{}'", *strDllDirectory, *CalcMTASAPath("mta")));
         SetDllDirectory(CalcMTASAPath("mta"));
     }
 
@@ -321,7 +321,7 @@ void CModManager::InitializeModList(const char* szModFolderPath)
     HANDLE           hFind;
 
     // Allocate a string with length of path + 5 letters to store searchpath plus "\*.*"
-    SString strPathWildchars("%s*.*", szModFolderPath);
+    SString strPathWildchars("{}*.*", szModFolderPath);
 
     // Set the working directory to the MTA folder
     CFilePathTranslator filePathTranslator;
@@ -363,7 +363,7 @@ void CModManager::VerifyAndAddEntry(const char* szModFolderPath, const char* szN
     if ((strcmp(szName, ".") != 0) && (strcmp(szName, "..") != 0) && (stricmp(szName, "race") != 0))
     {
         // Put together a modpath string and a MTA-relative path to Client(_d).dll
-        SString strClientDLL("%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL);
+        SString strClientDLL("{}{}\\{}", szModFolderPath, szName, CMODMANAGER_CLIENTDLL);
 
         // Attempt to load the primary client DLL
         HMODULE hDLL = LoadLibraryEx(strClientDLL, NULL, DONT_RESOLVE_DLL_REFERENCES);
@@ -377,7 +377,7 @@ void CModManager::VerifyAndAddEntry(const char* szModFolderPath, const char* szN
             }
             else
             {
-                WriteErrorEvent(SString("Unknown mod DLL: %s", szName));
+                WriteErrorEvent(SString("Unknown mod DLL: {}", szName));
             }
 
             // Free the DLL
@@ -385,7 +385,7 @@ void CModManager::VerifyAndAddEntry(const char* szModFolderPath, const char* szN
         }
         else
         {
-            WriteErrorEvent(SString("Invalid mod DLL: %s (reason: %d)", szName, GetLastError()));
+            WriteErrorEvent(SString("Invalid mod DLL: {} (reason: {})", szName, GetLastError()));
         }
     }
 }

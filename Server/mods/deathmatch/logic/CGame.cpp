@@ -351,11 +351,11 @@ void CGame::GetTag(char* szInfoTag, int iInfoTag)
 
     if (!GetConfig()->GetThreadNetEnabled())
     {
-        strInfoTag += SString(" %c:%c: %u fps", 130, 130, g_pGame->GetServerFPS());
+        strInfoTag += SString(" {:c}:{:c}: {} fps", 130, 130, g_pGame->GetServerFPS());
     }
     else
     {
-        strInfoTag += SString(" %c:%c: %u fps (%u)", 130, 130, g_pGame->GetSyncFPS(), g_pGame->GetServerFPS());
+        strInfoTag += SString(" {:c}:{:c}: {} fps ({})", 130, 130, g_pGame->GetSyncFPS(), g_pGame->GetServerFPS());
     }
 
     STRNCPY(szInfoTag, *strInfoTag, iInfoTag);
@@ -665,25 +665,25 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         switch (m_pMainConfig->GetVoiceSampleRate())
         {
             case 0:
-                strVoice = SString("Quality [%i];  Sample Rate: [8000Hz]", m_pMainConfig->GetVoiceQuality());
+                strVoice = SString("Quality [{}];  Sample Rate: [8000Hz]", m_pMainConfig->GetVoiceQuality());
                 break;
             case 1:
-                strVoice = SString("Quality [%i];  Sample Rate: [16000Hz]", m_pMainConfig->GetVoiceQuality());
+                strVoice = SString("Quality [{}];  Sample Rate: [16000Hz]", m_pMainConfig->GetVoiceQuality());
                 break;
             case 2:
-                strVoice = SString("Quality [%i];  Sample Rate: [32000Hz]", m_pMainConfig->GetVoiceQuality());
+                strVoice = SString("Quality [{}];  Sample Rate: [32000Hz]", m_pMainConfig->GetVoiceQuality());
                 break;
             default:
                 break;
         }
     if (m_pMainConfig->GetVoiceBitrate())
-        strVoice += SString(";  Bitrate: [%ibps]", m_pMainConfig->GetVoiceBitrate());
+        strVoice += SString(";  Bitrate: [{}bps]", m_pMainConfig->GetVoiceBitrate());
 
     // Make bandwidth reduction string
     SString strBandwidthSaving = m_pMainConfig->GetSetting("bandwidth_reduction");
     strBandwidthSaving = strBandwidthSaving.Left(1).ToUpper() + strBandwidthSaving.SubStr(1);
     if (g_pBandwidthSettings->bLightSyncEnabled)
-        strBandwidthSaving += SString(" with lightweight sync rate of %dms", g_TickRateSettings.iLightSync);
+        strBandwidthSaving += SString(" with lightweight sync rate of {}ms", g_TickRateSettings.iLightSync);
 
     // Show the server header
     CLogger::LogPrintfNoStamp(
@@ -740,10 +740,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     // Setup resource-cache directory
     {
-        SString strResourceCachePath("%s/resource-cache", g_pServerInterface->GetServerModPath());
-        SString strResourceCacheUnzippedPath("%s/unzipped", strResourceCachePath.c_str());
-        SString strResourceCacheHttpClientFilesPath("%s/http-client-files", strResourceCachePath.c_str());
-        SString strResourceCacheHttpClientFilesNoClientCachePath("%s/http-client-files-no-client-cache", strResourceCachePath.c_str());
+        SString strResourceCachePath("{}/resource-cache", g_pServerInterface->GetServerModPath());
+        SString strResourceCacheUnzippedPath("{}/unzipped", strResourceCachePath.c_str());
+        SString strResourceCacheHttpClientFilesPath("{}/http-client-files", strResourceCachePath.c_str());
+        SString strResourceCacheHttpClientFilesNoClientCachePath("{}/http-client-files-no-client-cache", strResourceCachePath.c_str());
 
         // Make sure the resource-cache directories exists
         MakeSureDirExists((strResourceCacheUnzippedPath + "/").c_str());
@@ -755,7 +755,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         FileRename(strResourceCachePath + "/http-client-files-protected", strResourceCachePath + "/_old_http-client-files-protected.delete-me");
 
         // Create cache readme
-        SString strReadmeFilename("%s/DO_NOT_MODIFY_Readme.txt", strResourceCachePath.c_str());
+        SString strReadmeFilename("{}/DO_NOT_MODIFY_Readme.txt", strResourceCachePath.c_str());
         FILE*   fh = File::Fopen(strReadmeFilename, "w");
         if (fh)
         {
@@ -1687,7 +1687,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
     #endif
 
         SString strIP = pPlayer->GetSourceIP();
-        SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
+        SString strIPAndSerial("IP: {}  Serial: {}  Version: {}", strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
         if (!CheckNickProvided(szNick))            // check the nick is valid
         {
             // Tell the console
@@ -1712,7 +1712,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                     // Two players could have the same IP, so see if the old player appears inactive before quitting them
                     if (pTempPlayer->UhOhNetworkTrouble())
                     {
-                        pTempPlayer->Send(CPlayerDisconnectedPacket(SString("Supplanted by %s from %s", szNick, pPlayer->GetSourceIP())));
+                        pTempPlayer->Send(CPlayerDisconnectedPacket(SString("Supplanted by {} from {}", szNick, pPlayer->GetSourceIP())));
                         // Tell the console
                         CLogger::LogPrintf("DISCONNECT: %s Supplanted by (%s)\n", szNick, pTempPlayer->GetNick());
                         QuitPlayer(*pTempPlayer, CClient::QUIT_QUIT);
@@ -1729,7 +1729,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                     if (bPasswordIsValid)
                     {
                         // If he's not join flooding
-                        if (!m_pMainConfig->GetJoinFloodProtectionEnabled() || !m_FloodProtect.AddConnect(SString("%x", Packet.GetSourceIP())))
+                        if (!m_pMainConfig->GetJoinFloodProtectionEnabled() || !m_FloodProtect.AddConnect(SString("{:x}", Packet.GetSourceIP())))
                         {
                             // Set the nick and the game version
                             pPlayer->SetNick(szNick);
@@ -1871,24 +1871,24 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                     if (usClientBranchId != usServerBranchId)
                     {
                         eType = CPlayerDisconnectedPacket::DIFFERENT_BRANCH;
-                        strMessage = SString("(client: %X, server: %X)\n", usClientBranchId, usServerBranchId);
+                        strMessage = SString("(client: {:X}, server: {:X})\n", usClientBranchId, usServerBranchId);
                     }
                     else if (MTASA_VERSION_BUILD == 0)
                     {
                         eType = CPlayerDisconnectedPacket::BAD_VERSION;
-                        strMessage = SString("(client: %X, server: %X)\n", usClientNetVersion, usServerNetVersion);
+                        strMessage = SString("(client: {:X}, server: {:X})\n", usClientNetVersion, usServerNetVersion);
                     }
                     else
                     {
                         if (usClientNetVersion < usServerNetVersion)
                         {
                             eType = CPlayerDisconnectedPacket::SERVER_NEWER;
-                            strMessage = SString("(%d)\n", MTASA_VERSION_BUILD);
+                            strMessage = SString("({})\n", MTASA_VERSION_BUILD);
                         }
                         else
                         {
                             eType = CPlayerDisconnectedPacket::SERVER_OLDER;
-                            strMessage = SString("(%d)\n", MTASA_VERSION_BUILD);
+                            strMessage = SString("({})\n", MTASA_VERSION_BUILD);
                         }
                     }
                     DisconnectPlayer(this, *pPlayer, eType, strMessage);
@@ -3693,7 +3693,7 @@ void CGame::Packet_PlayerTransgression(CPlayerTransgressionPacket& Packet)
     if (pPlayer)
     {
         // If ac# not disabled on this server, do a kick
-        if (!g_pGame->GetConfig()->IsDisableAC(SString("%d", Packet.m_uiLevel)))
+        if (!g_pGame->GetConfig()->IsDisableAC(SString("{}", Packet.m_uiLevel)))
         {
             CStaticFunctionDefinitions::KickPlayer(pPlayer, NULL, Packet.m_strMessage);
         }
@@ -3718,10 +3718,10 @@ void CGame::Packet_PlayerDiagnostic(CPlayerDiagnosticPacket& Packet)
                 pPlayer->m_strD3d9Sha256 = parts[3];
             }
         }
-        else if (Packet.m_uiLevel >= 1000 || g_pGame->GetConfig()->IsEnableDiagnostic(SString("%d", Packet.m_uiLevel)))
+        else if (Packet.m_uiLevel >= 1000 || g_pGame->GetConfig()->IsEnableDiagnostic(SString("{}", Packet.m_uiLevel)))
         {
             // If diagnosticis enabled on this server, log it
-            SString strMessageCombo("DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick(), Packet.m_uiLevel, Packet.m_strMessage.c_str());
+            SString strMessageCombo("DIAGNOSTIC: {} #{} {}\n", pPlayer->GetNick(), Packet.m_uiLevel, Packet.m_strMessage.c_str());
             CLogger::LogPrint(strMessageCombo);
         }
     }
@@ -3941,7 +3941,7 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
 
 void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
 {
-    SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP(), pPlayer->GetSerial().c_str(), pPlayer->GetPlayerVersion().c_str());
+    SString strIPAndSerial("IP: {}  Serial: {}  Version: {}", pPlayer->GetSourceIP(), pPlayer->GetSerial().c_str(), pPlayer->GetPlayerVersion().c_str());
     // Call the onPlayerConnect event. If it returns false, disconnect the player
     CLuaArguments Arguments;
     Arguments.PushString(pPlayer->GetNick());
@@ -4348,7 +4348,7 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     {
         m_strPrevMinClientConnectRequirement = strNewMin;
         if (!strNewMin.empty())
-            CLogger::LogPrintf(SString("Server minclientversion is now %s\n", *strNewMin));
+            CLogger::LogPrintf(SString("Server minclientversion is now {}\n", *strNewMin));
         else
             CLogger::LogPrintf("Server minclientversion is now cleared\n");
     }
@@ -4397,7 +4397,7 @@ CMtaVersion CGame::CalculateMinClientRequirement()
             }
 
             if (uiNumIncompatiblePlayers > 0)
-                CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin));
+                CLogger::LogPrintf(SString("Forced {} player(s) to reconnect so they can update to {}\n", uiNumIncompatiblePlayers, *strKickMin));
         }
     }
 

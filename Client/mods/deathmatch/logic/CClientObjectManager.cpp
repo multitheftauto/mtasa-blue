@@ -178,7 +178,7 @@ bool CClientObjectManager::ObjectsAroundPointLoaded(const CVector& vecPosition, 
                     {
                         // Debugging information
                         *pstrStatus +=
-                            SString("ID:%05d  Dist:%4.1f  GetGameObject:%d  IsLoaded:%d  IsStreamedIn:%d\n", pObject->GetModel(), sqrtf(fDistSquared),
+                            SString("ID:{:05}  Dist:{:4.1f}  GetGameObject:{}  IsLoaded:{}  IsStreamedIn:{}\n", pObject->GetModel(), sqrtf(fDistSquared),
                                     pObject->GetGameObject() ? 1 : 0, pObject->GetModelInfo()->IsLoaded() ? 1 : 0, pObject->IsStreamedIn() ? 1 : 0);
                     }
                     else if (!bResult)

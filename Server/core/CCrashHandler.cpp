@@ -68,7 +68,7 @@ void CCrashHandler::Init(const SString& strInServerPath)
     // Prepare initial dumpfile name
     time_t     pTime = time(NULL);
     struct tm* tm = localtime(&pTime);
-    SString strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+    SString strFilename("server_{}_{:04}{:02}{:02}_{:02}{:02}.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
     ms_strDumpPathFilename = PathJoin(ms_strDumpPath, strFilename);
     MakeSureDirExists(ms_strDumpPathFilename);
 
@@ -104,16 +104,16 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     sFileName.Format("server_%s_%04d%02d%02d_%02d%02d.log", MTA_DM_BUILDTYPE, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
 
     SString sContent;
-    sContent += SString("MTA:SA Server v%s-r%d-%s crash report.\n", MTA_DM_VERSIONSTRING, MTASA_VERSION_BUILD, MTA_DM_BUILDTYPE);
-    sContent += SString("%04d-%02d-%02d %02d:%02d\n", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
-    sContent += SString("Caught %d addresses ...\n\n", iAmount);
+    sContent += SString("MTA:SA Server v{}-r{}-{} crash report.\n", MTA_DM_VERSIONSTRING, MTASA_VERSION_BUILD, MTA_DM_BUILDTYPE);
+    sContent += SString("{:04}-{:02}-{:02} {:02}:{:02}\n", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+    sContent += SString("Caught {} addresses ...\n\n", iAmount);
     sContent += "Backtrace:\n";
 
     for (int i = 0; i < iAmount; i++)
     {
         if (symbols[i])
         {
-            sContent += SString("#%d - %s\n", i, symbols[i]);
+            sContent += SString("#{} - {}\n", i, symbols[i]);
         }
     }
     sContent += std::string(80, '-') + "\n";
@@ -143,7 +143,7 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
 #ifdef __APPLE__
 bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
 {
-    auto path = PathJoin(dump_dir, SString("%s.dmp", minidump_id));
+    auto path = PathJoin(dump_dir, SString("{}.dmp", minidump_id));
 #else
 bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded)
 {
@@ -155,7 +155,7 @@ bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* c
     // Set final dump file name (Not so safe)
     time_t     pTime = time(NULL);
     struct tm* tm = localtime(&pTime);
-    SString strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+    SString strFilename("server_{}_{:04}{:02}{:02}_{:02}{:02}.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
     SString strFinalDumpPathFilename = PathJoin(ms_strDumpPath, strFilename);
     File::Rename(ms_strDumpPathFilename, strFinalDumpPathFilename);
 
@@ -233,7 +233,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
                 strModuleName += "64";
             #endif
 
-            SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
+            SString strFilename("server_{}_{}_{:08x}_{:x}_{:04}{:02}{:02}_{:02}{:02}.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
                                 pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff, SystemTime.wYear, SystemTime.wMonth,
                                 SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);
 
@@ -270,17 +270,17 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
                 time_t timeTemp;
                 time(&timeTemp);
 
-                SString strMTAVersionFull = SString("%s", MTA_DM_BUILDTAG_LONG);
+                SString strMTAVersionFull = SString("{}", MTA_DM_BUILDTAG_LONG);
 
                 SString strInfo;
-                strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
-                strInfo += SString("Time = %s", ctime(&timeTemp));
+                strInfo += SString("Version = {}\n", strMTAVersionFull.c_str());
+                strInfo += SString("Time = {}", ctime(&timeTemp));
 
-                strInfo += SString("Module = %s\n", pExceptionInformation->GetModulePathName());
+                strInfo += SString("Module = {}\n", pExceptionInformation->GetModulePathName());
 
                 // Write the basic exception information
-                strInfo += SString("Code = 0x%08X\n", pExceptionInformation->GetCode());
-                strInfo += SString("Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset());
+                strInfo += SString("Code = 0x{:08X}\n", pExceptionInformation->GetCode());
+                strInfo += SString("Offset = 0x{:08X}\n\n", pExceptionInformation->GetAddressModuleOffset());
 
                 // Write the register info
                 strInfo += SString(

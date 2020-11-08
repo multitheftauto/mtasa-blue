@@ -50,7 +50,7 @@ void CFunctionUseLogger::MaybeFlush(bool bForce)
         if (bForce || (timeNow - callRecord.timeFirstUsed).ToInt() > 1500)
         {
             // Add log line
-            SString strMessage("%s - %s - %s x %d [%s]\n", *GetLocalTimeString(true, true), *callRecord.strResourceName, *callRecord.strFunctionName,
+            SString strMessage("{} - {} - {} x {} [{}]\n", *GetLocalTimeString(true, true), *callRecord.strResourceName, *callRecord.strFunctionName,
                                callRecord.uiCallCount, *callRecord.strExampleArgs);
 
             if (!m_strLogFilename.empty())
@@ -74,7 +74,7 @@ void CFunctionUseLogger::OnFunctionUse(lua_State* luaVM, const char* szFunctionN
     CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromLuaState(luaVM);
     SString    strResourceName = pResource ? pResource->GetName() : "Unknown";
 
-    SString strKey("%s-%s", szFunctionName, *strResourceName);
+    SString strKey("{}-{}", szFunctionName, *strResourceName);
 
     SFuncCallRecord* pItem = MapFind(m_FuncCallRecordMap, strKey);
     if (!pItem)

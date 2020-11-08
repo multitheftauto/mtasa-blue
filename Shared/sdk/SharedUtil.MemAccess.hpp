@@ -94,7 +94,7 @@ namespace SharedUtil
         VirtualProtect((LPVOID)hMem.dwFirstPage, 0x1000, PAGE_EXECUTE_READWRITE, &hMem.oldProt);
 
         // Make sure not using this slow function too much
-        OutputDebugLine(SString("[Mem] OpenMemWrite at %08x for %d bytes  (oldProt:%04x)", pAddr, uiAmount, hMem.oldProt));
+        OutputDebugLine(SString("[Mem] OpenMemWrite at {:08x} for {} bytes  (oldProt:{:04x})", pAddr, uiAmount, hMem.oldProt));
 
 #ifdef MTA_DEBUG
 #if 0   // Annoying

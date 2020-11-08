@@ -80,7 +80,7 @@ CClientGUIElement::CClientGUIElement(CClientManager* pManager, CLuaMain* pLuaMai
             m_strCGUITypeName = "unknown";
             break;
     }
-    SetTypeName(SString("gui-%s", *m_strCGUITypeName));
+    SetTypeName(SString("gui-{}", *m_strCGUITypeName));
 
     // Add us to the list in the manager
     m_pGUIManager->Add(this);

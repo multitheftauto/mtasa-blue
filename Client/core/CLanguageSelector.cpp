@@ -275,7 +275,7 @@ SString CLanguageSelector::GetFlagFilename(SString strLocale)
 {
     if (strLocale.empty())
         strLocale = CVARS_GET_VALUE<SString>("locale");
-    return CalcMTASAPath(SString(MTA_LOCALE_DIR "%s\\flag.png", *strLocale));
+    return CalcMTASAPath(SString(MTA_LOCALE_DIR "{}\\flag.png", *strLocale));
 }
 
 ///////////////////////////////////////////////////////////////

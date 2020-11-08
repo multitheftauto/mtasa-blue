@@ -203,16 +203,16 @@ void CPerfStatBandwidthReductionImpl::GetStats(CPerfStatResult* pResult, const s
         SString* row = pResult->AddRow();
 
         int c = 0;
-        row[c++] = SString("%d) %s", i, szDesc[i]);
+        row[c++] = SString("{}) {}", i, szDesc[i]);
         row[c++] = CPerfStatManager::GetScaledByteString(stats1Sec.puresync.llSentBytesByZone[i]);
         row[c++] = CPerfStatManager::GetScaledByteString(stats1Sec.puresync.llSkippedBytesByZone[i]);
-        row[c++] = SString("%lld", stats1Sec.puresync.llSentPacketsByZone[i]);
-        row[c++] = SString("%lld", stats1Sec.puresync.llSkippedPacketsByZone[i]);
+        row[c++] = SString("{}", stats1Sec.puresync.llSentPacketsByZone[i]);
+        row[c++] = SString("{}", stats1Sec.puresync.llSkippedPacketsByZone[i]);
 
         row[c++] = CPerfStatManager::GetScaledByteString(m_StatsTotal.puresync.llSentBytesByZone[i]);
         row[c++] = CPerfStatManager::GetScaledByteString(m_StatsTotal.puresync.llSkippedBytesByZone[i]);
-        row[c++] = SString("%lld", m_StatsTotal.puresync.llSentPacketsByZone[i]);
-        row[c++] = SString("%lld", m_StatsTotal.puresync.llSkippedPacketsByZone[i]);
+        row[c++] = SString("{}", m_StatsTotal.puresync.llSentPacketsByZone[i]);
+        row[c++] = SString("{}", m_StatsTotal.puresync.llSkippedPacketsByZone[i]);
 
         llTotals[0] += stats1Sec.puresync.llSentBytesByZone[i];
         llTotals[1] += stats1Sec.puresync.llSkippedBytesByZone[i];
@@ -233,13 +233,13 @@ void CPerfStatBandwidthReductionImpl::GetStats(CPerfStatResult* pResult, const s
         row[c++] = "Light sync";
         row[c++] = CPerfStatManager::GetScaledByteString(stats1Sec.lightsync.llLightSyncBytesSent);
         row[c++] = CPerfStatManager::GetScaledByteString(stats1Sec.lightsync.llSyncBytesSkipped);
-        row[c++] = SString("%lld", stats1Sec.lightsync.llLightSyncPacketsSent);
-        row[c++] = SString("%lld", stats1Sec.lightsync.llSyncPacketsSkipped);
+        row[c++] = SString("{}", stats1Sec.lightsync.llLightSyncPacketsSent);
+        row[c++] = SString("{}", stats1Sec.lightsync.llSyncPacketsSkipped);
 
         row[c++] = CPerfStatManager::GetScaledByteString(m_StatsTotal.lightsync.llLightSyncBytesSent);
         row[c++] = CPerfStatManager::GetScaledByteString(m_StatsTotal.lightsync.llSyncBytesSkipped);
-        row[c++] = SString("%lld", m_StatsTotal.lightsync.llLightSyncPacketsSent);
-        row[c++] = SString("%lld", m_StatsTotal.lightsync.llSyncPacketsSkipped);
+        row[c++] = SString("{}", m_StatsTotal.lightsync.llLightSyncPacketsSent);
+        row[c++] = SString("{}", m_StatsTotal.lightsync.llSyncPacketsSkipped);
 
         llTotals[0] += stats1Sec.lightsync.llLightSyncBytesSent;
         llTotals[1] += stats1Sec.lightsync.llSyncBytesSkipped;
@@ -262,13 +262,13 @@ void CPerfStatBandwidthReductionImpl::GetStats(CPerfStatResult* pResult, const s
         row[c++] = "Total";
         row[c++] = CPerfStatManager::GetScaledByteString(llTotals[0]);
         row[c++] = CPerfStatManager::GetScaledByteString(llTotals[1]);
-        row[c++] = SString("%lld", llTotals[2]);
-        row[c++] = SString("%lld", llTotals[3]);
+        row[c++] = SString("{}", llTotals[2]);
+        row[c++] = SString("{}", llTotals[3]);
 
         row[c++] = CPerfStatManager::GetScaledByteString(llTotals[4]);
         row[c++] = CPerfStatManager::GetScaledByteString(llTotals[5]);
-        row[c++] = SString("%lld", llTotals[6]);
-        row[c++] = SString("%lld", llTotals[7]);
+        row[c++] = SString("{}", llTotals[6]);
+        row[c++] = SString("{}", llTotals[7]);
     }
 
     // Add reduction
@@ -294,13 +294,13 @@ void CPerfStatBandwidthReductionImpl::GetStats(CPerfStatResult* pResult, const s
 
         int c = 0;
         row[c++] = "Reduction percent";
-        row[c++] = SString("%0.0f%%", -dBytesPercent5Sec);
+        row[c++] = SString("{:0.0f}%", -dBytesPercent5Sec);
         row[c++] = "";
-        row[c++] = SString("%0.0f%%", -dPacketsPercent5Sec);
+        row[c++] = SString("{:0.0f}%", -dPacketsPercent5Sec);
         row[c++] = "";
-        row[c++] = SString("%0.0f%%", -dBytesPercentAll);
+        row[c++] = SString("{:0.0f}%", -dBytesPercentAll);
         row[c++] = "";
-        row[c++] = SString("%0.0f%%", -dPacketsPercentAll);
+        row[c++] = SString("{:0.0f}%", -dPacketsPercentAll);
         row[c++] = "";
 
         pResult->AddRow();

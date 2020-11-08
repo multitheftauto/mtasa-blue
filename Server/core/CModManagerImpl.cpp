@@ -37,7 +37,7 @@ bool CModManagerImpl::RequestLoad(const char* szModName)
 
 SString CModManagerImpl::GetAbsolutePath(const char* szRelative)
 {
-    return SString("%s/%s", m_strModPath.c_str(), szRelative);
+    return SString("{}/{}", m_strModPath.c_str(), szRelative);
 }
 
 bool CModManagerImpl::IsModLoaded()
@@ -57,9 +57,9 @@ bool CModManagerImpl::Load(const char* szModName, int iArgumentCount, char* szAr
         return false;
 
     // Make the string path to the mod library
-    m_strModPath = SString("%s/mods/%s", m_strServerPath.c_str(), szModName);
+    m_strModPath = SString("{}/mods/{}", m_strServerPath.c_str(), szModName);
 
-    SString strLibFilename("%s%s", szModName, MTA_LIB_SUFFIX MTA_LIB_EXTENSION);
+    SString strLibFilename("{}{}", szModName, MTA_LIB_SUFFIX MTA_LIB_EXTENSION);
     SString strFilename = PathJoin(m_strServerPath, SERVER_BIN_PATH_MOD, strLibFilename);
 
     // Attempt to load it

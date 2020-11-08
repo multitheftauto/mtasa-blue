@@ -102,7 +102,7 @@ void CQuestionBox::Show()
     m_pWindow->BringToFront();
     g_pCore->RemoveMessageBox();
 
-    AddReportLog(9100, SString("QuestionBox::Show [%s] %s", m_pWindow->GetText().c_str(), *m_strMsg.Left(200).Replace("\n", "|")));
+    AddReportLog(9100, SString("QuestionBox::Show [{}] {}", m_pWindow->GetText().c_str(), *m_strMsg.Left(200).Replace("\n", "|")));
 }
 
 void CQuestionBox::Reset()

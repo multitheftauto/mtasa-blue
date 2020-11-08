@@ -80,7 +80,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
     catch (CEGUI::InvalidRequestException e)
     {
         SString strMessage = e.getMessage().c_str();
-        BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
+        BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n{}", *strMessage));
     }
 
     // Window fonts first
@@ -98,7 +98,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
     catch (CEGUI::InvalidRequestException e)
     {
         SString strMessage = e.getMessage().c_str();
-        BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
+        BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n{}", *strMessage));
     }
 }
 
@@ -414,7 +414,7 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont(const char* szFontName, const char* sz
     }
     if (!pResult)
     {
-        BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading font!\n\n(%s)", szFontWinFile));
+        BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading font!\n\n({})", szFontWinFile));
     }
 
     return pResult;
@@ -998,7 +998,7 @@ void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
 {
     if (m_GuiWorkingDirectoryStack.size() < 2)
     {
-        OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Stack empty. Expected '%s'", *strDirCheck));
+        OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Stack empty. Expected '{}'", *strDirCheck));
     }
     else
     {
@@ -1007,7 +1007,7 @@ void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
             const SString& strWas = m_GuiWorkingDirectoryStack.back();
             if (strDirCheck != strWas)
             {
-                OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Mismatch. Got '%s', expected '%s'", *strWas, *strDirCheck));
+                OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Mismatch. Got '{}', expected '{}'", *strWas, *strDirCheck));
             }
         }
         m_GuiWorkingDirectoryStack.pop_back();

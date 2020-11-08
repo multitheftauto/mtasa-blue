@@ -13,7 +13,7 @@
 
 CProxyDirectInputDevice8::CProxyDirectInputDevice8(IDirectInputDevice8A* pDevice)
 {
-    WriteDebugEvent(SString("CProxyDirectInputDevice8::CProxyDirectInputDevice8 %08x", this));
+    WriteDebugEvent(SString("CProxyDirectInputDevice8::CProxyDirectInputDevice8 {:08x}", this));
     CCore::GetSingleton().ApplyHooks2();
 
     // Initialize our device member variable.
@@ -37,13 +37,13 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8(IDirectInputDevice8A* pDevice
                                 didi.tszProductName));
     }
     else
-        WriteDebugEvent(SString("   CProxyDirectInputDevice8 GetDeviceInfo failed:%08x", hResult));
+        WriteDebugEvent(SString("   CProxyDirectInputDevice8 GetDeviceInfo failed:{:08x}", hResult));
 }
 
 CProxyDirectInputDevice8::~CProxyDirectInputDevice8()
 {
     GetJoystickManager()->RemoveDevice(m_pDevice);
-    WriteDebugEvent(SString("CProxyDirectInputDevice8::~CProxyDirectInputDevice8 %08x", this));
+    WriteDebugEvent(SString("CProxyDirectInputDevice8::~CProxyDirectInputDevice8 {:08x}", this));
 }
 
 /*** IUnknown methods ***/

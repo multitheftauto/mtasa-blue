@@ -218,13 +218,13 @@ bool CPlayer::ShouldIgnoreMinClientVersionChecks()
 
 bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
 {
-    OutputDebugLine(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    OutputDebugLine(SString("[Data] SubscribeElementData {} [{}]", GetNick(), strName.c_str()));
     return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
 }
 
 bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
 {
-    OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    OutputDebugLine(SString("[Data] UnsubscribeElementData {} [{}]", GetNick(), strName.c_str()));
     return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
 }
 
@@ -236,7 +236,7 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
     {
         if (it->first == pElement)
         {
-            OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+            OutputDebugLine(SString("[Data] UnsubscribeElementData {} [{}]", GetNick(), it->second.c_str()));
             it = m_DataSubscriptions.erase(it);
             erased = true;
         }
@@ -930,7 +930,7 @@ void CPlayer::RemovePlayerFromDistLists(CPlayer* pOther)
 
 void CPlayer::MovePlayerToNearList(CPlayer* pOther)
 {
-    OutputDebugLine(SString("[Sync] ++ %s: Move %s to nearlist", GetNick(), pOther->GetNick()));
+    OutputDebugLine(SString("[Sync] ++ {}: Move {} to nearlist", GetNick(), pOther->GetNick()));
 
     dassert(!MapContains(m_NearPlayerList, pOther) && MapContains(m_FarPlayerList, pOther));
     SViewerInfo* pInfo = MapFind(m_FarPlayerList, pOther);
@@ -941,7 +941,7 @@ void CPlayer::MovePlayerToNearList(CPlayer* pOther)
 // Assumes CSimControl::UpdatePuresyncSimPlayer is called soon after this function
 void CPlayer::MovePlayerToFarList(CPlayer* pOther)
 {
-    OutputDebugLine(SString("[Sync] -- %s: Move %s to farlist", GetNick(), pOther->GetNick()));
+    OutputDebugLine(SString("[Sync] -- {}: Move {} to farlist", GetNick(), pOther->GetNick()));
 
     dassert(MapContains(m_NearPlayerList, pOther) && !MapContains(m_FarPlayerList, pOther));
     SViewerInfo* pInfo = MapFind(m_NearPlayerList, pOther);

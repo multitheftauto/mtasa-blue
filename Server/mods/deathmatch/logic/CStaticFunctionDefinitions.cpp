@@ -3398,11 +3398,11 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
         usPort = usPort ? usPort : g_pGame->GetConfig()->GetServerPort();
         if (szHost[0])
         {
-            pPlayer->SetQuitReasonForLog(SString("[Redirected to %s:%d]", szHost, usPort));
+            pPlayer->SetQuitReasonForLog(SString("[Redirected to {}:{}]", szHost, usPort));
         }
         else
         {
-            pPlayer->SetQuitReasonForLog(SString("[Redirected to port %d]", usPort));
+            pPlayer->SetQuitReasonForLog(SString("[Redirected to port {}]", usPort));
         }
 
         return true;
@@ -11197,7 +11197,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount(const SString& strName, const S
         SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation(strName);
         if (!strCaseVariation.empty())
         {
-            strOutError = SString("Already an account using a case variation of that name ('%s')", *strCaseVariation);
+            strOutError = SString("Already an account using a case variation of that name ('{}')", *strCaseVariation);
             return NULL;
         }
     }
@@ -11281,7 +11281,7 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
             SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation(strNewName);
             if (!strCaseVariation.empty())
             {
-                strOutError = SString("Already an account using a case variation of that name ('%s')", *strCaseVariation);
+                strOutError = SString("Already an account using a case variation of that name ('{}')", *strCaseVariation);
                 return false;
             }
         }
@@ -11571,7 +11571,7 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
         }
 
         // Format the responsible element and the reason/duration into the message string
-        SString strMessage("%s%s", strResponsible.c_str(), strDetails.c_str());
+        SString strMessage("{}{}", strResponsible.c_str(), strDetails.c_str());
 
         // Limit overall length of message
         if (strMessage.length() > 255)
@@ -12160,5 +12160,5 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag()
 
 CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 {
-    return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
+    return SString("{}.{}.{}-{}.{:05}.{}", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
 }

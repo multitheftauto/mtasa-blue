@@ -418,9 +418,9 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
             {
                 double dNumber = pArgument->GetNumber();
                 if (dNumber == floor(dNumber))
-                    strParsedQuery += SString("%lld", (long long)dNumber);
+                    strParsedQuery += SString("{}", (long long)dNumber);
                 else
-                    strParsedQuery += SString("%f", dNumber);
+                    strParsedQuery += SString("{:f}", dNumber);
             }
             else if (type == LUA_TSTRING)
             {
@@ -475,21 +475,21 @@ SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl)
                 case SQLITE_INTEGER:
                 {
                     int iValue = va_arg(vl, int);
-                    strParsedQuery += SString("%d", iValue);
+                    strParsedQuery += SString("{}", iValue);
                 }
                 break;
 
                 case SQLITE_INTEGER64:
                 {
                     long long int llValue = va_arg(vl, long long int);
-                    strParsedQuery += SString("%lld", llValue);
+                    strParsedQuery += SString("{}", llValue);
                 }
                 break;
 
                 case SQLITE_FLOAT:
                 {
                     double fValue = va_arg(vl, double);
-                    strParsedQuery += SString("%f", fValue);
+                    strParsedQuery += SString("{:f}", fValue);
                 }
                 break;
 

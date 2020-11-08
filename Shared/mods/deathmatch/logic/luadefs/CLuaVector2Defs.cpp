@@ -278,7 +278,7 @@ int CLuaVector2Defs::ToString(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        SString string = SString("vector2: { x = %.3f, y = %.3f }", pVector->fX, pVector->fY);
+        SString string = SString("vector2: { x = {:.3f}, y = {:.3f} }", pVector->fX, pVector->fY);
         lua_pushstring(luaVM, string.c_str());
         return 1;
     }

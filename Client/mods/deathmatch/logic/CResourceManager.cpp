@@ -238,7 +238,7 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
     if (pResourceFile && !pResourceFile->IsModifedByScript())
     {
         pResourceFile->SetModifedByScript(true);
-        SString strMessage("Resource file modifed by script (%s): %s ", *strReason, *ConformResourcePath(strInFilename));
+        SString strMessage("Resource file modifed by script ({}): {} ", *strReason, *ConformResourcePath(strInFilename));
         AddReportLog(7059, strMessage + g_pNet->GetConnectedServer(true), 10);
     }
 }
@@ -269,7 +269,7 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
                 CMD5Hasher::ConvertToHex(checksum.md5, szMd5);
                 char szMd5Wanted[33];
                 CMD5Hasher::ConvertToHex(pResourceFile->GetServerChecksum().md5, szMd5Wanted);
-                SString strMessage("%s [Expected Size:%d MD5:%s][Got Size:%d MD5:%s] ", *ConformResourcePath(strInFilename), pResourceFile->GetDownloadSize(),
+                SString strMessage("{} [Expected Size:{} MD5:{}][Got Size:{} MD5:{}] ", *ConformResourcePath(strInFilename), pResourceFile->GetDownloadSize(),
                                    szMd5Wanted, (int)FileSize(strInFilename), szMd5);
                 if (pResourceFile->IsDownloaded())
                 {

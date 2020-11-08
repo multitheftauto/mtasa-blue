@@ -44,7 +44,7 @@ void CElementRefManager::AddElementRefs(const char* szDebugInfo, ...)
 
         dassert(ms_ElementRefList.find(ppElement) != ms_ElementRefList.end());
 #ifdef MTA_DEBUG
-        MapSet(ms_ElementRefListDebugInfo, ppElement, SString("Index:%d Addr:0x%s", i, szDebugInfo));
+        MapSet(ms_ElementRefListDebugInfo, ppElement, SString("Index:{} Addr:0x{}", i, szDebugInfo));
 #endif
     }
     va_end(vl);
@@ -65,7 +65,7 @@ void CElementRefManager::AddElementListRef(const char* szDebugInfo, std::list<CE
 
     dassert(ms_ElementRefListList.find(pList) != ms_ElementRefListList.end());
 #ifdef MTA_DEBUG
-    MapSet(ms_ElementRefListListDebugInfo, pList, SString("list Addr:0x%s", szDebugInfo));
+    MapSet(ms_ElementRefListListDebugInfo, pList, SString("list Addr:0x{}", szDebugInfo));
 #endif
 }
 
@@ -140,7 +140,7 @@ void CElementRefManager::OnElementDelete(CElement* pElement)
     #ifdef MTA_DEBUG
                 SString* pstrDebugInfo = MapFind(ms_ElementRefListDebugInfo, &pOther);
                 assert(pstrDebugInfo);
-                OutputDebugLine(SString("[ElementRef] Did null %s (%08x @ %08x)", **pstrDebugInfo, pElement, &pOther));
+                OutputDebugLine(SString("[ElementRef] Did null {} ({:08x} @ {:08x})", **pstrDebugInfo, pElement, &pOther));
     #endif
             }
         }
@@ -165,7 +165,7 @@ void CElementRefManager::OnElementDelete(CElement* pElement)
         #ifdef MTA_DEBUG
                     SString* pstrDebugInfo = MapFind(ms_ElementRefListListDebugInfo, &rList);
                     assert(pstrDebugInfo);
-                    OutputDebugLine(SString("[ElementRef] Did list item %s (%08x @ %08x)", **pstrDebugInfo, pElement, &rList));
+                    OutputDebugLine(SString("[ElementRef] Did list item {} ({:08x} @ {:08x})", **pstrDebugInfo, pElement, &rList));
         #endif
                 }
                 else

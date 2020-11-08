@@ -364,7 +364,7 @@ void CClientVariables::LoadDefaults()
     {
         RECT rect;
         GetWindowRect(GetDesktopWindow(), &rect);
-        Set("display_resolution", SString("%dx%dx32", rect.right, rect.bottom));
+        Set("display_resolution", SString("{}x{}x32", rect.right, rect.bottom));
     }
 
     // We will default this one during CProxyDirect3DDevice9 constructor, because we need a valid direct3d device to give a proper default value.

@@ -269,13 +269,13 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
         else
         {
             if (m_bTestmodeEnabled && bOutputDebug)
-                DebugOutputThreadsafe(SString("[BROWSER] Blocked page: %s", strURL.c_str()), 255, 0, 0);
+                DebugOutputThreadsafe(SString("[BROWSER] Blocked page: {}", strURL.c_str()), 255, 0, 0);
             return eURLState::WEBPAGE_DISALLOWED;
         }
     }
 
     if (m_bTestmodeEnabled && bOutputDebug)
-        DebugOutputThreadsafe(SString("[BROWSER] Blocked page: %s", strURL.c_str()), 255, 0, 0);
+        DebugOutputThreadsafe(SString("[BROWSER] Blocked page: {}", strURL.c_str()), 255, 0, 0);
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
@@ -560,16 +560,16 @@ bool CWebCore::UpdateListsFromMaster()
         time_t currentTime;
         time(&currentTime);
 
-        if (lastUpdateTime < SString("%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
+        if (lastUpdateTime < SString("{}", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
         {
             OutputDebugLine("Updating white- and blacklist...");
             SHttpRequestOptions options;
             options.uiConnectionAttempts = 3;
             g_pCore->GetNetwork()
                 ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
+                ->QueueFile(SString("{}?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
 
-            pLastUpdateNode->SetTagContent(SString("%d", (long long)currentTime));
+            pLastUpdateNode->SetTagContent(SString("{}", (long long)currentTime));
             m_pXmlConfig->Write();
         }
     }
@@ -765,7 +765,7 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
                 options.uiConnectionAttempts = 3;
                 g_pCore->GetNetwork()
                     ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                    ->QueueFile(SString("%s?type=fetchwhite", BROWSER_UPDATE_URL), NULL, pWebCore, &CWebCore::StaticFetchWhitelistFinished, options);
+                    ->QueueFile(SString("{}?type=fetchwhite", BROWSER_UPDATE_URL), NULL, pWebCore, &CWebCore::StaticFetchWhitelistFinished, options);
 
                 pWebCore->m_iWhitelistRevision = iWhiteListRevision;
             }
@@ -776,7 +776,7 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
                 options.uiConnectionAttempts = 3;
                 g_pCore->GetNetwork()
                     ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                    ->QueueFile(SString("%s?type=fetchblack", BROWSER_UPDATE_URL), NULL, pWebCore, &CWebCore::StaticFetchBlacklistFinished, options);
+                    ->QueueFile(SString("{}?type=fetchblack", BROWSER_UPDATE_URL), NULL, pWebCore, &CWebCore::StaticFetchBlacklistFinished, options);
 
                 pWebCore->m_iBlacklistRevision = iBlackListRevision;
             }

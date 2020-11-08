@@ -1079,7 +1079,7 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "version");
-                SString strVersion("%.2f", mod->_GetFunctions().fVersion);
+                SString strVersion("{:.2f}", mod->_GetFunctions().fVersion);
                 lua_pushstring(luaVM, strVersion);
                 lua_settable(luaVM, -3);
 

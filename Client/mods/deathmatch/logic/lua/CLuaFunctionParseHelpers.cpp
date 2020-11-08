@@ -758,7 +758,7 @@ void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMat
             SString    strPath, strMetaPath;
             if (CResourceManager::ParseResourcePathInput(strFilePath, pFileResource, &strPath, &strMetaPath))
             {
-                SString strUniqueName = SString("%s*%s*%s", pParentResource->GetName(), pFileResource->GetName(), strMetaPath.c_str()).Replace("\\", "/");
+                SString strUniqueName = SString("{}*{}*{}", pParentResource->GetName(), pFileResource->GetName(), strMetaPath.c_str()).Replace("\\", "/");
                 pMaterialElement = g_pClientGame->GetManager()->GetRenderElementManager()->FindAutoTexture(strPath, strUniqueName);
 
                 if (pMaterialElement)

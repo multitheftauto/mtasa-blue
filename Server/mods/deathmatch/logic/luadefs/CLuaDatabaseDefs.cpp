@@ -249,7 +249,7 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
                     strHost = strHost.SubStr(1);
                     if (!IsValidFilePath(strHost))
                     {
-                        argStream.SetCustomError(SString("host path %s not valid", *strHost));
+                        argStream.SetCustomError(SString("host path {} not valid", *strHost));
                     }
                     else
                     {
@@ -269,7 +269,7 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
                     }
                     else
                     {
-                        argStream.SetCustomError(SString("host path %s not found", *strHost));
+                        argStream.SetCustomError(SString("host path {} not found", *strHost));
                     }
                 }
             }

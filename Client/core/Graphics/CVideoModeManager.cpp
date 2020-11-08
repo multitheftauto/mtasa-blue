@@ -314,14 +314,14 @@ void CVideoModeManager::OnLoseFocus()
 
                 if (!EnumDisplaySettings(GetCurrentAdapterDeviceName(), ENUM_REGISTRY_SETTINGS, &dmScreenSettings))
                 {
-                    AddReportLog(7340, SString("EnumDisplaySettings failed for %s", *GetCurrentAdapterDeviceName()));
+                    AddReportLog(7340, SString("EnumDisplaySettings failed for {}", *GetCurrentAdapterDeviceName()));
                     return;
                 }
 
                 int iChangeResult = ChangeDisplaySettingsEx(GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_RESET, NULL);
                 if (iChangeResult != DISP_CHANGE_SUCCESSFUL)
                 {
-                    AddReportLog(7341, SString("ChangeDisplaySettingsEx failed for %s (%d)", *GetCurrentAdapterDeviceName(), iChangeResult));
+                    AddReportLog(7341, SString("ChangeDisplaySettingsEx failed for {} ({})", *GetCurrentAdapterDeviceName(), iChangeResult));
                     return;
                 }
             }
@@ -605,9 +605,9 @@ bool CVideoModeManager::GameResMatchesCurrentAdapter()
 ///////////////////////////////////////////////////////////////
 SString CVideoModeManager::MakeResolutionString(uint uiWidth, uint uiHeight, uint uiDepth, uint uiAdapter)
 {
-    SString strRes("%dx%dx%d", uiWidth, uiHeight, uiDepth);
+    SString strRes("{}x{}x{}", uiWidth, uiHeight, uiDepth);
     if (uiAdapter > 0)
-        strRes += SString("x%d", uiAdapter);
+        strRes += SString("x{}", uiAdapter);
     return strRes;
 }
 

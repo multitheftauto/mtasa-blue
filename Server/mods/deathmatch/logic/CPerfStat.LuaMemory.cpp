@@ -280,18 +280,18 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats(CPerfStatResult* pResult, const s
 
         if (labs(calcedDelta) >= 1)
         {
-            row[c] = SString("%d KB", calcedDelta);
+            row[c] = SString("{} KB", calcedDelta);
             calcedDelta = 0;
         }
         c++;
 
-        row[c++] = SString("%d KB", calcedCurrent);
-        row[c++] = SString("%d KB", calcedMax);
+        row[c++] = SString("{} KB", calcedCurrent);
+        row[c++] = SString("{} KB", calcedMax);
 
         // Some extra 'all VM' things
         c += 6;
-        row[c++] = !g_pStats->iDbJobDataCount ? "-" : SString("%d", g_pStats->iDbJobDataCount);
-        row[c++] = g_pStats->iDbConnectionCount - 2 == 0 ? "-" : SString("%d", g_pStats->iDbConnectionCount - 2);
+        row[c++] = !g_pStats->iDbJobDataCount ? "-" : SString("{}", g_pStats->iDbJobDataCount);
+        row[c++] = g_pStats->iDbConnectionCount - 2 == 0 ? "-" : SString("{}", g_pStats->iDbConnectionCount - 2);
     }
 
     // For each VM
@@ -312,19 +312,19 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats(CPerfStatResult* pResult, const s
 
         if (labs(LuaMainMemory.Delta) >= 1)
         {
-            row[c] = SString("%d KB", LuaMainMemory.Delta);
+            row[c] = SString("{} KB", LuaMainMemory.Delta);
             LuaMainMemory.Delta = 0;
         }
         c++;
 
-        row[c++] = SString("%d KB", LuaMainMemory.Current);
-        row[c++] = SString("%d KB", LuaMainMemory.Max);
-        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("%d", LuaMainMemory.OpenXMLFiles);
-        row[c++] = !LuaMainMemory.OpenFiles ? "-" : SString("%d", LuaMainMemory.OpenFiles);
-        row[c++] = !LuaMainMemory.Refs ? "-" : SString("%d", LuaMainMemory.Refs);
-        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("%d", LuaMainMemory.TimerCount);
-        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("%d", LuaMainMemory.ElementCount);
-        row[c++] = !LuaMainMemory.TextDisplayCount ? "-" : SString("%d", LuaMainMemory.TextDisplayCount);
-        row[c++] = !LuaMainMemory.TextItemCount ? "-" : SString("%d", LuaMainMemory.TextItemCount);
+        row[c++] = SString("{} KB", LuaMainMemory.Current);
+        row[c++] = SString("{} KB", LuaMainMemory.Max);
+        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("{}", LuaMainMemory.OpenXMLFiles);
+        row[c++] = !LuaMainMemory.OpenFiles ? "-" : SString("{}", LuaMainMemory.OpenFiles);
+        row[c++] = !LuaMainMemory.Refs ? "-" : SString("{}", LuaMainMemory.Refs);
+        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("{}", LuaMainMemory.TimerCount);
+        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("{}", LuaMainMemory.ElementCount);
+        row[c++] = !LuaMainMemory.TextDisplayCount ? "-" : SString("{}", LuaMainMemory.TextDisplayCount);
+        row[c++] = !LuaMainMemory.TextItemCount ? "-" : SString("{}", LuaMainMemory.TextItemCount);
     }
 }

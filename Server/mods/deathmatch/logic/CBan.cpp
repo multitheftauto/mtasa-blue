@@ -50,11 +50,11 @@ SString CBan::GetDurationDesc()
         int iMins = static_cast<int>(Duration / 60);
 
         if (iDays)
-            return SString("%d day%s", iDays, iDays > 1 ? "s" : "");
+            return SString("{} day{}", iDays, iDays > 1 ? "s" : "");
         if (iHours)
-            return SString("%d hour%s", iHours, iHours > 1 ? "s" : "");
+            return SString("{} hour{}", iHours, iHours > 1 ? "s" : "");
         if (iMins)
-            return SString("%d min%s", iMins, iMins > 1 ? "s" : "");
+            return SString("{} min{}", iMins, iMins > 1 ? "s" : "");
     }
     return "";
 }

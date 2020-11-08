@@ -241,11 +241,11 @@ void CClientPerfStatPacketUsageImpl::GetStats(CClientPerfStatResult* pResult, co
         int c = 0;
         // Turn "PACKET_ID_PED_SYNC" into "64_Ped_sync"
         SString strPacketDesc = EnumToString((ePacketID)i).SplitRight("PACKET_ID", NULL, -1).ToLower();
-        row[c++] = SString("%d", i) + strPacketDesc.Left(2).ToUpper() + strPacketDesc.SubStr(2);
+        row[c++] = SString("{}", i) + strPacketDesc.Left(2).ToUpper() + strPacketDesc.SubStr(2);
         if (statInDelta.iCount)
         {
-            row[c++] = SString("%d", (statInDelta.iCount + 4) / 5);
-            row[c++] = SString("%d", (statInDelta.iTotalBytes + 4) / 5);
+            row[c++] = SString("{}", (statInDelta.iCount + 4) / 5);
+            row[c++] = SString("{}", (statInDelta.iTotalBytes + 4) / 5);
             row[c++] = SString("%2.2f%%",
                                statInDelta.totalTime / 50000.f);            // Number of microseconds in sample period ( 5sec * 1000000 ) into percent ( * 100 )
         }
@@ -258,9 +258,9 @@ void CClientPerfStatPacketUsageImpl::GetStats(CClientPerfStatResult* pResult, co
 
         if (statOutDelta.iCount)
         {
-            row[c++] = SString("%d", (statOutDelta.iCount + 4) / 5);
-            row[c++] = SString("%d", (statOutDelta.iTotalBytes + 4) / 5);
-            row[c++] = SString("%d%%", (int)(statOutDelta.iCount * 100 / iOutDeltaCountTotal));
+            row[c++] = SString("{}", (statOutDelta.iCount + 4) / 5);
+            row[c++] = SString("{}", (statOutDelta.iTotalBytes + 4) / 5);
+            row[c++] = SString("{}%", (int)(statOutDelta.iCount * 100 / iOutDeltaCountTotal));
         }
         else
         {

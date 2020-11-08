@@ -599,7 +599,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
                                                          static_cast<float>(vecTableContent[2]), static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
                 break;
             default:
-                argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
+                argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got {} numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
@@ -654,7 +654,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
                                                                  static_cast<float>(vecTableContent[4]), static_cast<float>(vecTableContent[5])});
                 break;
             default:
-                argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
+                argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got {} numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
@@ -703,7 +703,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
                                                          static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
                 break;
             default:
-                argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
+                argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got {} numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
@@ -757,7 +757,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
                                                                  static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
                 break;
             default:
-                argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
+                argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got {} numbers", vecTableContent.size()).c_str());
                 break;
         }
     }

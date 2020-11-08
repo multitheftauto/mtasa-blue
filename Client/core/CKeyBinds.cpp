@@ -2640,8 +2640,8 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
                 if (szCommand)
                 {
                     char*   szArguments = strtok(NULL, "\0");
-                    SString strKeyState("%s", bState ? "down" : "up");
-                    SString strCommandAndArguments("%s%s%s", szCommand, szArguments ? " " : "", szArguments ? szArguments : "");
+                    SString strKeyState("{}", bState ? "down" : "up");
+                    SString strCommandAndArguments("{}{}{}", szCommand, szArguments ? " " : "", szArguments ? szArguments : "");
 
                     if (!CommandExists(szKey, szCommand, true, bState, szArguments))
                     {

@@ -744,7 +744,7 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     {
         TIMEUS deltaTimeUs = GetTimeUs() - startTime;
         if (deltaTimeUs > 10000)
-            TIMING_DETAIL(SString("Event: %s [%d ms]", szName, deltaTimeUs / 1000));
+            TIMING_DETAIL(SString("Event: {} [{} ms]", szName, deltaTimeUs / 1000));
     }
 
     g_pClientGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, NULL);
@@ -1456,7 +1456,7 @@ void CClientEntity::_CheckEntitiesFromRoot(unsigned int uiTypeHash)
 
         if (mapResults2.find(pElement1) == mapResults2.end())
         {
-            OutputDebugString(SString("Client: 0x%08x  %s is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName()));
+            OutputDebugString(SString("Client: 0x{:08x}  {} is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName()));
         }
     }
 
@@ -1466,7 +1466,7 @@ void CClientEntity::_CheckEntitiesFromRoot(unsigned int uiTypeHash)
 
         if (mapResults1.find(pElement2) == mapResults1.end())
         {
-            OutputDebugString(SString("Client: 0x%08x  %s is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName()));
+            OutputDebugString(SString("Client: 0x{:08x}  {} is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName()));
         }
     }
 
@@ -1488,7 +1488,7 @@ void CClientEntity::_FindAllChildrenByTypeIndex(unsigned int uiTypeHash, std::ma
         assert(this == CElementIDs::GetElement(ID));
         if (this->IsBeingDeleted())
             OutputDebugString(
-                SString("Client: 0x%08x  %s is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName()));
+                SString("Client: 0x{:08x}  {} is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName()));
     }
 
     // Call us on the children
@@ -1518,7 +1518,7 @@ void CClientEntity::_GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClie
             assert(pEntity == CElementIDs::GetElement(ID));
             if (pEntity->IsBeingDeleted())
                 OutputDebugString(
-                    SString("Client: 0x%08x  %s is flagged as IsBeingDeleted() but is still in GetEntitiesFromRoot\n", pEntity, pEntity->GetTypeName()));
+                    SString("Client: 0x{:08x}  {} is flagged as IsBeingDeleted() but is still in GetEntitiesFromRoot\n", pEntity, pEntity->GetTypeName()));
 
             assert(mapResults.find(pEntity) == mapResults.end());
             mapResults[pEntity] = 1;

@@ -97,12 +97,12 @@ void RaiseFatalError(unsigned int uiCode)
 #endif
 
     // Populate the message and show the box
-    SString strBuffer(_("Fatal error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
-    SString strTroubleLink(SString("fatal-error&code=%d", uiCode));
+    SString strBuffer(_("Fatal error ({}). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strTroubleLink(SString("fatal-error&code={}", uiCode));
     g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CD62"), strBuffer, strTroubleLink);
 
     // Request the mod unload
-    AddReportLog(7108, SString("Game - RaiseFatalError %d", uiCode));
+    AddReportLog(7108, SString("Game - RaiseFatalError {}", uiCode));
     g_pCore->GetModManager()->RequestUnload();
 }
 
@@ -113,13 +113,13 @@ void RaiseProtocolError(unsigned int uiCode)
     //#endif
 
     // Populate the message and show the box
-    SString strBuffer(_("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
-    SString strTroubleLink(SString("protocol-error&code=%d", uiCode));
+    SString strBuffer(_("Protocol error ({}). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strTroubleLink(SString("protocol-error&code={}", uiCode));
     g_pCore->ShowErrorMessageBox(_("Connection error") + _E("CD63"), strBuffer, strTroubleLink);            // Protocol error
 
     // Request the mod unload
     g_pCore->GetModManager()->RequestUnload();
-    AddReportLog(7109, SString("Game - RaiseProtocolError %d", uiCode));
+    AddReportLog(7109, SString("Game - RaiseProtocolError {}", uiCode));
 }
 
 void RotateVector(CVector& vecLine, const CVector& vecRotation)
@@ -341,7 +341,7 @@ void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, unsigned int uiCo
         return;
 
     // Send message to the disconnected player
-    Player.Send(CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::CONNECTION_DESYNC, SString("(%u)", uiCode)));
+    Player.Send(CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::CONNECTION_DESYNC, SString("({})", uiCode)));
 
     // Quit him
     pGame->QuitPlayer(Player, CClient::QUIT_CONNECTION_DESYNC);
@@ -390,35 +390,35 @@ SString GetDataUnit(unsigned long long ullInput)
     // Bytes per sec?
     if (fInput < 1024)
     {
-        return SString("%u B", (uint)ullInput);
+        return SString("{} B", (uint)ullInput);
     }
 
     // Kilobytes per sec?
     fInput /= 1024;
     if (fInput < 1024)
     {
-        return SString("%.2f kB", fInput);
+        return SString("{:.2f} kB", fInput);
     }
 
     // Megabytes per sec?
     fInput /= 1024;
     if (fInput < 1024)
     {
-        return SString("%.2f MB", fInput);
+        return SString("{:.2f} MB", fInput);
     }
 
     // Gigabytes per sec?
     fInput /= 1024;
     if (fInput < 1024)
     {
-        return SString("%.2f GB", fInput);
+        return SString("{:.2f} GB", fInput);
     }
 
     // Terrabytes per sec?
     fInput /= 1024;
     if (fInput < 1024)
     {
-        return SString("%.2f TB", fInput);
+        return SString("{:.2f} TB", fInput);
     }
 
     // Unknown

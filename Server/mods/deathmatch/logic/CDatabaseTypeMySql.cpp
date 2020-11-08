@@ -175,7 +175,7 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect(const SString& strHost, const S
     // For stats
     SString strQueueName;
     GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
-    m_strStatsKeyHead = SString("dbcon mysql [%s] ", *strQueueName);
+    m_strStatsKeyHead = SString("dbcon mysql [{}] ", *strQueueName);
     UpdateStats();
 
     return pConnection;
@@ -232,8 +232,8 @@ void CDatabaseTypeMySql::UpdateStats()
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("%d", iIndex++), 0, "Database connection: mysql (shared)", *strShareKey,
-                                                        *SString("Share count: %d", pConnection->GetShareCount()), NULL);
+        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("{}", iIndex++), 0, "Database connection: mysql (shared)", *strShareKey,
+                                                        *SString("Share count: {}", pConnection->GetShareCount()), NULL);
 
         // Update unshared map for the second part
         MapRemove(unsharedConnectionMap, pConnection);
@@ -245,8 +245,8 @@ void CDatabaseTypeMySql::UpdateStats()
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("%d", iIndex++), 0, "Database connection: mysql (unshared)",
-                                                        *pConnection->m_strOtherTag, *SString("Refs: %d", pConnection->GetShareCount()), NULL);
+        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("{}", iIndex++), 0, "Database connection: mysql (unshared)",
+                                                        *pConnection->m_strOtherTag, *SString("Refs: {}", pConnection->GetShareCount()), NULL);
     }
 }
 
@@ -309,9 +309,9 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
             {
                 double dNumber = pArgument->GetNumber();
                 if (dNumber == floor(dNumber))
-                    strParsedQuery += SString("%lld", (long long)dNumber);
+                    strParsedQuery += SString("{}", (long long)dNumber);
                 else
-                    strParsedQuery += SString("%f", dNumber);
+                    strParsedQuery += SString("{:f}", dNumber);
             }
             else if (type == LUA_TSTRING)
             {
@@ -366,21 +366,21 @@ SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl)
                 case SQLITE_INTEGER:
                 {
                     int iValue = va_arg(vl, int);
-                    strParsedQuery += SString("%d", iValue);
+                    strParsedQuery += SString("{}", iValue);
                 }
                 break;
 
                 case SQLITE_INTEGER64:
                 {
                     long long int llValue = va_arg(vl, long long int);
-                    strParsedQuery += SString("%lld", llValue);
+                    strParsedQuery += SString("{}", llValue);
                 }
                 break;
 
                 case SQLITE_FLOAT:
                 {
                     double fValue = va_arg(vl, double);
-                    strParsedQuery += SString("%f", fValue);
+                    strParsedQuery += SString("{:f}", fValue);
                 }
                 break;
 

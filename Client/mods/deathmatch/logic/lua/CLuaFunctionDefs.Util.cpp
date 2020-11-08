@@ -384,7 +384,7 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
                         }
                     }
                 }
-                m_pScriptDebugging->LogCustom(luaVM, SString("%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1))));
+                m_pScriptDebugging->LogCustom(luaVM, SString("{}: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1))));
             }
             else
             {

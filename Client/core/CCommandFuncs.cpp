@@ -55,9 +55,9 @@ void CCommandFuncs::Ver(const char* szParameters)
     unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
     SString        strVersion = BLUE_VERSION_STRING;
     if (usNetRev > 0 || usNetRel > 0)
-        strVersion += SString(".%d", usNetRev);
+        strVersion += SString(".{}", usNetRev);
     if (usNetRel > 0)
-        strVersion += SString(".%03d", usNetRel);
+        strVersion += SString(".{:03}", usNetRel);
     strVersion += "\n";
     strVersion += g_pCore->GetBlueCopyrightString();
     CLocalGUI::GetSingleton().EchoConsole(strVersion);
@@ -164,7 +164,7 @@ void CCommandFuncs::Time(const char* szParameters)
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-    SString strTimeAndDate(_("* The time is %d:%02d:%02d"), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+    SString strTimeAndDate(_("* The time is {}:{:02}:{:02}"), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
     CCore::GetSingleton().ChatEchoColor(strTimeAndDate, 255, 100, 100);
 }
 
@@ -432,7 +432,7 @@ void CCommandFuncs::Test(const char* szParameters)
     if (SStringX(szParameters) == "ca")
     {
         SString strStats = CCrashDumpWriter::GetCrashAvertedStatsSoFar();
-        SString strMsg = SString("Crash averted stats:\n%s", strStats.empty() ? "None" : *strStats);
+        SString strMsg = SString("Crash averted stats:\n{}", strStats.empty() ? "None" : *strStats);
         CCore::GetSingleton().GetConsole()->Print(strMsg);
     }
     else if (SStringX(szParameters) == "crashme")

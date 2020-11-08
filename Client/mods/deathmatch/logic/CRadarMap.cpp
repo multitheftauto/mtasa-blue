@@ -71,16 +71,16 @@ CRadarMap::CRadarMap(CClientManager* pManager)
         SString strMessage;
     } messageList[] = {
         {SColorRGBA(255, 255, 255, 200), 0.92f, 1.5f, "Current Mode: Kill all humans"},
-        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString("Press %s to change mode.", *GetBoundKeyName("radar_attach"))},
+        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString("Press {} to change mode.", *GetBoundKeyName("radar_attach"))},
         {SColorRGBA(255, 255, 255, 255), 0.05f, 1.0f,
-         SString("Press %s/%s to zoom in/out.", *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
+         SString("Press {}/{} to zoom in/out.", *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
         {SColorRGBA(255, 255, 255, 255), 0.08f, 1.0f,
-         SString("Press %s, %s, %s, %s to navigate the map.", *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"),
+         SString("Press {}, {}, {}, {} to navigate the map.", *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"),
                  *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
         {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f,
-         SString("Press %s/%s to change opacity.", *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString("Press %s to hide the map.", *GetBoundKeyName("radar"))},
-        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString("Press %s to hide this help text.", *GetBoundKeyName("radar_help"))},
+         SString("Press {}/{} to change opacity.", *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
+        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString("Press {} to hide the map.", *GetBoundKeyName("radar"))},
+        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString("Press {} to hide this help text.", *GetBoundKeyName("radar_help"))},
     };
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
@@ -174,7 +174,7 @@ void CRadarMap::CreateMarkerTextures()
     // Load the icons
     for (uint i = 0; i < RADAR_MARKER_LIMIT; i++)
     {
-        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(PathJoin(strRadarSetDirectory, SString("%02u.png", i + 1)));
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(PathJoin(strRadarSetDirectory, SString("{:02}.png", i + 1)));
         m_MarkerTextureList.push_back(pTextureItem);
     }
 

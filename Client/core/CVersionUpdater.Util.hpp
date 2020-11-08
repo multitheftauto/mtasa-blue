@@ -173,7 +173,7 @@ namespace
             m_iValue = atoi(str);
             return true;
         }
-        virtual SString ToString() const { return SString("%d", m_iValue); }
+        virtual SString ToString() const { return SString("{}", m_iValue); }
     };
 
     ///////////////////////////////////////////////////////////////
@@ -223,12 +223,12 @@ namespace
         SString ToString() const
         {
             if (m_Seconds < 60)
-                return SString("%ds", m_Seconds);
+                return SString("{}s", m_Seconds);
             if (m_Seconds < 60 * 60)
-                return SString("%dm", m_Seconds / 60);
+                return SString("{}m", m_Seconds / 60);
             if (m_Seconds < 60 * 60 * 24)
-                return SString("%dh", m_Seconds / 60 / 60);
-            return SString("%dd", m_Seconds / 60 / 60 / 24);
+                return SString("{}h", m_Seconds / 60 / 60);
+            return SString("{}d", m_Seconds / 60 / 60 / 24);
         }
     };
 
@@ -356,25 +356,25 @@ namespace
             m_strTempFileName = MakeUniquePath(PathJoin(GetMTADataPath(), "temp", "buffer.xml"));
             if (!FileSave(m_strTempFileName, &data[0], uiSize))
             {
-                AddReportLog(2501, SString("CXMLBuffer::SetFromBuffer: Could not save %s", m_strTempFileName.c_str()));
+                AddReportLog(2501, SString("CXMLBuffer::SetFromBuffer: Could not save {}", m_strTempFileName.c_str()));
                 return NULL;
             }
 
             m_pXMLFile = CCore::GetSingleton().GetXML()->CreateXML(m_strTempFileName);
             if (!m_pXMLFile)
             {
-                AddReportLog(2502, SString("CXMLBuffer::SetFromBuffer: Could not CreateXML %s", m_strTempFileName.c_str()));
+                AddReportLog(2502, SString("CXMLBuffer::SetFromBuffer: Could not CreateXML {}", m_strTempFileName.c_str()));
                 return NULL;
             }
             if (!m_pXMLFile->Parse())
             {
-                AddReportLog(2503, SString("CXMLBuffer::SetFromBuffer: Could not parse %s", m_strTempFileName.c_str()));
+                AddReportLog(2503, SString("CXMLBuffer::SetFromBuffer: Could not parse {}", m_strTempFileName.c_str()));
                 return NULL;
             }
             m_pRoot = m_pXMLFile->GetRootNode();
             if (!m_pRoot)
             {
-                AddReportLog(2504, SString("CXMLBuffer::SetFromBuffer: No root node in %s", m_strTempFileName.c_str()));
+                AddReportLog(2504, SString("CXMLBuffer::SetFromBuffer: No root node in {}", m_strTempFileName.c_str()));
                 return NULL;
             }
 
@@ -886,7 +886,7 @@ namespace
     #if MTA_DEBUG
             CStringPair* pPair = MapFind(*this, strType.ToLower());
             if (!pPair || pPair->strValue1 != pair.strValue1 || pPair->strValue2 != pair.strValue2)
-                OutputDebugLine(SString("[Updater] SetCondition %s %s %s", strType.c_str(), strValue1.c_str(), strValue2.c_str()));
+                OutputDebugLine(SString("[Updater] SetCondition {} {} {}", strType.c_str(), strValue1.c_str(), strValue2.c_str()));
     #endif
             MapSet(*this, strType.ToLower(), pair);
         }

@@ -128,7 +128,7 @@ void CResourceFileDownloadManager::DoPulse()
     {
         // Throw the error and disconnect
         g_pCore->GetConsole()->Printf(_("Download error: %s"), *m_strLastHTTPError);
-        AddReportLog(7106, SString("Game - HTTPError (%s)", *m_strLastHTTPError));
+        AddReportLog(7106, SString("Game - HTTPError ({})", *m_strLastHTTPError));
 
         g_pCore->GetModManager()->RequestUnload();
         g_pCore->ShowMessageBox(_("Error") + _E("CD20"), *m_strLastHTTPError, MB_BUTTON_OK | MB_ICON_ERROR);            // HTTP Error
@@ -219,7 +219,7 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
 
     const SHttpServerInfo&            serverInfo = m_HttpServerList[uiHttpServerIndex];
     CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(serverInfo.downloadChannel);
-    SString strHTTPDownloadURLFull("%s/%s/%s", *serverInfo.strUrl, pResourceFile->GetResource()->GetName(), pResourceFile->GetShortName());
+    SString strHTTPDownloadURLFull("{}/{}/{}", *serverInfo.strUrl, pResourceFile->GetResource()->GetName(), pResourceFile->GetShortName());
 
     SHttpRequestOptions options;
     options.uiConnectionAttempts = serverInfo.uiConnectionAttempts;
@@ -232,7 +232,7 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
     if (!bUniqueDownload)
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar
-        OutputDebugLine(SString("[ResourceFileDownload] Using existing download for %s", *strHTTPDownloadURLFull));
+        OutputDebugLine(SString("[ResourceFileDownload] Using existing download for {}", *strHTTPDownloadURLFull));
     }
     return true;
 }
@@ -273,7 +273,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
             {
                 // Was re-added - Add size again to total.
                 AddDownloadSize(pResourceFile->GetDownloadSize());
-                SString strMessage("External HTTP file mismatch (Retrying this file with internal HTTP) [%s]", *ConformResourcePath(pResourceFile->GetName()));
+                SString strMessage("External HTTP file mismatch (Retrying this file with internal HTTP) [{}]", *ConformResourcePath(pResourceFile->GetName()));
                 g_pClientGame->TellServerSomethingImportant(1011, strMessage, 3);
                 return;
             }
@@ -321,7 +321,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
 ///////////////////////////////////////////////////////////////
 SString* CResourceFileDownloadManager::MakeDownloadContextString(CDownloadableResource* pDownloadableResource)
 {
-    return new SString("%d:%s", pDownloadableResource->GetResource()->GetScriptID(), pDownloadableResource->GetShortName());
+    return new SString("{}:{}", pDownloadableResource->GetResource()->GetScriptID(), pDownloadableResource->GetShortName());
 }
 
 ///////////////////////////////////////////////////////////////

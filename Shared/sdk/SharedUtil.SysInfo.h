@@ -27,7 +27,7 @@ namespace SharedUtil
         int     GetFileVersionRelease() { return LOWORD(dwFileVersionLS); }
         SString GetFileVersionString()
         {
-            return SString("%d.%d.%d.%d", GetFileVersionMajor(), GetFileVersionMinor(), GetFileVersionBuild(), GetFileVersionRelease());
+            return SString("{}.{}.{}.{}", GetFileVersionMajor(), GetFileVersionMinor(), GetFileVersionBuild(), GetFileVersionRelease());
         }
         SString strCompanyName;
         SString strProductName;

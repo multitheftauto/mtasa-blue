@@ -493,7 +493,7 @@ namespace SharedUtil
         }
         else
         {
-            salt = SString("$2y$%02u$%s", cost, salt.substr(0, 22).c_str());
+            salt = SString("$2y${:02}${}", cost, salt.substr(0, 22).c_str());
         }
 
         if (salt.size() != 29)

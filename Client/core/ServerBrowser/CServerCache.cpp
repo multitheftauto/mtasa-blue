@@ -281,7 +281,7 @@ void CServerCache::StaticSaveServerCache()
         item.strValue = inet_ntoa((in_addr&)key.ulIp);
         SString strIp = inet_ntoa((in_addr&)key.ulIp);
         MapSet(item.attributeMap, "ip", strIp);
-        MapSet(item.attributeMap, "port", SString("%u", key.usGamePort));
+        MapSet(item.attributeMap, "port", SString("{}", key.usGamePort));
         MapSet(item.attributeMap, "nPlayers", info.nPlayers.ToString());
         MapSet(item.attributeMap, "nMaxPlayers", info.nMaxPlayers.ToString());
         MapSet(item.attributeMap, "nPing", info.nPing.ToString());

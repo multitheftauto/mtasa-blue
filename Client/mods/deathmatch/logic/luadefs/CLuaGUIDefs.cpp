@@ -4027,7 +4027,7 @@ int CLuaGUIDefs::GUICreateFont(lua_State* luaVM)
             {
                 if (FileExists(strPath))
                 {
-                    SString strUniqueName = SString("%s*%s*%s", pParentResource->GetName(), pFileResource->GetName(), strMetaPath.c_str()).Replace("\\", "/");
+                    SString strUniqueName = SString("{}*{}*{}", pParentResource->GetName(), pFileResource->GetName(), strMetaPath.c_str()).Replace("\\", "/");
                     CClientGuiFont* pGuiFont = g_pClientGame->GetManager()->GetRenderElementManager()->CreateGuiFont(strPath, strUniqueName, iSize);
                     if (pGuiFont)
                     {

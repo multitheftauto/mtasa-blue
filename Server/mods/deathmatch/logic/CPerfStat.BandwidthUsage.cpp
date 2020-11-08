@@ -599,9 +599,9 @@ void CPerfStatBandwidthUsageImpl::GetStats(CPerfStatResult* pResult, const std::
                 SNetStatHistoryItem& item = type.itemList[printIndex];
 
                 if (uiType == BWSTAT_INDEX_HOURS)
-                    row[c++] = SString("%d:00", printIndex);
+                    row[c++] = SString("{}:00", printIndex);
                 else if (uiType == BWSTAT_INDEX_DAYS)
-                    row[c++] = SString("%d", printIndex + 1);
+                    row[c++] = SString("{}", printIndex + 1);
                 else if (uiType == BWSTAT_INDEX_MONTHS)
                 {
                     // Make month text

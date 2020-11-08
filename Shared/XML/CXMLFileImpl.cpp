@@ -101,7 +101,7 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 
         SString strErrorDesc;
         if (m_pDocument->Error())
-            strErrorDesc = SString("Line %d: %s", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc());
+            strErrorDesc = SString("Line {}: {}", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc());
         else
             strErrorDesc = "Invalid file";
         SetLastError(CXMLErrorCodes::OtherError, strErrorDesc);

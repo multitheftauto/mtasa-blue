@@ -262,18 +262,18 @@ void CPerfStatManagerImpl::GetStats(CPerfStatResult* pResult, const SString& str
 SString CPerfStatManager::GetScaledByteString(long long Amount)
 {
     if (Amount > 1024LL * 1024 * 1024 * 1024)
-        return SString("%.2f TB", Amount / (1024.0 * 1024 * 1024 * 1024));
+        return SString("{:.2f} TB", Amount / (1024.0 * 1024 * 1024 * 1024));
 
     if (Amount > 1024LL * 1024 * 1024)
-        return SString("%.2f GB", Amount / (1024.0 * 1024 * 1024));
+        return SString("{:.2f} GB", Amount / (1024.0 * 1024 * 1024));
 
     if (Amount > 1024 * 1024)
-        return SString("%.2f MB", Amount / (1024.0 * 1024));
+        return SString("{:.2f} MB", Amount / (1024.0 * 1024));
 
     if (Amount > 1024)
-        return SString("%.2f KB", Amount / (1024.0));
+        return SString("{:.2f} KB", Amount / (1024.0));
 
-    return SString("%d", Amount);
+    return SString("{}", Amount);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -286,18 +286,18 @@ SString CPerfStatManager::GetScaledByteString(long long Amount)
 SString CPerfStatManager::GetScaledBitString(long long Amount)
 {
     if (Amount > 1024LL * 1024 * 1024 * 1024)
-        return SString("%.2f Tbit", Amount / (1024.0 * 1024 * 1024 * 1024));
+        return SString("{:.2f} Tbit", Amount / (1024.0 * 1024 * 1024 * 1024));
 
     if (Amount > 1024LL * 1024 * 1024)
-        return SString("%.2f Gbit", Amount / (1024.0 * 1024 * 1024));
+        return SString("{:.2f} Gbit", Amount / (1024.0 * 1024 * 1024));
 
     if (Amount > 1024 * 1024)
-        return SString("%.2f Mbit", Amount / (1024.0 * 1024));
+        return SString("{:.2f} Mbit", Amount / (1024.0 * 1024));
 
     if (Amount > 1024)
-        return SString("%.2f kbit", Amount / (1024.0));
+        return SString("{:.2f} kbit", Amount / (1024.0));
 
-    return SString("%d bit", Amount);
+    return SString("{} bit", Amount);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -310,12 +310,12 @@ SString CPerfStatManager::GetScaledBitString(long long Amount)
 SString CPerfStatManager::GetScaledFloatString(float fValue)
 {
     if (fValue < 1)
-        return SString("%.2f", fValue);            // 0.00 to 0.99
+        return SString("{:.2f}", fValue);            // 0.00 to 0.99
 
     if (fValue < 5)
-        return SString("%.1f", fValue);            // 1.0 to 4.9
+        return SString("{:.1f}", fValue);            // 1.0 to 4.9
 
-    return SString("%.0f", fValue);            // 5 to inf. and beyond
+    return SString("{:.0f}", fValue);            // 5 to inf. and beyond
 }
 
 ///////////////////////////////////////////////////////////////
@@ -355,7 +355,7 @@ SString CPerfStatManager::GetPerSecondString(long long llValue, double dDeltaTic
 {
     dDeltaTickCount = std::max(1.0, dDeltaTickCount);
     double dValue = llValue * 1000 / dDeltaTickCount;
-    return SString(dValue < 5 ? "%1.1f" : "%1.0f", dValue);
+    return SString(dValue < 5 ? "{:1.1f}" : "{:1.0f}", dValue);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -371,8 +371,8 @@ SString CPerfStatManager::GetPercentString(long long llValue, long long llTotal)
     double dValue = llValue * 100 / (double)llTotal;
     dValue = Clamp(0.0, dValue, 100.0);
     if (dValue < 1)
-        return SString("%1.2f %%", dValue);
+        return SString("{:1.2f} %", dValue);
     if (dValue < 5)
-        return SString("%1.1f %%", dValue);
-    return SString("%1.0f %%", dValue);
+        return SString("{:1.1f} %", dValue);
+    return SString("{:1.0f} %", dValue);
 }

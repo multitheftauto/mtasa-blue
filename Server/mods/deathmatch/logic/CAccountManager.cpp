@@ -518,7 +518,7 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
     if (!pAccount)
     {
         if (pEchoClient)
-            pEchoClient->SendEcho(SString("login: No known account for '%s'", szAccountName).c_str());
+            pEchoClient->SendEcho(SString("login: No known account for '{}'", szAccountName).c_str());
         CLogger::AuthPrintf("LOGIN: %s tried to log in as '%s' (Unknown account) (IP: %s  Serial: %s)\n", strPlayerName.c_str(), szAccountName,
                             strPlayerIP.c_str(), strPlayerSerial.c_str());
         return false;
@@ -527,13 +527,13 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
     if (pAccount->GetClient())
     {
         if (pEchoClient)
-            pEchoClient->SendEcho(SString("login: Account for '%s' is already in use", szAccountName).c_str());
+            pEchoClient->SendEcho(SString("login: Account for '{}' is already in use", szAccountName).c_str());
         return false;
     }
     if (!IsValidPassword(szPassword) || !pAccount->IsPassword(szPassword))
     {
         if (pEchoClient)
-            pEchoClient->SendEcho(SString("login: Invalid password for account '%s'", szAccountName).c_str());
+            pEchoClient->SendEcho(SString("login: Invalid password for account '{}'", szAccountName).c_str());
         CLogger::AuthPrintf("LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str(), szAccountName,
                             strPlayerIP.c_str(), strPlayerSerial.c_str());
         m_AccountProtect.AddConnect(strPlayerIP.c_str());

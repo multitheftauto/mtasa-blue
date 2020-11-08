@@ -1126,7 +1126,7 @@ bool CMainConfig::GetSetting(const SString& strName, SString& strValue)
     }
     else if (strName == "fpslimit")
     {
-        strValue = SString("%d", GetFPSLimit());
+        strValue = SString("{}", GetFPSLimit());
         return true;
     }
     else if (strName == "networkencryption")
@@ -1142,22 +1142,22 @@ bool CMainConfig::GetSetting(const SString& strName, SString& strValue)
     }
     else if (strName == "busy_sleep_time")
     {
-        strValue = SString("%d", m_iPendingWorkToDoSleepTime);
+        strValue = SString("{}", m_iPendingWorkToDoSleepTime);
         return true;
     }
     else if (strName == "idle_sleep_time")
     {
-        strValue = SString("%d", m_iNoWorkToDoSleepTime);
+        strValue = SString("{}", m_iNoWorkToDoSleepTime);
         return true;
     }
     else if (strName == "verifyclientsettings")
     {
-        strValue = SString("%d", m_iEnableClientChecks);
+        strValue = SString("{}", m_iEnableClientChecks);
         return true;
     }
     else if (strName == "threadnet")
     {
-        strValue = SString("%d", m_bThreadNetEnabled ? 1 : 0);
+        strValue = SString("{}", m_bThreadNetEnabled ? 1 : 0);
         return true;
     }
     else if (strName == "module" || strName == "resource")
@@ -1180,7 +1180,7 @@ bool CMainConfig::GetSetting(const SString& strName, SString& strValue)
             const SIntSetting& item = settingList[i];
             if (strName == item.szName)
             {
-                strValue = SString("%d", *item.pVariable);
+                strValue = SString("{}", *item.pVariable);
                 return true;
             }
         }
@@ -1273,7 +1273,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
             m_iPendingWorkToDoSleepTime = iSleepMs;
             if (bSave)
             {
-                SetString(m_pRootNode, "busy_sleep_time", SString("%d", m_iPendingWorkToDoSleepTime));
+                SetString(m_pRootNode, "busy_sleep_time", SString("{}", m_iPendingWorkToDoSleepTime));
                 Save();
             }
             return true;
@@ -1287,7 +1287,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
             m_iNoWorkToDoSleepTime = iSleepMs;
             if (bSave)
             {
-                SetString(m_pRootNode, "idle_sleep_time", SString("%d", m_iNoWorkToDoSleepTime));
+                SetString(m_pRootNode, "idle_sleep_time", SString("{}", m_iNoWorkToDoSleepTime));
                 Save();
             }
             return true;
@@ -1342,7 +1342,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
             {
                 if (!strComboResult.empty())
                     strComboResult += ",";
-                strComboResult += SString("%d", uiId);
+                strComboResult += SString("{}", uiId);
             }
         }
 
@@ -1381,7 +1381,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
                 *item.pVariable = iValue;
                 if (item.bSavable && bSave)
                 {
-                    SetString(m_pRootNode, item.szName, SString("%d", *item.pVariable));
+                    SetString(m_pRootNode, item.szName, SString("{}", *item.pVariable));
                     Save();
                 }
 

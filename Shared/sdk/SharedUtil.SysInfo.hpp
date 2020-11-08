@@ -80,7 +80,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     // Error here can be non fatal
     // if (FAILED(hres))
     //{
-    //    OutputDebugLine ( SString ( "[Error] Failed to initialize COM library. Error code = %x", hres ) );
+    //    OutputDebugLine ( SString ( "[Error] Failed to initialize COM library. Error code = {:x}", hres ) );
     //    return "";
     //}
 
@@ -105,7 +105,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     // Error here can be non fatal
     //    if (FAILED(hres))
     //    {
-    //        OutputDebugLine ( SString ( "[Error] QueryWMI - Failed to initialize security. Error code = %x", hres ) );
+    //        OutputDebugLine ( SString ( "[Error] QueryWMI - Failed to initialize security. Error code = {:x}", hres ) );
     //        return "";
     //    }
 
@@ -118,7 +118,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 
     if (FAILED(hres))
     {
-        AddReportLog(9130, SString("QueryWMI - Failed to create IWbemLocator object. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(9130, SString("QueryWMI - Failed to create IWbemLocator object. Error code = {:x} ({})", hres, *strQuery));
         return false;
     }
 
@@ -144,7 +144,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     if (FAILED(hres))
     {
         pLoc->Release();
-        AddReportLog(9135, SString("QueryWMI - Could not connect. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(9135, SString("QueryWMI - Could not connect. Error code = {:x} ({})", hres, *strQuery));
         return false;
     }
 
@@ -165,7 +165,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     {
         pSvc->Release();
         pLoc->Release();
-        AddReportLog(9136, SString("QueryWMI - Could not set proxy blanket. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(9136, SString("QueryWMI - Could not set proxy blanket. Error code = {:x} ({})", hres, *strQuery));
         return false;
     }
 
@@ -179,7 +179,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     {
         pSvc->Release();
         pLoc->Release();
-        AddReportLog(9137, SString("QueryWMI - Query failed. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(9137, SString("QueryWMI - Query failed. Error code = {:x} ({})", hres, *strQuery));
         return false;
     }
 
@@ -203,7 +203,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 
         if (hr == STATUS_ACCESS_VIOLATION)
         {
-            AddReportLog(9130, SString("QueryWMI pEnumerator->Next returned STATUS_ACCESS_VIOLATION for %s", *strQuery));
+            AddReportLog(9130, SString("QueryWMI pEnumerator->Next returned STATUS_ACCESS_VIOLATION for {}", *strQuery));
             break;
         }
 
@@ -214,13 +214,13 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 
         if (hr != WBEM_S_NO_ERROR)
         {
-            AddReportLog(9131, SString("QueryWMI pEnumerator->Next returned %08x for %s", hr, *strQuery));
+            AddReportLog(9131, SString("QueryWMI pEnumerator->Next returned {:08x} for {}", hr, *strQuery));
             break;
         }
 
         if (pclsObj == NULL)
         {
-            AddReportLog(9132, SString("QueryWMI pclsObj == NULL returned %08x for %s", hr, *strQuery));
+            AddReportLog(9132, SString("QueryWMI pclsObj == NULL returned {:08x} for {}", hr, *strQuery));
             break;
         }
 
@@ -248,7 +248,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
             }
             else
             {
-                AddReportLog(9133, SString("QueryWMI pclsObj->Get returned %08x for key %d in %s", hr, i, *strQuery));
+                AddReportLog(9133, SString("QueryWMI pclsObj->Get returned {:08x} for key {} in {}", hr, i, *strQuery));
             }
 
             outResult.back().insert(outResult.back().end(), strValue);
@@ -377,7 +377,7 @@ void SharedUtil::GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std
         {
             const SString& displayName = result[i][0];
             uint           uiProductState = atoi(result[i][1]);
-            SString        strComboName("%s[%05x]", *displayName, uiProductState);
+            SString        strComboName("{}[{:05x}]", *displayName, uiProductState);
             if (uiProductState & 0x1000)
                 outEnabledList.push_back(strComboName);
             else
@@ -393,7 +393,7 @@ void SharedUtil::GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std
         {
             const SString& displayName = result[i][0];
             const SString& onAccessScanningEnabled = result[i][1];
-            SString        strComboName("%s[%s]", *displayName, *onAccessScanningEnabled);
+            SString        strComboName("{}[{}]", *displayName, *onAccessScanningEnabled);
             if (onAccessScanningEnabled != "0")
                 outEnabledList.push_back(strComboName);
             else
@@ -482,7 +482,7 @@ bool SharedUtil::GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* p
         UINT  cbLang;
         if (VerQueryValueA(lpData, "\\VarFileInfo\\Translation", (LPVOID*)&langInfo, &cbLang))
         {
-            SString strFirstBit("\\StringFileInfo\\%04x%04x\\", langInfo[0], langInfo[1]);
+            SString strFirstBit("\\StringFileInfo\\{:04x}{:04x}\\", langInfo[0], langInfo[1]);
 
             LPVOID lpt;
             UINT   cbBufSize;

@@ -450,7 +450,7 @@ void CBassAudio::CompleteStreamConnect(HSTREAM pSound)
         // g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_WMA_CHANGE", BASS_ErrorGetCode() );
     }
     else
-        strError = SString("BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str());
+        strError = SString("BASS ERROR {} in PlayStream  b3D = {}  path = {}", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str());
 
     OutputDebugLine("[Bass]        stream connect complete");
 
