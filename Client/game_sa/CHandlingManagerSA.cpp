@@ -283,7 +283,7 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehic
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
-        if (eHandling >= HT_BIKE || eHandling <= HT_FREEWAY)
+        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
             return m_pOriginalBikeEntries[eHandling - HT_BIKE];
     }
 
