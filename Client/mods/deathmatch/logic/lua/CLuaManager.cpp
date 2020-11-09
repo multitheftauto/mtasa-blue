@@ -128,11 +128,9 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     }
 
     // Find a matching VM in our map
-    {
-        CLuaMain* pLuaMain = MapFindRef(m_VirtualMachineMap, luaVM);
-        if (pLuaMain)
-            return pLuaMain;
-    }
+    if (CLuaMain* pLuaMain = MapFindRef(m_VirtualMachineMap, luaVM))
+        return pLuaMain;
+    
 
     // Find a matching VM in our list
     // Note: This is a fallback method, and in an ideal world it's never used
