@@ -568,7 +568,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
     ideFlags.uiFlags = uiFlags;
 
     // Default value
-    m_pInterface->usFlags = 0xC0; //  bIsBackfaceCulled and bIsLod
+    m_pInterface->usFlags = 0xC0;            //  bIsBackfaceCulled and bIsColLoaded
 
     // setBaseModelInfoFlags
     if (ideFlags.bDrawLast)

@@ -180,7 +180,7 @@ public:
             unsigned char      bDontCastShadowsOn : 1;
             unsigned char      bDoWeOwnTheColModel : 1;
             unsigned char      bIsBackfaceCulled : 1;
-            unsigned char      bIsLod : 1;
+            unsigned char      bIsColLoaded : 1;
             unsigned char      bIsRoad : 1;
             unsigned char      bHasComplexHierarchy : 1;
             unsigned char      bDontCollideWithFlyer : 1;
