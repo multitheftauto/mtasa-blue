@@ -26,10 +26,10 @@ CLuaManager::CLuaManager(CClientGame* pClientGame)
     m_pGUIManager = pClientGame->GetGUIManager();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands();
 
-    // Ensure lua was compiled with apichecks
-    #ifdef NDEBUG
-        #error "NDEBUG should not be defined"
-    #endif
+// Ensure lua was compiled with apichecks
+#ifdef NDEBUG
+    #error "NDEBUG should not be defined"
+#endif
     assert(luaX_is_apicheck_enabled());
 
     m_VirtualMachines.reserve(256);
@@ -46,8 +46,8 @@ CLuaManager::~CLuaManager()
     for (auto* vm : m_VirtualMachines)
         delete vm;
 
-	// Close and remove LVM from memory
-	ProcessPendingDeleteList();
+    // Close and remove LVM from memory
+    ProcessPendingDeleteList();
 
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
@@ -72,7 +72,7 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
         // Remove it from our list
         const auto iter = std::find(m_VirtualMachines.begin(), m_VirtualMachines.end(), pLuaMain);
-        dassert(iter != m_VirtualMachines.end()); // Make sure it exists
+        dassert(iter != m_VirtualMachines.end());            // Make sure it exists
         m_VirtualMachines.erase(iter);
 
         // Delete it unless it is already
@@ -130,7 +130,6 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     // Find a matching VM in our map
     if (CLuaMain* pLuaMain = MapFindRef(m_VirtualMachineMap, luaVM))
         return pLuaMain;
-    
 
     // Find a matching VM in our list
     // Note: This is a fallback method, and in an ideal world it's never used
@@ -138,7 +137,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     {
         if (luaVM == vm->GetVirtualMachine())
         {
-            dassert(0); // Why not in map?
+            dassert(0);            // Why not in map?
             return vm;
         }
     }

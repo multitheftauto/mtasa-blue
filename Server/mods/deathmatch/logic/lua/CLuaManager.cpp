@@ -60,7 +60,7 @@ CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEna
 {
     // Create it and add it to the list over VM's
     auto pLuaMain = new CLuaMain(this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager,
-        pResourceOwner, bEnableOOP);
+                                 pResourceOwner, bEnableOOP);
     m_VirtualMachines.push_back(pLuaMain);
 
     pLuaMain->InitVM();
@@ -83,7 +83,7 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
         // Remove it from our list
         const auto iter = std::find(m_VirtualMachines.begin(), m_VirtualMachines.end(), pLuaMain);
-        dassert(iter != m_VirtualMachines.end()); // Make sure it exists
+        dassert(iter != m_VirtualMachines.end());            // Make sure it exists
         m_VirtualMachines.erase(iter);
 
         return true;
@@ -94,7 +94,7 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
 void CLuaManager::OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM)
 {
-    m_VirtualMachineMap.insert({ pLuaMain->GetVirtualMachine(), pLuaMain });
+    m_VirtualMachineMap.insert({pLuaMain->GetVirtualMachine(), pLuaMain});
 }
 
 void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
@@ -135,7 +135,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     {
         if (luaVM == vm->GetVirtualMachine())
         {
-            dassert(0); // Why not in map?
+            dassert(0);            // Why not in map?
             return vm;
         }
     }
