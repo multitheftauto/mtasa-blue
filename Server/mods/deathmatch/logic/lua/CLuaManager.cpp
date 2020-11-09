@@ -83,7 +83,7 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
         // Remove it from our list
         const auto iter = std::find(m_VirtualMachines.begin(), m_VirtualMachines.end(), pLuaMain);
-        assert(iter != m_VirtualMachines.end()); // Make sure it exists
+        dassert(iter != m_VirtualMachines.end()); // Make sure it exists
         m_VirtualMachines.erase(iter);
 
         return true;
