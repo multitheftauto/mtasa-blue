@@ -44,7 +44,7 @@ public:
             for (CPlayer* pPlayer : sendList)
                 groupMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
 
-            DoBroadcast(Packet, groupMap, std::forward<Pred_t>(pred));
+            DoBroadcastIf(Packet, groupMap, std::forward<Pred_t>(pred));
         }
     }
 

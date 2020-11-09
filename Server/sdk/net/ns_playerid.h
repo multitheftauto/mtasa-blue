@@ -31,7 +31,7 @@ public:
 class NetServerPlayerID
 {
 protected:
-    unsigned long  m_uiBinaryAddress;
+    unsigned long  m_uiBinaryAddress; // Also called the IP address...
     unsigned short m_usPort;
 
 public:
@@ -66,6 +66,23 @@ public:
 
     unsigned long  GetBinaryAddress() const { return m_uiBinaryAddress; };
     unsigned short GetPort() const { return m_usPort; };
+
+
+
+    // CFastHashMap/Set helpers
+    // Must return keys that wont accur naturally. So, dont return a default constructed NetServerPlayerID
+    friend NetServerPlayerID GetEmptyMapKey(NetServerPlayerID*)
+    {
+        // Return something here that isn't GetDeletedMapKey(), or a default constructed NetServerPlayerID
+        return { std::numeric_limits<unsigned long>::min() / 3, std::numeric_limits<unsigned short>::min() / 3};
+    }
+    friend NetServerPlayerID GetDeletedMapKey(NetServerPlayerID*)
+    {
+        // Return something here that isn't GetEmptyMapKey(), or a default constructed NetServerPlayerID
+        return { std::numeric_limits<unsigned long>::min() / 2, std::numeric_limits<unsigned short>::min() / 2 };
+    }
+};
+
 // std::hash ovherload for NetServerPlayerID - used in CFastHashMap
 namespace std
 {
