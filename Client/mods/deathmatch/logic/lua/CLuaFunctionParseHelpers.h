@@ -66,6 +66,7 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM_CLASS(eClientModelType);
+DECLARE_ENUM_CLASS(eModelIdeFlags);
 
 class CRemoteCall;
 
