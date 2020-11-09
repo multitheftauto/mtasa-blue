@@ -1167,12 +1167,6 @@ void CClientVehicle::SetEngineBroken(bool bEngineBroken)
     {
         m_pVehicle->SetEngineBroken(bEngineBroken);
         m_pVehicle->SetEngineOn(!bEngineBroken);
-
-        // We need to recreate the vehicle if we're going from broken to unbroken
-        if (!bEngineBroken && m_pVehicle->IsEngineBroken())
-        {
-            ReCreate();
-        }
     }
     m_bEngineBroken = bEngineBroken;
 }
