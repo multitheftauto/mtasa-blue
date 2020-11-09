@@ -1843,7 +1843,8 @@ void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
 
 void CVehicleSA::SetFlyingHandlingData(CFlyingHandlingEntry* pFlyingHandling)
 {
-    // Store the handling
+    if (!pFlyingHandling)
+        return;
     m_pFlyingHandlingData = static_cast<CFlyingHandlingEntrySA*>(pFlyingHandling);
     GetVehicleInterface()->pFlyingHandlingData = m_pFlyingHandlingData->GetInterface();
 }

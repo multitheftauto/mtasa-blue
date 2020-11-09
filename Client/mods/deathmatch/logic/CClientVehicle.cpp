@@ -2887,7 +2887,6 @@ void CClientVehicle::Create()
                 case CLIENTVEHICLE_BIKE:
                 case CLIENTVEHICLE_BMX:
                     dynamic_cast<CBike*>(m_pVehicle)->SetBikeHandlingData(m_pBikeHandlingEntry);
-                default:
                     break;
             }
 
