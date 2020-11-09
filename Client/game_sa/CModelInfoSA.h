@@ -139,7 +139,7 @@ class CVehicleModelInfo_SA_VTBL : public CClumpModelInfo_SA_VTBL
 {
 };
 
-enum class eModelSpecialTypes : char
+enum class eModelSpecialTypes : unsigned char
 {
     NONE = 0,
     TREE = 1,
@@ -148,7 +148,8 @@ enum class eModelSpecialTypes : char
     GLASS_2 = 5,
     TAG = 6,
     GARAGE_DOOR = 7,
-    UNKNOW_1 = 10,
+    CRANE = 9, // don't present in IDE but used in gta
+    UNKNOW_1 = 10, // read only
     BREAKABLE_STATUE = 11,
 };
 
@@ -184,7 +185,7 @@ public:
             unsigned char      bHasComplexHierarchy : 1;
             unsigned char      bDontCollideWithFlyer : 1;
             eModelSpecialTypes eSpecialModelType : 4;
-            unsigned char      bWetRoadReflection : 1;            // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+            unsigned char      bWetRoadReflection : 1;            // Used for tags 
         };
 
         unsigned short usFlags;

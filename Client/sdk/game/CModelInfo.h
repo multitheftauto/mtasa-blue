@@ -28,6 +28,27 @@ public:
     float   fRadius;
 };
 
+enum class eModelIdeFlags
+{
+    IS_ROAD,
+    DRAW_LAST,
+    ADDICTIVE,
+    IGNORE_LIGHTING,            // Used with animated objects
+    NO_ZBUFFER_WRITE,
+    DONT_RECEIVE_SHADOWS,
+    IS_GLASS_TYPE_1,
+    IS_GLASS_TYPE_2,
+    IS_GARAGE_DOOR,
+    IS_DAMAGABLE,
+    IS_TREE,
+    IS_PALM,
+    DOES_NOT_COLLIDE_WITH_FLYER,
+    IS_TAG,
+    DISABLE_BACKFACE_CULLING,
+    IS_BREAKABLE_STATUE,
+    IS_CRANE,
+};
+
 enum class eModelInfoType : unsigned char
 {
     ATOMIC = 1,

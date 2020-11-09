@@ -52,6 +52,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineGetModelFlags", ArgumentParser<EngineGetModelFlags>},
         {"engineSetModelFlags", ArgumentParser<EngineSetModelFlags>},
+        {"engineGetModelFlag", ArgumentParser<EngineGetModelFlag>},
+        {"engineSetModelFlag", ArgumentParser<EngineSetModelFlag>},
         {"engineResetModelFlags", ArgumentParser<EngineResetModelFlags>},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
 
@@ -2023,6 +2025,16 @@ uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
     return pModelInfo->GetFlags();
 }
 
+bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlags eFlag)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
+
+    if (uiModelId >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    return pModelInfo->GetFlags();
+}
+
 bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags)
 {
     // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
@@ -2038,6 +2050,18 @@ bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::opti
         pModelInfo->SetFlags(uiFlags);
 
     return true; 
+}
+
+bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlags eFlags, bool bState)
+{
+    // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    return true;
 }
 
 bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)

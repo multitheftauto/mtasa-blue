@@ -615,6 +615,10 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
             if (ideFlags.bFlag24)
                 m_pInterface->eSpecialModelType = eModelSpecialTypes::UNKNOW_1;
+
+            // Added
+            if (ideFlags.bFlag20)
+                m_pInterface->eSpecialModelType = eModelSpecialTypes::CRANE;
             break;
         }
         case eModelInfoType::CLUMP:
