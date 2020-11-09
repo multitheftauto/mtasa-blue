@@ -45,7 +45,7 @@ public:
 
     CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; };
 
-    auto GetLuaMains() const { return m_VirtualMachines; }
+    const auto& GetLuaMains() const { return m_VirtualMachines; }
 
     void DoPulse();
 

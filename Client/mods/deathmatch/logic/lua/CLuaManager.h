@@ -33,7 +33,7 @@ public:
     void      OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void      OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
 
-    auto GetLuaMains() const { return m_VirtualMachines; }
+    const auto& GetLuaMains() const { return m_VirtualMachines; }
 
     void DoPulse();
 
