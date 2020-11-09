@@ -66,4 +66,17 @@ public:
 
     unsigned long  GetBinaryAddress() const { return m_uiBinaryAddress; };
     unsigned short GetPort() const { return m_usPort; };
+// std::hash ovherload for NetServerPlayerID - used in CFastHashMap
+namespace std
+{
+    template<>
+    struct hash<NetServerPlayerID>
+    {
+        size_t operator()(const NetServerPlayerID& v) const noexcept
+        {
+            // Based on https://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
+            const auto port = v.GetPort();
+            return v.GetBinaryAddress() + 0x9e3779b9 + (port << 6) + (port >> 2);
+        }
+    };
 };
