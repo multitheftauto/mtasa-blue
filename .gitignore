@@ -416,4 +416,3 @@ utils/DXFiles/
 !*.dll
 !*.exe
 utils/vswhere.exe
-refactor/
