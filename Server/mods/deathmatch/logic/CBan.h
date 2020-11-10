@@ -16,10 +16,8 @@
 
 class CBan
 {
+    friend class CBanManager;
 public:
-    CBan();
-    ~CBan();
-
     const std::string& GetIP() const noexcept { return m_strIP; };
     void               SetIP(std::string strIP) noexcept
     {
