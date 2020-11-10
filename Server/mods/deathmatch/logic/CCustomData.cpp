@@ -31,30 +31,6 @@ SCustomData* CCustomData::Get(const char* szName)
     return NULL;
 }
 
-void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
-{
-    if (syncType == ESyncType::BROADCAST)
-    {
-        SCustomData* pDataSynced = GetSynced(szName);
-        if (pDataSynced)
-        {
-            pDataSynced->Variable = Variable;
-            pDataSynced->syncType = syncType;
-        }
-        else
-        {
-            SCustomData newData;
-            newData.Variable = Variable;
-            newData.syncType = syncType;
-            m_SyncedData[szName] = newData;
-        }
-    }
-    else
-    {
-        DeleteSynced(szName);
-    }
-}
-
 void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(szName);
