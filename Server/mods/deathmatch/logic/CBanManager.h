@@ -14,6 +14,11 @@
 #include "CClient.h"
 #include "CPlayerManager.h"
 
+#include <unordered_set>
+#include <vector>
+#include <memory>
+
+
 class CBanManager
 {
 public:
@@ -56,14 +61,14 @@ public:
     bool        IsValidIP(const char* szIP);
     static void SetBansModified() { ms_bSaveRequired = true; }
 
-    list<CBan*>::const_iterator IterBegin() { return m_BanManager.begin(); };
-    list<CBan*>::const_iterator IterEnd() { return m_BanManager.end(); };
+    list<CBan*>::const_iterator IterBegin() { return m_Bans.begin(); };
+    list<CBan*>::const_iterator IterEnd() { return m_Bans.end(); };
 
 private:
     SString m_strBanListXMLPath;
 
-    CMappedList<CBan*> m_BanManager;
-    std::set<CBan*>    m_BansBeingDeleted;
+    CMappedList<CBan*> m_Bans;
+    std::unordered_set<CBan*>    m_BansBeingDeleted;
 
     time_t m_NextUpdateTime;
 

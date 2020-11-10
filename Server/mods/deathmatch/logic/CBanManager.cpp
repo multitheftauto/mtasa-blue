@@ -22,12 +22,12 @@ CBanManager::CBanManager() :
 CBanManager::~CBanManager()
 {
     SaveBanList();
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         delete *iter;
     }
-    m_BanManager.clear();
+    m_Bans.clear();
 
     // Cleanup queued deletions
     for (std::set<CBan*>::iterator iter = m_BansBeingDeleted.begin(); iter != m_BansBeingDeleted.end(); iter++)
@@ -43,8 +43,8 @@ void CBanManager::DoPulse()
 
     if (tTime > m_NextUpdateTime)
     {
-        list<CBan*>::const_iterator iter = m_BanManager.begin();
-        while (iter != m_BanManager.end())
+        list<CBan*>::const_iterator iter = m_Bans.begin();
+        while (iter != m_Bans.end())
         {
             if ((*iter)->GetTimeOfUnban() > 0)
             {
@@ -56,7 +56,7 @@ void CBanManager::DoPulse()
                     g_pGame->GetMapManager()->GetRootElement()->CallEvent("onUnban", Arguments);
 
                     RemoveBan(*iter);
-                    iter = m_BanManager.begin();
+                    iter = m_Bans.begin();
                     continue;
                 }
             }
@@ -176,7 +176,7 @@ CBan* CBanManager::AddBan(const SString& strBanner, const SString& strReason, ti
         pBan->SetBanner(strBanner);
 
     // Add it to the back of our banned list, add it to net server's ban list
-    m_BanManager.push_back(pBan);
+    m_Bans.push_back(pBan);
 
     return pBan;
 }
@@ -184,14 +184,14 @@ CBan* CBanManager::AddBan(const SString& strBanner, const SString& strReason, ti
 CBan* CBanManager::GetBanFromScriptID(uint uiScriptID)
 {
     CBan* pBan = (CBan*)CIdArray::FindEntry(uiScriptID, EIdClass::BAN);
-    dassert(!pBan || ListContains(m_BanManager, pBan));
+    dassert(!pBan || ListContains(m_Bans, pBan));
     return pBan;
 }
 
 bool CBanManager::IsSpecificallyBanned(const char* szIP)
 {
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetIP() == szIP)
         {
@@ -204,8 +204,8 @@ bool CBanManager::IsSpecificallyBanned(const char* szIP)
 
 bool CBanManager::IsSerialBanned(const char* szSerial)
 {
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetSerial() == szSerial)
         {
@@ -218,8 +218,8 @@ bool CBanManager::IsSerialBanned(const char* szSerial)
 
 bool CBanManager::IsAccountBanned(const char* szAccount)
 {
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetAccount() == szAccount)
         {
@@ -232,8 +232,8 @@ bool CBanManager::IsAccountBanned(const char* szAccount)
 
 CBan* CBanManager::GetBanFromAccount(const char* szAccount)
 {
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetAccount() == szAccount)
         {
@@ -246,9 +246,9 @@ CBan* CBanManager::GetBanFromAccount(const char* szAccount)
 
 void CBanManager::RemoveBan(CBan* pBan)
 {
-    if (m_BanManager.Contains(pBan))
+    if (m_Bans.Contains(pBan))
     {
-        m_BanManager.remove(pBan);
+        m_Bans.remove(pBan);
         MapInsert(m_BansBeingDeleted, pBan);
         pBan->SetBeingDeleted();
     }
@@ -259,8 +259,8 @@ CBan* CBanManager::GetBanFromIP(const char* szIP)
 {
     CBan* pBanWildcardMatch = NULL;
 
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         const SString& strIP = (*iter)->GetIP().c_str();
 
@@ -295,8 +295,8 @@ CBan* CBanManager::GetBanFromIP(const char* szIP)
 
 CBan* CBanManager::GetBanFromSerial(const char* szSerial)
 {
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetSerial() == szSerial)
             return *iter;
@@ -307,8 +307,8 @@ CBan* CBanManager::GetBanFromSerial(const char* szSerial)
 unsigned int CBanManager::GetBansWithNick(const char* szNick)
 {
     unsigned int                uiOccurrances = 0;
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetNick() == szNick)
         {
@@ -322,8 +322,8 @@ unsigned int CBanManager::GetBansWithNick(const char* szNick)
 unsigned int CBanManager::GetBansWithBanner(const char* szBanner)
 {
     unsigned int                uiOccurrances = 0;
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         if ((*iter)->GetBanner(), szBanner)
         {
@@ -419,14 +419,14 @@ bool CBanManager::ReloadBanList()
     if (ms_bSaveRequired)
         SaveBanList();
 
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
+    list<CBan*>::const_iterator iter = m_Bans.begin();
+    for (; iter != m_Bans.end(); iter++)
     {
         CBan* pBan = *iter;
         MapInsert(m_BansBeingDeleted, pBan);
         pBan->SetBeingDeleted();
     }
-    m_BanManager.clear();
+    m_Bans.clear();
 
     return LoadBanList();
 }
@@ -449,8 +449,8 @@ void CBanManager::SaveBanList()
         {
             // Iterate the ban list adding it to the XML tree
             CXMLNode*                   pNode;
-            list<CBan*>::const_iterator iter = m_BanManager.begin();
-            for (; iter != m_BanManager.end(); iter++)
+            list<CBan*>::const_iterator iter = m_Bans.begin();
+            for (; iter != m_Bans.end(); iter++)
             {
                 pNode = pRootNode->CreateSubNode("ban");
 
