@@ -22,58 +22,44 @@ CBanManager::CBanManager() :
 CBanManager::~CBanManager()
 {
     SaveBanList();
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        delete *iter;
-    }
-    m_Bans.clear();
-
-    // Cleanup queued deletions
-    for (std::set<CBan*>::iterator iter = m_BansBeingDeleted.begin(); iter != m_BansBeingDeleted.end(); iter++)
-    {
-        delete *iter;
-    }
-    m_BansBeingDeleted.clear();
 }
 
 void CBanManager::DoPulse()
 {
-    time_t tTime = time(NULL);
+    for (auto iter = m_Bans.begin(); iter != m_Bans.end(); iter++)
+        if (iter->IsBeingDeleted()) // Should we delete it now?
+            iter = m_Bans.erase(iter); // Okayyy
 
-    if (tTime > m_NextUpdateTime)
+    // Perhaps process unbans?
+    time_t timeNow = time(NULL);
+    if (timeNow > m_NextUpdateTime)
     {
-        list<CBan*>::const_iterator iter = m_Bans.begin();
-        while (iter != m_Bans.end())
+        for (auto iter = m_Bans.begin(); iter != m_Bans.end(); iter++)
         {
-            if ((*iter)->GetTimeOfUnban() > 0)
-            {
-                if (tTime >= (*iter)->GetTimeOfUnban())
-                {
-                    // Trigger the event
-                    CLuaArguments Arguments;
-                    Arguments.PushBan(*iter);
-                    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onUnban", Arguments);
+            auto& ban = *iter;
+            const auto tunban = ban.GetTimeOfUnban();
 
-                    RemoveBan(*iter);
-                    iter = m_Bans.begin();
-                    continue;
-                }
-            }
-            iter++;
+            // Banned forever?
+            if (tunban <= 0)
+                continue;
+
+            // Has it expired?
+            if (timeNow < ban.GetTimeOfUnban())
+                continue;
+
+            CLuaArguments Arguments;
+            Arguments.PushBan(&ban);
+            g_pGame->GetMapManager()->GetRootElement()->CallEvent("onUnban", Arguments);
+
+            iter = m_Bans.erase(iter); // Make sure nothing blows up..
         }
-        m_NextUpdateTime = tTime + 1;
+
+        m_NextUpdateTime = timeNow + 1;
     }
 
+    // And now, maybe save it all :D
     if (ms_bSaveRequired)
         SaveBanList();
-
-    // Cleanup queued deletions
-    for (std::set<CBan*>::iterator iter = m_BansBeingDeleted.begin(); iter != m_BansBeingDeleted.end(); iter++)
-    {
-        delete *iter;
-    }
-    m_BansBeingDeleted.clear();
 }
 
 CBan* CBanManager::AddBan(CPlayer* pPlayer, const SString& strBanner, const SString& strReason, time_t tTimeOfUnban)
@@ -90,7 +76,6 @@ CBan* CBanManager::AddBan(CPlayer* pPlayer, const SString& strBanner, const SStr
             return pBan;
         }
     }
-
     return NULL;
 }
 
@@ -165,20 +150,56 @@ CBan* CBanManager::AddAccountBan(const SString& strAccount, CClient* pBanner, co
 CBan* CBanManager::AddBan(const SString& strBanner, const SString& strReason, time_t tTimeOfUnban)
 {
     // Create the ban and assign its values
-    CBan* pBan = new CBan;
-    pBan->SetTimeOfBan(time(NULL));
-    pBan->SetTimeOfUnban(tTimeOfUnban);
+    CBan& ban = m_Bans.emplace_back();
 
-    if (strReason.length() > 0)
-        pBan->SetReason(strReason.c_str());
+    ban.SetTimeOfBan(time(NULL));
+    ban.SetTimeOfUnban(tTimeOfUnban);
+    ban.SetReason(strReason);
+    ban.SetBanner(strBanner);
 
-    if (strBanner.length() > 0)
-        pBan->SetBanner(strBanner);
+    return &ban;
+}
 
-    // Add it to the back of our banned list, add it to net server's ban list
-    m_Bans.push_back(pBan);
+bool CBanManager::IsSerialBanned(std::string_view serial)
+{
+    return (bool)GetBanFromSerial(serial);
+}
 
-    return pBan;
+bool CBanManager::IsAccountBanned(std::string_view account)
+{
+    return (bool)GetBanFromAccount(account);
+}
+
+bool CBanManager::IsSpecificallyBanned(std::string_view IP)
+{
+    return FindIf([=](const CBan& ban) {
+        return ban.GetIP() == IP; });
+}
+
+// Include wildcard checks
+CBan* CBanManager::GetBanFromIP(std::string_view ip)
+{
+    return FindIf([=](const CBan& ban) {
+        const auto& bannedIP = ban.GetIP();
+        if (bannedIP.find("*") != std::string::npos) // Wildcard ban?
+        {
+            for (uint i = 0; i < 17; i++)
+            {
+                char a = ip[i];
+                char b = bannedIP[i];
+                if (a == b)
+                {
+                    if (a == 0)
+                        return true;            // Full match
+                }
+                else
+                    return b == '*';
+            }
+        }
+        else
+            return bannedIP == ip;
+        return false;
+    });
 }
 
 CBan* CBanManager::GetBanFromScriptID(uint uiScriptID)
@@ -188,150 +209,28 @@ CBan* CBanManager::GetBanFromScriptID(uint uiScriptID)
     return pBan;
 }
 
-bool CBanManager::IsSpecificallyBanned(const char* szIP)
+CBan* CBanManager::GetBanFromAccount(std::string_view account)
 {
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetIP() == szIP)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return FindIf([=](const CBan& ban) {
+        return ban.GetAccount() == account; });
 }
 
-bool CBanManager::IsSerialBanned(const char* szSerial)
+CBan* CBanManager::GetBanFromSerial(std::string_view serial)
 {
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetSerial() == szSerial)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return FindIf([=](const CBan& ban) {
+        return ban.GetSerial() == serial; });
 }
 
-bool CBanManager::IsAccountBanned(const char* szAccount)
+unsigned int CBanManager::GetBansWithNick(std::string_view nick)
 {
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetAccount() == szAccount)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return CountIf([=](const CBan& ban) {
+        return ban.GetNick() == nick; });
 }
 
-CBan* CBanManager::GetBanFromAccount(const char* szAccount)
+unsigned int CBanManager::GetBansWithBanner(std::string_view banner)
 {
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetAccount() == szAccount)
-        {
-            return (*iter);
-        }
-    }
-
-    return NULL;
-}
-
-void CBanManager::RemoveBan(CBan* pBan)
-{
-    if (m_Bans.Contains(pBan))
-    {
-        m_Bans.remove(pBan);
-        MapInsert(m_BansBeingDeleted, pBan);
-        pBan->SetBeingDeleted();
-    }
-}
-
-// Include wildcard checks
-CBan* CBanManager::GetBanFromIP(const char* szIP)
-{
-    CBan* pBanWildcardMatch = NULL;
-
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        const SString& strIP = (*iter)->GetIP().c_str();
-
-        if (strIP.Contains("*"))
-        {
-            for (uint i = 0; i < 17; i++)
-            {
-                char a = szIP[i];
-                char b = strIP[i];
-                if (a == b)
-                {
-                    if (a == 0)
-                        return *iter;            // Full match
-                }
-                else
-                {
-                    if (b == '*')
-                        pBanWildcardMatch = *iter;
-
-                    // Characters do not match
-                    break;
-                }
-            }
-        }
-        else if (strIP == szIP)
-        {
-            return *iter;            // Full match
-        }
-    }
-    return pBanWildcardMatch;
-}
-
-CBan* CBanManager::GetBanFromSerial(const char* szSerial)
-{
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetSerial() == szSerial)
-            return *iter;
-    }
-    return NULL;
-}
-
-unsigned int CBanManager::GetBansWithNick(const char* szNick)
-{
-    unsigned int                uiOccurrances = 0;
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetNick() == szNick)
-        {
-            uiOccurrances++;
-        }
-    }
-
-    return uiOccurrances;
-}
-
-unsigned int CBanManager::GetBansWithBanner(const char* szBanner)
-{
-    unsigned int                uiOccurrances = 0;
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        if ((*iter)->GetBanner(), szBanner)
-        {
-            uiOccurrances++;
-        }
-    }
-
-    return uiOccurrances;
+    return CountIf([=](const CBan& ban) {
+        return ban.GetBanner() == banner; });
 }
 
 bool CBanManager::LoadBanList()
@@ -339,75 +238,80 @@ bool CBanManager::LoadBanList()
     m_bAllowSave = true;
 
     // Create the XML
-    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strBanListXMLPath);
+    std::unique_ptr<CXMLFile> pFile(g_pServerInterface->GetXML()->CreateXML(m_strBanListXMLPath));
     if (!pFile)
     {
+        CLogger::ErrorPrintf("Banlist: load error: failed creating XML. Check if the file exists.\n");
         return false;
     }
 
     // Parse it
     if (!pFile->Parse())
     {
-        delete pFile;
         if (FileExists(m_strBanListXMLPath))
-            CLogger::ErrorPrintf("Error parsing banlist\n");
+            CLogger::ErrorPrintf("Banlist: load error: Error parsing\n");
         return false;
     }
 
     // Grab the XML root node
     CXMLNode* pRootNode = pFile->GetRootNode();
     if (!pRootNode)
-    {
         pRootNode = pFile->CreateRootNode("banlist");
-    }
 
     // Is the rootnode's name <banlist>?
-    if (pRootNode->GetTagName().compare("banlist") != 0)
+    if (pRootNode->GetTagName() == std::string_view{ "banlist" })
     {
-        CLogger::ErrorPrintf("Wrong root node ('banlist')\n");
+        CLogger::ErrorPrintf("Banlist: load error: Wrong root node name (Got: '%s', expected 'banlist')\n", pRootNode->GetTagName().c_str());
         return false;
     }
 
-    // Iterate the nodes
-    CXMLNode*    pNode = NULL;
-    unsigned int uiCount = pRootNode->GetSubNodeCount();
-
-    for (unsigned int i = 0; i < uiCount; i++)
+    const auto timeNow = time(NULL);
+    for (auto it = pRootNode->ChildrenBegin(); it != pRootNode->ChildrenEnd(); it++)
     {
-        // Grab the node
-        pNode = pRootNode->GetSubNode(i);
+        CXMLNode* pNode = *it;
 
-        if (pNode)
+        // Helper function
+        auto SafeGetValue = [pNode](const char* attrName) mutable {
+            if (CXMLAttribute* pAttribute = pNode->GetAttributes().Find(attrName))
+                return pAttribute->GetValue();
+            return std::string{};
+        };
+
+        const std::string& ip = SafeGetValue("ip");
+        const std::string& serial = SafeGetValue("serial");
+        const std::string& account = SafeGetValue("account");
+
+        if (ip.empty() && serial.empty() && account.empty())
+            continue;
+
+        CBan& ban = m_Bans.emplace_back();
+
+        if (IsValidIP(ip.c_str()))
+            ban.SetIP(ip);
+        ban.SetAccount(account);
+        ban.SetSerial(serial);
+        ban.SetBanner(SafeGetValue("banner"));
+        ban.SetNick(SafeGetValue("nick"));
+        ban.SetReason(SafeGetValue("reason"));
+
+        // Try to read and set ban time and unban time
+        try
         {
-            if (pNode->GetTagName().compare("ban") == 0)
-            {
-                std::string strIP = SafeGetValue(pNode, "ip"), strSerial = SafeGetValue(pNode, "serial"), strAccount = SafeGetValue(pNode, "account");
-                if (!strIP.empty() || !strSerial.empty() || !strAccount.empty())
-                {
-                    CBan* pBan = AddBan();
-                    if (IsValidIP(strIP.c_str()))
-                    {
-                        pBan->SetIP(strIP);
-                    }
-                    pBan->SetAccount(strAccount);
-                    pBan->SetSerial(strSerial);
-                    pBan->SetBanner(SafeGetValue(pNode, "banner"));
-                    pBan->SetNick(SafeGetValue(pNode, "nick"));
-                    pBan->SetReason(SafeGetValue(pNode, "reason"));
-
-                    std::string strTime = SafeGetValue(pNode, "time");
-                    if (!strTime.empty())
-                        pBan->SetTimeOfBan((time_t)atoi(strTime.c_str()));
-
-                    strTime = SafeGetValue(pNode, "unban");
-                    if (!strTime.empty())
-                        pBan->SetTimeOfUnban((time_t)atoi(strTime.c_str()));
-                }
-            }
+            auto ReadAndSet = [&](const char* what, auto setter) mutable {
+                if (const std::string& time = SafeGetValue(what); !time.empty())
+                    setter((time_t)std::stoll(time));
+                else // Empty
+                    setter(timeNow);
+            };
+            ReadAndSet("time", [&](time_t value) mutable { ban.SetTimeOfBan(value); });
+            ReadAndSet("unban", [&](time_t value) mutable { ban.SetTimeOfBan(value); });
+        }
+        catch (const std::exception& e)
+        {
+            CLogger::ErrorPrintf("Banlist: load error: failed parsing attribute `time` or `unban`. Error: %s", e.what());
         }
     }
 
-    delete pFile;
     ms_bSaveRequired = false;
     return true;
 }
@@ -419,14 +323,8 @@ bool CBanManager::ReloadBanList()
     if (ms_bSaveRequired)
         SaveBanList();
 
-    list<CBan*>::const_iterator iter = m_Bans.begin();
-    for (; iter != m_Bans.end(); iter++)
-    {
-        CBan* pBan = *iter;
-        MapInsert(m_BansBeingDeleted, pBan);
-        pBan->SetBeingDeleted();
-    }
-    m_Bans.clear();
+    for (CBan& ban : m_Bans)
+        ban.SetBeingDeleted(); // Set all bans as being deleted (Will get deleted in DoPulse)
 
     return LoadBanList();
 }
@@ -437,83 +335,66 @@ void CBanManager::SaveBanList()
     if (!m_bAllowSave)
         return;
 
-    // Create the XML file
-    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strBanListXMLPath);
+    ms_bSaveRequired = false;
+
+    // Create the XML
+    std::unique_ptr<CXMLFile> pFile(g_pServerInterface->GetXML()->CreateXML(m_strBanListXMLPath));
     if (pFile)
     {
-        // create the root node again as you are outputting all the bans again not just new ones
-        CXMLNode* pRootNode = pFile->CreateRootNode("banlist");
-
-        // Check it was created
-        if (pRootNode)
-        {
-            // Iterate the ban list adding it to the XML tree
-            CXMLNode*                   pNode;
-            list<CBan*>::const_iterator iter = m_Bans.begin();
-            for (; iter != m_Bans.end(); iter++)
-            {
-                pNode = pRootNode->CreateSubNode("ban");
-
-                if (pNode)
-                {
-                    SafeSetValue(pNode, "nick", (*iter)->GetNick());
-                    SafeSetValue(pNode, "ip", (*iter)->GetIP());
-                    SafeSetValue(pNode, "serial", (*iter)->GetSerial());
-                    SafeSetValue(pNode, "account", (*iter)->GetAccount());
-                    SafeSetValue(pNode, "banner", (*iter)->GetBanner());
-                    SafeSetValue(pNode, "reason", (*iter)->GetReason());
-                    SafeSetValue(pNode, "time", (unsigned int)(*iter)->GetTimeOfBan());
-                    if ((*iter)->GetTimeOfUnban() > 0)
-                    {
-                        SafeSetValue(pNode, "unban", (unsigned int)(*iter)->GetTimeOfUnban());
-                    }
-                }
-            }
-
-            // Write the XML file
-            if (!pFile->Write())
-                CLogger::ErrorPrintf("Error saving '%s'\n", FILENAME_BANLIST);
-        }
-
-        // Delete the file pointer
-        delete pFile;
+        CLogger::ErrorPrintf("Banlist: save error: failed creating XML. Check if the file exists.\n");
+        return;
     }
+
+    // create the root node again as you are outputting all the bans again not just new ones
+    CXMLNode* pRootNode = pFile->CreateRootNode("banlist");
+    if (!pRootNode)
+    {
+        CLogger::ErrorPrintf("Banlist: save error: failed creating rootnode\n");
+        return;
+    }
+
+    // Iterate the ban list adding it to the XML tree
+    for (CBan& ban : m_Bans)
+    {
+        CXMLNode* pNode = pRootNode->CreateSubNode("ban");
+        if (!pNode)
+            continue;
+
+        // Helper functions
+        auto CreateAttrAndSet = [pNode](const char* attrName, const auto& value) mutable {
+            CXMLAttribute* pAttribute = pNode->GetAttributes().Create(attrName);
+            if (pAttribute)
+                pAttribute->SetValue(value);
+        };
+
+        auto SafeSetValueString = [&](const char* attrName, const std::string& value) {
+            if (!value.empty())
+                CreateAttrAndSet(attrName, value.c_str());
+        };
+
+        auto SafeSetValueInt = [&](const char* attrName, unsigned int value) {
+            if (value)
+                CreateAttrAndSet(attrName, value);
+        };
+
+        SafeSetValueString("nick", ban.GetNick());
+        SafeSetValueString("ip", ban.GetIP());
+        SafeSetValueString("serial", ban.GetSerial());
+        SafeSetValueString("account", ban.GetAccount());
+        SafeSetValueString("banner", ban.GetBanner());
+        SafeSetValueString("reason", ban.GetReason());
+
+        // These two will work fine until 03:14:07 on Tuesday, 19 January 2038
+        SafeSetValueInt("time", (unsigned int)ban.GetTimeOfBan());
+        SafeSetValueInt("unban", (unsigned int)ban.GetTimeOfUnban());
+    }
+
+    // Write the XML file
+    if (!pFile->Write())
+        CLogger::ErrorPrintf("Banlist: save error: failed saving '%s'\n", FILENAME_BANLIST);
+
+    // Loading the ban list into memory modifies this. We need to set it to false again
     ms_bSaveRequired = false;
-}
-
-void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, const std::string& strValue)
-{
-    if (!strValue.empty())
-    {
-        CXMLAttribute* pAttribute = pNode->GetAttributes().Create(szKey);
-        if (pAttribute)
-        {
-            pAttribute->SetValue(strValue.c_str());
-        }
-    }
-}
-
-void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, unsigned int uiValue)
-{
-    if (uiValue)
-    {
-        CXMLAttribute* pAttribute = pNode->GetAttributes().Create(szKey);
-        if (pAttribute)
-        {
-            pAttribute->SetValue(uiValue);
-        }
-    }
-}
-
-std::string CBanManager::SafeGetValue(CXMLNode* pNode, const char* szKey)
-{
-    CXMLAttribute* pAttribute = pNode->GetAttributes().Find(szKey);
-
-    if (pAttribute)
-    {
-        return pAttribute->GetValue();
-    }
-    return std::string();
 }
 
 bool CBanManager::IsValidIP(const char* szIP)

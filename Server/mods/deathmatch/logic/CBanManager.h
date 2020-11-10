@@ -14,13 +14,13 @@
 #include "CClient.h"
 #include "CPlayerManager.h"
 
-#include <unordered_set>
-#include <vector>
-#include <memory>
+#include <list>
+#include <string_view>
 
 
 class CBanManager
 {
+    using BanList_t = std::list<CBan>;
 public:
     CBanManager();
     virtual ~CBanManager();
@@ -38,37 +38,62 @@ public:
 
     CBan* AddBan(const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0);
 
-    CBan* GetBanFromScriptID(uint uiScriptID);
-
-    bool  IsSpecificallyBanned(const char* szIP);
-    bool  IsSerialBanned(const char* szSerial);
-    bool  IsAccountBanned(const char* szAccount);
-    CBan* GetBanFromAccount(const char* szAccount);
+    bool  IsSpecificallyBanned(std::string_view ip);
+    bool  IsSerialBanned(std::string_view serial);
+    bool  IsAccountBanned(std::string_view account);
     void  RemoveBan(CBan* pBan);
 
-    CBan* GetBanFromSerial(const char* szSerial);
-    CBan* GetBanFromIP(const char* szIP);
+    CBan* GetBanFromIP(std::string_view ip);
+    CBan* GetBanFromScriptID(uint uiScriptID);
+    CBan* GetBanFromAccount(std::string_view account);
+    CBan* GetBanFromSerial(std::string_view serial);
 
-    unsigned int GetBansWithNick(const char* szNick);
-    unsigned int GetBansWithBanner(const char* szBanner);
+    unsigned int GetBansWithNick(std::string_view szNick);
+    unsigned int GetBansWithBanner(std::string_view szBanner);
 
     bool        LoadBanList();
     bool        ReloadBanList();
     void        SaveBanList();
-    void        SafeSetValue(CXMLNode* pNode, const char* szKey, const std::string& strValue);
-    void        SafeSetValue(CXMLNode* pNode, const char* szKey, unsigned int);
-    std::string SafeGetValue(CXMLNode* pNode, const char* szKey);
     bool        IsValidIP(const char* szIP);
     static void SetBansModified() { ms_bSaveRequired = true; }
 
-    list<CBan*>::const_iterator IterBegin() { return m_Bans.begin(); };
-    list<CBan*>::const_iterator IterEnd() { return m_Bans.end(); };
+    // Iterate thru bans that aren't currently being deleted
+    // Even in the class itself use this, not a range based for loop!
+    template<class Functor_t>
+    void IterBans(const Functor_t& f) const noexcept
+    {
+        for (const CBan& ban : m_Bans)
+            if (!ban.IsBeingDeleted())
+                f(ban);
+    }
+
+    // Find a ban based on a predicate
+    template<class Pred_t>
+    CBan* FindIf(const Pred_t& predicate) const noexcept
+    {
+        for (const CBan& ban : m_Bans)
+            if (!ban.IsBeingDeleted())
+                if (predicate(ban))
+                    return &ban;
+        return nullptr;
+    }
+
+    // Like std::count_if
+    template<class Pred_t>
+    size_t CountIf(const Pred_t& predicate) const noexcept
+    {
+        size_t i = 0;
+        for (const CBan& ban : m_Bans)
+            if (!ban.IsBeingDeleted())
+                if (predicate(ban))
+                    i++;
+        return i;
+    }
 
 private:
     SString m_strBanListXMLPath;
 
-    CMappedList<CBan*> m_Bans;
-    std::unordered_set<CBan*>    m_BansBeingDeleted;
+    BanList_t m_Bans;
 
     time_t m_NextUpdateTime;
 
