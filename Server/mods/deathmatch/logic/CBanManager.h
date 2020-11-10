@@ -54,7 +54,7 @@ public:
     bool        LoadBanList();
     bool        ReloadBanList();
     void        SaveBanList();
-    bool        IsValidIP(const char* szIP);
+    static bool IsValidIP(const char* szIP);
     static void SetBansModified() { ms_bSaveRequired = true; }
 
     // Iterate thru bans that aren't currently being deleted
@@ -97,7 +97,6 @@ private:
 
     time_t m_NextUpdateTime;
 
-    bool        IsValidIPPart(const char* szIP);
     bool        m_bAllowSave;
     static bool ms_bSaveRequired;
 };
