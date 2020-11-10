@@ -26,7 +26,7 @@ CBan::~CBan()
     CBanManager::SetBansModified();
 }
 
-time_t CBan::GetBanTimeRemaining()
+time_t CBan::GetBanTimeRemaining() const noexcept
 {
     time_t End = GetTimeOfUnban();
     if (End > 0)
@@ -36,7 +36,7 @@ time_t CBan::GetBanTimeRemaining()
     return 0;
 }
 
-SString CBan::GetDurationDesc()
+SString CBan::GetDurationDesc() const noexcept
 {
     time_t Start = GetTimeOfBan();
     time_t End = GetTimeOfUnban();

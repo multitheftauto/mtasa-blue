@@ -20,68 +20,68 @@ public:
     CBan();
     ~CBan();
 
-    const std::string& GetIP() { return m_strIP; };
-    void               SetIP(const std::string& strIP)
+    const std::string& GetIP() const noexcept { return m_strIP; };
+    void               SetIP(std::string strIP) noexcept
     {
         CBanManager::SetBansModified();
-        m_strIP = strIP;
+        m_strIP = std::move(strIP);
     };
 
-    const std::string& GetNick() { return m_strNick; };
-    void               SetNick(const std::string& strNick)
+    const std::string& GetNick() const noexcept { return m_strNick; };
+    void               SetNick(std::string strNick) noexcept
     {
         CBanManager::SetBansModified();
-        m_strNick = strNick;
+        m_strNick = std::move(strNick);
     };
 
-    const std::string& GetBanner() { return m_strBanner; };
-    void               SetBanner(const std::string& strBanner)
+    const std::string& GetBanner() const noexcept { return m_strBanner; };
+    void               SetBanner(std::string strBanner) noexcept
     {
         CBanManager::SetBansModified();
-        m_strBanner = strBanner;
+        m_strBanner = std::move(strBanner);
     };
 
-    const std::string& GetReason() { return m_strReason; };
-    void               SetReason(const std::string& strReason)
+    const std::string& GetReason() const noexcept { return m_strReason; };
+    void               SetReason(std::string strReason) noexcept
     {
         CBanManager::SetBansModified();
-        m_strReason = strReason;
+        m_strReason = std::move(strReason);
     };
 
-    const time_t GetTimeOfBan() { return m_tTimeOfBan; };
-    void         SetTimeOfBan(time_t tTimeOfBan)
+    const time_t GetTimeOfBan() const noexcept { return m_tTimeOfBan; };
+    void         SetTimeOfBan(time_t tTimeOfBan) noexcept
     {
         CBanManager::SetBansModified();
         m_tTimeOfBan = tTimeOfBan;
     };
 
-    time_t GetTimeOfUnban() { return m_tTimeOfUnban; };
-    void   SetTimeOfUnban(time_t tTimeOfUnban)
+    time_t GetTimeOfUnban() const noexcept { return m_tTimeOfUnban; };
+    void   SetTimeOfUnban(time_t tTimeOfUnban) noexcept
     {
         CBanManager::SetBansModified();
         m_tTimeOfUnban = tTimeOfUnban;
     };
 
-    const std::string& GetSerial() { return m_strSerial; };
-    void               SetSerial(const std::string& strSerial)
+    const std::string& GetSerial() const noexcept { return m_strSerial; };
+    void               SetSerial(std::string strSerial) noexcept
     {
         CBanManager::SetBansModified();
-        m_strSerial = strSerial;
+        m_strSerial = std::move(strSerial);
     };
 
-    const std::string& GetAccount() { return m_strAccount; };
-    void               SetAccount(const std::string& strAccount)
+    const std::string& GetAccount() const noexcept { return m_strAccount; };
+    void               SetAccount(std::string strAccount) noexcept
     {
         CBanManager::SetBansModified();
-        m_strAccount = strAccount;
+        m_strAccount = std::move(strAccount);
     };
 
-    time_t  GetBanTimeRemaining();
-    SString GetDurationDesc();
-    SString GetReasonText() const;
-    uint    GetScriptID() const { return m_uiScriptID; }
-    bool    IsBeingDeleted() const { return m_bBeingDeleted; }
-    void    SetBeingDeleted() { m_bBeingDeleted = true; }
+    time_t  GetBanTimeRemaining() const noexcept;
+    SString GetDurationDesc() const noexcept;
+    SString GetReasonText() const noexcept;
+    uint    GetScriptID() const noexcept { return m_uiScriptID; }
+    bool    IsBeingDeleted() const noexcept { return m_bBeingDeleted; }
+    void    SetBeingDeleted() noexcept { m_bBeingDeleted = true; }
 
 private:
     std::string m_strIP;
