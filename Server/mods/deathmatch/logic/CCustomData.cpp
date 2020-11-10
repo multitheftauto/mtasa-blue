@@ -11,45 +11,6 @@
 
 #include "StdInc.h"
 
-void CCustomData::Set(const std::string& szName, const CLuaArgument& Variable, ESyncType syncType)
-{
-    assert(szName);
-
-    // Grab the item with the given name
-    SCustomData* pData = Get(szName);
-    if (pData)
-    {
-        // Update existing
-        pData->Variable = Variable;
-        pData->syncType = syncType;
-        UpdateSynced(szName, Variable, syncType);
-    }
-    else
-    {
-        // Add new
-        SCustomData newData;
-        newData.Variable = Variable;
-        newData.syncType = syncType;
-        m_Data[szName] = newData;
-        UpdateSynced(szName, Variable, syncType);
-    }
-}
-
-bool CCustomData::Delete(const std::string& szName)
-{
-    // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
-    if (it != m_Data.end())
-    {
-        DeleteSynced(szName);
-        m_Data.erase(it);
-        return true;
-    }
-
-    // Didn't exist
-    return false;
-}
-
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
     std::map<std::string, SCustomData>::const_iterator iter = m_Data.begin();
