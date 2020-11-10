@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-SCustomData* CCustomData::Get(const char* szName)
+SCustomData* CCustomData::Get(const std::string& name)
 {
     assert(szName);
 
@@ -22,7 +22,7 @@ SCustomData* CCustomData::Get(const char* szName)
     return NULL;
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+void CCustomData::Set(const std::string& szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(szName);
 
@@ -46,7 +46,7 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncTyp
     }
 }
 
-bool CCustomData::Delete(const char* szName)
+bool CCustomData::Delete(const std::string& szName)
 {
     // Find the item and delete it
     std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
