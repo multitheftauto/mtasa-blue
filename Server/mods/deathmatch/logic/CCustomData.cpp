@@ -31,17 +31,6 @@ SCustomData* CCustomData::Get(const char* szName)
     return NULL;
 }
 
-SCustomData* CCustomData::GetSynced(const char* szName)
-{
-    assert(szName);
-
-    std::map<std::string, SCustomData>::const_iterator it = m_SyncedData.find(szName);
-    if (it != m_SyncedData.end())
-        return (SCustomData*)&it->second;
-
-    return NULL;
-}
-
 bool CCustomData::DeleteSynced(const char* szName)
 {
     // Find the item and delete it
