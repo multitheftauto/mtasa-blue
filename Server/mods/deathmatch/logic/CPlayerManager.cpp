@@ -130,6 +130,12 @@ void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pE
         [=, &name](CPlayer* pPlayer) { return pPlayer != pSkip && pPlayer->IsSubscribed(pElement, name); });
 }
 
+void CPlayerManager::BroadcastAll(const CPacket& Packet, CPlayer* pSkip = nullptr) const
+{
+
+}
+
+
 void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
 {
     for (CPlayer* pPlayer : m_Players)

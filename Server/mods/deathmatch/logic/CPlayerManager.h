@@ -108,6 +108,11 @@ public:
     void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = nullptr) const;
     void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = nullptr) const;
     void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const std::string& name, CPlayer* pSkip = nullptr) const;
+    void BroadcastAll(const CPacket& Packet, CPlayer* pSkip = nullptr) const
+    {
+        DoBroadcastIf(Packet, m_Players,
+            [=](CPlayer* pPlayer) {return pSkip != pPlayer; });
+    }
 
     // Subscriber based elementdata things
     void ClearElementData(CElement* pElement, const std::string& name);
