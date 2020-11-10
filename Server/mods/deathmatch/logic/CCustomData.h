@@ -34,10 +34,10 @@ struct SCustomData
 class CCustomData
 {
 public:
-    SCustomData* Get(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
+    SCustomData* Get(const std::string& szName);
+    void         Set(const std::string& szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
-    bool Delete(const char* szName);
+    bool Delete(const std::string& name);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
