@@ -74,7 +74,7 @@ CVehicleInOutPacket::~CVehicleInOutPacket()
 bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
 {
     m_PedID = INVALID_ELEMENT_ID;
-    if (BitStream.Version() >= 0x070)
+    if (BitStream.Can(eBitStreamVersion::PedEnterExit))
     {
         BitStream.Read(m_PedID);
         if (m_PedID == INVALID_ELEMENT_ID)

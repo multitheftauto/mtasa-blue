@@ -6423,7 +6423,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     }
 
     // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && (g_pNet->GetServerBitStreamVersion() < 0x070))
+    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         return false;
     }
@@ -6562,7 +6562,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     }
 
     // Write the ped ID to it if server supports it
-    if (g_pNet->GetServerBitStreamVersion() >= 0x070)
+    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         pBitStream->Write(GetID());
     }
@@ -6635,7 +6635,7 @@ bool CClientPed::ExitVehicle()
     }
 
     // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && (g_pNet->GetServerBitStreamVersion() < 0x070))
+    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         return false;
     }
@@ -6670,7 +6670,7 @@ bool CClientPed::ExitVehicle()
     }
 
     // Write the ped ID to it if server supports it
-    if (g_pNet->GetServerBitStreamVersion() >= 0x070)
+    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         pBitStream->Write(GetID());
     }
@@ -6753,7 +6753,7 @@ void CClientPed::UpdateVehicleInOut()
                     if (pBitStream)
                     {
                         // Write the ped ID to it
-                        if (g_pNet->GetServerBitStreamVersion() >= 0x070)
+                        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
                         {
                             pBitStream->Write(GetID());
                         }
@@ -6812,7 +6812,7 @@ void CClientPed::UpdateVehicleInOut()
                     if (pBitStream)
                     {
                         // Write the ped or player ID to it
-                        if (g_pNet->GetServerBitStreamVersion() >= 0x070)
+                        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
                         {
                             pBitStream->Write(GetID());
                         }
@@ -6859,7 +6859,7 @@ void CClientPed::UpdateVehicleInOut()
                     if (pBitStream)
                     {
                         // Write the ped or player ID to it
-                        if (g_pNet->GetServerBitStreamVersion() >= 0x070)
+                        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
                         {
                             pBitStream->Write(GetID());
                         }
@@ -6972,7 +6972,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->GetServerBitStreamVersion() >= 0x070)
+                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
                     {
                         pBitStream->Write(GetID());
                     }

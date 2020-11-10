@@ -2762,7 +2762,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
                                     {
                                         CPlayer* pSendPlayer = *iter;
-                                        if (pSendPlayer->GetBitStreamVersion() < 0x070)
+                                        if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
                                         {
                                             if (pSendPlayer->IsJoined())
                                                 // Store this player as incompatible for later
@@ -2785,7 +2785,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
                             {
                                 CPlayer* pSendPlayer = *iter;
-                                if (pSendPlayer->GetBitStreamVersion() < 0x070)
+                                if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
                                 {
                                     switch (ucAction)
                                     {
@@ -2956,7 +2956,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                             for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
                                                             {
                                                                 CPlayer* pSendPlayer = *iter;
-                                                                if (pSendPlayer->GetBitStreamVersion() < 0x070)
+                                                                if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
                                                                 {
                                                                     bValidOccupant = false;
                                                                     break;
