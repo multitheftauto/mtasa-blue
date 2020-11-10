@@ -18,6 +18,7 @@ class CPlayerManager;
 #include "CPlayer.h"
 #include "../Config.h"
 #include <net/CNetBufferWatchDog.h>
+#include "CGame.h" // Todo: Somehow remove this.. Needed for SendPacketBatchBegin
 
 class CPlayerManager
 {
