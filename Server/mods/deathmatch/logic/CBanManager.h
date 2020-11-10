@@ -38,18 +38,19 @@ public:
 
     CBan* AddBan(const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0);
 
-    bool  IsSpecificallyBanned(std::string_view ip);
-    bool  IsSerialBanned(std::string_view serial);
-    bool  IsAccountBanned(std::string_view account);
+    bool  IsSpecificallyBanned(std::string_view ip) const noexcept;
+    bool  IsSerialBanned(std::string_view serial) const noexcept;
+    bool  IsAccountBanned(std::string_view account) const noexcept;
+
+    CBan* GetBanFromIP(std::string_view ip) const noexcept;
+    CBan* GetBanFromScriptID(uint uiScriptID) const noexcept;
+    CBan* GetBanFromAccount(std::string_view account) const noexcept;
+    CBan* GetBanFromSerial(std::string_view serial) const noexcept;
+
+    unsigned int GetBansWithNick(std::string_view szNick) const noexcept;
+    unsigned int GetBansWithBanner(std::string_view szBanner) const noexcept;
+
     void  RemoveBan(CBan* pBan);
-
-    CBan* GetBanFromIP(std::string_view ip);
-    CBan* GetBanFromScriptID(uint uiScriptID);
-    CBan* GetBanFromAccount(std::string_view account);
-    CBan* GetBanFromSerial(std::string_view serial);
-
-    unsigned int GetBansWithNick(std::string_view szNick);
-    unsigned int GetBansWithBanner(std::string_view szBanner);
 
     bool        LoadBanList();
     bool        ReloadBanList();

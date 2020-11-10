@@ -160,24 +160,24 @@ CBan* CBanManager::AddBan(const SString& strBanner, const SString& strReason, ti
     return &ban;
 }
 
-bool CBanManager::IsSerialBanned(std::string_view serial)
+bool CBanManager::IsSerialBanned(std::string_view serial) const noexcept
 {
     return (bool)GetBanFromSerial(serial);
 }
 
-bool CBanManager::IsAccountBanned(std::string_view account)
+bool CBanManager::IsAccountBanned(std::string_view account) const noexcept
 {
     return (bool)GetBanFromAccount(account);
 }
 
-bool CBanManager::IsSpecificallyBanned(std::string_view IP)
+bool CBanManager::IsSpecificallyBanned(std::string_view IP) const noexcept
 {
     return FindIf([=](const CBan& ban) {
         return ban.GetIP() == IP; });
 }
 
 // Include wildcard checks
-CBan* CBanManager::GetBanFromIP(std::string_view ip)
+CBan* CBanManager::GetBanFromIP(std::string_view ip) const noexcept
 {
     return FindIf([=](const CBan& ban) {
         const auto& bannedIP = ban.GetIP();
@@ -202,32 +202,32 @@ CBan* CBanManager::GetBanFromIP(std::string_view ip)
     });
 }
 
-CBan* CBanManager::GetBanFromScriptID(uint uiScriptID)
+CBan* CBanManager::GetBanFromScriptID(uint uiScriptID) const noexcept
 {
     CBan* pBan = (CBan*)CIdArray::FindEntry(uiScriptID, EIdClass::BAN);
     dassert(!pBan || ListContains(m_Bans, pBan));
     return pBan;
 }
 
-CBan* CBanManager::GetBanFromAccount(std::string_view account)
+CBan* CBanManager::GetBanFromAccount(std::string_view account) const noexcept
 {
     return FindIf([=](const CBan& ban) {
         return ban.GetAccount() == account; });
 }
 
-CBan* CBanManager::GetBanFromSerial(std::string_view serial)
+CBan* CBanManager::GetBanFromSerial(std::string_view serial) const noexcept
 {
     return FindIf([=](const CBan& ban) {
         return ban.GetSerial() == serial; });
 }
 
-unsigned int CBanManager::GetBansWithNick(std::string_view nick)
+unsigned int CBanManager::GetBansWithNick(std::string_view nick) const noexcept
 {
     return CountIf([=](const CBan& ban) {
         return ban.GetNick() == nick; });
 }
 
-unsigned int CBanManager::GetBansWithBanner(std::string_view banner)
+unsigned int CBanManager::GetBansWithBanner(std::string_view banner) const noexcept
 {
     return CountIf([=](const CBan& ban) {
         return ban.GetBanner() == banner; });
