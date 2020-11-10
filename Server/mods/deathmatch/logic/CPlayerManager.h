@@ -64,6 +64,7 @@ public:
 
     size_t Count() const noexcept { return m_Players.size(); }
     size_t CountJoined() const;
+    size_t HasAnyJoined() const noexcept { return m_JoinedByBitStreamVer.CountUniqueVersions() > 0; }
 
     bool   Exists(CPlayer* pPlayer) const noexcept { return m_Players.find(pPlayer) != m_Players.end(); }
 
