@@ -397,7 +397,7 @@ bool CNetServerBuffer::GetSyncThreadStatistics(SSyncThreadStatistics* pDest, boo
     if (!pDest)
         return false;
 
-    int iNumActiveRemoteSystems = std::max(1U, g_pGame->GetPlayerManager()->Count());
+    size_t iNumActiveRemoteSystems = std::max<size_t>(1U, g_pGame->GetPlayerManager()->Count());
     int iLoopCount = std::max(1, ms_StatsLoopCount);
     pDest->uiRecvTimeAvgUs = (uint)(ms_StatsRecvTimeTotalUs / iLoopCount);
     pDest->uiSendTimeAvgUs = (uint)(ms_StatsSendTimeTotalUs / iLoopCount);
