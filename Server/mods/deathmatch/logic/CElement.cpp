@@ -692,32 +692,31 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+void CElement::SetCustomData(const std::string& name, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
-    assert(szName);
-    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+    if (name.length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        CLogger::ErrorPrintf("Custom data name too long (%.*s)\n", MAX_CUSTOMDATA_NAME_LENGTH, name.c_str());
         return;
     }
 
     // Grab the old variable
     CLuaArgument       oldVariable;
-    const SCustomData* pData = m_pCustomData->Get(szName);
+    const SCustomData* pData = m_pCustomData->Get(name);
     if (pData)
     {
         oldVariable = pData->Variable;
     }
 
     // Set the new data
-    m_pCustomData->Set(szName, Variable, syncType);
+    m_pCustomData->Set(name, Variable, syncType);
 
     if (bTriggerEvent)
     {
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
+        Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(Variable);
         CallEvent("onElementDataChange", Arguments, pClient);

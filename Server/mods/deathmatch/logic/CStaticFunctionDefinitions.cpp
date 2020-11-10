@@ -873,11 +873,11 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const std::string& name, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(pElement);
     assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
+    assert(name.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     ESyncType     lastSyncType = ESyncType::BROADCAST;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
