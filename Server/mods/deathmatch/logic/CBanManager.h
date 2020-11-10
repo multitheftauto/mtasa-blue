@@ -58,12 +58,14 @@ public:
     static bool IsValidIP(const char* szIP);
     static void SetBansModified() { ms_bSaveRequired = true; }
 
+    size_t GetCount() const noexcept { return m_Bans.size(); }
+
     // Iterate thru bans that aren't currently being deleted
     // Even in the class itself use this, not a range based for loop!
     template<class Functor_t>
     void IterBans(const Functor_t& f) const noexcept
     {
-        for (const CBan& ban : m_Bans)
+        for (CBan& ban : m_Bans)
             if (!ban.IsBeingDeleted())
                 f(ban);
     }
