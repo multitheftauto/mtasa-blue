@@ -14,7 +14,7 @@ bool CBanManager::ms_bSaveRequired = false;
 
 CBanManager::CBanManager()
 {
-    m_strPath = g_pServerInterface->GetModManager()->GetAbsolutePath(FILENAME_BANLIST);
+    m_strBanListXMLPath = g_pServerInterface->GetModManager()->GetAbsolutePath(FILENAME_BANLIST);
     m_tUpdate = 0;
     m_bAllowSave = false;
 }
@@ -339,7 +339,7 @@ bool CBanManager::LoadBanList()
     m_bAllowSave = true;
 
     // Create the XML
-    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strPath);
+    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strBanListXMLPath);
     if (!pFile)
     {
         return false;
@@ -349,7 +349,7 @@ bool CBanManager::LoadBanList()
     if (!pFile->Parse())
     {
         delete pFile;
-        if (FileExists(m_strPath))
+        if (FileExists(m_strBanListXMLPath))
             CLogger::ErrorPrintf("Error parsing banlist\n");
         return false;
     }
@@ -438,7 +438,7 @@ void CBanManager::SaveBanList()
         return;
 
     // Create the XML file
-    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strPath);
+    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strBanListXMLPath);
     if (pFile)
     {
         // create the root node again as you are outputting all the bans again not just new ones
