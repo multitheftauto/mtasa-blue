@@ -14,7 +14,6 @@
 #include "CCommon.h"
 #include <vector>
 #include <net/CNetServer.h>
-#include "CPlayerManager.h"
 
 class CPlayer;
 class CGame;
