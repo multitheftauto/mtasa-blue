@@ -551,6 +551,10 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
     if (!MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
+    // Don't change bIsColLoaded flag
+    usFlags &= 0xFF7F;                                  // Disable flag in input
+    usFlags |= m_pInterface->usFlags & 0x80;            // Apply current bIsColLoaded flag
+
     m_pInterface->usFlags = usFlags;
 }
 
@@ -567,8 +571,10 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
     tIdeFlags ideFlags;
     ideFlags.uiFlags = uiFlags;
 
-    // Default value
-    m_pInterface->usFlags = 0xC0;            //  bIsBackfaceCulled and bIsColLoaded
+    // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
+    // But bIsColLoaded should not be changed
+    m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
+    m_pInterface->bIsBackfaceCulled = true;
 
     // setBaseModelInfoFlags
     if (ideFlags.bDrawLast)
@@ -639,7 +645,13 @@ void CModelInfoSA::StaticResetFlags()
     {
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[iter->first];
         if (pInterface)
-            pInterface->usFlags = iter->second;
+        {
+            // Don't change bIsColLoaded flag
+            ushort usFlags = iter->second;
+            usFlags &= 0xFF7F;
+            usFlags |= pInterface->usFlags & 0x80; 
+            pInterface->usFlags = usFlags;
+        }
     }
 
     ms_ModelDefaultFlagsMap.clear();
