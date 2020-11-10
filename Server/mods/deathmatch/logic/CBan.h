@@ -17,6 +17,28 @@
 class CBan
 {
     friend class CBanManager;
+
+    CBan() :
+        m_uiScriptID(CIdArray::PopUniqueId(this, EIdClass::BAN))
+    {
+        CBanManager::SetBansModified();
+    }
+
+    // I'm lazy to implement these, but feel free to do so if it's needed
+    // Tip: Use the copy-swap idiom:
+    // https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
+    CBan(const CBan&) = delete;
+    CBan(CBan&&) = delete;
+    
+    ~CBan()
+    {
+        CIdArray::PushUniqueId(this, EIdClass::BAN, m_uiScriptID);
+        CBanManager::SetBansModified();
+    }
+
+    // Same as above
+    CBan& operator=(const CBan&) = delete;
+    CBan& operator=(CBan&&) = delete;
 public:
     const std::string& GetIP() const noexcept { return m_strIP; };
     void               SetIP(std::string strIP) noexcept
@@ -82,14 +104,14 @@ public:
     void    SetBeingDeleted() noexcept { m_bBeingDeleted = true; }
 
 private:
-    std::string m_strIP;
-    std::string m_strNick;
-    std::string m_strBanner;
-    std::string m_strReason;
-    std::string m_strSerial;
-    std::string m_strAccount;
-    time_t      m_tTimeOfBan;
-    time_t      m_tTimeOfUnban;
-    uint        m_uiScriptID;
-    bool        m_bBeingDeleted;
+    std::string m_strIP{};
+    std::string m_strNick{};
+    std::string m_strBanner{};
+    std::string m_strReason{};
+    std::string m_strSerial{};
+    std::string m_strAccount{};
+    time_t      m_tTimeOfBan = 0;
+    time_t      m_tTimeOfUnban = 0;
+    uint        m_uiScriptID = INVALID_ARRAY_ID;
+    bool        m_bBeingDeleted = false;
 };

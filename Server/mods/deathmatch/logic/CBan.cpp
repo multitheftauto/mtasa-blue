@@ -11,21 +11,6 @@
 
 #include "StdInc.h"
 
-CBan::CBan()
-{
-    m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::BAN);
-    m_tTimeOfBan = 0;
-    m_tTimeOfUnban = 0;
-    m_bBeingDeleted = false;
-    CBanManager::SetBansModified();
-}
-
-CBan::~CBan()
-{
-    CIdArray::PushUniqueId(this, EIdClass::BAN, m_uiScriptID);
-    CBanManager::SetBansModified();
-}
-
 time_t CBan::GetBanTimeRemaining() const noexcept
 {
     time_t End = GetTimeOfUnban();
