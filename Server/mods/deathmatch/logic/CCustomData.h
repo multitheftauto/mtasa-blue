@@ -43,6 +43,8 @@ public:
         data.syncType = syncType;
     }
 
+    bool Delete(const std::string& name) { return (bool)m_Data.erase(name); }
+
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
     /*
