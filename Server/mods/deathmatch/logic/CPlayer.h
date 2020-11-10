@@ -92,7 +92,7 @@ public:
     void               SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
     unsigned short     GetMTAVersion() { return m_usMTAVersion; };
     void               SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
-    unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
+    unsigned short     GetBitStreamVersion() const { return m_usBitStreamVersion; };
     void               SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
     bool               CanBitStream(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(m_usBitStreamVersion) >= query; }
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
