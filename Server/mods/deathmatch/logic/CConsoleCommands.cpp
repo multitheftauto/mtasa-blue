@@ -1175,17 +1175,15 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
         // Any player requested?
         if (strcmp(szArguments, "*") == 0)
         {
-            // Iterate the players and echo their IPs and ports if anyone was requested
-            size_t uiCount = 0;
-            pConsole->GetPlayerManager()->IterateJoined([&](CPlayer* pPlayer) {
-                pClient->SendEcho(SString("%s - %s:%u", pPlayer->GetNick(), pPlayer->GetSourceIP(), pPlayer->GetSourcePort()));
-            });
-
-            // No players?
-            if (uiCount == 0)
+            if (pConsole->GetPlayerManager()->HasAnyJoined())
             {
-                pClient->SendEcho("whois: No players connected");
+                // Iterate the players and echo their IPs and ports if anyone was requested
+                pConsole->GetPlayerManager()->IterateJoined([&](CPlayer* pPlayer) {
+                    pClient->SendEcho(SString("%s - %s:%u", pPlayer->GetNick(), pPlayer->GetSourceIP(), pPlayer->GetSourcePort()));
+                });
             }
+            else
+                pClient->SendEcho("whois: No players connected");
         }
         else
         {
