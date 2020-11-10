@@ -18,7 +18,7 @@
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 
-enum class ESyncType
+enum class ESyncType : unsigned char
 {
     LOCAL,
     BROADCAST,
@@ -41,8 +41,6 @@ public:
     void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
     bool Delete(const char* szName);
-
-    unsigned short CountOnlySynchronized();
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
