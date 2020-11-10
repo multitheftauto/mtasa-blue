@@ -13,7 +13,7 @@
 
 #include <core/CServerInterface.h>
 #include "lua/CLuaArgument.h"
-#include <map>
+#include "SharedUtil.FastHashMap.h"
 #include <string>
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
@@ -41,8 +41,10 @@ public:
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
+    /*
     std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
     std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    */
 private:
-    std::map<std::string, SCustomData> m_Data;
+    SharedUtil::CFastHashMap<std::string, SCustomData> m_Data;
 };
