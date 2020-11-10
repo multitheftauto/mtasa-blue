@@ -60,12 +60,12 @@ public:
     list<CBan*>::const_iterator IterEnd() { return m_BanManager.end(); };
 
 private:
-    SString m_strPath;
+    SString m_strBanListXMLPath;
 
     CMappedList<CBan*> m_BanManager;
     std::set<CBan*>    m_BansBeingDeleted;
 
-    time_t m_tUpdate;
+    time_t m_NextUpdateTime;
 
     bool        IsValidIPPart(const char* szIP);
     bool        m_bAllowSave;

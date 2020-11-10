@@ -12,11 +12,11 @@
 #include "StdInc.h"
 bool CBanManager::ms_bSaveRequired = false;
 
-CBanManager::CBanManager()
+CBanManager::CBanManager() :
+    m_strBanListXMLPath(g_pServerInterface->GetModManager()->GetAbsolutePath(FILENAME_BANLIST)),
+    m_NextUpdateTime(0),
+    m_bAllowSave(false)
 {
-    m_strBanListXMLPath = g_pServerInterface->GetModManager()->GetAbsolutePath(FILENAME_BANLIST);
-    m_NextUpdateTime = 0;
-    m_bAllowSave = false;
 }
 
 CBanManager::~CBanManager()
