@@ -333,7 +333,7 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
             vecNewPosition += pElement->GetPosition();
 
         pNewElement->SetPosition(vecNewPosition);
-        pNewElement->GetCustomDataPointer()->Copy(pElement->GetCustomDataPointer());
+        *pNewElement->GetCustomDataPointer() = *pElement->GetCustomDataPointer();
         pNewElement->SetInterior(pElement->GetInterior());
         pNewElement->SetDimension(pElement->GetDimension());
 

@@ -11,15 +11,6 @@
 
 #include "StdInc.h"
 
-void CCustomData::Copy(CCustomData* pCustomData)
-{
-    map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
-    for (; iter != pCustomData->IterEnd(); iter++)
-    {
-        Set(iter->first.c_str(), iter->second.Variable);
-    }
-}
-
 SCustomData* CCustomData::Get(const char* szName)
 {
     assert(szName);

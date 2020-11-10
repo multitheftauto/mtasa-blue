@@ -34,8 +34,6 @@ struct SCustomData
 class CCustomData
 {
 public:
-    void Copy(CCustomData* pCustomData);
-
     SCustomData* Get(const char* szName);
     void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
