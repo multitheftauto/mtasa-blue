@@ -10,7 +10,7 @@
  *****************************************************************************/
 #pragma once
 
-class CPlayerACInfoPacket : public CPacket
+class CPlayerACInfoPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_ACINFO; };

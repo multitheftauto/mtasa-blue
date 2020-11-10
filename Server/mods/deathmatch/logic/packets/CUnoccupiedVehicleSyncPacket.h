@@ -16,7 +16,7 @@
 #include <vector>
 #include "net/SyncStructures.h"
 
-class CUnoccupiedVehicleSyncPacket : public CPacket
+class CUnoccupiedVehicleSyncPacket final : public CPacket
 {
 public:
     struct SyncData

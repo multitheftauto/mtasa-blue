@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CFireSyncPacket : public CPacket
+class CFireSyncPacket final : public CPacket
 {
 public:
     CFireSyncPacket();

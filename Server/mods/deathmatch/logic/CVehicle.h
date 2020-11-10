@@ -322,8 +322,8 @@ public:
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
 
-    void            GenerateHandlingData();
-    CHandlingEntry* GetHandlingData() { return m_pHandlingEntry; }
+    void                  GenerateHandlingData();
+    CHandlingEntry*       GetHandlingData() { return m_pHandlingEntry; };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now(true) - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(true); }
