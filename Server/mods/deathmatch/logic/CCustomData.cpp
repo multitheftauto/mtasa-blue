@@ -13,29 +13,26 @@
 
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = m_Data.begin();
-    for (; iter != m_Data.end(); iter++)
+    for (auto& [name, data] : m_Data)
     {
-        CLuaArgument* arg = (CLuaArgument*)&iter->second.Variable;
-
-        switch (arg->GetType())
+        switch (data.Variable.GetType())
         {
             case LUA_TSTRING:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue(arg->GetString().c_str());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(name.c_str());
+                attr->SetValue(data.Variable.GetString().c_str());
                 break;
             }
             case LUA_TNUMBER:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue((float)arg->GetNumber());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(name.c_str());
+                attr->SetValue((float)data.Variable.GetNumber());
                 break;
             }
             case LUA_TBOOLEAN:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue(arg->GetBoolean());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(name.c_str());
+                attr->SetValue(data.Variable.GetBoolean());
                 break;
             }
         }
