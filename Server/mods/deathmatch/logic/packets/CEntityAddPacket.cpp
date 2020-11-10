@@ -153,22 +153,20 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
             if (BitStream.Version() >= 0x56)
                 BitStream.WriteBit(pElement->IsCallPropagationEnabled());
 
-            // Write custom data
-            CCustomData* pCustomData = pElement->GetCustomDataPointer();
-            assert(pCustomData);
-            BitStream.WriteCompressed(pCustomData->CountOnlySynchronized());
-            map<string, SCustomData>::const_iterator iter = pCustomData->SyncedIterBegin();
-            for (; iter != pCustomData->SyncedIterEnd(); ++iter)
+            // Write synced custom data (aka element data)
+            BitStream.WriteCompressed(pElement->GetCustomDataPointer()->CountSynced());
+
+            for (const auto& [name, data] : pElement->GetCustomDataPointer()->GetAll())
             {
-                const char*         szName = iter->first.c_str();
-                const CLuaArgument* pArgument = &iter->second.Variable;
+                if (data.syncType == ESyncType::LOCAL)
+                    continue;
 
-                unsigned char ucNameLength = static_cast<unsigned char>(strlen(szName));
+                unsigned char ucNameLength = static_cast<unsigned char>(name.length());
                 BitStream.Write(ucNameLength);
-                BitStream.Write(szName, ucNameLength);
-                pArgument->WriteToBitStream(BitStream);
+                BitStream.Write(name.c_str(), ucNameLength);
+                data.Variable.WriteToBitStream(BitStream);
             }
-
+            
             // Grab its name
             char szEmpty[1];
             szEmpty[0] = 0;

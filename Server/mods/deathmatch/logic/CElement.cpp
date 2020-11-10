@@ -520,14 +520,12 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
 
 CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
 {
-    assert(table);
+    dassert(table);
 
-    // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_pCustomData->IterBegin();
-    for (; iter != m_pCustomData->IterEnd(); iter++)
+    for (const auto& [name, data] : m_pCustomData->GetAll())
     {
-        table->PushString(iter->first.c_str());                // key
-        table->PushArgument(iter->second.Variable);            // value
+        table->PushString(name);                // key
+        table->PushArgument(data.Variable);            // value
     }
 
     return table;
@@ -747,22 +745,19 @@ void CElement::DeleteCustomData(const char* szName)
 // Used to send the root element data when a player joins
 void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
-    for (map<std::string, SCustomData>::const_iterator iter = m_pCustomData->SyncedIterBegin(); iter != m_pCustomData->SyncedIterEnd(); ++iter)
+    for (const auto& [name, data] : m_pCustomData->GetAll())
     {
-        const std::string& strName = iter->first;
-        const SCustomData& customData = iter->second;
-
-        if (customData.syncType == ESyncType::LOCAL)
+        if (data.syncType == ESyncType::LOCAL)
             continue;
 
         // Tell our clients to update their data
-        unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+        unsigned short usNameLength = static_cast<unsigned short>(name.length());
         CBitStream     BitStream;
         BitStream.pBitStream->WriteCompressed(usNameLength);
-        BitStream.pBitStream->Write(strName.c_str(), usNameLength);
-        customData.Variable.WriteToBitStream(*BitStream.pBitStream);
+        BitStream.pBitStream->Write(name.c_str(), usNameLength);
+        data.Variable.WriteToBitStream(*BitStream.pBitStream);
 
-        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
+        if (data.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, name))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
     }
 }
