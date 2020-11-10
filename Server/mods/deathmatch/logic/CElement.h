@@ -246,7 +246,7 @@ protected:
     void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
 
     CMapEventManager* m_pEventManager;
-    CCustomData*      m_CustomData;
+    CCustomData       m_CustomData;
 
     EElementType m_iType;
     ElementID    m_ID;
