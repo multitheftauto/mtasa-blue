@@ -50,7 +50,6 @@ public:
     std::map<std::string, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
 
 private:
-    bool DeleteSynced(const char* szName);
     void UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType);
 
     std::map<std::string, SCustomData> m_Data;
