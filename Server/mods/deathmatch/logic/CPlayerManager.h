@@ -23,23 +23,18 @@ class CPlayerManager
 {
     friend class CPlayer;
 
-protected:
-    // Some protected typedefs for code readability
-    using BitStreamVersion = unsigned short;            // Todo: move this to it's appropriate place
-    using PlayersByBitStreamVersionMap = std::unordered_map<BitStreamVersion, std::vector<CPlayer*>>;
-
 public:
     // Send one packet to a list of players
     template <class T, class Pred_t>
     static void BroadcastIf(const CPacket& Packet, const T& sendList, Pred_t&& pred)
     {
-        if constexpr (std::is_base_of_v<PlayersByBitStreamVersionMap, T>) // Can we call it as is?
+        if constexpr (std::is_base_of_v<CSendList, T>) // Can we call it as is?
             DoBroadcast(Packet, sendList, std::forward<Pred_t>(pred));
 
         else // Sadly not, conversion needed..
         {
             // Group players by bitstream version
-            PlayersByBitStreamVersionMap groupMap;
+            CSendList groupMap;
 
             for (CPlayer* pPlayer : sendList)
                 groupMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
@@ -129,7 +124,7 @@ private:
     // Eg.: It takes in a `CPlayer*` as its first (and only) argument
     // And only if it (the predicate) returns true, the packet is sent to the player.
     template<class Predicate_t>
-    static void DoBroadcastIf(const CPacket& Packet, const PlayersByBitStreamVersionMap& playersByBitStreamVer, Predicate_t predicate)
+    static void DoBroadcastIf(const CPacket& Packet, const CSendList& playersByBitStreamVer, Predicate_t predicate)
     {
         if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
             return;
@@ -164,10 +159,10 @@ private:
             // Destroy the bitstream
             g_pNetServer->DeallocateNetServerBitStream(pBitStream);
         }
-    }
+    } 
 
     // Wrapper around the above function so it can be called without a predicate
-    static void DoBroadcast(const CPacket& Packet, const PlayersByBitStreamVersionMap& playersByBitStreamVer)
+    static void DoBroadcast(const CPacket& Packet, const CSendList& playersByBitStreamVer)
     {
         DoBroadcastIf(Packet, playersByBitStreamVer,
             [](CPlayer*) { return true; }); // Placeholder lambda
@@ -181,7 +176,7 @@ private:
 
     CFastHashSet<CPlayer*>                    m_Players; // All joined players
     CFastHashMap<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;
-    PlayersByBitStreamVersionMap              m_JoinedByBitStreamVer; // Players joined into groups by bit stream version for easy packet sending
+    CSendList                                 m_JoinedByBitStreamVer; // Players joined into groups by bit stream version for easy packet sending
     CMtaVersion                               m_LowestJoinedPlayerVersion;
     CElapsedTime                              m_ZombieCheckTimer;
 };

@@ -79,9 +79,7 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
 
 size_t CPlayerManager::CountJoined() const
 {
-    return std::accumulate(m_JoinedByBitStreamVer.begin(), m_JoinedByBitStreamVer.end(), 0,
-        [](const auto& count, const auto& pair) { return count + pair.second.size(); }
-    );
+    return m_JoinedByBitStreamVer.CountJoined(); // O(n), where n = m_JoinedByBitStreamVer.CountUniqueVersions()
 }
 
 // Find player by fully matching nick. Todo: Partial nick
@@ -161,7 +159,7 @@ void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
         m_LowestJoinedPlayerVersion = pPlayer->GetPlayerVersion();
     g_pGame->CalculateMinClientRequirement();
 
-    m_JoinedByBitStreamVer[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
+    m_JoinedByBitStreamVer.Insert(pPlayer);
 }
 
 void CPlayerManager::AddToList(CPlayer* pPlayer)
@@ -194,8 +192,7 @@ void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
 
     dassert(m_Players.size() == m_SocketPlayerMap.size());
 
-    if (auto* players = MapFind(m_JoinedByBitStreamVer, pPlayer->GetBitStreamVersion())) // May not be in this map though
-        ListRemoveFirst(*players, pPlayer);
+    m_JoinedByBitStreamVer.Erase(pPlayer);
 
     for (CPlayer* itPlayer : m_Players)
     {
