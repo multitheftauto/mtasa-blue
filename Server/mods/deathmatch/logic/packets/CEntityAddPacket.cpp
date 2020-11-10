@@ -154,7 +154,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(pElement->IsCallPropagationEnabled());
 
             // Write custom data
-            CCustomData* pCustomData = pElement->GetCustomDataPointer();
+            CCustomData* pCustomData = pElement->GetCustomDataManager();
             assert(pCustomData);
             BitStream.WriteCompressed(pCustomData->CountOnlySynchronized());
             map<string, SCustomData>::const_iterator iter = pCustomData->SyncedIterBegin();
