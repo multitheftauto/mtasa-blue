@@ -28,7 +28,7 @@ public:
     float   fRadius;
 };
 
-enum class eModelIdeFlags
+enum class eModelIdeFlag
 {
     IS_ROAD,
     DRAW_LAST,

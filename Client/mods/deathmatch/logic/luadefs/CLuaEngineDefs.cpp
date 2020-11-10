@@ -2025,7 +2025,7 @@ uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
     return pModelInfo->GetFlags();
 }
 
-bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlags eFlag)
+bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlag eFlag)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
 
@@ -2052,7 +2052,7 @@ bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::opti
     return true; 
 }
 
-bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlags eFlags, bool bState)
+bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlags, bool bState)
 {
     // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
 

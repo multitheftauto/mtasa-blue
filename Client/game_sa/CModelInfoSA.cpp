@@ -597,34 +597,34 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
             m_pInterface->bIsRoad = ideFlags.bIsRoad;
 
             if (ideFlags.bIsGlassType1)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::GLASS_1;
+                m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_1;
 
             if (ideFlags.bIsGlassType2)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::GLASS_2;
+                m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_2;
 
             if (ideFlags.bIsGarageDoor)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::GARAGE_DOOR;
+                m_pInterface->eSpecialModelType = eModelSpecialType::GARAGE_DOOR;
 
             if (ideFlags.bIsTree)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::TREE;
+                m_pInterface->eSpecialModelType = eModelSpecialType::TREE;
 
             if (ideFlags.bIsPalm)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::PALM;
+                m_pInterface->eSpecialModelType = eModelSpecialType::PALM;
 
             m_pInterface->bDontCollideWithFlyer = ideFlags.bDontCollideWithFlyer;
 
             if (ideFlags.bIsTag)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::TAG;
+                m_pInterface->eSpecialModelType = eModelSpecialType::TAG;
 
             if (ideFlags.bIsBreakableStatue)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::BREAKABLE_STATUE;
+                m_pInterface->eSpecialModelType = eModelSpecialType::BREAKABLE_STATUE;
 
             if (ideFlags.bFlag24)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::UNKNOW_1;
+                m_pInterface->eSpecialModelType = eModelSpecialType::UNKNOW_1;
 
             // Added
             if (ideFlags.bFlag20)
-                m_pInterface->eSpecialModelType = eModelSpecialTypes::CRANE;
+                m_pInterface->eSpecialModelType = eModelSpecialType::CRANE;
             break;
         }
         case eModelInfoType::CLUMP:
@@ -636,6 +636,127 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
             break;
     }
 
+}
+
+void CModelInfoSA::SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return;
+
+    switch (eIdeFlag)
+    {
+        case eModelIdeFlag::IS_ROAD:
+            m_pInterface->bIsRoad = bState;
+            break;
+        case eModelIdeFlag::DRAW_LAST:
+            m_pInterface->bAlphaTransparency = bState;
+            if (bState)
+                m_pInterface->bAdditiveRender = true;
+            break;
+        case eModelIdeFlag::ADDICTIVE:
+            m_pInterface->bAdditiveRender = bState;
+            break;
+        case eModelIdeFlag::IGNORE_LIGHTING:
+            m_pInterface->bAdditiveRender = bState;
+            break;
+        case eModelIdeFlag::NO_ZBUFFER_WRITE:
+            m_pInterface->bDontWriteZBuffer = bState;
+            break;
+        case eModelIdeFlag::DONT_RECEIVE_SHADOWS:
+            m_pInterface->bDontCastShadowsOn = bState;
+            break;
+        case eModelIdeFlag::IS_GLASS_TYPE_1:
+            SetModelSpecialType(eModelSpecialType::GLASS_1, bState);
+            break;
+        case eModelIdeFlag::IS_GLASS_TYPE_2:
+            SetModelSpecialType(eModelSpecialType::GLASS_2, bState);
+            break;
+        case eModelIdeFlag::IS_GARAGE_DOOR:
+            SetModelSpecialType(eModelSpecialType::GARAGE_DOOR, bState);
+            break;
+        case eModelIdeFlag::IS_TREE:
+            SetModelSpecialType(eModelSpecialType::TREE, bState);
+            break;
+        case eModelIdeFlag::IS_PALM:
+            SetModelSpecialType(eModelSpecialType::PALM, bState);
+            break;
+        case eModelIdeFlag::IS_TAG:
+            SetModelSpecialType(eModelSpecialType::TAG, bState);
+            break;
+        case eModelIdeFlag::IS_BREAKABLE_STATUE:
+            SetModelSpecialType(eModelSpecialType::BREAKABLE_STATUE, bState);
+            break;
+        case eModelIdeFlag::IS_CRANE:
+            SetModelSpecialType(eModelSpecialType::CRANE, bState);
+            break;
+        case eModelIdeFlag::IS_DAMAGABLE:
+            // Can't set
+            break;
+        case eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER:
+            m_pInterface->bDontCollideWithFlyer = bState;
+            break;
+        case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
+            m_pInterface->bIsBackfaceCulled = !bState;
+            break;
+        default:
+            break;
+    }
+}
+
+bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    switch (eIdeFlag)
+    {
+        case eModelIdeFlag::IS_ROAD:
+            return m_pInterface->bIsRoad;
+        case eModelIdeFlag::DRAW_LAST:
+           return m_pInterface->bAlphaTransparency;
+        case eModelIdeFlag::ADDICTIVE:
+            return m_pInterface->bAdditiveRender;
+        case eModelIdeFlag::IGNORE_LIGHTING:
+            return m_pInterface->bAdditiveRender;
+        case eModelIdeFlag::NO_ZBUFFER_WRITE:
+            return m_pInterface->bDontWriteZBuffer;
+        case eModelIdeFlag::DONT_RECEIVE_SHADOWS:
+            return m_pInterface->bDontCastShadowsOn;
+        case eModelIdeFlag::IS_GLASS_TYPE_1:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::GLASS_1;
+        case eModelIdeFlag::IS_GLASS_TYPE_2:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::GLASS_2;
+        case eModelIdeFlag::IS_GARAGE_DOOR:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::GARAGE_DOOR;
+        case eModelIdeFlag::IS_TREE:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::TREE;
+        case eModelIdeFlag::IS_PALM:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::PALM;
+        case eModelIdeFlag::IS_TAG:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::TAG;
+        case eModelIdeFlag::IS_BREAKABLE_STATUE:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::BREAKABLE_STATUE;
+        case eModelIdeFlag::IS_CRANE:
+            return m_pInterface->eSpecialModelType == eModelSpecialType::CRANE;
+        case eModelIdeFlag::IS_DAMAGABLE:
+            return ((bool (*)())m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();
+        case eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER:
+            return m_pInterface->bDontCollideWithFlyer;
+        case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
+            return !m_pInterface->bIsBackfaceCulled;
+        default:
+            return false;
+    }
+}
+
+void CModelInfoSA::SetModelSpecialType(eModelSpecialType eType, bool bState)
+{
+    if (bState)
+        m_pInterface->eSpecialModelType = eType;
+    else if (m_pInterface->eSpecialModelType == eType)
+        m_pInterface->eSpecialModelType = eModelSpecialType::NONE;
 }
 
 void CModelInfoSA::StaticResetFlags()

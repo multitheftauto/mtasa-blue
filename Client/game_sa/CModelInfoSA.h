@@ -139,7 +139,7 @@ class CVehicleModelInfo_SA_VTBL : public CClumpModelInfo_SA_VTBL
 {
 };
 
-enum class eModelSpecialTypes : unsigned char
+enum class eModelSpecialType : unsigned char
 {
     NONE = 0,
     TREE = 1,
@@ -184,7 +184,7 @@ public:
             unsigned char      bIsRoad : 1;
             unsigned char      bHasComplexHierarchy : 1;
             unsigned char      bDontCollideWithFlyer : 1;
-            eModelSpecialTypes eSpecialModelType : 4;
+            eModelSpecialType  eSpecialModelType : 4;
             unsigned char      bWetRoadReflection : 1;            // Used for tags 
         };
 
@@ -347,6 +347,8 @@ public:
     unsigned short GetFlags();
     unsigned short GetOriginalFlags();
     void           SetIdeFlags(unsigned int uiFlags);
+    void           SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState);
+    bool           GetIdeFlag(eModelIdeFlag eIdeFlag);
     void           SetFlags(unsigned short usFlags);
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
@@ -431,4 +433,5 @@ public:
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
+    void SetModelSpecialType(eModelSpecialType eType, bool bState);
 };
