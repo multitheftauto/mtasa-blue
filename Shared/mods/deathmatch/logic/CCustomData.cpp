@@ -11,6 +11,13 @@
 
 #include "StdInc.h"
 
+#ifdef MTA_CLIENT
+    #define DECLARE_PROFILER_SECTION_CCustomData
+    #include "profiler/SharedUtil.Profiler.h"
+#else
+
+
+
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
     for (auto& [name, data] : m_Data)
@@ -39,3 +46,4 @@ CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
     }
     return pNode;
 }
+#endif

@@ -11,11 +11,14 @@
 
 #pragma once
 
-#include <core/CServerInterface.h>
-#include "lua/CLuaArgument.h"
-#include "SharedUtil.FastHashMap.h"
-#include <string>
-
+#ifdef MTA_CLIENT
+    #include "lua/CLuaArgument.h"
+#else
+    #include <core/CServerInterface.h>
+    #include "lua/CLuaArgument.h"
+    #include "SharedUtil.FastHashMap.h"
+    #include <string>
+#endif
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 
 enum class ESyncType : unsigned char
@@ -25,17 +28,33 @@ enum class ESyncType : unsigned char
     SUBSCRIBE,
 };
 
+#ifdef MTA_CLIENT
+struct SCustomData
+{
+    CLuaArgument Variable;
+    bool         bSynchronized;
+};
+#else
 struct SCustomData
 {
     CLuaArgument Variable;
     ESyncType    syncType;
 };
+#endif
 
 class CCustomData
 {
 public:
     SCustomData* Get(const std::string& name) { return MapFind(m_Data, name); }
 
+#ifdef MTA_CLIENT
+    void Set(const std::string& name, const CLuaArgument& Variable, bool bSynchronized = true)
+    {
+        auto& data = m_Data[name];
+        data.Variable = Variable;
+        data.bSynchronized = syncType;
+    }
+#else
     void Set(const std::string& name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST)
     {
         auto& data = m_Data[name];
@@ -43,19 +62,20 @@ public:
         data.syncType = syncType;
     }
 
-    bool Delete(const std::string& name) { return (bool)m_Data.erase(name); }
-
+    // Server only
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
-    const size_t Count() const noexcept { return m_Data.size(); }
     const size_t CountSynced() const
     {
         return std::count_if(m_Data.begin(), m_Data.end(), [](const auto& kvpair) {
             return kvpair.second.syncType != ESyncType::LOCAL;
         });
     }
-    
+#endif
 
+    // Shared functions
+    bool Delete(const std::string& name) { return (bool)m_Data.erase(name); }
+    const size_t Count() const noexcept { return m_Data.size(); } 
     const auto& GetAll() const noexcept { return m_Data; }
 private:
     SharedUtil::CFastHashMap<std::string, SCustomData> m_Data;
