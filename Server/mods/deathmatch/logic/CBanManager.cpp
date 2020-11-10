@@ -15,7 +15,7 @@ bool CBanManager::ms_bSaveRequired = false;
 CBanManager::CBanManager()
 {
     m_strBanListXMLPath = g_pServerInterface->GetModManager()->GetAbsolutePath(FILENAME_BANLIST);
-    m_tUpdate = 0;
+    m_NextUpdateTime = 0;
     m_bAllowSave = false;
 }
 
@@ -41,7 +41,7 @@ void CBanManager::DoPulse()
 {
     time_t tTime = time(NULL);
 
-    if (tTime > m_tUpdate)
+    if (tTime > m_NextUpdateTime)
     {
         list<CBan*>::const_iterator iter = m_BanManager.begin();
         while (iter != m_BanManager.end())
@@ -62,7 +62,7 @@ void CBanManager::DoPulse()
             }
             iter++;
         }
-        m_tUpdate = tTime + 1;
+        m_NextUpdateTime = tTime + 1;
     }
 
     if (ms_bSaveRequired)
