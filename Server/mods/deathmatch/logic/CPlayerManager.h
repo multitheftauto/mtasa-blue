@@ -13,12 +13,12 @@ class CPlayerManager;
 
 #pragma once
 
+#include "CGame.h" // Todo: Somehow remove this.. Needed for SendPacketBatchBegin
 #include "packets/CPacket.h"
 #include "CSendList.h"
 #include "CPlayer.h"
 #include "../Config.h"
 #include <net/CNetBufferWatchDog.h>
-#include "CGame.h" // Todo: Somehow remove this.. Needed for SendPacketBatchBegin
 
 class CPlayerManager
 {
