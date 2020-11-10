@@ -26,22 +26,15 @@ class CPlayerManager
 
 public:
     // Send one packet to a list of players
+    // CSendList can be used, and is prefferred over anything else
+    // as CSendList is already pre constructed
+    // The list must be sequencial
+    // So for example.: map, wont work, because its value_type is a pair, not CPlayer*
+    // list, vector, set, and other iterable containers will work
     template <class T, class Pred_t>
-    static void BroadcastIf(const CPacket& Packet, const T& sendList, Pred_t&& pred)
+    static void BroadcastIf(const CPacket& Packet, T&& sendList, Pred_t&& pred)
     {
-        if constexpr (std::is_base_of_v<CSendList, T>) // Can we call it as is?
-            DoBroadcast(Packet, sendList, std::forward<Pred_t>(pred));
-
-        else // Sadly not, conversion needed..
-        {
-            // Group players by bitstream version
-            CSendList groupMap;
-
-            for (CPlayer* pPlayer : sendList)
-                groupMap[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
-
-            DoBroadcastIf(Packet, groupMap, std::forward<Pred_t>(pred));
-        }
+        DoBroadcastIf(Packet, std::forward<T>(sendList), std::forward<Pred_t>(pred));
     }
 
     template <class T>
