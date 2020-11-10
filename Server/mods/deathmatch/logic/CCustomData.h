@@ -56,6 +56,7 @@ public:
     }
     
 
+    const auto& GetAll() const noexcept { return m_Data; }
 private:
     SharedUtil::CFastHashMap<std::string, SCustomData> m_Data;
 };
