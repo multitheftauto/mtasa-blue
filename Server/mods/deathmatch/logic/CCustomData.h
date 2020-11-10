@@ -47,10 +47,15 @@ public:
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
-    /*
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
-    */
+    const size_t Count() const noexcept { return m_Data.size(); }
+    const size_t CountSynced() const
+    {
+        return std::count_if(m_Data.begin(), m_Data.end(), [](const auto& kvpair) {
+            return kvpair.second.syncType != ESyncType::LOCAL;
+        });
+    }
+    
+
 private:
     SharedUtil::CFastHashMap<std::string, SCustomData> m_Data;
 };
