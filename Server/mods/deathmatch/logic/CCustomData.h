@@ -43,11 +43,6 @@ public:
 
     std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
     std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
-
-    std::map<std::string, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
-    std::map<std::string, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
-
 private:
     std::map<std::string, SCustomData> m_Data;
-    std::map<std::string, SCustomData> m_SyncedData;
 };
