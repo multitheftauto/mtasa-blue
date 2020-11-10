@@ -11,17 +11,6 @@
 
 #include "StdInc.h"
 
-SCustomData* CCustomData::Get(const std::string& name)
-{
-    assert(szName);
-
-    std::map<std::string, SCustomData>::const_iterator it = m_Data.find(szName);
-    if (it != m_Data.end())
-        return (SCustomData*)&it->second;
-
-    return NULL;
-}
-
 void CCustomData::Set(const std::string& szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(szName);

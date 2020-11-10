@@ -34,8 +34,7 @@ struct SCustomData
 class CCustomData
 {
 public:
-    SCustomData* Get(const std::string& szName);
-    void         Set(const std::string& szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
+    SCustomData* Get(const std::string& name) { return MapFind(m_Data, name); }
 
     bool Delete(const std::string& name);
 
