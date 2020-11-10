@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CClient.h"
-#include "CPlayerManager.h"
 
 class CBanManager
 {
