@@ -154,6 +154,7 @@ void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
     g_pGame->CalculateMinClientRequirement();
 
     m_JoinedByBitStreamVer.Insert(pPlayer);
+    dassert(m_JoinedByBitStreamVer.CountJoined() <= m_Players.size());
 }
 
 void CPlayerManager::AddToList(CPlayer* pPlayer)
@@ -176,6 +177,7 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
     m_SocketPlayerMap[pPlayer->GetSocket()] = pPlayer;
 
     dassert(m_SocketPlayerMap.size() == m_Players.size());
+    dassert(m_JoinedByBitStreamVer.CountJoined() <= m_Players.size());
 }
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
@@ -189,6 +191,7 @@ void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
     dassert(m_Players.size() == m_SocketPlayerMap.size());
 
     m_JoinedByBitStreamVer.Erase(pPlayer);
+    dassert(m_JoinedByBitStreamVer.CountJoined() <= m_Players.size());
 
     for (CPlayer* itPlayer : m_Players)
     {
