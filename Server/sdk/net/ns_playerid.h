@@ -64,8 +64,8 @@ public:
         return left.m_uiBinaryAddress < right.m_uiBinaryAddress || (left.m_uiBinaryAddress == right.m_uiBinaryAddress && left.m_usPort < right.m_usPort);
     }
 
-    unsigned long  GetBinaryAddress() const { return m_uiBinaryAddress; };
-    unsigned short GetPort() const { return m_usPort; };
+    unsigned long  GetBinaryAddress() const { return m_uiBinaryAddress; }
+    unsigned short GetPort() const { return m_usPort; }
 
     // CFastHashMap/Set helpers
     // Must return keys that wont accur naturally. So, dont return a default constructed NetServerPlayerID
