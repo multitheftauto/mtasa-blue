@@ -158,14 +158,8 @@ void CPlayerManager::OnPlayerJoin(CPlayer* pPlayer)
 
 void CPlayerManager::AddToList(CPlayer* pPlayer)
 {
-    dassert(m_Players.find(pPlayer) == m_Players.end()); // Make sure he's not in the set already
-    m_Players.insert(pPlayer); // Before putting this into dassert, look at its definiton :-)
-
-    dassert(!MapFind(m_SocketPlayerMap, pPlayer->GetSocket()));
-    m_SocketPlayerMap[pPlayer->GetSocket()] = pPlayer;
-
-    dassert(m_SocketPlayerMap.size() == m_Players.size());
-
+    // Do this before adding the player to the list. 
+    // (Otherwise it'll trigger the dassert in AddPlayerToDistLists)
     for (CPlayer* itPlayer : m_Players)
     {
         // Add other players to near/far lists
@@ -174,6 +168,14 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
         // Add to other players near/far lists
         itPlayer->AddPlayerToDistLists(pPlayer);
     }
+
+    dassert(m_Players.find(pPlayer) == m_Players.end()); // Make sure he's not in the set already
+    m_Players.insert(pPlayer); // Before putting this into dassert, look at its definiton :-)
+
+    dassert(!MapFind(m_SocketPlayerMap, pPlayer->GetSocket()));
+    m_SocketPlayerMap[pPlayer->GetSocket()] = pPlayer;
+
+    dassert(m_SocketPlayerMap.size() == m_Players.size());
 }
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
