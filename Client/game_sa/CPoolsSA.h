@@ -114,11 +114,16 @@ public:
         if (index == -1)
             return nullptr;
 
-        this->m_pObjects[index] = B();
-        this->m_byteMap[index].bEmpty = false;
-        this->m_byteMap[index].nId ^= index ^ (index + 1);
+        return this->AllocateAt(index);
+    }
 
-        return &this->m_pObjects[index];
+    B* AllocateAt(uint uiSlot)
+    {
+        this->m_pObjects[uiSlot] = B();
+        this->m_byteMap[uiSlot].bEmpty = false;
+        this->m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
+
+        return &this->m_pObjects[uiSlot];
     }
 
     void Release(uint index)
@@ -241,8 +246,11 @@ public:
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
 
-    uint AddTextureDictonarySlot(std::string strTxdName);
-    void RemoveTextureDictonarySlot(unsigned int uiTxdId);
+    uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName);
+    void RemoveTextureDictonarySlot(uint uiTxdId);
+    bool IsFreeTextureDictonarySlot(uint uiTxdId);
+
+    ushort GetFreeTextureDictonarySlot();
 
 private:
     // Generic container for pools

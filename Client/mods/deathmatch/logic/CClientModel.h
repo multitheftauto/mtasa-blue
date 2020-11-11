@@ -20,6 +20,7 @@ enum class eClientModelType
     PED,
     OBJECT,
     VEHICLE,
+    TXD,
 };
 
 class CClientModel
@@ -33,9 +34,14 @@ public:
     int                             GetModelID(void) const { return m_iModelID; };
     eClientModelType                GetModelType(void) const { return m_eModelType; };
     bool                            Allocate(ushort usParentID);
+    bool                            AllocateTXD(std::string &strTxdName);
     bool                            Deallocate(void);
     void                            SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
     CResource*                      GetParentResource(void) const { return m_pParentResource; }
+
+private:
+    bool DeallocateDFF(CModelInfo* pModelInfo);
+    bool DeallocateTXD(CModelInfo* pModelInfo);
 
 protected:
     CClientManager* m_pManager;

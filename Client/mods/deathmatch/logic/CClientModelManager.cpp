@@ -57,7 +57,7 @@ bool CClientModelManager::Remove(CClientModel* pModel)
 
 int CClientModelManager::GetFirstFreeModelID(void)
 {
-    for (int i = 0; i < MAX_MODEL_ID; i++)
+    for (int i = 0; i < MAX_MODEL_DFF_ID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
         if (!pModelInfo->IsValid())
@@ -66,6 +66,14 @@ int CClientModelManager::GetFirstFreeModelID(void)
         }
     }
     return INVALID_MODEL_ID;
+}
+
+int CClientModelManager::GetFreeTxdModelID()
+{
+    ushort usTxdId = g_pGame->GetPools()->GetFreeTextureDictonarySlot();
+    if (usTxdId == -1)
+        return INVALID_MODEL_ID;
+    return MAX_MODEL_DFF_ID + usTxdId;
 }
 
 CClientModel* CClientModelManager::FindModelByID(int iModelID)

@@ -57,13 +57,15 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
+        case eClientModelType::TXD:
+            return true;
         default:
             return false;
     }
     return false;
 }
 
-bool CClientModel::Deallocate(void)
+bool CClientModel::Deallocate()
 {
     if (!m_bAllocatedByUs)
         return false;
@@ -74,6 +76,21 @@ bool CClientModel::Deallocate(void)
     if (!pModelInfo->IsValid())
         return false;
 
+    switch (m_eModelType)
+    {
+        case eClientModelType::PED:
+        case eClientModelType::OBJECT:
+        case eClientModelType::VEHICLE:
+            return DeallocateDFF(pModelInfo);
+        case eClientModelType::TXD:
+            return DeallocateTXD(pModelInfo);
+        default:
+            return false;
+    }
+}
+
+bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
+{
     auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
@@ -130,6 +147,34 @@ bool CClientModel::Deallocate(void)
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
 
     pModelInfo->DeallocateModel();
+
+    this->SetParentResource(nullptr);
+    return true;
+}
+
+bool CClientModel::AllocateTXD(std::string &strTxdName)
+{
+    uint uiSlotID = g_pGame->GetPools()->AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
+    if (uiSlotID == -1)
+        return false;
+
+    return true;
+}
+
+bool CClientModel::DeallocateTXD(CModelInfo* pModelInfo)
+{
+    uint uiTextureDictonarySlotID = pModelInfo->GetModel() - MAX_MODEL_DFF_ID;
+
+    for (uint uiModelID = 0; uiModelID < MAX_MODEL_DFF_ID; uiModelID++)
+    {
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID, true);
+
+        if (pModelInfo->GetTextureDictionaryID() == uiTextureDictonarySlotID)
+            pModelInfo->SetTextureDictionaryID(0);
+    }
+
+    g_pGame->GetPools()->RemoveTextureDictonarySlot(uiTextureDictonarySlotID);
+    g_pGame->GetStreaming()->GetStreamingInfoFromModelId(pModelInfo->GetModel())->Reset();
 
     this->SetParentResource(nullptr);
     return true;

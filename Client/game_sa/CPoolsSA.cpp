@@ -1421,17 +1421,16 @@ int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
     return iOut;
 }
 
-unsigned int CPoolsSA::AddTextureDictonarySlot(std::string strTxdName)
+unsigned int CPoolsSA::AllocateTextureDictonarySlot(uint uiSlotId, std::string& strTxdName)
 {
-    CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->Allocate();
+    CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->AllocateAt(uiSlotId);
     if (!pTxd)
         return -1;
 
-    typedef uint(__cdecl * Function_TxdGatHashFromName)(char* strName);
-    Function_TxdGatHashFromName getHash = (Function_TxdGatHashFromName)(0x53CF30);
+    strTxdName.resize(24);
 
     pTxd->usUsagesCount = 0;
-    pTxd->hash = getHash(&strTxdName.at(0));
+    pTxd->hash = pGame->GetKeyGen()->GetUppercaseKey(strTxdName.c_str());
     pTxd->rwTexDictonary = nullptr;
     pTxd->usParentIndex = -1;
 
@@ -1449,4 +1448,14 @@ void CPoolsSA::RemoveTextureDictonarySlot(uint uiTxdId)
     freeTxdSlot(uiTxdId);
 
     (*m_ppTxdPoolInterface)->Release(uiTxdId);
+}
+
+bool CPoolsSA::IsFreeTextureDictonarySlot(uint uiTxdId)
+{
+    return (*m_ppTxdPoolInterface)->IsFreeAt(uiTxdId);
+}
+
+ushort CPoolsSA::GetFreeTextureDictonarySlot()
+{
+    return (*m_ppTxdPoolInterface)->GetFreeSlot();
 }

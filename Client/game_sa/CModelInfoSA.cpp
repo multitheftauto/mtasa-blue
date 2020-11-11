@@ -515,7 +515,10 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
 
 bool CModelInfoSA::IsValid()
 {
-    if (m_dwModelID >= 20000 && m_dwModelID < MODELINFO_MAX)
+    if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
+        return !pGame->GetPools()->IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
+
+    if (m_dwModelID >= MODELINFO_TXD_MAX && m_dwModelID < MODELINFO_MAX)
         return true;
 
     if (!ppModelInfo[m_dwModelID])

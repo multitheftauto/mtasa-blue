@@ -2036,27 +2036,30 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
     return true;
 }
 
-uint CLuaEngineDefs::EngineRequestTXD(std::string strTxdName)
+uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
 {
     if (strTxdName.size() > 24)
         throw std::invalid_argument("Over 24");
 
-    typedef uint(__cdecl * Function_TxdAllocate)( char* szName );
-    Function_TxdAllocate newTxd = (Function_TxdAllocate)(0x731C80);
+    int iModelID = m_pManager->GetModelManager()->GetFreeTxdModelID();
+    if (iModelID == INVALID_MODEL_ID)
+        return false;
 
-    strTxdName.resize(24);
+    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
+    if (pModel == nullptr)
+        pModel = new CClientModel(m_pManager, iModelID, eClientModelType::TXD);
 
-    //uint uiNewTxdID = newTxd(strTxdName.data());
-    uint uiNewTxdID = g_pGame->GetPools()->AddTextureDictonarySlot(strTxdName);
+    pModel->AllocateTXD(strTxdName);
+    pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());
 
-    return uiNewTxdID;
+    return iModelID - 20000;
 }
-
 
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
-    g_pGame->GetPools()->RemoveTextureDictonarySlot(txdID);
-    g_pGame->GetStreaming()->GetStreamingInfoFromModelId(20000 + txdID)->Reset();
+    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(20000 + txdID);
+    if (pModel && pModel->Deallocate())
+        return true;
 
-    return true;
+    return false;
 }
