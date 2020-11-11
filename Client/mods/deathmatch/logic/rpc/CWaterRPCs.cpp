@@ -26,11 +26,18 @@ void CWaterRPCs::LoadFunctions()
 void CWaterRPCs::SetWorldWaterLevel(NetBitStreamInterface& bitStream)
 {
     float fLevel;
-    bool  bIncludeWorldNonSeaLevel;
+    bool  bIncludeWorldNonSeaLevel = true;
+    bool  bIncludeWorldSeaLevel = true;
+    bool  bIncludeOutsideWorldLevel = false;
 
     if (bitStream.Read(fLevel) && bitStream.ReadBit(bIncludeWorldNonSeaLevel))
     {
-        m_pWaterManager->SetWorldWaterLevel(fLevel, NULL, bIncludeWorldNonSeaLevel);
+        if (bitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
+        {
+            bitStream.ReadBit(bIncludeWorldSeaLevel);
+            bitStream.ReadBit(bIncludeOutsideWorldLevel);
+        }
+        m_pWaterManager->SetWorldWaterLevel(fLevel, nullptr, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
     }
 }
 

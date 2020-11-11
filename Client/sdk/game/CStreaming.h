@@ -43,8 +43,6 @@ public:
     virtual void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL) = 0;
     virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
-
     virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned short id) = 0;
-
     virtual void ReinitStreaming() = 0;
 };
