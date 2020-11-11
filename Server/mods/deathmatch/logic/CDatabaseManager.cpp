@@ -388,7 +388,7 @@ CDbJobData* CDatabaseManagerImpl::QueryStartf(SConnectionHandle hConnection, con
 // Start a query and wait for the result
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::QueryWithResultf(SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ...)
+bool CDatabaseManagerImpl::QueryWithResultf(SConnectionHandle hConnection, CRegistryResultData& result, const char* szQuery, ...)
 {
     va_list vl;
     va_start(vl, szQuery);
@@ -419,14 +419,12 @@ bool CDatabaseManagerImpl::QueryWithResultf(SConnectionHandle hConnection, CRegi
     // Process result
     if (pJobData->result.status == EJobResult::FAIL)
     {
-        if (pResult)
-            *pResult = CRegistryResult();
+        result = {}; // Clear result
         return false;
     }
     else
     {
-        if (pResult)
-            *pResult = pJobData->result.registryResult;
+        result = std::move(pJobData->result.registryResult);
         return true;
     }
 }

@@ -673,11 +673,11 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
         Args.ReadArguments(luaVM, 2);
 
         CPerfStatSqliteTiming::GetSingleton()->SetCurrentResource(luaVM);
-        if (CStaticFunctionDefinitions::ExecuteSQLQuery(strQuery, &Args, &Result))
+        if (CStaticFunctionDefinitions::ExecuteSQLQuery(strQuery, &Args, Result))
         {
             lua_newtable(luaVM);
             int i = 0;
-            for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter, ++i)
+            for (CRegistryResultIterator iter = Result.begin(); iter != Result.end(); ++iter, ++i)
             {
                 const CRegistryResultRow& row = *iter;
                 // for ( int i = 0; i < Result.nRows; i++ ) {
@@ -685,14 +685,14 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
                 lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
                 lua_pushvalue(luaVM, -2);                // value
                 lua_settable(luaVM, -4);                 // refer to the top level table
-                for (int j = 0; j < Result->nColumns; j++)
+                for (int j = 0; j < Result.nColumns; j++)
                 {
                     const CRegistryResultCell& cell = row[j];
                     if (cell.nType == SQLITE_NULL)
                         continue;
 
                     // Push the column name
-                    lua_pushlstring(luaVM, Result->ColNames[j].c_str(), Result->ColNames[j].size());
+                    lua_pushlstring(luaVM, Result.ColNames[j].c_str(), Result.ColNames[j].size());
                     switch (cell.nType)            // push the value with the right type
                     {
                         case SQLITE_INTEGER:

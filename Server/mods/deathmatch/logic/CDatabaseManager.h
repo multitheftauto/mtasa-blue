@@ -160,7 +160,7 @@ public:
     virtual CDbJobData*       GetQueryFromId(SDbJobId id) = 0;
     virtual const SString&    GetLastErrorMessage() = 0;
     virtual bool              IsLastErrorSuppressed() = 0;
-    virtual bool              QueryWithResultf(SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ...) = 0;
+    virtual bool              QueryWithResultf(SConnectionHandle hConnection, CRegistryResultData& result, const char* szQuery, ...) = 0;
     virtual bool              QueryWithCallback(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery,
                                                 CLuaArguments* pArgs = nullptr) = 0;
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...) = 0;
