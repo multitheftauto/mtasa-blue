@@ -47,7 +47,7 @@ public:
     virtual uint           GetLastErrorCode() = 0;
     virtual void           AddRef() = 0;
     virtual void           Release() = 0;
-    virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult) = 0;
+    virtual bool           Query(const SString& strQuery, CRegistryResultData& registryResult) = 0;
     virtual void           Flush() = 0;
     virtual int            GetShareCount() = 0;
 
