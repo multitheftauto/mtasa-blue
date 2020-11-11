@@ -630,9 +630,9 @@ private:
     // Clouds Enabled
     bool m_bCloudsEnabled;
 
-    COpenPortsTester*       m_pOpenPortsTester;
-    CMasterServerAnnouncer* m_pMasterServerAnnouncer;
-    CHqComms*               m_pHqComms;
+    COpenPortsTester*         m_pOpenPortsTester;
+    CMasterServerAnnouncer*   m_pMasterServerAnnouncer;
+    std::unique_ptr<CHqComms> m_pHqComms;
 
     CLightsyncManager m_lightsyncManager;
 

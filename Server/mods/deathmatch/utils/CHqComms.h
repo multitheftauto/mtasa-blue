@@ -20,7 +20,7 @@ enum
 // Check with MTA HQ for status updates
 //
 ////////////////////////////////////////////////////////////////////
-class CHqComms : public CRefCountable
+class CHqComms
 {
 public:
     ZERO_ON_NEW

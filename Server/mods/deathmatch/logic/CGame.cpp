@@ -516,7 +516,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
                                     m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pLuaManager, m_pGroups,
                                     &m_Events, m_pScriptDebugging, &m_ElementDeleter);
     m_pACLManager = new CAccessControlListManager;
-    m_pHqComms = new CHqComms;
+    m_pHqComms = std::make_unique<CHqComms>();
 
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
