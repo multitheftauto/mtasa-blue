@@ -664,7 +664,7 @@ public:
     static bool               ExecuteSQLDelete(const std::string& strTable, const std::string& strWhere);
     static bool               ExecuteSQLInsert(const std::string& strTable, const std::string& strValues, const std::string& strColumns);
     static bool               ExecuteSQLSelect(const std::string& strTable, const std::string& strColumns, const std::string& strWhere, unsigned int uiLimit,
-                                               CRegistryResult* pResult);
+                                               CRegistryResultData& pResult);
     static bool               ExecuteSQLUpdate(const std::string& strTable, const std::string& strSet, const std::string& strWhere);
     static bool               ExecuteSQLQuery(const std::string& str, CLuaArguments* pArgs, CRegistryResult* pResult);
 

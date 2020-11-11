@@ -11097,9 +11097,9 @@ bool CStaticFunctionDefinitions::ExecuteSQLInsert(const std::string& strTable, c
 }
 
 bool CStaticFunctionDefinitions::ExecuteSQLSelect(const std::string& strTable, const std::string& strColumns, const std::string& strWhere, unsigned int uiLimit,
-                                                  CRegistryResult* pResult)
+                                                  CRegistryResultData& result)
 {
-    return m_pRegistry->Select(strColumns, strTable, strWhere, uiLimit, pResult);
+    return m_pRegistry->Select(strColumns, strTable, strWhere, uiLimit, result);
 }
 
 bool CStaticFunctionDefinitions::ExecuteSQLUpdate(const std::string& strTable, const std::string& strSet, const std::string& strWhere)
