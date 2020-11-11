@@ -11071,9 +11071,9 @@ void CStaticFunctionDefinitions::ExecuteSQLCreateTable(const std::string& strTab
     m_pRegistry->CreateTable(strTable, strDefinition);
 }
 
-bool CStaticFunctionDefinitions::ExecuteSQLQuery(const std::string& strQuery, CLuaArguments* pArgs, CRegistryResult* pResult)
+bool CStaticFunctionDefinitions::ExecuteSQLQuery(const std::string& strQuery, CLuaArguments* pArgs, CRegistryResultData& result)
 {
-    return m_pRegistry->Query(strQuery, pArgs, pResult);
+    return m_pRegistry->Query(strQuery, pArgs, result);
 }
 
 const std::string& CStaticFunctionDefinitions::SQLGetLastError()

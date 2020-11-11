@@ -666,7 +666,7 @@ public:
     static bool               ExecuteSQLSelect(const std::string& strTable, const std::string& strColumns, const std::string& strWhere, unsigned int uiLimit,
                                                CRegistryResultData& pResult);
     static bool               ExecuteSQLUpdate(const std::string& strTable, const std::string& strSet, const std::string& strWhere);
-    static bool               ExecuteSQLQuery(const std::string& str, CLuaArguments* pArgs, CRegistryResult* pResult);
+    static bool               ExecuteSQLQuery(const std::string& str, CLuaArguments* pArgs, CRegistryResultData& result);
 
     // Account get funcs
     static CAccount*                     GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive = true);
