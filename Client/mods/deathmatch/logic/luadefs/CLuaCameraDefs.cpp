@@ -447,7 +447,7 @@ bool CLuaCameraDefs::SetCameraViewMode(unsigned char ucVehicleViewMode, std::opt
         pCamera->SetCameraPedViewMode((ePedCamMode)ucPedViewMode.value());
 
     return true;
-    }
+}
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 {
