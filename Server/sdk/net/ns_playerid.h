@@ -67,19 +67,20 @@ public:
     unsigned long  GetBinaryAddress() const { return m_uiBinaryAddress; };
     unsigned short GetPort() const { return m_usPort; };
 
-
-
     // CFastHashMap/Set helpers
     // Must return keys that wont accur naturally. So, dont return a default constructed NetServerPlayerID
     friend NetServerPlayerID GetEmptyMapKey(NetServerPlayerID*)
     {
         // Return something here that isn't GetDeletedMapKey(), or a default constructed NetServerPlayerID
-        return { std::numeric_limits<unsigned long>::min() / 3, std::numeric_limits<unsigned short>::min() / 3};
+        // 2130706440 is the number representation of the loopback address (127.0.0.8)
+        // In theory not a single living person will have this IP
+        return { 2130706440, 0 };
     }
+
     friend NetServerPlayerID GetDeletedMapKey(NetServerPlayerID*)
     {
         // Return something here that isn't GetEmptyMapKey(), or a default constructed NetServerPlayerID
-        return { std::numeric_limits<unsigned long>::min() / 2, std::numeric_limits<unsigned short>::min() / 2 };
+        return { 2130706440, 1 };
     }
 };
 
