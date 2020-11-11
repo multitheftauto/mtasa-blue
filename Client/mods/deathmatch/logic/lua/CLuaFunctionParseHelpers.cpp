@@ -683,6 +683,7 @@ ADD_ENUM(eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER, "does_not_collide_with_flye
 ADD_ENUM(eModelIdeFlag::IS_TAG, "is_tag")
 ADD_ENUM(eModelIdeFlag::DISABLE_BACKFACE_CULLING, "disable_backface_culling")
 ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
+ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
 IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
 
 //
