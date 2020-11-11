@@ -121,7 +121,6 @@ void CRemoteMasterServer::Refresh()
     // Send new request
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_();
-    AddRef();            // Keep alive
     SHttpRequestOptions options;
     options.uiConnectionAttempts = 1;
     GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options);
@@ -138,7 +137,6 @@ void CRemoteMasterServer::StaticDownloadFinished(const SHttpDownloadResult& resu
 {
     CRemoteMasterServer* pRemoteMasterServer = (CRemoteMasterServer*)result.pObj;
     pRemoteMasterServer->DownloadFinished(result);
-    pRemoteMasterServer->Release();            // Unkeep alive
 }
 
 ///////////////////////////////////////////////////////////////

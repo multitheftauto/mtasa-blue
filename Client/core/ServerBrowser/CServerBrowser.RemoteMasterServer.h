@@ -6,7 +6,7 @@
 // Communicate with a remote master server and parse the result.
 //
 
-class CRemoteMasterServerInterface : public CRefCountable
+class CRemoteMasterServerInterface
 {
 protected:
     virtual ~CRemoteMasterServerInterface() {}

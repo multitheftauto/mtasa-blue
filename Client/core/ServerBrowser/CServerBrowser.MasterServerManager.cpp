@@ -27,9 +27,11 @@ public:
 
     // CMasterServerManager
 protected:
-    CElapsedTime                               m_ElapsedTime;
-    std::vector<CRemoteMasterServerInterface*> m_MasterServerList;
-    uint                                       m_iActiveAmount;
+    using MasterServerList_t = std::vector<std::unique_ptr<CRemoteMasterServerInterface>>;
+
+    CElapsedTime       m_ElapsedTime;
+    MasterServerList_t m_MasterServerList;
+    uint               m_iActiveAmount;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -65,10 +67,6 @@ CMasterServerManager::CMasterServerManager()
 ///////////////////////////////////////////////////////////////
 CMasterServerManager::~CMasterServerManager()
 {
-    for (uint i = 0; i < m_MasterServerList.size(); i++)
-        SAFE_RELEASE(m_MasterServerList[i]);
-
-    m_MasterServerList.clear();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -87,7 +85,7 @@ void CMasterServerManager::Refresh()
         GetVersionUpdater()->GetAseServerList(resultList);
 
         for (uint i = 0; i < resultList.size(); i++)
-            m_MasterServerList.push_back(NewRemoteMasterServer(resultList[i]));
+            m_MasterServerList.emplace_back(NewRemoteMasterServer(resultList[i]));
     }
 
     // Pass on refresh request to first two servers
