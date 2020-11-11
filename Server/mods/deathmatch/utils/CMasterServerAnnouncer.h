@@ -32,7 +32,7 @@ enum
 // A remote master server to announce our existence to
 //
 ////////////////////////////////////////////////////////////////////
-class CMasterServer : public CRefCountable
+class CMasterServer
 {
 public:
     ZERO_ON_NEW
@@ -45,8 +45,6 @@ public:
         m_uiPushInterval = 1000 * 60 * 10;                           // 10 mins push interval
     }
 
-protected:
-    ~CMasterServer() {}            // Must use Release()
 public:
     //
     // Pulse this master server
@@ -200,15 +198,6 @@ class CMasterServerAnnouncer
 public:
     ZERO_ON_NEW
 
-    ~CMasterServerAnnouncer()
-    {
-        while (!m_MasterServerList.empty())
-        {
-            m_MasterServerList.back()->Release();
-            m_MasterServerList.pop_back();
-        }
-    }
-
     //
     // Make list of master servers to contact
     //
@@ -222,9 +211,9 @@ public:
                    const SString& strInUrl)
     {
         // Check if server is already present
-        for (auto pMasterServer : m_MasterServerList)
+        for (const auto& pMasterServer : m_MasterServerList)
         {
-            if (pMasterServer->GetDefinition().strURL.BeginsWithI(strInUrl.SplitLeft("%")))
+            if (pMasterServer.GetDefinition().strURL.BeginsWithI(strInUrl.SplitLeft("%")))
                 return;
         }
 
@@ -248,8 +237,8 @@ public:
         strUrl = strUrl.Replace("%EXTRA%", strExtra);
         strUrl = strUrl.Replace("%IP%", strServerIP);
 
-        SMasterServerDefinition masterServerDefinition = {bAcceptsPush, bDoReminders, bHideProblems, bHideSuccess, uiReminderIntervalMins, strDesc, strUrl};
-        m_MasterServerList.push_back(new CMasterServer(masterServerDefinition));
+        SMasterServerDefinition masterServerDefinition{bAcceptsPush, bDoReminders, bHideProblems, bHideSuccess, uiReminderIntervalMins, strDesc, strUrl};
+        m_MasterServerList.emplace_back(masterServerDefinition);
     }
 
     //
@@ -260,12 +249,10 @@ public:
         if (m_MasterServerList.empty())
             InitServerList();
 
-        for (uint i = 0; i < m_MasterServerList.size(); i++)
-        {
-            m_MasterServerList[i]->Pulse();
-        }
+        for (auto& server : m_MasterServerList)
+            server.Pulse();
     }
 
 protected:
-    std::vector<CMasterServer*> m_MasterServerList;
+    std::list<CMasterServer> m_MasterServerList;
 };
