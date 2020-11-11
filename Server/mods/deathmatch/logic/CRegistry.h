@@ -41,7 +41,7 @@ public:
 
     bool Delete(const std::string& strTable, const std::string& strWhere);
     bool Insert(const std::string& strTable, const std::string& strValues, const std::string& strColumns);
-    bool Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult);
+    bool Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResultData& result);
     bool Update(const std::string& strTable, const std::string& strSet, const std::string& strWhere);
 
     bool Query(const std::string& strQuery, class CLuaArguments* pArgs, CRegistryResultData& result);

@@ -358,7 +358,7 @@ bool CRegistry::Query(const std::string& strQuery, CLuaArguments* pArgs, CRegist
     return QueryInternal(strParsedQuery.c_str(), result);
 }
 
-bool CRegistry::Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult)
+bool CRegistry::Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResultData& result)
 {
     std::string strQuery = "SELECT " + strColumns + " FROM " + strTable;
     if (!strWhere.empty())
@@ -373,7 +373,7 @@ bool CRegistry::Select(const std::string& strColumns, const std::string& strTabl
     }
 
     // Execute the query
-    return QueryInternal(strQuery.c_str(), pResult);
+    return QueryInternal(strQuery.c_str(), result);
 }
 
 void CRegistry::BeginAutomaticTransaction()
