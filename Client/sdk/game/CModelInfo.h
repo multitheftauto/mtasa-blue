@@ -159,6 +159,8 @@ public:
     virtual unsigned short GetOriginalFlags() = 0;
     virtual void           SetFlags(unsigned short usFlags) = 0;
     virtual void           SetIdeFlags(unsigned int uiFlags) = 0;
+    virtual bool           GetIdeFlag(eModelIdeFlag eFlag) = 0;
+    virtual void           SetIdeFlag(eModelIdeFlag eFlag, bool bState) = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
     virtual bool           IsValid() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;

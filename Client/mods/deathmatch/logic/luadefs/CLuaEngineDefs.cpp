@@ -2054,7 +2054,7 @@ bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlag eFlag)
     if (uiModelId >= 20000 || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
 
-    return pModelInfo->GetFlags();
+    return pModelInfo->GetIdeFlag(eFlag);
 }
 
 bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags)
@@ -2074,7 +2074,7 @@ bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::opti
     return true; 
 }
 
-bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlags, bool bState)
+bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool bState)
 {
     // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
 
@@ -2082,6 +2082,8 @@ bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlags, bo
 
     if (uiModelID >= 20000 || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    pModelInfo->SetIdeFlag(eFlag, bState);
 
     return true;
 }
