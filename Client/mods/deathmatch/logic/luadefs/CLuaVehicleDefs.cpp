@@ -3036,52 +3036,43 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
     unsigned char    ucSirenID = 0;
-    SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
     if (!argStream.HasErrors())
     {
-        tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Grab the siren structure data
-        lua_newtable(luaVM);
+        const SSirenInfo& info = pVehicle->m_tSirenBeaconInfo;            // Grab the siren structure data
 
-        for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
+        lua_createtable(luaVM, info.m_ucSirenCount, 0);
+        for (size_t i = 0; i < info.m_ucSirenCount; i++)
         {
-            lua_pushnumber(luaVM, i + 1);
-            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, (lua_Number)i + 1); 
+            lua_createtable(luaVM, 0, 8);
+            {
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_dwMinSirenAlpha);
+                lua_setfield(luaVM, -2, "Min_Alpha");
 
-            lua_pushstring(luaVM, "Min_Alpha");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha);
-            lua_settable(luaVM, -3);            // End of Min_Alpha property
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_RGBBeaconColour.R);
+                lua_setfield(luaVM, -2, "Red");
 
-            lua_pushstring(luaVM, "Red");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R);
-            lua_settable(luaVM, -3);            // End of Red property
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_RGBBeaconColour.G);
+                lua_setfield(luaVM, -2, "Green");
 
-            lua_pushstring(luaVM, "Green");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G);
-            lua_settable(luaVM, -3);            // End of Green property
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_RGBBeaconColour.B);
+                lua_setfield(luaVM, -2, "Blue");
 
-            lua_pushstring(luaVM, "Blue");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B);
-            lua_settable(luaVM, -3);            // End of Blue property
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_RGBBeaconColour.A);
+                lua_setfield(luaVM, -2, "Alpha");
 
-            lua_pushstring(luaVM, "Alpha");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A);
-            lua_settable(luaVM, -3);            // End of Alpha property
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_vecSirenPositions.fX);
+                lua_setfield(luaVM, -2, "x");
 
-            lua_pushstring(luaVM, "x");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX);
-            lua_settable(luaVM, -3);            // End of X property
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_vecSirenPositions.fY);
+                lua_setfield(luaVM, -2, "y");
 
-            lua_pushstring(luaVM, "y");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY);
-            lua_settable(luaVM, -3);            // End of Y property
-
-            lua_pushstring(luaVM, "z");
-            lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ);
-            lua_settable(luaVM, -3);            // End of Z property
-
-            lua_settable(luaVM, -3);            // End of Table
+                lua_pushnumber(luaVM, info.m_tSirenInfo[i].m_vecSirenPositions.fZ);
+                lua_setfield(luaVM, -2, "z");
+            }
+            lua_settable(luaVM, -3);
         }
 
         return 1;
