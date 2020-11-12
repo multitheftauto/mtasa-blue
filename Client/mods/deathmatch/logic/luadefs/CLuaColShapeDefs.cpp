@@ -585,14 +585,16 @@ int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
 
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, pColPolygon->CountPoints(), 0);
 
         uint uiIndex = 0;
         for (auto iter = pColPolygon->IterBegin(); iter != pColPolygon->IterEnd(); ++iter)
         {
             CVector2D vecPoint = *iter;
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_newtable(luaVM);
+
+            // Push a {x, y} table
+            lua_createtable(luaVM, 2, 0);
             {
                 lua_pushnumber(luaVM, 1);
                 lua_pushnumber(luaVM, vecPoint.fX);
@@ -625,7 +627,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
 
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, pColPolygon->CountPoints(), 0);
 
         uint uiIndex = 0;
         for (auto iter = pColPolygon->IterBegin(); iter != pColPolygon->IterEnd(); ++iter)

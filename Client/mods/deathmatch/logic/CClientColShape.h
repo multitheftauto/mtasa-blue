@@ -66,8 +66,10 @@ public:
     void                                RemoveCollider(CClientEntity* pEntity) { m_Colliders.remove(pEntity); }
     bool                                ColliderExists(CClientEntity* pEntity);
     void                                RemoveAllColliders();
+
     CFastList<CClientEntity*>::iterator CollidersBegin() { return m_Colliders.begin(); }
     CFastList<CClientEntity*>::iterator CollidersEnd() { return m_Colliders.end(); }
+    auto                                CountColliders() const noexcept { return m_Colliders.size(); }
 
     void SizeChanged();
 
