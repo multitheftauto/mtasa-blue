@@ -778,21 +778,6 @@ void CModelInfoSA::StaticResetFlags()
     ms_ModelDefaultFlagsMap.clear();
 }
 
-//BYTE CModelInfoSA::GetStreamFlags()
-//{
-//    DWORD dwFunc = FUNC_GetModelFlags;
-//    DWORD ModelID = m_dwModelID;
-//    BYTE  bFlags = 0;
-//    _asm
-//    {
-//        push    ModelID
-//        call    dwFunc
-//        add     esp, 4
-//        mov     bFlags, al
-//    }
-//    return bFlags;
-//}
-
 CBoundingBox* CModelInfoSA::GetBoundingBox()
 {
     DWORD         dwFunc = FUNC_GetBoundingBox;
