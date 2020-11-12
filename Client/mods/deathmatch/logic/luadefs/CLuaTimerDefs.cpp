@@ -155,27 +155,29 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            // Create a new table
-            lua_newtable(luaVM);
-
             // Add all the timers with less than ulTime left
             CLuaTimerManager*                     pLuaTimerManager = pLuaMain->GetTimerManager();
             CTickCount                            llCurrentTime = CTickCount::Now();
-            unsigned int                          uiIndex = 0;
             CFastList<CLuaTimer*>::const_iterator iter = pLuaTimerManager->IterBegin();
-            for (; iter != pLuaTimerManager->IterEnd(); iter++)
+
+            // Create a new table
+            // If no time is specified we preallocate CountTimers(), otherwise none
+            lua_createtable(luaVM, dTime ? 0 : pLuaTimerManager->CountTimers(), 0);
+            for (lua_Number i = 1; iter != pLuaTimerManager->IterEnd(); ++iter)
             {
                 CLuaTimer* pLuaTimer = *iter;
-
-                // If the time left is less than the time specified, or the time specifed is 0
-                CTickCount llTimeLeft = (pLuaTimer->GetStartTime() + pLuaTimer->GetDelay()) - llCurrentTime;
-                if (dTime == 0 || llTimeLeft.ToDouble() <= dTime)
+                if (dTime != 0) // Time specified is non-zero?
                 {
-                    // Add it to the table
-                    lua_pushnumber(luaVM, ++uiIndex);
-                    lua_pushtimer(luaVM, pLuaTimer);
-                    lua_settable(luaVM, -3);
+                    // If the time left is less than the time specified
+                    CTickCount llTimeLeft = (pLuaTimer->GetStartTime() + pLuaTimer->GetDelay()) - llCurrentTime;
+                    if (llTimeLeft.ToDouble() > dTime)
+                        continue; // Nope
                 }
+
+                // Add it to the table
+                lua_pushnumber(luaVM, i++);
+                lua_pushtimer(luaVM, pLuaTimer);
+                lua_settable(luaVM, -3);
             }
             return 1;
         }
