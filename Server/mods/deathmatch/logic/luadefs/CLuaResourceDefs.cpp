@@ -660,12 +660,13 @@ int CLuaResourceDefs::getResourceFromName(lua_State* luaVM)
 
 int CLuaResourceDefs::getResources(lua_State* luaVM)
 {
-    unsigned int uiIndex = 0;
-    lua_newtable(luaVM);
+    lua_Number i = 1;
+    lua_createtable(luaVM, m_pResourceManager->Count(), 0);
+
     list<CResource*>::const_iterator iter = m_pResourceManager->IterBegin();
     for (; iter != m_pResourceManager->IterEnd(); ++iter)
     {
-        lua_pushnumber(luaVM, ++uiIndex);
+        lua_pushnumber(luaVM, i++);
         lua_pushresource(luaVM, *iter);
         lua_settable(luaVM, -3);
     }
