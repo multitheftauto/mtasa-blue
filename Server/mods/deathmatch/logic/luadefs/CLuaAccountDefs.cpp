@@ -374,16 +374,20 @@ int CLuaAccountDefs::GetAccountsByIP(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_newtable(luaVM);
         std::vector<CAccount*> accounts;
 
         CStaticFunctionDefinitions::GetAccountsByIP(strIP, accounts);
-        for (unsigned int i = 0; i < accounts.size(); ++i)
+
+        lua_createtable(luaVM, accounts.size(), 0);
+
+        lua_Number i = 1;
+        for (CAccount* pAccount : accounts)
         {
-            lua_pushnumber(luaVM, i + 1);
-            lua_pushaccount(luaVM, accounts[i]);
+            lua_pushnumber(luaVM, i++);
+            lua_pushaccount(luaVM, pAccount);
             lua_settable(luaVM, -3);
         }
+
         return 1;
     }
     else
