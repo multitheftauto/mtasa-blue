@@ -467,23 +467,19 @@ int CLuaPlayerDefs::GetPlayerACInfo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 0, 4);
 
-        lua_pushstring(luaVM, "DetectedAC");
         lua_pushstring(luaVM, pPlayer->m_strDetectedAC);
-        lua_settable(luaVM, -3);
+        lua_setfield(luaVM, -2, "DetectedAC");
 
-        lua_pushstring(luaVM, "d3d9Size");
         lua_pushnumber(luaVM, pPlayer->m_uiD3d9Size);
-        lua_settable(luaVM, -3);
+        lua_setfield(luaVM, -2, "d3d9Size");
 
-        lua_pushstring(luaVM, "d3d9MD5");
         lua_pushstring(luaVM, pPlayer->m_strD3d9Md5);
-        lua_settable(luaVM, -3);
+        lua_setfield(luaVM, -2, "d3d9MD5");
 
-        lua_pushstring(luaVM, "d3d9SHA256");
         lua_pushstring(luaVM, pPlayer->m_strD3d9Sha256);
-        lua_settable(luaVM, -3);
+        lua_setfield(luaVM, -2, "d3d9SHA256");
 
         return 1;
     }
