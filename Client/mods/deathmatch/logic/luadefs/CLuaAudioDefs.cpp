@@ -863,7 +863,8 @@ int CLuaAudioDefs::GetSoundWaveData(lua_State* luaVM)
         if (pData != NULL)
         {
             // Create a new table
-            lua_newtable(luaVM);
+            // Forced to use hashtable, because someone decided to start i at 0...
+            lua_createtable(luaVM, 0, iLength);
             for (int i = 0; i < iLength; i++)
             {
                 lua_pushnumber(luaVM, i);
