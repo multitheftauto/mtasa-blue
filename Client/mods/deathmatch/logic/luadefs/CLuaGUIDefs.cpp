@@ -2043,13 +2043,11 @@ int CLuaGUIDefs::GUIGetProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Create a new table
-        lua_newtable(luaVM);
-
-        // Add all our properties to the table on top of the given lua main's stack
         unsigned int     uiIndex = 0;
         CGUIPropertyIter iter = guiElement->GetCGUIElement()->GetPropertiesBegin();
         CGUIPropertyIter iterEnd = guiElement->GetCGUIElement()->GetPropertiesEnd();
+
+        lua_createtable(luaVM, std::distance(iter, iterEnd), 0);
         for (; iter != iterEnd; iter++)
         {
             const char* szKey = (*iter)->strKey;
