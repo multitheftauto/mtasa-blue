@@ -552,12 +552,11 @@ int CLuaXMLDefs::xmlNodeGetAttributes(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 0, pNode->GetAttributes().Count()); 
         for (auto iter = pNode->GetAttributes().ListBegin(); iter != pNode->GetAttributes().ListEnd(); ++iter)
         {
-            lua_pushstring(luaVM, (*iter)->GetName().c_str());
             lua_pushstring(luaVM, (*iter)->GetValue().c_str());
-            lua_settable(luaVM, -3);
+            lua_setfield(luaVM, -2, (*iter)->GetName().c_str());
         }
         return 1;
     }

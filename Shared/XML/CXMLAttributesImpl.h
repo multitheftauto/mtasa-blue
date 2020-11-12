@@ -38,6 +38,7 @@ public:
 
     std::list<CXMLAttribute*>::iterator ListBegin() { return m_Attributes.begin(); }
     std::list<CXMLAttribute*>::iterator ListEnd() { return m_Attributes.end(); }
+    auto                                Count() const noexcept { return m_Attributes.size(); }
 
     bool IsUsingIDs() const { return m_bUsingIDs; }
 
