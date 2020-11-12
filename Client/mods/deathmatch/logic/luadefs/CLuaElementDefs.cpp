@@ -1187,7 +1187,7 @@ int CLuaElementDefs::GetAttachedElements(lua_State* luaVM)
         if (pLuaMain)
         {
             // Create a new table
-            lua_newtable(luaVM);
+            lua_createtable(luaVM, pEntity->GetAttachedEntityCount(), 0);
 
             // Add All Attached Elements
             for (uint i = 0; i < pEntity->GetAttachedEntityCount(); i++)
