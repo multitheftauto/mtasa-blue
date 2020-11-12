@@ -49,6 +49,7 @@ public:
 
     std::list<CClientPlayer*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<CClientPlayer*>::const_iterator IterEnd() { return m_List.end(); }
+    auto                                      CountPlayers() const noexcept { return m_List.size(); }
 
     void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }

@@ -142,17 +142,15 @@ int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_newtable(luaVM);
-
-        unsigned int uiIndex = 0;
+        lua_createtable(luaVM, pTeam->CountPlayers(), 0);
 
         list<CClientPlayer*>::const_iterator iter = pTeam->IterBegin();
-        for (; iter != pTeam->IterEnd(); iter++)
+        for (lua_Number i = 1; iter != pTeam->IterEnd(); iter++)
         {
             CClientPlayer* pPlayer = *iter;
             if (!pPlayer->IsBeingDeleted())
             {
-                lua_pushnumber(luaVM, ++uiIndex);
+                lua_pushnumber(luaVM, i++);
                 lua_pushelement(luaVM, pPlayer);
                 lua_settable(luaVM, -3);
             }
