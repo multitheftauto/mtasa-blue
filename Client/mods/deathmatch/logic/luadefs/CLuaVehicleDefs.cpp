@@ -597,9 +597,6 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Create a new table
-        lua_newtable(luaVM);
-
         // Get the maximum amount of passengers
         unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
 
@@ -609,6 +606,9 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
             lua_pushboolean(luaVM, false);
             return 1;
         }
+
+        // Create a new table
+        lua_createtable(luaVM, 0, ucMaxPassengers); // seats start a 0, so we need a hashtable
 
         // Add All Occupants
         for (unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ucSeat)
