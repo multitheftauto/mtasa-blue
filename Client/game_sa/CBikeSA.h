@@ -77,7 +77,7 @@ public:
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
 private:
-    CBikeHandlingEntrySA* m_pBikeHandlingData;
+    CBikeHandlingEntrySA* m_pBikeHandlingData = nullptr;
 public:
     CBikeSA(){};
     CBikeSA(CBikeSAInterface* bike);
