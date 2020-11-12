@@ -1096,14 +1096,15 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetModules(lua_State* luaVM)
 {
-    lua_newtable(luaVM);
     list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-    list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
+
+    lua_createtable(luaVM, lua_LoadedModules.size(), 0);
+
     unsigned int                uiIndex = 1;
-    for (; iter != lua_LoadedModules.end(); ++iter)
+    for (CLuaModule* pModule : lua_LoadedModules)
     {
         lua_pushnumber(luaVM, uiIndex++);
-        lua_pushstring(luaVM, (*iter)->_GetFunctions().szFileName);
+        lua_pushstring(luaVM, pModule->_GetFunctions().szFileName);
         lua_settable(luaVM, -3);
     }
     return 1;
