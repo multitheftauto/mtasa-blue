@@ -1641,25 +1641,6 @@ namespace SharedUtil
 
         std::map<uint, uint> m_StartLastMap;
     };
-
-    //
-    // Pointer with reference count.
-    //
-    template <typename T>
-    class CRefedPointer : public CRefCountable
-    {
-    private:
-        T* pData;            // Target
-
-        virtual ~CRefedPointer() { SAFE_DELETE(pData); }
-        CRefedPointer(const CRefedPointer<T>& other);
-        CRefedPointer<T>& operator=(const CRefedPointer<T>& other);
-
-    public:
-        CRefedPointer() { pData = new T(); }
-
-        T* GetData() { return pData; }
-    };
 };            // namespace SharedUtil
 
 using namespace SharedUtil;
