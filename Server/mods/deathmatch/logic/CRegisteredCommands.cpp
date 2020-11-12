@@ -259,7 +259,7 @@ void CRegisteredCommands::GetCommands(lua_State* luaVM)
 {
     unsigned int uiIndex = 0;
 
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, m_Commands.size(), 0);
 
     for (SCommand* pCommand : m_Commands)
     {
