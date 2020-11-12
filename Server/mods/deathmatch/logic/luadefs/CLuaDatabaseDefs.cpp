@@ -507,26 +507,27 @@ int CLuaDatabaseDefs::DbFree(lua_State* luaVM)
 // Plop single set of registry results into a lua table
 void PushRegistryResultTable(lua_State* luaVM, const CRegistryResultData* Result)
 {
-    lua_newtable(luaVM);
-    int i = 0;
-    for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter, ++i)
+    lua_createtable(luaVM, Result->nRows, 0);
+
+    lua_Number i = 1;
+    for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter)
     {
         const CRegistryResultRow& row = *iter;
-        lua_pushnumber(luaVM, i + 1);
-        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, i++); // Push row index
+
+        lua_createtable(luaVM, 0, Result->nColumns); // Table for columns
         for (int j = 0; j < Result->nColumns; j++)
         {
             const CRegistryResultCell& cell = row[j];
 
-            // Push the column name
-            lua_pushlstring(luaVM, Result->ColNames[j].c_str(), Result->ColNames[j].size());
+            lua_pushlstring(luaVM, Result->ColNames[j].c_str(), Result->ColNames[j].size()); // Push column name
             switch (cell.nType)            // push the value with the right type
             {
                 case SQLITE_INTEGER:
-                    lua_pushnumber(luaVM, static_cast<double>(cell.nVal));
+                    lua_pushnumber(luaVM, static_cast<lua_Number>(cell.nVal));
                     break;
                 case SQLITE_FLOAT:
-                    lua_pushnumber(luaVM, cell.fVal);
+                    lua_pushnumber(luaVM, static_cast<lua_Number>(cell.fVal));
                     break;
                 case SQLITE_BLOB:
                     lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength);

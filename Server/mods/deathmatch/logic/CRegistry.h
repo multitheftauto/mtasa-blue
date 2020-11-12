@@ -162,4 +162,5 @@ struct CRegistryResultData
     CRegistryResultData*    GetThis() { return this; }
     CRegistryResultIterator begin() const { return Data.begin(); }
     CRegistryResultIterator end() const { return Data.end(); }
+    auto                    size() const noexcept { return Data.size(); }
 };
