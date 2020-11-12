@@ -1094,7 +1094,7 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
             std::vector<SString> nameList;
             g_pCore->GetGraphics()->GetRenderItemManager()->GetVisibleTextureNames(nameList, strTextureNameMatch, usModelID);
 
-            lua_newtable(luaVM);
+            lua_createtable(luaVM, nameList.size(), 0);
             for (uint i = 0; i < nameList.size(); i++)
             {
                 lua_pushnumber(luaVM, i + 1);
