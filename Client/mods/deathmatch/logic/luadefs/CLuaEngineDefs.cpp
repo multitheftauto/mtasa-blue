@@ -1180,7 +1180,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     CResource* pParentResource = pLuaMain->GetResource();
 
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, 0, textureList.size());
     for (const auto& pair : textureList)
     {
         CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
