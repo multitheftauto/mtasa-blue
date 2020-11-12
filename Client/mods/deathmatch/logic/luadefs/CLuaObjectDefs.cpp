@@ -254,7 +254,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
         {
             case OBJECT_PROPERTY_ALL:
             {
-                lua_newtable(luaVM);
+                lua_createtable(luaVM, 6, 0);
 
                 lua_pushnumber(luaVM, pObject->GetMass());
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_MASS));
@@ -276,7 +276,6 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 lua_pushnumber(luaVM, pObject->GetBuoyancyConstant());
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_BUOYANCY));
                 return 1;
-                break;
             }
             case OBJECT_PROPERTY_MASS:
             {
