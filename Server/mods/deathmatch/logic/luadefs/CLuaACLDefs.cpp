@@ -214,7 +214,7 @@ int CLuaACLDefs::aclList(lua_State* luaVM)
     //  table aclList ()
 
     // Create a table to return into
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, m_pACLManager->ACL_Count(), 0);
 
     // Loop through ACL stuff
     unsigned int                              uiIndex = 0;
@@ -409,7 +409,8 @@ int CLuaACLDefs::aclListRights(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Create a table to return into
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, pACL->CountRights(), 0);
+
 
         // Loop through ACL
         char                                           szRightName[128];
@@ -608,7 +609,7 @@ int CLuaACLDefs::aclGroupList(lua_State* luaVM)
     //  table aclGroupList ()
 
     // Create a table to return into
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, m_pACLManager->Groups_Count(), 0);
 
     // Loop through ACL stuff
     unsigned int                                   uiIndex = 0;
@@ -683,7 +684,7 @@ int CLuaACLDefs::aclGroupListACL(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Create a table to return into
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, pGroup->CountACL(), 0);
 
         // Loop through ACL stuff
         unsigned int                              uiIndex = 0;
@@ -791,7 +792,7 @@ int CLuaACLDefs::aclGroupListObjects(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Create a table to return into
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, pGroup->CountObjects(), 0);
 
         // Loop through ACL stuff
         char                                                 szBuffer[255];

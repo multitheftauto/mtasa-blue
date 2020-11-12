@@ -67,8 +67,10 @@ public:
 
     list<class CAccessControlList*>::iterator            IterBeginACL() { return m_ACLs.begin(); };
     list<class CAccessControlList*>::iterator            IterEndACL() { return m_ACLs.end(); };
+    auto                                                 CountACL() const noexcept { return m_ACLs.size(); }
     list<class CAccessControlListGroupObject*>::iterator IterBeginObjects() { return m_Objects.begin(); };
     list<class CAccessControlListGroupObject*>::iterator IterEndObjects() { return m_Objects.end(); };
+    auto                                                 CountObjects() const noexcept { return m_Objects.size(); }
 
     void WriteToXMLNode(CXMLNode* pNode);
     uint GetScriptID() const { return m_uiScriptID; }

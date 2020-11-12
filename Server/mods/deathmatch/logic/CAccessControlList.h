@@ -35,6 +35,7 @@ public:
 
     list<CAccessControlListRight*>::const_iterator IterBegin() { return m_Rights.begin(); };
     list<CAccessControlListRight*>::const_iterator IterEnd() { return m_Rights.end(); };
+    auto                                           CountRights() const noexcept { return m_Rights.size(); }
 
     bool CanBeModifiedByScript();
     uint GetScriptID() const { return m_uiScriptID; }
