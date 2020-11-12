@@ -484,11 +484,12 @@ int CLuaXMLDefs::xmlNodeGetChildren(lua_State* luaVM)
         }
         else
         {
-            lua_newtable(luaVM);
-            uiIndex = 0;
+            lua_createtable(luaVM, pNode->CountChildren(), 0); 
+
+            lua_Number i = 1;
             for (auto iter = pNode->ChildrenBegin(); iter != pNode->ChildrenEnd(); ++iter)
             {
-                lua_pushnumber(luaVM, ++uiIndex);
+                lua_pushnumber(luaVM, i++);
                 lua_pushxmlnode(luaVM, *iter);
                 lua_settable(luaVM, -3);
             }
