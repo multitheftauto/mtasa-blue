@@ -1068,7 +1068,7 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
         {
             if (mod->_GetName() == strModuleName)
             {
-                lua_newtable(luaVM);
+                lua_createtable(luaVM, 0, 3);
 
                 lua_pushstring(luaVM, "name");
                 lua_pushstring(luaVM, mod->_GetFunctions().szModuleName);
