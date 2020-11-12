@@ -2655,7 +2655,7 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
     {
         CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 2, 33);
 
         lua_pushnumber(luaVM, pEntry->GetMass());
         lua_setfield(luaVM, -2, "mass");
@@ -2667,16 +2667,21 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
         lua_setfield(luaVM, -2, "dragCoeff");
 
         lua_createtable(luaVM, 3, 0);
-        CVector vecCenter = pEntry->GetCenterOfMass();
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, vecCenter.fX);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, vecCenter.fY);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, vecCenter.fZ);
-        lua_settable(luaVM, -3);
+        {
+            CVector vecCenter = pEntry->GetCenterOfMass();
+        
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vecCenter.fX);
+            lua_settable(luaVM, -3);
+
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vecCenter.fY);
+            lua_settable(luaVM, -3);
+
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vecCenter.fZ);
+            lua_settable(luaVM, -3);
+        }
         lua_setfield(luaVM, -2, "centerOfMass");
 
         lua_pushnumber(luaVM, pEntry->GetPercentSubmerged());
@@ -2695,6 +2700,7 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
         else            // What the ... (yeah, security)
             lua_pushnil(luaVM);
         lua_setfield(luaVM, -2, "driveType");
+        
         CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType();
         if (eEngineType == CHandlingEntry::PETROL)
             lua_pushstring(luaVM, "petrol");
@@ -2796,6 +2802,7 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
 
         lua_pushnumber(luaVM, pEntry->GetAnimGroup());
         lua_setfield(luaVM, -2, "animGroup");
+
         return 1;
     }
     else
