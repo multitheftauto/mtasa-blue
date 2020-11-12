@@ -148,8 +148,8 @@ enum class eModelSpecialType : unsigned char
     GLASS_2 = 5,
     TAG = 6,
     GARAGE_DOOR = 7,
-    CRANE = 9, // don't present in IDE but used in gta
-    UNKNOW_1 = 10, // read only
+    CRANE = 9,                // Not present in IDE but used in gta
+    UNKNOW_1 = 10,            // Read only
     BREAKABLE_STATUE = 11,
 };
 
