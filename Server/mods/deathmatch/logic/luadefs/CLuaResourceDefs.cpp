@@ -1238,35 +1238,33 @@ int CLuaResourceDefs::getResourceACLRequests(lua_State* luaVM)
         pResource->GetAclRequests(Result);
 
         // Make table!
-        lua_newtable(luaVM);
-        for (uint i = 0; i < Result.size(); i++)
+        lua_createtable(luaVM, Result.size(), 0);
+
+        lua_Number i = 1;
+        for (const auto& request : Result)
         {
-            lua_newtable(luaVM);                     // new table
-            lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
-            lua_pushvalue(luaVM, -2);                // value
-            lua_settable(luaVM, -4);                 // refer to the top level table
+            lua_createtable(luaVM);         // new table
+            {
+                // Push this table into the toplevel table (leaves it on the stack still though)
+                lua_pushnumber(luaVM, i++);  // row index number (starting at 1, not 0)
+                lua_pushvalue(luaVM, -2);    // value
+                lua_settable(luaVM, -4);     // refer to the top level table
 
-            const SAclRequest& request = Result[i];
-            lua_pushstring(luaVM, "name");
-            lua_pushstring(luaVM, request.rightName.GetFullName());
-            lua_settable(luaVM, -3);
+                lua_pushstring(luaVM, request.rightName.GetFullName());
+                lua_settable(luaVM, -2, "name");
 
-            lua_pushstring(luaVM, "access");
-            lua_pushboolean(luaVM, request.bAccess);
-            lua_settable(luaVM, -3);
+                lua_pushboolean(luaVM, request.bAccess);
+                lua_settable(luaVM, -2, "access");
 
-            lua_pushstring(luaVM, "pending");
-            lua_pushboolean(luaVM, request.bPending);
-            lua_settable(luaVM, -3);
+                lua_pushboolean(luaVM, request.bPending);
+                lua_settable(luaVM, -2, "pending");
 
-            lua_pushstring(luaVM, "who");
-            lua_pushstring(luaVM, request.strWho);
-            lua_settable(luaVM, -3);
+                lua_pushstring(luaVM, request.strWho);
+                lua_settable(luaVM, -2, "who");
 
-            lua_pushstring(luaVM, "date");
-            lua_pushstring(luaVM, request.strDate);
-            lua_settable(luaVM, -3);
-
+                lua_pushstring(luaVM, request.strDate);
+                lua_settable(luaVM, -2, "date");
+            }
             lua_pop(luaVM, 1);            // pop the inner table
         }
         return 1;
