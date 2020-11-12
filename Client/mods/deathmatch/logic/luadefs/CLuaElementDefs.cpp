@@ -968,7 +968,7 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
         CClientEntityResult result;
         GetClientSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
 
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, result.size(), 0);
         unsigned int index = 0;
 
         for (CClientEntity* entity : result)
