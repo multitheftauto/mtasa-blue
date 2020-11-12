@@ -798,20 +798,18 @@ int CLuaVehicleDefs::GetVehicleUpgrades(lua_State* luaVM)
         CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
         if (pUpgrades)
         {
-            // Create a new table
-            lua_newtable(luaVM);
+            // Create a new table - preallocates a generous amount
+            lua_createtable(luaVM, 16, 0);
 
             // Add all the upgrades to the table
             const SSlotStates& usSlotStates = pUpgrades->GetSlotStates();
 
-            unsigned int  uiIndex = 0;
-            unsigned char ucSlot = 0;
-            for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
+            for (size_t i = 0; i < VEHICLE_UPGRADE_SLOTS; i++)
             {
-                if (usSlotStates[ucSlot] != 0)
+                if (usSlotStates[i] != 0)
                 {
-                    lua_pushnumber(luaVM, ++uiIndex);
-                    lua_pushnumber(luaVM, usSlotStates[ucSlot]);
+                    lua_pushnumber(luaVM, (lua_Number)i + 1);
+                    lua_pushnumber(luaVM, usSlotStates[i]);
                     lua_settable(luaVM, -3);
                 }
             }
