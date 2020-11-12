@@ -190,7 +190,8 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         char*        szToken = strtok(strText, strDelimiter);
 
         // Create a new table
-        lua_newtable(luaVM);
+        // Reserve a generous amount, because it'll get GCd fast probably
+        lua_createtable(luaVM, 8, 0); 
 
         // strtok until we're out of tokens
         while (szToken)
