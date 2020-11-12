@@ -1172,7 +1172,7 @@ int CLuaElementDefs::getAttachedElements(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Create a new table
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 2, 0); // Generous estimate
 
         // Add All Attached Elements
         unsigned int                    uiIndex = 0;
