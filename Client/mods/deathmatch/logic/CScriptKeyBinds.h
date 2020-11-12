@@ -87,6 +87,7 @@ public:
 
     std::list<CScriptKeyBind*>::iterator IterBegin() { return m_List.begin(); }
     std::list<CScriptKeyBind*>::iterator IterEnd() { return m_List.end(); }
+    auto                                 CountBinds() const noexcept { return m_List.size(); }
 
     // Key-function bind funcs
     bool AddKeyFunction(const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);

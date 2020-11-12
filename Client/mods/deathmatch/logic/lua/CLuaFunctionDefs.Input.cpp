@@ -372,11 +372,10 @@ int CLuaFunctionDefs::GetBoundKeys(lua_State* luaVM)
             g_pCore->GetKeyBinds()->GetBoundControls(pControl, controlBinds);
             if (!controlBinds.empty())
             {
-                lua_newtable(luaVM);
-                list<CGTAControlBind*>::iterator iter = controlBinds.begin();
-                for (; iter != controlBinds.end(); iter++)
+                lua_createtable(luaVM, 0, controlBinds.size());
+                for (CGTAControlBind* pBind : controlBinds)
                 {
-                    lua_pushstring(luaVM, (*iter)->boundKey->szKey);
+                    lua_pushstring(luaVM, pBind->boundKey->szKey);
                     lua_pushstring(luaVM, "down");
                     lua_settable(luaVM, -3);
                 }
@@ -392,12 +391,11 @@ int CLuaFunctionDefs::GetBoundKeys(lua_State* luaVM)
             g_pCore->GetKeyBinds()->GetBoundCommands(strKey, commandBinds);
             if (!commandBinds.empty())
             {
-                lua_newtable(luaVM);
-                list<CCommandBind*>::iterator iter = commandBinds.begin();
-                for (; iter != commandBinds.end(); iter++)
+                lua_createtable(luaVM, 0, commandBinds.size());
+                for (CCommandBind* pBind : commandBinds)
                 {
-                    lua_pushstring(luaVM, (*iter)->boundKey->szKey);
-                    lua_pushstring(luaVM, (*iter)->bHitState ? "down" : "up");
+                    lua_pushstring(luaVM, pBind->boundKey->szKey);
+                    lua_pushstring(luaVM, pBind->bHitState ? "down" : "up");
                     lua_settable(luaVM, -3);
                 }
             }
@@ -436,12 +434,14 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey(lua_State* luaVM)
                     bCheckHitState = true, bHitState = false;
             }
 
-            // Create a new table
-            lua_newtable(luaVM);
-
-            // Add all the bound functions to it
+            // Get all bound functions
             unsigned int                          uiIndex = 0;
             list<CScriptKeyBind*>::const_iterator iter = m_pClientGame->GetScriptKeyBinds()->IterBegin();
+
+            // Create new table
+            lua_createtable(luaVM, m_pClientGame->GetScriptKeyBinds()->CountBinds(), 0);
+
+            // Push values into the table
             for (; iter != m_pClientGame->GetScriptKeyBinds()->IterEnd(); iter++)
             {
                 CScriptKeyBind* pScriptKeyBind = *iter;
@@ -572,13 +572,9 @@ int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
                 else if (stricmp(szHitState, "up") == 0)
                     bCheckHitState = true, bHitState = false;
             }
-
-            // Create a new table
-            lua_newtable(luaVM);
-
-            // Add all the bound commands to it
             list<CKeyBind*>::const_iterator iter = g_pCore->GetKeyBinds()->IterBegin();
 
+            lua_createtable(luaVM, 0, g_pCore->GetKeyBinds()->CountAll());
             for (; iter != g_pCore->GetKeyBinds()->IterEnd(); iter++)
             {
                 CKeyBind* pKeyBind = *iter;
