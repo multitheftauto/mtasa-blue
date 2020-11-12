@@ -37,6 +37,7 @@ public:
     int GetFreeTxdModelID();
 
     CClientModel* FindModelByID(int iModelID);
+    CClientModel* Request(CClientManager* pManager, int iModelID, eClientModelType eType);
 
     std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientModelType type, const unsigned int minModelID = 0);
 

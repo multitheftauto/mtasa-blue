@@ -584,9 +584,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
             {
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
-                    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-                    if (pModel == nullptr)
-                        pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                    CClientModel* pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
 
                     ushort usParentID = -1;
 
@@ -2045,9 +2043,7 @@ uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxd
     if (iModelID == INVALID_MODEL_ID)
         return false;
 
-    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-    if (pModel == nullptr)
-        pModel = new CClientModel(m_pManager, iModelID, eClientModelType::TXD);
+    CClientModel* pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
 
     pModel->AllocateTXD(strTxdName);
     pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());

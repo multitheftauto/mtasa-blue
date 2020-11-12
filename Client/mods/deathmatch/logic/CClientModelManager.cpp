@@ -85,6 +85,19 @@ CClientModel* CClientModelManager::FindModelByID(int iModelID)
     return nullptr;
 }
 
+CClientModel* CClientModelManager::Request(CClientManager* pManager, int iModelID, eClientModelType eType)
+{
+    CClientModel* pModel = FindModelByID(iModelID);
+    if (pModel)
+    {
+        pModel->m_eModelType = eType;
+        return pModel;
+    }
+
+    pModel = new CClientModel(pManager, iModelID, eType);
+    return pModel;
+}
+
 std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientModelType type, const unsigned int minModelID)
 {
     std::vector<CClientModel*> found;
