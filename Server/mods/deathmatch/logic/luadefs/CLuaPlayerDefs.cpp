@@ -1665,50 +1665,53 @@ int CLuaPlayerDefs::GetFunctionsBoundToKey(lua_State* luaVM)
         }
 
         // Create a new table
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, pPlayer->GetKeyBinds()->Count(), 0);
 
         // Add all the bound functions to it
-        unsigned int              uiIndex = 0;
+        lua_Number i = 1;
         list<CKeyBind*>::iterator iter = pPlayer->GetKeyBinds()->IterBegin();
         for (; iter != pPlayer->GetKeyBinds()->IterEnd(); ++iter)
         {
             CKeyBind* pKeyBind = *iter;
-            if (!pKeyBind->IsBeingDeleted())
+            if (pKeyBind->IsBeingDeleted())
+                continue; // Skip binds being deleted
+            
+            // Todo: Refactor. Making it virtual would be the easiest way
+            // I mean CKeyFunctionBind, and CControlFunctionBind
+            switch (pKeyBind->GetType()) 
             {
-                switch (pKeyBind->GetType())
+                case KEY_BIND_FUNCTION:
                 {
-                    case KEY_BIND_FUNCTION:
+                    CKeyFunctionBind* pBind = static_cast<CKeyFunctionBind*>(pKeyBind);
+                    if (!bCheckHitState || pBind->bHitState == bHitState)
                     {
-                        CKeyFunctionBind* pBind = static_cast<CKeyFunctionBind*>(pKeyBind);
-                        if (!bCheckHitState || pBind->bHitState == bHitState)
+                        if (strKey == pBind->boundKey->szKey)
                         {
-                            if (strKey == pBind->boundKey->szKey)
-                            {
-                                lua_pushnumber(luaVM, ++uiIndex);
-                                lua_rawgeti(luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt());
-                                lua_settable(luaVM, -3);
-                            }
+                            lua_pushnumber(luaVM, i++);
+                            lua_rawgeti(luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt());
+                            lua_settable(luaVM, -3);
                         }
-                        break;
                     }
-                    case KEY_BIND_CONTROL_FUNCTION:
-                    {
-                        CControlFunctionBind* pBind = static_cast<CControlFunctionBind*>(pKeyBind);
-                        if (!bCheckHitState || pBind->bHitState == bHitState)
-                        {
-                            if (strKey == pBind->boundControl->szControl)
-                            {
-                                lua_pushnumber(luaVM, ++uiIndex);
-                                lua_rawgeti(luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt());
-                                lua_settable(luaVM, -3);
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        break;
+                    break;
                 }
+                case KEY_BIND_CONTROL_FUNCTION:
+                {
+                    CControlFunctionBind* pBind = static_cast<CControlFunctionBind*>(pKeyBind);
+                    if (!bCheckHitState || pBind->bHitState == bHitState)
+                    {
+                        if (strKey == pBind->boundControl->szControl)
+                        {
+                            lua_pushnumber(luaVM, i++);
+                            lua_rawgeti(luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt());
+                            lua_settable(luaVM, -3);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
+            
         }
         return 1;
     }
