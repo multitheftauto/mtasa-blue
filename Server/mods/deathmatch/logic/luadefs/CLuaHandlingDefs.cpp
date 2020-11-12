@@ -565,7 +565,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
             const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
             if (pEntry)
             {
-                lua_newtable(luaVM);
+                lua_createtable(luaVM, 0, 33);
 
                 lua_pushnumber(luaVM, pEntry->GetMass());
                 lua_setfield(luaVM, -2, "mass");
