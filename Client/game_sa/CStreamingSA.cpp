@@ -16,8 +16,6 @@ CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26
 HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // Contains open files
 CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
 
-CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
-
 namespace
 {
     //
@@ -140,11 +138,6 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
-}
-
-CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
-{
-    return &ms_aInfoForModel[id];
 }
 
 void CStreamingSA::ReinitStreaming()

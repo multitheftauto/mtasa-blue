@@ -43,10 +43,9 @@ public:
     virtual void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL) = 0;
     virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
-    virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned short id) = 0;
+    virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned int uiID) = 0;
     virtual void ReinitStreaming() = 0;
     virtual unsigned char AddArchive(const char* szFilePath) = 0;
     virtual void RemoveArchive(unsigned char ucArchiveID) = 0;
-    virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned int id) = 0;
-    virtual void            SetStreamingInfoForModelId(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
+    virtual void SetStreamingInfoForModelId(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
 };
