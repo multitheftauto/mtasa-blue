@@ -922,13 +922,11 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
             // Grab optional type arg
             const char* szType = strType == "" ? NULL : strType.c_str();
 
-            // Create a new table
-            lua_newtable(luaVM);
+            unsigned int uiIndex = 0;
+            auto         iter = pColShape->CollidersBegin();
 
-            // Add all the elements within the shape to it
-            unsigned int                        uiIndex = 0;
-            CFastList<CClientEntity*>::iterator iter = pColShape->CollidersBegin();
-            for (; iter != pColShape->CollidersEnd(); iter++)
+            lua_createtable(luaVM, pColShape->CountColliders(), 0);
+            for (; iter != pColShape->CollidersEnd(); ++iter)
             {
                 if (szType == NULL || strcmp((*iter)->GetTypeName(), szType) == 0)
                 {
