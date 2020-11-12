@@ -172,9 +172,15 @@ int CLuaBanDefs::GetBans(lua_State* luaVM)
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, m_pBanManager->CountBans(), 0);
 
-        CStaticFunctionDefinitions::GetBans(luaVM);
+        list<CBan*>::const_iterator iter = m_pBanManager->IterBegin();
+        for (lua_Number i = 1; iter != m_pBanManager->IterEnd(); iter++)
+        {
+            lua_pushnumber(luaVM, i++);
+            lua_pushban(luaVM, *iter);
+            lua_settable(luaVM, -3);
+        }
 
         return 1;
     }

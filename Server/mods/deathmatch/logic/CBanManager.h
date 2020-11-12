@@ -58,6 +58,7 @@ public:
 
     list<CBan*>::const_iterator IterBegin() { return m_BanManager.begin(); };
     list<CBan*>::const_iterator IterEnd() { return m_BanManager.end(); };
+    auto                        CountBans() const noexcept { return m_BanManager.size(); }
 
 private:
     SString m_strPath;

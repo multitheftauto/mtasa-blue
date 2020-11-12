@@ -11710,20 +11710,6 @@ bool CStaticFunctionDefinitions::RemoveBan(CBan* pBan, CPlayer* pResponsible)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetBans(lua_State* pLua)
-{
-    list<CBan*>::const_iterator iter = m_pBanManager->IterBegin();
-    unsigned int                uiIndex = 0;
-
-    for (; iter != m_pBanManager->IterEnd(); iter++)
-    {
-        lua_pushnumber(pLua, ++uiIndex);
-        lua_pushban(pLua, *iter);
-        lua_settable(pLua, -3);
-    }
-    return true;
-}
-
 bool CStaticFunctionDefinitions::ReloadBanList()
 {
     return m_pBanManager->ReloadBanList();
