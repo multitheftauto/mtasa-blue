@@ -32,7 +32,7 @@ enum class eModelIdeFlag
 {
     IS_ROAD,
     DRAW_LAST,
-    ADDICTIVE,
+    ADDITIVE,
     IGNORE_LIGHTING,            // Used with animated objects
     NO_ZBUFFER_WRITE,
     DONT_RECEIVE_SHADOWS,
