@@ -57,8 +57,6 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
-        case eClientModelType::TXD:
-            return true;
         default:
             return false;
     }
