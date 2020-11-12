@@ -13,7 +13,7 @@
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, 299, 0); // 299 skins are valid by default, so reserve that amount
 
     // Gather GTASA default skins
     for (int i = 0; i <= 312; i++)
