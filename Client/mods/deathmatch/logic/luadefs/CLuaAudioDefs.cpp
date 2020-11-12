@@ -787,7 +787,10 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
             if (iBands == 0)
             {
                 // Create a new table
-                lua_newtable(luaVM);
+                // Congarts to anyone who started lua indexing at 0 instead of 1
+                // this way lua uses the hashtable 
+                lua_createtable(luaVM, 0, iLength / 2);
+
                 for (int i = 0; i <= iLength / 2; i++)
                 {
                     lua_pushnumber(luaVM, i);
@@ -798,7 +801,7 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
             else
             {
                 // Create a new table
-                lua_newtable(luaVM);
+                lua_createtable(luaVM, 0, iBands);
                 for (int i = 0; i <= iBands - 1; i++)
                 {
                     lua_pushnumber(luaVM, i);
