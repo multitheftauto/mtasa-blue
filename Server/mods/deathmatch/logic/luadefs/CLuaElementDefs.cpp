@@ -989,12 +989,10 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Create a new table
-        lua_newtable(luaVM);
-
-        // Add all the elements within the shape to it
         unsigned int              uiIndex = 0;
         list<CElement*>::iterator iter = pColShape->CollidersBegin();
+
+        lua_createtable(luaVM, pColShape->CountColliders(), 0);
         for (; iter != pColShape->CollidersEnd(); ++iter)
         {
             if ((strType.empty() || strType == (*iter)->GetTypeName()) && !(*iter)->IsBeingDeleted())

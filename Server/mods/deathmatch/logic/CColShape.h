@@ -54,8 +54,10 @@ public:
     void                      RemoveCollider(CElement* pElement) { m_Colliders.remove(pElement); }
     bool                      ColliderExists(CElement* pElement);
     void                      RemoveAllColliders();
+
     list<CElement*>::iterator CollidersBegin() { return m_Colliders.begin(); }
     list<CElement*>::iterator CollidersEnd() { return m_Colliders.end(); }
+    auto                      CountColliders() const noexcept { return m_Colliders.size(); }
 
     bool IsPartnered() { return m_bPartnered; }
 
