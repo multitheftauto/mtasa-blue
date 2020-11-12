@@ -57,12 +57,12 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
-    static uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelID);
-    static bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
-    static bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelID, eModelIdeFlag eFlag);
-    static bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool state);
-    static bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID);
-    static bool CLuaEngineDefs::EngineRestreamWorld();
+    static uint EngineGetModelFlags(uint uiModelID);
+    static bool EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
+    static bool EngineGetModelFlag(uint uiModelID, eModelIdeFlag eFlag);
+    static bool EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool state);
+    static bool EngineResetModelFlags(uint uiModelID);
+    static bool EngineRestreamWorld();
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 private:

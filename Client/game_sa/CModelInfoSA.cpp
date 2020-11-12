@@ -33,7 +33,7 @@ union tIdeFlags
         char bIsRoad : 1;
         char bFlag2 : 1;
         char bDrawLast : 1;
-        char bAddictive : 1;
+        char bAdditive : 1;
         char bFlag5 : 1;
         char bFlag6 : 1;
         char bNoZBufferWrite : 1;
@@ -53,7 +53,7 @@ union tIdeFlags
         char bFlag19 : 1;
         char bFlag20 : 1;
         char bIsTag : 1;
-        char bDisableBackfaceCilling : 1;
+        char bDisableBackfaceCulling : 1;
         char bIsBreakableStatue : 1;
         char bFlag24 : 1;
 
@@ -583,10 +583,10 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
         m_pInterface->bAdditiveRender = true;
     }
 
-    m_pInterface->bAdditiveRender = ideFlags.bAddictive;
+    m_pInterface->bAdditiveRender = ideFlags.bAdditive;
     m_pInterface->bDontWriteZBuffer = ideFlags.bNoZBufferWrite;
     m_pInterface->bDontCastShadowsOn = ideFlags.bDontReceiveShadows;
-    m_pInterface->bIsBackfaceCulled = !ideFlags.bDisableBackfaceCilling;
+    m_pInterface->bIsBackfaceCulled = !ideFlags.bDisableBackfaceCulling;
 
     switch (GetModelType())
     {
@@ -645,7 +645,7 @@ void CModelInfoSA::SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState)
             if (bState)
                 m_pInterface->bAdditiveRender = true;
             break;
-        case eModelIdeFlag::ADDICTIVE:
+        case eModelIdeFlag::ADDITIVE:
             m_pInterface->bAdditiveRender = bState;
             break;
         case eModelIdeFlag::IGNORE_LIGHTING:
@@ -707,7 +707,7 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
             return m_pInterface->bIsRoad;
         case eModelIdeFlag::DRAW_LAST:
            return m_pInterface->bAlphaTransparency;
-        case eModelIdeFlag::ADDICTIVE:
+        case eModelIdeFlag::ADDITIVE:
             return m_pInterface->bAdditiveRender;
         case eModelIdeFlag::IGNORE_LIGHTING:
             return m_pInterface->bAdditiveRender;
