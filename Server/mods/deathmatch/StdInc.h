@@ -248,7 +248,6 @@ struct SAclRequest;
 #include "CPlayerCamera.h"
 #include "CPlayerClothes.h"
 #include "CPlayerManager.h"
-#include "CPlayerStats.h"
 #include "CPlayerTasks.h"
 #include "CPlayerTextManager.h"
 #include "CRPCFunctions.h"

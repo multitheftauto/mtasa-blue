@@ -24,13 +24,14 @@ public:
 
     bool HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient);
 
-    void             AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted);
+    void             AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, const char* szConsoleHelpText);
     void             DeleteCommand(const char* szCommand);
     void             DeleteAllCommands();
     CConsoleCommand* GetCommand(const char* szKey);
 
     list<CConsoleCommand*>::const_iterator CommandsBegin() { return m_Commands.begin(); };
     list<CConsoleCommand*>::const_iterator CommandsEnd() { return m_Commands.end(); };
+    const auto&                            CommandsList() { return m_Commands; }
 
     class CBlipManager*    GetBlipManager() { return m_pBlipManager; };
     class CLuaManager*     GetLuaManager() { return m_pLuaManager; };

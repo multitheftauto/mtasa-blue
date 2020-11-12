@@ -68,6 +68,9 @@ public:
     LUA_DECLARE(EngineImageLinkModel);
     LUA_DECLARE(EngineRestoreModelImage);
     static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
+    static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
+    static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

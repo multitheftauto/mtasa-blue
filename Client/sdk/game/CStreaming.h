@@ -13,14 +13,14 @@
 
 struct CStreamingInfo
 {
-    WORD  prevId;
-    WORD  nextId;
-    WORD  nextInImg;
-    BYTE  flg;
-    BYTE  archiveId;
-    DWORD offsetInBlocks;
-    DWORD sizeInBlocks;
-    DWORD loadState;
+    uint16 prevId;
+    uint16 nextId;
+    uint16 nextInImg;
+    uint8  flg;
+    uint8  archiveId;
+    uint32 offsetInBlocks;
+    uint32 sizeInBlocks;
+    uint32 loadState;
 
 public:
     void Reset()
@@ -43,6 +43,7 @@ public:
     virtual void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL) = 0;
     virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
+    virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned short id) = 0;
     virtual void ReinitStreaming() = 0;
     virtual unsigned char AddArchive(const char* szFilePath) = 0;
     virtual void RemoveArchive(unsigned char ucArchiveID) = 0;

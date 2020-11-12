@@ -999,12 +999,6 @@ inner:
     }
 }
 
-CStreamingInfo* GetStreamingInfoFromModelId(uint id)
-{
-    CStreamingInfo* pItemInfo = (CStreamingInfo*)(0x8E4CC0);
-    return pItemInfo + id;
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CEntity::GetBoundRect
@@ -1031,7 +1025,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         if (!pColModel)
         {
             // Crash will occur at offset 00134134
-            CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId(usModelId);
+            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfoFromModelId(usModelId);
             SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
                                pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
                                pModelInfo->bCollisionWasStreamedWithModel, pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,

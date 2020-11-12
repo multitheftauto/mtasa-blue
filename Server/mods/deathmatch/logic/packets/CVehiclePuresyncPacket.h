@@ -17,7 +17,7 @@
 
 class CVehicle;
 
-class CVehiclePuresyncPacket : public CPacket
+class CVehiclePuresyncPacket final : public CPacket
 {
 public:
     CVehiclePuresyncPacket(){};

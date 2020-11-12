@@ -29,7 +29,7 @@ public:
 
     bool GetWaterLevel(CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
-    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
+    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     bool SetAllElementWaterLevel(float fLevel, void* pChangeSource);
     void ResetWorldWaterLevel();
 
