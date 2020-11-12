@@ -1057,7 +1057,7 @@ int CLuaEngineDefs::EngineGetModelTextureNames(lua_State* luaVM)
             std::vector<SString> nameList;
             g_pGame->GetRenderWare()->GetModelTextureNames(nameList, usModelID);
 
-            lua_newtable(luaVM);
+            lua_createtable(luaVM, nameList.size(), 0);
             for (uint i = 0; i < nameList.size(); i++)
             {
                 lua_pushnumber(luaVM, i + 1);
