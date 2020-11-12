@@ -35,13 +35,13 @@ public:
     virtual uint           GetLastErrorCode();
     virtual void           AddRef();
     virtual void           Release();
-    virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult);
+    virtual bool           Query(const SString& strQuery, CRegistryResultData& registryResult);
     virtual void           Flush();
     virtual int            GetShareCount() { return m_iRefCount; }
 
     // CDatabaseConnectionMySql
     void SetLastError(uint uiCode, const SString& strMessage);
-    bool QueryInternal(const SString& strQuery, CRegistryResult& registryResult);
+    bool QueryInternal(const SString& strQuery, CRegistryResultData& registryResult);
     void BeginAutomaticTransaction();
     void EndAutomaticTransaction();
     int  ConvertToSqliteType(enum_field_types type);
@@ -229,7 +229,7 @@ void CDatabaseConnectionMySql::SetLastError(uint uiCode, const SString& strMessa
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionMySql::Query(const SString& strQuery, CRegistryResult& registryResult)
+bool CDatabaseConnectionMySql::Query(const SString& strQuery, CRegistryResultData& registryResult)
 {
     BeginAutomaticTransaction();
     return QueryInternal(strQuery, registryResult);
@@ -243,9 +243,9 @@ bool CDatabaseConnectionMySql::Query(const SString& strQuery, CRegistryResult& r
 // Return true with datum in registryResult on success
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryResult& registryResult)
+bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryResultData& registryResult)
 {
-    CRegistryResultData* pResult = registryResult->GetThis();
+    CRegistryResultData* pResult = &registryResult;
 
     int status = mysql_real_query(m_handle, strQuery, static_cast<unsigned long>(strQuery.length()));
     if (status)
@@ -341,8 +341,8 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
             return false;
         }
 
-        pResult->pNextResult = new CRegistryResultData();
-        pResult = pResult->pNextResult;
+        pResult->pNextResult = MakeRegistryResultDataRef();
+        pResult = pResult->pNextResult.get();
     }
 
     return true;
