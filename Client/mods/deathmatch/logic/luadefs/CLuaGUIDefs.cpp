@@ -3658,7 +3658,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
 
     // If we are asking for all CVars, prepare a new table
     if (bAll)
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 0, MAX_CHATBOX_LAYOUT_CVARS);
     else
         argStream.ReadString(strCVarArg);
 
@@ -3682,20 +3682,19 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                     {
                         ss.clear();
                         ss.str(strCVarValue);
-                        ss >> iR >> iG >> iB >> iA;
-                        lua_newtable(luaVM);
-                        lua_pushnumber(luaVM, 1);
-                        lua_pushnumber(luaVM, iR);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 2);
-                        lua_pushnumber(luaVM, iG);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 3);
-                        lua_pushnumber(luaVM, iB);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 4);
-                        lua_pushnumber(luaVM, iA);
-                        lua_settable(luaVM, -3);
+
+                        // Extract color componenet value from string, 
+                        // and push it into a table one by one in this order: R, G, B, A
+                        lua_createtable(luaVM, 4, 0);
+                        for (lua_Number i = 1; i =< 4; i++)
+                        {
+                            int value;
+                            ss >> value;
+                            lua_pushnumber(luaVM, i);       // Push index
+                            lua_pushnumber(luaVM, value);   // Push color component value
+                            lua_settable(luaVM, -3);
+
+                        }
                     }
                 }
                 // Push chat scale into a table
@@ -3704,17 +3703,21 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                     pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
                     if (!strCVarValue.empty())
                     {
-                        float fX, fY;
                         ss.clear();
                         ss.str(strCVarValue);
-                        ss >> fX >> fY;
-                        lua_newtable(luaVM);
-                        lua_pushnumber(luaVM, 1);
-                        lua_pushnumber(luaVM, fX);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 2);
-                        lua_pushnumber(luaVM, fY);
-                        lua_settable(luaVM, -3);
+
+                        // Extract position values from the string in this order: x, y
+                        // and push it into a table
+                        lua_createtable(luaVM, 2, 0);
+                        for (lua_Number i = 1; i =< 2; i++)
+                        {
+                            float value;
+                            ss >> value;
+
+                            lua_pushnumber(luaVM, i);       // Push index
+                            lua_pushnumber(luaVM, value);   // Push positional value
+                            lua_settable(luaVM, -3);
+                        }
                     }
                 }
                 else
