@@ -397,7 +397,7 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
     {
         CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 0, 33);
 
         lua_pushnumber(luaVM, pEntry->GetMass());
         lua_setfield(luaVM, -2, "mass");
