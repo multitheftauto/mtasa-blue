@@ -1124,7 +1124,7 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
         CPerfStatResult Result;
         CPerfStatManager::GetSingleton()->GetStats(&Result, strCategory, strOptions, strFilter);
 
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, Result.ColumnCount(), 0);
         for (int c = 0; c < Result.ColumnCount(); c++)
         {
             const SString& name = Result.ColumnName(c);
@@ -1133,18 +1133,18 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
             lua_settable(luaVM, -3);
         }
 
-        lua_newtable(luaVM);
-        for (int r = 0; r < Result.RowCount(); r++)
+        lua_createtable(luaVM, Result.RowCount(), 0);
+        for (uint r = 0; r < Result.RowCount(); r++)
         {
-            lua_newtable(luaVM);                     // new table
-            lua_pushnumber(luaVM, r + 1);            // row index number (starting at 1, not 0)
-            lua_pushvalue(luaVM, -2);                // value
-            lua_settable(luaVM, -4);                 // refer to the top level table
+            lua_createtable(luaVM, Result.ColumnCount(), 0);    // new table
+            lua_pushnumber(luaVM, (lua_Number)r + 1);           // row index number (starting at 1, not 0)
+            lua_pushvalue(luaVM, -2);                           // value
+            lua_settable(luaVM, -4);                            // refer to the top level table
 
-            for (int c = 0; c < Result.ColumnCount(); c++)
+            for (uint c = 0; c < Result.ColumnCount(); c++)
             {
                 SString& cell = Result.Data(c, r);
-                lua_pushnumber(luaVM, c + 1);
+                lua_pushnumber(luaVM, (lua_Number)c + 1);
                 lua_pushlstring(luaVM, cell.c_str(), cell.length());
                 lua_settable(luaVM, -3);
             }
