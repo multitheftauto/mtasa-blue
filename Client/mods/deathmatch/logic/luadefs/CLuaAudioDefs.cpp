@@ -1344,29 +1344,19 @@ int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pSound)
+        dassert(pPlayer || pSound); // Should be valid at this point..
+        
+        std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
+
+        lua_createtable(luaVM, 0, iFxEffects.size());
+        for (const auto& [name, effect] : iFxEffects)
         {
-            std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable(luaVM);
-            for (std::map<std::string, int>::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter)
-            {
-                lua_pushboolean(luaVM, pSound->IsFxEffectEnabled((*iter).second));
-                lua_setfield(luaVM, -2, (*iter).first.c_str());
-            }
-            return 1;
-        }
-        else if (pPlayer)
-        {
-            CClientPlayerVoice*        pPlayerVoice = pPlayer->GetVoice();
-            std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable(luaVM);
-            for (std::map<std::string, int>::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter)
-            {
-                lua_pushboolean(luaVM, pPlayerVoice->IsFxEffectEnabled((*iter).second));
-                lua_setfield(luaVM, -2, (*iter).first.c_str());
-            }
-            return 1;
-        }
+            if (pSound)
+                lua_pushboolean(luaVM, pSound->IsFxEffectEnabled(effect));
+            else
+                lua_pushboolean(luaVM, pPlayerVoice->IsFxEffectEnabled(effect)); 
+            lua_setfield(luaVM, -2, name.c_str());
+        }    
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
