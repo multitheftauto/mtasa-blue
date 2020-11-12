@@ -676,16 +676,16 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
         CPerfStatSqliteTiming::GetSingleton()->SetCurrentResource(luaVM);
         if (CStaticFunctionDefinitions::ExecuteSQLQuery(strQuery, &Args, &Result))
         {
-            lua_newtable(luaVM);
-            int i = 0;
-            for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter, ++i)
+            lua_createtable(luaVM, Result->size(), 0);
+            lua_Number i = 1;
+            for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter)
             {
                 const CRegistryResultRow& row = *iter;
-                // for ( int i = 0; i < Result.nRows; i++ ) {
-                lua_newtable(luaVM);                     // new table
-                lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
-                lua_pushvalue(luaVM, -2);                // value
-                lua_settable(luaVM, -4);                 // refer to the top level table
+
+                lua_createtable(luaVM, Result->nColumns, 0);  // new table
+                lua_pushnumber(luaVM, i++);                   // row index number
+                lua_pushvalue(luaVM, -2);                     // value
+                lua_settable(luaVM, -4);                      // refer to the top level table
                 for (int j = 0; j < Result->nColumns; j++)
                 {
                     const CRegistryResultCell& cell = row[j];
