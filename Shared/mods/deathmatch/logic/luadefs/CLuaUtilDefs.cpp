@@ -557,7 +557,7 @@ int CLuaUtilDefs::PregMatch(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_newtable(luaVM);
+        lua_createtable(luaVM, 8, 0); // Preallocate a generous amount 
 
         pcrecpp::RE pPattern(strPattern, pOptions);
 
