@@ -599,10 +599,10 @@ int CLuaDatabaseDefs::DbPoll(lua_State* luaVM)
         {
             // One or more results (from multiple statements)
             lua_newtable(luaVM);
-            for (int i = 0; Result; Result = Result->pNextResult, i++)
+            for (lua_Number i = 1; Result; Result = Result->pNextResult)
             {
-                lua_pushnumber(luaVM, i + 1);
-                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, i++);
+                lua_createtable(luaVM, 3, 0);
                 {
                     lua_pushnumber(luaVM, 1);            // [1] - table of result rows
                     PushRegistryResultTable(luaVM, Result);
