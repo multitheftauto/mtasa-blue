@@ -496,6 +496,7 @@ public:
     bool                                               GetComponentVisible(const SString& vehicleComponent, bool& bVisible);
     std::map<SString, SVehicleComponentData>::iterator ComponentsBegin() { return m_ComponentData.begin(); }
     std::map<SString, SVehicleComponentData>::iterator ComponentsEnd() { return m_ComponentData.end(); }
+    auto                                               CountComponents() const noexcept { return m_ComponentData.size(); }
 
     bool DoesSupportUpgrade(const SString& strFrameName);
 

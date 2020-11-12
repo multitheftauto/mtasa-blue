@@ -3564,12 +3564,12 @@ int CLuaVehicleDefs::GetVehicleComponents(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         std::map<SString, SVehicleComponentData>::iterator iter = pVehicle->ComponentsBegin();
-        lua_newtable(luaVM);
+
+        lua_createtable(luaVM, 0, pVehicle->CountComponents());
         for (; iter != pVehicle->ComponentsEnd(); iter++)
         {
-            lua_pushstring(luaVM, (*iter).first);
             lua_pushboolean(luaVM, (*iter).second.m_bVisible);
-            lua_settable(luaVM, -3);            // End of Table
+            lua_setfield(luaVM, -2, iter->first.c_str());
         }
         return 1;
     }
