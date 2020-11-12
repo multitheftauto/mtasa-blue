@@ -596,35 +596,26 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
             // SetAtomicModelInfoFlags
             m_pInterface->bIsRoad = ideFlags.bIsRoad;
 
-            if (ideFlags.bIsGlassType1)
-                m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_1;
-
-            if (ideFlags.bIsGlassType2)
-                m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_2;
-
-            if (ideFlags.bIsGarageDoor)
-                m_pInterface->eSpecialModelType = eModelSpecialType::GARAGE_DOOR;
-
-            if (ideFlags.bIsTree)
-                m_pInterface->eSpecialModelType = eModelSpecialType::TREE;
-
-            if (ideFlags.bIsPalm)
-                m_pInterface->eSpecialModelType = eModelSpecialType::PALM;
-
             m_pInterface->bDontCollideWithFlyer = ideFlags.bDontCollideWithFlyer;
 
-            if (ideFlags.bIsTag)
-                m_pInterface->eSpecialModelType = eModelSpecialType::TAG;
-
-            if (ideFlags.bIsBreakableStatue)
-                m_pInterface->eSpecialModelType = eModelSpecialType::BREAKABLE_STATUE;
-
-            if (ideFlags.bFlag24)
-                m_pInterface->eSpecialModelType = eModelSpecialType::UNKNOW_1;
-
-            // Added
             if (ideFlags.bFlag20)
                 m_pInterface->eSpecialModelType = eModelSpecialType::CRANE;
+            else if (ideFlags.bFlag24)
+                m_pInterface->eSpecialModelType = eModelSpecialType::UNKNOW_1;
+            else if (ideFlags.bIsBreakableStatue)
+                m_pInterface->eSpecialModelType = eModelSpecialType::BREAKABLE_STATUE;
+            else if (ideFlags.bIsTag)
+                m_pInterface->eSpecialModelType = eModelSpecialType::TAG;
+            else if (ideFlags.bIsPalm)
+                m_pInterface->eSpecialModelType = eModelSpecialType::PALM;
+            else if (ideFlags.bIsTree)
+                m_pInterface->eSpecialModelType = eModelSpecialType::TREE;
+            else if (ideFlags.bIsGarageDoor)
+                m_pInterface->eSpecialModelType = eModelSpecialType::GARAGE_DOOR;
+            else if (ideFlags.bIsGlassType2)
+                m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_2;
+            else if (ideFlags.bIsGlassType1)
+                m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_1;
             break;
         }
         case eModelInfoType::CLUMP:
