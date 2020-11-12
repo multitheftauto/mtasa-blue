@@ -164,7 +164,6 @@ public:
     CPoolsSA();
     ~CPoolsSA();
 
-public:
     // Vehicles pool
     CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
     CVehicle* AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface);
