@@ -738,7 +738,8 @@ int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
             const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
             if (pEntry)
             {
-                lua_newtable(luaVM);
+                lua_createtable(luaVM, 0, 33);
+
                 lua_pushnumber(luaVM, pEntry->GetMass());
                 lua_setfield(luaVM, -2, "mass");
                 lua_pushnumber(luaVM, pEntry->GetTurnMass());
