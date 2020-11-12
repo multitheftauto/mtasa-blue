@@ -613,42 +613,36 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CVehicle*        pVehicle = NULL;
-    SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
     if (argStream.HasErrors() == false)
     {
-        tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Create a new table
-        lua_newtable(luaVM);
+        const SSirenInfo& info = pVehicle->m_tSirenBeaconInfo;
 
-        lua_pushstring(luaVM, "SirenCount");
-        lua_pushnumber(luaVM, tSirenInfo.m_ucSirenCount);
-        lua_settable(luaVM, -3);            // End of SirenCount Property
+        lua_createtable(luaVM, 0, 3);
+        {
+            lua_pushnumber(luaVM, info.m_ucSirenCount);
+            lua_setfield(luaVM, -2, "SirenCount");
 
-        lua_pushstring(luaVM, "SirenType");
-        lua_pushnumber(luaVM, tSirenInfo.m_ucSirenType);
-        lua_settable(luaVM, -3);            // End of SirenType Property
+            lua_pushnumber(luaVM, info.m_ucSirenType);
+            lua_setfield(luaVM, -2, "SirenType");
 
-        lua_pushstring(luaVM, "Flags");
-        lua_newtable(luaVM);
+            lua_createtable(luaVM, 0, 4);
+            {
+                lua_pushboolean(luaVM, info.m_b360Flag);
+                lua_setfield(luaVM, -2, "360");
 
-        lua_pushstring(luaVM, "360");
-        lua_pushboolean(luaVM, tSirenInfo.m_b360Flag);
-        lua_settable(luaVM, -3);            // End of 360 Property
+                lua_pushboolean(luaVM, info.m_bDoLOSCheck);
+                lua_setfield(luaVM, -2, "DoLOSCheck");
 
-        lua_pushstring(luaVM, "DoLOSCheck");
-        lua_pushboolean(luaVM, tSirenInfo.m_bDoLOSCheck);
-        lua_settable(luaVM, -3);            // End of DoLOSCheck Property
+                lua_pushboolean(luaVM, info.m_bUseRandomiser);
+                lua_setfield(luaVM, -2, "UseRandomiser");
 
-        lua_pushstring(luaVM, "UseRandomiser");
-        lua_pushboolean(luaVM, tSirenInfo.m_bUseRandomiser);
-        lua_settable(luaVM, -3);            // End of UseRandomiser Property
-
-        lua_pushstring(luaVM, "Silent");
-        lua_pushboolean(luaVM, tSirenInfo.m_bSirenSilent);
-        lua_settable(luaVM, -3);            // End of Silent Property
-
-        lua_settable(luaVM, -3);            // End of Flags table
+                lua_pushboolean(luaVM, info.m_bSirenSilent);
+                lua_setfield(luaVM, -2, "Silent");
+            }
+            lua_setfield(luaVM, -2, "Flags");
+        }
 
         return 1;
     }
