@@ -2826,25 +2826,34 @@ int CLuaVehicleDefs::GetOriginalHandling(lua_State* luaVM)
             const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
             if (pEntry)
             {
-                lua_newtable(luaVM);
+                lua_createtable(luaVM, 0, 33);
+
                 lua_pushnumber(luaVM, pEntry->GetMass());
                 lua_setfield(luaVM, -2, "mass");
+                
                 lua_pushnumber(luaVM, pEntry->GetTurnMass());
                 lua_setfield(luaVM, -2, "turnMass");
+                
                 lua_pushnumber(luaVM, pEntry->GetDragCoeff());
                 lua_setfield(luaVM, -2, "dragCoeff");
+
                 lua_createtable(luaVM, 3, 0);
-                CVector vecCenter = pEntry->GetCenterOfMass();
-                lua_pushnumber(luaVM, 1);
-                lua_pushnumber(luaVM, vecCenter.fX);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 2);
-                lua_pushnumber(luaVM, vecCenter.fY);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 3);
-                lua_pushnumber(luaVM, vecCenter.fZ);
-                lua_settable(luaVM, -3);
+                {
+                    CVector vecCenter = pEntry->GetCenterOfMass();
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, vecCenter.fX);
+                    lua_settable(luaVM, -3);
+
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, vecCenter.fY);
+                    lua_settable(luaVM, -3);
+
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, vecCenter.fZ);
+                    lua_settable(luaVM, -3);
+                }
                 lua_setfield(luaVM, -2, "centerOfMass");
+
                 lua_pushnumber(luaVM, pEntry->GetPercentSubmerged());
                 lua_setfield(luaVM, -2, "percentSubmerged");
                 lua_pushnumber(luaVM, pEntry->GetTractionMultiplier());
