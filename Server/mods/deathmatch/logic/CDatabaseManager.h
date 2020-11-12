@@ -110,14 +110,14 @@ public:
 
     struct
     {
-        EJobResultType  status;
-        uint            uiErrorCode;
-        SString         strReason;
-        bool            bErrorSuppressed;
-        CRegistryResult registryResult;
-        CTickCount      timeReady;
-        bool            bLoggedWarning;
-        bool            bIgnoreResult;
+        EJobResultType      status;
+        uint                uiErrorCode;
+        SString             strReason;
+        bool                bErrorSuppressed;
+        CRegistryResultData registryResult;
+        CTickCount          timeReady;
+        bool                bLoggedWarning;
+        bool                bIgnoreResult;
     } result;
 
     struct
@@ -161,6 +161,7 @@ public:
     virtual const SString&    GetLastErrorMessage() = 0;
     virtual bool              IsLastErrorSuppressed() = 0;
     virtual bool              QueryWithResultf(SConnectionHandle hConnection, CRegistryResultData& result, const char* szQuery, ...) = 0;
+    virtual bool              QueryWithFailedCheckf(SConnectionHandle hConnection, const char* szQuery, ...) = 0;
     virtual bool              QueryWithCallback(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery,
                                                 CLuaArguments* pArgs = nullptr) = 0;
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...) = 0;

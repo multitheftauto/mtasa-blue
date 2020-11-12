@@ -162,7 +162,7 @@ SConnectionHandle CDatabaseManagerImpl::Connect(const SString& strType, const SS
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::Disconnect(uint hConnection)
+bool CDatabaseManagerImpl::Disconnect(SConnectionHandle hConnection)
 {
     ClearLastErrorMessage();
 

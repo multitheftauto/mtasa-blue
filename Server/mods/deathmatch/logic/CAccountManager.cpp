@@ -25,9 +25,9 @@ CAccountManager::CAccountManager(const SString& strDbPathFilename)
     ReconnectToDatabase();
 
     // Check if new installation
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'");
-    bool bNewInstallation = (result->nRows == 0);
+    CRegistryResultData result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'");
+    bool bNewInstallation = (result.nRows == 0);
 
     // Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf(m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)");
@@ -47,8 +47,8 @@ CAccountManager::CAccountManager(const SString& strDbPathFilename)
     m_pDatabaseManager->Execf(m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_SERIALUSAGE_USERID_SERIAL_U on serialusage(userid,serial)");
 
     // Check if unique index on accounts exists
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'");
-    if (result->nRows == 0)
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'");
+    if (result.nRows == 0)
     {
         // Need to add unique index on accounts
         if (!bNewInstallation)
@@ -69,8 +69,8 @@ CAccountManager::CAccountManager(const SString& strDbPathFilename)
     }
 
     // Check if unique index on userdata exists
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'");
-    if (result->nRows == 0)
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'");
+    if (result.nRows == 0)
     {
         // Need to add unique index on userdata
         if (!bNewInstallation)
@@ -96,8 +96,8 @@ CAccountManager::CAccountManager(const SString& strDbPathFilename)
     m_pDatabaseManager->Execf(m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY");
 
     // Check if httppass has been added yet
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "PRAGMA table_info(accounts)");
-    if (ListContains(result->ColNames, "httppass") == false)
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "PRAGMA table_info(accounts)");
+    if (ListContains(result.ColNames, "httppass") == false)
     {
         m_pDatabaseManager->Execf(m_hDbConnection, "ALTER TABLE accounts ADD COLUMN httppass TEXT");
     }
@@ -143,16 +143,16 @@ void CAccountManager::DoPulse()
 bool CAccountManager::Load()
 {
     // Create a registry result
-    CRegistryResult result;
+    CRegistryResultData result;
     // Select all our required information from the accounts database
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT id,name,password,ip,serial,httppass from accounts");
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT id,name,password,ip,serial,httppass from accounts");
 
     // Initialize all our variables
     m_iAccounts = 0;
     bool         bNeedsVacuum = false;
     CElapsedTime activityTimer;
     bool         bOutputFeedback = false;
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
     {
         const CRegistryResultRow& row = *iter;
         // Fill User ID, Name & Password (Required data)
@@ -209,7 +209,7 @@ bool CAccountManager::Load()
         {
             activityTimer.Reset();
             bOutputFeedback = true;
-            CLogger::LogPrintf("Reading accounts %d/%d\n", m_List.size(), result->nRows);
+            CLogger::LogPrintf("Reading accounts %d/%d\n", m_List.size(), result.nRows);
         }
     }
     if (bOutputFeedback)
@@ -312,14 +312,14 @@ bool CAccountManager::IntegrityCheck()
 {
     // Check database integrity
     {
-        CRegistryResult result;
-        bool            bOk = m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "PRAGMA integrity_check");
+        CRegistryResultData result;
+        bool            bOk = m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "PRAGMA integrity_check");
 
         // Get result as a string
         SString strResult;
-        if (result->nRows && result->nColumns)
+        if (result.nRows && result.nColumns)
         {
-            CRegistryResultCell& cell = result->Data.front()[0];
+            CRegistryResultCell& cell = result.Data.front()[0];
             if (cell.nType == SQLITE_TEXT)
                 strResult = std::string((const char*)cell.pVal, cell.nLength - 1);
         }
@@ -342,8 +342,7 @@ bool CAccountManager::IntegrityCheck()
         m_pDatabaseManager->Execf(m_hDbConnection, "DROP TABLE IF EXISTS write_test");
         m_pDatabaseManager->Execf(m_hDbConnection, "CREATE TABLE IF NOT EXISTS write_test (id INTEGER PRIMARY KEY, value INTEGER)");
         m_pDatabaseManager->Execf(m_hDbConnection, "INSERT OR IGNORE INTO write_test (id, value) VALUES(1,2)");
-        bool bOk = m_pDatabaseManager->QueryWithResultf(m_hDbConnection, NULL, "UPDATE write_test SET value=3 WHERE id=1");
-        if (!bOk)
+        if (!m_pDatabaseManager->QueryWithFailedCheckf(m_hDbConnection, "UPDATE write_test SET value=3 WHERE id=1"))
         {
             CLogger::ErrorPrintf("%s\n", *m_pDatabaseManager->GetLastErrorMessage());
             CLogger::ErrorPrintf("Errors were encountered updating '%s' database\n", *ExtractFilename(PathConform("internal.db")));
@@ -360,14 +359,14 @@ bool CAccountManager::IntegrityCheck()
     {
         CLogger::LogPrintf("Compacting accounts database '%s' ...\n", *ExtractFilename(PathConform("internal.db")));
 
-        CRegistryResult result;
-        bool            bOk = m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "VACUUM");
+        CRegistryResultData result;
+        bool            bOk = m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "VACUUM");
 
         // Get result as a string
         SString strResult;
-        if (result->nRows && result->nColumns)
+        if (result.nRows && result.nColumns)
         {
-            CRegistryResultCell& cell = result->Data.front()[0];
+            CRegistryResultCell& cell = result.Data.front()[0];
             if (cell.nType == SQLITE_TEXT)
                 strResult = std::string((const char*)cell.pVal, cell.nLength - 1);
         }
@@ -662,19 +661,19 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
     // Get the user ID
     int iUserID = pAccount->GetID();
     // create a new registry result for the query return
-    CRegistryResult result;
+    CRegistryResultData result;
 
     // Select the value and type from the database where the user is our user and the key is the required key
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID,
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID,
                                          SQLITE_TEXT, szKey);
 
     // Default result is nil
     auto pResult = std::make_shared<CLuaArgument>();
 
     // Do we have any results?
-    if (result->nRows > 0)
+    if (result.nRows > 0)
     {
-        const CRegistryResultRow& row = result->Data.front();
+        const CRegistryResultRow& row = result.Data.front();
 
         const auto type = static_cast<int>(row[1].nVal);
         const auto value = (const char*)row[0].pVal;
@@ -701,7 +700,7 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
             break;
 
         default:
-            dassert(0); // It never should hit this, if so, something corrupted
+            dassert(0); // It should never hit this. If it did something has went really wrong..
             break;
         }
     }
@@ -771,14 +770,14 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
         // Get the user ID of the from account
         int iUserID = pFromAccount->GetID();
         // create a new registry result for the from account query return value
-        CRegistryResult result;
+        CRegistryResultData result;
 
-        m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID);
+        m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID);
 
         // Do we have any results?
-        if (result->nRows > 0)
+        if (result.nRows > 0)
         {
-            for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+            for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
             {
                 const CRegistryResultRow& row = *iter;
                 // Get our key
@@ -804,12 +803,12 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
             }
             else            // store to database
             {
-                CRegistryResult subResult;
+                CRegistryResultData subResult;
 
-                m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1",
+                m_pDatabaseManager->QueryWithResultf(m_hDbConnection, subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1",
                                                      SQLITE_INTEGER, pToAccount->GetID(), SQLITE_TEXT, iter->second.GetKey().c_str());
                 // If there is a key with this value update it otherwise insert it and store the return value in bRetVal
-                if (subResult->nRows > 0)
+                if (subResult.nRows > 0)
                     m_pDatabaseManager->Execf(m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT,
                                               iter->second.GetStrValue().c_str(), SQLITE_INTEGER, iter->second.GetType(), SQLITE_INTEGER, pToAccount->GetID(),
                                               SQLITE_TEXT, iter->second.GetKey().c_str());
@@ -863,17 +862,17 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
     // Get the user ID
     int iUserID = pAccount->GetID();
     // create a new registry result for the query return
-    CRegistryResult result;
+    CRegistryResultData result;
     SString         strKey;
 
     // Select the value and type from the database where the user is our user and the key is the required key
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID);
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID);
 
     // Do we have any results?
-    if (result->nRows > 0)
+    if (result.nRows > 0)
     {
         // Loop through until i is the same as the number of rows
-        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+        for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
         {
             const CRegistryResultRow& row = *iter;
             // Get our key
@@ -915,10 +914,10 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
 void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
 {
     Save();
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str());
+    CRegistryResultData result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
     {
         const CRegistryResultRow& row = *iter;
 
@@ -931,10 +930,10 @@ void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<
 void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts)
 {
     Save();
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
+    CRegistryResultData result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
     {
         const CRegistryResultRow& row = *iter;
 
@@ -946,10 +945,10 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
 
 CAccount* CAccountManager::GetAccountByID(int ID)
 {
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
+    CRegistryResultData result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
     {
         const auto& row = *iter;
 
@@ -962,12 +961,12 @@ CAccount* CAccountManager::GetAccountByID(int ID)
 void CAccountManager::GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts)
 {
     Save();
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result,
+    CRegistryResultData result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result,
                                          "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id",
                                          SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
     {
         const CRegistryResultRow& row = *iter;
 
@@ -1137,8 +1136,8 @@ void CAccountManager::LoadAccountSerialUsage(CAccount* pAccount)
     auto& outSerialUsageList = pAccount->GetSerialUsageList();
     outSerialUsageList.clear();
 
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result,
+    CRegistryResultData result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, result,
                                          "SELECT "
                                          " serial"
                                          " ,added_ip"
@@ -1152,7 +1151,7 @@ void CAccountManager::LoadAccountSerialUsage(CAccount* pAccount)
                                          " WHERE userid=?",
                                          SQLITE_INTEGER, pAccount->GetID());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
     {
         const CRegistryResultRow& row = *iter;
         outSerialUsageList.push_back(CAccount::SSerialUsage());
