@@ -230,10 +230,10 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
     CDbJobData* pJobData = pDatabaseManager->QueryStartf(
         m_DatabaseConnection, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent`,`GameRecvBlocked`,`GameResent` from " BW_STATS_TABLE_NAME);
     pDatabaseManager->QueryPoll(pJobData, -1);
-    CRegistryResult result = pJobData->result.registryResult;
+    CRegistryResultData& result = pJobData->result.registryResult;
 
     // If data set is empty, try loading old data
-    if (result->nRows == 0)
+    if (result.nRows == 0)
     {
         CDbJobData* pJobData = pDatabaseManager->QueryStartf(
             m_DatabaseConnection, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent`,`GameRecvBlocked` from " BW_STATS_TABLE_NAME);
@@ -242,7 +242,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
     }
 
     // If data set is empty, try loading old data
-    if (result->nRows == 0)
+    if (result.nRows == 0)
     {
         pJobData = pDatabaseManager->QueryStartf(m_DatabaseConnection, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from " BW_STATS_TABLE_NAME);
         pDatabaseManager->QueryPoll(pJobData, -1);
@@ -250,12 +250,12 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
     }
 
     // If data set is empty, try loading old data
-    if (result->nRows == 0)
-        g_pGame->GetRegistry()->Query(&result, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from `_perfstats_bandwidth_usage`");
+    if (result.nRows == 0)
+        g_pGame->GetRegistry()->Query(result, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from `_perfstats_bandwidth_usage`");
 
-    if (result->nRows > 0 && result->nColumns >= 5)
+    if (result.nRows > 0 && result.nColumns >= 5)
     {
-        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+        for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
         {
             const CRegistryResultRow& row = *iter;
             SString                   strType = (const char*)row[0].pVal;
@@ -264,10 +264,10 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
             float                     GameSent = std::max(0.f, row[3].fVal);
             float                     HttpSent = std::max(0.f, row[4].fVal);
             float                     GameRecvBlocked = 0;
-            if (result->nColumns >= 6)
+            if (result.nColumns >= 6)
                 GameRecvBlocked = std::max(0.f, row[5].fVal);
             float GameResent = 0;
-            if (result->nColumns >= 7)
+            if (result.nColumns >= 7)
                 GameResent = std::max(0.f, row[6].fVal);
 
             uint uiType = BWStatNameToIndex(strType);
