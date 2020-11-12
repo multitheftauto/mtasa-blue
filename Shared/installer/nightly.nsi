@@ -881,12 +881,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
                 SetOverwrite ifnewer
                 File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[briefcaserace]\*.zip"
             SectionEnd
-            Section "Classic Deathmatch Gamemode"
-            SectionIn 1 2
-                SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[cdm]"
-                SetOverwrite ifnewer
-                File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[cdm]\*.zip"
-            SectionEnd
             Section "Capture the Flag Gamemode"
             SectionIn 1 2
                 SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[ctf]"
