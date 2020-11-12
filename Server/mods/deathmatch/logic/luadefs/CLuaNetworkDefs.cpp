@@ -221,8 +221,7 @@ int CLuaNetworkDefs::GetRemoteRequests(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     CResource*       pResource = nullptr;
     CLuaMain*        pLuaMain = nullptr;
-    int              iIndex = 0;
-
+  
     argStream.ReadUserData(pResource, NULL);
 
     if (pResource)
@@ -230,13 +229,17 @@ int CLuaNetworkDefs::GetRemoteRequests(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_newtable(luaVM);
+        const auto& calls = g_pGame->GetRemoteCalls()->GetCalls();
 
-        for (const auto& request : g_pGame->GetRemoteCalls()->GetCalls())
+        // Might reserve a lot more than needed, but it'll get GCd pretty fast, so.. CPU over RAM
+        lua_createtable(luaVM, calls.size(), 0);
+
+        lua_Number i = 1;
+        for (const auto& request : calls)
         {
-            if (!pResource || request->GetVM() == pLuaMain)
+            if (!pLuaMain || request->GetVM() == pLuaMain)
             {
-                lua_pushnumber(luaVM, ++iIndex);
+                lua_pushnumber(luaVM, i++);
                 lua_pushuserdata(luaVM, request);
                 lua_settable(luaVM, -3);
             }
