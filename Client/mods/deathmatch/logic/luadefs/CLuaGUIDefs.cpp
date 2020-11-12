@@ -2587,28 +2587,29 @@ int CLuaGUIDefs::GUIGridListGetSelectedItems(lua_State* luaVM)
     {
         CGUIGridList* pList = static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement());
         CGUIListItem* pItem = NULL;
+        const auto    selectedCount = pList->GetSelectedCount();
 
-        lua_newtable(luaVM);
-
-        for (int i = 1; i <= pList->GetSelectedCount(); i++)
+        lua_createtable(luaVM, selectedCount, 0);
+        for (int i = 1; i <= selectedCount; i++)
         {
             pItem = pList->GetNextSelectedItem(pItem);
             if (!pItem)
                 break;
 
             lua_pushnumber(luaVM, i);
-            lua_newtable(luaVM);
+            
+            lua_createtable(luaVM, 0, 2);
+            {
+                // column
+                lua_pushstring(luaVM, "column");
+                lua_pushnumber(luaVM, pList->GetItemColumnIndex(pItem));
+                lua_settable(luaVM, -3);
 
-            // column
-            lua_pushstring(luaVM, "column");
-            lua_pushnumber(luaVM, pList->GetItemColumnIndex(pItem));
-            lua_settable(luaVM, -3);
-
-            // row
-            lua_pushstring(luaVM, "row");
-            lua_pushnumber(luaVM, pList->GetItemRowIndex(pItem));
-            lua_settable(luaVM, -3);
-
+                // row
+                lua_pushstring(luaVM, "row");
+                lua_pushnumber(luaVM, pList->GetItemRowIndex(pItem));
+                lua_settable(luaVM, -3);
+            }
             // push to main table
             lua_settable(luaVM, -3);
         }
