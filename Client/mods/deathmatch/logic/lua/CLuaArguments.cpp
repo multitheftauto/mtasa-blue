@@ -154,13 +154,17 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
         pKnownTables = new CFastHashMap<CLuaArguments*, int>();
         bKnownTablesCreated = true;
 
-        lua_newtable(luaVM);
+        // Reserve a lot more than needed, so lua wont need to reallocate
+        // this table is GCd when this function returns, so
+        lua_createtable(luaVM, 100, 0); 
+
         // using registry to make it fail safe, else we'd have to carry
         // either lua top or current depth variable between calls
         lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
     }
-
-    lua_newtable(luaVM);
+    
+    // No lua_createtable here, because we dont know what type the key will be
+    lua_newtable(luaVM); 
 
     // push it onto the known tables
     int size = pKnownTables->size();
