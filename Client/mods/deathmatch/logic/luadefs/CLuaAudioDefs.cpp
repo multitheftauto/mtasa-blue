@@ -1180,7 +1180,9 @@ int CLuaAudioDefs::GetSoundMetaTags(lua_State* luaVM)
             }
             else
             {
-                lua_newtable(luaVM);
+                // Preallocate a generous amount
+                lua_createtable(luaVM, 0, 15);
+
                 CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%TITL", strMetaTags);
                 if (!strMetaTags.empty())
                 {
