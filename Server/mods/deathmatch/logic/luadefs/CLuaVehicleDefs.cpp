@@ -1198,8 +1198,8 @@ int CLuaVehicleDefs::GetVehicleCompatibleUpgrades(lua_State* luaVM)
         CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
         if (pUpgrades)
         {
-            // Create a new table
-            lua_newtable(luaVM);
+            // Create a new table - preallocates a generous amount
+            lua_createtable(luaVM, 30, 0);
 
             unsigned int uiIndex = 0;
             for (unsigned short usUpgrade = 1000; usUpgrade <= 1193; usUpgrade++)
