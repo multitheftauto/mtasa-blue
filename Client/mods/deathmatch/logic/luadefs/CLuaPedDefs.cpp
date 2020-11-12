@@ -1344,21 +1344,30 @@ int CLuaPedDefs::GetPedAnimation(lua_State* luaVM)
             const SAnimationCache& animationCache = pPed->GetAnimationCache();
             lua_pushstring(luaVM, strBlockName);
             lua_pushstring(luaVM, strAnimName);
-            lua_newtable(luaVM);
-            lua_pushinteger(luaVM, animationCache.iTime);
-            lua_setfield(luaVM, -2, "time");
-            lua_pushboolean(luaVM, animationCache.bLoop);
-            lua_setfield(luaVM, -2, "loop");
-            lua_pushboolean(luaVM, animationCache.bUpdatePosition);
-            lua_setfield(luaVM, -2, "updatePosition");
-            lua_pushboolean(luaVM, animationCache.bInterruptable);
-            lua_setfield(luaVM, -2, "interruptable");
-            lua_pushboolean(luaVM, animationCache.bFreezeLastFrame);
-            lua_setfield(luaVM, -2, "freezeLastFrame");
-            lua_pushinteger(luaVM, animationCache.iBlend);
-            lua_setfield(luaVM, -2, "blendTime");
-            lua_pushboolean(luaVM, pPed->IsTaskToBeRestoredOnAnimEnd());
-            lua_setfield(luaVM, -2, "restoreTaskOnAnimEnd");
+
+            lua_createtable(luaVM, 0, 7);
+            {
+                lua_pushinteger(luaVM, animationCache.iTime);
+                lua_setfield(luaVM, -2, "time");
+
+                lua_pushboolean(luaVM, animationCache.bLoop);
+                lua_setfield(luaVM, -2, "loop");
+
+                lua_pushboolean(luaVM, animationCache.bUpdatePosition);
+                lua_setfield(luaVM, -2, "updatePosition");
+
+                lua_pushboolean(luaVM, animationCache.bInterruptable);
+                lua_setfield(luaVM, -2, "interruptable");
+
+                lua_pushboolean(luaVM, animationCache.bFreezeLastFrame);
+                lua_setfield(luaVM, -2, "freezeLastFrame");
+
+                lua_pushinteger(luaVM, animationCache.iBlend);
+                lua_setfield(luaVM, -2, "blendTime");
+                
+                lua_pushboolean(luaVM, pPed->IsTaskToBeRestoredOnAnimEnd());
+                lua_setfield(luaVM, -2, "restoreTaskOnAnimEnd");
+            }
             return 3;
         }
     }
