@@ -150,13 +150,15 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
         pKnownTables = new CFastHashMap<CLuaArguments*, int>();
         bKnownTablesCreated = true;
 
-        lua_newtable(luaVM);
+        // We reserve a lot of entries here, because this table will be freed as soon as pushing is finished
+        lua_createtable(luaVM, 0, 100);
+
         // using registry to make it fail safe, else we'd have to carry
         // either lua top or current depth variable between calls
         lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
     }
 
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, m_Arguments.size(), 0);
 
     // push it onto the known tables
     int size = pKnownTables->size();
