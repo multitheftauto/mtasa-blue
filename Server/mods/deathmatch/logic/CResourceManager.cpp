@@ -1316,10 +1316,10 @@ void CResourceManager::LoadBlockedFileReasons()
     pDatabaseManager->QueryPoll(pJobData, -1);
     CRegistryResult& result = pJobData->result.registryResult;
 
-    if (result->nRows > 0 && result->nColumns >= 2)
+    if (result.nRows > 0 && result.nColumns >= 2)
     {
         m_BlockedFileReasonMap.clear();
-        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+        for (CRegistryResultIterator iter = result.begin(); iter != result.end(); ++iter)
         {
             const CRegistryResultRow& row = *iter;
             SString                   strFileHash = (const char*)row[0].pVal;
