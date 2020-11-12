@@ -149,24 +149,16 @@ typedef std::list<CRegistryResultRow>::const_iterator CRegistryResultIterator;
 
 struct CRegistryResultData
 {
-    CRegistryResultData()
-    {
-        nRows = 0;
-        nColumns = 0;
-        uiNumAffectedRows = 0;
-        ullLastInsertId = 0;
-        pNextResult = nullptr;
-    }
-    ~CRegistryResultData() { SAFE_DELETE(pNextResult); }
-    std::vector<SString>          ColNames;
-    std::list<CRegistryResultRow> Data;
-    int                           nRows;
-    int                           nColumns;
-    uint                          uiNumAffectedRows;
-    uint64                        ullLastInsertId;
-    CRegistryResultData*          pNextResult;
+    CRegistryResultData() = default;
 
-    CRegistryResultData*    GetThis() { return this; }
+    std::vector<SString>          ColNames{};
+    std::list<CRegistryResultRow> Data{};
+    int                           nRows = 0;
+    int                           nColumns = 0;
+    uint                          uiNumAffectedRows = 0;
+    uint64                        ullLastInsertId = 0;
+    CRegistryResultDataRef        pNextResult = nullptr;
+
     CRegistryResultIterator begin() const { return Data.begin(); }
     CRegistryResultIterator end() const { return Data.end(); }
 };
