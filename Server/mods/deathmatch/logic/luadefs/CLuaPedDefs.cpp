@@ -174,13 +174,15 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
 
 int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 {
-    int iIndex = 0;
-    lua_newtable(luaVM);
-    for (int i = 0; i <= 312; i++)
+    // Out of these 312, 299 are valid, so reserve that much
+    lua_createtable(luaVM, 299, 0);  
+
+    lua_Number li = 1;
+    for (size_t i = 0; i <= 312; i++)
     {
         if (CPlayerManager::IsValidPlayerModel(i))
         {
-            lua_pushnumber(luaVM, ++iIndex);
+            lua_pushnumber(luaVM, li++);
             lua_pushnumber(luaVM, i);
             lua_settable(luaVM, -3);
         }
