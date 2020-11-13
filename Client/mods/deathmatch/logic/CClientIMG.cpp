@@ -136,10 +136,9 @@ tImgFileInfo* CClientIMG::GetFileInfo(unsigned int usFileID)
 
 unsigned int CClientIMG::GetFileID(std::string &strFileName)
 {
-    strFileName.resize(24);
     for (unsigned int i = 0; i < m_uiFilesCount; i++)
     {
-        if (strFileName == m_pContentInfo[i].szFileName)
+        if (strFileName.compare(m_pContentInfo[i].szFileName) == 0)
             return i;
     }
     return -1;

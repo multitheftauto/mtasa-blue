@@ -602,13 +602,13 @@ std::vector<std::string> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG
 
 std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<std::string, uint> file)
 {
-    uint  uiFileID;
+    uint  uiFileID = -1;
     uint* pFileID = std::get_if<uint>(&file);
 
     if (pFileID)
         uiFileID = *pFileID - 1;
     else
-        pIMG->GetFileID(std::get<std::string>(file));
+        uiFileID = pIMG->GetFileID(std::get<std::string>(file));
 
     if (uiFileID == -1)
         std::invalid_argument("File not found");
@@ -626,13 +626,13 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<st
 
 bool CLuaEngineDefs::EngineImageLinkModel(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
 {
-    uint  uiFileID;
+    uint  uiFileID = -1;
     uint* pFileID = std::get_if<uint>(&file);
 
     if (pFileID)
         uiFileID = *pFileID - 1;
     else
-        pIMG->GetFileID(std::get<std::string>(file));
+        uiFileID = pIMG->GetFileID(std::get<std::string>(file));
 
     if (uiFileID == -1)
         std::invalid_argument("File not found");
