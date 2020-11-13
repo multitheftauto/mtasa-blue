@@ -18,7 +18,6 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(EngineLoadIMG);
     LUA_DECLARE(EngineLoadDFF);
     LUA_DECLARE(EngineLoadTXD);
     LUA_DECLARE(EngineLoadCOL);
@@ -60,13 +59,14 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
-    LUA_DECLARE(EngineAddImage)
-    LUA_DECLARE(EngineRemoveImage)
-    LUA_DECLARE(EngineImageGetFilesCount)
-    LUA_DECLARE(EngineImageGetFileList)
-    LUA_DECLARE(EngineImageGetFile)
-    LUA_DECLARE(EngineImageLinkModel);
-    LUA_DECLARE(EngineRestoreModelImage);
+    static CClientIMG* EngineLoadIMG(lua_State* const luaVM, std::string strFilePath);
+    static bool EngineAddImage(CClientIMG* pImg);
+    static bool EngineRemoveImage(CClientIMG* pImg);
+    static uint EngineImageGetFilesCount(CClientIMG* pImg);
+    static bool EngineImageLinkModel(CClientIMG* pImg, std::variant<std::string, uint> file, uint uiModelID);
+    static bool EngineRestoreModelImage(uint uiModelID);
+    static std::vector<std::string> EngineImageGetFileList(CClientIMG* pImg);
+    static std::string              EngineImageGetFile(CClientIMG* pImg, std::variant<std::string, uint> file);
     static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);

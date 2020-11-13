@@ -50,15 +50,15 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
-        {"engineLoadIMG", EngineLoadIMG},
-        {"engineImageLinkModel", EngineImageLinkModel},
-        {"engineRestoreModelImage", EngineRestoreModelImage},
-        {"engineAddImage", EngineAddImage},
-        {"engineRemoveImage", EngineRemoveImage},
-        {"engineImageGetFilesCount", EngineImageGetFilesCount},
-        {"engineImageGetFileList", EngineImageGetFileList},
-        {"engineImageGetFile", EngineImageGetFile},
-        {"engineGetModelTXDID", EngineGetModelTXDID},
+        {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
+        {"engineImageLinkModel", ArgumentParser<EngineImageLinkModel>},
+        {"engineRestoreModelImage", ArgumentParser<EngineRestoreModelImage>},
+        {"engineAddImage", ArgumentParser<EngineAddImage>},
+        {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
+        {"engineImageGetFilesCount", ArgumentParser<EngineImageGetFilesCount>},
+        {"engineImageGetFileList", ArgumentParser<EngineImageGetFileList>},
+        {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
+        {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
         //{"engineSetModelTXDID", EngineSetModelTXDID},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
@@ -141,8 +141,8 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
     lua_classfunction(luaVM, "linkModel", "engineImageLinkModel");
 
-    lua_classvariable(luaVM, "filesCount", nullptr, EngineImageGetFilesCount);
-    lua_classvariable(luaVM, "files", nullptr, EngineImageGetFileList);
+    lua_classvariable(luaVM, "filesCount", nullptr, ArgumentParser<EngineImageGetFilesCount>);
+    lua_classvariable(luaVM, "files", nullptr, ArgumentParser<EngineImageGetFileList>);
 
     lua_registerclass(luaVM, "EngineIMG", "Element");
 }
@@ -157,67 +157,6 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 
     lua_registerclass(luaVM, "EngineDFF", "Element");
 }
-
-int CLuaEngineDefs::EngineLoadIMG(lua_State* luaVM)
-{
-    SString          input;
-    CScriptArgReader argStream(luaVM);
-    // Grab the IMG filename or data
-    argStream.ReadString(input);
-
-    if (!argStream.HasErrors())
-    {
-        // Grab the lua main and the resource belonging to this script
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Get the resource we belong to
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-
-                SString filePath;
-
-                // Is this a legal filepath?
-                if (CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
-                {
-                    // Grab the resource root entity
-                    CClientEntity* pRoot = pResource->GetResourceIMGRoot();
-                    // Create the img handle
-                    CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
-
-                    // Attempt loading the file
-                    if (pImg->Load(std::move(filePath)))
-                    {
-                        // Success. Make it a child of the resource img root
-                        pImg->SetParent(pRoot);
-
-                        lua_pushelement(luaVM, pImg);
-                        return 1;
-                    }
-                    else
-                    {
-                        delete pImg;
-                        argStream.SetCustomError(input, "Error loading IMG");
-                    }
-                }
-                else
-                {
-                    argStream.SetCustomError(input, "Bad file path");
-                }
-            }
-        }
-    }
-
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 
 int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 {
@@ -594,198 +533,119 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineAddImage(lua_State* luaVM)
+CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strFilePath)
 {
-    CClientIMG*    pIMG;
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pIMG);
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return false;
 
-    if (!argStream.HasErrors())
+    std::string strFullPath;
+
+    if (CResourceManager::ParseResourcePathInput(strFilePath, pResource, &strFullPath))
     {
-        lua_pushboolean(luaVM, pIMG->StreamEnable());
-        return 1;
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        // Grab the resource root entity
+        CClientEntity* pRoot = pResource->GetResourceIMGRoot();
+        // Create the img handle
+        CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineRemoveImage(lua_State* luaVM)
-{
-    CClientIMG* pIMG;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pIMG);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pIMG->StreamDisable());
-        return 1;
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineImageGetFilesCount(lua_State* luaVM)
-{
-    CClientIMG* pIMG;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pIMG);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushnumber(luaVM, pIMG->GetFilesCount());
-        return 1;
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineImageGetFileList(lua_State* luaVM)
-{
-    CClientIMG* pIMG;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pIMG);
-
-    if (!argStream.HasErrors())
-    {
-        lua_newtable(luaVM);
-
-        for (unsigned int i = 0; i < pIMG->GetFilesCount(); i++)
+        // Attempt loading the file
+        if (pImg->Load(std::move(strFullPath)))
         {
-            tImgFileInfo* pFileInfo = pIMG->GetFileInfo(i);
+            // Success. Make it a child of the resource img root
+            pImg->SetParent(pRoot);
 
-            lua_pushnumber(luaVM, i);
-            lua_pushstring(luaVM, pFileInfo->szFileName);
-            lua_settable(luaVM, -3);
-        }
-        
-        return 1;
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineImageGetFile(lua_State* luaVM)
-{
-    CClientIMG*    pIMG;
-    unsigned int   fileID = -1;
-    SString        strFileName;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pIMG);
-
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(fileID);
-    else
-        argStream.ReadString(strFileName);
-
-    if (!argStream.HasErrors())
-    {
-        if (fileID == -1)
-            fileID = pIMG->GetFileID(strFileName);
-
-        SString buffer;
-        long    lBytesRead = pIMG->GetFile(fileID, buffer);
-
-        if (lBytesRead >= 0)
-        {
-            // Push the string onto the Lua stack. Use pushlstring so we are binary
-            // compatible. Normal push string takes zero terminated strings.
-            lua_pushlstring(luaVM, buffer.data(), lBytesRead);
-            return 1;
-        }
-        else if (lBytesRead == -2)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "out of memory");
+            return pImg;
         }
         else
         {
-            argStream.SetCustomWarning("File not found");
+            delete pImg;
+            std::invalid_argument("Error loading IMG");
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Error
-    lua_pushnil(luaVM);
-    return 1;
-}
-
-
-int CLuaEngineDefs::EngineImageLinkModel(lua_State* luaVM)
-{
-    unsigned short usModelID;
-    CClientIMG* pIMG;
-    unsigned int fileID = -1;
-    SString strFileName;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pIMG);
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(fileID);
-    else
-        argStream.ReadString(strFileName);
-    argStream.ReadNumber(usModelID);
-
-    if (!argStream.HasErrors())
     {
-        if (fileID == -1)
-            fileID = pIMG->GetFileID(strFileName);
-
-        if (fileID != -1 && pIMG->LinkModel(usModelID, fileID))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-           argStream.SetCustomError(SString("Model ID %d replace failed", usModelID));
+        std::invalid_argument("Bad file path");
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
-int CLuaEngineDefs::EngineRestoreModelImage(lua_State* luaVM)
+bool CLuaEngineDefs::EngineAddImage(CClientIMG* pIMG)
 {
-    // Grab the model ID
-    unsigned int uiModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
+    return pIMG->StreamEnable();
+}
 
-    // Valid client DFF and model?
+bool CLuaEngineDefs::EngineRemoveImage(CClientIMG* pIMG)
+{
+    return pIMG->StreamDisable();
+}
+
+uint CLuaEngineDefs::EngineImageGetFilesCount(CClientIMG* pIMG)
+{
+    return pIMG->GetFilesCount();
+}
+
+std::vector<std::string> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG)
+{
+    uint uiFilesCount = pIMG->GetFilesCount();
+    std::vector<std::string> aOutput;
+    aOutput.reserve(uiFilesCount);
+
+    for (unsigned int i = 0; i < uiFilesCount; i++)
+        aOutput.push_back(pIMG->GetFileInfo(i)->szFileName);
+
+    return aOutput;
+}
+
+std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<std::string, uint> file)
+{
+    uint  uiFileID;
+    uint* pFileID = std::get_if<uint>(&file);
+
+    if (pFileID)
+        uiFileID = *pFileID - 1;
+    else
+        pIMG->GetFileID(std::get<std::string>(file));
+
+    if (uiFileID == -1)
+        std::invalid_argument("File not found");
+
+    std::string strBuffer;
+    long    lBytesRead = pIMG->GetFile(uiFileID, strBuffer);
+
+    if (lBytesRead >= 0)
+        return strBuffer;
+    else if (lBytesRead == -2)
+        std::invalid_argument("Out of memory");
+    else
+        std::invalid_argument("File not found");
+}
+
+bool CLuaEngineDefs::EngineImageLinkModel(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
+{
+    uint  uiFileID;
+    uint* pFileID = std::get_if<uint>(&file);
+
+    if (pFileID)
+        uiFileID = *pFileID - 1;
+    else
+        pIMG->GetFileID(std::get<std::string>(file));
+
+    if (uiFileID == -1)
+        std::invalid_argument("File not found");
+
+    return pIMG->LinkModel(uiModelID, uiFileID);
+}
+
+bool CLuaEngineDefs::EngineRestoreModelImage(uint uiModelID)
+{
     if (CClientIMGManager::IsLinkableModel(uiModelID))
-    {
-        // Restore the model
-        if (m_pImgManager->RestoreModel(uiModelID))
-        {
-            // Success
-            lua_pushboolean(luaVM, true);
-            return true;
-        }
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadType(luaVM);
-    }
+        return m_pImgManager->RestoreModel(uiModelID);
 
-    // Failure
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)

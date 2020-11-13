@@ -105,7 +105,7 @@ void CClientIMG::Unload()
     }
 }
 
-long CClientIMG::GetFile(unsigned int uiFileID, SString& buffer)
+long CClientIMG::GetFile(unsigned int uiFileID, std::string& buffer)
 {
     tImgFileInfo* pFileInfo = GetFileInfo(uiFileID);
     if (!pFileInfo)
@@ -134,12 +134,12 @@ tImgFileInfo* CClientIMG::GetFileInfo(unsigned int usFileID)
     return &m_pContentInfo[usFileID];
 }
 
-unsigned int CClientIMG::GetFileID(SString strFileName)
+unsigned int CClientIMG::GetFileID(std::string &strFileName)
 {
     strFileName.resize(24);
     for (unsigned int i = 0; i < m_uiFilesCount; i++)
     {
-        if (strFileName.EqualsI(m_pContentInfo[i].szFileName))
+        if (strFileName == m_pContentInfo[i].szFileName)
             return i;
     }
     return -1;

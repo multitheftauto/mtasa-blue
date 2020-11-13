@@ -47,8 +47,8 @@ public:
     bool              Load(SString sFilePath);
     void              Unload();
     tImgFileInfo*     GetFileInfo(unsigned int uiFileID);
-    unsigned int      GetFileID(SString sFileName);
-    long              GetFile(unsigned int uiFileID, SString& buffer);
+    unsigned int      GetFileID(std::string &sFileName);
+    long              GetFile(unsigned int uiFileID, std::string& buffer);
 
     bool              StreamEnable();
     bool              StreamDisable();
