@@ -30,7 +30,7 @@ public:
 
     virtual std::list<CXMLNode*>::iterator ChildrenBegin() = 0;
     virtual std::list<CXMLNode*>::iterator ChildrenEnd() = 0;
-    virtual size_t                         CountChildren() = 0;
+    virtual size_t                         CountChildren() const noexcept = 0;
 
     virtual CXMLAttributes& GetAttributes() = 0;
     virtual CXMLNode*       GetParent() = 0;
