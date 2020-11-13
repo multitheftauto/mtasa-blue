@@ -705,30 +705,6 @@ ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::SetTXDIDForModelID
-//
-// Set a TXD ID associated with the model ID
-//
-////////////////////////////////////////////////////////////////
-bool CRenderWareSA::SetTXDIDForModelID(ushort usModelID, ushort usTXDID)
-{
-    if (usModelID >= 20000)
-    {
-        return false;
-    }
-    else
-    {
-        // Ensure valid
-        if (!((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
-            return false;
-
-        ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary = usTXDID;
-        return true;
-    }
-}
-
-////////////////////////////////////////////////////////////////
-//
 // CRenderWareSA::GetModelTextureNames
 //
 // Get list of texture names associated with the model

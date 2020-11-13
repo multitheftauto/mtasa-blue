@@ -60,7 +60,6 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImageGetFileList", ArgumentParser<EngineImageGetFileList>},
         {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
-        //{"engineSetModelTXDID", EngineSetModelTXDID},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1134,55 +1133,10 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineGetModelTXDID(lua_State* luaVM)
+uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
-    //  int engineGetModelTXDID ( int modelID )
-    unsigned short usModelID;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModelID);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned short usTXDID = g_pGame->GetRenderWare()->GetTXDIDForModelID(usModelID);
-        lua_pushinteger(luaVM, usTXDID);
-        return 1;
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // We failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetRenderWare()->GetTXDIDForModelID(uiModelID);
 }
-
-
-//int CLuaEngineDefs::EngineSetModelTXDID(lua_State* luaVM)
-//{
-//    unsigned short usModelID;
-//    unsigned short usTXDID;
-//
-//    CScriptArgReader argStream(luaVM);
-//    argStream.ReadNumber(usModelID);
-//    argStream.ReadNumber(usTXDID);
-//
-//    if (!argStream.HasErrors())
-//    {
-//        bool bResult = g_pGame->GetRenderWare()->SetTXDIDForModelID(usModelID, usTXDID);
-//        if (bResult)
-//        {
-//            lua_pushboolean(luaVM, bResult);
-//            return 1;
-//        }
-//        argStream.SetCustomError("Expected valid model ID at argument 1");
-//    }
-//    if (argStream.HasErrors())
-//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-//
-//    // We failed
-//    lua_pushboolean(luaVM, false);
-//    return 1;
-//}
 
 int CLuaEngineDefs::EngineGetModelNameFromID(lua_State* luaVM)
 {

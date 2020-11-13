@@ -43,8 +43,7 @@ public:
     LUA_DECLARE(EngineSetAsynchronousLoading);
     LUA_DECLARE(EngineApplyShaderToWorldTexture);
     LUA_DECLARE(EngineRemoveShaderFromWorldTexture);
-    LUA_DECLARE(EngineGetModelTXDID);
-    LUA_DECLARE(EngineSetModelTXDID);
+    static uint EngineGetModelTXDID(uint uiDffModelID);
     LUA_DECLARE(EngineGetModelNameFromID);
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
