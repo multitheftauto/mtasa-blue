@@ -140,8 +140,8 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFile", "engineImageGetFile");
     lua_classfunction(luaVM, "getFileList", "engineImageGetFileList");
     lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
-    lua_classfunction(luaVM, "linkTXD", "engineImageLinkDFF");
-    lua_classfunction(luaVM, "linkDFF", "engineImageLinkTXD");
+    lua_classfunction(luaVM, "linkTXD", "engineImageLinkTXD");
+    lua_classfunction(luaVM, "linkDFF", "engineImageLinkDFF");
 
     lua_classvariable(luaVM, "filesCount", nullptr, ArgumentParser<EngineImageGetFilesCount>);
     lua_classvariable(luaVM, "files", nullptr, ArgumentParser<EngineImageGetFileList>);
@@ -566,13 +566,11 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
         else
         {
             delete pImg;
-            std::invalid_argument("Error loading IMG");
+            throw std::invalid_argument("Error loading IMG");
         }
     }
-    else
-    {
-        std::invalid_argument("Bad file path");
-    }
+
+    throw std::invalid_argument("Bad file path");
 }
 
 bool CLuaEngineDefs::EngineAddImage(CClientIMG* pIMG)
@@ -613,7 +611,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<st
         uiFileID = pIMG->GetFileID(std::get<std::string>(file));
 
     if (uiFileID == -1)
-        std::invalid_argument("File not found");
+        throw std::invalid_argument("File not found");
 
     std::string strBuffer;
     long    lBytesRead = pIMG->GetFile(uiFileID, strBuffer);
@@ -621,9 +619,9 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<st
     if (lBytesRead >= 0)
         return strBuffer;
     else if (lBytesRead == -2)
-        std::invalid_argument("Out of memory");
+        throw std::invalid_argument("Out of memory");
     else
-        std::invalid_argument("File not found");
+        throw std::invalid_argument("File not found");
 }
 
 bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
@@ -637,7 +635,7 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::stri
         uiFileID = pIMG->GetFileID(std::get<std::string>(file));
 
     if (uiFileID == -1)
-        std::invalid_argument("File not found");
+        throw std::invalid_argument("File not found");
 
     return pIMG->LinkModel(uiModelID, uiFileID);
 }
@@ -653,7 +651,7 @@ bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::stri
         uiFileID = pIMG->GetFileID(std::get<std::string>(file));
 
     if (uiFileID == -1)
-        std::invalid_argument("File not found");
+        throw std::invalid_argument("File not found");
 
     return pIMG->LinkModel(20000 + uiTxdID, uiFileID);
 }
