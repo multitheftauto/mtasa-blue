@@ -162,7 +162,7 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
 
             // Create a new table
             // If no time is specified we preallocate CountTimers(), otherwise none
-            lua_createtable(luaVM, dTime ? 0 : pLuaTimerManager->CountTimers(), 0);
+            lua_createtable(luaVM, dTime ? 0 : pLuaTimerManager->Count(), 0);
             for (lua_Number i = 1; iter != pLuaTimerManager->IterEnd(); ++iter)
             {
                 CLuaTimer* pLuaTimer = *iter;
