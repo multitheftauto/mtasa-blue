@@ -9,120 +9,60 @@
  *
  *****************************************************************************/
 
-#pragma once
+#include <set>
+#include <string>
 
-#include "lua/LuaCommon.h"
-#include "lua/CLuaArguments.h"
-#include <list>
 
-enum eKeyBindType
+struct CKeyBind
 {
-    KEY_BIND_FUNCTION = 0,
-    KEY_BIND_CONTROL_FUNCTION,
-    KEY_BIND_UNDEFINED,
-};
-
-struct SBindableKey
-{
-    const char* szKey;
-};
-
-struct SBindableGTAControl
-{
-    const char* szControl;
-};
-
-class CKeyBind
-{
-public:
-    CKeyBind()
+    enum class BoundToState
     {
-        boundKey = NULL;
-        luaMain = NULL;
-        beingDeleted = false;
-    }
-    virtual ~CKeyBind() {}
-    bool IsBeingDeleted() { return beingDeleted; }
+        DOWN,
+        UP,
+        BOTH
+    };
 
-    const SBindableKey*  boundKey;
-    CLuaMain*            luaMain;
-    bool                 beingDeleted;
-    virtual eKeyBindType GetType() = 0;
+public:
+    CKeyBind(std::string val, BoundToState state, CLuaFunctionRef cbref, CLuaArguments cbargs) :
+        m_boundTo(val, state),
+        m_callback(cbref, cbargs)
+    {}
+
+
+    bool IsBeingDeleted() const noexcept { return m_isBeingDeleted; }
+
+private:
+    bool m_isBeingDeleted = false;
+
+    struct 
+    {
+        std::string  value = "none"; // key, control, or whatever else
+        BoundToState state = BoundToState::BOTH;
+    } m_boundTo;
+
+
+    // Lua things
+    struct 
+    {
+        CLuaFunctionRef func;
+        CLuaArguments   args;
+    } m_callback;
 };
 
-class CKeyBindWithState : public CKeyBind
+struct CKeyBinds
 {
-public:
-    CKeyBindWithState() { bHitState = true; }
-    bool bHitState;
-};
+    // Shared things
+    static bool CKeyBinds::IsBindableKey(std::string_view key);
 
-class CFunctionBind
-{
-public:
-    CFunctionBind() {}
-    ~CFunctionBind() {}
-    CLuaFunctionRef m_iLuaFunction;
-    CLuaArguments   m_Arguments;
-};
+    static bool CKeyBinds::IsBindableControl(std::string_view control);
 
-class CKeyFunctionBind : public CKeyBindWithState, public CFunctionBind
-{
-public:
-    eKeyBindType GetType() { return KEY_BIND_FUNCTION; }
-};
+    static bool CKeyBinds::IsBindable(std::string_view value) { return IsBindableKey(value) || IsBindableControl(value); }
 
-class CControlFunctionBind : public CKeyBindWithState, public CFunctionBind
-{
-public:
-    eKeyBindType               GetType() { return KEY_BIND_CONTROL_FUNCTION; }
-    const SBindableGTAControl* boundControl;
-};
+protected: 
+    // Note std::less<> is for transparent lookup. Aka: std::string_view can be used
+    // directly without converting it to an std::string
+    static std::set<std::string, std::less<>> ms_bindableKeys;
+    static std::set<std::string, std::less<>> ms_bindableControls;
 
-class CKeyBinds
-{
-public:
-    CKeyBinds(class CPlayer* pPlayer);
-    ~CKeyBinds();
-
-    static const SBindableKey*        GetBindableFromKey(const char* szKey);
-    static const SBindableGTAControl* GetBindableFromControl(const char* szControl);
-
-    // Basic funcs
-    void Add(CKeyBind* pKeyBind);
-    void Clear(eKeyBindType bindType = KEY_BIND_UNDEFINED);
-    void Call(CKeyBind* pKeyBind);
-    bool ProcessKey(const char* szKey, bool bHitState, eKeyBindType bindType);
-
-    std::list<CKeyBind*>::iterator IterBegin() { return m_List.begin(); }
-    std::list<CKeyBind*>::iterator IterEnd() { return m_List.end(); }
-
-    // Key-function bind funcs
-    bool AddKeyFunction(const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
-    bool AddKeyFunction(const SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
-    bool RemoveKeyFunction(const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true,
-                           const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-    bool KeyFunctionExists(const char* szKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true,
-                           const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-
-    // Control-function bind funcs
-    bool AddControlFunction(const char* szControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
-    bool AddControlFunction(const SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction,
-                            CLuaArguments& Arguments);
-    bool RemoveControlFunction(const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true,
-                               const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-    bool ControlFunctionExists(const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true,
-                               const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-
-    void RemoveAllKeys(CLuaMain* pLuaMain);
-
-    static bool IsMouse(const SBindableKey* pKey);
-    void        RemoveDeletedBinds();
-
-protected:
-    bool Remove(CKeyBind* pKeyBind);
-
-    CPlayer*             m_pPlayer;
-    std::list<CKeyBind*> m_List;
-    bool                 m_bProcessingKey;
+    std::vector<>
 };
