@@ -43,7 +43,7 @@ public:
     static CElement*      GetElementByIndex(const char* szType, unsigned int uiIndex);
     static CElement*      GetElementChild(CElement* pElement, unsigned int uiIndex);
     static bool           GetElementChildrenCount(CElement* pElement, unsigned int& uiCount);
-    static CLuaArgument*  GetElementData(CElement* pElement, const char* szName, bool bInherit);
+    static CLuaArgument*  GetElementData(CElement* pElement, const std::string& name, bool bInherit);
     static CLuaArguments* GetAllElementData(CElement* pElement, CLuaArguments* table);
     static CElement*      GetElementParent(CElement* pElement);
     static bool           GetElementMatrix(CElement* pElement, CMatrix& matrix);

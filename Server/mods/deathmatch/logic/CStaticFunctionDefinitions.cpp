@@ -394,13 +394,12 @@ CElement* CStaticFunctionDefinitions::GetElementByIndex(const char* szType, unsi
     return m_pMapManager->GetRootElement()->FindChildByType(szType, uiIndex, true);
 }
 
-CLuaArgument* CStaticFunctionDefinitions::GetElementData(CElement* pElement, const char* szName, bool bInherit)
+CLuaArgument* CStaticFunctionDefinitions::GetElementData(CElement* pElement, const std::string& name, bool bInherit)
 {
     assert(pElement);
-    assert(szName);
 
     // Return its custom data
-    return pElement->GetCustomData(szName, bInherit);
+    return pElement->GetCustomData(name, bInherit);
 }
 
 CLuaArguments* CStaticFunctionDefinitions::GetAllElementData(CElement* pElement, CLuaArguments* table)
@@ -876,7 +875,7 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
 bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const std::string& name, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(pElement);
-    assert(szName);
+
     assert(name.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     ESyncType     lastSyncType = ESyncType::BROADCAST;

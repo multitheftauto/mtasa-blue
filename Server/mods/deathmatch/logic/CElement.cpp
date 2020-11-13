@@ -495,7 +495,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType)
+CLuaArgument* CElement::GetCustomData(const std::string& name, bool bInheritData, ESyncType* pSyncType)
 {
     assert(szName);
 
