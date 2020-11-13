@@ -58,6 +58,7 @@ public:
     void                                  ListResourcesLoaded(const SString& strListType);
     std::list<CResource*>::const_iterator IterBegin() { return m_resources.begin(); };
     std::list<CResource*>::const_iterator IterEnd() { return m_resources.end(); };
+    auto                                  Count() { return m_resources.size(); };
 
     bool         Refresh(bool bRefreshAll = false, const SString strJustThisResource = "", bool bShowTiming = false);
     void         UpgradeResources(CResource* pResource = NULL);
