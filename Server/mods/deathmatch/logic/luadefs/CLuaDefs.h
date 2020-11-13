@@ -21,6 +21,7 @@
 #include "../CMainConfig.h"
 #include "../CMarkerManager.h"
 #include "../CObjectManager.h"
+#include "../CBanManager.h"
 #include "../CPickupManager.h"
 #include "../CPlayerManager.h"
 #include "../CRadarAreaManager.h"
@@ -84,6 +85,7 @@ protected:
     static CColManager*               m_pColManager;
     static CResourceManager*          m_pResourceManager;
     static CAccessControlListManager* m_pACLManager;
+    static CBanManager*               m_pBanManager;
     static CMainConfig*               m_pMainConfig;
 
 protected:
