@@ -497,10 +497,8 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
 
 CLuaArgument* CElement::GetCustomData(const std::string& name, bool bInheritData, ESyncType* pSyncType)
 {
-    assert(szName);
-
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_pCustomData->Get(name);
     if (pData)
     {
         if (pSyncType)
@@ -511,7 +509,7 @@ CLuaArgument* CElement::GetCustomData(const std::string& name, bool bInheritData
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pSyncType);
+        return m_pParent->GetCustomData(name, true, pSyncType);
     }
 
     // None available
