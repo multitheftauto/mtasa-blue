@@ -52,7 +52,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
         {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
-        {"engineImageLinkModel", ArgumentParser<EngineImageLinkModel>},
+        {"engineImageLinkDFF", ArgumentParser<EngineImageLinkDFF>},
+        {"engineImageLinkTXD", ArgumentParser<EngineImageLinkTXD>},
         {"engineRestoreModelImage", ArgumentParser<EngineRestoreModelImage>},
         {"engineAddImage", ArgumentParser<EngineAddImage>},
         {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
@@ -624,7 +625,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<st
         std::invalid_argument("File not found");
 }
 
-bool CLuaEngineDefs::EngineImageLinkModel(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
+bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
 {
     uint  uiFileID = -1;
     uint* pFileID = std::get_if<uint>(&file);
@@ -638,6 +639,22 @@ bool CLuaEngineDefs::EngineImageLinkModel(CClientIMG* pIMG, std::variant<std::st
         std::invalid_argument("File not found");
 
     return pIMG->LinkModel(uiModelID, uiFileID);
+}
+
+bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiTxdID)
+{
+    uint  uiFileID = -1;
+    uint* pFileID = std::get_if<uint>(&file);
+
+    if (pFileID)
+        uiFileID = *pFileID - 1;
+    else
+        uiFileID = pIMG->GetFileID(std::get<std::string>(file));
+
+    if (uiFileID == -1)
+        std::invalid_argument("File not found");
+
+    return pIMG->LinkModel(20000 + uiTxdID, uiFileID);
 }
 
 bool CLuaEngineDefs::EngineRestoreModelImage(uint uiModelID)
