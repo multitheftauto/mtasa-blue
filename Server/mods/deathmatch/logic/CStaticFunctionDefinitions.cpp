@@ -879,7 +879,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const std::s
     assert(name.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     ESyncType     lastSyncType = ESyncType::BROADCAST;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+    CLuaArgument* pCurrentVariable = pElement->GetCustomData(name, false, &lastSyncType);
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
