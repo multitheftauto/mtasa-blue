@@ -96,6 +96,7 @@ public:
 
     std::list<CKeyBind*>::iterator IterBegin() { return m_List.begin(); }
     std::list<CKeyBind*>::iterator IterEnd() { return m_List.end(); }
+    auto                           Count() const noexcept { return m_List.size(); }
 
     // Key-function bind funcs
     bool AddKeyFunction(const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
