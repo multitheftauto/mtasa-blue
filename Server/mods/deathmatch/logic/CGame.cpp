@@ -1534,6 +1534,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
+    m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
 
     // Radar area events
 
