@@ -1324,16 +1324,18 @@ int CLuaAudioDefs::SetSoundEffectEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
+    CClientPlayerVoice* pPlayerVoice = nullptr;
+    CClientSound*       pSound = NULL;
+    CScriptArgReader    argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CClientSound>())
     {
         argStream.ReadUserData(pSound);
     }
     else if (argStream.NextIsUserDataOfType<CClientPlayer>())
     {
+        CClientPlayer* pPlayer;
         argStream.ReadUserData(pPlayer);
+        pPlayerVoice = pPlayer->GetVoice();
     }
     else
     {
@@ -1344,7 +1346,7 @@ int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        dassert(pPlayer || pSound); // Should be valid at this point..
+        dassert(pPlayerVoice || pSound); // Should be valid at this point..
         
         std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
 
@@ -1354,7 +1356,7 @@ int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
             if (pSound)
                 lua_pushboolean(luaVM, pSound->IsFxEffectEnabled(effect));
             else
-                lua_pushboolean(luaVM, pPlayerVoice->IsFxEffectEnabled(effect)); 
+                lua_pushboolean(luaVM, pPlayerVoice->IsFxEffectEnabled(effect));
             lua_setfield(luaVM, -2, name.c_str());
         }    
     }
