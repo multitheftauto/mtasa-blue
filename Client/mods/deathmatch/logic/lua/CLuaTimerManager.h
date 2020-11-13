@@ -40,6 +40,7 @@ public:
 
     CFastList<CLuaTimer*>::const_iterator IterBegin() { return m_TimerList.begin(); }
     CFastList<CLuaTimer*>::const_iterator IterEnd() { return m_TimerList.end(); }
+    auto                                  Count() const noexcept { return m_TimerList.end(); }
 
 private:
     CFastList<CLuaTimer*>  m_TimerList;
