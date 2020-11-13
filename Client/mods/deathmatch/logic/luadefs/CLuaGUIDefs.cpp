@@ -3686,7 +3686,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                         // Extract color componenet value from string, 
                         // and push it into a table one by one in this order: R, G, B, A
                         lua_createtable(luaVM, 4, 0);
-                        for (lua_Number i = 1; i =< 4; i++)
+                        for (lua_Number i = 1; i <= 4; i++)
                         {
                             int value;
                             ss >> value;
@@ -3709,7 +3709,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                         // Extract position values from the string in this order: x, y
                         // and push it into a table
                         lua_createtable(luaVM, 2, 0);
-                        for (lua_Number i = 1; i =< 2; i++)
+                        for (lua_Number i = 1; i <= 2; i++)
                         {
                             float value;
                             ss >> value;
