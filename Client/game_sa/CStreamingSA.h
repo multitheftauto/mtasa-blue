@@ -14,13 +14,6 @@
 #include <game/CStreaming.h>
 #include "Common.h"
 
-// Shoud be changed to interfaces
-#define ARRAY_StreamHandlersNames                    0x8E4098 // [32][64]
-
-#define ARRAY_StreamModelInfo                        0x8E4CC0 // size = 26316
-
-#define VAR_StreamHandlersMaxCount                   32
-#define VAR_StreamHandlerCreateFlags                 0x8E3FE0
 #define VAR_StreamHandlersMaxCount                   32
 #define VAR_MaxArchives                              8
 
@@ -30,10 +23,6 @@
 #define FUNC_CStreaming_RequestAnimations            0x407120
 #define FUNC_CStreaming_RequestSpecialModel          0x409d10
 
-#define FUNC_CStreaming_RequestFile                  0x406A20 // (DWORD streamNum, int lpBuffer, int streamIndex, int sectorCount)
-
-#define FUNC_CStreaming_RemoveImages                 0x4066B3 // Remove all IMG`s from streaming
-#define FUNC_CStreaming_RemoveImage                  0x4068A0
 
 struct CArchiveInfo
 {
