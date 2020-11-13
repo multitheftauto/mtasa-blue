@@ -886,27 +886,27 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const std::s
         if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+            unsigned short usNameLength = static_cast<unsigned short>(name.length());
             CBitStream     BitStream;
             BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(szName, usNameLength);
+            BitStream.pBitStream->Write(name.c_str(), usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
 
             if (syncType == ESyncType::BROADCAST)
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
             else
-                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
+                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, name.c_str());
 
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
+            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), m_pPlayerManager->Count(),
                                                                                  BitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
         // Unsubscribe all the players
         if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
-            m_pPlayerManager->ClearElementData(pElement, szName);
+            m_pPlayerManager->ClearElementData(pElement, name.c_str());
 
         // Set its custom data
-        pElement->SetCustomData(szName, Variable, syncType);
+        pElement->SetCustomData(name, Variable, syncType);
         return true;
     }
     return false;
