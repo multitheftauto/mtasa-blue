@@ -1243,7 +1243,7 @@ int CLuaResourceDefs::getResourceACLRequests(lua_State* luaVM)
         lua_Number i = 1;
         for (const auto& request : Result)
         {
-            lua_createtable(luaVM);         // new table
+            lua_createtable(luaVM, 0, 5);         // new table
             {
                 // Push this table into the toplevel table (leaves it on the stack still though)
                 lua_pushnumber(luaVM, i++);  // row index number (starting at 1, not 0)
@@ -1251,19 +1251,19 @@ int CLuaResourceDefs::getResourceACLRequests(lua_State* luaVM)
                 lua_settable(luaVM, -4);     // refer to the top level table
 
                 lua_pushstring(luaVM, request.rightName.GetFullName());
-                lua_settable(luaVM, -2, "name");
+                lua_setfield(luaVM, -2, "name");
 
                 lua_pushboolean(luaVM, request.bAccess);
-                lua_settable(luaVM, -2, "access");
+                lua_setfield(luaVM, -2, "access");
 
                 lua_pushboolean(luaVM, request.bPending);
-                lua_settable(luaVM, -2, "pending");
+                lua_setfield(luaVM, -2, "pending");
 
                 lua_pushstring(luaVM, request.strWho);
-                lua_settable(luaVM, -2, "who");
+                lua_setfield(luaVM, -2, "who");
 
                 lua_pushstring(luaVM, request.strDate);
-                lua_settable(luaVM, -2, "date");
+                lua_setfield(luaVM, -2, "date");
             }
             lua_pop(luaVM, 1);            // pop the inner table
         }
