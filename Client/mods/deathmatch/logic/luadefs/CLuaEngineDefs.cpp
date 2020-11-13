@@ -140,7 +140,8 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFile", "engineImageGetFile");
     lua_classfunction(luaVM, "getFileList", "engineImageGetFileList");
     lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
-    lua_classfunction(luaVM, "linkModel", "engineImageLinkModel");
+    lua_classfunction(luaVM, "linkTXD", "engineImageLinkDFF");
+    lua_classfunction(luaVM, "linkDFF", "engineImageLinkTXD");
 
     lua_classvariable(luaVM, "filesCount", nullptr, ArgumentParser<EngineImageGetFilesCount>);
     lua_classvariable(luaVM, "files", nullptr, ArgumentParser<EngineImageGetFileList>);
