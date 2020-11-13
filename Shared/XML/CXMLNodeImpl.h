@@ -40,7 +40,7 @@ public:
 
     std::list<CXMLNode*>::iterator ChildrenBegin() { return m_Children.begin(); };
     std::list<CXMLNode*>::iterator ChildrenEnd() { return m_Children.end(); };
-    auto                           CountChildren() const noexcept { return m_Children.size(); }
+    size_t                         CountChildren() const noexcept { return m_Children.size(); }
 
     CXMLAttributes& GetAttributes();
     CXMLNode*       GetParent();
