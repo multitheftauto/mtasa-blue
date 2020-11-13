@@ -86,7 +86,8 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
     lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
-    lua_classfunction(luaVM, "restoreModelImage", "engineRestoreModelImage");
+    lua_classfunction(luaVM, "restoreDFFImage", "engineRestoreDFFImage");
+    lua_classfunction(luaVM, "restoreTXDImage", "engineRestoreTXDImage");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
