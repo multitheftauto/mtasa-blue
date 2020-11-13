@@ -50,6 +50,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
         {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
         {"engineImageLinkModel", ArgumentParser<EngineImageLinkModel>},
         {"engineRestoreModelImage", ArgumentParser<EngineRestoreModelImage>},
