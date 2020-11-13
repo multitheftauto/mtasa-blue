@@ -64,7 +64,8 @@ public:
     static uint EngineImageGetFilesCount(CClientIMG* pImg);
     static bool EngineImageLinkDFF(CClientIMG* pImg, std::variant<std::string, uint> file, uint uiModelID);
     static bool EngineImageLinkTXD(CClientIMG* pImg, std::variant<std::string, uint> file, uint uiModelID);
-    static bool EngineRestoreModelImage(uint uiModelID);
+    static bool EngineRestoreDFFImage(uint uiModelID);
+    static bool EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string> EngineImageGetFileList(CClientIMG* pImg);
     static std::string              EngineImageGetFile(CClientIMG* pImg, std::variant<std::string, uint> file);
     static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);

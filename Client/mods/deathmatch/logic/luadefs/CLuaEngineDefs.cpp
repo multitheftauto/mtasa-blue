@@ -54,7 +54,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
         {"engineImageLinkDFF", ArgumentParser<EngineImageLinkDFF>},
         {"engineImageLinkTXD", ArgumentParser<EngineImageLinkTXD>},
-        {"engineRestoreModelImage", ArgumentParser<EngineRestoreModelImage>},
+        {"engineRestoreDFFImage", ArgumentParser<EngineRestoreDFFImage>},
+        {"engineRestoreTXDImage", ArgumentParser<EngineRestoreTXDImage>},
         {"engineAddImage", ArgumentParser<EngineAddImage>},
         {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
         {"engineImageGetFilesCount", ArgumentParser<EngineImageGetFilesCount>},
@@ -626,6 +627,9 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<st
 
 bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
 {
+    if (uiModelID >= 20000)
+        throw std::invalid_argument("Expected model ID in range [0-19999] at argument 3");
+
     uint  uiFileID = -1;
     uint* pFileID = std::get_if<uint>(&file);
 
@@ -642,6 +646,9 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::stri
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiTxdID)
 {
+    if (uiTxdID >= 5000)
+        throw std::invalid_argument("Expected model ID in range [0-4999] at argument 3");
+
     uint  uiFileID = -1;
     uint* pFileID = std::get_if<uint>(&file);
 
@@ -656,10 +663,24 @@ bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::stri
     return pIMG->LinkModel(20000 + uiTxdID, uiFileID);
 }
 
-bool CLuaEngineDefs::EngineRestoreModelImage(uint uiModelID)
+bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 {
+    if (uiModelID >= 20000)
+        throw std::invalid_argument("Expected model ID in range [0-19999] at argument 1");
+
     if (CClientIMGManager::IsLinkableModel(uiModelID))
         return m_pImgManager->RestoreModel(uiModelID);
+
+    return false;
+}
+
+bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
+{
+    if (uiModelID >= 5000)
+        throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
+
+    if (CClientIMGManager::IsLinkableModel(uiModelID))
+        return m_pImgManager->RestoreModel(uiModelID + 20000);
 
     return false;
 }
