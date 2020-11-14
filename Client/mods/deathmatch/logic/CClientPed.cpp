@@ -6702,13 +6702,7 @@ bool CClientPed::ExitVehicle()
     return true;
 }
 
-//////////////////////////////////////////////////////////////////
-//
-// CClientPed::ResetVehicleInOut
-//
-// Resets enter/exit variables
-//
-//////////////////////////////////////////////////////////////////
+// ResetVehicleInOut resets enter/exit variables, and is only called for the local player or for peds we're syncing.
 void CClientPed::ResetVehicleInOut()
 {
     m_ulLastVehicleInOutTime = 0;
