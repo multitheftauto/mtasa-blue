@@ -87,8 +87,6 @@ void CPedSync::RemovePed(CClientPed* pPed)
         m_List.remove(pPed);
 
     pPed->SetSyncing(false);
-    // Reset vehicle in/out stuff in case the ped was entering/exiting
-    pPed->ResetVehicleInOut();
 }
 
 bool CPedSync::Exists(CClientPed* pPed)

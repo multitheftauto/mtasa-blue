@@ -7019,3 +7019,14 @@ void CClientPed::UpdateVehicleInOut()
         }
     }
 }
+
+// Called from CPedSync
+void CClientPed::SetSyncing(bool bIsSyncing)
+{
+    m_bIsSyncing = bIsSyncing;
+    if (!bIsSyncing)
+    {
+        // Reset vehicle in/out stuff in case the ped was entering/exiting
+        ResetVehicleInOut();
+    }
+}

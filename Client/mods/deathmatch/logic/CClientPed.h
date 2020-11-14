@@ -169,7 +169,7 @@ public:
 
     bool IsLocalPlayer() { return m_bIsLocalPlayer; }
     bool IsSyncing() { return m_bIsSyncing; }
-    void SetSyncing(bool bIsSyncing) { m_bIsSyncing = bIsSyncing; };
+    void SetSyncing(bool bIsSyncing);
 
     bool            GetMatrix(CMatrix& Matrix) const;
     bool            SetMatrix(const CMatrix& Matrix);
