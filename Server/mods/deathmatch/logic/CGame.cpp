@@ -1242,7 +1242,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06E)
+    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
@@ -1534,6 +1534,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
+    m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
 
     // Radar area events
 

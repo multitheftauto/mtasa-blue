@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include "../../Config.h"
 
-class CConsoleEchoPacket : public CPacket
+class CConsoleEchoPacket final : public CPacket
 {
 public:
     CConsoleEchoPacket(const char* szMessage) { m_strMessage.AssignLeft(szMessage, MAX_CONSOLEECHO_LENGTH); }

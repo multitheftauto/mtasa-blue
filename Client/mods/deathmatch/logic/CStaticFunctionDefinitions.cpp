@@ -1292,7 +1292,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTWATER:
         {
             Entity.SetDimension(usDimension);
-
             return true;
         }
 
@@ -6308,9 +6307,9 @@ bool CStaticFunctionDefinitions::GetWaterVertexPosition(CClientWater* pWater, in
     return pWater->GetVertexPosition(iVertexIndex - 1, vecPosition);
 }
 
-bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel)
+bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
-    return g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel);
+    return g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 }
 
 bool CStaticFunctionDefinitions::SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource)

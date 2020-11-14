@@ -96,6 +96,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
     //                              ModelID, Position, IsMissionVehicle
 
     m_pHandlingData = NULL;
+    m_pFlyingHandlingData = NULL;
     m_pSuspensionLines = NULL;
 
     DWORD dwReturn = 0;
@@ -1827,12 +1828,25 @@ CHandlingEntry* CVehicleSA::GetHandlingData()
     return m_pHandlingData;
 }
 
+CFlyingHandlingEntry* CVehicleSA::GetFlyingHandlingData()
+{
+    return m_pFlyingHandlingData;
+}
+
 void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
 {
     // Store the handling and recalculate it
     m_pHandlingData = static_cast<CHandlingEntrySA*>(pHandling);
     GetVehicleInterface()->pHandlingData = m_pHandlingData->GetInterface();
     RecalculateHandling();
+}
+
+void CVehicleSA::SetFlyingHandlingData(CFlyingHandlingEntry* pFlyingHandling)
+{
+    if (!pFlyingHandling)
+        return;
+    m_pFlyingHandlingData = static_cast<CFlyingHandlingEntrySA*>(pFlyingHandling);
+    GetVehicleInterface()->pFlyingHandlingData = m_pFlyingHandlingData->GetInterface();
 }
 
 void CVehicleSA::RecalculateHandling()
@@ -2643,7 +2657,7 @@ void CVehicleSA::UpdateLandingGearPosition()
             // Update Air Resistance
             float fDragCoeff = GetHandlingData()->GetDragCoeff();
 
-            const float& fFlyingHandlingGearUpR = pVehicle->pFlyingHandlingData->GearUpR;
+            const float& fFlyingHandlingGearUpR = pVehicle->pFlyingHandlingData->fGearUpR;
             pVehicle->m_fAirResistance = fDragCoeff / 1000.0f * 0.5f * fFlyingHandlingGearUpR;
         }
     }
