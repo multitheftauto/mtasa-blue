@@ -1,0 +1,41 @@
+/***********************************************************************
+    Enumeration of queue IDs
+***********************************************************************/
+enum RenderQueueID
+{
+    RQ_USER_0,
+    RQ_UNDERLAY,
+    RQ_USER_1,
+    RQ_BASE,
+    RQ_USER_2,
+    RQ_CONTENT_1,
+    RQ_USER_3,
+    RQ_CONTENT_2,
+    RQ_USER_4,
+    RQ_OVERLAY,
+    RQ_USER_5
+};
+
+/***********************************************************************
+    RenderingSurface
+***********************************************************************/
+class RenderingSurface : public EventSet
+{
+    void addGeometryBuffer(RenderQueueID queue, const GeometryBuffer& buffer);
+    void removeGeometryBuffer(RenderQueueID queue, const GeometryBuffer& buffer);
+
+    void clearGeometry(RenderQueueID queue);
+    void clearGeometry();
+
+    void invalidate();
+    bool isInvalidated() const;
+
+    bool isRenderingWindow() const;
+
+    void transferRenderingWindow(RenderingWindow& window);
+
+    //virtual void draw();
+    //RenderingWindow& createRenderingWindow(TextureTarget& target);
+    //void destroyRenderingWindow(RenderingWindow& window);
+    //const RenderTarget& getRenderTarget() const;
+};

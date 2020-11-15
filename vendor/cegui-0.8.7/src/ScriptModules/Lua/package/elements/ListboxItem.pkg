@@ -1,0 +1,33 @@
+/***********************************************************************
+	ListboxItem
+***********************************************************************/
+class ListboxItem
+{
+	string getText() const;
+	unsigned int getID() const;
+	void* getUserData() const;
+	bool isSelected() const;
+	bool isDisabled() const;
+	bool isAutoDeleted() const;
+	const Window* getOwnerWindow();
+	ColourRect getSelectionColours() const;
+	const Image* getSelectionBrushImage() const;
+
+	void setText(utf8string text);
+	void setID(unsigned int item_id);
+	void setUserData(void* item_data);
+	void setSelected(bool setting);
+	void setDisabled(bool setting);
+	void setAutoDeleted(bool setting);
+	void setOwnerWindow(const Window* owner);
+	void setSelectionColours(const ColourRect& cols);
+	void setSelectionColours(Colour top_left_colour, Colour top_right_colour, Colour bottom_left_colour, Colour bottom_right_colour);
+	void setSelectionColours(Colour col);
+	void setSelectionBrushImage(const Image* image);
+	void setSelectionBrushImage(utf8string name);
+
+	Size<float> getPixelSize() const;
+
+	//void draw(const Vector3<float>& position, float alpha, const Rect<float>& clipper) const;
+	// operators missing
+};

@@ -1,0 +1,21 @@
+/******************************************************************************
+  SectionSpecification
+******************************************************************************/
+
+class SectionSpecification
+{
+  void render(Window& srcWindow, const ColourRect* modcols = 0, const Rect<float>* clipper = 0, bool clipToDisplay = false) const;
+  void render(Window& srcWindow, const Rect<float>& baseRect, const ColourRect* modcols = 0, const Rect<float>* clipper = 0, bool clipToDisplay = false) const;
+
+  string getOwnerWidgetLookFeel() const;
+  string getSectionName() const;
+  const ColourRect& getOverrideColours() const;
+  void setOverrideColours(const ColourRect& cols);
+  bool isUsingOverrideColours() const;
+  void setUsingOverrideColours(bool setting = true);
+  void setOverrideColoursPropertySource(utf8string property);
+  void setRenderControlPropertySource(utf8string property);
+  // void writeXMLToStream(OutStream& out_stream) const;
+  SectionSpecification(utf8string owner, utf8string sectionName, const string controlPropertySource, const string controlPropertyValue, const string controlPropertyWidget);
+  SectionSpecification(utf8string owner, utf8string sectionName, utf8string controlPropertySource, const string controlPropertyValue, const string controlPropertyWidget, const ColourRect& cols);
+};

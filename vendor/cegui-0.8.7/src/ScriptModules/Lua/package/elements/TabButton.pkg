@@ -1,0 +1,11 @@
+/***********************************************************************
+	TabButton
+***********************************************************************/
+class TabButton : public ButtonBase
+{
+	bool isSelected() const;
+	void setSelected(bool select);
+
+	void setTargetWindow(Window* wnd);
+	Window* getTargetWindow();
+};

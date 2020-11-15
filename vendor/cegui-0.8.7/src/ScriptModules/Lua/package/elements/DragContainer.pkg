@@ -1,0 +1,32 @@
+/***********************************************************************
+	DragContainer
+***********************************************************************/
+class DragContainer : public Window
+{
+	bool isDraggingEnabled() const;
+	void setDraggingEnabled(bool setting);
+
+	bool isBeingDragged() const;
+
+	float getPixelDragThreshold() const;
+	void setPixelDragThreshold(float pixels);
+
+	float getDragAlpha() const;
+	void setDragAlpha(float alpha);
+
+	const Image* getDragCursorImage() const;
+	void setDragCursorImage(utf8string name);
+	void setDragCursorImage(const Image* image);
+
+	Window* getCurrentDropTarget() const;
+
+    bool isStickyModeEnabled() const;
+    void setStickyModeEnabled(bool setting);
+
+    bool pickUp(bool force_sticky = false);
+
+    void setFixedDragOffset(const UVector2& offset);
+    const UVector2& getFixedDragOffset() const;
+    void setUsingFixedDragOffset(bool enable);
+    bool isUsingFixedDragOffset() const;
+};

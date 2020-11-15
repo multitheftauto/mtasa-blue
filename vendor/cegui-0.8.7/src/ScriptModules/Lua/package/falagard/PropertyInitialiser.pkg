@@ -1,0 +1,14 @@
+/******************************************************************************
+  PropertyInitialiser
+******************************************************************************/
+
+class PropertyInitialiser
+{
+  //void apply(PropertySet& target) const;
+  void apply(Window& target) const;
+
+  string getTargetPropertyName() const;
+  string getInitialiserValue() const;
+  //void writeXMLToStream(OutStream& out_stream) const;
+  PropertyInitialiser(utf8string property, utf8string value);
+};

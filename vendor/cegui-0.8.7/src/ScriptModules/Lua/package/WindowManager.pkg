@@ -1,0 +1,36 @@
+/***********************************************************************
+	WindowManager
+***********************************************************************/
+class WindowManager : public EventSet
+{
+	static WindowManager& getSingleton();
+
+	tolua_throws|CEGUI::AlreadyExistsException,nil|CEGUI::InvalidRequestException,nil| Window* createWindow(utf8string type, utf8string name="");
+
+    //tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| Window* loadLayoutFromContainer(const RawDataContainer& source);
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| Window*	loadLayoutFromFile(utf8string filename, utf8string resourceGroup = "");
+    tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| Window* loadLayoutFromString(utf8string source);
+
+    void writeLayoutToStream(const Window& window, OutStream& out) const;
+    string getLayoutAsString(const Window& window) const;
+    void saveLayoutToFile(const Window& window, utf8string filename) const;
+
+	void destroyWindow(Window* window);
+	void destroyAllWindows();
+
+	bool isAlive(Window* window) const;
+
+	bool isDeadPoolEmpty() const;
+	void cleanDeadPool();
+
+    WindowIterator getIterator() const;
+
+    static void setDefaultResourceGroup(utf8string resourceGroup);
+    static string& getDefaultResourceGroup();
+
+    void lock();
+    void unlock();
+    bool isLocked() const;
+
+    tolua_outside EventIterator ceguiLua_getEventIterator @ getEventIterator() const;
+};

@@ -1,0 +1,66 @@
+/***********************************************************************
+	Combobox
+***********************************************************************/
+class Combobox : public Window
+{
+	bool getSingleClickEnabled() const;
+	bool isDropDownListVisible() const;
+
+    Editbox* getEditbox() const;
+    PushButton* getPushButton() const;
+    ComboDropList* getDropList() const;
+
+	bool hasInputFocus() const;
+	bool isReadOnly() const;
+    RegexMatcher::MatchState getTextMatchState() const;
+	string getValidationString() const;
+
+	unsigned long getCaretIndex() const;
+	unsigned long getSelectionStartIndex() const;
+	unsigned long getSelectionEndIndex() const;
+	unsigned long getSelectionLength() const;
+	unsigned long getMaxTextLength() const;
+
+	void activateEditbox();
+
+	unsigned long getItemCount() const;
+	ListboxItem* getSelectedItem() const;
+	ListboxItem* getListboxItemFromIndex(unsigned long index) const;
+	unsigned long getItemIndex(const ListboxItem* item) const;
+	bool isItemSelected(unsigned long index) const;
+	ListboxItem* findItemWithText(utf8string text, const ListboxItem* start_item);
+	bool isListboxItemInList(const ListboxItem* item) const;
+
+	void resetList();
+	void addItem(ListboxItem* item);
+	void insertItem(ListboxItem* item, const ListboxItem* position);
+	void removeItem(const ListboxItem* item);
+	void clearAllSelections();
+	void setSortingEnabled(bool setting);
+	void setShowVertScrollbar(bool setting);
+	void setShowHorzScrollbar(bool setting);
+	void setItemSelectState(ListboxItem* item, bool state);
+	void setItemSelectState(unsigned long item_index, bool state);
+	void handleUpdatedListItemData();
+
+	bool isSortEnabled() const;
+	bool isVertScrollbarAlwaysShown() const;
+	bool isHorzScrollbarAlwaysShown() const;
+
+	void showDropList();
+	void hideDropList();
+	void setSingleClickEnabled(bool setting);
+
+	void setReadOnly(bool setting);
+	void setValidationString(utf8string validation_string);
+	void setCaretIndex(unsigned long caret_pos);
+	void setSelection(unsigned long start_pos, unsigned long end_pos);
+	void setMaxTextLength(unsigned long max_len);
+
+
+    bool getAutoSizeListHeightToContent() const;
+    bool getAutoSizeListWidthToContent() const;
+    void setAutoSizeListHeightToContent(bool auto_size);
+    void setAutoSizeListWidthToContent(bool auto_size);
+    void updateAutoSizedDropList();
+};

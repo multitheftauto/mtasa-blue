@@ -1,0 +1,148 @@
+/***********************************************************************
+	MultiColumnList
+***********************************************************************/
+struct MCLGridRef
+{
+	unsigned int row;
+	unsigned int column;
+
+	//bool operator< (const MCLGridRef& rhs) const;
+	//bool operator>= (const MCLGridRef& rhs) const;
+	bool operator== (const MCLGridRef& rhs) const;
+
+	MCLGridRef(unsigned int r, unsigned int c);
+};
+
+
+/***********************************************************************
+	MultiColumnList
+***********************************************************************/
+class MultiColumnList : public Window
+{
+	enum SelectionMode
+	{
+		RowSingle,
+		RowMultiple,
+		CellSingle,
+		CellMultiple,
+		NominatedColumnSingle,
+		NominatedColumnMultiple,
+		ColumnSingle,
+		ColumnMultiple,
+		NominatedRowSingle,
+		NominatedRowMultiple
+	};
+
+	bool isUserSortControlEnabled() const;
+	bool isUserColumnSizingEnabled() const;
+	bool isUserColumnDraggingEnabled() const;
+
+	unsigned int getColumnCount() const;
+	unsigned int getRowCount() const;
+	unsigned int getSortColumn() const;
+	unsigned int getColumnWithID(unsigned int col_id) const;
+	unsigned int getColumnWithHeaderText(utf8string text) const;
+
+	UDim getTotalColumnHeadersWidth() const;
+	UDim getColumnHeaderWidth(unsigned int col_idx) const;
+
+	ListHeaderSegment::SortDirection getSortDirection() const;
+	ListHeaderSegment& getHeaderSegmentForColumn(unsigned int col_idx) const;
+
+	unsigned int getItemRowIndex(const ListboxItem* item) const;
+	unsigned int getItemColumnIndex(const ListboxItem* item) const;
+
+	MCLGridRef getItemGridReference(const ListboxItem* item) const;
+	ListboxItem* getItemAtGridReference(const MCLGridRef& grid_ref) const;
+
+	bool isListboxItemInColumn(const ListboxItem* item, unsigned int col_idx) const;
+	bool isListboxItemInRow(const ListboxItem* item, unsigned int row_idx) const;
+	bool isListboxItemInList(const ListboxItem* item) const;
+
+	ListboxItem* findColumnItemWithText(utf8string text, unsigned int col_idx, const ListboxItem* start_item) const;
+	ListboxItem* findRowItemWithText(utf8string text, unsigned int row_idx, const ListboxItem* start_item) const;
+	ListboxItem* findListItemWithText(utf8string text, const ListboxItem* start_item) const;
+	ListboxItem* getFirstSelectedItem() const;
+	ListboxItem* getNextSelected(const ListboxItem* start_item) const;
+
+	unsigned int getSelectedCount() const;
+	bool isItemSelected(const MCLGridRef& grid_ref) const;
+
+	unsigned int getNominatedSelectionColumnID() const;
+	unsigned int getNominatedSelectionColumn() const;
+	unsigned int getNominatedSelectionRow() const;
+
+	SelectionMode getSelectionMode() const;
+
+	bool isVertScrollbarAlwaysShown() const;
+	bool isHorzScrollbarAlwaysShown() const;
+
+	unsigned int getColumnID(unsigned int col_idx) const;
+	unsigned int getRowID(unsigned int row_idx) const;
+    unsigned int getRowWithID(unsigned int row_id) const;
+
+    Rect<float> getListRenderArea() const;
+
+    Scrollbar* getVertScrollbar() const;
+    Scrollbar* getHorzScrollbar() const;
+    ListHeader* getListHeader() const;
+
+    float getTotalRowsHeight() const;
+    float getWidestColumnItemWidth(unsigned int col_idx) const;
+    float getHighestRowItemHeight(unsigned int row_idx) const;
+
+	void resetList();
+
+	void addColumn(utf8string text, unsigned int col_id, const UDim& width);
+	void insertColumn(utf8string text, unsigned int col_id, const UDim& width, unsigned int position);
+	void removeColumn(unsigned int col_idx);
+	void removeColumnWithID(unsigned int col_id);
+	void moveColumn(unsigned int col_idx, unsigned int position);
+	void moveColumnWithID(unsigned int col_id, unsigned int position);
+
+	unsigned int addRow();
+	unsigned int addRow(ListboxItem* item, unsigned int col_id);
+	unsigned int insertRow(unsigned int row_idx);
+	unsigned int insertRow(ListboxItem* item, unsigned int col_id, unsigned int row_idx);
+	void removeRow(unsigned int row_idx);
+
+	void setItem(ListboxItem* item, const MCLGridRef& position);
+	void setItem(ListboxItem* item, unsigned int col_id, unsigned int row_idx);
+
+	void setSelectionMode(MultiColumnList::SelectionMode sel_mode);
+	void setNominatedSelectionColumnID(unsigned int col_id);
+	void setNominatedSelectionColumn(unsigned int col_idx);
+	void setNominatedSelectionRow(unsigned int row_idx);
+
+	void setSortDirection(ListHeaderSegment::SortDirection direction);
+	void setSortColumn(unsigned int col_idx);
+	void setSortColumnByID(unsigned int col_id);
+
+	void setShowVertScrollbar(bool setting);
+	void setShowHorzScrollbar(bool setting);
+
+	void clearAllSelections();
+
+	void setItemSelectState(ListboxItem* item, bool state);
+	void setItemSelectState(const MCLGridRef& grid_ref, bool state);
+
+	void handleUpdatedItemData();
+
+	void setColumnHeaderWidth(unsigned int col_idx, const UDim& width);
+	void setUserSortControlEnabled(bool setting);
+	void setUserColumnSizingEnabled(bool setting);
+	void setUserColumnDraggingEnabled(bool setting);
+	void autoSizeColumnHeader(unsigned int col_idx);
+
+	void setRowID(unsigned int row_idx, unsigned int row_id);
+
+    void ensureRowIsVisible(unsigned int row_idx);
+    void ensureColumnIsVisible(unsigned int col_idx);
+    void ensureItemRowIsVisible(const ListboxItem* item);
+    void ensureItemColumnIsVisible(const ListboxItem* item);
+    void ensureItemIsVisible(const ListboxItem* item);
+    void ensureItemIsVisible(const MCLGridRef& grid_ref);
+
+    void setAutoSizeColumnUsesHeader(bool include_header);
+    bool getAutoSizeColumnUsesHeader() const;
+};

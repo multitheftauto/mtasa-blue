@@ -1,0 +1,139 @@
+/***********************************************************************
+	EventArgs
+***********************************************************************/
+class EventArgs
+{
+	unsigned int handled;
+
+	EventArgs();
+};
+
+
+
+/***********************************************************************
+	MouseCursorEventArgs
+***********************************************************************/
+class MouseCursorEventArgs : public EventArgs
+{
+	MouseCursor* mouseCursor;
+	const Image* image;
+
+	MouseCursorEventArgs(MouseCursor* cursor);
+};
+
+
+
+/***********************************************************************
+	WindowEventArgs
+***********************************************************************/
+class WindowEventArgs : public EventArgs
+{
+	Window* window;
+
+	WindowEventArgs(Window* wnd);
+};
+
+
+
+/***********************************************************************
+	ActivationEventArgs
+***********************************************************************/
+class ActivationEventArgs : public WindowEventArgs
+{
+	Window* otherWindow;
+
+	ActivationEventArgs(Window* wnd);
+};
+
+
+
+/***********************************************************************
+	HeaderSequenceEventArgs
+***********************************************************************/
+class HeaderSequenceEventArgs : public WindowEventArgs
+{
+	// remove 'd_' member variable prefix
+	unsigned int d_oldIdx @ oldIdx;
+	unsigned int d_newIdx @ newIdx;
+
+	HeaderSequenceEventArgs(Window* wnd, unsigned int old_index, unsigned int new_index);
+};
+
+
+
+/***********************************************************************
+	MouseButton
+***********************************************************************/
+enum MouseButton
+{
+	LeftButton,
+	RightButton,
+	MiddleButton,
+	X1Button,
+	X2Button,
+	MouseButtonCount,
+	NoButton
+};
+
+
+
+/***********************************************************************
+	MouseEventArgs
+***********************************************************************/
+class MouseEventArgs : public WindowEventArgs
+{
+	Vector2<float> position;
+	Vector2<float> moveDelta;
+	MouseButton button;
+	unsigned int sysKeys;
+	float wheelChange;
+
+	MouseEventArgs(Window* wnd);
+};
+
+
+
+/***********************************************************************
+	KeyEventArgs
+***********************************************************************/
+class KeyEventArgs : public WindowEventArgs
+{
+	unsigned long codepoint;
+	Key::Scan scancode;
+	unsigned int sysKeys;
+
+	KeyEventArgs(Window* wnd);
+};
+
+
+
+/************************************************************************
+    DragDropEventArgs
+*************************************************************************/
+class DragDropEventArgs : public WindowEventArgs
+{
+    DragContainer* dragDropItem;
+
+    DragDropEventArgs(Window* wnd);
+};
+
+
+/***********************************************************************
+   TreeEventArgs
+***********************************************************************/
+class TreeEventArgs : public WindowEventArgs
+{
+   TreeItem *treeItem;
+
+   TreeEventArgs(Window* wnd);
+};
+
+/***********************************************************************
+    RenderQueueEventArgs
+***********************************************************************/
+class RenderQueueEventArgs : public EventArgs
+{
+    RenderQueueID queueID;
+
+    RenderQueueEventArgs(RenderQueueID id);
+};

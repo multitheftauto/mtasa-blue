@@ -1,0 +1,29 @@
+/***********************************************************************
+    CoordConverter utility class
+***********************************************************************/
+class CoordConverter
+{
+    static float asAbsolute(const UDim& u, float base);
+    static float asRelative(const UDim& u, float base);
+
+    //static Vector2<float> asAbsolute(const Vector2<UDim>& v, const Size<float>& base);
+    //static Vector2<float> asRelative(const Vector2<UDim>& v, const Size<float>& base);
+    static Vector2<float> asAbsolute(const UVector2& v, const Size<float>& base);
+    static Vector2<float> asRelative(const UVector2& v, const Size<float>& base);
+
+    static Rect<float> asAbsolute(const URect& r, const Size<float>& base);
+    static Rect<float> asRelative(const URect& r, const Size<float>& base);
+
+    static float screenToWindowX(const Window& window, const UDim& x);
+    static float screenToWindowX(const Window& window, const float x);
+
+    static float screenToWindowY(const Window& window, const UDim& y);
+    static float screenToWindowY(const Window& window, const float y);
+
+    static Vector2<float> screenToWindow(const Window& window, const UVector2& vec);
+    static Vector2<float> screenToWindow(const Window& window, const Vector2<float>& vec);
+
+    static Rect<float> screenToWindow(const Window& window, const URect& rect);
+    static Rect<float> screenToWindow(const Window& window, const Rect<float>& rect);
+
+};

@@ -1,0 +1,16 @@
+/***********************************************************************
+    OutStream
+***********************************************************************/
+
+class OutStream
+{
+};
+
+class FileStream : public OutStream
+{
+    FileStream();
+
+    bool is_open();
+    tolua_outside void CEGUI::ceguiLua_FileStream_open @ open(const char* filename);
+    void close();
+};

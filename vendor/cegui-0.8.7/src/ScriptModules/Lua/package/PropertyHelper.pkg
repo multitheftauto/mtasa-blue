@@ -1,0 +1,39 @@
+/***********************************************************************
+	PropertyHelper
+***********************************************************************/
+$renaming ceguiLua_PropertyHelper @ PropertyHelper
+
+class ceguiLua_PropertyHelper
+{
+	static	float			stringToFloat(utf8string str);
+	static	unsigned int	stringToUint(utf8string str);
+	static	bool			stringToBool(utf8string str);
+	static	Size<float>		stringToSize(utf8string str);
+	static	Vector2<float>	stringToVector2(utf8string str);
+	static	Rect<float>		stringToRect(utf8string str);
+	static	const Image*	stringToImage(utf8string str);
+	static	Colour			stringToColour(utf8string str);
+	static	ColourRect		stringToColourRect(utf8string str);
+
+	static	UDim			stringToUDim(utf8string str);
+	static	UVector2		stringToUVector2(utf8string str);
+	static	USize           stringToUSize(utf8string str);
+	static	URect			stringToURect(utf8string str);
+    static AspectMode stringToAspectMode(utf8string str);
+
+	static string	floatToString(float val);
+	static string	uintToString(unsigned int val);
+	static string	boolToString(bool val);
+	static string	sizeToString(const Size<float>& val);
+	static string	vector2ToString(const Vector2<float>& val);
+	static string	rectToString(const Rect<float>& val);
+	static string	imageToString(const Image* val);
+	static string	colourToString(const Colour& val);
+	static string	colourRectToString(const ColourRect& val);
+
+	static string	udimToString(const UDim& val);
+	static string	uvector2ToString(const UVector2& val);
+	static string	usizeToString(const USize& val);
+	static string	urectToString(const URect& val);
+    static string aspectModeToString(AspectMode val);
+};

@@ -1,0 +1,19 @@
+class InjectedInputReceiver
+{
+    bool injectMouseMove(float delta_x, float delta_y);
+    bool injectMouseLeaves();
+    bool injectMouseButtonDown(MouseButton button);
+    bool injectMouseButtonUp(MouseButton button);
+    bool injectKeyDown(Key::Scan scan_code);
+    bool injectKeyUp(Key::Scan scan_code);
+    bool injectChar(unsigned long code_point);
+    bool injectMouseWheelChange(float delta);
+    bool injectMousePosition(float x_pos, float y_pos);
+    bool injectTimePulse(float timeElapsed);
+    bool injectMouseButtonClick(const MouseButton button);
+    bool injectMouseButtonDoubleClick(const MouseButton button);
+    bool injectMouseButtonTripleClick(const MouseButton button);
+    bool injectCopyRequest();
+    bool injectCutRequest();
+    bool injectPasteRequest();
+};

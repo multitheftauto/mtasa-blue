@@ -1,0 +1,23 @@
+/***********************************************************************
+    GeometryBuffer
+***********************************************************************/
+class GeometryBuffer
+{
+public:
+    void draw() const;
+
+    //void setTransform(const float* matrix);
+
+    void setTranslation(const Vector3<float>& v);
+    void setRotation(const Quaternion& r);
+    void setPivot(const Vector3<float>& p);
+    void appendVertex(const Vertex& vertex);
+    void appendGeometry(const Vertex* vbuff, unsigned int vertex_count);
+    void setActiveTexture(Texture* texture);
+    void reset();
+    Texture* getActiveTexture() const;
+    unsigned int getVertexCount() const;
+    unsigned int getBatchCount() const;
+    void setRenderEffect(RenderEffect* effect);
+    RenderEffect* getRenderEffect();
+};

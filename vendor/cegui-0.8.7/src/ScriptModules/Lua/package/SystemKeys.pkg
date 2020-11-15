@@ -1,0 +1,29 @@
+class SystemKeys
+{
+    enum SystemKey
+    {
+        None          = 0x0000,
+        LeftMouse     = 0x0001,
+        RightMouse    = 0x0002,
+        Shift         = 0x0004,
+        Control       = 0x0008,
+        MiddleMouse   = 0x0010,
+        X1Mouse       = 0x0020,
+        X2Mouse       = 0x0040,
+        Alt           = 0x0080
+    };
+
+    void reset();
+
+    unsigned int get() const;
+    bool isPressed(SystemKey key) const;
+
+    void keyPressed(Key::Scan key);
+    void keyReleased(Key::Scan key);
+    void mouseButtonPressed(MouseButton button);
+    void mouseButtonReleased(MouseButton button);
+
+    static SystemKey mouseButtonToSystemKey(MouseButton button);
+    static SystemKey keyCodeToSystemKey(Key::Scan key);
+};
+

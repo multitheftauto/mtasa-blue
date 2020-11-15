@@ -1,0 +1,12 @@
+/***********************************************************************
+	ScrolledItemListBase
+***********************************************************************/
+class ScrolledItemListBase : public ItemListBase
+{
+	bool isVertScrollbarAlwaysShown() const;
+	bool isHorzScrollbarAlwaysShown() const;
+    Scrollbar* getVertScrollbar() const;
+    Scrollbar* getHorzScrollbar() const;
+    void setShowVertScrollbar(bool mode);
+    void setShowHorzScrollbar(bool mode);
+};

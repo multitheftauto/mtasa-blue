@@ -1,0 +1,18 @@
+/***********************************************************************
+    Interpolator
+*************************************************************************/
+
+class Interpolator
+{
+    string getType() const;
+
+    string interpolateAbsolute(utf8string value1,
+                               utf8string value2,
+                               float position);
+
+    string interpolateRelative(utf8string base,
+                               utf8string value1,
+                               utf8string value2,
+                               float position);
+};
+

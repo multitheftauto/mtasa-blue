@@ -1,0 +1,24 @@
+/***********************************************************************
+	ListboxTextItem
+
+	The constructor is not exportet, instead a helper function is
+	available (CEGUI.createListboxTextItem).
+
+	I decided to do it like this to avoid any possible memory issues
+	with allocating from Lua.
+***********************************************************************/
+class ListboxTextItem : public ListboxItem
+{
+	Font* getFont() const;
+	ColourRect getTextColours() const;
+
+	void setFont(utf8string font_name);
+	void setFont(Font* font);
+
+	void setTextColours(Colour top_left_colour, Colour top_right_colour, Colour bottom_left_colour, Colour bottom_right_colour);
+	void setTextColours(const ColourRect& cols);
+	void setTextColours(Colour col);
+
+    void setTextParsingEnabled(const bool enable);
+    bool isTextParsingEnabled() const;
+};

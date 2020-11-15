@@ -1,0 +1,25 @@
+/***********************************************************************
+    SequentialLayoutContainer
+*************************************************************************/
+
+class SequentialLayoutContainer : public LayoutContainer
+{
+    unsigned int getPositionOfChild(Window* wnd) const;
+    unsigned int getPositionOfChild(utf8string wnd) const;
+    Window* getChildAtPosition(unsigned int position) const;
+
+    void swapChildPositions(unsigned int wnd1, unsigned int wnd2);
+    void swapChildren(Window* wnd1, Window* wnd2);
+    void swapChildren(utf8string wnd1, Window* wnd2);
+    void swapChildren(Window* wnd1, utf8string wnd2);
+    void swapChildren(utf8string wnd1, utf8string wnd2);
+
+    void moveChildToPosition(Window* wnd, unsigned int position);
+    void moveChildToPosition(utf8string wnd, unsigned int position);
+    void moveChild(Window* window, int delta = 1);
+
+    void addChildToPosition(Window* window, unsigned int position);
+
+    void removeChildFromPosition(unsigned int position);
+};
+

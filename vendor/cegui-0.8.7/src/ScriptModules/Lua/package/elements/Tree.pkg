@@ -1,0 +1,33 @@
+/***********************************************************************
+	Tree
+***********************************************************************/
+class Tree : public Window
+{
+	unsigned long	getItemCount(void) const;
+	unsigned long	getSelectedCount(void) const;
+	
+	TreeItem*	getFirstSelectedItem(void) const;
+	TreeItem*	getLastSelectedItem(void) const;
+	
+	bool	isSortEnabled(void) const;
+	bool	isMultiselectEnabled(void) const;
+	bool	isItemTooltipsEnabled(void) const;
+	
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| TreeItem*	findFirstItemWithText(utf8string text);
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| TreeItem*	findNextItemWithText(utf8string text, const TreeItem* start_item);
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| TreeItem*	findFirstItemWithID(unsigned int searchID);
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| TreeItem*	findNextItemWithID(unsigned int searchID, const TreeItem* start_item);
+	
+	bool	isTreeItemInList(const TreeItem* item) const;
+	void	resetList(void);
+	void	addItem(TreeItem* item);
+	
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| void	insertItem(TreeItem* item, const TreeItem* position);
+	void	removeItem(const TreeItem* item);
+	void	clearAllSelections(void);
+	void	setSortingEnabled(bool setting);
+	void	setMultiselectEnabled(bool setting);
+	void	setItemSelectState(TreeItem* item, bool state);
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| void	setItemSelectState(unsigned long item_index, bool state);
+	tolua_throws|CEGUI::Exception,error|std::exception,error|any,error| void	ensureItemIsVisible(const TreeItem* item);
+};

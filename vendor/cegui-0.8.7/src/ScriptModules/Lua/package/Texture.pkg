@@ -1,0 +1,26 @@
+/***********************************************************************
+	Texture
+***********************************************************************/
+class Texture
+{
+    enum PixelFormat
+    {
+        PF_RGB,
+        PF_RGBA,
+        PF_RGBA_4444,
+        PF_RGB_565,
+        PF_PVRTC2,
+        PF_PVRTC4,
+        PF_RGB_DXT1,
+        PF_RGBA_DXT1,
+        PF_RGBA_DXT3,
+        PF_RGBA_DXT5
+    };
+
+    const Size<float>& getSize() const;
+    const Size<float>& getOriginalDataSize() const;
+    const Vector2<float>& getTexelScaling() const;
+    void loadFromFile(utf8string filename, utf8string resourceGroup);
+    //void loadFromMemory(const void* buffer, const Size<float>& buffer_size, PixelFormat pixel_format);
+    bool isPixelFormatSupported(PixelFormat fmt) const;
+};

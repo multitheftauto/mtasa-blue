@@ -1,0 +1,12 @@
+class StringTranscoder
+{
+/* we do not expose this, since lua just has its basic string type
+
+    uint16* stringToUTF16(const String& input) const;
+    std::wstring stringToStdWString(const String& input) const;
+    String stringFromUTF16(const uint16* input) const;
+    String stringFromStdWString(const std::wstring& input) const;
+    void deleteUTF16Buffer(const uint16* input) const;
+*/
+};
+

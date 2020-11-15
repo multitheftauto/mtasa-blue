@@ -1,0 +1,8 @@
+class SimpleTimer
+{
+    SimpleTimer();
+
+    static double currentTime();
+    void restart();
+    double elapsed();
+};

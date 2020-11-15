@@ -1,0 +1,38 @@
+/*********************************************************************
+ TextComponent
+**********************************************************************/
+class TextComponent : public FalagardComponentBase 
+{
+        string getText() const;
+        string getEffectiveText(const Window& wnd) const;
+        string getTextVisual() const;
+        string getEffectiveVisualText(const Window& wnd) const;
+        void setText(utf8string text);
+
+        string getFont() const;
+        string getEffectiveFont(const Window& wnd) const;
+        void setFont(utf8string font);
+
+        VerticalTextFormatting getVerticalFormatting(const Window& wnd) const;
+        void setVerticalFormatting(VerticalTextFormatting fmt);
+
+        HorizontalTextFormatting getHorizontalFormatting(const Window& wnd) const;
+        void setHorizontalFormatting(HorizontalTextFormatting fmt);
+
+        void setHorizontalFormattingPropertySource(utf8string property_name);
+        void setVerticalFormattingPropertySource(utf8string property_name);
+
+        bool isTextFetchedFromProperty() const;
+        string getTextPropertySource() const;
+        void setTextPropertySource(utf8string property);
+        
+        bool isFontFetchedFromProperty() const;
+        string getFontPropertySource() const;
+        void setFontPropertySource(utf8string property);
+
+        float getHorizontalTextExtent(const Window& window) const;
+        float getVerticalTextExtent(const Window& window) const;
+
+    //void writeXMLToStream(OutStream& out_stream) const;
+    TextComponent();
+};

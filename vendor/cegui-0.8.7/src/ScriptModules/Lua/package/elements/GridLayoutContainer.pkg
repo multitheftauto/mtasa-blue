@@ -1,0 +1,44 @@
+/***********************************************************************
+    GridLayoutContainer
+*************************************************************************/
+class GridLayoutContainer : public LayoutContainer
+{
+    enum AutoPositioning
+    {
+        AP_Disabled,
+        AP_LeftToRight,
+        AP_TopToBottom
+    };
+
+    void setGridDimensions(unsigned int width, unsigned int height);
+    unsigned int getGridWidth() const;
+    unsigned int getGridHeight() const;
+
+    void setAutoPositioning(AutoPositioning positioning);
+    AutoPositioning getAutoPositioning() const;
+
+    void setNextAutoPositioningIdx(unsigned int idx);
+    unsigned int getNextAutoPositioningIdx() const;
+
+    void autoPositioningSkipCells(unsigned int cells);
+
+    void addChildToPosition(Window* window, unsigned int gridX, unsigned int gridY);
+
+    Window* getChildAtPosition(unsigned int gridX, unsigned int gridY);
+
+    void removeChildFromPosition(unsigned int gridX, unsigned int gridY);
+
+    void swapChildPositions(unsigned int wnd1, unsigned int wnd2);
+    void swapChildPositions(unsigned int gridX1, unsigned int gridY1,
+                            unsigned int gridX2, unsigned int gridY2);
+
+    void swapChildren(Window* wnd1, Window* wnd2);
+    void swapChildren(Window* wnd1, utf8string wnd2);
+    void swapChildren(utf8string wnd1, Window* wnd2);
+
+    void moveChildToPosition(Window* wnd, unsigned int gridX, unsigned int gridY);
+    void moveChildToPosition(utf8string wnd,
+                             unsigned int gridX, unsigned int gridY);
+
+};
+

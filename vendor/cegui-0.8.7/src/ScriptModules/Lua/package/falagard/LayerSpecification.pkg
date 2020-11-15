@@ -1,0 +1,16 @@
+/******************************************************************************
+  LayerSpecification
+******************************************************************************/
+
+class LayerSpecification
+{
+  void render(Window& srcWindow, const ColourRect* modcols = 0, const Rect<float>* clipper = 0, bool clipToDisplay = false) const;
+  void render(Window& srcWindow, const Rect<float>& baseRect, const ColourRect* modcols = 0, const Rect<float>* clipper = 0, bool clipToDisplay = false) const;
+  void addSectionSpecification(const SectionSpecification& section);
+  void clearSectionSpecifications();
+  unsigned int getLayerPriority() const;
+  bool operator<(const LayerSpecification& other) const;
+  //void writeXMLToStream(OutStream& out_stream) const;
+  LayerSpecification(unsigned int priority);
+};
+

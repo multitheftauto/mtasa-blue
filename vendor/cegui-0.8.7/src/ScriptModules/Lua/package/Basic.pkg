@@ -1,0 +1,284 @@
+/************************************************************************
+    rename the default template basic types to be shorter :)
+*************************************************************************/
+$renaming Vector2<float> @ Vector2f
+$renaming Vector3<float> @ Vector3f
+$renaming Size<float> @ Sizef
+$renaming Rect<float> @ Rectf
+
+// How aspect ratio should be maintained
+enum AspectMode
+{
+    AM_IGNORE,
+    AM_SHRINK,
+    AM_EXPAND
+};
+
+// Possible actions when loading an XML resource that already exists.
+enum XMLResourceExistsAction
+{
+    XREA_RETURN,
+    XREA_REPLACE,
+    XREA_THROW
+};
+
+/***********************************************************************
+    Vector2
+***********************************************************************/
+class Vector2
+{
+    TOLUA_TEMPLATE_BIND(T, float)
+
+    // rename 'd_x' and 'd_y' to just 'x' and 'y'
+    T d_x @ x;
+    T d_y @ y;
+
+    Vector2<T> operator+ (const Vector2<T>& vec) const;
+    Vector2<T> operator- (const Vector2<T>& vec) const;
+    Vector2<T> operator* (const Vector2<T>& vec) const;
+    bool operator== (const Vector2<T>& vec) const;
+
+    Vector2();
+    Vector2(T x, T y);
+};
+
+/***********************************************************************
+    Vector3
+***********************************************************************/
+class Vector3
+{
+    TOLUA_TEMPLATE_BIND(T, float)
+
+    // rename 'd_x', 'd_y' and 'd_z' to just 'x', 'y' and 'z'
+    T d_x @ x;
+    T d_y @ y;
+    T d_z @ z;
+
+    bool operator== (const Vector3<T>& vec) const;
+
+    Vector3();
+    Vector3(T x, T y, T z);
+};
+
+/***********************************************************************
+	Size
+***********************************************************************/
+class Size
+{
+    TOLUA_TEMPLATE_BIND(T, float)
+
+	// rename 'd_width' and 'd_height' to just 'width' and 'height'
+	T d_width @ width;
+	T d_height @ height;
+
+	bool operator== (const Size<T>& sz) const;
+
+	void clamp(Size<T> min, Size<T> max);
+	void scaleToAspect(AspectMode mode, T ratio);
+
+	Size();
+	Size(T w, T h);
+};
+
+
+
+/***********************************************************************
+	Rect
+***********************************************************************/
+class Rect
+{
+    TOLUA_TEMPLATE_BIND(T, float)
+
+    Vector2<T> d_min @ min;
+    Vector2<T> d_max @ max;
+
+	Rect();
+
+	Rect(const T& left, const T& top, const T& right, const T& bottom);
+    Rect(const Vector2<T>& min, const Vector2<T>& max);
+    Rect(const Vector2<T>& pos, const Size<T>& size);
+    Rect(const Rect<T>& r);
+
+    void left(const T& v);
+    void top(const T& v);
+    void right(const T& v);
+    void bottom(const T& v);
+
+    const T& left() const;
+    const T& top() const;
+    const T& right() const;
+    const T& bottom() const;
+
+	void setPosition(const Vector2<T>& min);
+	const Vector2<T>& getPosition() const;
+
+    void setSize(const Size<T>& size);
+	Size<T> getSize() const;
+
+    void setWidth(const T& w);
+	T getWidth() const;
+
+    void setHeight(const T& h);
+	T getHeight() const;
+
+	Rect<T> getIntersection(const Rect<T>& rect) const;
+
+	void offset(const Vector2<T>& v);
+
+	bool isPointInRect(const Vector2<T>& v) const;
+
+	void constrainSizeMax(const Size<T>& size);
+	void constrainSizeMin(const Size<T>& size);
+	void constrainSize(const Size<T>& max_sz, const Size<T>& min_sz);
+
+	bool operator==(const Rect<T>& rhs) const;
+    Rect<T> operator*(T scalar) const;
+	Rect<T> operator+(const Rect<T>& r) const;
+};
+
+class Quaternion
+{
+    float d_w @ w;
+    float d_x @ x;
+    float d_y @ y;
+    float d_z @ z;
+
+    static const Quaternion ZERO;
+    static const Quaternion IDENTITY;
+
+    static Quaternion eulerAnglesRadians(float x, float y, float z);
+    static Quaternion eulerAnglesDegrees(float x, float y, float z);
+    static Quaternion axisAngleRadians(const Vector3<float>& axis, float rotation);
+    static Quaternion axisAngleDegrees(const Vector3<float>& axis, float rotation);
+
+    static Quaternion slerp(const Quaternion& left, const Quaternion& right, float position, bool shortestPath = false);
+
+    Quaternion(float w = 1.0, float x = 0.0, float y = 0.0, float z = 0.0);
+    Quaternion(const Quaternion& v);
+    //Quaternion& operator= (const Quaternion& v);
+
+    bool operator== (const Quaternion& v) const;
+    //bool operator!= (const Quaternion& v) const;
+    Quaternion operator- () const;
+    Quaternion operator+ (const Quaternion& v) const;
+    Quaternion operator* (const Quaternion& v) const;
+    Quaternion operator* (float v) const;
+    //inline friend Quaternion operator * (float v, const Quaternion& q);
+
+    float dot(const Quaternion& v) const;
+    float length() const;
+    float normalise();
+};
+
+
+/***********************************************************************
+	Colour
+***********************************************************************/
+class Colour
+{
+	float getAlpha() const;
+	float getRed() const;
+	float getGreen() const;
+	float getBlue() const;
+	float getHue() const;
+	float getSaturation() const;
+	float getLumination() const;
+
+	void set(float r, float g, float b, float a);
+	void setAlpha(float a);
+	void setRed(float r);
+	void setGreen(float g);
+	void setBlue(float b);
+	void setRGB(float r, float g, float b);
+	void setHSL(float hue, float saturation, float luminance, float alpha=1);
+
+	Colour operator+ (const Colour& c) const;
+	Colour operator- (const Colour& c) const;
+	//Colour operator* (const Colour& c) const; // gives a warning about argb_t to Colour conversion
+	bool operator== (const Colour& c) const;
+
+	Colour();
+	Colour(float r, float g, float b, float a);
+};
+
+
+
+/***********************************************************************
+	ColourRect
+***********************************************************************/
+class ColourRect
+{
+	Colour d_top_left @ top_left;
+	Colour d_top_right @ top_right;
+	Colour d_bottom_left @ bottom_left;
+	Colour d_bottom_right @ bottom_right;
+
+	void	setAlpha(float alpha);
+	void	setTopAlpha(float alpha);
+	void	setBottomAlpha(float alpha);
+	void	setLeftAlpha(float alpha);
+	void	setRightAlpha(float alpha);
+	void	modulateAlpha(float alpha);
+
+	void	setColours(const Colour& col);
+
+	bool	isMonochromatic() const;
+
+	ColourRect getSubRectangle( float left, float right, float top, float bottom ) const;
+	Colour getColourAtPoint( float x, float y ) const;
+
+	//ColourRect& operator*= (const ColourRect& other); // no support for *= operators
+
+	ColourRect();
+	ColourRect(const Colour& col);
+	ColourRect(const Colour& top_left, const Colour& top_right, const Colour& bottom_left, const Colour& bottom_right);
+};
+
+
+
+/************************************************************************
+    String
+*************************************************************************/
+class String
+{
+    static const unsigned long npos;
+
+    unsigned long size() const;
+    unsigned long length() const;
+    bool empty() const;
+    unsigned long capacity() const;
+
+    unsigned long& operator[] (unsigned long i);
+    unsigned long& at(unsigned long i);
+    string c_str() const;
+
+    void reserve(unsigned long num=0);
+    void resize(unsigned long num);
+    void resize(unsigned long num, unsigned long codepoint);
+
+    void clear();
+    String& erase();
+    // default len is different from usual to handle ambiguity issue
+    String& erase(unsigned long idx, unsigned long len=1);
+
+    String& replace(unsigned long begin, unsigned long len, const String&s);
+    //String& replace(unsigned long begin, unsigned long len, unsigned long codepoint);
+
+    void swap(String& s);
+    String& insert(unsigned long pos, const String& s);
+    //String& insert(unsigned long pos, unsigned long codepoint);
+
+    unsigned long find(unsigned long codepoint, unsigned long idx=0) const;
+    unsigned long rfind(unsigned long codepoint, unsigned long idx=-1) const;
+    unsigned long find(const String& sub, unsigned long idx=0) const;
+    unsigned long rfind(const String& sub, unsigned long idx=-1) const;
+
+    String substr(unsigned long idx=0, unsigned long len=-1) const;
+
+    void push_back(unsigned long codepoint);
+
+    String();
+    String(unsigned long num, unsigned long codepoint);
+    String(utf8string s);
+    String(const String& s);
+};

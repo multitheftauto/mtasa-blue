@@ -1,0 +1,13 @@
+/***********************************************************************
+	PopupMenu
+***********************************************************************/
+class PopupMenu : public MenuBase
+{
+	float getFadeInTime() const;
+	float getFadeOutTime() const;
+
+	void setFadeInTime(float fadetime);
+	void setFadeOutTime(float fadetime);
+	void openPopupMenu();
+	void closePopupMenu();
+};

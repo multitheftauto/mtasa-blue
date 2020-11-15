@@ -1,0 +1,31 @@
+/***********************************************************************
+	MultiLineEditbox
+***********************************************************************/
+class MultiLineEditbox : public Window
+{
+	bool hasInputFocus() const;
+	bool isReadOnly() const;
+	unsigned long getCaretIndex() const;
+	unsigned long getSelectionStartIndex() const;
+	unsigned long getSelectionEndIndex() const;
+	unsigned long getSelectionLength() const;
+	unsigned long getMaxTextLength() const;
+	bool isWordWrapped() const;
+
+    Scrollbar* getVertScrollbar() const;
+    bool isVertScrollbarAlwaysShown() const;
+    Scrollbar* getHorzScrollbar() const;
+    Rect<float> getTextRenderArea() const;
+    unsigned long getLineNumberFromIndex(unsigned long index) const;
+
+	void setReadOnly(bool setting);
+	void setCaretIndex(unsigned long caret_pos);
+	void setSelection(unsigned long start_pos, unsigned long end_pos);
+	void setMaxTextLength(unsigned long max_len);
+	void ensureCaretIsVisible();
+	void setWordWrapping(bool setting);
+    void setShowVertScrollbar(bool setting);
+
+    void setSelectionBrushImage(const Image* image);
+    const Image* getSelectionBrushImage() const;
+};

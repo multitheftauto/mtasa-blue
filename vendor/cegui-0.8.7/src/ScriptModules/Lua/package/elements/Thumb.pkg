@@ -1,0 +1,22 @@
+/***********************************************************************
+	Thumb
+***********************************************************************/
+class Thumb : public PushButton
+{
+	bool isHotTracked() const;
+	bool isVertFree() const;
+	bool isHorzFree() const;
+
+	void setHotTracked(bool setting);
+	void setVertFree(bool setting);
+	void setHorzFree(bool setting);
+
+
+	// we have a helper function that converts the std::pair to two return values tolua++ style
+	tolua_outside void ceguiLua_Thumb_getVertRange @ getVertRange(float* min=0, float* max=0);
+	tolua_outside void ceguiLua_Thumb_getHorzRange @ getHorzRange(float* min=0, float* max=0);
+
+
+	void setVertRange(float min, float max);
+	void setHorzRange(float min, float max);
+};

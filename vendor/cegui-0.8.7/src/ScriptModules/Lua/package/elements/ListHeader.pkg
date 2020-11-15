@@ -1,0 +1,55 @@
+/***********************************************************************
+	ListHeader
+***********************************************************************/
+class ListHeader : public Window
+{
+	unsigned int getColumnCount() const;
+
+	ListHeaderSegment& getSegmentFromColumn(unsigned int column) const;
+	ListHeaderSegment& getSegmentFromID(unsigned int id) const;
+	ListHeaderSegment& getSortSegment() const;
+
+	unsigned int getColumnFromSegment(const ListHeaderSegment& segment) const;
+	unsigned int getColumnFromID(unsigned int id) const;
+	unsigned int getSortColumn() const;
+	unsigned int getColumnWithText(utf8string text) const;
+
+	float getPixelOffsetToSegment(const ListHeaderSegment& segment) const;
+	float getPixelOffsetToColumn(unsigned int column) const;
+	float getTotalSegmentsPixelExtent() const;
+	UDim  getColumnWidth(unsigned int column) const;
+
+	ListHeaderSegment::SortDirection getSortDirection() const;
+
+	bool isSortingEnabled() const;
+	bool isColumnSizingEnabled() const;
+	bool isColumnDraggingEnabled() const;
+
+	float getSegmentOffset() const;
+
+
+	void setSortingEnabled(bool setting);
+	void setSortDirection(ListHeaderSegment::SortDirection direction);
+	void setSortSegment(const ListHeaderSegment& segment);
+	void setSortColumn(unsigned int column);
+	void setSortColumnFromID(unsigned int id);
+
+	void setColumnSizingEnabled(bool setting);
+	void setColumnDraggingEnabled(bool setting);
+	void addColumn(utf8string text, unsigned int id, const UDim& width);
+
+	void insertColumn(utf8string text, unsigned int id, const UDim& width, unsigned int position);
+	void insertColumn(utf8string text, unsigned int id, const UDim& width, const ListHeaderSegment& position);
+	void removeColumn(unsigned int column);
+	void removeSegment(const ListHeaderSegment& segment);
+
+	void moveColumn(unsigned int column, unsigned int position);
+	void moveColumn(unsigned int column, const ListHeaderSegment& position);
+
+	void moveSegment(const ListHeaderSegment& segment, unsigned int position);
+	void moveSegment(const ListHeaderSegment& segment, const ListHeaderSegment& position);
+
+	void setSegmentOffset(float offset);
+
+	void setColumnWidth(unsigned int column, const UDim& width);
+};

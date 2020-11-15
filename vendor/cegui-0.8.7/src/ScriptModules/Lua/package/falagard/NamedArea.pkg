@@ -1,0 +1,14 @@
+/***********************************************************************
+  NamedArea
+***********************************************************************/
+class NamedArea
+{
+  string getName() const;
+  const ComponentArea& getArea() const;
+  void setArea(ComponentArea area);
+  //void writeXMLToStream(OutStream& out_stream) const;
+
+  NamedArea();
+  NamedArea(utf8string name);
+};
+

@@ -1,0 +1,16 @@
+/***********************************************************************
+	MenuBase
+***********************************************************************/
+class MenuBase : public ItemListBase
+{
+	float getItemSpacing() const;
+	bool isMultiplePopupsAllowed() const;
+	MenuItem* getPopupMenuItem() const;
+
+	void setItemSpacing(float spacing);
+	void changePopupMenuItem(MenuItem* item);
+	void setAllowMultiplePopups(bool setting);
+
+    bool getAutoCloseNestedPopups(void) const;
+    MenuItem* getPopupMenuItem(void) const;
+};

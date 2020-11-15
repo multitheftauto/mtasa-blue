@@ -1,0 +1,75 @@
+class GUIContextEventArgs : public EventArgs
+{
+public:
+    GUIContextEventArgs(GUIContext* context);
+    GUIContext* context;
+};
+
+class GUIContext : public RenderingSurface
+{
+    Window* getRootWindow() const;
+    void setRootWindow(Window* new_root);
+
+    //void setModalWindow(Window* window);
+    Window* getModalWindow() const;
+
+    Window* getWindowContainingMouse() const;
+
+    const Size<float>& getSurfaceSize() const;
+
+    const SystemKeys& getSystemKeys() const;
+
+    void markAsDirty();
+    bool isDirty() const;
+
+    MouseCursor& getMouseCursor();
+    //const MouseCursor& getMouseCursor() const;
+
+    void setMouseMoveScalingFactor(float factor);
+    float getMouseMoveScalingFactor() const;
+
+    void setMouseButtonClickTimeout(float seconds);
+    float getMouseButtonClickTimeout() const;
+
+    void setMouseButtonMultiClickTimeout(float seconds);
+    float getMouseButtonMultiClickTimeout() const;
+
+    void setMouseButtonMultiClickTolerance(const Size<float>& sz);
+    const Size<float>& getMouseButtonMultiClickTolerance() const;
+
+    void setMouseClickEventGenerationEnabled(const bool enable);
+    bool isMouseClickEventGenerationEnabled() const;
+
+    void updateWindowContainingMouse();
+
+    //void setInputCaptureWindow(Window* window);
+    Window* getInputCaptureWindow() const;
+
+    void setDefaultTooltipObject(Tooltip* tooltip);
+    void setDefaultTooltipType(utf8string tooltip_type);
+
+    Tooltip* getDefaultTooltipObject() const;
+
+    void setDefaultFont(utf8string name);
+    void setDefaultFont(Font* font);
+    Font* getDefaultFont(void) const;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // InjectedInputReceiver
+    bool injectMouseMove(float delta_x, float delta_y);
+    bool injectMouseLeaves(void);
+    bool injectMouseButtonDown(MouseButton button);
+    bool injectMouseButtonUp(MouseButton button);
+    bool injectKeyDown(Key::Scan scan_code);
+    bool injectKeyUp(Key::Scan scan_code);
+    bool injectChar(unsigned long code_point);
+    bool injectMouseWheelChange(float delta);
+    bool injectMousePosition(float x_pos, float y_pos);
+    bool injectTimePulse(float timeElapsed);
+    bool injectMouseButtonClick(MouseButton button);
+    bool injectMouseButtonDoubleClick(MouseButton button);
+    bool injectMouseButtonTripleClick(MouseButton button);
+    bool injectCopyRequest();
+    bool injectCutRequest();
+    bool injectPasteRequest();
+};

@@ -127,6 +127,9 @@ workspace "MTASA"
 		include "vendor/cegui-0.4.0-custom/WidgetSets/Falagard"
 		include "vendor/cegui-0.4.0-custom"
 
+		group "Client/CEGUI-0.8.7"
+		include "vendor/cegui-0.8.7"
+
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"

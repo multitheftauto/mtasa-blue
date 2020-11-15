@@ -1,0 +1,42 @@
+/***********************************************************************
+    Animation
+*************************************************************************/
+
+class Animation
+{
+    enum ReplayMode
+    {
+        RM_Once,
+        RM_Loop,
+        RM_Bounce
+    };
+
+    string getName() const;
+
+    void setReplayMode(ReplayMode mode);
+    ReplayMode getReplayMode() const;
+
+    void setDuration(float duration);
+    float getDuration() const;
+
+    void setAutoStart(bool autoStart);
+    bool getAutoStart() const;
+
+    Affector* createAffector(void);
+    Affector* createAffector(utf8string targetProperty,
+                             utf8string interpolator);
+    tolua_throws|CEGUI::InvalidRequestException,error| void destroyAffector(Affector* affector);
+
+    tolua_throws|CEGUI::InvalidRequestException,nil| Affector* getAffectorAtIdx(unsigned int index) const;
+
+    unsigned int getNumAffectors(void) const;
+
+    tolua_throws|CEGUI::InvalidRequestException,error| void defineAutoSubscription(utf8string eventName, utf8string action);
+    tolua_throws|CEGUI::InvalidRequestException,error| void undefineAutoSubscription(utf8string eventName,
+                                  utf8string action);
+    void undefineAllAutoSubscriptions();
+
+    tolua_throws|CEGUI::InvalidRequestException,error| void autoSubscribe(AnimationInstance* instance);
+    void autoUnsubscribe(AnimationInstance* instance);
+};
+

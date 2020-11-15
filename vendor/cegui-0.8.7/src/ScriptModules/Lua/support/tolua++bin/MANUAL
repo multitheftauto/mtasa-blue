@@ -1,0 +1,58 @@
+This tolua++ is modified with support for exception handling, and more will
+likely come over time.
+
+So to avoid forgetting how it works and what's new, all added features will
+be documented in full in this file:
+
+***********************
+* Exception handling: *
+***********************
+A new function modifier 'tolua_throws' has been added. It goes the same place
+as 'tolua_outside' etc. - so before the function name and return type.
+
+Two "types" of exceptions are supported internally, but they can be customized
+by making the tolua++ binary execute a Lua script before parsing with the '-L'
+command line option.
+Look in '../LuaScriptModule/package/exceptions.lua' to see the format. It's
+fairly simple and gives you alot of control.
+
+You always have 'std::exception' and 'any' (which means ...) available.
+
+This first example would be valid in a .pkg file for tolua++, and would ensure
+that any exceptions based on 'std::exception' thrown by the real C++ function
+would result in return value of 'nil' in Lua:
+
+	tolua_throws|std::exception,nil| void I_Throw:StdException();
+
+Inside the pipes the exception name follow by return values (or actions) are
+listed. The syntax is like so:
+
+	tolua_throws|<exceptionName>[,<ret1>[,<ret2> ... [, <retN>]]]|[<exceptionName>...|]
+
+The return values can by any of the following:
+* nil
+* message (the exception message, or 'Unknown' if not possible.
+* true
+* false
+* error (can only be used alone, will contain the exception is possible)
+
+In case no return values are specified, it will default to: 'nil, message'.
+
+Example 1: 
+----------
+Returns 'nil, false' for all exceptions:
+
+	tolua_throws|any,nil,false|
+
+Example 2:
+----------
+Returns 'nil, message' if a 'std::exception' is thrown:
+
+	tolua_throws|std::exception,nil,message|
+
+Example 3:
+----------
+If a CEGUI::Exception is thrown, return 'nil, message'.
+If any other kind of exception is thrown abort (error).
+
+	tolua_throws|CEGUI::Exception|any,error|

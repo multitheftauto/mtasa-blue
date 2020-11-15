@@ -1,0 +1,7 @@
+class TextureTarget : public RenderTarget
+{
+    void clear();
+    Texture& getTexture() const;
+    void declareRenderSize(const Size<float>& sz);
+    bool isRenderingInverted() const;
+};

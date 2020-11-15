@@ -1,0 +1,49 @@
+enum AutoScaledMode
+{
+    ASM_Disabled,
+    ASM_Vertical,
+    ASM_Horizontal,
+    ASM_Min,
+    ASM_Max,
+    ASM_Both
+};
+
+class Image
+{
+
+    const string getName() const;
+
+    const Size<float>& getRenderedSize() const;
+    const Vector2<float>& getRenderedOffset() const;
+
+    void render(GeometryBuffer& buffer,
+                        const Rect<float>& dest_area,
+                        const Rect<float>* clip_area,
+                        const ColourRect& colours) const;
+
+    void render(GeometryBuffer& buffer,
+                const Vector2<float>& position,
+                const Rect<float>* clip_area = 0) const;
+
+    void render(GeometryBuffer& buffer,
+                const Vector2<float>& position,
+                const Rect<float>* clip_area,
+                const ColourRect& colours) const;
+
+    void render(GeometryBuffer& buffer,
+                const Vector2<float>& position,
+                const Size<float>& size,
+                const Rect<float>* clip_area = 0) const;
+
+    void render(GeometryBuffer& buffer,
+                const Vector2<float>& position,
+                const Size<float>& size,
+                const Rect<float>* clip_area,
+                const ColourRect& colours) const;
+
+    static void computeScalingFactors(AutoScaledMode mode,
+                                      const Size<float>& display_size,
+                                      const Size<float>& native_display_size,
+                                      float& x_scale,
+                                      float& y_scale);
+};

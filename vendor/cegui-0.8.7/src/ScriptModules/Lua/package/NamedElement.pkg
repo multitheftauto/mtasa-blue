@@ -1,0 +1,24 @@
+class NamedElementEventArgs : public EventArgs
+{
+    NamedElementEventArgs(NamedElement* element);
+    NamedElement* element;
+};
+
+class NamedElement : public Element
+{
+    NamedElement(utf8string name = "");
+    ~NamedElement();
+
+    tolua_throws|CEGUI::AlreadyExistsException,error| void setName(utf8string name);
+    string& getName() const;
+
+    string getNamePath() const;
+
+    bool isChild(utf8string name_path) const;
+    bool isAncestor(utf8string name) const;
+
+    tolua_throws|CEGUI::UnknownObjectException,nil| NamedElement* getChildElement(utf8string name_path) const;
+
+    void removeChild(utf8string name_path);
+};
+

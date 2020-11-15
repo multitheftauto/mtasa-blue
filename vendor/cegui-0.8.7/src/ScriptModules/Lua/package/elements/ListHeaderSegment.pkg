@@ -1,0 +1,23 @@
+/***********************************************************************
+	ListHeaderSegment
+***********************************************************************/
+class ListHeaderSegment : public Window
+{
+	enum SortDirection
+	{
+		None,
+		Ascending,
+		Descending
+	};
+
+	bool isSizingEnabled() const;
+	SortDirection getSortDirection() const;
+	bool isDragMovingEnabled() const;
+	const Vector2<float>& getDragMoveOffset() const;
+	bool isClickable() const;
+
+	void setSizingEnabled(bool setting);
+	void setSortDirection(SortDirection sort_dir);
+	void setDragMovingEnabled(bool setting);
+	void setClickable(bool setting);
+};

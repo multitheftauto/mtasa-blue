@@ -1,0 +1,47 @@
+/***********************************************************************
+	TreeItem
+***********************************************************************/
+class TreeItem
+{
+    Font* getFont() const;
+    ColourRect getTextColours() const;
+    void setFont(Font* font);
+    void setFont(utf8string font_name);
+    void setTextColours(const ColourRect& cols);
+    void setTextColours(Colour top_left_colour, Colour top_right_colour,
+                        Colour bottom_left_colour, Colour bottom_right_colour);
+    void setTextColours(Colour col);
+    string getText() const;
+    string getTooltipText() const;
+    unsigned int getID() const;
+    void *getUserData() const;
+    bool isSelected() const;
+    bool isDisabled() const;
+    bool isAutoDeleted() const;
+    const Window *getOwnerWindow();
+    ColourRect getSelectionColours() const;
+    const Image* getSelectionBrushImage() const;
+    void setText(utf8string text);
+    void setTooltipText(utf8string text);
+    void setID(unsigned int item_id);
+    void setUserData(void* item_data);
+    void setSelected(bool setting);
+    void setDisabled(bool setting);
+    void setAutoDeleted(bool setting);
+    void setOwnerWindow(const Window* owner);
+    void setSelectionColours(const ColourRect& cols);
+    void setSelectionColours(Colour top_left_colour,Colour top_right_colour,Colour bottom_left_colour,Colour bottom_right_colour);
+    void setSelectionColours(Colour col);
+    void setSelectionBrushImage(const Image* image);
+    void setSelectionBrushImage(utf8string name);
+    void setButtonLocation(Rect<float>& buttonOffset);
+    Rect<float>& getButtonLocation();
+    bool getIsOpen();
+    void toggleIsOpen();
+    TreeItem *getTreeItemFromIndex(unsigned long itemIndex);
+    unsigned long getItemCount() const;
+    void addItem(TreeItem* item);
+    void removeItem(const TreeItem* item);
+    void setIcon(const Image &theIcon);
+
+};

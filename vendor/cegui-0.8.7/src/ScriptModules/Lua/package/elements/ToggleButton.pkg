@@ -1,0 +1,5 @@
+class ToggleButton : public ButtonBase
+{
+	bool isSelected() const;
+	void setSelected(bool select);
+};

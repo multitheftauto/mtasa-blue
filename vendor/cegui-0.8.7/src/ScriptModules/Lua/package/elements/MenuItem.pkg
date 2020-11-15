@@ -1,0 +1,21 @@
+/***********************************************************************
+	Menubar
+***********************************************************************/
+class MenuItem : public ItemEntry
+{
+	bool isHovering() const;
+	bool isPushed() const;
+	PopupMenu* getPopupMenu() const;
+
+	void setPopupMenu(PopupMenu* popup);
+	void openPopupMenu();
+	void closePopupMenu(bool notify=true);
+	bool togglePopupMenu();
+
+    bool hasAutoPopup(void) const;
+    float getAutoPopupTimeout(void) const;
+    void setAutoPopupTimeout(float time);
+
+    const UVector2& getPopupOffset(void) const;
+    void setPopupOffset(const UVector2& popupOffset);
+};

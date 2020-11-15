@@ -1,0 +1,13 @@
+/***********************************************************************
+	Slider
+***********************************************************************/
+class Slider : public Window
+{
+	float getCurrentValue() const;
+	float getMaxValue() const;
+	float getClickStep() const;
+
+	void setMaxValue(float maxVal);
+	void setCurrentValue(float value);
+	void setClickStep(float step);
+};

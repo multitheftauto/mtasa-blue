@@ -1,0 +1,36 @@
+/***********************************************************************
+	FontManager
+***********************************************************************/
+class FontManager
+{
+	static FontManager& getSingleton();
+
+    //tolua_throws|CEGUI::AlreadyExistsException,error| Font& createFromContainer(const RawDataContainer& source, XMLResourceExistsAction action = XREA_RETURN);
+    tolua_throws|CEGUI::AlreadyExistsException,error| Font& createFromFile(utf8string xml_filename, utf8string resource_group = "", XMLResourceExistsAction action = XREA_RETURN);
+    tolua_throws|CEGUI::AlreadyExistsException,error| Font& createFromString(utf8string source, XMLResourceExistsAction action = XREA_RETURN);
+
+    tolua_throws|CEGUI::AlreadyExistsException,error|CEGUI::GenericException,error| Font& createFreeTypeFont(const utf8string font_name, const float point_size,
+                                                                                                             const bool anti_aliased,
+                                                                                                             const utf8string font_filename,
+                                                                                                             const utf8string resource_group = "",
+                                                                                                             AutoScaledMode auto_scaled = CEGUI::ASM_Disabled,
+                                                                                                             const Size<float>& native_res = Size<float>(640.0f, 480.0f),
+                                                                                                             XMLResourceExistsAction action = XREA_RETURN);
+    tolua_throws|CEGUI::AlreadyExistsException,error| Font& createPixmapFont(const utf8string font_name,
+                                                                             const utf8string imageset_filename,
+                                                                             const utf8string resource_group = "",
+                                                                             AutoScaledMode auto_scaled = CEGUI::ASM_Disabled,
+                                                                             const Size<float>& native_res = Size<float>(640.0f, 480.0f),
+                                                                             XMLResourceExistsAction action = XREA_RETURN);
+
+	void destroy(utf8string name);
+	void destroy(Font& font);
+	void destroyAll();
+
+	bool isDefined(utf8string name) const;
+	Font& get(utf8string name) const;
+
+	void notifyDisplaySizeChanged(const Size<float>& sz);
+
+    FontIterator getIterator() const;
+};

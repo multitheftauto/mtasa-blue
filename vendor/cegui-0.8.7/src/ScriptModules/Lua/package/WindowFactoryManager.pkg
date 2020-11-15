@@ -1,0 +1,38 @@
+/***********************************************************************
+	WindowFactoryManager
+***********************************************************************/
+class FalagardWindowMapping
+{
+    string d_windowType @ windowType;
+    string d_lookName @ lookName;
+    string d_baseType @ baseType;
+    string d_rendererType @ rendererType;
+    string d_effectName @ effectName;
+};
+
+class WindowFactory
+{
+    string getTypeName() const;
+};
+
+class WindowFactoryManager
+{
+    static WindowFactoryManager& getSingleton();
+
+    bool isFactoryPresent(utf8string name) const;
+    void addWindowTypeAlias(utf8string aliasName, utf8string targetType);
+    void removeWindowTypeAlias(utf8string aliasName, utf8string targetType);
+    void addFalagardWindowMapping(utf8string newType, utf8string targetType, utf8string lookName, utf8string renderer, utf8string effectName = "");
+    void removeFalagardWindowMapping(utf8string type);
+    bool isFalagardMappedType(utf8string type) const;
+    string getMappedLookForType(utf8string type) const;
+    string getMappedRendererForType(utf8string type) const;
+    String getDereferencedAliasType(utf8string type) const;
+    const FalagardWindowMapping& getFalagardMappingForType(utf8string type) const;
+
+    void removeAllWindowTypeAliases();
+    void removeAllFalagardWindowMappings();
+
+    WindowFactoryIterator getIterator() const;
+    FalagardMappingIterator getFalagardMappingIterator() const;
+};

@@ -1,0 +1,100 @@
+/***********************************************************************
+	UDim
+***********************************************************************/
+class UDim
+{
+	float d_scale @ scale;
+	float d_offset @ offset;
+
+	UDim operator+ (const UDim& other) const;
+	UDim operator- (const UDim& other) const;
+	UDim operator/ (const UDim& other) const;
+	UDim operator* (const UDim& other) const;
+
+	bool operator== (const UDim& other) const;
+
+	UDim();
+	UDim(float scale, float offset);
+};
+
+
+/***********************************************************************
+	UVector2
+***********************************************************************/
+class UVector2
+{
+	UDim d_x @ x;
+	UDim d_y @ y;
+
+	UVector2 operator+ (const UVector2& other) const;
+	UVector2 operator- (const UVector2& other) const;
+	UVector2 operator/ (const UVector2& other) const;
+	UVector2 operator* (const UVector2& other) const;
+
+	bool operator== (const UVector2& other) const;
+
+	UVector2();
+	UVector2(UDim& scale, UDim& offset);
+};
+
+/***********************************************************************
+	USize
+***********************************************************************/
+class USize
+{
+	UDim d_width @ width;
+	UDim d_height @ height;
+
+	bool operator== (const USize& sz) const;
+
+	USize();
+	USize(const UDim& w, const UDim& h);
+};
+
+
+/***********************************************************************
+	URect
+***********************************************************************/
+class URect
+{
+	UVector2 d_min @ min;
+	UVector2 d_max @ max;
+
+	const UVector2& getPosition() const;
+	USize getSize() const;
+	UDim getWidth() const;
+	UDim getHeight() const;
+
+	void setPosition(const UVector2& pos);
+	void setSize(const USize& sz);
+	void setWidth(const UDim& w);
+	void setHeight(const UDim& h);
+
+	void offset(const UVector2& sz);
+
+	URect();
+	URect(const UVector2& min, const UVector2& max);
+	URect(const UDim& left, const UDim& top, const UDim& right, const UDim& bottom);
+};
+
+/***********************************************************************
+	UBox
+***********************************************************************/
+class UBox
+{
+    UBox();
+    UBox(const UDim& margin);
+    UBox(const UDim& top, const UDim& left, const UDim& bottom, const UDim& right);
+    UBox(const UBox& b);
+
+    bool operator==(const UBox& rhs) const;
+    //bool operator!=(const UBox& rhs) const;
+
+    //UBox& operator=(const UBox& rhs);
+
+    UDim d_top    @ top;
+    UDim d_left   @ left;
+    UDim d_bottom @ bottom;
+    UDim d_right  @ right;
+};
+

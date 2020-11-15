@@ -1,0 +1,5 @@
+In here we have a modified version of the tolua++ 1.0.91 code generator with
+added support for exception handling.
+
+The original tolua++ readme can be found at: '../tolua++/README'
+if you need more details.

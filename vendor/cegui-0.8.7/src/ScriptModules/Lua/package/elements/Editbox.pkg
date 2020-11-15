@@ -1,0 +1,27 @@
+/***********************************************************************
+	Editbox
+***********************************************************************/
+class Editbox : public Window
+{
+	bool hasInputFocus() const;
+	bool isReadOnly() const;
+	bool isTextMasked() const;
+    RegexMatcher::MatchState getTextMatchState() const;
+
+	string getValidationString() const;
+
+	unsigned long getCaretIndex() const;
+	unsigned long getSelectionStartIndex() const;
+	unsigned long getSelectionEndIndex() const;
+	unsigned long getSelectionLength() const;
+	unsigned long getMaskCodePoint() const;
+	unsigned long getMaxTextLength() const;
+
+	void setReadOnly(bool setting);
+	void setTextMasked(bool setting);
+	void setValidationString(utf8string validation_string);
+	void setCaretIndex(unsigned long caret_pos);
+	void setSelection(unsigned long start_pos, unsigned long end_pos);
+	void setMaskCodePoint(unsigned long code_point);
+	void setMaxTextLength(unsigned long max_len);
+};
