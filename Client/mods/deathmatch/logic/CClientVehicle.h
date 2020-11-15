@@ -258,6 +258,7 @@ public:
     unsigned char GetDoorStatus(unsigned char ucDoor);
     unsigned char GetWheelStatus(unsigned char ucWheel);
     bool          IsWheelCollided(unsigned char ucWheel);
+    int           GetWheelFrictionState(unsigned char ucWheel);
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
 

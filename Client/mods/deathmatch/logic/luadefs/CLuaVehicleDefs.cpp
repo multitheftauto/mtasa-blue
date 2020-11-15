@@ -44,6 +44,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehiclePlateText", GetVehiclePlateText},
         {"getVehicleWheelStates", GetVehicleWheelStates},
         {"isVehicleWheelOnGround", IsVehicleWheelCollided},
+        {"getVehicleWheelFrictionState", GetVehicleWheelFrictionState},
         {"isVehicleDamageProof", IsVehicleDamageProof},
         {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
         {"isVehicleFrozen", IsVehicleFrozen},
@@ -195,6 +196,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
+    lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
     lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getVariant", "getVehicleVariant");
@@ -946,6 +948,30 @@ int CLuaVehicleDefs::IsVehicleWheelCollided(lua_State* luaVM)
 
     if (!argStream.HasErrors())
         lua_pushboolean(luaVM, pVehicle->IsWheelCollided(wheel));
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+    }
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleWheelFrictionState(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = nullptr;
+    eWheelPosition   wheel;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadEnumStringOrNumber(wheel);
+
+    if (!argStream.HasErrors())
+    {
+        int wheelFrictionState = pVehicle->GetWheelFrictionState(wheel);
+        if (wheelFrictionState >= 0)
+            lua_pushnumber(luaVM, wheelFrictionState);
+        else
+            lua_pushboolean(luaVM, false);
+    }
     else
     {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
