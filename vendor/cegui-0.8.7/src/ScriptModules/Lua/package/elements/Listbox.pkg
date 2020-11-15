@@ -1,0 +1,41 @@
+/***********************************************************************
+	Listbox
+***********************************************************************/
+class Listbox : public Window
+{
+	unsigned long getItemCount() const;
+	unsigned long getSelectedCount() const;
+	ListboxItem* getFirstSelectedItem() const;
+	ListboxItem* getNextSelected(const ListboxItem* start_item) const;
+	ListboxItem* getListboxItemFromIndex(unsigned long index) const;
+	unsigned long getItemIndex(const ListboxItem* item) const;
+	ListboxItem* findItemWithText(utf8string text, const ListboxItem* start_item);
+	bool isSortEnabled() const;
+	bool isMultiselectEnabled() const;
+	bool isItemSelected(unsigned long index) const;
+	bool isListboxItemInList(const ListboxItem* item) const;
+	bool isVertScrollbarAlwaysShown() const;
+	bool isHorzScrollbarAlwaysShown() const;
+
+	void resetList(void);
+	void addItem(ListboxItem* item);
+	void insertItem(ListboxItem* item, const ListboxItem* position);
+	void removeItem(const ListboxItem* item);
+	void clearAllSelections(void);
+	void setSortingEnabled(bool setting);
+	void setMultiselectEnabled(bool setting);
+	void setShowVertScrollbar(bool setting);
+	void setShowHorzScrollbar(bool setting);
+	void setItemSelectState(ListboxItem* item, bool state);
+	void setItemSelectState(unsigned long item_index, bool state);
+	void handleUpdatedItemData(void);
+	void ensureItemIsVisible(unsigned long item_index);
+	void ensureItemIsVisible(const ListboxItem* item);
+	
+	Rect<float> getListRenderArea() const;
+	Scrollbar* getVertScrollbar() const;
+	Scrollbar* getHorzScrollbar() const;
+	float getWidestItemWidth() const;
+	float getTotalItemsHeight() const;
+    ListboxItem* getItemAtPoint(const Vector2<float>& pt) const;
+};

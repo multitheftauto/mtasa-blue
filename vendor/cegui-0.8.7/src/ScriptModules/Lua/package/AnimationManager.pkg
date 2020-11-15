@@ -1,0 +1,41 @@
+/***********************************************************************
+    AnimationManager
+*************************************************************************/
+
+class AnimationManager
+{
+    static AnimationManager& getSingleton();
+
+    tolua_throws|CEGUI::AlreadyExistsException,nil| void addInterpolator(Interpolator* interpolator);
+    tolua_throws|CEGUI::UnknownObjectException,nil| void removeInterpolator(Interpolator* interpolator);
+    tolua_throws|CEGUI::UnknownObjectException,nil| Interpolator* getInterpolator(utf8string name) const;
+
+    tolua_throws|CEGUI::UnknownObjectException,nil| Animation* createAnimation(utf8string name);
+    tolua_throws|CEGUI::UnknownObjectException,nil| void destroyAnimation(Animation* animation);
+    tolua_throws|CEGUI::UnknownObjectException,nil| void destroyAnimation(utf8string name);
+    tolua_throws|CEGUI::UnknownObjectException,nil| Animation* getAnimation(utf8string name) const;
+    tolua_throws|CEGUI::InvalidRequestException,nil| Animation* getAnimationAtIdx(unsigned int index) const;
+
+    unsigned int getNumAnimations() const;
+
+    tolua_throws|CEGUI::UnknownObjectException,nil| AnimationInstance* instantiateAnimation(Animation* animation);
+    tolua_throws|CEGUI::UnknownObjectException,nil| AnimationInstance* instantiateAnimation(utf8string name);
+    tolua_throws|CEGUI::InvalidRequestException,nil| void destroyAnimationInstance(AnimationInstance* instance);
+    void destroyAllInstancesOfAnimation(Animation* animation);
+
+    tolua_throws|CEGUI::InvalidRequestException,nil| AnimationInstance* getAnimationInstanceAtIdx(unsigned int index) const;
+
+    unsigned int getNumAnimationInstances() const;
+
+    void autoStepInstances(float delta);
+
+    void loadAnimationsFromXML(utf8string filename,
+                               utf8string resourceGroup = "");
+
+    void loadAnimationsFromString(utf8string source);
+    string getAnimationDefinitionAsString(const Animation& animation) const;
+
+    static void setDefaultResourceGroup(utf8string resourceGroup);
+    static string getDefaultResourceGroup();
+};
+

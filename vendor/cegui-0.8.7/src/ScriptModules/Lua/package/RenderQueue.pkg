@@ -1,0 +1,9 @@
+class RenderQueue 
+{
+    void addGeometryBuffer(const GeometryBuffer& buffer);
+    void removeGeometryBuffer(const GeometryBuffer& buffer);
+
+    void draw() const;
+    void reset();
+};
+

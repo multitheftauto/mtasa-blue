@@ -1,0 +1,15 @@
+/******************************************************************************
+  PropertyDefinition
+******************************************************************************/
+/* Commented for many reasons, but mostly because this class is now a template.
+class PropertyDefinition : public PropertyDefinitionBase
+{
+  //string get(const PropertyReceiver* receiver) const;
+  //void set(PropertyReceiver* receiver, utf8string value);
+  string get(const Window* receiver) const;
+  void set(Window* receiver, utf8string value);
+
+  PropertyDefinition(utf8string name, utf8string initialValue, bool redrawOnWrite, bool layoutOnWrite);
+};
+*/
+

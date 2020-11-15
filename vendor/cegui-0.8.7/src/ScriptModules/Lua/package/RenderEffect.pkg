@@ -1,0 +1,10 @@
+/***********************************************************************
+    RenderEffect
+***********************************************************************/
+class RenderEffect
+{
+    //void performPreRenderFunctions();
+    //void performPostRenderFunctions();
+    //bool realiseGeometry(RenderingWindow& window, GeometryBuffer& geometry);
+    //bool update(const float elapsed, RenderingWindow& window);
+};

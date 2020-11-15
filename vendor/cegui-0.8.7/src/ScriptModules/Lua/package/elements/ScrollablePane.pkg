@@ -1,0 +1,41 @@
+/***********************************************************************
+	ScrollablePane
+***********************************************************************/
+class ScrollablePane : public Window
+{
+	const ScrolledContainer* getContentPane() const;
+
+	bool	isVertScrollbarAlwaysShown() const;
+	void	setShowVertScrollbar(bool setting);
+
+	bool	isHorzScrollbarAlwaysShown() const;
+	void	setShowHorzScrollbar(bool setting);
+
+	bool isContentPaneAutoSized() const;
+	void setContentPaneAutoSized(bool setting);
+
+	const Rect<float>& getContentPaneArea() const;
+	void setContentPaneArea(const Rect<float>& area);
+
+	float getHorizontalStepSize() const;
+	void setHorizontalStepSize(float step);
+
+	float getHorizontalOverlapSize() const;
+	void setHorizontalOverlapSize(float overlap);
+
+	float getHorizontalScrollPosition() const;
+	void setHorizontalScrollPosition(float position);
+
+	float getVerticalStepSize() const;
+	void setVerticalStepSize(float step);
+
+	float getVerticalOverlapSize() const;
+	void setVerticalOverlapSize(float overlap);
+
+	float getVerticalScrollPosition() const;
+	void setVerticalScrollPosition(float position);
+
+    Rect<float> getViewableArea() const;
+    Scrollbar* getVertScrollbar() const;
+    Scrollbar* getHorzScrollbar() const;
+};

@@ -1,0 +1,13 @@
+/***********************************************************************
+	Scheme
+***********************************************************************/
+class Scheme
+{
+	void loadResources();
+	void unloadResources();
+	bool resourcesLoaded() const;
+	string getName() const;
+
+    static void setDefaultResourceGroup(utf8string resourceGroup);
+    static string getDefaultResourceGroup();
+};

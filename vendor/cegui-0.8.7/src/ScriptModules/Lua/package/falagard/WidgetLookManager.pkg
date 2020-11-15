@@ -1,0 +1,26 @@
+/***********************************************************************
+  WidgetLookManager
+***********************************************************************/
+
+class WidgetLookManager
+{
+  static WidgetLookManager& getSingleton(void);
+
+  //void parseLookNFeelSpecificationFromContainer(const RawDataContainer& source);
+  void parseLookNFeelSpecificationFromFile(utf8string filename, utf8string resourceGroup = "");
+  void parseLookNFeelSpecificationFromString(utf8string source);
+
+  bool isWidgetLookAvailable(utf8string widget) const;
+  const WidgetLookFeel& getWidgetLook(utf8string widget) const;
+  void eraseWidgetLook(utf8string widget);
+  void eraseAllWidgetLooks();
+  void addWidgetLook(WidgetLookFeel& look);
+
+  void writeWidgetLookToStream(utf8string name, OutStream& out_stream) const;
+  void writeWidgetLookSeriesToStream(utf8string prefix, OutStream& out_stream) const;
+
+  WidgetLookManager();
+
+  static void setDefaultResourceGroup(utf8string resourceGroup);
+  static string getDefaultResourceGroup();
+};

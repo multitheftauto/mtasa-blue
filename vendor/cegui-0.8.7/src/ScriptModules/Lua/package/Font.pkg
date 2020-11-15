@@ -1,0 +1,35 @@
+/***********************************************************************
+	Font
+***********************************************************************/
+class Font //: public PropertySet
+{
+	//////////////////////////////////////////////
+	// PropertySet
+	void setProperty(utf8string name, utf8string value);
+	string getProperty(utf8string name) const;
+	string getPropertyDefault(utf8string name) const;
+	string getPropertyHelp(utf8string name) const;
+
+	bool isPropertyPresent(utf8string name) const;
+	bool isPropertyDefault(utf8string name) const;
+
+    tolua_outside PropertyIterator ceguiLua_getPropertyIterator @ getPropertyIterator() const;
+
+    static void setDefaultResourceGroup(utf8string resourceGroup);
+    static string getDefaultResourceGroup();
+
+	bool isCodepointAvailable(unsigned long cp) const;
+
+	void notifyDisplaySizeChanged(const Size<float>& sz);
+	void setNativeResolution(const Size<float>& sz);
+
+    void setAutoScaled(AutoScaledMode auto_scaled);
+    AutoScaledMode getAutoScaled() const;
+
+	float getTextExtent(utf8string text, float xscale=1);
+	float getLineSpacing(float yscale=1) const;
+	float getFontHeight(float yscale=1) const;
+
+	unsigned long getCharAtPixel(utf8string text, unsigned long start_char, float pixel, float xscale=1);
+	unsigned long getCharAtPixel(utf8string text, float pixel, float xscale=1);
+};

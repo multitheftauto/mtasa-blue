@@ -1,0 +1,6 @@
+Since Linux has standards and autotools install PyCEGUI nicely there, there
+is no need to support distutils there. Windows however has no standards what
+so ever plus it has up to 93% more noobs than Linux. Therefore Windows MSI
+installers can be created with distutils and setup.py here.
+
+Thanks for understanding

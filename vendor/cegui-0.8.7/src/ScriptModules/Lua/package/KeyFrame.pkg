@@ -1,0 +1,28 @@
+/***********************************************************************
+    KeyFrame
+*************************************************************************/
+
+class KeyFrame
+{
+public:
+    enum Progression
+    {
+        P_Linear,
+        P_QuadraticAccelerating,
+        P_QuadraticDecelerating,
+        P_Discrete
+    };
+
+    Affector* getParent() const;
+
+    float getPosition() const;
+
+    void setValue(utf8string value);
+    string getValue() const;
+
+    void setProgression(Progression p);
+    Progression getProgression() const;
+
+    float alterInterpolationPosition(float position);
+};
+

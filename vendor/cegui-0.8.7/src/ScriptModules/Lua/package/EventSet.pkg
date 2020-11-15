@@ -1,0 +1,46 @@
+/************************************************************************
+    Event
+*************************************************************************/
+class Event
+{
+    string getName() const;
+};
+
+class EventConnection
+{
+    bool connected() const;
+    void disconnect();
+};
+
+
+/***********************************************************************
+	EventSet
+***********************************************************************/
+class EventSet
+{
+	void addEvent(utf8string name);
+	void removeEvent(utf8string name);
+	void removeAllEvents();
+	bool isEventPresent(utf8string name);
+
+    tolua_throws|CEGUI::UnknownObjectException,error| tolua_outside EventConnection LuaFunctorSubscribeEvent @ subscribeEvent(utf8string name, lua_Object funcIndex, lua_Object selfIndex=LUA_NOREF, lua_Object error_handler = LUA_NOREF, lua_State*);
+
+	tolua_throws|CEGUI::UnknownObjectException,error| EventConnection subscribeScriptedEvent @ subscribeEvent(utf8string name, utf8string callback_name);
+
+	void fireEvent(utf8string name, EventArgs& args, utf8string eventnamespace="");
+
+	bool isMuted() const;
+	void setMutedState(bool setting);
+
+    tolua_outside EventIterator ceguiLua_getEventIterator @ getEventIterator() const;
+};
+
+
+
+/***********************************************************************
+	GlobalEventSet
+***********************************************************************/
+class GlobalEventSet : public EventSet
+{
+	static GlobalEventSet& getSingleton();
+};

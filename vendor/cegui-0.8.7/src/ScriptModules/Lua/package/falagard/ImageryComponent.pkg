@@ -1,0 +1,27 @@
+/******************************************************************************
+  ImageryComponent
+******************************************************************************/
+
+class ImageryComponent : public FalagardComponentBase 
+{
+        const Image* getImage() const;
+        void setImage(const Image* image);
+        void setImage(utf8string name);
+
+        VerticalFormatting getVerticalFormatting(const Window& wnd) const;
+        void setVerticalFormatting(VerticalFormatting fmt);
+
+        HorizontalFormatting getHorizontalFormatting(const Window& wnd) const;
+        void setHorizontalFormatting(HorizontalFormatting fmt);
+
+        void setHorizontalFormattingPropertySource(utf8string property_name);
+        void setVerticalFormattingPropertySource(utf8string property_name);
+
+
+        bool isImageFetchedFromProperty() const;
+        string getImagePropertySource() const;
+        void setImagePropertySource(utf8string property);
+
+  //void writeXMLToStream(OutStream& out_stream) const;
+  ImageryComponent();
+};

@@ -1,0 +1,155 @@
+// include the header that makes these files generate valid code
+$#include "required.h"
+$#include "CEGUI/PropertyHelper.h"
+
+// start the CEGUI namespace and include everything inside that
+namespace CEGUI
+{
+
+$pfile "Basic.pkg"
+$pfile "UnifiedCoordSystem.pkg"
+$pfile "Logger.pkg"
+
+$pfile "Font.pkg"
+$pfile "FontManager.pkg"
+
+$pfile "Image.pkg"
+$pfile "BasicImage.pkg"
+$pfile "ImageManager.pkg"
+
+$pfile "Iterators.pkg"
+
+$pfile "SimpleTimer.pkg"
+
+$pfile "Key.pkg"
+$pfile "SystemKeys.pkg"
+$pfile "InputEvent.pkg"
+$pfile "EventSet.pkg"
+
+$pfile "MouseCursor.pkg"
+$pfile "Element.pkg"
+$pfile "NamedElement.pkg"
+$pfile "Window.pkg"
+$pfile "CoordConverter.pkg"
+$pfile "System.pkg"
+$pfile "GUIContext.pkg"
+
+$pfile "WindowManager.pkg"
+$pfile "WindowFactoryManager.pkg"
+
+$pfile "Scheme.pkg"
+$pfile "SchemeManager.pkg"
+
+$pfile "StringTranscoder.pkg"
+
+$pfile "PropertyHelper.pkg"
+
+$pfile "RegexMatcher.pkg"
+
+// Renderer related
+$pfile "Vertex.pkg"
+$pfile "RenderingContext.pkg"
+$pfile "RenderEffect.pkg"
+$pfile "GeometryBuffer.pkg"
+$pfile "RenderingSurface.pkg"
+$pfile "RenderTarget.pkg"
+$pfile "RenderingWindow.pkg"
+$pfile "RenderQueue.pkg"
+$pfile "Renderer.pkg"
+$pfile "Texture.pkg"
+$pfile "TextureTarget.pkg"
+
+// Animation system classes
+$pfile "KeyFrame.pkg"
+$pfile "Affector.pkg"
+$pfile "AnimationInstance.pkg"
+$pfile "Animation.pkg"
+$pfile "AnimationManager.pkg"
+$pfile "Interpolator.pkg"
+
+// elements
+$pfile "elements/GUISheet.pkg"
+$pfile "elements/Tree.pkg"
+
+$pfile "elements/ButtonBase.pkg"
+$pfile "elements/ToggleButton.pkg"
+$pfile "elements/PushButton.pkg"
+$pfile "elements/Thumb.pkg"
+$pfile "elements/RadioButton.pkg"
+
+$pfile "elements/TabButton.pkg"
+$pfile "elements/TabControl.pkg"
+
+$pfile "elements/Titlebar.pkg"
+$pfile "elements/TreeItem.pkg"
+$pfile "elements/FrameWindow.pkg"
+
+$pfile "elements/Tooltip.pkg"
+
+$pfile "elements/DragContainer.pkg"
+
+$pfile "elements/Scrollbar.pkg"
+$pfile "elements/ScrolledContainer.pkg"
+$pfile "elements/ScrollablePane.pkg"
+
+$pfile "elements/Slider.pkg"
+
+$pfile "elements/Spinner.pkg"
+
+$pfile "elements/ProgressBar.pkg"
+
+$pfile "elements/Editbox.pkg"
+$pfile "elements/MultiLineEditbox.pkg"
+
+$pfile "elements/ListboxItem.pkg"
+$pfile "elements/ListboxTextItem.pkg"
+
+$pfile "elements/Combobox.pkg"
+$pfile "elements/Listbox.pkg"
+$pfile "elements/ComboDropList.pkg"
+
+$pfile "elements/ListHeaderSegment.pkg"
+$pfile "elements/ListHeader.pkg"
+$pfile "elements/MultiColumnList.pkg"
+
+$pfile "elements/ItemEntry.pkg"
+$pfile "elements/ItemListBase.pkg"
+$pfile "elements/MenuBase.pkg"
+$pfile "elements/Menubar.pkg"
+$pfile "elements/PopupMenu.pkg"
+$pfile "elements/MenuItem.pkg"
+$pfile "elements/ScrolledItemListBase.pkg"
+$pfile "elements/ItemListbox.pkg"
+
+$pfile "elements/GroupBox.pkg"
+
+$pfile "elements/LayoutContainer.pkg"
+$pfile "elements/SequentialLayoutContainer.pkg"
+$pfile "elements/HorizontalLayoutContainer.pkg"
+$pfile "elements/VerticalLayoutContainer.pkg"
+$pfile "elements/GridLayoutContainer.pkg"
+
+$pfile "falagard/Enums.pkg"
+$pfile "falagard/Dimension.pkg"
+$pfile "falagard/NamedArea.pkg"
+$pfile "falagard/PropertyDefinitionBase.pkg"
+$pfile "falagard/PropertyDefinition.pkg"
+$pfile "falagard/PropertyInitialiser.pkg"
+$pfile "falagard/PropertyLinkDefinition.pkg"
+$pfile "falagard/FalagardComponentBase.pkg"
+$pfile "falagard/FrameComponent.pkg"
+$pfile "falagard/ImageryComponent.pkg"
+$pfile "falagard/TextComponent.pkg"
+$pfile "falagard/ImagerySection.pkg"
+$pfile "falagard/SectionSpecification.pkg"
+$pfile "falagard/LayerSpecification.pkg"
+$pfile "falagard/StateImagery.pkg"
+$pfile "falagard/WidgetComponent.pkg"
+$pfile "falagard/WidgetLookFeel.pkg"
+$pfile "falagard/WidgetLookManager.pkg"
+
+$pfile "HelperFunctions.pkg"
+
+$pfile "OutStream.pkg"
+
+}

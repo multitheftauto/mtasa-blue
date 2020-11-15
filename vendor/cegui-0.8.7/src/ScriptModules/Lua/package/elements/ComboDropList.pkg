@@ -1,0 +1,11 @@
+/***********************************************************************
+	ComboDropList
+***********************************************************************/
+class ComboDropList : public Listbox
+{
+	void	setArmed(bool setting);
+	bool	isArmed(void) const;
+	void	setAutoArmEnabled(bool setting);
+	bool	isAutoArmEnabled(void) const;
+    void resizeToContent(bool fit_width, bool fit_height);
+};

@@ -1,0 +1,286 @@
+/****************************************************
+	EventArgs casting helper functions.
+	These are not part of the core CEGUI API, merely here for
+	convenience
+*****************************************************/
+$[
+
+function CEGUI.toMouseCursorEventArgs(e)
+    return tolua.cast(e,"const CEGUI::MouseCursorEventArgs")
+end
+
+function CEGUI.toWindowEventArgs(e)
+    return tolua.cast(e,"const CEGUI::WindowEventArgs")
+end
+
+function CEGUI.toActivationEventArgs(e)
+    return tolua.cast(e,"const CEGUI::ActivationEventArgs")
+end
+
+function CEGUI.toHeaderSequenceEventArgs(e)
+    return tolua.cast(e,"const CEGUI::HeaderSequenceEventArgs")
+end
+
+function CEGUI.toMouseEventArgs(e)
+    return tolua.cast(e,"const CEGUI::MouseEventArgs")
+end
+
+function CEGUI.toKeyEventArgs(e)
+    return tolua.cast(e,"const CEGUI::KeyEventArgs")
+end
+
+function CEGUI.toDragDropEventArgs(e)
+    return tolua.cast(e,"const CEGUI::DragDropEventArgs")
+end
+
+function CEGUI.toTreeEventArgs(e)
+    return tolua.cast(e,"const CEGUI::TreeEventArgs")
+end
+
+function CEGUI.toRenderQueueEventArgs(e)
+    return tolua.cast(e,"const CEGUI::RenderQueueEventArgs")
+end
+
+CEGUI.EventArgs.toMouseCursorEventArgs      = CEGUI.toMouseCursorEventArgs
+CEGUI.EventArgs.toWindowEventArgs           = CEGUI.toWindowEventArgs
+CEGUI.EventArgs.toActivationEventArgs       = CEGUI.toActivationEventArgs
+CEGUI.EventArgs.toHeaderSequenceEventArgs   = CEGUI.toHeaderSequenceEventArgs
+CEGUI.EventArgs.toMouseEventArgs            = CEGUI.toMouseEventArgs
+CEGUI.EventArgs.toKeyEventArgs              = CEGUI.toKeyEventArgs
+CEGUI.EventArgs.toDragDropEventArgs         = CEGUI.toDragDropEventArgs
+CEGUI.EventArgs.toTreeEventArgs             = CEGUI.toTreeEventArgs
+CEGUI.EventArgs.toRenderQueueEventArgs      = CEGUI.toRenderQueueEventArgs
+
+$]
+
+
+/****************************************************
+	Functions for easy casting CEGUI::Window class
+	to the widget classes derived from it.
+	
+	all widget types gets these and they are made available as:
+	CEGUI.toButtonBase and CEGUI.Window:toButtonBase
+	etc...
+*****************************************************/
+$[
+
+function CEGUI.toButtonBase(w)
+    return tolua.cast(w,"CEGUI::ButtonBase")
+end
+
+function CEGUI.toToggleButton(w)
+    return tolua.cast(w,"CEGUI::ToggleButton")
+end
+
+--Deprecated, but kept for backwards compatibility; remove at suitable place in time 
+CEGUI.toCheckbox = CEGUI.toToggleButton
+
+function CEGUI.toCombobox(w)
+    return tolua.cast(w,"CEGUI::Combobox")
+end
+
+function CEGUI.toComboDropList(w)
+    return tolua.cast(w,"CEGUI::ComboDropList")
+end
+
+function CEGUI.toDragContainer(w)
+    return tolua.cast(w,"CEGUI::DragContainer")
+end
+
+function CEGUI.toEditbox(w)
+    return tolua.cast(w,"CEGUI::Editbox")
+end
+
+function CEGUI.toFrameWindow(w)
+    return tolua.cast(w,"CEGUI::FrameWindow")
+end
+
+function CEGUI.toGridLayoutContainer(w)
+    return tolua.cast(w,"CEGUI::GridLayoutContainer")
+end
+
+function CEGUI.toGUISheet(w)
+    return tolua.cast(w,"CEGUI::GUISheet")
+end
+
+function CEGUI.toHorizontalLayoutContainer(w)
+    return tolua.cast(w,"CEGUI::HorizontalLayoutContainer")
+end
+
+function CEGUI.toItemEntry(w)
+    return tolua.cast(w,"CEGUI::ItemEntry")
+end
+
+function CEGUI.toItemListBase(w)
+    return tolua.cast(w,"CEGUI::ItemListBase")
+end
+
+function CEGUI.toItemListbox(w)
+    return tolua.cast(w,"CEGUI::ItemListbox")
+end
+
+function CEGUI.toLayoutContainer(w)
+    return tolua.cast(w,"CEGUI::LayoutContainer")
+end
+
+function CEGUI.toListbox(w)
+    return tolua.cast(w,"CEGUI::Listbox")
+end
+
+function CEGUI.toListHeader(w)
+    return tolua.cast(w,"CEGUI::ListHeader")
+end
+
+function CEGUI.toListHeaderSegment(w)
+    return tolua.cast(w,"CEGUI::ListHeaderSegment")
+end
+
+function CEGUI.toMenubar(w)
+    return tolua.cast(w,"CEGUI::Menubar")
+end
+
+function CEGUI.toMenuBase(w)
+    return tolua.cast(w,"CEGUI::MenuBase")
+end
+
+function CEGUI.toMenuItem(w)
+    return tolua.cast(w,"CEGUI::MenuItem")
+end
+
+function CEGUI.toMultiColumnList(w)
+    return tolua.cast(w,"CEGUI::MultiColumnList")
+end
+
+function CEGUI.toMultiLineEditbox(w)
+    return tolua.cast(w,"CEGUI::MultiLineEditbox")
+end
+
+function CEGUI.toPopupMenu(w)
+    return tolua.cast(w,"CEGUI::PopupMenu")
+end
+
+function CEGUI.toProgressBar(w)
+    return tolua.cast(w,"CEGUI::ProgressBar")
+end
+
+function CEGUI.toPushButton(w)
+    return tolua.cast(w,"CEGUI::PushButton")
+end
+
+function CEGUI.toRadioButton(w)
+    return tolua.cast(w,"CEGUI::RadioButton")
+end
+
+function CEGUI.toScrollablePane(w)
+    return tolua.cast(w,"CEGUI::ScrollablePane")
+end
+
+function CEGUI.toScrollbar(w)
+    return tolua.cast(w,"CEGUI::Scrollbar")
+end
+
+function CEGUI.toScrolledContainer(w)
+    return tolua.cast(w,"CEGUI::ScrolledContainer")
+end
+
+function CEGUI.toScrolledItemListBase(w)
+    return tolua.cast(w,"CEGUI::ScrolledItemListBase")
+end
+
+function CEGUI.toSequentialLayoutContainer(w)
+    return tolua.cast(w,"CEGUI::SequentialLayoutContainer")
+end
+
+function CEGUI.toSlider(w)
+    return tolua.cast(w,"CEGUI::Slider")
+end
+
+function CEGUI.toSpinner(w)
+    return tolua.cast(w,"CEGUI::Spinner")
+end
+
+function CEGUI.toTabButton(w)
+    return tolua.cast(w,"CEGUI::TabButton")
+end
+
+function CEGUI.toTabControl(w)
+    return tolua.cast(w,"CEGUI::TabControl")
+end
+
+function CEGUI.toTabPane(w)
+    return tolua.cast(w,"CEGUI::TabPane")
+end
+
+function CEGUI.toThumb(w)
+    return tolua.cast(w,"CEGUI::Thumb")
+end
+
+function CEGUI.toTooltip(w)
+    return tolua.cast(w,"CEGUI::Tooltip")
+end
+
+function CEGUI.toTree(w)
+    return tolua.cast(w,"CEGUI::Tree")
+end
+
+function CEGUI.toVerticalLayoutContainer(w)
+    return tolua.cast(w,"CEGUI::VerticalLayoutContainer")
+end
+
+CEGUI.Window.toButtonBase = CEGUI.toButtonBase
+--Deprecated, but kept for backwards compatibility; remove at suitable place in time
+CEGUI.Window.toCheckbox = CEGUI.toToggleButton
+CEGUI.Window.toCombobox = CEGUI.toCombobox
+CEGUI.Window.toComboDropList = CEGUI.toComboDropList
+CEGUI.Window.toDragContainer = CEGUI.toDragContainer
+CEGUI.Window.toEditbox = CEGUI.toEditbox
+CEGUI.Window.toFrameWindow = CEGUI.toFrameWindow
+CEGUI.Window.toGridLayoutContainer = CEGUI.toGridLayoutContainer
+CEGUI.Window.toGUISheet = CEGUI.toGUISheet
+CEGUI.Window.toHorizontalLayoutContainer = CEGUI.toHorizontalLayoutContainer
+CEGUI.Window.toItemEntry = CEGUI.toItemEntry
+CEGUI.Window.toItemListBase = CEGUI.toItemListBase
+CEGUI.Window.toItemListbox = CEGUI.toItemListbox
+CEGUI.Window.toLayoutContainer = CEGUI.toLayoutContainer
+CEGUI.Window.toListbox = CEGUI.toListbox
+CEGUI.Window.toListHeader = CEGUI.toListHeader
+CEGUI.Window.toListHeaderSegment = CEGUI.toListHeaderSegment
+CEGUI.Window.toMenubar = CEGUI.toMenubar
+CEGUI.Window.toMenuBase = CEGUI.toMenuBase
+CEGUI.Window.toMenuItem = CEGUI.toMenuItem
+CEGUI.Window.toMultiColumnList = CEGUI.toMultiColumnList
+CEGUI.Window.toMultiLineEditbox = CEGUI.toMultiLineEditbox
+CEGUI.Window.toPopupMenu = CEGUI.toPopupMenu
+CEGUI.Window.toProgressBar = CEGUI.toProgressBar
+CEGUI.Window.toPushButton = CEGUI.toPushButton
+CEGUI.Window.toRadioButton = CEGUI.toRadioButton
+CEGUI.Window.toScrollablePane = CEGUI.toScrollablePane
+CEGUI.Window.toScrollbar = CEGUI.toScrollbar
+CEGUI.Window.toScrolledContainer = CEGUI.toScrolledContainer
+CEGUI.Window.toScrolledItemListBase = CEGUI.toScrolledItemListBase
+CEGUI.Window.toSequentialLayoutContainer = CEGUI.toSequentialLayoutContainer
+CEGUI.Window.toSlider = CEGUI.toSlider
+CEGUI.Window.toSpinner = CEGUI.toSpinner
+CEGUI.Window.toTabButton = CEGUI.toTabButton
+CEGUI.Window.toTabControl = CEGUI.toTabControl
+CEGUI.Window.toTabPane = CEGUI.toTabPane
+CEGUI.Window.toThumb = CEGUI.toThumb
+CEGUI.Window.toToggleButton = CEGUI.toToggleButton
+CEGUI.Window.toTooltip = CEGUI.toTooltip
+CEGUI.Window.toTree = CEGUI.toTree
+CEGUI.Window.toVerticalLayoutContainer = CEGUI.toVerticalLayoutContainer
+
+$]
+
+/****************************************************
+	Helper to create a ListboxTextItem.
+	Mimics the constructor
+*****************************************************/
+ListboxTextItem* ceguiLua_createListboxTextItem @ createListboxTextItem(utf8string text, unsigned int item_id=0, void* item_data=0, bool disabled=false, bool auto_delete=true);
+
+/****************************************************
+	Helper to create a TreeItem.
+	Mimics the constructor
+*****************************************************/
+TreeItem* ceguiLua_createTreeItem @ createTreeItem(utf8string text, unsigned int item_id=0, void* item_data=0, bool disabled=false, bool auto_delete=true);
+

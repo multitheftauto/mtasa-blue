@@ -1,0 +1,62 @@
+/***********************************************************************
+    System
+***********************************************************************/
+class System : public EventSet
+{
+    static unsigned int getMajorVersion();
+    static unsigned int getMinorVersion();
+    static unsigned int getPatchVersion();
+
+    static const string getVersion();
+    static const string getVerboseVersion();
+
+    static System& getSingleton(void);
+    Renderer* getRenderer(void) const;
+
+    //Clipboard* getClipboard() const;
+
+    GUIContext& getDefaultGUIContext() const;
+
+    void renderAllGUIContexts();
+
+    //ScriptModule* getScriptingModule(void) const;
+    //void setScriptingModule(ScriptModule* scriptModule);
+    //ResourceProvider* getResourceProvider(void) const;
+
+    void executeScriptFile(utf8string filename, utf8string resourceGroup = "") const;
+    int executeScriptGlobal(utf8string function_name) const;
+    void executeScriptString(utf8string str) const;
+
+    //void setXMLParser(const String& parserName);
+    //void setXMLParser(XMLParser* parser);
+    //XMLParser* getXMLParser(void) const     { return d_xmlParser; }
+    //static void setDefaultXMLParserName(const String& parserName);
+    //static const String getDefaultXMLParserName();
+    
+    //ImageCodec& getImageCodec() const;
+    //void setImageCodec(const String& codecName);
+    //void setImageCodec(ImageCodec& codec);
+    //static void setDefaultImageCodecName(const String& codecName);
+    //static const String& getDefaultImageCodecName();
+
+    void notifyDisplaySizeChanged(const Size<float>& new_size);
+
+    //RenderedStringParser* getDefaultCustomRenderedStringParser() const;
+    //void setDefaultCustomRenderedStringParser(RenderedStringParser* parser);
+
+    void invalidateAllCachedRendering();
+
+    //RegexMatcher* createRegexMatcher() const;
+    //void destroyRegexMatcher(RegexMatcher* rm) const;
+
+    bool injectTimePulse(float timeElapsed);
+
+    GUIContext& createGUIContext(RenderTarget& rt);
+    void destroyGUIContext(GUIContext& context);
+
+    void addStandardWindowFactories();
+    static const StringTranscoder& getStringTranscoder();
+
+    tolua_outside EventIterator ceguiLua_getEventIterator @ getEventIterator() const;
+};
+

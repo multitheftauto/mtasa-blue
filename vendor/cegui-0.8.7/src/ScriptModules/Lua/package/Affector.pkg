@@ -1,0 +1,33 @@
+/***********************************************************************
+    Affector
+*************************************************************************/
+class Affector
+{
+    enum ApplicationMethod
+    {
+        AM_Absolute,
+        AM_Relative
+    };
+
+    void setApplicationMethod(ApplicationMethod method);
+    ApplicationMethod getApplicationMethod() const;
+
+    void setTargetProperty(utf8string target);
+    string getTargetProperty() const;
+
+    void setInterpolator(Interpolator* interpolator);
+    void setInterpolator(utf8string name);
+    Interpolator* getInterpolator() const;
+
+    tolua_throws|CEGUI::InvalidRequestException,nil| KeyFrame* createKeyFrame(float position);
+    KeyFrame* createKeyFrame(float position, utf8string value,
+                        KeyFrame::Progression progression = KeyFrame::P_Linear);
+
+    tolua_throws|CEGUI::InvalidRequestException,error| void destroyKeyFrame(KeyFrame* keyframe);
+
+    tolua_throws|CEGUI::InvalidRequestException,nil| KeyFrame* getKeyFrameAtPosition(float position) const;
+    tolua_throws|CEGUI::InvalidRequestException,nil| KeyFrame* getKeyFrameAtIdx(unsigned int index) const;
+    unsigned int getNumKeyFrames() const;
+
+};
+

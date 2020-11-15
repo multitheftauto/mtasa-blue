@@ -1,0 +1,18 @@
+/***********************************************************************
+	SchemeManager
+***********************************************************************/
+class SchemeManager
+{
+	static SchemeManager& getSingleton();
+
+    //tolua_throws|CEGUI::AlreadyExistsException,error| Scheme& createFromContainer(const RawDataContainer& source, XMLResourceExistsAction action = XREA_RETURN);
+    tolua_throws|CEGUI::AlreadyExistsException,error| Scheme& createFromFile(utf8string xml_filename, utf8string resource_group = "", XMLResourceExistsAction action = XREA_RETURN);
+    tolua_throws|CEGUI::AlreadyExistsException,error| Scheme& createFromString(utf8string source, XMLResourceExistsAction action = XREA_RETURN);
+
+	void destroy(utf8string name);
+	bool isDefined(utf8string name) const;
+	Scheme& get(utf8string name) const;
+	void destroyAll();
+
+    SchemeIterator getIterator() const;
+};

@@ -1,0 +1,25 @@
+/***********************************************************************
+	Spinner
+***********************************************************************/
+class Spinner : public Window
+{
+	enum TextInputMode
+	{
+		FloatingPoint,
+		Integer,
+		Hexadecimal,
+		Octal
+	};
+
+	float getCurrentValue() const;
+	float getStepSize() const;
+	float getMaximumValue() const;
+	float getMinimumValue() const;
+	TextInputMode getTextInputMode() const;
+
+	void setCurrentValue(float value);
+	void setStepSize(float step);
+	void setMaximumValue(float maxValue);
+	void setMinimumValue(float minVaue);
+	void setTextInputMode(TextInputMode mode);
+};

@@ -1,0 +1,29 @@
+/***********************************************************************
+	TabControl
+***********************************************************************/
+class TabControl : public Window
+{
+	unsigned int getTabCount() const;
+
+	void setSelectedTab(utf8string name);
+	void setSelectedTab(unsigned int ID);
+	void setSelectedTabAtIndex(unsigned int index);
+
+	Window* getTabContentsAtIndex(unsigned int index) const;
+	Window* getTabContents(utf8string name) const;
+	Window* getTabContents(unsigned int ID) const;
+
+	bool isTabContentsSelected(Window* wnd) const;
+	unsigned int getSelectedTabIndex() const;
+
+	const UDim& getTabHeight() const;
+	const UDim& getTabTextPadding() const;
+
+	void setTabHeight(const UDim& height);
+	void setTabTextPadding(const UDim& pad);
+
+	void addTab(Window* wnd);
+
+	void removeTab(unsigned int ID);
+	void removeTab(utf8string name);
+};

@@ -1,0 +1,8 @@
+How to generate distutils package:
+
+1) generate the bindings sources
+2) cd into this folder
+3) call python setup.py bdist_msi ("python" has to be the python you want this package for!)
+
+bdist_msi could be bdist_wininst but wininst has problems with UAC elevation and
+other things so MSI is probably the way to go

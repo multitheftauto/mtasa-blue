@@ -1,0 +1,12 @@
+/***********************************************************************
+    BasicImage
+***********************************************************************/
+class BasicImage : public Image
+{
+    void setTexture(Texture* texture);
+    void setArea(const Rect<float>& pixel_area);
+    void setOffset(const Vector2<float>& pixel_offset);
+    void setAutoScaled(AutoScaledMode mode);
+    void setNativeResolution(const Size<float>& native_res);
+};
+

@@ -1,0 +1,41 @@
+/***********************************************************************
+    AnimationInstance
+*************************************************************************/
+
+class AnimationEventArgs : public EventArgs
+{
+    AnimationInstance* instance;
+};
+
+class AnimationInstance
+{
+    Animation* getDefinition() const;
+
+    //void setTarget(PropertySet* target);
+    //PropertySet* getTarget() const;
+
+    void setEventReceiver(EventSet* receiver);
+    EventSet* getEventReceiver() const;
+
+    void setEventSender(EventSet* sender);
+    EventSet* getEventSender() const;
+
+    void setTargetWindow(Window* target);
+    
+    tolua_throws|CEGUI::InvalidRequestException,error| void setPosition(float position);
+    float getPosition() const;
+
+    tolua_throws|CEGUI::InvalidRequestException,error| void setSpeed(float speed);
+    float getSpeed() const;
+
+    void start(bool skipNextStep = true);
+    void stop();
+    void pause();
+    void unpause(bool skipNextStep = true);
+    void togglePause(bool skipNextStep = true);
+
+    bool isRunning() const;
+
+    tolua_throws|CEGUI::InvalidRequestException,error| void step(float delta);
+};
+

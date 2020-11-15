@@ -1,0 +1,151 @@
+enum HorizontalAlignment
+{
+    HA_LEFT,
+    HA_CENTRE,
+    HA_RIGHT
+};
+
+enum VerticalAlignment
+{
+    VA_TOP,
+    VA_CENTRE,
+    VA_BOTTOM
+};
+
+
+class ElementEventArgs : public EventArgs
+{
+    ElementEventArgs(Element* element);
+    Element* element;
+};
+
+class Element
+//    public PropertySet,
+//    public EventSet,
+{
+    class CachedRectf
+    {
+//        typedef Rect<float> (Element::*DataGenerator)(bool) const;
+//        CachedRectf(Element const* element, DataGenerator generator);
+        
+        const Rect<float>& get() const;
+        Rect<float> getFresh(bool skipAllPixelAlignment = false) const;
+        
+        void invalidateCache() const;
+        bool isCacheValid() const;
+        void regenerateCache() const;
+    };
+    
+    Element();
+    ~Element();
+
+    Element* getParentElement() const;
+
+    void setArea(const URect& area);
+    void setArea(const UVector2& pos, const USize& size);
+    void setArea(const UDim& xpos, const UDim& ypos,
+                 const UDim& width, const UDim& height);
+    const URect& getArea() const;
+    
+
+
+    void setPosition(const UVector2& pos);
+    void setXPosition(const UDim& pos);
+    void setYPosition(const UDim& pos);
+
+    const UVector2& getPosition() const;
+    const UDim& getXPosition() const;
+    const UDim& getYPosition() const;
+    
+    void setHorizontalAlignment(HorizontalAlignment alignment);
+    HorizontalAlignment getHorizontalAlignment() const;
+
+    void setVerticalAlignment(VerticalAlignment alignment);
+    VerticalAlignment getVerticalAlignment() const;
+
+    void setSize(const USize& size);
+    USize getSize() const;
+
+    void setWidth(const UDim& width);
+    UDim getWidth() const;
+
+    void setHeight(const UDim& height);
+    UDim getHeight() const;
+
+    void setMinSize(const USize& size);
+    const USize& getMinSize() const;
+
+    void setMaxSize(const USize& size);
+    const USize& getMaxSize() const;
+
+    void setAspectMode(AspectMode mode);
+    AspectMode getAspectMode() const;
+
+    void setAspectRatio(float ratio);
+    float getAspectRatio() const;
+    
+    void setPixelAligned(bool setting);
+    bool isPixelAligned() const;
+
+    const Vector2<float>& getPixelPosition() const;
+    const Size<float>& getPixelSize() const;
+
+    Size<float> calculatePixelSize(bool skipAllPixelAlignment = false) const;
+
+    Size<float> getParentPixelSize(bool skipAllPixelAlignment = false) const;
+
+    const Quaternion& getRotation() const;
+
+    tolua_throws|CEGUI::InvalidRequestException,error| void addChild(Element* element);
+    void removeChild(Element* element);
+    Element* getChildElementAtIdx(unsigned int idx) const;
+    unsigned int getChildCount() const;
+    bool isChild(const Element* element) const;
+    bool isAncestor(const Element* element) const;
+    
+    void setNonClient(bool setting);
+    bool isNonClient() const;
+    
+    const CachedRectf& getUnclippedOuterRect() const;
+    const CachedRectf& getUnclippedInnerRect() const;
+    const CachedRectf& getUnclippedRect(const bool inner) const;
+    const CachedRectf& getClientChildContentArea() const;
+    const CachedRectf& getNonClientChildContentArea() const;
+
+    const CachedRectf& getChildContentArea(bool non_client = false) const;
+    
+    void notifyScreenAreaChanged(bool recursive = true);
+
+    const Size<float>& getRootContainerSize() const;
+
+	//////////////////////////////////////////////
+	// PropertySet
+	void setProperty(utf8string name, utf8string value);
+	string getProperty(utf8string name) const;
+	string getPropertyDefault(utf8string name) const;
+	string getPropertyHelp(utf8string name) const;
+
+	bool isPropertyPresent(utf8string name) const;
+	bool isPropertyDefault(utf8string name) const;
+
+    tolua_outside PropertyIterator ceguiLua_getPropertyIterator @ getPropertyIterator() const;
+
+	//////////////////////////////////////////////
+	// EventSet
+	void addEvent(utf8string name);
+	void removeEvent(utf8string name);
+	void removeAllEvents();
+	bool isEventPresent(utf8string name);
+
+    tolua_throws|CEGUI::UnknownObjectException,error| tolua_outside EventConnection LuaFunctorSubscribeEvent @ subscribeEvent(utf8string name, lua_Object funcIndex, lua_Object selfIndex=LUA_NOREF, lua_Object error_handler = LUA_NOREF, lua_State*);
+
+	tolua_throws|CEGUI::UnknownObjectException,error| EventConnection subscribeScriptedEvent @ subscribeEvent(utf8string name, utf8string callback_name);
+	
+	void fireEvent(utf8string name, EventArgs& args, utf8string eventnamespace="");
+
+	bool isMuted() const;
+	void setMutedState(bool setting);
+
+    tolua_outside EventIterator ceguiLua_getEventIterator @ getEventIterator() const;
+};
+

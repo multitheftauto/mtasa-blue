@@ -1,0 +1,19 @@
+/******************************************************************************
+  StateImagery
+******************************************************************************/
+
+class StateImagery
+{
+  void render(Window& srcWindow, const ColourRect* modcols = 0, const Rect<float>* clipper = 0) const;
+  void render(Window& srcWindow, const Rect<float>& baseRect, const ColourRect* modcols = 0, const Rect<float>* clipper = 0) const;
+
+  void addLayer(const LayerSpecification& layer);
+  void clearLayers();
+  string getName() const;
+  bool isClippedToDisplay() const;
+  void setClippedToDisplay(bool setting);
+  //void writeXMLToStream(OutStream& out_stream) const;
+  StateImagery(utf8string name);
+  StateImagery();
+};
+

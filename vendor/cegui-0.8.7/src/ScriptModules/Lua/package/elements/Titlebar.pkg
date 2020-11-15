@@ -1,0 +1,8 @@
+/***********************************************************************
+	Titlebar
+***********************************************************************/
+class Titlebar : public Window
+{
+	bool isDraggingEnabled() const;
+	void setDraggingEnabled(bool setting);
+};

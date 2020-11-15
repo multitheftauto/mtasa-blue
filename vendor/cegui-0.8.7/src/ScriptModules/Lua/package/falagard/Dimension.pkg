@@ -1,0 +1,179 @@
+/******************************************************************************
+  BaseDim  
+******************************************************************************/
+class BaseDim
+{
+  tolua_throws|CEGUI::InvalidRequestException,error| float getValue(const Window& wnd) const;
+  tolua_throws|CEGUI::InvalidRequestException,error| float getValue(const Window& wnd, const Rect<float>& container) const;
+  BaseDim* clone() const;
+  //void writeXMLToStream(OutStream& out_stream) const;
+};
+
+/******************************************************************************
+  OperatorDim 
+******************************************************************************/
+class OperatorDim : public BaseDim
+{
+    OperatorDim();
+    OperatorDim(DimensionOperator op);
+    OperatorDim(DimensionOperator op, BaseDim* left, BaseDim* right);
+
+    void setLeftOperand(const BaseDim* operand);
+    BaseDim* getLeftOperand() const;
+
+    void setRightOperand(const BaseDim* operand);
+    BaseDim* getRightOperand() const;
+
+    void setOperator(DimensionOperator op);
+    DimensionOperator getOperator() const;
+
+    void setNextOperand(const BaseDim* operand);
+};
+
+/******************************************************************************
+  AbsoluteDim 
+******************************************************************************/
+class AbsoluteDim : public BaseDim
+{
+  void setBaseValue(float val);
+  float getBaseValue() const;
+  AbsoluteDim(float val);
+};
+
+/******************************************************************************
+  ImageDimBase
+******************************************************************************/
+class ImageDimBase : public BaseDim 
+{
+  void setSourceDimension(DimensionType dim);
+  DimensionType getSourceDimension() const;
+};
+
+/******************************************************************************
+  ImageDim
+******************************************************************************/
+class ImageDim : public ImageDimBase 
+{
+  void setSourceImage(utf8string name);
+  string getSourceImage() const;
+
+  ImageDim(utf8string image_name, DimensionType dim);
+};
+
+/******************************************************************************
+  ImagePropertyDim
+******************************************************************************/
+class ImagePropertyDim : public ImageDimBase 
+{
+  void setSourceProperty(utf8string name);
+  string getSourceProperty() const;
+
+  ImagePropertyDim(utf8string property_name, DimensionType dim);
+};
+
+/******************************************************************************
+  WidgetDim
+******************************************************************************/
+class WidgetDim : public BaseDim
+{
+  void setWidgetName(utf8string name);
+  string getWidgetName() const;
+
+  void setSourceDimension(DimensionType dim);
+  DimensionType getSourceDimension() const;
+
+  WidgetDim(utf8string name, DimensionType dim);
+};
+
+/******************************************************************************
+  UnifiedDim
+******************************************************************************/
+class UnifiedDim : public BaseDim 
+{
+  const UDim& getBaseValue() const;
+  void setBaseValue(const UDim& val);
+
+  DimensionType getSourceDimension() const;
+  void setSourceDimension(DimensionType dim);
+
+  UnifiedDim(const UDim& value, DimensionType dim);
+};
+
+/******************************************************************************
+  FontDim
+******************************************************************************/
+class FontDim : public BaseDim
+{
+  string getName() const;
+  void setName(utf8string name);
+
+  string getFont() const;
+  void setFont(utf8string font);
+
+  string getText() const;
+  void setText(utf8string text);
+
+  FontMetricType getMetric() const;
+  void setMetric(FontMetricType metric);
+
+  float getPadding() const;
+  void setPadding(float padding);
+
+  FontDim(utf8string name, utf8string font, utf8string text, FontMetricType metric, float padding = 0);
+};
+
+/******************************************************************************
+  PropertyDim
+******************************************************************************/
+class PropertyDim : public BaseDim
+{
+  string getWidgetName() const;
+  void setWidgetName(utf8string name);
+
+  string getPropertyName() const;
+  void setPropertyName(utf8string property);
+
+  DimensionType getSourceDimension() const;
+  void setSourceDimension(DimensionType dim);
+
+  PropertyDim(utf8string name, utf8string property, DimensionType type);
+};
+
+/******************************************************************************
+  Dimension
+******************************************************************************/
+class Dimension
+{
+  const BaseDim& getBaseDimension() const;
+  void setBaseDimension(const BaseDim& dim);
+  DimensionType getDimensionType() const;
+  void setDimensionType(DimensionType type);
+
+  //Dimension& operator=(const Dimension& other);
+  //void writeXMLToStream(OutStream& out_stream) const;
+  Dimension(const BaseDim& dim, DimensionType type);
+  Dimension(const Dimension& other);
+  Dimension();
+};
+
+/******************************************************************************
+  ComponentArea 
+******************************************************************************/
+class ComponentArea
+{
+  Rect<float> getPixelRect(const Window& wnd) const;
+  Rect<float> getPixelRect(const Window& wnd, const Rect<float>& container) const;
+  //void writeXMLToStream(OutStream& out_stream) const;
+  bool isAreaFetchedFromProperty() const;
+  string getAreaPropertySource() const;
+  void setAreaPropertySource(utf8string property);
+
+  void setNamedAreaSouce(utf8string widget_look, utf8string area_name);
+  bool isAreaFetchedFromNamedArea() const;
+
+  Dimension d_left;
+  Dimension d_top;
+  Dimension d_right_or_width;
+  Dimension d_bottom_or_height;
+  ComponentArea();
+};

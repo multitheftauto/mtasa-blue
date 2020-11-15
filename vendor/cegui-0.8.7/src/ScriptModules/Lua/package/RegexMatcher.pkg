@@ -1,0 +1,25 @@
+class RegexMatchStateEventArgs : public WindowEventArgs
+{
+public:
+    RegexMatchStateEventArgs(Window* wnd,
+                             RegexMatcher::MatchState state);
+
+    RegexMatcher::MatchState matchState;
+};
+
+class RegexMatcher
+{
+public:
+    //! Enumeration of possible states when cosidering a regex match.
+    enum MatchState
+    {
+        MS_VALID,
+        MS_INVALID,
+        MS_PARTIAL
+    };
+
+    void setRegexString(utf8string regex);
+    string getRegexString() const;
+    MatchState getMatchStateOfString(utf8string str) const;
+};
+

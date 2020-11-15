@@ -1,0 +1,10 @@
+This directory contains the tolua++ .pkg files used to generate the bindings.
+We now use a custom tolua++ parser to allow exception handling.
+
+To generate the bindings, would must build the 'tolua++cegui' binary in
+'cegui_mk2/ScriptingModules/CEGUILua/tolua++bin', and use it something like this:
+
+	../../tolua++bin/tolua++cegui -o ../src/lua_CEGUI.cpp -L exceptions.lua CEGUI.pkg
+
+It's important to execute 'exceptions.lua' and it will fail if you don't as the .pkg
+files rely on the the exception types defined in that file.

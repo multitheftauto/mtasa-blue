@@ -1,0 +1,31 @@
+/***********************************************************************
+    RenderingWindow
+***********************************************************************/
+class RenderingWindow : public RenderingSurface
+{
+    void setClippingRegion(const Rect<float>& region);
+
+    void setPosition(const Vector2<float>& position);
+    void setSize(const Size<float>& size);
+    void setRotation(const Quaternion& rotation);
+    void setPivot(const Vector3<float>& pivot);
+
+    const Vector2<float>& getPosition() const;
+    const Size<float>& getSize() const;
+    const Quaternion& getRotation()const;
+    const Vector3<float>& getPivot() const;
+
+    void setRenderEffect(RenderEffect* effect);
+    RenderEffect* getRenderEffect();
+
+
+    const RenderingSurface& getOwner() const;
+    RenderingSurface& getOwner();
+
+    void unprojectPoint(const Vector2<float>& p_in, Vector2<float>& p_out);
+
+    //const TextureTarget& getTextureTarget() const;
+    //TextureTarget& getTextureTarget();
+    //void update(const float elapsed);
+    //void realiseGeometry();
+};

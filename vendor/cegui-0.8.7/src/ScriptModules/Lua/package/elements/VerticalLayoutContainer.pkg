@@ -1,0 +1,8 @@
+/***********************************************************************
+    VerticalLayoutContainer
+*************************************************************************/
+
+class VerticalLayoutContainer : public SequentialLayoutContainer
+{
+};
+

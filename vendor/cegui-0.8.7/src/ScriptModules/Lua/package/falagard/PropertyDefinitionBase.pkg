@@ -1,0 +1,11 @@
+/******************************************************************************
+  PropertyDefinitionBase 
+*******************************************************************************/
+/* Commented for many reasons, but mostly because this class is now a template.
+class PropertyDefinitionBase : public Property 
+{
+  //void set(PropertyReceiver* receiver, utf8string value);
+  void set(Window* receiver, utf8string value);
+  //virtual void writeXMLToStream(OutStream& out_stream) const;
+};
+*/

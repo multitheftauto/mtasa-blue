@@ -1,0 +1,40 @@
+/******************************************************************************
+  FrameComponent
+******************************************************************************/
+
+class FrameComponent : public FalagardComponentBase
+{
+    void setLeftEdgeFormatting(VerticalFormatting fmt);
+    void setRightEdgeFormatting(VerticalFormatting fmt);
+    void setTopEdgeFormatting(HorizontalFormatting fmt);
+    void setBottomEdgeFormatting(HorizontalFormatting fmt);
+    void setBackgroundVerticalFormatting(VerticalFormatting fmt);
+    void setBackgroundHorizontalFormatting(HorizontalFormatting fmt);
+
+    void setLeftEdgeFormattingPropertySource(utf8string property_name);
+    void setRightEdgeFormattingPropertySource(utf8string property_name);
+    void setTopEdgeFormattingPropertySource(utf8string property_name);
+    void setBottomEdgeFormattingPropertySource(utf8string property_name);
+    void setBackgroundVerticalFormattingPropertySource(utf8string property_name);
+    void setBackgroundHorizontalFormattingPropertySource(utf8string property_name);
+
+    VerticalFormatting getLeftEdgeFormatting(const Window& wnd) const;
+    VerticalFormatting getRightEdgeFormatting(const Window& wnd) const;
+    HorizontalFormatting getTopEdgeFormatting(const Window& wnd) const;
+    HorizontalFormatting getBottomEdgeFormatting(const Window& wnd) const;
+    VerticalFormatting getBackgroundVerticalFormatting(const Window& wnd) const;
+    HorizontalFormatting getBackgroundHorizontalFormatting(const Window& wnd) const;
+
+    const Image* getImage(FrameImageComponent part,
+                          const Window& wnd) const;
+
+    void setImage(FrameImageComponent part, const Image* image);
+    void setImage(FrameImageComponent part, utf8string name);
+    void setImagePropertySource(FrameImageComponent part, utf8string name);
+    bool isImageSpecified(FrameImageComponent part) const;
+    bool isImageFetchedFromProperty(FrameImageComponent part) const;
+    string getImagePropertySource(FrameImageComponent part) const;
+
+  //void writeXMLToStream(OutStream& out_stream) const;
+  FrameComponent();
+};

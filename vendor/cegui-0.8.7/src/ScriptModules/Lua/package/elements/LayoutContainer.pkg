@@ -1,0 +1,13 @@
+/***********************************************************************
+    LayoutContainer
+*************************************************************************/
+
+class LayoutContainer : public Window
+{
+    void markNeedsLayouting();
+    bool needsLayouting() const;
+
+    void layout();
+    void layoutIfNecessary();
+};
+

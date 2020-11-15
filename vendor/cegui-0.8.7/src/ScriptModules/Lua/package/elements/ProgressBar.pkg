@@ -1,0 +1,13 @@
+/***********************************************************************
+	ProgressBar
+***********************************************************************/
+class ProgressBar : public Window
+{
+	float getProgress() const;
+	float getStepSize() const;
+
+	void setProgress(float progress);
+	void setStepSize(float step);
+	void step();
+	void adjustProgress(float delta);
+};

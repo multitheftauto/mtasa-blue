@@ -1,0 +1,14 @@
+/***********************************************************************
+	ItemEntry
+***********************************************************************/
+class ItemEntry : public Window
+{
+	Size<float> getItemPixelSize();
+	ItemListBase* getOwnerList() const;
+	bool isSelected() const;
+	bool isSelectable() const;
+	void setSelected(bool setting);
+	void select();
+	void deselect();
+	void setSelectable(bool setting);
+};

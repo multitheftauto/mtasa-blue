@@ -1,0 +1,263 @@
+/************************************************************************
+    Lua iterator implementation
+*************************************************************************/
+$[
+
+function CEGUI.iterator_impl_next(p)
+    if p:isAtEnd() then
+        return nil;
+    end
+    local k,v = p:key(), p:value();
+    p:next();
+    return k,v;
+end
+
+function CEGUI.iterator_impl(self)
+   return CEGUI.iterator_impl_next, self; 
+end
+
+$]
+
+
+
+/************************************************************************
+    PropertyIterator
+*************************************************************************/
+class Property
+{
+    string getHelp() const;
+    string getName() const;
+};
+
+class PropertyIterator
+{
+    string getCurrentKey @ key() const;
+    Property* getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    PropertyIterator& __operator_increment @ next();
+    PropertyIterator& __operator_decrement @ previous();
+    bool operator== (const PropertyIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    PropertyIterator(const PropertyIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.PropertyIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+
+
+/************************************************************************
+    EventIterator
+*************************************************************************/
+class EventIterator
+{
+    string getCurrentKey @ key() const;
+    Event* getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    EventIterator& __operator_increment @ next();
+    EventIterator& __operator_decrement @ previous();
+    bool operator== (const EventIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    EventIterator(const EventIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.EventIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+
+
+/************************************************************************
+    WindowIterator
+*************************************************************************/
+class WindowIterator
+{
+    Window* getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    WindowIterator& __operator_increment @ next();
+    WindowIterator& __operator_decrement @ previous();
+    bool operator== (const WindowIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    WindowIterator(const WindowIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.WindowIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+
+
+/************************************************************************
+    WindowFactoryIterator
+*************************************************************************/
+class WindowFactoryIterator
+{
+    string getCurrentKey @ key() const;
+    WindowFactory* getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    WindowFactoryIterator& __operator_increment @ next();
+    WindowFactoryIterator& __operator_decrement @ previous();
+    bool operator== (const WindowFactoryIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    WindowFactoryIterator(const WindowFactoryIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.WindowFactoryIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+
+
+/************************************************************************
+    FalagardMappingIterator
+*************************************************************************/
+class FalagardMappingIterator
+{
+    string getCurrentKey @ key() const;
+    FalagardWindowMapping getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    FalagardMappingIterator& __operator_increment @ next();
+    FalagardMappingIterator& __operator_decrement @ previous();
+    bool operator== (const FalagardMappingIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    FalagardMappingIterator(const FalagardMappingIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.FalagardMappingIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+
+
+/************************************************************************
+    SchemeIterator
+*************************************************************************/
+class SchemeIterator
+{
+    string getCurrentKey @ key() const;
+    Scheme* getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    SchemeIterator& __operator_increment @ next();
+    SchemeIterator& __operator_decrement @ previous();
+    bool operator== (const SchemeIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    SchemeIterator(const SchemeIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.SchemeIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+
+
+/************************************************************************
+    FontIterator
+*************************************************************************/
+class FontIterator
+{
+    string getCurrentKey @ key() const;
+    Font* getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    FontIterator& __operator_increment @ next();
+    FontIterator& __operator_decrement @ previous();
+    bool operator== (const FontIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    FontIterator(const FontIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.FontIterator.iterator = CEGUI.iterator_impl;
+
+$]
+
+/************************************************************************
+    ImageIterator
+*************************************************************************/
+
+class ImageIterator
+{
+    string getCurrentKey @ key() const;
+    ImagePair getCurrentValue @ value() const;
+
+    bool isAtEnd() const;
+    bool isAtStart() const;
+
+    ImageIterator& __operator_increment @ next();
+    ImageIterator& __operator_decrement @ previous();
+    bool operator== (const ImageIterator& rhs) const;
+
+    void toStart();
+    void toEnd();
+
+    ImageIterator(const ImageIterator& org);
+};
+
+// lua iterator
+$[
+
+CEGUI.ImageIterator.iterator = CEGUI.iterator_impl;
+
+$]
