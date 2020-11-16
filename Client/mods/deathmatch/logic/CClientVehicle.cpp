@@ -1515,6 +1515,11 @@ bool CClientVehicle::IsWheelCollided(unsigned char ucWheel)
     return true;
 }
 
+int CClientVehicle::GetWheelFrictionState(unsigned char ucWheel)
+{
+    return m_pVehicle->GetWheelFrictionState(ucWheel);
+}
+
 unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
 {
     if (ucPanel < MAX_PANELS)
