@@ -88,6 +88,10 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
+    // Force delete all objects in cache
+    // https://github.com/multitheftauto/mtasa-blue/issues/1840
+    g_pClientGame->GetElementDeleter()->DoDeleteAll();
+
     // Deallocate all models that this resource allocated earlier
     g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 
