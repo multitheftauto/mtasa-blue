@@ -1,0 +1,863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="Generic/Image" name="GameMenuRoot" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="Image" value="GameMenuImages/Background" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Property name="MousePassThroughEnabled" value="True" />
+        <Window type="Generic/Image" name="TopBar" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{0,0}}" />
+            <Property name="Image" value="GameMenuImages/TopBar" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="AspectMode" value="Expand" />
+            <Property name="AspectRatio" value="13.714" />
+            <Property name="MousePassThroughEnabled" value="True" />
+            <Window type="Generic/Label" name="TopBarLabel" >
+                <Property name="Area" value="{{0,0},{0.2,0},{0.4,0},{0.5,0}}" />
+                <Property name="Font" value="Jura-13" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="NormalTextColour" value="FF00A9FF" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+        </Window>
+        <Window type="Generic/Image" name="BotBar" >
+            <Property name="Area" value="{{0,-1},{0,1},{1,-1},{0,1}}" />
+            <Property name="Image" value="GameMenuImages/BotBar" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="AspectMode" value="Expand" />
+            <Property name="AspectRatio" value="13.714" />
+            <Property name="VerticalAlignment" value="Bottom" />
+            <Property name="MousePassThroughEnabled" value="True" />
+            <Window type="Generic/Label" name="BotBarLabel" >
+                <Property name="Area" value="{{0,0},{0.32,0},{0.4,0},{0.87,0}}" />
+                <Property name="Font" value="Jura-13" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="NormalTextColour" value="FFFFF900" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+        </Window>
+        <Window type="DefaultWindow" name="InnerPartContainer" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{0.8,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="VerticalAlignment" value="Centre" />
+            <Property name="MousePassThroughEnabled" value="True" />
+            <Window type="Generic/Image" name="InsideImage1" >
+                <Property name="Area" value="{{0,0},{0,0},{0,0},{0.347222,0}}" />
+                <Property name="Image" value="GameMenuImages/CenterImageInside" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="MousePassThroughEnabled" value="True" />
+            </Window>
+            <Window type="DefaultWindow" name="InsideStartClickArea" >
+                <Property name="Area" value="{{0,0},{0,0},{0,0},{0.3125,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AlwaysOnTop" value="True" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Window type="Generic/Label" name="StartButtonLabel" >
+                    <Property name="Area" value="{{0,0},{0.3,0},{1,0},{0.45,0}}" />
+                    <Property name="Font" value="Jura-18" />
+                    <Property name="Text" value="Start" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="StartButtonImage" >
+                    <Property name="Area" value="{{0,0},{-0.35,0},{0,0},{-0.15,0}}" />
+                    <Property name="Image" value="GameMenuImages/CenterImageButtonStartButt" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AspectMode" value="Expand" />
+                    <Property name="AspectRatio" value="2.5" />
+                    <Property name="VerticalAlignment" value="Bottom" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Property name="AutoRenderingSurface" value="True" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="DefaultWindow" name="OuterRingsContainer" >
+                <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="InsideImage3" >
+                    <Property name="Area" value="{{0,0},{0,0},{0,0},{0.54,0}}" />
+                    <Property name="Image" value="GameMenuImages/CenterImageOutside1" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AspectMode" value="Expand" />
+                    <Property name="PixelAligned" value="False" />
+                    <Property name="VerticalAlignment" value="Centre" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Property name="AutoRenderingSurface" value="True" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="InsideImage4" >
+                    <Property name="Area" value="{{0,0},{0,0},{0,0},{0.495,0}}" />
+                    <Property name="Image" value="GameMenuImages/CenterImageOutside2" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AspectMode" value="Expand" />
+                    <Property name="PixelAligned" value="False" />
+                    <Property name="VerticalAlignment" value="Centre" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Property name="AutoRenderingSurface" value="True" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="InsideImage2" >
+                <Property name="Area" value="{{0,0},{0,0},{0,0},{0.3,0}}" />
+                <Property name="Image" value="GameMenuImages/CenterImageInside2" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="MousePassThroughEnabled" value="True" />
+            </Window>
+        </Window>
+        <Window type="DefaultWindow" name="LoginContainer" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="MousePassThroughEnabled" value="True" />
+            <Window type="GameMenu/Editbox" name="LoginEditbox" >
+                <Property name="Area" value="{{0.828906,0},{0.154167,0},{0.928906,0},{0.179167,0}}" />
+                <Property name="Font" value="Jura-10" />
+                <Property name="MouseCursorImage" value="" />
+            </Window>
+            <Window type="GameMenu/Editbox" name="PasswordEditbox" >
+                <Property name="Area" value="{{0.849219,0},{0.202778,0},{0.949219,0},{0.227778,0}}" />
+                <Property name="Font" value="Jura-10" />
+                <Property name="MouseCursorImage" value="" />
+            </Window>
+            <Window type="Generic/Label" name="PasswordLabel" >
+                <Property name="Area" value="{{0.746094,0},{0.202778,0},{0.846094,0},{0.227778,0}}" />
+                <Property name="Font" value="Jura-10" />
+                <Property name="Text" value="Password" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="NormalTextColour" value="FF0094FF" />
+            </Window>
+            <Window type="Generic/Label" name="LoginLabel" >
+                <Property name="Area" value="{{0.72539,0},{0.154862,0},{0.82539,0},{0.179862,0}}" />
+                <Property name="Font" value="Jura-10" />
+                <Property name="Text" value="Login" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="NormalTextColour" value="FF0094FF" />
+            </Window>
+            <Window type="Generic/Image" name="AcceptButton" >
+                <Property name="Area" value="{{0.888,0},{0.25,0},{0.888,0},{0.275,0}}" />
+                <Property name="Image" value="GameMenuImages/LoginButtonBG" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="2" />
+                <Window type="Generic/Label" name="Label" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="››" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FFC9FAFF" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+        </Window>
+        <Window type="DefaultWindow" name="InnerButtonsContainer" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="MousePassThroughEnabled" value="True" />
+            <Window type="Generic/Image" name="ButtonOptions" >
+                <Property name="Area" value="{{0.125781,0},{-0.136806,0},{0.160937,0},{-0.0743055,0}}" />
+                <Property name="Image" value="GameMenuImages/ButtonOptionsIcon" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Shrink" />
+                <Property name="PixelAligned" value="False" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="ButtonLoad" >
+                <Property name="Area" value="{{-0.0941409,0},{-0.197917,0},{-0.0681408,0},{-0.145917,0}}" />
+                <Property name="Image" value="GameMenuImages/ButtonLoadIcon" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Shrink" />
+                <Property name="PixelAligned" value="False" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="ButtonCharacters" >
+                <Property name="Area" value="{{-0.127734,0},{-0.120834,0},{-0.101734,0},{-0.0688336,0}}" />
+                <Property name="Image" value="GameMenuImages/ButtonCharactersIcon" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Shrink" />
+                <Property name="PixelAligned" value="False" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="ButtonQuit" >
+                <Property name="Area" value="{{0.10039,0},{0.173611,0},{0.127734,0},{0.222222,0}}" />
+                <Property name="Image" value="GameMenuImages/ButtonQuitIcon" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Shrink" />
+                <Property name="PixelAligned" value="False" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="PopupLinesSave" >
+                <Property name="Area" value="{{-0.571211,0},{0.166632,0},{-0.271211,0},{0.259514,0}}" />
+                <Property name="Image" value="GameMenuImages/PopupLinesSave" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="MinSize" value="{{0,0},{0.0928819,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="BottomAligned" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Window type="Generic/Label" name="LabelSave" >
+                    <Property name="Area" value="{{-0.0338542,0},{0.462687,0},{0.229167,0},{0.761194,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Save" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="PopupLinesLoad" >
+                <Property name="Area" value="{{-0.601876,0},{0.203784,0},{-0.301876,0},{0.29684,0}}" />
+                <Property name="Image" value="GameMenuImages/PopupLinesSave" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="MinSize" value="{{0,0},{0.0930555,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="BottomAligned" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Label" name="LabelLoad" >
+                    <Property name="Area" value="{{-0.00260417,0},{0.522388,0},{0.257682,0},{0.776119,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Load" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="PopupLinesCharacters" >
+                <Property name="Area" value="{{-0.636055,0},{0.298229,0},{-0.336055,0},{0.598229,0}}" />
+                <Property name="Image" value="GameMenuImages/PopupLinesCharacter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="MinSize" value="{{0,0},{0.3,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Label" name="LabelCharacters" >
+                    <Property name="Area" value="{{-0.09375,0},{0.0277778,0},{0.210156,0},{0.178241,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Characters" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelName1" >
+                    <Property name="Area" value="{{-0.289063,0},{0.472222,0},{0.0148437,0},{0.622685,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="john" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelName2" >
+                    <Property name="Area" value="{{-0.294271,0},{0.601852,0},{0.00963506,0},{0.752315,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="omae" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelNew" >
+                    <Property name="Area" value="{{-0.294271,0},{0.731481,0},{0.009635,0},{0.881943,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="New" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelSelect" >
+                    <Property name="Area" value="{{0.00520833,0},{0.407407,0},{0.309895,0},{0.560185,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Select" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelDelete" >
+                    <Property name="Area" value="{{0.0078125,0},{0.527778,0},{0.312499,0},{0.680556,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Delete" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="PopupLinesOptions" >
+                <Property name="Area" value="{{0.63914,0},{0.24441,0},{0.93914,0},{0.397188,0}}" />
+                <Property name="Image" value="GameMenuImages/PopupLinesOptions" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="MinSize" value="{{0,0},{0.152778,0}}" />
+                <Property name="HorzFormatting" value="LeftAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Label" name="LabelOptions" >
+                    <Property name="Area" value="{{-0.661458,0},{0.354545,0},{-0.357552,0},{0.518181,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Options" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelVideo" >
+                    <Property name="Area" value="{{-0.382813,0},{0.372727,0},{-0.0789061,0},{0.572727,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Video" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelAudio" >
+                    <Property name="Area" value="{{-0.380208,0},{0.145455,0},{-0.0763018,0},{0.345455,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Audio" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelControls" >
+                    <Property name="Area" value="{{-0.351563,0},{0.645455,0},{-0.0476562,0},{0.818182,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Controls" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="PopupLinesQuit" >
+                <Property name="Area" value="{{0.609843,0},{0.652395,0},{0.909843,0},{0.798228,0}}" />
+                <Property name="Image" value="GameMenuImages/PopupLinesQuit" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="MinSize" value="{{0,0},{0.145833,0}}" />
+                <Property name="HorzFormatting" value="LeftAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Label" name="LabelNo" >
+                    <Property name="Area" value="{{-0.348958,0},{0.52381,0},{-0.0442705,0},{0.761905,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="No" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelYes" >
+                    <Property name="Area" value="{{-0.351563,0},{0.0571429,0},{-0.0468748,0},{0.314286,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Yes" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+                <Window type="Generic/Label" name="LabelQuit" >
+                    <Property name="Area" value="{{-0.651042,0},{0.228571,0},{-0.346354,0},{0.485714,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Quit" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="ButtonSave" >
+                <Property name="Area" value="{{-0.0640627,0},{-0.227084,0},{-0.0380627,0},{-0.175084,0}}" />
+                <Property name="Image" value="GameMenuImages/ButtonSaveIcon" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Shrink" />
+                <Property name="PixelAligned" value="False" />
+                <Property name="VerticalAlignment" value="Centre" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="SaveSelectionIcon" >
+                <Property name="Area" value="{{-0.157813,0},{0.218056,0},{-0.135938,0},{0.256944,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="LoadSelectionIcon" >
+                <Property name="Area" value="{{-0.189836,0},{0.256889,0},{-0.167961,0},{0.295778,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="Name2SelectionIcon" >
+                <Property name="Area" value="{{-0.23632,0},{0.496472,0},{-0.214445,0},{0.535361,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="NewSelectionIcon" >
+                <Property name="Area" value="{{-0.228703,0},{0.537792,0},{-0.206828,0},{0.576681,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="DeleteSelectionIcon" >
+                <Property name="Area" value="{{-0.137883,0},{0.47425,0},{-0.116008,0},{0.513139,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="SelectSelectionIcon" >
+                <Property name="Area" value="{{-0.137688,0},{0.439875,0},{-0.115812,0},{0.478764,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="ControlsSelectionIcon" >
+                <Property name="Area" value="{{0.323445,0},{0.349944,0},{0.34532,0},{0.388833,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="VideoSelectionIcon" >
+                <Property name="Area" value="{{0.318758,0},{0.310708,0},{0.340633,0},{0.349597,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="AudioSelectionIcon" >
+                <Property name="Area" value="{{0.313875,0},{0.274597,0},{0.33575,0},{0.313486,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="YesSelectionIcon" >
+                <Property name="Area" value="{{0.288875,0},{0.674944,0},{0.31075,0},{0.713833,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="NoSelectionIcon" >
+                <Property name="Area" value="{{0.288094,0},{0.738833,0},{0.309969,0},{0.777722,0}}" />
+                <Property name="Image" value="GameMenuImages/DotOuter" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Property name="AutoRenderingSurface" value="True" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="Image3" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotDot" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image1" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInner" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Image" name="Image2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotInnest" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="BottomAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+        </Window>
+        <Window type="DefaultWindow" name="BotNavigationContainer" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="MousePassThroughEnabled" value="True" />
+            <Window type="Generic/Image" name="LeftArrow" >
+                <Property name="Area" value="{{-0.12,0},{0.82,0},{-0.1,0},{0.856,0}}" />
+                <Property name="Image" value="GameMenuImages/BotBarLeftArrow" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="RightArrow" >
+                <Property name="Area" value="{{0.12,0},{0.82,0},{0.14,0},{0.856,0}}" />
+                <Property name="Image" value="GameMenuImages/BotBarRightArrow" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="DefaultWindow" name="NaviCenterContainer" >
+                <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Image" name="NavigationIcon" >
+                    <Property name="Area" value="{{0,0},{0.783,0},{0.0382812,0},{0.878833,0}}" />
+                    <Property name="Image" value="GameMenuImages/IconChangeDestination" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                </Window>
+                <Window type="Generic/Label" name="NavigationLabel" >
+                    <Property name="Area" value="{{0,0},{0.802,0},{0.2,0},{0.843667,0}}" />
+                    <Property name="Font" value="Jura-10" />
+                    <Property name="Text" value="Change Destination" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF0094FF" />
+                    <Property name="DisabledTextColour" value="FF0094FF" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                </Window>
+                <Window type="Generic/Image" name="NaviBotSelectionIcon" >
+                    <Property name="Area" value="{{0.066,0},{0.805,0},{0.087875,0},{0.843889,0}}" />
+                    <Property name="Image" value="GameMenuImages/DotOuter" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                    <Property name="VertFormatting" value="TopAligned" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Property name="AutoRenderingSurface" value="True" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                    <Window type="Generic/Image" name="Image1" >
+                        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                        <Property name="Image" value="GameMenuImages/DotInner" />
+                        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                        <Property name="HorzFormatting" value="RightAligned" />
+                        <Property name="VertFormatting" value="BottomAligned" />
+                        <Property name="MousePassThroughEnabled" value="True" />
+                    </Window>
+                    <Window type="Generic/Image" name="Image2" >
+                        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                        <Property name="Image" value="GameMenuImages/DotInnest" />
+                        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                        <Property name="HorzFormatting" value="RightAligned" />
+                        <Property name="VertFormatting" value="BottomAligned" />
+                        <Property name="MousePassThroughEnabled" value="True" />
+                    </Window>
+                    <Window type="Generic/Image" name="Image3" >
+                        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                        <Property name="Image" value="GameMenuImages/DotDot" />
+                        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                        <Property name="HorzFormatting" value="RightAligned" />
+                        <Property name="VertFormatting" value="BottomAligned" />
+                        <Property name="MousePassThroughEnabled" value="True" />
+                    </Window>
+                </Window>
+            </Window>
+            <Window type="DefaultWindow" name="LeftArrowArea" >
+                <Property name="Area" value="{{0.345,0},{0.806,0},{0.395,0},{0.866,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AlwaysOnTop" value="True" />
+            </Window>
+            <Window type="DefaultWindow" name="RightArrowArea" >
+                <Property name="Area" value="{{0.605,0},{0.806,0},{0.655,0},{0.866,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AlwaysOnTop" value="True" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

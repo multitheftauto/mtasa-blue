@@ -1,0 +1,1506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Falagard version="7">
+    <WidgetLook name="Vanilla/VerticalImageSliderThumb">
+        <PropertyDefinition initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="ScrollThumbColours"/>
+        <Property name="VertFree" value="true"/>
+        <Property name="MouseInputPropagationEnabled" value="true"/>
+        <ImagerySection name="thumb">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1.0" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1.0" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/VerticalImageSliderThumb"/>
+                <ColourRectProperty name="ScrollThumbColours"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="thumb"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="thumb"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="thumb"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="thumb">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="Vanilla/VerticalImageSlider">
+        <PropertyDefinition initialValue="Vanilla-Images/DefaultScrollImage" type="Image" name="ScrollImage"/>
+        <PropertyDefinition initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" type="ColourRect" name="TopEndColours"/>
+        <PropertyDefinition initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" type="ColourRect" name="BottomEndColours"/>
+        <PropertyLinkDefinition widget="__auto_thumb__" initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" name="ScrollThumbColours" redrawOnWrite="true" targetProperty="ScrollThumbColours" type="ColourRect"/>
+        <Property name="VerticalSlider" value="true"/>
+        <Property name="MouseAutoRepeatEnabled" value="true"/>
+        <Property name="WantsMultiClickEvents" value="false"/>
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child nameSuffix="__auto_thumb__" type="Vanilla/VerticalImageSliderThumb">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="1.0" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <OperatorDim op="Multiply">
+                        <UnifiedDim scale="1.0" type="Width"/>
+                        <OperatorDim op="Divide">
+                            <ImageDim name="Vanilla-Images/VerticalImageSliderThumb" dimension="Height"/>
+                            <ImageDim name="Vanilla-Images/VerticalImageSliderThumb" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </Child>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale="0.2" type="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <OperatorDim op="Multiply">
+                            <WidgetDim widget="__auto_thumb__" dimension="Height"/>
+                            <AbsoluteDim value="0.5"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="0.8" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="Height"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_thumb__" dimension="Height"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/VerticalImageSliderContainer"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="scrollimage">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale="0.2" type="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <OperatorDim op="Multiply">
+                            <WidgetDim widget="__auto_thumb__" dimension="Height"/>
+                            <AbsoluteDim value="0.5"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="0.8" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="Height"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_thumb__" dimension="Height"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <ImageProperty name="ScrollImage"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale="0.2" type="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="0.8" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Multiply">
+                            <WidgetDim widget="__auto_thumb__" dimension="Height"/>
+                            <AbsoluteDim value="0.5"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/VerticalImageSliderTopEnd"/>
+                <ColourRectProperty name="TopEndColours"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale="0.2" type="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="Height"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_thumb__" dimension="Height"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="0.8" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="1.0" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/VerticalImageSliderBottomEnd"/>
+                <ColourRectProperty name="BottomEndColours"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="scrollimage"/>
+                <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="scrollimage">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="Vanilla/HorizontalImageSliderThumb">
+        <PropertyDefinition initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="ScrollThumbColours"/>
+        <Property name="HorzFree" value="true"/>
+        <Property name="MouseInputPropagationEnabled" value="true"/>
+        <ImagerySection name="thumb">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1.0" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1.0" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/HorizontalImageSliderThumb"/>
+                <ColourRectProperty name="ScrollThumbColours"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="thumb"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="thumb"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="thumb"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="thumb">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="Vanilla/HorizontalImageSlider">
+        <PropertyDefinition initialValue="Vanilla-Images/DefaultScrollImage" type="Image" name="ScrollImage"/>
+        <PropertyDefinition initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" type="ColourRect" name="TopEndColours"/>
+        <PropertyDefinition initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" type="ColourRect" name="BottomEndColours"/>
+        <PropertyLinkDefinition widget="__auto_thumb__" initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" name="ScrollThumbColours" redrawOnWrite="true" targetProperty="ScrollThumbColours" type="ColourRect"/>
+        <Property name="VerticalSlider" value="false"/>
+        <Property name="MouseAutoRepeatEnabled" value="true"/>
+        <Property name="WantsMultiClickEvents" value="false"/>
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child nameSuffix="__auto_thumb__" type="Vanilla/HorizontalImageSliderThumb">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <OperatorDim op="Multiply">
+                        <UnifiedDim scale="1.0" type="Height"/>
+                        <OperatorDim op="Divide">
+                            <ImageDim name="Vanilla-Images/HorizontalImageSliderThumb" dimension="Width"/>
+                            <ImageDim name="Vanilla-Images/HorizontalImageSliderThumb" dimension="Height"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="1.0" type="Height"/>
+                </Dim>
+            </Area>
+        </Child>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Multiply">
+                            <WidgetDim widget="__auto_thumb__" dimension="Width"/>
+                            <AbsoluteDim value="0.5"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale="0.2" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="Width"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_thumb__" dimension="Width"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="0.8" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/HorizontalImageSliderContainer"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="scrollimage">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Multiply">
+                            <WidgetDim widget="__auto_thumb__" dimension="Width"/>
+                            <AbsoluteDim value="0.5"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale="0.2" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="Width"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_thumb__" dimension="Width"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="0.8" type="Height"/>
+                    </Dim>
+                </Area>
+                <ImageProperty name="ScrollImage"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale="0.2" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Multiply">
+                            <WidgetDim widget="__auto_thumb__" dimension="Width"/>
+                            <AbsoluteDim value="0.5"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="0.8" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/HorizontalImageSliderLeftEnd"/>
+                <ColourRectProperty name="TopEndColours"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="Width"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_thumb__" dimension="Width"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale="0.2" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1.0" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="0.8" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="Vanilla-Images/HorizontalImageSliderRightEnd"/>
+                <ColourRectProperty name="BottomEndColours"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="scrollimage"/>
+                <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="scrollimage">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="Vanilla/FrameColourRect">
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="Colour"/>
+        <ImagerySection name="withframe">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="Vanilla-Images/FrameTopLeft"/>
+                <Image component="TopRightCorner" name="Vanilla-Images/FrameTopRight"/>
+                <Image component="BottomLeftCorner" name="Vanilla-Images/FrameBottomLeft"/>
+                <Image component="BottomRightCorner" name="Vanilla-Images/FrameBottomRight"/>
+                <Image component="LeftEdge" name="Vanilla-Images/FrameLeft"/>
+                <Image component="TopEdge" name="Vanilla-Images/FrameTop"/>
+                <Image component="RightEdge" name="Vanilla-Images/FrameRight"/>
+                <Image component="BottomEdge" name="Vanilla-Images/FrameBottom"/>
+                <Image component="Background" name="Vanilla-Images/GenericBrush"/>
+                <ColourRectProperty name="Colour"/>
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="withframe"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="withframe"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="Vanilla/ColourPicker">
+        <PropertyDefinition initialValue="Vanilla/ColourPickerControls" type="String" name="ColourPickerControlsStyle"/>
+        <PropertyDefinition initialValue="true" type="bool" name="ShareColourPickerControlsWidget"/>
+        <PropertyLinkDefinition widget="__auto_colourrect__" initialValue="tl:FFFF0000 tr:FFFF0000 bl:FFFF0000 br:FFFF0000" name="Colour" redrawOnWrite="true" targetProperty="Colour" type="ColourRect"/>
+        <Child nameSuffix="__auto_colourrect__" type="Vanilla/FrameColourRect">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="1" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="1" type="Height"/>
+                </Dim>
+            </Area>
+        </Child>
+        <StateImagery name="Enabled">
+    </StateImagery>
+        <StateImagery name="Disabled">
+    </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="Vanilla/ColourPickerControls">
+        <PropertyDefinition initialValue="Vanilla/StaticImage" type="String" name="ColourPickerCursorStyle"/>
+        <PropertyDefinition initialValue="Vanilla-Images/ColourPickerCursor" type="Image" name="ColourPickerCursorImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:D3FFFFFF tr:D3FFFFFF bl:D3FFFFFF br:D3FFFFFF" type="ColourRect" name="BackgroundColours"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="20" type="uint" name="ColourPickerImageSliderWidth"/>
+        <PropertyLinkDefinition targetProperty="Colour" widget="__auto_oldcolourrect__" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="PreviousColour"/>
+        <PropertyLinkDefinition targetProperty="Colour" widget="__auto_newcolourrect__" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="NewColour"/>
+        <PropertyLinkDefinition targetProperty="CaptionColour" widget="__auto_titlebar__" initialValue="FF4A4A4A" type="ColourRect" name="CaptionColour"/>
+        <PropertyLinkDefinition initialValue="DejaVuSans-10-NoScale" type="Font" name="ColourPickerFontType">
+            <PropertyLinkTarget widget="__auto_cancelbutton__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_acceptbutton__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_titlebar__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_hexadecimaleditbox__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_hexadecimalstatictext__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_newcolourdescription__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_oldcolourdescription__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxRdescription__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxR__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxGdescription__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxG__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxBdescription__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxB__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_HSVeditboxH__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonH__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_HSVeditboxS__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonS__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonV__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_HSVeditboxV__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_Labeditboxa__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttona__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_Labeditboxb__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttonb__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_LabeditboxL__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_LabradiobuttonL__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_alphaeditbox__" property="Font"/>
+            <PropertyLinkTarget widget="__auto_alphastatictext__" property="Font"/>
+        </PropertyLinkDefinition>
+        <PropertyLinkDefinition initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" type="ColourRect" name="ColourPickerFontColours">
+            <PropertyLinkTarget widget="__auto_hexadecimalstatictext__" property="TextColours"/>
+            <PropertyLinkTarget widget="__auto_newcolourdescription__" property="TextColours"/>
+            <PropertyLinkTarget widget="__auto_oldcolourdescription__" property="TextColours"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxRdescription__" property="TextColours"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxGdescription__" property="TextColours"/>
+            <PropertyLinkTarget widget="__auto_coloureditboxBdescription__" property="TextColours"/>
+            <PropertyLinkTarget widget="__auto_alphastatictext__" property="TextColours"/>
+        </PropertyLinkDefinition>
+        <PropertyLinkDefinition initialValue="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" type="ColourRect" name="RadioButtonNormalTextColours">
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonH__" property="NormalTextColour"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonS__" property="NormalTextColour"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonV__" property="NormalTextColour"/>
+            <PropertyLinkTarget widget="__auto_LabradiobuttonL__" property="NormalTextColour"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttona__" property="NormalTextColour"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttonb__" property="NormalTextColour"/>
+        </PropertyLinkDefinition>
+        <PropertyLinkDefinition initialValue="tl:FF434343 tr:FF434343 bl:FF434343 br:FF434343" type="ColourRect" name="RadioButtonHoverTextColours">
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonH__" property="HoverTextColour"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonS__" property="HoverTextColour"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonV__" property="HoverTextColour"/>
+            <PropertyLinkTarget widget="__auto_LabradiobuttonL__" property="HoverTextColour"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttona__" property="HoverTextColour"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttonb__" property="HoverTextColour"/>
+        </PropertyLinkDefinition>
+        <PropertyLinkDefinition initialValue="tl:FF636363 tr:FF636363 bl:FF636363 br:FF636363" type="ColourRect" name="RadioButtonPushedTextColours">
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonH__" property="PushedTextColour"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonS__" property="PushedTextColour"/>
+            <PropertyLinkTarget widget="__auto_HSVradiobuttonV__" property="PushedTextColour"/>
+            <PropertyLinkTarget widget="__auto_LabradiobuttonL__" property="PushedTextColour"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttona__" property="PushedTextColour"/>
+            <PropertyLinkTarget widget="__auto_Labradiobuttonb__" property="PushedTextColour"/>
+        </PropertyLinkDefinition>
+        <Property name="AlwaysOnTop" value="true"/>
+        <Property name="Size" value="{{0,460},{0,460}}"/>
+        <Property name="HorizontalAlignment" value="Centre"/>
+        <Property name="VerticalAlignment" value="Centre"/>
+        <Child nameSuffix="__auto_titlebar__" type="Vanilla/Titlebar">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="1" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <FontDim padding="14" type="LineSpacing"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="CentreAligned"/>
+            <Property name="Text" value="ColourPicker"/>
+        </Child>
+        <Child nameSuffix="__auto_cancelbutton__" type="Vanilla/Button">
+            <Area>
+                <Dim type="LeftEdge">
+                    <UnifiedDim scale="-0.02" type="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <UnifiedDim scale="-0.02" type="Height"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.18" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="Cancel"/>
+        </Child>
+        <Child nameSuffix="__auto_acceptbutton__" type="Vanilla/Button">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.01" type="Width"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_cancelbutton__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_cancelbutton__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <UnifiedDim scale="-0.02" type="Height"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.18" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="Accept"/>
+        </Child>
+        <Child nameSuffix="__auto_oldcolourrect__" type="Vanilla/FrameColourRect">
+            <Area>
+                <Dim type="LeftEdge">
+                    <UnifiedDim scale="0.04" type="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="-0.06" type="Height"/>
+                        <UnifiedDim scale="0.05" type="Height"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.11" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.11" type="Width"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_newcolourrect__" type="Vanilla/FrameColourRect">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.04" type="Width"/>
+                        <OperatorDim op="Add">
+                            <WidgetDim widget="__auto_oldcolourrect__" dimension="Width"/>
+                            <WidgetDim widget="__auto_oldcolourrect__" dimension="LeftEdge"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_oldcolourrect__" dimension="TopEdge"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.11" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.11" type="Width"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_newcolourdescription__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.02" type="Width"/>
+                        <WidgetDim widget="__auto_oldcolourrect__" dimension="LeftEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_oldcolourrect__" dimension="TopEdge"/>
+                            <WidgetDim widget="__auto_oldcolourrect__" dimension="Height"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.04" type="Width"/>
+                        <WidgetDim widget="__auto_oldcolourrect__" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.04" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="Previous"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="CentreAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_oldcolourdescription__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.02" type="Width"/>
+                        <WidgetDim widget="__auto_newcolourrect__" dimension="LeftEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_newcolourrect__" dimension="TopEdge"/>
+                            <WidgetDim widget="__auto_newcolourrect__" dimension="Height"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.04" type="Width"/>
+                        <WidgetDim widget="__auto_newcolourrect__" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.04" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="Current"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="CentreAligned"/>
+        </Child>
+        <!--
+		***************************************************
+			ColourPicker Texture and Scrollbar
+		***************************************************
+		-->
+        <Child nameSuffix="__auto_colourpickerstaticimage__" type="Vanilla/StaticImage">
+            <Area>
+                <Dim type="LeftEdge">
+                    <UnifiedDim scale="0.04" type="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <PropertyDim name="ColourPickerImageSliderWidth"/>
+                        <WidgetDim widget="__auto_titlebar__" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <AbsoluteDim value="260"/>
+                </Dim>
+                <Dim type="Height">
+                    <AbsoluteDim value="260"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+        </Child>
+        <Child nameSuffix="__auto_colourpickerimageslider__" type="Vanilla/VerticalImageSlider">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="5"/>
+                        <WidgetDim widget="__auto_colourpickerstaticimage__" dimension="RightEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_colourpickerstaticimage__" dimension="TopEdge"/>
+                </Dim>
+                <Dim type="Width">
+                    <PropertyDim name="ColourPickerImageSliderWidth"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_colourpickerstaticimage__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+        </Child>
+        <!--
+		***************************************************
+			Start of RGB colour attribute child widgets 
+		***************************************************
+		-->
+        <Child nameSuffix="__auto_coloureditboxBdescription__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.08" type="Width"/>
+                        <WidgetDim widget="__auto_newcolourrect__" dimension="RightEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <UnifiedDim scale="-0.1" type="Height"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.04" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="B"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="LeftAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_coloureditboxB__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_coloureditboxBdescription__" dimension="RightEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_coloureditboxBdescription__" dimension="TopEdge"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.09" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="255"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="MaxTextLength" value="3"/>
+            <Property name="ValidationString" value="^$|[1][0-9][0-9]|[0-2][5][0-5]|[0-2][0-4][0-9]|[0-9]{1,2}"/>
+        </Child>
+        <Child nameSuffix="__auto_coloureditboxGdescription__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_coloureditboxBdescription__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.01" type="Height"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_coloureditboxBdescription__" dimension="TopEdge"/>
+                            <WidgetDim widget="__auto_coloureditboxBdescription__" dimension="Height"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.04" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="G"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="LeftAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_coloureditboxG__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_coloureditboxGdescription__" dimension="RightEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_coloureditboxGdescription__" dimension="TopEdge"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.09" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="255"/>
+            <Property name="MaxTextLength" value="3"/>
+            <Property name="ValidationString" value="^$|[1][0-9][0-9]|[0-2][5][0-5]|[0-2][0-4][0-9]|[0-9]{1,2}"/>
+        </Child>
+        <Child nameSuffix="__auto_coloureditboxRdescription__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_coloureditboxGdescription__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.01" type="Height"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_coloureditboxGdescription__" dimension="TopEdge"/>
+                            <WidgetDim widget="__auto_coloureditboxGdescription__" dimension="Height"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.04" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="R"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="LeftAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_coloureditboxR__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_coloureditboxRdescription__" dimension="RightEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_coloureditboxRdescription__" dimension="TopEdge"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.09" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="255"/>
+            <Property name="MaxTextLength" value="3"/>
+            <Property name="ValidationString" value="^$|[1][0-9][0-9]|[0-2][5][0-5]|[0-2][0-4][0-9]|[0-9]{1,2}"/>
+        </Child>
+        <!--
+		***************************************************
+			Hexadecimal description and editbox
+		***************************************************
+		-->
+        <Child nameSuffix="__auto_hexadecimaleditbox__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Subtract">
+                        <WidgetDim widget="__auto_coloureditboxB__" dimension="RightEdge"/>
+                        <UnifiedDim scale="0.17" type="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <UnifiedDim scale="-0.02" type="Height"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.17" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="FFFFFFFF"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="ValidationString" value="[0-9a-fA-F]{0,8}"/>
+        </Child>
+        <Child nameSuffix="__auto_hexadecimalstatictext__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Subtract">
+                        <WidgetDim widget="__auto_hexadecimaleditbox__" dimension="LeftEdge"/>
+                        <UnifiedDim scale="0.22" type="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <UnifiedDim scale="-0.02" type="Height"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.20" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.05" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="Hexadecimal:"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="CentreAligned"/>
+        </Child>
+        <!--
+		***************************************************
+			Start of HSV colour model child widgets 
+		***************************************************
+		-->
+        <Child nameSuffix="__auto_HSVeditboxH__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <UnifiedDim scale="-0.070" type="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.05" type="Height"/>
+                        <WidgetDim widget="__auto_colourpickerstaticimage__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="255.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_HSVradiobuttonH__" type="Vanilla/RadioButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="-6"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_HSVeditboxH__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_HSVeditboxH__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <WidgetDim widget="__auto_HSVeditboxH__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.055" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_HSVeditboxH__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="H"/>
+            <Property name="RadioButtonRelativeWidth" value="0.5"/>
+            <Property name="RadioButtonRelativeHeight" value="0.5"/>
+        </Child>
+        <Child nameSuffix="__auto_HSVeditboxS__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_HSVeditboxH__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.01" type="Height"/>
+                        <WidgetDim widget="__auto_HSVeditboxH__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="100.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_HSVradiobuttonS__" type="Vanilla/RadioButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="-6"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_HSVeditboxS__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_HSVeditboxS__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <WidgetDim widget="__auto_HSVeditboxS__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.055" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_HSVeditboxS__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="S"/>
+            <Property name="RadioButtonRelativeWidth" value="0.5"/>
+            <Property name="RadioButtonRelativeHeight" value="0.5"/>
+        </Child>
+        <Child nameSuffix="__auto_HSVeditboxV__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_HSVeditboxS__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.01" type="Height"/>
+                        <WidgetDim widget="__auto_HSVeditboxS__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="255.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_HSVradiobuttonV__" type="Vanilla/RadioButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="-6"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_HSVeditboxV__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_HSVeditboxV__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <WidgetDim widget="__auto_HSVeditboxV__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.055" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_HSVeditboxV__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="V"/>
+            <Property name="RadioButtonRelativeWidth" value="0.5"/>
+            <Property name="RadioButtonRelativeHeight" value="0.5"/>
+        </Child>
+        <!--
+		***************************************************
+			Start of L*a*b colour model child widgets 
+		***************************************************
+		-->
+        <Child nameSuffix="__auto_LabeditboxL__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_HSVeditboxH__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.07" type="Height"/>
+                        <WidgetDim widget="__auto_HSVeditboxV__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="100.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_LabradiobuttonL__" type="Vanilla/RadioButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="-6"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_LabeditboxL__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_LabeditboxL__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <WidgetDim widget="__auto_LabeditboxL__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.055" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_LabeditboxL__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="L"/>
+            <Property name="RadioButtonRelativeWidth" value="0.5"/>
+            <Property name="RadioButtonRelativeHeight" value="0.5"/>
+        </Child>
+        <Child nameSuffix="__auto_Labeditboxa__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_LabeditboxL__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.01" type="Height"/>
+                        <WidgetDim widget="__auto_LabeditboxL__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="130.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_Labradiobuttona__" type="Vanilla/RadioButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="-6"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_Labeditboxa__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_Labeditboxa__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <WidgetDim widget="__auto_Labeditboxa__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.055" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_Labeditboxa__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="a"/>
+            <Property name="RadioButtonRelativeWidth" value="0.5"/>
+            <Property name="RadioButtonRelativeHeight" value="0.5"/>
+        </Child>
+        <Child nameSuffix="__auto_Labeditboxb__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <WidgetDim widget="__auto_Labeditboxa__" dimension="LeftEdge"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.01" type="Height"/>
+                        <WidgetDim widget="__auto_Labeditboxa__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="130.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_Labradiobuttonb__" type="Vanilla/RadioButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <AbsoluteDim value="-6"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_Labeditboxb__" dimension="LeftEdge"/>
+                            <WidgetDim widget="__auto_Labeditboxb__" dimension="Width"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.0" type="Height"/>
+                        <WidgetDim widget="__auto_Labeditboxb__" dimension="TopEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.055" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <WidgetDim widget="__auto_Labeditboxb__" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="Text" value="b"/>
+            <Property name="RadioButtonRelativeWidth" value="0.5"/>
+            <Property name="RadioButtonRelativeHeight" value="0.5"/>
+        </Child>
+        <!--
+		***************************************************
+			Start of Alpha child widgets 
+		***************************************************
+		-->
+        <Child nameSuffix="__auto_colourpickeralphaslider__" type="Vanilla/HorizontalImageSlider">
+            <Area>
+                <Dim type="LeftEdge">
+                    <UnifiedDim scale="0.57" type="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <UnifiedDim scale="0.74" type="Height"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.40" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.07" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_alphaeditbox__" type="Vanilla/Editbox">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.075" type="Width"/>
+                        <OperatorDim op="Add">
+                            <WidgetDim widget="__auto_colourpickeralphaslider__" dimension="LeftEdge"/>
+                            <OperatorDim op="Multiply">
+                                <WidgetDim widget="__auto_colourpickeralphaslider__" dimension="Width"/>
+                                <AbsoluteDim value="0.5"/>
+                            </OperatorDim>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.01" type="Height"/>
+                        <WidgetDim widget="__auto_colourpickeralphaslider__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.15" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="TextFormatting" value="CentreAligned"/>
+            <Property name="Text" value="0.000"/>
+            <Property name="MaxTextLength" value="8"/>
+            <Property name="ValidationString" value="[-+]?[0-9]*\.?[0-9]+"/>
+        </Child>
+        <Child nameSuffix="__auto_alphastatictext__" type="Vanilla/StaticText">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="-0.10" type="Width"/>
+                        <WidgetDim widget="__auto_alphaeditbox__" dimension="LeftEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Add">
+                        <UnifiedDim scale="0.01" type="Height"/>
+                        <WidgetDim widget="__auto_colourpickeralphaslider__" dimension="BottomEdge"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.10" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.055" type="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="TopAligned"/>
+            <HorzAlignment type="LeftAligned"/>
+            <Property name="Text" value="Alpha:"/>
+            <Property name="FrameEnabled" value="false"/>
+            <Property name="BackgroundEnabled" value="false"/>
+            <Property name="HorzFormatting" value="CentreAligned"/>
+        </Child>
+        <!--
+		***************************************************
+			Start of ImagerySection definitions 
+		***************************************************
+		-->
+        <ImagerySection name="withframe">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="Vanilla-Images/FrameTopLeft"/>
+                <Image component="TopRightCorner" name="Vanilla-Images/FrameTopRight"/>
+                <Image component="BottomLeftCorner" name="Vanilla-Images/FrameBottomLeft"/>
+                <Image component="BottomRightCorner" name="Vanilla-Images/FrameBottomRight"/>
+                <Image component="LeftEdge" name="Vanilla-Images/FrameLeft"/>
+                <Image component="TopEdge" name="Vanilla-Images/FrameTop"/>
+                <Image component="RightEdge" name="Vanilla-Images/FrameRight"/>
+                <Image component="BottomEdge" name="Vanilla-Images/FrameBottom"/>
+                <Image component="Background" name="Vanilla-Images/GenericBrush"/>
+                <ColourRectProperty name="BackgroundColours"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="noframe">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <Image component="Background" name="Vanilla-Images/GenericBrush"/>
+                <ColourRectProperty name="BackgroundColours"/>
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="withframe"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="noframe"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+</Falagard>

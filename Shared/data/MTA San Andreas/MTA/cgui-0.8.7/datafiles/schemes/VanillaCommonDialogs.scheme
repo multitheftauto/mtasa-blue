@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!--
+     Note: Currently to use this you must also load the VanillaSkin.scheme.
+     Eventually it will be possible to 'include' one scheme from another, but
+     we're not quite there yet.
+-->
+
+<GUIScheme version="5" name="VanillaCommonDialogs">
+	<Font filename="DejaVuSans-10-NoScale.font" />
+	<LookNFeel filename="VanillaCommonDialogs.looknfeel" />
+	<WindowRendererSet filename="CEGUICoreWindowRendererSet" />
+	<FalagardMapping windowType="Vanilla/VerticalImageSliderThumb" targetType="CEGUI/Thumb" renderer="Core/Button"  lookNFeel="Vanilla/VerticalImageSliderThumb" />
+	<FalagardMapping windowType="Vanilla/VerticalImageSlider" targetType="CEGUI/Slider" renderer="Core/Slider" lookNFeel="Vanilla/VerticalImageSlider" />
+	<FalagardMapping windowType="Vanilla/HorizontalImageSliderThumb" targetType="CEGUI/Thumb" renderer="Core/Button"  lookNFeel="Vanilla/HorizontalImageSliderThumb" />
+	<FalagardMapping windowType="Vanilla/HorizontalImageSlider" targetType="CEGUI/Slider" renderer="Core/Slider" lookNFeel="Vanilla/HorizontalImageSlider" />
+	<FalagardMapping windowType="Vanilla/FrameColourRect" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="Vanilla/FrameColourRect" />
+	<FalagardMapping windowType="Vanilla/ColourPicker" targetType="CEGUI/ColourPicker" renderer="Core/Default" lookNFeel="Vanilla/ColourPicker" />
+	<FalagardMapping windowType="Vanilla/ColourPickerControls" targetType="CEGUI/ColourPickerControls" renderer="Core/Default" lookNFeel="Vanilla/ColourPickerControls" />
+</GUIScheme>
+

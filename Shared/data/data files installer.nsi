@@ -193,6 +193,41 @@ Section "Data files" SEC01
 	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 
+	;================
+	; CEGUI 0.8.7
+	;================
+
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\xml_schemas"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Animation.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\CEGUIConfig.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Falagard.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Font.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\GUILayout.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\GUIScheme.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Imageset.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Samples.xsd"
+	
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\schemes"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\schemes\Default.scheme"
+	
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\looknfeel"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\looknfeel\TaharezLook.looknfeel"
+	
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\layouts"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\layouts\TaharezLookOverview.layout"	
+	
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\imagesets"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\imagesets\TaharezLook.imageset"		
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\imagesets\TaharezLook.png"		
+	
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\fonts"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\pricedown.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\sabankgothic.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\sagothic.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\saheader.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\sans.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\unifont-5.1.20080907.ttf"	
+
 	SetOutPath "$INSTDIR\server\mods\deathmatch"
 	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\libmysql.dll"
 

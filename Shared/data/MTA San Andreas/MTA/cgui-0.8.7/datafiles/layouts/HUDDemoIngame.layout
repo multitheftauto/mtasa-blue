@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="Generic/Image" name="HUDDemoRoot" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="Image" value="HUDDemo/Background" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Property name="HorzFormatting" value="Tiled" />
+        <Property name="VertFormatting" value="Tiled" />
+        <Property name="MousePassThroughEnabled" value="True" />
+        <Window type="Generic/Image" name="TopBar" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{0.12,0}}" />
+            <Property name="Image" value="HUDDemo/BGBar" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="RiseOnClickEnabled" value="False" />
+            <Window type="Generic/Image" name="Life1" >
+                <Property name="Area" value="{{0.0140625,0},{0.0930233,0},{0.0140625,0},{0.697674,0}}" />
+                <Property name="Image" value="HUDDemo/Life" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="RiseOnClickEnabled" value="False" />
+            </Window>
+            <Window type="Generic/Image" name="Life2" >
+                <Property name="Area" value="{{0.0617188,0},{0.0930233,0},{0.102344,0},{0.697674,0}}" />
+                <Property name="Image" value="HUDDemo/Life" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="RiseOnClickEnabled" value="False" />
+            </Window>
+            <Window type="Generic/Image" name="Life3" >
+                <Property name="Area" value="{{0.109766,0},{0.0930233,0},{0.150391,0},{0.697674,0}}" />
+                <Property name="Image" value="HUDDemo/Life" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="RiseOnClickEnabled" value="False" />
+            </Window>
+            <Window type="HUDDemo/ProgressBar" name="LifeBar" >
+                <Property name="Area" value="{{0.0140625,0},{0.755814,3},{0.289063,0},{0.918605,0}}" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.3" />
+                <Property name="RiseOnClickEnabled" value="False" />
+            </Window>
+            <Window type="Generic/Label" name="LivesLabel" >
+                <Property name="Area" value="{{0,212},{0,17},{0.1,149},{0.372093,29}}" />
+                <Property name="Font" value="GreatVibes-22" />
+                <Property name="Text" value="Lives" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="NormalTextColour" value="FFFFEFCE" />
+                <Property name="DisabledTextColour" value="FFFFEFCE" />
+                <Property name="RiseOnClickEnabled" value="False" />
+            </Window>
+            <Window type="Generic/Image" name="Logo" >
+                <Property name="Area" value="{{0,0},{0,0},{0,0},{1,0}}" />
+                <Property name="Image" value="HUDDemo/Logo" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="2.247" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="HorizontalAlignment" value="Centre" />
+            </Window>
+            <Window type="Generic/Image" name="ScoreBGImage" >
+                <Property name="Area" value="{{-0.03,0},{0,0},{-0.03,0},{1,0}}" />
+                <Property name="Image" value="HUDDemo/ScoreBG" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="2" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Window type="Generic/Label" name="Score" >
+                    <Property name="Area" value="{{0.0988372,0},{0.27907,0},{0.180233,128},{0.406977,32}}" />
+                    <Property name="Font" value="GreatVibes-22" />
+                    <Property name="Text" value="0 pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="RiseOnClickEnabled" value="False" />
+                </Window>
+            </Window>
+            <Window type="Generic/Label" name="ScoreLabel" >
+                <Property name="Area" value="{{-0.17,0},{0,0},{-0.07,0},{1,0}}" />
+                <Property name="Font" value="GreatVibes-22" />
+                <Property name="Text" value="Score" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="RightAligned" />
+                <Property name="NormalTextColour" value="FFFFEFCE" />
+                <Property name="DisabledTextColour" value="FFFFEFCE" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="HorizontalAlignment" value="Right" />
+            </Window>
+        </Window>
+        <Window type="Generic/Image" name="BotBar" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{0.12,0}}" />
+            <Property name="Image" value="HUDDemo/BGBar" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="AlwaysOnTop" value="True" />
+            <Property name="VerticalAlignment" value="Bottom" />
+            <Property name="RiseOnClickEnabled" value="False" />
+            <Window type="Generic/Image" name="MenuImage" >
+                <Property name="Area" value="{{0,0},{0,0},{0,0},{4,0}}" />
+                <Property name="Image" value="HUDDemo/Menu" />
+                <Property name="MaxSize" value="{{999,0},{999,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="0.944" />
+                <Property name="ClippedByParent" value="False" />
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Property name="MousePassThroughEnabled" value="True" />
+                <Window type="Generic/Label" name="BreadLabel" >
+                    <Property name="Area" value="{{0.15,0},{0.369186,0},{1,0},{0.459186,0}}" />
+                    <Property name="Font" value="GreatVibes-16" />
+                    <Property name="Text" value="Bread ...                     +2pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Label" name="PrizzaLabel" >
+                    <Property name="Area" value="{{0.15,0},{0.473837,0},{1,0},{0.563837,0}}" />
+                    <Property name="Font" value="GreatVibes-16" />
+                    <Property name="Text" value="Prizza ...                    +3pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Label" name="SteakLabel" >
+                    <Property name="Area" value="{{0.15,0},{0.572674,0},{1,0},{0.662674,0}}" />
+                    <Property name="Font" value="GreatVibes-16" />
+                    <Property name="Text" value="Bloody steak ... -0.35hp -13pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Label" name="PooLabel" >
+                    <Property name="Area" value="{{0.15,0},{0.677325,0},{1,0},{0.767325,0}}" />
+                    <Property name="Font" value="GreatVibes-16" />
+                    <Property name="Text" value="Poo ...           -0.35hp -9pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Label" name="VegetableLabel" >
+                    <Property name="Area" value="{{0.15,0},{0.773255,0},{1,0},{0.863255,0}}" />
+                    <Property name="Font" value="GreatVibes-16" />
+                    <Property name="Text" value="Vegetable people ...         +1pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="Generic/Label" name="VegFruitsLabel" >
+                    <Property name="Area" value="{{0.15,0},{0.869185,0},{1.00001,0},{0.959185,0}}" />
+                    <Property name="Font" value="GreatVibes-16" />
+                    <Property name="Text" value="Vegetables and fruits ...    +88pts" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+            </Window>
+            <Window type="DefaultWindow" name="BonusItemsWindow" >
+                <Property name="Area" value="{{0,0},{0,0},{0.3,0},{1,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="HorizontalAlignment" value="Centre" />
+                <Window type="Generic/Image" name="BonusItemBG1" >
+                    <Property name="Area" value="{{0,0},{0,0},{0,0},{1,0}}" />
+                    <Property name="Image" value="HUDDemo/ToolBG" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AspectMode" value="Expand" />
+                    <Property name="AspectRatio" value="1.644" />
+                    <Property name="VerticalAlignment" value="Bottom" />
+                    <Property name="RiseOnClickEnabled" value="False" />
+                    <Window type="Generic/Image" name="ToolMixerImage" >
+                        <Property name="Area" value="{{0,0},{0,0},{0,0},{0.8,0}}" />
+                        <Property name="Image" value="HUDDemo/ToolMixer" />
+                        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                        <Property name="AspectMode" value="Expand" />
+                        <Property name="VerticalAlignment" value="Centre" />
+                        <Property name="RiseOnClickEnabled" value="False" />
+                        <Property name="HorizontalAlignment" value="Centre" />
+                    </Window>
+                </Window>
+                <Window type="Generic/Image" name="BonusItemBG2" >
+                    <Property name="Area" value="{{0,0},{0,0},{0,0},{1,0}}" />
+                    <Property name="Image" value="HUDDemo/ToolBG" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AspectMode" value="Expand" />
+                    <Property name="AspectRatio" value="1.644" />
+                    <Property name="VerticalAlignment" value="Bottom" />
+                    <Property name="RiseOnClickEnabled" value="False" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Window type="Generic/Image" name="ToolMixerImage" >
+                        <Property name="Area" value="{{0,0},{0,0},{0,0},{0.8,0}}" />
+                        <Property name="Image" value="HUDDemo/ToolGlove" />
+                        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                        <Property name="AspectMode" value="Expand" />
+                        <Property name="VerticalAlignment" value="Centre" />
+                        <Property name="RiseOnClickEnabled" value="False" />
+                        <Property name="HorizontalAlignment" value="Centre" />
+                    </Window>
+                </Window>
+                <Window type="Generic/Image" name="BonusItemBG3" >
+                    <Property name="Area" value="{{0,0},{0,0},{0,0},{1,0}}" />
+                    <Property name="Image" value="HUDDemo/ToolBG" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AspectMode" value="Expand" />
+                    <Property name="AspectRatio" value="1.644" />
+                    <Property name="VerticalAlignment" value="Bottom" />
+                    <Property name="RiseOnClickEnabled" value="False" />
+                    <Property name="HorizontalAlignment" value="Right" />
+                    <Window type="Generic/Image" name="ToolMixerImage" >
+                        <Property name="Area" value="{{0,0},{0,0},{0,0},{0.8,0}}" />
+                        <Property name="Image" value="HUDDemo/ToolPot" />
+                        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                        <Property name="AspectMode" value="Expand" />
+                        <Property name="VerticalAlignment" value="Centre" />
+                        <Property name="RiseOnClickEnabled" value="False" />
+                        <Property name="HorizontalAlignment" value="Centre" />
+                    </Window>
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="WeaponBGImage" >
+                <Property name="Area" value="{{0,0},{0,0},{0,0},{1,0}}" />
+                <Property name="Image" value="HUDDemo/WeaponBG" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="3" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Window type="Generic/Label" name="WeaponLabel" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Font" value="GreatVibes-22" />
+                    <Property name="Text" value="Le Spoon" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="NormalTextColour" value="FF472D1C" />
+                    <Property name="VerticalAlignment" value="Centre" />
+                    <Property name="DisabledTextColour" value="FF472D1C" />
+                    <Property name="RiseOnClickEnabled" value="False" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                    <Property name="MousePassThroughEnabled" value="True" />
+                </Window>
+                <Window type="DefaultWindow" name="LeftArrowArea" >
+                    <Property name="Area" value="{{0.0310078,0},{0.139535,0},{0.208527,0},{0.739535,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AutoRepeatDelay" value="0" />
+                </Window>
+                <Window type="DefaultWindow" name="RightArrowArea" >
+                    <Property name="Area" value="{{0.790698,0},{0.162791,0},{0.952713,0},{0.762791,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AutoRepeatDelay" value="0" />
+                </Window>
+            </Window>
+            <Window type="Generic/Image" name="WeaponSpoon" >
+                <Property name="Area" value="{{0.0648438,0},{-1.0814,0},{0.124531,0},{-1.0814,0}}" />
+                <Property name="Image" value="HUDDemo/IconSpoon" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="0.404" />
+                <Property name="ClippedByParent" value="False" />
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="MousePassThroughEnabled" value="True" />
+            </Window>
+            <Window type="Generic/Image" name="WeaponKnife" >
+                <Property name="Area" value="{{0.130469,0},{-0.813953,0},{0.158906,0},{-0.813953,0}}" />
+                <Property name="Image" value="HUDDemo/IconKnife" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="0.213" />
+                <Property name="ClippedByParent" value="False" />
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="MousePassThroughEnabled" value="True" />
+            </Window>
+            <Window type="Generic/Image" name="WeaponFork" >
+                <Property name="Area" value="{{0.0304688,0},{-0.848837,0},{0.0796877,0},{-0.848837,0}}" />
+                <Property name="Image" value="HUDDemo/IconFork" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="AspectMode" value="Expand" />
+                <Property name="AspectRatio" value="0.421" />
+                <Property name="ClippedByParent" value="False" />
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="RiseOnClickEnabled" value="False" />
+                <Property name="MousePassThroughEnabled" value="True" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<GUIScheme version="5" name="AlfiskoSkin">
+    <Font filename="DejaVuSans-12.font" />
+    <Imageset filename="AlfiskoSkin.imageset" />
+    <LookNFeel filename="AlfiskoSkin.looknfeel" />
+    <WindowRendererSet filename="CEGUICoreWindowRendererSet" />
+
+    <FalagardMapping windowType="AlfiskoSkin/Label" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="AlfiskoSkin/Label" />
+    <FalagardMapping windowType="AlfiskoSkin/Button" targetType="CEGUI/PushButton" renderer="Core/Button" lookNFeel="AlfiskoSkin/Button" />
+    <FalagardMapping windowType="AlfiskoSkin/ImageButton" targetType="CEGUI/PushButton" renderer="Core/Button" lookNFeel="AlfiskoSkin/ImageButton" />
+    <FalagardMapping windowType="AlfiskoSkin/RadioButton" targetType="CEGUI/RadioButton" renderer="Core/ToggleButton" lookNFeel="AlfiskoSkin/RadioButton" />
+    <FalagardMapping windowType="AlfiskoSkin/Checkbox" targetType="CEGUI/ToggleButton" renderer="Core/ToggleButton" lookNFeel="AlfiskoSkin/Checkbox" />
+    <FalagardMapping windowType="AlfiskoSkin/Titlebar" targetType="CEGUI/Titlebar" renderer="Core/Titlebar" lookNFeel="AlfiskoSkin/Titlebar" />
+    <FalagardMapping windowType="AlfiskoSkin/FrameWindow" targetType="CEGUI/FrameWindow" renderer="Core/FrameWindow" lookNFeel="AlfiskoSkin/FrameWindow" />
+    <FalagardMapping windowType="AlfiskoSkin/Editbox" targetType="CEGUI/Editbox" renderer="Core/Editbox" lookNFeel="AlfiskoSkin/Editbox" />
+	<FalagardMapping windowType="AlfiskoSkin/VerticalScrollbarThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="AlfiskoSkin/VerticalScrollbarThumb" />
+	<FalagardMapping windowType="AlfiskoSkin/VerticalScrollbar" targetType="CEGUI/Scrollbar" renderer="Core/Scrollbar" lookNFeel="AlfiskoSkin/VerticalScrollbar" />
+	<FalagardMapping windowType="AlfiskoSkin/HorizontalScrollbarThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="AlfiskoSkin/HorizontalScrollbarThumb" />
+	<FalagardMapping windowType="AlfiskoSkin/HorizontalScrollbar" targetType="CEGUI/Scrollbar" renderer="Core/Scrollbar" lookNFeel="AlfiskoSkin/HorizontalScrollbar" />
+	<FalagardMapping windowType="AlfiskoSkin/MultiLineEditbox" targetType="CEGUI/MultiLineEditbox" renderer="Core/MultiLineEditbox" lookNFeel="AlfiskoSkin/MultiLineEditbox" />
+	<FalagardMapping windowType="AlfiskoSkin/ProgressBar" targetType="CEGUI/ProgressBar" renderer="Core/ProgressBar" lookNFeel="AlfiskoSkin/ProgressBar" />
+	<FalagardMapping windowType="AlfiskoSkin/HorizontalSliderThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="AlfiskoSkin/HorizontalSliderThumb" />
+	<FalagardMapping windowType="AlfiskoSkin/HorizontalSlider" targetType="CEGUI/Slider" renderer="Core/Slider" lookNFeel="AlfiskoSkin/HorizontalSlider" />
+	<FalagardMapping windowType="AlfiskoSkin/VerticalSliderThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="AlfiskoSkin/VerticalSliderThumb" />
+	<FalagardMapping windowType="AlfiskoSkin/VerticalSlider" targetType="CEGUI/Slider" renderer="Core/Slider" lookNFeel="AlfiskoSkin/VerticalSlider" />
+
+	<FalagardMapping windowType="AlfiskoSkin/MenuItem" targetType="CEGUI/MenuItem" renderer="Core/MenuItem" lookNFeel="AlfiskoSkin/MenuItem" />
+<!--
+	<FalagardMapping windowType="AlfiskoSkin/Menubar" targetType="CEGUI/Menubar" renderer="Core/Menubar" lookNFeel="AlfiskoSkin/Menubar" />
+	<FalagardMapping windowType="AlfiskoSkin/PopupMenu" targetType="CEGUI/PopupMenu" renderer="Core/PopupMenu" lookNFeel="AlfiskoSkin/PopupMenu" />
+
+	<FalagardMapping windowType="AlfiskoSkin/TabButton" targetType="CEGUI/TabButton" renderer="Core/TabButton" lookNFeel="AlfiskoSkin/TabButton" />
+	<FalagardMapping windowType="AlfiskoSkin/TabButtonPane" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="AlfiskoSkin/TabButtonPane" />
+	<FalagardMapping windowType="AlfiskoSkin/TabContentPane" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="AlfiskoSkin/TabContentPane" />
+	<FalagardMapping windowType="AlfiskoSkin/TabControl" targetType="CEGUI/TabControl" renderer="Core/TabControl" lookNFeel="AlfiskoSkin/TabControl" />
+
+	<FalagardMapping windowType="AlfiskoSkin/ComboDropList" targetType="CEGUI/ComboDropList" renderer="Core/Listbox" lookNFeel="AlfiskoSkin/ComboDropList" />
+	<FalagardMapping windowType="AlfiskoSkin/ComboEditbox" targetType="CEGUI/Editbox"	 renderer="Core/Editbox" lookNFeel="AlfiskoSkin/ComboEditbox" />
+	<FalagardMapping windowType="AlfiskoSkin/Combobox" targetType="CEGUI/Combobox"	 renderer="Core/Default" lookNFeel="AlfiskoSkin/Combobox" />
+
+	<FalagardMapping windowType="AlfiskoSkin/ListboxItem" targetType="CEGUI/ItemEntry" renderer="Core/ItemEntry" lookNFeel="AlfiskoSkin/ListboxItem" />
+	<FalagardMapping windowType="AlfiskoSkin/ItemListbox" targetType="CEGUI/ItemListbox" renderer="Core/ItemListbox" lookNFeel="AlfiskoSkin/ItemListbox" />
+	<FalagardMapping windowType="AlfiskoSkin/Listbox" targetType="CEGUI/Listbox" renderer="Core/Listbox" lookNFeel="AlfiskoSkin/Listbox" />
+
+	<FalagardMapping windowType="AlfiskoSkin/ListHeaderSegment" targetType="CEGUI/ListHeaderSegment" renderer="Core/ListHeaderSegment" lookNFeel="AlfiskoSkin/ListHeaderSegment" />
+	<FalagardMapping windowType="AlfiskoSkin/ListHeader" targetType="CEGUI/ListHeader" renderer="Core/ListHeader" lookNFeel="AlfiskoSkin/ListHeader" />
+	<FalagardMapping windowType="AlfiskoSkin/MultiColumnList" targetType="CEGUI/MultiColumnList" renderer="Core/MultiColumnList" lookNFeel="AlfiskoSkin/MultiColumnList" />
+
+	<FalagardMapping windowType="AlfiskoSkin/ScrollablePane" targetType="CEGUI/ScrollablePane" renderer="Core/ScrollablePane" lookNFeel="AlfiskoSkin/ScrollablePane" />
+
+	<FalagardMapping windowType="AlfiskoSkin/Spinner" targetType="CEGUI/Spinner" renderer="Core/Default" lookNFeel="AlfiskoSkin/Spinner" />
+	<FalagardMapping windowType="AlfiskoSkin/Tooltip" targetType="CEGUI/Tooltip" renderer="Core/Tooltip" lookNFeel="AlfiskoSkin/Tooltip" />
+	<FalagardMapping windowType="AlfiskoSkin/StaticImage" targetType="DefaultWindow" renderer="Core/StaticImage" lookNFeel="AlfiskoSkin/StaticImage" />
+	<FalagardMapping windowType="AlfiskoSkin/StaticText" targetType="DefaultWindow" renderer="Core/StaticText" lookNFeel="AlfiskoSkin/StaticText" />
+	<FalagardMapping windowType="AlfiskoSkin/GroupBox" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="AlfiskoSkin/GroupBox" />
+    <FalagardMapping windowType="AlfiskoSkin/Tree" targetType="CEGUI/Tree" renderer="Core/Tree" lookNFeel="AlfiskoSkin/Tree" />
+-->
+
+</GUIScheme>
+

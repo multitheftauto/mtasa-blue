@@ -43,6 +43,8 @@
 #   endif
 #endif
 
+#define CEGUI_BUILD_STATIC_CONFIGURATION
+
 //////////////////////////////////////////////////////////////////////////
 // CEGUI supports custom memory allocation (optional)
 //////////////////////////////////////////////////////////////////////////
@@ -78,14 +80,15 @@
 //////////////////////////////////////////////////////////////////////////
 // Set this to the default ImageCodec to be used.
 //////////////////////////////////////////////////////////////////////////
-//#ifndef CEGUI_DEFAULT_IMAGE_CODEC
-// #   define CEGUI_DEFAULT_IMAGE_CODEC "DevILImageCodec"
-//#endif
+#define CEGUI_BUILD_IMAGECODEC_SILLY
+#ifndef CEGUI_DEFAULT_IMAGE_CODEC
+#   define CEGUI_DEFAULT_IMAGE_CODEC "SILLYImageCodec"
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // The following says which TinyXML api version has been found
 //////////////////////////////////////////////////////////////////////////
-// #define CEGUI_TINYXML_HAS_2_6_API 1
+#define CEGUI_TINYXML_HAS_2_6_API 1
 
 //////////////////////////////////////////////////////////////////////////
 // Specifies whether to build the Direct3D 9 renderer module
@@ -203,7 +206,7 @@
 // itself, and likely will not be useful externally.
     // #define CEGUI_ICONV_USES_CONST_INBUF
 
-#define CEGUI_MSVC_STATIC_RUNTIME   
+//#define CEGUI_MSVC_STATIC_RUNTIME   
 
 #endif	// end of guard _CEGUIConfig_h_
 

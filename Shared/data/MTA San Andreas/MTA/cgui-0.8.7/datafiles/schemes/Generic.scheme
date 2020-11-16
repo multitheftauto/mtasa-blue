@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<GUIScheme version="5" name="Generic">
+	<LookNFeel filename="Generic.looknfeel" />
+	<WindowRendererSet filename="CEGUICoreWindowRendererSet" />
+
+	<FalagardMapping windowType="Generic/Label" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="Generic/Label" />
+	<FalagardMapping windowType="Generic/LabelWithOutline" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="Generic/LabelWithOutline" />
+    <FalagardMapping windowType="Generic/Image" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="Generic/Image" />
+    <FalagardMapping windowType="Generic/ImageButton" targetType="CEGUI/PushButton" renderer="Core/Button" lookNFeel="Generic/ImageButton" />
+    
+</GUIScheme>

@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="DefaultWindow" name="root" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Window type="TaharezLook/StaticImage" name="StaticImage" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Window type="TaharezLook/Button" name="button" >
+                <Property name="Area" value="{{0.00390625,0},{0.00694444,0},{0.0976563,0},{0.0347222,0}}" />
+                <Property name="Text" value="Button" />
+            </Window>
+            <Window type="TaharezLook/Listbox" name="disabledListbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.583333,0},{0.160156,0},{0.666666,0}}" />
+                <Property name="Disabled" value="true" />
+                <Window type="TaharezLook/ListboxItem" name="ListboxItem" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{0.333333,0}}" />
+                    <Property name="Text" value="Item 1" />
+                    <Property name="Selected" value="true" />
+                </Window>
+                <Window type="TaharezLook/ListboxItem" name="ListboxItem2" >
+                    <Property name="Area" value="{{0,0},{0.333333,0},{1,0},{0.666666,0}}" />
+                    <Property name="Text" value="Item 2" />
+                </Window>
+                <Window type="TaharezLook/ListboxItem" name="ListboxItem3" >
+                    <Property name="Area" value="{{0,0},{0.666667,0},{1,0},{1,0}}" />
+                    <Property name="Text" value="Item 3" />
+                    <Property name="AutoRenderingSurface" value="true" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/Listbox" name="listbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.465278,0},{0.160156,0},{0.576389,0}}" />
+                <Property name="ForceHorzScrollbar" value="true" />
+                <Property name="ForceVertScrollbar" value="true" />
+                <Window type="TaharezLook/ListboxItem" name="ListboxItem" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{0.25,0}}" />
+                    <Property name="Text" value="Item 1" />
+                    <Property name="AutoRenderingSurface" value="true" />
+                </Window>
+                <Window type="TaharezLook/ListboxItem" name="ListboxItem2" >
+                    <Property name="Area" value="{{0,0},{0.25,0},{1,0},{0.5,0}}" />
+                    <Property name="Text" value="Item 2" />
+                    <Property name="AutoRenderingSurface" value="true" />
+                </Window>
+                <Window type="TaharezLook/ListboxItem" name="ListboxItem3" >
+                    <Property name="Area" value="{{0,0},{0.5,0},{1,0},{0.75,0}}" />
+                    <Property name="Text" value="Item 3" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/HorizontalScrollbar" name="disabledScrollbar" >
+                <Property name="Area" value="{{0.164063,0},{0.388889,0},{0.320313,0},{0.409722,0}}" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/HorizontalScrollbar" name="scrollbar" >
+                <Property name="Area" value="{{0.164063,0},{0.361111,0},{0.320313,0},{0.381944,0}}" />
+            </Window>
+            <Window type="TaharezLook/VUMeter" name="disabledVertProgressBar" >
+                <Property name="Area" value="{{0.185938,0},{0.461111,0},{0.201563,0},{0.738889,0}}" />
+                <Property name="Disabled" value="true" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.5" />
+            </Window>
+            <Window type="TaharezLook/Slider" name="disabledSlider" >
+                <Property name="Area" value="{{0.225,0},{0.461111,0},{0.240625,0},{0.738889,0}}" />
+                <Property name="Disabled" value="true" />
+                <Property name="CurrentValue" value="1" />
+            </Window>
+            <Window type="TaharezLook/ProgressBar" name="disabledProgressBar" >
+                <Property name="Area" value="{{0.164063,0},{0.326389,0},{0.320313,0},{0.354167,0}}" />
+                <Property name="Disabled" value="true" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.11" />
+            </Window>
+            <Window type="TaharezLook/ProgressBar" name="progressBar" >
+                <Property name="Area" value="{{0.164063,0},{0.291667,0},{0.320313,0},{0.319445,0}}" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.5" />
+            </Window>
+            <Window type="TaharezLook/GroupBox" name="disabledGroupBox" >
+                <Property name="Area" value="{{0.00390625,0},{0.375,-1},{0.160156,0},{0.444444,-1}}" />
+                <Property name="Text" value="Group Box Disabled" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="RiseOnClickEnabled" value="false" />
+            </Window>
+            <Window type="TaharezLook/Titlebar" name="titlebar" >
+                <Property name="Area" value="{{0.101563,0},{0.0416667,0},{0.257813,0},{0.0694445,0}}" />
+                <Property name="Text" value="Title Bar" />
+                <Property name="AlwaysOnTop" value="true" />
+                <Property name="MousePassThroughEnabled" value="true" />
+                <Property name="MouseInputPropagationEnabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/Editbox" name="disabledEditbox" >
+                <Property name="Area" value="{{0.296875,0},{0.00694444,0},{0.390625,0},{0.0347222,0}}" />
+                <Property name="Text" value="Disabled" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/Titlebar" name="disabledTitlebar" >
+                <Property name="Area" value="{{0.269531,0},{0.0416667,0},{0.425781,0},{0.0694445,0}}" />
+                <Property name="Text" value="Disabled Title Bar" />
+                <Property name="Disabled" value="true" />
+                <Property name="AlwaysOnTop" value="true" />
+            </Window>
+            <Window type="TaharezLook/Editbox" name="readOnlyEditbox" >
+                <Property name="Area" value="{{0.394531,0},{0.00694444,0},{0.488281,0},{0.0347222,0}}" />
+                <Property name="Text" value="Read Only" />
+                <Property name="ReadOnly" value="true" />
+            </Window>
+            <Window type="TaharezLook/VUMeter" name="vertProgressBar" >
+                <Property name="Area" value="{{0.166407,0},{0.461111,0},{0.182032,0},{0.738889,0}}" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.5" />
+            </Window>
+            <Window type="TaharezLook/Slider" name="slider" >
+                <Property name="Area" value="{{0.205469,0},{0.461111,0},{0.221094,0},{0.738889,0}}" />
+                <Property name="CurrentValue" value="1" />
+            </Window>
+            <Window type="TaharezLook/Checkbox" name="checkBox2" >
+                <Property name="Area" value="{{0.00390625,0},{0.180556,0},{0.0976563,0},{0.208334,0}}" />
+                <Property name="Text" value="CheckBox 2" />
+            </Window>
+            <Window type="TaharezLook/RadioButton" name="disabledCheckedRadioButton" >
+                <Property name="Area" value="{{0.00390625,0},{0.125,0},{0.0976563,0},{0.152778,0}}" />
+                <Property name="Text" value="Disabled Marked" />
+                <Property name="Disabled" value="true" />
+                <Property name="Selected" value="true" />
+            </Window>
+            <Window type="TaharezLook/Button" name="disabledButton" >
+                <Property name="Area" value="{{0.101563,0},{0.00694444,0},{0.195313,0},{0.0347222,0}}" />
+                <Property name="Text" value="Disabled" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/RadioButton" name="radioButton1" >
+                <Property name="Area" value="{{0.00390625,0},{0.0416667,0},{0.0976563,0},{0.0694445,0}}" />
+                <Property name="Text" value="Radio Button 1" />
+            </Window>
+            <Window type="TaharezLook/RadioButton" name="radioButton2" >
+                <Property name="Area" value="{{0.00390625,0},{0.0694444,0},{0.0976563,0},{0.0972222,0}}" />
+                <Property name="Text" value="Radio Button 2" />
+            </Window>
+            <Window type="TaharezLook/RadioButton" name="disabledUncheckedRadioButton" >
+                <Property name="Area" value="{{0.00390625,0},{0.0972222,0},{0.0976563,0},{0.125,0}}" />
+                <Property name="Text" value="Disabled Unmarked" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/Checkbox" name="checkBox1" >
+                <Property name="Area" value="{{0.00390625,0},{0.152778,0},{0.0976563,0},{0.180556,0}}" />
+                <Property name="Text" value="CheckBox 1" />
+            </Window>
+            <Window type="TaharezLook/FrameWindow" name="frameWindow" >
+                <Property name="Area" value="{{0.101563,0},{0.0833333,0},{0.257813,0},{0.277778,0}}" />
+                <Property name="Text" value="Frame Window" />
+            </Window>
+            <Window type="TaharezLook/GroupBox" name="groupBox" >
+                <Property name="Area" value="{{0.00390625,0},{0.291667,0},{0.160156,0},{0.361111,0}}" />
+                <Property name="Text" value="Group Box" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="RiseOnClickEnabled" value="false" />
+            </Window>
+            <Window type="TaharezLook/VerticalScrollbar" name="scrollbar2" >
+                <Property name="Area" value="{{0.244532,0},{0.461111,0},{0.256251,0},{0.738889,0}}" />
+            </Window>
+            <Window type="TaharezLook/VerticalScrollbar" name="disabledScrollbar2" >
+                <Property name="Area" value="{{0.260157,0},{0.461111,0},{0.271876,0},{0.738889,0}}" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/Editbox" name="editbox" >
+                <Property name="Area" value="{{0.199219,0},{0.00694444,0},{0.292969,0},{0.0347222,0}}" />
+                <Property name="Text" value="Edit Box" />
+            </Window>
+            <Window type="TaharezLook/Checkbox" name="disabledCheckedCheckbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.236111,0},{0.0976563,0},{0.263889,0}}" />
+                <Property name="Text" value="Disabled Marked" />
+                <Property name="Disabled" value="true" />
+                <Property name="Selected" value="true" />
+            </Window>
+            <Window type="TaharezLook/Checkbox" name="disabledUncheckedCheckbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.208333,0},{0.0976563,0},{0.236111,0}}" />
+                <Property name="Text" value="Disabled Unmarked" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/ComboEditbox" name="ComboEditbox" >
+                <Property name="Area" value="{{0.492188,0},{0.00694444,0},{0.617188,0},{0.0347222,0}}" />
+            </Window>
+            <Window type="TaharezLook/Combobox" name="disabledComboBox" >
+                <Property name="Area" value="{{0.527344,0},{0.0416667,0},{0.621094,0},{0.208333,0}}" />
+                <Property name="Disabled" value="true" />
+                <Property name="ReadOnly" value="true" />
+            </Window>
+            <Window type="TaharezLook/Combobox" name="combobox" >
+                <Property name="Area" value="{{0.429688,0},{0.0416667,0},{0.523438,0},{0.208333,0}}" />
+            </Window>
+            <Window type="TaharezLook/Spinner" name="Spinner" >
+                <Property name="Area" value="{{0.429688,0},{0.0833333,0},{0.468751,0},{0.111111,0}}" />
+                <Property name="Text" value="0" />
+                <Property name="AutoRenderingSurface" value="true" />
+            </Window>
+            <Window type="TaharezLook/Spinner" name="Spinner2" >
+                <Property name="Area" value="{{0.476563,0},{0.0833333,0},{0.515626,0},{0.111111,0}}" />
+                <Property name="Text" value="0" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="TaharezLook/MultiLineEditbox" name="MultiLineEditbox" >
+                <Property name="Area" value="{{0.328125,0},{0.291667,0},{0.484375,0},{0.402778,0}}" />
+                <Property name="Text" >
+                
+</Property>
+                <Property name="WordWrap" value="false" />
+                <Property name="BlinkCaret" value="true" />
+                <Property name="AutoRenderingSurface" value="true" />
+            </Window>
+            <Window type="TaharezLook/MultiLineEditbox" name="MultiLineEditbox2" >
+                <Property name="Area" value="{{0.328125,0},{0.416667,0},{0.484375,0},{0.527778,0}}" />
+                <Property name="Text" >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+                
+</Property>
+                <Property name="ReadOnly" value="true" />
+            </Window>
+            <Window type="TaharezLook/MultiLineEditbox" name="MultiLineEditbox3" >
+                <Property name="Area" value="{{0.328125,0},{0.541667,0},{0.484375,0},{0.652778,0}}" />
+                <Property name="Text" >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+                
+</Property>
+                <Property name="Disabled" value="true" />
+                <Property name="AutoRenderingSurface" value="true" />
+            </Window>
+            <Window type="TaharezLook/StaticText" name="HoverText" >
+                <Property name="Area" value="{{0.348437,0},{0.677778,0},{0.442187,0},{0.708334,0}}" />
+                <Property name="Text" value="Hover for tooltip" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="TooltipText" value="Hi, I am a tooltip." />
+                <Property name="TooltipType" value="TaharezLook/Tooltip" />
+                <Property name="HorzScrollPageSize" value="108" />
+                <Property name="VertScrollPageSize" value="10" />
+                <Property name="HorzScrollDocumentSize" value="107" />
+                <Property name="VertScrollDocumentSize" value="13.6796" />
+            </Window>
+            <Window type="TaharezLook/ScrollablePane" name="ScrollablePane" >
+                <Property name="Area" value="{{0.492188,0},{0.25,24},{0.648438,0},{0.402778,0}}" />
+                <Property name="ContentArea" value="l:0 t:0 r:1040 b:619" />
+                <Property name="ForceHorzScrollbar" value="true" />
+                <Property name="ForceVertScrollbar" value="true" />
+                <Window type="TaharezLook/Button" name="Button" >
+                    <Property name="Area" value="{{4.25532,0},{8.16327,0},{5.53191,0},{8.36735,0}}" />
+                    <Property name="Text" value="You found the secret button!" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/TabControl" name="TabControl" >
+                <Property name="Area" value="{{0.00390625,0},{0.694444,0},{0.160156,0},{0.861111,0}}" />
+                <Property name="TabHeight" value="{0,22.98}" />
+                <Property name="TabPanePosition" value="Bottom" />
+                <Window type="DefaultWindow" name="Tab1tab" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Text" value="Page one" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="DefaultWindow" name="Tab2Page2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Text" value="Page two" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Visible" value="false" />
+                </Window>
+                <Window type="DefaultWindow" name="Tab3Page2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Text" value="Page two" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Visible" value="false" />
+                </Window>
+                <Window type="DefaultWindow" name="Tab4Page2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Text" value="Page two" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Visible" value="false" />
+                </Window>
+                <Window type="DefaultWindow" name="Tab5Page2" >
+                    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+                    <Property name="Text" value="Page two" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Visible" value="false" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/Menubar" name="Menubar" >
+                <Property name="Area" value="{{0.492188,0},{0.416667,0},{0.648438,0},{0.444445,0}}" />
+                <Window type="TaharezLook/MenuItem" >
+                    <Property name="Area" value="{{0,7},{0,0},{0,36},{0,19}}" />
+                    <Property name="Text" value="File" />
+                    <Property name="VerticalAlignment" value="Centre" />
+                    <Window type="TaharezLook/PopupMenu" >
+                        <Property name="Area" value="{{0,0},{0,0},{0,37},{0,24.6796}}" />
+                        <Property name="Visible" value="false" />
+                        <Property name="ItemSpacing" value="2" />
+                        <Property name="ClippedByParent" value="false" />
+                        <Property name="AutoResizeEnabled" value="true" />
+                        <Window type="TaharezLook/MenuItem" >
+                            <Property name="Area" value="{{0,2},{0,2},{0,33},{0,21}}" />
+                            <Property name="Text" value="Quit" />
+                        </Window>
+                    </Window>
+                </Window>
+                <Window type="TaharezLook/MenuItem" >
+                    <Property name="Area" value="{{0,46},{0,0},{0,89},{0,19}}" />
+                    <Property name="Text" value="Demo" />
+                    <Property name="VerticalAlignment" value="Centre" />
+                    <Window type="TaharezLook/PopupMenu" >
+                        <Property name="Area" value="{{0,0},{0,0},{0,108},{0,45.3591}}" />
+                        <Property name="Visible" value="false" />
+                        <Property name="ItemSpacing" value="2" />
+                        <Property name="ClippedByParent" value="false" />
+                        <Property name="AutoResizeEnabled" value="true" />
+                        <Window type="TaharezLook/MenuItem" >
+                            <Property name="Area" value="{{0,2},{0,2},{0,104},{0,21}}" />
+                            <Property name="Text" value="New dialog" />
+                            <Property name="TooltipText" value="Hotkey: Space" />
+                        </Window>
+                        <Window type="TaharezLook/MenuItem" >
+                            <Property name="Area" value="{{0,2},{0,23},{0,104},{0,42}}" />
+                            <Property name="Text" value="Number Two" />
+                            <Window type="TaharezLook/PopupMenu" >
+                                <Property name="Area" value="{{0,0},{0,0},{0,76},{0,24.6796}}" />
+                                <Property name="Visible" value="false" />
+                                <Property name="ItemSpacing" value="2" />
+                                <Property name="ClippedByParent" value="false" />
+                                <Property name="AutoResizeEnabled" value="true" />
+                                <Window type="TaharezLook/MenuItem" >
+                                    <Property name="Area" value="{{0,2},{0,2},{0,72},{0,21}}" />
+                                    <Property name="Text" value="Extended" />
+                                </Window>
+                            </Window>
+                        </Window>
+                    </Window>
+                </Window>
+            </Window>
+            <Window type="TaharezLook/Tree" name="Tree" >
+                <Property name="Area" value="{{0.492188,0},{0.458333,0},{0.648438,0},{0.680555,0}}" />
+                <Property name="Text" value="Tree" />
+                <Property name="ForceHorzScrollbar" value="true" />
+                <Property name="ForceVertScrollbar" value="true" />
+            </Window>
+            <Window type="TaharezLook/FrameWindow" name="FrameWindow" >
+                <Property name="Area" value="{{0.269531,0},{0.0833333,0},{0.425781,0},{0.277778,0}}" />
+                <Property name="Text" value="Disabled Frame Window" />
+                <Property name="Disabled" value="true" />
+                <Property name="TitlebarEnabled" value="false" />
+                <Property name="CloseButtonEnabled" value="false" />
+            </Window>
+            <Window type="Generic/Label" name="Label" >
+                <Property name="Area" value="{{0.2375,0},{0.755556,0},{0.458594,0},{0.843056,0}}" />
+                <Property name="Text" value="I am a label window with a tooltip set. Below is my child window:" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="TooltipText" value="This tooltip will be inherited to children windows" />
+                <Property name="TooltipType" value="TaharezLook/Tooltip" />
+                <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="NormalTextColour" value="FFFFFFFF" />
+                <Property name="DisabledTextColour" value="FFFFFFFF" />
+                <Window type="TaharezLook/Button" name="Button" >
+                    <Property name="Area" value="{{0.261983,0},{0.54314,0},{0.788484,0},{0.860601,0}}" />
+                    <Property name="Text" value="I inherit tooltips" />
+                    <Property name="TooltipType" value="TaharezLook/Tooltip" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/AlternateProgressBar" name="AlternateProgressBar" >
+                <Property name="Area" value="{{0.164063,0},{0.415278,0},{0.328125,0},{0.436111,0}}" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.5" />
+            </Window>
+            <Window type="TaharezLook/StaticText" name="StaticText2" >
+                <Property name="Area" value="{{0.519531,0},{0.0819444,0},{0.648438,0},{0.169444,0}}" />
+                <Property name="Text" value="Testing StaticText without scrollbars" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="WordWrapLeftAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorzScrollPageSize" value="153" />
+                <Property name="VertScrollPageSize" value="51" />
+                <Property name="HorzScrollDocumentSize" value="152" />
+                <Property name="VertScrollDocumentSize" value="145.484" />
+            </Window>
+            <Window type="TaharezLook/StaticText" name="StaticText" >
+                <Property name="Area" value="{{0.519531,0},{0.173611,0},{0.648438,0},{0.277778,0}}" />
+                <Property name="Text" value="Testing the Formatting Tags: It is [colour=&apos;FF00FF00&apos;]possible[colour=&apos;FFFFFFFF&apos;] to embed images [image=&apos;TaharezLook/MouseArrow&apos;] or change the [font=&apos;DejaVuSans-12&apos;]Font type and [font=&apos;&apos;]many more things (see the docu or CEGUI wiki) [colour=&apos;FF00FF00&apos;][image=&apos;TaharezLook/MouseArrow&apos;]" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzScrollbar" value="true" />
+                <Property name="VertScrollbar" value="true" />
+                <Property name="HorzFormatting" value="WordWrapLeftAligned" />
+                <Property name="HorzScrollPageSize" value="147" />
+                <Property name="VertScrollPageSize" value="63" />
+                <Property name="HorzScrollDocumentSize" value="146" />
+                <Property name="VertScrollDocumentSize" value="165.539" />
+            </Window>
+            <Window type="Generic/Label" name="Label2" >
+                <Property name="Area" value="{{0.436719,0},{0.119445,0},{0.514844,0},{0.1625,0}}" />
+                <Property name="Text" value="StaticImage with an Image:" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="NormalTextColour" value="FFFFFFFF" />
+                <Property name="DisabledTextColour" value="FFFFFFFF" />
+            </Window>
+            <Window type="TaharezLook/StaticImage" name="StaticImage" >
+                <Property name="Area" value="{{0.450782,0},{0.163889,0},{0.501563,0},{0.227778,0}}" />
+                <Property name="Image" value="TaharezLook/UpArrow" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="CentreAligned" />
+                <Property name="VertFormatting" value="CentreAligned" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

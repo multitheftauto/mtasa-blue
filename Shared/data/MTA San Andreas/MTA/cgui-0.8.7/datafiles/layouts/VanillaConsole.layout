@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<GUILayout version="4">
+    <Window name="Console" type="Vanilla/FrameWindow">
+        <Property name="AlwaysOnTop" value="True" />
+        <Property name="MinSize" value="{{0.2,0},{0.2,0}}" />
+        <Property name="MaxSize" value="{{0.8,0},{0.8,0}}" />
+        <Property name="Position" value="{{0.5,0},{0.5,0}}" />
+        <Property name="Size" value="{{0.5,0},{0.45,0}}" />
+        <Property name="Text" value="Console" />
+        <Property name="CloseButtonEnabled" value="False" />
+
+        <Window name="Submit" type="Vanilla/Button">
+            <Property name="ID" value="1" />
+            <Property name="VerticalAlignment" value="Bottom" />
+            <Property name="HorizontalAlignment" value="Right" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="Position" value="{{0,-7},{0,-7}}" />
+            <Property name="Size" value="{{0.25,0},{0,30}}" />
+            <Property name="Text" value="Submit" />
+        </Window>
+
+        <Window name="Editbox" type="Vanilla/Editbox">
+            <Property name="ID" value="2" />
+            <Property name="VerticalAlignment" value="Bottom" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="Position" value="{{0,7},{0,-7}}" />
+            <Property name="Size" value="{{0.75,-21},{0,30}}" />
+            <Property name="Text" value="" />
+        </Window>
+
+        <Window name="History" type="Vanilla/MultiLineEditbox">
+            <Property name="ID" value="3" />
+            <Property name="ReadOnly" value="True" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="Position" value="{{0,7},{0,7}}" />
+            <Property name="Size" value="{{1,-14},{1,-47}}" />
+            <Property name="Text">CEGUI Demo Console - F12 toggles this window
+
+It's now easy to add multiline text property.
+Line 1
+
+You can now put &lt;xml&gt;stuff&lt;/xml&gt; in your property easly " " "
+
+Line 2
+Line 3
+</Property>
+        </Window>
+    </Window>
+</GUILayout>

@@ -1,22 +1,23 @@
 project "CEGUI-0.8.7"
 	language "C++"
-	kind "StaticLib"
+	kind "SharedLib"
 	targetname "CEGUI-0.8.7"
+	targetdir(buildpath("mta"))
 
 	includedirs {
 		"include",
 		"../freetype/include",
-		"../tinyxml",
 		"../pcre"
 	}
 
-	links { "freetype", "tinyxml", "pcre" }
+	links { 
+		"freetype", 
+		"pcre",
+		"winmm"
+	}
 
 	defines {
 		"CEGUIBASE_EXPORTS",
-		"CEGUIDIRECT3D9RENDERER_EXPORTS",
-		"CEGUICOREWINDOWRENDERERSET_EXPORTS",
-		"CEGUITINYXMLPARSER_EXPORTS",
 		"_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING"
 	}
 
@@ -41,6 +42,12 @@ project "CEGUI-0.8.7"
 		"include/CEGUI/CommonDialogs/**",
 		"src/ScriptModules/**",
 		"include/CEGUI/ScriptModules/**",
+		"src/RendererModules/**",
+		"include/CEGUI/RendererModules/**",
+		"src/WindowRendererSets/**",
+		"include/CEGUI/WindowRendererSets/**",
+		"src/XMLParserModules/**",
+		"include/CEGUI/XMLParserModules/**",	
 		"src/implementations/**",
 		"include/CEGUI/implementations/**",
 		"src/MinizipResourceProvider.cpp",
@@ -57,3 +64,7 @@ project "CEGUI-0.8.7"
 	filter {"system:windows"}
 		linkoptions { "/ignore:4221" }
 		disablewarnings { "4221" }
+
+	configuration "Debug"
+		links { "dbghelp" }
+	 configuration {}

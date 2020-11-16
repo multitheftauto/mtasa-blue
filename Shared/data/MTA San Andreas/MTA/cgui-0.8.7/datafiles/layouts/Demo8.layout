@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<GUILayout version="4">
+<Window name="root" type="DefaultWindow">
+    <Window name="Demo8" type="DefaultWindow">
+        <Property name="MaxSize" value="{{1,0},{2,0}}" />
+        <Property name="Size" value="{{1,0},{2,0}}" />
+
+        <Window name="ViewScroll" type="TaharezLook/LargeVerticalScrollbar">
+            <Property name="Position" value="{{0,0},{0,0}}" />
+            <Property name="Size" value="{{0.03,0},{0.75,0}}" />
+            <Property name="DocumentSize" value="2" />
+            <Property name="PageSize" value="1" />
+            <Property name="StepSize" value="0.01" />
+            <Property name="OverlapSize" value="0.5" />
+            <Property name="TooltipText" value="This scrollbar will scroll the window layout." />
+        </Window>
+
+        <Window name="Window1" type="TaharezLook/FrameWindow">
+            <Property name="Position" value="{{0.05,0},{0.1,0}}" />
+            <Property name="MaxSize" value="{{0.5,0},{1,0}}" />
+            <Property name="MinSize" value="{{0,128},{0,128}}" />
+            <Property name="Size" value="{{0.4,0},{0.3,0}}" />
+            <Property name="Text" value="Demo 8 - Listbox Demo" />
+            <Property name="TooltipText" value="Window shows a simple Listbox demo." />
+
+            <Window name="Listbox" type="TaharezLook/Listbox">
+                <Property name="Position" value="{{0.05,0},{0.05,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="Size" value="{{0.9,0},{0.38,0}}" />
+                <Property name="TooltipText" value="Listbox containing the items you have added." />
+            </Window>
+
+            <Window name="Controls" type="TaharezLook/StaticText">
+                <Property name="Position" value="{{0.05,0},{0.45,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="Size" value="{{0.9,0},{0.5,0}}" />
+
+                <Window name="Red" type="TaharezLook/HorizontalScrollbar">
+                    <Property name="Position" value="{{0.05,0},{0.05,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.9,0},{0.06,0}}" />
+                    <Property name="DocumentSize" value="1" />
+                    <Property name="PageSize" value="0.0625" />
+                    <Property name="StepSize" value="0.00392" />
+                    <Property name="OverlapSize" value="0.00392" />
+                    <Property name="TooltipText" value="Slider to adjust the red colour component." />
+                </Window>
+
+                <Window name="Green" type="TaharezLook/HorizontalScrollbar">
+                    <Property name="Position" value="{{0.05,0},{0.12,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.9,0},{0.06,0}}" />
+                    <Property name="DocumentSize" value="1" />
+                    <Property name="PageSize" value="0.0625" />
+                    <Property name="StepSize" value="0.00392" />
+                    <Property name="OverlapSize" value="0.00392" />
+                    <Property name="TooltipText" value="Slider to adjust the green colour component." />
+                </Window>
+
+                <Window name="Blue" type="TaharezLook/HorizontalScrollbar">
+                    <Property name="Position" value="{{0.05,0},{0.19,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.9,0},{0.06,0}}" />
+                    <Property name="DocumentSize" value="1" />
+                    <Property name="PageSize" value="0.0625" />
+                    <Property name="StepSize" value="0.00392" />
+                    <Property name="OverlapSize" value="0.00392" />
+                    <Property name="TooltipText" value="Slider to adjust the blue colour component." />
+                </Window>
+
+                <Window name="ColourSample" type="TaharezLook/StaticImage">
+                    <Property name="Position" value="{{0.05,0},{0.26,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.9,0},{0.1,0}}" />
+                    <Property name="Image" value="TaharezLook/MultiListSelectionBrush" />
+                    <Property name="ImageColours" value="tl:0 tr:0 bl:0 br:0" />
+                    <Property name="TooltipText" value="Shows a sample of the selected colour." />
+                </Window>
+
+                <Window name="Editbox" type="TaharezLook/Editbox">
+                    <Property name="Position" value="{{0.05,0},{0.38,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.6,0},{0.15,0}}" />
+                    <Property name="TooltipText" value="Enter the text for a new Listbox item here." />
+                </Window>
+
+                <Window name="Add" type="TaharezLook/Button">
+                    <Property name="Position" value="{{0.68,0},{0.38,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.3,0},{0.15,0}}" />
+                    <Property name="Text" value="Add" />
+                    <Property name="TooltipText" value="Adds a new item to the Listbox." />
+                </Window>
+
+                <Window name="ins1" type="TaharezLook/StaticText">
+                    <Property name="Position" value="{{0.05,0},{0.55,0}}" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Size" value="{{0.9,0},{0.4,0}}" />
+                    <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                    <Property name="Text" value="Use this panel to add items.  The scrollbars change the selection colour." />
+                    <Property name="TooltipText" value="Information panel." />
+                </Window>
+            </Window>
+        </Window>
+
+        <Window name="Window2" type="TaharezLook/FrameWindow">
+            <Property name="Position" value="{{0.55,0},{0.1,0}}" />
+            <Property name="MaxSize" value="{{0.5,0},{1,0}}" />
+            <Property name="MinSize" value="{{0,128},{0,128}}" />
+            <Property name="Size" value="{{0.4,0},{0.3,0}}" />
+            <Property name="Text" value="Demo 8 - Information Window" />
+            <Property name="TooltipText" value="Contains some StaticText information panels" />
+
+            <Window name="Info" type="TaharezLook/StaticText">
+                <Property name="Position" value="{{0.05,0},{0.05,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="Size" value="{{0.9,0},{0.3,0}}" />
+                <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                <Property name="Text" value="The panel below gives some information about the item under the mouse." />
+            </Window>
+    
+            <Window name="Tips" type="TaharezLook/StaticText">
+                <Property name="Position" value="{{0.05,0},{0.4,0}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="Size" value="{{0.9,0},{0.55,0}}" />
+                <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                <Property name="Text" value="We removed this, and now use proper tool tips instead!" />
+            </Window>
+        </Window>
+    </Window>
+</Window>
+</GUILayout>

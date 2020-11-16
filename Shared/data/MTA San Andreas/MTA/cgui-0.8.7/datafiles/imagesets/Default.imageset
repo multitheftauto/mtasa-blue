@@ -1,0 +1,95 @@
+<Imageset autoScaled="horizontal" imagefile="Default.png" name="CGUI" nativeHorzRes="800" nativeVertRes="600" version="2">
+	<Image name="GenericBrush" xPos="28" yPos="8" width="1" height="1" />
+	<Image name="ListboxSelectionBrush" xPos="28" yPos="8" width="1" height="1" />
+
+	<Image name="FrameTopLeft" xPos="21" yPos="1" width="8" height="8" />
+	<Image name="FrameTopRight" xPos="29" yPos="1" width="8" height="8" />
+	<Image name="FrameBottomLeft" xPos="21" yPos="9" width="8" height="8" />
+	<Image name="FrameBottomRight" xPos="29" yPos="9" width="8" height="8" />
+	<Image name="FrameLeft" xPos="21" yPos="9" width="8" height="1" />
+	<Image name="FrameRight" xPos="29" yPos="9" width="8" height="1" />
+	<Image name="FrameTop" xPos="60" yPos="1" width="1" height="8" />
+	<Image name="FrameBottom" xPos="60" yPos="9" width="1" height="8" />
+	<Image name="FrameTopLeftSquared" xPos="57" yPos="1" width="8" height="8" />
+	<Image name="FrameTopRightSquared" xPos="58" yPos="1" width="8" height="8" />
+	<Image name="FrameBottomRightSquared" xPos="58" yPos="9" width="8" height="8" />
+	<Image name="ScrollUpArrow" xPos="1" yPos="20" width="17" height="22" />
+	<Image name="ScrollDownArrow" xPos="1" yPos="66" width="17" height="22" />
+	<Image name="VertScrollContainer" xPos="1" yPos="44" width="17" height="20" />
+	<Image name="ScrollLeftArrow" xPos="20" yPos="71" width="22" height="17" />
+	<Image name="ScrollRightArrow" xPos="66" yPos="71" width="22" height="17" />
+	<Image name="HorzScrollContainer" xPos="44" yPos="71" width="20" height="17" />
+	<Image name="ScrollbarThumb" xPos="47" yPos="50" width="15" height="16" />
+	<Image name="ShadowBrush" xPos="48" yPos="1" width="24" height="24" />
+
+	<Image name="TitleBarBorder" xPos="21" yPos="27" width="1" height="1" />
+
+	<Image name="TitleBarTop" xPos="46" yPos="20" width="2" height="8" />
+	<Image name="TitleBarTopLeft" xPos="39" yPos="20" width="8" height="8" />
+	<Image name="TitleBarTopRight" xPos="47" yPos="20" width="8" height="8" />
+	<Image name="TitleBarBackground" xPos="46" yPos="23" width="3" height="3" />
+
+	<Image name="TitleBarTopSelected" xPos="28" yPos="20" width="2" height="8" />
+	<Image name="TitleBarTopLeftSelected" xPos="21" yPos="20" width="8" height="8" />
+	<Image name="TitleBarTopRightSelected" xPos="29" yPos="20" width="8" height="8" />
+	<Image name="TitleBarBackgroundSelected" xPos="28" yPos="23" width="3" height="3" />
+
+	<Image name="Frame2TopLeftSquared" xPos="67" yPos="1" width="8" height="8" />
+	<Image name="Frame2BottomRightSquared" xPos="67" yPos="9" width="8" height="8" />
+
+	<Image name="Frame2TopLeft" xPos="39" yPos="1" width="8" height="8" />
+	<Image name="Frame2TopRight" xPos="47" yPos="1" width="8" height="8" />
+	<Image name="Frame2BottomLeft" xPos="39" yPos="9" width="8" height="8" />
+	<Image name="Frame2BottomRight" xPos="47" yPos="9" width="8" height="8" />
+	<Image name="Frame2Left" xPos="39" yPos="8" width="8" height="1" />
+	<Image name="Frame2Right" xPos="47" yPos="8" width="8" height="1" />
+	<Image name="Frame2Top" xPos="46" yPos="1" width="1" height="8" />
+	<Image name="Frame2Bottom" xPos="46" yPos="9" width="1" height="8" />
+	<Image name="Frame2Background" xPos="46" yPos="8" width="1" height="1" />
+
+	<Image name="ProgressTopLeft" xPos="42" yPos="31" width="10" height="7" />
+	<Image name="ProgressTopRight" xPos="53" yPos="31" width="10" height="7" />
+	<Image name="ProgressBottomLeft" xPos="42" yPos="39" width="10" height="7" />
+	<Image name="ProgressBottomRight" xPos="53" yPos="39" width="10" height="7" />
+	<Image name="ProgressLeft" xPos="42" yPos="40" width="10" height="1" />
+	<Image name="ProgressRight" xPos="53" yPos="36" width="10" height="1" />
+	<Image name="ProgressTop" xPos="53" yPos="31" width="1" height="7" />
+	<Image name="ProgressBottom" xPos="53" yPos="39" width="1" height="7" />
+	<Image name="ProgressBackground" xPos="53" yPos="38" width="1" height="1" />
+	<Image name="ProgressBarDimSegment" xPos="78" yPos="31" width="5" height="16" />
+	<Image name="ProgressBarLitSegment" xPos="67" yPos="31" width="5" height="16" />
+
+	<Image name="ComboboxButtonNormal" xPos="90" yPos="55" width="16" height="16" />
+	<Image name="ComboboxButtonHover" xPos="90" yPos="74" width="16" height="16" />
+
+	<Image name="HeaderLine" xPos="28" yPos="7" width="1" height="1" />
+	<Image name="HeaderMainBrush" xPos="36" yPos="2" width="1" height="1" />
+	<Image name="HeaderBottomEdge" xPos="40" yPos="21" width="1" height="4" />
+	<Image name="HeaderSplitter" xPos="39" yPos="20" width="2" height="8" />
+	<Image name="LargeLeftArrow" xPos="2" yPos="65" width="5" height="9" />
+	<Image name="LargeRightArrow" xPos="9" yPos="65" width="5" height="9" />
+	<Image name="LargeUpArrow" xPos="2" yPos="76" width="9" height="5" />
+	<Image name="LargeDownArrow" xPos="2" yPos="83" width="9" height="5" />
+	<Image name="SmallLeftArrow" xPos="20" yPos="66" width="5" height="3" />
+	<Image name="SmallRightArrow" xPos="26" yPos="66" width="5" height="3" />
+	<Image name="SmallUpArrow" xPos="20" yPos="66" width="5" height="3" />
+	<Image name="SmallDownArrow" xPos="26" yPos="66" width="5" height="3" />
+
+	<Image name="MouseArrow" xPos="1" yPos="1" width="12" height="18" />
+	<Image name="NSSizingCursorImage" xPos="2" yPos="105" width="10" height="22" />
+	<Image name="EWSizingCursorImage" xPos="15" yPos="107" width="22" height="10" />
+	<Image name="NWSESizingCursorImage" xPos="59" yPos="105" width="18" height="18" />
+	<Image name="NESWSizingCursorImage" xPos="83" yPos="105" width="18" height="18" />
+	<Image name="MouseEsWeCursor" xPos="39" yPos="111" width="19" height="10" />
+	<Image name="MouseMoveCursor" xPos="104" yPos="105" width="22" height="22" />
+
+	<Image name="CheckboxNormal" xPos="89" yPos="1" width="16" height="16" />
+	<Image name="CheckboxHover" xPos="89" yPos="19" width="16" height="16" />
+	<Image name="CheckboxMark" xPos="89" yPos="37" width="16" height="16" />
+	<Image name="CheckboxMarkHover" xPos="107" yPos="55" width="16" height="16" />
+	<Image name="RadioButtonMark" xPos="107" yPos="1" width="16" height="16" />
+	<Image name="RadioButtonHover" xPos="107" yPos="19" width="16" height="16" />
+	<Image name="RadioButtonNormal" xPos="107" yPos="37" width="16" height="16" />
+	<Image name="RadioButtonMarkHover" xPos="107" yPos="73" width="16" height="16" />
+
+</Imageset>

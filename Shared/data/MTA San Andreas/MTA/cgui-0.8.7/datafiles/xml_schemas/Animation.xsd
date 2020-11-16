@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:element name="Animations" type="animAnimationsType" />
+	<xsd:complexType name="animAnimationsType">
+        <xsd:sequence>
+            <xsd:element name="AnimationDefinition" type="animAnimationDefinitionType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="animAnimationDefinitionType">
+        <xsd:sequence>
+            <xsd:element name="Affector" type="animAffectorType" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="Subscription" type="animSubscriptionType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="duration" type="xsd:decimal" use="required" />
+		<xsd:attribute name="replayMode" type="animReplayModeEnum" use="optional" default="loop" />
+		<xsd:attribute name="autoStart" type="xsd:boolean" use="optional" default="false" />
+	</xsd:complexType>
+	<xsd:complexType name="animAffectorType">
+        <xsd:sequence>
+            <xsd:element name="KeyFrame" type="animKeyFrameType" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+		<xsd:attribute name="applicationMethod" type="animApplicationMethodEnum" use="optional" default="absolute" />
+		<xsd:attribute name="property" type="xsd:string" use="required" />
+		<xsd:attribute name="interpolator" type="xsd:string" use="required" />
+	</xsd:complexType>
+	<xsd:complexType name="animKeyFrameType">
+		<xsd:attribute name="position" type="xsd:decimal" use="required" />
+		<xsd:attribute name="value" type="xsd:string" use="optional" default="" />
+		<xsd:attribute name="progression" type="xsd:string" use="optional" default="" />
+		<xsd:attribute name="sourceProperty" type="xsd:string" use="optional" default="" />
+	</xsd:complexType>
+	<xsd:complexType name="animSubscriptionType">
+		<xsd:attribute name="event" type="xsd:string" use="required" />
+		<xsd:attribute name="action" type="animActionEnum" use="required" />
+	</xsd:complexType>
+    <xsd:simpleType name="animReplayModeEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="once" />
+            <xsd:enumeration value="loop" />
+            <xsd:enumeration value="bounce" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="animApplicationMethodEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="absolute" />
+            <xsd:enumeration value="relative" />
+            <xsd:enumeration value="relative multiply" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="animProgressionEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="linear" />
+            <xsd:enumeration value="discrete" />
+            <xsd:enumeration value="quadratic accelerating" />
+            <xsd:enumeration value="quadratic decelerating" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="animActionEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Start" />
+            <xsd:enumeration value="Stop" />
+            <xsd:enumeration value="Pause" />
+            <xsd:enumeration value="Unpause" />
+            <xsd:enumeration value="TogglePause" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>
+

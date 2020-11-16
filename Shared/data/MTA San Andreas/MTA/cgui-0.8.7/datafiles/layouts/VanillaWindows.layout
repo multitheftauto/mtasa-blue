@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<GUILayout version="4">
+    <Window name="root" type="Vanilla/StaticImage">
+        <Property name="Position" value="{{0,0},{0,0}}" />
+        <Property name="Size" value="{{1,0},{1,0}}" />
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
+
+        <Window name="NewNode" type="Vanilla/FrameWindow">
+            <Property name="MinSize" value="{{0.2,0},{0.2,0}}" />
+            <Property name="MaxSize" value="{{0.8,0},{0.8,0}}" />
+            <Property name="Position" value="{{0.6,0},{0.1,0}}" />
+            <Property name="Size" value="{{0.3,0},{0.5,0}}" />
+            <Property name="Text" value="New Node" />
+            <Property name="CloseButtonEnabled" value="False" />
+
+            <Window name="Listbox" type="Vanilla/Listbox">
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,7},{0,7}}" />
+                <Property name="Size" value="{{1,-14},{1,-80}}" />
+            </Window>
+
+            <Window name="label1" type="Vanilla/StaticText">
+                <Property name="BackgroundEnabled" value="False" />
+                <Property name="FrameEnabled" value="False" />
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,7},{0,-45}}" />
+                <Property name="Size" value="{{0,60},{0,30}}" />
+                <Property name="Text" value="Name:" />
+            </Window>
+
+            <Window name="Editbox" type="Vanilla/Editbox">
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,-7},{0,-40}}" />
+                <Property name="Size" value="{{1,-74},{0,30}}" />
+                <Property name="Text" value="" />
+            </Window>
+
+            <Window name="Okay" type="Vanilla/Button">
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,7},{0,-7}}" />
+                <Property name="Size" value="{{0,60},{0,30}}" />
+                <Property name="Text" value="Okay" />
+            </Window>
+
+            <Window name="Cancel" type="Vanilla/Button">
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="HorizontalAlignment" value="Right" />
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,-7},{0,-7}}" />
+                <Property name="Size" value="{{0,60},{0,30}}" />
+                <Property name="Text" value="Cancel" />
+            </Window>
+
+        </Window>
+
+        <Window name="NamespaceViewer" type="Vanilla/FrameWindow">
+            <Property name="MinSize" value="{{0.2,0},{0.2,0}}" />
+            <Property name="MaxSize" value="{{0.8,0},{0.8,0}}" />
+            <Property name="Position" value="{{0.25,0},{0.48,0}}" />
+            <Property name="Size" value="{{0.5,0},{0.5,0}}" />
+            <Property name="Text" value="Namespace Viewer" />
+            <Property name="CloseButtonEnabled" value="False" />
+
+            <Window name="area1" type="Vanilla/StaticText">
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,7},{0,7}}" />
+                <Property name="Size" value="{{1,-14},{0,93}}" />
+            </Window>
+
+            <Window name="area2" type="Vanilla/Listbox">
+                <Property name="VerticalAlignment" value="Bottom" />
+                <Property name="MaxSize" value="{{1.0,0},{1.0,0}}" />
+                <Property name="Position" value="{{0,7},{0,-7}}" />
+                <Property name="Size" value="{{1,-14},{1,-110}}" />
+            </Window>
+        </Window>
+
+    </Window>
+</GUILayout>
