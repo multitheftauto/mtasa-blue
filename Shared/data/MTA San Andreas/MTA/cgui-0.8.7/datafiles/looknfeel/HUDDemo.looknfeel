@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+
+<!--
+    Generic.looknfeel by Lukas E. Meindl
+
+    This looknfeel was created for the HUDDemo to provide it with a score popup widget, it uses an animation defined
+    in this looknfeel file
+-->
+
+<Falagard version="7">
+
+    <WidgetLook name="HUDDemo/PopupLabel">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFF0000" type="Colour" name="NormalTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFF0000" type="Colour" name="DisabledTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="VerticalTextFormatting" name="VertFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="LeftAligned" type="HorizontalTextFormatting" name="HorzFormatting"/>
+        <Property name="Size" value="{{0.1, 0}, {0.08, 0}}" />
+        <Property name="MousePassThroughEnabled" value="true" />
+        <ImagerySection name="Label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="Label">
+                    <ColourProperty name="NormalTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="Label">
+                    <ColourProperty name="DisabledTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+
+
+        <AnimationDefinition autoStart="false" duration="2.5" name="PopupAnimation" replayMode="once">
+            <Affector property="Position" interpolator="UVector2" applicationMethod="relative">
+                <KeyFrame position="0.0" value="{{0, 0}, {0, 0}}" />
+                <KeyFrame position="2.5" progression="linear" value="{{0, 0}, {-0.2, 0}}" />
+            </Affector>
+            <Affector property="Alpha" interpolator="float" applicationMethod="absolute">
+                <KeyFrame position="0.8" value="1.0" />
+                <KeyFrame position="2.5" progression="linear" value="0.0" />
+            </Affector>
+            <Subscription event="StartAnimation" action="Start" />
+        </AnimationDefinition>
+    </WidgetLook>
+
+
+    <WidgetLook name="HUDDemo/ProgressBar">
+        <Property name="Size" value="{{0, 256}, {0, 32}}" />
+        <NamedArea name="ProgressArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="1" type="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="1" type="Height"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="background">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="HUDDemo/LifeBarBG"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="progress">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="HUDDemo/LifeBarFill"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="background"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="background"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledProgress">
+            <Layer>
+                <Section section="progress"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledProgress">
+            <Layer>
+                <Section section="progress" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+</Falagard>

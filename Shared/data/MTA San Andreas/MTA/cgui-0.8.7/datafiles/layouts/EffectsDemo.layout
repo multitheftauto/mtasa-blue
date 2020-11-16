@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<GUILayout version="4">
+    <Window name="EffectsDemoRoot" type="DefaultWindow">
+    <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window name="EffectsFrameWindow" type="Vanilla/FrameWindow">
+            <Property name="Text" value="Effects Demo" />
+            <Property name="MaxSize" value="{{0.8,0},{0.8,0}}" />
+            <Property name="MinSize" value="{{0.2,0},{0.2,0}}" />
+            <Property name="Area" value="{{0.4,0},{0.35,0},{0.85,0},{0.85,0}}" />
+            <Property name="CloseButtonEnabled" value="False" />
+            <Window name="MultiLineEditbox1" type="TaharezLook/MultiLineEditbox">
+                <Property name="Text">This text is a multiline text:
+Line 1
+You can insert text anywhere, for example, here in line 2 
+or maybe even in line 3?</Property>
+                <Property name="Area" value="{{0.02,0},{0.02,0},{0.98,0},{0.55,0}}" />
+            </Window>
+            <Window name="EffectsCombobox" type="TaharezLook/Combobox">
+                <Property name="Area" value="{{0.02,0},{0.59,0},{0.46,0},{1.0,0}}" />
+                <Property name="ReadOnly" value="True" />
+                <Property name="ClippedByParent" value="False" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>
+

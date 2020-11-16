@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<Falagard version="7">
+
+    <WidgetLook name="TaharezLook/InventoryReceiver">
+        <PropertyDefinition name="Image" initialValue="" redrawOnWrite="true" type="Image"/>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+					<Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+					<Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+					<Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+					<Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+				</Area>
+                <ImageProperty name="Image" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="main" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled" />
+    </WidgetLook>
+
+    <WidgetLook name="TaharezLook/InventoryItem">
+        <PropertyDefinition name="Image" initialValue="" redrawOnWrite="true" type="Image"/>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <ImageProperty name="Image" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="overlay">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image name="TaharezLook/GenericBrush" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="main" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DraggingValidTarget">
+            <Layer>
+                <Section section="main" />
+                <Section section="overlay">
+                    <Colours topLeft="FF00FF00" topRight="FF00FF00" bottomLeft="FF00FF00" bottomRight="FF00FF00" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DraggingInvalidTarget">
+            <Layer>
+                <Section section="main" />
+                <Section section="overlay">
+                    <Colours topLeft="FFFF0000" topRight="FFFF0000" bottomLeft="FFFF0000" bottomRight="FFFF0000" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+</Falagard>
+

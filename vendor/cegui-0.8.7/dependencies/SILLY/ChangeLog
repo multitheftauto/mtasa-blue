@@ -1,0 +1,18 @@
+Simple Image Loading LibrarY (SILLY) 
+http://cegui.org.uk
+
+Copyright 2004 - 2006 CEGUI Team & Contributing Authors
+
+Release: 0.1.0 RC2
+==================
+Added: Image loading from file 
+Modified: premake.lua now looks in a local dependencies dir for jpeg, png, zlib 
+Modified: documenation main page to integrate an example of image loading using FileDataSource 
+Fixed: the TGA loader was not setting the source pixel format in Image::loadHeader
+Fixed: add zlib when builing with png 
+Fixed: configure script issue when disabling libpng 
+Fixed: the documentation on the main page 
+
+Release: 0.1.0 RC1 
+==================
+Initial release 

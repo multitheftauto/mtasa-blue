@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<GUIScheme version="5" name="HUDDemo">
+    <Imageset filename="HUDDemo.imageset" />
+    <Font filename="GreatVibes-22.font" />
+    <Font filename="GreatVibes-16.font" />
+    <LookNFeel filename="HUDDemo.looknfeel" />
+    
+    <FalagardMapping windowType="HUDDemo/PopupLabel" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="HUDDemo/PopupLabel" />
+    <FalagardMapping windowType="HUDDemo/ProgressBar" targetType="CEGUI/ProgressBar" renderer="Core/ProgressBar" lookNFeel="HUDDemo/ProgressBar" />
+</GUIScheme>
+

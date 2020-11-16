@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="DefaultWindow" name="Root" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Property name="InheritsAlpha" value="False" />
+        <Window type="TaharezLook/FrameWindow" name="TextDemo" >
+            <Property name="Area" value="{{0.0191444,-4},{0.0367866,0},{0.989488,-4},{0.901572,0}}" />
+            <Property name="Text" value="Text sample" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Window type="TaharezLook/GroupBox" name="StaticGroup" >
+                <Property name="Area" value="{{0.0173979,0},{0.018319,0},{0.986007,0},{0.404881,0}}" />
+                <Property name="Text" value="Static text" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Window type="TaharezLook/StaticText" name="StaticText" >
+                    <Property name="Area" value="{{0.032217,0},{0.0565401,0},{0.42415,0},{0.938917,0}}" />
+                    <Property name="Text" value="Demonstrates static (non editable) text. Use the controls on your right for formatting options." />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="HorzFormatting" value="WordWrapLeftAligned" />
+                    <Property name="VertFormatting" value="TopAligned" />
+                    <Property name="HorzScrollPageSize" value="449" />
+                    <Property name="VertScrollPageSize" value="168" />
+                    <Property name="HorzScrollDocumentSize" value="441" />
+                    <Property name="VertScrollDocumentSize" value="27.3591" />
+                </Window>
+                <Window type="TaharezLook/RadioButton" name="HorzCentered" >
+                    <Property name="Area" value="{{0.435194,0},{0.553137,0},{0.585194,0},{0.670126,0}}" />
+                    <Property name="Text" value="Center aligned" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/RadioButton" name="VertTop" >
+                    <Property name="Area" value="{{0.630188,0},{0.227647,0},{0.780188,0},{0.344636,0}}" />
+                    <Property name="Text" value="Top aligned" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/StaticText" name="lblVertFormatting" >
+                    <Property name="Area" value="{{0.630188,0},{0.066344,0},{0.780188,0},{0.183333,0}}" />
+                    <Property name="Text" value="Vert. formatting" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="FrameEnabled" value="False" />
+                    <Property name="BackgroundEnabled" value="False" />
+                    <Property name="HorzScrollPageSize" value="177" />
+                    <Property name="VertScrollPageSize" value="24" />
+                    <Property name="HorzScrollDocumentSize" value="101" />
+                    <Property name="VertScrollDocumentSize" value="13.6796" />
+                </Window>
+                <Window type="TaharezLook/RadioButton" name="VertBottom" >
+                    <Property name="Area" value="{{0.630188,0},{0.395294,0},{0.780188,0},{0.512283,0}}" />
+                    <Property name="Text" value="Bottom aligned" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/RadioButton" name="VertCentered" >
+                    <Property name="Area" value="{{0.630188,0},{0.553137,0},{0.780188,0},{0.670126,0}}" />
+                    <Property name="Text" value="Center aligned" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/Checkbox" name="Wrap" >
+                    <Property name="Area" value="{{0.821951,0},{0.358591,0},{0.962843,0},{0.47558,0}}" />
+                    <Property name="Text" value="Word wrap" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="Selected" value="True" />
+                </Window>
+                <Window type="TaharezLook/StaticText" name="lblHorzFormatting" >
+                    <Property name="Area" value="{{0.436163,0},{0.066344,0},{0.586163,0},{0.183333,0}}" />
+                    <Property name="Text" value="Horz. formatting" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="FrameEnabled" value="False" />
+                    <Property name="BackgroundEnabled" value="False" />
+                    <Property name="HorzScrollPageSize" value="177" />
+                    <Property name="VertScrollPageSize" value="24" />
+                    <Property name="HorzScrollDocumentSize" value="105" />
+                    <Property name="VertScrollDocumentSize" value="13.6796" />
+                </Window>
+                <Window type="TaharezLook/RadioButton" name="HorzRight" >
+                    <Property name="Area" value="{{0.435194,0},{0.395295,0},{0.585194,0},{0.512284,0}}" />
+                    <Property name="Text" value="Right aligned" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/RadioButton" name="HorzLeft" >
+                    <Property name="Area" value="{{0.436163,0},{0.227647,0},{0.586163,0},{0.344636,0}}" />
+                    <Property name="Text" value="Left aligned" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/GroupBox" name="SingleLineGroup" >
+                <Property name="Area" value="{{0.0184568,0},{0.415308,0},{0.984039,0},{0.570098,0}}" />
+                <Property name="Text" value="Single line editing" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Window type="TaharezLook/Editbox" name="editName" >
+                    <Property name="Area" value="{{0.032217,0},{0.497488,0},{0.282217,0},{0.917243,0}}" />
+                    <Property name="Text" value="Your name" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/Editbox" name="editPasswd" >
+                    <Property name="Area" value="{{0.386344,0},{0.497488,0},{0.576599,0},{0.917243,0}}" />
+                    <Property name="Text" value="Secret" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/StaticText" name="lblAge" >
+                    <Property name="Area" value="{{0.309388,0},{0.115043,0},{0.361665,0},{0.534798,0}}" />
+                    <Property name="Text" value="Age:" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AlwaysOnTop" value="True" />
+                    <Property name="FrameEnabled" value="False" />
+                    <Property name="BackgroundEnabled" value="False" />
+                    <Property name="HorzScrollPageSize" value="61" />
+                    <Property name="VertScrollPageSize" value="27" />
+                    <Property name="HorzScrollDocumentSize" value="29" />
+                    <Property name="VertScrollDocumentSize" value="13.6796" />
+                </Window>
+                <Window type="TaharezLook/StaticText" name="lblPassword" >
+                    <Property name="Area" value="{{0.386344,0},{0.115043,0},{0.576599,0},{0.534798,0}}" />
+                    <Property name="Text" value="Password:" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AlwaysOnTop" value="True" />
+                    <Property name="FrameEnabled" value="False" />
+                    <Property name="BackgroundEnabled" value="False" />
+                    <Property name="HorzScrollPageSize" value="223" />
+                    <Property name="VertScrollPageSize" value="27" />
+                    <Property name="HorzScrollDocumentSize" value="70" />
+                    <Property name="VertScrollDocumentSize" value="13.6796" />
+                </Window>
+                <Window type="TaharezLook/StaticText" name="lblName" >
+                    <Property name="Area" value="{{0.032217,0},{0.115043,0},{0.282217,0},{0.534798,0}}" />
+                    <Property name="Text" value="Name:" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                    <Property name="AlwaysOnTop" value="True" />
+                    <Property name="FrameEnabled" value="False" />
+                    <Property name="BackgroundEnabled" value="False" />
+                    <Property name="HorzScrollPageSize" value="294" />
+                    <Property name="VertScrollPageSize" value="27" />
+                    <Property name="HorzScrollDocumentSize" value="40" />
+                    <Property name="VertScrollDocumentSize" value="13.6796" />
+                </Window>
+                <Window type="TaharezLook/Editbox" name="editAge" >
+                    <Property name="Area" value="{{0.309388,0},{0.497488,0},{0.361665,0},{0.917243,0}}" />
+                    <Property name="Text" value="18" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+            </Window>
+            <Window type="TaharezLook/GroupBox" name="MultiLineGroup" >
+                <Property name="Area" value="{{0.018457,0},{0.583793,0},{0.984039,0},{0.932058,0}}" />
+                <Property name="Text" value="Multi line editing" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Window type="TaharezLook/MultiLineEditbox" name="editMulti" >
+                    <Property name="Area" value="{{0.032217,0},{0.0684321,0},{0.579514,0},{0.910619,12}}" />
+                    <Property name="Text" >
+</Property>
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+                <Window type="TaharezLook/Checkbox" name="forceScroll" >
+                    <Property name="Area" value="{{0.589235,0},{0.383349,0},{0.83639,0},{0.533435,0}}" />
+                    <Property name="Text" value="Force vertical scrollbar" />
+                    <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                </Window>
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

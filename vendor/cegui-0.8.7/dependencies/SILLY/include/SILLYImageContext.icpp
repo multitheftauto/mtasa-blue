@@ -1,0 +1,104 @@
+/***********************************************************************
+    filename:   SILLYImageContext.icpp 
+    created:    10 Jun 2006
+    author:     Olivier Delannoy
+
+    purpose:    Inline definition for ImageContext  
+*************************************************************************/
+/***************************************************************************
+ *   Copyright (C) 2004 - 2006 Paul D Turner & The CEGUI Development Team
+ *
+ *   Permission is hereby granted, free of charge, to any person obtaining
+ *   a copy of this software and associated documentation files (the
+ *   "Software"), to deal in the Software without restriction, including
+ *   without limitation the rights to use, copy, modify, merge, publish,
+ *   distribute, sublicense, and/or sell copies of the Software, and to
+ *   permit persons to whom the Software is furnished to do so, subject to
+ *   the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be
+ *   included in all copies or substantial portions of the Software.
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *   IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ *   OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ *   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *   OTHER DEALINGS IN THE SOFTWARE.
+ ***************************************************************************/
+
+// Start of section namespace SILLY
+namespace SILLY
+{
+
+inline ImageContext::ImageContext(size_t width, size_t height)
+    : d_pixels(0), d_length(0), d_width(width), d_height(height), d_currentOffset(0), d_format(PF_RGBA) 
+{
+}
+
+
+inline ImageContext::~ImageContext() 
+{
+}    	
+
+
+inline void ImageContext::setDestination(byte* pixels, size_t length, PixelFormat format)
+{
+    d_pixels = pixels;
+    d_length = length;
+    d_currentOffset = 0;
+    d_format = format;
+}
+
+inline void ImageContext::setNextPixel(byte red, byte green, byte bleu, byte alpha)
+{
+    //assert(d_currentOffset < d_length && "ASSERT: try to set a pixel outside of the image");
+    switch(d_format)
+    {
+    case PF_A1B5G5R5:
+        // The hard part 
+        assert(0 && "ASSERT: Not yet implemented");
+        break;
+    case PF_RGB:
+        // Ignore alpha channel 
+        d_pixels[d_currentOffset++] = red;
+        d_pixels[d_currentOffset++] = green;
+        d_pixels[d_currentOffset++] = bleu;
+        break;
+
+    case PF_RGBA:    
+        d_pixels[d_currentOffset++] = red;
+        d_pixels[d_currentOffset++] = green;
+        d_pixels[d_currentOffset++] = bleu;
+        d_pixels[d_currentOffset++] = alpha;
+        break;   
+    
+    }
+}
+inline size_t ImageContext::getWidth() const
+{
+    return d_width;
+}
+
+inline void ImageContext::setWidth(size_t width) 
+{
+    d_width = width;
+}
+
+inline size_t ImageContext::getHeight() const
+{
+    return d_height;
+}
+
+inline void ImageContext::setHeight(size_t height)
+{
+    d_height = height;
+}
+inline PixelFormat ImageContext::getPixelFormat() const
+{
+	return d_format;
+}
+
+} // End of section namespace SILLY
+

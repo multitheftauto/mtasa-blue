@@ -1,0 +1,281 @@
+<?xml version="1.0" ?>
+
+<!--
+    Generic.looknfeel by Lukas E. Meindl
+
+    This looknfeel was created to provide GUIs with generic widgets that don't have a specific skin
+-->
+
+<Falagard version="7">
+
+    <WidgetLook name="Generic/Label">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="Colour" name="NormalTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF444444" type="Colour" name="DisabledTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="VerticalTextFormatting" name="VertFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="HorizontalTextFormatting" name="HorzFormatting"/>
+        <Property name="Size" value="{{0, 128}, {0, 32}}" />
+        <ImagerySection name="Label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="Label">
+                    <ColourProperty name="NormalTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="Label">
+                    <ColourProperty name="DisabledTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="Generic/LabelWithOutline">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="Colour" name="NormalTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="Colour" name="NormalOutlineColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFCCCCCC" type="Colour" name="DisabledTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="Colour" name="DisabledOutlineColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="VerticalTextFormatting" name="VertFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="HorizontalTextFormatting" name="HorzFormatting"/>
+        <Property name="Size" value="{{0, 128}, {0, 32}}" />
+        <ImagerySection name="Outline">
+            <TextComponent> <!-- -1, -1 -->
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" offset="-2" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" offset="-2" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+            <TextComponent> <!-- +1, -1 -->
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" offset="-2" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" offset="-2" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+            <TextComponent> <!-- +1, +1 -->
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" offset="-2" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" offset="-2" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+            <TextComponent> <!-- -1, +1 -->
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" offset="-2" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" offset="-2" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="Label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="1"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="1"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" offset="-2" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" offset="-2" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="Outline">
+                    <ColourProperty name="NormalOutlineColour"/>
+                </Section>
+                <Section section="Label">
+                    <ColourProperty name="NormalTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="Outline">
+                    <ColourProperty name="DisabledOutlineColour"/>
+                </Section>
+                <Section section="Label">
+                    <ColourProperty name="DisabledTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="Generic/Image">
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="ImageColours"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="VerticalFormatting" name="VertFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="HorizontalFormatting" name="HorzFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="Image"/>
+        <Property name="Size" value="{{0, 128}, {0, 128}}" />
+
+        <ImagerySection name="imageSection">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1.0" type="RightEdge"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="1.0" type="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <ImageProperty name="Image"/>
+                <ColourRectProperty name="ImageColours"/>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="imageSection"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="imageSection"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="Generic/ImageButton">
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="NormalImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="HoverImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="PushedImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="DisabledImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="VerticalFormatting" name="VertImageFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="HorizontalFormatting" name="HorzImageFormatting"/>
+        <Property name="Size" value="{{0, 96}, {0, 32}}" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <ImageProperty name="NormalImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <ImageProperty name="HoverImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <ImageProperty name="PushedImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="disabled">
+            <ImageryComponent>
+                <ImageProperty name="DisabledImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="PushedOff">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="disabled"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+</Falagard>

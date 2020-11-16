@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<Imageset version="2" name="WindowsLook" imagefile="WindowsLook.png" nativeHorzRes="800" nativeVertRes="600" autoScaled="vertical">
+	<Image name="Background" xPos="9" yPos="9" width="2" height="2" />
+	<Image name="WindowFrameLeft" xPos="2" yPos="9" width="4" height="2" />
+	<Image name="WindowFrameRight" xPos="14" yPos="9" width="4" height="2" />
+	<Image name="WindowFrameTop" xPos="9" yPos="2" width="2" height="4" />
+	<Image name="WindowFrameBottom" xPos="9" yPos="14" width="2" height="4" />
+	<Image name="WindowFrameTopLeft" xPos="2" yPos="2" width="4" height="4" />
+	<Image name="WindowFrameTopRight" xPos="14" yPos="2" width="4" height="4" />
+	<Image name="WindowFrameBottomLeft" xPos="2" yPos="14" width="4" height="4" />
+	<Image name="WindowFrameBottomRight" xPos="14" yPos="14" width="4" height="4" />
+	<Image name="ButtonNormalLeft" xPos="20" yPos="9" width="2" height="2" />
+	<Image name="ButtonNormalRight" xPos="34" yPos="9" width="2" height="2" />
+	<Image name="ButtonNormalTop" xPos="27" yPos="2" width="2" height="2" />
+	<Image name="ButtonNormalBottom" xPos="27" yPos="16" width="2" height="2" />
+	<Image name="ButtonNormalTopLeft" xPos="20" yPos="2" width="3" height="3" />
+	<Image name="ButtonNormalTopRight" xPos="33" yPos="2" width="3" height="3" />
+	<Image name="ButtonNormalBottomLeft" xPos="20" yPos="15" width="3" height="3" />
+	<Image name="ButtonNormalBottomRight" xPos="33" yPos="15" width="3" height="3" />
+	<Image name="ButtonPushedLeft" xPos="38" yPos="9" width="2" height="2" />
+	<Image name="ButtonPushedRight" xPos="52" yPos="9" width="2" height="2" />
+	<Image name="ButtonPushedTop" xPos="45" yPos="2" width="2" height="2" />
+	<Image name="ButtonPushedBottom" xPos="45" yPos="16" width="2" height="2" />
+	<Image name="ButtonPushedTopLeft" xPos="38" yPos="2" width="3" height="3" />
+	<Image name="ButtonPushedTopRight" xPos="51" yPos="2" width="3" height="3" />
+	<Image name="ButtonPushedBottomLeft" xPos="38" yPos="15" width="3" height="3" />
+	<Image name="ButtonPushedBottomRight" xPos="51" yPos="15" width="3" height="3" />
+	<Image name="ButtonHoverLeft" xPos="56" yPos="9" width="2" height="2" />
+	<Image name="ButtonHoverRight" xPos="70" yPos="9" width="2" height="2" />
+	<Image name="ButtonHoverTop" xPos="63" yPos="2" width="2" height="2" />
+	<Image name="ButtonHoverBottom" xPos="63" yPos="16" width="2" height="2" />
+	<Image name="ButtonHoverTopLeft" xPos="56" yPos="2" width="3" height="3" />
+	<Image name="ButtonHoverTopRight" xPos="69" yPos="2" width="3" height="3" />
+	<Image name="ButtonHoverBottomLeft" xPos="56" yPos="15" width="3" height="3" />
+	<Image name="ButtonHoverBottomRight" xPos="69" yPos="15" width="3" height="3" />
+	<Image name="EditFrameLeft" xPos="74" yPos="9" width="3" height="2" />
+	<Image name="EditFrameRight" xPos="87" yPos="9" width="3" height="2" />
+	<Image name="EditFrameTop" xPos="81" yPos="2" width="2" height="3" />
+	<Image name="EditFrameBottom" xPos="81" yPos="15" width="2" height="3" />
+	<Image name="EditFrameTopLeft" xPos="74" yPos="2" width="3" height="3" />
+	<Image name="EditFrameTopRight" xPos="87" yPos="2" width="3" height="3" />
+	<Image name="EditFrameBottomLeft" xPos="74" yPos="15" width="3" height="3" />
+	<Image name="EditFrameBottomRight" xPos="87" yPos="15" width="3" height="3" />
+	<Image name="StaticFrameLeft" xPos="92" yPos="9" width="2" height="2" />
+	<Image name="StaticFrameRight" xPos="106" yPos="9" width="2" height="2" />
+	<Image name="StaticFrameTop" xPos="99" yPos="2" width="2" height="2" />
+	<Image name="StaticFrameBottom" xPos="99" yPos="16" width="2" height="2" />
+	<Image name="StaticFrameTopLeft" xPos="92" yPos="2" width="3" height="3" />
+	<Image name="StaticFrameTopRight" xPos="105" yPos="2" width="3" height="3" />
+	<Image name="StaticFrameBottomLeft" xPos="92" yPos="15" width="3" height="3" />
+	<Image name="StaticFrameBottomRight" xPos="105" yPos="15" width="3" height="3" />
+	<Image name="CloseButtonNormal" xPos="2" yPos="20" width="13" height="13" />
+	<Image name="CloseButtonHover" xPos="2" yPos="35" width="13" height="13" />
+	<Image name="CloseButtonPushed" xPos="2" yPos="50" width="13" height="13" />
+	<Image name="TitlebarTopLeft" xPos="87" yPos="103" width="8" height="4" />
+	<Image name="TitlebarTopRight" xPos="109" yPos="103" width="8" height="4" />
+	<Image name="TitlebarBottomLeft" xPos="87" yPos="123" width="8" height="2" />
+	<Image name="TitlebarBottomRight" xPos="109" yPos="123" width="8" height="2" />
+	<Image name="TitlebarLeft" xPos="87" yPos="110" width="8" height="10" />
+	<Image name="TitlebarRight" xPos="109" yPos="110" width="8" height="10" />
+	<Image name="TitlebarTop" xPos="98" yPos="103" width="8" height="4" />
+	<Image name="TitlebarBottom" xPos="98" yPos="123" width="8" height="2" />
+	<Image name="TitlebarFill" xPos="98" yPos="110" width="8" height="10" />
+	<Image name="CheckboxNormal" xPos="17" yPos="37" width="10" height="10" />
+	<Image name="CheckboxHover" xPos="17" yPos="49" width="10" height="10" />
+	<Image name="CheckboxMark" xPos="17" yPos="61" width="10" height="10" />
+	<Image name="RadioButtonNormal" xPos="29" yPos="37" width="10" height="10" />
+	<Image name="RadioButtonHover" xPos="29" yPos="49" width="10" height="10" />
+	<Image name="RadioButtonMark" xPos="29" yPos="61" width="10" height="10" />
+	<Image name="SliderThumbNormal" xPos="47" yPos="20" width="7" height="10" />
+	<Image name="SliderThumbHover" xPos="47" yPos="32" width="7" height="10" />
+	<Image name="SliderTrackLeft" xPos="56" yPos="20" width="3" height="4" />
+	<Image name="SlidertrackMiddle" xPos="63" yPos="20" width="2" height="4" />
+	<Image name="SliderTrackRight" xPos="69" yPos="20" width="3" height="4" />
+	<Image name="SliderTick" xPos="56" yPos="26" width="1" height="4" />
+	<Image name="HeaderMainBrush" xPos="53" yPos="45" width="2" height="2" />
+	<Image name="HeaderBottomEdge" xPos="53" yPos="50" width="2" height="4" />
+	<Image name="HeaderSplitter" xPos="47" yPos="44" width="3" height="15" />
+	<Image name="VertScrollbarGrip" xPos="41" yPos="68" width="5" height="8" />
+	<Image name="HorzScrollbarGrip" xPos="41" yPos="61" width="8" height="5" />
+	<Image name="LargeLeftArrow" xPos="2" yPos="65" width="5" height="9" />
+	<Image name="LargeRightArrow" xPos="9" yPos="65" width="5" height="9" />
+	<Image name="LargeUpArrow" xPos="2" yPos="76" width="9" height="5" />
+	<Image name="LargeDownArrow" xPos="2" yPos="83" width="9" height="5" />
+	<Image name="SmallLeftArrow" xPos="17" yPos="73" width="5" height="5" />
+	<Image name="SmallRightArrow" xPos="24" yPos="73" width="5" height="5" />
+	<Image name="SmallUpArrow" xPos="17" yPos="80" width="5" height="5" />
+	<Image name="SmallDownArrow" xPos="24" yPos="80" width="5" height="5" />
+	<Image name="EditBoxCaret" xPos="29" yPos="118" width="2" height="8" />
+	<Image name="MouseArrow" xPos="2" yPos="90" width="10" height="19" xOffset="0" yOffset="0" />
+	<Image name="MouseMoveCursor" xPos="14" yPos="90" width="22" height="22" xOffset="-10" yOffset="-10" />
+	<Image name="MouseNoSoCursor" xPos="38" yPos="89" width="11" height="19" xOffset="-4" yOffset="-9" />
+	<Image name="MouseEsWeCursor" xPos="2" yPos="116" width="19" height="8" xOffset="-9" yOffset="-4" />
+	<Image name="MouseNeSwCursor" xPos="51" yPos="90" width="15" height="15" xOffset="-7" yOffset="-6" />
+	<Image name="MouseNwSeCursor" xPos="68" yPos="90" width="15" height="15" xOffset="-6" yOffset="-7" />
+	<Image name="MouseTextBar" xPos="73" yPos="107" width="11" height="20" xOffset="-5" yOffset="-10" />
+	
+	<Image name="TabHorizontalTopFiller" xPos="81" yPos="20" width="2" height="2" />
+	<Image name="TabHorizontalBottomFiller" xPos="81" yPos="34" width="2" height="2" />
+	<Image name="TabContentPaneUpperLeft" xPos="92" yPos="2" width="3" height="3" />
+	<Image name="TabContentPaneTop" xPos="99" yPos="2" width="2" height="3" />
+	<Image name="TabContentPaneUpperRight" xPos="105" yPos="2" width="3" height="3" />
+	<Image name="TabContentPaneLeft" xPos="92" yPos="9" width="2" height="2" />
+	<Image name="TabContentPaneMiddle" xPos="9" yPos="9" width="2" height="2" />
+	<Image name="TabContentPaneRight" xPos="106" yPos="9" width="2" height="2" />
+	<Image name="TabContentPaneLower" xPos="99" yPos="15" width="2" height="3" />
+	<Image name="TabContentPaneLowerLeft" xPos="92" yPos="15" width="3" height="3" />
+	<Image name="TabContentPaneLowerRight" xPos="105" yPos="15" width="3" height="3" />
+
+	<Image name="TabButtonUpperLeftNormal" xPos="74" yPos="20" width="3" height="3" />
+	<Image name="TabButtonUpperNormal" xPos="81" yPos="20" width="2" height="3" />
+	<Image name="TabButtonUpperRightNormal" xPos="87" yPos="20" width="3" height="3" />
+	<Image name="TabButtonLeftNormal" xPos="74" yPos="27" width="2" height="2" />
+	<Image name="TabButtonMiddleNormal" xPos="9" yPos="9" width="2" height="2" />
+	<Image name="TabButtonRightNormal" xPos="88" yPos="27" width="2" height="2" />
+	<Image name="TabButtonLowerLeftNormal" xPos="74" yPos="33" width="3" height="3" />
+	<Image name="TabButtonLowerNormal" xPos="81" yPos="33" width="2" height="3" />
+	<Image name="TabButtonLowerRightNormal" xPos="87" yPos="33" width="3" height="3" />
+
+	<Image name="TabButtonUpperLeftSelected" xPos="92" yPos="20" width="3" height="3" />
+	<Image name="TabButtonUpperSelected" xPos="99" yPos="20" width="2" height="3" />
+	<Image name="TabButtonUpperRightSelected" xPos="105" yPos="20" width="3" height="3" />
+	<Image name="TabButtonLeftSelected" xPos="92" yPos="27" width="2" height="2" />
+	<Image name="TabButtonMiddleSelected" xPos="9" yPos="9" width="2" height="2" />
+	<Image name="TabButtonRightSelected" xPos="106" yPos="27" width="2" height="2" />
+	<Image name="TabButtonLowerLeftSelected" xPos="92" yPos="33" width="3" height="3" />
+	<Image name="TabButtonLowerSelected" xPos="99" yPos="33" width="2" height="3" />
+	<Image name="TabButtonLowerRightSelected" xPos="105" yPos="33" width="3" height="3" />
+
+	<Image name="TabButtonScrollLeftNormal" xPos="75" yPos="75" width="13" height="13" />
+	<Image name="TabButtonScrollRightNormal" xPos="87" yPos="75" width="13" height="13" />
+	<Image name="TabButtonScrollLeftHover" xPos="99" yPos="75" width="13" height="13" />
+	<Image name="TabButtonScrollRightHover" xPos="111" yPos="75" width="13" height="13" />
+
+	<Image name="TooltipTopLeft" xPos="74" yPos="38" width="3" height="3" />
+	<Image name="TooltipTopRight" xPos="87" yPos="38" width="4" height="3" />
+	<Image name="TooltipBottomLeft" xPos="74" yPos="51" width="3" height="4" />
+	<Image name="TooltipBottomRight" xPos="87" yPos="51" width="4" height="4" />
+	<Image name="TooltipLeftEdge" xPos="74" yPos="45" width="3" height="2" />
+	<Image name="TooltipRightEdge" xPos="87" yPos="45" width="4" height="2" />
+	<Image name="TooltipTopEdge" xPos="81" yPos="38" width="2" height="3" />
+	<Image name="TooltipBottomEdge" xPos="81" yPos="51" width="2" height="4" />
+	<Image name="TooltipMiddle" xPos="81" yPos="45" width="2" height="2" />
+
+	<Image name="MenuTopLeft" xPos="61" yPos="57" width="2" height="2" />
+	<Image name="MenuTopRight" xPos="70" yPos="57" width="2" height="2" />
+	<Image name="MenuBottomLeft" xPos="61" yPos="66" width="2" height="2" />
+	<Image name="MenuBottomRight" xPos="70" yPos="66" width="2" height="2" />
+	<Image name="MenuLeft" xPos="61" yPos="62" width="2" height="1" />
+	<Image name="MenuRight" xPos="70" yPos="62" width="2" height="1" />
+	<Image name="MenuTop" xPos="66" yPos="57" width="1" height="2" />
+	<Image name="MenuBottom" xPos="66" yPos="66" width="1" height="2" />
+	
+	<Image name="PopupMenuFrameTopLeft" xPos="74" yPos="57" width="3" height="3" />
+	<Image name="PopupMenuFrameTopRight" xPos="87" yPos="57" width="3" height="3" />
+	<Image name="PopupMenuFrameBottomLeft" xPos="74" yPos="70" width="3" height="3" />
+	<Image name="PopupMenuFrameBottomRight" xPos="87" yPos="70" width="3" height="3" />
+	<Image name="PopupMenuFrameLeft" xPos="74" yPos="64" width="3" height="2" />
+	<Image name="PopupMenuFrameRight" xPos="87" yPos="64" width="3" height="2" />
+	<Image name="PopupMenuFrameTop" xPos="81" yPos="57" width="2" height="3" />
+	<Image name="PopupMenuFrameBottom" xPos="81" yPos="70" width="2" height="3" />
+	<Image name="PopupMenuArrowRight" xPos="61" yPos="75" width="5" height="9" />
+	<Image name="PopupMenuArrowLeft" xPos="68" yPos="75" width="5" height="9" />
+
+	<Image name="MultiListSelectionBrush" xPos="9" yPos="71" width="14" height="14" />
+</Imageset>

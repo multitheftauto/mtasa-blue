@@ -1,0 +1,32 @@
+<Imageset autoScaled="vertical" imagefile="HUDDemo.png" name="HUDDemo" nativeHorzRes="1280" nativeVertRes="720" version="2">
+    <Image height="162" name="Poo" width="162" xPos="0" yPos="7" />
+    <Image height="146" name="Plate" width="483" xPos="779" yPos="1113" />
+    <Image height="300" name="Bread" width="300" xPos="980" yPos="37" />
+    <Image height="260" name="Prizza" width="260" xPos="35" yPos="283" />
+    <Image height="310" name="Steak" width="310" xPos="951" yPos="351" />
+    <Image height="260" name="VegetablePeople" width="260" xPos="20" yPos="632" />
+    <Image height="360" name="VegetablesAndFruits" width="360" xPos="3" yPos="920" />
+    <Image height="55" name="Background" width="55" xPos="220" yPos="9" />
+    <Image height="15" name="LifeBarBG" width="361" xPos="905" yPos="0" />
+    <Image height="13" name="LifeBarFill" width="361" xPos="906" yPos="19" />
+    <Image height="60" name="Life" width="60" xPos="442" yPos="719" />
+    <Image height="198" name="Logo" width="445" xPos="835" yPos="722" />
+    <Image height="100" name="ScoreBG" width="200" xPos="359" yPos="26" />
+    <Image height="100" name="WeaponBG" width="300" xPos="624" yPos="33" />
+    <Image height="463" name="Menu" width="422" xPos="535" yPos="230" />
+    <Image height="213" name="IconSpoon" width="86" xPos="390" yPos="805" />
+    <Image height="197" name="IconKnife" width="42" xPos="651" yPos="821" />
+    <Image height="164" name="IconForkHL" width="69" xPos="466" yPos="1041" />
+    <Image height="80" name="ToolMixer" width="80" xPos="569" yPos="146" />
+    <Image height="80" name="ToolGlove" width="80" xPos="685" yPos="147" />
+    <Image height="80" name="ToolPot" width="80" xPos="820" yPos="145" />
+    <Image height="104" name="ToolBG" width="171" xPos="334" yPos="196" />
+    <Image height="1" name="BGBar" width="1" xPos="285" yPos="11" />
+    <Image height="213" name="IconSpoonHL" width="86" xPos="501" yPos="805" />
+    <Image height="197" name="IconKnifeHL" width="42" xPos="727" yPos="821" />
+    <Image height="164" name="IconFork" width="69" xPos="568" yPos="1041" />
+    <Image height="125" name="Spoon" width="103" xPos="365" yPos="320" />
+    <Image height="1" name="Filler" width="1" xPos="285" yPos="22" />
+    <Image height="36" name="ButtonNormal" width="130" xPos="274" yPos="148" />
+    <Image height="36" name="ButtonPressed" width="130" xPos="417" yPos="148" />
+</Imageset>

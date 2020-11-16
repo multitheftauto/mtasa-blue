@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="DefaultWindow" name="DefaultWindow" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Window type="TaharezLook/FrameWindow" name="FrameWindow" >
+            <Property name="Area" value="{{0.3,0},{0.3,0},{0.7,0},{0.7,0}}" />
+            <Property name="Text" value="Demo Window" />
+            <Window type="TaharezLook/Button" name="Button" >
+                <Property name="Area" value="{{1,-160},{1,-43},{1,-15},{1,-11}}" />
+                <Property name="Text" value="DemoButton" />
+            </Window>
+            <Window type="TaharezLook/Editbox" name="Editbox" >
+                <Property name="Area" value="{{0,10},{0,8},{1,-10},{0,40}}" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

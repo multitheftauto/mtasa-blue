@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Imageset version="2" name="FairChar" imagefile="FairChar.png" nativeHorzRes="800" nativeVertRes="600" autoScaled="vertical">
+	<Image name=" " xPos="0"   yPos="0"  width="0"  height="0" />
+	<Image name="A" xPos="4"   yPos="1"  width="30" height="30" yOffset="-30" />
+	<Image name="B" xPos="35"  yPos="1"  width="31" height="30" yOffset="-30" />
+	<Image name="C" xPos="68"  yPos="1"  width="31" height="30" yOffset="-30" />
+	<Image name="D" xPos="98"  yPos="1"  width="32" height="30" yOffset="-30" />
+	<Image name="E" xPos="131" yPos="1"  width="32" height="30" yOffset="-30" />
+	<Image name="F" xPos="163" yPos="1"  width="32" height="30" yOffset="-30" />
+	<Image name="G" xPos="196" yPos="1"  width="30" height="30" yOffset="-30" />
+	<Image name="H" xPos="1"   yPos="94" width="30" height="30" yOffset="-30" />
+	<Image name="I" xPos="32"  yPos="94" width="25" height="30" yOffset="-30" />
+	<Image name="J" xPos="1"   yPos="32" width="24" height="30" yOffset="-30" />
+	<Image name="K" xPos="28"  yPos="32" width="30" height="30" yOffset="-30" />
+	<Image name="L" xPos="60"  yPos="32" width="30" height="30" yOffset="-30" />
+	<Image name="M" xPos="92"  yPos="32" width="30" height="30" yOffset="-30" />
+	<Image name="N" xPos="123" yPos="32" width="31" height="30" yOffset="-30" />
+	<Image name="O" xPos="156" yPos="32" width="30" height="30" yOffset="-30" />
+	<Image name="P" xPos="187" yPos="32" width="31" height="30" yOffset="-30" />
+	<Image name="Q" xPos="58"  yPos="94" width="30" height="30" yOffset="-30" />
+	<Image name="R" xPos="89"  yPos="94" width="32" height="30" yOffset="-30" />
+	<Image name="S" xPos="1"   yPos="63" width="30" height="30" yOffset="-30" />
+	<Image name="T" xPos="32"  yPos="63" width="24" height="30" yOffset="-30" />
+	<Image name="U" xPos="59"  yPos="63" width="30" height="30" yOffset="-30" />
+	<Image name="V" xPos="91"  yPos="63" width="30" height="30" yOffset="-30" />
+	<Image name="W" xPos="123" yPos="63" width="30" height="30" yOffset="-30" />
+	<Image name="X" xPos="155" yPos="63" width="30" height="30" yOffset="-30" />
+	<Image name="Y" xPos="186" yPos="63" width="30" height="30" yOffset="-30" />
+	<Image name="Z" xPos="123" yPos="94" width="30" height="30" yOffset="-30" />
+</Imageset>

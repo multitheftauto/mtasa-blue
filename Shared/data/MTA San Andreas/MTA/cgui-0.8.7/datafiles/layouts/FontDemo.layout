@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="DefaultWindow" name="FontDemoRoot" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window type="Vanilla/FrameWindow" name="FontDemoWindow" >
+            <Property name="Area" value="{{0,0},{0,1},{1,0},{1,1}}" />
+            <Property name="Text" value="Font Demo" />
+            <Property name="SizingEnabled" value="False" />
+            <Property name="DragMovingEnabled" value="False" />
+            <Property name="CloseButtonEnabled" value="False" />
+            <AutoWindow namePath="__auto_titlebar__" >
+                <Property name="DraggingEnabled" value="False" />
+            </AutoWindow>
+            <Window type="Vanilla/MultiLineEditbox" name="MultiLineTextWindow" >
+                <Property name="Area" value="{{0.015677,0},{0.0415294,0},{0.631001,0},{0.990059,0}}" />
+                <Property name="Text" >
+</Property>
+            </Window>
+            <Window type="Vanilla/Listbox" name="TextSelector" >
+                <Property name="Area" value="{{0.65,0},{0.0415294,0},{0.97,0},{0.281529,0}}" />
+            </Window>
+            <Window type="Vanilla/Listbox" name="FontSelector" >
+                <Property name="Area" value="{{0.65,0},{0.33,0},{0.97,0},{0.57,0}}" />
+            </Window>
+            <Window type="Vanilla/Label" name="TextSelectorLabel" >
+                <Property name="Area" value="{{0.64921,0},{-0.003,0},{0.96921,0},{0.041,0}}" />
+                <Property name="Text" value="Text/Language selector" />
+            </Window>
+            <Window type="Vanilla/Label" name="FontSelectorLabel" >
+                <Property name="Area" value="{{0.65,0},{0.285,0},{0.97,0},{0.329,0}}" />
+                <Property name="Text" value="Font selector" />
+            </Window>
+            <Window type="Vanilla/FrameWindow" name="FontCreator" >
+                <Property name="Area" value="{{0.65,0},{0.615,0},{0.97,0},{0.951765,26}}" />
+                <Property name="SizingEnabled" value="False" />
+                <Property name="TitlebarEnabled" value="False" />
+                <Property name="DragMovingEnabled" value="False" />
+                <Property name="CloseButtonEnabled" value="False" />
+                <Property name="EWSizingCursorImage" value="" />
+                <Property name="NSSizingCursorImage" value="" />
+                <Property name="NESWSizingCursorImage" value="" />
+                <Property name="NWSESizingCursorImage" value="" />
+                <AutoWindow namePath="__auto_titlebar__" >
+                    <Property name="DraggingEnabled" value="False" />
+                </AutoWindow>
+                <Window type="Vanilla/Button" name="CreationButton" >
+                    <Property name="Area" value="{{-0.231458,0},{0.69011,0},{0.225064,0},{0.828409,0}}" />
+                    <Property name="Text" value="Add new font" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                </Window>
+                <Window type="Vanilla/Checkbox" name="AntiAliasingCheckbox" >
+                    <Property name="Area" value="{{0.552855,0},{0.525021,0},{0.940323,0},{0.645021,0}}" />
+                    <Property name="Text" value="Anti-aliasing" />
+                </Window>
+                <Window type="Vanilla/Editbox" name="FontNameEditbox" >
+                    <Property name="Area" value="{{0.372558,0},{0.0409958,0},{0.972558,0},{0.170996,0}}" />
+                </Window>
+                <Window type="Vanilla/Label" name="FontNameLabel" >
+                    <Property name="Area" value="{{0.0525575,0},{0.0409958,0},{0.352558,0},{0.170996,0}}" />
+                    <Property name="Text" value="Name" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                </Window>
+                <Window type="Vanilla/Combobox" name="FontFileCombobox" >
+                    <Property name="Area" value="{{0.37,0},{0.203458,0},{0.976138,0},{0.958644,0}}" />
+                    <Property name="ReadOnly" value="True" />
+                    <Property name="ForceVertScrollbar" value="True" />
+                    <AutoWindow namePath="__auto_editbox__" >
+                        <Property name="ReadOnly" value="True" />
+                    </AutoWindow>
+                    <AutoWindow namePath="__auto_droplist__" >
+                        <AutoWindow namePath="__auto_hscrollbar__" >
+                            <AutoWindow namePath="__auto_thumb__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_decbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_incbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                        </AutoWindow>
+                        <AutoWindow namePath="__auto_vscrollbar__" >
+                            <AutoWindow namePath="__auto_thumb__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_decbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_incbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                        </AutoWindow>
+                    </AutoWindow>
+                </Window>
+                <Window type="Vanilla/Label" name="FontFileLabel" >
+                    <Property name="Area" value="{{0.0525575,0},{0.195021,0},{0.352558,0},{0.325021,0}}" />
+                    <Property name="Text" value="Font file" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                </Window>
+                <Window type="Vanilla/Editbox" name="FontSizeEditbox" >
+                    <Property name="Area" value="{{0.372558,0},{0.355021,0},{0.672558,0},{0.485021,0}}" />
+                    <Property name="Text" value="12.0" />
+                    <Property name="MaxTextLength" value="8" />
+                    <Property name="ValidationString" value="[0-9]*\.?[0-9]" />
+                </Window>
+                <Window type="Vanilla/Label" name="FontSizeLabel" >
+                    <Property name="Area" value="{{0.0525575,0},{0.355021,0},{0.352558,0},{0.485021,0}}" />
+                    <Property name="Text" value="Font size" />
+                    <Property name="HorzFormatting" value="RightAligned" />
+                </Window>
+                <Window type="Vanilla/Label" name="FontSizePtsLabel" >
+                    <Property name="Area" value="{{0.682558,0},{0.355021,0},{0.812558,0},{0.485021,0}}" />
+                    <Property name="Text" value="pts." />
+                    <Property name="HorzFormatting" value="LeftAligned" />
+                </Window>
+                <Window type="Vanilla/Button" name="EditButton" >
+                    <Property name="Area" value="{{0.232737,0},{0.686463,0},{0.676471,0},{0.824761,0}}" />
+                    <Property name="Text" value="Edit selected font" />
+                    <Property name="HorizontalAlignment" value="Centre" />
+                </Window>
+                <Window type="Vanilla/Button" name="RenewNameButton" >
+                    <Property name="Area" value="{{0.13,0},{0.05,0},{0.218,0},{0.16,0}}" />
+                    <Property name="Text" value="✭" />
+                </Window>
+                <Window type="Vanilla/Combobox" name="AutoScaleCombobox" >
+                    <Property name="Area" value="{{0.0525575,0},{0.52527,0},{0.400384,50},{0.819876,50}}" />
+                    <Property name="ReadOnly" value="True" />
+                    <Property name="ForceVertScrollbar" value="True" />
+                    <AutoWindow namePath="__auto_editbox__" >
+                        <Property name="ReadOnly" value="True" />
+                    </AutoWindow>
+                    <AutoWindow namePath="__auto_droplist__" >
+                        <AutoWindow namePath="__auto_hscrollbar__" >
+                            <AutoWindow namePath="__auto_thumb__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_decbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_incbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                        </AutoWindow>
+                        <AutoWindow namePath="__auto_vscrollbar__" >
+                            <AutoWindow namePath="__auto_thumb__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_decbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                            <AutoWindow namePath="__auto_incbtn__" >
+                                <Property name="RestoreOldCapture" value="True" />
+                            </AutoWindow>
+                        </AutoWindow>
+                    </AutoWindow>
+                </Window>
+                <Window type="Vanilla/Label" name="InfoLabel" >
+                    <Property name="Area" value="{{0.0485934,0},{0.850622,0},{0.97954,0},{0.93776,0}}" />
+                    <Property name="NormalTextColour" value="FFFF2222" />
+                </Window>
+            </Window>
+            <Window type="Vanilla/Label" name="Label" >
+                <Property name="Area" value="{{0.65,0},{0.57,0},{0.97,0},{0.614,0}}" />
+                <Property name="Text" value="Font editor" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

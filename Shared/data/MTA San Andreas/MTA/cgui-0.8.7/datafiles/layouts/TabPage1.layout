@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<GUILayout version="4">
+    <Window name="Page1" type="DefaultWindow">
+        <Property name="Text" value="Page one" />
+
+        <Window name="TabPaneTop" type="TaharezLook/RadioButton">
+            <Property name="ID" value="0" />
+            <Property name="Text" value="Tab pane at top" />
+            <Property name="Area" value="{{0.05,0},{0.1,0},{0.45,0},{0.2,0}}" />
+        </Window>
+
+        <Window name="TabPaneBottom" type="TaharezLook/RadioButton">
+            <Property name="ID" value="1" />
+            <Property name="Text" value="Tab pane at bottom" />
+            <Property name="Area" value="{{0.05,0},{0.2,0},{0.45,0},{0.3,0}}" />
+        </Window>
+
+        <Window name="AddTab" type="TaharezLook/Button">
+            <Property name="Text" value="Add a new tab" />
+            <Property name="Area" value="{{0.05,0},{0.35,0},{0.45,0},{0.45,0}}" />
+            <Property name="TooltipText" value="Switch active page to selected" />
+        </Window>
+
+        <Window name="PageList" type="TaharezLook/Listbox">
+            <Property name="Area" value="{{0.55,0},{0.1,0},{0.95,0},{0.48,0}}" />
+            <Property name="TooltipText" value="A list of available tabs to experiment with" />
+        </Window>
+
+        <Window name="Go" type="TaharezLook/Button">
+            <Property name="Text" value="Goto" />
+            <Property name="Area" value="{{0.55,0},{0.5,0},{0.67,0},{0.57,0}}" />
+            <Property name="TooltipText" value="Switch active page to selected" />
+        </Window>
+
+        <Window name="Show" type="TaharezLook/Button">
+            <Property name="Text" value="Show" />
+            <Property name="Area" value="{{0.69,0},{0.5,0},{0.81,0},{0.57,0}}" />
+            <Property name="TooltipText" value="Make the selected tab visible in the tab pane" />
+        </Window>
+
+        <Window name="Del" type="TaharezLook/Button">
+            <Property name="Text" value="Del" />
+            <Property name="Area" value="{{0.83,0},{0.5,0},{0.95,0},{0.57,0}}" />
+            <Property name="TooltipText" value="Delete the selected pane" />
+        </Window>
+
+        <Window name="TabHeightDesc" type="TaharezLook/StaticText">
+            <Property name="FrameEnabled" value="False" />
+            <Property name="Area" value="{{0.05,0},{0.6,0},{0.95,0},{0.7,0}}" />
+            <Property name="BackgroundEnabled" value="False" />
+            <Property name="Text" value="Change the height of tab buttons in pixels" />
+        </Window>
+        <Window name="TabHeight" type="TaharezLook/HorizontalScrollbar">
+            <Property name="DocumentSize" value="64" />
+            <Property name="PageSize" value="4" />
+            <Property name="StepSize" value="1" />
+            <Property name="OverlapSize" value="0" />
+            <Property name="Area" value="{{0.05,0},{0.7,0},{0.95,0},{0.7,12}}" />
+        </Window>
+
+        <Window name="TabPaddingDesc" type="TaharezLook/StaticText">
+            <Property name="FrameEnabled" value="False" />
+            <Property name="Area" value="{{0.05,0},{0.8,0},{0.95,0},{0.9,0}}" />
+            <Property name="BackgroundEnabled" value="False" />
+            <Property name="Text" value="Change the padding of the text on buttons in pixels" />
+        </Window>
+        <Window name="TabPadding" type="TaharezLook/HorizontalScrollbar">
+            <Property name="DocumentSize" value="100" />
+            <Property name="PageSize" value="5" />
+            <Property name="StepSize" value="1" />
+            <Property name="OverlapSize" value="0" />
+            <Property name="Area" value="{{0.06,0},{0.9,0},{0.95,0},{0.9,12}}" />
+        </Window>
+    </Window>
+</GUILayout>

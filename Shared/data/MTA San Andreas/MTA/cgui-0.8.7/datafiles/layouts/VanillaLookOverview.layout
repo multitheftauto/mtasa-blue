@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="DefaultWindow" name="root" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Window type="Vanilla/StaticImage" name="StaticImage" >
+            <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Window type="Vanilla/Button" name="button" >
+                <Property name="Area" value="{{0.00390625,0},{0.00694444,0},{0.0976563,0},{0.0347222,0}}" />
+                <Property name="Text" value="Button" />
+            </Window>
+            <Window type="Vanilla/Listbox" name="disabledListbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.583333,0},{0.160156,0},{0.666666,0}}" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/Listbox" name="listbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.465278,0},{0.160156,0},{0.576389,0}}" />
+                <Property name="ForceHorzScrollbar" value="true" />
+                <Property name="ForceVertScrollbar" value="true" />
+            </Window>
+            <Window type="Vanilla/HorizontalScrollbar" name="disabledScrollbar" >
+                <Property name="Area" value="{{0.164063,0},{0.388889,0},{0.320313,0},{0.409722,0}}" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/HorizontalScrollbar" name="scrollbar" >
+                <Property name="Area" value="{{0.164063,0},{0.361111,0},{0.320313,0},{0.381944,0}}" />
+            </Window>
+            <Window type="Vanilla/ProgressBar" name="disabledProgressBar" >
+                <Property name="Area" value="{{0.164063,0},{0.326389,0},{0.320313,0},{0.354167,0}}" />
+                <Property name="Disabled" value="true" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.11" />
+            </Window>
+            <Window type="Vanilla/ProgressBar" name="progressBar" >
+                <Property name="Area" value="{{0.164063,0},{0.291667,0},{0.320313,0},{0.319445,0}}" />
+                <Property name="StepSize" value="0.01" />
+                <Property name="CurrentProgress" value="0.5" />
+            </Window>
+
+            <Window type="Vanilla/Titlebar" name="titlebar" >
+                <Property name="Area" value="{{0.101563,0},{0.0416667,0},{0.257813,0},{0.0694445,0}}" />
+                <Property name="Text" value="Title Bar" />
+                <Property name="AlwaysOnTop" value="true" />
+                <Property name="MousePassThroughEnabled" value="true" />
+                <Property name="MouseInputPropagationEnabled" value="true" />
+            </Window>
+            <Window type="Vanilla/Editbox" name="disabledEditbox" >
+                <Property name="Area" value="{{0.296875,0},{0.00694444,0},{0.390625,0},{0.0347222,0}}" />
+                <Property name="Text" value="Disabled" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/Titlebar" name="disabledTitlebar" >
+                <Property name="Area" value="{{0.269531,0},{0.0416667,0},{0.425781,0},{0.0694445,0}}" />
+                <Property name="Text" value="Disabled Title Bar" />
+                <Property name="Disabled" value="true" />
+                <Property name="AlwaysOnTop" value="true" />
+            </Window>
+            <Window type="Vanilla/Editbox" name="readOnlyEditbox" >
+                <Property name="Area" value="{{0.394531,0},{0.00694444,0},{0.488281,0},{0.0347222,0}}" />
+                <Property name="Text" value="Read Only" />
+                <Property name="ReadOnly" value="true" />
+            </Window>
+            <Window type="Vanilla/Checkbox" name="checkBox2" >
+                <Property name="Area" value="{{0.00390625,0},{0.180556,0},{0.0976563,0},{0.208334,0}}" />
+                <Property name="Text" value="CheckBox 2" />
+            </Window>
+            <Window type="Vanilla/RadioButton" name="disabledCheckedRadioButton" >
+                <Property name="Area" value="{{0.00390625,0},{0.125,0},{0.0976563,0},{0.152778,0}}" />
+                <Property name="Text" value="Disabled Marked" />
+                <Property name="Disabled" value="true" />
+                <Property name="Selected" value="true" />
+            </Window>
+            <Window type="Vanilla/Button" name="disabledButton" >
+                <Property name="Area" value="{{0.101563,0},{0.00694444,0},{0.195313,0},{0.0347222,0}}" />
+                <Property name="Text" value="Disabled" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/RadioButton" name="radioButton1" >
+                <Property name="Area" value="{{0.00390625,0},{0.0416667,0},{0.0976563,0},{0.0694445,0}}" />
+                <Property name="Text" value="Radio Button 1" />
+            </Window>
+            <Window type="Vanilla/RadioButton" name="radioButton2" >
+                <Property name="Area" value="{{0.00390625,0},{0.0694444,0},{0.0976563,0},{0.0972222,0}}" />
+                <Property name="Text" value="Radio Button 2" />
+            </Window>
+            <Window type="Vanilla/RadioButton" name="disabledUncheckedRadioButton" >
+                <Property name="Area" value="{{0.00390625,0},{0.0972222,0},{0.0976563,0},{0.125,0}}" />
+                <Property name="Text" value="Disabled Unmarked" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/Checkbox" name="checkBox1" >
+                <Property name="Area" value="{{0.00390625,0},{0.152778,0},{0.0976563,0},{0.180556,0}}" />
+                <Property name="Text" value="CheckBox 1" />
+            </Window>
+            <Window type="Vanilla/FrameWindow" name="frameWindow" >
+                <Property name="Area" value="{{0.101563,0},{0.0833333,0},{0.257813,0},{0.277778,0}}" />
+                <Property name="Text" value="Frame Window" />
+            </Window>
+            <Window type="Vanilla/VerticalScrollbar" name="scrollbar2" >
+                <Property name="Area" value="{{0.244532,0},{0.461111,0},{0.256251,0},{0.738889,0}}" />
+            </Window>
+            <Window type="Vanilla/VerticalScrollbar" name="disabledScrollbar2" >
+                <Property name="Area" value="{{0.260157,0},{0.461111,0},{0.271876,0},{0.738889,0}}" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/Editbox" name="editbox" >
+                <Property name="Area" value="{{0.199219,0},{0.00694444,0},{0.292969,0},{0.0347222,0}}" />
+                <Property name="Text" value="Edit Box" />
+            </Window>
+            <Window type="Vanilla/Checkbox" name="disabledCheckedCheckbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.236111,0},{0.0976563,0},{0.263889,0}}" />
+                <Property name="Text" value="Disabled Marked" />
+                <Property name="Disabled" value="true" />
+                <Property name="Selected" value="true" />
+            </Window>
+            <Window type="Vanilla/Checkbox" name="disabledUncheckedCheckbox" >
+                <Property name="Area" value="{{0.00390625,0},{0.208333,0},{0.0976563,0},{0.236111,0}}" />
+                <Property name="Text" value="Disabled Unmarked" />
+                <Property name="Disabled" value="true" />
+            </Window>
+            <Window type="Vanilla/Combobox" name="disabledComboBox" >
+                <Property name="Area" value="{{0.527344,0},{0.0416667,0},{0.621094,0},{0.208333,0}}" />
+                <Property name="Disabled" value="true" />
+                <Property name="ReadOnly" value="true" />
+            </Window>
+            <Window type="Vanilla/Combobox" name="combobox" >
+                <Property name="Area" value="{{0.429688,0},{0.0416667,0},{0.523438,0},{0.208333,0}}" />
+            </Window>
+            <Window type="Vanilla/MultiLineEditbox" name="MultiLineEditbox" >
+                <Property name="Area" value="{{0.328125,0},{0.291667,0},{0.484375,0},{0.402778,0}}" />
+                <Property name="Text" >
+                
+</Property>
+                <Property name="WordWrap" value="false" />
+                <Property name="BlinkCaret" value="true" />
+                <Property name="AutoRenderingSurface" value="true" />
+            </Window>
+            <Window type="Vanilla/MultiLineEditbox" name="MultiLineEditbox2" >
+                <Property name="Area" value="{{0.328125,0},{0.416667,0},{0.484375,0},{0.527778,0}}" />
+                <Property name="Text" >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+                
+</Property>
+                <Property name="ReadOnly" value="true" />
+            </Window>
+            <Window type="Vanilla/MultiLineEditbox" name="MultiLineEditbox3" >
+                <Property name="Area" value="{{0.328125,0},{0.541667,0},{0.484375,0},{0.652778,0}}" />
+                <Property name="Text" >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+                
+</Property>
+                <Property name="Disabled" value="true" />
+                <Property name="AutoRenderingSurface" value="true" />
+            </Window>
+            <Window type="Vanilla/StaticText" name="HoverText" >
+                <Property name="Area" value="{{0.348437,0},{0.677778,0},{0.442187,0},{0.705556,0}}" />
+                <Property name="Text" value="Hover for tooltip" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="TooltipText" value="Hi, I am a tooltip." />
+                <Property name="TooltipType" value="Vanilla/Tooltip" />
+                <Property name="HorzScrollPageSize" value="108" />
+                <Property name="VertScrollPageSize" value="8" />
+                <Property name="HorzScrollDocumentSize" value="107" />
+                <Property name="VertScrollDocumentSize" value="13.6796" />
+            </Window>
+            <Window type="Vanilla/FrameWindow" name="FrameWindow" >
+                <Property name="Area" value="{{0.269531,0},{0.0833333,0},{0.425781,0},{0.277778,0}}" />
+                <Property name="Text" value="Disabled Frame Window" />
+                <Property name="Disabled" value="true" />
+                <Property name="TitlebarEnabled" value="false" />
+                <Property name="CloseButtonEnabled" value="false" />
+            </Window>
+            <Window type="Generic/Label" name="Label" >
+                <Property name="Area" value="{{0.2375,0},{0.755556,0},{0.458594,0},{0.843056,0}}" />
+                <Property name="Text" value="I am a label window with a tooltip set. Below is my child window:" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="TooltipText" value="This tooltip will be inherited to children windows" />
+                <Property name="TooltipType" value="Vanilla/Tooltip" />
+                <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="NormalTextColour" value="FFFFFFFF" />
+                <Property name="DisabledTextColour" value="FFFFFFFF" />
+                <Window type="Vanilla/Button" name="Button" >
+                    <Property name="Area" value="{{0.261983,0},{0.54314,0},{0.788484,0},{0.860601,0}}" />
+                    <Property name="Text" value="I inherit tooltips" />
+                    <Property name="TooltipType" value="Vanilla/Tooltip" />
+                </Window>
+            </Window>
+                <Window type="Vanilla/StaticText" name="StaticText2" >
+                <Property name="Area" value="{{0.519531,0},{0.0819444,0},{0.648438,0},{0.169444,0}}" />
+                <Property name="Text" value="Testing StaticText without scrollbars" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="WordWrapLeftAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="HorzScrollPageSize" value="153" />
+                <Property name="VertScrollPageSize" value="51" />
+                <Property name="HorzScrollDocumentSize" value="152" />
+                <Property name="VertScrollDocumentSize" value="145.484" />
+            </Window>
+            <Window type="Vanilla/StaticText" name="StaticText" >
+                <Property name="Area" value="{{0.519531,0},{0.173611,0},{0.648438,0},{0.277778,0}}" />
+                <Property name="Text" value="Testing the Formatting Tags: It is [colour=&apos;FF00FF00&apos;]possible[colour=&apos;FFFFFFFF&apos;] to embed images [image=&apos;Vanilla-Images/MouseArrow&apos;] or change the [font=&apos;DejaVuSans-12&apos;]Font type and [font=&apos;&apos;]many more things (see the docu or CEGUI wiki) [colour=&apos;FF00FF00&apos;][image=&apos;Vanilla-Images/MouseArrow&apos;]" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzScrollbar" value="true" />
+                <Property name="VertScrollbar" value="true" />
+                <Property name="HorzFormatting" value="WordWrapLeftAligned" />
+                <Property name="HorzScrollPageSize" value="147" />
+                <Property name="VertScrollPageSize" value="63" />
+                <Property name="HorzScrollDocumentSize" value="146" />
+                <Property name="VertScrollDocumentSize" value="165.539" />
+            </Window>
+            <Window type="Generic/Label" name="Label2" >
+                <Property name="Area" value="{{0.436719,0},{0.119445,0},{0.514844,0},{0.1625,0}}" />
+                <Property name="Text" value="StaticImage with an Image:" />
+                <Property name="HorzFormatting" value="WordWrapCentreAligned" />
+                <Property name="VertFormatting" value="TopAligned" />
+                <Property name="NormalTextColour" value="FFFFFFFF" />
+                <Property name="DisabledTextColour" value="FFFFFFFF" />
+            </Window>
+            <Window type="TaharezLook/StaticImage" name="StaticImage" >
+                <Property name="Area" value="{{0.450782,0},{0.163889,0},{0.501563,0},{0.227778,0}}" />
+                <Property name="Image" value="Vanilla-Images/ColourPickerCursor" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="HorzFormatting" value="CentreAligned" />
+                <Property name="VertFormatting" value="CentreAligned" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

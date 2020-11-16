@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:element name="Samples" type="sampsSamplesType" />
+	<xsd:complexType name="sampsSamplesType">
+        <xsd:sequence>
+            <xsd:element name="SampleDefinition" type="sampsSampleDefinitionType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="sampsSampleDefinitionType">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="sampsSampleTypeEnum" use="required" />
+        <xsd:attribute name="summary" type="xsd:string" use="optional"  default="" />
+        <xsd:attribute name="description" type="xsd:string" use="optional"  default="" />
+        <xsd:attribute name="credits" type="xsd:string" use="optional"  default="" />
+	</xsd:complexType>
+    <xsd:simpleType name="sampsSampleTypeEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="C++ Module" />
+            <xsd:enumeration value="Lua" />
+            <xsd:enumeration value="Python" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>
+

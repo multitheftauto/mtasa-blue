@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	<xsd:element name="Imageset" type="ImagesetType"/>
+	
+	<xsd:complexType name="ImagesetType">
+		<xsd:sequence>
+			<xsd:element name="Image" type="ImageType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="imagefile" type="xsd:string" use="required"/>
+		<xsd:attribute name="resourceGroup" type="xsd:string" use="optional"  default="" />
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="nativeHorzRes" type="xsd:nonNegativeInteger" use="optional" default="640" />
+		<xsd:attribute name="nativeVertRes" type="xsd:nonNegativeInteger" use="optional" default="480" />
+		<xsd:attribute name="autoScaled" default="false">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="false" />
+					<xsd:enumeration value="vertical" />
+					<xsd:enumeration value="horizontal" />
+					<xsd:enumeration value="min" />
+					<xsd:enumeration value="max" />
+					<xsd:enumeration value="true" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:nonNegativeInteger" use="optional" default="0" />
+	</xsd:complexType>
+	
+	<xsd:complexType name="ImageType">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" processContents="skip" maxOccurs="unbounded" />
+        </xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="type" type="xsd:string" use="optional" default="BasicImage" />
+		<xsd:anyAttribute processContents="skip" />
+	</xsd:complexType>
+
+</xsd:schema>

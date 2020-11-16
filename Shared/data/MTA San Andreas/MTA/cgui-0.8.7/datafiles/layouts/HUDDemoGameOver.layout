@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="Generic/Image" name="GameOverRoot" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="Image" value="HUDDemo/Filler" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Property name="AlwaysOnTop" value="True" />
+        <Property name="ImageColours" value="tl:88888888 tr:88888888 bl:88888888 br:88888888" />
+        <Window type="Generic/Image" name="GameOverImage" >
+            <Property name="Area" value="{{0,0},{0.119444,0},{0,0},{0.519444,0}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Property name="AspectMode" value="Expand" />
+            <Property name="AspectRatio" value="1.923" />
+            <Property name="HorizontalAlignment" value="Centre" />
+        </Window>
+        <Window type="Generic/ImageButton" name="ButtonRestart" >
+            <Property name="Area" value="{{0,0},{0.597222,0},{0.153906,0},{0.661111,0}}" />
+            <Property name="HoverImage" value="HUDDemo/ButtonNormal" />
+            <Property name="NormalImage" value="HUDDemo/ButtonNormal" />
+            <Property name="PushedImage" value="HUDDemo/ButtonPressed" />
+            <Property name="DisabledImage" value="HUDDemo/ButtonNormal" />
+            <Property name="HorizontalAlignment" value="Centre" />
+            <Window type="Generic/Label" name="LabelRestart" >
+                <Property name="Area" value="{{0,0},{0.152778,0},{1,0},{1,0}}" />
+                <Property name="Font" value="GreatVibes-22" />
+                <Property name="Text" value="Restart" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="NormalTextColour" value="FFFFFFFF" />
+                <Property name="DisabledTextColour" value="FFFFFFFF" />
+                <Property name="MousePassThroughEnabled" value="True" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

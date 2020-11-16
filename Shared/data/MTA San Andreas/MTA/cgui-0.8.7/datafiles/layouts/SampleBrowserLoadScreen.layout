@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="DefaultWindow" name="LoadScreenRoot" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window type="SampleBrowserSkin/ProgressBar" name="LoadScreenProgressBar" >
+            <Property name="Area" value="{{0.2,0},{0.5,0},{0.8,0},{0.6,0}}" />
+            <Property name="StepSize" value="0.01" />
+        </Window>
+        <Window type="SampleBrowserSkin/StaticText" name="LoadScreenText" >
+            <Property name="Area" value="{{0.35,0},{0.41,0},{0.65,0},{0.48,0}}" />
+            <Property name="Text" value="" />
+            <Property name="HorzScrollPageSize" value="342.4" />
+            <Property name="VertScrollPageSize" value="18.8" />
+            <Property name="HorzScrollDocumentSize" value="64" />
+            <Property name="VertScrollDocumentSize" value="18.625" />
+            <Window type="SampleBrowserSkin/Label" name="LoadScreenTextChunkProgress" >
+                <Property name="Area" value="{{0,0},{0,0},{1,-12},{1,0}}" />
+                <Property name="Text" value="" />
+                <Property name="HorzFormatting" value="RightAligned" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<GUIScheme version="5" name="GameMenu">
+	<Imageset filename="GameMenu.imageset" />
+    <Font filename="Jura-10.font" />
+	<Font filename="Jura-13.font" />
+    <Font filename="Jura-18.font" />
+	<LookNFeel filename="GameMenu.looknfeel" />
+	<WindowRendererSet filename="CEGUICoreWindowRendererSet" />
+    
+    <FalagardMapping windowType="GameMenu/Editbox" targetType="CEGUI/Editbox" renderer="Core/Editbox" lookNFeel="GameMenu/Editbox" />
+	
+    </GUIScheme>
+

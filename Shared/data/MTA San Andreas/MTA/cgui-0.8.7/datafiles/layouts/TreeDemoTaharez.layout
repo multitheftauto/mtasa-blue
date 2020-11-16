@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<GUILayout version="4">
+	<Window name="DemoWindow" type="TaharezLook/FrameWindow">
+		<Property name="MaxSize" value="{{1,0},{1,0}}" />
+		<Property name="MinSize" value="{{0,128},{0,128}}" />
+		<Property name="Size" value="{{0.5,0},{0.8,0}}" />
+
+        <Property name="Text" value="Tree Demo" />
+        <Property name="CloseButtonEnabled" value="False" />
+		<Property name="SizingEnabled" value="True" />
+		<Property name="FrameEnabled" value="True" />
+		<Property name="RollUpEnabled" value="True" />
+		<Property name="SizingBorderThickness" value="8.0" />
+
+        <Window name="Tree" type="TaharezLook/Tree">
+			<Property name="ID" value="1" />
+			<Property name="MaxSize" value="{{1,0},{1,0}}" />
+		
+			<Property name="Size" value="{{0.96,0},{0.90,0}}" />
+			<Property name="Position" value="{{0.02,0},{0.02,0}}" />
+		</Window>
+
+		<Window name="Editbox" type="TaharezLook/Editbox">
+			<Property name="ID" value="2" />
+			<Property name="VerticalAlignment" value="Bottom" />
+			<Property name="MinSize" value="{{0.1,0},{0.04,0}}" />
+			<Property name="Size" value="{{0.96,0},{0.05,0}}" />
+			<Property name="Position" value="{{0.02,0},{-0.02,0}}" />
+			<Property name="ReadOnly" value="True" />
+			<Property name="Text" value="" />
+			<Property name="TooltipText" value="World Location X" />
+		</Window>
+	</Window>
+</GUILayout>

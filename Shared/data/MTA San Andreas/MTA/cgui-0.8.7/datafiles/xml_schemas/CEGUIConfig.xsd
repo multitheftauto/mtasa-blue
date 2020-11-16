@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xsd:element name="CEGUIConfig" type="CEGUIConfigType"/>
+
+    <xsd:complexType name="CEGUIConfigType">
+        <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="Logging" type="loggingType" />
+                <xsd:element name="AutoLoad" type="autoLoadType" />
+                <xsd:element name="ResourceDirectory" type="resourceDirectoryType" />
+                <xsd:element name="DefaultResourceGroup" type="defaultResourceGroupType" />
+                <xsd:element name="Scripting" type="scriptingType" />
+                <xsd:element name="DefaultXMLParser" type="defaultObjectType" />
+                <xsd:element name="DefaultImageCodec" type="defaultObjectType" />
+                <xsd:element name="DefaultFont" type="defaultObjectType" />
+                <xsd:element name="DefaultMouseCursor" type="defaultMouseCursorType" />
+                <xsd:element name="DefaultTooltip" type="defaultObjectType" />
+                <xsd:element name="DefaultGUISheet" type="defaultObjectType" />
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="loggingType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="filename" type="xsd:string" use="optional" default="CEGUI.log" />
+                <xsd:attribute name="level" type="logLevel" use="optional" default="Standard" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="autoLoadType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="type" type="resourceType" use="required" />
+                <xsd:attribute name="group" type="xsd:string" use="optional" default="" />
+                <xsd:attribute name="pattern" type="xsd:string" use="optional" default="*" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="resourceDirectoryType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="group" type="xsd:string" use="required" />
+                <xsd:attribute name="directory" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="defaultResourceGroupType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="type" type="resourceType" use="optional" default="Default" />
+                <xsd:attribute name="group" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="scriptingType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="initScript" type="xsd:string" use="optional" default="" />
+                <xsd:attribute name="terminateScript" type="xsd:string" use="optional" default="" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="defaultObjectType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="defaultMouseCursorType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="imageset" type="xsd:string" use="required" />
+                <xsd:attribute name="image" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="logLevel">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Errors"/>
+            <xsd:enumeration value="Standard"/>
+            <xsd:enumeration value="Informative"/>
+            <xsd:enumeration value="Insane"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="resourceType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Imageset"/>
+            <xsd:enumeration value="Font"/>
+            <xsd:enumeration value="Scheme"/>
+            <xsd:enumeration value="LookNFeel"/>
+            <xsd:enumeration value="Layout"/>
+            <xsd:enumeration value="Script"/>
+            <xsd:enumeration value="XMLSchema"/>
+            <xsd:enumeration value="Default"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+</xsd:schema>

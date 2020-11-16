@@ -1,0 +1,2487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Falagard version="7">
+    <WidgetLook name="AlfiskoSkin/Label">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="Colour" name="NormalTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFDDDDDD" type="Colour" name="DisabledTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="VerticalTextFormatting" name="VertFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="CentreAligned" type="HorizontalTextFormatting" name="HorzFormatting"/>
+        <Property name="Size" value="{{0, 128}, {0, 32}}" />
+        <ImagerySection name="Label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="Width">
+                        <UnifiedDim scale="1" type="Width"/>
+                    </Dim>
+                    <Dim type="Height">
+                        <UnifiedDim scale="1" type="Height"/>
+                    </Dim>
+                </Area>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="Label">
+                    <ColourProperty name="NormalTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="Label">
+                    <ColourProperty name="DisabledTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/Button">
+        <PropertyDefinition initialValue="CentreAligned" type="VerticalTextFormatting" name="VertLabelFormatting"/>
+        <PropertyDefinition initialValue="CentreAligned" type="HorizontalTextFormatting" name="HorzLabelFormatting"/>
+        <Property name="Size" value="{{0, 96}, {0, 32}}" />
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                </Area>
+                <Colours topLeft="FF000000" bottomLeft="FF000000" topRight="FF000000" bottomRight="FF000000"/>
+                <VertFormatProperty name="VertLabelFormatting"/>
+                <HorzFormatProperty name="HorzLabelFormatting"/>
+            </TextComponent>
+            <TextComponent>
+                <VertFormatProperty name="VertLabelFormatting"/>
+                <HorzFormatProperty name="HorzLabelFormatting"/>
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/ButtonNormalTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/ButtonNormalTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/ButtonNormalBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/ButtonNormalBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/ButtonNormalL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/ButtonNormalR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/ButtonNormalT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/ButtonNormalB"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonNormalL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonNormalT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/ButtonNormalR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ButtonNormalFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonNormalL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/ButtonNormalR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/ButtonNormalB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ButtonNormalFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/ButtonHoverTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/ButtonHoverTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/ButtonHoverBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/ButtonHoverBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/ButtonHoverL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/ButtonHoverR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/ButtonHoverT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/ButtonHoverB"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonHoverL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonHoverT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/ButtonHoverR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ButtonHoverFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonHoverL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/ButtonHoverR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/ButtonHoverB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ButtonHoverFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/ButtonPushedTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/ButtonPushedTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/ButtonPushedBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/ButtonPushedBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/ButtonPushedL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/ButtonPushedR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/ButtonPushedT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/ButtonPushedB"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonPushedL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonPushedT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/ButtonPushedR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ButtonPushedFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ButtonPushedL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/ButtonPushedR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/ButtonPushedB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ButtonPushedFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="PushedOff">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/ImageButton">
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="NormalImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="HoverImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="PushedImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="" type="Image" name="DisabledImage"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="VerticalFormatting" name="VertImageFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="HorizontalFormatting" name="HorzImageFormatting"/>
+        <Property name="Size" value="{{0, 96}, {0, 32}}" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <ImageProperty name="NormalImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <ImageProperty name="HoverImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <ImageProperty name="PushedImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="disabled">
+            <ImageryComponent>
+                <ImageProperty name="DisabledImage"/>
+                <VertFormatProperty name="VertImageFormatting"/>
+                <HorzFormatProperty name="HorzImageFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="PushedOff">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="disabled"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/RadioButton">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="LabelColour"/>
+        <Property name="Size" value="{{0, 256}, {0, 32}}" />
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Add">
+                            <ImageDim name="AlfiskoSkin/RadioButtonNormal" dimension="Width"/>
+                            <AbsoluteDim value="3"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <ColourProperty name="LabelColour"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/RadioButtonNormal"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/RadioButtonHover"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="selected">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/RadioButtonChecked"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="selected"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+                <Section section="label">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedNormal">
+            <Layer>
+                <Section section="selected"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedHover">
+            <Layer>
+                <Section section="hover"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedPushed">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedDisabled">
+            <Layer>
+                <Section section="selected">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+                <Section section="label">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/Checkbox">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="LabelColour"/>
+        <Property name="Size" value="{{0, 128}, {0, 32}}" />
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Add">
+                            <ImageDim name="AlfiskoSkin/CheckboxNormal" dimension="Width"/>
+                            <AbsoluteDim value="3"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <ColourProperty name="LabelColour"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/CheckboxNormal"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/CheckboxHover"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="selected">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/CheckboxChecked"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="selected"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+                <Section section="label">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedNormal">
+            <Layer>
+                <Section section="selected"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedHover">
+            <Layer>
+                <Section section="hover"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedPushed">
+            <Layer>
+                <Section section="normal"/>
+                <Section section="label"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedDisabled">
+            <Layer>
+                <Section section="selected">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+                <Section section="label">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/Titlebar">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="CaptionColour"/>
+        <Property name="Size" value="{{0, 256}, {0, 32}}" />
+        <ImagerySection name="active">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/TitlebarActiveTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/TitlebarActiveTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/TitlebarActiveBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/TitlebarActiveBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/TitlebarActiveL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/TitlebarActiveR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/TitlebarActiveT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/TitlebarActiveB"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarActiveL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarActiveT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/TitlebarActiveR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/TitlebarActiveFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarActiveL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/TitlebarActiveR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/TitlebarActiveB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/TitlebarActiveFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="inactive">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/TitlebarInactiveTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/TitlebarInactiveTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/TitlebarInactiveBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/TitlebarInactiveBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/TitlebarInactiveL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/TitlebarInactiveR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/TitlebarInactiveT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/TitlebarInactiveB"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarInactiveL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarInactiveT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/TitlebarInactiveR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/TitlebarInactiveFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarInactiveL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/TitlebarInactiveR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/TitlebarInactiveB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/TitlebarInactiveFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="caption">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Add">
+                            <ImageDim name="AlfiskoSkin/TitlebarDummy1" dimension="Width"/>
+                            <AbsoluteDim value="1"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                </Area>
+                <Colours topLeft="FF000000" bottomLeft="FF000000" topRight="FF000000" bottomRight="FF000000"/>
+                <VertFormat type="CentreAligned"/>
+            </TextComponent>
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/TitlebarDummy1" dimension="Width"/>
+                    </Dim>
+                </Area>
+                <ColourProperty name="CaptionColour"/>
+                <VertFormat type="CentreAligned"/>
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Active">
+            <Layer>
+                <Section section="active"/>
+                <Section section="caption"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Inactive">
+            <Layer>
+                <Section section="inactive"/>
+                <Section section="caption"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/FrameWindow">
+        <PropertyLinkDefinition targetProperty="CaptionColour" widget="__auto_titlebar__" initialValue="FFFFFFFF" type="ColourRect" name="CaptionColour"/>
+        <PropertyLinkDefinition targetProperty="Font" widget="__auto_titlebar__" type="Font" name="TitlebarFont"/>
+        <Property name="AutoRenderingSurface" value="true"/>
+        <Property name="Size" value="{{0.3, 0}, {0.3, 0}}" />
+        <NamedArea name="ClientWithTitleWithFrame">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/WindowClipL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_titlebar__" dimension="BottomEdge"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <ImageDim name="AlfiskoSkin/WindowClipR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <ImageDim name="AlfiskoSkin/WindowClipB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientWithTitleNoFrame">
+            <Area>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_titlebar__" dimension="BottomEdge"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientNoTitleWithFrame">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/WindowClipL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/WindowClipT" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <ImageDim name="AlfiskoSkin/WindowClipR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <ImageDim name="AlfiskoSkin/WindowClipB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientNoTitleNoFrame"/>
+        <Child nameSuffix="__auto_titlebar__" type="AlfiskoSkin/Titlebar">
+            <Area>
+                <Dim type="Height">
+                    <FontDim padding="16" type="LineSpacing"/>
+                </Dim>
+            </Area>
+            <Property name="AlwaysOnTop" value="False"/>
+            <Property name="NonClient" value="true"/>
+        </Child>
+        <Child nameSuffix="__auto_closebutton__" type="AlfiskoSkin/ImageButton">
+            <Area>
+                <Dim type="LeftEdge">
+                    <OperatorDim op="Subtract">
+                        <AbsoluteDim value="0"/>
+                        <ImageDim name="AlfiskoSkin/TitlebarActiveTR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <OperatorDim op="Multiply">
+                        <AbsoluteDim value="0.5"/>
+                        <OperatorDim op="Subtract">
+                            <WidgetDim widget="__auto_titlebar__" dimension="Height"/>
+                            <ImageDim name="AlfiskoSkin/CloseButtonNormal" dimension="Height"/>
+                        </OperatorDim>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <ImageDim name="AlfiskoSkin/CloseButtonNormal" dimension="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <ImageDim name="AlfiskoSkin/CloseButtonNormal" dimension="Height"/>
+                </Dim>
+            </Area>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="AlwaysOnTop" value="true"/>
+            <Property name="NonClient" value="true"/>
+            <Property name="NormalImage" value="AlfiskoSkin/CloseButtonNormal"/>
+            <Property name="HoverImage" value="AlfiskoSkin/CloseButtonNormal"/>
+            <Property name="PushedImage" value="AlfiskoSkin/CloseButtonPushed"/>
+        </Child>
+        <ImagerySection name="withtitle_frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <WidgetDim widget="__auto_titlebar__" dimension="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/WindowBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/WindowBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/WindowL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/WindowR"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/WindowB"/>
+                <Image component="Background" name="AlfiskoSkin/WindowFill"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="notitle_frame">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/WindowTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/WindowTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/WindowBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/WindowBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/WindowL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/WindowR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/WindowT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/WindowB"/>
+                <Image component="Background" name="AlfiskoSkin/WindowFill"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="withtitle_noframe_client_area">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <WidgetDim widget="__auto_titlebar__" dimension="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/WindowFill"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="notitle_noframe_client_area">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/WindowFill"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="ActiveWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/Editbox">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="NormalTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="SelectedTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFB6D142" type="ColourRect" name="ActiveSelectionColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF808080" type="ColourRect" name="InactiveSelectionColour"/>
+        <Property name="MouseCursorImage" value="AlfiskoSkin/MouseTextBar"/>
+        <Property name="Size" value="{{0, 256}, {0, 32}}" />
+        <NamedArea name="TextArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxT" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <ImageDim name="AlfiskoSkin/EditboxR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <ImageDim name="AlfiskoSkin/EditboxB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="container_normal">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/EditboxTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/EditboxTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/EditboxBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/EditboxBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/EditboxL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/EditboxR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/EditboxT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/EditboxB"/>
+                <Image component="Background" name="AlfiskoSkin/EditboxFill"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="selection">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/GenericBrush"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="Caret">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="Width">
+                        <AbsoluteDim value="3"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/GenericBrush"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="container_normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ReadOnly">
+            <Layer>
+                <Section section="container_normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="container_normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveSelection">
+            <Layer>
+                <Section section="selection">
+                    <ColourProperty name="ActiveSelectionColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveSelection">
+            <Layer>
+                <Section section="selection">
+                    <ColourProperty name="InactiveSelectionColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/HorizontalScrollbarThumb">
+        <Property name="HorzFree" value="true"/>
+        <Property name="MouseInputPropagationEnabled" value="true"/>
+        <Property name="Size" value="{{0, 32}, {0, 32}}" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbNormalTR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbNormalBR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbNormalTL"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbNormalBL"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzThumbNormalTL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzThumbNormalTR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbNormalT"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzThumbNormalBL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzThumbNormalBR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbNormalB"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbHoverTR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbHoverBR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbHoverTL"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbHoverBL"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzThumbHoverTL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzThumbHoverTR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbHoverT"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzThumbHoverBL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzThumbHoverBR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbHoverB"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbPushedTR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbPushedBR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbPushedTL"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbPushedBL"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzThumbPushedTL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzThumbPushedTR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbPushedT"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzThumbPushedBL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzThumbPushedBR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbPushedB"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/HorizontalScrollbar">
+        <Property name="Size" value="{{1, 0}, {0, 32}}" />
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/HorzScrollbarT" dimension="Height"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="Height"/>
+                        <ImageDim name="AlfiskoSkin/HorzScrollbarB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/ScrollLeftNormal" dimension="Width"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1.0" type="RightEdge"/>
+                        <ImageDim name="AlfiskoSkin/ScrollRightNormal" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child nameSuffix="__auto_incbtn__" type="AlfiskoSkin/ImageButton">
+            <Area>
+                <Dim type="Width">
+                    <ImageDim name="AlfiskoSkin/ScrollRightNormal" dimension="Width"/>
+                </Dim>
+            </Area>
+            <HorzAlignment type="RightAligned"/>
+            <Property name="NormalImage" value="AlfiskoSkin/ScrollRightNormal"/>
+            <Property name="HoverImage" value="AlfiskoSkin/ScrollRightHover"/>
+            <Property name="PushedImage" value="AlfiskoSkin/ScrollRightPushed"/>
+        </Child>
+        <Child nameSuffix="__auto_decbtn__" type="AlfiskoSkin/ImageButton">
+            <Area>
+                <Dim type="Width">
+                    <ImageDim name="AlfiskoSkin/ScrollLeftNormal" dimension="Width"/>
+                </Dim>
+            </Area>
+            <Property name="NormalImage" value="AlfiskoSkin/ScrollLeftNormal"/>
+            <Property name="HoverImage" value="AlfiskoSkin/ScrollLeftHover"/>
+            <Property name="PushedImage" value="AlfiskoSkin/ScrollLeftNormal"/>
+        </Child>
+        <Child nameSuffix="__auto_thumb__" type="AlfiskoSkin/HorizontalScrollbarThumb">
+            <Area>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/HorzScrollbarT" dimension="Height"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="Height"/>
+                        <ImageDim name="AlfiskoSkin/HorzScrollbarB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="0.1" type="Width"/>
+                </Dim>
+            </Area>
+            <Property name="MinSize" value="{{0,25},{0,0}}"/>
+        </Child>
+        <ImagerySection name="main">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollLeftNormal" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="RightEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollRightNormal" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image component="TopEdge" name="AlfiskoSkin/HorzScrollbarT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/HorzScrollbarB"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/HorzScrollbarT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollLeftNormal" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="RightEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollRightNormal" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzScrollbarFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <UnifiedDim scale=".5" type="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/HorzScrollbarB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollLeftNormal" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="RightEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollRightNormal" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzScrollbarFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/HorzScrollbarT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/HorzScrollbarB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollLeftNormal" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="LeftEdge"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbShadowL"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/HorzScrollbarT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/HorzScrollbarB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="RightEdge"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="RightEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollRightNormal" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzThumbShadowR"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/VerticalScrollbarThumb">
+        <Property name="VertFree" value="true"/>
+        <Property name="MouseInputPropagationEnabled" value="true"/>
+        <Property name="Size" value="{{0, 32}, {0, 32}}" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbNormalBL"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbNormalBR"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbNormalTL"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbNormalTR"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertThumbNormalTL" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertThumbNormalBL" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbNormalL"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertThumbNormalTR" dimension="Height"/>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertThumbNormalBR" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbNormalR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbHoverBL"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbHoverBR"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbHoverTL"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbHoverTR"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertThumbHoverTL" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertThumbHoverBL" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbHoverL"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertThumbHoverTR" dimension="Height"/>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertThumbHoverBR" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbHoverR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbPushedBL"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbPushedBR"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbPushedTL"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbPushedTR"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertThumbPushedTL" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertThumbPushedBL" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbPushedL"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertThumbPushedTR" dimension="Height"/>
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertThumbPushedBR" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbPushedR"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/VerticalScrollbar">
+        <Property name="VerticalScrollbar" value="true"/>
+        <Property name="Size" value="{{0, 32}, {1, 0}}" />
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/VertScrollbarL" dimension="Width"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="Width"/>
+                        <ImageDim name="AlfiskoSkin/VertScrollbarR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/ScrollUpNormal" dimension="Height"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1.0" type="BottomEdge"/>
+                        <ImageDim name="AlfiskoSkin/ScrollDownNormal" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child nameSuffix="__auto_incbtn__" type="AlfiskoSkin/ImageButton">
+            <Area>
+                <Dim type="Height">
+                    <ImageDim name="AlfiskoSkin/ScrollDownNormal" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+            <Property name="NormalImage" value="AlfiskoSkin/ScrollDownNormal"/>
+            <Property name="HoverImage" value="AlfiskoSkin/ScrollDownHover"/>
+            <Property name="PushedImage" value="AlfiskoSkin/ScrollDownPushed"/>
+        </Child>
+        <Child nameSuffix="__auto_decbtn__" type="AlfiskoSkin/ImageButton">
+            <Area>
+                <Dim type="Height">
+                    <ImageDim name="AlfiskoSkin/ScrollUpNormal" dimension="Height"/>
+                </Dim>
+            </Area>
+            <Property name="NormalImage" value="AlfiskoSkin/ScrollUpNormal"/>
+            <Property name="HoverImage" value="AlfiskoSkin/ScrollUpHover"/>
+            <Property name="PushedImage" value="AlfiskoSkin/ScrollUpNormal"/>
+        </Child>
+        <Child nameSuffix="__auto_thumb__" type="AlfiskoSkin/VerticalScrollbarThumb">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/VertScrollbarL" dimension="Width"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="Width"/>
+                        <ImageDim name="AlfiskoSkin/VertScrollbarR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="0.1" type="Height"/>
+                </Dim>
+            </Area>
+            <Property name="MinSize" value="{{0,0},{0,25}}"/>
+        </Child>
+        <ImagerySection name="main">
+            <FrameComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollUpNormal" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="BottomEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollDownNormal" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image component="LeftEdge" name="AlfiskoSkin/VertScrollbarL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/VertScrollbarR"/>
+            </FrameComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/VertScrollbarL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollUpNormal" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="BottomEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollDownNormal" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertScrollbarFill1"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <UnifiedDim scale=".5" type="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/VertScrollbarR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollUpNormal" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="BottomEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollDownNormal" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertScrollbarFill2"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/VertScrollbarL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/VertScrollbarR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/ScrollUpNormal" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="TopEdge"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbShadowT"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/VertScrollbarL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/VertScrollbarR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="BottomEdge"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="BottomEdge"/>
+                            <ImageDim name="AlfiskoSkin/ScrollDownNormal" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertThumbShadowB"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/MultiLineEditbox">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="NormalTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="SelectedTextColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFB6D142" type="ColourRect" name="ActiveSelectionColour"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF808080" type="ColourRect" name="InactiveSelectionColour"/>
+        <Property name="MouseCursorImage" value="AlfiskoSkin/MouseTextBar"/>
+        <Property name="SelectionBrushImage" value="AlfiskoSkin/GenericBrush"/>
+        <Property name="Size" value="{{0, 256}, {0, 256}}" />
+        <NamedArea name="TextArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxT" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <ImageDim name="AlfiskoSkin/EditboxR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <ImageDim name="AlfiskoSkin/EditboxB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="TextAreaHScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxT" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <ImageDim name="AlfiskoSkin/EditboxR" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <WidgetDim widget="__auto_hscrollbar__" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="TextAreaVScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxT" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <WidgetDim widget="__auto_vscrollbar__" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <ImageDim name="AlfiskoSkin/EditboxB" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="TextAreaHVScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxL" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="AlfiskoSkin/EditboxT" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="RightEdge"/>
+                        <WidgetDim widget="__auto_vscrollbar__" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1" type="BottomEdge"/>
+                        <WidgetDim widget="__auto_hscrollbar__" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child nameSuffix="__auto_hscrollbar__" type="AlfiskoSkin/HorizontalScrollbar">
+            <Area>
+                <Dim type="Width">
+                    <UnifiedDim scale="1" type="Width" offset="-15"/>
+                </Dim>
+                <Dim type="Height">
+                    <AbsoluteDim value="15"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_vscrollbar__" type="AlfiskoSkin/VerticalScrollbar">
+            <Area>
+                <Dim type="Width">
+                    <AbsoluteDim value="15"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="1" type="Height" offset="-15"/>
+                </Dim>
+            </Area>
+            <HorzAlignment type="RightAligned"/>
+        </Child>
+        <ImagerySection name="main">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/EditboxTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/EditboxTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/EditboxBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/EditboxBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/EditboxL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/EditboxR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/EditboxT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/EditboxB"/>
+                <Image component="Background" name="AlfiskoSkin/EditboxFill"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="Caret">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="Width">
+                        <AbsoluteDim value="2"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/GenericBrush"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ReadOnly">
+            <Layer>
+                <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/ProgressBar">
+        <Property name="CurrentProgress" value=".01"/>
+        <Property name="Size" value="{{0, 256}, {0, 32}}" />
+        <NamedArea name="ProgressArea"/>
+        <ImagerySection name="progress_empty">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/ProgressEmptyTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/ProgressEmptyTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/ProgressEmptyBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/ProgressEmptyBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/ProgressEmptyL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/ProgressEmptyR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/ProgressEmptyT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/ProgressEmptyB"/>
+                <Image component="Background" name="AlfiskoSkin/ProgressEmptyFill"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="progress_full">
+            <FrameComponent>
+                <Image component="TopLeftCorner" name="AlfiskoSkin/ProgressFullTL"/>
+                <Image component="TopRightCorner" name="AlfiskoSkin/ProgressFullTR"/>
+                <Image component="BottomLeftCorner" name="AlfiskoSkin/ProgressFullBL"/>
+                <Image component="BottomRightCorner" name="AlfiskoSkin/ProgressFullBR"/>
+                <Image component="LeftEdge" name="AlfiskoSkin/ProgressFullL"/>
+                <Image component="RightEdge" name="AlfiskoSkin/ProgressFullR"/>
+                <Image component="TopEdge" name="AlfiskoSkin/ProgressFullT"/>
+                <Image component="BottomEdge" name="AlfiskoSkin/ProgressFullB"/>
+                <Image component="Background" name="AlfiskoSkin/ProgressFullFill"/>
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="progress_shadow">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <OperatorDim op="Multiply">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <PropertyDim name="CurrentProgress"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <AbsoluteDim value="5"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/ProgressShadow"/>
+                <VertFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="progress_empty"/>
+                <Section section="progress_shadow"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="progress_empty">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledProgress">
+            <Layer>
+                <Section section="progress_full"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledProgress">
+            <Layer>
+                <Section section="progress_full">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/HorizontalSliderThumb">
+        <Property name="HorzFree" value="true"/>
+        <Property name="MouseInputPropagationEnabled" value="true"/>
+        <Property name="Size" value="{{0, 32}, {0, 32}}" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/HorzSliderThumbNormal"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/HorzSliderThumbHover"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/HorzSliderThumbPushed"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/HorizontalSlider">
+        <Property name="MouseAutoRepeatEnabled" value="true"/>
+        <Property name="WantsMultiClickEvents" value="false"/>
+        <Property name="Size" value="{{0, 256}, {0, 32}}" />
+        <NamedArea name="ThumbTrackArea"/>
+        <Child nameSuffix="__auto_thumb__" type="AlfiskoSkin/HorizontalSliderThumb">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <ImageDim name="AlfiskoSkin/HorzSliderThumbNormal" dimension="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <ImageDim name="AlfiskoSkin/HorzSliderThumbNormal" dimension="Height"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="CentreAligned"/>
+        </Child>
+        <ImagerySection name="track">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/HorzSliderTrackL"/>
+                <VertFormat type="CentreAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/HorzSliderTrackR"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="AlfiskoSkin/HorzSliderTrackL" dimension="Width"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Width"/>
+                            <ImageDim name="AlfiskoSkin/HorzSliderTrackR" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzSliderTrackFill"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="RightEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="LeftEdge"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzSliderShadowL"/>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="RightAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="RightEdge"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/HorzSliderShadowR"/>
+                <VertFormat type="CentreAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="track"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="track"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/VerticalSliderThumb">
+        <Property name="VertFree" value="true"/>
+        <Property name="MouseInputPropagationEnabled" value="true"/>
+        <Property name="Size" value="{{0, 32}, {0, 32}}" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/VertSliderThumbNormal"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/VertSliderThumbHover"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/VertSliderThumbPushed"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="Stretched"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" bottomLeft="FF7F7F7F" topRight="FF7F7F7F" bottomRight="FF7F7F7F"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/VerticalSlider">
+        <Property name="VerticalSlider" value="true"/>
+        <Property name="MouseAutoRepeatEnabled" value="true"/>
+        <Property name="WantsMultiClickEvents" value="false"/>
+        <Property name="Size" value="{{0, 32}, {0, 256}}" />
+        <NamedArea name="ThumbTrackArea"/>
+        <Child nameSuffix="__auto_thumb__" type="AlfiskoSkin/VerticalSliderThumb">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <ImageDim name="AlfiskoSkin/VertSliderThumbNormal" dimension="Width"/>
+                </Dim>
+                <Dim type="Height">
+                    <ImageDim name="AlfiskoSkin/VertSliderThumbNormal" dimension="Height"/>
+                </Dim>
+            </Area>
+            <HorzAlignment type="CentreAligned"/>
+        </Child>
+        <ImagerySection name="track">
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/VertSliderTrackT"/>
+                <HorzFormat type="CentreAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Image name="AlfiskoSkin/VertSliderTrackB"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="CentreAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <ImageDim name="AlfiskoSkin/VertSliderTrackT" dimension="Height"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1" type="Height"/>
+                            <ImageDim name="AlfiskoSkin/VertSliderTrackB" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertSliderTrackFill"/>
+                <VertFormat type="Stretched"/>
+                <HorzFormat type="CentreAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="BottomEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="TopEdge"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertSliderShadowT"/>
+                <VertFormat type="BottomAligned"/>
+                <HorzFormat type="CentreAligned"/>
+            </ImageryComponent>
+            <ImageryComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <WidgetDim widget="__auto_thumb__" dimension="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <Image name="AlfiskoSkin/VertSliderShadowB"/>
+                <HorzFormat type="CentreAligned"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="track"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="track"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    <WidgetLook name="AlfiskoSkin/MenuItem">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="LabelTextColour"/>
+        <Property name="WantsMultiClickEvents" value="false"/>
+        <Property name="Size" value="{{0, 128}, {0, 32}}" />
+        <NamedArea name="ContentSize">
+            <Area>
+                <Dim type="Width">
+                    <FontDim type="HorzExtent"/>
+                </Dim>
+                <Dim type="Height">
+                    <FontDim type="LineSpacing"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="HasPopupContentSize">
+            <Area>
+                <Dim type="Width">
+                    <FontDim type="HorzExtent"/>
+                </Dim>
+                <Dim type="Height">
+                    <FontDim type="LineSpacing"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="label">
+            <TextComponent>
+                <VertFormat type="CentreAligned"/>
+                <HorzFormat type="LeftAligned"/>
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="frame">
+    </ImagerySection>
+        <ImagerySection name="popup_arrow">
+    </ImagerySection>
+        <StateImagery name="EnabledNormal">
+            <Layer>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledHover">
+            <Layer>
+                <Section section="frame"/>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledPushed">
+            <Layer>
+                <Section section="frame"/>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledPopupOpen">
+            <Layer>
+                <Section section="frame"/>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNormal">
+            <Layer>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledHover">
+            <Layer>
+                <Section section="frame"/>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledPushed">
+            <Layer>
+                <Section section="frame"/>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledPopupOpen">
+            <Layer>
+                <Section section="frame"/>
+                <Section section="label">
+                    <ColourProperty name="LabelTextColour"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="PopupClosedIcon">
+            <Layer>
+                <Section section="popup_arrow"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="PopupOpenIcon">
+            <Layer>
+                <Section section="popup_arrow"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+</Falagard>
