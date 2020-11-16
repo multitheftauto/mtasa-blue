@@ -815,9 +815,7 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
                 }
             }
 
-            // Create a new table
-            lua_newtable(luaVM);
-
+            // The table will be created by the function below
             // Add all the elements with a matching type to it
             pStartAt->FindAllChildrenByType(strType.c_str(), luaVM, bStreamedIn);
             return 1;

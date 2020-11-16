@@ -975,6 +975,7 @@ void CClientEntity::FindAllChildrenByType(const char* szType, lua_State* luaVM, 
     }
     else
     {
+        lua_newtable(luaVM)
         FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex, bStreamedIn);
     }
 }
@@ -1408,16 +1409,14 @@ void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaV
     _CheckEntitiesFromRoot(uiTypeHash);
 #endif
 
-    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find(uiTypeHash);
-    if (find != ms_mapEntitiesFromRoot.end())
+    if (CFromRootListType* pList = MapFind(ms_mapEntitiesFromRoot, uiTypeHash))
     {
-        CFromRootListType& listEntities = find->second;
-        CClientEntity*     pEntity;
-        unsigned int       uiIndex = 0;
+        lua_createtable(luaVM, pList->size(), 0);
 
-        for (CFromRootListType::reverse_iterator i = listEntities.rbegin(); i != listEntities.rend(); ++i)
+        lua_Number index = 1;
+        for (CFromRootListType::reverse_iterator i = pList->rbegin(); i != pList->rend(); ++i)
         {
-            pEntity = *i;
+            CClientEntity* pEntity = *i;
 
             // Only streamed in elements?
             if (!bStreamedIn || !pEntity->IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(pEntity)->IsStreamedIn())
@@ -1425,13 +1424,15 @@ void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaV
                 if (!pEntity->IsBeingDeleted())
                 {
                     // Add it to the table
-                    lua_pushnumber(luaVM, ++uiIndex);
+                    lua_pushnumber(luaVM, index++);
                     lua_pushelement(luaVM, pEntity);
                     lua_settable(luaVM, -3);
                 }
             }
         }
     }
+    else
+        lua_newtable(luaVM); // Create an empty table ont he stack anyways
 }
 
 #if CHECK_ENTITIES_FROM_ROOT
