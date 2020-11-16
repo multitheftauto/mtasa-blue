@@ -41,7 +41,6 @@ public:
     LUA_DECLARE(GetVehicleCompatibleUpgrades);
     LUA_DECLARE(GetVehicleWheelStates);
     LUA_DECLARE(IsVehicleWheelCollided);
-    LUA_DECLARE(GetVehicleWheelFrictionState);
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleLightState);
     LUA_DECLARE(GetVehiclePanelState);
@@ -150,6 +149,7 @@ public:
     static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
                                                                                                 const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
+    static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
