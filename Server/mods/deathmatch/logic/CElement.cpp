@@ -231,10 +231,11 @@ CElement* CElement::FindChildByType(const char* szType, unsigned int uiIndex, bo
     return FindChildByTypeIndex(uiTypeHash, uiIndex, uiCurrentIndex, bRecursive);
 }
 
-void CElement::FindAllChildrenByType(const char* szType, lua_State* pLua)
+// Creates a new lua table, and pushes all entites with the given type name
+void CElement::FindAllChildrenByType(const char* szType, lua_State* luaVM)
 {
     assert(szType);
-    assert(pLua);
+    assert(luaVM);
 
     // Add all children of the given type to the table
     unsigned int uiIndex = 0;
@@ -242,11 +243,12 @@ void CElement::FindAllChildrenByType(const char* szType, lua_State* pLua)
 
     if (this == g_pGame->GetMapManager()->GetRootElement())
     {
-        GetEntitiesFromRoot(uiTypeHash, pLua);
+        GetEntitiesFromRoot(uiTypeHash, luaVM);
     }
     else
     {
-        FindAllChildrenByTypeIndex(uiTypeHash, pLua, uiIndex);
+        lua_newtable(luaVM);
+        FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex);
     }
 }
 
@@ -1322,29 +1324,26 @@ void CElement::RemoveEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity)
         CElement::RemoveEntityFromRoot((*iter)->GetTypeHash(), *iter);
 }
 
-void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* pLua)
+void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM)
 {
 #if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot(uiTypeHash);
 #endif
-
-    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find(uiTypeHash);
-    if (find != ms_mapEntitiesFromRoot.end())
+    if (CFromRootListType* pList = MapFind(ms_mapEntitiesFromRoot, uiTypeHash))
     {
-        CFromRootListType& listEntities = find->second;
-        CElement*          pEntity;
-        unsigned int       uiIndex = 0;
+        lua_createtable(luaVM, pList->size(), 0);
 
-        for (CChildListType::const_reverse_iterator i = listEntities.rbegin(); i != listEntities.rend(); ++i)
+        lua_Number index = 1;
+        for (CElement* pEntitty : *pList)
         {
-            pEntity = *i;
-
             // Add it to the table
-            lua_pushnumber(pLua, ++uiIndex);
-            lua_pushelement(pLua, pEntity);
-            lua_settable(pLua, -3);
+            lua_pushnumber(luaVM, index++);
+            lua_pushelement(luaVM, pEntitty);
+            lua_settable(luaVM, -3);
         }
     }
+    else
+        lua_newtable(luaVM); // Create an empty table ont he stack anyways
 }
 
 void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, std::vector<CElement*>& outResult)

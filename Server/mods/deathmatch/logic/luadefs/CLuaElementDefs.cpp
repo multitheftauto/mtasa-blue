@@ -887,9 +887,7 @@ int CLuaElementDefs::getElementsByType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Create a new table
-        lua_newtable(luaVM);
-
+        // The table will be creted by the function below
         // Add all the elements with a matching type to it
         startAt->FindAllChildrenByType(strType, luaVM);
         return 1;
