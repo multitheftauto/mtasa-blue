@@ -60,7 +60,7 @@ int CClientModelManager::GetFirstFreeModelID(void)
     for (int i = 0; i < MAX_MODEL_ID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
-        if (!pModelInfo->IsValid())
+        if (!pModelInfo->IsValid() && (i < 300 || i > 319) )
         {
             return i;
         }
