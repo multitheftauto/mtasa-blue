@@ -30,16 +30,16 @@ public:
     CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType);
     ~CClientModel(void);
 
-    int                             GetModelID(void) const { return m_iModelID; };
-    eClientModelType                GetModelType(void) const { return m_eModelType; };
-    bool                            Allocate(ushort usParentID);
-    bool                            Deallocate(void);
-    void                            SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
-    CResource*                      GetParentResource(void) const { return m_pParentResource; }
+    int              GetModelID(void) const { return m_iModelID; };
+    eClientModelType GetModelType(void) const { return m_eModelType; };
+    bool             Allocate(ushort usParentID);
+    bool             Deallocate(void);
+    void             RestoreEntitiesUsingThisModel();
+    void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
+    CResource*       GetParentResource(void) const { return m_pParentResource; }
 
 protected:
     CClientManager* m_pManager;
-    class CClientModelManager*      m_pModelManager;
 
     int                             m_iModelID;
     eClientModelType                m_eModelType;
