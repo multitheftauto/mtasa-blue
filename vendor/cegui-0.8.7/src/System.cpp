@@ -104,6 +104,8 @@ const String System::EventRenderedStringParserChanged("RenderedStringParserChang
 String System::d_defaultXMLParserName(STRINGIZE(CEGUI_DEFAULT_XMLPARSER));
 // Holds name of default ImageCodec
 String System::d_defaultImageCodecName(STRINGIZE(CEGUI_DEFAULT_IMAGE_CODEC));
+// Holds path of the module directory
+String System::d_moduleDir("");
 
 
 /*************************************************************************
@@ -755,12 +757,25 @@ void System::cleanupXMLParser()
 }
 
 //----------------------------------------------------------------------------//
+
+void System::setModuleDirEnvVar(const String& moduleDir)
+{
+    d_moduleDir = moduleDir;
+}
+
+const String System::getModuleDirEnvVar()
+{
+    return d_moduleDir;
+}
+
+//----------------------------------------------------------------------------//
+
 void System::setXMLParser(const String& parserName)
 {
 #ifndef CEGUI_STATIC
     cleanupXMLParser();
     // load dynamic module
-    d_parserModule = CEGUI_NEW_AO DynamicModule(String("CEGUI") + parserName);
+    d_parserModule = CEGUI_NEW_AO DynamicModule(String("CEGUI") + parserName, getModuleDirEnvVar());
     // get pointer to parser creation function
     XMLParser* (*createFunc)(void) =
         (XMLParser* (*)(void))d_parserModule->getSymbolAddress("createParser");
@@ -832,8 +847,8 @@ void System::setupImageCodec(const String& codecName)
 #    else
         // load the appropriate image codec module
         d_imageCodecModule = codecName.empty() ?
-            CEGUI_NEW_AO DynamicModule(String("CEGUI") + d_defaultImageCodecName) :
-            CEGUI_NEW_AO DynamicModule(String("CEGUI") + codecName);
+            CEGUI_NEW_AO DynamicModule(String("CEGUI") + d_defaultImageCodecName, getModuleDirEnvVar()) :
+            CEGUI_NEW_AO DynamicModule(String("CEGUI") + codecName, getModuleDirEnvVar());
 
         // use function from module to create the codec object.
         d_imageCodec = ((ImageCodec*(*)(void))d_imageCodecModule->

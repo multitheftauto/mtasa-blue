@@ -109,6 +109,7 @@ void Scheme::loadResources(void)
     loadFactoryAliases();
     loadFalagardMappings();
 
+
     Logger::getSingleton().logEvent("---- Resource loading for GUI scheme '" + d_name + "' completed ----", Informative);
 }
 
@@ -259,7 +260,7 @@ void Scheme::loadWindowFactories()
 #if !defined(CEGUI_STATIC)
             // load dynamic module as required
             if (!(*cmod).dynamicModule)
-                (*cmod).dynamicModule = CEGUI_NEW_AO DynamicModule((*cmod).name);
+                (*cmod).dynamicModule = CEGUI_NEW_AO DynamicModule((*cmod).name, CEGUI::System::getModuleDirEnvVar());
 
             FactoryModule& (*getWindowFactoryModuleFunc)() =
                 reinterpret_cast<FactoryModule&(*)()>(
@@ -313,7 +314,7 @@ void Scheme::loadWindowRendererFactories()
 #if !defined(CEGUI_STATIC)
             // load dynamic module as required
             if (!(*cmod).dynamicModule)
-                (*cmod).dynamicModule = CEGUI_NEW_AO DynamicModule((*cmod).name);
+                (*cmod).dynamicModule = CEGUI_NEW_AO DynamicModule((*cmod).name, CEGUI::System::getModuleDirEnvVar());
 
             FactoryModule& (*getWRFactoryModuleFunc)() =
                 reinterpret_cast<FactoryModule&(*)()>((*cmod).dynamicModule->
