@@ -13,6 +13,8 @@
 
 #define CGUISCROLLPANE_NAME "CGUI/ScrollablePane"
 
+using namespace GUINew;
+
 CGUIScrollPane_Impl::CGUIScrollPane_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     m_pManager = pGUI;

@@ -13,6 +13,8 @@
 
 #define CGUITABPANEL_NAME "CGUI/TabControl"
 
+using namespace GUINew;
+
 CGUITabPanel_Impl::CGUITabPanel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     m_pManager = pGUI;

@@ -11,6 +11,8 @@
 #include "StdInc.h"
 #include <core/CWebViewInterface.h>
 
+using namespace GUINew;
+
 CGUIWebBrowser_Impl::CGUIWebBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     // Initialize
@@ -76,7 +78,7 @@ void CGUIWebBrowser_Impl::Clear()
     }
 }
 
-void CGUIWebBrowser_Impl::LoadFromWebView(CWebViewInterface* pWebView)
+void CGUIWebBrowser_Impl::LoadFromWebView(::CWebViewInterface* pWebView)
 {
     m_pWebView = pWebView;
 

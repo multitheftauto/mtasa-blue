@@ -13,6 +13,8 @@
 
 #define CGUIMEMO_NAME "CGUI/MultiLineEditbox"
 
+using namespace GUINew;
+
 CGUIMemo_Impl::CGUIMemo_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit)
 {
     m_pManager = pGUI;

@@ -11,7 +11,11 @@
 
 #pragma once
 
-class CGUISize
+namespace GUINew{
+    class CGUISize;
+}
+
+class GUINew::CGUISize
 {
 public:
     CGUISize() {}

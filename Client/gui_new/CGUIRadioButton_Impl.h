@@ -14,7 +14,11 @@
 #include <gui_new/CGUIRadioButton.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIRadioButton_Impl : public CGUIRadioButton, public CGUIElement_Impl
+namespace GUINew{
+    class CGUIRadioButton_Impl;
+}
+
+class GUINew::CGUIRadioButton_Impl : public CGUIRadioButton, public CGUIElement_Impl
 {
 public:
     CGUIRadioButton_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");

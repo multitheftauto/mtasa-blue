@@ -17,7 +17,11 @@
 #include "CGUIStaticImage_Impl.h"
 #include "CGUIWindow_Impl.h"
 
-class CGUIMessageBox_Impl : public CGUIMessageBox
+namespace GUINew {
+    class CGUIMessageBox_Impl;
+}
+
+class GUINew::CGUIMessageBox_Impl : public CGUIMessageBox
 {
 public:
     CGUIMessageBox_Impl(class CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags);

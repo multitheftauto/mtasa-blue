@@ -14,7 +14,11 @@
 #include <gui_new/CGUITab.h>
 #include "CGUIElement_Impl.h"
 
-class CGUITab_Impl : public CGUITab, public CGUIElement_Impl, public CGUITabList
+namespace GUINew{
+    class CGUITab_Impl;
+}
+
+class GUINew::CGUITab_Impl : public CGUITab, public CGUIElement_Impl, public CGUITabList
 {
 public:
     CGUITab_Impl(class CGUI_Impl* pManager, CGUIElement_Impl* pParent, const char* szCaption);

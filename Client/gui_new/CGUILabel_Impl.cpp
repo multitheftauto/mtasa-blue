@@ -13,6 +13,8 @@
 
 #define CGUILABEL_NAME "CGUI/StaticText"
 
+using namespace GUINew;
+
 CGUILabel_Impl::CGUILabel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szText)
 {
     m_pManager = pGUI;

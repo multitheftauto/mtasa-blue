@@ -11,17 +11,31 @@
 
 #pragma once
 
-class CGUIElement;
+class GUINew::CGUIElement;
+
+namespace GUINew{
+    template <typename Ret, typename Arguments>
+    class CGUICallbackInterface;
+
+    template <typename Ret, typename Arguments>
+    class CGUICallbackFree;
+
+    template <class T, typename Ret, typename Arguments>
+    class CGUICallbackMethod;
+
+    template <typename Ret, typename Arguments>
+    class CGUICallback;
+}
 
 // Define callbacks
-#define GUI_CALLBACK            CGUICallback < bool, CGUIElement * >
-#define GUI_CALLBACK_KEY        CGUICallback < bool, CGUIKeyEventArgs >
-#define GUI_CALLBACK_MOUSE      CGUICallback < bool, CGUIMouseEventArgs >
-#define GUI_CALLBACK_FOCUS      CGUICallback < bool, CGUIFocusEventArgs >
+#define GUI_CALLBACK            GUINew::CGUICallback < bool, GUINew::CGUIElement * >
+#define GUI_CALLBACK_KEY        GUINew::CGUICallback < bool, GUINew::CGUIKeyEventArgs >
+#define GUI_CALLBACK_MOUSE      GUINew::CGUICallback < bool, GUINew::CGUIMouseEventArgs >
+#define GUI_CALLBACK_FOCUS      GUINew::CGUICallback < bool, GUINew::CGUIFocusEventArgs >
 
 // Represents any callback
 template <typename Ret, typename Arguments>
-class CGUICallbackInterface
+class GUINew::CGUICallbackInterface
 {
 public:
     virtual Ret operator()(Arguments) const = 0;
@@ -29,7 +43,7 @@ public:
 
 // Callback to a static function
 template <typename Ret, typename Arguments>
-class CGUICallbackFree : public CGUICallbackInterface<Ret, Arguments>
+class GUINew::CGUICallbackFree : public CGUICallbackInterface<Ret, Arguments>
 {
     typedef Ret (*F)(Arguments);
 
@@ -44,7 +58,7 @@ protected:
 
 // Callback to a method
 template <class T, typename Ret, typename Arguments>
-class CGUICallbackMethod : public CGUICallbackInterface<Ret, Arguments>
+class GUINew::CGUICallbackMethod : public CGUICallbackInterface<Ret, Arguments>
 {
     typedef Ret (T::*F)(Arguments);
 
@@ -60,7 +74,7 @@ protected:
 
 // Class representing any callback
 template <typename Ret, typename Arguments>
-class CGUICallback
+class GUINew::CGUICallback
 {
 public:
     // Default constructor

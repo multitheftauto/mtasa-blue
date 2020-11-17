@@ -14,7 +14,11 @@
 #include <gui_new/CGUIScrollPane.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIScrollPane_Impl : public CGUIScrollPane, public CGUIElement_Impl, public CGUITabList
+namespace GUINew{
+    class CGUIScrollPane_Impl;
+}
+
+class GUINew::CGUIScrollPane_Impl : public CGUIScrollPane, public CGUIElement_Impl, public CGUITabList
 {
 public:
     CGUIScrollPane_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);

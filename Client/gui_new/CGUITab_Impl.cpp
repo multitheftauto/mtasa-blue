@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+using namespace GUINew;
+
 CGUITab_Impl::CGUITab_Impl(CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const char* szCaption)
 {
     m_pManager = pGUI;

@@ -15,7 +15,11 @@
 #include "CGUIWindow.h"
 #include "CGUICallback.h"
 
-class CGUIMessageBox
+namespace GUINew {
+    class CGUIMessageBox;
+}
+
+class GUINew::CGUIMessageBox
 {
 public:
     virtual ~CGUIMessageBox(){};

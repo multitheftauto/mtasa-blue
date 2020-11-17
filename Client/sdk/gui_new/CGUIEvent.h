@@ -14,12 +14,19 @@
 #include "CGUI.h"
 #include "CGUITypes.h"
 
-struct CGUIEventArgs
+namespace GUINew{
+    struct CGUIEventArgs;
+    struct CGUIKeyEventArgs;
+    struct CGUIMouseEventArgs;
+    struct CGUIFocusEventArgs;
+}
+
+struct GUINew::CGUIEventArgs
 {
     CGUIElement* pWindow;
 };
 
-struct CGUIKeyEventArgs
+struct GUINew::CGUIKeyEventArgs
 {
     CGUIElement* pWindow;
 
@@ -28,7 +35,7 @@ struct CGUIKeyEventArgs
     unsigned int   sysKeys;
 };
 
-struct CGUIMouseEventArgs
+struct GUINew::CGUIMouseEventArgs
 {
     CGUIElement* pWindow;
 
@@ -41,7 +48,7 @@ struct CGUIMouseEventArgs
     CGUIElement*           pSwitchedWindow;
 };
 
-struct CGUIFocusEventArgs
+struct GUINew::CGUIFocusEventArgs
 {
     CGUIElement* pActivatedWindow;
     CGUIElement* pDeactivatedWindow;

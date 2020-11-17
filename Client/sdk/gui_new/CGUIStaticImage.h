@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUITexture.h"
 
-class CGUIStaticImage : public CGUIElement
+namespace GUINew{
+    class CGUIStaticImage;
+}
+
+class GUINew::CGUIStaticImage : public CGUIElement
 {
 public:
     virtual ~CGUIStaticImage(){};

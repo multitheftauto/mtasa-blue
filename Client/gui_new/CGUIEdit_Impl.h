@@ -14,7 +14,11 @@
 #include <gui_new/CGUIEdit.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIEdit_Impl : public CGUIEdit, public CGUIElement_Impl, public CGUITabListItem
+namespace GUINew{
+    class CGUIEdit_Impl;
+}
+
+class GUINew::CGUIEdit_Impl : public CGUIEdit, public CGUIElement_Impl, public CGUITabListItem
 {
 public:
     CGUIEdit_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "");

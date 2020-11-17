@@ -13,6 +13,8 @@
 
 #define CGUIWINDOW_NAME "CGUI/FrameWindow"
 
+using namespace GUINew;
+
 CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption, const SString& strLayoutFile)
 {
     m_pManager = pGUI;

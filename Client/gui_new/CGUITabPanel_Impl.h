@@ -17,7 +17,11 @@
 
 #define MAX_TABS 64
 
-class CGUITabPanel_Impl : public CGUITabPanel, public CGUIElement_Impl
+namespace GUINew{
+    class CGUITabPanel_Impl;
+}
+
+class GUINew::CGUITabPanel_Impl : public CGUITabPanel, public CGUIElement_Impl
 {
     friend class CGUITab_Impl;
 

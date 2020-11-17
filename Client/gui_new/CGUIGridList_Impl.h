@@ -14,9 +14,12 @@
 #include <gui_new/CGUIGridList.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIListItem_Impl;
+namespace GUINew{
+    class CGUIListItem_Impl;
+    class CGUIGridList_Impl;
+}
 
-class CGUIGridList_Impl : public CGUIGridList, public CGUIElement_Impl
+class GUINew::CGUIGridList_Impl : public CGUIGridList, public CGUIElement_Impl
 {
 public:
     CGUIGridList_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, bool bFrame = true);

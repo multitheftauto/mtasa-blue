@@ -16,19 +16,23 @@
 // Use StaticImage here as we'd have to add the same definition twice to the Falagard definition file otherwise
 #define CGUIWEBBROWSER_NAME "CGUI/StaticImage"
 
-class CGUITexture;
-class CGUITexture_Impl;
-class CGUI_Impl;
+class GUINew::CGUITexture;
+class GUINew::CGUITexture_Impl;
+class GUINew::CGUI_Impl;
 class CWebViewInterface;
 
-class CGUIWebBrowser_Impl : public CGUIWebBrowser, public CGUIElement_Impl
+namespace GUINew{
+    class CGUIWebBrowser_Impl;
+}
+
+class GUINew::CGUIWebBrowser_Impl : public CGUIWebBrowser, public CGUIElement_Impl
 {
 public:
     CGUIWebBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent = nullptr);
     ~CGUIWebBrowser_Impl();
     void Clear();
 
-    void LoadFromWebView(CWebViewInterface* pWebView);
+    void LoadFromWebView(::CWebViewInterface* pWebView);
 
     void SetFrameEnabled(bool bFrameEnabled);
     bool IsFrameEnabled();
@@ -52,11 +56,11 @@ protected:
 
 private:
     CGUI_Impl*                 m_pGUI;
-    CEGUI::BasicImage*         m_pImage;
-    CEGUI::Texture*            m_pTexture;
+    CEGUI::BasicImage*  m_pImage;
+    CEGUI::Texture*     m_pTexture;
     CEGUI::Direct3D9Renderer*  m_pRenderer;
 
-    CWebViewInterface* m_pWebView;
+    ::CWebViewInterface* m_pWebView;
 
     #define EXCLUDE_SET_SIZE // WTF? TODO: Refactor this
     #include "CGUIElement_Inc.h"

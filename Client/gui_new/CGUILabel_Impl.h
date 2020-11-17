@@ -14,9 +14,13 @@
 #include <gui_new/CGUILabel.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIFont;
+class GUINew::CGUIFont;
 
-class CGUILabel_Impl : public CGUILabel, public CGUIElement_Impl
+namespace GUINew{
+    class CGUILabel_Impl;
+}
+
+class GUINew::CGUILabel_Impl : public CGUILabel, public CGUIElement_Impl
 {
 public:
     CGUILabel_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "");

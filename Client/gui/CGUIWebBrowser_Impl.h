@@ -29,7 +29,7 @@ public:
     ~CGUIWebBrowser_Impl();
     void Clear();
 
-    void LoadFromWebView(CWebViewInterface* pWebView);
+    void LoadFromWebView(::CWebViewInterface* pWebView);
 
     void SetFrameEnabled(bool bFrameEnabled);
     bool IsFrameEnabled();

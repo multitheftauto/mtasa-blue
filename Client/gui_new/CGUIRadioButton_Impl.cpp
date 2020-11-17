@@ -13,6 +13,8 @@
 
 #define CGUIRADIOBUTTON_NAME "CGUI/RadioButton"
 
+using namespace GUINew;
+
 CGUIRadioButton_Impl::CGUIRadioButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption)
 {
     m_pManager = pGUI;

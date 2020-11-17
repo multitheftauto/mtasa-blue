@@ -13,7 +13,11 @@
 
 #include "CGUIElement.h"
 
-class CGUILabel : public CGUIElement
+namespace GUINew{
+    class CGUILabel;
+}
+
+class GUINew::CGUILabel : public CGUIElement
 {
 public:
     virtual ~CGUILabel(){};

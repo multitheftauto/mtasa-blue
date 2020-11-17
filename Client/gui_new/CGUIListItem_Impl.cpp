@@ -25,6 +25,8 @@
 //    }
 //}
 
+using namespace GUINew;
+
 CGUIListItem_Impl::CGUIListItem_Impl(CGUI_Impl* pGUI, const char* szText, unsigned int uiType, CGUIStaticImage_Impl* pImage)
 {
     ItemType = uiType;

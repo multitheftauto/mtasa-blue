@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUIMemo : public CGUIElement
+namespace GUINew{
+    class CGUIMemo;
+}
+
+class GUINew::CGUIMemo : public CGUIElement
 {
 public:
     virtual ~CGUIMemo(){};

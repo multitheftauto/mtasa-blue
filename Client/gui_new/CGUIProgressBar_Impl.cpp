@@ -13,6 +13,8 @@
 
 #define CGUILABEL_NAME "CGUI/ProgressBar"
 
+using namespace GUINew;
+
 CGUIProgressBar_Impl::CGUIProgressBar_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     m_pManager = pGUI;

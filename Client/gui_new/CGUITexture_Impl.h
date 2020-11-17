@@ -19,7 +19,11 @@ namespace CEGUI
     class Renderer;
 }            // namespace CEGUI
 
-class CGUITexture_Impl : public CGUITexture
+namespace GUINew{
+    class CGUITexture_Impl;
+}
+
+class GUINew::CGUITexture_Impl : public CGUITexture
 {
 public:
     CGUITexture_Impl(class CGUI_Impl* pGUI);

@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+using namespace GUINew;
+
 CGUITexture_Impl::CGUITexture_Impl(CGUI_Impl* pGUI)
 {
     // Save the renderer

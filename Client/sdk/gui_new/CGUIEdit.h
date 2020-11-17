@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUIEdit : public CGUIElement
+namespace GUINew{
+    class CGUIEdit;
+}
+
+class GUINew::CGUIEdit : public CGUIElement
 {
 public:
     virtual ~CGUIEdit(){};

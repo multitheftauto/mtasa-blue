@@ -20,18 +20,29 @@
 #define NULL 0
 #endif
 
-typedef int       CGUIHandle;
-typedef CVector2D CGUIPosition;
+namespace GUINew{
+    typedef int CGUIHandle;
+    typedef CVector2D CGUIPosition;
+    struct CGUIProperty;
+    typedef std::list<CGUIProperty*>::const_iterator CGUIPropertyIter;
+    enum CGUIMouseInput;
+    enum CGUIMouseButton;
+    enum CGUIVerticalAlign;
+    enum CGUIHorizontalAlign;
+    class CGUIColor;
+    struct CGUIMouse;
+    struct CGUIKeys;
+}
 
-struct CGUIProperty
+struct GUINew::CGUIProperty
 {
     SString strKey;
     SString strValue;
 };
 
-typedef std::list<CGUIProperty*>::const_iterator CGUIPropertyIter;
 
-enum CGUIMouseInput
+
+enum GUINew::CGUIMouseInput
 {
     CGUI_MI_MOUSEMOVE,
     CGUI_MI_MOUSEPOS,
@@ -40,7 +51,7 @@ enum CGUIMouseInput
     CGUI_MI_MOUSEWHEEL
 };
 
-enum CGUIMouseButton            // Synchronized with CEGUI::MouseButton in ceguiinputevent.h
+enum GUINew::CGUIMouseButton            // Synchronized with CEGUI::MouseButton in ceguiinputevent.h
 {
     LeftButton,
     RightButton,
@@ -51,14 +62,14 @@ enum CGUIMouseButton            // Synchronized with CEGUI::MouseButton in cegui
     NoButton = 6,
 };
 
-enum CGUIVerticalAlign
+enum GUINew::CGUIVerticalAlign
 {
     CGUI_ALIGN_TOP = 0,
     CGUI_ALIGN_VERTICALCENTER = 1,
     CGUI_ALIGN_BOTTOM = 2,
 };
 
-enum CGUIHorizontalAlign
+enum GUINew::CGUIHorizontalAlign
 {
     CGUI_ALIGN_LEFT = 0,
     CGUI_ALIGN_RIGHT = 1,
@@ -70,7 +81,7 @@ enum CGUIHorizontalAlign
     CGUI_ALIGN_JUSTIFIED_WORDWRAP = 7
 };
 
-class CGUIColor
+class GUINew::CGUIColor
 {
 public:
     CGUIColor()
@@ -92,7 +103,7 @@ public:
     unsigned char B;
 };
 
-struct CGUIMouse
+struct GUINew::CGUIMouse
 {
     /* Enumeration of CEGUI style mouse buttons */
     enum MouseButton
@@ -107,7 +118,7 @@ struct CGUIMouse
     };
 };
 
-struct CGUIKeys
+struct GUINew::CGUIKeys
 {
     /* Enumeration of CEGUI style scancodes */
     enum Scan

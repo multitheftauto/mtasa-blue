@@ -30,6 +30,8 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
+using namespace GUINew;
+
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f), m_pRenderer(&CEGUI::Direct3D9Renderer::bootstrapSystem(pDevice, 208))
 {
     m_RenderOkTimer.SetMaxIncrement(100);

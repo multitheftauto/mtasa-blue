@@ -14,9 +14,6 @@
 #include <gui_new/CGUIListItem.h>
 #include <CEGUI/CEGUI.h>
 
-class CGUIStaticImage;
-class CGUIStaticImage_Impl;
-
 // Create custom ListboxItem types
 //namespace CEGUI
 //{
@@ -31,7 +28,13 @@ class CGUIStaticImage_Impl;
 //    CEGUI_DECLARE_WINDOW_FACTORY(ImageListboxItem);
 //}
 
-class CGUIListItem_Impl : public CGUIListItem
+namespace GUINew{
+    class CGUIStaticImage;
+    class CGUIStaticImage_Impl;
+    class CGUIListItem_Impl;
+}
+
+class GUINew::CGUIListItem_Impl : public CGUIListItem
 {
 public:
     enum Type

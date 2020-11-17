@@ -20,9 +20,13 @@ namespace CEGUI
     class Window;
     class EventArgs;
 }            // namespace CEGUI
-class CGUI_Impl;
+class GUINew::CGUI_Impl;
 
-class CGUIElement_Impl : public CGUIElement
+namespace GUINew{
+    class CGUIElement_Impl;
+}
+
+class GUINew::CGUIElement_Impl : public CGUIElement
 {
 public:
     CGUIElement_Impl();

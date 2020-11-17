@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUITab.h"
 
-class CGUITabPanel : public CGUIElement
+namespace GUINew{
+    class CGUITabPanel;
+}
+
+class GUINew::CGUITabPanel : public CGUIElement
 {
 public:
     virtual ~CGUITabPanel(){};

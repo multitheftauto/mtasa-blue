@@ -16,38 +16,46 @@
 #include "CGUIListItem.h"
 #include "CGUICallback.h"
 
-namespace SelectionModes
-{
-    enum SelectionMode
+namespace GUINew{
+    namespace SelectionModes
     {
-        RowSingle,
-        RowMultiple,
-        CellSingle,
-        CellMultiple,
-        NominatedColumnSingle,
-        NominatedColumnMultiple,
-        ColumnSingle,
-        ColumnMultiple,
-        NominatedRowSingle,
-        NominatedRowMultiple
-    };
+        enum SelectionMode
+        {
+            RowSingle,
+            RowMultiple,
+            CellSingle,
+            CellMultiple,
+            NominatedColumnSingle,
+            NominatedColumnMultiple,
+            ColumnSingle,
+            ColumnMultiple,
+            NominatedRowSingle,
+            NominatedRowMultiple
+        };
+    }
 }
 
-using SelectionModes::SelectionMode;
+using GUINew::SelectionModes::SelectionMode;
 
-namespace SortDirections
-{
-    enum SortDirection
+namespace GUINew{
+    namespace SortDirections
     {
-        None,
-        Ascending,
-        Descending
-    };
+        enum SortDirection
+        {
+            None,
+            Ascending,
+            Descending
+        };
+    }
 }
 
-using SortDirections::SortDirection;
+using GUINew::SortDirections::SortDirection;
 
-class CGUIGridList : public CGUIElement
+namespace GUINew{
+    class CGUIGridList;
+}
+
+class GUINew::CGUIGridList : public CGUIElement
 {
 public:
     virtual ~CGUIGridList(){};

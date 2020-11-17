@@ -13,12 +13,18 @@
 #include "CGUIElement.h"
 #include "CGUITexture.h"
 
-class CGUIWebBrowser : public CGUIElement
+namespace GUINew{
+    class CGUIWebBrowser;
+}
+
+class CWebViewInterface;
+
+class GUINew::CGUIWebBrowser : public CGUIElement
 {
 public:
     virtual ~CGUIWebBrowser(){};
 
-    virtual void LoadFromWebView(class CWebViewInterface* pWebView) = 0;
+    virtual void LoadFromWebView(class ::CWebViewInterface* pWebView) = 0;
 
     virtual void SetFrameEnabled(bool bFrameEnabled) = 0;
     virtual bool IsFrameEnabled() = 0;
