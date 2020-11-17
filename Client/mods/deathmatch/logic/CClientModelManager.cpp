@@ -60,7 +60,8 @@ int CClientModelManager::GetFirstFreeModelID(void)
     for (int i = 0; i < MAX_MODEL_ID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
-        if (!pModelInfo->IsValid())
+        // GTA can try unload some special ID's in CStreamingSA::ReinitStreaming (Github #1819)
+        if (!pModelInfo->IsValid() && (i < 300 || i > 319) )
         {
             return i;
         }
