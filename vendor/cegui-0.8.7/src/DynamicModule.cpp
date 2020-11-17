@@ -118,18 +118,10 @@ static void addLibraryNameSuffixes(String& name)
 //----------------------------------------------------------------------------//
 static String getModuleDirEnvVar()
 {
-    DWORD bufferSize = 65535; //Limit according to http://msdn.microsoft.com/en-us/library/ms683188.aspx
-    std::string buffer;
+    if (const char* envModuleDir = getenv(MODULE_DIR_VAR_NAME))
+        return String(envModuleDir);
 
-    buffer.resize(bufferSize);
-    bufferSize = GetEnvironmentVariable(MODULE_DIR_VAR_NAME, buffer.data(), bufferSize);
-
-    if (!bufferSize)
-        return String();
-
-    buffer.resize(bufferSize);
-
-    return String(buffer.c_str());
+    return String();
 }
 
 //----------------------------------------------------------------------------//
@@ -167,12 +159,12 @@ static String getFailureString()
 }
 
 //----------------------------------------------------------------------------//
-static DYNLIB_HANDLE DynLibLoad(const String& name)
+static DYNLIB_HANDLE DynLibLoad(const String& name, const String& envModuleDir = "")
 {
     DYNLIB_HANDLE handle = 0;
 
     // prefer whatever location is set in CEGUI_MODULE_DIR environment var
-    const String envModuleDir(getModuleDirEnvVar());
+    //const String envModuleDir(getModuleDirEnvVar());
 
     if (!envModuleDir.empty())
         handle = DYNLIB_LOAD(envModuleDir + '/' + name);
@@ -197,7 +189,7 @@ static DYNLIB_HANDLE DynLibLoad(const String& name)
 }
 
 //----------------------------------------------------------------------------//
-DynamicModule::DynamicModule(const String& name) :
+DynamicModule::DynamicModule(const String& name, const String& envModuleDir = "") :
     d_pimpl(CEGUI_NEW_AO Impl(name))
 {
 	if (name.empty())

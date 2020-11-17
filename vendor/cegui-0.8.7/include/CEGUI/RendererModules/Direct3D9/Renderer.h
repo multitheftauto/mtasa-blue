@@ -85,7 +85,8 @@ public:
         Reference to the CEGUI::Direct3D9Renderer object that was created.
     */
     static Direct3D9Renderer& bootstrapSystem(LPDIRECT3DDEVICE9 device,
-                                              const int abi = CEGUI_VERSION_ABI);
+                                              const int abi = CEGUI_VERSION_ABI,
+                                              String moduleDir = "");
 
     /*!
     \brief

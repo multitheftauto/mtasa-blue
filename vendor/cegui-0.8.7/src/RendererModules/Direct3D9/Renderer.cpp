@@ -56,7 +56,7 @@ static const D3DMATRIX s_identityMatrix =
 
 //----------------------------------------------------------------------------//
 Direct3D9Renderer& Direct3D9Renderer::bootstrapSystem(LPDIRECT3DDEVICE9 device,
-                                                      const int abi)
+                                                      const int abi, String moduleDir)
 {
     System::performVersionTest(CEGUI_VERSION_ABI, abi, CEGUI_FUNCTION_NAME);
 
@@ -66,6 +66,7 @@ Direct3D9Renderer& Direct3D9Renderer::bootstrapSystem(LPDIRECT3DDEVICE9 device,
 
     Direct3D9Renderer& renderer(create(device));
     DefaultResourceProvider* rp = new CEGUI::DefaultResourceProvider();
+    System::setModuleDirEnvVar(moduleDir);
     System::create(renderer, rp);
 
     return renderer;

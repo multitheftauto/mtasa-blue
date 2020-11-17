@@ -50,7 +50,7 @@ public:
     \param name
         String object holding the name of a loadable module.
     */
-    DynamicModule(const String& name);
+    DynamicModule(const String& name, const String& envModuleDir);
 
     /*!
     \brief

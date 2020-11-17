@@ -534,6 +534,9 @@ public:
     static void performVersionTest(const int expected, const int received,
                                    const String& func);
 
+    static void setModuleDirEnvVar(const String& moduleDir);
+    static const String getModuleDirEnvVar();
+
 private:
     // unimplemented constructors / assignment
     System(const System& obj);
@@ -640,6 +643,8 @@ protected:
     bool d_ourLogger;
     //! currently set global RenderedStringParser.
     RenderedStringParser* d_customRenderedStringParser;
+
+    static String d_moduleDir;
 
     typedef std::vector<GUIContext* CEGUI_VECTOR_ALLOC(GUIContext*)> GUIContextCollection;
     GUIContextCollection d_guiContexts;
