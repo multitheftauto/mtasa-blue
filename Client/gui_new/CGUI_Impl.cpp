@@ -62,7 +62,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
     m_pDefaultResourceProvider->setResourceGroupDirectory("absolute", "");
     m_pDefaultResourceProvider->setResourceGroupDirectory("mta_cgui", CalcMTASAPath("MTA/cgui-0.8.7").data());
     m_pDefaultResourceProvider->setResourceGroupDirectory("mta", CalcMTASAPath("MTA").data());
-    m_pDefaultResourceProvider->setResourceGroupDirectory("mta_images", CalcMTASAPath("MTA/cgui-0.8.7/images").data());
+    m_pDefaultResourceProvider->setResourceGroupDirectory("mta_images", CalcMTASAPath("MTA/cgui/images").data());
     m_pDefaultResourceProvider->setResourceGroupDirectory("mta_basedir", GetMTASABaseDir().data());
 
     // CEGUI layout group directories
@@ -151,8 +151,8 @@ void CGUI_Impl::SetSkin(const char* szName)
     
     m_HasSchemeLoaded = true;
 
-    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage("CGUI/MouseArrow");
-    m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType("CGUI/Tooltip");
+    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
+    m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType("TaharezLook/Tooltip");
 
     // Destroy any windows we already have
     m_pWindowManager->destroyAllWindows();
@@ -329,12 +329,12 @@ bool CGUI_Impl::GetGUIInputEnabled()
             {
                 return false;
             }
-            if (pActiveWindow->getType() == "CGUI/Editbox")
+            if (pActiveWindow->getType() == "TaharezLook/Editbox")
             {
                 CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
                 return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
             }
-            else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+            else if (pActiveWindow->getType() == "TaharezLook/MultiLineEditbox")
             {
                 CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
                 return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
@@ -750,7 +750,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
 
                 // Edit boxes
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (Wnd->getType() == "CGUI/Editbox")
+                if (Wnd->getType() == "TaharezLook/Editbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
@@ -779,7 +779,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                 }
 
                 // Multiline editboxes
-                if (Wnd->getType() == "CGUI/MultiLineEditbox")
+                if (Wnd->getType() == "TaharezLook/MultiLineEditbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast<CEGUI::MultiLineEditbox*>(Wnd);
@@ -836,7 +836,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
             if (KeyboardArgs.sysKeys & CEGUI::Control)
             {
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (Wnd->getType() == "CGUI/Editbox" || Wnd->getType() == "CGUI/MultiLineEditbox")
+                if (Wnd->getType() == "TaharezLook/Editbox" || Wnd->getType() == "TaharezLook/MultiLineEditbox")
                 {
                     // Open the clipboard
                     OpenClipboard(NULL);
@@ -852,7 +852,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         bool          bReplaceNewLines = true;
                         bool          bIsBoxFull = false;
 
-                        if (Wnd->getType() == "CGUI/Editbox")
+                        if (Wnd->getType() == "TaharezLook/Editbox")
                         {
                             // Turn our event window into an editbox
                             CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
@@ -948,7 +948,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         if (bIsBoxFull)
                         {
                             // Fire an event if the editbox is full
-                            if (Wnd->getType() == "CGUI/Editbox")
+                            if (Wnd->getType() == "TaharezLook/Editbox")
                             {
                                 CEGUI::Editbox*        WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                                 CEGUI::WindowEventArgs args(WndEdit);
@@ -963,7 +963,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         }
                         else
                         {
-                            if (Wnd->getType() == "CGUI/Editbox")
+                            if (Wnd->getType() == "TaharezLook/Editbox")
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                                 WndEdit->setText(strEditText);
@@ -993,13 +993,13 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
             {
                 // Edit boxes
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (Wnd->getType() == "CGUI/Editbox")
+                if (Wnd->getType() == "TaharezLook/Editbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                     WndEdit->setSelection(0, WndEdit->getText().size());
                 }
-                else if (Wnd->getType() == "CGUI/MultiLineEditbox")
+                else if (Wnd->getType() == "TaharezLook/MultiLineEditbox")
                 {
                     // Turn our event window into a multiline editbox
                     CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast<CEGUI::MultiLineEditbox*>(Wnd);

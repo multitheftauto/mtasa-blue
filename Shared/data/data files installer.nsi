@@ -208,7 +208,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Samples.xsd"
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\schemes"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\schemes\Default.scheme"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\schemes\TaharezLook.scheme"
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\looknfeel"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\looknfeel\TaharezLook.looknfeel"

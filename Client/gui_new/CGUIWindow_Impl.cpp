@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUIWINDOW_NAME "CGUI/FrameWindow"
+#define CGUIWINDOW_NAME "TaharezLook/FrameWindow"
 
 using namespace GUINew;
 

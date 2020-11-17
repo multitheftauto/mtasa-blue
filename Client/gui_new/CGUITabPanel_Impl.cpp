@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUITABPANEL_NAME "CGUI/TabControl"
+#define CGUITABPANEL_NAME "TaharezLook/TabControl"
 
 using namespace GUINew;
 

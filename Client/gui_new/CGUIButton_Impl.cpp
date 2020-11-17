@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUIBUTTON_NAME "CGUI/Button"
+#define CGUIBUTTON_NAME "TaharezLook/Button"
 
 using namespace GUINew;
 

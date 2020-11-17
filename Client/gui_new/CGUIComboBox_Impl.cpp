@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUICOMBOBOX_NAME "CGUI/Combobox"
+#define CGUICOMBOBOX_NAME "TaharezLook/Combobox"
 
 using namespace GUINew;
 

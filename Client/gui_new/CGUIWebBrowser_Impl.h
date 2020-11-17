@@ -14,7 +14,7 @@
 #include "CGUITexture_Impl.h"
 
 // Use StaticImage here as we'd have to add the same definition twice to the Falagard definition file otherwise
-#define CGUIWEBBROWSER_NAME "CGUI/StaticImage"
+#define CGUIWEBBROWSER_NAME "TaharezLook/StaticImage"
 
 class CGUITexture;
 class GUINew::CGUITexture_Impl;

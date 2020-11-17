@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUISCROLLPANE_NAME "CGUI/ScrollablePane"
+#define CGUISCROLLPANE_NAME "TaharezLook/ScrollablePane"
 
 using namespace GUINew;
 

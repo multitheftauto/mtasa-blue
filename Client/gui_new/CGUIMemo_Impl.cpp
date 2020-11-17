@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUIMEMO_NAME "CGUI/MultiLineEditbox"
+#define CGUIMEMO_NAME "TaharezLook/MultiLineEditbox"
 
 using namespace GUINew;
 

@@ -356,10 +356,10 @@ void CGUIElement_Impl::CorrectEdges()
     CEGUI::USize    currentSize = m_pWindow->getSize();
 
     // Label turns out to be buggy
-    if (m_pWindow->getType() == "CGUI/StaticText")
+    if (m_pWindow->getType() == "TaharezLook/StaticText")
         return;
 
-    if (m_pWindow->getParent()->getType() == "CGUI/FrameWindow")
+    if (m_pWindow->getParent()->getType() == "TaharezLook/FrameWindow")
     {
         CEGUI::USize parentSize = m_pWindow->getParent()->getSize();
         if (currentPosition.d_x.d_offset < CGUI_NODRAW_LEFT)
