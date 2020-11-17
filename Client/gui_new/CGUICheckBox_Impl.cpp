@@ -13,6 +13,8 @@
 
 #define CGUICHECKBOX_NAME "CGUI/Checkbox"
 
+using namespace GUINew;
+
 CGUICheckBox_Impl::CGUICheckBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption, bool bChecked)
 {
     m_pManager = pGUI;

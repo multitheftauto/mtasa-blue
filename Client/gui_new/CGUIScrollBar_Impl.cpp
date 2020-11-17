@@ -14,6 +14,8 @@
 #define CGUISCROLLBAR_HORIZONTAL_NAME   "CGUI/HorizontalScrollbar"
 #define CGUISCROLLBAR_VERTICAL_NAME     "CGUI/VerticalScrollbar"
 
+using namespace GUINew;
+
 CGUIScrollBar_Impl::CGUIScrollBar_Impl(CGUI_Impl* pGUI, bool bHorizontal, CGUIElement* pParent)
 {
     m_pManager = pGUI;

@@ -14,7 +14,11 @@
 #include "CGUIStaticImage.h"
 #include <string>
 
-class CGUIListItem
+namespace GUINew{
+    class CGUIListItem;
+}
+
+class GUINew::CGUIListItem
 {
 public:
     virtual ~CGUIListItem(){};

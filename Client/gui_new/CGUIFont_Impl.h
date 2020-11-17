@@ -14,7 +14,11 @@
 #include <gui_new/CGUIFont.h>
 #include <CEGUI/CEGUI.h>
 
-class CGUIFont_Impl : public CGUIFont
+namespace GUINew{
+    class CGUIFont_Impl;
+}
+
+class GUINew::CGUIFont_Impl : public CGUIFont
 {
 public:
     CGUIFont_Impl(class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0,

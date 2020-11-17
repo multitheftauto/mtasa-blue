@@ -11,9 +11,12 @@
 
 #include <list>
 
-typedef std::list<CGUITabListItem*>::const_iterator CGUITabIterator;
+namespace GUINew{
+    typedef std::list<CGUITabListItem*>::const_iterator CGUITabIterator;
+    class CGUITabList;
+}
 
-class CGUITabList
+class GUINew::CGUITabList
 {
 public:
     CGUITabList(){};

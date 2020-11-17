@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUIComboBox : public CGUIElement
+namespace GUINew{
+    class CGUIComboBox;
+}
+
+class GUINew::CGUIComboBox : public CGUIElement
 {
 public:
     virtual ~CGUIComboBox(){};

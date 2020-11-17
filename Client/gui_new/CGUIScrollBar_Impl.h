@@ -14,7 +14,11 @@
 #include <gui_new/CGUIScrollBar.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIScrollBar_Impl : public CGUIScrollBar, public CGUIElement_Impl
+namespace GUINew{
+    class CGUIScrollBar_Impl;
+}
+
+class GUINew::CGUIScrollBar_Impl : public CGUIScrollBar, public CGUIElement_Impl
 {
 public:
     CGUIScrollBar_Impl(class CGUI_Impl* pGUI, bool bHorizontal, CGUIElement* pParent = NULL);

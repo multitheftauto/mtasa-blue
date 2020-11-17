@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUICheckBox : public CGUIElement
+namespace GUINew{
+    class CGUICheckBox;
+}
+
+class GUINew::CGUICheckBox : public CGUIElement
 {
 public:
     virtual ~CGUICheckBox(){};

@@ -13,7 +13,11 @@
 
 #include "CRect2D.h"
 
-class CGUIFont
+namespace GUINew{
+    class CGUIFont;
+}
+
+class GUINew::CGUIFont
 {
 public:
     virtual ~CGUIFont(){};

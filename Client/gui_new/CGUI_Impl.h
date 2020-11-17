@@ -9,8 +9,6 @@
  *
  *****************************************************************************/
 
-class CGUI_Impl;
-
 #pragma once
 
 #include <gui_new/CGUI.h>
@@ -19,28 +17,33 @@ class CGUI_Impl;
 
 #define CGUI_CHAR_SIZE 6
 
-class CGUIElement;
-class CGUIElement_Impl;
-class CGUIButton;
-class CGUICheckBox;
-class CGUIEdit;
-class CGUIEvent;
-class CGUIFont;
-class CGUIFont_Impl;
-class CGUIGridList;
-class CGUILabel;
-class CGUIMemo;
-class CGUIMessageBox;
-class CGUIProgressBar;
-class CGUIRadioButton;
-class CGUIStaticImage;
-class CGUIScrollBar;
-class CGUIScrollPane;
-class CGUIComboBox;
-class CGUITexture;
-class CGUIWindow;
-class CGUITab;
-class CGUITabPanel;
+namespace GUINew {
+    class CGUI_Impl;
+
+    class CGUIElement;
+    class CGUIElement_Impl;
+    class CGUIButton;
+    class CGUICheckBox;
+    class CGUIEdit;
+    class CGUIEvent;
+    class CGUIFont;
+    class CGUIFont_Impl;
+    class CGUIGridList;
+    class CGUILabel;
+    class CGUIMemo;
+    class CGUIMessageBox;
+    class CGUIProgressBar;
+    class CGUIRadioButton;
+    class CGUIStaticImage;
+    class CGUIScrollBar;
+    class CGUIScrollPane;
+    class CGUIComboBox;
+    class CGUITexture;
+    class CGUIWindow;
+    class CGUITab;
+    class CGUITabPanel;
+}
+
 struct IDirect3DDevice9;
 
 namespace CEGUI
@@ -57,7 +60,8 @@ namespace CEGUI
     //typedef GUISheet DefaultWindow;
 }            // namespace CEGUI
 
-class CGUI_Impl : public CGUI, public CGUITabList
+
+class GUINew::CGUI_Impl : public CGUI, public CGUITabList
 {
 public:
     CGUI_Impl(IDirect3DDevice9* pDevice);

@@ -13,7 +13,11 @@
 
 #include "CGUIElement.h"
 
-class CGUIWindow : public CGUIElement
+namespace GUINew{
+    class CGUIWindow;
+}
+
+class GUINew::CGUIWindow : public CGUIElement
 {
 public:
     virtual ~CGUIWindow(){};

@@ -14,7 +14,11 @@
 #include <gui_new/CGUIWindow.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl, public CGUITabList
+namespace GUINew{
+    class CGUIWindow_Impl;
+}
+
+class GUINew::CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl, public CGUITabList
 {
 public:
     CGUIWindow_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "", const SString& strLayoutFile = "");

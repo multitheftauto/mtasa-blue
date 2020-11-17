@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+using namespace GUINew;
+
 void CGUITabList::SelectNext(CGUITabListItem* pBase)
 {
     // Loop through all elements which can be activated

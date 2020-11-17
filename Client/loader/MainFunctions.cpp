@@ -903,6 +903,7 @@ void CheckLibVersions()
 
     const char* moduleList[] = {"MTA\\loader.dll",
                                 "MTA\\cgui.dll",
+                                "MTA\\cgui_new.dll",
                                 "MTA\\core.dll",
                                 "MTA\\game_sa.dll",
                                 "MTA\\multiplayer_sa.dll",

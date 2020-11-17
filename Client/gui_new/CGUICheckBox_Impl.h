@@ -14,7 +14,11 @@
 #include <gui_new/CGUICheckBox.h>
 #include "CGUIElement_Impl.h"
 
-class CGUICheckBox_Impl : public CGUICheckBox, public CGUIElement_Impl
+namespace GUINew{
+    class CGUICheckBox_Impl;
+}
+
+class GUINew::CGUICheckBox_Impl : public CGUICheckBox, public CGUIElement_Impl
 {
 public:
     CGUICheckBox_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "", bool bChecked = false);

@@ -14,7 +14,11 @@
 #include "CGUIElement_Impl.h"
 #include "CGUIListItem_Impl.h"
 
-class CGUIComboBox_Impl : public CGUIComboBox, public CGUIElement_Impl
+namespace GUINew{
+    class CGUIComboBox_Impl;
+}
+
+class GUINew::CGUIComboBox_Impl : public CGUIComboBox, public CGUIElement_Impl
 {
 public:
     CGUIComboBox_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");

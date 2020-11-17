@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUIScrollBar : public CGUIElement
+namespace GUINew{
+    class CGUIScrollBar;
+}
+
+class GUINew::CGUIScrollBar : public CGUIElement
 {
 public:
     virtual ~CGUIScrollBar(){};

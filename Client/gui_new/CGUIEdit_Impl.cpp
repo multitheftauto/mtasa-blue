@@ -13,6 +13,8 @@
 
 #define CGUIEDIT_NAME "CGUI/Editbox"
 
+using namespace GUINew;
+
 CGUIEdit_Impl::CGUIEdit_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit)
 {
     m_pManager = pGUI;

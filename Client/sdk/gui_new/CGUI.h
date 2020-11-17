@@ -13,7 +13,10 @@
 #include <cstring>
 #include <SharedUtil.h>
 
-class CGUI;
+namespace GUINew{
+    class CGUI;
+}
+
 
 #include "CGUIEnumDefs.h"
 #include "CGUIElement.h"
@@ -49,7 +52,7 @@ class CGUI;
 
 #define CHECK_CHANNEL(channel) assert ( (channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT )
 
-class CGUI
+class GUINew::CGUI
 {
 public:
     virtual void SetSkin(const char* szName) = 0;

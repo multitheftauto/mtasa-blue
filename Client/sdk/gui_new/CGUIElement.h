@@ -9,7 +9,10 @@
  *
  *****************************************************************************/
 
-class CGUIElement;
+namespace GUINew{
+    class CGUIElement;
+    enum eCGUIType;
+}
 
 #pragma once
 
@@ -24,7 +27,7 @@ namespace CEGUI
     class EventArgs;
 }
 
-enum eCGUIType
+enum GUINew::eCGUIType
 {
     CGUI_BUTTON,
     CGUI_CHECKBOX,
@@ -44,7 +47,7 @@ enum eCGUIType
     CGUI_WEBBROWSER
 };
 
-class CGUIElement
+class GUINew::CGUIElement
 {
 public:
     virtual ~CGUIElement(){};

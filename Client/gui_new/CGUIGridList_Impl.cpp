@@ -17,6 +17,8 @@
 
 #define CGUIGRIDLIST_MAX_TEXT_LENGTH    256
 
+using namespace GUINew;
+
 CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame)
 {
     m_pManager = pGUI;

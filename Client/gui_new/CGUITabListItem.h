@@ -12,7 +12,11 @@
 
 #include <gui_new/CGUI.h>
 
-class CGUITabListItem : public CGUIElement
+namespace GUINew{
+    class CGUITabListItem;
+}
+
+class GUINew::CGUITabListItem : public CGUIElement
 {
 public:
     virtual bool ActivateOnTab() = 0;

@@ -13,6 +13,8 @@
 
 #define CGUICOMBOBOX_NAME "CGUI/Combobox"
 
+using namespace GUINew;
+
 CGUIComboBox_Impl::CGUIComboBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption)
 {
     m_pManager = pGUI;

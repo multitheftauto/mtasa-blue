@@ -14,7 +14,11 @@
 #include <gui_new/CGUIMemo.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIMemo_Impl : public CGUIMemo, public CGUIElement_Impl, public CGUITabListItem
+namespace GUINew{
+    class CGUIMemo_Impl;
+}
+
+class GUINew::CGUIMemo_Impl : public CGUIMemo, public CGUIElement_Impl, public CGUITabListItem
 {
 public:
     CGUIMemo_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "");

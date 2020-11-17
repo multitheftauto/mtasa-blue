@@ -14,13 +14,17 @@
 #include <gui_new/CGUIButton.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIButton_Impl : public CGUIButton, public CGUIElement_Impl
+namespace GUINew{
+    class CGUIButton_Impl;
+}
+
+class GUINew::CGUIButton_Impl : public CGUIButton, public CGUIElement_Impl
 {
 public:
     CGUIButton_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");
     ~CGUIButton_Impl();
 
-    eCGUIType GetType() { return CGUI_BUTTON; };
+    eCGUIType GetType() { return GUINew::CGUI_BUTTON; };
 
     #include "CGUIElement_Inc.h"
 };

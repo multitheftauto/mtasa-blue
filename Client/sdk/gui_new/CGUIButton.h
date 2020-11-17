@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUIButton : public CGUIElement
+namespace GUINew{
+    class CGUIButton;
+}
+
+class GUINew::CGUIButton : public CGUIElement
 {
 public:
     virtual ~CGUIButton(){};

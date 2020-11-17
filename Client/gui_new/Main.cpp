@@ -10,8 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#define ALLOC_STATS_MODULE_NAME "cgui"
+#define ALLOC_STATS_MODULE_NAME "cgui_new"
 #include "SharedUtil.hpp"
+
+using namespace GUINew;
 
 CGUI_Impl* g_pGUI = NULL;
 
@@ -26,7 +28,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     return TRUE;
 }
 
-MTAEXPORT CGUI* InitGUIInterface(IDirect3DDevice9* pDevice)
+MTAEXPORT CGUI* InitNewGUIInterface(IDirect3DDevice9* pDevice)
 {
     // Create our GUI interface if not already done
     if (!g_pGUI)

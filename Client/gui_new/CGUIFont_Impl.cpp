@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+using namespace GUINew;
+
 CGUIFont_Impl::CGUIFont_Impl(CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale, bool isWinFont)
 {
     // Store the fontmanager and create a font with the given attributes

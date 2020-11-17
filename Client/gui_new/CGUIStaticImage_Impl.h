@@ -14,10 +14,15 @@
 #include <gui_new/CGUIStaticImage.h>
 #include "CGUITexture_Impl.h"
 
-class CGUITexture;
-class CGUITexture_Impl;
+class GUINew::CGUITexture;
+class GUINew::CGUITexture_Impl;
 
-class CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl, public CGUITabList
+namespace GUINew{
+    class CGUIStaticImage_Impl;
+}
+
+
+class GUINew::CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl, public CGUITabList
 {
 public:
     CGUIStaticImage_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);

@@ -15,7 +15,11 @@
 
 struct IDirect3DTexture9;
 
-class CGUITexture
+namespace GUINew{
+    class CGUITexture;
+}
+
+class GUINew::CGUITexture
 {
 public:
     virtual ~CGUITexture(){};

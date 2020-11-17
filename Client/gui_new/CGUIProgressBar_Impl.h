@@ -14,7 +14,11 @@
 #include <gui_new/CGUIProgressBar.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIProgressBar_Impl : public CGUIProgressBar, public CGUIElement_Impl
+namespace GUINew{
+    class CGUIProgressBar_Impl;
+}
+
+class GUINew::CGUIProgressBar_Impl : public CGUIProgressBar, public CGUIElement_Impl
 {
 public:
     CGUIProgressBar_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);

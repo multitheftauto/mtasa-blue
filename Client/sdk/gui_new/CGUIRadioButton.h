@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include "CGUICallback.h"
 
-class CGUIRadioButton : public CGUIElement
+namespace GUINew{
+    class CGUIRadioButton;
+}
+
+class GUINew::CGUIRadioButton : public CGUIElement
 {
 public:
     virtual ~CGUIRadioButton(){};

@@ -14,7 +14,11 @@
 #include "CGUIElement.h"
 #include <string>
 
-class CGUIProgressBar : public CGUIElement
+namespace GUINew{
+    class CGUIProgressBar;
+}
+
+class GUINew::CGUIProgressBar : public CGUIElement
 {
 public:
     virtual ~CGUIProgressBar(){};

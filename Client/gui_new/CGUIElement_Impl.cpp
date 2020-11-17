@@ -18,6 +18,8 @@
 #define CGUI_NODRAW_TOP 9.0f
 #define CGUI_NODRAW_BOTTOM 9.0f
 
+using namespace GUINew;
+
 CGUIElement_Impl::CGUIElement_Impl()
 {
     m_pData = NULL;

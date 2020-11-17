@@ -11,8 +11,15 @@
 
 #pragma once
 
+namespace GUINew{
+    enum CMessageBoxFlag;
+    enum eInputChannel;
+    enum eInputMode;
+    enum eCursorType;
+}
+
 // Message box types
-enum CMessageBoxFlag
+enum GUINew::CMessageBoxFlag
 {
     MB_BUTTON_NONE = 0,
     MB_BUTTON_OK = 1,
@@ -26,21 +33,21 @@ enum CMessageBoxFlag
 };
 
 // Input handler switcher
-enum eInputChannel
+enum GUINew::eInputChannel
 {
     INPUT_CORE,
     INPUT_MOD,
     INPUT_CHANNEL_COUNT,
 };
 
-enum eInputMode
+enum GUINew::eInputMode
 {
     INPUTMODE_ALLOW_BINDS,
     INPUTMODE_NO_BINDS,
     INPUTMODE_NO_BINDS_ON_EDIT,
 };
 
-enum eCursorType
+enum GUINew::eCursorType
 {
     CURSORTYPE_NONE,
     CURSORTYPE_DEFAULT,

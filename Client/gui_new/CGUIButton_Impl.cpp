@@ -13,6 +13,8 @@
 
 #define CGUIBUTTON_NAME "CGUI/Button"
 
+using namespace GUINew;
+
 CGUIButton_Impl::CGUIButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption)
 {
     m_pManager = pGUI;

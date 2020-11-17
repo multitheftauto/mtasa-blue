@@ -13,6 +13,8 @@
 
 #define CGUISTATICIMAGE_NAME "CGUI/StaticImage"
 
+using namespace GUINew;
+
 CGUIStaticImage_Impl::CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     // Initialize

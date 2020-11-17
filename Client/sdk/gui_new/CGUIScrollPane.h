@@ -13,7 +13,11 @@
 
 #include "CGUIElement.h"
 
-class CGUIScrollPane : public CGUIElement
+namespace GUINew{
+    class CGUIScrollPane;
+}
+
+class GUINew::CGUIScrollPane : public CGUIElement
 {
 public:
     virtual ~CGUIScrollPane(){};
