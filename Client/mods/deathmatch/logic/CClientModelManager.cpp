@@ -70,7 +70,7 @@ std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
     return nullptr;
 }
 
-std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(const eClientModelType type, const unsigned int minModelID)
+std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eClientModelType type, const unsigned int minModelID)
 {
     std::vector<std::shared_ptr<CClientModel>> found;
     found.reserve(m_modelCount);

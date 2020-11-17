@@ -14,6 +14,7 @@ class CClientModelManager;
 
 #include <list>
 #include <vector>
+#include <memory>
 #include "CClientModel.h"
 
 #define MAX_MODEL_ID 20000
@@ -35,7 +36,7 @@ public:
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
 
-    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(const eClientModelType type, const unsigned int minModelID = 0);
+    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 

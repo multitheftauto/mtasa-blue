@@ -18,6 +18,7 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include "CClientModel.h"
 #include <memory>
 
 class CClientCamera;
@@ -737,4 +738,5 @@ public:
     bool              m_bTaskToBeRestoredOnAnimEnd;
     eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
     bool              m_bWarpInToVehicleRequired = false;
+    std::shared_ptr<CClientModel> m_clientModel;
 };

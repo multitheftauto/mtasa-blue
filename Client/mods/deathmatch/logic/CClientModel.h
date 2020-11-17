@@ -13,7 +13,6 @@ class CClientModel;
 #pragma once
 
 #include <list>
-#include "CClientModelManager.h"
 
 enum class eClientModelType
 {
@@ -21,6 +20,9 @@ enum class eClientModelType
     OBJECT,
     VEHICLE,
 };
+
+class CResource;
+class CClientManager;
 
 class CClientModel
 {
@@ -44,6 +46,5 @@ protected:
     int                             m_iModelID;
     eClientModelType                m_eModelType;
     bool                            m_bAllocatedByUs;
-
     CResource*                      m_pParentResource; // Resource that allocated model
 };
