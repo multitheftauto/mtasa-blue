@@ -7,7 +7,7 @@ project "CEGUITinyXMLParser"
 	includedirs {
 		"../../include",
 		"../../../freetype/include",
-        "../../../pcre",
+        "../../dependencies/pcre-8.12",
         "../../dependencies/tinyxml-2.6.2"
 	}
     
@@ -15,7 +15,8 @@ project "CEGUITinyXMLParser"
         "CEGUI-0.8.7",
         "tinyxml-2.6.2",
 		"freetype", 
-		"pcre",
+		"pcre-8.12",
+		"dbghelp",
         "winmm",
         "d3d9",
     }
@@ -49,7 +50,7 @@ project "CEGUITinyXMLParser"
 		disablewarnings { "4221" }
 
     configuration "Debug"
-        links { "dbghelp", "d3dx9d" }
+        links { "d3dx9d" }
     configuration "Release"
         links { "d3dx9" }
 	 configuration {}
