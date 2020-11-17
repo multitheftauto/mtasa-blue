@@ -118,10 +118,18 @@ static void addLibraryNameSuffixes(String& name)
 //----------------------------------------------------------------------------//
 static String getModuleDirEnvVar()
 {
-    if (const char* envModuleDir = getenv(MODULE_DIR_VAR_NAME))
-        return String(envModuleDir);
+    DWORD bufferSize = 65535; //Limit according to http://msdn.microsoft.com/en-us/library/ms683188.aspx
+    std::string buffer;
 
-    return String();
+    buffer.resize(bufferSize);
+    bufferSize = GetEnvironmentVariable(MODULE_DIR_VAR_NAME, buffer.data(), bufferSize);
+
+    if (!bufferSize)
+        return String();
+
+    buffer.resize(bufferSize);
+
+    return String(buffer.c_str());
 }
 
 //----------------------------------------------------------------------------//
