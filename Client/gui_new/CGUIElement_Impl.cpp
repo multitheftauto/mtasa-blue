@@ -265,6 +265,62 @@ bool CGUIElement_Impl::IsAlwaysOnTop()
     return m_pWindow->isAlwaysOnTop();
 }
 
+CRect2D CGUIElement_Impl::AbsoluteToRelative(const CRect2D& Rect)
+{
+    float fLeft     = CEGUI::CoordConverter::screenToWindowX(*m_pWindow, Rect.fX1);
+    float fTop      = CEGUI::CoordConverter::screenToWindowY(*m_pWindow, Rect.fY1);
+    float fRight    = CEGUI::CoordConverter::screenToWindowX(*m_pWindow, Rect.fX2);
+    float fBottom   = CEGUI::CoordConverter::screenToWindowY(*m_pWindow, Rect.fY2);
+
+    return CRect2D(fLeft, fTop, fRight, fBottom);
+}
+
+CVector2D CGUIElement_Impl::AbsoluteToRelative(const CVector2D& Vector)
+{
+    CEGUI::UDim absoluteWidth = CEGUI::UDim(0, Vector.fX);
+    CEGUI::UDim absoluteHeight = CEGUI::UDim(0, Vector.fY);
+    CEGUI::USize baseSize = m_pWindow->getSize();
+
+    float fRelativeWidth = CEGUI::CoordConverter::asRelative(absoluteWidth, baseSize.d_width.d_offset);
+    float fRelativeHeight = CEGUI::CoordConverter::asRelative(absoluteHeight, baseSize.d_height.d_offset);
+
+    return CVector2D(fRelativeWidth, fRelativeHeight);
+}
+
+CRect2D CGUIElement_Impl::RelativeToAbsolute(const CRect2D& Rect)
+{
+    CEGUI::UDim relativeLeft       = CEGUI::UDim(Rect.fX1, 0);
+    CEGUI::UDim relativeTop        = CEGUI::UDim(Rect.fY1, 0);
+    CEGUI::UDim relativeRight      = CEGUI::UDim(Rect.fX2, 0);
+    CEGUI::UDim relativeBottom     = CEGUI::UDim(Rect.fY2, 0);
+
+    CEGUI::URect area = m_pWindow->getArea();
+
+    float fBaseLeft = area.getPosition().d_x.d_offset;
+    float fBaseTop = area.getPosition().d_y.d_offset;
+    float fBaseRight = area.getWidth().d_offset;
+    float fBaseBottom = area.getHeight().d_offset;
+
+    float fAbsoluteLeft = CEGUI::CoordConverter::asAbsolute(relativeLeft, fBaseLeft);
+    float fAbsoluteTop = CEGUI::CoordConverter::asAbsolute(relativeTop, fBaseTop);
+    float fAbsoluteRight = CEGUI::CoordConverter::asAbsolute(relativeRight, fBaseRight);
+    float fAbsoluteBottom = CEGUI::CoordConverter::asAbsolute(relativeBottom, fBaseBottom);
+
+    return CRect2D(fAbsoluteLeft, fAbsoluteTop, fAbsoluteRight, fAbsoluteBottom);
+}
+
+CVector2D CGUIElement_Impl::RelativeToAbsolute(const CVector2D& Vector)
+{
+    CEGUI::USize relativeSize = CEGUI::USize(CEGUI::UDim(Vector.fX, 0), CEGUI::UDim(Vector.fY, 0));
+    CEGUI::USize baseSize = m_pWindow->getSize();
+    
+    CEGUI::Size size = CEGUI::Size(baseSize.d_width.d_offset, baseSize.d_height.d_offset);
+
+    CEGUI::Size absoluteSize = CEGUI::CoordConverter::asAbsolute(relativeSize, size, true);
+
+    return CVector2D(absoluteSize.d_width, absoluteSize.d_height);
+}
+
 void CGUIElement_Impl::SetParent(CGUIElement* pParent)
 {
     // Disable z-sorting if the label has a parent

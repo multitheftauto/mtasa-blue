@@ -20,7 +20,7 @@ class CGUITexture
 public:
     virtual ~CGUITexture(){};
 
-    virtual bool LoadFromFile(const char* szFilename) = 0;
+    virtual bool LoadFromFile(const char* szFilename, const char* szResourceGroup = "mta") = 0;
     virtual void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight) = 0;
     virtual void Clear() = 0;
 

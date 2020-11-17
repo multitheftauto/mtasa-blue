@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIMessageBox.h>
+#include <gui/CGUIMessageBox.h>
 #include "CGUIButton_Impl.h"
 #include "CGUILabel_Impl.h"
 #include "CGUIStaticImage_Impl.h"
@@ -35,7 +35,7 @@ public:
 
     void SetClickHandler(GUI_CALLBACK Callback);
 
-    CGUIWindow* GetWindow();
+    ::CGUIWindow* GetWindow();
 
 private:
     bool OnResponseHandler(CGUIElement* pElement);

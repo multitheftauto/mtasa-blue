@@ -10,13 +10,13 @@
  *****************************************************************************/
 #pragma once
 
-#include <gui_new/CGUIWebBrowser.h>
+#include <gui/CGUIWebBrowser.h>
 #include "CGUITexture_Impl.h"
 
 // Use StaticImage here as we'd have to add the same definition twice to the Falagard definition file otherwise
 #define CGUIWEBBROWSER_NAME "CGUI/StaticImage"
 
-class GUINew::CGUITexture;
+class CGUITexture;
 class GUINew::CGUITexture_Impl;
 class GUINew::CGUI_Impl;
 class CWebViewInterface;

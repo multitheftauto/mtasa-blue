@@ -61,6 +61,17 @@ void CGUIFont_Impl::DrawTextString(const char* szText, CRect2D DrawArea, float f
         0, fScaleX, fScaleY);
 }
 
+void CGUIFont_Impl::SetAntiAliasingEnabled(bool bAntialiased)
+{
+    //m_pFont->setAntiAliased(bAntialiased);
+}
+
+bool CGUIFont_Impl::IsAntiAliasingEnabled()
+{
+    //return m_pFont->isAntiAliased();
+    return false;
+}
+
 void CGUIFont_Impl::SetAutoScalingEnabled(bool bAutoScaled)
 {
     CEGUI::AutoScaledMode scaleMode = bAutoScaled ? CEGUI::AutoScaledMode::ASM_Both : CEGUI::AutoScaledMode::ASM_Disabled;

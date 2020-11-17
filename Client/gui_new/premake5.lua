@@ -11,7 +11,8 @@ project "GUI New"
 		includedirs {
 			"../sdk",
 			"../../vendor/cegui-0.8.7/include",
-			"../../vendor/sparsehash/src/"
+			"../../vendor/sparsehash/src/",
+			"../../vendor/freetype/include",
 		}
 
 	pchheader "StdInc.h"

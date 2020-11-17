@@ -11,10 +11,10 @@
 
 #pragma once
 
-#include <gui_new/CGUIStaticImage.h>
+#include <gui/CGUIStaticImage.h>
 #include "CGUITexture_Impl.h"
 
-class GUINew::CGUITexture;
+class CGUITexture;
 class GUINew::CGUITexture_Impl;
 
 namespace GUINew{

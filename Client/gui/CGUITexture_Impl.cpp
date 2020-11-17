@@ -26,7 +26,7 @@ CGUITexture_Impl::~CGUITexture_Impl()
         m_pRenderer->destroyTexture(m_pTexture);
 }
 
-bool CGUITexture_Impl::LoadFromFile(const char* szFilename)
+bool CGUITexture_Impl::LoadFromFile(const char* szFilename, const char* szResourceGroup)
 {
     // Try to load it
     try

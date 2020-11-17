@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include <gui_new/CGUIFont.h>
+#include <gui/CGUIFont.h>
 #include <CEGUI/CEGUI.h>
+#include <CEGUI/FreeTypeFont.h>
 
 namespace GUINew{
     class CGUIFont_Impl;
@@ -24,7 +25,9 @@ public:
     CGUIFont_Impl(class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0,
                   bool bAutoScale = false, bool isWinFont = false);
     ~CGUIFont_Impl();
-    
+
+    void SetAntiAliasingEnabled(bool bAntialiased);
+    bool IsAntiAliasingEnabled();
     void SetAutoScalingEnabled(bool bAutoScaled);
     bool IsAutoScalingEnabled();
 

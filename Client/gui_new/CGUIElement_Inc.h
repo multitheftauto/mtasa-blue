@@ -19,11 +19,11 @@ std::string GetProperty(const char* szProperty)
     return GUINew::CGUIElement_Impl::GetProperty(szProperty);
 };
 
-GUINew::CGUIPropertyIter GetPropertiesBegin()
+CGUIPropertyIter GetPropertiesBegin()
 {
     return GUINew::CGUIElement_Impl::GetPropertiesBegin();
 };
-GUINew::CGUIPropertyIter GetPropertiesEnd()
+CGUIPropertyIter GetPropertiesEnd()
 {
     return GUINew::CGUIElement_Impl::GetPropertiesEnd();
 };
@@ -203,11 +203,29 @@ bool IsAlwaysOnTop()
     return GUINew::CGUIElement_Impl::IsAlwaysOnTop();
 };
 
-void SetParent(GUINew::CGUIElement* pParent)
+CRect2D AbsoluteToRelative(const CRect2D& Rect)
+{
+    return CGUIElement_Impl::AbsoluteToRelative(Rect);
+};
+CVector2D AbsoluteToRelative(const CVector2D& Vector)
+{
+    return CGUIElement_Impl::AbsoluteToRelative(Vector);
+};
+
+CRect2D RelativeToAbsolute(const CRect2D& Rect)
+{
+    return CGUIElement_Impl::RelativeToAbsolute(Rect);
+};
+CVector2D RelativeToAbsolute(const CVector2D& Vector)
+{
+    return CGUIElement_Impl::RelativeToAbsolute(Vector);
+};
+
+void SetParent(CGUIElement* pParent)
 {
     GUINew::CGUIElement_Impl::SetParent(pParent);
 };
-GUINew::CGUIElement* GetParent()
+CGUIElement* GetParent()
 {
     return GUINew::CGUIElement_Impl::GetParent();
 };

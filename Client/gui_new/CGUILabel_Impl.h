@@ -11,10 +11,10 @@
 
 #pragma once
 
-#include <gui_new/CGUILabel.h>
+#include <gui/CGUILabel.h>
 #include "CGUIElement_Impl.h"
 
-class GUINew::CGUIFont;
+class CGUIFont;
 
 namespace GUINew{
     class CGUILabel_Impl;

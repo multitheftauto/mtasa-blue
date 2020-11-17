@@ -175,7 +175,7 @@ void CGUIGridList_Impl::ForceUpdate()
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->invalidate(true);
 }
 
-int CGUIGridList_Impl::AddRow(std::vector<std::pair<SString, bool> >* m_items)
+int CGUIGridList_Impl::AddRow(bool fast, std::vector<std::pair<SString, bool> >* m_items)
 {
     try
     {
@@ -362,7 +362,7 @@ void CGUIGridList_Impl::SetItemData(int iRow, int hColumn, const char* pszData)
     }
 }
 
-int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bool bNumber, bool bSection)
+int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast, const char* szSortText)
 {
     try
     {
@@ -412,6 +412,9 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
         {
             // If it doesn't, create it and set it in the gridlist
             pItem = new CGUIListItem_Impl(m_pManager, szText, bNumber);
+
+            if (szSortText)
+                pItem->SetText(szText);
 
             CEGUI::ListboxItem* pListboxItem = pItem->GetListItem();
             win->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, GetColumnIndex(hColumn)));

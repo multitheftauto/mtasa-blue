@@ -13,6 +13,8 @@
 
 class CGUI;
 
+#include <SharedUtil.h>
+
 #include "CGUIEnumDefs.h"
 #include "CGUIElement.h"
 #include "CGUIButton.h"
@@ -120,7 +122,7 @@ public:
     //
 
     virtual CGUIWindow* CreateWnd(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
-    virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false) = 0;
+    virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false, bool isWinFont = false) = 0;
     virtual CGUITexture* CreateTexture() = 0;
 
     virtual void        SetCursorEnabled(bool bEnabled) = 0;

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIEdit.h>
+#include <gui/CGUIEdit.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{

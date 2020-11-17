@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUICheckBox.h>
+#include <gui/CGUICheckBox.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{

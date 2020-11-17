@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUITab.h>
+#include <gui/CGUITab.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{
