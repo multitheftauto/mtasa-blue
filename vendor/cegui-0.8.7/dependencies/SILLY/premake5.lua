@@ -18,6 +18,8 @@ project "CEGUISILLYModule"
     }
 
     defines {
+		"SILLY_HAVE_JPG",
+		"SILLY_HAVE_PNG",
         "SILLY_EXPORTS"
     }
 
