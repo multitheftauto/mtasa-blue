@@ -30,6 +30,9 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
 MTAEXPORT CGUI* InitNewGUIInterface(IDirect3DDevice9* pDevice)
 {
+    // Set CEGUI module directory
+    SetEnvironmentVariable("CEGUI_MODULE_DIR", "C:/Users/Ryan/Documents/GitHub/mtasa-blue/Bin/mta");
+
     // Create our GUI interface if not already done
     if (!g_pGUI)
     {
