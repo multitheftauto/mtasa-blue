@@ -7,12 +7,13 @@ project "CEGUI-0.8.7"
 	includedirs {
 		"include",
 		"../freetype/include",
-		"../pcre"
+		"dependencies/pcre-8.12"
 	}
 
 	links { 
 		"freetype", 
-		"pcre",
+		"pcre-8.12",
+		"dbghelp",
 		"winmm"
 	}
 
@@ -64,7 +65,3 @@ project "CEGUI-0.8.7"
 	filter {"system:windows"}
 		linkoptions { "/ignore:4221" }
 		disablewarnings { "4221" }
-
-	configuration "Debug"
-		links { "dbghelp" }
-	 configuration {}

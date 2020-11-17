@@ -7,13 +7,14 @@ project "CEGUIDirect3D9Renderer"
 	includedirs {
 		"../../include",
 		"../../../freetype/include",
-		"../../../pcre"
+		"../../dependencies/pcre-8.12"
 	}
     
     links {
         "CEGUI-0.8.7",
 		"freetype", 
-		"pcre",
+		"pcre-8.12",
+		"dbghelp",
         "winmm",
         "d3d9",
     }
@@ -47,7 +48,7 @@ project "CEGUIDirect3D9Renderer"
 		disablewarnings { "4221" }
 
     configuration "Debug"
-        links { "dbghelp", "d3dx9d" }
+        links { "d3dx9d" }
     configuration "Release"
         links { "d3dx9" }
 	 configuration {}
