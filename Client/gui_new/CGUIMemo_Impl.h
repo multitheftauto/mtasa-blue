@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIMemo.h>
+#include <gui/CGUIMemo.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{

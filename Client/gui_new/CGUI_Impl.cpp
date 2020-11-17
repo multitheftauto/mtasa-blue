@@ -182,6 +182,11 @@ void CGUI_Impl::SetSkin(const char* szName)
     m_bTransferBoxVisible = false;
 }
 
+void CGUI_Impl::SetBidiEnabled(bool bEnabled)
+{
+    //m_pSystem->SetBidiEnabled(bEnabled);
+}
+
 void CGUI_Impl::SubscribeToMouseEvents()
 {
     // Mouse events
@@ -1009,50 +1014,50 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
     return true;
 }
 
-//void CGUI_Impl::SetDefaultGuiWorkingDirectory(const SString& strDir)
-//{
-//    assert(m_GuiWorkingDirectoryStack.empty());
-//    m_GuiWorkingDirectoryStack.push_back(PathConform(strDir + "\\"));
-//    ApplyGuiWorkingDirectory();
-//}
-//
-//void CGUI_Impl::PushGuiWorkingDirectory(const SString& strDir)
-//{
-//    m_GuiWorkingDirectoryStack.push_back(PathConform(strDir + "\\"));
-//    ApplyGuiWorkingDirectory();
-//}
+void CGUI_Impl::SetDefaultGuiWorkingDirectory(const SString& strDir)
+{
+    //assert(m_GuiWorkingDirectoryStack.empty());
+    //m_GuiWorkingDirectoryStack.push_back(PathConform(strDir + "\\"));
+    //ApplyGuiWorkingDirectory();
+}
 
-//void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
-//{
-//    if (m_GuiWorkingDirectoryStack.size() < 2)
-//    {
-//        OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Stack empty. Expected '%s'", *strDirCheck));
-//    }
-//    else
-//    {
-//        if (!strDirCheck.empty())
-//        {
-//            const SString& strWas = m_GuiWorkingDirectoryStack.back();
-//            if (strDirCheck != strWas)
-//            {
-//                OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Mismatch. Got '%s', expected '%s'", *strWas, *strDirCheck));
-//            }
-//        }
-//        m_GuiWorkingDirectoryStack.pop_back();
-//    }
-//    ApplyGuiWorkingDirectory();
-//}
+void CGUI_Impl::PushGuiWorkingDirectory(const SString& strDir)
+{
+    //m_GuiWorkingDirectoryStack.push_back(PathConform(strDir + "\\"));
+    //ApplyGuiWorkingDirectory();
+}
 
-//void CGUI_Impl::ApplyGuiWorkingDirectory()
-//{
-//    CEGUI::System::getSingleton().SetGuiWorkingDirectory(m_GuiWorkingDirectoryStack.back());
-//}
-//
-//const SString& CGUI_Impl::GetGuiWorkingDirectory() const
-//{
-//    dassert(!m_GuiWorkingDirectoryStack.empty());
-//    return m_GuiWorkingDirectoryStack.back();
-//}
+void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
+{
+    //if (m_GuiWorkingDirectoryStack.size() < 2)
+    //{
+    //    OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Stack empty. Expected '%s'", *strDirCheck));
+    //}
+    //else
+    //{
+    //    if (!strDirCheck.empty())
+    //    {
+    //        const SString& strWas = m_GuiWorkingDirectoryStack.back();
+    //        if (strDirCheck != strWas)
+    //        {
+    //            OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Mismatch. Got '%s', expected '%s'", *strWas, *strDirCheck));
+    //        }
+    //    }
+    //    m_GuiWorkingDirectoryStack.pop_back();
+    //}
+    //ApplyGuiWorkingDirectory();
+}
+
+void CGUI_Impl::ApplyGuiWorkingDirectory()
+{
+    //CEGUI::System::getSingleton().SetGuiWorkingDirectory(m_GuiWorkingDirectoryStack.back());
+}
+
+const SString& CGUI_Impl::GetGuiWorkingDirectory() const
+{
+    dassert(!m_GuiWorkingDirectoryStack.empty());
+    return m_GuiWorkingDirectoryStack.back();
+}
 
 bool CGUI_Impl::Event_MouseClick(const CEGUI::EventArgs& Args)
 {

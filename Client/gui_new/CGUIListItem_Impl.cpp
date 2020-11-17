@@ -78,7 +78,7 @@ void CGUIListItem_Impl::SetFont(const char* szFontName)
         reinterpret_cast<CEGUI::ListboxTextItem*>(m_pListItem)->setFont(CEGUI::String(szFontName));
 }
 
-void CGUIListItem_Impl::SetText(const char* pszText)
+void CGUIListItem_Impl::SetText(const char* pszText, const char* pszSortText)
 {
     m_pListItem->setText(CGUI_Impl::GetUTFString(pszText));
 }

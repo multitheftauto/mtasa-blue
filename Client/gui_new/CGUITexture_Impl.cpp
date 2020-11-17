@@ -78,8 +78,7 @@ LPDIRECT3DTEXTURE9 CGUITexture_Impl::GetD3DTexture()
     return reinterpret_cast<CEGUI::Direct3D9Texture*>(m_pTexture)->getDirect3D9Texture();
 }
 
-/* Unused? */
-//void CGUITexture_Impl::CreateTexture(unsigned int width, unsigned int height)
-//{
-//    return reinterpret_cast<CEGUI::Texture*>(m_pTexture)->
-//}
+void CGUITexture_Impl::CreateTexture(unsigned int width, unsigned int height)
+{
+    //return reinterpret_cast<CEGUI::Direct3D9Texture*>(m_pTexture)->createRenderTarget(width, height);
+}

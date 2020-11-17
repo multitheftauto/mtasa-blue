@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIScrollPane.h>
+#include <gui/CGUIScrollPane.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{

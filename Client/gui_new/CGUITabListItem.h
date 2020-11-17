@@ -10,7 +10,7 @@
  *****************************************************************************/
 #pragma once
 
-#include <gui_new/CGUI.h>
+#include <gui/CGUI.h>
 
 namespace GUINew{
     class CGUITabListItem;

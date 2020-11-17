@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUITexture.h>
+#include <gui/CGUITexture.h>
 
 namespace CEGUI
 {
@@ -37,8 +37,7 @@ public:
     void               SetTexture(CEGUI::Texture* pTexture);
     LPDIRECT3DTEXTURE9 GetD3DTexture();
 
-    /* Unused? */
-    //void CreateTexture(unsigned int width, unsigned int height);
+    void CreateTexture(unsigned int width, unsigned int height);
 
 private:
     class CGUI_Impl*           m_pGUI;

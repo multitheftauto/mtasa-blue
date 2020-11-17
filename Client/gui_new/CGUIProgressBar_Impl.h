@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIProgressBar.h>
+#include <gui/CGUIProgressBar.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{

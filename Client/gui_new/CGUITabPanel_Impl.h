@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUITabPanel.h>
+#include <gui/CGUITabPanel.h>
 #include "CGUIElement_Impl.h"
 #include "CGUITab_Impl.h"
 

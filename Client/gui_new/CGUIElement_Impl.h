@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIElement.h>
+#include <gui/CGUIElement.h>
 
 #include <list>
 
@@ -84,6 +84,12 @@ public:
 
     void SetAlwaysOnTop(bool bAlwaysOnTop);
     bool IsAlwaysOnTop();
+
+    CRect2D   AbsoluteToRelative(const CRect2D& Rect);
+    CVector2D AbsoluteToRelative(const CVector2D& Vector);
+
+    CRect2D   RelativeToAbsolute(const CRect2D& Rect);
+    CVector2D RelativeToAbsolute(const CVector2D& Vector);
 
     void         SetParent(CGUIElement* pParent);
     CGUIElement* GetParent();

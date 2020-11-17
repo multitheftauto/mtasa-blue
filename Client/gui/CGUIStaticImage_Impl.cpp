@@ -59,7 +59,7 @@ CGUIStaticImage_Impl::~CGUIStaticImage_Impl()
     DestroyElement();
 }
 
-bool CGUIStaticImage_Impl::LoadFromFile(const char* szFilename)
+bool CGUIStaticImage_Impl::LoadFromFile(const char* szFilename, const char* szResourceGroup)
 {
     // Load texture
     if (!m_pTexture)

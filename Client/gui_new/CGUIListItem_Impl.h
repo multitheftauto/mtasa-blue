@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIListItem.h>
+#include <gui/CGUIListItem.h>
 #include <CEGUI/CEGUI.h>
 
 // Create custom ListboxItem types
@@ -29,7 +29,6 @@
 //}
 
 namespace GUINew{
-    class CGUIStaticImage;
     class CGUIStaticImage_Impl;
     class CGUIListItem_Impl;
 }
@@ -48,7 +47,7 @@ public:
     ~CGUIListItem_Impl();
 
     std::string GetText() const;
-    void        SetText(const char* pszText);
+    void        SetText(const char* pszText, const char* pszSortText = NULL);
 
     void* GetData() const { return m_pData; }
     void  SetData(void* pData, CGUICallback<void, void*> deleteDataCallback = NULL)

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIButton.h>
+#include <gui/CGUIButton.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{
@@ -24,7 +24,7 @@ public:
     CGUIButton_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");
     ~CGUIButton_Impl();
 
-    eCGUIType GetType() { return GUINew::CGUI_BUTTON; };
+    eCGUIType GetType() { return CGUI_BUTTON; };
 
     #include "CGUIElement_Inc.h"
 };

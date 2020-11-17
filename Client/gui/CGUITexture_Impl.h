@@ -25,7 +25,7 @@ public:
     CGUITexture_Impl(class CGUI_Impl* pGUI);
     ~CGUITexture_Impl();
 
-    bool LoadFromFile(const char* szFilename);
+    bool LoadFromFile(const char* szFilename, const char* szResourceGroup = "mta");
     void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight);
     void Clear();
 

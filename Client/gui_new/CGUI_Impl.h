@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUI.h>
+#include <gui/CGUI.h>
 #include <list>
 #include <windows.h>
 
@@ -19,29 +19,8 @@
 
 namespace GUINew {
     class CGUI_Impl;
-
-    class CGUIElement;
     class CGUIElement_Impl;
-    class CGUIButton;
-    class CGUICheckBox;
-    class CGUIEdit;
-    class CGUIEvent;
-    class CGUIFont;
     class CGUIFont_Impl;
-    class CGUIGridList;
-    class CGUILabel;
-    class CGUIMemo;
-    class CGUIMessageBox;
-    class CGUIProgressBar;
-    class CGUIRadioButton;
-    class CGUIStaticImage;
-    class CGUIScrollBar;
-    class CGUIScrollPane;
-    class CGUIComboBox;
-    class CGUITexture;
-    class CGUIWindow;
-    class CGUITab;
-    class CGUITabPanel;
 }
 
 struct IDirect3DDevice9;
@@ -68,7 +47,7 @@ public:
     void destroy();
 
     void SetSkin(const char* szName);
-    //void SetBidiEnabled(bool bEnabled);
+    void SetBidiEnabled(bool bEnabled);
 
     void Draw();
     void Invalidate();
@@ -181,10 +160,10 @@ public:
     float GetTextExtent(const char* szText, const char* szFont = "default-normal");
     float GetMaxTextExtent(SString strFont, SString arg, ...);
 
-    //const SString& GetGuiWorkingDirectory() const;
-    //void           SetDefaultGuiWorkingDirectory(const SString& strDir);
-    //void           PushGuiWorkingDirectory(const SString& strDir);
-    //void           PopGuiWorkingDirectory(const SString& strDirCheck = "");
+    const SString& GetGuiWorkingDirectory() const;
+    void           SetDefaultGuiWorkingDirectory(const SString& strDir);
+    void           PushGuiWorkingDirectory(const SString& strDir);
+    void           PopGuiWorkingDirectory(const SString& strDirCheck = "");
 
     void SetCharacterKeyHandler(eInputChannel channel, const GUI_CALLBACK_KEY& Callback)
     {

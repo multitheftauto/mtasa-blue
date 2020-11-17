@@ -23,7 +23,7 @@ public:
     CGUIStaticImage_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);
     ~CGUIStaticImage_Impl();
 
-    bool LoadFromFile(const char* szFilename);
+    bool LoadFromFile(const char* szFilename, const char* szResourceGroup = "mta");
     bool LoadFromTexture(CGUITexture* pTexture);
     bool GetNativeSize(CVector2D& vecSize);
     void Clear();

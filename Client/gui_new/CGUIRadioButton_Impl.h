@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui_new/CGUIRadioButton.h>
+#include <gui/CGUIRadioButton.h>
 #include "CGUIElement_Impl.h"
 
 namespace GUINew{

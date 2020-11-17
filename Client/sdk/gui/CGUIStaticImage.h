@@ -19,7 +19,7 @@ class CGUIStaticImage : public CGUIElement
 public:
     virtual ~CGUIStaticImage(){};
 
-    virtual bool LoadFromFile(const char* szFilename) = 0;
+    virtual bool LoadFromFile(const char* szFilename, const char* szResourceGroup = "mta") = 0;
     virtual bool LoadFromTexture(CGUITexture* pTexture) = 0;
     virtual void Clear() = 0;
     virtual bool GetNativeSize(CVector2D& vecSize) = 0;

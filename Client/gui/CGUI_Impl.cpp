@@ -372,7 +372,7 @@ CGUIEdit* CGUI_Impl::_CreateEdit(CGUIElement_Impl* pParent, const char* szText)
     return new CGUIEdit_Impl(this, pParent, szText);
 }
 
-CGUIFont* CGUI_Impl::CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale)
+CGUIFont* CGUI_Impl::CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale, bool isWinFont)
 {
     return new CGUIFont_Impl(this, szFontName, szFontFile, uSize, uFlags, bAutoScale);
 }
