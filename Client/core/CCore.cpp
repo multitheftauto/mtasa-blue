@@ -932,7 +932,13 @@ void CCore::DeinitGUI()
 
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
-    m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+    bool bUseNewGUI;
+    CVARS_GET("use_new_cegui", bUseNewGUI);
+
+    SString sModuleName = bUseNewGUI ? "GUINew" : "GUI";
+    SString sInitMethodName = bUseNewGUI ? "InitNewGUIInterface" : "InitGUIInterface";
+
+    m_pGUI = InitModule<CGUI>(m_GUIModule, sModuleName, sInitMethodName, pDevice);
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath("screenshots");
@@ -942,7 +948,13 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
 
 void CCore::CreateGUI()
 {
-    LoadModule(m_GUIModule, "GUI", "cgui");
+    bool bUseNewGUI;
+    CVARS_GET("use_new_cegui", bUseNewGUI);
+    
+    if (bUseNewGUI)
+        LoadModule(m_GUIModule, "GUINew", "cgui_new");
+    else
+        LoadModule(m_GUIModule, "GUI", "cgui");
 }
 
 void CCore::DestroyGUI()

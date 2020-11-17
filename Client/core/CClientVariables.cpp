@@ -352,6 +352,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("filter_duplicate_log_lines", true);                                      // Filter duplicate log lines for debug view and clientscript.log
     DEFAULT("discord_rich_presence", true);                                           // Enable Discord Game SDK
     DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));                          // Command to run when right clicking quick connect (beta - can be removed at any time)
+    DEFAULT("use_new_cegui", 0);                                                  // Should we use the new CEGUI 0.8.7? (for testing / development only)
 
     if (!Exists("locale"))
     {
