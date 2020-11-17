@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUICHECKBOX_NAME "CGUI/Checkbox"
+#define CGUICHECKBOX_NAME "TaharezLook/Checkbox"
 
 using namespace GUINew;
 

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUILABEL_NAME "CGUI/ProgressBar"
+#define CGUILABEL_NAME "TaharezLook/ProgressBar"
 
 using namespace GUINew;
 

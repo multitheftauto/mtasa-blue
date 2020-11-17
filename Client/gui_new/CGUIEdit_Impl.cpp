@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUIEDIT_NAME "CGUI/Editbox"
+#define CGUIEDIT_NAME "TaharezLook/Editbox"
 
 using namespace GUINew;
 

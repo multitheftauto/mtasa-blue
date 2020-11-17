@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUIRADIOBUTTON_NAME "CGUI/RadioButton"
+#define CGUIRADIOBUTTON_NAME "TaharezLook/RadioButton"
 
 using namespace GUINew;
 

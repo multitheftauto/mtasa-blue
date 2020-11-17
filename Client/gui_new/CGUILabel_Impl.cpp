@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUILABEL_NAME "CGUI/StaticText"
+#define CGUILABEL_NAME "TaharezLook/StaticText"
 
 using namespace GUINew;
 
@@ -83,7 +83,7 @@ CGUIVerticalAlign CGUILabel_Impl::GetVerticalAlign()
 
 void CGUILabel_Impl::SetHorizontalAlign(CGUIHorizontalAlign eAlign)
 {
-    m_pLabel->setHorizontalFormatting(CEGUI::HorizontalTextFormatting::HTF_LEFT_ALIGNED);
+    m_pLabel->setHorizontalFormatting(static_cast<CEGUI::HorizontalTextFormatting>(eAlign));
 }
 
 CGUIHorizontalAlign CGUILabel_Impl::GetHorizontalAlign()

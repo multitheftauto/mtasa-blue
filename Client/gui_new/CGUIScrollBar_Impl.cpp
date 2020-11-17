@@ -11,8 +11,8 @@
 
 #include "StdInc.h"
 
-#define CGUISCROLLBAR_HORIZONTAL_NAME   "CGUI/HorizontalScrollbar"
-#define CGUISCROLLBAR_VERTICAL_NAME     "CGUI/VerticalScrollbar"
+#define CGUISCROLLBAR_HORIZONTAL_NAME   "TaharezLook/HorizontalScrollbar"
+#define CGUISCROLLBAR_VERTICAL_NAME     "TaharezLook/VerticalScrollbar"
 
 using namespace GUINew;
 

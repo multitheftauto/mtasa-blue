@@ -11,8 +11,8 @@
 
 #include "StdInc.h"
 
-#define CGUIGRIDLIST_NAME "CGUI/MultiColumnList"
-#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList" //MultiColumnListNoFrame
+#define CGUIGRIDLIST_NAME "TaharezLook/MultiColumnList"
+#define CGUIGRIDLISTNOFRAME_NAME "TaharezLook/MultiColumnList" //MultiColumnListNoFrame
 #define CGUIGRIDLIST_SPACER "   "
 
 #define CGUIGRIDLIST_MAX_TEXT_LENGTH    256

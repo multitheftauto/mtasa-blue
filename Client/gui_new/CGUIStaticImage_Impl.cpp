@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUISTATICIMAGE_NAME "CGUI/StaticImage"
+#define CGUISTATICIMAGE_NAME "TaharezLook/StaticImage"
 
 using namespace GUINew;
 

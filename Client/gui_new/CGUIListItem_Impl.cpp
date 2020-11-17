@@ -54,7 +54,7 @@ CGUIListItem_Impl::CGUIListItem_Impl(CGUI_Impl* pGUI, const char* szText, unsign
     {
         // Set flags and properties
         m_pListItem->setAutoDeleted(false);
-        m_pListItem->setSelectionBrushImage("CGUI/ListboxSelectionBrush");
+        //m_pListItem->setSelectionBrushImage("CGUI/ListboxSelectionBrush");
     }
 
     m_pData = NULL;
