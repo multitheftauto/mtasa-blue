@@ -64,22 +64,24 @@ bool CGUIStaticImage_Impl::LoadFromFile(const char* szFilename, const char* szRe
     // Ensure we don't already have an image
     Clear();
 
-    // Get an unique identifier for CEGUI for the image
-    char szUnique[CGUI_CHAR_SIZE];
-    m_pGUI->GetUniqueName(szUnique);
+    // Check if the image already exists and load it
+    if (m_pImagesetManager->isDefined(szFilename))
+        m_pImage = (CEGUI::BasicImage*)&m_pImagesetManager->get(szFilename);
+    else
+    {
+        // Define a new image in the ImageManager
+        m_pImagesetManager->addFromImageFile(szFilename, szFilename, szResourceGroup);
 
-    // Define a new image in the ImageManager
-    m_pImagesetManager->addFromImageFile(szUnique, szFilename, szResourceGroup);
+        // Failed to create image
+        if (!m_pImagesetManager->isDefined(szFilename))
+            return false;
 
-    // Failed to create image
-    if (!m_pImagesetManager->isDefined(szUnique))
-        return false;
-
-    // Get the image from the image manager and cast to BasicImage
-    m_pImage = (CEGUI::BasicImage*)&m_pImagesetManager->get(szUnique);
+        // Get the image from the image manager and cast to BasicImage
+        m_pImage = (CEGUI::BasicImage*)&m_pImagesetManager->get(szFilename);
+    }
 
     // Set image to window
-    m_pWindow->setProperty("Image", szUnique);
+    m_pWindow->setProperty("Image", szFilename);
 
     return true;
 }
