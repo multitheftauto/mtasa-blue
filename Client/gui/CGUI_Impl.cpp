@@ -276,6 +276,11 @@ void CGUI_Impl::ProcessKeyboardInput(unsigned long ulKey, bool bIsDown)
     }
 }
 
+SString CGUI_Impl::GetDefaultSkinName()
+{
+    return "Default";
+}
+
 bool CGUI_Impl::GetGUIInputEnabled()
 {
     switch (m_eInputMode)
