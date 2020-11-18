@@ -24,7 +24,7 @@ CLocalGUI* CSingleton<CLocalGUI>::m_pSingleton = NULL;
 #endif
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 
-const char* const DEFAULT_SKIN_NAME = "TaharezLook";            // TODO: Change to whatever the default skin is if it changes
+const char* const DEFAULT_SKIN_NAME = "Default";            // TODO: Change to whatever the default skin is if it changes
 
 CLocalGUI::CLocalGUI()
 {
@@ -65,9 +65,13 @@ void CLocalGUI::SetSkin(const char* szName)
 
     try
     {
-        //pGUI->SetSkin(szName);
-        pGUI->SetSkin(DEFAULT_SKIN_NAME);
-        m_LastSkinName = DEFAULT_SKIN_NAME;
+        bool usingNewCEGUI = CCore::GetSingleton().IsUsingNewCEGUI();
+        if(usingNewCEGUI)
+            pGUI->SetSkin("TaharezLook");
+        else
+            pGUI->SetSkin(szName);
+        
+        m_LastSkinName = usingNewCEGUI ? "TaharezLook" : szName;
     }
     catch (...)
     {
