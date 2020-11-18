@@ -73,32 +73,65 @@ void CGUILabel_Impl::SetText(const char* Text)
 
 void CGUILabel_Impl::SetVerticalAlign(CGUIVerticalAlign eAlign)
 {
-    m_pLabel->setVerticalFormatting(static_cast<CEGUI::VerticalTextFormatting>(eAlign));
+    m_pWindow->setProperty("VertFormatting", CGUIVerticalAlignValues[eAlign]);
 }
 
 CGUIVerticalAlign CGUILabel_Impl::GetVerticalAlign()
 {
-    return static_cast<CGUIVerticalAlign>(m_pLabel->getVerticalFormatting(*m_pWindow));
+    SString verticalAlign = m_pWindow->getProperty("VertFormatting");
+
+    if (verticalAlign == CGUIVerticalAlignValues[1])
+        return CGUIVerticalAlign::CGUI_ALIGN_TOP;
+
+    if (verticalAlign == CGUIVerticalAlignValues[2])
+        return CGUIVerticalAlign::CGUI_ALIGN_BOTTOM;
+
+    if (verticalAlign == CGUIVerticalAlignValues[3])
+        return CGUIVerticalAlign::CGUI_ALIGN_VERTICALCENTER;
+
+    // Fallback
+    return CGUIVerticalAlign::CGUI_ALIGN_TOP;
 }
 
 void CGUILabel_Impl::SetHorizontalAlign(CGUIHorizontalAlign eAlign)
 {
-    m_pLabel->setHorizontalFormatting(static_cast<CEGUI::HorizontalTextFormatting>(eAlign));
+    m_pWindow->setProperty("HorzFormatting", CGUIHorizontalAlignValues[eAlign]);
 }
 
 CGUIHorizontalAlign CGUILabel_Impl::GetHorizontalAlign()
 {
-    return static_cast<CGUIHorizontalAlign>(m_pLabel->getHorizontalFormatting(*m_pWindow));
+    SString horizontalAlign = m_pWindow->getProperty("HorzFormatting");
+
+    if (horizontalAlign == CGUIHorizontalAlignValues[1])
+        return CGUIHorizontalAlign::CGUI_ALIGN_LEFT;
+
+    if (horizontalAlign == CGUIHorizontalAlignValues[2])
+        return CGUIHorizontalAlign::CGUI_ALIGN_RIGHT;
+
+    if (horizontalAlign == CGUIHorizontalAlignValues[3])
+        return CGUIHorizontalAlign::CGUI_ALIGN_HORIZONTALCENTER;
+
+    if (horizontalAlign == CGUIHorizontalAlignValues[4])
+        return CGUIHorizontalAlign::CGUI_ALIGN_LEFT_WORDWRAP;
+
+    if (horizontalAlign == CGUIHorizontalAlignValues[5])
+        return CGUIHorizontalAlign::CGUI_ALIGN_RIGHT_WORDWRAP;
+
+    if (horizontalAlign == CGUIHorizontalAlignValues[6])
+        return CGUIHorizontalAlign::CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP;
+
+    // Fallback
+    return CGUIHorizontalAlign::CGUI_ALIGN_LEFT;
 }
 
 void CGUILabel_Impl::SetTextColor(CGUIColor Color)
 {
-    m_pLabel->setColours(CEGUI::Colour(1.0f / 255.0f * Color.R, 1.0f / 255.0f * Color.G, 1.0f / 255.0f * Color.B));
+    //m_pLabel->setColours(CEGUI::Colour(1.0f / 255.0f * Color.R, 1.0f / 255.0f * Color.G, 1.0f / 255.0f * Color.B));
 }
 
 void CGUILabel_Impl::SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    m_pLabel->setColours(CEGUI::Colour(1.0f / 255.0f * ucRed, 1.0f / 255.0f * ucGreen, 1.0f / 255.0f * ucBlue));
+    //m_pLabel->setColours(CEGUI::Colour(1.0f / 255.0f * ucRed, 1.0f / 255.0f * ucGreen, 1.0f / 255.0f * ucBlue));
 }
 
 CGUIColor CGUILabel_Impl::GetTextColor()
@@ -110,7 +143,8 @@ CGUIColor CGUILabel_Impl::GetTextColor()
 
 void CGUILabel_Impl::GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue)
 {
-    CEGUI::Colour r = (m_pLabel->getColours()).getColourAtPoint(0, 0);
+    //CEGUI::Colour r = (m_pLabel->getColours()).getColourAtPoint(0, 0);
+    CEGUI::Colour r = CEGUI::Colour(255, 255, 255);
 
     ucRed = (unsigned char)(r.getRed() * 255);
     ucGreen = (unsigned char)(r.getGreen() * 255);
