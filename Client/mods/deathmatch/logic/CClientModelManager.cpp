@@ -37,8 +37,8 @@ void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
 
 bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 {
-    int modelId = pModel ? pModel->GetModelID() : 0;
-    if (pModel && m_Models[modelId] != nullptr)
+    int modelId = pModel->GetModelID();
+    if (m_Models[modelId] != nullptr)
     {
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
@@ -77,7 +77,7 @@ std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(
 
     for (int i = minModelID; i < MAX_MODEL_ID; i++)
     {
-        std::shared_ptr<CClientModel> model = m_Models[i];
+        const std::shared_ptr<CClientModel>& model = m_Models[i];
         if (model && model->GetModelType() == type)
         {
             found.push_back(model);

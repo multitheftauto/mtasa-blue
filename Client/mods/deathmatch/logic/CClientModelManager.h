@@ -24,7 +24,7 @@ class CClientModelManager
     friend class CClientModel;
 
 public:
-    CClientModelManager(class CClientManager* pManager) {}
+    CClientModelManager() = default;
     ~CClientModelManager(void);
 
     void RemoveAll(void);

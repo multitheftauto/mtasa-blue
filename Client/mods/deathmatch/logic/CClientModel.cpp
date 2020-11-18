@@ -62,10 +62,10 @@ bool CClientModel::Deallocate(void)
     if (!m_bAllocatedByUs)
         return false;
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
-    if (!pModelInfo->IsValid())
+    if (!pModelInfo || !pModelInfo->IsValid())
         return false;
     pModelInfo->DeallocateModel();
-    this->SetParentResource(nullptr);
+    SetParentResource(nullptr);
     return true;
 }
 
