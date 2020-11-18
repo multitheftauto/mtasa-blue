@@ -32,7 +32,7 @@
 #define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION "1.5.1"
 
 // This include needs to see the defines
-#include "packet_process/all.h"
+#include "packet_process/all.hpp"
 
 CGame* g_pGame = NULL;
 
