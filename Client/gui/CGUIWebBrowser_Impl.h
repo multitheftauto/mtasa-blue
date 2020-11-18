@@ -15,7 +15,7 @@
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
 // Use StaticImage here as we'd have to add the same definition twice to the Falagard definition file otherwise
-#define CGUIWEBBROWSER_NAME "CGUI/StaticImage"
+#define CGUIWEBBROWSER_NAME "StaticImage"
 
 class CGUITexture;
 class CGUITexture_Impl;
