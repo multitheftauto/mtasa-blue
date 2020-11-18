@@ -58,6 +58,12 @@ enum CGUIVerticalAlign
     CGUI_ALIGN_VERTICALCENTER = 2,
 };
 
+const char* const CGUIVerticalAlignValues[] = {
+    "TopAligned",
+    "BottomAligned",
+    "VertCentred",
+};
+
 enum CGUIHorizontalAlign
 {
     CGUI_ALIGN_LEFT = 0,
@@ -66,6 +72,17 @@ enum CGUIHorizontalAlign
     CGUI_ALIGN_LEFT_WORDWRAP = 4,
     CGUI_ALIGN_RIGHT_WORDWRAP = 5,
     CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP = 6,
+};
+
+const char* const CGUIHorizontalAlignValues[] = {
+    "LeftAligned",
+    "RightAligned",
+    "HorzCentred",
+    "HorzJustified",
+    "WordWrapLeftAligned",
+    "WordWrapRightAligned",
+    "WordWrapCentred",
+    "WordWrapJustified",
 };
 
 class CGUIColor
