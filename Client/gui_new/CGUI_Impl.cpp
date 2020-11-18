@@ -30,6 +30,8 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
+const char* const DEFAULT_NEW_CEGUI_SKIN_NAME = "VanillaSkin";
+
 using namespace GUINew;
 
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f), m_pRenderer(&CEGUI::Direct3D9Renderer::bootstrapSystem(pDevice, 208, CalcMTASAPath("MTA").data()))
@@ -136,6 +138,11 @@ void CGUI_Impl::destroy()
     m_pSystem->destroy();
 }
 
+SString CGUI_Impl::GetDefaultSkinName()
+{
+    return DEFAULT_NEW_CEGUI_SKIN_NAME;
+}
+
 void CGUI_Impl::SetSkin(const char* szName)
 {
     if (m_HasSchemeLoaded)
@@ -151,8 +158,8 @@ void CGUI_Impl::SetSkin(const char* szName)
     
     m_HasSchemeLoaded = true;
 
-    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
-    m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType("TaharezLook/Tooltip");
+    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage(GetDefaultSkinName() + "/MouseArrow");
+    m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType(GetDefaultSkinName() + "/Tooltip");
 
     // Destroy any windows we already have
     m_pWindowManager->destroyAllWindows();
@@ -329,17 +336,17 @@ bool CGUI_Impl::GetGUIInputEnabled()
             {
                 return false;
             }
-            if (pActiveWindow->getType() == "TaharezLook/Editbox")
+            if (typeid(pActiveWindow).name() == "Editbox")
             {
                 CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
                 return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
             }
-            else if (pActiveWindow->getType() == "TaharezLook/MultiLineEditbox")
+            else if (typeid(pActiveWindow).name() == "MultiLineEditbox")
             {
                 CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
                 return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
             }
-            else if (pActiveWindow->getType() == CGUIWEBBROWSER_NAME)
+            else if (typeid(pActiveWindow).name() == CGUIWEBBROWSER_NAME)
             {
                 auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
                 if (pElement->GetType() == CGUI_WEBBROWSER)
@@ -750,7 +757,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
 
                 // Edit boxes
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (Wnd->getType() == "TaharezLook/Editbox")
+                if (typeid(Wnd).name() == "Editbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
@@ -779,7 +786,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                 }
 
                 // Multiline editboxes
-                if (Wnd->getType() == "TaharezLook/MultiLineEditbox")
+                if (typeid(Wnd).name() == "MultiLineEditbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast<CEGUI::MultiLineEditbox*>(Wnd);
@@ -836,7 +843,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
             if (KeyboardArgs.sysKeys & CEGUI::Control)
             {
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (Wnd->getType() == "TaharezLook/Editbox" || Wnd->getType() == "TaharezLook/MultiLineEditbox")
+                if (typeid(Wnd).name() == "Editbox" || typeid(Wnd).name() == "MultiLineEditbox")
                 {
                     // Open the clipboard
                     OpenClipboard(NULL);
@@ -852,7 +859,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         bool          bReplaceNewLines = true;
                         bool          bIsBoxFull = false;
 
-                        if (Wnd->getType() == "TaharezLook/Editbox")
+                        if (typeid(Wnd).name() == "Editbox")
                         {
                             // Turn our event window into an editbox
                             CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
@@ -948,7 +955,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         if (bIsBoxFull)
                         {
                             // Fire an event if the editbox is full
-                            if (Wnd->getType() == "TaharezLook/Editbox")
+                            if (typeid(Wnd).name() == "Editbox")
                             {
                                 CEGUI::Editbox*        WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                                 CEGUI::WindowEventArgs args(WndEdit);
@@ -963,7 +970,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         }
                         else
                         {
-                            if (Wnd->getType() == "TaharezLook/Editbox")
+                            if (typeid(Wnd).name() == "Editbox")
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                                 WndEdit->setText(strEditText);
@@ -993,13 +1000,13 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
             {
                 // Edit boxes
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (Wnd->getType() == "TaharezLook/Editbox")
+                if (typeid(Wnd).name() == "Editbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                     WndEdit->setSelection(0, WndEdit->getText().size());
                 }
-                else if (Wnd->getType() == "TaharezLook/MultiLineEditbox")
+                else if (typeid(Wnd).name() == "MultiLineEditbox")
                 {
                     // Turn our event window into a multiline editbox
                     CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast<CEGUI::MultiLineEditbox*>(Wnd);

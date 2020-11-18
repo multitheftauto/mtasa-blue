@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUICHECKBOX_NAME "TaharezLook/Checkbox"
+#define CGUICHECKBOX_NAME "Checkbox"
 
 using namespace GUINew;
 
@@ -24,7 +24,7 @@ CGUICheckBox_Impl::CGUICheckBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, cons
     pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(CGUICHECKBOX_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUICHECKBOX_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
 
     m_pWindow->setText(CGUI_Impl::GetUTFString(szCaption));

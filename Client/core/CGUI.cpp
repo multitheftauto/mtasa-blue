@@ -66,12 +66,18 @@ void CLocalGUI::SetSkin(const char* szName)
     try
     {
         bool usingNewCEGUI = CCore::GetSingleton().IsUsingNewCEGUI();
+        SString defaultSkinName = DEFAULT_SKIN_NAME;
+
         if(usingNewCEGUI)
-            pGUI->SetSkin("TaharezLook");
+        {
+            defaultSkinName = pGUI->GetDefaultSkinName();
+            CVARS_SET("current_skin", defaultSkinName); // We can only currently use TaharezLook in the new CEGUI
+            pGUI->SetSkin(defaultSkinName);
+        }
         else
             pGUI->SetSkin(szName);
         
-        m_LastSkinName = usingNewCEGUI ? "TaharezLook" : szName;
+        m_LastSkinName = usingNewCEGUI ? defaultSkinName : szName;
     }
     catch (...)
     {
@@ -180,6 +186,14 @@ void CLocalGUI::CreateObjects(IUnknown* pDevice)
     SString           currentSkinName;
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
     cvars->Get("current_skin", currentSkinName);
+
+
+    if (CCore::GetSingleton().IsUsingNewCEGUI())
+    {
+        currentSkinName = pGUI->GetDefaultSkinName(); // We can only currently use TaharezLook in the new CEGUI
+        CVARS_SET(pGUI->GetDefaultSkinName(), currentSkinName);
+    }
+
     if (currentSkinName.empty())
     {
         currentSkinName = DEFAULT_SKIN_NAME;
@@ -222,6 +236,12 @@ void CLocalGUI::DoPulse()
         //
         SString currentSkinName;
         cvars->Get("current_skin", currentSkinName);
+
+        if (CCore::GetSingleton().IsUsingNewCEGUI())
+        {
+            currentSkinName = CCore::GetSingleton().GetGUI()->GetDefaultSkinName(); // We can only currently use TaharezLook in the new CEGUI
+            CVARS_SET("current_skin", currentSkinName);
+        }
 
         if (currentSkinName != m_LastSkinName)
         {

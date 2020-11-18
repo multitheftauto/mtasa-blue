@@ -11,8 +11,8 @@
 
 #include "StdInc.h"
 
-#define CGUIGRIDLIST_NAME "TaharezLook/MultiColumnList"
-#define CGUIGRIDLISTNOFRAME_NAME "TaharezLook/MultiColumnList" //MultiColumnListNoFrame
+#define CGUIGRIDLIST_NAME "MultiColumnList"
+#define CGUIGRIDLISTNOFRAME_NAME "MultiColumnList" //MultiColumnListNoFrame
 #define CGUIGRIDLIST_SPACER "   "
 
 #define CGUIGRIDLIST_MAX_TEXT_LENGTH    256
@@ -34,9 +34,9 @@ CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool
 
     // Create the window and set default settings
     if (bFrame)
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIGRIDLIST_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIGRIDLIST_NAME, szUnique);
     else
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIGRIDLISTNOFRAME_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIGRIDLISTNOFRAME_NAME, szUnique);
 
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setArea(CEGUI::UDim(0.0f, 0), CEGUI::UDim(0.0f, 0), CEGUI::UDim(0.4f, 0), CEGUI::UDim(0.4f, 0));
