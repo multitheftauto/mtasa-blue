@@ -18,6 +18,7 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include "CClientModel.h"
 #include <memory>
 
 class CClientCamera;
@@ -733,8 +734,9 @@ public:
     std::shared_ptr<CClientIFP> m_pCustomAnimationIFP;
 
     // Key: Internal GTA animation, Value: Custom Animation
-    ReplacedAnim_type m_mapOfReplacedAnimations;
-    bool              m_bTaskToBeRestoredOnAnimEnd;
-    eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
-    bool              m_bWarpInToVehicleRequired = false;
+    ReplacedAnim_type             m_mapOfReplacedAnimations;
+    bool                          m_bTaskToBeRestoredOnAnimEnd;
+    eTaskType                     m_eTaskTypeToBeRestoredOnAnimEnd;
+    bool                          m_bWarpInToVehicleRequired = false;
+    std::shared_ptr<CClientModel> m_clientModel;
 };
