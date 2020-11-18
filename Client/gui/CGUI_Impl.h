@@ -75,6 +75,8 @@ public:
     void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton);
     void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown);
     void ProcessCharacter(unsigned long ulCharacter);
+    
+    SString GetDefaultSkinName();
 
     //
     bool                 GetGUIInputEnabled();
