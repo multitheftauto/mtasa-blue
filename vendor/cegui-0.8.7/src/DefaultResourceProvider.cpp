@@ -108,7 +108,7 @@ void DefaultResourceProvider::setResourceGroupDirectory(
 #endif
 
     if (String::npos == separators.find(directory[directory.length() - 1]))
-        d_resourceGroups[resourceGroup] = directory + '/';
+        d_resourceGroups[resourceGroup] = directory + '\\';
     else
         d_resourceGroups[resourceGroup] = directory;
 }
