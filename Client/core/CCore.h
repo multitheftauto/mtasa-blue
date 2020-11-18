@@ -176,6 +176,9 @@ public:
     void DeinitGUI();
     void DestroyGUI();
 
+    // Temporary to get if using new CEGUI
+    bool IsUsingNewCEGUI();
+
     // Web
     bool IsWebCoreLoaded() { return m_pWebCore != nullptr; }
     void DestroyWeb();
@@ -373,6 +376,9 @@ private:
     bool                 m_bDummyProgressUpdateAlways;
     bool                 m_bIsRenderingGrass;
     bool                 m_bFakeLagCommandEnabled;
+
+    // Temporary to get if using new CEGUI
+    bool m_bUsingNewCEGUI;
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
