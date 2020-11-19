@@ -10,88 +10,79 @@
 
 #include "StdInc.h"
 
-CClientModelManager::~CClientModelManager(void)
+ushort CClientModelManager::GetFirstFreeModelID() const noexcept
 {
-    RemoveAll();
-}
-
-void CClientModelManager::RemoveAll(void)
-{
-    for (int i = 0; i < MAX_MODEL_ID; i++)
+    for (size_t i = 0; i < MAX_MODEL_ID; i++)
     {
-        m_Models[i] = nullptr;
+        // GTA can try to unload some special ID's in CStreamingSA::ReinitStreaming (Github #1819)
+        if (i >= 300 && i <= 319)
+            continue;
+
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
+        if (!pModelInfo->IsValid())
+            return i;
     }
-    m_modelCount = 0;
+    return INVALID_MODEL_ID;
 }
 
-void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
+// If you want to return a ptr here, please use weak_ptr
+ushort CClientModelManager::Request(CResource* pParentResource, eClientModelType type, std::optional<ushort> parentModelID)
 {
-    if (m_Models[pModel->GetModelID()] != nullptr)
+    const auto freeId = GetFirstFreeModelID();
+    if (IsLogicallyValidID(freeId))
     {
-        dassert(m_Models[pModel->GetModelID()].get() == pModel.get());
-        return;
+        dassert(!m_Models[freeId); // Make sure there isnt something already
+
+        m_modelCount++;
+        m_Models[freeId] = std::make_shared<CClientModel>(freeId, type);
+        dassert(model); // Failed to allocate
+
+        m_Models[freeId]->Allocate(std::move(parentModelID));
+
+        return freeId;
     }
-    m_Models[pModel->GetModelID()] = pModel;
-    m_modelCount++;
+    return INVALID_MODEL_ID;
 }
 
-bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
+bool CClientModelManager::Free(ushort id)
 {
-    int modelId = pModel->GetModelID();
-    if (m_Models[modelId] != nullptr)
+    dassert(id < MAX_MODE_ID);
+
+    if (m_Models[id])
     {
-        m_Models[modelId]->RestoreEntitiesUsingThisModel();
-        m_Models[modelId] = nullptr;
+        m_Models[id]->RestoreEntitiesUsingThisModel();
+        m_Models[id] = nullptr;
+
         m_modelCount--;
+
         return true;
     }
     return false;
 }
 
-int CClientModelManager::GetFirstFreeModelID(void)
+std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(ushort id) const noexcept
 {
-    for (int i = 0; i < MAX_MODEL_ID; i++)
-    {
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
-        // GTA can try unload some special ID's in CStreamingSA::ReinitStreaming (Github #1819)
-        if (!pModelInfo->IsValid() && (i < 300 || i > 319) )
-        {
-            return i;
-        }
-    }
-    return INVALID_MODEL_ID;
+    return (id < MAX_MODEL_ID) ? m_Models[id] : nullptr;
 }
 
-std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
-{
-    if (iModelID < MAX_MODEL_ID)
-    {
-        return m_Models[iModelID];
-    }
-    return nullptr;
-}
-
-std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eClientModelType type, const unsigned int minModelID)
+std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eClientModelType type, const unsigned int minModelID) const
 {
     std::vector<std::shared_ptr<CClientModel>> found;
-    found.reserve(m_modelCount);
+    found.reserve(m_modelCount - minModelID);
 
-    for (int i = minModelID; i < MAX_MODEL_ID; i++)
+    for (size_t i = minModelID; i < MAX_MODEL_ID; i++)
     {
-        const std::shared_ptr<CClientModel>& model = m_Models[i];
+        const auto& model = m_Models[i];
         if (model && model->GetModelType() == type)
-        {
             found.push_back(model);
-        }
     }
+
     return found;
 }
 
 void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
 {
     for (ushort i = 0; i < MAX_MODEL_ID; i++)
-    {
-        if (m_Models[i] != nullptr && m_Models[i]->GetParentResource() == pResource)
-            Remove(m_Models[i]);
-    }
+        if (m_Models[i] && m_Models[i]->GetParentResource() == pResource)
+            Free(i);
 }

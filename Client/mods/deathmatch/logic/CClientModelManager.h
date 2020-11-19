@@ -12,7 +12,7 @@ class CClientModelManager;
 
 #pragma once
 
-#include <list>
+#include <optional>
 #include <vector>
 #include <memory>
 #include "CClientModel.h"
@@ -21,26 +21,24 @@ class CClientModelManager;
 
 class CClientModelManager
 {
-    friend class CClientModel;
-
 public:
     CClientModelManager() = default;
-    ~CClientModelManager(void);
+    ~CClientModelManager() = default;
 
-    void RemoveAll(void);
+    ushort GetFirstFreeModelID() const noexcept;
+    ushort Request(CResource* pParentResource, eClientModelType type, std::optional<ushort> parentModelID);
 
-    void Add(const std::shared_ptr<CClientModel>& pModel);
-    bool Remove(const std::shared_ptr<CClientModel>& pModel);
-
-    int GetFirstFreeModelID(void);
-
-    std::shared_ptr<CClientModel> FindModelByID(int iModelID);
-
-    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
-
+    bool Free(ushort id);
     void DeallocateModelsAllocatedByResource(CResource* pResource);
+
+    std::shared_ptr<CClientModel> FindModelByID(ushort iModelID)  const noexcept;
+    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0) const;
+
+    // Check if the ID is < MAX_MODEL_ID
+    // Logical validity means that the model might be in our model array
+    static bool IsLogicallyValidID(ushort id) { return id < MAX_MODEL_ID; }
 
 private:
     std::shared_ptr<CClientModel> m_Models[MAX_MODEL_ID];
-    unsigned int                  m_modelCount = 0;
+    size_t                        m_modelCount = 0;
 };
