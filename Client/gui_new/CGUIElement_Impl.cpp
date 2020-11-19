@@ -212,7 +212,7 @@ void CGUIElement_Impl::SetText(const char* szText)
 
 std::string CGUIElement_Impl::GetText()
 {
-    return CGUI_Impl::GetUTFString(m_pWindow->getText().c_str()).c_str();
+    return m_pWindow->getText().c_str();
 }
 
 void CGUIElement_Impl::SetAlpha(float fAlpha)
@@ -355,11 +355,13 @@ void CGUIElement_Impl::CorrectEdges()
     CEGUI::UVector2 currentPosition = m_pWindow->getPosition();
     CEGUI::USize    currentSize = m_pWindow->getSize();
 
+    SString defaultSkinName = "";
+
     // Label turns out to be buggy
-    if (m_pWindow->getType() == "TaharezLook/StaticText")
+    if (typeid(m_pWindow).name() == "StaticText")
         return;
 
-    if (m_pWindow->getParent()->getType() == "TaharezLook/FrameWindow")
+    if (typeid(m_pWindow->getParent()).name() == "FrameWindow")
     {
         CEGUI::USize parentSize = m_pWindow->getParent()->getSize();
         if (currentPosition.d_x.d_offset < CGUI_NODRAW_LEFT)
