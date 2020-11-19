@@ -15,7 +15,7 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
+#define CORE_MTA_FILLER "cgui-0.8.7\\images\\mta_filler.png"
 #define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
 #define CORE_SETTINGS_HEADERS 3
 #define CORE_SETTINGS_HEADER_SPACER " "
@@ -3527,7 +3527,11 @@ void CSettings::SaveData()
     // Set our new skin last, as it'll destroy all our GUI
     pItem = m_pInterfaceSkinSelector->GetSelectedItem();
     if (pItem)
-        CVARS_SET("current_skin", pItem->GetText());
+    {
+        std::string itemText = pItem->GetText();
+        CVARS_SET("current_skin", itemText);
+    }
+        
 
     // Streaming memory
     float        fPos = m_pStreamingMemory->GetScrollPosition();
@@ -3732,7 +3736,7 @@ void CSettings::CreateChatColorTab(eChatColorType eType, const char* szName, CGU
         pPreviewImage->SetPosition(CVector2D(10.0f, 10.0f));
         pPreviewImage->SetSize(CVector2D(fSize - 20.0f, fSize - 20.0f));
 
-        if (pPreviewImage->LoadFromFile(CalcMTASAPath("MTA\\cgui\\images\\radarset\\01.png")))
+        if (pPreviewImage->LoadFromFile("cgui-0.8.7\\images\\radarset\\01.png"))
         {
             m_pChatColorPreview[eType] = pPreviewImage;
             UpdateChatColorPreview(eType);
