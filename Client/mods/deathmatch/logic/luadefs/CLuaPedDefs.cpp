@@ -1013,7 +1013,8 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entit
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::optional<bool> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>>
+CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -1023,81 +1024,7 @@ std::optional<bool> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CC
         {
             CMatrix matrix;
             g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, matrix);
-
-
-
-            // Main table of rows
-            lua_createtable(luaVM, 4, 0);
-
-            // First row
-            lua_createtable(luaVM, 4, 0);
-            {
-                lua_pushnumber(luaVM, matrix.vRight.fX);
-                lua_rawseti(luaVM, -2, 1);
-
-                lua_pushnumber(luaVM, matrix.vRight.fY);
-                lua_rawseti(luaVM, -2, 2);
-
-                lua_pushnumber(luaVM, matrix.vRight.fZ);
-                lua_rawseti(luaVM, -2, 3);
-
-                lua_pushnumber(luaVM, 0.0f);
-                lua_rawseti(luaVM, -2, 4);
-            }
-            lua_rawseti(luaVM, -2, 1); // Push into row table
-
-            // Second row
-            lua_createtable(luaVM, 4, 0);
-            {
-                lua_pushnumber(luaVM, matrix.vFront.fX);
-                lua_rawseti(luaVM, -2, 1);
-
-                lua_pushnumber(luaVM, matrix.vFront.fY);
-                lua_rawseti(luaVM, -2, 2);
-
-                lua_pushnumber(luaVM, matrix.vFront.fZ);
-                lua_rawseti(luaVM, -2, 3);
-
-                lua_pushnumber(luaVM, 0.0f);
-                lua_rawseti(luaVM, -2, 4);
-            }
-            lua_rawseti(luaVM, -2, 2); // Push into row table
-
-            // Third row
-            lua_createtable(luaVM, 4, 0);
-            {
-                lua_pushnumber(luaVM, matrix.vUp.fX);
-                lua_rawseti(luaVM, -2, 1);
-
-                lua_pushnumber(luaVM, matrix.vUp.fY);
-                lua_rawseti(luaVM, -2, 2);
-
-                lua_pushnumber(luaVM, matrix.vUp.fZ);
-                lua_rawseti(luaVM, -2, 3);
-
-                lua_pushnumber(luaVM, 0.0f);
-                lua_rawseti(luaVM, -2, 4);
-            }
-            lua_rawseti(luaVM, -2, 3); // Push into row table
-
-            // Fourth row
-            lua_createtable(luaVM, 4, 0);
-            {
-                lua_pushnumber(luaVM, matrix.vPos.fX);
-                lua_rawseti(luaVM, -2, 1);
-
-                lua_pushnumber(luaVM, matrix.vPos.fY);
-                lua_rawseti(luaVM, -2, 2);
-
-                lua_pushnumber(luaVM, matrix.vPos.fZ);
-                lua_rawseti(luaVM, -2, 3);
-
-                lua_pushnumber(luaVM, 1.0f);
-                lua_rawseti(luaVM, -2, 4);
-            }
-            lua_rawseti(luaVM, -2, 4); // Push into row table
-
-            return std::nullopt;
+            return matrix.To4x4Array();
         }
     }
     return false;
