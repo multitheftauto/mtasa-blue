@@ -173,7 +173,7 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
     pFlag->SetPosition(vecFlagPos);
     pFlag->SetSize(CVector2D(FLAG_SIZE_X, FLAG_SIZE_Y));
     pFlag->SetZOrderingEnabled(false);
-    pFlag->LoadFromFile(GetFlagFilename(strLocale));
+    pFlag->LoadFromFile(GetFlagFilename(strLocale), "absolute");
 
     CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(g_pCore->GetGUI()->CreateLabel(pGUIParent));
     pLabel->SetPosition(vecLabelPos);

@@ -44,7 +44,7 @@
 
 #define CORE_MTA_STATIC_BG          "cgui\\images\\background.png"
 #define CORE_MTA_LOGO               "cgui\\images\\background_logo.png"
-#define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
+#define CORE_MTA_FILLER             "cgui-0.8.7\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 #define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
@@ -1016,7 +1016,7 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
 
     if (g_pCore->GetLocalization()->IsLocalized())
     {
-        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
+        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename), "mta_basedir"))
             pImage->LoadFromFile(PathJoin("cgui/images", szFilename));
     }
     else
