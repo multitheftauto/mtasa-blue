@@ -15,7 +15,6 @@
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"engineFreeModel", EngineFreeModel},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
         {"engineLoadDFF", EngineLoadDFF},
@@ -28,6 +27,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineReplaceAnimation", EngineReplaceAnimation},
         {"engineRestoreAnimation", EngineRestoreAnimation},
         {"engineRequestModel", ArgumentParserWarn<false, EngineRequestModel>},
+        {"engineFreeModel", ArgumentParserWarn<false, EngineFreeModel>},
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
         {"engineResetModelLODDistance", EngineResetModelLODDistance},
@@ -575,28 +575,11 @@ std::variant<bool, ushort> CLuaEngineDefs::EngineRequestModel(lua_State* luaVM, 
     return id;
 }
 
-int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
+int CLuaEngineDefs::EngineFreeModel(ushort id)
 {
-    int iModelID;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iModelID);
-
-    if (!argStream.HasErrors())
-    {
-        auto modelManager = m_pManager->GetModelManager();
-        std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
-        if (pModel && modelManager->Remove(pModel))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (!CClientModelManager::IsLogicallyValidID(id))
+        throw std::invalid_argument(SString("The provided argument id (%u) isn't valid", id));
+    return m_pManager->GetModelManager()->Free(id);
 }
 
 int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)

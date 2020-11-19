@@ -29,6 +29,8 @@ public:
     LUA_DECLARE(EngineRestoreModel);
 
     static std::variant<bool, ushort> EngineRequestModel(lua_State* luaVM, eClientModelType modelType, std::optional<ushort> parentModel);
+    static bool                       EngineFreeModel(ushort id);
+
     LUA_DECLARE(EngineReplaceAnimation);
     LUA_DECLARE(EngineRestoreAnimation);
     LUA_DECLARE(EngineReplaceMatchingAtomics);
