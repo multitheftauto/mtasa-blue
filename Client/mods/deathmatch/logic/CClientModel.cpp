@@ -128,3 +128,19 @@ void CClientModel::RestoreEntitiesUsingThisModel()
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
 }
+
+unsigned short CClientModel::GetDefaultParentModel(eClientModelType type)
+{
+    switch (type)
+    {
+    case eClientModelType::PED:
+        return 7; // male01
+
+    case eClientModelType::OBJECT:
+        return 1337; // BinNt07_LA (trash can)
+
+    case eClientModelType::VEHICLE:
+        return 400; // VT_LANDSTAL
+    }
+    assert(0); // Shoudn't happen
+}

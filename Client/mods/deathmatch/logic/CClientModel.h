@@ -41,6 +41,8 @@ public:
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
     CResource*       GetParentResource(void) const { return m_pParentResource; }
 
+    static unsigned short GetDefaultParentModel(eClientModelType type);
+
 protected:
     int              m_iModelID;
     eClientModelType m_eModelType;
