@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define CGUISCROLLPANE_NAME "TaharezLook/ScrollablePane"
+#define CGUISCROLLPANE_NAME "ScrollablePane"
 
 using namespace GUINew;
 
@@ -27,7 +27,7 @@ CGUIScrollPane_Impl::CGUIScrollPane_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
     pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(CGUISCROLLPANE_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUISCROLLPANE_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setArea(CEGUI::URect(CEGUI::UDim(0.9f, 0), CEGUI::UDim(0.9f, 0), CEGUI::UDim(0.9f, 0), CEGUI::UDim(0.9f, 0)));
 
