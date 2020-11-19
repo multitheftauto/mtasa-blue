@@ -27,8 +27,8 @@ public:
     LUA_DECLARE(EngineRestoreCOL);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
-    LUA_DECLARE(EngineRequestModel);
-    LUA_DECLARE(EngineFreeModel);
+
+    static std::variant<bool, ushort> EngineRequestModel(lua_State* luaVM, eClientModelType modelType, std::optional<ushort> parentModel);
     LUA_DECLARE(EngineReplaceAnimation);
     LUA_DECLARE(EngineRestoreAnimation);
     LUA_DECLARE(EngineReplaceMatchingAtomics);

@@ -27,7 +27,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
         {"engineRestoreAnimation", EngineRestoreAnimation},
-        {"engineRequestModel", EngineRequestModel},
+        {"engineRequestModel", ArgumentParserWarn<false, EngineRequestModel>},
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
         {"engineResetModelLODDistance", EngineResetModelLODDistance},
@@ -565,61 +565,14 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
+std::variant<bool, ushort> CLuaEngineDefs::EngineRequestModel(lua_State* luaVM, eClientModelType modelType, std::optional<ushort> parentModel)
 {
-    eClientModelType eModelType;
+    CLuaMain* const pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    const auto id = m_pManager->GetModelManager()->Request(pLuaMain->GetResource(), modelType, std::move(parentModel));
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(eModelType);
-
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        CResource* pResource = pLuaMain->GetResource();
-        if (pResource)
-        {
-            if (!argStream.HasErrors())
-            {
-                int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
-                if (iModelID != INVALID_MODEL_ID) {
-                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-                    if (pModel == nullptr)
-                        pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
-                    m_pManager->GetModelManager()->Add(pModel);
-                    ushort usParentID = -1;
-
-                    if (argStream.NextIsNumber())
-                        argStream.ReadNumber(usParentID);
-                    else
-                    {
-                        switch (eModelType)
-                        {
-                            case eClientModelType::PED:
-                                usParentID = 7; // male01
-                                break;
-                            case eClientModelType::OBJECT:
-                                usParentID = 1337; // BinNt07_LA (trash can)
-                                break;
-                            case eClientModelType::VEHICLE:
-                                usParentID = VT_LANDSTAL;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    pModel->Allocate(usParentID);
-                    pModel->SetParentResource(pResource);
-
-                    lua_pushinteger(luaVM, iModelID);
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        }
-    }
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (id == INVALID_MODEL_ID)
+        return false;
+    return id;
 }
 
 int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
