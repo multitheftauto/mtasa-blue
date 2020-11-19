@@ -51,6 +51,9 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     //m_pWindow->setMetricsMode(CEGUI::Absolute);
     m_pWindow->setMinSize(CEGUI::USize(CEGUI::UDim(0, 96.0f), CEGUI::UDim(0, 48.0f)));
 
+    // Don't enable the close button by default
+    reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setCloseButtonEnabled(false);
+
     // Some window specific style options
     reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->getTitlebar()->setFont("default-bold-small");
 
