@@ -10,9 +10,8 @@
 
 #include "StdInc.h"
 
-CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
+CClientModel::CClientModel(int iModelID, eClientModelType eModelType)
 {
-    m_pManager = pManager;
     m_iModelID = iModelID;
     m_eModelType = eModelType;
 }

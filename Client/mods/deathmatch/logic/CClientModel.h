@@ -29,7 +29,7 @@ class CClientModel
     friend class CClientModelManager;
 
 public:
-    CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType);
+    CClientModel(int iModelID, eClientModelType eModelType);
     ~CClientModel(void);
 
     int              GetModelID(void) const { return m_iModelID; };
@@ -41,10 +41,8 @@ public:
     CResource*       GetParentResource(void) const { return m_pParentResource; }
 
 protected:
-    CClientManager* m_pManager;
-
-    int                             m_iModelID;
-    eClientModelType                m_eModelType;
-    bool                            m_bAllocatedByUs;
-    CResource*                      m_pParentResource; // Resource that allocated model
+    int              m_iModelID;
+    eClientModelType m_eModelType;
+    bool             m_bAllocatedByUs;
+    CResource*       m_pParentResource; // Resource that allocated model
 };
