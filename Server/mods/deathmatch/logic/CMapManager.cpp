@@ -15,7 +15,7 @@ extern CGame* g_pGame;
 
 CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
                          CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
-                         CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock, CLuaManager* pLuaManager,
+                         CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock,
                          CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
 {
     // Init
@@ -31,7 +31,6 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pColManager = pColManager;
     m_pWaterManager = pWaterManager;
     m_pServerClock = pClock;
-    m_pLuaManager = pLuaManager;
     m_pGroups = pGroups;
     m_pEvents = pEvents;
     m_pScriptDebugging = pScriptDebugging;

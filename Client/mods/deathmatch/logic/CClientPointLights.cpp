@@ -57,7 +57,7 @@ void CClientPointLights::DoPulse()
 
 void CClientPointLights::SetDimension(unsigned short usDimension)
 {
-    m_usDimension = usDimension;
+    CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pPointLightsManager->GetDimension());
 }
 

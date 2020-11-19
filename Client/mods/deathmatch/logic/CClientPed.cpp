@@ -253,6 +253,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     }
 
     g_pClientGame->InsertPedPointerToSet(this);
+    m_clientModel = pManager->GetModelManager()->FindModelByID(m_ulModel);
 }
 
 CClientPed::~CClientPed()
@@ -371,6 +372,7 @@ CClientPed::~CClientPed()
 
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pOccupiedVehicle, &m_pOccupyingVehicle, &m_pTargetedEntity, &m_pCurrentContactEntity,
                                               &m_pBulletImpactEntity, &m_interp.pTargetOriginSource, NULL);
+    m_clientModel = nullptr;
 }
 
 void CClientPed::SetStat(unsigned short usStat, float fValue)
@@ -4009,6 +4011,8 @@ void CClientPed::_ChangeModel()
 
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(true);
     }
+    if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+        m_clientModel = nullptr;
 }
 
 void CClientPed::ReCreateModel()

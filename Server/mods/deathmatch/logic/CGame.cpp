@@ -511,9 +511,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pWaterManager = new CWaterManager;
-    m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
+    m_pScriptDebugging = new CScriptDebugging();
     m_pMapManager = new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager,
-                                    m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pLuaManager, m_pGroups,
+                                    m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups,
                                     &m_Events, m_pScriptDebugging, &m_ElementDeleter);
     m_pACLManager = new CAccessControlListManager;
     m_pHqComms = new CHqComms;
@@ -521,9 +521,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager,
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager,
                               m_pBanManager, m_pACLManager);
-    m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
+    m_pMainConfig = new CMainConfig(m_pConsole);
     m_pRPCFunctions = new CRPCFunctions;
 
     m_pWeaponStatsManager = new CWeaponStatManager();
@@ -1536,6 +1536,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
+    m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
 
     // Radar area events
 

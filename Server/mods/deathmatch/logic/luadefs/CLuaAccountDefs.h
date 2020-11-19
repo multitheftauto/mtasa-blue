@@ -19,7 +19,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Log in/out
-    LUA_DECLARE(LogIn);
+    static bool LogIn(CPlayer* pPlayer, CAccount* pAccount, std::optional<std::string> password);
     LUA_DECLARE(LogOut);
 
     // Account get funcs

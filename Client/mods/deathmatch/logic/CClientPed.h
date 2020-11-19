@@ -18,6 +18,7 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include "CClientModel.h"
 #include <memory>
 
 class CClientCamera;
@@ -757,4 +758,6 @@ public:
     bool           m_bNoNewVehicleTask;         // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
     ElementID      m_NoNewVehicleTaskReasonID;  // ElementID of the vehicle that we are waiting on
     CClientPed*    m_pGettingJackedBy;          // The ped that is jacking us
+
+    std::shared_ptr<CClientModel> m_clientModel;
 };

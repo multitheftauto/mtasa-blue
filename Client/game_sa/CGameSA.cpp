@@ -96,7 +96,6 @@ CGameSA::CGameSA()
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
-    this->m_pText = new CTextSA();
     this->m_pStats = new CStatsSA();
     this->m_pFont = new CFontSA();
     this->m_pPathFind = new CPathFindSA();
@@ -237,7 +236,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
-    delete reinterpret_cast<CTextSA*>(m_pText);
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
