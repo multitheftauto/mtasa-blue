@@ -30,7 +30,7 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
-const char* const DEFAULT_NEW_CEGUI_SKIN_NAME = "VanillaSkin";
+const char* const DEFAULT_NEW_CEGUI_SKIN_NAME = "WindowsLook";
 
 using namespace GUINew;
 
@@ -52,6 +52,9 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
     m_pSchemeManager = CEGUI::SchemeManager::getSingletonPtr();
     m_pWindowManager = CEGUI::WindowManager::getSingletonPtr();
     m_pWindowFactoryManager = CEGUI::WindowFactoryManager::getSingletonPtr();
+
+    // Setup system keys
+    m_pSystemKeys = &CEGUI::SystemKeys();
 
     m_pGeometryBuffer = &m_pRenderer->createGeometryBuffer();
 
@@ -1283,31 +1286,34 @@ bool CGUI_Impl::Event_MouseEnter(const CEGUI::EventArgs& Args)
     if (pElement)
         pElement->Event_OnMouseEnter();
 
-    //if (m_MouseEnterHandlers[m_Channel])
-    //{
-    //    CGUIMouseEventArgs NewArgs;
+    if (m_MouseEnterHandlers[m_Channel])
+    {
+        CGUIMouseEventArgs NewArgs;
 
-    //    // copy the variables
-    //    NewArgs.pWindow = pElement;
-    //    NewArgs.button = static_cast<CGUIMouse::MouseButton>(e.button);
-    //    NewArgs.moveDelta = CVector2D(e.moveDelta.d_x, e.moveDelta.d_y);
-    //    NewArgs.position = CGUIPosition(e.position.d_x, e.position.d_y);
-    //    NewArgs.sysKeys = e.sysKeys;
-    //    NewArgs.wheelChange = e.wheelChange;
-    //    NewArgs.clickCount = e.clickCount;
-    //    if (e.switchedWindow)
-    //    {
-    //        CEGUI::Window* Master = GetMasterWindow(e.switchedWindow);
-    //        // If the source and target windows are the same, don't bother triggering this
-    //        if (Master == wnd)
-    //            return true;
-    //        NewArgs.pSwitchedWindow = reinterpret_cast<CGUIElement*>(Master->getUserData());
-    //    }
-    //    else
-    //        NewArgs.pSwitchedWindow = NULL;
+        // copy the variables
+        NewArgs.pWindow = pElement;
+        NewArgs.button = static_cast<CGUIMouse::MouseButton>(e.button);
+        NewArgs.moveDelta = CVector2D(e.moveDelta.d_x, e.moveDelta.d_y);
+        NewArgs.position = CGUIPosition(e.position.d_x, e.position.d_y);
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
+        NewArgs.clickCount = e.clickCount;
 
-    //    m_MouseEnterHandlers[m_Channel](NewArgs);
-    //}
+        CEGUI::Window* switchedWindow = m_pSystem->getDefaultGUIContext().getWindowContainingMouse();
+
+        if (switchedWindow)
+        {
+            CEGUI::Window* Master = GetMasterWindow(switchedWindow);
+            // If the source and target windows are the same, don't bother triggering this
+            if (Master == wnd)
+                return true;
+            NewArgs.pSwitchedWindow = reinterpret_cast<CGUIElement*>(Master->getUserData());
+        }
+        else
+            NewArgs.pSwitchedWindow = NULL;
+
+        m_MouseEnterHandlers[m_Channel](NewArgs);
+    }
 
     return true;
 }
@@ -1345,16 +1351,19 @@ bool CGUI_Impl::Event_MouseLeave(const CEGUI::EventArgs& Args)
         NewArgs.sysKeys = e.sysKeys;
         NewArgs.wheelChange = e.wheelChange;
         NewArgs.clickCount = e.clickCount;
-        //if (e.switchedWindow)
-        //{
-        //    CEGUI::Window* Master = GetMasterWindow(e.switchedWindow);
-        //    // If the source and target windows are the same, don't bother triggering this
-        //    if (Master == wnd)
-        //        return true;
-        //    NewArgs.pSwitchedWindow = reinterpret_cast<CGUIElement*>(Master->getUserData());
-        //}
-        //else
-        //    NewArgs.pSwitchedWindow = NULL;
+
+        CEGUI::Window* switchedWindow = m_pSystem->getDefaultGUIContext().getWindowContainingMouse();
+
+        if (switchedWindow)
+        {
+            CEGUI::Window* Master = GetMasterWindow(switchedWindow);
+            // If the source and target windows are the same, don't bother triggering this
+            if (Master == wnd)
+                return true;
+            NewArgs.pSwitchedWindow = reinterpret_cast<CGUIElement*>(Master->getUserData());
+        }
+        else
+            NewArgs.pSwitchedWindow = NULL;
 
         m_MouseLeaveHandlers[m_Channel](NewArgs);
     }
