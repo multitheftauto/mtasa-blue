@@ -12,7 +12,7 @@ class CClientModel;
 
 #pragma once
 
-#include <list>
+#include <optional>
 
 enum class eClientModelType
 {
@@ -31,10 +31,11 @@ class CClientModel
 public:
     CClientModel(int iModelID, eClientModelType eModelType);
     ~CClientModel(void);
-
+    
+public:
     int              GetModelID(void) const { return m_iModelID; };
     eClientModelType GetModelType(void) const { return m_eModelType; };
-    bool             Allocate(ushort usParentID);
+    bool             Allocate(std::optional<ushort> usParentID);
     bool             Deallocate(void);
     void             RestoreEntitiesUsingThisModel();
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }

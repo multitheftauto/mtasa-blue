@@ -21,8 +21,11 @@ CClientModel::~CClientModel(void)
     Deallocate();
 }
 
-bool CClientModel::Allocate(ushort usParentID)
+bool CClientModel::Allocate(std::optional<ushort> usParentID)
 {
+    if (!usParentID.has_value())
+        usParentID.emplace(GetDefaultParentModel(m_eModelType));
+
     m_bAllocatedByUs = true;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
@@ -37,16 +40,16 @@ bool CClientModel::Allocate(ushort usParentID)
             pModelInfo->MakePedModel("PSYCHO");
             break;
         case eClientModelType::OBJECT:
-            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID.value()))
             {
-                pModelInfo->MakeObjectModel(usParentID);
+                pModelInfo->MakeObjectModel(usParentID.value());
                 return true;
             }
             break;
         case eClientModelType::VEHICLE:
-            if (g_pClientGame->GetVehicleManager()->IsValidModel(usParentID))
+            if (g_pClientGame->GetVehicleManager()->IsValidModel(usParentID.value()))
             {
-                pModelInfo->MakeVehicleAutomobile(usParentID);
+                pModelInfo->MakeVehicleAutomobile(usParentID.value());
                 return true;
             }
             break;
