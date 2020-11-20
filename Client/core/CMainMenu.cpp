@@ -1016,7 +1016,7 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
 
     if (g_pCore->GetLocalization()->IsLocalized())
     {
-        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename), "mta_basedir"))
+        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename), "absolute"))
             pImage->LoadFromFile(PathJoin("cgui/images", szFilename));
     }
     else
