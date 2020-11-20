@@ -56,6 +56,7 @@ public:
     virtual void SetBidiEnabled(bool bEnabled) = 0;
 
     virtual SString GetDefaultSkinName() = 0;
+    virtual SString GetElementPrefix() = 0;
 
     virtual void Draw() = 0;
     virtual void Invalidate() = 0;

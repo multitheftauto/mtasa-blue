@@ -30,7 +30,8 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
-const char* const DEFAULT_NEW_CEGUI_SKIN_NAME = "WindowsLook";
+const char* const CEGUI_DEFAULT_SKIN_NAME = "WindowsLook";
+const char* const CEGUI_ELEMENT_PREFIX = "WindowsLook"; // e.g CGUI/Button
 
 using namespace GUINew;
 
@@ -142,7 +143,12 @@ void CGUI_Impl::destroy()
 
 SString CGUI_Impl::GetDefaultSkinName()
 {
-    return DEFAULT_NEW_CEGUI_SKIN_NAME;
+    return CEGUI_DEFAULT_SKIN_NAME;
+}
+
+SString CGUI_Impl::GetElementPrefix()
+{
+    return CEGUI_ELEMENT_PREFIX;
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
@@ -160,8 +166,8 @@ void CGUI_Impl::SetSkin(const char* szName)
     
     m_HasSchemeLoaded = true;
 
-    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage(GetDefaultSkinName() + "/MouseArrow");
-    m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType(GetDefaultSkinName() + "/Tooltip");
+    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage(GetElementPrefix() + "/MouseArrow");
+    m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType(GetElementPrefix() + "/Tooltip");
 
     // Destroy any windows we already have
     m_pWindowManager->destroyAllWindows();

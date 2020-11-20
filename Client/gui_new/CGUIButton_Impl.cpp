@@ -24,7 +24,7 @@ CGUIButton_Impl::CGUIButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIBUTTON_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetElementPrefix() + "/" + CGUIBUTTON_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
 
     m_pWindow->setText(CGUI_Impl::GetUTFString(szCaption));

@@ -77,6 +77,7 @@ public:
     void ProcessCharacter(unsigned long ulCharacter);
     
     SString GetDefaultSkinName();
+    SString GetElementPrefix();
 
     //
     bool                 GetGUIInputEnabled();

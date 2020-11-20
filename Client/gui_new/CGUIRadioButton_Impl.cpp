@@ -24,7 +24,7 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIRADIOBUTTON_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetElementPrefix() + "/" + CGUIRADIOBUTTON_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
 
     m_pWindow->setText(szCaption);
