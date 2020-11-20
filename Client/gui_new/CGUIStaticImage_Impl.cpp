@@ -32,7 +32,10 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUISTATICIMAGE_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setArea(CEGUI::Rect(CEGUI::UDim(0.0f, 0), CEGUI::UDim(0.0f, 0), CEGUI::UDim(1.0f, 0), CEGUI::UDim(1.0f, 0)));
-    m_pWindow->setProperty("BackgroundEnabled", "false");
+    m_pWindow->setProperty("BackgroundEnabled", "False");
+
+    // Make sure frame is disabled
+    SetFrameEnabled(false);
 
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData(reinterpret_cast<void*>(this));
@@ -124,7 +127,7 @@ void CGUIStaticImage_Impl::Clear()
     if (!m_pImage)
         return;
 
-    m_pImagesetManager->destroy(m_pImage->getName());
+    //m_pImagesetManager->destroy(m_pImage->getName());
 }
 
 bool CGUIStaticImage_Impl::GetNativeSize(CVector2D& vecSize)
@@ -142,12 +145,12 @@ bool CGUIStaticImage_Impl::GetNativeSize(CVector2D& vecSize)
 
 void CGUIStaticImage_Impl::SetFrameEnabled(bool bFrameEnabled)
 {
-    m_pWindow->setProperty("FrameEnabled", "false");
+    m_pWindow->setProperty("FrameEnabled", bFrameEnabled ? "True" : "False");
 }
 
 bool CGUIStaticImage_Impl::IsFrameEnabled()
 {
-    return m_pWindow->getProperty("FrameEnabled") == "true" ? true : false;
+    return m_pWindow->getProperty("FrameEnabled") == "True" ? true : false;
 }
 
 CEGUI::Image* CGUIStaticImage_Impl::GetDirectImage()

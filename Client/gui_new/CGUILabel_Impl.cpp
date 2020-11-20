@@ -28,7 +28,6 @@ CGUILabel_Impl::CGUILabel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char
     m_pWindow->setDestroyedByParent(false);
 
     m_pWindow->setText(szText);
-    m_pLabel = reinterpret_cast<CEGUI::TextComponent*>(m_pWindow);
     
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData(reinterpret_cast<void*>(this));
@@ -78,7 +77,7 @@ void CGUILabel_Impl::SetVerticalAlign(CGUIVerticalAlign eAlign)
 
 CGUIVerticalAlign CGUILabel_Impl::GetVerticalAlign()
 {
-    SString verticalAlign = m_pWindow->getProperty("VertFormatting");
+    SString verticalAlign = m_pWindow->getProperty("VertFormatting").c_str();
 
     if (verticalAlign == CGUIVerticalAlignValues[1])
         return CGUIVerticalAlign::CGUI_ALIGN_TOP;
@@ -100,7 +99,7 @@ void CGUILabel_Impl::SetHorizontalAlign(CGUIHorizontalAlign eAlign)
 
 CGUIHorizontalAlign CGUILabel_Impl::GetHorizontalAlign()
 {
-    SString horizontalAlign = m_pWindow->getProperty("HorzFormatting");
+    SString horizontalAlign = m_pWindow->getProperty("HorzFormatting").c_str();
 
     if (horizontalAlign == CGUIHorizontalAlignValues[1])
         return CGUIHorizontalAlign::CGUI_ALIGN_LEFT;
@@ -126,12 +125,24 @@ CGUIHorizontalAlign CGUILabel_Impl::GetHorizontalAlign()
 
 void CGUILabel_Impl::SetTextColor(CGUIColor Color)
 {
-    //m_pLabel->setColours(CEGUI::Colour(1.0f / 255.0f * Color.R, 1.0f / 255.0f * Color.G, 1.0f / 255.0f * Color.B));
+    std::uint32_t argb = 0xFF000000; // alpha 255
+    argb |= static_cast<std::uint32_t>(Color.R) << 16;
+    argb |= static_cast<std::uint32_t>(Color.G) << 8;
+    argb |= static_cast<std::uint32_t>(Color.B);
+    SString hexString = SString("%08x", argb).ToUpper();
+
+    m_pWindow->setProperty("TextColours", SString("tl:%s tr:%s bl:%s br:%s", *hexString, *hexString, *hexString, *hexString));
 }
 
 void CGUILabel_Impl::SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    //m_pLabel->setColours(CEGUI::Colour(1.0f / 255.0f * ucRed, 1.0f / 255.0f * ucGreen, 1.0f / 255.0f * ucBlue));
+    std::uint32_t argb = 0xFF000000; // alpha 255
+    argb |= static_cast<std::uint32_t>(ucRed) << 16;
+    argb |= static_cast<std::uint32_t>(ucGreen) << 8;
+    argb |= static_cast<std::uint32_t>(ucBlue);
+    SString hexString = SString("%08x", argb).ToUpper();
+
+    m_pWindow->setProperty("TextColours", SString("tl:%s tr:%s bl:%s br:%s", *hexString, *hexString, *hexString, *hexString));
 }
 
 CGUIColor CGUILabel_Impl::GetTextColor()
@@ -153,12 +164,12 @@ void CGUILabel_Impl::GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, 
 
 void CGUILabel_Impl::SetFrameEnabled(bool bFrameEnabled)
 {
-    reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setFrameEnabled(bFrameEnabled);
+    m_pWindow->setProperty("FrameEnabled", bFrameEnabled ? "True" : "False");
 }
 
 bool CGUILabel_Impl::IsFrameEnabled()
 {
-    return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isFrameEnabled();
+    return m_pWindow->getProperty("FrameEnabled") == "True" ? true : false;
 }
 
 float CGUILabel_Impl::GetCharacterWidth(int iCharIndex)
