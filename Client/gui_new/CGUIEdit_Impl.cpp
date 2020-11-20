@@ -24,7 +24,7 @@ CGUIEdit_Impl::CGUIEdit_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* 
     pGUI->GetUniqueName(szUnique);
 
     // Create the edit and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIEDIT_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetElementPrefix() + "/" + CGUIEDIT_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setArea(CEGUI::URect(CEGUI::UDim(0, 0.00f), CEGUI::UDim(0, 0.00f), CEGUI::UDim(0, 0.128f), CEGUI::UDim(0, 0.24f)));
 

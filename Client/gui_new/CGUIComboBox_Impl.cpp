@@ -24,7 +24,7 @@ CGUIComboBox_Impl::CGUIComboBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, cons
     pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUICOMBOBOX_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetElementPrefix() + "/" + CGUICOMBOBOX_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
 
     // This needs a better alternative, so changing comboBox will change this - Jyrno42

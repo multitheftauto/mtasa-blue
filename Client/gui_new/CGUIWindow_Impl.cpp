@@ -34,7 +34,7 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     if (!m_pWindow)
     {
         // Create new here
-        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIWINDOW_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetElementPrefix() + "/" + CGUIWINDOW_NAME, szUnique);
         m_pWindow->setArea(CEGUI::URect(CEGUI::UDim(0.10f, 0), CEGUI::UDim(0.10f, 0), CEGUI::UDim(0.60f, 0), CEGUI::UDim(0.90f, 0)));
         m_pWindow->setAlpha(0.8f);
 

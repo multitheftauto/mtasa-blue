@@ -28,7 +28,7 @@ CGUIWebBrowser_Impl::CGUIWebBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
     pGUI->GetUniqueName(szUnique);
 
     // Create the control and set default properties
-    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetDefaultSkinName() + "/" + CGUIWEBBROWSER_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->GetElementPrefix() + "/" + CGUIWEBBROWSER_NAME, szUnique);
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setArea(CEGUI::Rect(CEGUI::UDim(0.0f, 0), CEGUI::UDim(0.0f, 0), CEGUI::UDim(1.0f, 0), CEGUI::UDim(1.0f, 0)));
     m_pWindow->setProperty("BackgroundEnabled", "false");

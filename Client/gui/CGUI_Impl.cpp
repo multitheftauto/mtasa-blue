@@ -30,6 +30,9 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
+const char* const CEGUI_DEFAULT_SKIN_NAME = "Default";
+const char* const CEGUI_ELEMENT_PREFIX = "CGUI"; // e.g CGUI/Button
+
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f)
 {
     m_RenderOkTimer.SetMaxIncrement(100);
@@ -278,7 +281,12 @@ void CGUI_Impl::ProcessKeyboardInput(unsigned long ulKey, bool bIsDown)
 
 SString CGUI_Impl::GetDefaultSkinName()
 {
-    return "Default";
+    return CEGUI_DEFAULT_SKIN_NAME;
+}
+
+SString CGUI_Impl::GetElementPrefix()
+{
+    return CEGUI_ELEMENT_PREFIX;
 }
 
 bool CGUI_Impl::GetGUIInputEnabled()

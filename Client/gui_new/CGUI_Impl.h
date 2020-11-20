@@ -68,6 +68,7 @@ public:
     // static CEGUI::String GetUTFString(const CEGUI::String& strInput);            // Not defined
 
     SString GetDefaultSkinName();
+    SString GetElementPrefix();
 
     //
     CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags);
