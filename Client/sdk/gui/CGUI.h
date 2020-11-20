@@ -57,6 +57,7 @@ public:
 
     virtual SString GetDefaultSkinName() = 0;
     virtual SString GetElementPrefix() = 0;
+    virtual SString GetImagesetPrefix() = 0;
 
     virtual void Draw() = 0;
     virtual void Invalidate() = 0;

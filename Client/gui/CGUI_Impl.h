@@ -78,6 +78,7 @@ public:
     
     SString GetDefaultSkinName();
     SString GetElementPrefix();
+    SString GetImagesetPrefix();
 
     //
     bool                 GetGUIInputEnabled();

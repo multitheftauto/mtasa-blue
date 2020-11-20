@@ -30,8 +30,9 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
-const char* const CEGUI_DEFAULT_SKIN_NAME = "WindowsLook";
-const char* const CEGUI_ELEMENT_PREFIX = "WindowsLook"; // e.g CGUI/Button
+const char* const CEGUI_DEFAULT_SKIN_NAME = "MTADefault";
+const char* const CEGUI_ELEMENT_PREFIX = "CGUI"; // e.g CGUI/Button
+const char* const CEGUI_IMAGESET_PREFIX = "CGUI-Images"; // e.g CGUI-Images/MouseArrow
 
 using namespace GUINew;
 
@@ -151,6 +152,11 @@ SString CGUI_Impl::GetElementPrefix()
     return CEGUI_ELEMENT_PREFIX;
 }
 
+SString CGUI_Impl::GetImagesetPrefix()
+{
+    return CEGUI_IMAGESET_PREFIX;
+}
+
 void CGUI_Impl::SetSkin(const char* szName)
 {
     if (m_HasSchemeLoaded)
@@ -166,7 +172,7 @@ void CGUI_Impl::SetSkin(const char* szName)
     
     m_HasSchemeLoaded = true;
 
-    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage(GetElementPrefix() + "/MouseArrow");
+    m_pSystem->getDefaultGUIContext().getMouseCursor().setDefaultImage(GetImagesetPrefix() + "/MouseArrow");
     m_pSystem->getSingleton().getDefaultGUIContext().setDefaultTooltipType(GetElementPrefix() + "/Tooltip");
 
     // Destroy any windows we already have
