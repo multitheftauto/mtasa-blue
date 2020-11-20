@@ -68,7 +68,7 @@
 // std::basic_string allocated according to allocator config
 #define CEGUI_STRING_CLASS_STD_AO 3
 
-#define CEGUI_STRING_CLASS 2
+#define CEGUI_STRING_CLASS 1
 
 //////////////////////////////////////////////////////////////////////////
 // Set this to the default XMLParser to be used.
@@ -169,10 +169,10 @@
 // Uncommenting CEGUI_USE_FRIBIDI uses an external copy of fribidi to
 // provide the bidirectional support (not supplied).
 //////////////////////////////////////////////////////////////////////////
-    // #define CEGUI_BIDI_SUPPORT
+#define CEGUI_BIDI_SUPPORT
 
 // Uncomment this to use the embedded minibidi library.
-    // #define CEGUI_USE_MINIBIDI
+#define CEGUI_USE_MINIBIDI
 // - or -
 // Uncomment this to use an external fribidi library.
     // #define CEGUI_USE_FRIBIDI
