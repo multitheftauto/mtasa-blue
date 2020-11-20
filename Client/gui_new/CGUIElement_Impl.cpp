@@ -212,7 +212,7 @@ void CGUIElement_Impl::SetText(const char* szText)
 
 std::string CGUIElement_Impl::GetText()
 {
-    return m_pWindow->getText().c_str();
+    return CGUI_Impl::GetUTFString(m_pWindow->getText().c_str()).c_str();
 }
 
 void CGUIElement_Impl::SetAlpha(float fAlpha)

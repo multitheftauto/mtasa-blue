@@ -96,7 +96,6 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
     //m_pWindowFactoryManager->addFactory(&CEGUI::getImageListboxItemFactory());
     //m_pWindowFactoryManager->addFalagardWindowMapping("CGUI/ImageListboxItem", "CEGUI/ItemEntry", "CGUI/ImageListboxItem", "Falagard/ItemEntry");
 
-
     // Set logging to Informative for debug and Standard for release
 #if defined(_DEBUG) || defined(DEBUG)
     CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
@@ -378,13 +377,13 @@ eInputMode CGUI_Impl::GetGUIInputMode()
 
 CEGUI::String CGUI_Impl::GetUTFString(const char* szInput)
 {
-    CEGUI::String strUTF = szInput;            // Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)szInput;            // Convert into a CEGUI String
     return strUTF;
 }
 
 CEGUI::String CGUI_Impl::GetUTFString(const std::string& strInput)
 {
-    CEGUI::String strUTF = strInput.c_str();            // Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str();            // Convert into a CEGUI String
     return strUTF;
 }
 
@@ -705,23 +704,21 @@ CGUIFont* CGUI_Impl::GetSansFont()
 
 float CGUI_Impl::GetTextExtent(const char* szText, const char* szFont)
 {
-    //return m_pFontManager->getFont(szFont)->getTextExtent(CGUI_Impl::GetUTFString(szText));
-    return 1;
+    return m_pFontManager->get(szFont).getTextExtent(CGUI_Impl::GetUTFString(szText));
 }
 
 float CGUI_Impl::GetMaxTextExtent(SString strFont, SString arg, ...)
 {
-    //float   fMaxTextExtent = NULL;
-    //va_list arguments;
-    //for (va_start(arguments, arg); arg != ""; arg = va_arg(arguments, SString))
-    //{
-    //    float fExtent = m_pFontManager->getFont(strFont)->getTextExtent(CGUI_Impl::GetUTFString(arg));
-    //    if (fExtent > fMaxTextExtent)
-    //        fMaxTextExtent = fExtent;
-    //}
-    //va_end(arguments);
-    //return fMaxTextExtent;
-    return 1;
+    float   fMaxTextExtent = NULL;
+    va_list arguments;
+    for (va_start(arguments, arg); arg != ""; arg = va_arg(arguments, SString))
+    {
+        float fExtent = m_pFontManager->get(strFont).getTextExtent(CGUI_Impl::GetUTFString(arg));
+        if (fExtent > fMaxTextExtent)
+            fMaxTextExtent = fExtent;
+    }
+    va_end(arguments);
+    return fMaxTextExtent;
 }
 
 bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
