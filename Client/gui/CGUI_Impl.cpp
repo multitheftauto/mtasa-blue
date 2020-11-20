@@ -32,6 +32,7 @@ using std::list;
 
 const char* const CEGUI_DEFAULT_SKIN_NAME = "Default";
 const char* const CEGUI_ELEMENT_PREFIX = "CGUI"; // e.g CGUI/Button
+const char* const CEGUI_IMAGESET_PREFIX = "CGUI-Images"; // e.g CGUI-Images/MouseArrow
 
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f)
 {
@@ -287,6 +288,11 @@ SString CGUI_Impl::GetDefaultSkinName()
 SString CGUI_Impl::GetElementPrefix()
 {
     return CEGUI_ELEMENT_PREFIX;
+}
+
+SString CGUI_Impl::GetImagesetPrefix()
+{
+    return CEGUI_IMAGESET_PREFIX;
 }
 
 bool CGUI_Impl::GetGUIInputEnabled()

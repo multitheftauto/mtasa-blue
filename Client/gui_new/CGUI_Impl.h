@@ -69,6 +69,7 @@ public:
 
     SString GetDefaultSkinName();
     SString GetElementPrefix();
+    SString GetImagesetPrefix();
 
     //
     CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags);
