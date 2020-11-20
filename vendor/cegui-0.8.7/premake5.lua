@@ -54,7 +54,8 @@ project "CEGUI-0.8.7"
 		"src/MinizipResourceProvider.cpp",
 		"include/CEGUI/MinizipResourceProvider.h",
 		"src/IconvStringTranscoder.cpp",
-		"include/CEGUI/IconvStringTranscoder.h"
+		"include/CEGUI/IconvStringTranscoder.h",
+		"src/minibidi.cpp"
 	}
 
 	filter "architecture:x64"
