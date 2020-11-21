@@ -11,6 +11,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#include <game/FileTypes.h>
+
 #include "CRenderWareSA.ShaderMatching.h"
 
 #define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40
@@ -103,7 +106,7 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId - 20000;
+    ushort usTxdId = (ushort)dwTxdId - GetBaseIDforTXD();
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));

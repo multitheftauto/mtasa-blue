@@ -11,6 +11,7 @@
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
+#include <game/FileTypes.h>
 #include "CModelCacheManager.h"
 
 DECLARE_ENUM(ePools);
@@ -474,8 +475,11 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     memStatsInfo.iStreamingMemoryUsed = *(int*)0x08E4CB4;
     memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
 
-    uint* pModelInfoArray = (uint*)0x08E4CC0;
-    for (uint i = 0; i < 25755; i++)
+    uint* pModelInfoArray = (uint*)*(void**)(0x403DA4 + 3);
+
+    unsigned int RRR_BASE_ID = GetBaseIDforRRR();
+
+    for (uint i = 0; i < RRR_BASE_ID; i++)
     {
         uint* pModelInfo = pModelInfoArray + 5 * i;
         uint  uiLoadedFlag = pModelInfo[4];
@@ -496,17 +500,17 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
                 memStatsInfo.modelInfo.uiUnknown_612_999++;
             else if (i < 1194)
                 memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
-            else if (i < 20000)
+            else if (i < GetBaseIDforTXD())
                 memStatsInfo.modelInfo.uiUnknown_1194_19999++;
-            else if (i < 25000)
+            else if (i < GetBaseIDforCOL())
                 memStatsInfo.modelInfo.uiTextures_20000_24999++;
-            else if (i < 25255)
+            else if (i < GetBaseIDforIPL())
                 memStatsInfo.modelInfo.uiCollisions_25000_25254++;
-            else if (i < 25511)
+            else if (i < GetBaseIDforDAT())
                 memStatsInfo.modelInfo.uiIpls_25255_25510++;
-            else if (i < 25575)
+            else if (i < GetBaseIDforIFP())
                 memStatsInfo.modelInfo.uiPaths_25511_25574++;
-            else if (i < 25755)
+            else if (i < GetBaseIDforRRR())
                 memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }

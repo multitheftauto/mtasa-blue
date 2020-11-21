@@ -33,7 +33,8 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_MAX                   26000       // Actual max is 25755
+// #define     MODELINFO_MAX                   26000       // Actual max is 25755
+static int MODELINFO_MAX = *(int32_t*)(0x46A574 + 2);            // let's derive it from SCM base ID
 #define     OBJECTDYNAMICINFO_MAX           160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
@@ -107,7 +108,7 @@ class CGameSA : public CGame
 
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA ModelInfo[MODELINFO_MAX];
+    CModelInfoSA* ModelInfo;
     CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
 public:
     ZERO_ON_NEW
