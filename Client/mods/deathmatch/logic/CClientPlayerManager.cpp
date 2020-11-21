@@ -10,6 +10,8 @@
 
 #include "StdInc.h"
 
+#include <game/FileTypes.h>
+
 #define REMOTE_PLAYER_CONNECTION_TROUBLE_TIME 6000
 
 using std::list;
@@ -178,7 +180,7 @@ bool CClientPlayerManager::IsPlayerLimitReached()
 
 bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
 {
-    if (ulModel < MAX_MODEL_ID)
+    if (ulModel < GetBaseIDforTXD())
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
         return pModelInfo && pModelInfo->IsPlayerModel();

@@ -145,14 +145,15 @@ DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
 DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
 void _declspec(naked) HOOK_CrashFix_Misc5()
 {
-    _asm
-    {
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+    _asm {
+        mov edi, dword ptr[ARRAY_ModelInfo]
+        mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont        // Skip much code if edi is zero (ped has no model)
+        je      cont            // Skip much code if edi is zero (ped has no model)
 
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+        mov edi, dword ptr[ARRAY_ModelInfo]
+        mov     edi, dword ptr [ecx*4+edi]
         jmp     RETURN_CrashFix_Misc5
     cont:
         push    5
@@ -1012,7 +1013,7 @@ struct CStreamingInfo
 
 CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 {
-    CStreamingInfo* pItemInfo = (CStreamingInfo*)(0x8E4CC0);
+    CStreamingInfo* pItemInfo = (CStreamingInfo*)(CStreaming__ms_aInfoForModel);
     return pItemInfo + id;
 }
 
@@ -1072,7 +1073,8 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
         popad
 
         // Continue replaced code
-        mov     ecx,dword ptr [eax*4+0A9B0C8h]
+        mov ecx, dword ptr[ARRAY_ModelInfo]
+        mov     ecx,dword ptr [eax*4+ecx]
         jmp     RETURN_CEntity_GetBoundRect
     }
 }
@@ -1316,7 +1318,11 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         popad
 
         // Replaced code
-        mov     eax, 0x0A9B0C8[eax*4]
+        push    ecx
+        mov     ecx, ARRAY_ModelInfo
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
     }
 }

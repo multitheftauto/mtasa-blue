@@ -42,6 +42,8 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
+    ModelInfo = new CModelInfoSA[MODELINFO_MAX];
+
     SetInitialVirtualProtect();
 
     // Initialize the offsets
@@ -259,6 +261,8 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+
+    delete[] ModelInfo;
 }
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)

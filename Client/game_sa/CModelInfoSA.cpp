@@ -10,11 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#include <game/FileTypes.h>
 #include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
-CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
+CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
@@ -266,7 +268,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
     //  if(this->IsVehicle())
     //  {
-    DWORD dwModelInfo = ARRAY_ModelInfo;
+    DWORD dwModelInfo = (DWORD)ARRAY_ModelInfo;
     DWORD dwFunc = FUNC_CText_Get;
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
@@ -279,7 +281,7 @@ char* CModelInfoSA::GetNameIfVehicle()
 
             mov     ebx, ModelID
             lea     ebx, [ebx*4]
-            add     ebx, ARRAY_ModelInfo
+            add     ebx, dword ptr[ARRAY_ModelInfo]
             mov     eax, [ebx]
             add     eax, 50
 
@@ -335,11 +337,11 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
         uint uiAnimFileIndex = GetAnimFileIndex();
         if (uiAnimFileIndex != 0xffffffff)
         {
-            uint          uiAnimId = uiAnimFileIndex + 25575;
+            uint          uiAnimId = uiAnimFileIndex + GetBaseIDforIFP();
             CModelInfoSA* pAnim = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiAnimId));
             if (!pAnim)
             {
-                if (uiAnimId != 25714)
+                if (uiAnimId != GetBaseIDforIFP() + 139)
                     LogEvent(505, "Model no anim", "", SString("%d (%d)", m_dwModelID, uiAnimId));
             }
             else if (!pAnim->IsLoaded())
@@ -469,7 +471,7 @@ BOOL CModelInfoSA::DoIsLoaded()
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
-    if (m_dwModelID < 20000)
+    if (m_dwModelID < GetBaseIDforTXD())
     {
         m_pInterface = ppModelInfo[m_dwModelID];
 
@@ -515,7 +517,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
 
 bool CModelInfoSA::IsValid()
 {
-    if (m_dwModelID >= 20000 && m_dwModelID < MODELINFO_MAX)
+    if (m_dwModelID >= GetBaseIDforTXD() && m_dwModelID < MODELINFO_MAX)
         return true;
     return ppModelInfo[m_dwModelID] != 0;
 }
@@ -525,10 +527,14 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     FLOAT fReturn = 0;
-    _asm
-    {
+    _asm {
         mov     eax, ModelID
-        mov     eax, ARRAY_ModelInfo[eax*4]
+
+        push    ecx
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
         mov     eax, [eax+20]
         cmp     eax, 0
         jz      skip
@@ -763,7 +769,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(*it);
-        MemPut<BYTE>(ARRAY_ModelLoaded + 20 * (*it), 0);
+        MemPut<BYTE>((char*)CStreaming__ms_aInfoForModel + 20 * (*it), 0);
     }
 }
 
@@ -896,8 +902,14 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
         _asm
         {
             mov     eax, ModelID
-            movsx   edx, usUpgrade
-            mov     eax, ARRAY_ModelInfo[eax*4]
+
+            push    ecx
+            mov ecx, dword ptr[ARRAY_ModelInfo]
+            mov     eax, dword ptr[ecx + eax*4]
+            pop     ecx
+
+
+            movsx   edx, usUpgrade;
             mov     ax, [eax+edx*2+0x2D6]
             mov     sreturn, ax
         }
@@ -912,7 +924,8 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
     _asm
     {
         mov     eax, ModelID
-        lea     ecx, ARRAY_ModelInfo[eax*4]
+        mov ecx, dword ptr[ARRAY_ModelInfo]
+        mov     ecx, dword ptr[ecx + eax*4]
 
         mov     eax, posn
         mov     ecx, [ecx+0x5C]
@@ -938,7 +951,12 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
     {
         push    ecx
         mov     ecx, ModelID
-        mov     ecx, ARRAY_ModelInfo[ecx*4]
+
+        push    eax
+        mov     eax, dword ptr[ARRAY_ModelInfo]
+        mov     ecx, dword ptr[eax + ecx*4]
+        pop     eax
+
         add     ecx, 40
         mov     szStoredText, ecx
         pop     ecx
@@ -956,7 +974,12 @@ unsigned int CModelInfoSA::GetNumRemaps()
     _asm
     {
         mov     ecx, ModelID
-        mov     ecx, ARRAY_ModelInfo[ecx*4]
+
+        push    eax
+        mov     eax, dword ptr[ARRAY_ModelInfo]
+        mov     ecx, dword ptr[eax + ecx*4]
+        pop     eax
+
         call    dwFunc
         mov     uiReturn, eax
     }
@@ -1230,7 +1253,12 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         _asm
         {
             mov     ecx, ModelID
-            mov     ecx, ARRAY_ModelInfo[ecx*4]
+
+            push    eax
+            mov     eax, dword ptr[ARRAY_ModelInfo]
+            mov     ecx, dword ptr[eax + ecx*4]
+            pop     eax
+
             push    1
             push    pColModelInterface
             call    dwFunc
@@ -1283,7 +1311,12 @@ void CModelInfoSA::RestoreColModel()
             _asm
             {
                 mov     ecx, ModelID
-                mov     ecx, ARRAY_ModelInfo[ecx*4]
+
+                push    eax
+                mov     eax, dword ptr[ARRAY_ModelInfo]
+                mov     ecx, dword ptr[eax + ecx*4]
+                pop     eax
+
                 push    1
                 push    dwOriginalColModelInterface
                 call    dwFunc

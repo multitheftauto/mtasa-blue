@@ -10,9 +10,11 @@
 
 #include "StdInc.h"
 
+#include <game/FileTypes.h>
+
 void OnModelLoaded(unsigned int uiModelID)
 {
-    if (uiModelID < 20000)
+    if (uiModelID < GetBaseIDforTXD())
         pGameInterface->GetModelInfo(uiModelID)->MakeCustomModel();
 }
 

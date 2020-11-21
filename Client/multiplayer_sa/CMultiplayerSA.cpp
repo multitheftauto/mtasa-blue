@@ -1389,8 +1389,8 @@ void CMultiplayerSA::InitHooks()
     // Fix melee doesn't work outside the world bounds.
     MemSet((void*)0x5FFAEE, 0x90, 2);
     MemSet((void*)0x5FFB4B, 0x90, 2);
-    MemSet((void*)0x5FFBA5, 0x90, 2);
-    MemSet((void*)0x5FFC03, 0x90, 2);
+    MemSet((void*)0x5FFBA2, 0x90, 5);
+    MemSet((void*)0x5FFC00, 0x90, 5);
 
     // Fix shooting sniper doesn't work outside the world bounds (for local player).
     MemSet((void*)0x7361BF, 0x90, 6);

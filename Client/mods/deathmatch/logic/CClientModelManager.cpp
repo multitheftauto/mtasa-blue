@@ -10,9 +10,16 @@
 
 #include "StdInc.h"
 
+#include <game/FileTypes.h>
+
+unsigned int MAX_MODEL_ID = GetBaseIDforTXD();
+
 CClientModelManager::CClientModelManager(CClientManager* pManager)
 {
-    for (ushort i = 0; i < MAX_MODEL_ID; i++)
+    // Allocate m_Models
+    m_Models = new CClientModel*[MAX_MODEL_ID];
+
+    for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         m_Models[i] = nullptr;
     }
@@ -22,11 +29,14 @@ CClientModelManager::~CClientModelManager(void)
 {
     // Delete all our models
     RemoveAll();
+
+    // Free m_Models
+    delete[] m_Models;
 }
 
 void CClientModelManager::RemoveAll(void)
 {
-    for (int i = 0; i < MAX_MODEL_ID; i++)
+    for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         Remove(m_Models[i]);
     }
@@ -57,7 +67,7 @@ bool CClientModelManager::Remove(CClientModel* pModel)
 
 int CClientModelManager::GetFirstFreeModelID(void)
 {
-    for (int i = 0; i < MAX_MODEL_ID; i++)
+    for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
         if (!pModelInfo->IsValid())
@@ -82,7 +92,7 @@ std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientMod
     std::vector<CClientModel*> found;
     found.reserve(m_modelCount);
 
-    for (int i = minModelID; i < MAX_MODEL_ID; i++)
+    for (unsigned int i = minModelID; i < MAX_MODEL_ID; i++)
     {
         CClientModel* model = m_Models[i];
         if (model && model->GetModelType() == type)
@@ -95,7 +105,7 @@ std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientMod
 
 void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
 {
-    for (ushort i = 0; i < MAX_MODEL_ID; i++)
+    for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         if (m_Models[i] != nullptr)
         {

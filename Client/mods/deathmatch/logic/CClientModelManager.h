@@ -16,8 +16,6 @@ class CClientModelManager;
 #include <vector>
 #include "CClientModel.h"
 
-#define MAX_MODEL_ID 20000
-
 class CClientModelManager
 {
     friend class CClientModel;
@@ -41,6 +39,6 @@ public:
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
 private:
-    CClientModel* m_Models[MAX_MODEL_ID];
+    CClientModel** m_Models;
     unsigned int m_modelCount = 0;
 };

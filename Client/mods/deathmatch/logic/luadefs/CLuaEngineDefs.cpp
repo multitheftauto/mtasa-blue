@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#include <game/FileTypes.h>
 #include <lua/CLuaFunctionParser.h>
 
 void CLuaEngineDefs::LoadFunctions()
@@ -717,7 +719,7 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
     {
         ushort usModelID = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (GitHub #446)
-        if (usModelID < 20000)
+        if (usModelID < GetBaseIDforTXD())
         {
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo)
@@ -727,7 +729,7 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
             }
         }
         else
-            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-%d] at argument 1, got \"%s\"", GetBaseIDforTXD(), *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -750,7 +752,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     {
         ushort usModelID = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (GitHub #446)
-        if (usModelID < 20000)
+        if (usModelID < GetBaseIDforTXD())
         {
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo && fDistance > 0.0f)
@@ -1597,7 +1599,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID >= 20000)
+        if (iModelID < 0 || iModelID >= GetBaseIDforTXD())
         {
             argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
             return luaL_error(luaVM, argStream.GetFullErrorMessage());

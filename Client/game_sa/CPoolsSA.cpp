@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+#include <game/FileTypes.h>
+
 extern bool g_bVehiclePointerInvalid;
 
 CPoolsSA::CPoolsSA()
@@ -1023,7 +1025,10 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     // Finally search model info array
     CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-    for (uint i = 1; i < 20000; i++)
+
+    unsigned int NUMBER_OF_MODELS = GetBaseIDforTXD();
+
+    for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
         CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
         if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
