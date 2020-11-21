@@ -100,6 +100,6 @@ public:
     LUA_DECLARE(RemovePedFromVehicle);
     LUA_DECLARE(SetPedOxygenLevel);
     LUA_DECLARE(SetPedStat);
-    LUA_DECLARE(SetPedEnterVehicle);
-    LUA_DECLARE(SetPedExitVehicle);
+    static bool SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger);
+    static bool SetPedExitVehicle(CClientPed* pPed);
 };

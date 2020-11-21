@@ -99,8 +99,8 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
-        {"setPedEnterVehicle", SetPedEnterVehicle},
-        {"setPedExitVehicle", SetPedExitVehicle},
+        {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
+        {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
     };
 
     // Add functions
@@ -2341,50 +2341,14 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedEnterVehicle(lua_State* luaVM)
+bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
 {
-    CClientPed*     pPed = nullptr;
-    CClientVehicle* pVehicle = nullptr;
-    bool            bPassenger = false;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    argStream.ReadUserData(pVehicle, nullptr);
-    argStream.ReadBool(bPassenger, false);
-
-    if (!argStream.HasErrors())
-    {
-        if (pPed->EnterVehicle(pVehicle, bPassenger))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
+    bool bPassenger = bOptPassenger.value_or(false);
+    return pPed->EnterVehicle(pVehicle, bPassenger);
 }
 
-int CLuaPedDefs::SetPedExitVehicle(lua_State* luaVM)
+bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
 {
-    CClientPed*     pPed = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        if (pPed->ExitVehicle())
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return pPed->ExitVehicle();
 }
