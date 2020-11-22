@@ -103,12 +103,12 @@ bool CGUIWindow_Impl::IsSizingEnabled()
 
 void CGUIWindow_Impl::SetFrameEnabled(bool bFrameEnabled)
 {
-    reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setFrameEnabled(bFrameEnabled);
+    m_pWindow->setProperty("FrameEnabled", bFrameEnabled ? "True" : "False");
 }
 
 bool CGUIWindow_Impl::IsFrameEnabled()
 {
-    return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isFrameEnabled();
+    return m_pWindow->getProperty("FrameEnabled") == "True" ? true : false;
 }
 
 void CGUIWindow_Impl::SetCloseButtonEnabled(bool bCloseButtonEnabled)
