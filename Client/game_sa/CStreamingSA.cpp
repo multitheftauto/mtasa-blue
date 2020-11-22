@@ -14,7 +14,7 @@
 #include "CModelInfoSA.h"
 
 // count: 26316 in unmodified game
-CStreamingInfo* CStreamingSA::ms_aInfoForModel = *(CStreamingInfo(*)[26316])CStreaming__ms_aInfoForModel;
+CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;
 
 namespace
 {

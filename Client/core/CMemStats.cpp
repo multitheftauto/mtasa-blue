@@ -898,14 +898,19 @@ void CMemStats::CreateTables()
         table.AddRow(SString("400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));
         table.AddRow(SString("612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999));
         table.AddRow(SString("1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193));
-        table.AddRow(SString("1194-19999|(World)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
-        table.AddRow(
-            SString("20000-24999|(Textures)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
-        table.AddRow(SString("25000-25254|(Collisions)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
+        table.AddRow(SString("1194-%d|(World)|^1~.%d|%d", GetBaseIDforTXD() - 1, m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
+        table.AddRow(SString("%d-%d|(Textures)|^1~.%d|%d", GetBaseIDforTXD(), GetBaseIDforCOL() - 1,
+            m_MemStatsDelta.modelInfo.uiTextures_20000_24999,
+                             m_MemStatsNow.modelInfo.uiTextures_20000_24999));
+        table.AddRow(SString("%d-%d|(Collisions)|^1~.%d|%d", GetBaseIDforCOL(), GetBaseIDforIPL() - 1,
+            m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
                              m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
-        table.AddRow(SString("25255-25510|(Ipls)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
-        table.AddRow(SString("25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
-        table.AddRow(SString("25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
+        table.AddRow(SString("%d-%d|(Ipls)|^1~.%d|%d", GetBaseIDforIPL(), GetBaseIDforDAT() - 1,
+            m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
+        table.AddRow(SString("%d-%d|(Paths)|^1~.%d|%d", GetBaseIDforDAT(), GetBaseIDforIFP() - 1,
+            m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
+        table.AddRow(SString("%d-%d|(Anims)|^1~.%d|%d", GetBaseIDforIFP(), GetBaseIDforRRR() - 1,
+            m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
         table.AddRow(SString("|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
     }
 

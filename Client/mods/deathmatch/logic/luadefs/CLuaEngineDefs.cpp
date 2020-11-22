@@ -774,7 +774,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
             }
         }
         else
-            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-%d] at argument 1, got \"%s\"", GetBaseIDforTXD() - 1,* strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1612,7 +1612,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
     {
         if (iModelID < 0 || iModelID >= GetBaseIDforTXD())
         {
-            argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
+            argStream.SetCustomError(SString("Expected model ID in range [0-%d] at argument 1", GetBaseIDforTXD() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -1640,9 +1640,9 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID > 19999)
+        if (iModelID < 0 || iModelID > GetBaseIDforTXD() - 1)
         {
-            argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
+            argStream.SetCustomError(SString("Expected model ID in range [0-%d] at argument 1", GetBaseIDforTXD() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -1675,9 +1675,9 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID > 19999)
+        if (iModelID < 0 || iModelID > GetBaseIDforTXD() - 1)
         {
-            argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
+            argStream.SetCustomError(SString("Expected model ID in range [0-%d] at argument 1", GetBaseIDforTXD() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
