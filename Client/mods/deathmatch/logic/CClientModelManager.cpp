@@ -1,4 +1,4 @@
-/*****************************************************************************
+#/*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
@@ -14,9 +14,12 @@
 
 unsigned int MAX_MODEL_ID = GetBaseIDforTXD();
 
-CClientModelManager::CClientModelManager() :
-    m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(MAX_MODEL_ID))
+CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(MAX_MODEL_ID))
 {
+    for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
+    {
+        m_Models[i] = nullptr;
+    }
 }
 
 CClientModelManager::~CClientModelManager(void)

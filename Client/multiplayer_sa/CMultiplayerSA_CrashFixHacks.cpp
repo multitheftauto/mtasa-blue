@@ -1015,7 +1015,7 @@ CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 {
-    ushort                     usModelId = pEntity->m_nModelIndex;
+    uint32                     usModelId = pEntity->m_nModelIndex;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelId];
     if (!pModelInfo)
     {
@@ -1047,10 +1047,10 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_GetBoundRect                      0x53412A
-#define HOOKSIZE_CEntity_GetBoundRect                     7
+#define HOOKPOS_CEntity_GetBoundRect                      0x534131
+#define HOOKSIZE_CEntity_GetBoundRect                     5
 #define HOOKCHECK_CEntity_GetBoundRect                    0x8B
-DWORD RETURN_CEntity_GetBoundRect = 0x534131;
+DWORD RETURN_CEntity_GetBoundRect = 0x534136;
 void _declspec(naked) HOOK_CEntity_GetBoundRect()
 {
     _asm
@@ -1062,8 +1062,8 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
         popad
 
         // Continue replaced code
-        mov ecx, dword ptr[ARRAY_ModelInfo]
-        mov     ecx,dword ptr [eax*4+ecx]
+        mov     eax, [ecx+14h]
+        mov     edx, [eax]
         jmp     RETURN_CEntity_GetBoundRect
     }
 }
