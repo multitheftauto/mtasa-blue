@@ -14,7 +14,7 @@
 
 unsigned int MAX_MODEL_ID = GetBaseIDforTXD();
 
-CClientModelManager::CClientModelManager(CClientManager* pManager) :
+CClientModelManager::CClientModelManager() :
     m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(MAX_MODEL_ID))
 {
 }
@@ -22,9 +22,6 @@ CClientModelManager::CClientModelManager(CClientManager* pManager) :
 CClientModelManager::~CClientModelManager(void)
 {
     RemoveAll();
-
-    // Free m_Models
-    delete[] m_Models;
 }
 
 void CClientModelManager::RemoveAll(void)

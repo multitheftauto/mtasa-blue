@@ -22,7 +22,7 @@ class CClientModelManager
     friend class CClientModel;
 
 public:
-    CClientModelManager() = default;
+    CClientModelManager::CClientModelManager();
     ~CClientModelManager(void);
 
     void RemoveAll(void);
@@ -40,6 +40,5 @@ public:
 
 private:
     std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
-    unsigned int                  m_modelCount = 0;
     unsigned int m_modelCount = 0;
 };

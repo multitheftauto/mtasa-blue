@@ -1000,17 +1000,6 @@ inner:
     }
 }
 
-struct CStreamingInfo
-{
-    DWORD gta_hash;
-    WORD  chain_next;
-    uchar flg;
-    uchar archiveId;
-    DWORD offsetInBlocks;
-    DWORD sizeInBlocks;
-    DWORD reqload;
-};
-
 CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 {
     CStreamingInfo* pItemInfo = (CStreamingInfo*)(CStreaming__ms_aInfoForModel);
@@ -1319,7 +1308,7 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 
         // Replaced code
         push    ecx
-        mov     ecx, ARRAY_ModelInfo
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
         mov     eax, dword ptr[ecx + eax*4]
         pop     ecx
 
