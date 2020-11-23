@@ -403,7 +403,7 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
         {
             lua_pushnumber(luaVM, ++uiIndex);
             lua_pushstring(luaVM, strName.c_str());
-            lua_settable(luaVM, -3); // Pack it into a key-value pair
+            lua_settable(luaVM, -3);            // Pack it into a key-value pair
         }
 
         return 1;
