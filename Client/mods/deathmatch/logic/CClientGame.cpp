@@ -6983,7 +6983,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::RestreamWorld()
 {
-    for (unsigned int uiModelID = 0; uiModelID <= 26316; uiModelID++)
+    for (unsigned int uiModelID = 0; uiModelID < 26316; uiModelID++)
     {
         g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
     }
