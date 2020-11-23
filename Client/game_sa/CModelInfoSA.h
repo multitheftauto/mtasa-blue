@@ -346,6 +346,7 @@ public:
     BYTE           GetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
+    bool           IsAllocatedInArchive();
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);

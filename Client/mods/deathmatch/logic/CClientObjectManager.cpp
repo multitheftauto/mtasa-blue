@@ -99,6 +99,9 @@ bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
     if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
+    if (!pModelInfo->IsAllocatedInArchive())
+        return false;
+
     eModelInfoType eType = pModelInfo->GetModelType();
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
