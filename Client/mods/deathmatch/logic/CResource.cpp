@@ -200,11 +200,6 @@ CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiD
     return pConfig;
 }
 
-void CResource::AddExportedFunction(const SString& name)
-{
-    m_exportedFunctions.insert(name);
-}
-
 bool CResource::CallExportedFunction(const SString& name, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
 {
     if (m_exportedFunctions.find(name) != m_exportedFunctions.end())

@@ -62,7 +62,7 @@ public:
     CElementGroup* GetElementGroup() { return m_pDefaultElementGroup; }
     void           AddToElementGroup(CClientEntity* pElement);
 
-    void AddExportedFunction(const SString& name);
+    void AddExportedFunction(const SString& name) { m_exportedFunctions.insert(name); }
     bool CallExportedFunction(const SString& name, CLuaArguments& args, CLuaArguments& returns, CResource& caller);
 
     class CClientEntity* GetResourceEntity() { return m_pResourceEntity; }
@@ -83,8 +83,7 @@ public:
     // Use this for cursor showing/hiding
     void ShowCursor(bool bShow, bool bToggleControls = true);
 
-    std::list<CExportedFunction*>::iterator IterBeginExportedFunctions() { return m_exportedFunctions.begin(); }
-    std::list<CExportedFunction*>::iterator IterEndExportedFunctions() { return m_exportedFunctions.end(); }
+    const auto& GetExportedFunctions() const noexcept { return m_exportedFunctions; }
 
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
