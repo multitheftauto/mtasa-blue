@@ -57,7 +57,7 @@ void CGUIFont_Impl::DrawTextString(const char* szText, CRect2D DrawArea, float f
     m_pFont->drawText(*m_pGeometryBuffer, szText ? CGUI_Impl::GetUTFString(szText) : CEGUI::String(),
         CEGUI::Vector2(DrawArea.fX1, DrawArea.fY1),
         &CEGUI::Rectf(CEGUI::Vector2(ClipRect.fX1, ClipRect.fY1), CEGUI::Vector2(ClipRect.fX2, ClipRect.fY2)),
-        CEGUI::ColourRect((CEGUI::argb_t)ulColor),
+        CEGUI::ColourRect(static_cast<CEGUI::argb_t>(ulColor)),
         0, fScaleX, fScaleY);
 }
 
