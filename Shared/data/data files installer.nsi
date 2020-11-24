@@ -198,35 +198,36 @@ Section "Data files" SEC01
 	;================
 
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\xml_schemas"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Animation.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\CEGUIConfig.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Falagard.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Font.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\GUILayout.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\GUIScheme.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Imageset.xsd"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\Samples.xsd"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\xml_schemas\*.xsd"
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\schemes"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\schemes\TaharezLook.scheme"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\schemes\*.scheme"
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\looknfeel"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\looknfeel\TaharezLook.looknfeel"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\looknfeel\*.looknfeel"
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\layouts"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\layouts\TaharezLookOverview.layout"	
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\layouts\*.layout"	
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\imagesets"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\imagesets\TaharezLook.imageset"		
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\imagesets\TaharezLook.png"		
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\imagesets\*.imageset"		
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\imagesets\*.png"				
 	
 	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\datafiles\fonts"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\pricedown.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\sabankgothic.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\sagothic.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\saheader.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\sans.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\unifont-5.1.20080907.ttf"	
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\datafiles\fonts\*.ttf"
+
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\images"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\images\*.png"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.jpg"
+
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\images\radarset"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\images\radarset\*.png"
+
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\images\transferset"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\images\transferset\*.png"
+	
+	SetOutPath "$INSTDIR\MTA\cgui-0.8.7\images\serverbrowser"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui-0.8.7\images\serverbrowser\*.png"
 
 	SetOutPath "$INSTDIR\server\mods\deathmatch"
 	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\libmysql.dll"
