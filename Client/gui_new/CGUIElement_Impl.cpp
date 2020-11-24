@@ -437,7 +437,7 @@ std::string CGUIElement_Impl::GetProperty(const char* szProperty)
 
 void CGUIElement_Impl::FillProperties()
 {
-    CEGUI::Window::PropertyIterator itPropertySet = ((CEGUI::PropertySet*)m_pWindow)->getPropertyIterator();
+    CEGUI::Window::PropertyIterator itPropertySet = (dynamic_cast<CEGUI::PropertySet*>(m_pWindow)->getPropertyIterator());
     while (!itPropertySet.isAtEnd())
     {
         CEGUI::String strKey = itPropertySet.getCurrentKey();
