@@ -2990,7 +2990,6 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSirenID = 0;
 
     argStream.ReadUserData(pVehicle);
     if (!argStream.HasErrors())
