@@ -48,9 +48,7 @@ void CRopesSA::RemoveEntityRope(CEntitySAInterface* pEntity)
 
     if (pRope)
     {
-        typedef void(__thiscall * Function_RemoveRope)(CRopesSAInterface * pRope);
-        Function_RemoveRope removeRope = (Function_RemoveRope)(0x556780);
-
-        removeRope(pRope);
+        auto CRope_Remove = (void(__thiscall *)(CRopesSAInterface*))0x556780;
+        CRope_Remove(pRope);
     }
 }
