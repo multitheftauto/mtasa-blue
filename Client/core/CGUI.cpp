@@ -171,6 +171,12 @@ void CLocalGUI::CreateObjects(IUnknown* pDevice)
         CVARS_SET("current_skin", currentSkinName);
     }
 
+    if (CCore::GetSingleton().IsUsingNewCEGUI())
+    {
+        currentSkinName = pGUI->GetDefaultSkinName();
+        CVARS_SET("current_skin", currentSkinName);
+    }
+
     SetSkin(currentSkinName);
 
     CreateWindows(false);
