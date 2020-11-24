@@ -682,7 +682,7 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
             {
                 const CRegistryResultRow& row = *iter;
 
-                lua_createtable(luaVM, Result->nColumns, 0);  // new table
+                lua_createtable(luaVM, 0, Result->nColumns);  // new table
                 lua_pushnumber(luaVM, i++);                   // row index number
                 lua_pushvalue(luaVM, -2);                     // value
                 lua_settable(luaVM, -4);                      // refer to the top level table
