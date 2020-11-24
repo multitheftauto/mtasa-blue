@@ -804,12 +804,12 @@ int CLuaVehicleDefs::GetVehicleUpgrades(lua_State* luaVM)
             // Add all the upgrades to the table
             const SSlotStates& usSlotStates = pUpgrades->GetSlotStates();
 
-            for (size_t i = 0; i < VEHICLE_UPGRADE_SLOTS; i++)
+            for (size_t slot = 0; slot < VEHICLE_UPGRADE_SLOTS; slot++)
             {
-                if (usSlotStates[i] != 0)
+                if (usSlotStates[slot] != 0)
                 {
-                    lua_pushnumber(luaVM, (lua_Number)i + 1);
-                    lua_pushnumber(luaVM, usSlotStates[i]);
+                    lua_pushnumber(luaVM, (lua_Number)(slot + 1));
+                    lua_pushnumber(luaVM, usSlotStates[slot]);
                     lua_settable(luaVM, -3);
                 }
             }
