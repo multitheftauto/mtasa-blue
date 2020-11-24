@@ -237,7 +237,7 @@ int CLuaNetworkDefs::GetRemoteRequests(lua_State* luaVM)
         lua_Number i = 1;
         for (const auto& request : calls)
         {
-            if (!pLuaMain || request->GetVM() == pLuaMain)
+            if (!pResource || request->GetVM() == pLuaMain)
             {
                 lua_pushnumber(luaVM, i++);
                 lua_pushuserdata(luaVM, request);
