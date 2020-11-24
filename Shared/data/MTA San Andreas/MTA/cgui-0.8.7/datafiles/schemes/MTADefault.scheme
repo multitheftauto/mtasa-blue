@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<GUIScheme version="5" name="MTADefaultSkin">
+	<Imageset filename="MTADefault.imageset" />
+	<LookNFeel filename="MTADefault.looknfeel" />
+	<WindowRendererSet filename="CEGUICoreWindowRendererSet" />
+	<FalagardMapping windowType="CGUI/Titlebar" targetType="CEGUI/Titlebar" renderer="Core/Titlebar" lookNFeel="CGUI/Titlebar" />
+	<FalagardMapping windowType="CGUI/Button" targetType="CEGUI/PushButton" renderer="Core/Button" lookNFeel="CGUI/Button" />
+	<FalagardMapping windowType="CGUI/FrameWindow" targetType="CEGUI/FrameWindow" renderer="Core/FrameWindow" lookNFeel="CGUI/FrameWindow" />
+	<FalagardMapping windowType="CGUI/Editbox" targetType="CEGUI/Editbox" renderer="Core/Editbox" lookNFeel="CGUI/Editbox" />
+	<FalagardMapping windowType="CGUI/VerticalScrollbarThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="CGUI/VerticalScrollbarThumb" />
+	<FalagardMapping windowType="CGUI/VerticalScrollbar" targetType="CEGUI/Scrollbar" renderer="Core/Scrollbar" lookNFeel="CGUI/VerticalScrollbar" />
+	<FalagardMapping windowType="CGUI/HorizontalScrollbarThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="CGUI/HorizontalScrollbarThumb" />
+	<FalagardMapping windowType="CGUI/HorizontalScrollbar" targetType="CEGUI/Scrollbar" renderer="Core/Scrollbar" lookNFeel="CGUI/HorizontalScrollbar" />
+	<FalagardMapping windowType="CGUI/StaticImage" targetType="DefaultWindow" renderer="Core/StaticImage" lookNFeel="CGUI/StaticImage" />
+	<FalagardMapping windowType="CGUI/StaticText" targetType="DefaultWindow" renderer="Core/StaticText" lookNFeel="CGUI/StaticText" />
+	<FalagardMapping windowType="CGUI/MultiLineEditbox" targetType="CEGUI/MultiLineEditbox" renderer="Core/MultiLineEditbox" lookNFeel="CGUI/MultiLineEditbox" />
+	<FalagardMapping windowType="CGUI/MultiColumnList" targetType="CEGUI/MultiColumnList" renderer="Core/MultiColumnList" lookNFeel="CGUI/MultiColumnList" />
+	<FalagardMapping windowType="CGUI/ListHeader" targetType="CEGUI/ListHeader" renderer="Core/ListHeader" lookNFeel="CGUI/ListHeader" />
+	<FalagardMapping windowType="CGUI/ListHeaderSegment" targetType="CEGUI/ListHeaderSegment" renderer="Core/ListHeaderSegment" lookNFeel="CGUI/ListHeaderSegment" />
+ 	<FalagardMapping windowType="CGUI/TabButton" targetType="CEGUI/TabButton" renderer="Core/TabButton" lookNFeel="CGUI/TabButton" />
+	<FalagardMapping windowType="CGUI/TabControl" targetType="CEGUI/TabControl" renderer="Core/TabControl" lookNFeel="CGUI/TabControl" />
+	<FalagardMapping windowType="CGUI/TabPane" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="CGUI/TabPane" />
+	<FalagardMapping windowType="CGUI/ProgressBar" targetType="CEGUI/ProgressBar" renderer="Core/ProgressBar" lookNFeel="CGUI/ProgressBar" />
+	<FalagardMapping windowType="CGUI/Checkbox" targetType="CEGUI/ToggleButton" renderer="Core/ToggleButton" lookNFeel="CGUI/Checkbox" />
+	<FalagardMapping windowType="CGUI/RadioButton" targetType="CEGUI/RadioButton" renderer="Core/ToggleButton" lookNFeel="CGUI/RadioButton" />
+	<FalagardMapping windowType="CGUI/ScrollablePane" targetType="CEGUI/ScrollablePane" renderer="Core/ScrollablePane" lookNFeel="CGUI/ScrollablePane" />
+	<FalagardMapping windowType="CGUI/ComboDropList" targetType="CEGUI/ComboDropList" renderer="Core/Listbox" lookNFeel="CGUI/ComboDropList" />
+	<FalagardMapping windowType="CGUI/ComboEditbox" targetType="CEGUI/Editbox" renderer="Core/Editbox" lookNFeel="CGUI/ComboEditbox" />
+	<FalagardMapping windowType="CGUI/Combobox" targetType="CEGUI/Combobox" renderer="Core/Default" lookNFeel="CGUI/Combobox" />
+	<FalagardMapping windowType="CGUI/ImageButton" targetType="CEGUI/PushButton" renderer="Core/Button" lookNFeel="CGUI/ImageButton" />
+<!--	
+	<FalagardMapping windowType="CGUI/ComboDropList" targetType="CEGUI/ComboDropList" lookNFeel="CGUI/ComboDropList" />
+	<FalagardMapping windowType="CGUI/ComboboxButton" targetType="CEGUI/Button" lookNFeel="CGUI/ComboboxButton" />
+	<FalagardMapping windowType="CGUI/Combobox" targetType="CEGUI/Combobox" lookNFeel="CGUI/Combobox" />
+	<FalagardMapping windowType="CGUI/ProgressBar" targetType="CEGUI/ProgressBar" lookNFeel="CGUI/ProgressBar" />
+	<FalagardMapping windowType="CGUI/ScrollablePane" targetType="CEGUI/ScrollablePane" lookNFeel="CGUI/ScrollablePane" />
+-->
+</GUIScheme>

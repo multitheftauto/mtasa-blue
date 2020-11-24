@@ -1,0 +1,2471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Falagard version="7">
+    <WidgetLook name="CGUI/Shared">
+        <ImagerySection name="Frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/FrameTopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/FrameTopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/FrameBottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/FrameBottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/FrameLeft" />
+                <Image component="TopEdge" name="CGUI-Images/FrameTop" />
+                <Image component="RightEdge" name="CGUI-Images/FrameRight" />
+                <Image component="BottomEdge" name="CGUI-Images/FrameBottom" />
+                <Image component="Background" name="CGUI-Images/GenericBrush" />
+            </FrameComponent>
+        </ImagerySection>
+      
+        <ImagerySection name="Frame2">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+            </FrameComponent>
+        </ImagerySection>
+      
+        <ImagerySection name="FrameOnly">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/FrameTopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/FrameTopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/FrameBottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/FrameBottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/FrameLeft" />
+                <Image component="TopEdge" name="CGUI-Images/FrameTop" />
+                <Image component="RightEdge" name="CGUI-Images/FrameRight" />
+                <Image component="BottomEdge" name="CGUI-Images/FrameBottom" />
+            </FrameComponent>
+        </ImagerySection>
+
+        <ImagerySection name="BackgroundOnly">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="8" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="8" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" offset="-8" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-8" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="Background" name="CGUI-Images/GenericBrush" />
+            </FrameComponent>
+        </ImagerySection>
+
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/ScrollablePane">
+		    <NamedArea name="ViewableArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+            </Area>
+		    </NamedArea>
+        <Child  type="CGUI/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" offset="-20" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+            </Area>
+            <VertAlignment type="BottomAligned" />
+        </Child>
+        <Child  type="CGUI/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" offset="-20" type="Height" /></Dim>
+            </Area>
+            <HorzAlignment type="RightAligned" />
+        </Child>
+        <StateImagery name="Enabled" />
+        <StateImagery name="Disabled" />
+    </WidgetLook>
+	
+    <WidgetLook name="CGUI/Titlebar">
+        <PropertyDefinition name="CaptionColour" initialValue="FFFFFFFF" />
+        <PropertyDefinition name="MovingCursorImage" initialValue="CGUI-Images/MouseMoveCursor" />
+        <ImagerySection name="caption">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="22" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" offset="-22" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <ColourProperty name="CaptionColour" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="CentreAligned" />
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" imageset="CGUI-Images" name="TitleBarTopLeft" />
+                <Image component="TopRightCorner" imageset="CGUI-Images" name="TitleBarTopRight" />
+                <Image component="BottomLeftCorner" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="BottomRightCorner" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="LeftEdge" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="TopEdge" imageset="CGUI-Images" name="TitleBarTop" />
+                <Image component="RightEdge" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="BottomEdge" imageset="CGUI-Images" name="TitleBarBackground" />
+                <Image component="Background" imageset="CGUI-Images" name="TitleBarBackground" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="selected">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" imageset="CGUI-Images" name="TitleBarTopLeftSelected" />
+                <Image component="TopRightCorner" imageset="CGUI-Images" name="TitleBarTopRightSelected" />
+                <Image component="BottomLeftCorner" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="BottomRightCorner" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="LeftEdge" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="TopEdge" imageset="CGUI-Images" name="TitleBarTopSelected" />
+                <Image component="RightEdge" imageset="CGUI-Images" name="TitleBarBorder" />
+                <Image component="BottomEdge" imageset="CGUI-Images" name="TitleBarBackgroundSelected" />
+                <Image component="Background" imageset="CGUI-Images" name="TitleBarBackgroundSelected" />
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="Active">
+            <Layer>
+                <Section section="caption" />
+		            <Section section="selected">
+                    <!--<Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />-->
+		            </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Inactive">
+            <Layer>
+                <Section section="caption" />
+		            <Section section="normal">
+                    <!--<Colours topLeft="FF101010" topRight="FF101010" bottomLeft="FF101010" bottomRight="FF101010" />-->
+		            </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="normal">
+            <Layer>
+                <Section section="caption" />
+		<Section section="main">
+	                <Colours topLeft="FF303030" topRight="FF303030" bottomLeft="FF303030" bottomRight="FF303030" />
+		</Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/TabButton">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF7D7D7D" type="ColourRect" name="NormalTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF7D7D7D" type="ColourRect" name="HoverTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="PushedTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="DisabledTextColour" />
+        <ImagerySection name="frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+		                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="inactive_frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+		                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/FrameTopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/FrameTopRight" />
+                <Image component="LeftEdge" name="CGUI-Images/FrameLeft" />
+                <Image component="TopEdge" name="CGUI-Images/FrameTop" />
+                <Image component="RightEdge" name="CGUI-Images/FrameRight" />
+                <Image component="Background" name="CGUI-Images/GenericBrush" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="WordWrapCentreAligned" />
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="inactive_frame">
+                    <Colours topLeft="FF171717" topRight="FF171717" bottomLeft="FF171717" bottomRight="FF171717" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="inactive_frame">
+                    <Colours topLeft="FF303030" topRight="FF303030" bottomLeft="FF303030" bottomRight="FF303030" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="HoverTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Selected">
+            <Layer>
+                <Section section="frame">
+                    <Colours topLeft="FFEEEEEE" topRight="FFEEEEEE" bottomLeft="FFEEEEEE" bottomRight="FFEEEEEE" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="PushedTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="inactive_frame">
+                    <Colours topLeft="FF505050" topRight="FF505050" bottomLeft="FF505050" bottomRight="FF505050" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="DisabledTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    
+    <WidgetLook name="CGUI/TabPane">
+        <ImagerySection name="normal">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeftSquared" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+              <Section section="normal">
+                <Colours topLeft="FFEEEEEE" topRight="FFEEEEEE" bottomLeft="FFEEEEEE" bottomRight="FFEEEEEE" />
+              </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF242424" topRight="FF242424" bottomLeft="FF242424" bottomRight="FF242424" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    
+    <WidgetLook name="CGUI/TabControl">
+        <Property name="TabButtonType" value="CGUI/TabButton" />
+        <Child  type="CGUI/TabPane" nameSuffix="__auto_TabPane__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </Child>
+        <Child  type="DefaultWindow" nameSuffix="__auto_TabPane__Buttons">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </Child>
+        <StateImagery name="Enabled" />
+        <StateImagery name="Disabled" />
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/Button">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF7C7C7C" type="ColourRect" name="NormalTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="HoverTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF7C7C7C" type="ColourRect" name="PushedTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF383838" type="ColourRect" name="DisabledTextColour" />
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-4" type="BottomEdge" /></Dim>
+                </Area>
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="WordWrapCentreAligned" />
+            </TextComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame2">
+                    <Colours topLeft="FF606060" topRight="FF606060" bottomLeft="FF606060" bottomRight="FF606060" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame2">
+
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="HoverTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame2">
+
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="PushedTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame2">
+                    <Colours topLeft="FF282828" topRight="FF282828" bottomLeft="FF282828" bottomRight="FF282828" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="DisabledTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/FrameWindow">
+        <Property name="NSSizingCursorImage" value="CGUI-Images/NSSizingCursorImage" />
+        <Property name="EWSizingCursorImage" value="CGUI-Images/EWSizingCursorImage" />
+        <Property name="NWSESizingCursorImage" value="CGUI-Images/NWSESizingCursorImage" />
+        <Property name="NESWSizingCursorImage" value="CGUI-Images/NESWSizingCursorImage" />
+        <Property name="RollUpEnabled" value="False" />
+        <NamedArea name="ClientWithTitleWithFrame">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="8" /></Dim>
+                    <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" offset="-8" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-8" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientWithTitleNoFrame">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientNoTitleWithFrame">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="8" /></Dim>
+                <Dim type="TopEdge"><AbsoluteDim value="8" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" offset="-8" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-8" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientNoTitleNoFrame">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </NamedArea>
+        <Child type="CGUI/Titlebar" nameSuffix="__auto_titlebar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><FontDim type="LineSpacing" padding="5" /></Dim>
+            </Area>
+            <Property name="AlwaysOnTop" value="False" />
+        </Child>
+        <Child type="CGUI/Button" nameSuffix="__auto_closebutton__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="-8" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="8" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="8" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="8" /></Dim>
+            </Area>
+            <HorzAlignment type="RightAligned" />
+            <Property name="AlwaysOnTop" value="True" />
+        </Child>
+        <ImagerySection name="withtitle_frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="notitle_frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="withtitle_noframe_client_area">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="notitle_noframe_client_area">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="ActiveWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/Editbox">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFDFDFDF" type="ColourRect" name="ReadOnlyBGColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="NormalTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="HoverTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF607FFF" type="ColourRect" name="PushedTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF808080" type="ColourRect" name="DisabledTextColour" />
+        <NamedArea name="TextArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="7" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="3" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1.0" offset="-7" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge" ><UnifiedDim scale="1.0" offset="-3" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="selection">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/GenericBrush" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="Caret">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><AbsoluteDim value="2" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/GenericBrush" />
+                <Colours topLeft="FF000000" topRight="FF000000" bottomLeft="FF000000" bottomRight="FF000000" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ReadOnly">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame" >
+                    <ColourProperty name="ReadOnlyBGColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame" >
+                    <ColourProperty name="ReadOnlyBGColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveSelection">
+            <Layer>
+                <Section section="selection">
+                    <ColourProperty name="ActiveSelectionColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveSelection">
+            <Layer>
+                <Section section="selection">
+                    <ColourProperty name="InactiveSelectionColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/VerticalScrollbarThumb">
+        <Property name="VertFree" value="True" />
+        <ImagerySection name="thumb">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/ScrollbarThumb" />
+              <!--<Colours topLeft="FFC1D1DA" topRight="FFC1D1DA" bottomLeft="FFC1D1DA" bottomRight="FFC1D1DA" />-->
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="thumb" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="thumb" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="thumb" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="thumb">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/HorizontalScrollbarThumb">
+        <Property name="HorzFree" value="True" />
+        <ImagerySection name="thumb">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="0.9" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="0.9" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/ScrollbarThumb" />
+              <!--<Colours topLeft="FFC1D1DA" topRight="FFC1D1DA" bottomLeft="FFC1D1DA" bottomRight="FFC1D1DA" />-->
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="thumb" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="thumb" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="thumb" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="thumb">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/HorizontalScrollbar">
+        <PropertyDefinition initialValue="False" name="UseStandardImagery" />
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="LeftEdge"><WidgetDim widget="__auto_decbtn__" dimension="RightEdge" /></Dim>
+                <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1" type="RightEdge">
+                        <DimOperator op="Subtract">
+                            <WidgetDim widget="__auto_incbtn__" dimension="Width" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <Child  type="CGUI/Button" nameSuffix="__auto_decbtn__">
+            <ImagerySection name="image">
+                <ImageryComponent>
+                    <Area>
+                        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="Width" ><UnifiedDim scale="1" type="Height" /></Dim>
+                        <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                    </Area>
+                    <Image imageset="CGUI-Images" image="ScrollRightArrow" />
+                    <VertAlignment type="CentreAligned" />
+                    <HorzAlignment type="RightAligned" />
+                </ImageryComponent>
+            </ImagerySection>
+            <StateImagery name="Normal">
+                <Layer>
+                    <Section section="image" />
+                </Layer>
+            </StateImagery>          
+        </Child>
+        <Child  type="CGUI/Button" nameSuffix="__auto_incbtn__">
+            <ImagerySection name="image">
+                <ImageryComponent>
+                    <Area>
+                        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="Width" ><UnifiedDim scale="1" type="Height" /></Dim>
+                        <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                    </Area>
+                    <Image imageset="CGUI-Images" image="ScrollLeftArrow" />
+                    <VertAlignment type="CentreAligned" />
+                </ImageryComponent>
+            </ImagerySection>
+            <StateImagery name="Normal">
+                <Layer>
+                    <Section section="image" />
+                </Layer>
+            </StateImagery>          
+        </Child>
+        <Child  type="CGUI/HorizontalScrollbarThumb" nameSuffix="__auto_thumb__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Height" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </Child>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge"><WidgetDim widget="__auto_decbtn__" dimension="RightEdge" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1" type="RightEdge">
+                            <DimOperator op="Subtract">
+                                <WidgetDim widget="__auto_incbtn__" dimension="Width" />
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image imageset="CGUI-Images" image="HorzScrollContainer" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+              <Section section="main" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/VerticalScrollbar">
+        <PropertyDefinition name="UseStandardImagery" initialValue="False" />
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><WidgetDim widget="__auto_decbtn__" dimension="BottomEdge" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge" >
+                    <UnifiedDim scale="1.0" type="BottomEdge">
+                        <DimOperator op="Subtract">
+                            <WidgetDim widget="__auto_incbtn__" dimension="Height" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child  type="CGUI/Button" nameSuffix="__auto_decbtn__">
+            <ImagerySection name="image">
+                <ImageryComponent>
+                    <Area>
+                        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                        <Dim type="Height" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    </Area>
+                    <Image imageset="CGUI-Images" image="ScrollDownArrow" />
+                    <VertAlignment type="BottomAligned" />
+                    <HorzAlignment type="CentreAligned" />
+                </ImageryComponent>
+            </ImagerySection>
+            <StateImagery name="Normal">
+                <Layer>
+                    <Section section="image" />
+                </Layer>
+            </StateImagery>          
+        </Child>
+        <Child  type="CGUI/Button" nameSuffix="__auto_incbtn__">
+            <ImagerySection name="image">
+                <ImageryComponent>
+                    <Area>
+                        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                        <Dim type="Height" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    </Area>
+                    <Image imageset="CGUI-Images" image="ScrollUpArrow" />
+                    <HorzAlignment type="CentreAligned" />
+                </ImageryComponent>
+            </ImagerySection>
+            <StateImagery name="Normal">
+                <Layer>
+                    <Section section="image" />
+                </Layer>
+            </StateImagery>          
+        </Child>        
+        <Child  type="CGUI/VerticalScrollbarThumb" nameSuffix="__auto_thumb__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Width" /></Dim>
+            </Area>
+        </Child>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><WidgetDim widget="__auto_decbtn__" dimension="BottomEdge" /></Dim>
+                    <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge" >
+                        <UnifiedDim scale="1.0" type="BottomEdge">
+                            <DimOperator op="Subtract">
+                                <WidgetDim widget="__auto_incbtn__" dimension="Height" />
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                </Area>
+                <Image imageset="CGUI-Images" name="VertScrollContainer" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+              <Section section="main"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/StaticImage">
+       <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="ImageColours"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="FrameColours"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFDFDFDF tr:FFDFDFDF bl:FFDFDFDF br:FFDFDFDF" type="ColourRect" name="BackgroundColours"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="VerticalFormatting" name="VertFormatting"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="Stretched" type="HorizontalFormatting" name="HorzFormatting"/>
+        <Property name="BackgroundEnabled" value="true"/>
+        <Property name="FrameEnabled" value="true"/>
+        <Property name="Size" value="{{0, 128}, {0, 128}}" />
+        <ImagerySection name="image_withframe">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <ImageDim name="WindowsLook/StaticFrameLeft" dimension="Width"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <ImageDim name="WindowsLook/StaticFrameTop" dimension="Height"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="RightEdge"/>
+                            <ImageDim name="WindowsLook/StaticFrameRight" dimension="Width"/>
+                        </OperatorDim>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <OperatorDim op="Subtract">
+                            <UnifiedDim scale="1.0" type="BottomEdge"/>
+                            <ImageDim name="WindowsLook/StaticFrameBottom" dimension="Height"/>
+                        </OperatorDim>
+                    </Dim>
+                </Area>
+                <ImageProperty name="Image"/>
+                <ColourRectProperty name="ImageColours"/>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="image_noframe">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0"/>
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="1.0" type="RightEdge"/>
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="1.0" type="BottomEdge"/>
+                    </Dim>
+                </Area>
+                <ImageProperty name="Image"/>
+                <ColourRectProperty name="ImageColours"/>
+                <VertFormatProperty name="VertFormatting"/>
+                <HorzFormatProperty name="HorzFormatting"/>
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled"/>
+        <StateImagery name="Disabled"/>
+        <StateImagery name="EnabledFrame">
+            <Layer>
+                <Section section="frame" look="CGUI/Shared"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledFrame">
+            <Layer>
+                <Section section="frame" look="CGUI/Shared"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameEnabledBackground">
+            <Layer>
+                <Section section="background" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameDisabledBackground">
+            <Layer>
+                <Section section="background" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameEnabledBackground">
+            <Layer>
+                <Section section="background_noframe" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameDisabledBackground">
+            <Layer>
+                <Section section="background_noframe" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameImage">
+            <Layer>
+                <Section section="image_withframe"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameImage">
+            <Layer>
+                <Section section="image_noframe"/>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/StaticText">
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" type="ColourRect" name="FrameColours"/>
+        <PropertyDefinition redrawOnWrite="true" initialValue="tl:FFDFDFDF tr:FFDFDFDF bl:FFDFDFDF br:FFDFDFDF" type="ColourRect" name="BackgroundColours"/>
+        <PropertyLinkDefinition targetProperty="ScrollPosition" widget="__auto_hscrollbar__" type="float" name="HorzScrollPosition"/>
+        <PropertyLinkDefinition targetProperty="PageSize" widget="__auto_hscrollbar__" type="float" name="HorzScrollPageSize"/>
+        <PropertyLinkDefinition targetProperty="DocumentSize" widget="__auto_hscrollbar__" type="float" name="HorzScrollDocumentSize"/>
+        <PropertyLinkDefinition targetProperty="ScrollPosition" widget="__auto_vscrollbar__" type="float" name="VertScrollPosition"/>
+        <PropertyLinkDefinition targetProperty="PageSize" widget="__auto_vscrollbar__" type="float" name="VertScrollPageSize"/>
+        <PropertyLinkDefinition targetProperty="DocumentSize" widget="__auto_vscrollbar__" type="float" name="VertScrollDocumentSize"/>
+        <Property name="BackgroundEnabled" value="true"/>
+        <Property name="FrameEnabled" value="true"/>
+        <Property name="TextColours" value="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000"/>
+        <Property name="Size" value="{{0, 256}, {0, 128}}" />
+        <NamedArea name="WithFrameTextRenderArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="WindowsLook/StaticFrameLeft" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="WindowsLook/StaticFrameTop" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1.0" type="RightEdge"/>
+                        <ImageDim name="WindowsLook/StaticFrameRight" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1.0" type="BottomEdge"/>
+                        <ImageDim name="WindowsLook/StaticFrameBottom" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="WithFrameTextRenderAreaHScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="WindowsLook/StaticFrameLeft" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="WindowsLook/StaticFrameTop" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1.0" type="RightEdge"/>
+                        <ImageDim name="WindowsLook/StaticFrameRight" dimension="Width"/>
+                    </OperatorDim>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge" offset="-16"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="WithFrameTextRenderAreaVScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="WindowsLook/StaticFrameLeft" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="WindowsLook/StaticFrameTop" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge" offset="-16"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <OperatorDim op="Subtract">
+                        <UnifiedDim scale="1.0" type="BottomEdge"/>
+                        <ImageDim name="WindowsLook/StaticFrameBottom" dimension="Height"/>
+                    </OperatorDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="WithFrameTextRenderAreaHVScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <ImageDim name="WindowsLook/StaticFrameLeft" dimension="Width"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <ImageDim name="WindowsLook/StaticFrameTop" dimension="Height"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge" offset="-16"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge" offset="-16"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="NoFrameTextRenderArea">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="NoFrameTextRenderAreaHScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge" offset="-16"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="NoFrameTextRenderAreaVScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge" offset="-16"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="NoFrameTextRenderAreaHVScroll">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="RightEdge">
+                    <UnifiedDim scale="1.0" type="RightEdge" offset="-16"/>
+                </Dim>
+                <Dim type="BottomEdge">
+                    <UnifiedDim scale="1.0" type="BottomEdge" offset="-16"/>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child nameSuffix="__auto_hscrollbar__" type="CGUI/HorizontalScrollbar">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <UnifiedDim scale="1" type="Width" offset="-16"/>
+                </Dim>
+                <Dim type="Height">
+                    <AbsoluteDim value="16"/>
+                </Dim>
+            </Area>
+            <VertAlignment type="BottomAligned"/>
+        </Child>
+        <Child nameSuffix="__auto_vscrollbar__" type="CGUI/VerticalScrollbar">
+            <Area>
+                <Dim type="LeftEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="TopEdge">
+                    <AbsoluteDim value="0"/>
+                </Dim>
+                <Dim type="Width">
+                    <AbsoluteDim value="16"/>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="1" type="Height" offset="-16"/>
+                </Dim>
+            </Area>
+            <HorzAlignment type="RightAligned"/>
+        </Child>
+        <StateImagery name="Enabled"/>
+        <StateImagery name="Disabled"/>
+        <StateImagery name="EnabledFrame">
+            <Layer>
+                <Section section="frame" look="CGUI/Shared"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledFrame">
+            <Layer>
+                <Section section="frame" look="CGUI/Shared"/>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameEnabledBackground">
+            <Layer>
+                <Section section="background" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameDisabledBackground">
+            <Layer>
+                <Section section="background" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameEnabledBackground">
+            <Layer>
+                <Section section="background_noframe" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameDisabledBackground">
+            <Layer>
+                <Section section="background_noframe" look="CGUI/Shared">
+                    <ColourRectProperty name="BackgroundColours"/>
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/ListHeaderSegment">
+      <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="NormalTextColour" />
+      <PropertyDefinition redrawOnWrite="true" initialValue="FF909090" name="DragGhost" />
+      <Property name="SizingCursorImage" value="CGUI-Images/MouseEsWeCursor" />
+      <Property name="MovingCursorImage" value="CGUI-Images/MouseMoveCursor" />
+      <ImagerySection name="segment">
+        <ImageryComponent>
+          <Area>
+            <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="RightEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+          </Area>
+          <Image name="CGUI-Images/HeaderMainBrush" />
+          <VertFormat type="Stretched" />
+          <HorzFormat type="Stretched" />
+        </ImageryComponent>
+      </ImagerySection>
+      <ImagerySection name="frame">
+        <FrameComponent>
+          <Area>
+            <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+            <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+            <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+            <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+          </Area>
+          <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+          <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+          <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+          <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+          <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+          <Image component="Background" name="CGUI-Images/Frame2Background" />
+        </FrameComponent>
+      </ImagerySection>
+      <ImagerySection name="ascend_icon">
+        <ImageryComponent>
+          <Area>
+            <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="TopEdge" ><AbsoluteDim value="10" /></Dim>
+            <Dim type="Width" ><ImageDim name="CGUI-Images/SmallUpArrow" dimension="Width" /></Dim>
+            <Dim type="Height" ><ImageDim name="CGUI-Images/SmallUpArrow" dimension="Height" /></Dim>
+          </Area>
+          <Image name="CGUI-Images/SmallUpArrow" />
+        </ImageryComponent>
+      </ImagerySection>
+      <ImagerySection name="descend_icon">
+        <ImageryComponent>
+          <Area>
+            <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="TopEdge" ><AbsoluteDim value="10" /></Dim>
+            <Dim type="Width" ><ImageDim name="CGUI-Images/SmallDownArrow" dimension="Width" /></Dim>
+            <Dim type="Height" ><ImageDim name="CGUI-Images/SmallDownArrow" dimension="Height" /></Dim>
+          </Area>
+          <Image name="CGUI-Images/SmallDownArrow" />
+        </ImageryComponent>
+      </ImagerySection>
+      <ImagerySection name="label">
+        <TextComponent>
+          <Area>
+            <Dim type="LeftEdge"><AbsoluteDim value="7" /></Dim>
+            <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
+            <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+          </Area>
+          <VertFormat type="CentreAligned" />
+        </TextComponent>
+      </ImagerySection>
+      <ImagerySection name="delim">
+        <ImageryComponent>
+          <Area>
+            <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+            <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+            <Dim type="BottomEdge" ><UnifiedDim scale="1.0" offset="-1" type="BottomEdge" /></Dim>
+            <Dim type="TopEdge" ><UnifiedDim scale="1" offset="-2" type="BottomEdge" /></Dim>
+          </Area>
+          <Image name="CGUI-Images/HeaderLine" />
+          <VertFormat type="Stretched" />
+          <HorzFormat type="Stretched" />
+        </ImageryComponent>
+      </ImagerySection>
+      <StateImagery name="Normal">
+        <Layer>
+          <Section section="delim">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+          <Section section="label">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+      <StateImagery name="Hover">
+        <Layer>
+          <Section section="delim">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+          <Section section="label">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+      <StateImagery name="SplitterHover">
+        <Layer>
+          <Section section="delim">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+          <Section section="label">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+      <StateImagery name="DragGhost" clipped="false" >
+        <Layer priority="1" >
+          <Section section="label">
+            <Colours topLeft="7FFFFFFF" topRight="7FFFFFFF" bottomLeft="7FFFFFFF" bottomRight="7FFFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+      <StateImagery name="AscendingSortIcon">
+        <Layer>
+          <Section section="ascend_icon" />
+        </Layer>
+      </StateImagery>
+      <StateImagery name="DescendingSortIcon">
+        <Layer>
+          <Section section="descend_icon" />
+        </Layer>
+      </StateImagery>
+      <StateImagery name="GhostAscendingSortIcon" clipped="false">
+        <Layer priority="1" >
+          <Section section="ascend_icon">
+            <Colours topLeft="90FFFFFF" topRight="90FFFFFF" bottomLeft="90FFFFFF" bottomRight="90FFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+      <StateImagery name="GhostDescendingSortIcon" clipped="false">
+        <Layer priority="1" >
+          <Section section="descend_icon">
+            <Colours topLeft="90FFFFFF" topRight="90FFFFFF" bottomLeft="90FFFFFF" bottomRight="90FFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+
+      <StateImagery name="Disabled">
+        <Layer>
+          <Section section="delim">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+          <Section section="label">
+            <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+          </Section>
+        </Layer>
+      </StateImagery>
+    </WidgetLook>
+  
+    <WidgetLook name="CGUI/ListHeader">
+      <Property name="SegmentWidgetType" value="CGUI/ListHeaderSegment" />
+      <StateImagery name="Enabled" />
+      <StateImagery name="Disabled" />
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/MultiColumnList">
+    <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="NormalTextColour" />
+    <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="HoverTextColour" />
+    <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="PushedTextColour" />
+    <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="DisabledTextColour" />
+    <NamedArea name="ItemRenderingArea">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/FrameLeft" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <WidgetDim widget="__auto_listheader__" dimension="BottomEdge" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/FrameRight" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/FrameBottom" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ItemRenderingAreaHScroll">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/FrameLeft" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <WidgetDim widget="__auto_listheader__" dimension="BottomEdge" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/FrameRight" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_hscrollbar__" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ItemRenderingAreaVScroll">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/FrameLeft" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <WidgetDim widget="__auto_listheader__" dimension="BottomEdge" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+							  <DimOperator op="Subtract">
+								  <WidgetDim widget="__auto_vscrollbar__" dimension="Width" />
+							  </DimOperator>
+						  </UnifiedDim>
+					  </Dim>
+					  <Dim type="BottomEdge" >
+						  <UnifiedDim scale="1" type="BottomEdge">
+							  <DimOperator op="Subtract">
+								  <ImageDim name="CGUI-Images/FrameBottom" dimension="Height" />
+							  </DimOperator>
+						  </UnifiedDim>
+					  </Dim>
+				  </Area>
+			  </NamedArea>
+			  <NamedArea name="ItemRenderingAreaHVScroll">
+				  <Area>
+					  <Dim type="LeftEdge" ><ImageDim name="CGUI-Images/FrameLeft" dimension="Width" /></Dim>
+					  <Dim type="TopEdge" ><WidgetDim widget="__auto_listheader__" dimension="BottomEdge" /></Dim>
+					  <Dim type="RightEdge" >
+						  <UnifiedDim scale="1" type="RightEdge">
+							  <DimOperator op="Subtract">
+								  <WidgetDim widget="__auto_vscrollbar__" dimension="Width" />
+							  </DimOperator>
+						  </UnifiedDim>
+					  </Dim>
+					  <Dim type="BottomEdge" >
+						  <UnifiedDim scale="1" type="BottomEdge">
+							  <DimOperator op="Subtract">
+								  <WidgetDim widget="__auto_hscrollbar__" dimension="Height" />
+							  </DimOperator>
+						  </UnifiedDim>
+					  </Dim>
+				  </Area>
+			  </NamedArea>
+			  <Child  type="CGUI/ListHeader" nameSuffix="__auto_listheader__">
+				  <Area>
+					  <Dim type="LeftEdge" ><ImageDim name="CGUI-Images/FrameLeft" dimension="Width" /></Dim>
+					  <Dim type="TopEdge" ><AbsoluteDim value="3" /></Dim>
+					  <Dim type="RightEdge" >
+					      <UnifiedDim scale="1" type="RightEdge"> 
+					          <DimOperator op="Subtract"> 
+					              <AbsoluteDim value="25" />
+					          </DimOperator> 
+					      </UnifiedDim> 
+					  </Dim>
+					  <Dim type="Height" >
+						  <FontDim type="LineSpacing">
+							  <DimOperator op="Multiply">
+								  <AbsoluteDim value="1.5" />
+							  </DimOperator>
+						  </FontDim>
+					  </Dim>
+				  </Area>
+			  </Child>
+        <Child  type="CGUI/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" offset="-20" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="19" /></Dim>
+            </Area>
+            <VertAlignment type="BottomAligned" />
+        </Child>
+        <Child  type="CGUI/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+	        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="19" /></Dim>
+	        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-20" type="BottomEdge" /></Dim>
+            </Area>
+            <HorzAlignment type="RightAligned" />
+        </Child>
+        <ImagerySection name="main">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+	              <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+                <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+                <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+                <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+                <Image component="Background" name="CGUI-Images/Frame2Background" />
+            </FrameComponent>
+        </ImagerySection>
+      
+			  <StateImagery name="Enabled">
+				  <Layer>
+            <Section section="main">
+              <Colours topLeft="FF333333" topRight="FF333333" bottomLeft="FF333333" bottomRight="FF333333" />
+            </Section>
+				  </Layer>
+			  </StateImagery>
+			  <StateImagery name="Disabled">
+				  <Layer>
+            <Section section="main">
+              <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+            </Section>
+				  </Layer>
+			  </StateImagery>
+		  </WidgetLook>
+
+    <WidgetLook name="CGUI/MultiLineEditbox">
+        <Property name="SelectionBrushImage" value="CGUI-Images/GenericBrush" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="NormalTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="SelectedTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF9F9F9F" type="ColourRect" name="ActiveSelectionColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF808080" type="ColourRect" name="InactiveSelectionColour" />
+        <NamedArea name="TextArea">
+            <Area>
+                <Dim type="LeftEdge" ><ImageDim name="CGUI-Images/FrameLeft" dimension="Width" /></Dim>
+                <Dim type="TopEdge" ><ImageDim name="CGUI-Images/FrameTop" dimension="Height" /></Dim>
+                <Dim type="RightEdge" >
+                    <UnifiedDim scale="1" type="RightEdge">
+                        <DimOperator op="Subtract">
+                            <ImageDim name="CGUI-Images/FrameRight" dimension="Width" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+                <Dim type="BottomEdge" >
+                    <UnifiedDim scale="1" type="BottomEdge">
+                        <DimOperator op="Subtract">
+                            <ImageDim name="CGUI-Images/FrameBottom" dimension="Height" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <Child  type="CGUI/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="-5" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" offset="-25" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+            </Area>
+            <VertAlignment type="BottomAligned" />
+        </Child>
+        <Child  type="CGUI/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="-5" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" offset="-10" type="Height" /></Dim>
+            </Area>
+            <HorzAlignment type="RightAligned" />
+        </Child>
+        <ImagerySection name="Caret">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><AbsoluteDim value="2" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/GenericBrush" />
+                <Colours topLeft="FF000000" topRight="FF000000" bottomLeft="FF000000" bottomRight="FF000000" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ReadOnly">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section look="CGUI/Shared" section="Frame" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/ProgressBar">
+        <NamedArea name="ProgressArea">
+            <Area>
+                <Dim type="LeftEdge" ><ImageDim name="CGUI-Images/ProgressLeft" dimension="Width" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge" >
+                    <UnifiedDim scale="1" type="RightEdge">
+                        <DimOperator op="Subtract">
+                            <ImageDim name="CGUI-Images/ProgressRight" dimension="Width" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/ProgressTopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/ProgressTopRight" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/ProgressBottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/ProgressBottomRight" />
+                <Image component="LeftEdge" name="CGUI-Images/ProgressLeft" />
+                <Image component="TopEdge" name="CGUI-Images/ProgressTop" />
+                <Image component="RightEdge" name="CGUI-Images/ProgressRight" />
+                <Image component="BottomEdge" name="CGUI-Images/ProgressBottom" />
+                <Image component="Background" name="CGUI-Images/ProgressBackground" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="progress_lights" >
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/ProgressBarLitSegment" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Tiled" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="frame">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledProgress">
+            <Layer>
+                <Section section="progress_lights" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledProgress">
+            <Layer>
+                <Section section="progress_lights">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/Checkbox">
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge" >
+                        <ImageDim name="CGUI-Images/CheckboxNormal" dimension="Width">
+                            <DimOperator op="Add">
+                                <AbsoluteDim value="3" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/CheckboxNormal" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/CheckboxMarkHover" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="selectedhover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/CheckboxHover" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="selected">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/CheckboxMark" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal" />
+                <Section section="label">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover" />
+                <Section section="label">
+                    <ColourProperty name="HoverTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="DisabledTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedNormal">
+            <Layer>
+                <Section section="selected" />
+                <Section section="label">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedHover">
+            <Layer>
+                <Section section="selectedhover" />
+                <Section section="label">
+                    <ColourProperty name="HoverTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedDisabled">
+            <Layer>
+                <Section section="selected">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="DisabledTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <WidgetLook name="CGUI/RadioButton">
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="LeftEdge" >
+                        <ImageDim name="CGUI-Images/RadioButtonNormal" dimension="Width">
+                            <DimOperator op="Add">
+                                <AbsoluteDim value="3" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/RadioButtonNormal" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/RadioButtonHover" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="selectedhover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/RadioButtonMarkHover" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="selected">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/RadioButtonMark" />
+                <VertFormat type="CentreAligned" />
+                <HorzFormat type="LeftAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal" />
+                <Section section="label">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover" />
+                <Section section="label">
+                    <ColourProperty name="HoverTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="DisabledTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedNormal">
+            <Layer>
+                <Section section="selected" />
+                <Section section="label">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedHover">
+            <Layer>
+                <Section section="selectedhover" />
+                <Section section="label">
+                    <ColourProperty name="HoverTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="SelectedDisabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+                <Section section="select_mark">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+                <Section section="label">
+                    <ColourProperty name="DisabledTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+  <WidgetLook name="CGUI/ComboDropList">
+    <NamedArea name="ItemRenderingArea">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/Frame2Left" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <ImageDim name="CGUI-Images/Frame2Top" dimension="Height" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/Frame2Right" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/Frame2Bottom" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ItemRenderingAreaHScroll">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/Frame2Left" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <ImageDim name="CGUI-Images/Frame2Top" dimension="Height" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/Frame2Right" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_hscrollbar__" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ItemRenderingAreaVScroll">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/Frame2Left" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <ImageDim name="CGUI-Images/Frame2Top" dimension="Height" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_vscrollbar__" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <ImageDim name="CGUI-Images/Frame2Bottom" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ItemRenderingAreaHVScroll">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim name="CGUI-Images/Frame2Left" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <ImageDim name="CGUI-Images/Frame2Top" dimension="Height" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_vscrollbar__" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_hscrollbar__" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <Child  type="CGUI/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+      <Area>
+        <Dim type="LeftEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="Width" >
+          <UnifiedDim scale="1" offset="-20" type="Width" />
+        </Dim>
+        <Dim type="Height" >
+          <AbsoluteDim value="19" />
+        </Dim>
+      </Area>
+      <VertAlignment type="BottomAligned" />
+    </Child>
+    <Child  type="CGUI/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+      <Area>
+        <Dim type="LeftEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="Width" >
+          <AbsoluteDim value="19" />
+        </Dim>
+        <Dim type="Height" >
+          <UnifiedDim scale="1" offset="-20" type="Height" />
+        </Dim>
+      </Area>
+      <HorzAlignment type="RightAligned" />
+    </Child>
+    <ImagerySection name="main">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge" >
+            <AbsoluteDim value="0" />
+          </Dim>
+          <Dim type="TopEdge" >
+            <AbsoluteDim value="0" />
+          </Dim>
+          <Dim type="Width" >
+            <UnifiedDim scale="1" type="Width" />
+          </Dim>
+          <Dim type="Height" >
+            <UnifiedDim scale="1" type="Height" />
+          </Dim>
+        </Area>
+        <Image component="TopLeftCorner" name="CGUI-Images/Frame2TopLeft" />
+        <Image component="TopRightCorner" name="CGUI-Images/Frame2TopRight" />
+        <Image component="BottomLeftCorner" name="CGUI-Images/Frame2BottomLeft" />
+        <Image component="BottomRightCorner" name="CGUI-Images/Frame2BottomRight" />
+        <Image component="LeftEdge" name="CGUI-Images/Frame2Left" />
+        <Image component="RightEdge" name="CGUI-Images/Frame2Right" />
+        <Image component="TopEdge" name="CGUI-Images/Frame2Top" />
+        <Image component="BottomEdge" name="CGUI-Images/Frame2Bottom" />
+        <Image component="Background" name="CGUI-Images/Frame2Background" />
+      </FrameComponent>
+    </ImagerySection>
+    <StateImagery name="Enabled">
+      <Layer>
+        <Section section="main" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section section="main">
+          <Colours topLeft="FF333333" topRight="FF333333" bottomLeft="FF333333" bottomRight="FF333333" />
+        </Section>
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+    <WidgetLook name="CGUI/ComboEditbox">
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFDFDFDF" type="ColourRect" name="ReadOnlyBGColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF000000" type="ColourRect" name="NormalTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FFFFFFFF" type="ColourRect" name="SelectedTextColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF607FFF" type="ColourRect" name="ActiveSelectionColour" />
+        <PropertyDefinition redrawOnWrite="true" initialValue="FF808080" type="ColourRect" name="InactiveSelectionColour" />
+        <NamedArea name="TextArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="7" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="3" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1.0" offset="-7" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge" ><UnifiedDim scale="1.0" offset="-3" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="ComboEditboxFrame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image component="TopLeftCorner" name="CGUI-Images/FrameTopLeft" />
+                <Image component="TopRightCorner" name="CGUI-Images/FrameTopRightSquared" />
+                <Image component="BottomLeftCorner" name="CGUI-Images/FrameBottomLeft" />
+                <Image component="BottomRightCorner" name="CGUI-Images/FrameBottomRightSquared" />
+                <Image component="LeftEdge" name="CGUI-Images/FrameLeft" />
+                <Image component="TopEdge" name="CGUI-Images/FrameTop" />
+                <Image component="RightEdge" name="CGUI-Images/FrameRight" />
+                <Image component="BottomEdge" name="CGUI-Images/FrameBottom" />
+                <Image component="Background" name="CGUI-Images/GenericBrush" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="selection">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/GenericBrush" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="Caret">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><AbsoluteDim value="2" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+                </Area>
+                <Image name="CGUI-Images/GenericBrush" />
+                <Colours topLeft="FF000000" topRight="FF000000" bottomLeft="FF000000" bottomRight="FF000000" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section look="CGUI/ComboEditbox" section="ComboEditboxFrame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ReadOnly">
+            <Layer>
+                <Section look="CGUI/ComboEditbox" section="ComboEditboxFrame" >
+                    <ColourProperty name="ReadOnlyBGColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section look="CGUI/ComboEditbox" section="ComboEditboxFrame" >
+                    <ColourProperty name="ReadOnlyBGColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveSelection">
+            <Layer>
+                <Section section="selection">
+                    <ColourProperty name="ActiveSelectionColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveSelection">
+            <Layer>
+                <Section section="selection">
+                    <ColourProperty name="InactiveSelectionColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+  <WidgetLook name="CGUI/Combobox">
+        <PropertyLinkDefinition targetProperty="NormalTextColour" widget="__auto_editbox__" initialValue="FF000000" type="ColourRect" name="NormalEditTextColour"/>
+        <PropertyLinkDefinition targetProperty="SelectedTextColour" widget="__auto_editbox__" initialValue="FFFFFFFF" type="ColourRect" name="SelectedEditTextColour"/>
+        <PropertyLinkDefinition targetProperty="ActiveSelectionColour" widget="__auto_editbox__" initialValue="FF607FFF" type="ColourRect" name="ActiveEditSelectionColour"/>
+        <PropertyLinkDefinition targetProperty="InactiveSelectionColour" widget="__auto_editbox__" initialValue="FF808080" type="ColourRect" name="InactiveEditSelectionColour"/>
+    <Child  type="CGUI/ComboEditbox" nameSuffix="__auto_editbox__">
+      <Area>
+        <Dim type="LeftEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <FontDim type="LineSpacing">
+                <DimOperator op="Multiply">
+                  <AbsoluteDim value="1.5" />
+                </DimOperator>
+              </FontDim>
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="Height" >
+          <FontDim type="LineSpacing">
+            <DimOperator op="Multiply">
+              <AbsoluteDim value="1.5" />
+            </DimOperator>
+          </FontDim>
+        </Dim>
+      </Area>
+    </Child>
+    <Child  type="CGUI/ComboDropList" nameSuffix="__auto_droplist__">
+      <Area>
+        <Dim type="LeftEdge" >
+          <AbsoluteDim value="0" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <WidgetDim widget="__auto_editbox__" dimension="BottomEdge" />
+        </Dim>
+        <Dim type="Width" >
+          <UnifiedDim scale="1" type="Width" />
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge" />
+        </Dim>
+      </Area>
+    </Child>
+
+    <Child  type="CGUI/ImageButton" nameSuffix="__auto_button__">
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" >
+                        <WidgetDim widget="__auto_editbox__" dimension="Height" />
+                    </Dim>
+                    <Dim type="Height" >
+                        <WidgetDim widget="__auto_editbox__" dimension="Height" />
+                    </Dim>
+                </Area>
+                <Image imageset="CGUI-Images" image="ComboboxButtonNormal" />
+                <HorzAlignment type="RightAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" >
+                        <WidgetDim widget="__auto_editbox__" dimension="Height" />
+                    </Dim>
+                    <Dim type="Height" >
+                        <WidgetDim widget="__auto_editbox__" dimension="Height" />
+                    </Dim>
+                </Area>
+                <Image imageset="CGUI-Images" image="ComboboxButtonHover" />
+                <HorzAlignment type="RightAligned" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal" />
+            </Layer>
+        </StateImagery>    
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover" />
+            </Layer>
+        </StateImagery>   
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="hover" />
+            </Layer>
+        </StateImagery>    
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal" />
+            </Layer>
+        </StateImagery>        
+    </Child>   
+    <StateImagery name="Enabled"/>
+    <StateImagery name="Disabled"/>
+  </WidgetLook>
+  
+    <WidgetLook name="CGUI/ImageButton">
+        <PropertyDefinition name="VertImageFormatting" initialValue="Stretched" redrawOnWrite="true" />
+        <PropertyDefinition name="HorzImageFormatting" initialValue="Stretched" redrawOnWrite="true" />
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <ImageProperty name="NormalImage" />
+                <VertFormatProperty name="VertImageFormatting" />
+                <HorzFormatProperty name="HorzImageFormatting" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <ImageProperty name="HoverImage" />
+                <VertFormatProperty name="VertImageFormatting" />
+                <HorzFormatProperty name="HorzImageFormatting" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <ImageProperty name="PushedImage" />
+                <VertFormatProperty name="VertImageFormatting" />
+                <HorzFormatProperty name="HorzImageFormatting" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="disabled">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <ImageProperty name="DisabledImage" />
+                <VertFormatProperty name="VertImageFormatting" />
+                <HorzFormatProperty name="HorzImageFormatting" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="normal" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="hover" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="pushed" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="PushedOff">
+            <Layer>
+                <Section section="hover" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="disabled" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+</Falagard>
