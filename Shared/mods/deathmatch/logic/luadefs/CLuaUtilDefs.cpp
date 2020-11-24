@@ -190,7 +190,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         char*        szToken = strtok(strText, strDelimiter);
 
         // Create a new table
-        // Reserve a generous amount, because it'll get GCd fast probably
+        // Reserve a small amount
         lua_createtable(luaVM, 8, 0); 
 
         // strtok until we're out of tokens
@@ -557,7 +557,8 @@ int CLuaUtilDefs::PregMatch(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_createtable(luaVM, 8, 0); // Preallocate a generous amount 
+        // Reserve a small amount
+        lua_createtable(luaVM, 8, 0);
 
         pcrecpp::RE pPattern(strPattern, pOptions);
 

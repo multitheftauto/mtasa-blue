@@ -608,7 +608,8 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
         }
 
         // Create a new table
-        lua_createtable(luaVM, 0, ucMaxPassengers); // seats start a 0, so we need a hashtable
+        // Seats start at 0, so we need to create a hashtable
+        lua_createtable(luaVM, 0, ucMaxPassengers);
 
         // Add All Occupants
         for (unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ucSeat)
