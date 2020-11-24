@@ -381,7 +381,7 @@ int CLuaACLDefs::aclSetRight(lua_State* luaVM)
 
 int CLuaACLDefs::aclListRights(lua_State* luaVM)
 {
-    //  table aclListRights ( acl theACL )
+    //  table aclListRights ( acl theACL, [string type] )
     CAccessControlList*                 pACL;
     SString                             strType;
     bool                                bAll = true;
@@ -409,8 +409,10 @@ int CLuaACLDefs::aclListRights(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Create a table to return into
-        lua_createtable(luaVM, pACL->CountRights(), 0);
-
+        if (bAll)
+            lua_createtable(luaVM, pACL->CountRights(), 0);
+        else
+            lua_createtable(luaVM, pACL->CountRights() / 2, 0); // Don't be too generous with prealloc here
 
         // Loop through ACL
         char                                           szRightName[128];
