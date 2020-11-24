@@ -170,6 +170,8 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        const bool bFilterTime = dTime != 0;
+
         // Find our VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
@@ -180,12 +182,15 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
             CFastList<CLuaTimer*>::const_iterator iter = pLuaTimerManager->IterBegin();
 
             // Create a new table
-            // If no time is specified we preallocate CountTimers(), otherwise none
-            lua_createtable(luaVM, dTime ? 0 : pLuaTimerManager->CountTimers(), 0);
+            if (bFilterTime)
+                lua_newtable(luaVM);
+            else
+                lua_createtable(luaVM, pLuaTimerManager->CountTimers(), 0);
+
             for (lua_Number i = 1; iter != pLuaTimerManager->IterEnd(); ++iter)
             {
                 CLuaTimer* pLuaTimer = *iter;
-                if (dTime != 0) // Time specified is non-zero?
+                if (bFilterTime)
                 {
                     // If the time left is less than the time specified
                     CTickCount llTimeLeft = (pLuaTimer->GetStartTime() + pLuaTimer->GetDelay()) - llCurrentTime;
