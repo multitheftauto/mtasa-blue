@@ -408,6 +408,8 @@ void CConsole::SetNextAutoCompleteMatch()
 
 void CConsole::CreateElements(CGUIElement* pParent)
 {
+    bool bNewCEGUI = CCore::GetSingleton().IsUsingNewCEGUI();
+
     // Adjust window size to resolution
     CVector2D ScreenSize = m_pManager->GetResolution();
     m_fWindowX *= ScreenSize.fX / NATIVE_RES_X;
@@ -432,7 +434,12 @@ void CConsole::CreateElements(CGUIElement* pParent)
     */
     CVector2D HistorySize = CVector2D(m_fWindowX - m_fWindowSpacer * 2.0f, m_fWindowY - m_fWindowSpacer * 1.5f - m_fWindowSpacerTop - m_fInputHeight);
     m_pHistory = reinterpret_cast<CGUIMemo*>(m_pManager->CreateMemo(m_pWindow));
-    m_pHistory->SetPosition(CVector2D(m_fWindowSpacer, m_fWindowSpacerTop));
+
+    if (!bNewCEGUI)
+        m_pHistory->SetPosition(CVector2D(m_fWindowSpacer, m_fWindowSpacerTop));
+    else
+        m_pHistory->SetPosition(CVector2D(0, m_fWindowSpacer * 0.5f));
+
     CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative(HistorySize);
     m_pHistory->SetSize(HistorySize);
     m_pHistory->SetReadOnly(true);
@@ -442,7 +449,12 @@ void CConsole::CreateElements(CGUIElement* pParent)
         pos y: SPACER (TOP) + HISTORY HEIGHT + SPACER
     */
     m_pInput = reinterpret_cast<CGUIEdit*>(m_pManager->CreateEdit(m_pWindow));
-    m_pInput->SetPosition(CVector2D(m_fWindowSpacer, HistorySize.fY + m_fWindowSpacer * 0.5f + m_fWindowSpacerTop));
+
+    if (!bNewCEGUI)
+        m_pInput->SetPosition(CVector2D(m_fWindowSpacer, HistorySize.fY + m_fWindowSpacer * 0.5f + m_fWindowSpacerTop));
+    else
+        m_pInput->SetPosition(CVector2D(0, HistorySize.fY + m_fWindowSpacer));
+
     m_pInput->SetWidth(HistorySize.fX);
     m_pInput->SetHeight(m_fInputHeight);
 }
