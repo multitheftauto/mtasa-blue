@@ -409,6 +409,7 @@ public:
     bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
+    void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
     void         FlushPendingRestreamIPL();
