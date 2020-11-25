@@ -18,7 +18,7 @@ class CPed;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-class CPedWastedPacket final : public CPacket
+class CPedWastedPacket : public CPacket
 {
 public:
     CPedWastedPacket();

@@ -17,7 +17,7 @@
 #include "Common.h"
 #include <vector>
 
-class CLightsyncPacket final : public CPacket
+class CLightsyncPacket : public CPacket
 {
 public:
     CLightsyncPacket() {}

@@ -22,7 +22,7 @@
 #define CHATCOLOR_ADMINSAY      131, 205, 241
 #define CHATCOLOR_CONSOLESAY    223, 149, 232
 
-class CChatEchoPacket final : public CPacket
+class CChatEchoPacket : public CPacket
 {
 public:
     CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false)

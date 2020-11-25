@@ -18,7 +18,7 @@ class CVehicleSpawnPacket;
 
 class CVehicle;
 
-class CVehicleSpawnPacket final : public CPacket
+class CVehicleSpawnPacket : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_SPAWN; };

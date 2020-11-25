@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include "../lua/CLuaArguments.h"
 
-class CCustomDataPacket final : public CPacket
+class CCustomDataPacket : public CPacket
 {
 public:
     CCustomDataPacket();

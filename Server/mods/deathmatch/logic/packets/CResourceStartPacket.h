@@ -15,7 +15,7 @@
 #include "../packets/CPacket.h"
 #include "../CResource.h"
 
-class CResourceStartPacket final : public CPacket
+class CResourceStartPacket : public CPacket
 {
 public:
     CResourceStartPacket(const char* szResourceName, class CResource* pResource);

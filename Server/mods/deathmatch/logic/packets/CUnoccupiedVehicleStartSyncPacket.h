@@ -14,7 +14,7 @@
 #include "CPacket.h"
 class CVehicle;
 
-class CUnoccupiedVehicleStartSyncPacket final : public CPacket
+class CUnoccupiedVehicleStartSyncPacket : public CPacket
 {
 public:
     CUnoccupiedVehicleStartSyncPacket(CVehicle* pVehicle) { m_pVehicle = pVehicle; };

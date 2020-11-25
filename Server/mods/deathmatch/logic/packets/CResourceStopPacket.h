@@ -13,7 +13,7 @@
 
 #include "../packets/CPacket.h"
 
-class CResourceStopPacket final : public CPacket
+class CResourceStopPacket : public CPacket
 {
 public:
     CResourceStopPacket(unsigned short usID);

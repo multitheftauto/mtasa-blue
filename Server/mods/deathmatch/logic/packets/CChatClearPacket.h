@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CChatClearPacket final : public CPacket
+class CChatClearPacket : public CPacket
 {
 public:
     CChatClearPacket() {};

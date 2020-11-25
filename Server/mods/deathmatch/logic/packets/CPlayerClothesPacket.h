@@ -21,7 +21,7 @@ struct SPlayerClothes
     unsigned char ucType;
 };
 
-class CPlayerClothesPacket final : public CPacket
+class CPlayerClothesPacket : public CPacket
 {
 public:
     ~CPlayerClothesPacket();

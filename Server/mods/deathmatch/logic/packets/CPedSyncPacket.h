@@ -15,7 +15,7 @@
 #include "CPacket.h"
 #include <vector>
 
-class CPedSyncPacket final : public CPacket
+class CPedSyncPacket : public CPacket
 {
 public:
     struct SyncData
