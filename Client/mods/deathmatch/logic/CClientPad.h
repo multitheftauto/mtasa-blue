@@ -46,7 +46,7 @@ public:
     static bool GetControlState(const char* szName, CControllerState& State, bool bOnFoot);
 
     static SFixedArray<short, MAX_GTA_CONTROLS>       m_sScriptedStates;
-    static SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> m_bScriptedStatesFrameForced;
+    static SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> m_bScriptedStatesOverride;
     static bool                                       m_bFlyWithMouse;
     static bool                                       m_bSteerWithMouse;
 

@@ -304,7 +304,7 @@ int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
     //  bool setAnalogControlState ( string controlName [, float state][, bFrameForced] )
     SString          strControlState = "";
     float            fState = 0.0f;
-    bool             bFrameForced = false;
+    bool             bOverrideUserInput = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strControlState);
 
@@ -314,9 +314,9 @@ int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
         {
             argStream.ReadNumber(fState);
             if (argStream.NextIsBool())
-                argStream.ReadBool(bFrameForced, false);
+                argStream.ReadBool(bOverrideUserInput, false);
 
-            if (CClientPad::SetAnalogControlState(strControlState, fState, bFrameForced))
+            if (CClientPad::SetAnalogControlState(strControlState, fState, bOverrideUserInput))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
