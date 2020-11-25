@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CPlayerJoinPacket final : public CPacket
+class CPlayerJoinPacket : public CPacket
 {
 public:
     virtual bool  RequiresSourcePlayer() const { return false; }

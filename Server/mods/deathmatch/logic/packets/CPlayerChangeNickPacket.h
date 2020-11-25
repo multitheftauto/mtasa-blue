@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include "../../Config.h"
 
-class CPlayerChangeNickPacket final : public CPacket
+class CPlayerChangeNickPacket : public CPacket
 {
 public:
     explicit CPlayerChangeNickPacket(const char* szNewNick);

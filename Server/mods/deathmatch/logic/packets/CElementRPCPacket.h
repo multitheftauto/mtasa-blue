@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CElementRPCPacket final : public CPacket
+class CElementRPCPacket : public CPacket
 {
 public:
     CElementRPCPacket(CElement* pSourceElement, unsigned char ucActionID, NetBitStreamInterface& BitStream)

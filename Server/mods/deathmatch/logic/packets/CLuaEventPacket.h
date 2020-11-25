@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include "../lua/CLuaArguments.h"
 
-class CLuaEventPacket final : public CPacket
+class CLuaEventPacket : public CPacket
 {
 public:
     CLuaEventPacket();

@@ -13,7 +13,7 @@
 
 #include "../packets/CPacket.h"
 
-class CPlayerDisconnectedPacket final : public CPacket
+class CPlayerDisconnectedPacket : public CPacket
 {
 public:
     enum ePlayerDisconnectType

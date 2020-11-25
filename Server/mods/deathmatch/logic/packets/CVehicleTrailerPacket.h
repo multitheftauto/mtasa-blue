@@ -15,7 +15,7 @@
 #include "../CCommon.h"
 #include "CPacket.h"
 
-class CVehicleTrailerPacket final : public CPacket
+class CVehicleTrailerPacket : public CPacket
 {
 public:
     CVehicleTrailerPacket(){};
