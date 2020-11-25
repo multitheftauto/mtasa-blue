@@ -704,7 +704,6 @@ public:
                         SString strReason = "", time_t tUnban = 0);
     static bool  RemoveBan(CBan* pBan, CPlayer* pResponsible = NULL);
 
-    static bool GetBans(lua_State* luaVM);
     static bool ReloadBanList();
 
     static bool GetBanIP(CBan* pBan, SString& strOutIP);
