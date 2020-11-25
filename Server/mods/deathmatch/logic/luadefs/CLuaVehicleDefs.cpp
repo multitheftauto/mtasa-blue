@@ -873,7 +873,7 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
             return 1;
         }
 
-        // So, someone decided to start seats from 0 in Lua as well..
+        // So, someone decided to start seats from 0 in Lua as well...
         // So we reserve a hashtable here
         lua_createtable(luaVM, 0, ucMaxPassengers);
 
