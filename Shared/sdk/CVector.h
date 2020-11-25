@@ -17,7 +17,7 @@
 
 #include <cmath>
 
-#define FLOAT_EPSILON 0.0001f
+#define FLOAT_EPSILON 0.0001f   
 #include "CVector4D.h"
 
 /**

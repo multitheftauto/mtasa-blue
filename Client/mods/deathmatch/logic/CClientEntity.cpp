@@ -975,7 +975,7 @@ void CClientEntity::FindAllChildrenByType(const char* szType, lua_State* luaVM, 
     }
     else
     {
-        lua_newtable(luaVM)
+        lua_newtable(luaVM);
         FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex, bStreamedIn);
     }
 }
