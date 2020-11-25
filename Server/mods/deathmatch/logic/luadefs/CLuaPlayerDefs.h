@@ -46,7 +46,7 @@ public:
     LUA_DECLARE(GetPlayerAccount);
     LUA_DECLARE(GetPlayerVersion);
     LUA_DECLARE(GetPlayerACInfo);
-    LUA_DECLARE(GetPlayerScriptDebugLevel);
+    static unsigned int GetPlayerScriptDebugLevel(CPlayer* const player);
 
     // Player set functions
     LUA_DECLARE(SetPlayerMoney);
@@ -61,11 +61,12 @@ public:
     LUA_DECLARE(SetPlayerNametagShowing);
     LUA_DECLARE(SetPlayerMuted);
     LUA_DECLARE(SetPlayerBlurLevel);
+    LUA_DECLARE(SetPlayerDiscordJoinParams);
     LUA_DECLARE(RedirectPlayer);
     LUA_DECLARE(SetPlayerName);
     LUA_DECLARE(DetonateSatchels);
     LUA_DECLARE(TakePlayerScreenShot);
-    LUA_DECLARE(SetPlayerScriptDebugLevel);
+    static bool SetPlayerScriptDebugLevel(CElement* const element, const std::variant<unsigned int, bool> variant);
 
     // All seeing eye
     LUA_DECLARE(GetPlayerAnnounceValue);

@@ -17,7 +17,7 @@ project "Loader"
 	}
 
 	links {
-		"unrar", "d3d9", "Wscapi",
+		"unrar", "d3d9",
 		"../../vendor/nvapi/x86/nvapi.lib"
 	}
 

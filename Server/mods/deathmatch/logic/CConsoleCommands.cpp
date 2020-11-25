@@ -602,6 +602,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
 
                                         // Send it to the player
                                         pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO));
+                                        break;
                                     }
                                     case CClient::CLIENT_SCRIPT:
                                     {
@@ -1233,6 +1234,11 @@ bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, 
 
             // Convert to number
             int iLevel = atoi(szArguments);
+            if (iLevel == 0 && strcmp(szArguments, "0") != 0)
+            {
+                pEchoClient->SendEcho("debugscript: Syntax is 'debugscript <mode>'");
+                return false;
+            }
             if (iLevel != (int)pPlayer->GetScriptDebugLevel())
             {
                 // Between 0 and 3?

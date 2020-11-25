@@ -57,12 +57,12 @@ class CGame;
 #include "lua/CLuaManager.h"
 
 #include "CLightsyncManager.h"
+#include "CBanManager.h"
 
 // Forward declarations
 class ASE;
 class CAccessControlListManager;
 class CAccountManager;
-class CBanManager;
 class CBlipManager;
 class CClock;
 class CColManager;
@@ -182,6 +182,7 @@ public:
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
+        GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
 
@@ -495,6 +496,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
+    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 

@@ -13,6 +13,8 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
+#include "D3DResourceSystemSA.h"
+#include "CFileLoaderSA.h"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
@@ -198,6 +200,8 @@ CGameSA::CGameSA()
     // Increase matrix array size
     MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);            // Default is 900
 
+    CEntitySAInterface::StaticSetHooks();
+    CPhysicalSAInterface::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();
@@ -206,6 +210,8 @@ CGameSA::CGameSA()
     CPedSA::StaticSetHooks();
     CSettingsSA::StaticSetHooks();
     CFxSystemSA::StaticSetHooks();
+    CFileLoaderSA::StaticSetHooks();
+    D3DResourceSystemSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -467,6 +473,9 @@ void CGameSA::Reset()
         CModelInfoSA::RestoreAllObjectsPropertiesGroups();
         // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
         CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
+
+        // Restore vehicle model wheel sizes
+        CModelInfoSA::ResetAllVehiclesWheelSizes();
     }
 }
 

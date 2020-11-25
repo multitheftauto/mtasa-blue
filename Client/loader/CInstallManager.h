@@ -38,12 +38,12 @@ protected:
     SString _InstallFiles();
     SString _ChangeToAdmin();
     SString _ShowCopyFailDialog();
+    SString _ProcessGtaVersionCheck();
     SString _ProcessLayoutChecks();
     SString _ProcessLangFileChecks();
     SString _ProcessExePatchChecks();
     SString _ProcessServiceChecks();
     SString _ProcessAppCompatChecks();
-    SString _ProcessWinmmChecks();
     SString _ChangeFromAdmin();
     SString _InstallNewsItems();
     SString _Quit();

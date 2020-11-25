@@ -65,7 +65,18 @@ class CPedModelInfoSAInterface;
 #define     FUNC_SetColModel                0x4C4BC0
 #define     FUNC_AddPedModel                0x4c67a0
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
-/**
+
+
+class CBaseModelInfoSAInterface;
+class CModelInfoSAInterface
+{
+public:
+    // Use GetModelInfo(int index) to get model info by id
+    static CBaseModelInfoSAInterface** ms_modelInfoPtrs;
+    static CBaseModelInfoSAInterface*  GetModelInfo(int index) { return ms_modelInfoPtrs[index]; }
+};
+
+    /**
  * \todo Fill this class with info from R*
  */
 class CBaseModelInfo_SA_VTBL
@@ -257,20 +268,21 @@ enum eModelInfoType : unsigned char
 class CModelInfoSA : public CModelInfo
 {
 protected:
-    CBaseModelInfoSAInterface*                                                                   m_pInterface;
-    DWORD                                                                                        m_dwModelID;
-    DWORD                                                                                        m_dwReferences;
-    DWORD                                                                                        m_dwPendingInterfaceRef;
-    CColModel*                                                                                   m_pCustomColModel;
-    CColModelSAInterface*                                                                        m_pOriginalColModelInterface;
-    RpClump*                                                                                     m_pCustomClump;
-    static std::map<unsigned short, int>                                                         ms_RestreamTxdIDMap;
-    static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
-    static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::unordered_map<DWORD, unsigned short>                                             ms_OriginalObjectPropertiesGroups;
-    bool                                                                                         m_bAddedRefForCollision;
-    SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
+    CBaseModelInfoSAInterface*                                                   m_pInterface;
+    DWORD                                                                        m_dwModelID;
+    DWORD                                                                        m_dwReferences;
+    DWORD                                                                        m_dwPendingInterfaceRef;
+    CColModel*                                                                   m_pCustomColModel;
+    CColModelSAInterface*                                                        m_pOriginalColModelInterface;
+    RpClump*                                                                     m_pCustomClump;
+    static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
+    static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
+    static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
+    static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
+    static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
+    bool                                                                         m_bAddedRefForCollision;
+    SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
     CModelInfoSA();
@@ -341,7 +353,12 @@ public:
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
+    void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
+    float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) override;
+    void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) override;
+    void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) override;
+    static void  ResetAllVehiclesWheelSizes();
 
     // ONLY use for peds
     void GetVoice(short* psVoiceType, short* psVoice);

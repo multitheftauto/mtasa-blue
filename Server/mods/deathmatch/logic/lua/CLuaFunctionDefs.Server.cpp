@@ -214,18 +214,18 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     argStream.ReadAnyAsString(strMessage);
     argStream.ReadNumber(uiLevel, 3);
 
-    if (uiLevel == 0)
+    if (uiLevel == 0 || uiLevel == 4)
     {
-        argStream.ReadNumber(ucR, 0xFF);
-        argStream.ReadNumber(ucG, 0xFF);
-        argStream.ReadNumber(ucB, 0xFF);
+        argStream.ReadNumber(ucR, 255);
+        argStream.ReadNumber(ucG, 255);
+        argStream.ReadNumber(ucB, 255);
     }
 
     if (!argStream.HasErrors())
     {
-        if (uiLevel > 3)
+        if (uiLevel > 4)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-3)", lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-4)", lua_tostring(luaVM, lua_upvalueindex(1)));
 
             lua_pushboolean(luaVM, false);
             return 1;
@@ -243,9 +243,13 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
         {
             m_pScriptDebugging->LogInformation(luaVM, "%s", strMessage.c_str());
         }
-        else if (uiLevel == 0)
+        else if (uiLevel == 4)
         {
             m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
+        }
+        else if (uiLevel == 0)
+        {
+            m_pScriptDebugging->LogDebug(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
         }
         lua_pushboolean(luaVM, true);
         return 1;
@@ -1407,28 +1411,30 @@ int CLuaFunctionDefs::GetVersion(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 {
-    if (lua_type(luaVM, 1) == LUA_TSTRING)
+    SString strModuleName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModuleName);
+
+    if (!argStream.HasErrors())
     {
-        list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-        list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-        SString                     strAttribute = lua_tostring(luaVM, 2);
-        SString                     strModuleName = lua_tostring(luaVM, 1);
-        for (; iter != lua_LoadedModules.end(); ++iter)
+        std::list<CLuaModule*> modules = m_pLuaModuleManager->GetLoadedModules();
+        for (const auto mod : modules)
         {
-            if (stricmp(strModuleName, (*iter)->_GetName().c_str()) == 0)
+            if (mod->_GetName() == strModuleName)
             {
                 lua_newtable(luaVM);
 
                 lua_pushstring(luaVM, "name");
-                lua_pushstring(luaVM, (*iter)->_GetFunctions().szModuleName);
+                lua_pushstring(luaVM, mod->_GetFunctions().szModuleName);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "author");
-                lua_pushstring(luaVM, (*iter)->_GetFunctions().szAuthor);
+                lua_pushstring(luaVM, mod->_GetFunctions().szAuthor);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "version");
-                SString strVersion("%.2f", (*iter)->_GetFunctions().fVersion);
+                SString strVersion("%.2f", mod->_GetFunctions().fVersion);
                 lua_pushstring(luaVM, strVersion);
                 lua_settable(luaVM, -3);
 
@@ -1436,8 +1442,10 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
             }
         }
     }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
-    m_pScriptDebugging->LogBadType(luaVM);
     return 1;
 }
 

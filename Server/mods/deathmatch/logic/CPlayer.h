@@ -25,6 +25,7 @@ class CPlayer;
 #include "packets/CPlayerStatsPacket.h"
 class CKeyBinds;
 class CPlayerCamera;
+enum class eVehicleAimDirection : unsigned char;
 
 enum eVoiceState
 {
@@ -87,20 +88,27 @@ public:
     const char* GetNick() { return m_strNick; };
     void        SetNick(const char* szNick);
 
-    int            GetGameVersion() { return m_iGameVersion; };
-    void           SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
-    unsigned short GetMTAVersion() { return m_usMTAVersion; };
-    void           SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
-    unsigned short GetBitStreamVersion() { return m_usBitStreamVersion; };
-    void           SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
+    int                GetGameVersion() { return m_iGameVersion; };
+    void               SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
+    unsigned short     GetMTAVersion() { return m_usMTAVersion; };
+    void               SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
+    unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
+    void               SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
     bool               ShouldIgnoreMinClientVersionChecks();
+    void               SetDiscordJoinSecret(const SString& joinSecret) { m_strDiscordJoinSecret = joinSecret; }
+    SString            GetDiscordJoinSecret() const { return m_strDiscordJoinSecret; }
 
     bool IsMuted() { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
     bool IsJoined() { return m_bIsJoined; }
     void SetJoined() { m_bIsJoined = true; }
+
+    bool SubscribeElementData(CElement* pElement, const std::string& strName);
+    bool UnsubscribeElementData(CElement* pElement, const std::string& strName);
+    bool UnsubscribeElementData(CElement* pElement);
+    bool IsSubscribed(CElement* pElement, const std::string& strName) const;
 
     float GetCameraRotation() { return m_fCameraRotation; };
     void  SetCameraRotation(float fRotation) { m_fCameraRotation = fRotation; };
@@ -114,8 +122,8 @@ public:
     void           SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
     float          GetAimDirection() { return m_fAimDirection; };
     void           SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
-    unsigned char  GetDriveByDirection() { return m_ucDriveByDirection; };
-    void           SetDriveByDirection(unsigned char ucDirection) { m_ucDriveByDirection = ucDirection; };
+    eVehicleAimDirection GetDriveByDirection() { return m_ucDriveByDirection; };
+    void           SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
     bool           IsAkimboArmUp() { return m_bAkimboArmUp; };
     void           SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
 
@@ -356,6 +364,7 @@ private:
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
     bool           m_bIsJoined;
+    SString        m_strDiscordJoinSecret;
 
     bool m_bNametagColorOverridden;
 
@@ -364,7 +373,7 @@ private:
     CVector       m_vecSniperSource;
     CVector       m_vecTargetting;
     float         m_fAimDirection;
-    unsigned char m_ucDriveByDirection;
+    eVehicleAimDirection m_ucDriveByDirection;
 
     bool m_bAkimboArmUp;
 
@@ -428,6 +437,8 @@ private:
     CElapsedTime m_LastReceivedSyncTimer;
 
     std::map<std::string, std::string> m_AnnounceValues;
+
+    std::set<std::pair<CElement*, std::string>> m_DataSubscriptions;
 
     uint m_uiWeaponIncorrectCount;
 
