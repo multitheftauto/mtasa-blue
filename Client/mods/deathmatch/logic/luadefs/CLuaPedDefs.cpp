@@ -1013,7 +1013,8 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entit
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>>
+CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -1023,7 +1024,7 @@ std::variant<bool, CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const l
         {
             CMatrix matrix;
             g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, matrix);
-            return matrix;
+            return matrix.To4x4Array();
         }
     }
     return false;
