@@ -676,6 +676,12 @@ ADD_ENUM(eCollisionKey::VERTICES, "vertices")
 ADD_ENUM(eCollisionKey::MOVE, "move")
 IMPLEMENT_ENUM_CLASS_END("collision-key")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
+ADD_ENUM(eClientModelType::PED, "ped")
+ADD_ENUM(eClientModelType::OBJECT, "object")
+ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+IMPLEMENT_ENUM_CLASS_END("client-model-type")
+
 //
 // Get best guess at name of userdata type
 //

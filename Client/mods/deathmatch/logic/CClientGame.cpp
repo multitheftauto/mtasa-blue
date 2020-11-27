@@ -2772,6 +2772,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
+    m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -5770,6 +5771,7 @@ void CClientGame::ResetMapInfo()
 
     // Water-colour
     g_pMultiplayer->ResetWater();
+    g_pMultiplayer->ResetColorFilter();
 
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
@@ -6981,7 +6983,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::RestreamWorld()
 {
-    for (unsigned int uiModelID = 0; uiModelID <= 26316; uiModelID++)
+    for (unsigned int uiModelID = 0; uiModelID < 26316; uiModelID++)
     {
         g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
     }

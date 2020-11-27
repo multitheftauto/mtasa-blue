@@ -85,6 +85,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
+        {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -228,6 +229,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
+    lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -4108,4 +4110,15 @@ bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, con
     m_pVehicleManager->RestreamVehicles(usModel);
 
     return true;
+}
+
+int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel)
+{
+    if (wheel < 0 || wheel > 3)
+        throw std::invalid_argument("Invalid wheel number");
+
+    if (CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) != CLIENTVEHICLE_CAR)
+        throw std::invalid_argument("Invalid vehicle type");
+
+    return pVehicle->GetWheelFrictionState(wheel);
 }

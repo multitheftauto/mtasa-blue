@@ -448,6 +448,7 @@ private:
     CDamageManagerSA*                m_pDamageManager;
     CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity;
     CHandlingEntrySA*                m_pHandlingData;
+    CFlyingHandlingEntrySA*          m_pFlyingHandlingData;
     void*                            m_pSuspensionLines;
     bool                             m_bIsDerailable;
     unsigned char                    m_ucAlpha;
@@ -659,12 +660,16 @@ public:
     CHandlingEntry* GetHandlingData();
     void            SetHandlingData(CHandlingEntry* pHandling);
 
+    CFlyingHandlingEntry* GetFlyingHandlingData();
+    void                  SetFlyingHandlingData(CFlyingHandlingEntry* pHandling);
+
     void BurstTyre(BYTE bTyre);
 
     BYTE GetBikeWheelStatus(BYTE bWheel);
     void SetBikeWheelStatus(BYTE bWheel, BYTE bStatus);
 
     bool IsWheelCollided(BYTE eWheelPosition);
+    int  GetWheelFrictionState(BYTE eWheelPosition);
 
     void GetGravity(CVector* pvecGravity) const { *pvecGravity = m_vecGravity; }
     void SetGravity(const CVector* pvecGravity);

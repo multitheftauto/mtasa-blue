@@ -1617,6 +1617,36 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
+void CMultiplayerSA::ResetColorFilter()
+{
+    if (*(BYTE*)0x7036EC == 0xB8)
+    {
+        static BYTE DefaultBytes[5] = { 0xC1, 0xE0, 0x08, 0x0B, 0xC1 }; // shl     eax, 8
+                                                                        // or      eax, ecx
+        MemCpy((void*)0x7036EC, DefaultBytes, sizeof(DefaultBytes));
+        MemCpy((void*)0x70373D, DefaultBytes, sizeof(DefaultBytes));
+    }
+}
+
+void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
+{
+    const bool bEnabled = *(BYTE*)0x7036EC == 0xB8;
+
+    // Update a pass0 color if needed
+    if (!bEnabled || *(DWORD*)0x7036ED != dwPass0Color)
+    {
+        MemPut<BYTE>(0x7036EC, 0xB8); // mov eax
+        MemPut<DWORD>(0x7036ED, dwPass0Color);
+    }
+
+    // Update a pass1 color if needed
+    if (!bEnabled || *(DWORD*)0x70373E != dwPass1Color)
+    {
+        MemPut<BYTE>(0x70373D, 0xB8); // mov eax
+        MemPut<DWORD>(0x70373E, dwPass1Color);
+    }
+}
+
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
                         bool bAllowAutoTypeChange)
 {
