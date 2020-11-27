@@ -692,7 +692,6 @@ public:
     static bool      CopyAccountData(CAccount* pAccount, CAccount* pFromAccount);
 
     // Log in/out funcs
-    static bool LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword);
     static bool LogOut(CPlayer* pPlayer);
 
     // Admin funcs

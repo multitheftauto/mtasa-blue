@@ -602,8 +602,7 @@ int CLuaAccountDefs::CopyAccountData(lua_State* luaVM)
 
 bool CLuaAccountDefs::LogIn(CPlayer* pPlayer, CAccount* pAccount, std::optional<std::string> password)
 {
-    std::string strPassword = password.value_or("");
-    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), strPassword.c_str(), password.has_value());
+    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), std::move(password));
 }
 
 int CLuaAccountDefs::LogOut(lua_State* luaVM)
