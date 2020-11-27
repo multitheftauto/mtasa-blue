@@ -189,18 +189,20 @@ CObjectSA::~CObjectSA()
     // OutputDebugString("Attempting to destroy Object\n");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
-        DWORD dwInterface = (DWORD)this->GetInterface();
-        if (dwInterface)
+        CEntitySAInterface* pInterface = GetInterface();
+        if (pInterface)
         {
-            if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
+            pGame->GetRopes()->RemoveEntityRope(pInterface);
+
+            if ((DWORD)pInterface->vtbl != VTBL_CPlaceable)
             {
                 CWorldSA* world = (CWorldSA*)pGame->GetWorld();
-                world->Remove(this->GetInterface(), CObject_Destructor);
+                world->Remove(pInterface, CObject_Destructor);
 
-                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
+                DWORD dwFunc = pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
                 _asm
                 {
-                    mov     ecx, dwInterface
+                    mov     ecx, pInterface
                     push    1            // delete too
                     call    dwFunc
                 }

@@ -11347,11 +11347,6 @@ bool CStaticFunctionDefinitions::CopyAccountData(CAccount* pAccount, CAccount* p
     return true;
 }
 
-bool CStaticFunctionDefinitions::LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword)
-{
-    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), szPassword);
-}
-
 bool CStaticFunctionDefinitions::LogOut(CPlayer* pPlayer)
 {
     return m_pAccountManager->LogOut(pPlayer, pPlayer);

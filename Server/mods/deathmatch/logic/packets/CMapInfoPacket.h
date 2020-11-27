@@ -22,7 +22,7 @@ struct SWorldWaterLevelInfo
     float fOutsideLevel;
 };
 
-class CMapInfoPacket final : public CPacket
+class CMapInfoPacket : public CPacket
 {
 public:
     explicit CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,

@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CDetonateSatchelsPacket final : public CPacket
+class CDetonateSatchelsPacket : public CPacket
 {
 public:
     CDetonateSatchelsPacket();

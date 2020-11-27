@@ -523,8 +523,12 @@ bool CModelInfoSA::IsValid()
     if (!ppModelInfo[m_dwModelID])
         return false;
 
-    auto sizeInBlocks = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks;
-    return sizeInBlocks > 0;
+    return true;
+}
+
+bool CModelInfoSA::IsAllocatedInArchive()
+{
+    return pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()

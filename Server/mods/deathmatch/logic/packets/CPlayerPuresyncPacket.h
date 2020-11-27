@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include "CPlayer.h"
 
-class CPlayerPuresyncPacket final : public CPacket
+class CPlayerPuresyncPacket : public CPacket
 {
 public:
     CPlayerPuresyncPacket(){};

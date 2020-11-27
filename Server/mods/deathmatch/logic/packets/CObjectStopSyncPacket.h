@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CObjectStopSyncPacket final : public CPacket
+class CObjectStopSyncPacket : public CPacket
 {
 public:
     CObjectStopSyncPacket(CObject* pObject) { m_pObject = pObject; };

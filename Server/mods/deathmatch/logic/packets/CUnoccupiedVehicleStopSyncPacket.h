@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CUnoccupiedVehicleStopSyncPacket final : public CPacket
+class CUnoccupiedVehicleStopSyncPacket : public CPacket
 {
 public:
     CUnoccupiedVehicleStopSyncPacket(ElementID ID) { m_ID = ID; };

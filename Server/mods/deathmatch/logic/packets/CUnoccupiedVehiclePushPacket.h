@@ -14,7 +14,7 @@
 #include "CPacket.h"
 class CVehicle;
 
-class CUnoccupiedVehiclePushPacket final : public CPacket
+class CUnoccupiedVehiclePushPacket : public CPacket
 {
 public:
     CUnoccupiedVehiclePushPacket(){};

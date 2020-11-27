@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CPlayerTimeoutPacket final : public CPacket
+class CPlayerTimeoutPacket : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_PLAYER_TIMEOUT); };

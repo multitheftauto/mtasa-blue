@@ -498,6 +498,7 @@ void CGameSA::Initialize()
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
+    SetupBrokenModels();
     m_pRenderWare->Initialize();
 
     // *Sebas* Hide the GTA:SA Main menu.
@@ -816,6 +817,12 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[316].MakePedModel ( "COPGRL2" );
     ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
+}
+
+void CGameSA::SetupBrokenModels()
+{
+    ModelInfo[3118].GetInterface()->pColModel = ModelInfo[3059].GetInterface()->pColModel;
+    ModelInfo[3553].GetInterface()->pColModel = ModelInfo[3554].GetInterface()->pColModel;
 }
 
 // Well, has it?

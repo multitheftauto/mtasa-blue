@@ -15,7 +15,7 @@
 #include "CPacket.h"
 #include "../CElement.h"
 
-class CCameraSyncPacket final : public CPacket
+class CCameraSyncPacket : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_CAMERA_SYNC; };
