@@ -531,7 +531,7 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
         return false;
     }
 
-    if (password.has_value() && !pAccount->IsPassword(password.value()))
+    if (password.has_value() && (!IsValidPassword(password.value()) || !pAccount->IsPassword(password.value())))
     {
         if (pEchoClient)
             pEchoClient->SendEcho(SString("login: Invalid password for account '%s'", szAccountName).c_str());
