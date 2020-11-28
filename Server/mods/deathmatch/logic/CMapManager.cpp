@@ -565,13 +565,13 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
                 pOccupant->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
 
                 // Tell everyone
-                CVehicleInOutPacket Reply(pVehicle->GetID(), 0, CGame::VEHICLE_NOTIFY_JACK_RETURN, pOccupant->GetID(), Player.GetID());
+                CVehicleInOutPacket Reply(Player.GetID(), pVehicle->GetID(), 0, CGame::VEHICLE_NOTIFY_JACK_RETURN, pOccupant->GetID(), Player.GetID());
                 Reply.SetSourceElement(&Player);
                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
             }
         }
-        if (pVehicle->GetJackingPlayer() == &Player)
-            pVehicle->SetJackingPlayer(NULL);
+        if (pVehicle->GetJackingPed() == &Player)
+            pVehicle->SetJackingPed(NULL);
     }
 
     // Update the player data

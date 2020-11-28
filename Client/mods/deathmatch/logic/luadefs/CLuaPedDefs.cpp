@@ -99,6 +99,8 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
+        {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
     };
 
     // Add functions
@@ -188,6 +190,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStat", "setPedStat");
     lua_classfunction(luaVM, "giveWeapon", "givePedWeapon");
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
+    lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
+    lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -2336,4 +2340,16 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
+{
+    CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
+    bool bPassenger = bOptPassenger.value_or(false);
+    return pPed->EnterVehicle(pVehicle, bPassenger);
+}
+
+bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
+{
+    return pPed->ExitVehicle();
 }
