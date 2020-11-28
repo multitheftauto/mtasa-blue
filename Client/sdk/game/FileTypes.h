@@ -50,3 +50,8 @@ static inline int32_t GetBaseIDforSCM()
 {
     return *(int32_t*)(0x46A574 + 2);
 }
+
+static inline int32_t GetCountOfAllFileIDs()
+{
+    return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / 0x14 /* sizeof(CStreamingInfo) */;
+}
