@@ -9,7 +9,7 @@
  *****************************************************************************/
 #pragma once
 
-class CPlayerNoSocketPacket final : public CPacket
+class CPlayerNoSocketPacket : public CPacket
 {
 public:
     virtual bool  RequiresSourcePlayer() const { return true; }

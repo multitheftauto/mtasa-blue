@@ -9,7 +9,7 @@
  *****************************************************************************/
 #pragma once
 
-class CPlayerNetworkStatusPacket final : public CPacket
+class CPlayerNetworkStatusPacket : public CPacket
 {
 public:
     virtual bool  RequiresSourcePlayer() const { return true; }

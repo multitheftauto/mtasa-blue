@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <vector>
 
-class CPickupHideShowPacket final : public CPacket
+class CPickupHideShowPacket : public CPacket
 {
 public:
     CPickupHideShowPacket(bool bShow) { m_bShow = bShow; };

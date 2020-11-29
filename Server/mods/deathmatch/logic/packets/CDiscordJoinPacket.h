@@ -12,7 +12,7 @@
 
 #include "CPacket.h"
 
-class CDiscordJoinPacket final : public CPacket
+class CDiscordJoinPacket : public CPacket
 {
 public:
     CDiscordJoinPacket() {}

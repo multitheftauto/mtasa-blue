@@ -261,9 +261,6 @@ public:
     void                SetPlayerStat(unsigned short usID, float fValue);
     float               GetWeaponRangeFromSlot(uint uiSlot = 0xFF);
 
-    CVehicle* GetJackingVehicle() { return m_pJackingVehicle; }
-    void      SetJackingVehicle(CVehicle* pVehicle);
-
     void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
     bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
 
@@ -458,7 +455,6 @@ private:
     SScreenShotInfo m_ScreenShotInfo;
 
     CPlayerStatsPacket* m_pPlayerStatsPacket;
-    CVehicle*           m_pJackingVehicle;
 
     // Used to reduce calls when calculating weapon range
     float       m_fWeaponRangeLast;

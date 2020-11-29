@@ -19,7 +19,7 @@ enum EServerInfoSyncFlag : uint8
     SERVER_INFO_FLAG_RESERVED = 1 << 1            // 0b00000010 and so on
 };
 
-class CServerInfoSyncPacket final : public CPacket
+class CServerInfoSyncPacket : public CPacket
 {
 public:
     CServerInfoSyncPacket(uint8 flags) { m_ActualInfo = flags; }

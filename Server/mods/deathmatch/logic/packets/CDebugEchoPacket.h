@@ -18,7 +18,7 @@
 #define DEBUGCOLOR_ERROR            255, 0, 0
 #define DEBUGCOLOR_INFO             0, 255, 0
 
-class CDebugEchoPacket final : public CPacket
+class CDebugEchoPacket : public CPacket
 {
 public:
     CDebugEchoPacket(const char* szMessage, unsigned int uiLevel = 0, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255)
