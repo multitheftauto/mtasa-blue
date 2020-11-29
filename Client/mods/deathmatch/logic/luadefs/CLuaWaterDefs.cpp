@@ -240,24 +240,20 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     else
     {
         // Call type 3
-        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel )
+        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements )
         float fLevel;
         bool  bIncludeWorldNonSeaLevel;
         bool  bIncludeAllWaterElements;
-        bool  bIncludeWorldSeaLevel;
-        bool  bIncludeOutsideWorldLevel;
 
         argStream.ReadNumber(fLevel);
         argStream.ReadBool(bIncludeWorldNonSeaLevel, true);
         argStream.ReadBool(bIncludeAllWaterElements, true);
-        argStream.ReadBool(bIncludeWorldSeaLevel, true);
-        argStream.ReadBool(bIncludeOutsideWorldLevel, false);
 
         if (!argStream.HasErrors())
         {
             if (bIncludeAllWaterElements)
                 CStaticFunctionDefinitions::SetAllElementWaterLevel(fLevel, pResource);
-            if (CStaticFunctionDefinitions::SetWorldWaterLevel(fLevel, pResource, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel))
+            if (CStaticFunctionDefinitions::SetWorldWaterLevel(fLevel, pResource, bIncludeWorldNonSeaLevel))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
