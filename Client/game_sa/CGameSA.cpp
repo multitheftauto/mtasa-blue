@@ -31,6 +31,9 @@ float*         CGameSA::VAR_OldTimeStep;
 float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
+unsigned int MODELINFO_MAX = GetCountOfAllFileIDs();            // default: 26316
+unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
+
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
  */
@@ -43,6 +46,7 @@ CGameSA::CGameSA()
     m_iCheckStatus = 0;
 
     ModelInfo = new CModelInfoSA[MODELINFO_MAX];
+    ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
 
@@ -261,6 +265,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
 
     delete[] ModelInfo;
+    delete[] ObjectGroupsInfo;
 }
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)

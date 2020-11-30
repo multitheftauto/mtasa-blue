@@ -15,6 +15,8 @@
 #include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
 
+#include <game/FileTypes.h>
+
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
 #define     CLASS_CPlayerInfo               0xB7CD98    // ##SA##
@@ -33,9 +35,8 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-// #define     MODELINFO_MAX                   26000       // Actual max is 25755
-static int MODELINFO_MAX = *(int32_t*)(0x46A574 + 2);            // let's derive it from SCM base ID
-#define     OBJECTDYNAMICINFO_MAX           160
+extern unsigned int MODELINFO_MAX;  // default: 26316
+extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -109,7 +110,7 @@ class CGameSA : public CGame
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA* ModelInfo;
-    CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
+    CObjectGroupPhysicalPropertiesSA* ObjectGroupsInfo;
 public:
     ZERO_ON_NEW
 
