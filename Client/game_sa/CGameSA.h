@@ -14,8 +14,7 @@
 #include "CModelInfoSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
-
-#include <game/FileTypes.h>
+#include <game/CStreaming.h>
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
@@ -310,6 +309,18 @@ public:
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
+
+    int32_t GetBaseIDforDFF() { return 0; }
+    int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
+    int32_t GetBaseIDforCOL() { return *(int32_t*)(0x410344 + 2); }
+    int32_t GetBaseIDforIPL() { return *(int32_t*)(0x4044F4 + 2); }
+    int32_t GetBaseIDforDAT() { return *(int32_t*)(0x44D064 + 2); }
+    int32_t GetBaseIDforIFP() { return *(int32_t*)(0x404969 + 2); }
+    int32_t GetBaseIDforRRR() { return *(int32_t*)(0x4594A1 + 2); }
+    int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
+    int32_t GetCountOfAllFileIDs() { return StaticGetCountOfAllFileIDs(); }
+
+    static int32_t StaticGetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); };
 
     DWORD GetSystemTime()
     {

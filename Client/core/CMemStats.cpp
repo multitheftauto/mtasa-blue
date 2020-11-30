@@ -11,7 +11,6 @@
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
-#include <game/FileTypes.h>
 #include "CModelCacheManager.h"
 
 DECLARE_ENUM(ePools);
@@ -476,8 +475,8 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
 
     uint* pModelInfoArray = (uint*)*(void**)(0x403DA4 + 3);
-
-    unsigned int RRR_BASE_ID = GetBaseIDforRRR();
+    CGame* pGame = g_pCore->GetGame();
+    unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
 
     for (uint i = 0; i < RRR_BASE_ID; i++)
     {
@@ -500,17 +499,17 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
                 memStatsInfo.modelInfo.uiUnknown_612_999++;
             else if (i < 1194)
                 memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
-            else if (i < GetBaseIDforTXD())
+            else if (i < pGame->GetBaseIDforTXD())
                 memStatsInfo.modelInfo.uiUnknown_1194_19999++;
-            else if (i < GetBaseIDforCOL())
+            else if (i < pGame->GetBaseIDforCOL())
                 memStatsInfo.modelInfo.uiTextures_20000_24999++;
-            else if (i < GetBaseIDforIPL())
+            else if (i < pGame->GetBaseIDforIPL())
                 memStatsInfo.modelInfo.uiCollisions_25000_25254++;
-            else if (i < GetBaseIDforDAT())
+            else if (i < pGame->GetBaseIDforDAT())
                 memStatsInfo.modelInfo.uiIpls_25255_25510++;
-            else if (i < GetBaseIDforIFP())
+            else if (i < pGame->GetBaseIDforIFP())
                 memStatsInfo.modelInfo.uiPaths_25511_25574++;
-            else if (i < GetBaseIDforRRR())
+            else if (i < pGame->GetBaseIDforRRR())
                 memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }
@@ -661,9 +660,10 @@ void CMemStats::UpdateIntervalStats()
 ///////////////////////////////////////////////////////////////
 void CMemStats::CreateTables()
 {
+    CGame* pGame = g_pCore->GetGame();
     m_TableList.clear();
 
-    //
+//
     // Color setups
     //
     #define YELLOW "#FFFF00"
@@ -898,18 +898,19 @@ void CMemStats::CreateTables()
         table.AddRow(SString("400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));
         table.AddRow(SString("612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999));
         table.AddRow(SString("1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193));
-        table.AddRow(SString("1194-%d|(World)|^1~.%d|%d", GetBaseIDforTXD() - 1, m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
-        table.AddRow(SString("%d-%d|(Textures)|^1~.%d|%d", GetBaseIDforTXD(), GetBaseIDforCOL() - 1,
+        table.AddRow(SString("1194-%d|(World)|^1~.%d|%d", pGame->GetBaseIDforTXD() - 1, m_MemStatsDelta.modelInfo.uiUnknown_1194_19999,
+                             m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
+        table.AddRow(SString("%d-%d|(Textures)|^1~.%d|%d", pGame->GetBaseIDforTXD(), pGame->GetBaseIDforCOL() - 1,
             m_MemStatsDelta.modelInfo.uiTextures_20000_24999,
                              m_MemStatsNow.modelInfo.uiTextures_20000_24999));
-        table.AddRow(SString("%d-%d|(Collisions)|^1~.%d|%d", GetBaseIDforCOL(), GetBaseIDforIPL() - 1,
+        table.AddRow(SString("%d-%d|(Collisions)|^1~.%d|%d", pGame->GetBaseIDforCOL(), pGame->GetBaseIDforIPL() - 1,
             m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
                              m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
-        table.AddRow(SString("%d-%d|(Ipls)|^1~.%d|%d", GetBaseIDforIPL(), GetBaseIDforDAT() - 1,
+        table.AddRow(SString("%d-%d|(Ipls)|^1~.%d|%d", pGame->GetBaseIDforIPL(), pGame->GetBaseIDforDAT() - 1,
             m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
-        table.AddRow(SString("%d-%d|(Paths)|^1~.%d|%d", GetBaseIDforDAT(), GetBaseIDforIFP() - 1,
+        table.AddRow(SString("%d-%d|(Paths)|^1~.%d|%d", pGame->GetBaseIDforDAT(), pGame->GetBaseIDforIFP() - 1,
             m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
-        table.AddRow(SString("%d-%d|(Anims)|^1~.%d|%d", GetBaseIDforIFP(), GetBaseIDforRRR() - 1,
+        table.AddRow(SString("%d-%d|(Anims)|^1~.%d|%d", pGame->GetBaseIDforIFP(), pGame->GetBaseIDforRRR() - 1,
             m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
         table.AddRow(SString("|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
     }

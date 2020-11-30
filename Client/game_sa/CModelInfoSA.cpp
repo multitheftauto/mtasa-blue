@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-#include <game/FileTypes.h>
 #include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
@@ -332,11 +330,11 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
         uint uiAnimFileIndex = GetAnimFileIndex();
         if (uiAnimFileIndex != 0xffffffff)
         {
-            uint          uiAnimId = uiAnimFileIndex + GetBaseIDforIFP();
+            uint          uiAnimId = uiAnimFileIndex + pGame->GetBaseIDforIFP();
             CModelInfoSA* pAnim = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiAnimId));
             if (!pAnim)
             {
-                if (uiAnimId != GetBaseIDforIFP() + 139)
+                if (uiAnimId != pGame->GetBaseIDforIFP() + 139)
                     LogEvent(505, "Model no anim", "", SString("%d (%d)", m_dwModelID, uiAnimId));
             }
             else if (!pAnim->IsLoaded())
@@ -471,7 +469,7 @@ BOOL CModelInfoSA::DoIsLoaded()
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
-    if (m_dwModelID < GetBaseIDforTXD())
+    if (m_dwModelID < pGame->GetBaseIDforTXD())
     {
         m_pInterface = ppModelInfo[m_dwModelID];
 
@@ -517,7 +515,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
 
 bool CModelInfoSA::IsValid()
 {
-    if (m_dwModelID >= GetBaseIDforTXD() && m_dwModelID < MODELINFO_MAX)
+    if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < MODELINFO_MAX)
         return true;
 
     if (!ppModelInfo[m_dwModelID])

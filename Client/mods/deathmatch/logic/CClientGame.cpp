@@ -14,7 +14,6 @@
 #include "game/CAnimBlendAssocGroup.h"
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
-#include "game/FileTypes.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -6984,7 +6983,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::RestreamWorld()
 {
-    unsigned int numberOfFileIDs = GetCountOfAllFileIDs();
+    unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
     for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
     {

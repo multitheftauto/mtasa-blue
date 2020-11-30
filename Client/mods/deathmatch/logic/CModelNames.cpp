@@ -10,8 +10,6 @@
 
 #include <StdInc.h>
 
-#include <game/FileTypes.h>
-
 struct
 {
     ushort      usID;
@@ -10497,7 +10495,7 @@ uint32 CModelNames::ResolveModelID(const SString& strModelName)
     {
         uint32 usModelID = atoi(strModelName.SubStr(3));
         if (usModelID)
-            return GetBaseIDforTXD() + usModelID;            // Encode global txd as model id 20000+
+            return g_pGame->GetBaseIDforTXD() + usModelID;            // Encode global txd as model id 20000+
     }
 
     // Now search for the name

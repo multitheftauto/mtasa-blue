@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
-
-#include <game/FileTypes.h>
 #include <game/RenderWareD3D.h>
 
 #include "gamesa_renderware.h"
@@ -689,17 +687,17 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
 ////////////////////////////////////////////////////////////////
 ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
 {
-    if (usModelID >= GetBaseIDforTXD() && usModelID < GetBaseIDforCOL())
+    if (usModelID >= pGame->GetBaseIDforTXD() && usModelID < pGame->GetBaseIDforCOL())
     {
         // Get global TXD ID instead
-        return usModelID - GetBaseIDforTXD();
+        return usModelID - pGame->GetBaseIDforTXD();
     }
     else
     {
         // Get the CModelInfo's TXD ID
 
         // Ensure valid
-        if (usModelID >= GetBaseIDforTXD() || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
+        if (usModelID >= pGame->GetBaseIDforTXD() || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
             return 0;
 
         return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;

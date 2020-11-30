@@ -31,7 +31,7 @@ float*         CGameSA::VAR_OldTimeStep;
 float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
-unsigned int MODELINFO_MAX = GetCountOfAllFileIDs();            // default: 26316
+unsigned int MODELINFO_MAX = CGameSA::StaticGetCountOfAllFileIDs();                                              // default: 26316
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
 /**
