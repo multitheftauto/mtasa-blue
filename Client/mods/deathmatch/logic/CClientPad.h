@@ -39,14 +39,14 @@ public:
     static void RemoveSetAnalogControlState(const char* szName);
 
     static void ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot);
-    static void ProcessControl(short& usControlValue, unsigned int uiIndex); //, bool bPositive
+    static void ProcessControl(short& usControlValue, unsigned int uiIndex);
 
     static void ProcessAllToggledControls(CControllerState& cs, bool bOnFoot);
     static bool ProcessToggledControl(const char* szName, CControllerState& cs, bool bOnFoot, bool bEnabled);
     static bool GetControlState(const char* szName, CControllerState& State, bool bOnFoot);
 
     static SFixedArray<short, MAX_GTA_CONTROLS>       m_sScriptedStates;
-    static SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> m_bScriptedStatesOverride;
+    static SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> m_bScriptedStatesNextFrameOverride;
     static bool                                       m_bFlyWithMouse;
     static bool                                       m_bSteerWithMouse;
 

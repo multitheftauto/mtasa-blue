@@ -16,7 +16,7 @@
 #define CS_NAN -32768
 
 SFixedArray<short, MAX_GTA_CONTROLS>       CClientPad::m_sScriptedStates;
-SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedStatesOverride;
+SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedStatesNextFrameOverride;
 bool                                       CClientPad::m_bFlyWithMouse;
 bool                                       CClientPad::m_bSteerWithMouse;
 
@@ -119,7 +119,7 @@ CClientPad::CClientPad()
     for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
     {
         m_sScriptedStates[i] = CS_NAN;
-        m_bScriptedStatesOverride[i] = false;
+        m_bScriptedStatesNextFrameOverride[i] = false;
     }
 }
 
@@ -602,82 +602,82 @@ bool CClientPad::SetAnalogControlState(const char* szName, float fState, bool bF
             case 0:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[1] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[1] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[1] = false;
                 return true;            // Left
             case 1:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[0] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[0] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[0] = false;
                 return true;            // Right
             case 2:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[3] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[3] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[3] = false;
                 return true;            // Up
             case 3:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[2] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[2] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[2] = false;
                 return true;            // Down
             case 4:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[5] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[5] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[5] = false;
                 return true;            // Vehicle Left
             case 5:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[4] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[4] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[4] = false;
                 return true;            // Vehicle Right
             case 6:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[7] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[7] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[7] = false;
                 return true;            // Up
             case 7:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[6] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[6] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[6] = false;
                 return true;            // Down
             case 8:
                 m_sScriptedStates[uiIndex] = (short)(fState * 255.0f);
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
                 return true;            // Accel
             case 9:
                 m_sScriptedStates[uiIndex] = (short)(fState * 255.0f);
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
                 return true;            // Reverse
             case 10:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[11] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[11] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[11] = false;
                 return true;            // Special Left
             case 11:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[10] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[10] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[10] = false;
                 return true;            // Special Right
             case 12:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[13] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[13] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[13] = false;
                 return true;            // Special Up
             case 13:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[12] = 0;
-                m_bScriptedStatesOverride[uiIndex] = bFrameForced;
-                m_bScriptedStatesOverride[12] = false;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[12] = false;
                 return true;            // Special Down
             default:
                 return false;
@@ -742,9 +742,9 @@ void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex)
     //          that's why we check unequals != 0
     //          otherwise the values are already in their expected value boundaries
     //
-    // usControlValue               is the updated input value we get from the player
-    // m_sScriptedStates            contains our script value
-    // m_bScriptedStatesOverride    if the player input should be forcefully overriden for the next frame
+    // usControlValue                       is the updated input value we get from the player
+    // m_sScriptedStates                    contains our script value
+    // m_bScriptedStatesNextFrameOverride   if the player input should be forcefully overriden for the next frame
     //
     //
     // old behavior or (override == false)
@@ -760,9 +760,9 @@ void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex)
     //
     //
 
-    if (m_bScriptedStatesOverride[uiIndex])
+    if (m_bScriptedStatesNextFrameOverride[uiIndex])
     {
-        m_bScriptedStatesOverride[uiIndex] = false;
+        m_bScriptedStatesNextFrameOverride[uiIndex] = false;
         if (m_sScriptedStates[uiIndex] != CS_NAN)
             std::swap(usControlValue, m_sScriptedStates[uiIndex]);
     }
