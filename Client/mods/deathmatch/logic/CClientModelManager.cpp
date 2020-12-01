@@ -40,7 +40,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     int modelId = pModel->GetModelID();
     if (m_Models[modelId] != nullptr)
     {
-        m_Models[modelId]->RestoreEntitiesUsingThisModel();
+        m_Models[modelId]->Deallocate();
         m_Models[modelId] = nullptr;
         m_modelCount--;
         return true;
@@ -78,16 +78,15 @@ std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
     return nullptr;
 }
 
-CClientModel* CClientModelManager::Request(CClientManager* pManager, int iModelID, eClientModelType eType)
+std::shared_ptr<CClientModel> CClientModelManager::Request(CClientManager* pManager, int iModelID, eClientModelType eType)
 {
-    CClientModel* pModel = FindModelByID(iModelID);
-    if (pModel)
+    std::shared_ptr<CClientModel> pModel = FindModelByID(iModelID);
+    if (pModel == nullptr)
     {
-        pModel->m_eModelType = eType;
-        return pModel;
+        pModel = std::make_shared<CClientModel>(pManager, iModelID, eType);
     }
 
-    pModel = new CClientModel(pManager, iModelID, eType);
+    pModel->m_eModelType = eType;
     return pModel;
 }
 

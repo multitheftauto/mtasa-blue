@@ -2043,7 +2043,7 @@ uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxd
     if (iModelID == INVALID_MODEL_ID)
         return false;
 
-    CClientModel* pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
 
     pModel->AllocateTXD(strTxdName);
     pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());
@@ -2053,7 +2053,7 @@ uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxd
 
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
-    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(20000 + txdID);
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(20000 + txdID);
     if (pModel && pModel->Deallocate())
         return true;
 

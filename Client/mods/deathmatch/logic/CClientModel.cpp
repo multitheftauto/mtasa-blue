@@ -136,6 +136,8 @@ bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
 
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
+
+    return true;
 }
 
 bool CClientModel::AllocateTXD(std::string &strTxdName)
