@@ -15,7 +15,7 @@
 #include "CPacket.h"
 #include "CVehicle.h"
 
-class CVehicleResyncPacket final : public CPacket
+class CVehicleResyncPacket : public CPacket
 {
 public:
     explicit CVehicleResyncPacket(CVehicle* pVehicle) { m_pVehicle = pVehicle; };

@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CPlayerConnectCompletePacket final : public CPacket
+class CPlayerConnectCompletePacket : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_SERVER_JOIN_COMPLETE); };

@@ -584,7 +584,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
             {
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
-                    CClientModel* pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
 
                     ushort usParentID = -1;
 
@@ -631,9 +631,9 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-
-        if (pModel && pModel->Deallocate())
+        auto modelManager = m_pManager->GetModelManager();
+        std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
+        if (pModel && modelManager->Remove(pModel))
         {
             lua_pushboolean(luaVM, true);
             return 1;

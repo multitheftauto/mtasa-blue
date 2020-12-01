@@ -14,7 +14,7 @@
 #include "CPacket.h"
 class CPed;
 
-class CPedStartSyncPacket final : public CPacket
+class CPedStartSyncPacket : public CPacket
 {
 public:
     CPedStartSyncPacket(CPed* pPed) { m_pPed = pPed; };

@@ -243,11 +243,6 @@ public:
         DEBUG_TRACE("CMenuManager         * GetMenuManager()");
         return m_pMenuManager;
     };
-    CText* GetText()
-    {
-        DEBUG_TRACE("CText                    * GetText()");
-        return m_pText;
-    };
     CStats* GetStats()
     {
         DEBUG_TRACE("CStats                   * GetStats()");
@@ -416,6 +411,7 @@ public:
     bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
+    void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
     void         FlushPendingRestreamIPL();
@@ -482,7 +478,6 @@ private:
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
     CMenuManager*             m_pMenuManager;
-    CText*                    m_pText;
     CStats*                   m_pStats;
     CFont*                    m_pFont;
     CPathFind*                m_pPathFind;

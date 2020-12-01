@@ -15,7 +15,7 @@
 #include "../CVehicle.h"
 #include "net/SyncStructures.h"
 
-class CVehicleDamageSyncPacket final : public CPacket
+class CVehicleDamageSyncPacket : public CPacket
 {
 public:
     CVehicleDamageSyncPacket();

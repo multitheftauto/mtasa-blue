@@ -19,7 +19,7 @@ class CEntityAddPacket;
 
 extern CGame* g_pGame;
 
-class CEntityAddPacket final : public CPacket
+class CEntityAddPacket : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_ENTITY_ADD; };

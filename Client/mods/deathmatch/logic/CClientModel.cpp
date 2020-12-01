@@ -12,20 +12,14 @@
 
 CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
 {
-    // Init
     m_pManager = pManager;
-    m_pModelManager = pManager->GetModelManager();
     m_iModelID = iModelID;
     m_eModelType = eModelType;
-
-    m_pModelManager->Add(this);
 }
 
 CClientModel::~CClientModel(void)
 {
     Deallocate();
-
-    m_pModelManager->Remove(this);
 }
 
 bool CClientModel::Allocate(ushort usParentID)
@@ -67,12 +61,11 @@ bool CClientModel::Deallocate()
 {
     if (!m_bAllocatedByUs)
         return false;
-
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
-
-    // ModelInfo must be valid
-    if (!pModelInfo->IsValid())
+    if (!pModelInfo || !pModelInfo->IsValid())
         return false;
+
+    SetParentResource(nullptr);
 
     switch (m_eModelType)
     {
@@ -121,8 +114,8 @@ bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
         }
         case eClientModelType::OBJECT:
         {
-            const auto& objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
-            unsigned short      usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
+            const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
+            unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
@@ -143,11 +136,6 @@ bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
 
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
-
-    pModelInfo->DeallocateModel();
-
-    this->SetParentResource(nullptr);
-    return true;
 }
 
 bool CClientModel::AllocateTXD(std::string &strTxdName)
@@ -174,6 +162,5 @@ bool CClientModel::DeallocateTXD(CModelInfo* pModelInfo)
     g_pGame->GetPools()->RemoveTextureDictonarySlot(uiTextureDictonarySlotID);
     g_pGame->GetStreaming()->GetStreamingInfoFromModelId(pModelInfo->GetModel())->Reset();
 
-    this->SetParentResource(nullptr);
     return true;
 }

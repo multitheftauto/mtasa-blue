@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <vector>
 
-class CEntityRemovePacket final : public CPacket
+class CEntityRemovePacket : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_ENTITY_REMOVE; };

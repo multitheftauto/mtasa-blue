@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CProjectileSyncPacket final : public CPacket
+class CProjectileSyncPacket : public CPacket
 {
 public:
     CProjectileSyncPacket();

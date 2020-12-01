@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CExplosionSyncPacket final : public CPacket
+class CExplosionSyncPacket : public CPacket
 {
 public:
     enum eExplosionType

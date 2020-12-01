@@ -137,6 +137,7 @@ public:
     virtual BYTE           GetFlags() = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
     virtual bool           IsValid() = 0;
+    virtual bool           IsAllocatedInArchive() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
     virtual void           SetTextureDictionaryID(unsigned short usSlotID) = 0;
     virtual float          GetLODDistance() = 0;
