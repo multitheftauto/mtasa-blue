@@ -815,10 +815,24 @@ void CGameSA::SetupSpecialCharacters()
     */
 }
 
+void CGameSA::FixModelCol(uint iFixModel, uint iFromModel)
+{
+    CBaseModelInfoSAInterface* pFixModelInterface = ModelInfo[iFixModel].GetInterface();
+    if (!pFixModelInterface || pFixModelInterface->pColModel)
+        return;
+
+    CBaseModelInfoSAInterface* pAviableModelInterface = ModelInfo[iFromModel].GetInterface();
+
+    if (!pAviableModelInterface)
+        return;
+
+    pFixModelInterface->pColModel = pAviableModelInterface->pColModel;
+}
+
 void CGameSA::SetupBrokenModels()
 {
-    ModelInfo[3118].GetInterface()->pColModel = ModelInfo[3059].GetInterface()->pColModel;
-    ModelInfo[3553].GetInterface()->pColModel = ModelInfo[3554].GetInterface()->pColModel;
+    FixModelCol(3118, 3059);
+    FixModelCol(3553, 3554);
 }
 
 // Well, has it?

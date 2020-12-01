@@ -409,6 +409,7 @@ public:
     bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
+    void         FixModelCol(uint iFixModel, uint iFromModel);
     void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
