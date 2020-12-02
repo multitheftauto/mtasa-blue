@@ -6488,7 +6488,9 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::RestreamWorld()
 {
-    for (unsigned int uiModelID = 0; uiModelID < 26316; uiModelID++)
+    unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
+
+    for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
     {
         g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
     }

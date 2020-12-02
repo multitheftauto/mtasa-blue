@@ -117,7 +117,12 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     _asm
     {
         mov     eax, dwModel
-        mov     eax, 0xA9B0C8[eax*4]
+
+        push    ecx
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
         mov     eax, [eax+20]
         movzx   eax, byte ptr [eax+40]
         push    eax
@@ -209,7 +214,12 @@ CObjectSA::~CObjectSA()
                 _asm
                 {
                     mov     eax, dwModelID
-                    mov     eax, 0xA9B0C8[eax*4]
+
+                    push    ecx
+                    mov     ecx, dword ptr[ARRAY_ModelInfo]
+                    mov     eax, dword ptr[ecx + eax*4]
+                    pop     ecx
+
                     mov     eax, [eax+20]
                     movzx   eax, byte ptr [eax+40]
                     push    eax

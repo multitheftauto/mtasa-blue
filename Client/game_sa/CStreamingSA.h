@@ -30,5 +30,5 @@ public:
     void ReinitStreaming();
     CStreamingInfo* GetStreamingInfoFromModelId(ushort id);
 private:
-    static CStreamingInfo (&ms_aInfoForModel)[26316];
+    static CStreamingInfo* ms_aInfoForModel; // count: 26316 in unmodified game
 };

@@ -92,7 +92,7 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 {
-    if (ulObjectModel >= 20000)
+    if (ulObjectModel >= g_pGame->GetBaseIDforTXD())
         return false;
 
     // Clothes and hands cause crash (Github #424)
