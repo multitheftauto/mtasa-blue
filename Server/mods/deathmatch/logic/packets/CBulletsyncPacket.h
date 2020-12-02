@@ -9,7 +9,7 @@
  *****************************************************************************/
 #pragma once
 
-class CBulletsyncPacket : public CPacket
+class CBulletsyncPacket final : public CPacket
 {
 public:
     CBulletsyncPacket(){};

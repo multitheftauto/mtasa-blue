@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CPlayerStatsPacket : public CPacket
+class CPlayerStatsPacket final : public CPacket
 {
 public:
     ~CPlayerStatsPacket() = default;
