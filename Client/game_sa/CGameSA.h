@@ -422,8 +422,7 @@ public:
     bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
-    // collision of a = collision from b
-    void         SetupBrokenModel(unsigned int modelID_a, unsigned int modelID_b);
+    void         FixModelCol(uint iFixModel, uint iFromModel);
     void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
