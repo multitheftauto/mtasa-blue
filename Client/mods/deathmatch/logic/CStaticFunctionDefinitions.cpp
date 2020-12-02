@@ -3965,17 +3965,19 @@ bool CStaticFunctionDefinitions::StopObject(CClientEntity& Entity)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectScale(CClientEntity& Entity, const CVector& vecScale)
+bool CStaticFunctionDefinitions::SetObjectScale(CClientEntity& Entity, const CVector& vecScale, bool forceUpdate)
 {
-    RUN_CHILDREN(SetObjectScale(**iter, vecScale))
+    RUN_CHILDREN(SetObjectScale(**iter, vecScale, forceUpdate))
 
     if (IS_OBJECT(&Entity))
     {
+        CEntity* entity = Entity.GetGameEntity();
+        if (entity && forceUpdate)
+            return entity->SetScale(vecScale);
         CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
         Object.SetScale(vecScale);
         return true;
     }
-
     return false;
 }
 
