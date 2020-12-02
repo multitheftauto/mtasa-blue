@@ -515,7 +515,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
 
 bool CModelInfoSA::IsValid()
 {
-    if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < MODELINFO_MAX)
+    if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
         return true;
 
     if (!ppModelInfo[m_dwModelID])

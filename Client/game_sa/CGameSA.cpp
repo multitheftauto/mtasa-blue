@@ -31,7 +31,6 @@ float*         CGameSA::VAR_OldTimeStep;
 float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
-unsigned int MODELINFO_MAX = CGameSA::StaticGetCountOfAllFileIDs();                                              // default: 26316
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
 /**
@@ -45,7 +44,8 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
-    ModelInfo = new CModelInfoSA[MODELINFO_MAX];
+    const unsigned int modelInfoMax = GetCountOfAllFileIDs(); 
+    ModelInfo = new CModelInfoSA[modelInfoMax];
     ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
@@ -69,7 +69,7 @@ CGameSA::CGameSA()
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (int i = 0; i < MODELINFO_MAX; i++)
+    for (int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
@@ -317,7 +317,7 @@ bool CGameSA::IsInForeground()
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
-    if (dwModelID < MODELINFO_MAX)
+    if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {

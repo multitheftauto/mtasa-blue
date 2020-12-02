@@ -34,7 +34,6 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-extern unsigned int MODELINFO_MAX;  // default: 26316
 extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
@@ -318,9 +317,7 @@ public:
     int32_t GetBaseIDforIFP() { return *(int32_t*)(0x404969 + 2); }
     int32_t GetBaseIDforRRR() { return *(int32_t*)(0x4594A1 + 2); }
     int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
-    int32_t GetCountOfAllFileIDs() { return StaticGetCountOfAllFileIDs(); }
-
-    static int32_t StaticGetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); };
+    int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime()
     {
