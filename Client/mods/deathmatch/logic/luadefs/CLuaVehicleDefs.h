@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <tuple>
 
 class CLuaVehicleDefs : public CLuaDefs
 {
@@ -151,8 +152,11 @@ public:
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
-    static std::variant<bool, CVector> GetVehicleTowHitchPosition(CClientVehicle* pVeh);
-    static std::variant<bool, CVector> GetVehicleTowBarPosition(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType);
+    static std::variant<bool, CVector> GetVehicleTowHitchPosition_OOP(CClientVehicle* pVeh);
+    static std::variant<bool, std::tuple<float, float, float>> GetVehicleTowHitchPosition(CClientVehicle* pVeh);
+
+    static std::variant<bool, CVector> GetVehicleTowBarPosition_OOP(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType);
+    static std::variant<bool, std::tuple<float, float, float>> GetVehicleTowBarPosition(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);

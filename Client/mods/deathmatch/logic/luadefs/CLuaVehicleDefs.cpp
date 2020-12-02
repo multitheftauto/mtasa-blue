@@ -76,8 +76,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleNitroLevel", GetVehicleNitroLevel},
         {"getHeliBladeCollisionsEnabled", GetHeliBladeCollisionsEnabled},
         {"isVehicleWindowOpen", IsVehicleWindowOpen},
-        {"GetVehicleTowHitchPosition", ArgumentParser<GetVehicleTowHitchPosition>},
-        {"GetVehicleTowBarPosition", ArgumentParser<GetVehicleTowBarPosition>},
+        {"getVehicleTowHitchPosition", ArgumentParser<GetVehicleTowHitchPosition>},
+        {"getVehicleTowBarPosition", ArgumentParser<GetVehicleTowBarPosition>},
         {"getVehicleComponentPosition", GetVehicleComponentPosition},
         {"getVehicleComponentRotation", GetVehicleComponentRotation},
         {"getVehicleComponentScale", GetVehicleComponentScale},
@@ -219,6 +219,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSirenParams", "getVehicleSirenParams");
     lua_classfunction(luaVM, "getSirens", "getVehicleSirens");
     lua_classfunction(luaVM, "getSirensOn", "getVehicleSirensOn");
+    lua_classfunction(luaVM, "getTowHitchPosition", ArgumentParser<GetVehicleTowHitchPosition_OOP>);
+    lua_classfunction(luaVM, "getTowBarPosition", ArgumentParser<GetVehicleTowBarPosition_OOP>);
     lua_classfunction(luaVM, "getComponentPosition", OOP_GetVehicleComponentPosition);
     lua_classfunction(luaVM, "getComponentVisible", "getVehicleComponentVisible");
     lua_classfunction(luaVM, "getComponentRotation", OOP_GetVehicleComponentRotation);
@@ -317,6 +319,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "undamageableDoors", "setVehicleDoorsUndamageable", NULL);
     lua_classvariable(luaVM, "taxiLight", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn");
     lua_classvariable(luaVM, "handling", NULL, "getVehicleHandling");
+    lua_classvariable(luaVM, "towHitchPosition", NULL, ArgumentParser<GetVehicleTowHitchPosition_OOP>);
     lua_classvariable(luaVM, "components", NULL, "getVehicleComponents");
     lua_classvariable(luaVM, "towingVehicle", NULL, "getVehicleTowingVehicle");
     lua_classvariable(luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle");
@@ -3154,7 +3157,7 @@ int CLuaVehicleDefs::GetVehicleDoorOpenRatio(lua_State* luaVM)
 }
 
 std::variant<bool, CVector>
-CLuaVehicleDefs::GetVehicleTowHitchPosition(CClientVehicle* pVeh)
+CLuaVehicleDefs::GetVehicleTowHitchPosition_OOP(CClientVehicle* pVeh)
 {
     const std::optional<CVector> pos = pVeh->GetTowHitchPos();
     if (pos.has_value())
@@ -3162,12 +3165,36 @@ CLuaVehicleDefs::GetVehicleTowHitchPosition(CClientVehicle* pVeh)
     return false;
 }
 
+std::variant<bool, std::tuple<float, float, float>>
+CLuaVehicleDefs::GetVehicleTowHitchPosition(CClientVehicle* pVeh)
+{
+    const std::optional<CVector> pos = pVeh->GetTowHitchPos();
+    if (pos.has_value())
+    {
+        const CVector value = pos.value();
+        return std::make_tuple(value.fX, value.fY, value.fZ);
+    }
+    return false;
+}
+
 std::variant<bool, CVector>
-CLuaVehicleDefs::GetVehicleTowBarPosition(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType)
+CLuaVehicleDefs::GetVehicleTowBarPosition_OOP(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType)
 {
     const std::optional<CVector> pos = pVeh->GetTowBarPos(pToAttach, bIgnoreModelType.value_or(false));
     if (pos.has_value())
         return pos.value();
+    return false;
+}
+
+std::variant<bool, std::tuple<float, float, float>>
+CLuaVehicleDefs::GetVehicleTowBarPosition(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType)
+{
+    const std::optional<CVector> pos = pVeh->GetTowBarPos(pToAttach, bIgnoreModelType.value_or(false));
+    if (pos.has_value())
+    {
+        const CVector value = pos.value();
+        return std::make_tuple(value.fX, value.fY, value.fZ);
+    }
     return false;
 }
 
