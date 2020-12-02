@@ -15,6 +15,7 @@ class CClientVehicle;
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
+#include <optional>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"
@@ -481,6 +482,9 @@ public:
     void SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour);
     void SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent);
     void RemoveVehicleSirens();
+
+    std::optional<CVector> GetTowHitchPos();
+    std::optional<CVector> GetTowBarPos(CClientVehicle* pAttachTo, bool bIgnoreModelType = false);
 
     bool ResetComponentPosition(const SString& vehicleComponent);
     bool SetComponentPosition(const SString& vehicleComponent, CVector vecPosition, EComponentBaseType base = EComponentBase::PARENT);

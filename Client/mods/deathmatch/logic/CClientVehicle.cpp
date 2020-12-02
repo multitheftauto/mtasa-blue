@@ -4634,6 +4634,27 @@ void CClientVehicle::RemoveVehicleSirens()
     m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
+std::optional<CVector> CClientVehicle::GetTowHitchPos()
+{
+    if (!m_pVehicle)
+        return std::nullopt;
+
+    CVector out;
+    m_pVehicle->GetTowHitchPos(&out);
+    return out;
+}
+
+std::optional<CVector> CClientVehicle::GetTowBarPos(CClientVehicle* pAttachTo, bool bIgnoreModelType)
+{
+    CVehicle* pAttachToGameVeh = pAttachTo->GetGameVehicle();
+    if (!m_pVehicle || !pAttachToGameVeh)
+        return std::nullopt;
+
+    CVector out;
+    m_pVehicle->GetTowBarPos(&out, pAttachToGameVeh);
+    return out;
+}
+
 bool CClientVehicle::SetComponentPosition(const SString& vehicleComponent, CVector vecPosition, EComponentBaseType inputBase)
 {
     // Ensure position is parent relative

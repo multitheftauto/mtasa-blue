@@ -151,6 +151,9 @@ public:
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
+    static std::variant<bool, CVector> GetVehicleTowHitchPosition(CClientVehicle* pVeh);
+    static std::variant<bool, CVector> GetVehicleTowBarPosition(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType);
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);

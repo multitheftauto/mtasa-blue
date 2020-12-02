@@ -76,6 +76,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleNitroLevel", GetVehicleNitroLevel},
         {"getHeliBladeCollisionsEnabled", GetHeliBladeCollisionsEnabled},
         {"isVehicleWindowOpen", IsVehicleWindowOpen},
+        {"GetVehicleTowHitchPosition", ArgumentParser<GetVehicleTowHitchPosition>},
+        {"GetVehicleTowBarPosition", ArgumentParser<GetVehicleTowBarPosition>},
         {"getVehicleComponentPosition", GetVehicleComponentPosition},
         {"getVehicleComponentRotation", GetVehicleComponentRotation},
         {"getVehicleComponentScale", GetVehicleComponentScale},
@@ -3149,6 +3151,24 @@ int CLuaVehicleDefs::GetVehicleDoorOpenRatio(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, CVector>
+CLuaVehicleDefs::GetVehicleTowHitchPosition(CClientVehicle* pVeh)
+{
+    const std::optional<CVector> pos = pVeh->GetTowHitchPos();
+    if (pos.has_value())
+        return pos.value();
+    return false;
+}
+
+std::variant<bool, CVector>
+CLuaVehicleDefs::GetVehicleTowBarPosition(CClientVehicle* pVeh, CClientVehicle* pToAttach, std::optional<bool> bIgnoreModelType)
+{
+    const std::optional<CVector> pos = pVeh->GetTowBarPos(pToAttach, bIgnoreModelType.value_or(false));
+    if (pos.has_value())
+        return pos.value();
+    return false;
 }
 
 int CLuaVehicleDefs::SetVehicleComponentPosition(lua_State* luaVM)
