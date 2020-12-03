@@ -2758,11 +2758,11 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         // Not in a vehicle?
         else
         {
-            // Not the local player or ped we sync?
-            if (!m_bIsLocalPlayer && !IsSyncing())
+            // Not the local player?
+            if (!m_bIsLocalPlayer)
             {
-                // Force the player in/out?
-                if (m_bForceGettingIn)
+                // Force the ped in/out? Only if remote player or ped we dont sync
+                if (m_bForceGettingIn && !IsSyncing())
                 {
                     // Are we entering a vehicle and it's a different vehicle from the one we've entered?
                     if (m_pOccupyingVehicle)
@@ -2784,8 +2784,8 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                     }
                 }
                 // Force him to get out of the vehicle as this tasks can sometimes cancel. This also
-                // applies to the local player and can cause problem #2870.
-                if (m_bForceGettingOut)
+                // applies to the local player and can cause problem #2870. Only if remote player or ped we dont sync
+                if (m_bForceGettingOut && !IsSyncing())
                 {
                     // Are we out of the car? If not, continue forcing.
                     if (GetRealOccupiedVehicle())
