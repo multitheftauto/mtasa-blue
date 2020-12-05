@@ -101,6 +101,10 @@ typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, unsigned char level
 typedef RwRaster*(__cdecl* RwRasterCreate_t)(int width, int height, int depth, int flags);
 typedef RwTexture*(__cdecl* RwTextureCreate_t)(RwRaster* raster);
 typedef RpMaterial*(__cdecl* RpMaterialSetTexture_t)(RpMaterial* mat, RwTexture* tex);
+typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
+typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
+typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
+typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -183,8 +187,12 @@ RWFUNC(RwRasterLock_t RwRasterLock, (RwRasterLock_t)0xDEAD)
 RWFUNC(RwRasterCreate_t RwRasterCreate, (RwRasterCreate_t)0xDEAD)
 RWFUNC(RwTextureCreate_t RwTextureCreate, (RwTextureCreate_t)0xDEAD)
 RWFUNC(RpMaterialSetTexture_t RpMaterialSetTexture, (RpMaterialSetTexture_t)0xDEAD)
+RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHierarchyFromSkinClump_t)0xDEAD)
+RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
+RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
+RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
 
-/*****************************************************************************/
+    /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/
 /*****************************************************************************/
 

@@ -11,6 +11,21 @@
 
 #include "StdInc.h"
 
+CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
+{
+    CVector boundCentre;
+    CEntitySAInterface::GetBoundCentre(&boundCentre);
+    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->boundingBox.fRadius;
+    *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    return pRect;
+}
+
+void CPhysicalSAInterface::StaticSetHooks()
+{
+    HookInstall(0x5449B0, &CPhysicalSAInterface::GetBoundRect_);
+}
+
 void CPhysicalSA::RestoreLastGoodPhysicsState()
 {
     CEntitySA::RestoreLastGoodPhysicsState();

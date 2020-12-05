@@ -611,6 +611,10 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
 
         // Add it to the slot
         m_SlotStates[ucSlot] = usUpgrade;
+
+        // Reset wheel scale if it is a wheel upgrade
+        if (ucSlot == 12)
+            m_pVehicle->ResetWheelScale();
     }
 }
 
@@ -655,6 +659,10 @@ bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
             {
                 m_SlotStates[ucSlot] = 0;
             }
+
+            // Reset wheel scale if it is a wheel upgrade
+            if (ucSlot == 12)
+                m_pVehicle->ResetWheelScale();
 
             return true;
         }
@@ -710,6 +718,10 @@ void CVehicleUpgrades::RemoveAll(bool bRipFromVehicle)
                 }
             }
             m_SlotStates[ucSlot] = 0;
+
+            // Reset wheel scale for wheel upgrades
+            if (ucSlot == 12 && m_pVehicle)
+                m_pVehicle->ResetWheelScale();
         }
     }
 }

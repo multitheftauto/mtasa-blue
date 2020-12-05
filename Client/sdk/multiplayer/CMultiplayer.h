@@ -88,6 +88,7 @@ typedef void(RenderHeliLightHandler)();
 typedef bool(ChokingHandler)(unsigned char ucWeaponType);
 typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
+typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
 typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PreHudRenderHandler)();
@@ -216,6 +217,7 @@ public:
     virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
+    virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
     virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void  SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
@@ -254,6 +256,8 @@ public:
     virtual void  ResetSky() = 0;
     virtual void  SetHeatHaze(const SHeatHazeSettings& settings) = 0;
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
+    virtual void  ResetColorFilter() = 0;
+    virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
     virtual void  ResetHeatHaze() = 0;
     virtual void  SetHeatHazeEnabled(bool bEnabled) = 0;
     virtual bool  HasWaterColor() = 0;

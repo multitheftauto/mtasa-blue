@@ -581,6 +581,12 @@ ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)
+ADD_ENUM(eResizableVehicleWheelGroup::FRONT_AXLE, "front_axle")
+ADD_ENUM(eResizableVehicleWheelGroup::REAR_AXLE, "rear_axle")
+ADD_ENUM(eResizableVehicleWheelGroup::ALL_WHEELS, "all_wheels")
+IMPLEMENT_ENUM_CLASS_END("resizable-vehicle-wheel-group")
+
 IMPLEMENT_ENUM_BEGIN(eSurfaceProperties)
 ADD_ENUM(SURFACE_PROPERTY_AUDIO, "audio")
 ADD_ENUM(SURFACE_PROPERTY_STEPWATERSPLASH, "stepwatersplash")
@@ -653,6 +659,12 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_LOOSE, "loose")
 ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
+ADD_ENUM(eClientModelType::PED, "ped")
+ADD_ENUM(eClientModelType::OBJECT, "object")
+ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 //
 // Get best guess at name of userdata type
