@@ -4890,19 +4890,11 @@ void CClientPed::SetMoveAnim(eMoveAnim iAnim)
 
 unsigned int CClientPed::CountProjectiles(eWeaponType weaponType)
 {
-    if (weaponType == WEAPONTYPE_UNARMED)
-        return static_cast<unsigned int>(m_Projectiles.size());
-
-    unsigned int                       uiCount = 0;
-    list<CClientProjectile*>::iterator iter = m_Projectiles.begin();
-    for (; iter != m_Projectiles.end(); iter++)
-    {
-        if ((*iter)->GetWeaponType() == weaponType)
-        {
-            uiCount++;
+    return std::count_if(m_Projectiles.begin(), m_Projectiles.end(),
+        [weaponType](CClientProjectile* const pProjectile) {
+            return pProjectile->GetWeaponType() == weaponType;
         }
-    }
-    return uiCount;
+    );
 }
 
 void CClientPed::RemoveAllProjectiles()

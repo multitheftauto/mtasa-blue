@@ -388,9 +388,10 @@ public:
     eMoveAnim GetMoveAnim();
     void      SetMoveAnim(eMoveAnim iAnim);
 
-    void         AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
-    void         RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }
-    unsigned int CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
+    void   AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
+    void   RemoveProjectile(CClientProjectile* pProjectile) { ListRemoveFirst(m_Projectiles, pProjectile); }
+    size_t CountProjectiles() const noexcept { return m_Projectiles.size(); }
+    size_t CountProjectiles(eWeaponType weaponType);
 
     void RemoveAllProjectiles();
     void DestroySatchelCharges(bool bBlow = true, bool bDestroy = true);
