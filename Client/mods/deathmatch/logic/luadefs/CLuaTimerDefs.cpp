@@ -158,7 +158,7 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
             // Create a new table
             lua_newtable(luaVM);
 
-            // Add all the timers with less than ulTime left
+            // Add all the timers with less than ulProcessAtTime left
             CLuaTimerManager*                     pLuaTimerManager = pLuaMain->GetTimerManager();
             CTickCount                            llCurrentTime = CTickCount::Now();
             unsigned int                          uiIndex = 0;

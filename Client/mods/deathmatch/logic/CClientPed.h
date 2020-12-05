@@ -92,7 +92,7 @@ struct SDelayedSyncData
         CVector vecTarget;
     };
 
-    unsigned long ulTime;
+    unsigned long ulProcessAtTime;
     std::variant<KeySync, ChangeWeapon, MoveSpeed> data;
 };
 

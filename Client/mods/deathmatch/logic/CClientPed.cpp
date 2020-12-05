@@ -907,7 +907,7 @@ void CClientPed::AddKeysync(unsigned long ulDelay, const CControllerState& Contr
     if (!m_bIsLocalPlayer)
     {
         SDelayedSyncData data;
-        data.ulTime = CClientTime::GetTime() + ulDelay;
+        data.ulProcessAtTime = CClientTime::GetTime() + ulDelay;
         data.data = SDelayedSyncData::KeySync{ ControllerState, bDucking};
 
         m_SyncBuffer.push_back(std::move(data));
@@ -922,7 +922,7 @@ void CClientPed::AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, unsign
     if (!m_bIsLocalPlayer)
     {
         SDelayedSyncData data;
-        data.ulTime = CClientTime::GetTime() + ulDelay;
+        data.ulProcessAtTime = CClientTime::GetTime() + ulDelay;
         data.data = SDelayedSyncData::ChangeWeapon{ slot, usWeaponAmmo };
 
         m_SyncBuffer.push_back(std::move(data));
@@ -937,7 +937,7 @@ void CClientPed::AddMoveSpeed(unsigned long ulDelay, const CVector& vecMoveSpeed
     if (!m_bIsLocalPlayer)
     {
         SDelayedSyncData data;
-        data.ulTime = CClientTime::GetTime() + ulDelay;
+        data.ulProcessAtTime = CClientTime::GetTime() + ulDelay;
         data.data = SDelayedSyncData::MoveSpeed{ vecMoveSpeed };
 
         m_SyncBuffer.push_back(std::move(data));
@@ -3474,7 +3474,7 @@ void CClientPed::UpdateKeysync(bool bCleanup)
     while (!m_SyncBuffer.empty())
     {
         const auto& syncData = m_SyncBuffer.front();
-        if (!bCleanup && syncData.ulTime > now)
+        if (!bCleanup && syncData.ulProcessAtTime > now)
             break;
 
         std::visit([this](const auto& additional) {
