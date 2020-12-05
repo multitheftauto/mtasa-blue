@@ -24,7 +24,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraInterior", GetCameraInterior},
         {"getCameraGoggleEffect", GetCameraGoggleEffect},
         {"getCameraFieldOfView", GetCameraFieldOfView},
-        {"getCameraDrunkLevel", ArgumentParserWarn<true, GetCameraDrunkLevel>},
+        {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
 
         // Cam set funcs
         {"setCameraMatrix", SetCameraMatrix},
@@ -36,7 +36,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraClip", GetCameraClip},
         {"setCameraViewMode", SetCameraViewMode},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
-        {"setCameraDrunkLevel", ArgumentParserWarn<true, SetCameraDrunkLevel>},
+        {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
     };
 
     // Add functions
