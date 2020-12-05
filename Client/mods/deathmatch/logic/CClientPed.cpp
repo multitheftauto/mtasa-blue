@@ -4913,35 +4913,25 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
         return;
     m_bDestroyingSatchels = true;
 
-    CClientProjectile* pProjectile = NULL;
-    CVector            vecPosition;
+    for (CClientProjectile* pProjectile : m_Projectiles) {
+        if (pProjectile->GetWeaponType() != WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+            continue;
 
-    list<CClientProjectile*>::iterator iter = m_Projectiles.begin();
-    while (iter != m_Projectiles.end())
-    {
-        pProjectile = *iter;
+        if (bBlow) {
+            CVector vecPosition;
+            pProjectile->GetPosition(vecPosition);
 
-        if (pProjectile->GetWeaponType() == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
-        {
-            if (bBlow)
-            {
-                pProjectile->GetPosition(vecPosition);
-                CLuaArguments Arguments;
-                Arguments.PushNumber(vecPosition.fX);
-                Arguments.PushNumber(vecPosition.fY);
-                Arguments.PushNumber(vecPosition.fZ);
-                Arguments.PushNumber(EXP_TYPE_GRENADE);
-                bool bCancelExplosion = !CallEvent("onClientExplosion", Arguments, true);
-
-                if (!bCancelExplosion)
-                    m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
-            }
-            if (bDestroy)
-            {
-                pProjectile->Destroy(bBlow);
-            }
+            CLuaArguments Arguments;
+            Arguments.PushNumber(vecPosition.fX);
+            Arguments.PushNumber(vecPosition.fY);
+            Arguments.PushNumber(vecPosition.fZ);
+            Arguments.PushNumber(EXP_TYPE_GRENADE);
+            if (CallEvent("onClientExplosion", Arguments, true))
+                m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
         }
-        iter++;
+
+        if (bDestroy)
+            pProjectile->Destroy(bBlow);
     }
 
     m_bDestroyingSatchels = false;
