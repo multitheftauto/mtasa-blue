@@ -498,13 +498,13 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaCameraDefs::SetCameraDrunkLevel(int drunkLevel)
+bool CLuaCameraDefs::SetCameraDrunkLevel(unsigned char drunkLevel)
 {
     if (drunkLevel < 0 || drunkLevel > 255)
         throw std::invalid_argument("Invalid range (0-255)");
 
     CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-    pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
+    pPlayerInfo->SetCamDrunkLevel(drunkLevel);
 
     return true;
 }

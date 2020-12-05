@@ -37,7 +37,7 @@ public:
     LUA_DECLARE(GetCameraClip);
     LUA_DECLARE(SetCameraViewMode);
     LUA_DECLARE(SetCameraGoggleEffect);
-    static bool SetCameraDrunkLevel(int drunkLevel);
+    static bool SetCameraDrunkLevel(unsigned char drunkLevel);
 
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);
