@@ -319,6 +319,6 @@ void CLuaManager::LoadCFunctions()
     CLuaWaterDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
-    // Backward compatability functions at the end, so the new function name is used in ACL
+    // Backward compatibility functions at the end, so the new function name is used in ACL
     CLuaCompatibilityDefs::LoadFunctions();
 }
