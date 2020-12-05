@@ -669,6 +669,7 @@ public:
     void SetBikeWheelStatus(BYTE bWheel, BYTE bStatus);
 
     bool IsWheelCollided(BYTE eWheelPosition);
+    int  GetWheelFrictionState(BYTE eWheelPosition);
 
     void GetGravity(CVector* pvecGravity) const { *pvecGravity = m_vecGravity; }
     void SetGravity(const CVector* pvecGravity);
