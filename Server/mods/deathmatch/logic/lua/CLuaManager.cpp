@@ -118,22 +118,17 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     // Grab the main virtual state because the one
     // we've got passed might be a coroutine state
     // and only the main state is in our list.
-    lua_State* main = lua_getmainstate(luaVM);
-    if (main)
-    {
-        luaVM = main;
-    }
+    lua_State* mainL = lua_getmainstate(luaVM);
 
     // Find a matching VM in our map
-    CLuaMain* pLuaMain = MapFindRef(m_VirtualMachineMap, luaVM);
-    if (pLuaMain)
+    if (CLuaMain* pLuaMain = MapFindRef(m_VirtualMachineMap, mainL))
         return pLuaMain;
 
     // Find a matching VM in our list
     // Note: This is a fallback method, and in an ideal world it's never used
     for (CLuaMain* vm : m_VirtualMachines)
     {
-        if (luaVM == vm->GetVirtualMachine())
+        if (mainL == vm->GetVirtualMachine())
         {
             dassert(0);            // Why not in map?
             return vm;
