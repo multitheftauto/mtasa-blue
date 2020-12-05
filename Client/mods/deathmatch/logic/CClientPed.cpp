@@ -341,15 +341,6 @@ CClientPed::~CClientPed()
     // Remove us from any occupied vehicle
     CClientVehicle::UnpairPedAndVehicle(this);
 
-    // Delete delayed sync data
-    list<SDelayedSyncData*>::iterator iter = m_SyncBuffer.begin();
-    for (; iter != m_SyncBuffer.end(); iter++)
-    {
-        delete *iter;
-    }
-
-    m_SyncBuffer.clear();
-
     if (m_interp.pTargetOriginSource)
     {
         m_interp.pTargetOriginSource->RemoveOriginSourceUser(this);
@@ -915,13 +906,11 @@ void CClientPed::AddKeysync(unsigned long ulDelay, const CControllerState& Contr
 {
     if (!m_bIsLocalPlayer)
     {
-        SDelayedSyncData* pData = new SDelayedSyncData;
-        pData->ulTime = CClientTime::GetTime() + ulDelay;
-        pData->ucType = DELAYEDSYNC_KEYSYNC;
-        pData->State = ControllerState;
-        pData->bDucking = bDucking;
+        SDelayedSyncData data;
+        data.ulTime = CClientTime::GetTime() + ulDelay;
+        data.data = SDelayedSyncData::KeySync{ ControllerState, bDucking};
 
-        m_SyncBuffer.push_back(pData);
+        m_SyncBuffer.push_back(std::move(data));
 
         if (!IsStreamedIn())
             UpdateKeysync(true);
@@ -932,13 +921,11 @@ void CClientPed::AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, unsign
 {
     if (!m_bIsLocalPlayer)
     {
-        SDelayedSyncData* pData = new SDelayedSyncData;
-        pData->ulTime = CClientTime::GetTime() + ulDelay;
-        pData->ucType = DELAYEDSYNC_CHANGEWEAPON;
-        pData->slot = slot;
-        pData->usWeaponAmmo = usWeaponAmmo;
+        SDelayedSyncData data;
+        data.ulTime = CClientTime::GetTime() + ulDelay;
+        data.data = SDelayedSyncData::ChangeWeapon{ slot, usWeaponAmmo };
 
-        m_SyncBuffer.push_back(pData);
+        m_SyncBuffer.push_back(std::move(data));
 
         if (!IsStreamedIn())
             UpdateKeysync(true);
@@ -949,12 +936,11 @@ void CClientPed::AddMoveSpeed(unsigned long ulDelay, const CVector& vecMoveSpeed
 {
     if (!m_bIsLocalPlayer)
     {
-        SDelayedSyncData* pData = new SDelayedSyncData;
-        pData->ulTime = CClientTime::GetTime() + ulDelay;
-        pData->ucType = DELAYEDSYNC_MOVESPEED;
-        pData->vecTarget = vecMoveSpeed;
+        SDelayedSyncData data;
+        data.ulTime = CClientTime::GetTime() + ulDelay;
+        data.data = SDelayedSyncData::MoveSpeed{ vecMoveSpeed };
 
-        m_SyncBuffer.push_back(pData);
+        m_SyncBuffer.push_back(std::move(data));
 
         if (!IsStreamedIn())
             UpdateKeysync(true);
@@ -3484,98 +3470,59 @@ void CClientPed::UpdateKeysync(bool bCleanup)
 {
     // TODO: we should ignore any 'old' keysyncs and set only the latest
 
-    // Got any keysyncs to apply?
-    if (m_SyncBuffer.size() > 0)
+    const auto now = CClientTime::GetTime();
+    while (!m_SyncBuffer.empty())
     {
-        // Time to apply it?
-        unsigned long ulCurrentTime = 0;
-        if (!bCleanup)
-            ulCurrentTime = CClientTime::GetTime();
+        const auto& syncData = m_SyncBuffer.front();
+        if (!bCleanup && syncData.ulTime > now)
+            break;
 
-        // Get the sync data at the front
-        SDelayedSyncData* pData = m_SyncBuffer.front();
+        std::visit([this](const auto& additional) {
+            using T = decltype(additional);
 
-        // Is the front data valid
-        if (pData)
-        {
-            // Check the front data's time (if this isn't valid, nothing else will be either so just leave it in the buffer)
-            if (bCleanup || ulCurrentTime >= pData->ulTime)
+            if constexpr (std::is_same_v<T, SDelayedSyncData::KeySync>)
             {
-                // Loop through until one of the conditions are caught
-                do
-                {
-                    // Remove it from the list straight away so we don't end up picking it up again
-                    m_SyncBuffer.pop_front();
-
-                    switch (pData->ucType)
-                    {
-                        case DELAYEDSYNC_KEYSYNC:
-                        {
-                            SetControllerState(pData->State);
-                            Duck(pData->bDucking);
-                            break;
-                        }
-                        case DELAYEDSYNC_CHANGEWEAPON:
-                        {
-                            if (pData->slot > WEAPONSLOT_TYPE_UNARMED)
-                            {
-                                // Grab the current weapon the player has
-                                CWeapon*    pPlayerWeapon = GetWeapon();
-                                eWeaponSlot eCurrentSlot = pData->slot;
-                                if (!pPlayerWeapon || pPlayerWeapon->GetSlot() != eCurrentSlot || GetRealOccupiedVehicle())
-                                {
-                                    CWeapon* pSlotWeapon = GetWeapon(eCurrentSlot);
-                                    if (pSlotWeapon)
-                                    {
-                                        pPlayerWeapon = GiveWeapon(pSlotWeapon->GetType(), pData->usWeaponAmmo, true);
-                                    }
-                                }
-
-                                // Give it unlimited ammo, set the ammo in clip and weapon state
-                                if (pPlayerWeapon)
-                                {
-                                    pPlayerWeapon->SetAmmoTotal(9999);
-                                    // r1154 - Commented out below as it was causing reload animation desync (Issue #4503). Although it must have been there for
-                                    // a reason...
-                                    if (/*pData->usWeaponAmmo < pPlayerWeapon->GetAmmoInClip () &&*/ pPlayerWeapon->GetState() != WEAPONSTATE_RELOADING)
-                                        pPlayerWeapon->SetAmmoInClip(pData->usWeaponAmmo);
-                                }
-                            }
-                            else
-                            {
-                                SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
-                            }
-                            break;
-                        }
-                        case DELAYEDSYNC_MOVESPEED:
-                        {
-                            SetMoveSpeed(pData->vecTarget);
-                            break;
-                        }
-                    }
-
-                    // Delete the data
-                    delete pData;
-
-                    // Reset the current sync data pointer
-                    pData = NULL;
-
-                    // Loop through until we have a new valid sync data, or we don't have any data left to process
-                    while (pData == NULL && m_SyncBuffer.size() > 0)
-                    {
-                        // Get the next sync data at the front
-                        pData = m_SyncBuffer.front();
-
-                        // Check to see if the data is invalid
-                        if (!pData)
-                        {
-                            // It is, so remove it from the list
-                            m_SyncBuffer.pop_front();
-                        }
-                    }
-                } while (pData && (bCleanup || ulCurrentTime >= pData->ulTime));
+                SetControllerState(additional.State);
+                Duck(additional.bDucking);
             }
-        }
+            else if constexpr (std::is_same_v<T, SDelayedSyncData::MoveSpeed>)
+            {
+                SetMoveSpeed(additional.vecTarget);
+            }
+            else if constexpr (std::is_same_v<T, SDelayedSyncData::ChangeWeapon>)
+            {
+                if (additional.slot == WEAPONSLOT_TYPE_UNARMED)
+                {
+                    SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
+                }
+                else
+                {
+                    // Grab the current weapon the player has
+                    CWeapon* pPlayerWeapon = GetWeapon();
+                    eWeaponSlot eCurrentSlot = additional.slot;
+                    if (!pPlayerWeapon || pPlayerWeapon->GetSlot() != eCurrentSlot || GetRealOccupiedVehicle())
+                    {
+                        CWeapon* pSlotWeapon = GetWeapon(eCurrentSlot);
+                        if (pSlotWeapon)
+                        {
+                            pPlayerWeapon = GiveWeapon(pSlotWeapon->GetType(), additional.usWeaponAmmo, true);
+                        }
+                    }
+
+                    // Give it unlimited ammo, set the ammo in clip and weapon state
+                    if (pPlayerWeapon)
+                    {
+                        pPlayerWeapon->SetAmmoTotal(9999);
+                        // r1154 - Commented out below as it was causing reload animation desync (Issue #4503). Although it must have been there for
+                        // a reason...
+                        if (/*additional.usWeaponAmmo < pPlayerWeapon->GetAmmoInClip () &&*/ pPlayerWeapon->GetState() != WEAPONSTATE_RELOADING)
+                            pPlayerWeapon->SetAmmoInClip(pData->usWeaponAmmo);
+                    }
+                }
+            }
+        }, syncData.data);
+        
+        m_SyncBuffer.pop_front();
     }
 }
 

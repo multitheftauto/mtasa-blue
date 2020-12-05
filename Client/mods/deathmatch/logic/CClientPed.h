@@ -82,15 +82,25 @@ enum eDeathAnims
 
 struct SDelayedSyncData
 {
-    unsigned long    ulTime;
-    unsigned char    ucType;
-    CControllerState State;
-    bool             bDucking;
-    eWeaponSlot      slot;
-    unsigned short   usWeaponAmmo;
-    CVector          vecTarget;
-    bool             bUseSource;
-    CVector          vecSource;
+    struct KeySync
+    {
+        CControllerState State;
+        bool             bDucking;
+    };
+
+    struct ChangeWeapon
+    {
+        eWeaponSlot    slot;
+        unsigned short usWeaponAmmo;
+    };
+
+    struct MoveSpeed
+    {
+        CVector vecTarget;
+    };
+
+    unsigned long ulTime;
+    std::variant<KeySync, ChangeWeapon, MoveSpeed> data;
 };
 
 struct SLastSyncedPedData
@@ -637,7 +647,7 @@ public:
     CVector                                  m_vecTargetTargetAngle;
     CVector                                  m_vecTargetInterpolateAngle;
     CClientEntityPtr                         m_pTargetedEntity;
-    std::list<SDelayedSyncData*>             m_SyncBuffer;
+    std::list<SDelayedSyncData>              m_SyncBuffer;
     bool                                     m_bDucked;
     bool                                     m_bWasDucked;            // For knowing when to register standing up
     bool                                     m_bIsChoking;
