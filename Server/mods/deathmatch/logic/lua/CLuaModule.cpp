@@ -195,7 +195,7 @@ void CLuaModule::_UnregisterFunctions()
         lua_State* luaVM = luaMain->GetVM();
         for (const SString& strFuncName : m_Functions)
         {
-            // Remove function global variable
+            // Set function global variable to nil
             lua_pushnil(luaVM);
             lua_setglobal(luaVM, strFuncName.c_str());
 
