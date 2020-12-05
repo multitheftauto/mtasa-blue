@@ -94,11 +94,13 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
 void CLuaManager::OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM)
 {
-    m_VirtualMachineMap.insert({pLuaMain->GetVirtualMachine(), pLuaMain});
+    dassert(!MapContains(m_VirtualMachineMap, pLuaMain->GetVirtualMachine()));
+    m_VirtualMachineMap[pLuaMain->GetVirtualMachine()] = pLuaMain;
 }
 
 void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
 {
+    dassert(MapContains(m_VirtualMachineMap, pLuaMain->GetVirtualMachine()));
     m_VirtualMachineMap.erase(pLuaMain->GetVirtualMachine());
 }
 
