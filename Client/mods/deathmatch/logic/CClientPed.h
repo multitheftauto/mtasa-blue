@@ -388,11 +388,9 @@ public:
     eMoveAnim GetMoveAnim();
     void      SetMoveAnim(eMoveAnim iAnim);
 
-    void                                    AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
-    void                                    RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }
-    std::list<CClientProjectile*>::iterator ProjectilesBegin() { return m_Projectiles.begin(); }
-    std::list<CClientProjectile*>::iterator ProjectilesEnd() { return m_Projectiles.end(); }
-    unsigned int                            CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
+    void         AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
+    void         RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }
+    unsigned int CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
 
     void RemoveAllProjectiles();
     void DestroySatchelCharges(bool bBlow = true, bool bDestroy = true);
