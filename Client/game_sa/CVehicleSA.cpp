@@ -1843,7 +1843,8 @@ void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
 
 void CVehicleSA::SetFlyingHandlingData(CFlyingHandlingEntry* pFlyingHandling)
 {
-    // Store the handling
+    if (!pFlyingHandling)
+        return;
     m_pFlyingHandlingData = static_cast<CFlyingHandlingEntrySA*>(pFlyingHandling);
     GetVehicleInterface()->pFlyingHandlingData = m_pFlyingHandlingData->GetInterface();
 }
@@ -1962,6 +1963,12 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
             break;
     }
     return false;
+}
+
+int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
+{
+    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
+    return vehicle->m_wheelFrictionState[eWheelPosition];
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)

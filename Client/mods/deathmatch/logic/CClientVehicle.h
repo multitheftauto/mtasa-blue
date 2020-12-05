@@ -23,6 +23,7 @@ class CClientVehicle;
 #include "CClientStreamElement.h"
 #include "CClientVehicleManager.h"
 #include "CVehicleUpgrades.h"
+#include "CClientModel.h"
 
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
@@ -258,6 +259,7 @@ public:
     unsigned char GetDoorStatus(unsigned char ucDoor);
     unsigned char GetWheelStatus(unsigned char ucWheel);
     bool          IsWheelCollided(unsigned char ucWheel);
+    int           GetWheelFrictionState(unsigned char ucWheel);
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
 
@@ -617,14 +619,14 @@ protected:
     bool                                   m_bIsOnGround;
     bool                                   m_bHeliSearchLightVisible;
     float                                  m_fHeliRotorSpeed;
-    const CHandlingEntry*                  m_pOriginalHandlingEntry;
-    CHandlingEntry*                        m_pHandlingEntry;
-    const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry;
-    CFlyingHandlingEntry*                  m_pFlyingHandlingEntry;
-    const CBoatHandlingEntry*              m_pOriginalBoatHandlingEntry;
-    CBoatHandlingEntry*                    m_pBoatHandlingEntry;
-    const CBikeHandlingEntry*              m_pOriginalBikeHandlingEntry;
-    CBikeHandlingEntry*                    m_pBikeHandlingEntry;
+    const CHandlingEntry*                  m_pOriginalHandlingEntry = nullptr;
+    CHandlingEntry*                        m_pHandlingEntry = nullptr;
+    const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry = nullptr;
+    CFlyingHandlingEntry*                  m_pFlyingHandlingEntry = nullptr;
+    const CBoatHandlingEntry*              m_pOriginalBoatHandlingEntry = nullptr;
+    CBoatHandlingEntry*                    m_pBoatHandlingEntry = nullptr;
+    const CBikeHandlingEntry*              m_pOriginalBikeHandlingEntry = nullptr;
+    CBikeHandlingEntry*                    m_pBikeHandlingEntry = nullptr;
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
@@ -694,6 +696,7 @@ protected:
     CMatrix                        m_matCreate;
     unsigned char                  m_ucFellThroughMapCount;
     SFixedArray<bool, MAX_WINDOWS> m_bWindowOpen;
+    std::shared_ptr<CClientModel>  m_clientModel;
 
 public:
 #ifdef MTA_DEBUG

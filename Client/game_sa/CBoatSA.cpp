@@ -46,7 +46,8 @@ CBoatHandlingEntry* CBoatSA::GetBoatHandlingData()
 
 void CBoatSA::SetBoatHandlingData(CBoatHandlingEntry* pBoatHandling)
 {
-    // Store the handling
+    if (!pBoatHandling)
+        return;
     m_pBoatHandlingData = static_cast<CBoatHandlingEntrySA*>(pBoatHandling);
     GetBoatInterface()->pBoatHandlingData = m_pBoatHandlingData->GetInterface();
 }

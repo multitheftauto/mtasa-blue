@@ -448,6 +448,10 @@ enum class eBitStreamVersion : unsigned short
     // 2020-11-03 0x70
     SetWaterLevel_ChangeOutsideWorldLevel,
 
+    // Implement entering/exiting/jacking for peds #1748
+    // 2020-11-10 0x71
+    PedEnterExit,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
