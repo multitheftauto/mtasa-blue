@@ -4899,11 +4899,7 @@ unsigned int CClientPed::CountProjectiles(eWeaponType weaponType)
 
 void CClientPed::RemoveAllProjectiles()
 {
-    CClientProjectile*                 pProjectile = NULL;
-    list<CClientProjectile*>::iterator iter = m_Projectiles.begin();
-    for (; iter != m_Projectiles.end(); iter++)
-    {
-        pProjectile = *iter;
+    for (CClientProjectile* pProjectile : m_Projectiles) {
         pProjectile->m_pCreator = NULL;
         pProjectile->Destroy();
     }
