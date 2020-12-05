@@ -262,6 +262,9 @@ public:
     void     SetSyncable(bool bSynced) { m_bSyncable = bSynced; };
     CPlayer* m_pSyncer;
 
+    CVehicle* GetJackingVehicle() { return m_pJackingVehicle; }
+    void      SetJackingVehicle(CVehicle* pVehicle);
+
     bool IsStealthAiming() { return m_bStealthAiming; }
     void SetStealthAiming(bool bAiming) { m_bStealthAiming = bAiming; }
 
@@ -305,6 +308,7 @@ protected:
     bool                                 m_bHeadless;
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
+    CVehicle*                            m_pJackingVehicle;
     bool                                 m_bReloadingWeapon;
 
     CVehicle*    m_pVehicle;

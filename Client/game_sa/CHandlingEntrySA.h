@@ -13,7 +13,6 @@
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
-#define FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits 0x6F5290
 #define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
 // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
 // http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
@@ -203,27 +202,4 @@ private:
 
     tHandlingDataSA* m_pOriginalData;
     bool             m_bChanged;
-};
-
-// sizeof(tFlyingHandlingDataSA) == 0x58
-struct tFlyingHandlingDataSA
-{
-    int     iVehicleID;
-    float   fThrust;
-    float   fThrustFallOff;
-    float   fYaw;
-    float   fStab;
-    float   fSideSlip;
-    float   fRoll;
-    float   fRollStab;
-    float   fPitch;
-    float   fPitchStab;
-    float   fFormLift;
-    float   fAttackLift;
-    float   GearUpR;
-    float   GearDownL;
-    float   WindMult;
-    float   MoveResistance;
-    CVector TurnResistance;
-    CVector SpeedResistance;
 };

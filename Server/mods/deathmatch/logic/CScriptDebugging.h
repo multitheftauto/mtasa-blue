@@ -34,7 +34,7 @@ struct SLogLine
 class CScriptDebugging
 {
 public:
-    CScriptDebugging(CLuaManager* pLuaManager);
+    CScriptDebugging();
     ~CScriptDebugging();
 
     bool AddPlayer(class CPlayer& Player, unsigned int uiLevel);
@@ -74,7 +74,6 @@ private:
     void PrintLog(const char* szText);
     void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
 
-    CLuaManager*                   m_pLuaManager;
     unsigned int                   m_uiLogFileLevel;
     unsigned int                   m_uiHtmlLogLevel;
     FILE*                          m_pLogFile;
