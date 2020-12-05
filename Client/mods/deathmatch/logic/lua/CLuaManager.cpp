@@ -152,7 +152,6 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
 void CLuaManager::LoadCFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-
         // Event funcs
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
