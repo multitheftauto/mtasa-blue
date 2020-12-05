@@ -31,13 +31,6 @@ class CClientPlayerClothes;
 class CClientVehicle;
 class CClientProjectile;
 
-enum eDelayedSyncData
-{
-    DELAYEDSYNC_KEYSYNC,
-    DELAYEDSYNC_CHANGEWEAPON,
-    DELAYEDSYNC_MOVESPEED,
-};
-
 enum eVehicleInOutState
 {
     VEHICLE_INOUT_NONE = 0,
