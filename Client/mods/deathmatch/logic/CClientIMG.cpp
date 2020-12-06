@@ -196,7 +196,7 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
     if (!pFileInfo)
         return false;
 
-    CStreamingInfo* pCurrInfo = g_pGame->GetStreaming()->GetStreamingInfoFromModelId(uiModelID);
+    CStreamingInfo* pCurrInfo = g_pGame->GetStreaming()->GetStreamingInfo(uiModelID);
 
     if (pCurrInfo->archiveId == m_ucArchiveID)
         return true; // Already linked

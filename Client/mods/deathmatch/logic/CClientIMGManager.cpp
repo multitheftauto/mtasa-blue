@@ -77,7 +77,7 @@ bool CClientIMGManager::Exists(CClientIMG* pIMG)
 
 CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 {
-    uchar ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfoFromModelId(uiModel)->archiveId;
+    uchar ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfo(uiModel)->archiveId;
     return GetElementFromArchiveID(ucArhiveID);
 }
 

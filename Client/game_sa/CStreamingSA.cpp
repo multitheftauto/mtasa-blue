@@ -152,7 +152,7 @@ void CStreamingSA::ReinitStreaming()
 // TODO: Somehow restream a single model instead of the whole world
 void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
-    CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
+    CStreamingInfo* pItemInfo = GetStreamingInfo(id);
 
     // Change nextInImg filed for prev model
     for (CStreamingInfo& info : ms_aInfoForModel)
@@ -174,9 +174,9 @@ void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID,
     pItemInfo->nextInImg = uiNextInImg;
 }
 
-CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
+CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
 {
-    return &ms_aInfoForModel[id];
+    return &ms_aInfoForModel[modelid];
 }
 
 unsigned char CStreamingSA::GetUnusedArchive()
