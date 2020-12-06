@@ -3615,8 +3615,13 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
         // Is the ped alive?
         if (!pPed->IsDead() && pPed->IsSpawned())
         {
+            // Reset his vehicle action, but only if not jacking
+            // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+            // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+            if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+                pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
             // Remove him from any occupied vehicle
-            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
             CVehicle* pVehicle = pPed->GetOccupiedVehicle();
             if (pVehicle)
             {
