@@ -208,17 +208,21 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
         return -1;
 
     // Get free stream handler id
-    HANDLE hFile = INVALID_HANDLE_VALUE;
-
     const auto ucStreamID = GetUnusedStreamHandle();
     if (ucStreamID == -1)
         return -1;
 
-    //  Create new stream handler
-    //  Supported state stored in 0x8E3FE0
-    DWORD dOpenFlags = *(DWORD*)(0x8E3FE0) | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS;
-
-    hFile = CreateFileA(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, dOpenFlags, NULL);
+    // Create new stream handler
+    const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
+    HANDLE hFile = CreateFileA(
+        szFilePath,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS,
+        NULL
+    );
 
     if (hFile == INVALID_HANDLE_VALUE)
         return -1;
