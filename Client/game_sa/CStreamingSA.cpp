@@ -147,18 +147,24 @@ void CStreamingSA::ReinitStreaming()
     ((Function_ReInitStreaming)(0x40E560))();
 }
 
+// ReinitStreaming should be called after this.
+// Otherwise the model wont be restreamed
+// TODO: Somehow restream a single model instead of the whole world
 void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
 
     // Change nextInImg filed for prev model
-    for ( unsigned int i = 0; i < 26316; i++)
+    for (CStreamingInfo& info : ms_aInfoForModel)
     {
-        if (ms_aInfoForModel[i].archiveId == pItemInfo->archiveId &&
-            (ms_aInfoForModel[i].offsetInBlocks + ms_aInfoForModel[i].sizeInBlocks) == pItemInfo->offsetInBlocks)
+        if (info.archiveId == pItemInfo->archiveId)
         {
-            ms_aInfoForModel[i].nextInImg = -1;
-            break;
+            // Check if the block after `info` is the beginning of `pItemInfo`'s block
+            if (info.offsetInBlocks + info.sizeInBlocks == pItemInfo->offsetInBlocks)
+            {
+                info.nextInImg = -1;
+                break;
+            }
         }
     }
 
