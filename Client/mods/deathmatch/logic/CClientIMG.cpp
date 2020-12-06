@@ -88,7 +88,7 @@ bool CClientIMG::Load(fs::path filePath)
         return false;
     }
 
-    m_ifs.read(reinterpret_cast<char*>(m_fileInfos.data()), { sizeof(tImgFileInfo) * (size_t)fileHeader.uiFilesCount });
+    m_ifs.read(reinterpret_cast<char*>(m_fileInfos.data()), sizeof(tImgFileInfo) * (std::streampos)fileHeader.uiFilesCount);
     if (m_ifs.fail() || m_ifs.eof())
     {
         m_ifs.close();
@@ -122,7 +122,7 @@ bool CClientIMG::GetFile(size_t fileID, std::string& buffer)
         throw std::invalid_argument("Out of memory");
     }
 
-    m_ifs.seekg({ pFileInfo->uiOffset * 2048 });
+    m_ifs.seekg((std::streampos)pFileInfo->uiOffset * 2048);
     m_ifs.read(buffer.data(), ulToReadSize);
 
     return !m_ifs.fail() && !m_ifs.eof();
