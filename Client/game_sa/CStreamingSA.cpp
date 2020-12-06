@@ -191,6 +191,16 @@ unsigned char CStreamingSA::GetUnusedArchive()
     return -1;
 }
 
+unsigned char CStreamingSA::GetUnusedStreamHandle()
+{
+    for (size_t i = 0; i < VAR_StreamHandlersMaxCount; i++)
+    {
+        if (m_aStreamingHandlers[i])
+            return i;
+    }
+    return -1;
+}
+
 unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 {
     const auto ucArchiveId = GetUnusedArchive();
@@ -199,19 +209,9 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 
     // Get free stream handler id
     HANDLE hFile = INVALID_HANDLE_VALUE;
-    unsigned char ucStreamID = 0;
-    
-    for (unsigned char ID = 0; ID < VAR_StreamHandlersMaxCount; ++ID)
-    {
-        HANDLE hFile = m_aStreamingHandlers[ID];
-        if (!hFile)
-        {
-            ucStreamID = ID;
-            break;
-        }
-    };
 
-    if (ucStreamID == 0)
+    const auto ucStreamID = GetUnusedStreamHandle();
+    if (ucStreamID == -1)
         return -1;
 
     //  Create new stream handler
