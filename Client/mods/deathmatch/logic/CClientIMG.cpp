@@ -173,7 +173,7 @@ bool CClientIMG::StreamDisable()
     // Unlink all models
     for (const auto& v : m_restoreInfo)
     {
-        g_pGame->GetStreaming()->SetStreamingInfoForModelId(
+        g_pGame->GetStreaming()->SetStreamingInfo(
             v.uiModelID, v.ucStreamID, v.uiOffset, v.usSize
         );
     }
@@ -204,7 +204,7 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
     m_restoreInfo.emplace_back(uiModelID,
         pCurrInfo->offsetInBlocks, pCurrInfo->sizeInBlocks, pCurrInfo->archiveId);
 
-    g_pGame->GetStreaming()->SetStreamingInfoForModelId(
+    g_pGame->GetStreaming()->SetStreamingInfo(
         uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
 
     return true;
@@ -221,7 +221,7 @@ bool CClientIMG::UnlinkModel(unsigned int uiModelID)
     if (it == m_restoreInfo.end())
         return false;
 
-    g_pGame->GetStreaming()->SetStreamingInfoForModelId(
+    g_pGame->GetStreaming()->SetStreamingInfo(
         uiModelID, it->ucStreamID, it->uiOffset, it->usSize);
 
     m_restoreInfo.erase(it);
