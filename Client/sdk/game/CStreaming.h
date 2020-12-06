@@ -50,5 +50,5 @@ public:
     virtual void ReinitStreaming() = 0;
     virtual unsigned char AddArchive(const char* szFilePath) = 0;
     virtual void RemoveArchive(unsigned char ucArchiveID) = 0;
-    virtual void SetStreamingInfoForModelId(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
+    virtual void SetStreamingInfo(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
 };
