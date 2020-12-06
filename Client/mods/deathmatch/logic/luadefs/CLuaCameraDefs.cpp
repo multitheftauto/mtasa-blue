@@ -498,7 +498,7 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaCameraDefs::SetCameraDrunkLevel(unsigned char drunkLevel)
+bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
 {
     if (drunkLevel < 0 || drunkLevel > 255)
         throw std::invalid_argument("Invalid range (0-255)");
