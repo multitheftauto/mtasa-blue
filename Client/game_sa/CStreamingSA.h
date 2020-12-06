@@ -44,7 +44,7 @@ public:
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
 
-    void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
+    void            SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
     CStreamingInfo* GetStreamingInfo(uint modelid);
     unsigned char   GetUnusedArchive();
     unsigned char   GetUnusedStreamHandle();
