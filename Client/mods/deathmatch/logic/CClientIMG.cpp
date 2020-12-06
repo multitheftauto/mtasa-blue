@@ -10,6 +10,7 @@
 
 #include <StdInc.h>
 
+
 #define INVALID_ARCHIVE_ID 0xFF
 
 struct tImgHeader
@@ -18,42 +19,40 @@ struct tImgHeader
     unsigned int uiFilesCount;
 };
 
-CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
+CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) :
+    ClassInit(this),
+    CClientEntity(ID),
+    m_pImgManager(pManager->GetIMGManager()),
+    m_ucArchiveID(INVALID_ARCHIVE_ID)
 {
-    // Init
-    m_uiFilesCount = 0;
     m_pManager = pManager;
-    m_ucArchiveID = INVALID_ARCHIVE_ID;
-    m_pFile = nullptr;
     SetTypeName("img");
-
-    m_pImgManager = pManager->GetIMGManager();
-
     m_pImgManager->AddToList(this);
 }
 
 CClientIMG::~CClientIMG()
 {
     m_pImgManager->RemoveFromList(this);
-
     if (IsStreamed())
         StreamDisable();
-
-    Unload();
 }
 
-bool CClientIMG::Load(SString sFilePath)
+bool CClientIMG::Load(fs::path filePath)
 {
-    if (sFilePath.empty())
+    if (!m_fileInfos.empty())
         return false;
 
-    if (!FileExists(sFilePath))
+    if (m_ifs.is_open())
         return false;
 
-    if (!m_pContentInfo.empty())
+    if (filePath.empty())
         return false;
 
-    m_strFilename = std::move(sFilePath);
+    if (!fs::exists(filePath))
+        return false;
+
+    m_filePath = filePath.string();
+    m_ifs = std::ifstream(filePath, std::ios::binary);
 
 /*    g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, nullptr, 0);
     if (!g_pCore->GetNetwork()->CheckFile("img", m_strFilename))
@@ -61,32 +60,38 @@ bool CClientIMG::Load(SString sFilePath)
 */
 
     // Open the file
-    m_pFile = File::Fopen(m_strFilename, "rb");
-    if (!m_pFile)
+    if (m_ifs.fail())
+    {
+        m_ifs.close();
         return false;
+    }
 
     tImgHeader fileHeader;
 
     // Read header
-    int iReadCount = fread(&fileHeader, sizeof(fileHeader), 1, m_pFile);
+    m_ifs.read(reinterpret_cast<char*>(&fileHeader), sizeof(tImgHeader));
 
-    if (!iReadCount || memcmp(&fileHeader.szMagic, "VER2", 4))
+    if (m_ifs.fail() || m_ifs.eof() || memcmp(&fileHeader.szMagic, "VER2", 4) != 0)
     {
-        fclose(m_pFile);
+        m_ifs.close();
         return false;
     }
 
-    m_uiFilesCount = fileHeader.uiFilesCount;
-
     // Read content info
-
-    m_pContentInfo.resize(m_uiFilesCount);
-
-    iReadCount = fread(&m_pContentInfo.at(0), sizeof(tImgFileInfo), m_uiFilesCount, m_pFile);
-    
-    if (iReadCount != m_uiFilesCount)
+    try
     {
-        Unload();
+        m_fileInfos.resize(fileHeader.uiFilesCount);
+    }
+    catch (const std::bad_alloc&)
+    {
+        m_ifs.close();
+        return false;
+    }
+
+    m_ifs.read(reinterpret_cast<char*>(m_fileInfos.data()), { sizeof(tImgFileInfo) * (size_t)fileHeader.uiFilesCount });
+    if (m_ifs.fail() || m_ifs.eof())
+    {
+        m_ifs.close();
         return false;
     }
 
@@ -95,53 +100,44 @@ bool CClientIMG::Load(SString sFilePath)
 
 void CClientIMG::Unload()
 {
-    m_pContentInfo.clear();
-    m_uiFilesCount = 0;
-
-    if (m_pFile)
-    {
-        fclose(m_pFile);
-        m_pFile = nullptr;
-    }
+    m_fileInfos.clear();
+    m_fileInfos.shrink_to_fit();
+    m_ifs.close();
 }
 
-long CClientIMG::GetFile(unsigned int uiFileID, std::string& buffer)
+bool CClientIMG::GetFile(size_t fileID, std::string& buffer)
 {
-    tImgFileInfo* pFileInfo = GetFileInfo(uiFileID);
+    const tImgFileInfo* pFileInfo = GetFileInfo(fileID);
     if (!pFileInfo)
-        return -1;
+        throw std::invalid_argument("Invalid file id");
 
-    unsigned long ulReadCount = pFileInfo->usSize * 2048;
+    const auto ulToReadSize = pFileInfo->usSize * 2048;
+    buffer.resize(ulToReadSize); // Might throw std::bad_alloc
 
-    try
-    {
-        buffer.resize(ulReadCount);
-    }
-    catch (const std::bad_alloc&)
-    {
-        return -2;
-    }
+    m_ifs.seekg({ pFileInfo->uiOffset * 2048 });
+    m_ifs.read(buffer.data(), ulToReadSize);
 
-    long iReadCount = fread(buffer.data(), 1, ulReadCount, m_pFile);
-
-    return iReadCount;
+    return !m_ifs.fail() && !m_ifs.eof();
 }
 
-tImgFileInfo* CClientIMG::GetFileInfo(unsigned int usFileID)
+tImgFileInfo* CClientIMG::GetFileInfo(size_t fileID)
 {
-    if (usFileID > m_uiFilesCount)
-        return NULL;
-    return &m_pContentInfo[usFileID];
+    if (fileID >= m_fileInfos.size())
+        return nullptr;
+    return &m_fileInfos[fileID];
 }
 
-unsigned int CClientIMG::GetFileID(std::string &strFileName)
+std::optional<size_t> CClientIMG::GetFileID(std::string_view filename)
 {
-    for (unsigned int i = 0; i < m_uiFilesCount; i++)
-    {
-        if (strFileName.compare(m_pContentInfo[i].szFileName) == 0)
-            return i;
-    }
-    return -1;
+    const auto it = std::find_if(m_fileInfos.begin(), m_fileInfos.end(),
+        [filename](const auto& fileInfo) {
+            return filename.compare(fileInfo.szFileName) == 0;
+        }
+    );
+
+    if (it == m_fileInfos.end())
+        return std::nullopt;
+    return std::distance(m_fileInfos.begin(), it);
 }
 
 bool CClientIMG::IsStreamed()
@@ -151,13 +147,13 @@ bool CClientIMG::IsStreamed()
 
 bool CClientIMG::StreamEnable()
 {
-    if (!m_uiFilesCount)
+    if (m_fileInfos.empty())
         return false;
 
     if (IsStreamed())
         return false;
 
-    m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(*m_strFilename);
+    m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(m_filePath.c_str());
     return IsStreamed();
 }
 
@@ -167,62 +163,60 @@ bool CClientIMG::StreamDisable()
         return false;
 
     // Unlink all models
-    std::list<tLinkedModelRestoreInfo*>::iterator inter = m_pRestoreData.begin();
-    for (; inter != m_pRestoreData.end(); inter++)
+    for (const auto& v : m_restoreInfo)
     {
-        tLinkedModelRestoreInfo* pRestoreData = *inter;
-
-        g_pGame->GetStreaming()->SetStreamingInfoForModelId(pRestoreData->uiModelID, pRestoreData->ucStreamID, pRestoreData->uiOffset,
-                                                            pRestoreData->usSize);
-        delete pRestoreData;
+        g_pGame->GetStreaming()->SetStreamingInfoForModelId(
+            v.uiModelID, v.ucStreamID, v.uiOffset, v.usSize
+        );
     }
-
-    m_pRestoreData.clear();
+    m_restoreInfo.clear();
+    m_restoreInfo.shrink_to_fit();
 
     // Remove archive from streaming
     g_pGame->GetStreaming()->RemoveArchive(m_ucArchiveID);
     m_ucArchiveID = INVALID_ARCHIVE_ID;
+
     return true;
 }
 
-bool CClientIMG::LinkModel(unsigned int uiModelID, unsigned int uiFileID)
+bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
 {
     if (!IsStreamed())
         return false;
 
-    if (uiFileID >= m_uiFilesCount)
+    tImgFileInfo* pFileInfo = GetFileInfo(uiFileID);
+    if (!pFileInfo)
         return false;
 
-    tImgFileInfo* pFileInfo = GetFileInfo(uiFileID);
+    CStreamingInfo* pCurrInfo = g_pGame->GetStreaming()->GetStreamingInfoFromModelId(uiModelID);
 
-    CStreamingInfo* pCurrentStreamingInfo = g_pGame->GetStreaming()->GetStreamingInfoFromModelId(uiModelID);
+    if (pCurrInfo->archiveId == m_ucArchiveID)
+        return true; // Already linked
 
-    tLinkedModelRestoreInfo* pModelRestoreData = new tLinkedModelRestoreInfo();
-    pModelRestoreData->uiModelID = uiModelID;
-    pModelRestoreData->ucStreamID = pCurrentStreamingInfo->archiveId;
-    pModelRestoreData->uiOffset = pCurrentStreamingInfo->offsetInBlocks;
-    pModelRestoreData->usSize = pCurrentStreamingInfo->sizeInBlocks;
+    m_restoreInfo.emplace_back(uiModelID,
+        pCurrInfo->offsetInBlocks, pCurrInfo->sizeInBlocks, pCurrInfo->archiveId);
 
-    m_pRestoreData.push_back(pModelRestoreData);
+    g_pGame->GetStreaming()->SetStreamingInfoForModelId(
+        uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
 
-    g_pGame->GetStreaming()->SetStreamingInfoForModelId(uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
     return true;
 }
 
 bool CClientIMG::UnlinkModel(unsigned int uiModelID)
 {
-    std::list<tLinkedModelRestoreInfo*>::iterator inter = m_pRestoreData.begin();
-    for (; inter != m_pRestoreData.end(); inter++)
-    {
-        tLinkedModelRestoreInfo* pRestoreData = *inter;
-        if (pRestoreData->uiModelID == uiModelID)
-        {
-            g_pGame->GetStreaming()->SetStreamingInfoForModelId(uiModelID, pRestoreData->ucStreamID, pRestoreData->uiOffset, pRestoreData->usSize);
-            m_pRestoreData.remove(pRestoreData);
-            delete pRestoreData;
-            return true;
+    const auto it = std::find_if(m_restoreInfo.begin(), m_restoreInfo.end(),
+        [uiModelID](const auto& restoreInfo) {
+            return restoreInfo.uiModelID == uiModelID;
         }
-    }
+    );
+    
+    if (it == m_restoreInfo.end())
+        return false;
 
-    return false;
+    g_pGame->GetStreaming()->SetStreamingInfoForModelId(
+        uiModelID, it->ucStreamID, it->uiOffset, it->usSize);
+
+    m_restoreInfo.erase(it);
+
+    return true;
 }

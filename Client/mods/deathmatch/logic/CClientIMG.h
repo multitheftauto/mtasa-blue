@@ -12,6 +12,12 @@
 #pragma once
 
 #include "CClientEntity.h"
+#include <vector>
+#include <fstream>
+#include <optional>
+#include <string_view>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 struct tImgFileInfo
 {
@@ -23,10 +29,19 @@ struct tImgFileInfo
 
 struct tLinkedModelRestoreInfo
 {
+    constexpr tLinkedModelRestoreInfo(unsigned int uiModelID, unsigned int uiOffset,
+        unsigned short usSize, unsigned char ucStreamID) :
+        uiModelID(uiModelID),
+        uiOffset(uiOffset),
+        usSize(usSize),
+        ucStreamID(ucStreamID)
+    {
+    }
+
     unsigned int   uiModelID;
-    unsigned char  ucStreamID;
     unsigned int   uiOffset;
     unsigned short usSize;
+    unsigned char  ucStreamID;
 };
 
 class CClientIMG : public CClientEntity
@@ -37,33 +52,35 @@ public:
     CClientIMG(class CClientManager* pManager, ElementID ID);
     ~CClientIMG();
 
-    void Unlink(){};
+    void Unlink() {};
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
+    void SetPosition(const CVector& vecPosition) {};
 
-    eClientEntityType GetType() const { return CCLIENTIMG; };
-    unsigned char     GetArchiveID() { return m_ucArchiveID; };
-    unsigned int      GetFilesCount() { return m_uiFilesCount; };
-    bool              Load(SString sFilePath);
-    void              Unload();
-    tImgFileInfo*     GetFileInfo(unsigned int uiFileID);
-    unsigned int      GetFileID(std::string &sFileName);
-    long              GetFile(unsigned int uiFileID, std::string& buffer);
+    eClientEntityType GetType() const { return CCLIENTIMG; }
+    unsigned char     GetArchiveID() { return m_ucArchiveID; }
+    unsigned int      GetFilesCount() { return m_fileInfos.size(); }
 
-    bool              StreamEnable();
-    bool              StreamDisable();
-    bool              IsStreamed();
-    bool              LinkModel(unsigned int usModelID, unsigned int usFileID);
-    bool              UnlinkModel(unsigned int usModelID);
+    bool Load(fs::path filePath);
+    void Unload();
+
+    tImgFileInfo*         GetFileInfo(size_t fileID);
+    std::optional<size_t> GetFileID(std::string_view filename);
+    bool                  GetFile(size_t uiFileID, std::string& buffer);
+
+    bool StreamEnable();
+    bool StreamDisable();
+    bool IsStreamed();
+
+    bool LinkModel(unsigned int usModelID, size_t fileID);
+    bool UnlinkModel(unsigned int usModelID);
 
 private:
-    class CClientIMGManager*    m_pImgManager;
+    class CClientIMGManager*   m_pImgManager;
 
-    SString                     m_strFilename;
-    FILE*                       m_pFile;
-    unsigned char               m_ucArchiveID;
-    unsigned int                m_uiFilesCount;
-    std::vector<tImgFileInfo>   m_pContentInfo;
+    std::ifstream              m_ifs;
+    std::string                m_filePath;
+    unsigned char              m_ucArchiveID;
+    std::vector<tImgFileInfo>  m_fileInfos;
 
-    std::list<tLinkedModelRestoreInfo*> m_pRestoreData;
+    std::vector<tLinkedModelRestoreInfo> m_restoreInfo;
 };
