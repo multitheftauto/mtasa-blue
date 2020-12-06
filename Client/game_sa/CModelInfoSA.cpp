@@ -1410,7 +1410,7 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
     CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
 
-    pTargetModelStreamingInfo->Reset();
+    *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
@@ -1464,7 +1464,7 @@ void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
     ppModelInfo[m_dwModelID] = nullptr;
-    pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->Reset();
+    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

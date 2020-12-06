@@ -15,27 +15,14 @@
 
 struct CStreamingInfo
 {
-    uint16_t prevId;
-    uint16_t nextId;
-    uint16_t nextInImg;
-    uint8_t  flg;
-    uint8_t  archiveId;
-    uint32_t offsetInBlocks;
-    uint32_t sizeInBlocks;
-    uint32_t loadState;
-
-public:
-    void Reset()
-    {
-        this->loadState = 0;
-        this->nextInImg = -1;
-        this->nextId = -1;
-        this->prevId = -1;
-        this->archiveId = 0;
-        this->flg = 0;
-        this->offsetInBlocks = 0;
-        this->sizeInBlocks = 0;
-    };
+    uint16_t prevId = -1;
+    uint16_t nextId = -1;
+    uint16_t nextInImg = -1;
+    uint8_t  flg = 0;
+    uint8_t  archiveId = 0;
+    uint32_t offsetInBlocks = 0;
+    uint32_t sizeInBlocks = 0;
+    uint32_t loadState = 0;
 };
 static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo");
 
