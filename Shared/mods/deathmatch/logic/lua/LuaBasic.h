@@ -66,7 +66,7 @@ namespace lua
         return 1;
     }
 
-    inline int Push(lua_State* L, const std::string& value)
+    inline int Push(lua_State* L, std::string_view value)
     {
         lua_pushlstring(L, value.data(), value.length());
         return 1;
