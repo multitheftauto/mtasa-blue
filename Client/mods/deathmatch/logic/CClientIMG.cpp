@@ -112,7 +112,15 @@ bool CClientIMG::GetFile(size_t fileID, std::string& buffer)
         throw std::invalid_argument("Invalid file id");
 
     const auto ulToReadSize = pFileInfo->usSize * 2048;
-    buffer.resize(ulToReadSize); // Might throw std::bad_alloc
+
+    try
+    {
+        buffer.resize(ulToReadSize);
+    }
+    catch (const std::bad_alloc&)
+    {
+        throw std::invalid_argument("Out of memory");
+    }
 
     m_ifs.seekg({ pFileInfo->uiOffset * 2048 });
     m_ifs.read(buffer.data(), ulToReadSize);

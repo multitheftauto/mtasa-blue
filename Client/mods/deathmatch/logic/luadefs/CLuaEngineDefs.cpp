@@ -590,78 +590,52 @@ uint CLuaEngineDefs::EngineImageGetFilesCount(CClientIMG* pIMG)
     return pIMG->GetFilesCount();
 }
 
-std::vector<std::string> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG)
+std::vector<std::string_view> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG)
 {
-    uint uiFilesCount = pIMG->GetFilesCount();
-    std::vector<std::string> aOutput;
-    aOutput.reserve(uiFilesCount);
+    const auto& fileInfos = pIMG->GetFileInfos();
 
-    for (unsigned int i = 0; i < uiFilesCount; i++)
-        aOutput.push_back(pIMG->GetFileInfo(i)->szFileName);
+    std::vector<std::string_view> out;
+    out.reserve(fileInfos.size());
 
-    return aOutput;
+    for (const auto& fileInfo : fileInfos)
+        out.emplace_back(fileInfo.szFileName);
+
+    return out;
 }
 
-std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<std::string, uint> file)
+static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<std::string_view, size_t> file)
 {
-    uint  uiFileID = -1;
-    uint* pFileID = std::get_if<uint>(&file);
-
-    if (pFileID)
-        uiFileID = *pFileID - 1;
+    if (std::holds_alternative<size_t>(file))
+        return std::get<size_t>(file);
+  
+    if (const auto id = pIMG->GetFileID(std::get<std::string_view>(file)))
+        throw std::invalid_argument("Invalid file name specified");
     else
-        uiFileID = pIMG->GetFileID(std::get<std::string>(file));
-
-    if (uiFileID == -1)
-        throw std::invalid_argument("File not found");
-
-    std::string strBuffer;
-    long    lBytesRead = pIMG->GetFile(uiFileID, strBuffer);
-
-    if (lBytesRead >= 0)
-        return strBuffer;
-    else if (lBytesRead == -2)
-        throw std::invalid_argument("Out of memory");
-    else
-        throw std::invalid_argument("File not found");
+        return id.value();
 }
 
-bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiModelID)
+std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<std::string_view, size_t> file)
+{
+    std::string buffer;
+
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer)) // Get file might throw 
+        throw std::exception("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    return buffer;
+}
+
+bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::string_view, size_t> file, uint uiModelID)
 {
     if (uiModelID >= 20000)
-        throw std::invalid_argument("Expected model ID in range [0-19999] at argument 3");
-
-    uint  uiFileID = -1;
-    uint* pFileID = std::get_if<uint>(&file);
-
-    if (pFileID)
-        uiFileID = *pFileID - 1;
-    else
-        uiFileID = pIMG->GetFileID(std::get<std::string>(file));
-
-    if (uiFileID == -1)
-        throw std::invalid_argument("File not found");
-
-    return pIMG->LinkModel(uiModelID, uiFileID);
+        throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
+    return pIMG->LinkModel(uiModelID, ResolveIMGFileID(pIMG, file));
 }
 
-bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::string, uint> file, uint uiTxdID)
+bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::string_view, size_t> file, uint uiTxdID)
 {
     if (uiTxdID >= 5000)
-        throw std::invalid_argument("Expected model ID in range [0-4999] at argument 3");
-
-    uint  uiFileID = -1;
-    uint* pFileID = std::get_if<uint>(&file);
-
-    if (pFileID)
-        uiFileID = *pFileID - 1;
-    else
-        uiFileID = pIMG->GetFileID(std::get<std::string>(file));
-
-    if (uiFileID == -1)
-        throw std::invalid_argument("File not found");
-
-    return pIMG->LinkModel(20000 + uiTxdID, uiFileID);
+        throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
+    return pIMG->LinkModel(20000 + uiTxdID, ResolveIMGFileID(pIMG, file));
 }
 
 bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
@@ -681,7 +655,7 @@ bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
         throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
 
     if (CClientIMGManager::IsLinkableModel(uiModelID))
-        return m_pImgManager->RestoreModel(uiModelID + 20000);
+        return m_pImgManager->RestoreModel(20000 + uiModelID);
 
     return false;
 }

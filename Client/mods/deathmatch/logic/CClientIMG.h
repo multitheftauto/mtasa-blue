@@ -15,6 +15,7 @@
 #include <vector>
 #include <fstream>
 #include <optional>
+#include <variant>
 #include <string_view>
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -59,6 +60,7 @@ public:
     eClientEntityType GetType() const { return CCLIENTIMG; }
     unsigned char     GetArchiveID() { return m_ucArchiveID; }
     unsigned int      GetFilesCount() { return m_fileInfos.size(); }
+    const auto&       GetFileInfos() const noexcept { return m_fileInfos; }
 
     bool Load(fs::path filePath);
     void Unload();
