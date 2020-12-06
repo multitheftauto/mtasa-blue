@@ -607,11 +607,11 @@ static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<std::string_view, 
 {
     if (std::holds_alternative<size_t>(file))
         return std::get<size_t>(file);
-  
-    if (const auto id = pIMG->GetFileID(std::get<std::string_view>(file)))
-        throw std::invalid_argument("Invalid file name specified");
-    else
+
+    const auto fileName = std::get<std::string_view>(file);
+    if (const auto id = pIMG->GetFileID(fileName))
         return id.value();
+    throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)fileName.length(), fileName.data()));
 }
 
 std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<std::string_view, size_t> file)
