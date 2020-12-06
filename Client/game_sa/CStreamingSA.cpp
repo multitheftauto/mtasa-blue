@@ -179,21 +179,21 @@ CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
     return &ms_aInfoForModel[id];
 }
 
-unsigned char CStreamingSA::AddArchive(const char* szFilePath)
+unsigned char CStreamingSA::GetUnusedArchive()
 {
     // Get internal IMG id
     // By default gta sa uses 6 of 8 IMG archives
-    uchar ucArchiveId = -1;
-    for (int i = 6; i < 8; i++)
+    for (size_t i = 6; i < 8; i++)
     {
-        CArchiveInfo* info = GetArchiveInfo(i);
-        if (!info->uiStreamHandleId)
-        {
-            ucArchiveId = i;
-            break;
-        }
+        if (!GetArchiveInfo(i)->uiStreamHandleId)
+            return i;
     }
+    return -1;
+}
 
+unsigned char CStreamingSA::AddArchive(const char* szFilePath)
+{
+    const auto ucArchiveId = GetUnusedArchive();
     if (ucArchiveId == -1)
         return -1;
 

@@ -46,6 +46,7 @@ public:
 
     void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
     CStreamingInfo* GetStreamingInfoFromModelId(uint id);
+    unsigned char   GetUnusedArchive();
     unsigned char   AddArchive(const char* szFilePath);
     void            RemoveArchive(unsigned char ucStreamHandler);
 
