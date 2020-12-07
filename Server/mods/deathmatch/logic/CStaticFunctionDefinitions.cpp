@@ -12166,11 +12166,18 @@ CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
 }
 
-void CStaticFunctionDefinitions::SetColPolygonHeight(CColShape* pElement, float fFloor, float fCeil)
+bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, float fFloor, float fCeil)
 {
-    m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(fFloor);
-    BitStream.pBitStream->Write(fCeil);
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, COLSHAPE_POLYGON_SET_HEIGHT, *BitStream.pBitStream));
+    if (pColPolygon->SetHeight(fFloor, fCeil))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        BitStream.pBitStream->Write(fFloor);
+        BitStream.pBitStream->Write(fCeil);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, COLSHAPE_POLYGON_SET_HEIGHT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }

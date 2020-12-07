@@ -7377,6 +7377,19 @@ bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CClientColPolygon* pColPo
     return false;
 }
 
+
+bool CStaticFunctionDefinitions::SetColPolygonHeight(CClientColPolygon* pColPolygon, float fFloor, float fCeil)
+{
+    if (pColPolygon->SetHeight(fFloor, fCeil))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CClientColShape* pColShape)
 {

@@ -30,6 +30,8 @@ void CLuaColShapeDefs::LoadFunctions()
         {"setColPolygonPointPosition", SetColPolygonPointPosition},
         {"addColPolygonPoint", AddColPolygonPoint},
         {"removeColPolygonPoint", RemoveColPolygonPoint},
+        {"getColPolygonHeight", GetColPolygonHeight},
+        {"setColPolygonHeight", SetColPolygonHeight},
 
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
@@ -38,8 +40,6 @@ void CLuaColShapeDefs::LoadFunctions()
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
-    CLuaCFunctions::AddFunction("getColPolygonHeight", GetColPolygonHeight);
-    CLuaCFunctions::AddFunction("setColPolygonHeight", SetColPolygonHeight);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -845,12 +845,12 @@ int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
         if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
         {
             CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
-            pColPolygon->SetHeight(fFloor, fCeil);
+            CStaticFunctionDefinitions::SetColPolygonHeight(pColPolygon, fFloor, fCeil);
             lua_pushboolean(luaVM, true);
             return 1;
         }
         else
-            argStream.SetCustomError("Colshape have to be type: Polygon to use this function!");
+            argStream.SetCustomError("ColShape must be Polygon");
 
     }
     else

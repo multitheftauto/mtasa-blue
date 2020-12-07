@@ -234,6 +234,8 @@ namespace
         {"getVehicleModelWheelSize", "1.5.7-9.20642"},
         {"setVehicleWheelScale", "1.5.7-9.20642"},
         {"getVehicleWheelScale", "1.5.7-9.20642"},
+        {"setColPolygonHeight", "1.5.9"},
+        {"setColPolygonHeight", "1.6.9"},
     };
 
     SVersionItem serverFunctionInitList[] = {

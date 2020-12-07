@@ -467,6 +467,7 @@ public:
     static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);
     static bool AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
     static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex);
+    static bool SetColPolygonHeight(CColPolygon* pPolygon, float fFloor, float fCeil);
 
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);
@@ -748,5 +749,4 @@ public:
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
     static CMtaVersion   GetVersionSortable();
-    static void          SetColPolygonHeight(CColShape* pPolygon, float fFloor, float fCeil);
 };

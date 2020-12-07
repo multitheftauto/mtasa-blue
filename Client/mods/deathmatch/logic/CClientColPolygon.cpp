@@ -164,11 +164,11 @@ CSphere CClientColPolygon::GetWorldBoundingSphere()
     return sphere;
 }
 
-void CClientColPolygon::SetHeight(float fFloor, float fCeil)
+bool CClientColPolygon::SetHeight(float fFloor, float fCeil)
 {
     m_fFloor = fFloor;
     m_fCeil = fCeil;
-    CStaticFunctionDefinitions::RefreshColShapeColliders(this);
+    return true;
 }
 
 //

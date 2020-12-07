@@ -680,6 +680,7 @@ public:
     static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint);
     static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
     static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex);
+    static bool SetColPolygonHeight(CClientColPolygon* pColPolygon, float fFloor, float fCeil);
 
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);

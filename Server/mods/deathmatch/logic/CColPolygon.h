@@ -38,7 +38,7 @@ public:
     std::vector<CVector2D>::const_iterator IterBegin() { return m_Points.begin(); };
     std::vector<CVector2D>::const_iterator IterEnd() { return m_Points.end(); };
 
-    void SetHeight(float fFloor, float fCeil);
+    bool SetHeight(float fFloor, float fCeil);
     void GetHeight(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
 
 protected:

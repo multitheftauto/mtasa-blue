@@ -177,9 +177,13 @@ CSphere CColPolygon::GetWorldBoundingSphere()
     return sphere;
 }
 
-void CColPolygon::SetHeight(float fFloor, float fCeil )
+bool CColPolygon::SetHeight(float fFloor, float fCeil)
 {
-    m_fFloor = fFloor;
-    m_fCeil = fCeil;
-    CStaticFunctionDefinitions::SetColPolygonHeight(this, fFloor, fCeil);
+    if (m_fFloor != fFloor && m_fCeil != fCeil)
+    {
+        m_fFloor = fFloor;
+        m_fCeil = fCeil;
+        return true;
+    }
+    return false;
 }
