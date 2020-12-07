@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "lua/CLuaFunctionParser.h"
 
 class CLuaColShapeDefs : public CLuaDefs
 {
@@ -37,6 +38,7 @@ public:
 
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
-    LUA_DECLARE(SetColPolygonHeight);
-    LUA_DECLARE(GetColPolygonHeight);
+
+    static std::tuple<float, float> GetColPolygonHeight(CClientColPolygon* pColPolygon);
+    static bool SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };

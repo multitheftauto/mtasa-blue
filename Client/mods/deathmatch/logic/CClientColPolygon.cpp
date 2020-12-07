@@ -166,9 +166,13 @@ CSphere CClientColPolygon::GetWorldBoundingSphere()
 
 bool CClientColPolygon::SetHeight(float fFloor, float fCeil)
 {
-    m_fFloor = fFloor;
-    m_fCeil = fCeil;
-    return true;
+    if (m_fFloor != fFloor || m_fCeil != fCeil)
+    {
+        m_fFloor = fFloor;
+        m_fCeil = fCeil;
+        return true;
+    }
+    return false;
 }
 
 //

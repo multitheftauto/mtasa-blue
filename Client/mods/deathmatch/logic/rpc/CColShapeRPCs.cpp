@@ -87,10 +87,7 @@ void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStrea
     float         fCeil;
     if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
     {
-        if (pSource)
-        {
-            CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
-            CStaticFunctionDefinitions::SetColPolygonHeight(pColShape, fFloor, fCeil);
-        }
+        CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
+        CStaticFunctionDefinitions::SetColPolygonHeight(pColShape, fFloor, fCeil);
     }
 }
