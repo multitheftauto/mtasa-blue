@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 #include <CEGUI.h>
 #include <windows.h>

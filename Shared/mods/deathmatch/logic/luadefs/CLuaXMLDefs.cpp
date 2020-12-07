@@ -12,9 +12,10 @@
 
 void CLuaXMLDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"xmlCreateFile", xmlCreateFile},
         {"xmlLoadFile", xmlLoadFile},
+        {"xmlLoadString", xmlLoadString},
         {"xmlCopyFile", xmlCopyFile},
         {"xmlSaveFile", xmlSaveFile},
         {"xmlUnloadFile", xmlUnloadFile},
@@ -35,10 +36,8 @@ void CLuaXMLDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaXMLDefs::AddClass(lua_State* luaVM)
@@ -46,6 +45,7 @@ void CLuaXMLDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "load", "xmlLoadFile");
+    lua_classfunction(luaVM, "loadstring", "xmlLoadString");
     lua_classfunction(luaVM, "unload", "xmlUnloadFile");
     lua_classfunction(luaVM, "copy", "xmlCopyFile");
     lua_classfunction(luaVM, "create", "xmlCreateFile");
@@ -214,6 +214,35 @@ int CLuaXMLDefs::xmlLoadFile(lua_State* luaVM)
     return 1;
 }
 
+int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
+{
+    SString strXmlContent;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strXmlContent);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    // Grab our resource
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent);
+
+        if (rootNode && rootNode->IsValid())
+        {
+            lua_pushxmlnode(luaVM, rootNode);
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, "Unable to load XML string");
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaXMLDefs::xmlCopyFile(lua_State* luaVM)
 {
 #ifndef MTA_CLIENT
@@ -338,9 +367,11 @@ int CLuaXMLDefs::xmlUnloadFile(lua_State* luaVM)
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (luaMain)
         {
-            luaMain->DestroyXML(pNode);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            if (luaMain->DestroyXML(pNode))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else

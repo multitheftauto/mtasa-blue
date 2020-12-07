@@ -341,9 +341,9 @@ void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user)
     UnlockCallbackId();
 }
 
-void CBassAudio::PlayStreamIntern(void* arguments)
+DWORD CBassAudio::PlayStreamIntern(LPVOID argument)
 {
-    CBassAudio* pBassAudio = LockCallbackId(arguments);
+    CBassAudio* pBassAudio = LockCallbackId(argument);
     if (pBassAudio)
     {
         pBassAudio->m_pVars->criticalSection.Lock();
@@ -355,7 +355,7 @@ void CBassAudio::PlayStreamIntern(void* arguments)
         // This can take a while
         HSTREAM pSound = BASS_StreamCreateURL(FromUTF8(strURL), 0, lFlags | BASS_UNICODE, NULL, NULL);
 
-        CBassAudio* pBassAudio = LockCallbackId(arguments);
+        CBassAudio* pBassAudio = LockCallbackId(argument);
         if (pBassAudio)
         {
             pBassAudio->m_pVars->criticalSection.Lock();
@@ -365,12 +365,14 @@ void CBassAudio::PlayStreamIntern(void* arguments)
         }
         else
         {
-            // Deal with unwanted pSound
-            g_pClientGame->GetManager()->GetSoundManager()->QueueChannelStop(pSound);
+            // Deal with unwanted pSound unless we're disconnecting already
+            if (g_pClientGame != nullptr && !g_pClientGame->IsBeingDeleted())
+                g_pClientGame->GetManager()->GetSoundManager()->QueueChannelStop(pSound);
         }
     }
 
     UnlockCallbackId();
+    return 0;
 }
 
 //

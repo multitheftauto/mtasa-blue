@@ -14,7 +14,7 @@
 using std::list;
 
 CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node)
-    : m_ulID(INVALID_XML_ID), m_bUsingIDs(pFile && pFile->IsUsingIDs()), m_pNode(&Node), m_Attributes(Node, pFile && pFile->IsUsingIDs())
+    : m_ulID(INVALID_XML_ID), m_bUsingIDs((!pFile) || pFile && pFile->IsUsingIDs()), m_pNode(&Node), m_Attributes(Node, (!pFile) || pFile && pFile->IsUsingIDs())
 {
     // Init
     m_pFile = pFile;
@@ -71,6 +71,20 @@ CXMLNodeImpl::~CXMLNodeImpl()
             pParent->RemoveChild(m_pNode);
         else
             delete m_pNode;
+    }
+}
+
+void CXMLNodeImpl::BuildFromDocument()
+{
+    TiXmlNode*    xmlChild = nullptr;
+    while (xmlChild = m_pNode->IterateChildren(xmlChild))
+    {
+        auto xmlChildElement = xmlChild->ToElement();
+        if (xmlChildElement)
+        {
+            auto xmlChildNode = new CXMLNodeImpl(nullptr, this, *xmlChildElement);
+            xmlChildNode->BuildFromDocument();
+        }
     }
 }
 

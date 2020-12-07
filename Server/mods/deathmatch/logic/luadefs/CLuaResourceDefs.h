@@ -54,6 +54,7 @@ public:
     LUA_DECLARE(getResourceExportedFunctions);
     LUA_DECLARE(getResourceOrganizationalPath);
     LUA_DECLARE(isResourceArchived);
+    static bool isResourceProtected(CResource* const resource);
 
     // Set stuff
     LUA_DECLARE(setResourceInfo);

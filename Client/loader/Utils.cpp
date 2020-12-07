@@ -789,38 +789,19 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             return GAME_PATH_UNICODE_CHARS;
     }
 
-    // Then step through looking for an existing file
-    bool    bFoundSteamExe = false;
-    SString strRegPath;
+    // Then step through looking for a known existing file
     for (uint i = 0; i < pathList.size(); i++)
     {
         if (pathList[i].empty())
             continue;
 
-        if (FileExists(PathJoin(pathList[i], MTA_GTAEXE_NAME)))
+        if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
         {
-            strRegPath = pathList[i];
-            break;
+            strOutResult = pathList[i];
+            // Update registry.
+            SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
+            return GAME_PATH_OK;
         }
-        if (FileExists(PathJoin(pathList[i], MTA_GTASTEAMEXE_NAME)))
-        {
-            bFoundSteamExe = true;
-        }
-    }
-
-    // Found an exe?
-    if (!strRegPath.empty())
-    {
-        strOutResult = strRegPath;
-        // Update registry.
-        SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
-        return GAME_PATH_OK;
-    }
-
-    // Found a steam exe?
-    if (bFoundSteamExe)
-    {
-        return GAME_PATH_STEAM;
     }
 
     // Try to find?
@@ -852,19 +833,13 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
     }
 
     // Check browse result
-    if (!FileExists(PathJoin(strOutResult, MTA_GTAEXE_NAME)))
+    if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
     {
-        if (FileExists(PathJoin(strOutResult, MTA_GTASTEAMEXE_NAME)))
-            return GAME_PATH_STEAM;
-
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch();
 
-        if (!FileExists(PathJoin(strOutResult, MTA_GTAEXE_NAME)))
+        if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
         {
-            if (FileExists(PathJoin(strOutResult, MTA_GTASTEAMEXE_NAME)))
-                return GAME_PATH_STEAM;
-
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
@@ -1525,8 +1500,8 @@ int GetFileAge(const SString& strPathFilename)
         FindClose(hFind);
         FILETIME ftNow;
         GetSystemTimeAsFileTime(&ftNow);
-        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime};
-        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, ftNow.dwHighDateTime};
+        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, static_cast<LONG>(findFileData.ftCreationTime.dwHighDateTime)};
+        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, static_cast<LONG>(ftNow.dwHighDateTime)};
         return static_cast<int>((timeNow.QuadPart - creationTime.QuadPart) / (LONGLONG)10000000);
     }
     return 0;
@@ -2153,9 +2128,10 @@ BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
     WINDOWINFO windowInfo;
     if (GetWindowInfo(hwnd, &windowInfo))
     {
-        if (windowInfo.atomWindowType == (WORD)WC_DIALOG)
+        if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
         {
-            SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+            // Ensure dialog is not hidden by other applications
+            SetForegroundWindow(hwnd);
             return false;
         }
     }

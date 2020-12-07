@@ -8,11 +8,15 @@ project "CEGUI"
 
 	includedirs {
 		"include",
-		"dependencies/include"
+		"dependencies/include",
+		"../freetype/include"
 	}
 
+	links { "freetype" }
+
 	defines {
-		"CEGUIBASE_EXPORTS"
+		"CEGUIBASE_EXPORTS",
+		"_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING"
 	}
 
 	vpaths {

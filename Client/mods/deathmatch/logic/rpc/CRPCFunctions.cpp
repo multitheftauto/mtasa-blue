@@ -99,7 +99,7 @@ void CRPCFunctions::AddHandlers()
     CWeaponRPCs::LoadFunctions();
     CWaterRPCs::LoadFunctions();
     CWorldRPCs::LoadFunctions();
-    CColShapeRPCs::LoadFunctions();
+    CColShapeRPCs::LoadFunctions(); 
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)
@@ -157,7 +157,7 @@ void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfac
             if (pSource == NULL)
             {
 #ifdef MTA_DEBUG
-                SString strMessage("CRPCFunctions::ProcessPacket - FIXME (%s)", *pElementHandler->strName);
+                SString strMessage("FIXME: CRPCFunctions::ProcessPacket - Element doesn't exist on client (%s)", *pElementHandler->strName);
                 OutputDebugLine(SStringX("[RPC] ") + strMessage);
                 CLogger::ErrorPrintf("%s", *strMessage);
 #endif

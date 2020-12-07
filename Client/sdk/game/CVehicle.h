@@ -31,6 +31,18 @@ enum eWinchType
     WINCH_SMALL_MAGNET = 3
 };
 
+enum eDoorLock : int32_t
+{
+    DOOR_LOCK_NOT_USED,
+    DOOR_LOCK_UNLOCKED,
+    DOOR_LOCK_LOCKED,
+    DOOR_LOCK_LOCKOUT_PLAYER_ONLY,
+    DOOR_LOCK_LOCKED_PLAYER_INSIDE,
+    DOOR_LOCK_COP_CAR,
+    DOOR_LOCK_FORCE_SHUT_DOORS,
+    DOOR_LOCK_SKIP_SHUT_DOORS,
+};
+
 // forward declaration, avoid compile error
 class CPed;
 class CObject;
@@ -230,12 +242,16 @@ public:
     virtual CHandlingEntry* GetHandlingData() = 0;
     virtual void            SetHandlingData(CHandlingEntry* pHandling) = 0;
 
+    virtual CFlyingHandlingEntry* GetFlyingHandlingData() = 0;
+    virtual void                  SetFlyingHandlingData(CFlyingHandlingEntry* pHandling) = 0;
+
     virtual void BurstTyre(BYTE bTyre) = 0;
 
     virtual BYTE GetBikeWheelStatus(BYTE bWheel) = 0;
     virtual void SetBikeWheelStatus(BYTE bWheel, BYTE bStatus) = 0;
 
     virtual bool IsWheelCollided(BYTE bWheel) = 0;
+    virtual int  GetWheelFrictionState(BYTE bWheel) = 0;
 
     virtual class CVehicleSAInterface* GetVehicleInterface() = 0;
 
@@ -315,5 +331,7 @@ public:
     virtual void                              UpdateLandingGearPosition() = 0;
     virtual bool                              SetPlateText(const SString& strText) = 0;
     virtual bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState) = 0;
+    virtual float                             GetWheelScale() = 0;
+    virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
 };

@@ -470,7 +470,7 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
 
 std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResourceFile)
 {
-    return SharedUtil::async([pResourceFile, this] { 
+    return SharedUtil::async([pResourceFile, this] {
         SString strPath;
 
         if (!GetFilePath(pResourceFile->GetName(), strPath))
@@ -509,7 +509,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                     return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                 }
 
-                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
                 if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
@@ -559,7 +559,7 @@ bool CResource::GenerateChecksums()
     SString strPath;
 
     if (GetFilePath("meta.xml", strPath))
-        m_metaChecksum = CChecksum::GenerateChecksumFromFile(strPath);
+        m_metaChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
     else
         m_metaChecksum = CChecksum();
 
@@ -569,20 +569,19 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
-    if (IsResourceZip() )
+    if (IsResourceZip())
     {
         // Zip file might have changed
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
         if (checksum != m_zipHash)
             return true;
-
     }
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
         if (GetFilePath(pResourceFile->GetName(), strPath))
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFile(strPath);
+            CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
 
             if (pResourceFile->GetLastChecksum() != checksum)
                 return true;
@@ -595,7 +594,7 @@ bool CResource::HasResourceChanged()
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
                     if (cachedChecksum != checksum)
                         return true;
@@ -610,7 +609,7 @@ bool CResource::HasResourceChanged()
 
     if (GetFilePath("meta.xml", strPath))
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(strPath);
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
         if (checksum != m_metaChecksum)
             return true;
     }
@@ -786,6 +785,36 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     m_pResourceDynamicElementRoot = new CDummy(g_pGame->GetGroups(), m_pResourceElement);
     m_pResourceDynamicElementRoot->SetTypeName("map");
     m_pResourceDynamicElementRoot->SetName("dynamic");
+
+    // Verify resource element id and dynamic element root id
+    if (m_pResourceElement->GetID() == INVALID_ELEMENT_ID || m_pResourceDynamicElementRoot->GetID() == INVALID_ELEMENT_ID)
+    {
+        // Destroy the dynamic element root
+        g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+        m_pResourceDynamicElementRoot = nullptr;
+
+        // Destroy the resource element
+        g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
+        m_pResourceElement = nullptr;
+
+        // Remove the temporary XML storage node
+        if (m_pNodeStorage)
+        {
+            delete m_pNodeStorage;
+            m_pNodeStorage = nullptr;
+        }
+
+        m_pRootElement = nullptr;
+
+        // Destroy the element group attached directly to this resource
+        delete m_pDefaultElementGroup;
+        m_pDefaultElementGroup = nullptr;
+
+        m_eState = EResourceState::Loaded;
+        m_strFailureReason = SString("Start up of resource %s cancelled by element id starvation", m_strResourceName.c_str());
+        CLogger::LogPrintf("%s\n", m_strFailureReason.c_str());
+        return false;
+    }
 
     // Set the Resource Element name
     m_pResourceElement->SetName(m_strResourceName.c_str());
@@ -1230,10 +1259,17 @@ bool CResource::HasGoneAway()
 // gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    if (IsResourceZip())
-        strPath = m_strResourceCachePath + szFilename;
-    else
-        strPath = m_strResourceDirectoryPath + szFilename;
+    // Always prefer the local resource directory, as scripts may 
+    // have added new files to the regular folder, rather than the zip
+    strPath = m_strResourceDirectoryPath + szFilename;
+    if (FileExists(strPath))
+        return true;
+
+    // If this is a zipped resource, try to use the unzipped file
+    if (!IsResourceZip())
+        return false;
+    
+    strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
 }
 
@@ -2413,8 +2449,8 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         SString strResourceFuncName("%s.function.%s", m_strResourceName.c_str(), strFuncName.c_str());
 
         // @@@@@ Deal with this the new way
-        if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFuncName.c_str(),
-                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
+        if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                         strResourceFuncName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
         {
             return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
         }
@@ -2632,7 +2668,8 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
 
                     SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pHtml->GetName());
                     if (g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                       strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
+                                                                    strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                                    !pHtml->IsRestricted()))
                     {
                         return pHtml->Request(ipoHttpRequest, ipoHttpResponse, pAccount);
                     }
@@ -2919,7 +2956,7 @@ bool CResource::UnzipResource()
     m_zipfile = nullptr;
 
     // Store the hash so we can figure out whether it has changed later
-    m_zipHash = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+    m_zipHash = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
     return true;
 }
 

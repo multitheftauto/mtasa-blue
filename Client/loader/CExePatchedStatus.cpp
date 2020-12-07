@@ -188,8 +188,9 @@ bool CopyExe()
 {
     SString strGTAEXEPathFrom = GetExePathFilename(false);
     SString strGTAEXEPathTo = GetExePathFilename(true);
-    if (!FileCopy(strGTAEXEPathFrom, strGTAEXEPathTo))
-        return false;
+    if (strGTAEXEPathFrom != strGTAEXEPathTo)
+        if (!FileCopy(strGTAEXEPathFrom, strGTAEXEPathTo))
+            return false;
     return true;
 }
 
