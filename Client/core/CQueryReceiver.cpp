@@ -83,7 +83,7 @@ bool CQueryReceiver::ReadString(std::string& strRead, const char* szBuffer, int&
     return false;
 }
 
-SQueryInfo CQueryReceiver::GetServerResponse(uint restrictions)
+SQueryInfo CQueryReceiver::GetServerResponse()
 {
     SQueryInfo info;
 
@@ -120,8 +120,7 @@ SQueryInfo CQueryReceiver::GetServerResponse(uint restrictions)
         // Game
         if (!ReadString(strTemp, szBuffer, i, len))
             return info;
-        if ((restrictions & RESTRICTION_GAME_NAME) == false)
-            info.gameName = strTemp;
+        info.gameName = strTemp;
 
         // Port (Ignore result as we must already have the correct value)
         if (!ReadString(strTemp, szBuffer, i, len))
@@ -130,42 +129,31 @@ SQueryInfo CQueryReceiver::GetServerResponse(uint restrictions)
         // Server name
         if (!ReadString(strTemp, szBuffer, i, len))
             return info;
-        if ((restrictions & RESTRICTION_SERVER_NAME) == false)
-            info.serverName = strTemp;
+        info.serverName = strTemp;
 
         // Game type
         if (!ReadString(strTemp, szBuffer, i, len))
             return info;
-        if ((restrictions & RESTRICTION_GAME_MODE) == false)
-            info.gameType = strTemp;
+        info.gameType = strTemp;
 
         // Map name
         if (!ReadString(strMapTemp, szBuffer, i, len))
             return info;
-        if ((restrictions & RESTRICTION_MAP_NAME) == false)
-            info.mapName = strMapTemp;
+        info.mapName = strMapTemp;
 
         // Version
         if (!ReadString(strTemp, szBuffer, i, len))
             return info;
-        if ((restrictions & RESTRICTION_SERVER_VERSION) == false)
-            info.versionText = strTemp;
+        info.versionText = strTemp;
 
         // Got space for password, serial verification, player count, players max?
         if (i + 4 > len)
             return info;
 
-        if ((restrictions & RESTRICTION_PASSWORDED_FLAG) == false)
-            info.isPassworded = (szBuffer[i++] == 1);
-
-        if ((restrictions & RESTRICTION_SERIALS_FLAG) == false)
-            info.serials = (szBuffer[i++] == 1);
-
-        if ((restrictions & RESTRICTION_PLAYER_COUNT) == false)
-            info.players = (unsigned char)szBuffer[i++];
-
-        if ((restrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
-            info.playerSlot = (unsigned char)szBuffer[i++];
+        info.isPassworded = (szBuffer[i++] == 1);
+        info.serials = (szBuffer[i++] == 1);
+        info.players = (unsigned char)szBuffer[i++];
+        info.playerSlot = (unsigned char)szBuffer[i++];
 
         // Recover large player count if present
         const SString strPlayerCount = strMapTemp.Right(strMapTemp.length() - strlen(strMapTemp) - 1);
@@ -174,10 +162,8 @@ SQueryInfo CQueryReceiver::GetServerResponse(uint restrictions)
             SString strJoinedPlayers, strMaxPlayers;
             if (strPlayerCount.Split("/", &strJoinedPlayers, &strMaxPlayers))
             {
-                if ((restrictions & RESTRICTION_PLAYER_COUNT) == false)
-                    info.players = atoi(strJoinedPlayers);
-                if ((restrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
-                    info.playerSlot = atoi(strMaxPlayers);
+                info.players = atoi(strJoinedPlayers);
+                info.playerSlot = atoi(strMaxPlayers);
             }
         }
 
@@ -218,8 +204,7 @@ SQueryInfo CQueryReceiver::GetServerResponse(uint restrictions)
                     SString strResult = RemoveColorCodes(strPlayer.c_str());
                     if (strResult.length() == 0)
                         strResult = strPlayer;
-                    if ((restrictions & RESTRICTION_PLAYER_LIST) == false)
-                        info.playersPool.push_back(strResult);
+                    info.playersPool.push_back(strResult);
                 }
             }
             catch (...)

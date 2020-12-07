@@ -14,7 +14,7 @@ using std::list;
 
 void CLuaResourceDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
@@ -30,10 +30,8 @@ void CLuaResourceDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaResourceDefs::AddClass(lua_State* luaVM)
@@ -395,16 +393,16 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
         }
     }
 
-    if (pResource)
+
+    // Push all functions into a key-value pair tableif (pResource)
     {
-        lua_newtable(luaVM);
-        unsigned int                       uiIndex = 0;
-        list<CExportedFunction*>::iterator iterd = pResource->IterBeginExportedFunctions();
-        for (; iterd != pResource->IterEndExportedFunctions(); iterd++)
+        lua_createtable(luaVM, 0, pResource->GetExportedFunctions().size());
+
+        unsigned int index = 1;
+        for (const auto& strName : pResource->GetExportedFunctions())
         {
-            lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, (*iterd)->GetFunctionName());
-            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, strName.c_str());
+            lua_rawseti(luaVM, -2, index++);
         }
         return 1;
     }

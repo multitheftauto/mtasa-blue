@@ -51,7 +51,7 @@ public:
     bool IsVisible() const { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    void SetDimension(unsigned short usDimension);
+    void SetDimension(unsigned short usDimension) override;
     void RelateDimension(unsigned short usDimension);
 
     short GetOrdering() { return m_sOrdering; }

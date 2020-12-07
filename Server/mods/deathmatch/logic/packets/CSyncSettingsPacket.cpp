@@ -64,7 +64,7 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(m_ucAllowDrivebyAnimationFix);
     }
 
-    if (BitStream.Version() >= 0x64)
+    if (BitStream.Can(eBitStreamVersion::ShotgunDamageFix))
     {
         BitStream.Write(m_ucAllowShotgunDamageFix);
     }
