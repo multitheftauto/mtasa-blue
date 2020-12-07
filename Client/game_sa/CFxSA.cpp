@@ -17,16 +17,6 @@ auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
 
 CFxSA::CFxSA(CFxSAInterface* pInterface) : m_pInterface(pInterface)
 {
-
-    RwTexture* pRwTexture;
-    auto shadowTypeCount = static_cast<std::underlying_type_t<eShadowType>>(eShadowType::_COUNT);
-    for (auto i = 0; i < shadowTypeCount; i++)
-    {
-        auto textureAddressPtr = (void**)(SHADOW_BASE_TEXTURE_OFFSET + i * 4);
-        void* textureAddress = *textureAddressPtr;
-        pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
-        m_textureMap[static_cast<eShadowType>(i)] = pRwTexture;
-    }
     m_textureMap[eShadowType::PLANE] = new RwTexture();
 }
 
@@ -259,8 +249,8 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
 
 bool CFxSA::IsShadowsLimitReached()
 {
-    short shadows = *(short*)0xC403DC;
-    return shadows >= 48;
+    unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)0xC403DC;
+    return CShadows_ShadowsStoredToBeRendered >= 48;
 }
 
 bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& vecOffset1, CVector2D& vecOffset2, SColor color, float fZDistance,
@@ -269,7 +259,9 @@ bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& v
     if (IsShadowsLimitReached())
         return false;
 
-    RwTexture* pTexture = m_textureMap[shadowType];
+
+    void*      textureAddress = *(void**)(SHADOW_BASE_TEXTURE_OFFSET + (int)shadowType * 4);
+    RwTexture* pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
     char       type = 1;
 
     switch (shadowType)
@@ -280,7 +272,10 @@ bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& v
             type = 2;
     }
 
-    StoreShadowToBeRendered(type, pTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,
+    if (pRwTexture == nullptr)
+        return false;
+
+    StoreShadowToBeRendered(type, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,
                             fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
 
     return true;
