@@ -443,6 +443,14 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
     return fReturn;
 }
 
+float CWorldSA::FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult)
+{
+    DEBUG_TRACE("FLOAT CWorldSA::FindRoofZFor3DCoord(float x, float y, float z, bool * pbOutResult)");
+
+    auto CWorld_FindRoofZFor3DCoord = (float(__cdecl*)(float, float, float, bool*))0x569750;
+    return CWorld_FindRoofZFor3DCoord(pvecPosition->fX, pvecPosition->fY, pvecPosition->fZ, pbOutResult);
+}
+
 void CWorldSA::LoadMapAroundPoint(CVector* vecPosition, FLOAT fRadius)
 {
     DEBUG_TRACE("VOID CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)");

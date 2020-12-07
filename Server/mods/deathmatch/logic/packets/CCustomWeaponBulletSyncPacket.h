@@ -10,7 +10,7 @@
 #pragma once
 #include "CCustomWeapon.h"
 
-class CCustomWeaponBulletSyncPacket : public CPacket
+class CCustomWeaponBulletSyncPacket final : public CPacket
 {
 public:
     CCustomWeaponBulletSyncPacket(){};

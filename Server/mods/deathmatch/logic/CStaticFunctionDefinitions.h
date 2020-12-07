@@ -268,7 +268,6 @@ public:
     static bool  IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable);
     static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
-    static bool  GetTrainTrack(CVehicle* pVehicle, uchar& ucTrack);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
     static bool  IsVehicleBlown(CVehicle* pVehicle);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
@@ -331,7 +330,6 @@ public:
     static bool SetTrainDerailable(CVehicle* pVehicle, bool bDerailable);
     static bool SetTrainDirection(CVehicle* pVehicle, bool bDirection);
     static bool SetTrainSpeed(CVehicle* pVehicle, float fSpeed);
-    static bool SetTrainTrack(CVehicle* pVehicle, uchar ucTrack);
     static bool SetTrainPosition(CVehicle* pVehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color);
     static bool SetVehicleTurretPosition(CVehicle* pVehicle, float fHorizontal, float fVertical);
@@ -549,7 +547,7 @@ public:
     static CWater* CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
     static bool    SetElementWaterLevel(CWater* pWater, float fLevel);
     static bool    SetAllElementWaterLevel(float fLevel);
-    static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel);
+    static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     static bool    ResetWorldWaterLevel();
     static bool    GetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool    SetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
@@ -694,7 +692,6 @@ public:
     static bool      CopyAccountData(CAccount* pAccount, CAccount* pFromAccount);
 
     // Log in/out funcs
-    static bool LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword);
     static bool LogOut(CPlayer* pPlayer);
 
     // Admin funcs

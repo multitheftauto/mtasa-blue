@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CConsoleCommand::CConsoleCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted)
+CConsoleCommand::CConsoleCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, const char* szConsoleHelpText)
 {
     // Init
     m_pHandler = pHandler;
@@ -20,6 +20,7 @@ CConsoleCommand::CConsoleCommand(FCommandHandler* pHandler, const char* szComman
     m_szCommand = new char[strlen(szCommand) + 1];
     strcpy(m_szCommand, szCommand);
     m_bRestricted = bRestricted;
+    m_szConsoleHelpText = szConsoleHelpText;
 }
 
 bool CConsoleCommand::operator()(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
