@@ -186,7 +186,7 @@ unsigned char CStreamingSA::GetUnusedArchive()
     for (size_t i = 6; i < 8; i++)
     {
         if (!GetArchiveInfo(i)->uiStreamHandleId)
-            return i;
+            return (unsigned char)i;
     }
     return -1;
 }
@@ -196,7 +196,7 @@ unsigned char CStreamingSA::GetUnusedStreamHandle()
     for (size_t i = 0; i < VAR_StreamHandlersMaxCount; i++)
     {
         if (m_aStreamingHandlers[i])
-            return i;
+            return (unsigned char)i;
     }
     return -1;
 }
