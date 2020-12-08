@@ -1292,7 +1292,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTWATER:
         {
             Entity.SetDimension(usDimension);
-
             return true;
         }
 
@@ -2714,17 +2713,6 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CClientVehicle& Vehicle, float& f
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetTrainTrack(CClientVehicle& Vehicle, uchar& ucTrack)
-{
-    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
-        return false;
-    else if (Vehicle.IsDerailed())
-        return false;
-
-    ucTrack = Vehicle.GetTrainTrack();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetTrainPosition(CClientVehicle& Vehicle, float& fPosition)
 {
     if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
@@ -3361,17 +3349,6 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CClientVehicle& Vehicle, float fS
         return false;
 
     Vehicle.SetTrainSpeed(fSpeed);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetTrainTrack(CClientVehicle& Vehicle, uchar ucTrack)
-{
-    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
-        return false;
-    else if (Vehicle.IsDerailed())
-        return false;
-
-    Vehicle.SetTrainTrack(ucTrack);
     return true;
 }
 
@@ -6330,9 +6307,9 @@ bool CStaticFunctionDefinitions::GetWaterVertexPosition(CClientWater* pWater, in
     return pWater->GetVertexPosition(iVertexIndex - 1, vecPosition);
 }
 
-bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel)
+bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
-    return g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel);
+    return g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 }
 
 bool CStaticFunctionDefinitions::SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource)
@@ -9761,10 +9738,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     //
     // Server or client side ped & vehicle
     //
-    if (pPed->IsLocalPlayer())
+    if (pPed->IsLocalPlayer() || pPed->IsSyncing())
     {
         // Reset the vehicle in/out checks
-        m_pClientGame->ResetVehicleInOut();
+        pPed->ResetVehicleInOut();
 
         /*
         // Make sure it can be damaged again (doesn't get changed back when we force the player in)
@@ -9784,11 +9761,14 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     CLuaArguments Arguments;
     Arguments.PushElement(pVehicle);            // vehicle
     Arguments.PushNumber(uiSeat);               // seat
-    pPed->CallEvent("onClientPlayerVehicleEnter", Arguments, true);
+    if (IS_PLAYER(pPed))
+        pPed->CallEvent("onClientPlayerVehicleEnter", Arguments, true);
+    else
+        pPed->CallEvent("onClientPedVehicleEnter", Arguments, true);
 
     // Call the onClientVehicleEnter event
     CLuaArguments Arguments2;
-    Arguments2.PushElement(pPed);             // player
+    Arguments2.PushElement(pPed);             // player / ped
     Arguments2.PushNumber(uiSeat);            // seat
     pVehicle->CallEvent("onClientVehicleEnter", Arguments2, true);
 
@@ -9824,10 +9804,10 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CClientPed* pPed)
         // Remove the player from his vehicle
         pPed->RemoveFromVehicle();
         pPed->SetVehicleInOutState(VEHICLE_INOUT_NONE);
-        if (pPed->m_bIsLocalPlayer)
+        if (pPed->m_bIsLocalPlayer || pPed->IsSyncing())
         {
             // Reset expectation of vehicle enter completion, in case we were removed while entering
-            g_pClientGame->ResetVehicleInOut();
+            pPed->ResetVehicleInOut();
         }
 
         // Call onClientPlayerVehicleExit
@@ -9835,11 +9815,14 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CClientPed* pPed)
         Arguments.PushElement(pVehicle);            // vehicle
         Arguments.PushNumber(uiSeat);               // seat
         Arguments.PushBoolean(false);               // jacker
-        pPed->CallEvent("onClientPlayerVehicleExit", Arguments, true);
+        if (IS_PLAYER(pPed))
+            pPed->CallEvent("onClientPlayerVehicleExit", Arguments, true);
+        else
+            pPed->CallEvent("onClientPedVehicleExit", Arguments, true);
 
         // Call onClientVehicleExit
         CLuaArguments Arguments2;
-        Arguments2.PushElement(pPed);             // player
+        Arguments2.PushElement(pPed);             // player / ped
         Arguments2.PushNumber(uiSeat);            // seat
         pVehicle->CallEvent("onClientVehicleExit", Arguments2, true);
         return true;

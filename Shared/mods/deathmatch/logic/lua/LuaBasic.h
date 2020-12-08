@@ -9,6 +9,7 @@
 #pragma once
 #include <optional>
 #include <variant>
+#include <array>
 
 /*
     Basic Lua operations:
@@ -116,6 +117,27 @@ namespace lua
     inline int Push(lua_State* L, const CVector4D& value)
     {
         lua_pushvector(L, value);
+        return 1;
+    }
+
+    inline int Push(lua_State* L, const CMatrix& value)
+    {
+        lua_pushmatrix(L, value);
+        return 1;
+    }
+
+    template <typename T, size_t N>
+    int Push(lua_State* L, const std::array<T, N>& val)
+    {
+        lua_createtable(L, N, 0);
+        lua_Number i = 1;
+        for (const auto& v : val)
+        {
+            Push(L, v);
+            lua_rawseti(L, -2, i++);
+        }
+
+        // Only the table remains on the stack
         return 1;
     }
 

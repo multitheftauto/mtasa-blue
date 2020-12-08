@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CServerTextItemPacket : public CPacket
+class CServerTextItemPacket final : public CPacket
 {
 public:
     CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format,
