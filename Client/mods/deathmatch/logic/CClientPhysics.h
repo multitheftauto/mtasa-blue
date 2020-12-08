@@ -81,10 +81,11 @@ public:
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
 
-    std::vector<std::unique_ptr<CLuaPhysicsShape>>           GetShapes() const { return m_vecShapes; }
-    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies() const { return m_vecRigidBodies; }
-    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
-    std::vector<std::unique_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
+    std::vector<CLuaPhysicsShape*>           GetShapes() const;
+    std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const;
+    std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const;
+    std::vector<CLuaPhysicsConstraint*>      GetConstraints() const;
+
     btDiscreteDynamicsWorld*                                 GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:

@@ -297,58 +297,26 @@ void CClientPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
 
 void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
-    auto it = m_vecRigidBodies.begin();
-    while (it != m_vecRigidBodies.end())
-    {
-        if (pLuaRigidBody == (*it).get())
-            it = m_vecRigidBodies.erase(it);
-        else
-            ++it;
-    }
-
     m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
+    m_vecRigidBodies.erase(std::remove(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), *pLuaRigidBody));
 }
 
 void CClientPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
-    auto it = m_vecShapes.begin();
-    while (it != m_vecShapes.end())
-    {
-        if (pLuaShape == (*it).get())
-            it = m_vecShapes.erase(it);
-        else
-            ++it;
-    }
-
     m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
+    m_vecShapes.erase(std::remove(m_vecShapes.begin(), m_vecShapes.end(), *pLuaShape));
 }
 
 void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
 {
-    auto it = m_vecConstraints.begin();
-    while (it != m_vecConstraints.end())
-    {
-        if (pLuaConstraint == (*it).get())
-            it = m_vecConstraints.erase(it);
-        else
-            ++it;
-    }
-
     m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
+    m_vecConstraints.erase(std::remove(m_vecConstraints.begin(), m_vecConstraints.end(), *pLuaConstraint));
 }
 
 void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    auto it = m_vecStaticCollisions.begin();
-    while (it != m_vecStaticCollisions.end())
-    {
-        if (pStaticCollision == (*it).get())
-            it = m_vecStaticCollisions.erase(it);
-        else
-            ++it;
-    }
-
     m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
+    m_vecStaticCollisions.erase(std::remove(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(), *pStaticCollision));
 }
 
 void CClientPhysics::AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
@@ -680,6 +648,50 @@ void CClientPhysics::ProcessCollisions()
             }
         }
     }
+}
+
+std::vector<CLuaPhysicsShape*> CClientPhysics::GetShapes() const
+{
+    std::vector<CLuaPhysicsShape*> shapes(m_vecShapes.size());
+    for (auto const& i : m_vecShapes)
+    {
+        shapes.push_back(i.get());
+    }
+
+    return shapes;
+}
+
+std::vector<CLuaPhysicsRigidBody*> CClientPhysics::GetRigidBodies() const
+{
+    std::vector<CLuaPhysicsRigidBody*> rigidBodies(m_vecRigidBodies.size());
+    for (auto const& i : m_vecRigidBodies)
+    {
+        rigidBodies.push_back(i.get());
+    }
+
+    return rigidBodies;
+}
+
+std::vector<CLuaPhysicsStaticCollision*> CClientPhysics::GetStaticCollisions() const
+{
+    std::vector<CLuaPhysicsStaticCollision*> staticCollisions(m_vecStaticCollisions.size());
+    for (auto const& i : m_vecStaticCollisions)
+    {
+        staticCollisions.push_back(i.get());
+    }
+
+    return staticCollisions;
+}
+
+std::vector<CLuaPhysicsConstraint*> CClientPhysics::GetConstraints() const
+{
+    std::vector<CLuaPhysicsConstraint*> constraints(m_vecConstraints.size());
+    for (auto const& i : m_vecConstraints)
+    {
+        constraints.push_back(i.get());
+    }
+
+    return constraints;
 }
 
 void CClientPhysics::DoPulse()
