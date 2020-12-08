@@ -62,12 +62,12 @@ public:
     static bool EngineAddImage(CClientIMG* pImg);
     static bool EngineRemoveImage(CClientIMG* pImg);
     static uint EngineImageGetFilesCount(CClientIMG* pImg);
-    static bool EngineImageLinkDFF(CClientIMG* pImg, std::variant<std::string_view, size_t> file, uint uiModelID);
-    static bool EngineImageLinkTXD(CClientIMG* pImg, std::variant<std::string_view, size_t> file, uint uiModelID);
+    static bool EngineImageLinkDFF(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiModelID);
+    static bool EngineImageLinkTXD(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiModelID);
     static bool EngineRestoreDFFImage(uint uiModelID);
     static bool EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string_view> EngineImageGetFileList(CClientIMG* pImg);
-    static std::string              EngineImageGetFile(CClientIMG* pImg, std::variant<std::string_view, size_t> file);
+    static std::string              EngineImageGetFile(CClientIMG* pImg, std::variant<size_t, std::string_view> file);
     static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);

@@ -603,7 +603,7 @@ std::vector<std::string_view> CLuaEngineDefs::EngineImageGetFileList(CClientIMG*
     return out;
 }
 
-static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<std::string_view, size_t> file)
+static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
 {
     if (std::holds_alternative<size_t>(file))
         return std::get<size_t>(file);
@@ -614,7 +614,7 @@ static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<std::string_view, 
     throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)fileName.length(), fileName.data()));
 }
 
-std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<std::string_view, size_t> file)
+std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
 {
     std::string buffer;
 
@@ -624,14 +624,14 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<st
     return buffer;
 }
 
-bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<std::string_view, size_t> file, uint uiModelID)
+bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiModelID)
 {
     if (uiModelID >= 20000)
         throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
     return pIMG->LinkModel(uiModelID, ResolveIMGFileID(pIMG, file));
 }
 
-bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<std::string_view, size_t> file, uint uiTxdID)
+bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
     if (uiTxdID >= 5000)
         throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
