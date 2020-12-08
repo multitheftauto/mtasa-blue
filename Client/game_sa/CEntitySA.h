@@ -198,6 +198,7 @@ public:
     void        TransformFromObjectSpace(CVector& outPosn, CVector const& offset);
     CVector*    GetBoundCentre(CVector* pOutCentre);
     void        UpdateRW();
+    void        UpdateRpHAnim();
     static void StaticSetHooks();
 
     //
@@ -245,7 +246,7 @@ public:
 
     bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
     void UpdateRpHAnim();
-    bool SetScale(const CVector& scale);
+    bool SetScaleInternal(const CVector& scale);
     VOID SetPosition(float fX, float fY, float fZ);
     VOID Teleport(float fX, float fY, float fZ);
     VOID ProcessControl();

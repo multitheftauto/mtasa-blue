@@ -33,6 +33,11 @@ void CEntitySAInterface::UpdateRW()
     ((void(__thiscall*)(CEntitySAInterface*))0x446F90)(this);
 }
 
+void CEntitySAInterface::UpdateRpHAnim()
+{
+    ((void(__thiscall*)(CEntitySAInterface*))0x532B20)(this);
+}
+
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 {
     CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
@@ -74,11 +79,10 @@ CEntitySA::CEntitySA()
 
 void CEntitySA::UpdateRpHAnim()
 {
-    auto CEntity_UpdateRpHAnim = (void(__thiscall*)(CEntitySAInterface*))0x532B20;
-    CEntity_UpdateRpHAnim(m_pInterface);
+    m_pInterface->UpdateRpHAnim();
 }
 
-bool CEntitySA::SetScale(const CVector& scale)
+bool CEntitySA::SetScaleInternal(const CVector& scale)
 {
     m_pInterface->UpdateRW();
     RpClump* clump = GetRpClump();
