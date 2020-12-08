@@ -1924,8 +1924,14 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     {
         pPed->SetIsDead(true);
         pPed->SetPosition(Packet.m_vecPosition);
+
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPed->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -1977,8 +1983,13 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPlayer->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -2814,7 +2825,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                 }
 
                 // Check we have a valid ped & he is spawned
-                if (bValidPed && pPed->IsSpawned())
+                if (bValidPed)
                 {
                     // Handle it depending on the action
                     switch (ucAction)
