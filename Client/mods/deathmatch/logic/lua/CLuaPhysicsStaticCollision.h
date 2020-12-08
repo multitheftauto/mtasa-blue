@@ -11,8 +11,6 @@
 
 class CLuaPhysicsElement;
 class CLuaPhysicsStaticCollision;
-class btHeightfieldTerrainShape;
-class heightfieldTerrainShape;
 
 #pragma once
 

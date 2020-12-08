@@ -11,6 +11,8 @@
 
 class CLuaPhysicsRigidBody;
 
+#include "lua/CLuaPhysicsElement.h";
+
 #pragma once
 
 // Define includes

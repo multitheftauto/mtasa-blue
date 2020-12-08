@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 class CLuaPhysicsElement;
-class btHeightfieldTerrainShape;
-class heightfieldTerrainShape;
 
 #pragma once
 

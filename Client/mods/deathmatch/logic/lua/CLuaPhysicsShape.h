@@ -20,6 +20,8 @@ class CLuaPhysicsElement;
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsShape.h"
 
+class heightfieldTerrainShape;
+
 class CLuaPhysicsShape : public CLuaPhysicsElement
 {
 public:

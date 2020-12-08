@@ -9,14 +9,15 @@
  *
  *****************************************************************************/
 
+#include "lua/CLuaPhysicsShape.h"
+#include "lua/CLuaPhysicsStaticCollision.h"
+#include "lua/CLuaPhysicsCompoundShape.h"
+#include "lua/CLuaPhysicsPointToPointConstraint.h"
+#include "lua/CLuaPhysicsRigidBody.h"
+
 #pragma once
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
-
-class CLuaPhysicsElement;
-class CLuaPhysicsCompoundShape;
-class CLuaPhysicsShape;
-class CLuaPhysicsPointToPointConstraint;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {

@@ -16,6 +16,7 @@ class CLuaPhysicsPointToPointConstraint;
 // Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
+#include "lua/CLuaPhysicsConstraint.h"
 
 enum ePhysicsConstraint;
 

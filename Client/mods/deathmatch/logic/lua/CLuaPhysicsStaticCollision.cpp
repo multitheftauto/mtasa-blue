@@ -19,7 +19,6 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
 {
     m_btCollisionObject = std::make_unique<btCollisionObject>();
     m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
-    pShape->AddStaticCollision(this);
     m_btCollisionObject->setUserPointer((void*)this);
     GetPhysics()->GetDynamicsWorld()->addCollisionObject(GetCollisionObject());
     pShape->AddStaticCollision(this);
