@@ -40,7 +40,7 @@ public:
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
 
-    void AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
+    CLuaPhysicsShape* AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
     void AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
     void AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
     void AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);

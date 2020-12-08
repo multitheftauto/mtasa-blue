@@ -1949,6 +1949,7 @@ std::vector<CLuaPhysicsStaticCollision*> CLuaPhysicsDefs::PhysicsGetStaticCollis
 {
     return pPhysics->GetStaticCollisions();
 }
+
 std::vector<CLuaPhysicsConstraint*> CLuaPhysicsDefs::PhysicsGetConstraints(CClientPhysics* pPhysics)
 {
     return pPhysics->GetConstraints();

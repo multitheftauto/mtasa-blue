@@ -102,7 +102,8 @@ std::unique_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollisio
     if (pShape.get() == nullptr)
         return std::unique_ptr<CLuaPhysicsStaticCollision>(nullptr);
 
-    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShape.get());
+    CLuaPhysicsShape* pShapePtr = AddShape(std::move(pShape));
+    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShapePtr);
     pStaticCollision->SetPosition(vecPosition);
     pStaticCollision->SetRotation(vecRotation);
     return pStaticCollision;
@@ -157,7 +158,7 @@ std::unique_ptr<CLuaPhysicsShape> CClientPhysics::CreateShapeFromModel(unsigned 
         pCompoundShape->AddShape(new CLuaPhysicsTriangleMeshShape(this, vecIndices), CVector(0, 0, 0));
     }
 
-    return pCompoundShape;
+    return std::move(pCompoundShape);
 }
 
 void CClientPhysics::StartBuildCollisionFromGTA()
@@ -356,10 +357,12 @@ void CClientPhysics::AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollisi
     m_vecStaticCollisions.push_back(std::move(pStaticCollision));
 }
 
-void CClientPhysics::AddShape(std::unique_ptr<CLuaPhysicsShape> pShape)
+CLuaPhysicsShape* CClientPhysics::AddShape(std::unique_ptr<CLuaPhysicsShape> pShape)
 {
+    CLuaPhysicsShape* pShapePtr = pShape.get();
     m_pLuaMain->GetPhysicsShapeManager()->AddShape(pShape.get());
     m_vecShapes.push_back(std::move(pShape));
+    return pShapePtr;
 }
 
 void CClientPhysics::AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody)
