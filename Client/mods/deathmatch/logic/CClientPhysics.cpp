@@ -101,16 +101,22 @@ void CClientPhysics::SetUseContinous(bool bUse)
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
 
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
+{
+    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShape);
+    pStaticCollision->SetPosition(vecPosition);
+    pStaticCollision->SetRotation(vecRotation);
+    return AddStaticCollision(std::move(pStaticCollision));
+}
+
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
 {
     CLuaPhysicsShape* pShape = CreateShapeFromModel(usModelId);
     if (pShape == nullptr)
         return nullptr;
 
-    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShape);
-    pStaticCollision->SetPosition(vecPosition);
-    pStaticCollision->SetRotation(vecRotation);
-    return AddStaticCollision(std::move(pStaticCollision));
+    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision(pShape, vecPosition, vecRotation);
+    return pStaticCollision;
 }
 
 CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
