@@ -17,19 +17,20 @@
 #include "CLuaPhysicsShapeManager.h"
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btConvexPolyhedron.h"
 
-CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
+CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<btCollisionShape> pShape) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
 {
-    m_heightfieldTerrainData = nullptr;
+    m_pBtShape = std::move(pShape);
+    m_pBtShape->setUserPointer((void*)this);
+}
+
+CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<heightfieldTerrainShape> pHeightfieldTerrainShape) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
+{
+    m_pBtShape = std::move(pHeightfieldTerrainShape->pHeightfieldTerrainShape);
+    m_pBtShape->setUserPointer((void*)this);
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
-}
-
-void CLuaPhysicsShape::Initialization(std::unique_ptr<btCollisionShape> pShape)
-{
-    pShape->setUserPointer((void*)this);
-    m_pBtShape = std::move(pShape);
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)

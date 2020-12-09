@@ -162,7 +162,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
                     argStream.SetCustomError(SString("Maximum radius must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
                     break;
                 }
-                pShape = new CLuaPhysicsSphereShape(pPhysics, fRadius);
+                pShape = pPhysics->CreateSphereShape(fRadius);
             }
             break;
         case PHYSICS_SHAPE_CAPSULE:
@@ -182,7 +182,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
                         SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
                     break;
                 }
-                pShape = new CLuaPhysicsCapsuleShape(pPhysics, fRadius, fHeight);
+                pShape = pPhysics->CreateCapsuleShape(fRadius, fHeight);
             }
             break;
         case PHYSICS_SHAPE_CONE:
@@ -202,7 +202,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
                         SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
                     break;
                 }
-                pShape = new CLuaPhysicsConeShape(pPhysics, fRadius, fHeight);
+                pShape = pPhysics->CreateConeShape(fRadius, fHeight);
             }
             break;
         case PHYSICS_SHAPE_CYLINDER:
@@ -222,7 +222,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
                         SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
                     break;
                 }
-                pShape = new CLuaPhysicsCylinderShape(pPhysics, CVector(fRadius, fHeight, fRadius));
+                pShape = pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
             }
             break;
         case PHYSICS_SHAPE_COMPOUND:
@@ -231,7 +231,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
             {
                 if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 512)
                 {
-                    pShape = new CLuaPhysicsCompoundShape(pPhysics, fInitialChildCapacity);
+                    pShape = pPhysics->CreateCompoundShape(fInitialChildCapacity);
                 }
                 else
                 {
@@ -247,9 +247,9 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
             }
             if (!argStream.HasErrors())
             {
-                if (vecList.size() >= 3)
+                if (vecList.size() > 2)
                 {
-                    pShape = new CLuaPhysicsConvexHullShape(pPhysics, vecList);
+                    pShape = pPhysics->CreateConvexHullShape(vecList);
                 }
                 else
                 {
@@ -293,7 +293,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
                     argStream.SetCustomError("Triangle mesh needs vertices count divisible by 3");
                     break;
                 }
-                pShape = new CLuaPhysicsTriangleMeshShape(pPhysics, vecList);
+                pShape = pPhysics->CreateTriangleMeshShape(vecList);
             }
             break;
         case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
@@ -311,7 +311,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysi
                 {
                     if (vecFloat.size() == iSizeX * iSizeY)
                     {
-                        pShape = new CLuaPhysicsHeightfieldTerrainShape(pPhysics, iSizeX, iSizeY, vecFloat);
+                        pShape = pPhysics->CreateHeightfieldTerrainShape(iSizeX, iSizeY, vecFloat);
                     }
                     else
                     {
@@ -618,9 +618,8 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* 
     if (fMass < 0)
         throw std::invalid_argument("Mass can not be negative");
 
-    CClientPhysics*       pPhysics = pShape->GetPhysics();
-    CLuaPhysicsRigidBody* pRigidBody =
-        pPhysics->CreateRigidBody(pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)), vecCenterOfMass.value_or(CVector(0, 0, 0)));
+    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)),
+                                                                             vecCenterOfMass.value_or(CVector(0, 0, 0)));
     lua_pushrigidbody(luaVM, pRigidBody);
 }
 

@@ -14,10 +14,8 @@
 #include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsCapsuleShape.h"
 
-CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CClientPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CClientPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight)))
 {
-    std::unique_ptr<btCapsuleShape> capsuleCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
-    Initialization(std::move(capsuleCollisionShape));
 }
 
 CLuaPhysicsCapsuleShape::~CLuaPhysicsCapsuleShape()

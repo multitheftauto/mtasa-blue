@@ -14,10 +14,8 @@
 #include "CLuaPhysicsTriangleMeshShape.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsTriangleMeshShape::CLuaPhysicsTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecIndices) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsTriangleMeshShape::CLuaPhysicsTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecIndices) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices)))
 {
-    std::unique_ptr<btBvhTriangleMeshShape> pTriangleMeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
-    Initialization(std::move(pTriangleMeshShape));
 }
 
 CLuaPhysicsTriangleMeshShape::~CLuaPhysicsTriangleMeshShape()

@@ -14,10 +14,8 @@
 #include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsConeShape.h"
 
-CLuaPhysicsConeShape::CLuaPhysicsConeShape(CClientPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsConeShape::CLuaPhysicsConeShape(CClientPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight)))
 {
-    std::unique_ptr<btConeShape> coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
-    Initialization(std::move(coneCollisionShape));
 }
 
 CLuaPhysicsConeShape::~CLuaPhysicsConeShape()

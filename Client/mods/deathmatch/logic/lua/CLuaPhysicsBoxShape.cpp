@@ -14,10 +14,8 @@
 #include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsBoxShape.h"
 
-CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CClientPhysics* pPhysics, CVector half) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CClientPhysics* pPhysics, CVector half) : CLuaPhysicsShape(pPhysics, CLuaPhysicsSharedLogic::CreateBox(half))
 {
-    std::unique_ptr<btBoxShape> boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
-    Initialization(std::move(boxCollisionShape));
 }
 
 bool CLuaPhysicsBoxShape::SetSize(CVector& vecSize)

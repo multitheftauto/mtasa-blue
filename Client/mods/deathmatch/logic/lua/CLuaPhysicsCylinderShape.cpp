@@ -14,10 +14,9 @@
 #include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsCylinderShape.h"
 
-CLuaPhysicsCylinderShape::CLuaPhysicsCylinderShape(CClientPhysics* pPhysics, CVector half) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsCylinderShape::CLuaPhysicsCylinderShape(CClientPhysics* pPhysics, CVector half)
+    : CLuaPhysicsShape(pPhysics, CLuaPhysicsSharedLogic::CreateCylinder(half))
 {
-    std::unique_ptr<btCylinderShape> cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
-    Initialization(std::move(cylinderCollisionShape));
 }
 
 CLuaPhysicsCylinderShape::~CLuaPhysicsCylinderShape()

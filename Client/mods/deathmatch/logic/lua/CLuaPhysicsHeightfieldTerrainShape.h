@@ -25,5 +25,5 @@ public:
 
 
 private:
-    std::unique_ptr<heightfieldTerrainShape> m_heightfieldTerrainData;
+    std::vector<float> m_heightfieldTerrainData;
 };

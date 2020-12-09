@@ -14,10 +14,8 @@
 #include "CLuaPhysicsShapeManager.h"
 #include "CLuaPhysicsConvexHullShape.h"
 
-CLuaPhysicsConvexHullShape::CLuaPhysicsConvexHullShape(CClientPhysics* pPhysics, std::vector<CVector>& vecPoints) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsConvexHullShape::CLuaPhysicsConvexHullShape(CClientPhysics* pPhysics, std::vector<CVector>& vecPoints) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints)))
 {
-    std::unique_ptr<btConvexHullShape> pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
-    Initialization(std::move(pConvexHull));
 }
 
 CLuaPhysicsConvexHullShape::~CLuaPhysicsConvexHullShape()

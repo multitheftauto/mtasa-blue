@@ -15,11 +15,9 @@
 #include "CLuaPhysicsHeightfieldTerrainShape.h"
 
 CLuaPhysicsHeightfieldTerrainShape::CLuaPhysicsHeightfieldTerrainShape(CClientPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
-    : CLuaPhysicsShape(pPhysics)
+    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData)))
 {
-    std::unique_ptr<heightfieldTerrainShape> pHeightfieldTerrain = CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData);
-    Initialization(std::move(pHeightfieldTerrain->pHeightfieldTerrainShape));
-    m_heightfieldTerrainData = std::move(pHeightfieldTerrain);
+    m_heightfieldTerrainData = vecHeightData;
 }
 
 CLuaPhysicsHeightfieldTerrainShape::~CLuaPhysicsHeightfieldTerrainShape()

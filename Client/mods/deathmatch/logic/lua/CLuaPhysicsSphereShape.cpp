@@ -14,10 +14,9 @@
 #include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsSphereShape.h"
 
-CLuaPhysicsSphereShape::CLuaPhysicsSphereShape(CClientPhysics* pPhysics, float fRadius) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsSphereShape::CLuaPhysicsSphereShape(CClientPhysics* pPhysics, float fRadius)
+    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateSphere(fRadius)))
 {
-    std::unique_ptr<btSphereShape> pSphere = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-    Initialization(std::move(pSphere));
 }
 
 CLuaPhysicsSphereShape::~CLuaPhysicsSphereShape()

@@ -25,12 +25,11 @@ class heightfieldTerrainShape;
 class CLuaPhysicsShape : public CLuaPhysicsElement
 {
 protected:
-    CLuaPhysicsShape(CClientPhysics* pPhysics);
+    CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<btCollisionShape> pShape);
+    CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<heightfieldTerrainShape> pHeightfieldTerrainShape);
 
 public:
     ~CLuaPhysicsShape();
-
-    void Initialization(std::unique_ptr<btCollisionShape> pShape);
 
     btCollisionShape*              GetBtShape() const { return m_pBtShape.get(); }
     void                           AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
@@ -51,7 +50,6 @@ public:
 
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;
-    heightfieldTerrainShape* m_heightfieldTerrainData = nullptr;
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;

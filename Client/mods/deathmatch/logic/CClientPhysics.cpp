@@ -23,6 +23,12 @@
 #include "lua/CLuaPhysicsCompoundShape.h"
 #include "lua/CLuaPhysicsBoxShape.h"
 #include "lua/CLuaPhysicsSphereShape.h"
+#include "lua/CLuaPhysicsCapsuleShape.h"
+#include "lua/CLuaPhysicsConeShape.h"
+#include "lua/CLuaPhysicsCylinderShape.h"
+#include "lua/CLuaPhysicsCompoundShape.h"
+#include "lua/CLuaPhysicsConvexHullShape.h"
+#include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
 #include "lua/CLuaPhysicsTriangleMeshShape.h"
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
@@ -716,6 +722,72 @@ CLuaPhysicsBoxShape* CClientPhysics::CreateBoxShape(CVector vector)
 {
     std::unique_ptr<CLuaPhysicsBoxShape> pShape = std::make_unique<CLuaPhysicsBoxShape>(this, vector);
     return (CLuaPhysicsBoxShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsSphereShape* CClientPhysics::CreateSphereShape(float radius)
+{
+    assert(radius <= 0);
+
+    std::unique_ptr<CLuaPhysicsSphereShape> pShape = std::make_unique<CLuaPhysicsSphereShape>(this, radius);
+    return (CLuaPhysicsSphereShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsCapsuleShape* CClientPhysics::CreateCapsuleShape(float fRadius, float fHeight)
+{
+    assert(fRadius <= 0);
+    assert(fHeight <= 0);
+
+    std::unique_ptr<CLuaPhysicsCapsuleShape> pShape = std::make_unique<CLuaPhysicsCapsuleShape>(this, fRadius, fHeight);
+    return (CLuaPhysicsCapsuleShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsConeShape* CClientPhysics::CreateConeShape(float fRadius, float fHeight)
+{
+    assert(fRadius <= 0);
+    assert(fHeight <= 0);
+
+    std::unique_ptr<CLuaPhysicsConeShape> pShape = std::make_unique<CLuaPhysicsConeShape>(this, fRadius, fHeight);
+    return (CLuaPhysicsConeShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsCylinderShape* CClientPhysics::CreateCylinderShape(CVector half)
+{
+    assert(half.fX <= 0);
+    assert(half.fY <= 0);
+    assert(half.fZ <= 0);
+
+    std::unique_ptr<CLuaPhysicsCylinderShape> pShape = std::make_unique<CLuaPhysicsCylinderShape>(this, half);
+    return (CLuaPhysicsCylinderShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsCompoundShape* CClientPhysics::CreateCompoundShape(int iInitialChildCapacity)
+{
+    assert(iInitialChildCapacity < 0);
+
+    std::unique_ptr<CLuaPhysicsCompoundShape> pShape = std::make_unique<CLuaPhysicsCompoundShape>(this, iInitialChildCapacity);
+    return (CLuaPhysicsCompoundShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsConvexHullShape* CClientPhysics::CreateConvexHullShape(std::vector<CVector>& vecPoints)
+{
+    assert(vecPoints.size() < 3);
+
+    std::unique_ptr<CLuaPhysicsConvexHullShape> pShape = std::make_unique<CLuaPhysicsConvexHullShape>(this, vecPoints);
+    return (CLuaPhysicsConvexHullShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsTriangleMeshShape* CClientPhysics::CreateTriangleMeshShape(std::vector<CVector>& vecVertices)
+{
+    assert(vecVertices.size() < 3);
+
+    std::unique_ptr<CLuaPhysicsTriangleMeshShape> pShape = std::make_unique<CLuaPhysicsTriangleMeshShape>(this, vecVertices);
+    return (CLuaPhysicsTriangleMeshShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsHeightfieldTerrainShape* CClientPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecFloat)
+{
+    std::unique_ptr<CLuaPhysicsHeightfieldTerrainShape> pShape = std::make_unique<CLuaPhysicsHeightfieldTerrainShape>(this, iSizeX, iSizeY, vecFloat);
+    return (CLuaPhysicsHeightfieldTerrainShape*)AddShape(std::move(pShape));
 }
 
 CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)

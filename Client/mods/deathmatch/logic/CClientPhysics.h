@@ -18,6 +18,14 @@ class CClientPhysics;
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 
 #include "lua/CLuaPhysicsBoxShape.h"
+#include "lua/CLuaPhysicsSphereShape.h"
+#include "lua/CLuaPhysicsCapsuleShape.h"
+#include "lua/CLuaPhysicsConeShape.h"
+#include "lua/CLuaPhysicsCylinderShape.h"
+#include "lua/CLuaPhysicsCompoundShape.h"
+#include "lua/CLuaPhysicsConvexHullShape.h"
+#include "lua/CLuaPhysicsTrianglemeshShape.h"
+#include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
 #include "lua/CLuaPhysicsPointToPointConstraint.h"
 
 enum ePhysicsDebugMode;
@@ -87,6 +95,14 @@ public:
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
     CLuaPhysicsBoxShape* CreateBoxShape(CVector vector);
+    CLuaPhysicsSphereShape* CreateSphereShape(float radius);
+    CLuaPhysicsCapsuleShape* CreateCapsuleShape(float fRadius, float fHeight);
+    CLuaPhysicsConeShape*    CreateConeShape(float fRadius, float fHeight);
+    CLuaPhysicsCylinderShape* CreateCylinderShape(CVector half);
+    CLuaPhysicsCompoundShape* CreateCompoundShape(int iInitialChildCapacity = 0);
+    CLuaPhysicsConvexHullShape* CreateConvexHullShape(std::vector<CVector>& vecPoints);
+    CLuaPhysicsTriangleMeshShape* CreateTriangleMeshShape(std::vector<CVector>& vecVertices);
+    CLuaPhysicsHeightfieldTerrainShape* CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecFloat);
 
     // Links two bodies together
     CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA,

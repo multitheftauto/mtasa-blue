@@ -14,10 +14,8 @@
 #include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsCompoundShape.h"
 
-CLuaPhysicsCompoundShape::CLuaPhysicsCompoundShape(CClientPhysics* pPhysics, int iInitialChildCapacity) : CLuaPhysicsShape(pPhysics)
+CLuaPhysicsCompoundShape::CLuaPhysicsCompoundShape(CClientPhysics* pPhysics, int iInitialChildCapacity) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCompound()))
 {
-    std::unique_ptr<btCompoundShape> pCompoundShape = CLuaPhysicsSharedLogic::CreateCompound();
-    Initialization(std::move(pCompoundShape));
 }
 
 CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
