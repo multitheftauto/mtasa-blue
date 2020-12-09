@@ -233,6 +233,7 @@ void CLuaManager::LoadCFunctions()
         {"getServerPassword", CLuaFunctionDefs::GetServerPassword},
         {"setServerPassword", CLuaFunctionDefs::SetServerPassword},
         {"getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting},
+        {"getServerEnvironmentValue", CLuaFunctionDefs::GetServerEnvironmentValue},
         {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
 
         // Loaded map funcs

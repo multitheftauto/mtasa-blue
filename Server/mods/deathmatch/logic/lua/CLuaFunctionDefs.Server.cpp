@@ -686,6 +686,25 @@ int CLuaFunctionDefs::SetServerConfigSetting(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetServerEnvironmentValue(lua_State* luaVM)
+{
+    SString strName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strName);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushstring(luaVM, getenv(strName));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::shutdown(lua_State* luaVM)
 {
     SString strReason;
