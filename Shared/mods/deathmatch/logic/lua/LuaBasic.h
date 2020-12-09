@@ -20,6 +20,10 @@
 class CVector2D;
 class CVector;
 class CVector4D;
+class CLuaPhysicsShape;
+class CLuaPhysicsRigidBody;
+class CLuaPhysicsStaticCollision;
+class CLuaPhysicsConstraint;
 
 namespace lua
 {
@@ -123,6 +127,12 @@ namespace lua
     inline int Push(lua_State* L, const CMatrix& value)
     {
         lua_pushmatrix(L, value);
+        return 1;
+    }
+    
+    inline int Push(lua_State* L, CLuaPhysicsShape* value)
+    {
+        lua_pushshape(L, value);
         return 1;
     }
 
