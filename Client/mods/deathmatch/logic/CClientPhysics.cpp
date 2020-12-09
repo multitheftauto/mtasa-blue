@@ -157,7 +157,7 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
     for (uint i = 0; pColData->numColSpheres > i; i++)
     {
         pColSphere = pColData->pColSpheres[i];
-        pCompoundShape->AddShape(new CLuaPhysicsSphereShape(this, pColSphere.fRadius), position);
+        pCompoundShape->AddShape(CreateSphereShape(pColSphere.fRadius), position);
     }
 
     if (pColData->numColTriangles > 0)
@@ -171,7 +171,7 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
             vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
         }
 
-        pCompoundShape->AddShape(new CLuaPhysicsTriangleMeshShape(this, vecIndices), CVector(0, 0, 0));
+        pCompoundShape->AddShape(CreateTriangleMeshShape(vecIndices), CVector(0, 0, 0));
     }
 
     return AddShape(std::move(pCompoundShape));
