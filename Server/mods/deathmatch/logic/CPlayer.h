@@ -65,7 +65,7 @@ struct SScreenShotInfo
     CBuffer   buffer;
 };
 
-class CPlayer : public CPed, public CClient
+class CPlayer final : public CPed, public CClient
 {
     friend class CElement;
     friend class CScriptDebugging;
