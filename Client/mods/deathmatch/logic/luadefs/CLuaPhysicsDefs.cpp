@@ -51,8 +51,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetRigidBodies", ArgumentParser<PhysicsGetRigidBodies>},
         {"physicsGetStaticCollisions", ArgumentParser<PhysicsGetStaticCollisions>},
         {"physicsGetConstraints", ArgumentParser<PhysicsGetConstraints>},
-        {"physicsSetProperties", PhysicsSetProperties},
-        {"physicsGetProperties", PhysicsGetProperties},
+        //{"physicsSetProperties", ArgumentParser<PhysicsSetWorldProperties, PhysicsSetRigidBodyProperties, PhysicsSetStaticCollisionProperties>},
+        //{"physicsGetProperties", ArgumentParser<PhysicsGetWorldProperties, PhysicsGetRigidBodyProperties, PhysicsGetStaticCollisionProperties>},
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsGetDebugMode", PhysicsGetDebugMode},
@@ -60,7 +60,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyVelocityForce", ArgumentParser<PhysicsApplyVelocityForce>},
         {"physicsApplyVelocity", ArgumentParser<PhysicsApplyVelocity>},
         {"physicsApplyAngularVelocity", ArgumentParser<PhysicsApplyAngularVelocity>},
-        {"physicsApplyAngularVelocityForce", ArgumentParser<PhysicsApplyAngularVelocityForce > },
+        {"physicsApplyAngularVelocityForce", ArgumentParser<PhysicsApplyAngularVelocityForce>},
         {"physicsApplyDamping", ArgumentParser<PhysicsApplyDamping>},
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
@@ -619,8 +619,8 @@ int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
     return 1;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
-                                                              std::optional<CVector> vecCenterOfMass)
+int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
+                                            std::optional<CVector> vecCenterOfMass)
 {
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Terrain shape is not supported");
@@ -628,27 +628,30 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     if (fMass <= 0)
         throw std::invalid_argument("Mass must bet greater than 0");
 
-    CClientPhysics*       pPhysics = pShape->GetPhysics();
-    std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody = std::make_unique<CLuaPhysicsRigidBody>(pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)), vecCenterOfMass.value_or(CVector(0, 0, 0)));
+    CClientPhysics*                       pPhysics = pShape->GetPhysics();
+    std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody = std::make_unique<CLuaPhysicsRigidBody>(
+        pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)), vecCenterOfMass.value_or(CVector(0, 0, 0)));
     CLuaPhysicsRigidBody* pRigidBodyPtr = pRigidBody.get();
     pPhysics->AddRigidBody(std::move(pRigidBody));
-    return pRigidBodyPtr;
+    lua_pushrigidbody(luaVM, pRigidBodyPtr);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel)
+int CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel)
 {
-//    return pPhysics->CreateShapeFromModel(usModel);
-    return nullptr;
+    CLuaPhysicsShape* pShape = pPhysics->CreateShapeFromModel(usModel);
+    lua_pushshape(luaVM, pShape);
+    return 1;
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape)
+int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape)
 {
-    CClientPhysics*             pPhysics = pShape->GetPhysics();
     CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
-    return pStaticCollision;
+    lua_pushstaticcollision(luaVM, pStaticCollision);
+    return 1;
 }
 
-bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition, std::optional<CVector> vecRotation)
+bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
+                                           std::optional<CVector> vecRotation)
 {
     if (pCompoundShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
@@ -735,1000 +738,847 @@ bool CLuaPhysicsDefs::PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBo
     return true;
 }
 
-int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument)
 {
-    CClientPhysics*             pPhysics = nullptr;
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
-    CLuaPhysicsShape*           pShape = nullptr;
-
-    ePhysicsProperty eProperty;
-    CScriptArgReader argStream(luaVM);
-
-    if (argStream.NextIsUserDataOfType<CClientPhysics>())
-        argStream.ReadUserData(pPhysics);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-        argStream.ReadUserData(pRigidBody);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
-        argStream.ReadUserData(pStaticCollision);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
-        argStream.ReadUserData(pStaticConstraint);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
-        argStream.ReadUserData(pShape);
-
-    argStream.ReadEnumString(eProperty);
-    if (!argStream.HasErrors())
+    switch (eProperty)
     {
-        bool    boolean;
-        CVector vector;
-        float   floatNumber[2];
-        int     intNumber;
-        SColor  color;
+        case PHYSICS_PROPERTY_GRAVITY:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                pPhysics->SetGravity(std::get<CVector>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_USE_CONTINOUS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetUseContinous(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_SIMULATION_ENABLED:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetSimulationEnabled(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_SUBSTEPS:
+            if (std::holds_alternative<int>(argument))
+            {
+                int subSteps = std::get<int>(argument);
+                if (subSteps >= 1 && subSteps <= 256)
+                {
+                    pPhysics->SetSubSteps(subSteps);
+                    return true;
+                }
+                else
+                {
+                    throw std::invalid_argument("Substeps must be between 1 and 256");
+                }
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_TRIGGEREVENTS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetTriggerEvents(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetTriggerCollisionEvents(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetTriggerConstraintEvents(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            return false;
+        case PHYSICS_PROPERTY_WORLDSIZE:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                CVector size = std::get<CVector>(argument);
 
-        if (pPhysics)
-        {
-            switch (eProperty)
-            {
-                case PHYSICS_PROPERTY_GRAVITY:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pPhysics->SetGravity(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_USE_CONTINOUS:
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        pPhysics->SetUseContinous(boolean);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SIMULATION_ENABLED:
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        pPhysics->SetSimulationEnabled(boolean);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SUBSTEPS:
-                    argStream.ReadNumber(intNumber);
-                    if (!argStream.HasErrors())
-                    {
-                        if (intNumber >= 1 && intNumber <= 256)
-                        {
-                            pPhysics->SetSubSteps(intNumber);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Substeps must be between 1 and 256");
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_TRIGGEREVENTS:
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        pPhysics->SetTriggerEvents(boolean);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        pPhysics->SetTriggerCollisionEvents(boolean);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        pPhysics->SetTriggerConstraintEvents(boolean);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_WORLDSIZE:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        if (vector.fX >= 1 && vector.fY >= 1 && vector.fZ >= 1)
-                        {
-                            pPhysics->SetWorldSize(vector);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("World size can not be smaller than cube 1x1x1");
-                        }
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
+                if (size.fX >= 1 && size.fY >= 1 && size.fZ >= 1)
+                {
+                    pPhysics->SetWorldSize(size);
+                    return true;
+                }
+                else
+                {
+                    throw std::invalid_argument("World size can not be smaller than cube 1x1x1");
+                }
             }
-        }
-        else if (pRigidBody)
-        {
-            switch (eProperty)
-            {
-                case PHYSICS_PROPERTY_SLEEP:
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        if (!boolean)
-                        {
-                            pRigidBody->Activate();
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_MASS:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] >= 0)
-                        {
-                            pRigidBody->SetMass(floatNumber[0]);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Mass can not be negative");
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_POSITION:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->SetPosition(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_ROTATION:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->SetRotation(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                case PHYSICS_PROPERTY_VELOCITY:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->SetLinearVelocity(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->SetAngularVelocity(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
-                    argStream.ReadNumber(floatNumber[0]);
-                    argStream.ReadNumber(floatNumber[1]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] >= 0 && floatNumber[1] >= 0)
-                        {
-                            pRigidBody->SetSleepingThresholds(floatNumber[0], floatNumber[1]);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Sleeping thresholds can not be negative");
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_RESTITUTION:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->SetRestitution(floatNumber[0]);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SCALE:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
-                        {
-                            pRigidBody->SetScale(vector);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Scale can not be negative");
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_DEBUG_COLOR:
-                    if (argStream.NextIsBool())
-                    {
-                        argStream.ReadBool(boolean);
-                        if (boolean == false)
-                        {
-                            pRigidBody->RemoveDebugColor();
-                        }
-                    }
-                    else
-                    {
-                        argStream.ReadColor(color);
-                        if (!argStream.HasErrors())
-                        {
-                            pRigidBody->SetDebugColor(color);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_FILTER_MASK:
-                    argStream.ReadNumber(intNumber);
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        if (intNumber > 0 && intNumber < 32)
-                        {
-                            pRigidBody->SetFilterMask((char)intNumber, boolean);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_FILTER_GROUP:
-                    argStream.ReadNumber(intNumber);
-                    if (!argStream.HasErrors())
-                    {
-                        if (intNumber > 0 && intNumber <= 32)
-                        {
-                            pRigidBody->SetFilterGroup(intNumber);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_MOTION_THRESHOLD:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] >= 0.0f && floatNumber[0] <= 1000.0f)
-                        {
-                            pRigidBody->SetMotionThreshold(floatNumber[0]);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] > MINIMUM_PRIMITIVE_SIZE && floatNumber[0] <= MAXIMUM_PRIMITIVE_SIZE)
-                        {
-                            pRigidBody->SetSweptSphereRadius(floatNumber[0]);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError(SString("Physics rigid body does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
-            }
-        }
-        else if (pStaticCollision)
-        {
-            switch (eProperty)
-            {
-                case PHYSICS_PROPERTY_POSITION:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pStaticCollision->SetPosition(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_ROTATION:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pStaticCollision->SetRotation(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SCALE:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
-                        {
-                            pStaticCollision->SetScale(vector);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Scale can not be negative");
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_DEBUG_COLOR:
-                    if (argStream.NextIsBool())
-                    {
-                        argStream.ReadBool(boolean);
-                        if (boolean == false)
-                        {
-                            pStaticCollision->RemoveDebugColor();
-                        }
-                    }
-                    else
-                    {
-                        argStream.ReadColor(color);
-                        if (!argStream.HasErrors())
-                        {
-                            pStaticCollision->SetDebugColor(color);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_FILTER_MASK:
-                    argStream.ReadNumber(intNumber);
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        if (intNumber > 0 && intNumber < 32)
-                        {
-                            pStaticCollision->SetFilterMask((char)intNumber - 1, boolean);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_FILTER_GROUP:
-                    argStream.ReadNumber(intNumber);
-                    if (!argStream.HasErrors())
-                    {
-                        pStaticCollision->SetFilterGroup(intNumber);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError(SString("Physics static collision does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
-            }
-        }
-        else if (pStaticConstraint)
-        {
-            switch (eProperty)
-            {
-                case PHYSICS_PROPERTY_STIFFNESS:
-                    argStream.ReadNumber(intNumber);
-                    argStream.ReadNumber(floatNumber[0]);
-                    argStream.ReadBool(boolean);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetStiffness(intNumber, floatNumber[0], boolean));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_PIVOT_A:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetPivotA(vector));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_PIVOT_B:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetPivotB(vector));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_LOWER_LIN_LIMIT:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetLowerLinLimit(floatNumber[0]));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_UPPER_LIN_LIMIT:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetUpperLinLimit(floatNumber[0]));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_LOWER_ANG_LIMIT:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetLowerAngLimit(floatNumber[0]));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_UPPER_ANG_LIMIT:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        lua_pushboolean(luaVM, pStaticConstraint->SetUpperAngLimit(floatNumber[0]));
-                        return 1;
-                    }
-                    break;
-                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        pStaticConstraint->SetBreakingImpulseThreshold(floatNumber[0]);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError(SString("Physics constraint does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
-            }
-        }
-        else if (pShape)
-        {
-            switch (eProperty)
-            {
-                case PHYSICS_PROPERTY_SIZE:
-                    if (argStream.NextIsVector3D())
-                        argStream.ReadVector3D(vector);
-                    else
-                    {
-                        argStream.ReadNumber(floatNumber[0]);
-                        vector.fX = floatNumber[0];
-                        vector.fY = floatNumber[0];
-                        vector.fZ = floatNumber[0];
-                    }
-                    if (!argStream.HasErrors())
-                    {
-                        if (vector.fX >= MINIMUM_PRIMITIVE_SIZE && vector.fY >= MINIMUM_PRIMITIVE_SIZE && vector.fZ >= MINIMUM_PRIMITIVE_SIZE)
-                        {
-                            if (pShape->SetSize(vector))
-                            {
-                                lua_pushboolean(luaVM, true);
-                                return 1;
-                            }
-                            else
-                            {
-                                argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
-                            }
-                        }
-                        else
-                        {
-                            argStream.SetCustomError(
-                                SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_RADIUS:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] < MINIMUM_PRIMITIVE_SIZE)
-                        {
-                            argStream.SetCustomError(SString("Radius of sphere can not be smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE));
-                            break;
-                        }
-                        if (floatNumber[0] > MAXIMUM_PRIMITIVE_SIZE)
-                        {
-                            argStream.SetCustomError(SString("Radius of sphere can not be greater than %.02f units", MAXIMUM_PRIMITIVE_SIZE));
-                            break;
-                        }
-                        if (pShape->SetRadius(floatNumber[0]))
-                        {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError(SString("Shape '%s' does not support radius property", pShape->GetType()));
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_HEIGHT:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] < MINIMUM_PRIMITIVE_SIZE)
-                        {
-                            argStream.SetCustomError(SString("Height of sphere can not be smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE));
-                            break;
-                        }
-                        if (floatNumber[0] > MAXIMUM_PRIMITIVE_SIZE)
-                        {
-                            argStream.SetCustomError(SString("Height of sphere can not be greater than %.02f units", MAXIMUM_PRIMITIVE_SIZE));
-                            break;
-                        }
-                        if (pShape->SetHeight(floatNumber[0]))
-                        {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError(SString("Shape '%s' does not support height property", pShape->GetType()));
-                        }
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SCALE:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
-                        {
-                            pShape->SetScale(vector);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Scale can not be negative");
-                        }
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
-            }
-        }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
     }
-
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
 }
 
-int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,
+                                                    std::variant<CVector, bool, float, int, SColor> argument1, std::optional<float> argument2)
 {
-    CClientPhysics*             pPhysics = nullptr;
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    CLuaPhysicsConstraint*      pConstraint = nullptr;
-    CLuaPhysicsShape*           pShape = nullptr;
-
-    ePhysicsProperty eProperty;
-    CScriptArgReader argStream(luaVM);
-
-    if (argStream.NextIsUserDataOfType<CClientPhysics>())
-        argStream.ReadUserData(pPhysics);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-        argStream.ReadUserData(pRigidBody);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
-        argStream.ReadUserData(pStaticCollision);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
-        argStream.ReadUserData(pConstraint);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
-        argStream.ReadUserData(pShape);
-
-    argStream.ReadEnumString(eProperty);
-    if (!argStream.HasErrors())
+    switch (eProperty)
     {
-        bool             boolean;
-        CVector          vector, vector2;
-        SColor           color;
-        float            floatNumber[2];
-        btVector3        btVector;
-        int              i = 0;
-        btJointFeedback* pFeedback;
+        case PHYSICS_PROPERTY_SLEEP:
+            if (std::holds_alternative<bool>(argument1))
+            {
+                if (!std::get<bool>(argument1))            // TODO
+                {
+                    pRigidBody->Activate();
+                    return true;
+                }
+            }
+            throw std::invalid_argument(SString("Property '%s' boolean as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_MASS:
+            if (std::holds_alternative<float>(argument1))
+            {
+                float mass = std::get<float>(argument1);
 
-        if (pPhysics)
-        {
-            switch (eProperty)
-            {
-                case PHYSICS_PROPERTY_GRAVITY:
-                    pPhysics->GetGravity(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
-                    pPhysics->GetTriggerCollisionEvents(boolean);
-                    lua_pushboolean(luaVM, boolean);
-                    return 1;
-                case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
-                    pPhysics->GetTriggerConstraintvents(boolean);
-                    lua_pushboolean(luaVM, boolean);
-                    return 1;
-                case PHYSICS_PROPERTY_SIMULATION_ENABLED:
-                    pPhysics->GetSimulationEnabled(boolean);
-                    lua_pushboolean(luaVM, boolean);
-                    return 1;
-                case PHYSICS_PROPERTY_USE_CONTINOUS:
-                    boolean = pPhysics->GetUseContinous();
-                    lua_pushboolean(luaVM, boolean);
-                    return 1;
-                case PHYSICS_PROPERTY_SUBSTEPS:
-                    pPhysics->GetSubSteps(i);
-                    lua_pushnumber(luaVM, i);
-                    return 1;
-                default:
-                    argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
+                if (mass >= 0)
+                {
+                    pRigidBody->SetMass(mass);
+                    return true;
+                }
+                throw std::invalid_argument("Mass can not be negative");
             }
-        }
-        else if (pRigidBody)
-        {
-            switch (eProperty)
+            throw std::invalid_argument(SString("Property '%s' requires float value as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_POSITION:
+            if (std::holds_alternative<CVector>(argument1))
             {
-                case PHYSICS_PROPERTY_POSITION:
-                    pRigidBody->GetPosition(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_ROTATION:
-                    pRigidBody->GetRotation(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_VELOCITY:
-                    pRigidBody->GetAngularVelocity(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
-                    pRigidBody->GetAngularVelocity(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
-                    pRigidBody->GetSleepingThresholds(floatNumber[0], floatNumber[1]);
-                    lua_pushnumber(luaVM, floatNumber[0]);
-                    lua_pushnumber(luaVM, floatNumber[1]);
-                    return 2;
-                case PHYSICS_PROPERTY_RESTITUTION:
-                    pRigidBody->GetRestitution(floatNumber[0]);
-                    lua_pushnumber(luaVM, floatNumber[0]);
-                    return 1;
-                case PHYSICS_PROPERTY_SCALE:
-                    pRigidBody->GetScale(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_DEBUG_COLOR:
-                    pRigidBody->GetDebugColor(color);
-                    lua_pushnumber(luaVM, color.R);
-                    lua_pushnumber(luaVM, color.G);
-                    lua_pushnumber(luaVM, color.B);
-                    return 3;
-                case PHYSICS_PROPERTY_MOTION_THRESHOLD:
-                    floatNumber[0] = pRigidBody->GetMotionThreshold();
-                    lua_pushnumber(luaVM, floatNumber[0]);
-                    return 1;
-                case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
-                    floatNumber[0] = pRigidBody->GetSweptSphereRadius();
-                    lua_pushnumber(luaVM, floatNumber[0]);
-                    return 1;
-                case PHYSICS_PROPERTY_SLEEP:
-                    boolean = pRigidBody->IsSleeping();
-                    lua_pushboolean(luaVM, boolean);
-                    return 1;
-                case PHYSICS_PROPERTY_WANTS_SLEEPING:
-                    boolean = pRigidBody->WantsSleeping();
-                    lua_pushboolean(luaVM, boolean);
-                    return 1;
-                case PHYSICS_PROPERTY_MASS:
-                    floatNumber[0] = pRigidBody->GetMass();
-                    lua_pushnumber(luaVM, floatNumber[0]);
-                    return 1;
-                default:
-                    argStream.SetCustomError(SString("Physics rigid body does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
+                pRigidBody->SetPosition(std::get<CVector>(argument1));
+                return true;
             }
-        }
-        else if (pStaticCollision)
-        {
-            switch (eProperty)
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_ROTATION:
+            if (std::holds_alternative<CVector>(argument1))
             {
-                case PHYSICS_PROPERTY_DEBUG_COLOR:
-                    pRigidBody->GetDebugColor(color);
-                    lua_pushnumber(luaVM, color.R);
-                    lua_pushnumber(luaVM, color.G);
-                    lua_pushnumber(luaVM, color.B);
-                    return 3;
-                case PHYSICS_PROPERTY_POSITION:
-                    pStaticCollision->GetPosition(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_ROTATION:
-                    pStaticCollision->GetRotation(vector);
-                    lua_pushnumber(luaVM, vector.fX);
-                    lua_pushnumber(luaVM, vector.fY);
-                    lua_pushnumber(luaVM, vector.fZ);
-                    return 3;
-                case PHYSICS_PROPERTY_SCALE:
-                    if (pStaticCollision->GetScale(vector))
-                    {
-                        lua_pushnumber(luaVM, vector.fX);
-                        lua_pushnumber(luaVM, vector.fY);
-                        lua_pushnumber(luaVM, vector.fZ);
-                        return 3;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError(SString("Physics static collision does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
+                pRigidBody->SetPosition(std::get<CVector>(argument1));
+                return true;
             }
-        }
-        else if (pShape)
-        {
-            btCollisionShape* pBtShape;
-            switch (eProperty)
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_VELOCITY:
+            if (std::holds_alternative<CVector>(argument1))
             {
-                case PHYSICS_PROPERTY_SIZE:
-                    if (pShape->GetSize(vector))
-                    {
-                        pShape->GetMargin(floatNumber[0]);
-                        lua_pushnumber(luaVM, vector.fX + floatNumber[0]);
-                        lua_pushnumber(luaVM, vector.fY + floatNumber[0]);
-                        lua_pushnumber(luaVM, vector.fZ + floatNumber[0]);
-                        return 3;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
-                    }
-                    break;
-                case PHYSICS_PROPERTY_RADIUS:
-                    if (pShape->GetRadius(floatNumber[0]))
-                    {
-                        lua_pushnumber(luaVM, floatNumber[0]);
-                        return 1;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support radius property", pShape->GetType()));
-                    }
-                    break;
-                case PHYSICS_PROPERTY_HEIGHT:
-                    if (pShape->GetHeight(floatNumber[0]))
-                    {
-                        lua_pushnumber(luaVM, floatNumber[0]);
-                        return 1;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support height property", pShape->GetType()));
-                    }
-                    break;
-                case PHYSICS_PROPERTY_SCALE:
-                    if (pShape->GetScale(vector))
-                    {
-                        lua_pushnumber(luaVM, vector.fX);
-                        lua_pushnumber(luaVM, vector.fY);
-                        lua_pushnumber(luaVM, vector.fZ);
-                        return 3;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
-                    }
-                    break;
-                case PHYSICS_PROPERTY_BOUNDING_BOX:
-                    if (pShape->GetBoundingBox(vector, vector2))
-                    {
-                        lua_pushnumber(luaVM, vector.fX);
-                        lua_pushnumber(luaVM, vector.fY);
-                        lua_pushnumber(luaVM, vector.fZ);
-                        lua_pushnumber(luaVM, vector2.fX);
-                        lua_pushnumber(luaVM, vector2.fY);
-                        lua_pushnumber(luaVM, vector2.fZ);
-                        return 6;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
-                    }
-                    break;
-                case PHYSICS_PROPERTY_BOUNDING_SPHERE:
-                    if (pShape->GetBoundingSphere(vector, floatNumber[0]))
-                    {
-                        lua_pushnumber(luaVM, vector.fX);
-                        lua_pushnumber(luaVM, vector.fY);
-                        lua_pushnumber(luaVM, vector.fZ);
-                        lua_pushnumber(luaVM, floatNumber[0]);
-                        return 4;
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
-                    }
-                    break;
-                case PHYSICS_PROPERTY_IS_COMPOUND:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isCompound());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_CONCAVE:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isConcave());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_CONVEX:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isConvex());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_CONVEX2D:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isConvex2d());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_INFINITE:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isInfinite());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_NON_MOVING:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isNonMoving());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_POLYHEDRAL:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isPolyhedral());
-                    return 1;
-                case PHYSICS_PROPERTY_IS_SOFT_BODY:
-                    pBtShape = pShape->GetBtShape();
-                    lua_pushboolean(luaVM, pBtShape->isSoftBody());
-                    return 1;
-                default:
-                    argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
+                pRigidBody->SetLinearVelocity(std::get<CVector>(argument1));
+                return true;
             }
-        }
-        else if (pConstraint)
-        {
-            switch (eProperty)
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
+            if (std::holds_alternative<CVector>(argument1))
             {
-                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
-                    lua_pushnumber(luaVM, pConstraint->GetBreakingImpulseThreshold());
-                    return 1;
-                case PHYSICS_PROPERTY_APPLIED_IMPULSE:
-                    lua_pushnumber(luaVM, pConstraint->GetAppliedImpulse());
-                    return 1;
-                case PHYSICS_PROPERTY_JOINTS_FEEDBACK:
-                    pFeedback = pConstraint->GetJoinFeedback();
-                    btVector = pFeedback->m_appliedForceBodyA;
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, btVector.getX());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, btVector.getY());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, btVector.getZ());
-                    lua_settable(luaVM, -3);
-                    btVector = pFeedback->m_appliedTorqueBodyA;
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, btVector.getX());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, btVector.getY());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, btVector.getZ());
-                    lua_settable(luaVM, -3);
-                    btVector = pFeedback->m_appliedForceBodyB;
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, btVector.getX());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, btVector.getY());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, btVector.getZ());
-                    lua_settable(luaVM, -3);
-                    btVector = pFeedback->m_appliedTorqueBodyB;
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, btVector.getX());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, btVector.getY());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, btVector.getZ());
-                    lua_settable(luaVM, -3);
-                    return 4;
-                case PHYSICS_PROPERTY_RIGID_BODY_A:
-                    pRigidBody = pConstraint->GetRigidBodyA();
-                    if (pRigidBody)
-                        lua_pushrigidbody(luaVM, pRigidBody);
-                    else
-                        lua_pushboolean(luaVM, false);
-                    return 1;
-                case PHYSICS_PROPERTY_RIGID_BODY_B:
-                    pRigidBody = pConstraint->GetRigidBodyB();
-                    if (pRigidBody)
-                        lua_pushrigidbody(luaVM, pRigidBody);
-                    else
-                        lua_pushboolean(luaVM, false);
-                    return 1;
-                case PHYSICS_PROPERTY_CONSTRAINT_BROKEN:
-                    lua_pushboolean(luaVM, pConstraint->IsBroken());
-                    return 1;
-                default:
-                    argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
-                    break;
+                pRigidBody->SetAngularVelocity(std::get<CVector>(argument1));
+                return true;
             }
-        }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
+            if (std::holds_alternative<float>(argument1))
+            {
+                if (argument2)
+                {
+                    float fLinear = std::get<float>(argument1);
+                    float fAngular = argument2.value();
+                    if (fLinear >= 0 && fAngular >= 0)
+                    {
+                        pRigidBody->SetSleepingThresholds(fLinear, fAngular);
+                        return true;
+                    }
+                    else
+                    {
+                        throw std::invalid_argument("Sleeping thresholds can not be negative.");
+                    }
+                }
+            }
+            throw std::invalid_argument(SString("Property '%s' requires two float values as arguments.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_RESTITUTION:
+            if (std::holds_alternative<float>(argument1))
+            {
+                pRigidBody->SetRestitution(std::get<float>(argument1));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' float value as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_SCALE:
+            if (std::holds_alternative<CVector>(argument1))
+            {
+                CVector scale = std::get<CVector>(argument1);
+                if (scale.fX > 0 && scale.fY > 0 && scale.fZ > 0)
+                {
+                    pRigidBody->SetScale(scale);
+                    return true;
+                }
+                throw std::invalid_argument("Scale must be greater than 0 in each axis.");
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_DEBUG_COLOR:
+            if (std::holds_alternative<bool>(argument1))
+            {
+                if (std::get<bool>(argument1))
+                {
+                    pRigidBody->RemoveDebugColor();
+                    return true;
+                }
+            }
+            else if (std::holds_alternative<SColor>(argument1))
+            {
+                pRigidBody->SetDebugColor(std::get<SColor>(argument1));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires color as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_FILTER_MASK:
+            if (std::holds_alternative<int>(argument1))
+            {
+                pRigidBody->SetFilterMask(std::get<int>(argument1));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_FILTER_GROUP:
+            if (std::holds_alternative<int>(argument1))
+            {
+                pRigidBody->SetFilterGroup(std::get<int>(argument1));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_MOTION_THRESHOLD:
+            if (std::holds_alternative<float>(argument1))
+            {
+                pRigidBody->SetMotionThreshold(std::get<float>(argument1));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
+            if (std::holds_alternative<float>(argument1))
+            {
+                pRigidBody->SetSweptSphereRadius(std::get<float>(argument1));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    throw std::invalid_argument(SString("Physics rigid body does not support '%s' property.", EnumToString(eProperty)).c_str());
 }
 
+bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision, ePhysicsProperty eProperty,
+                                                          std::variant<CVector, bool, int, SColor> argument)
+{
+    switch (eProperty)
+    {
+        case PHYSICS_PROPERTY_POSITION:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                pStaticCollision->SetPosition(std::get<CVector>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_ROTATION:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                pStaticCollision->SetRotation(std::get<CVector>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_SCALE:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                CVector scale = std::get<CVector>(argument);
+                if (scale.fX > 0 && scale.fY > 0 && scale.fZ > 0)
+                {
+                    pStaticCollision->SetScale(scale);
+                    return true;
+                }
+                throw std::invalid_argument("Scale must be greater than 0 in each axis.");
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_DEBUG_COLOR:
+            if (std::holds_alternative<bool>(argument))
+            {
+                if (std::get<bool>(argument))
+                {
+                    pStaticCollision->RemoveDebugColor();
+                    return true;
+                }
+            }
+            else if (std::holds_alternative<SColor>(argument))
+            {
+                pStaticCollision->SetDebugColor(std::get<SColor>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires color as argument.", EnumToString(eProperty)).c_str());
+            break;
+        case PHYSICS_PROPERTY_FILTER_MASK:
+            if (std::holds_alternative<int>(argument))
+            {
+                pStaticCollision->SetFilterMask(std::get<int>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
+        case PHYSICS_PROPERTY_FILTER_GROUP:
+            if (std::holds_alternative<int>(argument))
+            {
+                pStaticCollision->SetFilterGroup(std::get<int>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
+    }
+    throw std::invalid_argument(SString("Physics static collision does not support %s property.", EnumToString(eProperty)).c_str());
+}
 
-CLuaPhysicsPointToPointConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(ePhysicsConstraint    eConstraint,
-                                                                                                CLuaPhysicsRigidBody* pRigidBody, CVector& position,
-                                                                                                CVector&            anchor,
-                                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+// int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
+//{
+//    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+//    CLuaPhysicsShape*           pShape = nullptr;
+//
+//    ePhysicsProperty eProperty;
+//    CScriptArgReader argStream(luaVM);
+//
+//    if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+//        argStream.ReadUserData(pStaticConstraint);
+//    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+//        argStream.ReadUserData(pShape);
+//
+//    argStream.ReadEnumString(eProperty);
+//    if (!argStream.HasErrors())
+//    {
+//        bool    boolean;
+//        CVector vector;
+//        float   floatNumber[2];
+//        int     intNumber;
+//        SColor  color;
+//        if (pStaticConstraint)
+//        {
+//            switch (eProperty)
+//            {
+//                case PHYSICS_PROPERTY_STIFFNESS:
+//                    argStream.ReadNumber(intNumber);
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    argStream.ReadBool(boolean);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetStiffness(intNumber, floatNumber[0], boolean));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_PIVOT_A:
+//                    argStream.ReadVector3D(vector);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetPivotA(vector));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_PIVOT_B:
+//                    argStream.ReadVector3D(vector);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetPivotB(vector));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_LOWER_LIN_LIMIT:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetLowerLinLimit(floatNumber[0]));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_UPPER_LIN_LIMIT:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetUpperLinLimit(floatNumber[0]));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_LOWER_ANG_LIMIT:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetLowerAngLimit(floatNumber[0]));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_UPPER_ANG_LIMIT:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        lua_pushboolean(luaVM, pStaticConstraint->SetUpperAngLimit(floatNumber[0]));
+//                        return 1;
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        pStaticConstraint->SetBreakingImpulseThreshold(floatNumber[0]);
+//                        lua_pushboolean(luaVM, true);
+//                        return 1;
+//                    }
+//                    break;
+//                default:
+//                    argStream.SetCustomError(SString("Physics constraint does not support %s property.", EnumToString(eProperty).c_str()));
+//                    break;
+//            }
+//        }
+//        else if (pShape)
+//        {
+//            switch (eProperty)
+//            {
+//                case PHYSICS_PROPERTY_SIZE:
+//                    if (argStream.NextIsVector3D())
+//                        argStream.ReadVector3D(vector);
+//                    else
+//                    {
+//                        argStream.ReadNumber(floatNumber[0]);
+//                        vector.fX = floatNumber[0];
+//                        vector.fY = floatNumber[0];
+//                        vector.fZ = floatNumber[0];
+//                    }
+//                    if (!argStream.HasErrors())
+//                    {
+//                        if (vector.fX >= MINIMUM_PRIMITIVE_SIZE && vector.fY >= MINIMUM_PRIMITIVE_SIZE && vector.fZ >= MINIMUM_PRIMITIVE_SIZE)
+//                        {
+//                            if (pShape->SetSize(vector))
+//                            {
+//                                lua_pushboolean(luaVM, true);
+//                                return 1;
+//                            }
+//                            else
+//                            {
+//                                argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
+//                            }
+//                        }
+//                        else
+//                        {
+//                            argStream.SetCustomError(
+//                                SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+//                        }
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_RADIUS:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        if (floatNumber[0] < MINIMUM_PRIMITIVE_SIZE)
+//                        {
+//                            argStream.SetCustomError(SString("Radius of sphere can not be smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE));
+//                            break;
+//                        }
+//                        if (floatNumber[0] > MAXIMUM_PRIMITIVE_SIZE)
+//                        {
+//                            argStream.SetCustomError(SString("Radius of sphere can not be greater than %.02f units", MAXIMUM_PRIMITIVE_SIZE));
+//                            break;
+//                        }
+//                        if (pShape->SetRadius(floatNumber[0]))
+//                        {
+//                            lua_pushboolean(luaVM, true);
+//                            return 1;
+//                        }
+//                        else
+//                        {
+//                            argStream.SetCustomError(SString("Shape '%s' does not support radius property", pShape->GetType()));
+//                        }
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_HEIGHT:
+//                    argStream.ReadNumber(floatNumber[0]);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        if (floatNumber[0] < MINIMUM_PRIMITIVE_SIZE)
+//                        {
+//                            argStream.SetCustomError(SString("Height of sphere can not be smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE));
+//                            break;
+//                        }
+//                        if (floatNumber[0] > MAXIMUM_PRIMITIVE_SIZE)
+//                        {
+//                            argStream.SetCustomError(SString("Height of sphere can not be greater than %.02f units", MAXIMUM_PRIMITIVE_SIZE));
+//                            break;
+//                        }
+//                        if (pShape->SetHeight(floatNumber[0]))
+//                        {
+//                            lua_pushboolean(luaVM, true);
+//                            return 1;
+//                        }
+//                        else
+//                        {
+//                            argStream.SetCustomError(SString("Shape '%s' does not support height property", pShape->GetType()));
+//                        }
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_SCALE:
+//                    argStream.ReadVector3D(vector);
+//                    if (!argStream.HasErrors())
+//                    {
+//                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
+//                        {
+//                            pShape->SetScale(vector);
+//                            lua_pushboolean(luaVM, true);
+//                            return 1;
+//                        }
+//                        else
+//                        {
+//                            argStream.SetCustomError("Scale can not be negative");
+//                        }
+//                    }
+//                    break;
+//                default:
+//                    argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
+//                    break;
+//            }
+//        }
+//    }
+//
+//    if (argStream.HasErrors())
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    // Failed
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
+
+std::variant<CVector, int, bool> CLuaPhysicsDefs::PhysicsGetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty)
+{
+    switch (eProperty)
+    {
+        case PHYSICS_PROPERTY_GRAVITY:
+            return pPhysics->GetGravity();
+        case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
+            return pPhysics->GetTriggerCollisionEvents();
+        case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
+            return pPhysics->GetTriggerConstraintvents();
+        case PHYSICS_PROPERTY_SIMULATION_ENABLED:
+            return pPhysics->GetSimulationEnabled();
+        case PHYSICS_PROPERTY_USE_CONTINOUS:
+            return pPhysics->GetUseContinous();
+        case PHYSICS_PROPERTY_SUBSTEPS:
+            return pPhysics->GetSubSteps();
+    }
+    throw std::invalid_argument(SString("Physics world does not support %s property.", EnumToString(eProperty)).c_str());
+}
+
+std::variant<CVector, float, bool, std::tuple<int, int, int, int>> CLuaPhysicsDefs::PhysicsGetStaticCollisionProperties(
+    CLuaPhysicsStaticCollision* pStaticCollision, ePhysicsProperty eProperty)
+{
+    SColor color;
+    switch (eProperty)
+    {
+        case PHYSICS_PROPERTY_DEBUG_COLOR:
+            pStaticCollision->GetDebugColor(color);
+            return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
+        case PHYSICS_PROPERTY_POSITION:
+            return pStaticCollision->GetPosition();
+        case PHYSICS_PROPERTY_ROTATION:
+            return pStaticCollision->GetRotation();
+        case PHYSICS_PROPERTY_SCALE:
+            return pStaticCollision->GetScale();
+            break;
+    }
+    throw std::invalid_argument(SString("Physics static collision does not support %s property.", EnumToString(eProperty)).c_str());
+}
+
+std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int, int, int>> CLuaPhysicsDefs::PhysicsGetRigidBodyProperties(
+    CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty)
+{
+    float  fLinear, fAngular;
+    SColor color;
+    switch (eProperty)
+    {
+        case PHYSICS_PROPERTY_POSITION:
+            return pRigidBody->GetPosition();
+        case PHYSICS_PROPERTY_ROTATION:
+            return pRigidBody->GetRotation();
+        case PHYSICS_PROPERTY_VELOCITY:
+            return pRigidBody->GetLinearVelocity();
+        case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
+            return pRigidBody->GetAngularVelocity();
+        case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
+            pRigidBody->GetSleepingThresholds(fLinear, fAngular);
+            return std::make_tuple(fLinear, fAngular);
+        case PHYSICS_PROPERTY_RESTITUTION:
+            return pRigidBody->GetRestitution();
+        case PHYSICS_PROPERTY_SCALE:
+            return pRigidBody->GetScale();
+        case PHYSICS_PROPERTY_DEBUG_COLOR:
+            pRigidBody->GetDebugColor(color);
+            return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
+        case PHYSICS_PROPERTY_MOTION_THRESHOLD:
+            return pRigidBody->GetMotionThreshold();
+        case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
+            return pRigidBody->GetSweptSphereRadius();
+        case PHYSICS_PROPERTY_SLEEP:
+            return pRigidBody->IsSleeping();
+        case PHYSICS_PROPERTY_WANTS_SLEEPING:
+            return pRigidBody->WantsSleeping();
+        case PHYSICS_PROPERTY_MASS:
+            return pRigidBody->GetMass();
+    }
+    throw std::invalid_argument(SString("Physics rigid body does not support %s property.", EnumToString(eProperty)).c_str());
+}
+
+// int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
+//{
+//    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+//    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+//    CLuaPhysicsConstraint*      pConstraint = nullptr;
+//    CLuaPhysicsShape*           pShape = nullptr;
+//
+//    ePhysicsProperty eProperty;
+//    CScriptArgReader argStream(luaVM);
+//
+//    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+//        argStream.ReadUserData(pRigidBody);
+//    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+//        argStream.ReadUserData(pStaticCollision);
+//    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+//        argStream.ReadUserData(pConstraint);
+//    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+//        argStream.ReadUserData(pShape);
+//
+//    argStream.ReadEnumString(eProperty);
+//    if (!argStream.HasErrors())
+//    {
+//        bool             boolean;
+//        CVector          vector, vector2;
+//        SColor           color;
+//        float            floatNumber[2];
+//        btVector3        btVector;
+//        int              i = 0;
+//        btJointFeedback* pFeedback;
+//
+//        if (pShape)
+//        {
+//            btCollisionShape* pBtShape;
+//            switch (eProperty)
+//            {
+//                case PHYSICS_PROPERTY_SIZE:
+//                    if (pShape->GetSize(vector))
+//                    {
+//                        pShape->GetMargin(floatNumber[0]);
+//                        lua_pushnumber(luaVM, vector.fX + floatNumber[0]);
+//                        lua_pushnumber(luaVM, vector.fY + floatNumber[0]);
+//                        lua_pushnumber(luaVM, vector.fZ + floatNumber[0]);
+//                        return 3;
+//                    }
+//                    else
+//                    {
+//                        argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_RADIUS:
+//                    if (pShape->GetRadius(floatNumber[0]))
+//                    {
+//                        lua_pushnumber(luaVM, floatNumber[0]);
+//                        return 1;
+//                    }
+//                    else
+//                    {
+//                        argStream.SetCustomError(SString("Shape '%s' does not support radius property", pShape->GetType()));
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_HEIGHT:
+//                    if (pShape->GetHeight(floatNumber[0]))
+//                    {
+//                        lua_pushnumber(luaVM, floatNumber[0]);
+//                        return 1;
+//                    }
+//                    else
+//                    {
+//                        argStream.SetCustomError(SString("Shape '%s' does not support height property", pShape->GetType()));
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_SCALE:
+//                    if (pShape->GetScale(vector))
+//                    {
+//                        lua_pushnumber(luaVM, vector.fX);
+//                        lua_pushnumber(luaVM, vector.fY);
+//                        lua_pushnumber(luaVM, vector.fZ);
+//                        return 3;
+//                    }
+//                    else
+//                    {
+//                        argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_BOUNDING_BOX:
+//                    if (pShape->GetBoundingBox(vector, vector2))
+//                    {
+//                        lua_pushnumber(luaVM, vector.fX);
+//                        lua_pushnumber(luaVM, vector.fY);
+//                        lua_pushnumber(luaVM, vector.fZ);
+//                        lua_pushnumber(luaVM, vector2.fX);
+//                        lua_pushnumber(luaVM, vector2.fY);
+//                        lua_pushnumber(luaVM, vector2.fZ);
+//                        return 6;
+//                    }
+//                    else
+//                    {
+//                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_BOUNDING_SPHERE:
+//                    if (pShape->GetBoundingSphere(vector, floatNumber[0]))
+//                    {
+//                        lua_pushnumber(luaVM, vector.fX);
+//                        lua_pushnumber(luaVM, vector.fY);
+//                        lua_pushnumber(luaVM, vector.fZ);
+//                        lua_pushnumber(luaVM, floatNumber[0]);
+//                        return 4;
+//                    }
+//                    else
+//                    {
+//                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
+//                    }
+//                    break;
+//                case PHYSICS_PROPERTY_IS_COMPOUND:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isCompound());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_CONCAVE:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isConcave());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_CONVEX:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isConvex());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_CONVEX2D:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isConvex2d());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_INFINITE:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isInfinite());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_NON_MOVING:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isNonMoving());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_POLYHEDRAL:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isPolyhedral());
+//                    return 1;
+//                case PHYSICS_PROPERTY_IS_SOFT_BODY:
+//                    pBtShape = pShape->GetBtShape();
+//                    lua_pushboolean(luaVM, pBtShape->isSoftBody());
+//                    return 1;
+//                default:
+//                    argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
+//                    break;
+//            }
+//        }
+//        else if (pConstraint)
+//        {
+//            switch (eProperty)
+//            {
+//                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
+//                    lua_pushnumber(luaVM, pConstraint->GetBreakingImpulseThreshold());
+//                    return 1;
+//                case PHYSICS_PROPERTY_APPLIED_IMPULSE:
+//                    lua_pushnumber(luaVM, pConstraint->GetAppliedImpulse());
+//                    return 1;
+//                case PHYSICS_PROPERTY_JOINTS_FEEDBACK:
+//                    pFeedback = pConstraint->GetJoinFeedback();
+//                    btVector = pFeedback->m_appliedForceBodyA;
+//                    lua_newtable(luaVM);
+//                    lua_pushnumber(luaVM, 1);
+//                    lua_pushnumber(luaVM, btVector.getX());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 2);
+//                    lua_pushnumber(luaVM, btVector.getY());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 3);
+//                    lua_pushnumber(luaVM, btVector.getZ());
+//                    lua_settable(luaVM, -3);
+//                    btVector = pFeedback->m_appliedTorqueBodyA;
+//                    lua_newtable(luaVM);
+//                    lua_pushnumber(luaVM, 1);
+//                    lua_pushnumber(luaVM, btVector.getX());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 2);
+//                    lua_pushnumber(luaVM, btVector.getY());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 3);
+//                    lua_pushnumber(luaVM, btVector.getZ());
+//                    lua_settable(luaVM, -3);
+//                    btVector = pFeedback->m_appliedForceBodyB;
+//                    lua_newtable(luaVM);
+//                    lua_pushnumber(luaVM, 1);
+//                    lua_pushnumber(luaVM, btVector.getX());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 2);
+//                    lua_pushnumber(luaVM, btVector.getY());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 3);
+//                    lua_pushnumber(luaVM, btVector.getZ());
+//                    lua_settable(luaVM, -3);
+//                    btVector = pFeedback->m_appliedTorqueBodyB;
+//                    lua_newtable(luaVM);
+//                    lua_pushnumber(luaVM, 1);
+//                    lua_pushnumber(luaVM, btVector.getX());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 2);
+//                    lua_pushnumber(luaVM, btVector.getY());
+//                    lua_settable(luaVM, -3);
+//                    lua_pushnumber(luaVM, 3);
+//                    lua_pushnumber(luaVM, btVector.getZ());
+//                    lua_settable(luaVM, -3);
+//                    return 4;
+//                case PHYSICS_PROPERTY_RIGID_BODY_A:
+//                    pRigidBody = pConstraint->GetRigidBodyA();
+//                    if (pRigidBody)
+//                        lua_pushrigidbody(luaVM, pRigidBody);
+//                    else
+//                        lua_pushboolean(luaVM, false);
+//                    return 1;
+//                case PHYSICS_PROPERTY_RIGID_BODY_B:
+//                    pRigidBody = pConstraint->GetRigidBodyB();
+//                    if (pRigidBody)
+//                        lua_pushrigidbody(luaVM, pRigidBody);
+//                    else
+//                        lua_pushboolean(luaVM, false);
+//                    return 1;
+//                case PHYSICS_PROPERTY_CONSTRAINT_BROKEN:
+//                    lua_pushboolean(luaVM, pConstraint->IsBroken());
+//                    return 1;
+//                default:
+//                    argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
+//                    break;
+//            }
+//        }
+//    }
+//    else
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    // Failed
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
+
+int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody,
+                                                                 CVector position, CVector anchor, std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
     if (eConstraint != ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
         throw std::invalid_argument("Invalid constraint type");
 
     std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBody, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
+        std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
     CLuaPhysicsPointToPointConstraint* pConstraintPtr = pConstraint.get();
     pRigidBody->GetPhysics()->AddConstraint(std::move(pConstraint));
-    return pConstraintPtr;
+    lua_pushconstraint(luaVM, pConstraintPtr);
 }
 
-CLuaPhysicsPointToPointConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                                        CLuaPhysicsRigidBody* pRigidBodyB, CVector& anchorA, CVector& anchorB,
-                                                                                        std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
+                                                                 CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
+                                                                 std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
     if (eConstraint != ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
         throw std::invalid_argument("Invalid constraint type");
@@ -1736,32 +1586,34 @@ CLuaPhysicsPointToPointConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointCon
     if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
         throw std::invalid_argument("Rigid bodies need to belong to the same physics world");
 
-    std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
+    std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
+        std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
     CLuaPhysicsPointToPointConstraint* pConstraintPtr = pConstraint.get();
     pRigidBodyA->GetPhysics()->AddConstraint(std::move(pConstraint));
-    return pConstraintPtr;
-    //CClientPhysics*       pPhysics;
-    //bool                  bDisableCollisionsBetweenLinkedBodies = true;
-    //CLuaPhysicsRigidBody* pRigidBodyA;
-    //CLuaPhysicsRigidBody* pRigidBodyB = nullptr;
-    //ePhysicsConstraint    eConstraint;
-    //CScriptArgReader      argStream(luaVM);
-    //argStream.ReadEnumString(eConstraint);
-    //if (argStream.NextIsBool())
+    lua_pushconstraint(luaVM, pConstraintPtr);
+    return 1;
+    // CClientPhysics*       pPhysics;
+    // bool                  bDisableCollisionsBetweenLinkedBodies = true;
+    // CLuaPhysicsRigidBody* pRigidBodyA;
+    // CLuaPhysicsRigidBody* pRigidBodyB = nullptr;
+    // ePhysicsConstraint    eConstraint;
+    // CScriptArgReader      argStream(luaVM);
+    // argStream.ReadEnumString(eConstraint);
+    // if (argStream.NextIsBool())
     //    argStream.ReadBool(bDisableCollisionsBetweenLinkedBodies, true);
 
-    //argStream.ReadUserData(pRigidBodyA);
-    //if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    // argStream.ReadUserData(pRigidBodyA);
+    // if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
     //    argStream.ReadUserData(pRigidBodyB);
 
-    //if (pRigidBodyA && pRigidBodyB)
+    // if (pRigidBodyA && pRigidBodyB)
     //{
     //    if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
     //    {
     //        argStream.SetCustomError("Rigid bodies need to belong to the same physics world");
     //    }
     //}
-    //if (!argStream.HasErrors())
+    // if (!argStream.HasErrors())
     //{
     //    pPhysics = pRigidBodyA->GetPhysics();
     //    CLuaPhysicsConstraint* pConstraint = nullptr;
@@ -1807,12 +1659,12 @@ CLuaPhysicsPointToPointConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointCon
     //    }
     //}
 
-    //if (argStream.HasErrors())
+    // if (argStream.HasErrors())
     //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     //// Failed
-    //lua_pushboolean(luaVM, false);
-    //return 1;
+    // lua_pushboolean(luaVM, false);
+    // return 1;
 }
 
 int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)

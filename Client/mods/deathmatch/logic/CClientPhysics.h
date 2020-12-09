@@ -40,10 +40,10 @@ public:
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
 
-    CLuaPhysicsShape* AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
-    void AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
-    void AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
-    void AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+    CLuaPhysicsShape*           AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
+    CLuaPhysicsRigidBody*       AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    CLuaPhysicsConstraint*      AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
+    CLuaPhysicsStaticCollision* AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
@@ -59,24 +59,25 @@ public:
     void                        StartBuildCollisionFromGTA();
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
-    std::unique_ptr<CLuaPhysicsShape>         CreateShapeFromModel(unsigned short usModelId);
-    std::unique_ptr<CLuaPhysicsStaticCollision> CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
+    CLuaPhysicsShape*         CreateShapeFromModel(unsigned short usModelId);
+    CLuaPhysicsStaticCollision* CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
                                                                CVector vecRotation = CVector(0, 0, 0));
 
     void SetGravity(CVector vecGravity);
     void GetGravity(CVector& vecGravity);
-    bool GetUseContinous();
+    CVector GetGravity() const;
+    bool GetUseContinous() const;
     void SetUseContinous(bool bUse);
     void SetSubSteps(int iSubSteps) { m_iSubSteps = iSubSteps; }
-    void GetSubSteps(int& iSubSteps) const { iSubSteps = m_iSubSteps; }
+    int    GetSubSteps() const { return m_iSubSteps; }
     void SetSimulationEnabled(bool bSimulationEnabled) { m_bSimulationEnabled = bSimulationEnabled; }
-    void GetSimulationEnabled(bool& bSimulationEnabled) const { bSimulationEnabled = m_bSimulationEnabled; }
+    bool    GetSimulationEnabled() const { return m_bSimulationEnabled; }
     void SetTriggerEvents(bool bTriggerEvents) { m_bTriggerEvents = bTriggerEvents; }
     void GetTriggerEvents(bool& bTriggerEvents) const { bTriggerEvents = m_bTriggerEvents; }
     void SetTriggerCollisionEvents(bool bTriggerCollisionEvents) { m_bTriggerCollisionEvents = bTriggerCollisionEvents; }
-    void GetTriggerCollisionEvents(bool& bTriggerCollisionEvents) const { bTriggerCollisionEvents = m_bTriggerCollisionEvents; }
+    bool    GetTriggerCollisionEvents() const { return m_bTriggerCollisionEvents; }
     void SetTriggerConstraintEvents(bool bTriggerConstraintEvents) { m_bTriggerConstraintEvents = bTriggerConstraintEvents; }
-    void GetTriggerConstraintvents(bool& bTriggerConstraintEvents) const { bTriggerConstraintEvents = m_bTriggerConstraintEvents; }
+    bool    GetTriggerConstraintvents() const { return m_bTriggerConstraintEvents; }
     void SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }

@@ -38,30 +38,42 @@ public:
     static bool                           PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
     static bool                           PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
     static std::string                    PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
-    static CLuaPhysicsStaticCollision*    PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape);
-    static CLuaPhysicsShape*              PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel);
+    static int                            PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape);
+    static int                            PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel);
     static bool                           PhysicsDrawDebug(CClientPhysics* pPhysics);
     static std::vector<CLuaPhysicsShape*> PhysicsGetShapes(CClientPhysics* pPhysics);
     static std::vector<CLuaPhysicsRigidBody*>       PhysicsGetRigidBodies(CClientPhysics* pPhysics);
     static std::vector<CLuaPhysicsStaticCollision*> PhysicsGetStaticCollisions(CClientPhysics* pPhysics);
     static std::vector<CLuaPhysicsConstraint*>      PhysicsGetConstraints(CClientPhysics* pPhysics);
     static bool                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
-    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
-                                                        std::optional<CVector> vecCenterOfMass);
-    static bool                  PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
-                                                      std::optional<CVector> vecRotation);
+    static int  PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
+                                       std::optional<CVector> vecCenterOfMass);
+    static bool PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
+                                     std::optional<CVector> vecRotation);
 
-    static CLuaPhysicsPointToPointConstraint* PhysicsCreatePointToPointConstraintVariantA(ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                                  CLuaPhysicsRigidBody* pRigidBodyB, CVector& anchorA, CVector& anchorB,
-                                                                                  std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+    static int PhysicsCreatePointToPointConstraintVariantA(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
+                                                           CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
+                                                           std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
-    static CLuaPhysicsPointToPointConstraint* PhysicsCreatePointToPointConstraintVariantB(ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody,
-                                                                                          CVector& position, CVector& anchor,
-                                                                                          std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+    static int PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody, CVector position,
+                                                           CVector anchor, std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+
+    static bool PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument);
+    static bool PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,
+                                              std::variant<CVector, bool, float, int, SColor> argument1, std::optional<float> argument2);
+    static bool PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision, ePhysicsProperty eProperty,
+                                                    std::variant<CVector, bool, int, SColor> argument);
+
+    static std::variant<CVector, int, bool> PhysicsGetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty);
+
+    static std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int, int, int>> PhysicsGetRigidBodyProperties(
+        CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty);
+    static std::variant<CVector, float, bool, std::tuple<int, int, int, int>> PhysicsGetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision,
+                                                                                                                  ePhysicsProperty            eProperty);
 
     LUA_DECLARE(PhysicsCreateShape);
-    LUA_DECLARE(PhysicsSetProperties);
-    LUA_DECLARE(PhysicsGetProperties);
+    // LUA_DECLARE(PhysicsSetProperties);
+    // LUA_DECLARE(PhysicsGetProperties);
     LUA_DECLARE(PhysicsSetDebugMode);
     LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);

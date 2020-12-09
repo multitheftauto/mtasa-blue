@@ -31,8 +31,8 @@ public:
     void SetMass(float fMass);
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecPosition);
-    void GetPosition(CVector& vecPosition);
-    void GetRotation(CVector& vecPosition);
+    CVector GetPosition() const;
+    CVector GetRotation() const;
 
     void SetMotionThreshold(float fThreshold);
     float GetMotionThreshold();
@@ -40,9 +40,9 @@ public:
     float GetSweptSphereRadius();
 
     void SetLinearVelocity(CVector vecVelocity);
-    void GetLinearVelocity(CVector& vecVelocity);
+    CVector GetLinearVelocity() const;
     void SetAngularVelocity(CVector vecVelocity);
-    void GetAngularVelocity(CVector& vecVelocity);
+    CVector GetAngularVelocity() const;
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
     void ApplyCentralForce(CVector& vecForce);
     void ApplyCentralImpulse(CVector& vecForce);
@@ -54,13 +54,15 @@ public:
     void SetSleepingThresholds(float fLinear, float fAngular);
     void GetSleepingThresholds(float& fLinear, float& fAngular);
     void SetRestitution(float fRestitution);
-    void GetRestitution(float& fRestitution);
+    float GetRestitution() const;
     void SetScale(CVector& vecScale);
-    void GetScale(CVector& vecScale);
+    CVector GetScale() const;
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
     void RemoveDebugColor();
     void SetFilterMask(short sIndex, bool bEnabled);
+    void SetFilterMask(int mask);
+
     void GetFilterMask(short sIndex, bool& bEnabled);
     void SetFilterGroup(int sIndex);
     void GetFilterGroup(int& sIndex);

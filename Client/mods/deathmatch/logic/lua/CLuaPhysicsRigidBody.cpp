@@ -105,10 +105,12 @@ void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
     Activate();
 }
 
-void CLuaPhysicsRigidBody::GetPosition(CVector& vecPosition)
+CVector CLuaPhysicsRigidBody::GetPosition() const
 {
+    CVector position;
     btTransform transform = m_pBtRigidBody->getWorldTransform();
-    CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
+    CLuaPhysicsSharedLogic::GetPosition(transform, position);
+    return position;
 }
 
 void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
@@ -119,19 +121,22 @@ void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
     Activate();
 }
 
-void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
+CVector CLuaPhysicsRigidBody::GetRotation() const
 {
+    CVector     rotation;
     btTransform transform = m_pBtRigidBody->getWorldTransform();
-    CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
+    CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
+    return rotation;
 }
 
 void CLuaPhysicsRigidBody::SetLinearVelocity(CVector vecVelocity)
 {
     m_pBtRigidBody->setLinearVelocity(reinterpret_cast<btVector3&>(vecVelocity));
 }
-void CLuaPhysicsRigidBody::GetLinearVelocity(CVector& vecVelocity)
+
+CVector CLuaPhysicsRigidBody::GetLinearVelocity() const
 {
-    vecVelocity = reinterpret_cast<const CVector&>(m_pBtRigidBody->getLinearVelocity());
+    return reinterpret_cast<const CVector&>(m_pBtRigidBody->getLinearVelocity());
 }
 
 void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
@@ -139,9 +144,9 @@ void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
     m_pBtRigidBody->setAngularVelocity(reinterpret_cast<btVector3&>(vecVelocity));
 }
 
-void CLuaPhysicsRigidBody::GetAngularVelocity(CVector& vecVelocity)
+CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
 {
-    vecVelocity = reinterpret_cast<const CVector&>(m_pBtRigidBody->getAngularVelocity());
+    return reinterpret_cast<const CVector&>(m_pBtRigidBody->getAngularVelocity());
 }
 
 void CLuaPhysicsRigidBody::ApplyCentralForce(CVector& vecForce)
@@ -188,9 +193,9 @@ void CLuaPhysicsRigidBody::SetRestitution(float fRestitution)
     m_pBtRigidBody->setRestitution(fRestitution);
 }
 
-void CLuaPhysicsRigidBody::GetRestitution(float& fRestitution)
+float CLuaPhysicsRigidBody::GetRestitution() const
 {
-    fRestitution = m_pBtRigidBody->getRestitution();
+    return m_pBtRigidBody->getRestitution();
 }
 
 void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
@@ -200,11 +205,17 @@ void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
     Activate();
 }
 
-void CLuaPhysicsRigidBody::GetScale(CVector& vecScale)
+CVector CLuaPhysicsRigidBody::GetScale() const
 {
-    CLuaPhysicsSharedLogic::GetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
+    CVector scale;
+    CLuaPhysicsSharedLogic::GetScale(m_pBtRigidBody->getCollisionShape(), scale);
+    return scale;
 }
 
+void CLuaPhysicsRigidBody::SetFilterMask(int mask)
+{
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = mask;
+}
 void CLuaPhysicsRigidBody::SetFilterMask(short sIndex, bool bEnabled)
 {
     if (bEnabled)

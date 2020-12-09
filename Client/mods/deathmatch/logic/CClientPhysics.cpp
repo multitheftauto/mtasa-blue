@@ -86,7 +86,12 @@ void CClientPhysics::GetGravity(CVector& vecGravity)
     vecGravity = reinterpret_cast<CVector&>(m_pDynamicsWorld->getGravity());
 }
 
-bool CClientPhysics::GetUseContinous()
+CVector CClientPhysics::GetGravity() const
+{
+    return reinterpret_cast<CVector&>(m_pDynamicsWorld->getGravity());
+}
+
+bool CClientPhysics::GetUseContinous() const
 {
     return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
 }
@@ -96,20 +101,19 @@ void CClientPhysics::SetUseContinous(bool bUse)
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
 
-std::unique_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
 {
-    std::unique_ptr<CLuaPhysicsShape> pShape = CreateShapeFromModel(usModelId);
-    if (pShape.get() == nullptr)
-        return std::unique_ptr<CLuaPhysicsStaticCollision>(nullptr);
+    CLuaPhysicsShape* pShape = CreateShapeFromModel(usModelId);
+    if (pShape == nullptr)
+        return nullptr;
 
-    CLuaPhysicsShape* pShapePtr = AddShape(std::move(pShape));
-    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShapePtr);
+    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShape);
     pStaticCollision->SetPosition(vecPosition);
     pStaticCollision->SetRotation(vecRotation);
-    return pStaticCollision;
+    return AddStaticCollision(std::move(pStaticCollision));
 }
 
-std::unique_ptr<CLuaPhysicsShape> CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
+CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
 {
     CColDataSA* pColData = CLuaPhysicsSharedLogic::GetModelColData(usModelId);
     if (pColData == nullptr)
@@ -117,7 +121,7 @@ std::unique_ptr<CLuaPhysicsShape> CClientPhysics::CreateShapeFromModel(unsigned 
 
     int iInitialSize = pColData->numColBoxes + pColData->numColSpheres;
 
-    if (iInitialSize == 0)
+    if (iInitialSize == 0 && pColData->numColTriangles == 0)
         return nullptr;            // don't create empty collisions
 
     CColSphereSA   pColSphere;
@@ -158,7 +162,7 @@ std::unique_ptr<CLuaPhysicsShape> CClientPhysics::CreateShapeFromModel(unsigned 
         pCompoundShape->AddShape(new CLuaPhysicsTriangleMeshShape(this, vecIndices), CVector(0, 0, 0));
     }
 
-    return std::move(pCompoundShape);
+    return AddShape(std::move(pCompoundShape));
 }
 
 void CClientPhysics::StartBuildCollisionFromGTA()
@@ -286,43 +290,57 @@ void CClientPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
     {
         case EIdClassType::RIGID_BODY:
             DestroyRigidBody((CLuaPhysicsRigidBody*)pPhysicsElement);
+            break;
         case EIdClassType::SHAPE:
             DestroyShape((CLuaPhysicsShape*)pPhysicsElement);
+            break;
         case EIdClassType::STATIC_COLLISION:
             DestroyStaticCollision((CLuaPhysicsStaticCollision*)pPhysicsElement);
+            break;
         case EIdClassType::CONSTRAINT:
             DestroyCostraint((CLuaPhysicsConstraint*)pPhysicsElement);
+            break;
     }
 }
 
 void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
     m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
-    m_vecRigidBodies.erase(std::remove(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), *pLuaRigidBody));
+    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>::iterator object =
+        std::find_if(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), [&](std::unique_ptr<CLuaPhysicsRigidBody>& obj) { return obj.get() == pLuaRigidBody; });
+    m_vecRigidBodies.erase(std::remove(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), *object));
 }
 
 void CClientPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
     m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
-    m_vecShapes.erase(std::remove(m_vecShapes.begin(), m_vecShapes.end(), *pLuaShape));
+    std::vector<std::unique_ptr<CLuaPhysicsShape>>::iterator object =
+        std::find_if(m_vecShapes.begin(), m_vecShapes.end(), [&](std::unique_ptr<CLuaPhysicsShape>& obj) { return obj.get() == pLuaShape; });
+    m_vecShapes.erase(std::remove(m_vecShapes.begin(), m_vecShapes.end(), *object));
 }
 
 void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
 {
     m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
-    m_vecConstraints.erase(std::remove(m_vecConstraints.begin(), m_vecConstraints.end(), *pLuaConstraint));
+    std::vector<std::unique_ptr<CLuaPhysicsConstraint>>::iterator object = std::find_if(
+        m_vecConstraints.begin(), m_vecConstraints.end(), [&](std::unique_ptr<CLuaPhysicsConstraint>& obj) { return obj.get() == pLuaConstraint; });
+    m_vecConstraints.erase(std::remove(m_vecConstraints.begin(), m_vecConstraints.end(), *object));
 }
 
 void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
-    m_vecStaticCollisions.erase(std::remove(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(), *pStaticCollision));
+    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>>::iterator object = std::find_if(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(),
+                     [&](std::unique_ptr<CLuaPhysicsStaticCollision>& obj) { return obj.get() == pStaticCollision; });
+    m_vecStaticCollisions.erase(std::remove(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(), *object));
 }
 
-void CClientPhysics::AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
+CLuaPhysicsStaticCollision* CClientPhysics::AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
-    m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision.get());
+    CLuaPhysicsStaticCollision* pStaticCollisionPtr = pStaticCollision.get();
+    m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollisionPtr);
     m_vecStaticCollisions.push_back(std::move(pStaticCollision));
+    return pStaticCollisionPtr;
 }
 
 CLuaPhysicsShape* CClientPhysics::AddShape(std::unique_ptr<CLuaPhysicsShape> pShape)
@@ -333,16 +351,20 @@ CLuaPhysicsShape* CClientPhysics::AddShape(std::unique_ptr<CLuaPhysicsShape> pSh
     return pShapePtr;
 }
 
-void CClientPhysics::AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody)
+CLuaPhysicsRigidBody* CClientPhysics::AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody)
 {
-    m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody.get());
+    CLuaPhysicsRigidBody* pRigidBodyPtr = pRigidBody.get();
+    m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBodyPtr);
     m_vecRigidBodies.push_back(std::move(pRigidBody));
+    return pRigidBodyPtr;
 }
 
-void CClientPhysics::AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint)
+CLuaPhysicsConstraint* CClientPhysics::AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint)
 {
-    m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint.get());
+    CLuaPhysicsConstraint* pConstraintPtr = pConstraint.get();
+    m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraintPtr);
     m_vecConstraints.push_back(std::move(pConstraint));
+    return pConstraintPtr;
 }
 
 void CClientPhysics::SetDebugLineWidth(float fWidth)
@@ -401,7 +423,7 @@ void CClientPhysics::ClearOutsideWorldRigidBodies()
         CLuaPhysicsRigidBody* pRigidBody = *iter;
         if (!pRigidBody->IsSleeping())
         {
-            pRigidBody->GetPosition(vecRigidBody);
+            vecRigidBody = pRigidBody->GetPosition();
             if (vecRigidBody.fZ <= -m_vecWorldSize.fZ || vecRigidBody.fZ >= m_vecWorldSize.fZ)
             {
                 vecRigidBodiesToRemove.push_back(pRigidBody);

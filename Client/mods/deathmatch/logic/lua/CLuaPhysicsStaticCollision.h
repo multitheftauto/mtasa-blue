@@ -25,17 +25,18 @@ public:
     ~CLuaPhysicsStaticCollision();
 
     void SetPosition(CVector vecPosition);
-    void GetPosition(CVector& vecPosition);
+    CVector GetPosition() const;
     void SetRotation(CVector vecRotation);
-    void GetRotation(CVector& vecRotation);
+    CVector GetRotation() const;
 
     bool SetScale(CVector& vecScale);
-    bool GetScale(CVector& vecScale);
+    CVector GetScale() const;
 
     void RemoveDebugColor();
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
 
+    void SetFilterMask(int mask);
     void SetFilterMask(short sIndex, bool bEnabled);
     void GetFilterMask(short sIndex, bool& bEnabled);
 
