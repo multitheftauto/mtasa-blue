@@ -117,7 +117,7 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
 {
     CColDataSA* pColData = CLuaPhysicsSharedLogic::GetModelColData(usModelId);
     if (pColData == nullptr)
-        return nullptr; // model has no collision
+        return nullptr;            // model has no collision
 
     int iInitialSize = pColData->numColBoxes + pColData->numColSpheres;
 
@@ -139,7 +139,7 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
         pColBox = pColData->pColBoxes[i];
         position = (pColBox.max + pColBox.min) / 2;
         halfSize = (pColBox.max - pColBox.min) * 0.5;
-        pCompoundShape->AddShape(new CLuaPhysicsBoxShape(this, halfSize), position);
+        pCompoundShape->AddShape(CreateBoxShape(halfSize), position);
     }
 
     for (uint i = 0; pColData->numColSpheres > i; i++)
@@ -330,7 +330,8 @@ void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
 void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
-    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>>::iterator object = std::find_if(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(),
+    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>>::iterator object =
+        std::find_if(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(),
                      [&](std::unique_ptr<CLuaPhysicsStaticCollision>& obj) { return obj.get() == pStaticCollision; });
     m_vecStaticCollisions.erase(std::remove(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(), *object));
 }
@@ -703,6 +704,34 @@ std::vector<CLuaPhysicsStaticCollision*> CClientPhysics::GetStaticCollisions() c
     }
 
     return staticCollisions;
+}
+
+CLuaPhysicsBoxShape* CClientPhysics::CreateBoxShape(CVector vector)
+{
+    std::unique_ptr<CLuaPhysicsBoxShape> pShape = std::make_unique<CLuaPhysicsBoxShape>(this, vector);
+    return (CLuaPhysicsBoxShape*)AddShape(std::move(pShape));
+}
+
+CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+{
+    std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody = std::make_unique<CLuaPhysicsRigidBody>(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    return AddRigidBody(std::move(pRigidBody));
+}
+
+CLuaPhysicsPointToPointConstraint* CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
+                                                                                bool bDisableCollisionsBetweenLinkedBodies)
+{
+    std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
+        std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies);
+    return (CLuaPhysicsPointToPointConstraint*)AddConstraint(std::move(pConstraint));
+}
+CLuaPhysicsPointToPointConstraint* CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                CVector anchorA, CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies)
+{
+    assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
+
+    std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
+    return (CLuaPhysicsPointToPointConstraint*)AddConstraint(std::move(pConstraint));
 }
 
 std::vector<CLuaPhysicsConstraint*> CClientPhysics::GetConstraints() const

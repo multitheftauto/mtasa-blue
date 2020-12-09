@@ -24,8 +24,10 @@ class heightfieldTerrainShape;
 
 class CLuaPhysicsShape : public CLuaPhysicsElement
 {
-public:
+protected:
     CLuaPhysicsShape(CClientPhysics* pPhysics);
+
+public:
     ~CLuaPhysicsShape();
 
     void Initialization(std::unique_ptr<btCollisionShape> pShape);

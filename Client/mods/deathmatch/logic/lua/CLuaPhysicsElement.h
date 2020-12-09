@@ -19,9 +19,12 @@ class CLuaPhysicsElement;
 
 class CLuaPhysicsElement
 {
-public:
+
+protected:
     CLuaPhysicsElement(CClientPhysics* pPhysics, EIdClass::EIdClassType classType);
     ~CLuaPhysicsElement();
+
+public:
 
     CClientPhysics* GetPhysics() const { return m_pPhysics; }
     uint            GetScriptID() const { return m_uiScriptID; }

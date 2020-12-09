@@ -10,20 +10,21 @@
  *****************************************************************************/
 
 class CLuaPhysicsBoxShape;
+class CLuaPhysicsShape;
 
 #pragma once
 
-// Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
+#include "lua/CLuaPhysicsShape.h"
+#include "lua/CLuaPhysicsBoxShape.h"
 
 class CLuaPhysicsBoxShape : public CLuaPhysicsShape
 {
+    friend class CClientPhysics;
+
 public:
     CLuaPhysicsBoxShape(CClientPhysics* pPhysics, CVector half);
-    ~CLuaPhysicsBoxShape();
-
     bool GetSize(CVector& vecSize);
     bool SetSize(CVector& vecSize);
-
 };

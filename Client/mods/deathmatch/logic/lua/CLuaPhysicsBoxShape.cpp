@@ -20,11 +20,6 @@ CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CClientPhysics* pPhysics, CVector half)
     Initialization(std::move(boxCollisionShape));
 }
 
-CLuaPhysicsBoxShape::~CLuaPhysicsBoxShape()
-{
-
-}
-
 bool CLuaPhysicsBoxShape::SetSize(CVector& vecSize)
 {
     btConvexInternalShape* pInternalShape = (btConvexInternalShape*)GetBtShape();

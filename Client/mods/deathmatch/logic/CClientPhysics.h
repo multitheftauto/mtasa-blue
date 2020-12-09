@@ -8,12 +8,17 @@
  *
  *****************************************************************************/
 
+class CClientPhysics;
+
 #pragma once
 
 #include <list>
 #include "CClientEntity.h"
 #include "CClientPhysicsManager.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
+
+#include "lua/CLuaPhysicsBoxShape.h"
+#include "lua/CLuaPhysicsPointToPointConstraint.h"
 
 enum ePhysicsDebugMode;
 class CLuaPhysicsConstraint;
@@ -39,11 +44,6 @@ public:
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
-
-    CLuaPhysicsShape*           AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
-    CLuaPhysicsRigidBody*       AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
-    CLuaPhysicsConstraint*      AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
-    CLuaPhysicsStaticCollision* AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
@@ -82,6 +82,18 @@ public:
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
 
+    CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+
+    CLuaPhysicsBoxShape* CreateBoxShape(CVector vector);
+
+    // Links two bodies together
+    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA,
+                                                                    CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies);
+
+    // Links body to position
+    CLuaPhysicsPointToPointConstraint*       CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
+                                                                          bool bDisableCollisionsBetweenLinkedBodies);
+
     std::vector<CLuaPhysicsShape*>           GetShapes() const;
     std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const;
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const;
@@ -90,6 +102,11 @@ public:
     btDiscreteDynamicsWorld*                                 GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:
+    CLuaPhysicsShape*           AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
+    CLuaPhysicsRigidBody*       AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    CLuaPhysicsConstraint*      AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
+    CLuaPhysicsStaticCollision* AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
