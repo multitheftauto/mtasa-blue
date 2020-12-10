@@ -131,15 +131,17 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientP
                 vector = CVector(fHalf, fHalf, fHalf);
             }
             else
-                throw std::invalid_argument(SString("shape '%s' requires float or x,y,z or vector at 3 argument.",EnumToString(shapeType)).c_str());
+                throw std::invalid_argument(SString("shape '%s' requires float or x,y,z or vector at 3 argument.", EnumToString(shapeType)).c_str());
 
-            if (vector.fX < MINIMUM_PRIMITIVE_SIZE || vector.fY < MINIMUM_PRIMITIVE_SIZE || vector.fZ < MINIMUM_PRIMITIVE_SIZE)
+            if (vector.fX < BulletPhysicsLimit::MinimumPrimitiveSize || vector.fY < BulletPhysicsLimit::MinimumPrimitiveSize ||
+                vector.fZ < BulletPhysicsLimit::MinimumPrimitiveSize)
                 throw std::invalid_argument(
-                    SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+                    SString("Minimum width, height and length must be equal or greater than %.02f units", BulletPhysicsLimit::MinimumPrimitiveSize).c_str());
 
-            if (vector.fX > MAXIMUM_PRIMITIVE_SIZE || vector.fY > MAXIMUM_PRIMITIVE_SIZE && vector.fZ > MAXIMUM_PRIMITIVE_SIZE)
+            if (vector.fX > BulletPhysicsLimit::MaximumPrimitiveSize ||
+                vector.fY > BulletPhysicsLimit::MaximumPrimitiveSize && vector.fZ > BulletPhysicsLimit::MaximumPrimitiveSize)
                 throw std::invalid_argument(
-                    SString("Maximum width, height and length must be equal or smaller than %.02f units", MAXIMUM_PRIMITIVE_SIZE).c_str());
+                    SString("Maximum width, height and length must be equal or smaller than %.02f units", BulletPhysicsLimit::MaximumPrimitiveSize).c_str());
 
             pShape = pPhysics->CreateBoxShape(vector);
             return pShape;

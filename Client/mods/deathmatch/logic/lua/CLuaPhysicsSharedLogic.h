@@ -7,10 +7,9 @@ namespace BulletPhysicsLimit
 {
     inline constexpr CVector WorldMinimumSize(1.f, 1.f, 1.f);
     inline constexpr CVector WorldMaximumSize(8192.f, 8192.f, 8192.f);
+    inline constexpr float   MinimumPrimitiveSize = 0.05f;
+    inline constexpr float   MaximumPrimitiveSize = 8196.f;
 }            // namespace BulletPhysicsLimit
-
-#define MINIMUM_PRIMITIVE_SIZE 0.05f               // to small collisions are not recommended
-#define MAXIMUM_PRIMITIVE_SIZE 10000.0f            // to big collisions are not recommended too
 
 struct heightfieldTerrainShape
 {
