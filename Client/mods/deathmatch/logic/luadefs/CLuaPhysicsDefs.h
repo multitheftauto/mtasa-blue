@@ -73,9 +73,11 @@ public:
 
     static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<float, CVector> variant);
 
+    static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
+
     // LUA_DECLARE(PhysicsSetProperties);
     // LUA_DECLARE(PhysicsGetProperties);
-    LUA_DECLARE(PhysicsSetDebugMode);
+
     LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsCreateConstraint);

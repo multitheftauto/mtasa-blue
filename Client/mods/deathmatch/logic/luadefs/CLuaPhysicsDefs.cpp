@@ -54,7 +54,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         //{"physicsSetProperties", ArgumentParser<PhysicsSetWorldProperties, PhysicsSetRigidBodyProperties, PhysicsSetStaticCollisionProperties>},
         //{"physicsGetProperties", ArgumentParser<PhysicsGetWorldProperties, PhysicsGetRigidBodyProperties, PhysicsGetStaticCollisionProperties>},
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
-        {"physicsSetDebugMode", PhysicsSetDebugMode},
+        {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", PhysicsGetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsApplyVelocityForce", ArgumentParser<PhysicsApplyVelocityForce>},
@@ -368,45 +368,25 @@ int CLuaPhysicsDefs::PhysicsBuildCollisionFromGTA(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsSetDebugMode(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant)
 {
-    CClientPhysics*   pPhysics;
-    ePhysicsDebugMode eDebugMode;
-    CScriptArgReader  argStream(luaVM);
-    argStream.ReadUserData(pPhysics);
-    argStream.ReadEnumString(eDebugMode);
-    if (!argStream.HasErrors())
+    switch (eDebugMode)
     {
-        if (eDebugMode == PHYSICS_DEBUG_LINE_WIDTH)
-        {
-            float fWidth;
-            argStream.ReadNumber(fWidth);
-            if (!argStream.HasErrors())
+        case PHYSICS_DEBUG_LINE_WIDTH:
+            if (std::holds_alternative<float>(variant))
             {
-                pPhysics->SetDebugLineWidth(fWidth);
-                lua_pushboolean(luaVM, true);
-                return 1;
+                pPhysics->SetDebugLineWidth(std::get<float>(variant));
+                return true;
             }
-        }
-        else
-        {
-            bool bEnabled;
-            argStream.ReadBool(bEnabled);
-            if (!argStream.HasErrors())
+            throw std::invalid_argument(SString("Property %s requires float as argument 3.", EnumToString(eDebugMode)).c_str());
+        default:
+            if (std::holds_alternative<float>(variant))
             {
-                if (pPhysics->SetDebugMode(eDebugMode, bEnabled))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
+                pPhysics->SetDebugMode(eDebugMode, std::get<bool>(variant));
+                return true;
             }
-        }
+            throw std::invalid_argument(SString("Property %s requires bool as argument 3.", EnumToString(eDebugMode)).c_str());
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 int CLuaPhysicsDefs::PhysicsGetDebugMode(lua_State* luaVM)
