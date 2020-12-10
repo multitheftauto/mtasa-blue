@@ -152,64 +152,6 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
 void CLuaManager::LoadCFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-        {"getPlayerRotation", CLuaPedDefs::GetPedRotation},
-        {"canPlayerBeKnockedOffBike", CLuaPedDefs::CanPedBeKnockedOffBike},
-        {"getPlayerContactElement", CLuaPedDefs::GetPedContactElement},
-        {"isPlayerInVehicle", CLuaPedDefs::IsPedInVehicle},
-        {"doesPlayerHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
-        {"isPlayerInWater", CLuaElementDefs::IsElementInWater},
-        {"isPedInWater", CLuaElementDefs::IsElementInWater},
-        {"isPedOnFire", CLuaPedDefs::IsPedOnFire},
-        {"setPedOnFire", CLuaPedDefs::SetPedOnFire},
-        {"isPlayerOnGround", CLuaPedDefs::IsPedOnGround},
-        {"getPlayerTask", CLuaPedDefs::GetPedTask},
-        {"getPlayerSimplestTask", CLuaPedDefs::GetPedSimplestTask},
-        {"isPlayerDoingTask", CLuaPedDefs::IsPedDoingTask},
-        {"getPlayerTarget", CLuaPedDefs::GetPedTarget},
-        {"getPlayerTargetStart", CLuaPedDefs::GetPedTargetStart},
-        {"getPlayerTargetEnd", CLuaPedDefs::GetPedTargetEnd},
-        {"getPlayerTargetCollision", CLuaPedDefs::GetPedTargetCollision},
-        {"getPlayerWeaponSlot", CLuaPedDefs::GetPedWeaponSlot},
-        {"getPlayerWeapon", CLuaPedDefs::GetPedWeapon},
-        {"getPlayerAmmoInClip", CLuaPedDefs::GetPedAmmoInClip},
-        {"getPlayerTotalAmmo", CLuaPedDefs::GetPedTotalAmmo},
-        {"getPedWeaponMuzzlePosition", CLuaPedDefs::GetPedWeaponMuzzlePosition},
-        {"getPlayerOccupiedVehicle", CLuaPedDefs::GetPedOccupiedVehicle},
-        {"getPlayerArmor", CLuaPedDefs::GetPedArmor},
-        {"getPlayerSkin", CLuaElementDefs::GetElementModel},
-        {"isPlayerChoking", CLuaPedDefs::IsPedChoking},
-        {"isPlayerDucked", CLuaPedDefs::IsPedDucked},
-        {"getPlayerStat", CLuaPedDefs::GetPedStat},
-        {"setPlayerWeaponSlot", CLuaPedDefs::SetPedWeaponSlot},
-        {"setPlayerSkin", CLuaElementDefs::SetElementModel},
-        {"setPlayerRotation", CLuaPedDefs::SetPedRotation},
-        {"setPlayerCanBeKnockedOffBike", CLuaPedDefs::SetPedCanBeKnockedOffBike},
-        {"setVehicleModel", CLuaElementDefs::SetElementModel},
-        {"getVehicleModel", CLuaElementDefs::GetElementModel},
-        {"getPedSkin", CLuaElementDefs::GetElementModel},
-        {"setPedSkin", CLuaElementDefs::SetElementModel},
-        {"getObjectRotation", CLuaElementDefs::GetElementRotation},
-        {"setObjectRotation", CLuaElementDefs::SetElementRotation},
-        {"getVehicleIDFromName", CLuaVehicleDefs::GetVehicleModelFromName},
-        {"getVehicleID", CLuaElementDefs::GetElementModel},
-        {"getVehicleRotation", CLuaElementDefs::GetElementRotation},
-        {"getVehicleNameFromID", CLuaVehicleDefs::GetVehicleNameFromModel},
-        {"setVehicleRotation", CLuaElementDefs::SetElementRotation},
-        {"attachElementToElement", CLuaElementDefs::AttachElements},
-        {"detachElementFromElement", CLuaElementDefs::DetachElements},
-        {"xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild},
-        {"xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren},
-        {"xmlNodeFindSubNode", CLuaXMLDefs::xmlNodeFindChild},
-        {"xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild},
-        {"xmlNodeFindChild", CLuaXMLDefs::xmlNodeFindChild},
-        {"isPlayerDead", CLuaPedDefs::IsPedDead},
-        {"guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex},
-        {"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
-        {"setControlState", CLuaPedDefs::SetPedControlState},
-        {"getControlState", CLuaPedDefs::GetPedControlState},
-        // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-
         // Event funcs
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
@@ -308,6 +250,7 @@ void CLuaManager::LoadCFunctions()
     CLuaBrowserDefs::LoadFunctions();
     CLuaCameraDefs::LoadFunctions();
     CLuaColShapeDefs::LoadFunctions();
+    CLuaCompatibilityDefs::LoadFunctions();
     CLuaDrawingDefs::LoadFunctions();
     CLuaEffectDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();

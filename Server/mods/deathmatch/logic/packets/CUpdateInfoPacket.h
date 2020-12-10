@@ -11,7 +11,7 @@
 
 #pragma once
 
-class CUpdateInfoPacket : public CPacket
+class CUpdateInfoPacket final : public CPacket
 {
 public:
     CUpdateInfoPacket();
