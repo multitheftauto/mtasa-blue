@@ -135,6 +135,24 @@ namespace lua
         lua_pushshape(L, value);
         return 1;
     }
+    
+    inline int Push(lua_State* L, CLuaPhysicsRigidBody* value)
+    {
+        lua_pushrigidbody(L, value);
+        return 1;
+    }
+    
+    inline int Push(lua_State* L, CLuaPhysicsStaticCollision* value)
+    {
+        lua_pushstaticcollision(L, value);
+        return 1;
+    }
+    
+    inline int Push(lua_State* L, CLuaPhysicsConstraint* value)
+    {
+        lua_pushconstraint(L, value);
+        return 1;
+    }
 
     template <typename T, size_t N>
     int Push(lua_State* L, const std::array<T, N>& val)

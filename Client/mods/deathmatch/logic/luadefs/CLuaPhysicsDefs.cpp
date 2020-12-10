@@ -585,10 +585,10 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* 
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Terrain shape is not supported");
 
-    if (fMass < 0)
+    if (fMass.value_or(1.f) < 0)
         throw std::invalid_argument("Mass can not be negative");
 
-    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)),
+    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(1.f), vecLocalInertia.value_or(CVector(0, 0, 0)),
                                                                              vecCenterOfMass.value_or(CVector(0, 0, 0)));
     lua_pushrigidbody(luaVM, pRigidBody);
 }
