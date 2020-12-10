@@ -593,19 +593,18 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* 
     lua_pushrigidbody(luaVM, pRigidBody);
 }
 
-int CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel)
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel)
 {
     CLuaPhysicsShape* pShape = pPhysics->CreateShapeFromModel(usModel);
-    lua_pushshape(luaVM, pShape);
-    return 1;
+    return pShape;
 }
 
-int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position, std::optional<CVector> rotation)
+CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
+                                                                         std::optional<CVector> rotation)
 {
     CLuaPhysicsStaticCollision* pStaticCollision =
         pShape->GetPhysics()->CreateStaticCollision(pShape, position.value_or(CVector(0, 0, 0)), rotation.value_or(CVector(0, 0, 0)));
-    lua_pushstaticcollision(luaVM, pStaticCollision);
-    return 1;
+    return pStaticCollision;
 }
 
 bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,

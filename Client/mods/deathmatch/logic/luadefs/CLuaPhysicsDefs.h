@@ -38,8 +38,9 @@ public:
     static bool                           PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
     static bool                           PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
     static std::string                    PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
-    static int  PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position, std::optional<CVector> rotation);
-    static int  PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel);
+    static CLuaPhysicsStaticCollision*     PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
+                                                                       std::optional<CVector> rotation);
+    static CLuaPhysicsShape*                         PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel);
     static bool PhysicsDrawDebug(CClientPhysics* pPhysics);
     static std::vector<CLuaPhysicsShape*>           PhysicsGetShapes(CClientPhysics* pPhysics);
     static std::vector<CLuaPhysicsRigidBody*>       PhysicsGetRigidBodies(CClientPhysics* pPhysics);
