@@ -127,6 +127,32 @@ namespace lua
         return 1;
     }
 
+    /*****************************************************************\
+    * The functions below may depend on each other, so they need to be
+    * forward declared.
+    * Please define functions that call `Push` after this line.
+    \*****************************************************************/
+
+    template <typename... Ts>
+    int Push(lua_State* L, const std::variant<Ts...>&& val);
+
+    template <typename T>
+    int Push(lua_State* L, const std::optional<T>&& val);
+
+    template <typename T, size_t N>
+    int Push(lua_State* L, const std::array<T, N>& val);
+
+    template <typename T>
+    int Push(lua_State* L, const std::vector<T>&& val);
+
+    template <typename K, typename V>
+    int Push(lua_State* L, const std::unordered_map<K, V>&& val);
+
+    template<typename... Ts>
+    int Push(lua_State* L, const std::tuple<Ts...>&& tuple);
+
+    // Define after this line, declare above.
+
     template <typename... Ts>
     int Push(lua_State* L, const std::variant<Ts...>&& val)
     {
