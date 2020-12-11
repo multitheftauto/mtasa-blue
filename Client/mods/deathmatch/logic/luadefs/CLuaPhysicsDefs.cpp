@@ -107,12 +107,14 @@ CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
     throw std::invalid_argument("Unknown error");
 }
 
-//CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<float, int, CVector, std::tuple<float, float>, std::vector<CVector>> variant)
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<float, CVector> variant)
+// CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<float, int,
+// CVector, std::tuple<float, float>, std::vector<CVector>> variant)
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType,
+                                                      std::variant<float, CVector> variant)
 {
-    CScriptArgReader  argStream(luaVM);
+    CScriptArgReader argStream(luaVM);
 
-    CLuaPhysicsShape* pShape = nullptr;
+    CLuaPhysicsShape*    pShape = nullptr;
     CVector              vector;
     float                fRadius;
     float                fHeight;
@@ -149,186 +151,186 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientP
 
             pShape = pPhysics->CreateBoxShape(vector);
             return pShape;
-        //case PHYSICS_SHAPE_SPHERE:
-        //    argStream.ReadNumber(fRadius);
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (fRadius < MINIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(SString("Minimum radius must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
+            // case PHYSICS_SHAPE_SPHERE:
+            //    argStream.ReadNumber(fRadius);
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (fRadius < MINIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(SString("Minimum radius must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
 
-        //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(SString("Maximum radius must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        pShape = pPhysics->CreateSphereShape(fRadius);
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_CAPSULE:
-        //    argStream.ReadNumber(fRadius);
-        //    argStream.ReadNumber(fHeight);
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (fRadius < MINIMUM_PRIMITIVE_SIZE || fHeight < MINIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        pShape = pPhysics->CreateCapsuleShape(fRadius, fHeight);
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_CONE:
-        //    argStream.ReadNumber(fRadius);
-        //    argStream.ReadNumber(fHeight);
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (fRadius < MINIMUM_PRIMITIVE_SIZE || fHeight < MINIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        pShape = pPhysics->CreateConeShape(fRadius, fHeight);
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_CYLINDER:
-        //    argStream.ReadNumber(fRadius);
-        //    argStream.ReadNumber(fHeight);
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (fRadius < MINIMUM_PRIMITIVE_SIZE || fHeight < MINIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
-        //        pShape = pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_COMPOUND:
-        //    argStream.ReadNumber(fInitialChildCapacity, 0);
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 512)
-        //        {
-        //            pShape = pPhysics->CreateCompoundShape(fInitialChildCapacity);
-        //        }
-        //        else
-        //        {
-        //            argStream.SetCustomError("Initial capacity should be between 0 and 512");
-        //        }
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_CONVEX_HULL:
-        //    while (argStream.NextIsVector3D())
-        //    {
-        //        argStream.ReadVector3D(vector);
-        //        vecList.push_back(vector);
-        //    }
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (vecList.size() > 2)
-        //        {
-        //            pShape = pPhysics->CreateConvexHullShape(vecList);
-        //        }
-        //        else
-        //        {
-        //            argStream.SetCustomError("Convex hull shape require at least 3 vertices");
-        //            break;
-        //        }
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_TRIANGLE_MESH:
-        //    while (argStream.NextIsTable())
-        //    {
-        //        vecFloat.clear();
+            //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(SString("Maximum radius must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        pShape = pPhysics->CreateSphereShape(fRadius);
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_CAPSULE:
+            //    argStream.ReadNumber(fRadius);
+            //    argStream.ReadNumber(fHeight);
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (fRadius < MINIMUM_PRIMITIVE_SIZE || fHeight < MINIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        pShape = pPhysics->CreateCapsuleShape(fRadius, fHeight);
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_CONE:
+            //    argStream.ReadNumber(fRadius);
+            //    argStream.ReadNumber(fHeight);
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (fRadius < MINIMUM_PRIMITIVE_SIZE || fHeight < MINIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        pShape = pPhysics->CreateConeShape(fRadius, fHeight);
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_CYLINDER:
+            //    argStream.ReadNumber(fRadius);
+            //    argStream.ReadNumber(fHeight);
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (fRadius < MINIMUM_PRIMITIVE_SIZE || fHeight < MINIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
+            //        pShape = pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_COMPOUND:
+            //    argStream.ReadNumber(fInitialChildCapacity, 0);
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 512)
+            //        {
+            //            pShape = pPhysics->CreateCompoundShape(fInitialChildCapacity);
+            //        }
+            //        else
+            //        {
+            //            argStream.SetCustomError("Initial capacity should be between 0 and 512");
+            //        }
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_CONVEX_HULL:
+            //    while (argStream.NextIsVector3D())
+            //    {
+            //        argStream.ReadVector3D(vector);
+            //        vecList.push_back(vector);
+            //    }
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (vecList.size() > 2)
+            //        {
+            //            pShape = pPhysics->CreateConvexHullShape(vecList);
+            //        }
+            //        else
+            //        {
+            //            argStream.SetCustomError("Convex hull shape require at least 3 vertices");
+            //            break;
+            //        }
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_TRIANGLE_MESH:
+            //    while (argStream.NextIsTable())
+            //    {
+            //        vecFloat.clear();
 
-        //        argStream.ReadNumberTable(vecFloat);
-        //        index++;
-        //        if (vecFloat.size() != 3)
-        //        {
-        //            argStream.SetCustomError(SString("Triangle mesh vertex at index %i does not have 3 float numbers", index).c_str());
-        //            break;
-        //        }
+            //        argStream.ReadNumberTable(vecFloat);
+            //        index++;
+            //        if (vecFloat.size() != 3)
+            //        {
+            //            argStream.SetCustomError(SString("Triangle mesh vertex at index %i does not have 3 float numbers", index).c_str());
+            //            break;
+            //        }
 
-        //        if (std::abs(vecFloat[0]) > MAXIMUM_PRIMITIVE_SIZE || std::abs(vecFloat[1]) > MAXIMUM_PRIMITIVE_SIZE ||
-        //            std::abs(vecFloat[2]) > MAXIMUM_PRIMITIVE_SIZE)
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index, MAXIMUM_PRIMITIVE_SIZE).c_str());
-        //            break;
-        //        }
+            //        if (std::abs(vecFloat[0]) > MAXIMUM_PRIMITIVE_SIZE || std::abs(vecFloat[1]) > MAXIMUM_PRIMITIVE_SIZE ||
+            //            std::abs(vecFloat[2]) > MAXIMUM_PRIMITIVE_SIZE)
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index, MAXIMUM_PRIMITIVE_SIZE).c_str());
+            //            break;
+            //        }
 
-        //        vecList.emplace_back(vecFloat[0], vecFloat[1], vecFloat[2]);
-        //    }
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (vecList.size() < 3)
-        //        {
-        //            argStream.SetCustomError("Triangle mesh require at least 3 vertices");
-        //            break;
-        //        }
-        //        if (vecList.size() % 3 != 0)
-        //        {
-        //            argStream.SetCustomError("Triangle mesh needs vertices count divisible by 3");
-        //            break;
-        //        }
-        //        pShape = pPhysics->CreateTriangleMeshShape(vecList);
-        //    }
-        //    break;
-        //case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
-        //    argStream.ReadNumber(iSizeX);
-        //    argStream.ReadNumber(iSizeY);
-        //    if (argStream.NextIsTable())
-        //        argStream.ReadNumberTable(vecFloat);
-        //    else            // fill with empty table
-        //        for (int i = 0; i < iSizeX * iSizeY; i++)
-        //            vecFloat.emplace_back(0);
+            //        vecList.emplace_back(vecFloat[0], vecFloat[1], vecFloat[2]);
+            //    }
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (vecList.size() < 3)
+            //        {
+            //            argStream.SetCustomError("Triangle mesh require at least 3 vertices");
+            //            break;
+            //        }
+            //        if (vecList.size() % 3 != 0)
+            //        {
+            //            argStream.SetCustomError("Triangle mesh needs vertices count divisible by 3");
+            //            break;
+            //        }
+            //        pShape = pPhysics->CreateTriangleMeshShape(vecList);
+            //    }
+            //    break;
+            // case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
+            //    argStream.ReadNumber(iSizeX);
+            //    argStream.ReadNumber(iSizeY);
+            //    if (argStream.NextIsTable())
+            //        argStream.ReadNumberTable(vecFloat);
+            //    else            // fill with empty table
+            //        for (int i = 0; i < iSizeX * iSizeY; i++)
+            //            vecFloat.emplace_back(0);
 
-        //    if (!argStream.HasErrors())
-        //    {
-        //        if (iSizeX >= 3 && iSizeY >= 3 && iSizeX <= 8192 && iSizeY <= 8192)
-        //        {
-        //            if (vecFloat.size() == iSizeX * iSizeY)
-        //            {
-        //                pShape = pPhysics->CreateHeightfieldTerrainShape(iSizeX, iSizeY, vecFloat);
-        //            }
-        //            else
-        //            {
-        //                argStream.SetCustomError(
-        //                    SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY, vecFloat.size())
-        //                        .c_str());
-        //            }
-        //        }
-        //        else
-        //        {
-        //            argStream.SetCustomError(
-        //                SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecFloat.size()).c_str());
-        //        }
-        //    }
-        //    break;
+            //    if (!argStream.HasErrors())
+            //    {
+            //        if (iSizeX >= 3 && iSizeY >= 3 && iSizeX <= 8192 && iSizeY <= 8192)
+            //        {
+            //            if (vecFloat.size() == iSizeX * iSizeY)
+            //            {
+            //                pShape = pPhysics->CreateHeightfieldTerrainShape(iSizeX, iSizeY, vecFloat);
+            //            }
+            //            else
+            //            {
+            //                argStream.SetCustomError(
+            //                    SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY, vecFloat.size())
+            //                        .c_str());
+            //            }
+            //        }
+            //        else
+            //        {
+            //            argStream.SetCustomError(
+            //                SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecFloat.size()).c_str());
+            //        }
+            //    }
+            //    break;
     }
 
     throw std::invalid_argument("todo");
@@ -583,8 +585,8 @@ int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
-                                            std::optional<CVector> vecCenterOfMass)
+CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass,
+                                                              std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass)
 {
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Terrain shape is not supported");
@@ -594,7 +596,7 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* 
 
     CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(1.f), vecLocalInertia.value_or(CVector(0, 0, 0)),
                                                                              vecCenterOfMass.value_or(CVector(0, 0, 0)));
-    lua_pushrigidbody(luaVM, pRigidBody);
+    return pRigidBody;
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel)
@@ -604,7 +606,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM,
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
-                                                                         std::optional<CVector> rotation)
+                                                                          std::optional<CVector> rotation)
 {
     CLuaPhysicsStaticCollision* pStaticCollision =
         pShape->GetPhysics()->CreateStaticCollision(pShape, position.value_or(CVector(0, 0, 0)), rotation.value_or(CVector(0, 0, 0)));
@@ -1522,7 +1524,6 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaV
 {
     if (eConstraint != ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
         throw std::invalid_argument("Invalid constraint type");
-
 
     CLuaPhysicsPointToPointConstraint* pConstraint =
         pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));

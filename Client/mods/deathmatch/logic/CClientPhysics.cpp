@@ -73,6 +73,10 @@ void CClientPhysics::Clear()
     {
         pRigidBody->Unlink();
     }
+    for (const auto& pStaticCollision : m_vecStaticCollisions)
+    {
+        pStaticCollision->Unlink();
+    }
     m_vecRigidBodies.clear();
     m_vecShapes.clear();
     m_vecStaticCollisions.clear();
