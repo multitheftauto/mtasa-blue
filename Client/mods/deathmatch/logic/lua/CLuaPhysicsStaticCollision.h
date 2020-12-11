@@ -45,6 +45,8 @@ public:
 
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject.get(); }
 
+    void Unlink();
 private:
     std::unique_ptr<btCollisionObject> m_btCollisionObject;
+    CLuaPhysicsShape*                  m_pShape;
 };

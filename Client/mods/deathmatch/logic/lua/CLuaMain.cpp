@@ -67,7 +67,17 @@ CLuaMain::~CLuaMain()
 
     // Delete the managers
     delete m_pLuaTimerManager;
+
+    // Physics
     delete m_pLuaPhysicsRigidBodyManager;
+    delete m_pLuaPhysicsStaticCollisionManager;
+    delete m_pLuaPhysicsContraintManager;
+    delete m_pLuaPhysicsShapeManager;
+
+    m_pLuaPhysicsRigidBodyManager = nullptr;
+    m_pLuaPhysicsStaticCollisionManager = nullptr;
+    m_pLuaPhysicsContraintManager = nullptr;
+    m_pLuaPhysicsShapeManager = nullptr;
 
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);

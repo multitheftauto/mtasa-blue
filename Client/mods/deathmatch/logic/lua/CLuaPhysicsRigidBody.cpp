@@ -19,10 +19,9 @@
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
     : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::RIGID_BODY)
 {
-    m_pPhysicsShape = pShape;
-
+    m_pShape = pShape;
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), fMass, vecLocalInertia, vecCenterOfMass);
-    m_pPhysicsShape->AddRigidBody(this);
+    m_pShape->AddRigidBody(this);
     m_pBtRigidBody->setDamping(0.001f, 0.001f);
     SetSleepingThresholds(0.1f, 0.1f);
     pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(GetBtRigidBody());
@@ -31,18 +30,7 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
-    for (int i = 0; i < m_pBtRigidBody->getNumConstraintRefs(); i++)
-    {
-        GetPhysics()->DestroyElement((CLuaPhysicsElement*)(m_pBtRigidBody->getConstraintRef(i)));
-    }
-
-    if (m_pBtRigidBody && m_pBtRigidBody->getMotionState())
-    {
-        delete m_pBtRigidBody->getMotionState();
-    }
-
-    GetPhysics()->GetDynamicsWorld()->removeRigidBody(GetBtRigidBody());
-    m_pPhysicsShape->RemoveRigidBody(this);
+    Unlink();
 }
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
@@ -272,4 +260,15 @@ void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular
 {
     fLinear = m_pBtRigidBody->getLinearSleepingThreshold();
     fAngular = m_pBtRigidBody->getLinearSleepingThreshold();
+}
+
+void CLuaPhysicsRigidBody::Unlink()
+{
+    if (m_pShape != nullptr)
+    {
+        GetPhysics()->GetDynamicsWorld()->removeRigidBody(GetBtRigidBody());
+        m_pShape->RemoveRigidBody(this);
+        m_pShape = nullptr;
+
+    }
 }

@@ -22,14 +22,12 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
     m_btCollisionObject->setUserPointer((void*)this);
     GetPhysics()->GetDynamicsWorld()->addCollisionObject(GetCollisionObject());
     pShape->AddStaticCollision(this);
+    m_pShape = pShape;
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 {
-    if (m_btCollisionObject)
-    {
-        GetPhysics()->GetDynamicsWorld()->removeCollisionObject(GetCollisionObject());
-    }
+    Unlink();
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
@@ -119,4 +117,13 @@ void CLuaPhysicsStaticCollision::SetFilterGroup(int iGroup)
 void CLuaPhysicsStaticCollision::GetFilterGroup(int& iGroup)
 {
     iGroup = m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup;
+}
+
+void CLuaPhysicsStaticCollision::Unlink()
+{
+    if (m_pShape)
+    {
+        m_pShape = nullptr;
+        GetPhysics()->GetDynamicsWorld()->removeCollisionObject(GetCollisionObject());
+    }
 }

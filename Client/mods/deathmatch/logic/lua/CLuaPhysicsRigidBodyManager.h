@@ -22,7 +22,7 @@ class CLuaPhysicsRigidBodyManager
 {
 public:
     CLuaPhysicsRigidBodyManager(){};
-    ~CLuaPhysicsRigidBodyManager(){};
+    ~CLuaPhysicsRigidBodyManager();
 
     CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
 

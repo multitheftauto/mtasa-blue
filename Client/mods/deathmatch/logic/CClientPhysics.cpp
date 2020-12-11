@@ -57,6 +57,8 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 
 CClientPhysics::~CClientPhysics()
 {
+    Clear();
+
     // delete dynamics world
     delete m_pDynamicsWorld;
     delete m_pSolver;
@@ -65,20 +67,20 @@ CClientPhysics::~CClientPhysics()
     delete m_pCollisionConfiguration;
 }
 
+void CClientPhysics::Clear()
+{
+    for (const auto& pRigidBody : m_vecRigidBodies)
+    {
+        pRigidBody->Unlink();
+    }
+    m_vecRigidBodies.clear();
+    m_vecShapes.clear();
+    m_vecStaticCollisions.clear();
+    m_vecConstraints.clear();
+}
+
 void CClientPhysics::Unlink()
 {
-    for (const auto& pConstraint : m_vecConstraints)
-        m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pConstraint.get());
-
-    for (const auto& pRigidBody : m_vecRigidBodies)
-        m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pRigidBody.get());
-
-    for (const auto& pStaticCollision : m_vecStaticCollisions)
-        m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision.get());
-
-    for (const auto& pShape : m_vecShapes)
-        m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pShape.get());
-
     m_pPhysicsManager->RemoveFromList(this);
 }
 

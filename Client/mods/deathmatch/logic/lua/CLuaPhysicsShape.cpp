@@ -31,6 +31,23 @@ CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<hei
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
+    if (GetType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
+    {
+
+    }
+    else
+    {
+        for (auto const& rigidBody : m_vecRigidBodyList)
+        {
+            rigidBody->Unlink();
+        }
+
+        for (auto const& staticCollision : m_vecStaticCollisions)
+        {
+            staticCollision->Unlink();
+        }
+
+    }
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)

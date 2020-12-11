@@ -120,6 +120,8 @@ public:
     btDiscreteDynamicsWorld*                                 GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:
+    void                        Clear();
+
     CLuaPhysicsShape*           AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
     CLuaPhysicsRigidBody*       AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
     CLuaPhysicsConstraint*      AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
@@ -161,8 +163,8 @@ private:
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;
 
+    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
     std::vector<std::unique_ptr<CLuaPhysicsShape>>           m_vecShapes;
     std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
-    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
     std::vector<std::unique_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
 };

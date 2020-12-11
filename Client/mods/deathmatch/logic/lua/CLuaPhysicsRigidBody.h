@@ -75,9 +75,10 @@ public:
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
+    void Unlink();
 private:
     std::unique_ptr<btRigidBody>         m_pBtRigidBody;
-    CLuaPhysicsShape*                    m_pPhysicsShape;
+    CLuaPhysicsShape*                    m_pShape;
     std::vector<CLuaPhysicsConstraint*>  m_constraintList;
     int                                  m_iLastSimulationCounter = 0;
 };
