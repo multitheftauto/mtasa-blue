@@ -87,21 +87,6 @@ namespace lua
         return 1;
     }
 
-    template <typename... Ts>
-    int Push(lua_State* L, const std::variant<Ts...>&& val)
-    {
-        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
-    }
-
-    template <typename T>
-    int Push(lua_State* L, const std::optional<T>&& val)
-    {
-        if (val.has_value())
-            return Push(L, val.value());
-        else
-            return Push(L, nullptr);
-     }
-
     inline int Push(lua_State* L, const CVector2D& value)
     {
         lua_pushvector(L, value);
@@ -125,6 +110,37 @@ namespace lua
         lua_pushmatrix(L, value);
         return 1;
     }
+
+    // Overload for enum types only
+    template <typename T>
+    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
+    {
+        // Push<string> must be defined before this function, otherwise it wont compile
+        return Push(L, EnumToString(val));
+    }
+
+    // Overload for pointers to classes. We boldly assume that these are script entities
+    template <typename T>
+    typename std::enable_if_t<(std::is_pointer_v<T>&& std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
+    {
+        lua_pushelement(L, val);
+        return 1;
+    }
+
+    template <typename... Ts>
+    int Push(lua_State* L, const std::variant<Ts...>&& val)
+    {
+        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
+    }
+
+    template <typename T>
+    int Push(lua_State* L, const std::optional<T>&& val)
+    {
+        if (val.has_value())
+            return Push(L, val.value());
+        else
+            return Push(L, nullptr);
+     }
 
     template <typename T, size_t N>
     int Push(lua_State* L, const std::array<T, N>& val)
@@ -180,20 +196,4 @@ namespace lua
         std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
         return sizeof...(Ts);
     }
-
-    // Overload for enum types only
-    template <typename T>
-    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
-    {
-        return Push(L, EnumToString(val));
-    }
-
-    // Overload for pointers to classes. We boldly assume that these are script entities
-    template <typename T>
-    typename std::enable_if_t<(std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
-    {
-        lua_pushelement(L, val);
-        return 1;
-    }
-
 }
