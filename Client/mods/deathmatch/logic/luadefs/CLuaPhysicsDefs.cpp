@@ -51,8 +51,12 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetRigidBodies", ArgumentParser<PhysicsGetRigidBodies>},
         {"physicsGetStaticCollisions", ArgumentParser<PhysicsGetStaticCollisions>},
         {"physicsGetConstraints", ArgumentParser<PhysicsGetConstraints>},
-        //{"physicsSetProperties", ArgumentParser<PhysicsSetWorldProperties, PhysicsSetRigidBodyProperties, PhysicsSetStaticCollisionProperties>},
-        //{"physicsGetProperties", ArgumentParser<PhysicsGetWorldProperties, PhysicsGetRigidBodyProperties, PhysicsGetStaticCollisionProperties>},
+        {"physicsSetProperties", ArgumentParser<PhysicsSetWorldProperties>},
+        {"physicsSetRigidBodyProperties", ArgumentParser<PhysicsSetRigidBodyProperties>},
+        {"physicsSetStaticCollisionProperties", ArgumentParser<PhysicsSetStaticCollisionProperties>},
+        {"physicsGetProperties", ArgumentParser<PhysicsGetWorldProperties>},
+        {"physicsGetRigidBodyProperties", ArgumentParser<PhysicsGetRigidBodyProperties>},
+        {"physicsGetStaticCollisionProperties", ArgumentParser<PhysicsGetStaticCollisionProperties>},
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", PhysicsGetDebugMode},
@@ -706,7 +710,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_USE_CONTINOUS:
             if (std::holds_alternative<bool>(argument))
             {
@@ -714,7 +717,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_SIMULATION_ENABLED:
             if (std::holds_alternative<bool>(argument))
             {
@@ -722,7 +724,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_SUBSTEPS:
             if (std::holds_alternative<int>(argument))
             {
@@ -738,7 +739,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 }
             }
             throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_TRIGGEREVENTS:
             if (std::holds_alternative<bool>(argument))
             {
@@ -746,7 +746,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
             if (std::holds_alternative<bool>(argument))
             {
@@ -754,7 +753,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
             if (std::holds_alternative<bool>(argument))
             {
@@ -762,7 +760,6 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            return false;
         case PHYSICS_PROPERTY_WORLDSIZE:
             if (std::holds_alternative<CVector>(argument))
             {
