@@ -72,7 +72,7 @@ public:
     static std::variant<CVector, float, bool, std::tuple<int, int, int, int>> PhysicsGetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision,
                                                                                                                   ePhysicsProperty            eProperty);
 
-    static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<float, CVector> variant);
+    static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float> variant);
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 

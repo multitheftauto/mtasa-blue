@@ -110,7 +110,7 @@ CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
 // CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<float, int,
 // CVector, std::tuple<float, float>, std::vector<CVector>> variant)
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType,
-                                                      std::variant<float, CVector> variant)
+                                                      std::variant<CVector, float> variant)
 {
     CScriptArgReader argStream(luaVM);
 
