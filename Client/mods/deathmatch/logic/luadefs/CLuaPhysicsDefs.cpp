@@ -810,34 +810,6 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
                 throw std::invalid_argument("Mass can not be negative");
             }
             throw std::invalid_argument(SString("Property '%s' requires float value as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_POSITION:
-            if (std::holds_alternative<CVector>(argument1))
-            {
-                pRigidBody->SetPosition(std::get<CVector>(argument1));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_ROTATION:
-            if (std::holds_alternative<CVector>(argument1))
-            {
-                pRigidBody->SetPosition(std::get<CVector>(argument1));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_VELOCITY:
-            if (std::holds_alternative<CVector>(argument1))
-            {
-                pRigidBody->SetLinearVelocity(std::get<CVector>(argument1));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
-            if (std::holds_alternative<CVector>(argument1))
-            {
-                pRigidBody->SetAngularVelocity(std::get<CVector>(argument1));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
         case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
             if (std::holds_alternative<float>(argument1))
             {
@@ -928,20 +900,6 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 {
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_POSITION:
-            if (std::holds_alternative<CVector>(argument))
-            {
-                pStaticCollision->SetPosition(std::get<CVector>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_ROTATION:
-            if (std::holds_alternative<CVector>(argument))
-            {
-                pStaticCollision->SetRotation(std::get<CVector>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
         case PHYSICS_PROPERTY_SCALE:
             if (std::holds_alternative<CVector>(argument))
             {
@@ -1230,10 +1188,6 @@ std::variant<CVector, float, bool, std::tuple<int, int, int, int>> CLuaPhysicsDe
         case PHYSICS_PROPERTY_DEBUG_COLOR:
             pStaticCollision->GetDebugColor(color);
             return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
-        case PHYSICS_PROPERTY_POSITION:
-            return pStaticCollision->GetPosition();
-        case PHYSICS_PROPERTY_ROTATION:
-            return pStaticCollision->GetRotation();
         case PHYSICS_PROPERTY_SCALE:
             return pStaticCollision->GetScale();
             break;
@@ -1248,14 +1202,6 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
     SColor color;
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_POSITION:
-            return pRigidBody->GetPosition();
-        case PHYSICS_PROPERTY_ROTATION:
-            return pRigidBody->GetRotation();
-        case PHYSICS_PROPERTY_VELOCITY:
-            return pRigidBody->GetLinearVelocity();
-        case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
-            return pRigidBody->GetAngularVelocity();
         case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
             pRigidBody->GetSleepingThresholds(fLinear, fAngular);
             return std::make_tuple(fLinear, fAngular);

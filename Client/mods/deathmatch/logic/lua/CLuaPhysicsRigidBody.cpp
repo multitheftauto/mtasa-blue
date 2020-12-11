@@ -186,11 +186,12 @@ float CLuaPhysicsRigidBody::GetRestitution() const
     return m_pBtRigidBody->getRestitution();
 }
 
-void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
+bool CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
 {
     CLuaPhysicsSharedLogic::SetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
     // prevents rigid from sleeping, otherwise it can overlap other collisions
     Activate();
+    return true;
 }
 
 CVector CLuaPhysicsRigidBody::GetScale() const

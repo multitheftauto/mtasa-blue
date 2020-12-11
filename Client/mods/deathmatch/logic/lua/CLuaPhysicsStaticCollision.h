@@ -14,7 +14,6 @@ class CLuaPhysicsStaticCollision;
 
 #pragma once
 
-// Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
@@ -24,11 +23,10 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void SetPosition(CVector vecPosition);
+    void SetPosition(CVector& vecPosition);
     CVector GetPosition() const;
-    void SetRotation(CVector vecRotation);
+    void SetRotation(CVector& vecRotation);
     CVector GetRotation() const;
-
     bool SetScale(CVector& vecScale);
     CVector GetScale() const;
 

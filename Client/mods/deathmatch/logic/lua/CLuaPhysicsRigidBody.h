@@ -9,13 +9,12 @@
  *
  *****************************************************************************/
 
+class CLuaPhysicsElement;
 class CLuaPhysicsRigidBody;
 
-#include "lua/CLuaPhysicsElement.h";
 
 #pragma once
 
-// Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
@@ -25,14 +24,17 @@ public:
     CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
+    void    SetPosition(CVector& vecPosition);
+    CVector GetPosition() const;
+    void    SetRotation(CVector& vecRotation);
+    CVector GetRotation() const;
+    bool    SetScale(CVector& vecScale);
+    CVector GetScale() const;
+
     void UpdateAABB() { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(GetBtRigidBody()); }
 
     void Activate();
     void SetMass(float fMass);
-    void SetPosition(CVector& vecPosition);
-    void SetRotation(CVector& vecPosition);
-    CVector GetPosition() const;
-    CVector GetRotation() const;
 
     void SetMotionThreshold(float fThreshold);
     float GetMotionThreshold();
@@ -55,8 +57,6 @@ public:
     void GetSleepingThresholds(float& fLinear, float& fAngular);
     void SetRestitution(float fRestitution);
     float GetRestitution() const;
-    void SetScale(CVector& vecScale);
-    CVector GetScale() const;
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
     void RemoveDebugColor();

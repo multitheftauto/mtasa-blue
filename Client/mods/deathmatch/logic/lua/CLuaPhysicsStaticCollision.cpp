@@ -13,7 +13,6 @@
 #include "CLuaPhysicsSharedLogic.h"
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
@@ -30,12 +29,12 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
     Unlink();
 }
 
-void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
+void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
 {
     CLuaPhysicsSharedLogic::SetPosition(GetCollisionObject(), vecPosition);
 }
 
-void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation)
+void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
 {
     CLuaPhysicsSharedLogic::SetRotation(GetCollisionObject(), vecRotation);
 }
