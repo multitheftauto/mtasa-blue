@@ -59,6 +59,9 @@ public:
     static int PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody, CVector position,
                                                            CVector anchor, std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
+    static CLuaPhysicsConstraint* PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+
     static bool PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument);
     static bool PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,
                                               std::variant<CVector, bool, float, int, SColor> argument1, std::optional<float> argument2);
@@ -72,7 +75,11 @@ public:
     static std::variant<CVector, float, bool, std::tuple<int, int, int, int>> PhysicsGetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision,
                                                                                                                   ePhysicsProperty            eProperty);
 
-    static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float> variant);
+    //static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float> variant);
+
+    static CLuaPhysicsShape* PhysicsCreateBoxShape(lua_State* luaVM, CClientPhysics* pPhysics, std::variant<CVector, float> variant);
+    static CLuaPhysicsShape* PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius);
+
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 

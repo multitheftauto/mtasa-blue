@@ -732,7 +732,7 @@ CLuaPhysicsBoxShape* CClientPhysics::CreateBoxShape(CVector vector)
 
 CLuaPhysicsSphereShape* CClientPhysics::CreateSphereShape(float radius)
 {
-    assert(radius <= 0);
+    assert(radius > 0);
 
     std::unique_ptr<CLuaPhysicsSphereShape> pShape = std::make_unique<CLuaPhysicsSphereShape>(this, radius);
     return (CLuaPhysicsSphereShape*)AddShape(std::move(pShape));
@@ -809,6 +809,7 @@ CLuaPhysicsPointToPointConstraint* CClientPhysics::CreatePointToPointConstraint(
         std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies);
     return (CLuaPhysicsPointToPointConstraint*)AddConstraint(std::move(pConstraint));
 }
+
 CLuaPhysicsPointToPointConstraint* CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                 CVector anchorA, CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies)
 {
@@ -816,6 +817,21 @@ CLuaPhysicsPointToPointConstraint* CClientPhysics::CreatePointToPointConstraint(
 
     std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
     return (CLuaPhysicsPointToPointConstraint*)AddConstraint(std::move(pConstraint));
+}
+
+CLuaPhysicsFixedConstraint* CClientPhysics::CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                  bool bDisableCollisionsBetweenLinkedBodies)
+{
+    assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
+
+    CVector vecPositionA = pRigidBodyA->GetPosition() - pRigidBodyB->GetPosition();
+    CVector vecRotationA;
+    CVector vecPositionB = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
+    CVector vecRotationB;
+
+    std::unique_ptr<CLuaPhysicsFixedConstraint> pConstraint = std::make_unique<CLuaPhysicsFixedConstraint>(
+        pRigidBodyA, pRigidBodyB, vecPositionA, vecRotationA, vecPositionB, vecRotationB, bDisableCollisionsBetweenLinkedBodies);
+    return (CLuaPhysicsFixedConstraint*)AddConstraint(std::move(pConstraint));
 }
 
 std::vector<CLuaPhysicsConstraint*> CClientPhysics::GetConstraints() const

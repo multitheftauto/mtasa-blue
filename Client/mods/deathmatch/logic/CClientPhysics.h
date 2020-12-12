@@ -27,6 +27,7 @@ class CClientPhysics;
 #include "lua/CLuaPhysicsTrianglemeshShape.h"
 #include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
 #include "lua/CLuaPhysicsPointToPointConstraint.h"
+#include "lua/CLuaPhysicsFixedConstraint.h"
 
 enum ePhysicsDebugMode;
 class CLuaPhysicsConstraint;
@@ -112,6 +113,9 @@ public:
     // Links body to position
     CLuaPhysicsPointToPointConstraint*       CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
                                                                           bool bDisableCollisionsBetweenLinkedBodies);
+
+    CLuaPhysicsFixedConstraint* CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                      bool bDisableCollisionsBetweenLinkedBodies);
 
     std::vector<CLuaPhysicsShape*>           GetShapes() const;
     std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const;

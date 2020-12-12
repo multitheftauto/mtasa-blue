@@ -82,14 +82,15 @@ void CClientPhysicsManager::DoPulse(void)
 
     for (auto const& pPhysics : vecPhysics)
     {
-        m_pAsyncTaskScheduler->PushTask<bool>(
-            [pPhysics] {
-                //g_pCore->GetConsole()->Printf("asdf");
-                pPhysics->DoPulse();
-                return true;
-            },
-            [](bool test) { int a = 5;
-            });
+        pPhysics->DoPulse();
+        //m_pAsyncTaskScheduler->PushTask<bool>(
+        //    [pPhysics] {
+        //        //g_pCore->GetConsole()->Printf("asdf");
+        //        pPhysics->DoPulse();
+        //        return true;
+        //    },
+        //    [](bool test) { int a = 5;
+        //    });
     }
 
 }

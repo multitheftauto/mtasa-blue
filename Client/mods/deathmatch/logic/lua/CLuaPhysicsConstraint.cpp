@@ -48,7 +48,7 @@ void CLuaPhysicsConstraint::Initialize(std::unique_ptr<btTypedConstraint> pConst
     m_pRigidBodyA = pRigidBodyA;
     m_pRigidBodyB = pRigidBodyB;
 
-    GetPhysics()->GetDynamicsWorld()->addConstraint(pConstraint.get(), m_bDisableCollisionsBetweenLinkedBodies);
+    GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint.get(), m_bDisableCollisionsBetweenLinkedBodies);
 }
 
 CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
