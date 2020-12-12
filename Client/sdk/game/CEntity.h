@@ -57,6 +57,7 @@ public:
     //  virtual VOID                        SetModelAlpha ( int iAlpha )=0;
     virtual class CEntitySAInterface* GetInterface() = 0;
     virtual void                      UpdateRpHAnim() = 0;
+    virtual bool                      SetScaleInternal(const CVector& scale) = 0;
     virtual VOID                      SetPosition(float fX, float fY, float fZ) = 0;
     virtual VOID                      SetPosition(CVector* vecPosition) = 0;
     virtual VOID                      Teleport(float fX, float fY, float fZ) = 0;
