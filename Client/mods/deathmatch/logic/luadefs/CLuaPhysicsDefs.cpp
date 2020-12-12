@@ -102,7 +102,7 @@ CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
             {
                 pGroup->Add((CClientEntity*)pPhysics);
             }
-            pPhysics->SetGravity(vecGravity.value_or(CVector(0, 0, -9.81)));
+            pPhysics->SetGravity(vecGravity.value_or(BulletPhysics::Defaults::Gravity));
             return pPhysics;
         }
     }
@@ -122,15 +122,17 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClie
         half = CVector(fHalf, fHalf, fHalf);
     }
 
-    if (half.fX < BulletPhysicsLimit::MinimumPrimitiveSize || half.fY < BulletPhysicsLimit::MinimumPrimitiveSize ||
-        half.fZ < BulletPhysicsLimit::MinimumPrimitiveSize)
-        throw std::invalid_argument(
-            SString("Minimum width, height and length must be equal or greater than %.02f units", BulletPhysicsLimit::MinimumPrimitiveSize).c_str());
+    half /= 2;
 
-    if (half.fX > BulletPhysicsLimit::MaximumPrimitiveSize ||
-        half.fY > BulletPhysicsLimit::MaximumPrimitiveSize && half.fZ > BulletPhysicsLimit::MaximumPrimitiveSize)
+    if (half.fX < BulletPhysics::Limits::MinimumPrimitiveSize || half.fY < BulletPhysics::Limits::MinimumPrimitiveSize ||
+        half.fZ < BulletPhysics::Limits::MinimumPrimitiveSize)
         throw std::invalid_argument(
-            SString("Maximum width, height and length must be equal or smaller than %.02f units", BulletPhysicsLimit::MaximumPrimitiveSize).c_str());
+            SString("Minimum width, height and length must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (half.fX > BulletPhysics::Limits::MaximumPrimitiveSize ||
+        half.fY > BulletPhysics::Limits::MaximumPrimitiveSize && half.fZ > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(
+            SString("Maximum width, height and length must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
     CLuaPhysicsBoxShape* pShape = pPhysics->CreateBoxShape(half);
     return pShape;
@@ -139,14 +141,14 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClie
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius)
 {
-    if (fRadius < BulletPhysicsLimit::MinimumPrimitiveSize)
+    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
     {
-        throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysicsLimit::MinimumPrimitiveSize).c_str());
+        throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
     }
 
-    if (fRadius > BulletPhysicsLimit::MaximumPrimitiveSize)
+    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize)
     {
-        throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysicsLimit::MaximumPrimitiveSize).c_str());
+        throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
     }
     return pPhysics->CreateSphereShape(fRadius);
 }
@@ -173,16 +175,16 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                argStream.ReadNumber(fHeight);
 //                if (!argStream.HasErrors())
 //                {
-//                    if (fRadius < BulletPhysicsLimit::MinimumPrimitiveSize || fHeight < BulletPhysicsLimit::MinimumPrimitiveSize)
+//                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysicsLimit::MinimumPrimitiveSize).c_str());
+//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 //                        break;
 //                    }
-//                    if (fRadius > BulletPhysicsLimit::MaximumPrimitiveSize || fHeight > BulletPhysicsLimit::MaximumPrimitiveSize)
+//                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysicsLimit::MaximumPrimitiveSize).c_str());
+//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    pShape = pPhysics->CreateCapsuleShape(fRadius, fHeight);
@@ -193,16 +195,16 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                argStream.ReadNumber(fHeight);
 //                if (!argStream.HasErrors())
 //                {
-//                    if (fRadius < BulletPhysicsLimit::MinimumPrimitiveSize || fHeight < BulletPhysicsLimit::MinimumPrimitiveSize)
+//                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysicsLimit::MinimumPrimitiveSize).c_str());
+//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 //                        break;
 //                    }
-//                    if (fRadius > BulletPhysicsLimit::MaximumPrimitiveSize || fHeight > BulletPhysicsLimit::MaximumPrimitiveSize)
+//                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysicsLimit::MaximumPrimitiveSize).c_str());
+//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    pShape = pPhysics->CreateConeShape(fRadius, fHeight);
@@ -213,16 +215,16 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                argStream.ReadNumber(fHeight);
 //                if (!argStream.HasErrors())
 //                {
-//                    if (fRadius < BulletPhysicsLimit::MinimumPrimitiveSize || fHeight < BulletPhysicsLimit::MinimumPrimitiveSize)
+//                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysicsLimit::MinimumPrimitiveSize).c_str());
+//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 //                        break;
 //                    }
-//                    if (fRadius > BulletPhysicsLimit::MaximumPrimitiveSize || fHeight > BulletPhysicsLimit::MaximumPrimitiveSize)
+//                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysicsLimit::MaximumPrimitiveSize).c_str());
+//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    pShape = pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
@@ -274,11 +276,11 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                        break;
 //                    }
 //
-//                    if (std::abs(vecFloat[0]) > BulletPhysicsLimit::MaximumPrimitiveSize || std::abs(vecFloat[1]) > BulletPhysicsLimit::MaximumPrimitiveSize ||
-//                        std::abs(vecFloat[2]) > BulletPhysicsLimit::MaximumPrimitiveSize)
+//                    if (std::abs(vecFloat[0]) > BulletPhysics::Limits::MaximumPrimitiveSize || std::abs(vecFloat[1]) > BulletPhysics::Limits::MaximumPrimitiveSize ||
+//                        std::abs(vecFloat[2]) > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index, BulletPhysicsLimit::MaximumPrimitiveSize)
+//                            SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index, BulletPhysics::Limits::MaximumPrimitiveSize)
 //                                .c_str());
 //                        break;
 //                    }
@@ -594,8 +596,9 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
     if (fMass.value_or(1.f) < 0)
         throw std::invalid_argument("Mass can not be negative");
 
-    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(1.f), vecLocalInertia.value_or(CVector(0, 0, 0)),
-                                                                             vecCenterOfMass.value_or(CVector(0, 0, 0)));
+    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass),
+                                              vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
+                                                                             vecCenterOfMass.value_or(BulletPhysics::Defaults::RigidBodyCenterOfMass));
     return pRigidBody;
 }
 
@@ -608,8 +611,8 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM,
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision =
-        pShape->GetPhysics()->CreateStaticCollision(pShape, position.value_or(CVector(0, 0, 0)), rotation.value_or(CVector(0, 0, 0)));
+    CLuaPhysicsStaticCollision* pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
+        pShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
     return pStaticCollision;
 }
 
@@ -622,7 +625,7 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundSh
     if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Shape can not be compound");
 
-    pCompoundShape->AddShape(pShape, vecPosition.value_or(CVector(0, 0, 0)), vecRotation.value_or(CVector(0, 0, 0)));
+    pCompoundShape->AddShape(pShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition), vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
     return true;
 }
 
@@ -730,14 +733,14 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
             if (std::holds_alternative<int>(argument))
             {
                 int subSteps = std::get<int>(argument);
-                if (subSteps >= 1 && subSteps <= 256)
+                if (subSteps >= 1 && subSteps <= BulletPhysics::Limits::MaximumSubSteps)
                 {
                     pPhysics->SetSubSteps(subSteps);
                     return true;
                 }
                 else
                 {
-                    throw std::invalid_argument("Substeps must be between 1 and 256");
+                    throw std::invalid_argument(SString("Substeps must be between 1 and %i", BulletPhysics::Limits::MaximumSubSteps).c_str());
                 }
             }
             throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
@@ -767,15 +770,20 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
             {
                 CVector size = std::get<CVector>(argument);
 
-                if (size.fX >= 1 && size.fY >= 1 && size.fZ >= 1)
+                CVector min = BulletPhysics::Limits::WorldMinimumSize;
+                CVector max = BulletPhysics::Limits::WorldMaximumSize;
+
+                if (size.fX < min.fX || size.fY < min.fY || size.fZ < min.fZ)
                 {
-                    pPhysics->SetWorldSize(size);
-                    return true;
+                    throw std::invalid_argument(SString("World size can not be smaller than %.2fx, %.2fy, %.2fy", min.fX, min.fY, min.fZ));
                 }
-                else
+                if (size.fX > max.fX || size.fY > max.fY || size.fZ > max.fZ)
                 {
-                    throw std::invalid_argument("World size can not be smaller than cube 1x1x1");
+                    throw std::invalid_argument(SString("World size can not be greater than %.2fx, %.2fy, %.2fy", max.fX, max.fY, max.fZ));
                 }
+
+                pPhysics->SetWorldSize(size);
+                return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
     }

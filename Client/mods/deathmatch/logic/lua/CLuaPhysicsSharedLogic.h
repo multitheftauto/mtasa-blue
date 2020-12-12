@@ -3,13 +3,29 @@
 #include "../Client/game_sa/CModelInfoSA.h"
 #include "../Client/game_sa/CColModelSA.h"
 
-namespace BulletPhysicsLimit
+namespace BulletPhysics
 {
-    inline constexpr CVector WorldMinimumSize(1.f, 1.f, 1.f);
-    inline constexpr CVector WorldMaximumSize(8192.f, 8192.f, 8192.f);
-    inline constexpr float   MinimumPrimitiveSize = 0.05f;
-    inline constexpr float   MaximumPrimitiveSize = 8196.f;
-}            // namespace BulletPhysicsLimit
+    namespace Limits
+    {
+        inline constexpr CVector WorldMinimumSize(1.f, 1.f, 1.f);
+        inline constexpr CVector WorldMaximumSize(8192.f, 8192.f, 8192.f);
+        inline constexpr float   MinimumPrimitiveSize = 0.05f;
+        inline constexpr float   MaximumPrimitiveSize = 8196.f;
+        inline constexpr int     MaximumSubSteps = 256;
+    }
+    namespace Defaults
+    {
+        inline constexpr CVector Gravity(0.f, 0.f, -9.81f);
+        inline constexpr float RigidBodyMass = 1.f;
+        inline constexpr CVector RigidBodyInertia(0.f, 0.f, 0.f);
+        inline constexpr CVector RigidBodyCenterOfMass(0.f, 0.f, 0.f);
+        inline constexpr CVector RigidBodyPosition(0.f, 0.f, 0.f);
+        inline constexpr CVector RigidBodyRotation(0.f, 0.f, 0.f);
+        inline constexpr CVector ChildShapePosition(0.f, 0.f, 0.f);
+        inline constexpr CVector ChildShapeRotation(0.f, 0.f, 0.f);
+    }
+}            // namespace BulletPhysics
+
 
 struct heightfieldTerrainShape
 {
