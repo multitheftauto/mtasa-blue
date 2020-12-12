@@ -22,8 +22,8 @@ class CLuaPhysicsSharedLogic
 public:
     static const char* GetShapeName(btCollisionShape* pShape);
 
-    static bool SetPosition(btTransform& transform, CVector& vecPosition);
-    static bool SetRotation(btTransform& transform, CVector& vecRotation);
+    static bool SetPosition(btTransform& transform, const CVector& vecPosition);
+    static bool SetRotation(btTransform& transform, const CVector& vecRotation);
     static bool GetRotation(btTransform& transform, CVector& vecRotation);
     static bool GetPosition(btTransform& transform, CVector& vecPosition);
 
@@ -32,7 +32,7 @@ public:
     static bool GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
     static bool GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 
-    static bool SetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
+    static bool SetScale(btCollisionShape* pCollisionShape, const CVector& vecScale);
     static bool GetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
 
     static std::unique_ptr<btBoxShape> CreateBox(CVector& half, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));

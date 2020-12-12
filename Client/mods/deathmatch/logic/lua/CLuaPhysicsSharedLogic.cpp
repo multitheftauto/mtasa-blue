@@ -91,10 +91,10 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
     return "unknown";
 }
 
-bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, CVector& vecRotation)
+bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, const CVector& vecRotation)
 {
     btQuaternion quaternion = transform.getRotation();
-    EulerToQuaternion(reinterpret_cast<btVector3&>(vecRotation), quaternion);
+    EulerToQuaternion(reinterpret_cast<const btVector3&>(vecRotation), quaternion);
     transform.setRotation(quaternion);
     return true;
 }
@@ -114,10 +114,10 @@ bool CLuaPhysicsSharedLogic::GetPosition(btTransform& transform, CVector& vecPos
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, CVector& vecPosition)
+bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform,const CVector& vecPosition)
 {
     btQuaternion quaternion;
-    transform.setOrigin(reinterpret_cast<btVector3&>(vecPosition));
+    transform.setOrigin(reinterpret_cast<const btVector3&>(vecPosition));
     return true;
 }
 
@@ -150,9 +150,9 @@ bool CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CV
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetScale(btCollisionShape* pCollisionShape, CVector& vecScale)
+bool CLuaPhysicsSharedLogic::SetScale(btCollisionShape* pCollisionShape, const CVector& vecScale)
 {
-    pCollisionShape->setLocalScaling(reinterpret_cast<btVector3&>(vecScale));
+    pCollisionShape->setLocalScaling(reinterpret_cast<const btVector3&>(vecScale));
     return true;
 }
 

@@ -3674,6 +3674,8 @@ void CClientGame::PostWorldProcessHandler()
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
 
+    m_pManager->GetPhysicsManager()->WaitForSimulationsToFinish();
+
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);

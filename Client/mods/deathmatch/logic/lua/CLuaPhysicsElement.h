@@ -30,10 +30,14 @@ public:
     uint            GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
     void                   Destroy();
+    bool                   IsReady() const { return m_isReady; }
+    void                   Ready() { m_isReady = true; }
+    virtual void           Initialize(){}
 
 private:
     void RemoveScriptID();
 
+    std::atomic<bool>      m_isReady;
     CClientPhysics*        m_pPhysics;
     EIdClass::EIdClassType m_classType;
     uint                   m_uiScriptID;

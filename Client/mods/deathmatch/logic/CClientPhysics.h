@@ -127,6 +127,7 @@ public:
 
     std::atomic<bool> isDuringSimulation = false;
 
+    SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_InitializeQueue;
 private:
     void                        Clear();
 

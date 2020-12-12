@@ -30,6 +30,8 @@ public:
     bool SetScale(CVector& vecScale);
     CVector GetScale() const;
 
+    void Initialize();
+
     void RemoveDebugColor();
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);

@@ -375,6 +375,7 @@ CLuaPhysicsRigidBody* CClientPhysics::AddRigidBody(std::unique_ptr<CLuaPhysicsRi
     CLuaPhysicsRigidBody* pRigidBodyPtr = pRigidBody.get();
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBodyPtr);
     m_vecRigidBodies.push_back(std::move(pRigidBody));
+    m_InitializeQueue.push(pRigidBodyPtr);
     return pRigidBodyPtr;
 }
 
@@ -861,6 +862,13 @@ void CClientPhysics::DrawDebugLines()
 void CClientPhysics::DoPulse()
 {
     std::lock_guard<std::mutex> guard(lock);
+
+    while (!m_InitializeQueue.empty())
+    {
+        CLuaPhysicsElement* pElement = m_InitializeQueue.top();
+        pElement->Initialize();
+        m_InitializeQueue.pop();
+    }
 
     isDuringSimulation = true;
     CTickCount tickCountNow = CTickCount::Now();

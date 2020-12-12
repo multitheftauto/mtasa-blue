@@ -29,6 +29,10 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
     Unlink();
 }
 
+void CLuaPhysicsStaticCollision::Initialize()
+{
+}
+
 void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
 {
     CLuaPhysicsSharedLogic::SetPosition(GetCollisionObject(), vecPosition);

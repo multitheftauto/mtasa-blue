@@ -880,7 +880,7 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
         case PHYSICS_PROPERTY_MOTION_THRESHOLD:
             if (std::holds_alternative<float>(argument1))
             {
-                pRigidBody->SetMotionThreshold(std::get<float>(argument1));
+                pRigidBody->SetCcdMotionThreshold(std::get<float>(argument1));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
@@ -1210,10 +1210,10 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
         case PHYSICS_PROPERTY_SCALE:
             return pRigidBody->GetScale();
         case PHYSICS_PROPERTY_DEBUG_COLOR:
-            pRigidBody->GetDebugColor(color);
+            color = pRigidBody->GetDebugColor();
             return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
         case PHYSICS_PROPERTY_MOTION_THRESHOLD:
-            return pRigidBody->GetMotionThreshold();
+            return pRigidBody->GetCcdMotionThreshold();
         case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
             return pRigidBody->GetSweptSphereRadius();
         case PHYSICS_PROPERTY_SLEEP:

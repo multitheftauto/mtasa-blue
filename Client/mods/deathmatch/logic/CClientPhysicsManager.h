@@ -44,5 +44,6 @@ private:
     std::atomic<bool>                isLocked;
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
     std::atomic<int>                 m_numPhysicsLeft;
+    bool                             m_bWaitForSimulationToFinish = true;
 
 };
