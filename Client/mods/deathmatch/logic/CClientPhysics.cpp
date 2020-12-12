@@ -829,25 +829,30 @@ std::vector<CLuaPhysicsConstraint*> CClientPhysics::GetConstraints() const
     return constraints;
 }
 
+bool CClientPhysics::CanDoPulse() const
+{
+    return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
+}
+
 void CClientPhysics::DoPulse()
 {
-    if (!m_pLuaMain || m_pLuaMain->BeingDeleted())
-        return;
+    std::lock_guard<std::mutex> guard(lock);
 
+    isDuringSimulation = true;
     CTickCount tickCountNow = CTickCount::Now();
 
     m_iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
     int iDeltaTimeBuildWorld = (int)(tickCountNow - m_LastTimeBuildWorld).ToLongLong();
     m_LastTimeMs = tickCountNow;
 
-    if (m_bBuildWorld)
-    {
-        if (iDeltaTimeBuildWorld > 1000)
-        {
-            m_LastTimeBuildWorld = tickCountNow;
-            BuildCollisionFromGTA();
-        }
-    }
+    //if (m_bBuildWorld)
+    //{
+    //    if (iDeltaTimeBuildWorld > 1000)
+    //    {
+    //        m_LastTimeBuildWorld = tickCountNow;
+    //        BuildCollisionFromGTA();
+    //    }
+    //}
 
     StepSimulation();
 

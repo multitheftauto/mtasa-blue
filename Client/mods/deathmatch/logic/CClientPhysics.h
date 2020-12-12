@@ -48,6 +48,7 @@ public:
 
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DoPulse();
+    bool CanDoPulse() const;
 
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
@@ -119,6 +120,8 @@ public:
 
     btDiscreteDynamicsWorld*                                 GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
+    std::atomic<bool> isDuringSimulation = false;
+
 private:
     void                        Clear();
 
@@ -131,6 +134,8 @@ private:
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+
+    std::mutex                           lock;
 
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
     btCollisionDispatcher*               m_pDispatcher;

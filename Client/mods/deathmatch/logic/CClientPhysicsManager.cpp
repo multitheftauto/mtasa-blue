@@ -9,13 +9,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <stack>
+
 
 using std::list;
+
 
 CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
 {
     // Init
     m_pManager = pManager;
+
+    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
 }
 
 CClientPhysicsManager::~CClientPhysicsManager()
@@ -36,8 +41,13 @@ void CClientPhysicsManager::DeleteAll()
     m_List.clear();
 }
 
-void CClientPhysicsManager::RemoveFromList(CClientPhysics* pPhysics)
+void CClientPhysicsManager::DoWork()
 {
+
+}
+
+void CClientPhysicsManager::RemoveFromList(CClientPhysics* pPhysics)
+    {
     if (!m_List.empty())
         m_List.remove(pPhysics);
 }
@@ -61,8 +71,25 @@ CClientPhysics* CClientPhysicsManager::GetPhysics(btDiscreteDynamicsWorld* pDyna
 void CClientPhysicsManager::DoPulse(void)
 {
     list<CClientPhysics*>::const_iterator iter = IterBegin();
+    std::vector<CClientPhysics*>          vecPhysics;
     for (; iter != IterEnd(); iter++)
     {
-        (*iter)->DoPulse();
+        if((*iter)->CanDoPulse())
+        {
+            vecPhysics.push_back(*iter);
+        }
     }
+
+    for (auto const& pPhysics : vecPhysics)
+    {
+        m_pAsyncTaskScheduler->PushTask<bool>(
+            [pPhysics] {
+                //g_pCore->GetConsole()->Printf("asdf");
+                pPhysics->DoPulse();
+                return true;
+            },
+            [](bool test) { int a = 5;
+            });
+    }
+
 }
