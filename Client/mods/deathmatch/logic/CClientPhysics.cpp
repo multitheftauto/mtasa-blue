@@ -48,7 +48,7 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 
     m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
     m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
-    m_pDebugDrawer = new CPhysicsDebugDrawer(g_pCore->GetGraphics());
+    m_pDebugDrawer = new CPhysicsDebugDrawer();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
     // Add us to Physics manager's list
@@ -850,6 +850,14 @@ bool CClientPhysics::CanDoPulse() const
     return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
 }
 
+void CClientPhysics::DrawDebugLines()
+{
+    for (auto const& line : m_pDebugDrawer->m_vecLines)
+    {
+        g_pCore->GetGraphics()->DrawLine3DQueued(line.from, line.to, m_pDebugDrawer->GetDebugLineWidth(), line.color, false);
+    }
+}
+
 void CClientPhysics::DoPulse()
 {
     std::lock_guard<std::mutex> guard(lock);
@@ -874,6 +882,7 @@ void CClientPhysics::DoPulse()
 
     if (m_bDrawDebugNextTime)
     {
+        m_pDebugDrawer->Clear();
         m_pDynamicsWorld->debugDrawWorld();
         m_bDrawDebugNextTime = false;
     }

@@ -3662,7 +3662,6 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
-    m_pManager->GetPhysicsManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
@@ -3679,6 +3678,8 @@ void CClientGame::PostWorldProcessHandler()
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
+
+    m_pManager->GetPhysicsManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()

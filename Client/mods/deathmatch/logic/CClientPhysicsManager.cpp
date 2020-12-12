@@ -68,29 +68,44 @@ CClientPhysics* CClientPhysicsManager::GetPhysics(btDiscreteDynamicsWorld* pDyna
     return nullptr;
 }
 
-void CClientPhysicsManager::DoPulse(void)
+void CClientPhysicsManager::WaitForSimulationsToFinish()
 {
+    while (isLocked)
+        ;
+}
+
+void CClientPhysicsManager::DoPulse()
+{
+    m_pAsyncTaskScheduler->CollectResults();
+
     list<CClientPhysics*>::const_iterator iter = IterBegin();
     std::vector<CClientPhysics*>          vecPhysics;
     for (; iter != IterEnd(); iter++)
     {
-        if((*iter)->CanDoPulse())
+        if ((*iter)->CanDoPulse())
         {
             vecPhysics.push_back(*iter);
+            (*iter)->DrawDebugLines();
         }
     }
 
+    isLocked = true;
+    m_numPhysicsLeft = vecPhysics.size();
     for (auto const& pPhysics : vecPhysics)
     {
-        pPhysics->DoPulse();
-        //m_pAsyncTaskScheduler->PushTask<bool>(
-        //    [pPhysics] {
-        //        //g_pCore->GetConsole()->Printf("asdf");
-        //        pPhysics->DoPulse();
-        //        return true;
-        //    },
-        //    [](bool test) { int a = 5;
-        //    });
+        m_pAsyncTaskScheduler->PushTask<long>(
+            [pPhysics] {
+                long start = GetTickCount64_();
+                pPhysics->DoPulse();
+                return GetTickCount64_() - start;
+            },
+            [this](long tickedPassed) {
+                g_pCore->GetConsole()->Printf("DoPulse: %ld", tickedPassed);
+                this->m_numPhysicsLeft--;
+                if (this->m_numPhysicsLeft == 0)
+                {
+                    isLocked = false;
+                }
+            });
     }
-
 }

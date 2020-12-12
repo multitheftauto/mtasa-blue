@@ -836,6 +836,8 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
     if (g_pCore->IsWindowMinimized())
         return;
 
+    std::lock_guard lock(drawLineLock);
+
     // Add it to the queue
     if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
         m_pLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
@@ -1595,7 +1597,11 @@ void CGraphics::DrawPreGUIQueue()
 void CGraphics::DrawPostGUIQueue()
 {
     DrawQueue(m_PostGUIQueue);
-    m_pLine3DBatcherPostGUI->Flush();
+    {
+        std::lock_guard lock(drawLineLock);
+
+        m_pLine3DBatcherPostGUI->Flush();
+    }
     m_pMaterialLine3DBatcherPostGUI->Flush();
     m_pPrimitive3DBatcherPostGUI->Flush();
     m_pMaterialPrimitive3DBatcherPostGUI->Flush();
@@ -1606,7 +1612,11 @@ void CGraphics::DrawPostGUIQueue()
 
 void CGraphics::DrawLine3DPreGUIQueue()
 {
-    m_pLine3DBatcherPreGUI->Flush();
+    {
+        std::lock_guard lock(drawLineLock);
+
+        m_pLine3DBatcherPreGUI->Flush();
+    }
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 

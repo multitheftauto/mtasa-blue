@@ -13,19 +13,29 @@
 #include <list>
 #include <bitset>
 
+class CPhysicsDebugLine
+{
+public:
+    CPhysicsDebugLine(const CVector& from, const CVector& to, const SColorARGB& color) : from(from), to(to), color(color) { }
+    CVector from;
+    CVector to;
+    SColorARGB color;
+
+};
+
 class CPhysicsDebugDrawer : public btIDebugDraw
 {
     std::bitset<32>     m_debugMode = 0;
-    CGraphicsInterface* m_pGraphics;
     SColorARGB          color = SColorARGB(255, 255, 0, 0);
     float               m_fLineWidth = 2.0f;
 
 public:
-    CPhysicsDebugDrawer(CGraphicsInterface* pGraphics) : m_pGraphics(pGraphics){};
-    ~CPhysicsDebugDrawer(){};
-
     void  SetDebugLineWidth(float fWidth) { m_fLineWidth = fWidth; }
     float GetDebugLineWidth() const { return m_fLineWidth; }
+
+    void Clear();
+    void DrawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor);
+
 
     void drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor);
 
@@ -48,4 +58,6 @@ public:
 
     int getDebugMode() const { return m_debugMode.to_ulong(); }
     int getDebugMode(byte bit) const { return m_debugMode.test(bit); }
+
+    std::vector<CPhysicsDebugLine> m_vecLines;
 };

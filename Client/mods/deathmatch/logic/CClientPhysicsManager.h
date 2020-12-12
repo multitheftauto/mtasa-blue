@@ -28,6 +28,7 @@ public:
     std::list<CClientPhysics*>::const_iterator IterEnd() { return m_List.end(); };
     CClientPhysics*                            GetPhysics(btDiscreteDynamicsWorld* pDynamicsWorld);
     void DoPulse();
+    void WaitForSimulationsToFinish();
 
 private:
 
@@ -40,7 +41,8 @@ private:
 
     std::list<CClientPhysics*> m_List;
 
-    std::atomic_flag                 lock = ATOMIC_FLAG_INIT;
+    std::atomic<bool>                isLocked;
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+    std::atomic<int>                 m_numPhysicsLeft;
 
 };

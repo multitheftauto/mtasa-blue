@@ -48,6 +48,7 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     void DrawDebug() { m_bDrawDebugNextTime = true; };
+    void DrawDebugLines();
     void DoPulse();
     bool CanDoPulse() const;
 
