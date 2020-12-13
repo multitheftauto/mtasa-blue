@@ -40,8 +40,12 @@ void CLuaPhysicsRigidBody::Initialize()
     m_pShape->AddRigidBody(this);
     m_pBtRigidBody->setDamping(0.001f, 0.001f);
     SetSleepingThresholds(0.1f, 0.1f);
-    m_pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(GetBtRigidBody());
     m_pBtRigidBody->setUserPointer((void*)this);
+    m_pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(GetBtRigidBody());
+
+    assert(m_pBtRigidBody->getBroadphaseHandle());
+    assert(m_pBtRigidBody->getBroadphaseProxy());
+
     Ready();
 
     SetPosition(m_pTempData->m_matrix.GetPosition());

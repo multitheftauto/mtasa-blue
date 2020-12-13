@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include <stack>
+#include <pthread.h>
 
 using std::list;
 
@@ -23,6 +24,7 @@ CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
 
 CClientPhysicsManager::~CClientPhysicsManager()
 {
+    WaitForSimulationsToFinish(true);
     // Make sure all the physics worlds are deleted
     DeleteAll();
 }
@@ -45,6 +47,7 @@ void CClientPhysicsManager::DoWork()
 
 void CClientPhysicsManager::RemoveFromList(CClientPhysics* pPhysics)
 {
+    WaitForSimulationsToFinish(true);
     if (!m_List.empty())
         m_List.remove(pPhysics);
 }
@@ -65,9 +68,9 @@ CClientPhysics* CClientPhysicsManager::GetPhysics(btDiscreteDynamicsWorld* pDyna
     return nullptr;
 }
 
-void CClientPhysicsManager::WaitForSimulationsToFinish()
+void CClientPhysicsManager::WaitForSimulationsToFinish(bool bForceWait)
 {
-    if (m_bWaitForSimulationToFinish)
+    if (m_bWaitForSimulationToFinish || bForceWait)
         while (isLocked)
         {
             m_pAsyncTaskScheduler->CollectResults();
@@ -75,6 +78,11 @@ void CClientPhysicsManager::WaitForSimulationsToFinish()
             {
                 // g_pCore->GetConsole()->Printf("sleep 1");
                 Sleep(1);
+            }
+            list<CClientPhysics*>::const_iterator iter = IterBegin();
+            for (; iter != IterEnd(); iter++)
+            {
+                (*iter)->WaitForSimulationToFinish();
             }
         }
     else
@@ -95,6 +103,7 @@ void CClientPhysicsManager::DoPulse()
     }
 
     m_numPhysicsLeft = vecPhysics.size();
+
     if (m_numPhysicsLeft > 0)
     {
         isLocked = true;
@@ -103,14 +112,18 @@ void CClientPhysicsManager::DoPulse()
             m_pAsyncTaskScheduler->PushTask<long>(
                 [pPhysics] {
                     long start = GetTickCount64_();
-                    pPhysics->DoPulse();
+                    SetThreadDescription(GetCurrentThread(), L"Physics worker");
+                    if (pPhysics)
+                    {
+                        pPhysics->DoPulse();
+                    }
                     return GetTickCount64_() - start;
                 },
-                [this](long tickedPassed) {
+                [&](long ticksPassed) {
                     /* if (tickedPassed > 10)
                          g_pCore->GetConsole()->Printf("DoPulse: %ld", tickedPassed);*/
-                    this->m_numPhysicsLeft--;
-                    if (this->m_numPhysicsLeft == 0)
+                    m_numPhysicsLeft--;
+                    if (m_numPhysicsLeft == 0)
                     {
                         isLocked = false;
                     }

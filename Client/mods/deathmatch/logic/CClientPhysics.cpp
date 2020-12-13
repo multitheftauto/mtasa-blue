@@ -45,30 +45,47 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pCollisionConfiguration = new btDefaultCollisionConfiguration();
     m_pDispatcher = new btCollisionDispatcher(m_pCollisionConfiguration);
     m_pSolver = new btSequentialImpulseConstraintSolver();
-
-    m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
-    m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
     m_pDebugDrawer = new CPhysicsDebugDrawer();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-    m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
+        m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
+        m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
+    }
+
     // Add us to Physics manager's list
     m_pPhysicsManager->AddToList(this);
 }
 
 CClientPhysics::~CClientPhysics()
 {
+    WaitForSimulationToFinish();
     Clear();
 
     // delete dynamics world
-    delete m_pDynamicsWorld;
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        delete m_pDynamicsWorld;
+        if (isDuringSimulation)
+            DebugBreak();
+    }
     delete m_pSolver;
     delete m_pOverlappingPairCache;
     delete m_pDispatcher;
     delete m_pCollisionConfiguration;
+
 }
 
-void CClientPhysics::Clear()
+void CClientPhysics::WaitForSimulationToFinish()
 {
+    while (isDuringSimulation)
+    {
+        Sleep(1);
+    }
+}
+void CClientPhysics::Clear()
+    {
     for (const auto& pRigidBody : m_vecRigidBodies)
     {
         pRigidBody->Unlink();
@@ -90,22 +107,34 @@ void CClientPhysics::Unlink()
 
 void CClientPhysics::SetGravity(const CVector& vecGravity) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
     m_pDynamicsWorld->setGravity(reinterpret_cast<const btVector3&>(vecGravity));
+    if (isDuringSimulation)
+        DebugBreak();
 }
 
 CVector CClientPhysics::GetGravity() const
 {
+    std::lock_guard guard(dynamicsWorldLock);
     return reinterpret_cast<const CVector&>(m_pDynamicsWorld->getGravity());
+    if (isDuringSimulation)
+        DebugBreak();
 }
 
 bool CClientPhysics::GetUseContinous() const
 {
+    std::lock_guard guard(dynamicsWorldLock);
     return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
+    if (isDuringSimulation)
+        DebugBreak();
 }
 
 void CClientPhysics::SetUseContinous(bool bUse) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
+    if (isDuringSimulation)
+        DebugBreak();
 }
 
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
@@ -237,7 +266,13 @@ btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(const CL
     CLuaPhysicsSharedLogic::GetPosition(from, fromPosition);
     CLuaPhysicsSharedLogic::GetPosition(to, toPosition);
     btCollisionWorld::ClosestConvexResultCallback result(reinterpret_cast<const btVector3&>(from), reinterpret_cast<const btVector3&>(to));
-    m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
+
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
+        if (isDuringSimulation)
+            DebugBreak();
+    }
     return result;
 }
 
@@ -246,7 +281,13 @@ btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from,
     btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
         RayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
-    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
+
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
+        if (isDuringSimulation)
+            DebugBreak();
+    }
     return RayCallback;
 }
 
@@ -255,7 +296,13 @@ btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastAll(CVector fr
     btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
         rayResult.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
-    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayResult);
+
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayResult);
+        if (isDuringSimulation)
+            DebugBreak();
+    }
 
     return rayResult;
 }
@@ -386,9 +433,10 @@ void CClientPhysics::StepSimulation()
     if (!m_bSimulationEnabled)
         return;
 
-    m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
-
-    m_iSimulationCounter++;
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
+    }
 }
 
 void CClientPhysics::ClearOutsideWorldRigidBodies()
@@ -417,9 +465,20 @@ void CClientPhysics::ClearOutsideWorldRigidBodies()
     }
 }
 
+btDiscreteDynamicsWorld* CClientPhysics::GetDynamicsWorld() const
+{
+    std::lock_guard guard(dynamicsWorldLock);
+    if (isDuringSimulation)
+        DebugBreak();
+    return m_pDynamicsWorld;
+}
 void CClientPhysics::ProcessCollisions()
 {
-    int                                numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
+    int numManifolds;
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
+    }
     CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = m_pLuaMain->GetPhysicsStaticCollisionManager();
     CLuaPhysicsConstraintManager*      pConstraintManager = m_pLuaMain->GetPhysicsConstraintManager();
@@ -805,8 +864,13 @@ std::vector<CLuaPhysicsConstraint*> CClientPhysics::GetConstraints() const
     return constraints;
 }
 
-bool CClientPhysics::CanDoPulse() const
+bool CClientPhysics::CanDoPulse()
 {
+    if (!m_canDoPulse) // first pulse can cause weird crash
+    {
+        m_canDoPulse = true;
+        return false;
+    }
     return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
 }
 
@@ -820,7 +884,9 @@ void CClientPhysics::DrawDebugLines()
 
 void CClientPhysics::DoPulse()
 {
+    OutputDebugString("In\n");
     std::lock_guard<std::mutex> guard(lock);
+    assert(!isDuringSimulation);
 
     while (!m_InitializeQueue.empty())
     {
@@ -829,7 +895,6 @@ void CClientPhysics::DoPulse()
         m_InitializeQueue.pop();
     }
 
-    isDuringSimulation = true;
     CTickCount tickCountNow = CTickCount::Now();
 
     m_iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
@@ -845,15 +910,24 @@ void CClientPhysics::DoPulse()
     //    }
     //}
 
+    isDuringSimulation = true;
     StepSimulation();
+    isDuringSimulation = false;
 
     if (m_bDrawDebugNextTime)
     {
         m_pDebugDrawer->Clear();
-        m_pDynamicsWorld->debugDrawWorld();
+        {
+            std::lock_guard guard(dynamicsWorldLock);
+            m_pDynamicsWorld->debugDrawWorld();
+            if (isDuringSimulation)
+                DebugBreak();
+        }
         m_bDrawDebugNextTime = false;
     }
 
-    ClearOutsideWorldRigidBodies();
-    ProcessCollisions();
+    //ClearOutsideWorldRigidBodies();
+    //ProcessCollisions();
+
+    OutputDebugString("Out\n");
 }

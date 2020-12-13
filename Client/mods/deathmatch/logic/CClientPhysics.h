@@ -52,11 +52,8 @@ public:
 
     // Running on worker thread
     void DoPulse();
-    bool CanDoPulse() const;
-
-    void StepSimulation();
-    void ClearOutsideWorldRigidBodies();
-    void ProcessCollisions();
+    bool CanDoPulse();
+    void WaitForSimulationToFinish();
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
@@ -93,7 +90,6 @@ public:
     bool    GetTriggerConstraintvents() const { return m_bTriggerConstraintEvents; }
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
-    int     GetSimulationCounter() const { return m_iSimulationCounter; }
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
@@ -123,13 +119,17 @@ public:
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const;
     std::vector<CLuaPhysicsConstraint*>      GetConstraints() const;
 
-    btDiscreteDynamicsWorld* GetDynamicsWorld() const { return m_pDynamicsWorld; }
+    btDiscreteDynamicsWorld* GetDynamicsWorld() const;            // Todo, Remove
 
     std::atomic<bool> isDuringSimulation = false;
 
     SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_InitializeQueue;
 
 private:
+    void StepSimulation();
+    void ClearOutsideWorldRigidBodies();
+    void ProcessCollisions();
+
     void Clear();
 
     CLuaPhysicsShape*           AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
@@ -143,6 +143,7 @@ private:
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     std::mutex lock;
+    mutable std::mutex dynamicsWorldLock;
 
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
     btCollisionDispatcher*               m_pDispatcher;
@@ -152,21 +153,21 @@ private:
 
     CPhysicsDebugDrawer* m_pDebugDrawer;
 
-    int       m_iDeltaTimeMs;
-    bool      m_bDrawDebugNextTime;
+    std::atomic<int> m_iDeltaTimeMs = 0;
+    bool      m_bDrawDebugNextTime = false;
     CLuaMain* m_pLuaMain;
 
     CClientPhysicsManager* m_pPhysicsManager;
 
+    bool m_canDoPulse = false;
     CTickCount m_LastTimeMs;
     CTickCount m_LastTimeBuildWorld;
     bool       m_bBuildWorld;
-    int        m_iSimulationCounter = 0;
-    float      m_fSpeed = 1.0f;
+    std::atomic<float>      m_fSpeed = 1.0f;
     bool       m_bDuringSimulation = false;
-    int        m_iSubSteps = 10;
+    std::atomic<int>        m_iSubSteps = 10;
     float      m_fImpulseThreshold = 0.01f;
-    bool       m_bSimulationEnabled = true;
+    std::atomic<bool> m_bSimulationEnabled = true;
     bool       m_bTriggerEvents = true;
     bool       m_bTriggerCollisionEvents = false;            // spam alert
     bool       m_bTriggerConstraintEvents = false;
