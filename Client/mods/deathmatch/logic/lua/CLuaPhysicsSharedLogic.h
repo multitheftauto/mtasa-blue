@@ -40,11 +40,13 @@ public:
 
     static bool SetPosition(btTransform& transform, const CVector& vecPosition);
     static bool SetRotation(btTransform& transform, const CVector& vecRotation);
-    static bool GetRotation(btTransform& transform, CVector& vecRotation);
-    static bool GetPosition(btTransform& transform, CVector& vecPosition);
+    static bool GetRotation(const btTransform& transform, CVector& vecRotation);
+    static bool GetPosition(const btTransform& transform, CVector& vecPosition);
+    static bool GetRotation(const btTransform& transform, btVector3& vecRotation);
+    static bool GetPosition(const btTransform& transform, btVector3& vecPosition);
 
-    static bool SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition);
-    static bool SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation);
+    static bool SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition);
+    static bool SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation);
     static bool GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
     static bool GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 

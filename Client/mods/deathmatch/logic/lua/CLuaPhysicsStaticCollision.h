@@ -23,11 +23,11 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void SetPosition(CVector& vecPosition);
+    void SetPosition(const CVector& vecPosition) const;
     CVector GetPosition() const;
-    void SetRotation(CVector& vecRotation);
+    void    SetRotation(const CVector& vecRotation) const;
     CVector GetRotation() const;
-    bool SetScale(CVector& vecScale);
+    bool    SetScale(const CVector& vecScale) const;
     CVector GetScale() const;
 
     void Initialize();

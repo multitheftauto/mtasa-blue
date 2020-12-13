@@ -60,7 +60,7 @@ public:
                                                            CVector anchor, std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static CLuaPhysicsConstraint* PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+                                                               std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static bool PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument);
     static bool PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,
@@ -75,28 +75,27 @@ public:
     static std::variant<CVector, float, bool, std::tuple<int, int, int, int>> PhysicsGetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision,
                                                                                                                   ePhysicsProperty            eProperty);
 
-    //static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float> variant);
+    // static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float>
+    // variant);
 
     static CLuaPhysicsShape* PhysicsCreateBoxShape(lua_State* luaVM, CClientPhysics* pPhysics, std::variant<CVector, float> variant);
     static CLuaPhysicsShape* PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius);
 
-
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 
-    static std::variant<bool,
-                        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
-                PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to,
-                                                                                       std::optional<bool> bFilterBackfaces);
+    static std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+                PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
     static bool PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
 
     static std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
     PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
 
+    static std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+    PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition, CVector vecEndRotation);
     // LUA_DECLARE(PhysicsSetProperties);
     // LUA_DECLARE(PhysicsGetProperties);
 
     LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsCreateConstraint);
-    LUA_DECLARE(PhysicsShapeCast);
 };

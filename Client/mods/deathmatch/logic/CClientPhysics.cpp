@@ -235,9 +235,15 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-void CClientPhysics::ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result)
+btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(const CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to)
 {
+    CVector fromPosition;
+    CVector toPosition;
+    CLuaPhysicsSharedLogic::GetPosition(from, fromPosition);
+    CLuaPhysicsSharedLogic::GetPosition(to, toPosition);
+    btCollisionWorld::ClosestConvexResultCallback result(reinterpret_cast<const btVector3&>(from), reinterpret_cast<const btVector3&>(to));
     m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
+    return result;
 }
 
 btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces)

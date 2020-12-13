@@ -60,7 +60,7 @@ public:
 
     btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to, bool bFilterBackfaces);
     btCollisionWorld::AllHitsRayResultCallback RayCastAll(CVector from, CVector to, bool bFilterBackfaces);
-    void ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
+    btCollisionWorld::ClosestConvexResultCallback ShapeCast(const CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to);
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     bool                        GetDebugMode(ePhysicsDebugMode eDebugMode);

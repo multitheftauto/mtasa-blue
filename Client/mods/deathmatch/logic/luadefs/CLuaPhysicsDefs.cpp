@@ -71,7 +71,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsLineCast", ArgumentParser<PhysicsLineCast>},
         {"physicsRayCast", ArgumentParser<PhysicsRayCast>},
         {"PhysicsRayCastAll", ArgumentParser<PhysicsRayCastAll>},
-        {"physicsShapeCast", PhysicsShapeCast},
+        {"physicsShapeCast", ArgumentParser<PhysicsShapeCast>},
         {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
     };
@@ -430,163 +430,6 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CClientPhysics* pPhysics)
 {
     pPhysics->DrawDebug();
     return true;
-}
-
-int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
-{
-    CLuaPhysicsShape* pShape;
-    CVector           vecStartPosition, vecStartRotation;
-    CVector           vecEndPosition, vecEndRotation;
-    CScriptArgReader  argStream(luaVM);
-    argStream.ReadUserData(pShape);
-    argStream.ReadVector3D(vecStartPosition);
-    argStream.ReadVector3D(vecEndPosition);
-    argStream.ReadVector3D(vecStartRotation, CVector(0, 0, 0));
-    argStream.ReadVector3D(vecEndRotation, CVector(0, 0, 0));
-
-    if (!argStream.HasErrors())
-    {
-        switch (pShape->GetType())
-        {
-            case BOX_SHAPE_PROXYTYPE:
-            case SPHERE_SHAPE_PROXYTYPE:
-            case CONE_SHAPE_PROXYTYPE:
-            case CYLINDER_SHAPE_PROXYTYPE:
-                break;
-            default:
-                m_pScriptDebugging->LogCustom(luaVM, SString("Shape casting does not support %s shape type.", pShape->GetName()).c_str());
-                lua_pushboolean(luaVM, false);
-                return 1;
-        }
-        CClientPhysics* pPhysics = pShape->GetPhysics();
-        btTransform     startTransform;
-        btTransform     endTransform;
-        startTransform.setIdentity();
-        endTransform.setIdentity();
-        CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
-        CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartRotation);
-        CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
-        CLuaPhysicsSharedLogic::SetRotation(endTransform, vecEndRotation);
-
-        btVector3                                     from = btVector3(vecStartPosition.fX, vecStartPosition.fY, vecStartPosition.fZ);
-        btVector3                                     to = btVector3(vecEndPosition.fX, vecEndPosition.fY, vecEndPosition.fZ);
-        btCollisionWorld::ClosestConvexResultCallback result(from, to);
-        pPhysics->ShapeCast(pShape, startTransform, endTransform, result);
-        lua_newtable(luaVM);
-        lua_pushstring(luaVM, "hit");
-        lua_pushboolean(luaVM, result.hasHit());
-        lua_settable(luaVM, -3);
-        if (result.hasHit())
-        {
-            btVector3    vecShapePosition = from.lerp(to, result.m_closestHitFraction);
-            btQuaternion startQuaternion = startTransform.getRotation();
-            btQuaternion endQuaternion = endTransform.getRotation();
-            btQuaternion shapeQuaternion = startQuaternion.slerp(endQuaternion, result.m_closestHitFraction);
-
-            btVector3 vecShapeRotation;
-            CLuaPhysicsSharedLogic::QuaternionToEuler(shapeQuaternion, vecShapeRotation);
-
-            lua_pushstring(luaVM, "shapeposition");
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, vecShapePosition.getX());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, vecShapePosition.getY());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, vecShapePosition.getZ());
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-
-            lua_pushstring(luaVM, "shaperotation");
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, vecShapeRotation.getX());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, vecShapeRotation.getY());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, vecShapeRotation.getZ());
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-
-            lua_pushstring(luaVM, "hitpoint");
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, result.m_hitPointWorld.getX());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, result.m_hitPointWorld.getY());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, result.m_hitPointWorld.getZ());
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-
-            lua_pushstring(luaVM, "hitnormal");
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, result.m_hitNormalWorld.getX());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, result.m_hitNormalWorld.getY());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, result.m_hitNormalWorld.getZ());
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-
-            const btCollisionObject* pCollisionObject = result.m_hitCollisionObject;
-            const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
-            const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
-
-            CLuaPhysicsShape*           pLuaShape = nullptr;
-            CLuaPhysicsRigidBody*       pLuaRigidBody = nullptr;
-            CLuaPhysicsStaticCollision* pLuaStaticCollision = nullptr;
-
-            if (pShape != nullptr)
-            {
-                pLuaShape = (CLuaPhysicsShape*)pShape->getUserPointer();
-            }
-
-            if (pRigidBody != nullptr)
-            {
-                pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
-            }
-            else if (pCollisionObject != nullptr)
-            {
-                pLuaStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
-            }
-
-            //lua_pushstring(luaVM, "shape");
-            //if (pLuaShape)
-            //    lua_pushshape(luaVM, pLuaShape);
-            //else
-            //    lua_pushboolean(luaVM, false);
-            //lua_settable(luaVM, -3);
-
-            //lua_pushstring(luaVM, "rigidbody");
-            //if (pLuaRigidBody)
-            //    lua_pushrigidbody(luaVM, pLuaRigidBody);
-            //else
-            //    lua_pushboolean(luaVM, false);
-            //lua_settable(luaVM, -3);
-
-            //lua_pushstring(luaVM, "staticcollision");
-            //if (pLuaStaticCollision)
-            //    lua_pushstaticcollision(luaVM, pLuaStaticCollision);
-            //else
-            //    lua_pushboolean(luaVM, false);
-            //lua_settable(luaVM, -3);
-        }
-
-        return 1;
-    }
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass,
@@ -1606,7 +1449,7 @@ std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhy
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
         {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
         {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld)},
-        {"shape", (CLuaPhysicsShape*)pShape->getUserPointer()},
+        {"shape", (CLuaPhysicsShape*)(pShape->getUserPointer())},
     };
 
     if (pRigidBody != nullptr)
@@ -1635,7 +1478,7 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
         std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
             {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld[i])},
             {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld[i])},
-            {"shape", (CLuaPhysicsShape*)pShape->getUserPointer()},
+            {"shape", (CLuaPhysicsShape*)(pShape->getUserPointer())},
         };
         
         if (pRigidBody != nullptr)
@@ -1649,6 +1492,69 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
     // maybe sort them by distance?
 
     return results;
+}
+
+std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition, CVector vecEndRotation)
+{
+    switch (pShape->GetType())
+    {
+        case BOX_SHAPE_PROXYTYPE:
+        case SPHERE_SHAPE_PROXYTYPE:
+        case CONE_SHAPE_PROXYTYPE:
+        case CYLINDER_SHAPE_PROXYTYPE:
+            break;
+        default:
+            throw std::invalid_argument(SString("Shape casting does not support %s shape type.", pShape->GetName()).c_str());
+    }
+
+    CClientPhysics* pPhysics = pShape->GetPhysics();
+    btTransform     startTransform;
+    btTransform     endTransform;
+    startTransform.setIdentity();
+    endTransform.setIdentity();
+    CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
+    CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartRotation);
+    CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
+    CLuaPhysicsSharedLogic::SetRotation(endTransform, vecEndRotation);
+
+    btCollisionWorld::ClosestConvexResultCallback callback = pPhysics->ShapeCast(pShape, startTransform, endTransform);
+    if (!callback.hasHit())
+        return false;
+
+    btVector3 fromPosition;
+    btVector3 toPosition;
+    CLuaPhysicsSharedLogic::GetPosition(startTransform, fromPosition);
+    CLuaPhysicsSharedLogic::GetPosition(endTransform, toPosition);
+
+    btVector3    vecShapePosition = fromPosition.lerp(toPosition, callback.m_closestHitFraction);
+    btQuaternion startQuaternion = startTransform.getRotation();
+    btQuaternion endQuaternion = endTransform.getRotation();
+    btQuaternion shapeQuaternion = startQuaternion.slerp(endQuaternion, callback.m_closestHitFraction);
+
+    btVector3 vecShapeRotation;
+    CLuaPhysicsSharedLogic::QuaternionToEuler(shapeQuaternion, vecShapeRotation);
+
+    const btCollisionObject* pCollisionObject = callback.m_hitCollisionObject;
+    const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
+    const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
+
+    assert(pCollisionShape);            // should never be nullptr if we hit something
+
+    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
+        {"shapeposition", reinterpret_cast<const CVector&>(vecShapePosition)},
+        {"shaperotation", reinterpret_cast<const CVector&>(vecShapeRotation)},
+        {"hitpoint", reinterpret_cast<const CVector&>(callback.m_hitPointWorld)},
+        {"hitnormal", reinterpret_cast<const CVector&>(callback.m_hitNormalWorld)},
+        {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
+    };
+
+    if (pRigidBody != nullptr)
+        result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+    else
+        result["staticcollision"] = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+
+    return result;
 }
 
 std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetShapes(CClientPhysics* pPhysics)

@@ -99,7 +99,7 @@ bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, const CVector& 
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::GetRotation(btTransform& transform, CVector& vecRotation)
+bool CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, CVector& vecRotation)
 {
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
@@ -108,9 +108,22 @@ bool CLuaPhysicsSharedLogic::GetRotation(btTransform& transform, CVector& vecRot
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::GetPosition(btTransform& transform, CVector& vecPosition)
+bool CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, btVector3& vecRotation)
 {
-    vecPosition = reinterpret_cast<CVector&>(transform.getOrigin());
+    btQuaternion quanternion = transform.getRotation();
+    CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, vecRotation);
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, btVector3& vecPosition)
+{
+    vecPosition = transform.getOrigin();
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, CVector& vecPosition)
+{
+    vecPosition = reinterpret_cast<const CVector&>(transform.getOrigin());
     return true;
 }
 
@@ -121,7 +134,7 @@ bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform,const CVector& v
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation)
+bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetRotation(transform, vecRotation);
@@ -129,7 +142,7 @@ bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CV
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition)
+bool CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetPosition(transform, vecPosition);
