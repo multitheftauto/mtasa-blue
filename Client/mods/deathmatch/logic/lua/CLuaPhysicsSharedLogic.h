@@ -12,6 +12,9 @@ namespace BulletPhysics
         inline constexpr float   MinimumPrimitiveSize = 0.05f;
         inline constexpr float   MaximumPrimitiveSize = 8196.f;
         inline constexpr int     MaximumSubSteps = 256;
+        inline constexpr int     MaximumInitialCompoundShapeCapacity = 256;
+        inline constexpr int     MinimumHeightfieldTerrain = 2;
+        inline constexpr int     MaximumHeightfieldTerrain = 1024;
     }            // namespace Limits
     namespace Defaults
     {

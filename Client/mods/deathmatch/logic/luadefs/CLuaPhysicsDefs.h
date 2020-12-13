@@ -80,6 +80,14 @@ public:
 
     static CLuaPhysicsShape* PhysicsCreateBoxShape(lua_State* luaVM, CClientPhysics* pPhysics, std::variant<CVector, float> variant);
     static CLuaPhysicsShape* PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius);
+    static CLuaPhysicsShape* PhysicsCreateCapsuleShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateConeShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateCylinderShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics, std::optional<int> initialCapacity);
+    static CLuaPhysicsShape* PhysicsCreateConvexHullShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecPoints);
+    static CLuaPhysicsShape* PhysicsCreateTriangleMeshShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecVertices);
+    static CLuaPhysicsShape* PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY,
+                                                                  std::vector<float> vecHeights);
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 

@@ -42,6 +42,13 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateFixedConstraint", ArgumentParser<PhysicsCreateFixedConstraint>},
         {"physicsCreateBoxShape", ArgumentParser<PhysicsCreateBoxShape>},
         {"physicsCreateSphereShape", ArgumentParser<PhysicsCreateSphereShape>},
+        {"physicsCreateCapsuleShape", ArgumentParser<PhysicsCreateCapsuleShape>},
+        {"physicsCreateConeShape", ArgumentParser<PhysicsCreateConeShape>},
+        {"physicsCreateCylinderShape", ArgumentParser<PhysicsCreateCylinderShape>},
+        {"physicsCreateCompoundShape", ArgumentParser<PhysicsCreateCompoundShape>},
+        {"physicsCreateConvexHullShape", ArgumentParser<PhysicsCreateConvexHullShape>},
+        {"physicsCreateTriangleMeshShape", ArgumentParser<PhysicsCreateTriangleMeshShape>},
+        {"physicsCreateHeightfieldTerrainShape", ArgumentParser<PhysicsCreateHeightfieldTerrainShape>},
         {"physicsCreateShapeFromModel", ArgumentParser<PhysicsCreateShapeFromModel>},
         {"physicsAddChildShape", ArgumentParser<PhysicsAddChildShape>},
         {"physicsRemoveChildShape", ArgumentParser<PhysicsRemoveChildShape>},
@@ -143,209 +150,122 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClie
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius)
 {
     if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
-    {
         throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
-    }
 
     if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize)
-    {
         throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
-    }
+
     return pPhysics->CreateSphereShape(fRadius);
 }
 
-// CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType,
-//                                                      std::variant<CVector, float> variant)
-//{
-//    CScriptArgReader argStream(luaVM);
-//
-//    CLuaPhysicsShape*    pShape = nullptr;
-//    CVector              vector;
-//    float                fRadius;
-//    float                fHeight;
-//    float                fHalf;
-//    float                fInitialChildCapacity;
-//    int                  iSizeX, iSizeY;
-//    int                  index = 0;
-//    std::vector<CVector> vecList;
-//    std::vector<float>   vecFloat;
-//    switch (shapeType)
-//    {
-//             case PHYSICS_SHAPE_CAPSULE:
-//                argStream.ReadNumber(fRadius);
-//                argStream.ReadNumber(fHeight);
-//                if (!argStream.HasErrors())
-//                {
-//                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units",
-//                            BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
-//                        break;
-//                    }
-//                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units",
-//                            BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
-//                        break;
-//                    }
-//                    pShape = pPhysics->CreateCapsuleShape(fRadius, fHeight);
-//                }
-//                break;
-//             case PHYSICS_SHAPE_CONE:
-//                argStream.ReadNumber(fRadius);
-//                argStream.ReadNumber(fHeight);
-//                if (!argStream.HasErrors())
-//                {
-//                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units",
-//                            BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
-//                        break;
-//                    }
-//                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units",
-//                            BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
-//                        break;
-//                    }
-//                    pShape = pPhysics->CreateConeShape(fRadius, fHeight);
-//                }
-//                break;
-//             case PHYSICS_SHAPE_CYLINDER:
-//                argStream.ReadNumber(fRadius);
-//                argStream.ReadNumber(fHeight);
-//                if (!argStream.HasErrors())
-//                {
-//                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units",
-//                            BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
-//                        break;
-//                    }
-//                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units",
-//                            BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
-//                        break;
-//                    }
-//                    pShape = pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
-//                }
-//                break;
-//             case PHYSICS_SHAPE_COMPOUND:
-//                argStream.ReadNumber(fInitialChildCapacity, 0);
-//                if (!argStream.HasErrors())
-//                {
-//                    if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 512)
-//                    {
-//                        pShape = pPhysics->CreateCompoundShape(fInitialChildCapacity);
-//                    }
-//                    else
-//                    {
-//                        argStream.SetCustomError("Initial capacity should be between 0 and 512");
-//                    }
-//                }
-//                break;
-//             case PHYSICS_SHAPE_CONVEX_HULL:
-//                while (argStream.NextIsVector3D())
-//                {
-//                    argStream.ReadVector3D(vector);
-//                    vecList.push_back(vector);
-//                }
-//                if (!argStream.HasErrors())
-//                {
-//                    if (vecList.size() > 2)
-//                    {
-//                        pShape = pPhysics->CreateConvexHullShape(vecList);
-//                    }
-//                    else
-//                    {
-//                        argStream.SetCustomError("Convex hull shape require at least 3 vertices");
-//                        break;
-//                    }
-//                }
-//                break;
-//             case PHYSICS_SHAPE_TRIANGLE_MESH:
-//                while (argStream.NextIsTable())
-//                {
-//                    vecFloat.clear();
-//
-//                    argStream.ReadNumberTable(vecFloat);
-//                    index++;
-//                    if (vecFloat.size() != 3)
-//                    {
-//                        argStream.SetCustomError(SString("Triangle mesh vertex at index %i does not have 3 float numbers", index).c_str());
-//                        break;
-//                    }
-//
-//                    if (std::abs(vecFloat[0]) > BulletPhysics::Limits::MaximumPrimitiveSize || std::abs(vecFloat[1]) >
-//                    BulletPhysics::Limits::MaximumPrimitiveSize ||
-//                        std::abs(vecFloat[2]) > BulletPhysics::Limits::MaximumPrimitiveSize)
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index,
-//                            BulletPhysics::Limits::MaximumPrimitiveSize)
-//                                .c_str());
-//                        break;
-//                    }
-//
-//                    vecList.emplace_back(vecFloat[0], vecFloat[1], vecFloat[2]);
-//                }
-//                if (!argStream.HasErrors())
-//                {
-//                    if (vecList.size() < 3)
-//                    {
-//                        argStream.SetCustomError("Triangle mesh require at least 3 vertices");
-//                        break;
-//                    }
-//                    if (vecList.size() % 3 != 0)
-//                    {
-//                        argStream.SetCustomError("Triangle mesh needs vertices count divisible by 3");
-//                        break;
-//                    }
-//                    pShape = pPhysics->CreateTriangleMeshShape(vecList);
-//                }
-//                break;
-//             case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
-//                argStream.ReadNumber(iSizeX);
-//                argStream.ReadNumber(iSizeY);
-//                if (argStream.NextIsTable())
-//                    argStream.ReadNumberTable(vecFloat);
-//                else            // fill with empty table
-//                    for (int i = 0; i < iSizeX * iSizeY; i++)
-//                        vecFloat.emplace_back(0);
-//
-//                if (!argStream.HasErrors())
-//                {
-//                    if (iSizeX >= 3 && iSizeY >= 3 && iSizeX <= 8192 && iSizeY <= 8192)
-//                    {
-//                        if (vecFloat.size() == iSizeX * iSizeY)
-//                        {
-//                            pShape = pPhysics->CreateHeightfieldTerrainShape(iSizeX, iSizeY, vecFloat);
-//                        }
-//                        else
-//                        {
-//                            argStream.SetCustomError(
-//                                SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY, vecFloat.size())
-//                                    .c_str());
-//                        }
-//                    }
-//                    else
-//                    {
-//                        argStream.SetCustomError(
-//                            SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecFloat.size()).c_str());
-//                    }
-//                }
-//                break;
-//    }
-//
-//    throw std::invalid_argument("todo");
-//}
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCapsuleShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
+{
+    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    if (fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(SString("Maximum height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    return pPhysics->CreateCapsuleShape(fRadius, fHeight);
+}
+
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConeShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
+{
+    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    if (fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(SString("Maximum height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    return pPhysics->CreateConeShape(fRadius, fHeight);
+}
+
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCylinderShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
+{
+    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+
+    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    if (fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
+        throw std::invalid_argument(SString("Maximum height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    return pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
+}
+
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics, std::optional<int> optionalInitialCapacity)
+{
+    int iInitialCapacity = optionalInitialCapacity.value_or(0);
+    if (iInitialCapacity < BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
+        throw std::invalid_argument(
+            SString("Initial capacity should be between 0 and %i", BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity).c_str());
+
+    return pPhysics->CreateCompoundShape(iInitialCapacity);
+}
+
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConvexHullShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecPoints)
+{
+    if (vecPoints.size() < 3)
+        throw std::invalid_argument("Convex hull shape require at least 3 vertices");
+
+    return pPhysics->CreateConvexHullShape(vecPoints);
+}
+
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateTriangleMeshShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecVertices)
+{
+    if (vecVertices.size() < 3)
+        throw std::invalid_argument("Triangle mesh shape require at least 3 vertices");
+    
+    if (vecVertices.size() % 3 != 0)
+        throw std::invalid_argument("Triangle mesh needs vertices count divisible by 3");
+
+    int index = 0;
+    for (auto const& vertex : vecVertices)
+    {
+        index++;
+        if (std::abs(vertex.fX) > BulletPhysics::Limits::MaximumPrimitiveSize || std::abs(vertex.fY) > BulletPhysics::Limits::MaximumPrimitiveSize ||
+            std::abs(vertex.fZ) > BulletPhysics::Limits::MaximumPrimitiveSize)
+        {
+            throw std::invalid_argument(
+                SString("Vertex at index %i exceed limit of coord greater than %.2f units.", index, BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
+                    .c_str());
+        }
+    }
+    return pPhysics->CreateTriangleMeshShape(vecVertices);
+}
+
+// Todo: Add support for greyscale texture as input
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY, std::vector<float> vecHeights)
+{
+    if (sizeX < BulletPhysics::Limits::MinimumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MinimumHeightfieldTerrain)
+        throw std::invalid_argument(SString("Minimum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MinimumHeightfieldTerrain).c_str());
+
+    if (sizeX > BulletPhysics::Limits::MaximumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MaximumHeightfieldTerrain)
+        throw std::invalid_argument(SString("Maximum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MaximumHeightfieldTerrain).c_str());
+
+    if (sizeX * sizeY != vecHeights.size())
+    {
+        throw std::invalid_argument(SString("Heigthfield of size %ix%i require %i floats, got %i floats", sizeX, sizeY, sizeX * sizeY, vecHeights.size()).c_str());
+    }
+
+    return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights);
+}
 
 bool CLuaPhysicsDefs::PhysicsDestroy(CLuaPhysicsElement* physicsElement)
 {
