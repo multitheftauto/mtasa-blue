@@ -58,8 +58,7 @@ public:
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
-    bool                                       RayCastIsClear(CVector from, CVector to);
-    btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
+    btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to, bool bFilterBackfaces);
     void                                       RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
     void ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 

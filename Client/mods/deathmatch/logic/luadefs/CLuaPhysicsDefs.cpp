@@ -68,7 +68,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyAngularVelocity", ArgumentParser<PhysicsApplyAngularVelocity>},
         {"physicsApplyAngularVelocityForce", ArgumentParser<PhysicsApplyAngularVelocityForce>},
         {"physicsApplyDamping", ArgumentParser<PhysicsApplyDamping>},
-        {"physicsRayCast", PhysicsRayCast},
+        {"physicsRayCast", ArgumentParser<PhysicsRayCast>},
+        {"physicsRayCastIsClear", ArgumentParser<PhysicsRayCastIsClear>},
         {"physicsShapeCast", PhysicsShapeCast},
         {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
@@ -558,26 +559,26 @@ int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
                 pLuaStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
             }
 
-            lua_pushstring(luaVM, "shape");
-            if (pLuaShape)
-                lua_pushshape(luaVM, pLuaShape);
-            else
-                lua_pushboolean(luaVM, false);
-            lua_settable(luaVM, -3);
+            //lua_pushstring(luaVM, "shape");
+            //if (pLuaShape)
+            //    lua_pushshape(luaVM, pLuaShape);
+            //else
+            //    lua_pushboolean(luaVM, false);
+            //lua_settable(luaVM, -3);
 
-            lua_pushstring(luaVM, "rigidbody");
-            if (pLuaRigidBody)
-                lua_pushrigidbody(luaVM, pLuaRigidBody);
-            else
-                lua_pushboolean(luaVM, false);
-            lua_settable(luaVM, -3);
+            //lua_pushstring(luaVM, "rigidbody");
+            //if (pLuaRigidBody)
+            //    lua_pushrigidbody(luaVM, pLuaRigidBody);
+            //else
+            //    lua_pushboolean(luaVM, false);
+            //lua_settable(luaVM, -3);
 
-            lua_pushstring(luaVM, "staticcollision");
-            if (pLuaStaticCollision)
-                lua_pushstaticcollision(luaVM, pLuaStaticCollision);
-            else
-                lua_pushboolean(luaVM, false);
-            lua_settable(luaVM, -3);
+            //lua_pushstring(luaVM, "staticcollision");
+            //if (pLuaStaticCollision)
+            //    lua_pushstaticcollision(luaVM, pLuaStaticCollision);
+            //else
+            //    lua_pushboolean(luaVM, false);
+            //lua_settable(luaVM, -3);
         }
 
         return 1;
@@ -1489,7 +1490,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaV
 
     CLuaPhysicsPointToPointConstraint* pConstraint =
         pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    lua_pushconstraint(luaVM, pConstraint);
+    //lua_pushconstraint(luaVM, pConstraint);
     return 1;
 }
 
@@ -1505,7 +1506,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaV
 
     CLuaPhysicsPointToPointConstraint* pConstraint = pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(
         pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    lua_pushconstraint(luaVM, pConstraint);
+    //lua_pushconstraint(luaVM, pConstraint);
     return 1;
     // CClientPhysics*       pPhysics;
     // bool                  bDisableCollisionsBetweenLinkedBodies = true;
@@ -1582,125 +1583,75 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaV
     // return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsRayCastIsClear(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {
-    CClientPhysics*  pPhysics;
-    ePhysicsRayType  eRayType;
-    CVector          from;
-    CVector          to;
-    bool             bFilterBackfaces;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPhysics);
-    argStream.ReadEnumString(eRayType, PHYSICS_RAY_DEFAULT);
-    argStream.ReadVector3D(from);
-    argStream.ReadVector3D(to);
-    argStream.ReadBool(bFilterBackfaces, false);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            if (eRayType == PHYSICS_RAY_IS_CLEAR)
-            {
-                bool bHasHit = pPhysics->RayCastIsClear(from, to);
-                lua_pushboolean(luaVM, bHasHit);
-                return 1;
-            }
-            else if (eRayType == PHYSICS_RAY_DEFAULT)
-            {
-                btCollisionWorld::ClosestRayResultCallback rayResult = pPhysics->RayCastDefault(from, to, bFilterBackfaces);
-                lua_newtable(luaVM);
-                lua_pushstring(luaVM, "hit");
-                lua_pushboolean(luaVM, rayResult.hasHit());
-                lua_settable(luaVM, -3);
-                if (rayResult.hasHit())
-                {
-                    lua_pushstring(luaVM, "hitpoint");
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getX());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getY());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getZ());
-                    lua_settable(luaVM, -3);
-                    lua_settable(luaVM, -3);
-
-                    lua_pushstring(luaVM, "hitnormal");
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getX());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getY());
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
-                    lua_settable(luaVM, -3);
-                    lua_settable(luaVM, -3);
-
-                    const btCollisionObject* pCollisionObject = rayResult.m_collisionObject;
-                    const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
-                    const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
-
-                    CLuaPhysicsShape*           pLuaShape = nullptr;
-                    CLuaPhysicsRigidBody*       pLuaRigidBody = nullptr;
-                    CLuaPhysicsStaticCollision* pLuaStaticCollision = nullptr;
-
-                    if (pShape != nullptr)
-                    {
-                        pLuaShape = (CLuaPhysicsShape*)pShape->getUserPointer();
-                    }
-
-                    if (pRigidBody != nullptr)
-                    {
-                        pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
-                    }
-                    else if (pCollisionObject != nullptr)
-                    {
-                        pLuaStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
-                    }
-
-                    lua_pushstring(luaVM, "shape");
-                    if (pLuaShape)
-                        lua_pushshape(luaVM, pLuaShape);
-                    else
-                        lua_pushboolean(luaVM, false);
-                    lua_settable(luaVM, -3);
-
-                    lua_pushstring(luaVM, "rigidbody");
-                    if (pLuaRigidBody)
-                        lua_pushrigidbody(luaVM, pLuaRigidBody);
-                    else
-                        lua_pushboolean(luaVM, false);
-                    lua_settable(luaVM, -3);
-
-                    lua_pushstring(luaVM, "staticcollision");
-                    if (pLuaStaticCollision)
-                        lua_pushstaticcollision(luaVM, pLuaStaticCollision);
-                    else
-                        lua_pushboolean(luaVM, false);
-                    lua_settable(luaVM, -3);
-                }
-                return 1;
-            }
-            else if (eRayType == PHYSICS_RAY_MULTIPLE)
-            {
-                pPhysics->RayCastMultiple(luaVM, from, to, bFilterBackfaces);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true)).hasHit();
 }
+
+std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsRayCast(
+    CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
+{
+    btCollisionWorld::ClosestRayResultCallback callback = pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true));
+
+    if (!callback.hasHit())
+        return false;
+
+    const btCollisionObject* pCollisionObject = callback.m_collisionObject;
+    const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
+    const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
+
+    assert(pShape != nullptr); // should never be nullptr if we hit something
+
+    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
+        {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
+        {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld)},
+        {"shape", (CLuaPhysicsShape*)pShape->getUserPointer()},
+    };
+
+    if (pRigidBody != nullptr)
+        result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+    else // add else if here if more collision element types get implemented
+        result["staticcollision"] = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+
+    return result;
+}
+
+//
+//int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
+//{
+//    CClientPhysics*  pPhysics;
+//    ePhysicsRayType  eRayType;
+//    CVector          from;
+//    CVector          to;
+//    bool             bFilterBackfaces;
+//    CScriptArgReader argStream(luaVM);
+//    argStream.ReadUserData(pPhysics);
+//    argStream.ReadEnumString(eRayType, PHYSICS_RAY_DEFAULT);
+//    argStream.ReadVector3D(from);
+//    argStream.ReadVector3D(to);
+//    argStream.ReadBool(bFilterBackfaces, false);
+//
+//    if (!argStream.HasErrors())
+//    {
+//        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+//        if (luaMain)
+//        {
+//            else if (eRayType == PHYSICS_RAY_DEFAULT)
+
+//            else if (eRayType == PHYSICS_RAY_MULTIPLE)
+//            {
+//                pPhysics->RayCastMultiple(luaVM, from, to, bFilterBackfaces);
+//                return 1;
+//            }
+//        }
+//    }
+//    else
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    // Failed
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
 
 std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetShapes(CClientPhysics* pPhysics)
 {

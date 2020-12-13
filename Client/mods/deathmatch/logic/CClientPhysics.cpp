@@ -240,18 +240,11 @@ void CClientPhysics::ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTr
     m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
 }
 
-bool CClientPhysics::RayCastIsClear(CVector from, CVector to)
-{
-    btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
-    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
-    return RayCallback.hasHit();
-}
-
-btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCastDefault(CVector from, CVector to, bool bFilterBackfaces)
+btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces)
 {
     btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
-        RayCallback.m_flags = 1 << 0;
+        RayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
     m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
     return RayCallback;
 }
@@ -260,7 +253,7 @@ void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to,
 {
     btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
-        rayResult.m_flags = 1 << 0;
+        rayResult.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
     m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayResult);
 
     lua_newtable(luaVM);

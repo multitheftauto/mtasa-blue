@@ -83,12 +83,16 @@ public:
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 
+    static std::variant<bool,
+                        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+                PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to,
+                                                                                       std::optional<bool> bFilterBackfaces);
+    static bool PhysicsRayCastIsClear(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
     // LUA_DECLARE(PhysicsSetProperties);
     // LUA_DECLARE(PhysicsGetProperties);
 
     LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsCreateConstraint);
-    LUA_DECLARE(PhysicsRayCast);
     LUA_DECLARE(PhysicsShapeCast);
 };
