@@ -127,7 +127,7 @@ bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, CVector& 
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform,const CVector& vecPosition)
+bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector& vecPosition)
 {
     btQuaternion quaternion;
     transform.setOrigin(reinterpret_cast<const btVector3&>(vecPosition));

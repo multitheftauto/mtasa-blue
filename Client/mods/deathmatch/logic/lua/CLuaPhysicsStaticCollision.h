@@ -23,7 +23,7 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void SetPosition(const CVector& vecPosition) const;
+    void    SetPosition(const CVector& vecPosition) const;
     CVector GetPosition() const;
     void    SetRotation(const CVector& vecRotation) const;
     CVector GetRotation() const;
@@ -32,20 +32,19 @@ public:
 
     void Initialize();
 
-    void RemoveDebugColor();
-    void SetDebugColor(SColor color);
-    void GetDebugColor(SColor& color);
+    void    RemoveDebugColor() const;
+    void    SetDebugColor(const SColor& color) const;
+    SColor& GetDebugColor() const;
 
-    void SetFilterMask(int mask);
-    void SetFilterMask(short sIndex, bool bEnabled);
-    void GetFilterMask(short sIndex, bool& bEnabled);
+    void SetFilterMask(int mask) const;
 
-    void SetFilterGroup(int iGroup);
-    void GetFilterGroup(int& iGroup);
+    void SetFilterGroup(int iGroup) const;
+    int  GetFilterGroup() const;
 
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject.get(); }
 
     void Unlink();
+
 private:
     std::unique_ptr<btCollisionObject> m_btCollisionObject;
     CLuaPhysicsShape*                  m_pShape;

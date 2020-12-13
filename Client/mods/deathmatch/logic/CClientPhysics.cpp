@@ -88,19 +88,14 @@ void CClientPhysics::Unlink()
     m_pPhysicsManager->RemoveFromList(this);
 }
 
-void CClientPhysics::SetGravity(CVector vecGravity)
+void CClientPhysics::SetGravity(const CVector& vecGravity) const
 {
-    m_pDynamicsWorld->setGravity(reinterpret_cast<btVector3&>(vecGravity));
-}
-
-void CClientPhysics::GetGravity(CVector& vecGravity)
-{
-    vecGravity = reinterpret_cast<CVector&>(m_pDynamicsWorld->getGravity());
+    m_pDynamicsWorld->setGravity(reinterpret_cast<const btVector3&>(vecGravity));
 }
 
 CVector CClientPhysics::GetGravity() const
 {
-    return reinterpret_cast<CVector&>(m_pDynamicsWorld->getGravity());
+    return reinterpret_cast<const CVector&>(m_pDynamicsWorld->getGravity());
 }
 
 bool CClientPhysics::GetUseContinous() const
@@ -108,7 +103,7 @@ bool CClientPhysics::GetUseContinous() const
     return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
 }
 
-void CClientPhysics::SetUseContinous(bool bUse)
+void CClientPhysics::SetUseContinous(bool bUse) const
 {
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
@@ -235,7 +230,7 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(const CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to)
+btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(const CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to) const
 {
     CVector fromPosition;
     CVector toPosition;
@@ -246,7 +241,7 @@ btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(const CL
     return result;
 }
 
-btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces)
+btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces) const
 {
     btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
@@ -255,7 +250,7 @@ btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from,
     return RayCallback;
 }
 
-btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastAll(CVector from, CVector to, bool bFilterBackfaces)
+btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const
 {
     btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
@@ -350,12 +345,12 @@ CLuaPhysicsConstraint* CClientPhysics::AddConstraint(std::unique_ptr<CLuaPhysics
     return pConstraintPtr;
 }
 
-void CClientPhysics::SetDebugLineWidth(float fWidth)
+void CClientPhysics::SetDebugLineWidth(float fWidth) const
 {
     m_pDebugDrawer->SetDebugLineWidth(fWidth);
 }
 
-float CClientPhysics::GetDebugLineWidth()
+float CClientPhysics::GetDebugLineWidth() const
 {
     return m_pDebugDrawer->GetDebugLineWidth();
 }
@@ -376,7 +371,7 @@ bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
 
     return true;
 }
-bool CClientPhysics::GetDebugMode(ePhysicsDebugMode eDebugMode)
+bool CClientPhysics::GetDebugMode(ePhysicsDebugMode eDebugMode) const
 {
     if (eDebugMode == PHYSICS_DEBUG_NoDebug)
     {
@@ -779,7 +774,8 @@ CLuaPhysicsPointToPointConstraint* CClientPhysics::CreatePointToPointConstraint(
 {
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
-    std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
+    std::unique_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
+        std::make_unique<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
     return (CLuaPhysicsPointToPointConstraint*)AddConstraint(std::move(pConstraint));
 }
 
@@ -840,7 +836,7 @@ void CClientPhysics::DoPulse()
     int iDeltaTimeBuildWorld = (int)(tickCountNow - m_LastTimeBuildWorld).ToLongLong();
     m_LastTimeMs = tickCountNow;
 
-    //if (m_bBuildWorld)
+    // if (m_bBuildWorld)
     //{
     //    if (iDeltaTimeBuildWorld > 1000)
     //    {

@@ -26,7 +26,6 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsi
 
 CLuaPhysicsRigidBodyManager::~CLuaPhysicsRigidBodyManager()
 {
-
 }
 
 void CLuaPhysicsRigidBodyManager::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
@@ -41,7 +40,7 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
     // Check if already removed
     if (!ListContains(m_RigidBodyList, pRigidBody))
         return;
-    
+
     // Remove all references
     ListRemove(m_RigidBodyList, pRigidBody);
     pRigidBody->Unlink();
@@ -49,10 +48,9 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
 
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
 {
-    for (auto &pRigidBody : m_RigidBodyList)
+    for (auto& pRigidBody : m_RigidBodyList)
         if (pRigidBody->GetBtRigidBody()->getCollisionShape() == pCollisionShape)
             return pRigidBody;
 
     return nullptr;
 }
-

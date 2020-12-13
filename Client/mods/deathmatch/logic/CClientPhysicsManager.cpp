@@ -11,9 +11,7 @@
 #include "StdInc.h"
 #include <stack>
 
-
 using std::list;
-
 
 CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
 {
@@ -43,11 +41,10 @@ void CClientPhysicsManager::DeleteAll()
 
 void CClientPhysicsManager::DoWork()
 {
-
 }
 
 void CClientPhysicsManager::RemoveFromList(CClientPhysics* pPhysics)
-    {
+{
     if (!m_List.empty())
         m_List.remove(pPhysics);
 }
@@ -74,9 +71,9 @@ void CClientPhysicsManager::WaitForSimulationsToFinish()
         while (isLocked)
         {
             m_pAsyncTaskScheduler->CollectResults();
-            if (isLocked) // still locked?
+            if (isLocked)            // still locked?
             {
-                //g_pCore->GetConsole()->Printf("sleep 1");
+                // g_pCore->GetConsole()->Printf("sleep 1");
                 Sleep(1);
             }
         }
@@ -110,8 +107,8 @@ void CClientPhysicsManager::DoPulse()
                     return GetTickCount64_() - start;
                 },
                 [this](long tickedPassed) {
-                   /* if (tickedPassed > 10)
-                        g_pCore->GetConsole()->Printf("DoPulse: %ld", tickedPassed);*/
+                    /* if (tickedPassed > 10)
+                         g_pCore->GetConsole()->Printf("DoPulse: %ld", tickedPassed);*/
                     this->m_numPhysicsLeft--;
                     if (this->m_numPhysicsLeft == 0)
                     {

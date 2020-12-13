@@ -140,7 +140,6 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClie
     return pShape;
 }
 
-
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius)
 {
     if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
@@ -155,7 +154,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
     return pPhysics->CreateSphereShape(fRadius);
 }
 
-//CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType,
+// CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType,
 //                                                      std::variant<CVector, float> variant)
 //{
 //    CScriptArgReader argStream(luaVM);
@@ -180,13 +179,15 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+//                            SString("Minimum radius and height must be equal or greater than %.02f units",
+//                            BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+//                            SString("Maximum radius and height must be equal or smaller than %.02f units",
+//                            BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    pShape = pPhysics->CreateCapsuleShape(fRadius, fHeight);
@@ -200,13 +201,15 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+//                            SString("Minimum radius and height must be equal or greater than %.02f units",
+//                            BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+//                            SString("Maximum radius and height must be equal or smaller than %.02f units",
+//                            BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    pShape = pPhysics->CreateConeShape(fRadius, fHeight);
@@ -220,13 +223,15 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize || fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Minimum radius and height must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+//                            SString("Minimum radius and height must be equal or greater than %.02f units",
+//                            BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize || fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Maximum radius and height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+//                            SString("Maximum radius and height must be equal or smaller than %.02f units",
+//                            BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 //                        break;
 //                    }
 //                    pShape = pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
@@ -278,11 +283,13 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
 //                        break;
 //                    }
 //
-//                    if (std::abs(vecFloat[0]) > BulletPhysics::Limits::MaximumPrimitiveSize || std::abs(vecFloat[1]) > BulletPhysics::Limits::MaximumPrimitiveSize ||
+//                    if (std::abs(vecFloat[0]) > BulletPhysics::Limits::MaximumPrimitiveSize || std::abs(vecFloat[1]) >
+//                    BulletPhysics::Limits::MaximumPrimitiveSize ||
 //                        std::abs(vecFloat[2]) > BulletPhysics::Limits::MaximumPrimitiveSize)
 //                    {
 //                        argStream.SetCustomError(
-//                            SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index, BulletPhysics::Limits::MaximumPrimitiveSize)
+//                            SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index,
+//                            BulletPhysics::Limits::MaximumPrimitiveSize)
 //                                .c_str());
 //                        break;
 //                    }
@@ -442,7 +449,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
         throw std::invalid_argument("Mass can not be negative");
 
     CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass),
-                                              vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
+                                                                             vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
                                                                              vecCenterOfMass.value_or(BulletPhysics::Defaults::RigidBodyCenterOfMass));
     return pRigidBody;
 }
@@ -470,7 +477,8 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundSh
     if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Shape can not be compound");
 
-    pCompoundShape->AddShape(pShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition), vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
+    pCompoundShape->AddShape(pShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
+                             vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
     return true;
 }
 
@@ -1039,7 +1047,7 @@ std::variant<CVector, float, bool, std::tuple<int, int, int, int>> CLuaPhysicsDe
     switch (eProperty)
     {
         case PHYSICS_PROPERTY_DEBUG_COLOR:
-            pStaticCollision->GetDebugColor(color);
+            color = pStaticCollision->GetDebugColor();
             return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
         case PHYSICS_PROPERTY_SCALE:
             return pStaticCollision->GetScale();
@@ -1319,7 +1327,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //}
 
 CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                          std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+                                                                     std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
     CLuaPhysicsFixedConstraint* pConstraint =
         pRigidBodyA->GetPhysics()->CreateFixedConstraint(pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
@@ -1334,7 +1342,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaV
 
     CLuaPhysicsPointToPointConstraint* pConstraint =
         pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    //lua_pushconstraint(luaVM, pConstraint);
+    // lua_pushconstraint(luaVM, pConstraint);
     return 1;
 }
 
@@ -1350,7 +1358,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaV
 
     CLuaPhysicsPointToPointConstraint* pConstraint = pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(
         pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    //lua_pushconstraint(luaVM, pConstraint);
+    // lua_pushconstraint(luaVM, pConstraint);
     return 1;
     // CClientPhysics*       pPhysics;
     // bool                  bDisableCollisionsBetweenLinkedBodies = true;
@@ -1432,8 +1440,8 @@ bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CV
     return pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true)).hasHit();
 }
 
-std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsRayCast(
-    CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
+std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {
     btCollisionWorld::ClosestRayResultCallback callback = pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true));
 
@@ -1444,7 +1452,7 @@ std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhy
     const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
     const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
 
-    assert(pShape); // should never be nullptr if we hit something
+    assert(pShape);            // should never be nullptr if we hit something
 
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
         {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
@@ -1467,7 +1475,7 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
     std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>> results;
 
     size_t hitNum = callback.m_hitPointWorld.size();
-    for (size_t i = 0; i < hitNum;i++)
+    for (size_t i = 0; i < hitNum; i++)
     {
         const btCollisionObject* pCollisionObject = callback.m_collisionObjects[i];
         const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
@@ -1480,7 +1488,7 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
             {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld[i])},
             {"shape", (CLuaPhysicsShape*)(pShape->getUserPointer())},
         };
-        
+
         if (pRigidBody != nullptr)
             result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
         else
@@ -1542,10 +1550,8 @@ CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosi
     assert(pCollisionShape);            // should never be nullptr if we hit something
 
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
-        {"shapeposition", reinterpret_cast<const CVector&>(vecShapePosition)},
-        {"shaperotation", reinterpret_cast<const CVector&>(vecShapeRotation)},
-        {"hitpoint", reinterpret_cast<const CVector&>(callback.m_hitPointWorld)},
-        {"hitnormal", reinterpret_cast<const CVector&>(callback.m_hitNormalWorld)},
+        {"shapeposition", reinterpret_cast<const CVector&>(vecShapePosition)},    {"shaperotation", reinterpret_cast<const CVector&>(vecShapeRotation)},
+        {"hitpoint", reinterpret_cast<const CVector&>(callback.m_hitPointWorld)}, {"hitnormal", reinterpret_cast<const CVector&>(callback.m_hitNormalWorld)},
         {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
     };
 

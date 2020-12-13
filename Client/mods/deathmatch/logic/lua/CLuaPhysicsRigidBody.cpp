@@ -27,7 +27,6 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
-
     Unlink();
     m_pTempData.reset();
 }
