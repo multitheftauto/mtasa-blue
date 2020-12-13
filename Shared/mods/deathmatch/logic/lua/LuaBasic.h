@@ -113,7 +113,7 @@ namespace lua
 
     // Overload for enum types only
     template <typename T>
-    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
+    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T& val)
     {
         // Push<string> must be defined before this function, otherwise it wont compile
         return Push(L, EnumToString(val));
@@ -134,33 +134,33 @@ namespace lua
     \*****************************************************************/
 
     template <typename... Ts>
-    int Push(lua_State* L, const std::variant<Ts...>&& val);
+    int Push(lua_State* L, const std::variant<Ts...>& val);
 
     template <typename T>
-    int Push(lua_State* L, const std::optional<T>&& val);
+    int Push(lua_State* L, const std::optional<T>& val);
 
     template <typename T, size_t N>
     int Push(lua_State* L, const std::array<T, N>& val);
 
     template <typename T>
-    int Push(lua_State* L, const std::vector<T>&& val);
+    int Push(lua_State* L, const std::vector<T>& val);
 
     template <typename K, typename V>
-    int Push(lua_State* L, const std::unordered_map<K, V>&& val);
+    int Push(lua_State* L, const std::unordered_map<K, V>& val);
 
     template<typename... Ts>
-    int Push(lua_State* L, const std::tuple<Ts...>&& tuple);
+    int Push(lua_State* L, const std::tuple<Ts...>& tuple);
 
     // Define after this line, declare above.
 
     template <typename... Ts>
-    int Push(lua_State* L, const std::variant<Ts...>&& val)
+    int Push(lua_State* L, const std::variant<Ts...>& val)
     {
-        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
+        return std::visit([L](const auto& value) -> int { return Push(L, value); }, val);
     }
 
     template <typename T>
-    int Push(lua_State* L, const std::optional<T>&& val)
+    int Push(lua_State* L, const std::optional<T>& val)
     {
         if (val.has_value())
             return Push(L, val.value());
@@ -184,11 +184,11 @@ namespace lua
     }
 
     template <typename T>
-    int Push(lua_State* L, const std::vector<T>&& val)
+    int Push(lua_State* L, const std::vector<T>& val)
     {
         lua_newtable(L);
         int i = 1;
-        for (auto&& v : val)
+        for (const auto& v : val)
         {
             Push(L, i++);
             Push(L, v);
@@ -200,10 +200,10 @@ namespace lua
     }
 
     template <typename K, typename V>
-    int Push(lua_State* L, const std::unordered_map<K, V>&& val)
+    int Push(lua_State* L, const std::unordered_map<K, V>& val)
     {
         lua_newtable(L);
-        for (auto&& [k, v] : val)
+        for (const auto& [k, v] : val)
         {
             Push(L, k);
             Push(L, v);
@@ -216,7 +216,7 @@ namespace lua
 
     // Tuples can be used to return multiple results
     template<typename... Ts>
-    int Push(lua_State* L, const std::tuple<Ts...>&& tuple)
+    int Push(lua_State* L, const std::tuple<Ts...>& tuple)
     {
         // Call Push on each element of the tuple
         std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
