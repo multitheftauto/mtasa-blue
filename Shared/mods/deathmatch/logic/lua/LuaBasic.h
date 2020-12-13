@@ -200,6 +200,22 @@ namespace lua
         return 1;
     }
 
+    // Temporary overload, remove after #1914 pr get marged
+    template <typename K, typename... Ts>
+    int Push(lua_State* L, const std::unordered_map<K, const std::variant<Ts...>>&& val)
+    {
+        lua_newtable(L);
+        for (auto&& [k, v] : val)
+        {
+            Push(L, k);
+            std::visit([L](auto& value) -> int { return Push(L, std::move(value)); }, v);
+            lua_settable(L, -3);
+        }
+
+        // Only the table remains on the stack
+        return 1;
+    }
+
     // Tuples can be used to return multiple results
     template<typename... Ts>
     int Push(lua_State* L, const std::tuple<Ts...>&& tuple)
