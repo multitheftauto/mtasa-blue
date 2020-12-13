@@ -59,7 +59,7 @@ public:
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
     btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to, bool bFilterBackfaces);
-    void                                       RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
+    btCollisionWorld::AllHitsRayResultCallback RayCastAll(CVector from, CVector to, bool bFilterBackfaces);
     void ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);

@@ -68,8 +68,9 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyAngularVelocity", ArgumentParser<PhysicsApplyAngularVelocity>},
         {"physicsApplyAngularVelocityForce", ArgumentParser<PhysicsApplyAngularVelocityForce>},
         {"physicsApplyDamping", ArgumentParser<PhysicsApplyDamping>},
+        {"physicsLineCast", ArgumentParser<PhysicsLineCast>},
         {"physicsRayCast", ArgumentParser<PhysicsRayCast>},
-        {"physicsRayCastIsClear", ArgumentParser<PhysicsRayCastIsClear>},
+        {"PhysicsRayCastAll", ArgumentParser<PhysicsRayCastAll>},
         {"physicsShapeCast", PhysicsShapeCast},
         {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
@@ -1583,7 +1584,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaV
     // return 1;
 }
 
-bool CLuaPhysicsDefs::PhysicsRayCastIsClear(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
+bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {
     return pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true)).hasHit();
 }
@@ -1600,7 +1601,7 @@ std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhy
     const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
     const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
 
-    assert(pShape != nullptr); // should never be nullptr if we hit something
+    assert(pShape); // should never be nullptr if we hit something
 
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
         {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
@@ -1610,48 +1611,45 @@ std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhy
 
     if (pRigidBody != nullptr)
         result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
-    else // add else if here if more collision element types get implemented
+    else
         result["staticcollision"] = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
 
     return result;
 }
 
-//
-//int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
-//{
-//    CClientPhysics*  pPhysics;
-//    ePhysicsRayType  eRayType;
-//    CVector          from;
-//    CVector          to;
-//    bool             bFilterBackfaces;
-//    CScriptArgReader argStream(luaVM);
-//    argStream.ReadUserData(pPhysics);
-//    argStream.ReadEnumString(eRayType, PHYSICS_RAY_DEFAULT);
-//    argStream.ReadVector3D(from);
-//    argStream.ReadVector3D(to);
-//    argStream.ReadBool(bFilterBackfaces, false);
-//
-//    if (!argStream.HasErrors())
-//    {
-//        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-//        if (luaMain)
-//        {
-//            else if (eRayType == PHYSICS_RAY_DEFAULT)
+std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
+{
+    btCollisionWorld::AllHitsRayResultCallback callback = pPhysics->RayCastAll(from, to, bFilterBackfaces.value_or(true));
+    std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>> results;
 
-//            else if (eRayType == PHYSICS_RAY_MULTIPLE)
-//            {
-//                pPhysics->RayCastMultiple(luaVM, from, to, bFilterBackfaces);
-//                return 1;
-//            }
-//        }
-//    }
-//    else
-//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-//
-//    // Failed
-//    lua_pushboolean(luaVM, false);
-//    return 1;
-//}
+    size_t hitNum = callback.m_hitPointWorld.size();
+    for (size_t i = 0; i < hitNum;i++)
+    {
+        const btCollisionObject* pCollisionObject = callback.m_collisionObjects[i];
+        const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
+        const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
+
+        assert(pShape);            // should never be nullptr if we hit something
+
+        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
+            {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld[i])},
+            {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld[i])},
+            {"shape", (CLuaPhysicsShape*)pShape->getUserPointer()},
+        };
+        
+        if (pRigidBody != nullptr)
+            result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+        else
+            result["staticcollision"] = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+
+        results.push_back(result);
+    }
+
+    // maybe sort them by distance?
+
+    return results;
+}
 
 std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetShapes(CClientPhysics* pPhysics)
 {

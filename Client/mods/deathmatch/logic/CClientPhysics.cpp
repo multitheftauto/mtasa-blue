@@ -249,50 +249,14 @@ btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from,
     return RayCallback;
 }
 
-void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
+btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastAll(CVector from, CVector to, bool bFilterBackfaces)
 {
     btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
         rayResult.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
     m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayResult);
 
-    lua_newtable(luaVM);
-    if (rayResult.hasHit())
-    {
-        for (int i = 0; i < rayResult.m_hitPointWorld.size(); i++)
-        {
-            lua_pushnumber(luaVM, i + 1);
-            lua_newtable(luaVM);
-
-            lua_pushstring(luaVM, "hitpoint");
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, rayResult.m_hitPointWorld[i].getX());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, rayResult.m_hitPointWorld[i].getY());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, rayResult.m_hitPointWorld[i].getZ());
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-
-            lua_pushstring(luaVM, "hitnormal");
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, rayResult.m_hitNormalWorld[i].getX());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, rayResult.m_hitNormalWorld[i].getY());
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, rayResult.m_hitNormalWorld[i].getZ());
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-
-            lua_settable(luaVM, -3);
-        }
-    }
+    return rayResult;
 }
 
 void CClientPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
