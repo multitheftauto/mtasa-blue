@@ -60,8 +60,8 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();
-
-    typedef void(__fastcall* LoadAllRequestedModelsFn_t)(bool);
+        
+    typedef void(__cdecl* LoadAllRequestedModelsFn_t)(bool);
     ((LoadAllRequestedModelsFn_t)FUNC_LoadAllRequestedModels)(bOnlyPriorityModels);
 
     if (IS_TIMING_CHECKPOINTS())
