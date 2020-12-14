@@ -245,7 +245,6 @@ namespace lua
         std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
         return sizeof...(Ts);
     }
-}            // namespace lua
 
     // Overload for enum types only
     template <typename T>
@@ -265,7 +264,7 @@ namespace lua
     template <typename T>
     int Push(lua_State* L, const std::shared_ptr<T>& ptr)
     {
-        lua_pushelement(L, ptr.get());
+        Push(L, ptr.get());
         return 1;
     }
 
@@ -275,4 +274,4 @@ namespace lua
         lua_pushelement(L, ptr.get());
         return 1;
     }
-}
+};            // namespace lua

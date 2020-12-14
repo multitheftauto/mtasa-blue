@@ -114,10 +114,10 @@ public:
     CLuaPhysicsFixedConstraint* CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                       bool bDisableCollisionsBetweenLinkedBodies);
 
-    std::vector<CLuaPhysicsShape*>           GetShapes() const;
-    std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const;
-    std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const;
-    std::vector<CLuaPhysicsConstraint*>      GetConstraints() const;
+    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> GetRigidBodies() const { return m_vecRigidBodies; }
+    std::vector<std::shared_ptr<CLuaPhysicsShape>>     GetShapes() const { return m_vecShapes; }
+    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
 
     btDiscreteDynamicsWorld* GetDynamicsWorld() const;            // Todo, Remove
 
@@ -176,8 +176,8 @@ private:
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;
 
-    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
-    std::vector<std::unique_ptr<CLuaPhysicsShape>>           m_vecShapes;
-    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
-    std::vector<std::unique_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
+    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
+    std::vector<std::shared_ptr<CLuaPhysicsShape>>           m_vecShapes;
+    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
 };

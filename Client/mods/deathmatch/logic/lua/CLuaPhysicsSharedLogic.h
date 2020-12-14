@@ -26,6 +26,10 @@ namespace BulletPhysics
         inline constexpr CVector RigidBodyRotation(0.f, 0.f, 0.f);
         inline constexpr CVector ChildShapePosition(0.f, 0.f, 0.f);
         inline constexpr CVector ChildShapeRotation(0.f, 0.f, 0.f);
+        inline constexpr float RigidBodyLinearDumping = 0.005f; // 0.0 - 1.0
+        inline constexpr float RigidBodyAngularDumping = 0.005f; // 0.0 - 1.0
+        inline constexpr float RigidBodyLinearSleepingThreshold = 0.1f;
+        inline constexpr float RigidBodyAngularSleepingThreshold = 0.1f;
     }            // namespace Defaults
 }            // namespace BulletPhysics
 

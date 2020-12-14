@@ -1483,22 +1483,22 @@ CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosi
     return result;
 }
 
-std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetShapes(CClientPhysics* pPhysics)
+std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetShapes(CClientPhysics* pPhysics)
 {
     return pPhysics->GetShapes();
 }
 
-std::vector<CLuaPhysicsRigidBody*> CLuaPhysicsDefs::PhysicsGetRigidBodies(CClientPhysics* pPhysics)
+std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> CLuaPhysicsDefs::PhysicsGetRigidBodies(CClientPhysics* pPhysics)
 {
     return pPhysics->GetRigidBodies();
 }
 
-std::vector<CLuaPhysicsStaticCollision*> CLuaPhysicsDefs::PhysicsGetStaticCollisions(CClientPhysics* pPhysics)
+std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> CLuaPhysicsDefs::PhysicsGetStaticCollisions(CClientPhysics* pPhysics)
 {
     return pPhysics->GetStaticCollisions();
 }
 
-std::vector<CLuaPhysicsConstraint*> CLuaPhysicsDefs::PhysicsGetConstraints(CClientPhysics* pPhysics)
+std::vector<std::shared_ptr<CLuaPhysicsConstraint>> CLuaPhysicsDefs::PhysicsGetConstraints(CClientPhysics* pPhysics)
 {
     return pPhysics->GetConstraints();
 }

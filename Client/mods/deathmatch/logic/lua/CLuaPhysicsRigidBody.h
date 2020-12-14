@@ -11,16 +11,20 @@
 
 class CLuaPhysicsElement;
 class CLuaPhysicsRigidBody;
+class CPhysicsRigidBodyProxy;
 
 #pragma once
 
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
+#include "lua/physics/CPhysicsRigidBodyProxy.h"
 
 class CLuaPhysicsRigidBodyTempData
 {
 public:
     float   m_fMass;
+    float   m_fLinearDamping;
+    float   m_fAngularDamping;
     float   m_fCcdMotionThreshold;
     float   m_fSweptSphereRadius;
     float   m_fDumping;
@@ -58,11 +62,14 @@ public:
     bool    SetScale(const CVector& vecScale);
     CVector GetScale() const;
 
-    void UpdateAABB() const { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(GetBtRigidBody()); }
+    void UpdateAABB() const { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(m_pRigidBodyProxy.get()); }
 
     void Initialize();
 
     bool Activate() const;
+
+    // both from 0.0f to 1.0f
+    void SetDumping(float fLinearDamping, float fAngularDamping);
     void SetMass(float fMass);
 
     // Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold
@@ -100,7 +107,7 @@ public:
     bool  WantsSleeping() const;
     float GetMass() const;
 
-    btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody.get(); }
+    CPhysicsRigidBodyProxy* GetBtRigidBody() const { return m_pRigidBodyProxy.get(); }
 
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
@@ -108,7 +115,7 @@ public:
     void Unlink();
 
 private:
-    std::unique_ptr<btRigidBody>                  m_pBtRigidBody;
+    std::unique_ptr<CPhysicsRigidBodyProxy>       m_pRigidBodyProxy;
     CLuaPhysicsShape*                             m_pShape;
     std::unique_ptr<CLuaPhysicsRigidBodyTempData> m_pTempData;
     std::vector<CLuaPhysicsConstraint*>           m_constraintList;
