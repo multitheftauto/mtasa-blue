@@ -106,6 +106,36 @@ void CClientPhysics::Unlink()
     m_pPhysicsManager->RemoveFromList(this);
 }
 
+void CClientPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
+{
+    m_pDynamicsWorld->addCollisionObject(pBtCollisionObject);
+}
+
+void CClientPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
+{
+    m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
+}
+
+void CClientPhysics::AddRigidBody(btRigidBody* pBtRigidBody) const
+{
+    m_pDynamicsWorld->addRigidBody(pBtRigidBody);
+}
+
+void CClientPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
+{
+    m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
+}
+
+void CClientPhysics::AddConstraint(btTypedConstraint* pBtTypedConstraint) const
+{
+    m_pDynamicsWorld->addConstraint(pBtTypedConstraint);
+}
+
+void CClientPhysics::RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const
+{
+    m_pDynamicsWorld->removeConstraint(pBtTypedConstraint);
+}
+
 void CClientPhysics::SetGravity(const CVector& vecGravity) const
 {
     std::lock_guard guard(dynamicsWorldLock);
@@ -466,13 +496,21 @@ void CClientPhysics::ClearOutsideWorldRigidBodies()
     }
 }
 
-btDiscreteDynamicsWorld* CClientPhysics::GetDynamicsWorld() const
+void CClientPhysics::CleanOverlappingPairCache(const CLuaPhysicsRigidBody* pRigidBody) const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    if (isDuringSimulation)
-        DebugBreak();
-    return m_pDynamicsWorld;
+
+    m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
+                                                                                      m_pDynamicsWorld->getDispatcher());
 }
+
+void CClientPhysics::UpdateSingleAabb(const CLuaPhysicsRigidBody* pRigidBody) const
+{
+    std::lock_guard guard(dynamicsWorldLock);
+
+    m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
+}
+
 void CClientPhysics::ProcessCollisions()
 {
     int numManifolds;

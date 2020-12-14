@@ -62,7 +62,7 @@ public:
     bool    SetScale(const CVector& vecScale);
     CVector GetScale() const;
 
-    void UpdateAABB() const { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(m_pRigidBodyProxy.get()); }
+    void UpdateAABB() const { GetPhysics()->UpdateSingleAabb(this); }
 
     void Initialize();
 

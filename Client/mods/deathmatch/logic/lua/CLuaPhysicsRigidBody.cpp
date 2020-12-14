@@ -82,8 +82,8 @@ bool CLuaPhysicsRigidBody::Activate() const
         m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
         m_pRigidBodyProxy->setActivationState(ACTIVE_TAG);
         m_pRigidBodyProxy->activate(true);
-        GetPhysics()->GetDynamicsWorld()->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(m_pRigidBodyProxy->getBroadphaseHandle(),
-                                                                                                          GetPhysics()->GetDynamicsWorld()->getDispatcher());
+
+        GetPhysics()->CleanOverlappingPairCache(this);
         return true;
     }
     return false;

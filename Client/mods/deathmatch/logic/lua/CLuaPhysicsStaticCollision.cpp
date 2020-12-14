@@ -19,7 +19,7 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
     m_btCollisionObject = std::make_unique<btCollisionObject>();
     m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
     m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(GetCollisionObject());
+    GetPhysics()->AddStaticCollision(m_btCollisionObject.get());
     pShape->AddStaticCollision(this);
     m_pShape = pShape;
 }
@@ -114,6 +114,6 @@ void CLuaPhysicsStaticCollision::Unlink()
     if (m_pShape)
     {
         m_pShape = nullptr;
-        GetPhysics()->GetDynamicsWorld()->removeCollisionObject(GetCollisionObject());
+        GetPhysics()->RemoveStaticCollision(GetCollisionObject());
     }
 }

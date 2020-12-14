@@ -74,6 +74,13 @@ public:
     CLuaPhysicsStaticCollision* CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
                                                                CVector vecRotation = CVector(0, 0, 0));
 
+    void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    void AddRigidBody(btRigidBody* pBtRigidBody) const;
+    void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
+    void AddConstraint(btTypedConstraint* pBtTypedConstraint) const;
+    void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
+
     void    SetGravity(const CVector& vecGravity) const;
     CVector GetGravity() const;
     bool    GetUseContinous() const;
@@ -119,7 +126,8 @@ public:
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
 
-    btDiscreteDynamicsWorld* GetDynamicsWorld() const;            // Todo, Remove
+    void CleanOverlappingPairCache(const CLuaPhysicsRigidBody* pRigidBody) const;
+    void UpdateSingleAabb(const CLuaPhysicsRigidBody* pRigidBody) const;
 
     std::atomic<bool> isDuringSimulation = false;
 

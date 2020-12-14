@@ -26,7 +26,6 @@ public:
 
     std::list<CClientPhysics*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CClientPhysics*>::const_iterator IterEnd() { return m_List.end(); };
-    CClientPhysics*                            GetPhysics(btDiscreteDynamicsWorld* pDynamicsWorld);
     void DoPulse();
     void WaitForSimulationsToFinish(bool bForceWait = false);
 

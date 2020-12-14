@@ -25,7 +25,7 @@ public:
     {
         delete getMotionState();
         delete getCollisionShape();
-        m_pPhysics->GetDynamicsWorld()->removeRigidBody(this);
+        m_pPhysics->RemoveRigidBody(this);
     }
 
     static std::unique_ptr<CPhysicsRigidBodyProxy> Create(CLuaPhysicsShape* pShape, const float fMass, const CVector& vecLocalInertia,
@@ -44,7 +44,7 @@ public:
 
         pRigidBody->m_pPhysics = pShape->GetPhysics();
 
-        pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(pRigidBody.get());
+        pShape->GetPhysics()->AddRigidBody(pRigidBody.get());
         return pRigidBody;
     }
 

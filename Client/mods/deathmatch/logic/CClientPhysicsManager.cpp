@@ -52,22 +52,6 @@ void CClientPhysicsManager::RemoveFromList(CClientPhysics* pPhysics)
         m_List.remove(pPhysics);
 }
 
-CClientPhysics* CClientPhysicsManager::GetPhysics(btDiscreteDynamicsWorld* pDynamicsWorld)
-{
-    if (m_List.empty())
-        return nullptr;
-
-    list<CClientPhysics*>::const_iterator iter = IterBegin();
-    for (; iter != IterEnd(); iter++)
-    {
-        if ((*iter)->GetDynamicsWorld() == pDynamicsWorld)
-        {
-            return *iter;
-        }
-    }
-    return nullptr;
-}
-
 void CClientPhysicsManager::WaitForSimulationsToFinish(bool bForceWait)
 {
     if (m_bWaitForSimulationToFinish || bForceWait)
