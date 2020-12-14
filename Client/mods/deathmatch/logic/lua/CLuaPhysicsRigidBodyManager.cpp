@@ -19,7 +19,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsi
     if (!pLuaRigidBody)
         return NULL;
 
-    if (!ListContains(m_RigidBodyList, pLuaRigidBody))
+    if (!ListContainsSharedPointer(m_RigidBodyList, pLuaRigidBody))
         return NULL;
     return pLuaRigidBody;
 }
@@ -28,7 +28,7 @@ CLuaPhysicsRigidBodyManager::~CLuaPhysicsRigidBodyManager()
 {
 }
 
-void CLuaPhysicsRigidBodyManager::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+void CLuaPhysicsRigidBodyManager::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
 {
     m_RigidBodyList.push_back(pRigidBody);
 }
@@ -38,15 +38,15 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
     assert(pRigidBody);
 
     // Check if already removed
-    if (!ListContains(m_RigidBodyList, pRigidBody))
+    if (!ListContainsSharedPointer(m_RigidBodyList, pRigidBody))
         return;
 
     // Remove all references
-    ListRemove(m_RigidBodyList, pRigidBody);
+    ListRemoveSharedPointer(m_RigidBodyList, pRigidBody);
     pRigidBody->Unlink();
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
+std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
 {
     for (auto& pRigidBody : m_RigidBodyList)
         if (pRigidBody->GetBtRigidBody()->getCollisionShape() == pCollisionShape)

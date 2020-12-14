@@ -17,13 +17,11 @@ void CLuaPhysicsStaticCollisionManager::RemoveStaticCollision(CLuaPhysicsStaticC
     assert(pLuaStaticCollision);
 
     // Check if already removed
-    if (!ListContains(m_StaticCollisionList, pLuaStaticCollision))
+    if (!ListContainsSharedPointer(m_StaticCollisionList, pLuaStaticCollision))
         return;
 
     // Remove all references
-    ListRemove(m_StaticCollisionList, pLuaStaticCollision);
-
-    delete pLuaStaticCollision;
+    ListRemoveSharedPointer(m_StaticCollisionList, pLuaStaticCollision);
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
@@ -32,19 +30,19 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
     if (!pLuaStaticCollision)
         return NULL;
 
-    if (!ListContains(m_StaticCollisionList, pLuaStaticCollision))
+    if (!ListContainsSharedPointer(m_StaticCollisionList, pLuaStaticCollision))
         return NULL;
     return pLuaStaticCollision;
 }
 
-void CLuaPhysicsStaticCollisionManager::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+void CLuaPhysicsStaticCollisionManager::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
     m_StaticCollisionList.push_back(pStaticCollision);
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape)
+std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape)
 {
-    for (CLuaPhysicsStaticCollision* pStaticCollision : m_StaticCollisionList)
+    for (std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision : m_StaticCollisionList)
     {
         if (pStaticCollision->GetCollisionObject()->getCollisionShape() == pCollisionShape)
             return pStaticCollision;
@@ -53,10 +51,11 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
     return nullptr;
 }
 
-std::vector<CLuaPhysicsStaticCollision*> CLuaPhysicsStaticCollisionManager::GetStaticCollisionsFromCollisionShape(const btCollisionShape* pCollisionShape)
+std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> CLuaPhysicsStaticCollisionManager::GetStaticCollisionsFromCollisionShape(
+    const btCollisionShape* pCollisionShape)
 {
-    std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
-    for (CLuaPhysicsStaticCollision* pStaticCollision : m_StaticCollisionList)
+    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> vecStaticCollisions;
+    for (std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision : m_StaticCollisionList)
     {
         if (pStaticCollision->GetCollisionObject()->getCollisionShape() == pCollisionShape)
             vecStaticCollisions.push_back(pStaticCollision);

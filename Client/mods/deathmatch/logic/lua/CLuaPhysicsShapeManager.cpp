@@ -18,12 +18,12 @@ CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiS
     if (!pLuaShape)
         return NULL;
 
-    if (!ListContains(m_ShapeList, pLuaShape))
+    if (!ListContainsSharedPointer(m_ShapeList, pLuaShape))
         return NULL;
     return pLuaShape;
 }
 
-void CLuaPhysicsShapeManager::AddShape(CLuaPhysicsShape* pShape)
+void CLuaPhysicsShapeManager::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
 {
     m_ShapeList.push_back(pShape);
 }
@@ -33,9 +33,6 @@ void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
     assert(pShape);
 
     // Check if already removed
-    if (!ListContains(m_ShapeList, pShape))
+    if (!ListContainsSharedPointer(m_ShapeList, pShape))
         return;
-
-    // Remove all references
-    ListRemove(m_ShapeList, pShape);
 }

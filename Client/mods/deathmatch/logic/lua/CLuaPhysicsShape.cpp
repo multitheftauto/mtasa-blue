@@ -46,11 +46,10 @@ CLuaPhysicsShape::~CLuaPhysicsShape()
         {
             staticCollision->Unlink();
         }
-
     }
 }
 
-void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+void CLuaPhysicsShape::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
 {
     if (ListContains(m_vecRigidBodyList, pRigidBody))
         return;
@@ -58,7 +57,7 @@ void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
     m_vecRigidBodyList.push_back(pRigidBody);
 }
 
-void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+void CLuaPhysicsShape::RemoveRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
 {
     if (!ListContains(m_vecRigidBodyList, pRigidBody))
         return;
@@ -66,7 +65,7 @@ void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
     ListRemove(m_vecRigidBodyList, pRigidBody);
 }
 
-void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+void CLuaPhysicsShape::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
     if (ListContains(m_vecStaticCollisions, pStaticCollision))
         return;
@@ -74,7 +73,7 @@ void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCol
     m_vecStaticCollisions.push_back(pStaticCollision);
 }
 
-void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+void CLuaPhysicsShape::RemoveStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
     if (!ListContains(m_vecStaticCollisions, pStaticCollision))
         return;

@@ -25,14 +25,14 @@ public:
 
     CLuaPhysicsConstraint* GetContraintFromScriptID(unsigned int uiScriptID);
 
-    void                   AddConstraint(CLuaPhysicsConstraint* pConstraint);
+    void                   AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint);
     void                   RemoveContraint(CLuaPhysicsConstraint* pLuaPhysicsConstraint);
 
     unsigned long GetContraintCount() const { return m_List.size(); }
 
-    std::vector<CLuaPhysicsConstraint*>::const_iterator                 IterBegin() { return m_List.begin(); }
-    std::vector<CLuaPhysicsConstraint*>::const_iterator IterEnd() { return m_List.end(); }
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>::const_iterator                 IterBegin() { return m_List.begin(); }
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
-    std::vector<CLuaPhysicsConstraint*> m_List;
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>> m_List;
 };

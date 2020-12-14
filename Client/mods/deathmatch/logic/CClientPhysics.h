@@ -57,22 +57,23 @@ public:
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
-    btCollisionWorld::ClosestConvexResultCallback ShapeCast(const CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to) const;
+    btCollisionWorld::ClosestConvexResultCallback ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to) const;
     btCollisionWorld::ClosestRayResultCallback    RayCast(CVector from, CVector to, bool bFilterBackfaces) const;
     btCollisionWorld::AllHitsRayResultCallback    RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const;
 
-    bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
-    bool                        GetDebugMode(ePhysicsDebugMode eDebugMode) const;
-    void                        SetDebugLineWidth(float fWidth) const;
-    float                       GetDebugLineWidth() const;
-    void                        StartBuildCollisionFromGTA();
-    void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
-    void                        BuildCollisionFromGTA();
-    CLuaPhysicsShape*           CreateShapeFromModel(unsigned short usModelId);
-    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
+    bool                                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
+    bool                                        GetDebugMode(ePhysicsDebugMode eDebugMode) const;
+    void                                        SetDebugLineWidth(float fWidth) const;
+    float                                       GetDebugLineWidth() const;
+    void                                        StartBuildCollisionFromGTA();
+    void                                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
+    void                                        BuildCollisionFromGTA();
+    std::shared_ptr<CLuaPhysicsShape>           CreateShapeFromModel(unsigned short usModelId);
+    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition = CVector(0, 0, 0),
+                                                                      CVector vecRotation = CVector(0, 0, 0));
 
-    CLuaPhysicsStaticCollision* CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
-                                                               CVector vecRotation = CVector(0, 0, 0));
+    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
+                                                                               CVector vecRotation = CVector(0, 0, 0));
 
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
     void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
@@ -98,40 +99,43 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
-    CLuaPhysicsBoxShape*                CreateBoxShape(CVector vector);
-    CLuaPhysicsSphereShape*             CreateSphereShape(float radius);
-    CLuaPhysicsCapsuleShape*            CreateCapsuleShape(float fRadius, float fHeight);
-    CLuaPhysicsConeShape*               CreateConeShape(float fRadius, float fHeight);
-    CLuaPhysicsCylinderShape*           CreateCylinderShape(CVector half);
-    CLuaPhysicsCompoundShape*           CreateCompoundShape(int iInitialChildCapacity = 0);
-    CLuaPhysicsConvexHullShape*         CreateConvexHullShape(std::vector<CVector>& vecPoints);
-    CLuaPhysicsTriangleMeshShape*       CreateTriangleMeshShape(std::vector<CVector>& vecVertices);
-    CLuaPhysicsHeightfieldTerrainShape* CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecFloat);
+    std::shared_ptr<CLuaPhysicsBoxShape>                CreateBoxShape(CVector vector);
+    std::shared_ptr<CLuaPhysicsSphereShape>             CreateSphereShape(float radius);
+    std::shared_ptr<CLuaPhysicsCapsuleShape>            CreateCapsuleShape(float fRadius, float fHeight);
+    std::shared_ptr<CLuaPhysicsConeShape>               CreateConeShape(float fRadius, float fHeight);
+    std::shared_ptr<CLuaPhysicsCylinderShape>           CreateCylinderShape(CVector half);
+    std::shared_ptr<CLuaPhysicsCompoundShape>           CreateCompoundShape(int iInitialChildCapacity = 0);
+    std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<CVector>& vecPoints);
+    std::shared_ptr<CLuaPhysicsTriangleMeshShape>       CreateTriangleMeshShape(std::vector<CVector>& vecVertices);
+    std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecFloat);
 
     // Links two bodies together
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA,
-                                                                    CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies);
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                    CVector anchorA, CVector anchorB,
+                                                                                    bool bDisableCollisionsBetweenLinkedBodies);
 
     // Links body to position
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
-                                                                    bool bDisableCollisionsBetweenLinkedBodies);
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
+                                                                                    bool bDisableCollisionsBetweenLinkedBodies);
 
-    CLuaPhysicsFixedConstraint* CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                      bool bDisableCollisionsBetweenLinkedBodies);
+    std::shared_ptr<CLuaPhysicsFixedConstraint> CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                      bool bDisableCollisionsBetweenLinkedBodies);
 
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> GetRigidBodies() const { return m_vecRigidBodies; }
-    std::vector<std::shared_ptr<CLuaPhysicsShape>>     GetShapes() const { return m_vecShapes; }
+    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies() const { return m_vecRigidBodies; }
+    std::vector<std::shared_ptr<CLuaPhysicsShape>>           GetShapes() const { return m_vecShapes; }
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
 
-    void CleanOverlappingPairCache(const CLuaPhysicsRigidBody* pRigidBody) const;
-    void UpdateSingleAabb(const CLuaPhysicsRigidBody* pRigidBody) const;
+    std::shared_ptr<CLuaPhysicsShape> GetSharedShape(CLuaPhysicsShape* pShape) const;
+
+    void CleanOverlappingPairCache(CLuaPhysicsRigidBody* pRigidBody) const;
+    void UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const;
 
     std::atomic<bool> isDuringSimulation = false;
 
-    SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_InitializeQueue;
+    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsElement>> m_InitializeQueue;
 
 private:
     void StepSimulation();
@@ -140,17 +144,17 @@ private:
 
     void Clear();
 
-    CLuaPhysicsShape*           AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
-    CLuaPhysicsRigidBody*       AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
-    CLuaPhysicsConstraint*      AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
-    CLuaPhysicsStaticCollision* AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+    void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape);
+    void AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    void AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint);
+    void AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
-    std::mutex lock;
+    std::mutex         lock;
     mutable std::mutex dynamicsWorldLock;
 
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
@@ -162,24 +166,24 @@ private:
     CPhysicsDebugDrawer* m_pDebugDrawer;
 
     std::atomic<int> m_iDeltaTimeMs = 0;
-    bool      m_bDrawDebugNextTime = false;
-    CLuaMain* m_pLuaMain;
+    bool             m_bDrawDebugNextTime = false;
+    CLuaMain*        m_pLuaMain;
 
     CClientPhysicsManager* m_pPhysicsManager;
 
-    bool m_canDoPulse = false;
-    CTickCount m_LastTimeMs;
-    CTickCount m_LastTimeBuildWorld;
-    bool       m_bBuildWorld;
-    std::atomic<float>      m_fSpeed = 1.0f;
-    bool       m_bDuringSimulation = false;
-    std::atomic<int>        m_iSubSteps = 10;
-    float      m_fImpulseThreshold = 0.01f;
-    std::atomic<bool> m_bSimulationEnabled = true;
-    bool       m_bTriggerEvents = true;
-    bool       m_bTriggerCollisionEvents = false;            // spam alert
-    bool       m_bTriggerConstraintEvents = false;
-    CVector    m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f);            // negative and positive
+    bool               m_canDoPulse = false;
+    CTickCount         m_LastTimeMs;
+    CTickCount         m_LastTimeBuildWorld;
+    bool               m_bBuildWorld;
+    std::atomic<float> m_fSpeed = 1.0f;
+    bool               m_bDuringSimulation = false;
+    std::atomic<int>   m_iSubSteps = 10;
+    float              m_fImpulseThreshold = 0.01f;
+    std::atomic<bool>  m_bSimulationEnabled = true;
+    bool               m_bTriggerEvents = true;
+    bool               m_bTriggerCollisionEvents = false;            // spam alert
+    bool               m_bTriggerConstraintEvents = false;
+    CVector            m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f);            // negative and positive
 
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;

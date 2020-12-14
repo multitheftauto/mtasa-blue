@@ -118,7 +118,7 @@ CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
     throw std::invalid_argument("Unknown error");
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClientPhysics* pPhysics, std::variant<CVector, float> variant)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClientPhysics* pPhysics, std::variant<CVector, float> variant)
 {
     CVector half;
     if (std::holds_alternative<CVector>(variant))
@@ -143,11 +143,10 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, CClie
         throw std::invalid_argument(
             SString("Maximum width, height and length must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    CLuaPhysicsBoxShape* pShape = pPhysics->CreateBoxShape(half);
-    return pShape;
+    return pPhysics->CreateBoxShape(half);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius)
 {
     if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
         throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
@@ -158,7 +157,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(lua_State* luaVM, CC
     return pPhysics->CreateSphereShape(fRadius);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCapsuleShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCapsuleShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
 {
     if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
         throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
@@ -175,7 +174,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCapsuleShape(lua_State* luaVM, C
     return pPhysics->CreateCapsuleShape(fRadius, fHeight);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConeShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateConeShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
 {
     if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
         throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
@@ -192,7 +191,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConeShape(lua_State* luaVM, CCli
     return pPhysics->CreateConeShape(fRadius, fHeight);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCylinderShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCylinderShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight)
 {
     if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
         throw std::invalid_argument(SString("Minimum radius must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
@@ -209,7 +208,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCylinderShape(lua_State* luaVM, 
     return pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics, std::optional<int> optionalInitialCapacity)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics, std::optional<int> optionalInitialCapacity)
 {
     int iInitialCapacity = optionalInitialCapacity.value_or(0);
     if (iInitialCapacity < BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
@@ -219,7 +218,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCompoundShape(lua_State* luaVM, 
     return pPhysics->CreateCompoundShape(iInitialCapacity);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConvexHullShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecPoints)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateConvexHullShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecPoints)
 {
     if (vecPoints.size() < 3)
         throw std::invalid_argument("Convex hull shape require at least 3 vertices");
@@ -227,7 +226,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConvexHullShape(lua_State* luaVM
     return pPhysics->CreateConvexHullShape(vecPoints);
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateTriangleMeshShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecVertices)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecVertices)
 {
     if (vecVertices.size() < 3)
         throw std::invalid_argument("Triangle mesh shape require at least 3 vertices");
@@ -251,7 +250,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateTriangleMeshShape(lua_State* lua
 }
 
 // Todo: Add support for greyscale texture as input
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY, std::vector<float> vecHeights)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY, std::vector<float> vecHeights)
 {
     if (sizeX < BulletPhysics::Limits::MinimumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MinimumHeightfieldTerrain)
         throw std::invalid_argument(SString("Minimum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MinimumHeightfieldTerrain).c_str());
@@ -359,7 +358,7 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CClientPhysics* pPhysics)
     return true;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass,
+std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass,
                                                               std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass)
 {
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
@@ -368,23 +367,25 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
     if (fMass.value_or(1.f) < 0)
         throw std::invalid_argument("Mass can not be negative");
 
-    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass),
+    std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass),
                                                                              vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
                                                                              vecCenterOfMass.value_or(BulletPhysics::Defaults::RigidBodyCenterOfMass));
     return pRigidBody;
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel)
 {
-    CLuaPhysicsShape* pShape = pPhysics->CreateShapeFromModel(usModel);
+    std::shared_ptr<CLuaPhysicsShape> pShape = pPhysics->CreateShapeFromModel(usModel);
     return pShape;
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
+std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
-        pShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
+    std::shared_ptr                             pSharedShape = pShape->GetPhysics()->GetSharedShape(pShape);
+    std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
+        pSharedShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
+
     return pStaticCollision;
 }
 
@@ -397,12 +398,13 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundSh
     if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Shape can not be compound");
 
-    pCompoundShape->AddShape(pShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
+    std::shared_ptr pSharedShape = pShape->GetPhysics()->GetSharedShape(pShape);
+    pCompoundShape->AddShape(pSharedShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
                              vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
     return true;
 }
 
-std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape)
+std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape)
 {
     return pCompoundShape->GetChildShapes();
 }
@@ -1246,12 +1248,12 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //    return 1;
 //}
 
-CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                      std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
-    CLuaPhysicsFixedConstraint* pConstraint =
+    std::shared_ptr<CLuaPhysicsFixedConstraint> pConstraint =
         pRigidBodyA->GetPhysics()->CreateFixedConstraint(pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    return (CLuaPhysicsConstraint*)pConstraint;
+    return pConstraint;
 }
 
 int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody,
@@ -1260,7 +1262,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaV
     if (eConstraint != ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
         throw std::invalid_argument("Invalid constraint type");
 
-    CLuaPhysicsPointToPointConstraint* pConstraint =
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
         pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
     // lua_pushconstraint(luaVM, pConstraint);
     return 1;
@@ -1276,7 +1278,7 @@ int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaV
     if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
         throw std::invalid_argument("Rigid bodies need to belong to the same physics world");
 
-    CLuaPhysicsPointToPointConstraint* pConstraint = pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(
         pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
     // lua_pushconstraint(luaVM, pConstraint);
     return 1;

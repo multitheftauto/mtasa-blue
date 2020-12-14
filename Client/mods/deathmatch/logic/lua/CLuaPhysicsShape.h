@@ -32,10 +32,10 @@ public:
     ~CLuaPhysicsShape();
 
     btCollisionShape*              GetBtShape() const { return m_pBtShape.get(); }
-    void                           AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                           RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                           AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    void                           RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void                           AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    void                           RemoveRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    void                           AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+    void                           RemoveStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     bool SetScale(CVector scale);
     bool GetScale(CVector& scale);
@@ -51,6 +51,6 @@ public:
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;
 
-    std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
-    std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
+    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodyList;
+    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
 };

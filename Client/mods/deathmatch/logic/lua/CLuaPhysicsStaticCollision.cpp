@@ -14,13 +14,13 @@
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
     m_btCollisionObject = std::make_unique<btCollisionObject>();
     m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
     m_btCollisionObject->setUserPointer((void*)this);
     GetPhysics()->AddStaticCollision(m_btCollisionObject.get());
-    pShape->AddStaticCollision(this);
+    //pShape->AddStaticCollision(this);
     m_pShape = pShape;
 }
 

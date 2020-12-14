@@ -23,7 +23,7 @@ CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
 
 }
 
-void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
+void CLuaPhysicsCompoundShape::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation)
 {
     btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
     btTransform      transform;
@@ -34,25 +34,13 @@ void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPos
     pCompound->recalculateLocalAabb();
 }
 
-std::vector<CLuaPhysicsShape*> CLuaPhysicsCompoundShape::GetChildShapes()
-{
-    btCompoundShape*               pCompound = (btCompoundShape*)GetBtShape();
-    std::vector<CLuaPhysicsShape*> vecChildShapes;
-    btCollisionShape*              pCollisionShape;
-    for (int i = 0; i < pCompound->getNumChildShapes(); i++)
-    {
-        pCollisionShape = pCompound->getChildShape(i);
-        vecChildShapes.push_back((CLuaPhysicsShape*)pCollisionShape->getUserPointer());
-    }
-    return vecChildShapes;
-}
-
 bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)
 {
     btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
     if (index >= 0 && index < pCompound->getNumChildShapes())
     {
         pCompound->removeChildShapeByIndex(index);
+        m_vecChildShapes.erase(m_vecChildShapes.begin() + index);
         UpdateRigids();
         return true;
     }

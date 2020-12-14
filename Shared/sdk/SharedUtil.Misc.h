@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <memory>
 
 namespace SharedUtil
 {
@@ -339,6 +340,19 @@ namespace SharedUtil
         return false;
     }
 
+    
+    // Remove all occurrences of item from itemList
+    template <typename T>
+    bool ListContainsSharedPointer(std::vector<std::shared_ptr<T>>& itemList, const T* item)
+    {
+        typename std::vector<std::shared_ptr<T>>::iterator it = itemList.begin();
+        for (; it != itemList.end(); ++it)
+            if (item == (*it).get())
+                return true;
+        return false;
+    }
+
+
     // Add item if it does not aleady exist in itemList
     template <class TL, class T>
     void ListAddUnique(TL& itemList, const T& item)
@@ -399,6 +413,21 @@ namespace SharedUtil
                 it = itemList.erase(it);
             else
                 ++it;
+        }
+    }
+
+    // Remove all occurrences of item from itemList
+    template <typename T>
+    void ListRemoveSharedPointer(std::vector<std::shared_ptr<T>>& itemList, const T* item)
+    {
+        typename std::vector<std::shared_ptr<T>>::iterator it = itemList.begin();
+        while (it != itemList.end())
+        {
+            if (item == (*it).get())
+            {
+                it = itemList.erase(it);
+                break;
+            }
         }
     }
 

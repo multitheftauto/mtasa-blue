@@ -30,12 +30,11 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
     Unlink();
 }
 
-void CLuaPhysicsRigidBody::Initialize()
+void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pThisRigidBody)
 {
     assert(m_pTempData);            // in case something goes wrong, or element get initialized twice
     m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, m_pTempData->m_fMass, m_pTempData->m_vecLocalInertia, m_pTempData->m_vecCenterOfMass);
     m_pRigidBodyProxy->setUserPointer((void*)this);
-    m_pShape->AddRigidBody(this);
 
     SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);
     SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
@@ -83,7 +82,7 @@ bool CLuaPhysicsRigidBody::Activate() const
         m_pRigidBodyProxy->setActivationState(ACTIVE_TAG);
         m_pRigidBodyProxy->activate(true);
 
-        GetPhysics()->CleanOverlappingPairCache(this);
+        //GetPhysics()->CleanOverlappingPairCache(this);
         return true;
     }
     return false;
@@ -535,7 +534,7 @@ void CLuaPhysicsRigidBody::Unlink()
     if (m_pShape != nullptr && IsReady())
     {
         m_pRigidBodyProxy.reset();
-        m_pShape->RemoveRigidBody(this);
+        //m_pShape->RemoveRigidBody(this);
         m_pShape = nullptr;
     }
 }

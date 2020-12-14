@@ -20,7 +20,7 @@ class CLuaPhysicsStaticCollision;
 class CLuaPhysicsStaticCollision : public CLuaPhysicsElement
 {
 public:
-    CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
+    CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape);
     ~CLuaPhysicsStaticCollision();
 
     void    SetPosition(const CVector& vecPosition) const;
@@ -47,5 +47,5 @@ public:
 
 private:
     std::unique_ptr<btCollisionObject> m_btCollisionObject;
-    CLuaPhysicsShape*                  m_pShape;
+    std::shared_ptr<CLuaPhysicsShape>  m_pShape;
 };

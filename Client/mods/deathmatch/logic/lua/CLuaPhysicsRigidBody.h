@@ -62,9 +62,9 @@ public:
     bool    SetScale(const CVector& vecScale);
     CVector GetScale() const;
 
-    void UpdateAABB() const { GetPhysics()->UpdateSingleAabb(this); }
+    void UpdateAABB() const {/*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/ }
 
-    void Initialize();
+    void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pThisRigidBody);
 
     bool Activate() const;
 

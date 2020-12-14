@@ -25,14 +25,14 @@ public:
 
     CLuaPhysicsShape* GetShapeFromScriptID(unsigned int uiScriptID);
 
-    void AddShape(CLuaPhysicsShape* pShape);
+    void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape);
 
     void          RemoveShape(CLuaPhysicsShape* pShape);
     unsigned long GetShapeCount() const { return m_ShapeList.size(); }
 
-    std::vector<CLuaPhysicsShape*>::const_iterator IterBegin() { return m_ShapeList.begin(); }
-    std::vector<CLuaPhysicsShape*>::const_iterator IterEnd() { return m_ShapeList.end(); }
+    std::vector<std::shared_ptr<CLuaPhysicsShape>>::const_iterator IterBegin() { return m_ShapeList.begin(); }
+    std::vector<std::shared_ptr<CLuaPhysicsShape>>::const_iterator IterEnd() { return m_ShapeList.end(); }
 
 private:
-    std::vector<CLuaPhysicsShape*> m_ShapeList;
+    std::vector<std::shared_ptr<CLuaPhysicsShape>> m_ShapeList;
 };

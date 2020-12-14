@@ -23,10 +23,13 @@ public:
     CLuaPhysicsCompoundShape(CClientPhysics* pPhysics, int iInitialChildCapacity);
     ~CLuaPhysicsCompoundShape();
 
-    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
+    void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
 
-    std::vector<CLuaPhysicsShape*> GetChildShapes();
+    std::vector<std::shared_ptr<CLuaPhysicsShape>> GetChildShapes() const { return m_vecChildShapes; }
     bool                           RemoveChildShape(int index);
     bool                           GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
     bool                           SetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
+
+private:
+    std::vector<std::shared_ptr<CLuaPhysicsShape>> m_vecChildShapes;
 };
