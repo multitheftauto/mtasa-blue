@@ -64,7 +64,7 @@ public:
 
     void UpdateAABB() const {/*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/ }
 
-    void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pThisRigidBody);
+    void Initialize();
 
     bool Activate() const;
 

@@ -30,8 +30,9 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
     Unlink();
 }
 
-void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pThisRigidBody)
+void CLuaPhysicsRigidBody::Initialize()
 {
+    std::shared_ptr<CLuaPhysicsRigidBody> pThisRigidBody = GetPhysics()->GetSharedRigidBody(this);
     assert(m_pTempData);            // in case something goes wrong, or element get initialized twice
     m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, m_pTempData->m_fMass, m_pTempData->m_vecLocalInertia, m_pTempData->m_vecCenterOfMass);
     m_pRigidBodyProxy->setUserPointer((void*)this);

@@ -106,4 +106,6 @@ public:
     LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsCreateConstraint);
+
+    static bool PhysicsOverlapBox(CClientPhysics* pPhysics);
 };

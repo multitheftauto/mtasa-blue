@@ -128,6 +128,7 @@ public:
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
 
+    std::shared_ptr<CLuaPhysicsRigidBody> GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const;
     std::shared_ptr<CLuaPhysicsShape> GetSharedShape(CLuaPhysicsShape* pShape) const;
 
     void CleanOverlappingPairCache(CLuaPhysicsRigidBody* pRigidBody) const;
@@ -136,6 +137,8 @@ public:
     std::atomic<bool> isDuringSimulation = false;
 
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsElement>> m_InitializeQueue;
+
+    void Query();
 
 private:
     void StepSimulation();

@@ -490,6 +490,16 @@ void CClientPhysics::ClearOutsideWorldRigidBodies()
     }
 }
 
+std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const
+{
+    auto it = m_vecRigidBodies.begin();
+    for (; it != m_vecRigidBodies.end(); ++it)
+        if (pRigidBody == (*it).get())
+            return *it;
+
+    assert(1==2); // Should never happen
+}
+
 std::shared_ptr<CLuaPhysicsShape> CClientPhysics::GetSharedShape(CLuaPhysicsShape* pShape) const
 {
     auto it = m_vecShapes.begin();
@@ -499,6 +509,7 @@ std::shared_ptr<CLuaPhysicsShape> CClientPhysics::GetSharedShape(CLuaPhysicsShap
 
     assert(1==2); // Should never happen
 }
+
 void CClientPhysics::CleanOverlappingPairCache(CLuaPhysicsRigidBody* pRigidBody) const
 {
     std::lock_guard guard(dynamicsWorldLock);
@@ -893,6 +904,53 @@ void CClientPhysics::DrawDebugLines()
     }
 }
 
+struct btMyBroadphaseAabbCallback : public btBroadphaseAabbCallback
+{
+    btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
+    short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
+    btMyBroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short int collisionGroup = btBroadphaseProxy::DefaultFilter,
+                               short int collisionMask = btBroadphaseProxy::AllFilter)
+        : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
+    {
+        m_collisionObjectArray.resize(0);
+    }
+
+    SIMD_FORCE_INLINE bool needsCollision(const btBroadphaseProxy* proxy) const
+    {
+        bool collides = (proxy->m_collisionFilterGroup & m_collisionFilterMask) != 0;
+        collides = collides && (m_collisionFilterGroup & proxy->m_collisionFilterMask);
+        return collides;
+    }
+
+    virtual bool process(const btBroadphaseProxy* proxy)
+    {
+
+        if (needsCollision(proxy))
+            m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
+        return true;
+    }
+};
+
+
+void CClientPhysics::Query()
+{
+    btVector3 min(0, 0, 0);
+    btVector3               max(100, 100, 100);
+
+    btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
+    btMyBroadphaseAabbCallback               callback(collisionObjectArray);
+    m_pDynamicsWorld->getBroadphase()->aabbTest(min, max, callback);
+
+    std::vector<btCollisionObject*> asd;
+    for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
+    {
+        auto const& b = callback.m_collisionObjectArray[i];
+        b->getInternalType();
+        asd.push_back(b);
+    }
+    int a = 5;
+}
+
 void CClientPhysics::DoPulse()
 {
     OutputDebugString("In\n");
@@ -902,7 +960,7 @@ void CClientPhysics::DoPulse()
     while (!m_InitializeQueue.empty())
     {
         std::shared_ptr<CLuaPhysicsElement> pElement = m_InitializeQueue.top();
-        pElement->Initialize(pElement);
+        pElement->Initialize();
 
         m_InitializeQueue.pop();
     }

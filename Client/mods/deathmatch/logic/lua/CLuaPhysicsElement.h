@@ -32,7 +32,7 @@ public:
     void                   Destroy();
     bool                   IsReady() const { return m_isReady; }
     void                   Ready() { m_isReady = true; }
-    virtual void           Initialize(std::shared_ptr<CLuaPhysicsElement> pThisRigidBody) {}
+    virtual void           Initialize() {}
 
 private:
     void RemoveScriptID();

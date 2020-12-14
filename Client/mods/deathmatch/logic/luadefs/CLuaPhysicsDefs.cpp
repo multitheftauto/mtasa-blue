@@ -81,6 +81,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsShapeCast", ArgumentParser<PhysicsShapeCast>},
         {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
+        {"physicsOverlapBox", ArgumentParser<PhysicsOverlapBox>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1524,5 +1525,11 @@ std::string CLuaPhysicsDefs::PhysicsGetElementType(CLuaPhysicsElement* pPhysicsE
 
 bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
 {
+    return true;
+}
+
+bool CLuaPhysicsDefs::PhysicsOverlapBox(CClientPhysics* pPhysics)
+{
+    pPhysics->Query();
     return true;
 }
