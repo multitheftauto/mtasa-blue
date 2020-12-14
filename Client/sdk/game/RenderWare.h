@@ -27,6 +27,11 @@
 #define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
 
+/* Type IDs */
+
+#define RP_TYPE_ATOMIC 1
+#define RP_TYPE_CLUMP  2
+
 typedef struct RwV2d                RwV2d;
 typedef struct RwV3d                RwV3d;
 typedef struct RwPlane              RwPlane;
