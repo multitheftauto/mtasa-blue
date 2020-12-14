@@ -140,7 +140,7 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
     }
 }
 
-CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint32 id)
 {
     return &ms_aInfoForModel[id];
 }
