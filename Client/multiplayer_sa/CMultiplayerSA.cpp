@@ -6880,14 +6880,17 @@ void PostCWorld_ProcessPedsAfterPreRender()
         if (!objectEntity)
             continue;
         auto objectInterface = objectEntity->GetObjectInterface();
-        if (objectInterface && objectInterface->bUpdateScale && objectEntity->GetPreRenderRequired())
+        if (objectInterface)
         {
-            objectEntity->SetScaleInternal(*objectEntity->GetScale());
-            objectInterface->bUpdateScale = false;
-            objectEntity->SetPreRenderRequired(false);
-            RpClump* clump = objectInterface->m_pRwObject;
-            if (clump && clump->object.type == RP_TYPE_CLUMP)
-                objectEntity->UpdateRpHAnim();
+            if ((objectInterface->fScale != 1.0f || objectInterface->bUpdateScale) && objectEntity->GetPreRenderRequired())
+            {
+                objectEntity->SetScaleInternal(*objectEntity->GetScale());
+                objectInterface->bUpdateScale = false;
+                objectEntity->SetPreRenderRequired(false);
+                RpClump* clump = objectInterface->m_pRwObject;
+                if (clump && clump->object.type == RP_TYPE_CLUMP)
+                    objectEntity->UpdateRpHAnim();
+            }
         }
     }
 }
