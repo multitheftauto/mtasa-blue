@@ -799,8 +799,7 @@ int CLuaVehicleDefs::GetVehicleUpgrades(lua_State* luaVM)
         CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
         if (pUpgrades)
         {
-            // Create a new table - preallocates a generous amount
-            lua_createtable(luaVM, 16, 0);
+            lua_createtable(luaVM, VEHICLE_UPGRADE_SLOTS, 0);
 
             // Add all the upgrades to the table
             const SSlotStates& usSlotStates = pUpgrades->GetSlotStates();
