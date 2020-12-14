@@ -580,33 +580,39 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
         {
             if (!argStream.HasErrors())
             {
-                int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
+                ushort usParentID = -1;
+                if (argStream.NextIsNumber())
+                    argStream.ReadNumber(usParentID);
+                else
+                {
+                    switch (eModelType)
+                    {
+                    case eClientModelType::PED:
+                        usParentID = 7; // male01
+                        break;
+                    case eClientModelType::OBJECT:
+                        usParentID = 1337; // BinNt07_LA (trash can)
+                        break;
+                    case eClientModelType::VEHICLE:
+                        usParentID = VT_LANDSTAL;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+
+                int iModelID = INVALID_MODEL_ID;
+                if (argStream.NextIsNumber())
+                    argStream.ReadNumber(iModelID);
+                else
+                    iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
+
                 if (iModelID != INVALID_MODEL_ID) {
                     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
                     if (pModel == nullptr)
                         pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
                     m_pManager->GetModelManager()->Add(pModel);
-                    ushort usParentID = -1;
 
-                    if (argStream.NextIsNumber())
-                        argStream.ReadNumber(usParentID);
-                    else
-                    {
-                        switch (eModelType)
-                        {
-                            case eClientModelType::PED:
-                                usParentID = 7; // male01
-                                break;
-                            case eClientModelType::OBJECT:
-                                usParentID = 1337; // BinNt07_LA (trash can)
-                                break;
-                            case eClientModelType::VEHICLE:
-                                usParentID = VT_LANDSTAL;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
                     pModel->Allocate(usParentID);
                     pModel->SetParentResource(pResource);
 
