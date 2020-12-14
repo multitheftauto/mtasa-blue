@@ -28,15 +28,14 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
     Unlink();
-    m_pTempData.reset();
 }
 
 void CLuaPhysicsRigidBody::Initialize()
 {
     assert(m_pTempData);            // in case something goes wrong, or element get initialized twice
     m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, m_pTempData->m_fMass, m_pTempData->m_vecLocalInertia, m_pTempData->m_vecCenterOfMass);
-    m_pShape->AddRigidBody(this);
     m_pRigidBodyProxy->setUserPointer((void*)this);
+    m_pShape->AddRigidBody(this);
 
     SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);
     SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
@@ -46,6 +45,7 @@ void CLuaPhysicsRigidBody::Initialize()
     SetPosition(m_pTempData->m_matrix.GetPosition());
     SetRotation(m_pTempData->m_matrix.GetRotation());
     SetScale(m_pTempData->m_matrix.GetScale());
+
     m_pTempData.reset();
 }
 

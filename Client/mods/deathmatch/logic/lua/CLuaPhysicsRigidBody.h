@@ -119,6 +119,5 @@ private:
     CLuaPhysicsShape*                             m_pShape;
     std::unique_ptr<CLuaPhysicsRigidBodyTempData> m_pTempData;
     std::vector<CLuaPhysicsConstraint*>           m_constraintList;
-    int                                           m_iLastSimulationCounter = 0;
     mutable std::mutex                            m_lock;
 };
