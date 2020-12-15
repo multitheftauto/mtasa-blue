@@ -64,10 +64,14 @@ public:
     bool    SetMatrix(const CMatrix& matrix);
     CMatrix GetMatrix() const;
 
+    // Called every time if while simulation position, rotation has changed.
+    void HasMoved();
+
     void UpdateAABB() const
     { /*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/
     }
 
+    // Running on worker thread
     void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
 
     void Activate() const;
@@ -125,6 +129,10 @@ private:
     std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;
     std::vector<CLuaPhysicsConstraint*>                m_constraintList;
     SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
+    CVector                                            m_vecPosition;
+    CVector                                            m_vecRotation;
     mutable std::mutex                                 m_lock;
+    mutable std::mutex                                 m_transformLock;
     mutable std::atomic<bool>                          m_bActivationRequested;
+
 };

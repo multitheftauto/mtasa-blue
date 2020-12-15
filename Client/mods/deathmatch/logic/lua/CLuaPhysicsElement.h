@@ -32,7 +32,7 @@ public:
     void                   Destroy();
     bool                   IsReady() const { return m_isReady; }
     void                   Ready() { m_isReady = true; }
-    bool                   IsSafeToUpdate() const;
+    bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
     void                   ApplyOrEnqueueChange(std::function<void()> change);
 

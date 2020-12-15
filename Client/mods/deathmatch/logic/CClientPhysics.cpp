@@ -1041,7 +1041,6 @@ void CClientPhysics::DoPulse()
 
     isDuringSimulation = true;
     StepSimulation();
-    isDuringSimulation = false;
 
     if (m_bDrawDebugNextTime)
     {
@@ -1049,12 +1048,23 @@ void CClientPhysics::DoPulse()
         {
             std::lock_guard guard(dynamicsWorldLock);
             m_pDynamicsWorld->debugDrawWorld();
-            if (isDuringSimulation)
-                DebugBreak();
         }
         m_bDrawDebugNextTime = false;
     }
 
+    btAlignedObjectArray<btRigidBody*>& nonStaticrigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
+    int                                a = 0;
+    for (int i = 0; i < nonStaticrigidBodies.size(); i++)
+    {
+        if (nonStaticrigidBodies[i]->isActive())
+        {
+            CLuaPhysicsRigidBody* pRigidBody = (CLuaPhysicsRigidBody*)nonStaticrigidBodies[i]->getUserPointer();
+            pRigidBody->HasMoved();
+        }
+    }
+    OutputDebugString(SString("Moving elements: %i", a).c_str());
+
+    isDuringSimulation = false;
     //ClearOutsideWorldRigidBodies();
     //ProcessCollisions();
 }

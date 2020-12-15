@@ -44,10 +44,53 @@ void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRig
 
     Ready();
 
-    SetPosition(m_pTempData->m_matrix.GetPosition());
-    SetRotation(m_pTempData->m_matrix.GetRotation());
+    CVector tempPosition;
+    CVector tempRotation;
+
+    {
+        std::lock_guard guard(m_transformLock);
+        tempPosition = m_vecPosition;
+        tempRotation = m_vecRotation;
+    }
+
+    SetPosition(tempPosition);
+    SetRotation(tempRotation);
     SetScale(m_pTempData->m_matrix.GetScale());
 }
+
+void CLuaPhysicsRigidBody::HasMoved()
+{
+    std::lock_guard guard(m_transformLock);
+
+    const btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
+    CLuaPhysicsSharedLogic::GetPosition(transform, m_vecPosition);
+    CLuaPhysicsSharedLogic::GetRotation(transform, m_vecRotation);
+}
+
+void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
+{
+    {
+        std::lock_guard guard(m_transformLock);
+        m_vecPosition = vecPosition;
+    }
+
+    std::function<void()> change([&, vecPosition]() {
+        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
+        transform.setOrigin(reinterpret_cast<const btVector3&>(vecPosition));
+        m_pRigidBodyProxy->setWorldTransform(transform);
+    });
+
+    ApplyOrEnqueueChange(change);
+
+    NeedsActivation();
+}
+
+CVector CLuaPhysicsRigidBody::GetPosition() const
+{
+    std::lock_guard guard(m_transformLock);
+    return m_vecPosition;
+}
+
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
@@ -171,38 +214,6 @@ float CLuaPhysicsRigidBody::GetMass() const
         return m_pRigidBodyProxy->getMass();
     }
     return m_pTempData->m_fMass;
-}
-
-void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
-{
-    m_pTempData->m_matrix.SetPosition(vecPosition);
-
-    std::function<void()> change([&, vecPosition]() {
-        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        transform.setOrigin(reinterpret_cast<const btVector3&>(vecPosition));
-        /*m_pRigidBodyProxy->setCcdMotionThreshold(1e-7);
-        m_pRigidBodyProxy->setCcdSweptSphereRadius(0.5f);*/
-        m_pRigidBodyProxy->setWorldTransform(transform);
-    });
-
-    ApplyOrEnqueueChange(change);
-
-    NeedsActivation();
-}
-
-CVector CLuaPhysicsRigidBody::GetPosition() const
-{
-    std::lock_guard guard(m_lock);
-
-    if (IsReady())
-    {
-        CVector     position;
-        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        CLuaPhysicsSharedLogic::GetPosition(transform, position);
-        return position;
-    }
-
-    return m_pTempData->m_matrix.GetPosition();
 }
 
 void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation)

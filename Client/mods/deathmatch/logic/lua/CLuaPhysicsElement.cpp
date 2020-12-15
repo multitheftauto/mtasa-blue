@@ -40,11 +40,10 @@ void CLuaPhysicsElement::Destroy()
     m_pPhysics->DestroyElement(this);
 }
 
-bool CLuaPhysicsElement::IsSafeToUpdate() const
+bool CLuaPhysicsElement::IsSafeToAccess() const
 {
     return m_pPhysics->isDuringSimulation;
 }
-
 
 void CLuaPhysicsElement::ApplyChanges()
 {
@@ -58,7 +57,7 @@ void CLuaPhysicsElement::ApplyChanges()
 
 void CLuaPhysicsElement::ApplyOrEnqueueChange(std::function<void()> change)
 {
-    if (IsSafeToUpdate())
+    if (IsSafeToAccess())
         change();
     else
     {
