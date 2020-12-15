@@ -64,7 +64,7 @@ public:
 
     void UpdateAABB() const {/*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/ }
 
-    void Initialize();
+    void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
 
     bool Activate() const;
 
@@ -115,7 +115,7 @@ public:
     void Unlink();
 
 private:
-    std::unique_ptr<CPhysicsRigidBodyProxy>       m_pRigidBodyProxy;
+    std::unique_ptr<CPhysicsRigidBodyProxy>       m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*                             m_pShape;
     std::unique_ptr<CLuaPhysicsRigidBodyTempData> m_pTempData;
     std::vector<CLuaPhysicsConstraint*>           m_constraintList;

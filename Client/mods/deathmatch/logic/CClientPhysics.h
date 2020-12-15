@@ -130,13 +130,13 @@ public:
 
     std::shared_ptr<CLuaPhysicsRigidBody> GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const;
     std::shared_ptr<CLuaPhysicsShape> GetSharedShape(CLuaPhysicsShape* pShape) const;
+    std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const;
 
     void CleanOverlappingPairCache(CLuaPhysicsRigidBody* pRigidBody) const;
     void UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const;
 
     std::atomic<bool> isDuringSimulation = false;
 
-    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsElement>> m_InitializeQueue;
 
     void Query();
 
@@ -195,4 +195,7 @@ private:
     std::vector<std::shared_ptr<CLuaPhysicsShape>>           m_vecShapes;
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
+
+    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsStaticCollision>> m_InitializeStaticCollisionsQueue;
+    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>> m_InitializeRigidBodiesQueue;
 };

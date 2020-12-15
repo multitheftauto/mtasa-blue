@@ -28,7 +28,7 @@ public:
         m_pPhysics->RemoveRigidBody(this);
     }
 
-    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(CLuaPhysicsShape* pShape, const float fMass, const CVector& vecLocalInertia,
+    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass, const CVector& vecLocalInertia,
                                                           const CVector& vecCenterOfMass)
     {
         btTransform transformZero;

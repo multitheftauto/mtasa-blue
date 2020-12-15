@@ -16,11 +16,8 @@
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
-    m_btCollisionObject = std::make_unique<btCollisionObject>();
-    m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->AddStaticCollision(m_btCollisionObject.get());
     //pShape->AddStaticCollision(this);
+    m_pTempData = std::make_unique<CLuaPhysicsStaticCollisionTempData>();
     m_pShape = pShape;
 }
 
@@ -29,13 +26,28 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
     Unlink();
 }
 
-void CLuaPhysicsStaticCollision::Initialize()
+void CLuaPhysicsStaticCollision::Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
+    m_btCollisionObject = CPhysicsStaticCollisionProxy::Create(m_pShape);
+    m_btCollisionObject->setUserPointer((void*)this);
+
+    Ready();
+
+    SetPosition(m_pTempData->m_matrix.GetPosition());
+    SetRotation(m_pTempData->m_matrix.GetRotation());
+    //SetScale(m_pTempData->m_matrix.GetScale());
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition) const
 {
-    CLuaPhysicsSharedLogic::SetPosition(GetCollisionObject(), vecPosition);
+    std::lock_guard guard(m_lock);
+
+    if (IsReady())
+    {
+        CLuaPhysicsSharedLogic::SetPosition(GetCollisionObject(), vecPosition);
+        return;
+    }
+    m_pTempData->m_matrix.SetPosition(vecPosition);
 }
 
 void CLuaPhysicsStaticCollision::SetRotation(const CVector& vecRotation) const
@@ -114,6 +126,6 @@ void CLuaPhysicsStaticCollision::Unlink()
     if (m_pShape)
     {
         m_pShape = nullptr;
-        GetPhysics()->RemoveStaticCollision(GetCollisionObject());
+        //GetPhysics()->RemoveStaticCollision(GetCollisionObject());
     }
 }

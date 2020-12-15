@@ -31,6 +31,7 @@
 #include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
 #include "lua/CLuaPhysicsTriangleMeshShape.h"
 #include "lua/physics/CPhysicsRigidBodyProxy.h"
+#include "lua/physics/CPhysicsStaticCollisionProxy.h"
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
@@ -108,31 +109,43 @@ void CClientPhysics::Unlink()
 
 void CClientPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
+
     m_pDynamicsWorld->addCollisionObject(pBtCollisionObject);
 }
 
 void CClientPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
+
     m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
 }
 
 void CClientPhysics::AddRigidBody(btRigidBody* pBtRigidBody) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
+
     m_pDynamicsWorld->addRigidBody(pBtRigidBody);
 }
 
 void CClientPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
+
     m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
 }
 
 void CClientPhysics::AddConstraint(btTypedConstraint* pBtTypedConstraint) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
+
     m_pDynamicsWorld->addConstraint(pBtTypedConstraint);
 }
 
 void CClientPhysics::RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const
 {
+    std::lock_guard guard(dynamicsWorldLock);
+
     m_pDynamicsWorld->removeConstraint(pBtTypedConstraint);
 }
 
@@ -171,8 +184,8 @@ void CClientPhysics::SetUseContinous(bool bUse) const
 std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation)
 {
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_shared<CLuaPhysicsStaticCollision>(pShape);
-    pStaticCollision->SetPosition(vecPosition);
-    pStaticCollision->SetRotation(vecRotation);
+   /* pStaticCollision->SetPosition(vecPosition);
+    pStaticCollision->SetRotation(vecRotation);*/
     AddStaticCollision(pStaticCollision);
     return pStaticCollision;
 }
@@ -395,7 +408,8 @@ void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticC
 void CClientPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
-    m_vecStaticCollisions.push_back(std::move(pStaticCollision));
+    m_vecStaticCollisions.push_back(pStaticCollision);
+    m_InitializeStaticCollisionsQueue.push(pStaticCollision);
 }
 
 void CClientPhysics::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
@@ -408,7 +422,7 @@ void CClientPhysics::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBo
 {
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
     m_vecRigidBodies.push_back(pRigidBody);
-    m_InitializeQueue.push(pRigidBody);
+    m_InitializeRigidBodiesQueue.push(pRigidBody);
 }
 
 void CClientPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint)
@@ -505,6 +519,16 @@ std::shared_ptr<CLuaPhysicsShape> CClientPhysics::GetSharedShape(CLuaPhysicsShap
     auto it = m_vecShapes.begin();
     for (; it != m_vecShapes.end(); ++it)
         if (pShape == (*it).get())
+            return *it;
+
+    assert(1==2); // Should never happen
+}
+
+std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const
+{
+    auto it = m_vecStaticCollisions.begin();
+    for (; it != m_vecStaticCollisions.end(); ++it)
+        if (pStaticCollision == (*it).get())
             return *it;
 
     assert(1==2); // Should never happen
@@ -953,16 +977,23 @@ void CClientPhysics::Query()
 
 void CClientPhysics::DoPulse()
 {
-    OutputDebugString("In\n");
     std::lock_guard<std::mutex> guard(lock);
     assert(!isDuringSimulation);
 
-    while (!m_InitializeQueue.empty())
+    while (!m_InitializeStaticCollisionsQueue.empty())
     {
-        std::shared_ptr<CLuaPhysicsElement> pElement = m_InitializeQueue.top();
-        pElement->Initialize();
+        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = m_InitializeStaticCollisionsQueue.top();
+        pStaticCollision->Initialize(pStaticCollision);
 
-        m_InitializeQueue.pop();
+        m_InitializeStaticCollisionsQueue.pop();
+    }
+
+    while (!m_InitializeRigidBodiesQueue.empty())
+    {
+        std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = m_InitializeRigidBodiesQueue.top();
+        pRigidBody->Initialize(pRigidBody);
+
+        m_InitializeRigidBodiesQueue.pop();
     }
 
     CTickCount tickCountNow = CTickCount::Now();
@@ -998,6 +1029,4 @@ void CClientPhysics::DoPulse()
 
     //ClearOutsideWorldRigidBodies();
     //ProcessCollisions();
-
-    OutputDebugString("Out\n");
 }
