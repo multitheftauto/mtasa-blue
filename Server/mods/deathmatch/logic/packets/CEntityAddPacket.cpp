@@ -206,7 +206,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&rotationRadians);
 
                     // Object id
-                    BitStream.WriteCompressed(pObject->GetModel());
+                    BitStream.WriteCompressed((uint16_t)pObject->GetModel());
 
                     // Alpha
                     SEntityAlphaSync alpha;

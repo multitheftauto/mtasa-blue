@@ -78,7 +78,7 @@ tVehicleAudioSettings*      pVehicleAudioSettings = nullptr;
 
 static tVehicleAudioSettings* __fastcall getVehicleSoundSettings()
 {
-    ushort usModel = pRequestSoundSettingsVehicle->m_nModelIndex;
+    uint32 usModel = pRequestSoundSettingsVehicle->m_nModelIndex;
     // Check if it is a custom model
     if (usModel < VT_LANDSTAL || usModel >= VT_MAX)
         usModel = pGameInterface->GetModelInfo(usModel)->GetParentID();

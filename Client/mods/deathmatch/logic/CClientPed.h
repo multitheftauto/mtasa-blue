@@ -229,7 +229,7 @@ public:
     int  GetVehicleInOutState() { return m_iVehicleInOutState; };
     void SetVehicleInOutState(int iState) { m_iVehicleInOutState = iState; };
 
-    unsigned long GetModel() { return m_ulModel; };
+    uint32 GetModel() { return m_ulModel; };
     bool          SetModel(unsigned long ulModel, bool bTemp = false);
 
     bool GetCanBeKnockedOffBike();
@@ -589,7 +589,7 @@ public:
     CPad*                       m_pPad;
     bool                        m_bIsLocalPlayer;
     int                         m_pRespawnState;
-    unsigned long               m_ulModel;
+    uint32                      m_ulModel;
     CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;

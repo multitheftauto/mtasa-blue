@@ -84,7 +84,7 @@ void _declspec(naked) HOOK_CClothesDeleteRwObject()
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMy_PostCPedDress()
 {
-    ushort                     usModelID = 0;
+    uint32                     usModelID = 0;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
     if (pSavedModel0RwObject)
     {
