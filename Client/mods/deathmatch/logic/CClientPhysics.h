@@ -138,7 +138,9 @@ public:
     std::atomic<bool> isDuringSimulation = false;
 
 
-    void Query();
+    void QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
+                  std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup,
+                  int collisionMask);
 
 private:
     void StepSimulation();

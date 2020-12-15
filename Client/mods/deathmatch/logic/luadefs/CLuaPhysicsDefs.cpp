@@ -1528,8 +1528,17 @@ bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
     return true;
 }
 
-bool CLuaPhysicsDefs::PhysicsOverlapBox(CClientPhysics* pPhysics)
+std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsOverlapBox(
+    CClientPhysics* pPhysics, CVector min, CVector max, std::optional<short> collisionGroup,
+                                        std::optional<int> collisionMask)
 {
-    pPhysics->Query();
-    return true;
+    std::vector<CLuaPhysicsRigidBody*> vecRigidBodies;
+    std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
+
+    pPhysics->QueryBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter), collisionMask.value_or(btBroadphaseProxy::AllFilter));
+    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
+        result;
+    result["rigidbodies"] = vecRigidBodies;
+    result["staticCollisions"] = vecStaticCollisions;
+    return result;
 }

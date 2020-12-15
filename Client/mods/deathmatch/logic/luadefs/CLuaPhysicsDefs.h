@@ -107,5 +107,6 @@ public:
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsCreateConstraint);
 
-    static bool PhysicsOverlapBox(CClientPhysics* pPhysics);
+    static std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> PhysicsOverlapBox(
+        CClientPhysics* pPhysics, CVector min, CVector max, std::optional<short> collisionGroup, std::optional<int> collisionMask);
 };

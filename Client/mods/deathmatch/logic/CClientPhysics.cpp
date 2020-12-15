@@ -928,12 +928,12 @@ void CClientPhysics::DrawDebugLines()
     }
 }
 
-struct btMyBroadphaseAabbCallback : public btBroadphaseAabbCallback
+struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
 {
     btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
     short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
-    btMyBroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short int collisionGroup = btBroadphaseProxy::DefaultFilter,
-                               short int collisionMask = btBroadphaseProxy::AllFilter)
+    BroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
+                           int collisionMask = btBroadphaseProxy::AllFilter)
         : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
     {
         m_collisionObjectArray.resize(0);
@@ -948,31 +948,33 @@ struct btMyBroadphaseAabbCallback : public btBroadphaseAabbCallback
 
     virtual bool process(const btBroadphaseProxy* proxy)
     {
-
         if (needsCollision(proxy))
             m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
         return true;
     }
 };
 
-
-void CClientPhysics::Query()
+void CClientPhysics::QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
+                              std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup,
+                              int collisionMask)
 {
-    btVector3 min(0, 0, 0);
-    btVector3               max(100, 100, 100);
-
     btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
-    btMyBroadphaseAabbCallback               callback(collisionObjectArray);
-    m_pDynamicsWorld->getBroadphase()->aabbTest(min, max, callback);
+    BroadphaseAabbCallback                   callback(collisionObjectArray, collisionGroup, collisionMask);
+    m_pDynamicsWorld->getBroadphase()->aabbTest(reinterpret_cast<const btVector3&>(min), reinterpret_cast<const btVector3&>(max), callback);
 
     std::vector<btCollisionObject*> asd;
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
-        auto const& b = callback.m_collisionObjectArray[i];
-        b->getInternalType();
-        asd.push_back(b);
+        auto const& btObject = callback.m_collisionObjectArray[i];
+        if (CPhysicsRigidBodyProxy* pRigidBody = dynamic_cast<CPhysicsRigidBodyProxy*>(btObject))
+        {
+            vecRigidBodies.push_back((CLuaPhysicsRigidBody*)pRigidBody->getUserPointer());
+        }
+        else if (CPhysicsStaticCollisionProxy* pStaticCollision = dynamic_cast<CPhysicsStaticCollisionProxy*>(btObject))
+        {
+            vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)pStaticCollision->getUserPointer());
+        }
     }
-    int a = 5;
 }
 
 void CClientPhysics::DoPulse()
