@@ -81,11 +81,13 @@ std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
     return nullptr;
 }
 
-void CClientModelManager::RequestModel(int iModelID, ushort usParentID, eClientModelType eModelType, CClientManager* pManager, CResource* pResource = NULL)
+bool CClientModelManager::RequestModel(int iModelID, ushort usParentID, eClientModelType eModelType, CClientManager* pManager, CResource* pResource)
 {
     std::shared_ptr<CClientModel> pModel = FindModelByID(iModelID);
-    if (pModel == nullptr)
-        pModel = std::make_shared<CClientModel>(pManager, iModelID, eModelType);
+    if (pModel != nullptr)
+        return false;
+
+    pModel = std::make_shared<CClientModel>(pManager, iModelID, eModelType);
 
     Add(pModel);
 
@@ -93,6 +95,8 @@ void CClientModelManager::RequestModel(int iModelID, ushort usParentID, eClientM
 
     if (pResource != NULL)
         pModel->SetParentResource(pResource);
+
+    return true;
 }
 
 std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eClientModelType type, const unsigned int minModelID)

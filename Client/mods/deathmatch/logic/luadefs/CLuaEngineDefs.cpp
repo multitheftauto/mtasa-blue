@@ -608,8 +608,10 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                     iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
 
                 if (iModelID != INVALID_MODEL_ID) {
-                    m_pManager->GetModelManager()->RequestModel(iModelID, usParentID, eModelType, m_pManager, pResource);
-                    lua_pushinteger(luaVM, iModelID);
+                    if (!m_pManager->GetModelManager()->RequestModel(iModelID, usParentID, eModelType, m_pManager, pResource))
+                        lua_pushboolean(luaVM, false);
+                    else
+                        lua_pushinteger(luaVM, iModelID);
                     return 1;
                 }
             }

@@ -33,7 +33,7 @@ public:
     int GetFirstFreeModelID(void);
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
-    void RequestModel(int iModelID, ushort usParentID, eClientModelType eModelType, CClientManager* pManager, CResource* pResource = NULL);
+    bool RequestModel(int iModelID, ushort usParentID, eClientModelType eModelType, CClientManager* pManager, CResource* pResource = NULL);
 
     std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
 
