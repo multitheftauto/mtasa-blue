@@ -29,7 +29,7 @@ class CClientObject : public CClientStreamElement
     friend class CClientPed;
 
 public:
-    CClientObject(class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod);
+    CClientObject(class CClientManager* pManager, ElementID ID, uint32 usModel, bool bLowLod);
     ~CClientObject();
 
     void Unlink();
@@ -67,8 +67,8 @@ public:
     bool IsVisible() { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    unsigned short GetModel() const { return m_usModel; };
-    void           SetModel(unsigned short usModel);
+    uint32 GetModel() const { return m_usModel; };
+    void           SetModel(uint32 usModel);
 
     bool           IsLowLod();
     bool           SetLowLodObject(CClientObject* pLowLodObject);
@@ -133,7 +133,7 @@ protected:
     class CClientObjectManager*       m_pObjectManager;
     class CClientModelRequestManager* m_pModelRequester;
 
-    unsigned short m_usModel;
+   uint32 m_usModel;
 
     CVector       m_vecPosition;
     CVector       m_vecRotation;

@@ -252,7 +252,7 @@ bool CKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
 void CKeysyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
     // Turret states
-    unsigned short usModel = pVehicle->GetModel();
+    uint32 usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(usModel))
     {
         // Read out the turret position
@@ -267,7 +267,7 @@ void CKeysyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterfa
 void CKeysyncPacket::WriteVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream) const
 {
     // Turret states
-    unsigned short usModel = pVehicle->GetModel();
+    uint32 usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(usModel))
     {
         // Grab the turret position

@@ -288,7 +288,7 @@ bool CClientObjectManager::IsHardObjectLimitReached()
     return g_pGame->GetPools()->GetObjectCount() >= MAX_OBJECTS_MTA;
 }
 
-void CClientObjectManager::RestreamObjects(unsigned short usModel)
+void CClientObjectManager::RestreamObjects(uint32 usModel)
 {
     for (uint i = 0; i < m_Objects.size(); i++)
     {

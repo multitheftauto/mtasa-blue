@@ -17,11 +17,11 @@ class CModelTexturesInfo
 public:
     std::vector<RwTexture*>            originalTextures;
     std::vector<SReplacementTextures*> usedByReplacements;
-    ushort                             usTxdId;
+    uint32                             usTxdId;
     RwTexDictionary*                   pTxd;
 };
 
-std::map<ushort, CModelTexturesInfo> ms_ModelTexturesInfoMap;
+std::map<uint32, CModelTexturesInfo> ms_ModelTexturesInfoMap;
 
 ////////////////////////////////////////////////////////////////
 //
@@ -30,13 +30,13 @@ std::map<ushort, CModelTexturesInfo> ms_ModelTexturesInfoMap;
 // Find/create texture info for a modelid
 //
 ////////////////////////////////////////////////////////////////
-CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
+CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(uint32 usModelId)
 {
     CModelInfoSA* pModelInfo = dynamic_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
     if (!pModelInfo)
         return NULL;
 
-    ushort usTxdId = pModelInfo->GetTextureDictionaryID();
+    uint32 usTxdId = pModelInfo->GetTextureDictionaryID();
 
     CModelTexturesInfo* pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
     if (!pInfo)
@@ -127,7 +127,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
 // Returns true if model was affected.
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId)
+bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, uint32 usModelId)
 {
     // Already done for this modelid?
     if (ListContains(pReplacementTextures->usedInModelIds, usModelId))
@@ -216,7 +216,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         SReplacementTextures::SPerTxd& perTxdInfo = pReplacementTextures->perTxdList[i];
 
         // Get textures info
-        ushort              usTxdId = perTxdInfo.usTxdId;
+        uint32              usTxdId = perTxdInfo.usTxdId;
         CModelTexturesInfo* pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
 
         // Validate

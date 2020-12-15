@@ -38,9 +38,9 @@ public:
     static unsigned short GetWeaponSlotFromModel(DWORD dwModelID);
     static bool           IsValidWeaponModel(DWORD dwModelID);
 
-    void RestreamPeds(unsigned short usModel);
+    void RestreamPeds(uint32 usModel);
     void RestreamAllPeds();
-    void RestreamWeapon(unsigned short usModel);
+    void RestreamWeapon(uint32 usModel);
 
 protected:
     CClientPedManager(class CClientManager* pManager);

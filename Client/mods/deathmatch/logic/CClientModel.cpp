@@ -22,7 +22,7 @@ CClientModel::~CClientModel(void)
     Deallocate();
 }
 
-bool CClientModel::Allocate(ushort usParentID)
+bool CClientModel::Allocate(uint32 usParentID)
 {
     m_bAllocatedByUs = true;
 

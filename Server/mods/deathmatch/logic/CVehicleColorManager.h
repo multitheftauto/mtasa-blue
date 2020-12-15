@@ -33,8 +33,8 @@ public:
     bool Generate(const char* szFilename);
     void Reset();
 
-    void          AddColor(unsigned short usModel, const CVehicleColor& colVehicle);
-    CVehicleColor GetRandomColor(unsigned short usModel);
+    void          AddColor(uint32_t usModel, const CVehicleColor& colVehicle);
+    CVehicleColor GetRandomColor(uint32_t usModel);
 
 private:
     SFixedArray<CVehicleColors, 212> m_Colors;

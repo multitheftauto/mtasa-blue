@@ -88,7 +88,7 @@ public:
         WEAPON_INVALID = 0xFF,
     };
 
-    CClientPickup(class CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition = CVector(0, 0, 0));
+    CClientPickup(class CClientManager* pManager, ElementID ID, uint32 usModel, CVector vecPosition = CVector(0, 0, 0));
     ~CClientPickup();
 
     void Unlink();
@@ -104,7 +104,7 @@ public:
 
     void           GetPosition(CVector& vecPosition) const override;
     void           SetPosition(const CVector& vecPosition);
-    void           SetModel(unsigned short usModel);
+    void           SetModel(uint32 usModel);
 
     void AttachTo(CClientEntity* pEntity) override;
 

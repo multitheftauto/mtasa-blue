@@ -1061,7 +1061,7 @@ int CLuaWorldDefs::RemoveWorldModel(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
-    unsigned short usModel = 0;
+    uint32         usModel = 0;
     float          fRadius = 0.0f;
     char           cInterior = -1;
     CVector        vecPosition;
@@ -1088,7 +1088,7 @@ int CLuaWorldDefs::RestoreWorldModel(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
-    unsigned short usModel = 0;
+    uint32         usModel = 0;
     float          fRadius = 0.0f;
     char           cInterior = -1;
     CVector        vecPosition;

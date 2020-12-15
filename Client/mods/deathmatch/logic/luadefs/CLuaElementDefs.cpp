@@ -1350,7 +1350,7 @@ int CLuaElementDefs::GetElementModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        uint32 usModel;
         if (CStaticFunctionDefinitions::GetElementModel(*pEntity, usModel))
         {
             lua_pushnumber(luaVM, usModel);

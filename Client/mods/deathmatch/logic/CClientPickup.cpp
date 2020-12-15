@@ -12,7 +12,7 @@
 
 extern CClientGame* g_pClientGame;
 
-CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition)
+CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, uint32 usModel, CVector vecPosition)
     : ClassInit(this), CClientStreamElement(pManager->GetPickupStreamer(), ID)
 {
     // Initialize
@@ -80,7 +80,7 @@ void CClientPickup::SetPosition(const CVector& vecPosition)
     }
 }
 
-void CClientPickup::SetModel(unsigned short usModel)
+void CClientPickup::SetModel(uint32 usModel)
 {
     // Different from our current id?
     if (m_usModel != usModel)

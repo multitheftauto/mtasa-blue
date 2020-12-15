@@ -31,16 +31,16 @@ struct STexNameInfo;
 //
 struct STexTag
 {
-    STexTag(ushort usTxdId) : m_bUsingTxdId(true), m_usTxdId(usTxdId), m_pTex(NULL) {}
+    STexTag(uint32 usTxdId) : m_bUsingTxdId(true), m_usTxdId(usTxdId), m_pTex(NULL) {}
 
     STexTag(RwTexture* pTex) : m_bUsingTxdId(false), m_usTxdId(0), m_pTex(pTex) {}
 
-    bool operator==(ushort usTxdId) const { return m_bUsingTxdId && usTxdId == m_usTxdId; }
+    bool operator==(uint32 usTxdId) const { return m_bUsingTxdId && usTxdId == m_usTxdId; }
 
     bool operator==(RwTexture* pTex) const { return !m_bUsingTxdId && pTex == m_pTex; }
 
     const bool       m_bUsingTxdId;
-    const ushort     m_usTxdId;            // Streamed textures are identified using the TXD id
+    const uint32     m_usTxdId;            // Streamed textures are identified using the TXD id
     const RwTexture* m_pTex;               // Custom textures are identified using the RwTexture pointer
 };
 

@@ -24,10 +24,10 @@ public:
     void RemoveAll();
     bool Exists(CClientColModel* pCol);
 
-    CClientColModel* GetElementThatReplaced(unsigned short usModel, CClientColModel* pDontSearch = NULL);
+    CClientColModel* GetElementThatReplaced(uint32 usModel, CClientColModel* pDontSearch = NULL);
 
-    static bool IsReplacableModel(unsigned short usModel);
-    bool        RestoreModel(unsigned short usModel);
+    static bool IsReplacableModel(uint32 usModel);
+    bool        RestoreModel(uint32 usModel);
 
     std::list<CClientColModel*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<CClientColModel*>::const_iterator IterEnd() { return m_List.end(); }

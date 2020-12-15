@@ -77,7 +77,7 @@ bool CClientColModel::LoadFromBuffer(SString buffer)
     return m_pColModel != nullptr;
 }
 
-bool CClientColModel::Replace(unsigned short usModel)
+bool CClientColModel::Replace(uint32 usModel)
 {
     // We have a model loaded?
     if (m_pColModel)
@@ -105,7 +105,7 @@ bool CClientColModel::Replace(unsigned short usModel)
     return false;
 }
 
-void CClientColModel::Restore(unsigned short usModel)
+void CClientColModel::Restore(uint32 usModel)
 {
     // Restore it
     InternalRestore(usModel);
@@ -117,7 +117,7 @@ void CClientColModel::Restore(unsigned short usModel)
 void CClientColModel::RestoreAll()
 {
     // Loop through our replaced ids
-    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    std::list<uint32>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
         // Restore this model
@@ -128,10 +128,10 @@ void CClientColModel::RestoreAll()
     m_Replaced.clear();
 }
 
-bool CClientColModel::HasReplaced(unsigned short usModel)
+bool CClientColModel::HasReplaced(uint32 usModel)
 {
     // Loop through our replaced ids
-    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    std::list<uint32>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
         // Is this the given ID
@@ -146,7 +146,7 @@ bool CClientColModel::HasReplaced(unsigned short usModel)
     return false;
 }
 
-void CClientColModel::InternalRestore(unsigned short usModel)
+void CClientColModel::InternalRestore(uint32 usModel)
 {
     // Grab the model info and restore it
     CModelInfo* pModel = g_pGame->GetModelInfo(usModel);

@@ -250,7 +250,7 @@ public:
     EDiagnosticDebugType GetDiagnosticDebug();
     void                 SetDiagnosticDebug(EDiagnosticDebugType value);
     CModelCacheManager*  GetModelCacheManager();
-    void                 AddModelToPersistentCache(ushort usModelId);
+    void                 AddModelToPersistentCache(uint32 usModelId);
 
     static void StaticIdleHandler();
     void        IdleHandler();

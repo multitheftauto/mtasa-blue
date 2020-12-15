@@ -17,7 +17,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod)
+CClientObject::CClientObject(CClientManager* pManager, ElementID ID, uint32 usModel, bool bLowLod)
     : ClassInit(this), CClientStreamElement(bLowLod ? pManager->GetObjectLodStreamer() : pManager->GetObjectStreamer(), ID), m_bIsLowLod(bLowLod)
 {
     // Init
@@ -253,7 +253,7 @@ void CClientObject::UpdateVisibility()
     }
 }
 
-void CClientObject::SetModel(unsigned short usModel)
+void CClientObject::SetModel(uint32 usModel)
 {
     // Valid model ID?
     if (CClientObjectManager::IsValidModel(usModel))

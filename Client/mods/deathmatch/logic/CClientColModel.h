@@ -27,11 +27,11 @@ public:
 
     bool IsLoaded() { return m_pColModel != NULL; };
 
-    bool Replace(unsigned short usModel);
-    void Restore(unsigned short usModel);
+    bool Replace(uint32 usModel);
+    void Restore(uint32 usModel);
     void RestoreAll();
 
-    bool        HasReplaced(unsigned short usModel);
+    bool        HasReplaced(uint32 usModel);
     static bool IsCOLData(const SString& strData);
 
     // Sorta a hack that these are required by CClientEntity...
@@ -43,10 +43,10 @@ private:
     bool LoadFromFile(SString filePath);
     bool LoadFromBuffer(SString buffer);
 
-    void InternalRestore(unsigned short usModel);
+    void InternalRestore(uint32 usModel);
 
     class CClientColModelManager* m_pColModelManager;
 
     CColModel*                m_pColModel;
-    std::list<unsigned short> m_Replaced;
+    std::list<uint32> m_Replaced;
 };

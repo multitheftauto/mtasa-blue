@@ -37,7 +37,7 @@ public:
 
     // CClientModelCacheManager interface
     virtual void DoPulse();
-    virtual void OnRestreamModel(ushort usModelId);
+    virtual void OnRestreamModel(uint32 usModelId);
 
     // CClientModelCacheManagerImpl methods
     CClientModelCacheManagerImpl();
@@ -45,12 +45,12 @@ public:
 
     void DoPulsePedModels();
     void DoPulseVehicleModels();
-    void ProcessPlayerList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientPlayer*>& playerList, float fMaxStreamDistanceSq);
-    void ProcessPedList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientPed*>& pedList, float fMaxStreamDistanceSq);
-    void ProcessVehicleList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientVehicle*>& vehicleList, float fMaxStreamDistanceSq);
-    void InsertIntoNeedCacheList(std::map<ushort, float>& outNeedCacheList, ushort usModelId, float fDistSq);
+    void ProcessPlayerList(std::map<uint32, float>& outNeedCacheList, const std::vector<CClientPlayer*>& playerList, float fMaxStreamDistanceSq);
+    void ProcessPedList(std::map<uint32, float>& outNeedCacheList, const std::vector<CClientPed*>& pedList, float fMaxStreamDistanceSq);
+    void ProcessVehicleList(std::map<uint32, float>& outNeedCacheList, const std::vector<CClientVehicle*>& vehicleList, float fMaxStreamDistanceSq);
+    void InsertIntoNeedCacheList(std::map<uint32, float>& outNeedCacheList, uint32 usModelId, float fDistSq);
     void ClearStats();
-    void AddProcessStat(const char* szTag, bool bCache, ePuresyncType syncType, ushort usModelId, const CVector& vecStartPos, const CVector& vecEndPos);
+    void AddProcessStat(const char* szTag, bool bCache, ePuresyncType syncType, uint32 usModelId, const CVector& vecStartPos, const CVector& vecEndPos);
 
 protected:
     int                 m_iFrameCounter;
@@ -187,7 +187,7 @@ void CClientModelCacheManagerImpl::DoPulsePedModels()
     }
 
     // Compile a list of ped models which should be cached
-    std::map<ushort, float> newNeedCacheList;
+    std::map<uint32, float> newNeedCacheList;
     ProcessPlayerList(newNeedCacheList, playerList, Square(PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2));
     ProcessPedList(newNeedCacheList, pedList, Square(PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2));
 
@@ -225,7 +225,7 @@ void CClientModelCacheManagerImpl::DoPulseVehicleModels()
     }
 
     // Compile a list of vehicle models which should be cached
-    std::map<ushort, float> newNeedCacheList;
+    std::map<uint32, float> newNeedCacheList;
     ProcessVehicleList(newNeedCacheList, vehicleList, Square(VEHICLE_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2));
 
     // Apply desired caching
@@ -237,7 +237,7 @@ void CClientModelCacheManagerImpl::DoPulseVehicleModels()
 // CClientModelCacheManagerImpl::ProcessPlayerList
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::ProcessPlayerList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientPlayer*>& playerList,
+void CClientModelCacheManagerImpl::ProcessPlayerList(std::map<uint32, float>& outNeedCacheList, const std::vector<CClientPlayer*>& playerList,
                                                      float fMaxStreamDistanceSq)
 {
     const ulong ulTimeNow = CClientTime::GetTime();
@@ -314,14 +314,14 @@ void CClientModelCacheManagerImpl::ProcessPlayerList(std::map<ushort, float>& ou
 // CClientModelCacheManagerImpl::ProcessPedList
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::ProcessPedList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientPed*>& pedList,
+void CClientModelCacheManagerImpl::ProcessPedList(std::map<uint32, float>& outNeedCacheList, const std::vector<CClientPed*>& pedList,
                                                   float fMaxStreamDistanceSq)
 {
     const ulong ulTimeNow = CClientTime::GetTime();
     for (std::vector<CClientPed*>::const_iterator iter = pedList.begin(); iter != pedList.end(); ++iter)
     {
         CClientPed*  pPed = *iter;
-        const ushort usModelId = (ushort)pPed->GetModel();
+        const uint32 usModelId = (uint32)pPed->GetModel();
 
         if (usModelId < 7 || usModelId > 312)
             continue;
@@ -379,14 +379,14 @@ void CClientModelCacheManagerImpl::ProcessPedList(std::map<ushort, float>& outNe
 // CClientModelCacheManagerImpl::ProcessVehicleList
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientVehicle*>& vehicleList,
+void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<uint32, float>& outNeedCacheList, const std::vector<CClientVehicle*>& vehicleList,
                                                       float fMaxStreamDistanceSq)
 {
     const ulong ulTimeNow = CClientTime::GetTime();
     for (std::vector<CClientVehicle*>::const_iterator iter = vehicleList.begin(); iter != vehicleList.end(); ++iter)
     {
         CClientVehicle* pVehicle = *iter;
-        const ushort    usModelId = pVehicle->GetModel();
+        const uint32    usModelId = pVehicle->GetModel();
 
         if (usModelId < 400 || usModelId > 611)
             continue;
@@ -456,7 +456,7 @@ void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& o
 // Update model id closest distance
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::InsertIntoNeedCacheList(std::map<ushort, float>& outNeedCacheList, ushort usModelId, float fDistSq)
+void CClientModelCacheManagerImpl::InsertIntoNeedCacheList(std::map<uint32, float>& outNeedCacheList, uint32 usModelId, float fDistSq)
 {
     float* pfDistSqCurrent = MapFind(outNeedCacheList, usModelId);
     if (!pfDistSqCurrent)
@@ -492,7 +492,7 @@ void CClientModelCacheManagerImpl::ClearStats()
 // CClientModelCacheManagerImpl::AddProcessStat
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::AddProcessStat(const char* szTag, bool bCache, ePuresyncType syncType, ushort usModelId, const CVector& vecStartPos,
+void CClientModelCacheManagerImpl::AddProcessStat(const char* szTag, bool bCache, ePuresyncType syncType, uint32 usModelId, const CVector& vecStartPos,
                                                   const CVector& vecEndPos)
 {
 #ifdef WITH_MODEL_CACHE_STATS
@@ -514,7 +514,7 @@ void CClientModelCacheManagerImpl::AddProcessStat(const char* szTag, bool bCache
 // Uncache here, now.
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
+void CClientModelCacheManagerImpl::OnRestreamModel(uint32 usModelId)
 {
     m_pCoreModelCacheManager->OnRestreamModel(usModelId);
 }

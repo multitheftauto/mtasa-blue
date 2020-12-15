@@ -29,7 +29,7 @@ CClientModelRequestManager::~CClientModelRequestManager()
     m_Requests.clear();
 }
 
-bool CClientModelRequestManager::IsLoaded(unsigned short usModelID)
+bool CClientModelRequestManager::IsLoaded(uint32 usModelID)
 {
     // Grab the model info
     CModelInfo* pInfo = g_pGame->GetModelInfo(usModelID);
@@ -97,7 +97,7 @@ CModelInfo* CClientModelRequestManager::GetRequestedModelInfo(CClientEntity* pRe
     return NULL;
 }
 
-bool CClientModelRequestManager::RequestBlocking(unsigned short usModelID, const char* szTag)
+bool CClientModelRequestManager::RequestBlocking(uint32 usModelID, const char* szTag)
 {
     // Grab the model info
     CModelInfo* pInfo = g_pGame->GetModelInfo(usModelID);
@@ -116,7 +116,7 @@ bool CClientModelRequestManager::RequestBlocking(unsigned short usModelID, const
     return false;
 }
 
-bool CClientModelRequestManager::Request(unsigned short usModelID, CClientEntity* pRequester)
+bool CClientModelRequestManager::Request(uint32 usModelID, CClientEntity* pRequester)
 {
     assert(pRequester);
     SClientModelRequest* pEntry;

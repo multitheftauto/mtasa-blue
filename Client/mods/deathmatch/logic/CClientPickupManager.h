@@ -42,7 +42,7 @@ public:
     static unsigned short GetArmorModel() { return 1242; };
 
     static bool IsPickupLimitReached();
-    void        RestreamPickups(unsigned short usModel);
+    void        RestreamPickups(uint32 usModel);
     void        RestreamAllPickups();
 
 private:

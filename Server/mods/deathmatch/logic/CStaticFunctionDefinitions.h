@@ -62,7 +62,7 @@ public:
     static bool           GetElementAlpha(CElement* pElement, unsigned char& ucAlpha);
     static bool           IsElementDoubleSided(CElement* pElement, bool& bDoubleSided);
     static bool           GetElementHealth(CElement* pElement, float& fHealth);
-    static bool           GetElementModel(CElement* pElement, unsigned short& usModel);
+    static bool           GetElementModel(CElement* pElement, uint32& usModel);
     static bool           IsElementInWater(CElement* pElement, bool& bInWater);
     static bool           GetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
     static CElement*      GetElementSyncer(CElement* pElement);
@@ -94,7 +94,7 @@ public:
     static bool SetElementAlpha(CElement* pElement, unsigned char ucAlpha);
     static bool SetElementDoubleSided(CElement* pElement, bool bDoubleSided);
     static bool SetElementHealth(CElement* pElement, float fHealth);
-    static bool SetElementModel(CElement* pElement, unsigned short usModel);
+    static bool SetElementModel(CElement* pElement, uint32 usModel);
     static bool SetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
     static bool SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable = true);
     static bool SetElementCollisionsEnabled(CElement* pElement, bool bEnable);
@@ -153,7 +153,7 @@ public:
                                      uint uiMaxPacketSize, CResource* pResource);
 
     // Ped get funcs
-    static CPed*     CreatePed(CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true);
+    static CPed*     CreatePed(CResource* pResource, uint32 usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true);
     static bool      GetPedArmor(CPed* pPed, float& fArmor);
     static bool      GetPedRotation(CPed* pPed, float& fRotation);
     static bool      IsPedDead(CPed* pPed, bool& bDead);
@@ -232,16 +232,16 @@ public:
     static bool SetWeaponAmmo(CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip);
 
     // Vehicle create/destroy functions
-    static CVehicle* CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate,
+    static CVehicle* CreateVehicle(CResource* pResource, uint32 usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate,
                                    unsigned char ucVariant, unsigned char ucVariant2);
 
     // Vehicle get functions
     static bool  GetVehicleVariant(CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
     static bool  GetVehicleColor(CVehicle* pVehicle, CVehicleColor& color);
-    static bool  GetVehicleModelFromName(const char* szName, unsigned short& usID);
+    static bool  GetVehicleModelFromName(const char* szName, uint32& usID);
     static bool  GetVehicleMaxPassengers(CVehicle* pVehicle, unsigned char& ucMaxPassengers);
     static bool  GetVehicleName(CVehicle* pVehicle, SString& strOutName);
-    static bool  GetVehicleNameFromModel(unsigned short usModel, SString& strOutName);
+    static bool  GetVehicleNameFromModel(uint32 usModel, SString& strOutName);
     static CPed* GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat);
     static CPed* GetVehicleController(CVehicle* pVehicle);
     static bool  GetVehicleRotation(CVehicle* pVehicle, CVector& vecRotation);
@@ -400,7 +400,7 @@ public:
     static bool SetBlipVisibleDistance(CElement* pElement, unsigned short usVisibleDistance);
 
     // Object create/destroy functions
-    static CObject* CreateObject(CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bIsLowLod);
+    static CObject* CreateObject(CResource* pResource, uint32 usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bIsLowLod);
 
     // Object get functions
     static bool GetObjectRotation(CObject* pObject, CVector& vecRotation);
@@ -636,8 +636,8 @@ public:
     static bool ResetWindVelocity();
     static bool ResetFarClipDistance();
     static bool ResetFogDistance();
-    static bool RemoveWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
-    static bool RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
+    static bool RemoveWorldModel(uint32 usModel, float fRadius, const CVector& vecPosition, char cInterior);
+    static bool RestoreWorldModel(uint32 usModel, float fRadius, const CVector& vecPosition, char cInterior);
     static bool RestoreAllWorldModels();
     static bool SendSyncIntervals(CPlayer* pPlayer = NULL);
     static bool SetMoonSize(int iMoonSize);

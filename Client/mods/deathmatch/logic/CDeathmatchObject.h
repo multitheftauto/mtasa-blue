@@ -19,9 +19,9 @@ class CDeathmatchObject : public CClientObject
 public:
 #ifdef WITH_OBJECT_SYNC
     CDeathmatchObject(CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, class CObjectSync* pObjectSync, ElementID ID,
-                      unsigned short usModel);
+                      uint32 usModel);
 #else
-    CDeathmatchObject(CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel, bool bLowLod);
+    CDeathmatchObject(CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, uint32 usModel, bool bLowLod);
 #endif
     ~CDeathmatchObject();
 

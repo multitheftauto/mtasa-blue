@@ -51,7 +51,7 @@ public:
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
     unsigned short GetModel() { return m_usModel; }
-    void           SetModel(unsigned short usModel) { m_usModel = usModel; }
+    void           SetModel(uint32 usModel) { m_usModel = usModel; }
 
     const CVector& GetScale() { return m_vecScale; }
     void           SetScale(const CVector& vecScale) { m_vecScale = vecScale; }

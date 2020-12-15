@@ -351,8 +351,8 @@ public:
     bool           IsValid();
     bool           IsAllocatedInArchive();
     float          GetDistanceFromCentreOfMassToBaseOfModel();
-    unsigned short GetTextureDictionaryID();
-    void           SetTextureDictionaryID(unsigned short usID);
+    uint32         GetTextureDictionaryID();
+    void           SetTextureDictionaryID(uint32 usID);
     float          GetLODDistance();
     float          GetOriginalLODDistance();
     void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
@@ -411,8 +411,8 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
-    void MakeObjectModel(ushort usBaseModelID);
-    void MakeVehicleAutomobile(ushort usBaseModelID);
+    void MakeObjectModel(uint32 usBaseModelID);
+    void MakeVehicleAutomobile(uint32 usBaseModelID);
     void DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
@@ -430,6 +430,6 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
-    void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
+    void CopyStreamingInfoFromModel(uint32 usCopyFromModelID);
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };

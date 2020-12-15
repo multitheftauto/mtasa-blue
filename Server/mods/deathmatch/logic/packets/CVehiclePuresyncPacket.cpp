@@ -679,7 +679,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel)
 {
     // Turret data
-    unsigned short usModel = pVehicle->GetModel();
+    uint32 usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(iRemoteModel))
     {
         // Read out the turret position
@@ -721,7 +721,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
 void CVehiclePuresyncPacket::WriteVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream) const
 {
     // Turret states
-    unsigned short usModel = pVehicle->GetModel();
+    uint32 usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(usModel))
     {
         SVehicleTurretSync vehicle;

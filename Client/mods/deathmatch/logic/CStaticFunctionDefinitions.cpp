@@ -722,7 +722,7 @@ bool CStaticFunctionDefinitions::GetElementHealth(CClientEntity& Entity, float& 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned short& usModel)
+bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, uint32& usModel)
 {
     switch (Entity.GetType())
     {
@@ -1438,7 +1438,7 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned short usModel)
+bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, uint32 usModel)
 {
     RUN_CHILDREN(SetElementModel(**iter, usModel))
 
@@ -2621,7 +2621,7 @@ CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, unsigned 
     return NULL;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, unsigned short& usID)
+bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, uint32& usID)
 {
     assert(szName);
 
@@ -2653,7 +2653,7 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned short usUpgr
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
+bool CStaticFunctionDefinitions::GetVehicleNameFromModel(uint32 usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
     return !strOutName.empty();
@@ -2733,7 +2733,7 @@ bool CStaticFunctionDefinitions::IsTrainChainEngine(CClientVehicle& Vehicle, boo
     return true;
 }
 
-CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
+CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, uint32 usModel, const CVector& vecPosition, const CVector& vecRotation,
                                                           const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
 {
     if (CClientVehicleManager::IsValidModel(usModel) && (ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
@@ -3577,7 +3577,7 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(uint32 usModel, eVehicleDummies eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3591,7 +3591,7 @@ bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(uint32 usModel, eVehicleDummies eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3605,7 +3605,7 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(uint32 usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3619,7 +3619,7 @@ bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned sh
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(uint32 usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3826,7 +3826,7 @@ bool CStaticFunctionDefinitions::IsElementFrozenWaitingForGroundToLoad(CClientEn
     return false;
 }
 
-CClientObject* CStaticFunctionDefinitions::CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation,
+CClientObject* CStaticFunctionDefinitions::CreateObject(CResource& Resource, uint32 usModelID, const CVector& vecPosition, const CVector& vecRotation,
                                                         bool bLowLod)
 {
     if (CClientObjectManager::IsValidModel(usModelID))
@@ -4263,7 +4263,7 @@ CClientPickup* CStaticFunctionDefinitions::CreatePickup(CResource& Resource, con
                                                         unsigned long ulRespawnInterval, double dSix)
 {
     CClientPickup* pPickup = NULL;
-    unsigned short usModel = 0;
+    uint32         usModel = 0;
     switch (ucType)
     {
         case CClientPickup::ARMOR:
@@ -4371,7 +4371,7 @@ bool CStaticFunctionDefinitions::SetPickupType(CClientEntity& Entity, unsigned c
         else if (ucType == CClientPickup::CUSTOM)
         {
             // Get the weapon id
-            unsigned short usModel = static_cast<unsigned short>(dThree);
+            uint32 usModel = static_cast<uint32>(dThree);
             if (CClientObjectManager::IsValidModel(usModel))
             {
                 Pickup.SetModel(usModel);
@@ -6574,7 +6574,7 @@ bool CStaticFunctionDefinitions::AreTrafficLightsLocked(bool& bLocked)
     return true;
 }
 
-bool CStaticFunctionDefinitions::RemoveWorldBuilding(unsigned short usModelToRemove, float fRadius, float fX, float fY, float fZ, char cInterior,
+bool CStaticFunctionDefinitions::RemoveWorldBuilding(uint32 usModelToRemove, float fRadius, float fX, float fY, float fZ, char cInterior,
                                                      uint& uiOutAmount)
 {
     g_pGame->GetWorld()->RemoveBuilding(usModelToRemove, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
@@ -6587,7 +6587,7 @@ bool CStaticFunctionDefinitions::RestoreWorldBuildings(uint& uiOutAmount)
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWorldBuilding(unsigned short usModelToRestore, float fRadius, float fX, float fY, float fZ, char cInterior,
+bool CStaticFunctionDefinitions::RestoreWorldBuilding(uint32 usModelToRestore, float fRadius, float fX, float fY, float fZ, char cInterior,
                                                       uint& uiOutAmount)
 {
     return g_pGame->GetWorld()->RestoreBuilding(usModelToRestore, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
@@ -7143,7 +7143,7 @@ bool CStaticFunctionDefinitions::ToggleAllControls(bool bGTAControls, bool bMTAC
 
 CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin,
                                                                 float fForce, CClientEntity* pTarget, CVector& vecRotation, CVector& vecVelocity,
-                                                                unsigned short usModel)
+                                                                uint32 usModel)
 {
     ConvertDegreesToRadians(vecRotation);
 

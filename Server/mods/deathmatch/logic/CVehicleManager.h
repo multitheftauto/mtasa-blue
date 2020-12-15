@@ -30,14 +30,14 @@ public:
     CVehicleManager();
     ~CVehicleManager();
 
-    CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    CVehicle* Create(CElement* pParent, uint32_t usModel, unsigned char ucVariant, unsigned char ucVariant2);
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void      DeleteAll();
 
     bool Exists(CVehicle* pVehicle);
 
     static bool         IsValidModel(unsigned int uiVehicleModel);
-    static eVehicleType GetVehicleType(unsigned short usModel);
+    static eVehicleType GetVehicleType(uint32_t usModel);
     static bool         IsValidUpgrade(unsigned short usUpgrade);
     static unsigned int GetMaxPassengers(unsigned int uiVehicleModel);
     static bool         HasTurret(unsigned int uiVehicleModel);
@@ -47,13 +47,13 @@ public:
     static bool         HasAdjustableProperty(unsigned int uiVehicleModel);
     static bool         HasSmokeTrail(unsigned int uiVehicleModel);
     static bool         IsTrailer(unsigned int uiVehicleModel);
-    static bool         HasDamageModel(unsigned short usModel);
+    static bool         HasDamageModel(uint32_t usModel);
     static bool         HasDamageModel(eVehicleType Type);
-    static bool         HasDoors(unsigned short usModel);
-    static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool         HasDoors(uint32_t usModel);
+    static void         GetRandomVariation(uint32_t usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
 
     CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
-    CVehicleColor         GetRandomColor(unsigned short usModel);
+    CVehicleColor         GetRandomColor(uint32_t usModel);
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
 

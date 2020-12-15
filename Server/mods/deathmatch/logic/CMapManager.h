@@ -60,7 +60,7 @@ public:
     CClock* GetServerClock() { return m_pServerClock; }
 
     void SpawnPlayers();
-    void SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior = 0,
+    void SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, uint32 usModel, unsigned char ucInterior = 0,
                      unsigned short usDimension = 0, CTeam* pTeam = NULL);
 
     void DoRespawning();

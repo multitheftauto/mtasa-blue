@@ -19,7 +19,7 @@ struct SBodyPartName
 SBodyPartName BodyPartNames[10] = {{"Unknown"},  {"Unknown"},   {"Unknown"},  {"Torso"},     {"Ass"},
                                    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}};
 
-CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) : CElement(pParent)
+CPed::CPed(CPedManager* pPedManager, CElement* pParent, uint32 usModel) : CElement(pParent)
 {
     // Init
     m_pPedManager = pPedManager;
@@ -201,7 +201,7 @@ bool CPed::ReadSpecialData(const int iLine)
     if (GetCustomDataInt("model", iTemp, true))
     {
         // Is it valid?
-        unsigned short usModel = static_cast<unsigned short>(iTemp);
+        uint32 usModel = static_cast<uint32>(iTemp);
         if (CPedManager::IsValidModel(usModel))
         {
             // Remember it and generate a new random color

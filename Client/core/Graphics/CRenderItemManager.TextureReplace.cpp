@@ -16,7 +16,7 @@
 // Get the names of all streamed in world textures, filtered by name and/or model
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, ushort usModelID)
+void CRenderItemManager::GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, uint32 usModelID)
 {
     // If modelid supplied, get the model texture names into a map
     std::set<SString> modelTextureNameMap;

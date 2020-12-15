@@ -325,12 +325,15 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         }
     }
 
-    multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
+    multimap<uint32, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
     for (; iter != g_pGame->GetBuildingRemovalManager()->IterEnd(); ++iter)
     {
         CBuildingRemoval* pBuildingRemoval = (*iter).second;
         BitStream.WriteBit(true);
-        BitStream.Write(pBuildingRemoval->GetModel());
+
+        uint16 usModelId = pBuildingRemoval->GetModel();
+        BitStream.Write(usModelId);
+
         BitStream.Write(pBuildingRemoval->GetRadius());
         BitStream.Write(pBuildingRemoval->GetPosition().fX);
         BitStream.Write(pBuildingRemoval->GetPosition().fY);

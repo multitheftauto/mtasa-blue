@@ -23,7 +23,7 @@ std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  10
 
-CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2)
+CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, uint32 usModel, unsigned char ucVariation, unsigned char ucVariation2)
     : ClassInit(this), CClientStreamElement(pManager->GetVehicleStreamer(), ID)
 {
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientVehicle"), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink,
@@ -45,7 +45,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_pModelInfo = g_pGame->GetModelInfo(usModel);
 
     // Apply handling
-    ushort usHandlingModelID = m_usModel;
+    uint32 usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
         usHandlingModelID = m_pModelInfo->GetParentID();
 
@@ -1029,7 +1029,7 @@ void CClientVehicle::SetTurretRotation(float fHorizontal, float fVertical)
     m_fTurretVertical = fVertical;
 }
 
-void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+void CClientVehicle::SetModelBlocking(uint32 usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
     // Different vehicle ID than we have now?
     if (m_usModel != usModel)

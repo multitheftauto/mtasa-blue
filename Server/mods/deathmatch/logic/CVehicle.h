@@ -144,7 +144,7 @@ class CVehicle final : public CElement
 
 public:
     ZERO_ON_NEW
-    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, uint32_t usModel, unsigned char ucVariant, unsigned char ucVariant2);
     ~CVehicle();
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
@@ -154,8 +154,8 @@ public:
 
     void DoPulse();
 
-    unsigned short GetModel() { return m_usModel; };
-    void           SetModel(unsigned short usModel);
+    uint32_t       GetModel() { return m_usModel; };
+    void           SetModel(uint32_t usModel);
     bool           HasValidModel();
 
     unsigned char GetVariant() { return m_ucVariant; };
@@ -357,7 +357,7 @@ private:
     CPlayer*                              m_pSyncer;
     SFixedArray<CPed*, MAX_VEHICLE_SEATS> m_pOccupants;
 
-    unsigned short m_usModel;
+    uint32_t       m_usModel;
     eVehicleType   m_eVehicleType;
     CVector        m_vecPosition;
     CVector        m_vecRotationDegrees;

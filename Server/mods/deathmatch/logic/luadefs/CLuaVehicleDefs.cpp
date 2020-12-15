@@ -466,7 +466,7 @@ int CLuaVehicleDefs::GetVehicleModelFromName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        uint32 usModel;
         if (CStaticFunctionDefinitions::GetVehicleModelFromName(strName, usModel))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(usModel));
@@ -823,7 +823,7 @@ int CLuaVehicleDefs::GetVehicleName(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleNameFromModel(lua_State* luaVM)
 {
-    unsigned short usModel;
+    uint32 usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);

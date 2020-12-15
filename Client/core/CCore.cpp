@@ -2067,7 +2067,7 @@ CModelCacheManager* CCore::GetModelCacheManager()
     return m_pModelCacheManager;
 }
 
-void CCore::AddModelToPersistentCache(ushort usModelId)
+void CCore::AddModelToPersistentCache(uint32 usModelId)
 {
     return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
 }

@@ -553,7 +553,7 @@ skip:
     return fReturn;
 }
 
-unsigned short CModelInfoSA::GetTextureDictionaryID()
+uint32 CModelInfoSA::GetTextureDictionaryID()
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -562,7 +562,7 @@ unsigned short CModelInfoSA::GetTextureDictionaryID()
     return 0;
 }
 
-void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
+void CModelInfoSA::SetTextureDictionaryID(uint32 usID)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -1405,7 +1405,7 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
     SetVoice(sVoiceType, sVoiceID);
 }
 
-void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
+void CModelInfoSA::CopyStreamingInfoFromModel(uint32 usBaseModelID)
 {
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseModelID);
     CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
@@ -1425,7 +1425,7 @@ void CModelInfoSA::MakePedModel(char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
-void CModelInfoSA::MakeObjectModel(ushort usBaseID)
+void CModelInfoSA::MakeObjectModel(uint32 usBaseID)
 {
     CBaseModelInfoSAInterface* m_pInterface = new CBaseModelInfoSAInterface();
 
@@ -1442,7 +1442,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
-void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
+void CModelInfoSA::MakeVehicleAutomobile(uint32 usBaseID)
 {
     CVehicleModelInfoSAInterface* m_pInterface = new CVehicleModelInfoSAInterface();
 
@@ -1744,7 +1744,7 @@ bool CModelInfoSA::ForceUnload()
         return false;
 
     // If success, then remove txd
-    ushort usTxdId = GetTextureDictionaryID();
+    uint32 usTxdId = GetTextureDictionaryID();
     if (usTxdId)
         pGame->GetRenderWare()->TxdForceUnload(usTxdId, true);
 

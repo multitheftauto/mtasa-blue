@@ -146,9 +146,9 @@ public:
     static bool  SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> optVariant1, std::optional<unsigned char> optVariant2);
     static float GetVehicleWheelScale(CClientVehicle* const pVehicle);
     static bool  SetVehicleWheelScale(CClientVehicle* const pVehicle, const float fWheelScale);
-    static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
+    static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const uint32                                     usModel,
                                                                                                 const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
-    static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
+    static bool SetVehicleModelWheelSize(const uint32 usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
     // Components

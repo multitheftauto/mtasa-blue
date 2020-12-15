@@ -29,7 +29,7 @@ class CVehicleUpgrades
 public:
     CVehicleUpgrades(CClientVehicle* pVehicle);
 
-    static bool IsUpgrade(unsigned short usModel);
+    static bool IsUpgrade(uint32 usModel);
     bool        IsUpgradeCompatible(unsigned short usUpgrade);
     static bool GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
 
@@ -45,7 +45,7 @@ public:
     void ReAddAll();
     void RemoveAll(bool bRipFromVehicle);
 
-    void RestreamVehicleUpgrades(unsigned short usModel);
+    void RestreamVehicleUpgrades(unsigned short usUpgrade);
 
 protected:
     SSlotStates     m_SlotStates;

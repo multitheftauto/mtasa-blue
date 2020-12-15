@@ -191,7 +191,7 @@ int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 
 int CLuaPedDefs::CreatePed(lua_State* luaVM)
 {
-    unsigned short usModel;
+    uint32         usModel;
     CVector        vecPosition;
     float          fRotation;
     bool           bSynced;

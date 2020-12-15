@@ -84,7 +84,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     }
 
     // Handle this explosion client side only if entity is local or breakable (i.e. barrel)
-    unsigned short usModel;
+    uint32     usModel;
     const bool     bHasModel = CStaticFunctionDefinitions::GetElementModel(*pResponsible, usModel);
 
     if (pResponsible->IsLocalEntity() || (bHasModel && CClientObjectManager::IsBreakableModel(usModel)))

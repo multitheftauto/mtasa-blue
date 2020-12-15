@@ -529,7 +529,7 @@ void CMapManager::OnPlayerQuit(CPlayer& Player)
 {
 }
 
-void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior,
+void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, uint32 usModel, unsigned char ucInterior,
                               unsigned short usDimension, CTeam* pTeam)
 {
     // Don't force them off their team if the spawnpoint doesn't have one

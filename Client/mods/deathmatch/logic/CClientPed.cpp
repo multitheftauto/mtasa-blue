@@ -701,7 +701,7 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
-void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
+void CClientPed::Spawn(const CVector& vecPosition, float fRotation, uint32 usModel, unsigned char ucInterior)
 {
     // Remove us from our car
     RemoveFromVehicle();

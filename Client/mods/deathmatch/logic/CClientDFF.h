@@ -35,11 +35,11 @@ public:
 
     bool Load(bool isRaw, SString input);
 
-    bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
+    bool ReplaceModel(uint32 usModel, bool bAlphaTransparency);
 
-    bool HasReplaced(unsigned short usModel);
+    bool HasReplaced(uint32 usModel);
 
-    void RestoreModel(unsigned short usModel);
+    void RestoreModel(uint32 usModel);
     void RestoreModels();
 
     static bool IsDFFData(const SString& strData);
@@ -53,23 +53,23 @@ private:
     bool LoadFromFile(SString filePath);
     bool LoadFromBuffer(SString buffer);
 
-    bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
+    bool DoReplaceModel(uint32 usModel, bool bAlphaTransparency);
     void UnloadDFF();
-    void InternalRestoreModel(unsigned short usModel);
+    void InternalRestoreModel(uint32 usModel);
 
-    bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
-    bool ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
-    bool ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
-    bool ReplacePedModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
+    bool ReplaceObjectModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency);
+    bool ReplaceVehicleModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency);
+    bool ReplaceWeaponModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency);
+    bool ReplacePedModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency);
 
-    RpClump* GetLoadedClump(ushort usModelId);
+    RpClump* GetLoadedClump(uint32 usModelId);
 
     class CClientDFFManager* m_pDFFManager;
 
     SString                            m_strDffFilename;
     SString                            m_RawDataBuffer;
     bool                               m_bIsRawData = false;
-    std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
+    std::map<uint32, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
     std::list<unsigned short> m_Replaced;
 };

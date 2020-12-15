@@ -24,7 +24,7 @@ public:
     virtual void PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreateRenderTargets) = 0;
     virtual void PostFrameExecutionHandler() = 0;
     virtual void IdleHandler() = 0;
-    virtual void RestreamModel(unsigned short usModel) = 0;
+    virtual void RestreamModel(uint32 usModel) = 0;
 
     virtual bool WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages) = 0;
 

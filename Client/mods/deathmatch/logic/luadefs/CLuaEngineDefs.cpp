@@ -451,7 +451,7 @@ int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModelID = CModelNames::ResolveModelID(strModelName);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelName);
 
         if (m_pColModelManager->RestoreModel(usModelID))
         {
@@ -479,7 +479,7 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Valid importable model?
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID == INVALID_MODEL_ID)
             usModelID = CModelNames::ResolveClothesTexID(strModelName);
         if (CClientTXD::IsImportableModel(usModelID))
@@ -516,7 +516,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID)
         {
             // Fixes vehicle dff leak problem with engineReplaceModel
@@ -542,7 +542,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 {
     // Grab the model ID
-    unsigned short usModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
+    uint32 usModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
 
     // Valid client DFF and model?
     if (CClientDFFManager::IsReplacableModel(usModelID))
@@ -586,7 +586,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                     if (pModel == nullptr)
                         pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
                     m_pManager->GetModelManager()->Add(pModel);
-                    ushort usParentID = -1;
+                    uint32 usParentID = -1;
 
                     if (argStream.NextIsNumber())
                         argStream.ReadNumber(usParentID);
@@ -726,7 +726,7 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelId);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (GitHub #446)
         if (usModelID < g_pGame->GetBaseIDforTXD())
         {
@@ -759,7 +759,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelId);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (GitHub #446)
         if (usModelID < g_pGame->GetBaseIDforTXD())
         {
@@ -790,7 +790,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+    uint32      usModelID = CModelNames::ResolveModelID(strModel);
     CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
     {
@@ -1051,7 +1051,7 @@ int CLuaEngineDefs::EngineGetModelTextureNames(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID)
         {
             std::vector<SString> nameList;
@@ -1088,7 +1088,7 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
+        uint32 usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID || strModelName == "")
         {
             std::vector<SString> nameList;
@@ -1115,7 +1115,7 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff)
 {
-    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    uint32      usModelID = CModelNames::ResolveModelID(strModelId);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
     {
@@ -1129,7 +1129,7 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHou
 
 std::variant<bool, std::tuple<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
 {
-    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+    uint32      usModelID = CModelNames::ResolveModelID(strModelId);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
     {
@@ -1166,7 +1166,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     else if (argStream.NextIsTable())
         argStream.ReadStringTable(vTextureNames);
 
-    ushort usModelID = CModelNames::ResolveModelID(strModelName);
+    uint32 usModelID = CModelNames::ResolveModelID(strModelName);
 
     if (usModelID == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames))
     {

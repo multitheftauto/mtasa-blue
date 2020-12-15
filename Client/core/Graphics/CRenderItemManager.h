@@ -44,7 +44,7 @@ public:
                                                              bool bAppendLayers);
     virtual bool               RemoveShaderItemFromWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity);
     virtual void               RemoveClientEntityRefs(CClientEntityBase* pClientEntity);
-    virtual void               GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, ushort usModelID);
+    virtual void               GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, uint32 usModelID);
     virtual eDxTestMode        GetTestMode() { return m_TestMode; }
     virtual void               SetTestMode(eDxTestMode testMode);
     virtual void               GetDxStatus(SDxStatus& outStatus);

@@ -375,7 +375,7 @@ CVehicleManager::~CVehicleManager()
     DeleteAll();
 }
 
-CVehicle* CVehicleManager::Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+CVehicle* CVehicleManager::Create(CElement* pParent, uint32_t usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
     CVehicle* const pVehicle = new CVehicle(this, pParent, usModel, ucVariant, ucVariant2);
 
@@ -423,7 +423,7 @@ bool CVehicleManager::IsValidModel(unsigned int ulVehicleModel)
     return ulVehicleModel >= 400 && ulVehicleModel <= 611;
 }
 
-eVehicleType CVehicleManager::GetVehicleType(unsigned short usModel)
+eVehicleType CVehicleManager::GetVehicleType(uint32_t usModel)
 {
     if (!IsValidModel(usModel))
         return VEHICLE_NONE;
@@ -446,7 +446,7 @@ unsigned int CVehicleManager::GetMaxPassengers(unsigned int uiVehicleModel)
     return 0xFF;
 }
 
-void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
+void CVehicleManager::GetRandomVariation(uint32_t usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
 {
     RandomizeRandomSeed();
     ucVariant = 255;
@@ -529,7 +529,7 @@ bool CVehicleManager::IsTrailer(unsigned int uiVehicleModel)
     return (IsValidModel(uiVehicleModel) && (gs_vehicleTypes[uiVehicleModel - 400] == VEHICLE_TRAILER));
 }
 
-bool CVehicleManager::HasDamageModel(unsigned short usModel)
+bool CVehicleManager::HasDamageModel(uint32_t usModel)
 {
     return HasDamageModel(GetVehicleType(usModel));
 }
@@ -550,7 +550,7 @@ bool CVehicleManager::HasDamageModel(eVehicleType Type)
     }
 }
 
-bool CVehicleManager::HasDoors(unsigned short usModel)
+bool CVehicleManager::HasDoors(uint32_t usModel)
 {
     bool bHasDoors = false;
 
@@ -581,7 +581,7 @@ bool CVehicleManager::HasDoors(unsigned short usModel)
     return bHasDoors;
 }
 
-CVehicleColor CVehicleManager::GetRandomColor(unsigned short usModel)
+CVehicleColor CVehicleManager::GetRandomColor(uint32_t usModel)
 {
     return m_ColorManager.GetRandomColor(usModel);
 }

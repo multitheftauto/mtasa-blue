@@ -242,12 +242,12 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, uint32 usModelID, bool bLoadEmbeddedCollisions)
 {
     // Set correct TXD as materials are processed at the same time
     if (usModelID != 0)
     {
-        unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+        uint32 usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
         SetTextureDict(usTxdId);
     }
 
@@ -350,7 +350,7 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 }
 
 // Replaces a vehicle/weapon/ped model
-void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
+void CRenderWareSA::ReplaceModel(RpClump* pNew, uint32 usModelID, DWORD dwSetClumpFunction)
 {
     auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*) (CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
     auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*) (CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
@@ -395,19 +395,19 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 }
 
 // Replaces a vehicle model
-void CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
+void CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, uint32 usModelID)
 {
     ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
 }
 
 // Replaces a weapon model
-void CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID)
+void CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, uint32 usModelID)
 {
     ReplaceModel(pNew, usModelID, FUNC_LoadWeaponModel);
 }
 
 // Replaces a ped model
-void CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
+void CRenderWareSA::ReplacePedModel(RpClump* pNew, uint32 usModelID)
 {
     ReplaceModel(pNew, usModelID, FUNC_LoadPedModel);
 }
@@ -463,7 +463,7 @@ unsigned int CRenderWareSA::LoadAtomics(RpClump* pClump, RpAtomicContainer* pAto
 // Replaces all atomics for a specific model
 typedef struct
 {
-    unsigned short usTxdID;
+    uint32   usTxdID;
     RpClump*       pClump;
 } SAtomicsReplacer;
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
@@ -480,7 +480,7 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     return true;
 }
 
-void CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
+void CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, uint32 usModelID)
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -570,7 +570,7 @@ bool CRenderWareSA::ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomi
 }
 
 // Replaces a CColModel for a specific object identified by the object id (usModelID)
-void CRenderWareSA::ReplaceCollisions(CColModel* pCol, unsigned short usModelID)
+void CRenderWareSA::ReplaceCollisions(CColModel* pCol, uint32 usModelID)
 {
     DWORD*        pPool = (DWORD*)ARRAY_ModelInfo;
     CColModelSA*  pColModel = (CColModelSA*)pCol;
@@ -621,7 +621,7 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTextur
     pTex->txd = NULL;
 }
 
-short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
+short CRenderWareSA::CTxdStore_GetTxdRefcount(uint32 usTxdID)
 {
     return *(short*)(*(*(DWORD**)0xC8800C) + 0xC * usTxdID + 4);
 }
@@ -645,7 +645,7 @@ bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwText
 // No idea what will happen if there is a custom txd replacement
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
+void CRenderWareSA::TxdForceUnload(uint32 usTxdId, bool bDestroyTextures)
 {
     RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
     if (!pTxd)
@@ -685,7 +685,7 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
 // Get a TXD ID associated with the model ID
 //
 ////////////////////////////////////////////////////////////////
-ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
+uint32 CRenderWareSA::GetTXDIDForModelID(uint32 usModelID)
 {
     if (usModelID >= pGame->GetBaseIDforTXD() && usModelID < pGame->GetBaseIDforCOL())
     {
@@ -712,7 +712,7 @@ ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
 // Will try to load the model if needed
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelId)
+void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, uint32 usModelId)
 {
     outNameList.clear();
 
@@ -723,7 +723,7 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
         return;
     }
 
-    ushort usTxdId = GetTXDIDForModelID(usModelId);
+    uint32 usTxdId = GetTXDIDForModelID(usModelId);
 
     if (usTxdId == 0)
         return;
@@ -760,11 +760,11 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
 // Will try to load the model if needed
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId, std::vector<SString> vTextureNames)
+bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, uint32 usModelId, std::vector<SString> vTextureNames)
 {
     outTextureList.clear();
 
-    ushort usTxdId = GetTXDIDForModelID(usModelId);
+    uint32 usTxdId = GetTXDIDForModelID(usModelId);
 
     if (usTxdId == 0)
         return false;
@@ -830,7 +830,7 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
 // If TXD must already be loaded
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, ushort usTxdId)
+void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, uint32 usTxdId)
 {
     if (usTxdId == 0)
         return;

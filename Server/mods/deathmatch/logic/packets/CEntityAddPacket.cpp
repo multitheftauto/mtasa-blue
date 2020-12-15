@@ -472,7 +472,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(ucVariant2);
 
                     // If the vehicle has a turret, send its position too
-                    unsigned short usModel = pVehicle->GetModel();
+                    uint32 usModel = pVehicle->GetModel();
                     if (CVehicleManager::HasTurret(usModel))
                     {
                         SVehicleTurretSync specific;

@@ -13,7 +13,7 @@
 class CBuildingRemoval
 {
 public:
-    CBuildingRemoval(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior);
+    CBuildingRemoval(uint32 usModel, float fRadius, const CVector& vecPos, char cInterior);
     ~CBuildingRemoval();
 
     float          GetRadius() { return m_fRadius; }
@@ -22,7 +22,7 @@ public:
     char           GetInterior() { return m_cInterior; }
 
 private:
-    unsigned short m_usModel;
+    uint32 m_usModel;
     CVector        m_vecPos;
     float          m_fRadius;
     char           m_cInterior;

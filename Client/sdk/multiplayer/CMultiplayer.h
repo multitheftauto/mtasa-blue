@@ -115,7 +115,7 @@ typedef void(GameObjectDestructHandler)(CEntitySAInterface* pObject);
 typedef void(GameVehicleDestructHandler)(CEntitySAInterface* pVehicle);
 typedef void(GamePlayerDestructHandler)(CEntitySAInterface* pPlayer);
 typedef void(GameProjectileDestructHandler)(CEntitySAInterface* pProjectile);
-typedef void(GameModelRemoveHandler)(ushort usModelId);
+typedef void(GameModelRemoveHandler)(uint32 usModelId);
 typedef void(GameRunNamedAnimDestructorHandler)(class CTaskSimpleRunNamedAnimSAInterface* pTask);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);

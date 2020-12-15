@@ -104,17 +104,17 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
-    void              RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
+    void              RemoveBuilding(uint32 usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
     bool              IsRemovedModelInRadius(SIPLInst* pInst);
-    bool              IsModelRemoved(unsigned short modelID);
+    bool              IsModelRemoved(uint32 modelID);
     void              ClearRemovedBuildingLists(uint* pOutAmount = NULL);
-    bool              RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
+    bool              RestoreBuilding(uint32 usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
     SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface);
     void              AddDataBuilding(CEntitySAInterface* pInterface);
     void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface);
     void              AddBinaryBuilding(CEntitySAInterface* pInterface);
     bool              IsObjectRemoved(CEntitySAInterface* pInterface);
-    bool              IsDataModelRemoved(unsigned short usModelID);
+    bool              IsDataModelRemoved(uint32 usModelID);
     bool              IsEntityRemoved(CEntitySAInterface* pInterface);
     bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
@@ -122,10 +122,10 @@ public:
     void              ResetAllSurfaceInfo() override;
     bool              ResetSurfaceInfo(short sSurfaceID) override;
 private:
-    std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
-    std::multimap<unsigned short, sBuildingRemovalItem*>*     m_pBinaryBuildings;
-    std::map<unsigned short, unsigned short>*                 m_pRemovedObjects;
+    std::multimap<uint32, SBuildingRemoval*>*                 m_pBuildingRemovals;
+    std::multimap<uint32, sDataBuildingRemovalItem*>*         m_pDataBuildings;
+    std::multimap<uint32, sBuildingRemovalItem*>*             m_pBinaryBuildings;
+    std::map<uint32, unsigned short>*                         m_pRemovedObjects;
     std::map<DWORD, bool>                                     m_pRemovedEntities;
     std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;

@@ -58,7 +58,7 @@ bool CClientDFFManager::Exists(CClientDFF* pDFF)
     return false;
 }
 
-CClientDFF* CClientDFFManager::GetElementThatReplaced(unsigned short usModel, CClientDFF* pDontSearch)
+CClientDFF* CClientDFFManager::GetElementThatReplaced(uint32 usModel, CClientDFF* pDontSearch)
 {
     // Matches given DFF?
     std::list<CClientDFF*>::iterator iter = m_List.begin();
@@ -76,13 +76,13 @@ CClientDFF* CClientDFFManager::GetElementThatReplaced(unsigned short usModel, CC
     return NULL;
 }
 
-bool CClientDFFManager::IsReplacableModel(unsigned short usModel)
+bool CClientDFFManager::IsReplacableModel(uint32 usModel)
 {
     // Either a vehicle model or an object model
     return CClientObjectManager::IsValidModel(usModel) || CClientVehicleManager::IsValidModel(usModel) || CClientPlayerManager::IsValidModel(usModel);
 }
 
-bool CClientDFFManager::RestoreModel(unsigned short usModel)
+bool CClientDFFManager::RestoreModel(uint32 usModel)
 {
     // Get the DFF file that replaced it
     CClientDFF* pDFF = GetElementThatReplaced(usModel);

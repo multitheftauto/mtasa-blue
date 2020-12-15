@@ -34,7 +34,7 @@ public:
 
     int              GetModelID(void) const { return m_iModelID; };
     eClientModelType GetModelType(void) const { return m_eModelType; };
-    bool             Allocate(ushort usParentID);
+    bool             Allocate(uint32 usParentID);
     bool             Deallocate(void);
     void             RestoreEntitiesUsingThisModel();
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }

@@ -38,7 +38,7 @@ public:
     static eClientVehicleType GetVehicleType(unsigned long ulModel);
     static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
     static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
-    static void               GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static void               GetRandomVariation(uint32 usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
 
     static bool HasTurret(unsigned long ulModel);
     static bool HasSirens(unsigned long ulModel);
@@ -55,9 +55,9 @@ public:
 
     static bool IsVehicleLimitReached();
 
-    void RestreamVehicles(unsigned short usModel);
+    void RestreamVehicles(uint32 usModel);
     void RestreamAllVehicles();
-    void RestreamVehicleUpgrades(unsigned short usModel);
+    void RestreamVehicleUpgrades(uint32 usModel);
 
     std::vector<CClientVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
     std::vector<CClientVehicle*>::const_iterator IterEnd() { return m_List.end(); };

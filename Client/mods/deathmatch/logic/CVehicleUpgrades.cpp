@@ -42,7 +42,7 @@ CVehicleUpgrades::CVehicleUpgrades(CClientVehicle* pVehicle)
     m_usLastLocalAddNitroType = 0;
 }
 
-bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
+bool CVehicleUpgrades::IsUpgrade(uint32 usModel)
 {
     return (usModel >= 1000 && usModel <= 1193);
 }
@@ -63,7 +63,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     if (vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX || vehicleType == CLIENTVEHICLE_HELI)
         return false;
 
-    unsigned short usModel = m_pVehicle->GetModel();
+    uint32 usModel = m_pVehicle->GetModel();
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
     // wheels.

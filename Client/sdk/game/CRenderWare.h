@@ -26,14 +26,14 @@ struct SReplacementTextures
     struct SPerTxd
     {
         std::vector<RwTexture*> usingTextures;
-        ushort                  usTxdId;
+        uint32                  usTxdId;
         bool                    bTexturesAreCopies;
     };
 
     std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
     std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
-    std::vector<ushort>     usedInTxdIds;
-    std::vector<ushort>     usedInModelIds;
+    std::vector<uint32>     usedInTxdIds;
+    std::vector<uint32>     usedInModelIds;
 };
 
 // Shader layers to render
@@ -65,34 +65,34 @@ class CRenderWare
 public:
     virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
                                                       bool bFilteringEnabled) = 0;
-    virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
+    virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, uint32 usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
-    virtual void             ClothesAddReplacementTxd(char* pFileData, ushort usFileId) = 0;
+    virtual void             ClothesAddReplacementTxd(char* pFileData, uint32 usFileId) = 0;
     virtual void             ClothesRemoveReplacementTxd(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
-    virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
+    virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, uint32 usModelID, bool bLoadEmbeddedCollisions) = 0;
     virtual CColModel*       ReadCOL(const SString& buffer) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
-    virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
+    virtual void             ReplaceCollisions(CColModel* pColModel, uint32 usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
-    virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;
+    virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, uint32 usModelID) = 0;
     virtual void             ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics) = 0;
     virtual void             ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szWheel) = 0;
     virtual void             RepositionAtomic(RpClump* pDst, RpClump* pSrc, const char* szName) = 0;
     virtual void             AddAllAtomics(RpClump* pDst, RpClump* pSrc) = 0;
-    virtual void             ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) = 0;
-    virtual void             ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) = 0;
-    virtual void             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual void             ReplaceVehicleModel(RpClump* pNew, uint32 usModelID) = 0;
+    virtual void             ReplaceWeaponModel(RpClump* pNew, uint32 usModelID) = 0;
+    virtual void             ReplacePedModel(RpClump* pNew, uint32 usModelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
-    virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
-    virtual bool             GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames) = 0;
+    virtual void             GetModelTextureNames(std::vector<SString>& outNameList, uint32 usModelID) = 0;
+    virtual bool             GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, uint32 usModelID, std::vector<SString> vTextureNames) = 0;
     virtual const char*      GetTextureName(CD3DDUMMY* pD3DData) = 0;
 
-    virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask) = 0;
+    virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, uint32 usModelId, int iTypeMask) = 0;
     virtual SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData) = 0;
     virtual void     AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
                                          bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers) = 0;
@@ -101,7 +101,7 @@ public:
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
-    virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+    virtual void     TxdForceUnload(uint32 usTxdId, bool bDestroyTextures) = 0;
 
     virtual void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix) = 0;
     virtual void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut) = 0;

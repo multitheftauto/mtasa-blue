@@ -17,7 +17,7 @@ extern CClientGame* g_pClientGame;
 
 #ifdef WITH_OBJECT_SYNC
 CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, CObjectSync* pObjectSync, ElementID ID,
-                                     unsigned short usModel)
+                                     uint32 usModel)
     : ClassInit(this), CClientObject(pManager, ID, usModel)
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
@@ -37,7 +37,7 @@ CDeathmatchObject::~CDeathmatchObject()
 
 #else
 
-CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel, bool bLowLod)
+CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, ElementID ID, uint32 usModel, bool bLowLod)
     : ClassInit(this), CClientObject(pManager, ID, usModel, bLowLod)
 {
     m_pMovingObjectsManager = pMovingObjectsManager;

@@ -13,6 +13,8 @@ class CPedManager;
 
 #pragma once
 
+#include <SharedUtil.h>
+
 class CPedManager
 {
     friend class CPed;
@@ -21,7 +23,7 @@ public:
     CPedManager();
     ~CPedManager();
 
-    class CPed* Create(unsigned short usModel, CElement* pParent);
+    class CPed* Create(uint32_t usModel, CElement* pParent);
     class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void        DeleteAll();
 
@@ -31,7 +33,7 @@ public:
     list<class CPed*>::const_iterator IterBegin() { return m_List.begin(); }
     list<class CPed*>::const_iterator IterEnd() { return m_List.end(); }
 
-    static bool IsValidModel(unsigned short usModel);
+    static bool IsValidModel(uint32_t usModel);
 
 protected:
     void AddToList(class CPed* pPed) { m_List.push_back(pPed); }

@@ -35,7 +35,7 @@ CClientDFF::~CClientDFF()
 }
 
 // Get a clump which has been loaded to replace the specified model id
-RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
+RpClump* CClientDFF::GetLoadedClump(uint32 usModelId)
 {
     if (usModelId == 0)
         return NULL;
@@ -89,7 +89,7 @@ bool CClientDFF::Load(bool isRaw, SString input)
 
 void CClientDFF::UnloadDFF()
 {
-    for (std::map<ushort, SLoadedClumpInfo>::iterator iter = m_LoadedClumpInfoMap.begin(); iter != m_LoadedClumpInfoMap.end(); ++iter)
+    for (std::map<uint32, SLoadedClumpInfo>::iterator iter = m_LoadedClumpInfoMap.begin(); iter != m_LoadedClumpInfoMap.end(); ++iter)
     {
         SLoadedClumpInfo& info = iter->second;
         if (info.pClump)
@@ -99,7 +99,7 @@ void CClientDFF::UnloadDFF()
     m_LoadedClumpInfoMap.clear();
 }
 
-bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
+bool CClientDFF::ReplaceModel(uint32 usModel, bool bAlphaTransparency)
 {
     // Record attempt in case it all goes wrong
     CArgMap argMap;
@@ -134,7 +134,7 @@ bool CClientDFF::LoadFromBuffer(SString buffer)
     return true;
 }
 
-bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
+bool CClientDFF::DoReplaceModel(uint32 usModel, bool bAlphaTransparency)
 {
     if (!CClientDFFManager::IsReplacableModel(usModel))
         return false;
@@ -185,7 +185,7 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     return false;
 }
 
-bool CClientDFF::HasReplaced(unsigned short usModel)
+bool CClientDFF::HasReplaced(uint32 usModel)
 {
     // See if we have a match in our list
     std::list<unsigned short>::iterator iter = m_Replaced.begin();
@@ -202,7 +202,7 @@ bool CClientDFF::HasReplaced(unsigned short usModel)
     return false;
 }
 
-void CClientDFF::RestoreModel(unsigned short usModel)
+void CClientDFF::RestoreModel(uint32 usModel)
 {
     // Restore the model and remove it from the list
     InternalRestoreModel(usModel);
@@ -223,7 +223,7 @@ void CClientDFF::RestoreModels()
     m_Replaced.clear();
 }
 
-void CClientDFF::InternalRestoreModel(unsigned short usModel)
+void CClientDFF::InternalRestoreModel(uint32 usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -282,7 +282,7 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     }
 }
 
-bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)
+bool CClientDFF::ReplaceObjectModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency)
 {
     // Stream out all the object models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -303,7 +303,7 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     return true;
 }
 
-bool CClientDFF::ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)
+bool CClientDFF::ReplaceWeaponModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency)
 {
     // Stream out all the weapon models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -324,7 +324,7 @@ bool CClientDFF::ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlpha
     return true;
 }
 
-bool CClientDFF::ReplacePedModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)
+bool CClientDFF::ReplacePedModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency)
 {
     // Stream out all the weapon models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -344,7 +344,7 @@ bool CClientDFF::ReplacePedModel(RpClump* pClump, ushort usModel, bool bAlphaTra
     return true;
 }
 
-bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)
+bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, uint32 usModel, bool bAlphaTransparency)
 {
     // Make sure previous model+collision is loaded
     m_pManager->GetModelRequestManager()->RequestBlocking(usModel, "CClientDFF::ReplaceVehicleModel");

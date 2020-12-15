@@ -136,7 +136,7 @@ class CClientVehicle : public CClientStreamElement
 
 protected:            // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
                       // cleaned up.
-    CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2);
+    CClientVehicle(CClientManager* pManager, ElementID ID, uint32 usModel, unsigned char ucVariation, unsigned char ucVariation2);
 
 public:
     ~CClientVehicle();
@@ -206,8 +206,8 @@ public:
     void GetTurretRotation(float& fHorizontal, float& fVertical);
     void SetTurretRotation(float fHorizontal, float fVertical);
 
-    unsigned short GetModel() { return m_usModel; };
-    void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    uint32 GetModel() { return m_usModel; };
+    void           SetModelBlocking(uint32 usModel, unsigned char ucVariant, unsigned char ucVariant2);
 
     unsigned char GetVariant() { return m_ucVariation; };
     unsigned char GetVariant2() { return m_ucVariation2; };
@@ -533,7 +533,7 @@ protected:
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
     CClientModelRequestManager* m_pModelRequester;
-    unsigned short              m_usModel;
+    uint32              m_usModel;
     bool                        m_bHasLandingGear;
     eClientVehicleType          m_eVehicleType;
     unsigned char               m_ucMaxPassengers;

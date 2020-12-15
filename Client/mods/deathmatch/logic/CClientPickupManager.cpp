@@ -119,7 +119,7 @@ void CClientPickupManager::RemoveFromList(CClientPickup* pPickup)
     }
 }
 
-void CClientPickupManager::RestreamPickups(unsigned short usModel)
+void CClientPickupManager::RestreamPickups(uint32 usModel)
 {
     for (std::list<CClientPickup*>::const_iterator iter = IterBegin(); iter != IterEnd(); iter++)
     {

@@ -68,7 +68,7 @@ public:
     static bool           GetElementAlpha(CClientEntity& Entity, unsigned char& ucAlpha);
     static bool           IsElementOnScreen(CClientEntity& Entity, bool& bOnScreen);
     static bool           GetElementHealth(CClientEntity& Entity, float& fHealth);
-    static bool           GetElementModel(CClientEntity& Entity, unsigned short& usModel);
+    static bool           GetElementModel(CClientEntity& Entity, uint32& usModel);
     static bool           IsElementInWater(CClientEntity& Entity, bool& bInWater);
     static bool           IsElementSyncer(CClientEntity& Entity, bool& bIsSyncer);
     static bool           IsElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool& bCanCollide);
@@ -97,7 +97,7 @@ public:
     static bool          SetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation);
     static bool          SetElementAlpha(CClientEntity& Entity, unsigned char ucAlpha);
     static bool          SetElementHealth(CClientEntity& Entity, float fHealth);
-    static bool          SetElementModel(CClientEntity& Entity, unsigned short usModel);
+    static bool          SetElementModel(CClientEntity& Entity, uint32 usModel);
     static bool          SetElementCollisionsEnabled(CClientEntity& Entity, bool bEnabled);
     static bool          SetElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide);
     static bool          SetElementFrozen(CClientEntity& Entity, bool bFrozen);
@@ -196,12 +196,12 @@ public:
     static bool GetClothesTypeName(unsigned char ucType, SString& strOutName);
 
     // Vehicle get funcs
-    static CClientVehicle* CreateVehicle(CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
+    static CClientVehicle* CreateVehicle(CResource& Resource, uint32 usModel, const CVector& vecPosition, const CVector& vecRotation,
                                          const char* szRegPlate = NULL, unsigned char ucVariant = 5, unsigned char ucVariant2 = 5);
-    static bool            GetVehicleModelFromName(const char* szName, unsigned short& usModel);
+    static bool            GetVehicleModelFromName(const char* szName, uint32& usModel);
     static bool            GetVehicleUpgradeSlotName(unsigned char ucSlot, SString& strOutName);
     static bool            GetVehicleUpgradeSlotName(unsigned short usUpgrade, SString& strOutName);
-    static bool            GetVehicleNameFromModel(unsigned short usModel, SString& strOutName);
+    static bool            GetVehicleNameFromModel(uint32 usModel, SString& strOutName);
     static bool            GetHelicopterRotorSpeed(CClientVehicle& Vehicle, float& fSpeed);
     static bool            GetVehicleEngineState(CClientVehicle& Vehicle, bool& bState);
     static bool            IsVehicleDamageProof(CClientVehicle& Vehicle, bool& bDamageProof);
@@ -221,10 +221,10 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
-    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
-    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
-    static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
-    static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            SetVehicleModelExhaustFumesPosition(uint32 usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(uint32 usModel, CVector& vecPosition);
+    static bool            SetVehicleModelDummyPosition(uint32 usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyPosition(uint32 usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -270,7 +270,7 @@ public:
     static bool SetVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow, bool bOpen);
 
     // Object get funcs
-    static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
+    static CClientObject* CreateObject(CResource& Resource, uint32 usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
@@ -595,9 +595,9 @@ public:
     static bool          GetCloudsEnabled();
     static bool          GetTrafficLightState(unsigned char& ucState);
     static bool          AreTrafficLightsLocked(bool& bLocked);
-    static bool          RemoveWorldBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint& uiOutAmount);
+    static bool          RemoveWorldBuilding(uint32 usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint& uiOutAmount);
     static bool          RestoreWorldBuildings(uint& uiOutAmount);
-    static bool RestoreWorldBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint& uiOutAmount);
+    static bool          RestoreWorldBuilding(uint32 usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint& uiOutAmount);
 
     static bool SetTime(unsigned char ucHour, unsigned char ucMin);
     static bool GetSkyGradient(unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed,
@@ -655,7 +655,7 @@ public:
 
     // Projectile functions
     static CClientProjectile* CreateProjectile(CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce,
-                                               CClientEntity* pTarget, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel = 0);
+                                               CClientEntity* pTarget, CVector& vecRotation, CVector& vecVelocity, uint32 usModel = 0);
 
     // Shape create funcs
     static CClientColCircle*    CreateColCircle(CResource& Resource, const CVector2D& vecPosition, float fRadius);

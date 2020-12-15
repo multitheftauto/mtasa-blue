@@ -41,7 +41,7 @@ public:
     bool        IsLowLodObjectLimitReached();
     bool        IsHardObjectLimitReached();
 
-    void RestreamObjects(unsigned short usModel);
+    void RestreamObjects(uint32 usModel);
     void RestreamAllObjects();
 
     void AddToList(CClientObject* pObject) { m_Objects.push_back(pObject); }

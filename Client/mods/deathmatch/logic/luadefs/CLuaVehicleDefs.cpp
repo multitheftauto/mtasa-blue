@@ -492,7 +492,7 @@ int CLuaVehicleDefs::GetVehicleModelFromName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        uint32 usModel;
         if (CStaticFunctionDefinitions::GetVehicleModelFromName(strName, usModel))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(usModel));
@@ -3969,7 +3969,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // bool setVehicleModelExhaustPosition ( int modelID, float x, float y, float z )
-    unsigned short usModel;
+    uint32  usModel;
     CVector        vecPosition;
 
     CScriptArgReader argStream(luaVM);
@@ -3994,7 +3994,7 @@ int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelExhaustPosition ( int modelID )
-    unsigned short usModel;
+    uint32 usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4021,7 +4021,7 @@ int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelExhaustPosition ( int modelID )
-    unsigned short usModel;
+    uint32 usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4071,7 +4071,7 @@ bool CLuaVehicleDefs::SetVehicleWheelScale(CClientVehicle* const pVehicle, const
 }
 
 std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
-    const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
+    const uint32 usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
 {
     CModelInfo* pModelInfo = nullptr;
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -4092,7 +4092,7 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     return pModelInfo->GetVehicleWheelSize(eActualWheelGroup);
 }
 
-bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
+bool CLuaVehicleDefs::SetVehicleModelWheelSize(const uint32 usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
 {
     CModelInfo* pModelInfo = nullptr;
 

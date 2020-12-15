@@ -14,7 +14,7 @@ public:
 
     // CClientModelCacheManager interface
     virtual void DoPulse() = 0;
-    virtual void OnRestreamModel(ushort usModelId) = 0;
+    virtual void OnRestreamModel(uint32 usModelId) = 0;
 };
 
 CClientModelCacheManager* NewClientModelCacheManager();

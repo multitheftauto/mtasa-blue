@@ -188,7 +188,7 @@ public:
     void SetTailLight(eLightType Style) { m_Handling.ucTailLight = Style; };
     void SetAnimGroup(unsigned char ucGroup) { m_Handling.ucAnimGroup = ucGroup; };
 
-    void Recalculate(unsigned short usModel);
+    void Recalculate(uint32 usModel);
 
     tHandlingDataSA* GetInterface() { return m_pHandlingSA; };
 

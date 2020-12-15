@@ -46,7 +46,7 @@ public:
     CVector*       pvecPosition;
     CVector*       pvecRotation;
     CVector*       pvecVelocity;
-    unsigned short usModel;
+    uint32         usModel;
 };
 
 class CClientProjectile : public CClientEntity
@@ -67,7 +67,7 @@ public:
     void              Unlink();
 
     void DoPulse();
-    void Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel);
+    void Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, uint32 usModel);
     void Destroy(bool bBlow = true);
 
     bool           IsActive();
@@ -81,8 +81,8 @@ public:
     void           SetRotationDegrees(const CVector& vecRotation);
     void           GetVelocity(CVector& vecVelocity);
     void           SetVelocity(CVector& vecVelocity);
-    unsigned short GetModel();
-    void           SetModel(unsigned short usModel);
+    uint32         GetModel();
+    void           SetModel(uint32 usModel);
     void           SetCounter(DWORD dwCounter);
     DWORD          GetCounter();
     CClientEntity* GetCreator() { return m_pCreator; }

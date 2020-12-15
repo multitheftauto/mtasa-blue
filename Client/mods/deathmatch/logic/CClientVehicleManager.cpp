@@ -480,7 +480,7 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
     return 0xFF;
 }
 
-void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
+void CClientVehicleManager::GetRandomVariation(uint32 usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
 {
     RandomizeRandomSeed();
     ucVariant = 255;
@@ -736,7 +736,7 @@ void CClientVehicleManager::OnDestruction(CClientVehicle* pVehicle)
     ListRemove(m_StreamedIn, pVehicle);
 }
 
-void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
+void CClientVehicleManager::RestreamVehicles(uint32 usModel)
 {
     g_pClientGame->GetModelCacheManager()->OnRestreamModel(usModel);
 
@@ -776,7 +776,7 @@ void CClientVehicleManager::RestreamAllVehicles()
     }
 }
 
-void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
+void CClientVehicleManager::RestreamVehicleUpgrades(uint32 usModel)
 {
     for (uint i = 0; i < m_List.size(); i++)
     {

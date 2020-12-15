@@ -1364,7 +1364,7 @@ int CLuaElementDefs::getElementModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        uint32 usModel;
         if (CStaticFunctionDefinitions::GetElementModel(pElement, usModel))
         {
             lua_pushnumber(luaVM, usModel);

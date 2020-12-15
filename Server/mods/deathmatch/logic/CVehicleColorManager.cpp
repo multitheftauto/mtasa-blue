@@ -65,14 +65,14 @@ bool CVehicleColorManager::Load(const char* szFilename)
                 char* szColor4 = strtok(NULL, " ");
 
                 // Set the colors that exist
-                unsigned short usModel = 0;
+                uint32         usModel = 0;
                 unsigned char  ucColor1 = 0;
                 unsigned char  ucColor2 = 0;
                 unsigned char  ucColor3 = 0;
                 unsigned char  ucColor4 = 0;
                 if (szModel)
                 {
-                    usModel = static_cast<unsigned short>(atol(szModel));
+                    usModel = static_cast<uint32>(atol(szModel));
 
                     if (szColor1)
                     {
@@ -138,7 +138,7 @@ void CVehicleColorManager::Reset()
     }
 }
 
-void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor& colVehicle)
+void CVehicleColorManager::AddColor(uint32_t usModel, const CVehicleColor& colVehicle)
 {
     if (usModel >= 400 && usModel <= 611)
     {
@@ -146,7 +146,7 @@ void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor&
     }
 }
 
-CVehicleColor CVehicleColorManager::GetRandomColor(unsigned short usModel)
+CVehicleColor CVehicleColorManager::GetRandomColor(uint32_t usModel)
 {
     if (usModel >= 400 && usModel <= 611)
     {

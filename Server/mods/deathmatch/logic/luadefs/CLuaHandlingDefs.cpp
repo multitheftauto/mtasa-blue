@@ -210,7 +210,7 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
 {
     //  bool setModelHandling ( int modelId, [ string property, var value ] )
-    unsigned short usModel;
+    uint32 usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -552,7 +552,7 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 {
     //  table getModelHandling ( int modelId )
-    unsigned short usModel;
+    uint32 usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -725,7 +725,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
 {
     //  table getOriginalHandling ( int modelID )
-    unsigned short usModel;
+    uint32 usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);

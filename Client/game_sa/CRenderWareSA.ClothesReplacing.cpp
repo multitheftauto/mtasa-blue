@@ -54,7 +54,7 @@ namespace
 // Add replacement txd for a clothing component
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::ClothesAddReplacementTxd(char* pFileData, ushort usFileId)
+void CRenderWareSA::ClothesAddReplacementTxd(char* pFileData, uint32 usFileId)
 {
     if (!pFileData)
         return;

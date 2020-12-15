@@ -40,7 +40,7 @@ public:
     int  GetRotation();
     void SetRotation(int iRotation);
 
-    void ModelRequestCallback(unsigned short usModelID){};
+    void ModelRequestCallback(uint32 usModelID){};
 
     float GetDistanceFromCentreOfMassToBaseOfModel();
 

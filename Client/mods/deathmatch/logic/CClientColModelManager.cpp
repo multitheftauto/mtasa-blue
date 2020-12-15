@@ -60,7 +60,7 @@ bool CClientColModelManager::Exists(CClientColModel* pCol)
     return false;
 }
 
-CClientColModel* CClientColModelManager::GetElementThatReplaced(unsigned short usModel, CClientColModel* pDontSearch)
+CClientColModel* CClientColModelManager::GetElementThatReplaced(uint32 usModel, CClientColModel* pDontSearch)
 {
     // Item exists in list?
     std::list<CClientColModel*>::iterator iter = m_List.begin();
@@ -78,13 +78,13 @@ CClientColModel* CClientColModelManager::GetElementThatReplaced(unsigned short u
     return NULL;
 }
 
-bool CClientColModelManager::IsReplacableModel(unsigned short usModel)
+bool CClientColModelManager::IsReplacableModel(uint32 usModel)
 {
     // We can only replace object collisions atm
     return CClientObjectManager::IsValidModel(usModel);
 }
 
-bool CClientColModelManager::RestoreModel(unsigned short usModel)
+bool CClientColModelManager::RestoreModel(uint32 usModel)
 {
     // Grab the item that replaced that model
     CClientColModel* pCol = GetElementThatReplaced(usModel);

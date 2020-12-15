@@ -3499,7 +3499,7 @@ void CClientGame::StaticGameProjectileDestructHandler(CEntitySAInterface* pProje
     g_pClientGame->GameProjectileDestructHandler(pProjectile);
 }
 
-void CClientGame::StaticGameModelRemoveHandler(ushort usModelId)
+void CClientGame::StaticGameModelRemoveHandler(uint32 usModelId)
 {
     g_pClientGame->GameModelRemoveHandler(usModelId);
 }
@@ -3519,13 +3519,13 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         if (pClientEntity)
         {
             int    iTypeMask;
-            ushort usModelId = 0xFFFF;
+            uint32 usModelId = 0xFFFFFFFF;
             switch (pClientEntity->GetType())
             {
                 case CCLIENTPED:
                 case CCLIENTPLAYER:
                     iTypeMask = TYPE_MASK_PED;
-                    usModelId = (ushort) static_cast<CClientPed*>(pClientEntity)->GetModel();
+                    usModelId = (uint32) static_cast<CClientPed*>(pClientEntity)->GetModel();
                     break;
                 case CCLIENTVEHICLE:
                     iTypeMask = TYPE_MASK_VEHICLE;
@@ -3542,7 +3542,7 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         }
     }
 
-    g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFFFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -4725,7 +4725,7 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
         CStaticFunctionDefinitions::DestroyElement(*pClientProjectile);
 }
 
-void CClientGame::GameModelRemoveHandler(ushort usModelId)
+void CClientGame::GameModelRemoveHandler(uint32 usModelId)
 {
     // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
 }
@@ -6443,7 +6443,7 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
 }
 
-void CClientGame::RestreamModel(unsigned short usModel)
+void CClientGame::RestreamModel(uint32 usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))

@@ -120,8 +120,8 @@ public:
     CTickCount GetLastUsedTime() { return m_LastUsedTime; }
     CTickCount GetCreationTime() { return m_CreationTime; }
 
-    unsigned short GetModel() { return m_usModel; };
-    void           SetModel(unsigned short usModel) { m_usModel = usModel; };
+    uint32_t GetModel() { return m_usModel; };
+    void           SetModel(uint32_t usModel) { m_usModel = usModel; };
 
     bool IsVisible() { return m_bVisible; };
     void SetVisible(bool bVisible);

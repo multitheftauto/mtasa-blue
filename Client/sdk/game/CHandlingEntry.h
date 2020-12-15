@@ -188,5 +188,5 @@ public:
 
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
-    virtual void Recalculate(unsigned short usModel) = 0;
+    virtual void Recalculate(uint32 usModel) = 0;
 };

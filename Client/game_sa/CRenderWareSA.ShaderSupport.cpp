@@ -51,7 +51,7 @@ DWORD RETURN_CTxdStore_RemoveTxd = 0x731E96;
 //
 struct STxdStreamEvent
 {
-    STxdStreamEvent(bool bAdded, ushort usTxdId) : bAdded(bAdded), usTxdId(usTxdId) {}
+    STxdStreamEvent(bool bAdded, uint32 usTxdId) : bAdded(bAdded), usTxdId(usTxdId) {}
 
     bool operator<(const STxdStreamEvent& other) const
     {
@@ -60,7 +60,7 @@ struct STxdStreamEvent
     bool operator==(const STxdStreamEvent& other) const { return usTxdId == other.usTxdId && bAdded == other.bAdded; }
 
     bool   bAdded;
-    ushort usTxdId;
+    uint32 usTxdId;
 };
 
 static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
@@ -70,7 +70,7 @@ static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId;
+    uint32 usTxdId = (uint32)dwTxdId;
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
@@ -103,7 +103,7 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
+    uint32 usTxdId = (uint32)dwTxdId - pGame->GetBaseIDforTXD();
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
@@ -212,7 +212,7 @@ void CRenderWareSA::PulseWorldTextureWatch()
 // Create a texinfo for the texture
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData)
+void CRenderWareSA::StreamingAddedTexture(uint32 usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData)
 {
     STexInfo* pTexInfo = CreateTexInfo(usTxdId, strTextureName, pD3DData);
     OnTextureStreamIn(pTexInfo);
@@ -226,11 +226,11 @@ void CRenderWareSA::StreamingAddedTexture(ushort usTxdId, const SString& strText
 // Delete texinfos which came from that TXD
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
+void CRenderWareSA::StreamingRemovedTxd(uint32 usTxdId)
 {
     TIMING_CHECKPOINT("+StreamingRemovedTxd");
 
-    typedef std::multimap<ushort, STexInfo*>::const_iterator ConstIterType;
+    typedef std::multimap<uint32, STexInfo*>::const_iterator ConstIterType;
     std::pair<ConstIterType, ConstIterType>                  range = m_TexInfoMap.equal_range(usTxdId);
     for (ConstIterType iter = range.first; iter != range.second;)
     {
@@ -286,7 +286,7 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
 {
     TIMING_CHECKPOINT("+ScriptRemovedTexture");
     // Find TexInfo for this script added texture
-    for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
+    for (std::multimap<uint32, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
         STexInfo* pTexInfo = iter->second;
         if (pTexInfo->texTag == pTex)
@@ -341,7 +341,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
     MapRemove(m_SpecialTextures, pTex);
 
     // Find TexInfo for this special texture
-    for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
+    for (std::multimap<uint32, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
         STexInfo* pTexInfo = iter->second;
         if (pTexInfo->texTag == pTex)
@@ -407,7 +407,7 @@ void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask)
+void CRenderWareSA::SetRenderingClientEntity(CClientEntityBase* pClientEntity, uint32 usModelId, int iTypeMask)
 {
     m_pRenderingClientEntity = pClientEntity;
     m_usRenderingEntityModelId = usModelId;

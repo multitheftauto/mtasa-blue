@@ -131,7 +131,7 @@ public:
         VEHICLEACTION_JACKED,
     };
 
-    CPed(class CPedManager* pPedManager, CElement* pParent, unsigned short usModel);
+    CPed(class CPedManager* pPedManager, CElement* pParent, uint32 usModel);
     ~CPed();
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
@@ -142,8 +142,8 @@ public:
     bool HasValidModel();
 
     bool           IsPlayer() { return m_bIsPlayer; }
-    unsigned short GetModel() { return m_usModel; };
-    void           SetModel(unsigned short usModel) { m_usModel = usModel; };
+    uint32   GetModel() { return m_usModel; };
+    void           SetModel(uint32 usModel) { m_usModel = usModel; };
 
     bool IsDucked() { return m_bDucked; };
     void SetDucked(bool bDucked) { m_bDucked = bDucked; };
@@ -272,7 +272,7 @@ protected:
     bool ReadSpecialData(const int iLine) override;
 
 protected:
-    unsigned short                       m_usModel;
+    uint32_t                             m_usModel;
     CMatrix                              m_Matrix;
     bool                                 m_bDucked;
     bool                                 m_bIsChoking;

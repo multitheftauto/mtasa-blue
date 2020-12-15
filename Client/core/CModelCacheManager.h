@@ -17,12 +17,12 @@ public:
     // CModelCacheManager interface
     virtual void DoPulse() = 0;
     virtual void GetStats(SModelCacheStats& outStats) = 0;
-    virtual bool UnloadModel(ushort usModelId) = 0;
-    virtual void OnRestreamModel(ushort usModelId) = 0;
+    virtual bool UnloadModel(uint32 usModelId) = 0;
+    virtual void OnRestreamModel(uint32 usModelId) = 0;
     virtual void OnClientClose() = 0;
-    virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList) = 0;
-    virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList) = 0;
-    virtual void AddModelToPersistentCache(ushort usModelId) = 0;
+    virtual void UpdatePedModelCaching(const std::map<uint32, float>& newNeedCacheList) = 0;
+    virtual void UpdateVehicleModelCaching(const std::map<uint32, float>& newNeedCacheList) = 0;
+    virtual void AddModelToPersistentCache(uint32 usModelId) = 0;
 };
 
 CModelCacheManager* NewModelCacheManager();

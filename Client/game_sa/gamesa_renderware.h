@@ -198,7 +198,7 @@ RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
 /** GTA function definitions and mappings                                   **/
 /*****************************************************************************/
 
-typedef bool(__cdecl* SetTextureDict_t)(unsigned short id);
+typedef bool(__cdecl* SetTextureDict_t)(unsigned int id);
 typedef bool(__cdecl* LoadClumpFile_t)(RwStream* stream, unsigned int id);            // (stream, model id)
 typedef bool(__cdecl* LoadModel_t)(RwBuffer* filename, unsigned int id);              // (memory chunk, model id)
 typedef void(__cdecl* LoadCollisionModel_t)(unsigned char*, CColModelSAInterface*, const char*);

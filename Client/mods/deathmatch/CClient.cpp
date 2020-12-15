@@ -256,7 +256,7 @@ bool CClient::ProcessCommand(const char* szCommandLine)
     return false;
 }
 
-void CClient::RestreamModel(unsigned short usModel)
+void CClient::RestreamModel(uint32_t usModel)
 {
     if (g_pClientGame)
     {

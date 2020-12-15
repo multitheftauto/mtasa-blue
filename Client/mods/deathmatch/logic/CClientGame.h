@@ -435,7 +435,7 @@ public:
     bool    IsHighFloatPrecision() const;
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
-    void RestreamModel(unsigned short usModel);
+    void RestreamModel(uint32 usModel);
     void RestreamWorld();
 
     void TriggerDiscordJoin(SString strSecret);
@@ -527,7 +527,7 @@ private:
     static void StaticGameVehicleDestructHandler(CEntitySAInterface* pVehicle);
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
-    static void StaticGameModelRemoveHandler(ushort usModelId);
+    static void StaticGameModelRemoveHandler(uint32 usModelId);
     static void StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask);
     static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
@@ -571,7 +571,7 @@ private:
     void        GameVehicleDestructHandler(CEntitySAInterface* pVehicle);
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
-    void        GameModelRemoveHandler(ushort usModelId);
+    void        GameModelRemoveHandler(uint32 usModelId);
     void        GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask);
     bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);

@@ -98,7 +98,7 @@ void CClientPedManager::OnDestruction(CClientPed* pPed)
     ListRemove(m_StreamedIn, pPed);
 }
 
-void CClientPedManager::RestreamPeds(unsigned short usModel)
+void CClientPedManager::RestreamPeds(uint32 usModel)
 {
     g_pClientGame->GetModelCacheManager()->OnRestreamModel(usModel);
 
@@ -147,7 +147,7 @@ void CClientPedManager::RestreamAllPeds()
     }
 }
 
-void CClientPedManager::RestreamWeapon(unsigned short usModel)
+void CClientPedManager::RestreamWeapon(uint32 usModel)
 {
     eWeaponSlot eSlot = (eWeaponSlot)GetWeaponSlotFromModel(usModel);
     // Store the affected vehicles

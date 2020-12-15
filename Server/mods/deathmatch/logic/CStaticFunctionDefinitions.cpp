@@ -595,7 +595,7 @@ bool CStaticFunctionDefinitions::GetElementHealth(CElement* pElement, float& fHe
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetElementModel(CElement* pElement, unsigned short& usModel)
+bool CStaticFunctionDefinitions::GetElementModel(CElement* pElement, uint32& usModel)
 {
     assert(pElement);
 
@@ -1618,7 +1618,7 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned short usModel)
+bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, uint32 usModel)
 {
     assert(pElement);
     RUN_CHILDREN(SetElementModel(*iter, usModel))
@@ -1991,7 +1991,7 @@ bool CStaticFunctionDefinitions::DetonateSatchels(CElement* pElement)
     return false;
 }
 
-CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation, bool bSynced)
+CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, uint32 usModel, const CVector& vecPosition, float fRotation, bool bSynced)
 {
     if (CPlayerManager::IsValidPlayerModel(usModel))
     {
@@ -4765,7 +4765,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
     return false;
 }
 
-CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
+CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, uint32 usModel, const CVector& vecPosition, const CVector& vecRotation,
                                                     const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
 {
     unsigned char ucVariation = ucVariant;
@@ -4925,14 +4925,14 @@ bool CStaticFunctionDefinitions::GetVehicleColor(CVehicle* pVehicle, CVehicleCol
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, unsigned short& usID)
+bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, uint32& usID)
 {
     assert(szName);
 
     unsigned long ulID = CVehicleNames::GetVehicleModel(szName);
     if (ulID != 0)
     {
-        usID = static_cast<unsigned short>(ulID);
+        usID = static_cast<uint32>(ulID);
         return true;
     }
 
@@ -4955,7 +4955,7 @@ bool CStaticFunctionDefinitions::GetVehicleName(CVehicle* pVehicle, SString& str
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
+bool CStaticFunctionDefinitions::GetVehicleNameFromModel(uint32 usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
     return !strOutName.empty();
@@ -7993,7 +7993,7 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CElement* pElement, unsi
     return true;
 }
 
-CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation,
+CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, uint32 usModelID, const CVector& vecPosition, const CVector& vecRotation,
                                                   bool bIsLowLod)
 {
     CObject* const pObject = m_pObjectManager->Create(pResource->GetDynamicElementRoot(), bIsLowLod);
@@ -8353,7 +8353,7 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
     else if (ucType == CPickup::CUSTOM)
     {
         // Get the model id
-        unsigned short usModel = static_cast<unsigned short>(dFive);
+        uint32 usModel = static_cast<unsigned short>(dFive);
         if (CObjectManager::IsValidModel(usModel))
         {
             // Create the pickup
@@ -8488,7 +8488,7 @@ bool CStaticFunctionDefinitions::SetPickupType(CElement* pElement, unsigned char
         else if (ucType == CPickup::CUSTOM)
         {
             // Get the weapon id
-            unsigned short usModel = static_cast<unsigned short>(dThree);
+            uint32 usModel = static_cast<unsigned short>(dThree);
             if (CObjectManager::IsValidModel(usModel))
             {
                 // Set the type, weapon type and ammo
@@ -10570,7 +10570,7 @@ bool CStaticFunctionDefinitions::ResetFogDistance()
     return true;
 }
 
-bool CStaticFunctionDefinitions::RemoveWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior)
+bool CStaticFunctionDefinitions::RemoveWorldModel(uint32 usModel, float fRadius, const CVector& vecPosition, char cInterior)
 {
     g_pGame->GetBuildingRemovalManager()->CreateBuildingRemoval(usModel, fRadius, vecPosition, cInterior);
 
@@ -10586,7 +10586,7 @@ bool CStaticFunctionDefinitions::RemoveWorldModel(unsigned short usModel, float 
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior)
+bool CStaticFunctionDefinitions::RestoreWorldModel(uint32 usModel, float fRadius, const CVector& vecPosition, char cInterior)
 {
     g_pGame->GetBuildingRemovalManager()->RestoreWorldModel(usModel, fRadius, vecPosition, cInterior);
 

@@ -138,7 +138,7 @@ public:
     virtual CBoundingBox*  GetBoundingBox() = 0;
     virtual bool           IsValid() = 0;
     virtual bool           IsAllocatedInArchive() = 0;
-    virtual unsigned short GetTextureDictionaryID() = 0;
+    virtual uint32         GetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
     virtual float          GetOriginalLODDistance() = 0;
     virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
@@ -193,8 +193,8 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
-    virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
-    virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
+    virtual void      MakeObjectModel(uint32 usBaseID) = 0;
+    virtual void      MakeVehicleAutomobile(uint32 usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;

@@ -52,7 +52,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
 int CLuaObjectDefs::CreateObject(lua_State* luaVM)
 {
     //  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
-    ushort  usModelID;
+    uint32  usModelID;
     CVector vecPosition;
     CVector vecRotation;
     bool    bIsLowLod;
