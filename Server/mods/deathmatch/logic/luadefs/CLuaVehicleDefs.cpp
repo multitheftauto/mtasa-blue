@@ -57,7 +57,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isTrainDerailable", IsTrainDerailable},
         {"getTrainDirection", GetTrainDirection},
         {"getTrainSpeed", GetTrainSpeed},
-        {"getTrainTrack", ArgumentParser<GetTrainTrack>},
+        //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
         {"isVehicleBlown", IsVehicleBlown},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
