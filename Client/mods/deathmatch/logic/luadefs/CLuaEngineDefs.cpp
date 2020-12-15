@@ -608,14 +608,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                     iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
 
                 if (iModelID != INVALID_MODEL_ID) {
-                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-                    if (pModel == nullptr)
-                        pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
-                    m_pManager->GetModelManager()->Add(pModel);
-
-                    pModel->Allocate(usParentID);
-                    pModel->SetParentResource(pResource);
-
+                    m_pManager->GetModelManager()->RequestModel(iModelID, usParentID, eModelType, m_pManager, pResource);
                     lua_pushinteger(luaVM, iModelID);
                     return 1;
                 }
