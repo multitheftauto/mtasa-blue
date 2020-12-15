@@ -142,6 +142,9 @@ public:
                   std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup,
                   int collisionMask);
 
+    void AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody);
+    void AddToChangesStack(const CLuaPhysicsElement* pElement);
+
 private:
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
@@ -200,4 +203,7 @@ private:
 
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsStaticCollision>> m_InitializeStaticCollisionsQueue;
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>> m_InitializeRigidBodiesQueue;
+
+    SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_StackElementChanges;
+    SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;
 };

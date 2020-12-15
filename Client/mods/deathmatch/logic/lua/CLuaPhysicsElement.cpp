@@ -39,3 +39,34 @@ void CLuaPhysicsElement::Destroy()
 {
     m_pPhysics->DestroyElement(this);
 }
+
+bool CLuaPhysicsElement::IsSafeToUpdate() const
+{
+    return m_pPhysics->isDuringSimulation;
+}
+
+
+void CLuaPhysicsElement::ApplyChanges()
+{
+    while (!m_stackChanges.empty())
+    {
+        m_stackChanges.top()();
+        m_stackChanges.pop();
+    }
+    m_bHasEnqueuedChanges = false;
+}
+
+void CLuaPhysicsElement::ApplyOrEnqueueChange(std::function<void()> change)
+{
+    if (IsSafeToUpdate())
+        change();
+    else
+    {
+        if (!m_bHasEnqueuedChanges)
+        {
+            m_bHasEnqueuedChanges = true;
+            GetPhysics()->AddToChangesStack(this);
+        }
+        m_stackChanges.push(change);
+    }
+}

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsRigidBody.h
  *  PURPOSE:     Lua rigid body class
@@ -64,11 +64,13 @@ public:
     bool    SetMatrix(const CMatrix& matrix);
     CMatrix GetMatrix() const;
 
-    void UpdateAABB() const {/*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/ }
+    void UpdateAABB() const
+    { /*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/
+    }
 
     void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
 
-    bool Activate() const;
+    void Activate() const;
 
     // both from 0.0f to 1.0f
     void SetDumping(float fLinearDamping, float fAngularDamping);
@@ -115,11 +117,14 @@ public:
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
     void Unlink();
+    void NeedsActivation() const;
 
 private:
-    std::unique_ptr<CPhysicsRigidBodyProxy>       m_pRigidBodyProxy = nullptr;
-    CLuaPhysicsShape*                             m_pShape;
-    std::unique_ptr<CLuaPhysicsRigidBodyTempData> m_pTempData;
-    std::vector<CLuaPhysicsConstraint*>           m_constraintList;
-    mutable std::mutex                            m_lock;
+    std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
+    CLuaPhysicsShape*                                  m_pShape;
+    std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;
+    std::vector<CLuaPhysicsConstraint*>                m_constraintList;
+    SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
+    mutable std::mutex                                 m_lock;
+    mutable std::atomic<bool>                          m_bActivationRequested;
 };

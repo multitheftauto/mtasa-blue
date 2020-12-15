@@ -977,6 +977,16 @@ void CClientPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
     }
 }
 
+void CClientPhysics::AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody)
+{
+    m_StackRigidBodiesActivation.push((CLuaPhysicsRigidBody*)pRigidBody);
+}
+
+void CClientPhysics::AddToChangesStack(const CLuaPhysicsElement* pElement)
+{
+    m_StackElementChanges.push((CLuaPhysicsElement*)pElement);
+}
+
 void CClientPhysics::DoPulse()
 {
     std::lock_guard<std::mutex> guard(lock);
@@ -996,6 +1006,22 @@ void CClientPhysics::DoPulse()
         pRigidBody->Initialize(pRigidBody);
 
         m_InitializeRigidBodiesQueue.pop();
+    }
+    
+    while (!m_StackElementChanges.empty())
+    {
+        CLuaPhysicsElement* pElement = m_StackElementChanges.top();
+        pElement->ApplyChanges();
+
+        m_StackElementChanges.pop();
+    }
+
+    while (!m_StackRigidBodiesActivation.empty())
+    {
+        CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesActivation.top();
+        pRigidBody->Activate();
+        CleanOverlappingPairCache(pRigidBody);
+        m_StackRigidBodiesActivation.pop();
     }
 
     CTickCount tickCountNow = CTickCount::Now();

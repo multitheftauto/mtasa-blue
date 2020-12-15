@@ -32,12 +32,17 @@ public:
     void                   Destroy();
     bool                   IsReady() const { return m_isReady; }
     void                   Ready() { m_isReady = true; }
+    bool                   IsSafeToUpdate() const;
+    void                   ApplyChanges();
+    void                   ApplyOrEnqueueChange(std::function<void()> change);
 
 private:
     void RemoveScriptID();
 
     std::atomic<bool>      m_isReady;
+    std::atomic<bool>      m_bHasEnqueuedChanges;
     CClientPhysics*        m_pPhysics;
     EIdClass::EIdClassType m_classType;
     uint                   m_uiScriptID;
+    SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
 };
