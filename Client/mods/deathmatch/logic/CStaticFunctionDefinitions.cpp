@@ -2734,10 +2734,13 @@ bool CStaticFunctionDefinitions::IsTrainChainEngine(CClientVehicle& Vehicle, boo
 }
 
 CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                          const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
+                                                          const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, unsigned short usModelOriginal)
 {
-    if (CClientVehicleManager::IsValidModel(usModel) && (ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
+    if ((ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
     {
+        if (!CClientVehicleManager::IsValidModel(usModel) && !m_pManager->GetModelManager()->RequestModel(usModel, usModelOriginal, eClientModelType::VEHICLE, m_pManager))
+            return nullptr;
+
         unsigned char ucVariation = ucVariant;
         unsigned char ucVariation2 = ucVariant2;
         if (ucVariant2 == 255 && ucVariant == 255)
