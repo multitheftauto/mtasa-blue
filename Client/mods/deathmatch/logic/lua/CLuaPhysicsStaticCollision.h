@@ -61,6 +61,8 @@ public:
     CVector GetRotation() const;
     bool    SetScale(const CVector& vecScale) const;
     CVector GetScale() const;
+    bool    SetMatrix(const CMatrix& matrix) const;
+    CMatrix GetMatrix() const;
 
     void Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 

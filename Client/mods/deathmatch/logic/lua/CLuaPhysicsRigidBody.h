@@ -61,6 +61,8 @@ public:
     CVector GetRotation() const;
     bool    SetScale(const CVector& vecScale);
     CVector GetScale() const;
+    bool    SetMatrix(const CMatrix& matrix);
+    CMatrix GetMatrix() const;
 
     void UpdateAABB() const {/*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/ }
 

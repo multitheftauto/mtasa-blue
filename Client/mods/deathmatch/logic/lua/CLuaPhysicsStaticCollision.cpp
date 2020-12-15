@@ -84,6 +84,34 @@ CVector CLuaPhysicsStaticCollision::GetScale() const
     return CVector(1, 1, 1);
 }
 
+bool CLuaPhysicsStaticCollision::SetMatrix(const CMatrix& matrix) const
+{
+    if (IsReady())
+    {
+        SetPosition(matrix.GetPosition());
+        SetRotation(matrix.GetRotation());
+        SetScale(matrix.GetScale());
+        return true;
+    }
+    m_pTempData->m_matrix = matrix;
+    return true;
+}
+
+CMatrix CLuaPhysicsStaticCollision::GetMatrix() const
+{
+    if (IsReady())
+    {
+        CMatrix matrix;
+        matrix.SetPosition(GetPosition());
+        matrix.SetRotation(GetRotation());
+        matrix.SetScale(GetScale());
+
+        return matrix;
+    }
+    return m_pTempData->m_matrix;
+}
+
+
 void CLuaPhysicsStaticCollision::RemoveDebugColor() const
 {
     m_btCollisionObject->removeCustomDebugColor();

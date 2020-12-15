@@ -428,6 +428,33 @@ CVector CLuaPhysicsRigidBody::GetScale() const
     return m_pTempData->m_matrix.GetScale();
 }
 
+bool CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
+{
+    if (IsReady())
+    {
+        SetPosition(matrix.GetPosition());
+        SetRotation(matrix.GetRotation());
+        SetScale(matrix.GetScale());
+        return true;
+    }
+    m_pTempData->m_matrix = matrix;
+    return true;
+}
+
+CMatrix CLuaPhysicsRigidBody::GetMatrix() const
+{
+    if (IsReady())
+    {
+        CMatrix matrix;
+        matrix.SetPosition(GetPosition());
+        matrix.SetRotation(GetRotation() / (180/PI));
+        matrix.SetScale(GetScale());
+
+        return matrix;
+    }
+    return m_pTempData->m_matrix;
+}
+
 void CLuaPhysicsRigidBody::SetFilterMask(int mask)
 {
     std::lock_guard guard(m_lock);

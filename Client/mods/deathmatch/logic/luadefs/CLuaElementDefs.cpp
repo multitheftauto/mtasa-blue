@@ -327,11 +327,22 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
 {
-    CClientEntity* pEntity = NULL;
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    CClientEntity*              pEntity = nullptr;
     bool           bBadSyntax;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    {
+        argStream.ReadUserData(pRigidBody);
+    }
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+    {
+        argStream.ReadUserData(pStaticCollision);
+    }
+    else
+        argStream.ReadUserData(pEntity);
     argStream.ReadBool(bBadSyntax, true);
 
     // Verify the arguments
@@ -339,7 +350,22 @@ int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
     {
         // Grab the position
         CMatrix matrix;
-        if (CStaticFunctionDefinitions::GetElementMatrix(*pEntity, matrix))
+        bool    bHasMatrix = false;
+        if (pRigidBody)
+        {
+            matrix = pRigidBody->GetMatrix();
+            bHasMatrix = true;
+        }
+        else if (pStaticCollision)
+        {
+            matrix = pStaticCollision->GetMatrix();
+            bHasMatrix = true;
+        }
+        else
+            if (pEntity)
+                bHasMatrix = CStaticFunctionDefinitions::GetElementMatrix(*pEntity, matrix);
+
+        if (bHasMatrix)
         {
             // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
             float fData = bBadSyntax == true ? 1.0f : 0.0f;
@@ -1903,11 +1929,23 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 {
     //  setElementMatrix ( element theElement, table matrix )
-    CClientEntity* pEntity;
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    CClientEntity*              pEntity = nullptr;
+
     CMatrix        matrix;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    {
+        argStream.ReadUserData(pRigidBody);
+    }
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+    {
+        argStream.ReadUserData(pStaticCollision);
+    }
+    else
+        argStream.ReadUserData(pEntity);
 
     if (argStream.NextIsTable())
     {
@@ -1924,10 +1962,26 @@ int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetElementMatrix(*pEntity, matrix))
+        if (pRigidBody)
         {
+            pRigidBody->SetMatrix(matrix);
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+        else if (pStaticCollision)
+        {
+            pStaticCollision->SetMatrix(matrix);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+        {
+            if (pEntity)
+                if (CStaticFunctionDefinitions::SetElementMatrix(*pEntity, matrix))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
         }
     }
     else
