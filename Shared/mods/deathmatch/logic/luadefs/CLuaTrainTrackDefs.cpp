@@ -12,7 +12,7 @@
 
 void CLuaTrainTrackDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("getDefaultTrack", ArgumentParser<GetDefaultTrack>);
+    //CLuaCFunctions::AddFunction("getDefaultTrack", ArgumentParser<GetDefaultTrack>);
 }
 
 void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
