@@ -38,8 +38,12 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
 
     if (BitStream.Version() >= 0x4F)
     {
-        if (!BitStream.Read(m_usModel))
+        uint16 usModel;
+
+        if (!BitStream.Read(usModel))
             return false;
+
+        m_usModel = usModel;
     }
 
     switch (m_ucWeaponType)
@@ -126,7 +130,7 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (BitStream.Version() >= 0x4F)
     {
-        BitStream.Write(m_usModel);
+        BitStream.Write((uint16_t)m_usModel);
     }
 
     switch (m_ucWeaponType)

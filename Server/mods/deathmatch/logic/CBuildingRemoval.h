@@ -18,7 +18,7 @@ public:
 
     float          GetRadius() { return m_fRadius; }
     const CVector& GetPosition() { return m_vecPos; }
-    unsigned short GetModel() { return m_usModel; }
+    uint32 GetModel() { return m_usModel; }
     char           GetInterior() { return m_cInterior; }
 
 private:

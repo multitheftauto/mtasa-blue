@@ -17,7 +17,7 @@ class CDeathmatchVehicle : public CClientVehicle
 {
     DECLARE_CLASS(CDeathmatchVehicle, CClientVehicle)
 public:
-    CDeathmatchVehicle(CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel,
+    CDeathmatchVehicle(CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, uint32 usVehicleModel,
                        unsigned char ucVariant, unsigned char ucVariant2);
     ~CDeathmatchVehicle();
 

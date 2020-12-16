@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-CDeathmatchVehicle::CDeathmatchVehicle(CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel,
+CDeathmatchVehicle::CDeathmatchVehicle(CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, uint32 usVehicleModel,
                                        unsigned char ucVariant, unsigned char ucVariant2)
     : ClassInit(this), CClientVehicle(pManager, ID, usVehicleModel, ucVariant, ucVariant2)
 {

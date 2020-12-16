@@ -533,7 +533,7 @@ protected:
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
     CClientModelRequestManager* m_pModelRequester;
-    uint32              m_usModel;
+    uint32                      m_usModel;
     bool                        m_bHasLandingGear;
     eClientVehicleType          m_eVehicleType;
     unsigned char               m_ucMaxPassengers;

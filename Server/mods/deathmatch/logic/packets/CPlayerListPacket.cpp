@@ -167,7 +167,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (true)
         {
             // Player model ID
-            BitStream.WriteCompressed(pPlayer->GetModel());
+            BitStream.WriteCompressed((uint16)pPlayer->GetModel());
 
             // Team id
             CTeam* pTeam = pPlayer->GetTeam();

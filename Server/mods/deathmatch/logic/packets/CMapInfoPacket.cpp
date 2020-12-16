@@ -331,8 +331,8 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         CBuildingRemoval* pBuildingRemoval = (*iter).second;
         BitStream.WriteBit(true);
 
-        uint16 usModelId = pBuildingRemoval->GetModel();
-        BitStream.Write(usModelId);
+        uint32 usModelId = pBuildingRemoval->GetModel();
+        BitStream.Write((uint16)usModelId);
 
         BitStream.Write(pBuildingRemoval->GetRadius());
         BitStream.Write(pBuildingRemoval->GetPosition().fX);

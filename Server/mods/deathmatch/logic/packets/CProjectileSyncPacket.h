@@ -34,5 +34,5 @@ public:
     CVector        m_vecTarget;
     CVector        m_vecRotation;
     CVector        m_vecMoveSpeed;
-    unsigned short m_usModel;
+    uint32         m_usModel;
 };

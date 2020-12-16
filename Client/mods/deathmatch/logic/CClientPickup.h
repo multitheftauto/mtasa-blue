@@ -127,7 +127,7 @@ private:
 
     CClientPickupManager* m_pPickupManager;
 
-    unsigned short m_usModel;
+    uint32 m_usModel;
     CPickup*       m_pPickup;
     CObject*       m_pObject;
     CVector        m_vecPosition;

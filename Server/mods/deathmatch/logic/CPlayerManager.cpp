@@ -320,7 +320,7 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
     DoBroadcast(Packet, groupMap);
 }
 
-bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
+bool CPlayerManager::IsValidPlayerModel(uint32 usPlayerModel)
 {
     return (usPlayerModel == 0 || usPlayerModel == 1 || usPlayerModel == 2 || usPlayerModel == 7 ||
             (usPlayerModel >= 9 && usPlayerModel != 208 && usPlayerModel != 149 && usPlayerModel != 119 && usPlayerModel != 86 && usPlayerModel != 74 &&

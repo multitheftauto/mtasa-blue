@@ -2848,7 +2848,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             } failReason = FAIL_INVALID;
 
                             // Is this vehicle enterable? (not a trailer)
-                            unsigned short usVehicleModel = pVehicle->GetModel();
+                            uint32 usVehicleModel = pVehicle->GetModel();
                             if (!CVehicleManager::IsTrailer(usVehicleModel))
                             {
                                 // He musn't already be doing something

@@ -1449,7 +1449,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, uint32 u
         {
             // Grab the model
             CClientPed&          Ped = static_cast<CClientPed&>(Entity);
-            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
+            const uint32 usCurrentModel = static_cast<ushort>(Ped.GetModel());
 
             if (usCurrentModel == usModel)
                 return false;
@@ -1466,7 +1466,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, uint32 u
         case CCLIENTVEHICLE:
         {
             CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
-            const unsigned short usCurrentModel = Vehicle.GetModel();
+            const uint32    usCurrentModel = Vehicle.GetModel();
 
             if (usCurrentModel == usModel)
                 return false;
@@ -1486,7 +1486,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, uint32 u
         case CCLIENTWEAPON:
         {
             CClientObject&       Object = static_cast<CClientObject&>(Entity);
-            const unsigned short usCurrentModel = Object.GetModel();
+            const uint32   usCurrentModel = Object.GetModel();
 
             if (usCurrentModel == usModel)
                 return false;
@@ -1505,7 +1505,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, uint32 u
         case CCLIENTPROJECTILE:
         {
             CClientProjectile&   Projectile = static_cast<CClientProjectile&>(Entity);
-            const unsigned short usCurrentModel = Projectile.GetModel();
+            const uint32       usCurrentModel = Projectile.GetModel();
 
             if (usCurrentModel == usModel)
                 return false;
