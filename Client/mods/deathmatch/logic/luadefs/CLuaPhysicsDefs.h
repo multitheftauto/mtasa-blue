@@ -111,4 +111,5 @@ public:
         CClientPhysics* pPhysics, CVector min, CVector max, std::optional<short> collisionGroup, std::optional<int> collisionMask);
 
     static std::tuple<CVector, CVector> PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float time, std::optional<bool> ignoreGravity);
+    static bool                         PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody);
 };

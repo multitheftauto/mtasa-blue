@@ -83,6 +83,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
         {"physicsOverlapBox", ArgumentParser<PhysicsOverlapBox>},
         {"physicsPredictTransform", ArgumentParser<PhysicsPredictTransform>},
+        {"physicsClearForces", ArgumentParser<PhysicsClearForces>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1526,6 +1527,12 @@ std::string CLuaPhysicsDefs::PhysicsGetElementType(CLuaPhysicsElement* pPhysicsE
 
 bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
 {
+    return true;
+}
+
+bool CLuaPhysicsDefs::PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody)
+{
+    pRigidBody->ClearForces();
     return true;
 }
 

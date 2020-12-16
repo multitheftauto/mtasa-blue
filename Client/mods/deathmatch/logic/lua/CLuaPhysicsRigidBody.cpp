@@ -299,6 +299,8 @@ void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce)
     });
 
     CommitChange(change);
+
+    NeedsActivation();
 }
 
 void CLuaPhysicsRigidBody::ApplyDamping(float fDamping) const
@@ -570,6 +572,19 @@ btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const
         m_pRigidBodyProxy->predictIntegratedTransform(time, predictedTransform);
     }
     return predictedTransform;
+}
+
+void CLuaPhysicsRigidBody::ClearForces()
+{
+    std::function<void()> change([&]() {
+        m_pRigidBodyProxy->setLinearVelocity(btVector3(0, 0, 0));
+        m_pRigidBodyProxy->setAngularVelocity(btVector3(0, 0, 0));
+        m_pRigidBodyProxy->setInterpolationAngularVelocity(btVector3(0, 0, 0));
+        m_pRigidBodyProxy->setInterpolationLinearVelocity(btVector3(0, 0, 0));
+        m_pRigidBodyProxy->clearForces();
+    });
+
+    CommitChange(change);
 }
 
 void CLuaPhysicsRigidBody::Unlink()

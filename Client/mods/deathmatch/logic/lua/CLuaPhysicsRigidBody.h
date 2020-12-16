@@ -122,6 +122,7 @@ public:
 
     void Unlink();
     btTransform& PredictTransform(float time) const;
+    void ClearForces();
     void NeedsActivation() const;
 
 private:
