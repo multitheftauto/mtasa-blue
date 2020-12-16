@@ -82,6 +82,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
         {"physicsOverlapBox", ArgumentParser<PhysicsOverlapBox>},
+        {"physicsPredictTransform", ArgumentParser<PhysicsPredictTransform>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1526,6 +1527,16 @@ std::string CLuaPhysicsDefs::PhysicsGetElementType(CLuaPhysicsElement* pPhysicsE
 bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
 {
     return true;
+}
+
+std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float step)
+{
+    btTransform& transform = pRigidBody->PredictTransform(step);
+    CVector position, rotation;
+
+    CLuaPhysicsSharedLogic::GetPosition(transform, position);
+    CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
+    return {position, rotation};
 }
 
 std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsOverlapBox(

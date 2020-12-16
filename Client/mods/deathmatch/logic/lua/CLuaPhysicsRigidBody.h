@@ -92,7 +92,7 @@ public:
     void    SetAngularVelocity(const CVector& vecVelocity);
     CVector GetAngularVelocity() const;
     void    ApplyForce(const CVector& vecFrom, const CVector& vecTo) const;
-    void    ApplyCentralForce(const CVector& vecForce) const;
+    void    ApplyCentralForce(const CVector& vecForce);
     void    ApplyCentralImpulse(const CVector& vecForce) const;
     void    ApplyDamping(float fDamping) const;
     void    ApplyImpulse(const CVector& vecFrom, const CVector& vecTo) const;
@@ -121,6 +121,7 @@ public:
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
     void Unlink();
+    btTransform& PredictTransform(float step) const;
     void NeedsActivation() const;
 
 private:

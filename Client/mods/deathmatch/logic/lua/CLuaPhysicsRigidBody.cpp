@@ -292,16 +292,13 @@ CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
     return m_pTempData->m_vecAngularVelocity;
 }
 
-void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce) const
+void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce)
 {
-    std::lock_guard guard(m_lock);
+    std::function<void()> change([&, vecForce]() {
+       m_pRigidBodyProxy->applyCentralForce(reinterpret_cast<const btVector3&>(vecForce));
+    });
 
-    if (IsReady())
-    {
-        m_pRigidBodyProxy->applyCentralForce(reinterpret_cast<const btVector3&>(vecForce));
-        return;
-    }
-    m_pTempData->m_vecApplyCentralForce = vecForce;
+    CommitChange(change);
 }
 
 void CLuaPhysicsRigidBody::ApplyDamping(float fDamping) const
@@ -563,6 +560,16 @@ void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular
     }
     fLinear = m_pTempData->m_fSleepingThresholdLinear;
     fAngular = m_pTempData->m_fSleepingThresholdAngular;
+}
+
+btTransform& CLuaPhysicsRigidBody::PredictTransform(float step) const
+{
+    btTransform predictedTransform = btTransform::getIdentity();
+    if (m_pRigidBodyProxy)
+    {
+        m_pRigidBodyProxy->predictIntegratedTransform(step, predictedTransform);
+    }
+    return predictedTransform;
 }
 
 void CLuaPhysicsRigidBody::Unlink()
