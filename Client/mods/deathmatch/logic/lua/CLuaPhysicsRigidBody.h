@@ -121,7 +121,7 @@ public:
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
     void Unlink();
-    btTransform& PredictTransform(float step) const;
+    btTransform& PredictTransform(float time) const;
     void NeedsActivation() const;
 
 private:

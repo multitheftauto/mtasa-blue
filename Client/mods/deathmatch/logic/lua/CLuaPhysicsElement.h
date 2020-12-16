@@ -34,6 +34,8 @@ public:
     void                   Ready() { m_isReady = true; }
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
+
+    // Run changes on worker thread, let you modify element before get created
     void                   CommitChange(std::function<void()> change);
 
 private:

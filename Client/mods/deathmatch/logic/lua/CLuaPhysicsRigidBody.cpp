@@ -562,12 +562,12 @@ void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular
     fAngular = m_pTempData->m_fSleepingThresholdAngular;
 }
 
-btTransform& CLuaPhysicsRigidBody::PredictTransform(float step) const
+btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const
 {
     btTransform predictedTransform = btTransform::getIdentity();
     if (m_pRigidBodyProxy)
     {
-        m_pRigidBodyProxy->predictIntegratedTransform(step, predictedTransform);
+        m_pRigidBodyProxy->predictIntegratedTransform(time, predictedTransform);
     }
     return predictedTransform;
 }

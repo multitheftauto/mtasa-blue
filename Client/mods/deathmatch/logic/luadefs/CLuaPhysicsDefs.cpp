@@ -1529,13 +1529,18 @@ bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
     return true;
 }
 
-std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float step)
+std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float time, std::optional<bool> ignoreGravity)
 {
-    btTransform& transform = pRigidBody->PredictTransform(step);
+    btTransform& transform = pRigidBody->PredictTransform(time);
     CVector position, rotation;
 
     CLuaPhysicsSharedLogic::GetPosition(transform, position);
     CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
+    if (!ignoreGravity.value_or(false))
+    {
+        CVector gravityFactor = pRigidBody->GetPhysics()->GetGravity() * time * time * 0.5;
+        position += gravityFactor;
+    }
     return {position, rotation};
 }
 
