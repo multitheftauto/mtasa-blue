@@ -2,7 +2,7 @@
 
 namespace SharedUtil
 {
-    CAsyncTaskScheduler::CAsyncTaskScheduler(std::size_t numWorkers)
+    CAsyncTaskScheduler::CAsyncTaskScheduler(std::size_t numWorkers, int sleep) : m_intSleepMs(sleep)
     {
         for (std::size_t i = 0; i < numWorkers; ++i)
         {
@@ -43,7 +43,7 @@ namespace SharedUtil
             if (m_Tasks.empty())
             {
                 m_TasksMutex.unlock();
-                std::this_thread::sleep_for(std::chrono::milliseconds(4));
+                std::this_thread::sleep_for(std::chrono::milliseconds(m_intSleepMs));
                 continue;
             }
 

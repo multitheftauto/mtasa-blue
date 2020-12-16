@@ -132,7 +132,6 @@ public:
     std::shared_ptr<CLuaPhysicsShape> GetSharedShape(CLuaPhysicsShape* pShape) const;
     std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const;
 
-    void CleanOverlappingPairCache(CLuaPhysicsRigidBody* pRigidBody) const;
     void UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const;
 
     std::atomic<bool> isDuringSimulation = false;
@@ -165,13 +164,13 @@ private:
     std::mutex         lock;
     mutable std::mutex dynamicsWorldLock;
 
-    btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
-    btCollisionDispatcher*               m_pDispatcher;
-    btBroadphaseInterface*               m_pOverlappingPairCache;
-    btSequentialImpulseConstraintSolver* m_pSolver;
-    btDiscreteDynamicsWorld*             m_pDynamicsWorld;
+    std::unique_ptr<btSequentialImpulseConstraintSolver> m_pSolver;
+    std::unique_ptr<btBroadphaseInterface>               m_pOverlappingPairCache;
+    std::unique_ptr<btCollisionDispatcher>               m_pDispatcher;
+    std::unique_ptr<btDefaultCollisionConfiguration>     m_pCollisionConfiguration;
+    std::unique_ptr<btDiscreteDynamicsWorld>             m_pDynamicsWorld;
 
-    CPhysicsDebugDrawer* m_pDebugDrawer;
+    std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 
     std::atomic<int> m_iDeltaTimeMs = 0;
     bool             m_bDrawDebugNextTime = false;
@@ -206,4 +205,10 @@ private:
 
     SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_StackElementChanges;
     SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;
+
+    // Multithreaded
+    std::vector<CLuaPhysicsRigidBody*> m_vecActiveRigidBodies;
+    mutable std::mutex                 m_vecActiveRigidBodiesLock;
+
+
 };

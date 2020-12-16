@@ -43,17 +43,18 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 
     SetTypeName("physics");
 
-    m_pOverlappingPairCache = new btDbvtBroadphase();
-    m_pCollisionConfiguration = new btDefaultCollisionConfiguration();
-    m_pDispatcher = new btCollisionDispatcher(m_pCollisionConfiguration);
-    m_pSolver = new btSequentialImpulseConstraintSolver();
-    m_pDebugDrawer = new CPhysicsDebugDrawer();
+    m_pOverlappingPairCache = std::make_unique<btDbvtBroadphase>();
+    m_pCollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
+    m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
+    m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
+    m_pDebugDrawer = std::make_unique<CPhysicsDebugDrawer>();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
-        m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
-        m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
+        m_pDynamicsWorld =
+            std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
+        m_pDynamicsWorld->setGravity(reinterpret_cast<const btVector3&>(BulletPhysics::Defaults::Gravity));
+        m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
     }
 
     // Add us to Physics manager's list
@@ -64,30 +65,16 @@ CClientPhysics::~CClientPhysics()
 {
     WaitForSimulationToFinish();
     Clear();
-
-    // delete dynamics world
-    {
-        std::lock_guard guard(dynamicsWorldLock);
-        delete m_pDynamicsWorld;
-        if (isDuringSimulation)
-            DebugBreak();
-    }
-    delete m_pSolver;
-    delete m_pOverlappingPairCache;
-    delete m_pDispatcher;
-    delete m_pCollisionConfiguration;
-
 }
 
 void CClientPhysics::WaitForSimulationToFinish()
 {
     while (isDuringSimulation)
-    {
         Sleep(1);
-    }
 }
+
 void CClientPhysics::Clear()
-    {
+{
     for (const auto& pRigidBody : m_vecRigidBodies)
     {
         pRigidBody->Unlink();
@@ -153,39 +140,32 @@ void CClientPhysics::SetGravity(const CVector& vecGravity) const
 {
     std::lock_guard guard(dynamicsWorldLock);
     m_pDynamicsWorld->setGravity(reinterpret_cast<const btVector3&>(vecGravity));
-    if (isDuringSimulation)
-        DebugBreak();
 }
 
 CVector CClientPhysics::GetGravity() const
 {
     std::lock_guard guard(dynamicsWorldLock);
     return reinterpret_cast<const CVector&>(m_pDynamicsWorld->getGravity());
-    if (isDuringSimulation)
-        DebugBreak();
 }
 
 bool CClientPhysics::GetUseContinous() const
 {
     std::lock_guard guard(dynamicsWorldLock);
     return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
-    if (isDuringSimulation)
-        DebugBreak();
 }
 
 void CClientPhysics::SetUseContinous(bool bUse) const
 {
     std::lock_guard guard(dynamicsWorldLock);
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
-    if (isDuringSimulation)
-        DebugBreak();
 }
 
-std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation)
+std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition,
+                                                                                  CVector vecRotation)
 {
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_shared<CLuaPhysicsStaticCollision>(pShape);
-   /* pStaticCollision->SetPosition(vecPosition);
-    pStaticCollision->SetRotation(vecRotation);*/
+    /* pStaticCollision->SetPosition(vecPosition);
+     pStaticCollision->SetRotation(vecRotation);*/
     AddStaticCollision(pStaticCollision);
     return pStaticCollision;
 }
@@ -316,8 +296,6 @@ btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(CLuaPhys
     {
         std::lock_guard guard(dynamicsWorldLock);
         m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
-        if (isDuringSimulation)
-            DebugBreak();
     }
     return result;
 }
@@ -331,8 +309,6 @@ btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from,
     {
         std::lock_guard guard(dynamicsWorldLock);
         m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
-        if (isDuringSimulation)
-            DebugBreak();
     }
     return RayCallback;
 }
@@ -346,8 +322,6 @@ btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastAll(CVector fr
     {
         std::lock_guard guard(dynamicsWorldLock);
         m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayResult);
-        if (isDuringSimulation)
-            DebugBreak();
     }
 
     return rayResult;
@@ -480,9 +454,9 @@ void CClientPhysics::StepSimulation()
 
 void CClientPhysics::ClearOutsideWorldRigidBodies()
 {
-    CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
+    CLuaPhysicsRigidBodyManager*                       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> vecRigidBodiesToRemove;
-    CVector                            vecRigidBody;
+    CVector                                            vecRigidBody;
     for (auto iter = pRigidBodyManager->IterBegin(); iter != pRigidBodyManager->IterEnd(); ++iter)
     {
         std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = *iter;
@@ -511,7 +485,7 @@ std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetSharedRigidBody(CLuaPhy
         if (pRigidBody == (*it).get())
             return *it;
 
-    assert(1==2); // Should never happen
+    assert(1 == 2);            // Should never happen
 }
 
 std::shared_ptr<CLuaPhysicsShape> CClientPhysics::GetSharedShape(CLuaPhysicsShape* pShape) const
@@ -521,7 +495,7 @@ std::shared_ptr<CLuaPhysicsShape> CClientPhysics::GetSharedShape(CLuaPhysicsShap
         if (pShape == (*it).get())
             return *it;
 
-    assert(1==2); // Should never happen
+    assert(1 == 2);            // Should never happen
 }
 
 std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const
@@ -531,15 +505,7 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticColli
         if (pStaticCollision == (*it).get())
             return *it;
 
-    assert(1==2); // Should never happen
-}
-
-void CClientPhysics::CleanOverlappingPairCache(CLuaPhysicsRigidBody* pRigidBody) const
-{
-    std::lock_guard guard(dynamicsWorldLock);
-
-    m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                      m_pDynamicsWorld->getDispatcher());
+    assert(1 == 2);            // Should never happen
 }
 
 void CClientPhysics::UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const
@@ -589,17 +555,17 @@ void CClientPhysics::ProcessCollisions()
 
     if (m_bTriggerCollisionEvents)
     {
-        const btCollisionObject*    objectA;
-        const btCollisionObject*    objectB;
-        const btCollisionShape*     shapeA;
-        const btCollisionShape*     shapeB;
-        std::shared_ptr<CLuaPhysicsRigidBody> pRigidA;
-        std::shared_ptr<CLuaPhysicsRigidBody> pRigidB;
+        const btCollisionObject*                    objectA;
+        const btCollisionObject*                    objectB;
+        const btCollisionShape*                     shapeA;
+        const btCollisionShape*                     shapeB;
+        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidA;
+        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidB;
         std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionA;
         std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionB;
-        btVector3                   ptA;
-        btVector3                   ptB;
-        bool                        bHasContacts;
+        btVector3                                   ptA;
+        btVector3                                   ptB;
+        bool                                        bHasContacts;
 
         for (int i = 0; i < numManifolds; i++)
         {
@@ -874,8 +840,8 @@ std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::CreateRigidBody(CLuaPhysic
     return pRigidBody;
 }
 
-std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
-                                                                                bool bDisableCollisionsBetweenLinkedBodies)
+std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position,
+                                                                                                CVector anchor, bool bDisableCollisionsBetweenLinkedBodies)
 {
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
         std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies);
@@ -883,8 +849,9 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointTo
     return pConstraint;
 }
 
-std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                CVector anchorA, CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies)
+std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA,
+                                                                                                CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA,
+                                                                                                CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies)
 {
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
@@ -895,7 +862,7 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointTo
 }
 
 std::shared_ptr<CLuaPhysicsFixedConstraint> CClientPhysics::CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                  bool bDisableCollisionsBetweenLinkedBodies)
+                                                                                  bool bDisableCollisionsBetweenLinkedBodies)
 {
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
@@ -912,20 +879,13 @@ std::shared_ptr<CLuaPhysicsFixedConstraint> CClientPhysics::CreateFixedConstrain
 
 bool CClientPhysics::CanDoPulse()
 {
-    if (!m_canDoPulse) // first pulse can cause weird crash
-    {
-        m_canDoPulse = true;
-        return false;
-    }
     return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
 }
 
 void CClientPhysics::DrawDebugLines()
 {
     for (auto const& line : m_pDebugDrawer->m_vecLines)
-    {
         g_pCore->GetGraphics()->DrawLine3DQueued(line.from, line.to, m_pDebugDrawer->GetDebugLineWidth(), line.color, false);
-    }
 }
 
 struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
@@ -955,12 +915,15 @@ struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
 };
 
 void CClientPhysics::QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
-                              std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup,
-                              int collisionMask)
+                              std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {
     btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
     BroadphaseAabbCallback                   callback(collisionObjectArray, collisionGroup, collisionMask);
-    m_pDynamicsWorld->getBroadphase()->aabbTest(reinterpret_cast<const btVector3&>(min), reinterpret_cast<const btVector3&>(max), callback);
+
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld->getBroadphase()->aabbTest(reinterpret_cast<const btVector3&>(min), reinterpret_cast<const btVector3&>(max), callback);
+    }
 
     std::vector<btCollisionObject*> asd;
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
@@ -1012,7 +975,8 @@ void CClientPhysics::DoPulse()
     {
         CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesActivation.top();
         pRigidBody->Activate();
-        CleanOverlappingPairCache(pRigidBody);
+        m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
+                                                                                          m_pDynamicsWorld->getDispatcher());
         m_StackRigidBodiesActivation.pop();
     }
 
@@ -1052,19 +1016,25 @@ void CClientPhysics::DoPulse()
         m_bDrawDebugNextTime = false;
     }
 
-    btAlignedObjectArray<btRigidBody*>& nonStaticrigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
-    int                                a = 0;
-    for (int i = 0; i < nonStaticrigidBodies.size(); i++)
     {
-        if (nonStaticrigidBodies[i]->isActive())
+        std::lock_guard guardVecActiveRigidBodies(m_vecActiveRigidBodiesLock);
+        std::lock_guard guardDynamicsWorld(dynamicsWorldLock);
+        m_vecActiveRigidBodies.clear();
+
+        btAlignedObjectArray<btRigidBody*>& nonStaticRigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
+        int                                 a = 0;
+        for (int i = 0; i < nonStaticRigidBodies.size(); i++)
         {
-            CLuaPhysicsRigidBody* pRigidBody = (CLuaPhysicsRigidBody*)nonStaticrigidBodies[i]->getUserPointer();
-            pRigidBody->HasMoved();
+            if (nonStaticRigidBodies[i]->isActive())
+            {
+                CLuaPhysicsRigidBody* pRigidBody = (CLuaPhysicsRigidBody*)nonStaticRigidBodies[i]->getUserPointer();
+                pRigidBody->HasMoved();
+                m_vecActiveRigidBodies.push_back(pRigidBody);
+            }
         }
     }
-    OutputDebugString(SString("Moving elements: %i", a).c_str());
 
     isDuringSimulation = false;
-    //ClearOutsideWorldRigidBodies();
-    //ProcessCollisions();
+    // ClearOutsideWorldRigidBodies();
+    // ProcessCollisions();
 }

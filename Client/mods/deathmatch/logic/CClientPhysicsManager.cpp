@@ -19,7 +19,7 @@ CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
     // Init
     m_pManager = pManager;
 
-    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
+    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2, 1);
 }
 
 CClientPhysicsManager::~CClientPhysicsManager()

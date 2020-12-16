@@ -3676,13 +3676,14 @@ void CClientGame::PostWorldProcessHandler()
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
 
+    m_pManager->GetPhysicsManager()->WaitForSimulationsToFinish();
+    m_pManager->GetPhysicsManager()->DrawDebug();
+
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
 
-    m_pManager->GetPhysicsManager()->WaitForSimulationsToFinish();
-    m_pManager->GetPhysicsManager()->DrawDebug();
 }
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
