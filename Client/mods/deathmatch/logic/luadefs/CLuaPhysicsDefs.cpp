@@ -77,7 +77,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyDamping", ArgumentParser<PhysicsApplyDamping>},
         {"physicsLineCast", ArgumentParser<PhysicsLineCast>},
         {"physicsRayCast", ArgumentParser<PhysicsRayCast>},
-        {"PhysicsRayCastAll", ArgumentParser<PhysicsRayCastAll>},
+        {"physicsRayCastAll", ArgumentParser<PhysicsRayCastAll>},
         {"physicsShapeCast", ArgumentParser<PhysicsShapeCast>},
         {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
