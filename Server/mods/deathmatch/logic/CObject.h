@@ -50,7 +50,7 @@ public:
     unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
-    unsigned short GetModel() { return m_usModel; }
+    uint32 GetModel() { return m_usModel; }
     void           SetModel(uint32 usModel) { m_usModel = usModel; }
 
     const CVector& GetScale() { return m_vecScale; }
@@ -85,7 +85,7 @@ private:
     CObjectManager* m_pObjectManager;
     CVector         m_vecRotation;
     unsigned char   m_ucAlpha;
-    unsigned short  m_usModel;
+    uint32          m_usModel;
     CVector         m_vecScale;
     bool            m_bIsFrozen;
     float           m_fHealth;

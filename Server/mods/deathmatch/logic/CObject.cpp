@@ -20,7 +20,7 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
     SetTypeName("object");
 
     m_pObjectManager = pObjectManager;
-    m_usModel = 0xFFFF;
+    m_usModel = 0xFFFFFFFF;
     m_pMoveAnimation = NULL;
     m_ucAlpha = 255;
     m_vecScale = CVector(1.0f, 1.0f, 1.0f);
