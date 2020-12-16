@@ -69,18 +69,13 @@ void CLuaPhysicsRigidBody::HasMoved()
 
 void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
 {
-    {
-        std::lock_guard guard(m_transformLock);
-        m_vecPosition = vecPosition;
-    }
-
     std::function<void()> change([&, vecPosition]() {
-        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        transform.setOrigin(reinterpret_cast<const btVector3&>(vecPosition));
-        m_pRigidBodyProxy->setWorldTransform(transform);
+        btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
+        CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        m_pRigidBodyProxy->proceedToTransform(transform);
     });
 
-    ApplyOrEnqueueChange(change);
+    CommitChange(change);
 
     NeedsActivation();
 }

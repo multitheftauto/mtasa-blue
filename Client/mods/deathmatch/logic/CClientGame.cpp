@@ -1138,6 +1138,8 @@ void CClientGame::DoPulses()
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent("onClientRender", Arguments, false);
 
+        m_pManager->GetPhysicsManager()->DoPulse();
+
         // Disallow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
 
@@ -3674,14 +3676,13 @@ void CClientGame::PostWorldProcessHandler()
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
 
-    m_pManager->GetPhysicsManager()->WaitForSimulationsToFinish();
-
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
 
-    m_pManager->GetPhysicsManager()->DoPulse();
+    m_pManager->GetPhysicsManager()->WaitForSimulationsToFinish();
+    m_pManager->GetPhysicsManager()->DrawDebug();
 }
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()

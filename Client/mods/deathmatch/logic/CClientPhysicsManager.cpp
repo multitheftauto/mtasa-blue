@@ -73,6 +73,18 @@ void CClientPhysicsManager::WaitForSimulationsToFinish(bool bForceWait)
         m_pAsyncTaskScheduler->CollectResults();
 }
 
+void CClientPhysicsManager::DrawDebug()
+{
+    list<CClientPhysics*>::const_iterator iter = IterBegin();
+    for (; iter != IterEnd(); iter++)
+    {
+        if ((*iter)->CanDoPulse())
+        {
+            (*iter)->DrawDebugLines();
+        }
+    }
+}
+
 void CClientPhysicsManager::DoPulse()
 {
     list<CClientPhysics*>::const_iterator iter = IterBegin();
@@ -82,7 +94,6 @@ void CClientPhysicsManager::DoPulse()
         if ((*iter)->CanDoPulse())
         {
             vecPhysics.push_back(*iter);
-            (*iter)->DrawDebugLines();
         }
     }
 

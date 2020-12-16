@@ -55,17 +55,12 @@ void CLuaPhysicsElement::ApplyChanges()
     m_bHasEnqueuedChanges = false;
 }
 
-void CLuaPhysicsElement::ApplyOrEnqueueChange(std::function<void()> change)
+void CLuaPhysicsElement::CommitChange(std::function<void()> change)
 {
-    if (IsSafeToAccess())
-        change();
-    else
+    if (!m_bHasEnqueuedChanges)
     {
-        if (!m_bHasEnqueuedChanges)
-        {
-            m_bHasEnqueuedChanges = true;
-            GetPhysics()->AddToChangesStack(this);
-        }
-        m_stackChanges.push(change);
+        m_bHasEnqueuedChanges = true;
+        GetPhysics()->AddToChangesStack(this);
     }
+    m_stackChanges.push(change);
 }

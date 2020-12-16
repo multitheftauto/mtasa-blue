@@ -34,7 +34,7 @@ public:
     void                   Ready() { m_isReady = true; }
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
-    void                   ApplyOrEnqueueChange(std::function<void()> change);
+    void                   CommitChange(std::function<void()> change);
 
 private:
     void RemoveScriptID();

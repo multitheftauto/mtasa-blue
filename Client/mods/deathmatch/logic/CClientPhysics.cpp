@@ -1007,14 +1007,6 @@ void CClientPhysics::DoPulse()
 
         m_InitializeRigidBodiesQueue.pop();
     }
-    
-    while (!m_StackElementChanges.empty())
-    {
-        CLuaPhysicsElement* pElement = m_StackElementChanges.top();
-        pElement->ApplyChanges();
-
-        m_StackElementChanges.pop();
-    }
 
     while (!m_StackRigidBodiesActivation.empty())
     {
@@ -1022,6 +1014,14 @@ void CClientPhysics::DoPulse()
         pRigidBody->Activate();
         CleanOverlappingPairCache(pRigidBody);
         m_StackRigidBodiesActivation.pop();
+    }
+
+    while (!m_StackElementChanges.empty())
+    {
+        CLuaPhysicsElement* pElement = m_StackElementChanges.top();
+        pElement->ApplyChanges();
+
+        m_StackElementChanges.pop();
     }
 
     CTickCount tickCountNow = CTickCount::Now();
