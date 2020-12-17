@@ -1026,7 +1026,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 BitStream.Write(&vertex);
                             }
 
-                            if (BitStream.Version() >= 0x1DA)
+                            if (BitStream.Can(eBitStreamVersion::SetPolygonHeight))
                             {
                                 float fFloor, fCeil;
                                 pPolygon->GetHeight(fFloor, fCeil);
