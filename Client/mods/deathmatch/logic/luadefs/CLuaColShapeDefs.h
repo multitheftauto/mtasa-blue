@@ -11,7 +11,6 @@
 
 #pragma once
 #include "CLuaDefs.h"
-#include "lua/CLuaFunctionParser.h"
 
 class CLuaColShapeDefs : public CLuaDefs
 {

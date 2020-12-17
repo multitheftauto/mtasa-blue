@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaColShapeDefs::LoadFunctions()
 {
@@ -841,5 +842,11 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
     if (fFloor > fCeil)
         std::swap(fFloor, fCeil);
 
-    return CStaticFunctionDefinitions::SetColPolygonHeight(pColPolygon, fFloor, fCeil);
+    if (pColPolygon->SetHeight(fFloor, fCeil))
+    {
+        CStaticFunctionDefinitions::RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
 }

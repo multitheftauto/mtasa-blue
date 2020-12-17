@@ -83,11 +83,14 @@ void CColShapeRPCs::RemoveColPolygonPoint(CClientEntity* pSource, NetBitStreamIn
 
 void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    float         fFloor;
-    float         fCeil;
+    float fFloor;
+    float fCeil;
     if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
     {
-        CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
-        CStaticFunctionDefinitions::SetColPolygonHeight(pColShape, fFloor, fCeil);
+        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
+        if (pColPolygon->SetHeight(fFloor, fCeil))
+        {
+            CStaticFunctionDefinitions::RefreshColShapeColliders(pColPolygon);
+        }
     }
 }

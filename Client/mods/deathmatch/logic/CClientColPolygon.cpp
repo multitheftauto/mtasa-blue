@@ -198,7 +198,7 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
         {
             float fZ = vecPosition.fZ - fDrawRadius + fDrawRadius * 2.0f * (s / (float)(uiNumSlices - 1));
             fZ += 4;            // Extra bit so a slice is on the same Z coord as the camera
-            if (m_fFloor < fZ && fZ < m_fCeil)
+            if (m_fFloor <= fZ && fZ <= m_fCeil)
             {
                 for (uint i = 0; i < uiNumPoints; i++)
                 {

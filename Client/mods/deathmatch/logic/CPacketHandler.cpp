@@ -3964,7 +3964,7 @@ retry:
                                 pPolygon->AddPoint(vertex.data.vecPosition);
                             }
                             pEntity = pShape = pPolygon;
-                            if (bitStream.Version() >= 0x1DA)
+                            if (bitStream.Can(eBitStreamVersion::SetPolygonHeight))
                             {
                                 float fFloor, fCeil;
                                 bitStream.Read(fFloor);
