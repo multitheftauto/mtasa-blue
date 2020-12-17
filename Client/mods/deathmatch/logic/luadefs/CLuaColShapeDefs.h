@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <variant>
 
 class CLuaColShapeDefs : public CLuaDefs
 {
