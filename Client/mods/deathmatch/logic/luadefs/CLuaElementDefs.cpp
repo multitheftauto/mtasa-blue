@@ -957,7 +957,7 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
 CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
     std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
 {
-    const auto typeHash = type.has_value() ?
+    const auto typeHash = (type.has_value() && !type.value().empty()) ?
         CClientEntity::GetTypeHashFromString(type.value()) : 0;
         
     CClientEntityResult result;

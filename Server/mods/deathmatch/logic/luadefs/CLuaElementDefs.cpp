@@ -1016,9 +1016,9 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
 CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
     std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
 {
-    const auto typeHash = type.has_value() ?
+    const auto typeHash = (type.has_value() && !type.value().empty()) ?
         CElement::GetTypeHashFromString(type.value()) : 0;
-
+        
     CElementResult result;
     GetSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 
