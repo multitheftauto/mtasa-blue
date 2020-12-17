@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsStaticCollision.h
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Static collision class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
