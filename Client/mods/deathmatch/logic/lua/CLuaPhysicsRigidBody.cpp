@@ -587,6 +587,26 @@ void CLuaPhysicsRigidBody::ClearForces()
     CommitChange(change);
 }
 
+void CLuaPhysicsRigidBody::ClearCollisionReport()
+{
+    m_vecCollisionReports.clear();
+}
+
+void CLuaPhysicsRigidBody::ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport)
+{
+    m_vecCollisionReports.push_back(std::move(pCollisionReport));
+}
+
+std::vector<SPhysicsCollisionReport*> CLuaPhysicsRigidBody::GetCollisionReports()
+{
+    std::vector<SPhysicsCollisionReport*> vecCollisionReports;
+    for (auto const& pCollisionReport : m_vecCollisionReports)
+    {
+        vecCollisionReports.push_back(pCollisionReport.get());
+    }
+    return vecCollisionReports;
+}
+
 void CLuaPhysicsRigidBody::Unlink()
 {
     if (m_pShape != nullptr && IsReady())

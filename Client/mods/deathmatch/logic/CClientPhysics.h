@@ -144,7 +144,10 @@ public:
     void AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody);
     void AddToChangesStack(const CLuaPhysicsElement* pElement);
 
-private:
+    std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
+    std::shared_ptr<CLuaPhysicsRigidBody>                    GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
+
+        private:
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
@@ -210,5 +213,6 @@ private:
     std::vector<CLuaPhysicsRigidBody*> m_vecActiveRigidBodies;
     mutable std::mutex                 m_vecActiveRigidBodiesLock;
 
+    std::vector<std::shared_ptr<CLuaPhysicsElement>> m_vecLastContact;
 
 };

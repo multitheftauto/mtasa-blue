@@ -10,12 +10,30 @@
  *****************************************************************************/
 
 class CLuaPhysicsElement;
+struct SPhysicsCollisionContact;
+struct SPhysicsCollisionReport;
 
 #pragma once
 
 // Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
+
+struct SPhysicsCollisionContact
+{
+    CVector vecPositionWorldOn;
+    CVector vecLocalPoint;
+    CVector vecLateralFrictionDir;
+    int     contactTriangle;
+    float   appliedImpulse;
+    float   appliedImpulseLiteral;
+};
+
+struct SPhysicsCollisionReport
+{
+    std::shared_ptr<CLuaPhysicsElement>                    pElement;
+    std::vector<std::shared_ptr<SPhysicsCollisionContact>> m_vecContacts;
+};
 
 class CLuaPhysicsElement
 {
@@ -37,6 +55,9 @@ public:
 
     // Run changes on worker thread, let you modify element before get created
     void                   CommitChange(std::function<void()> change);
+
+    virtual void ClearCollisionReport(){}
+    virtual void ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport){}
 
 private:
     void RemoveScriptID();

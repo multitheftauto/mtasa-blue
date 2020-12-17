@@ -446,10 +446,8 @@ void CClientPhysics::StepSimulation()
     if (!m_bSimulationEnabled)
         return;
 
-    {
-        std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
-    }
+    std::lock_guard guard(dynamicsWorldLock);
+    m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
 }
 
 void CClientPhysics::ClearOutsideWorldRigidBodies()
@@ -515,6 +513,27 @@ void CClientPhysics::UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const
     m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
 }
 
+
+std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject)
+{
+    for (std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision : GetStaticCollisions())
+    {
+        if (pStaticCollision->GetCollisionObject() == pCollisionObject)
+            return pStaticCollision;
+    }
+
+    return nullptr;
+}
+
+std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject)
+{
+    for (auto& pRigidBody : GetRigidBodies())
+        if (pRigidBody->GetBtRigidBody() == pCollisionObject)
+            return pRigidBody;
+
+    return nullptr;
+}
+
 void CClientPhysics::ProcessCollisions()
 {
     int numManifolds;
@@ -522,232 +541,114 @@ void CClientPhysics::ProcessCollisions()
         std::lock_guard guard(dynamicsWorldLock);
         numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
     }
-    CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
-    CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = m_pLuaMain->GetPhysicsStaticCollisionManager();
-    CLuaPhysicsConstraintManager*      pConstraintManager = m_pLuaMain->GetPhysicsConstraintManager();
 
-    if (!pRigidBodyManager)
-        return;
+    for (const auto& element : m_vecLastContact)
+        element->ClearCollisionReport();
 
-    if (!pStaticCollisionManager)
-        return;
+    m_vecLastContact.clear();
 
-    if (!pConstraintManager)
-        return;
+    //if (m_bTriggerConstraintEvents)
+    //{
+    //    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>::const_iterator iter = pConstraintManager->IterBegin();
+    //    for (; iter != pConstraintManager->IterEnd(); iter++)
+    //    {
+    //        if ((*iter)->BreakingStatusHasChanged())
+    //        {
+    //            /* if ((*iter)->IsBroken())
+    //             {*/
+    //            CLuaArguments Arguments;
+    //            Arguments.PushPhysicsConstraint((*iter).get());
 
-    if (m_bTriggerConstraintEvents)
+    //            CallEvent("onPhysicsConstraintBreak", Arguments, true);
+    //            //}
+    //        }
+    //    }
+    //}
+
+    btCollisionObject* objectA = nullptr;
+    btCollisionObject* objectB = nullptr;
+    btCollisionShape*  shapeA = nullptr;
+    btCollisionShape*  shapeB = nullptr;
+
+    for (int i = 0; i < numManifolds; i++)
     {
-        std::vector<std::shared_ptr<CLuaPhysicsConstraint>>::const_iterator iter = pConstraintManager->IterBegin();
-        for (; iter != pConstraintManager->IterEnd(); iter++)
-        {
-            if ((*iter)->BreakingStatusHasChanged())
-            {
-                /* if ((*iter)->IsBroken())
-                 {*/
-                CLuaArguments Arguments;
-                Arguments.PushPhysicsConstraint((*iter).get());
+        btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+        if (contactManifold == nullptr)
+            continue;
 
-                CallEvent("onPhysicsConstraintBreak", Arguments, true);
-                //}
-            }
+        int numContacts = contactManifold->getNumContacts();
+        if (numContacts == 0)
+            continue;
+
+        objectA = (btCollisionObject*)(contactManifold->getBody0());
+        objectB = (btCollisionObject*)(contactManifold->getBody1());
+        shapeA = objectA->getCollisionShape();
+        shapeB = objectB->getCollisionShape();
+
+        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidRigidA = GetRigidBodyFromCollisionShape(objectA);
+        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidRigidB = GetRigidBodyFromCollisionShape(objectB);
+        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionA = GetStaticCollisionFromCollisionShape(objectA);
+        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionB = GetStaticCollisionFromCollisionShape(objectB);
+
+        std::unique_ptr<SPhysicsCollisionReport> collisionReportA = std::make_unique<SPhysicsCollisionReport>();
+        std::unique_ptr<SPhysicsCollisionReport> collisionReportB = std::make_unique<SPhysicsCollisionReport>();
+
+        if (pRigidRigidA)
+            collisionReportA->pElement = pRigidRigidA;
+        else
+            collisionReportA->pElement = pStaticCollisionA;
+
+        if (pRigidRigidB)
+            collisionReportB->pElement = pRigidRigidB;
+        else
+            collisionReportB->pElement = pStaticCollisionB;
+
+        for (int j = 0; j < numContacts; j++)
+        {
+            btManifoldPoint& manifoldPoint = contactManifold->getContactPoint(j);
+            //if (pt.getAppliedImpulse() < m_fImpulseThreshold)            // if hit is strong enough
+            //{
+            //}
+            std::shared_ptr<SPhysicsCollisionContact> contactA = std::make_shared<SPhysicsCollisionContact>();
+            std::shared_ptr<SPhysicsCollisionContact> contactB = std::make_shared<SPhysicsCollisionContact>();
+            contactA->vecPositionWorldOn = reinterpret_cast<const CVector&>(manifoldPoint.getPositionWorldOnA());
+            contactB->vecPositionWorldOn = reinterpret_cast<const CVector&>(manifoldPoint.getPositionWorldOnB());
+            contactA->vecLocalPoint = reinterpret_cast<const CVector&>(manifoldPoint.m_localPointA);
+            contactB->vecLocalPoint = reinterpret_cast<const CVector&>(manifoldPoint.m_localPointB);
+            contactA->vecLateralFrictionDir = reinterpret_cast<const CVector&>(manifoldPoint.m_lateralFrictionDir1);
+            contactB->vecLateralFrictionDir = reinterpret_cast<const CVector&>(manifoldPoint.m_lateralFrictionDir2);
+            contactA->contactTriangle = manifoldPoint.m_partId0;
+            contactB->contactTriangle = manifoldPoint.m_partId1;
+            contactA->appliedImpulse = manifoldPoint.getAppliedImpulse();
+            contactB->appliedImpulse = manifoldPoint.getAppliedImpulse();
+            contactA->appliedImpulseLiteral = manifoldPoint.m_appliedImpulseLateral1;
+            contactB->appliedImpulseLiteral = manifoldPoint.m_appliedImpulseLateral2;
+            collisionReportA->m_vecContacts.push_back(std::move(contactA));
+            collisionReportB->m_vecContacts.push_back(std::move(contactB));
         }
-    }
 
-    if (m_bTriggerCollisionEvents)
-    {
-        const btCollisionObject*                    objectA;
-        const btCollisionObject*                    objectB;
-        const btCollisionShape*                     shapeA;
-        const btCollisionShape*                     shapeB;
-        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidA;
-        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidB;
-        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionA;
-        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionB;
-        btVector3                                   ptA;
-        btVector3                                   ptB;
-        bool                                        bHasContacts;
-
-        for (int i = 0; i < numManifolds; i++)
+        if (pRigidRigidA)
         {
-            btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-            if (contactManifold == nullptr)
-                continue;
+            m_vecLastContact.push_back(pRigidRigidA);
+            pRigidRigidA->ReportCollision(std::move(collisionReportB));
+        }
 
-            int numContacts = contactManifold->getNumContacts();
-            if (numContacts == 0)
-                continue;
+        if (pRigidRigidB)
+        {
+            m_vecLastContact.push_back(pRigidRigidB);
+            pRigidRigidB->ReportCollision(std::move(collisionReportA));
+        }
 
-            objectA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
-            objectB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
-            shapeA = objectA->getCollisionShape();
-            shapeB = objectA->getCollisionShape();
-            pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeA);
+        if (pStaticCollisionA)
+        {
+            m_vecLastContact.push_back(pStaticCollisionA);
+            pStaticCollisionA->ReportCollision(std::move(collisionReportB));
+        }
 
-            if (pRigidA)
-            {
-                if (pRigidA->IsSleeping())
-                    continue;
-            }
-            else
-            {
-                pStaticCollisionA = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeA);
-                if (pStaticCollisionA == nullptr)
-                    continue;
-            }
-
-            pRigidB = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeB);
-
-            if (pRigidB)
-            {
-                if (pRigidB->IsSleeping())
-                    continue;
-            }
-            else
-            {
-                pStaticCollisionB = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeB);
-                if (pStaticCollisionB == nullptr)
-                    continue;
-            }
-
-            CLuaArguments Arguments;
-            CLuaArguments ContactA;
-            CLuaArguments ContactB;
-            CLuaArguments ContactShared;
-
-            bHasContacts = false;
-
-            for (int j = 0; j < numContacts; j++)
-            {
-                btManifoldPoint& pt = contactManifold->getContactPoint(j);
-                if (pt.getAppliedImpulse() < m_fImpulseThreshold)            // if hit is strong enough
-                {
-                    ptA = pt.getPositionWorldOnA();
-                    ptB = pt.getPositionWorldOnB();
-
-                    CLuaArguments singleContactA;
-                    CLuaArguments singleContactB;
-                    CLuaArguments sharedContactManifolds;
-
-                    CLuaArguments worldContactPointA;
-                    worldContactPointA.PushNumber(1);
-                    worldContactPointA.PushNumber(ptA.getX());
-                    worldContactPointA.PushNumber(2);
-                    worldContactPointA.PushNumber(ptA.getY());
-                    worldContactPointA.PushNumber(3);
-                    worldContactPointA.PushNumber(ptA.getZ());
-                    singleContactA.PushNumber(1);
-                    singleContactA.PushTable(&worldContactPointA);
-
-                    CLuaArguments worldContactPointB;
-                    worldContactPointB.PushNumber(1);
-                    worldContactPointB.PushNumber(ptB.getX());
-                    worldContactPointB.PushNumber(2);
-                    worldContactPointB.PushNumber(ptB.getY());
-                    worldContactPointB.PushNumber(3);
-                    worldContactPointB.PushNumber(ptB.getZ());
-                    singleContactB.PushNumber(1);
-                    singleContactB.PushTable(&worldContactPointB);
-
-                    ptA = pt.m_localPointA;
-                    ptB = pt.m_localPointB;
-
-                    CLuaArguments localContactPointA;
-                    localContactPointA.PushNumber(1);
-                    localContactPointA.PushNumber(ptA.getX());
-                    localContactPointA.PushNumber(2);
-                    localContactPointA.PushNumber(ptA.getY());
-                    localContactPointA.PushNumber(3);
-                    localContactPointA.PushNumber(ptA.getZ());
-                    singleContactA.PushNumber(2);
-                    singleContactA.PushTable(&localContactPointA);
-
-                    CLuaArguments localContactPointB;
-                    localContactPointB.PushNumber(1);
-                    localContactPointB.PushNumber(ptB.getX());
-                    localContactPointB.PushNumber(2);
-                    localContactPointB.PushNumber(ptB.getY());
-                    localContactPointB.PushNumber(3);
-                    localContactPointB.PushNumber(ptB.getZ());
-                    singleContactB.PushNumber(2);
-                    singleContactB.PushTable(&localContactPointB);
-
-                    ptA = pt.m_lateralFrictionDir1;
-                    ptB = pt.m_lateralFrictionDir2;
-
-                    CLuaArguments contactDirA;
-                    contactDirA.PushNumber(1);
-                    contactDirA.PushNumber(ptA.getX());
-                    contactDirA.PushNumber(2);
-                    contactDirA.PushNumber(ptA.getY());
-                    contactDirA.PushNumber(3);
-                    contactDirA.PushNumber(ptA.getZ());
-                    singleContactA.PushNumber(3);
-                    singleContactA.PushTable(&contactDirA);
-
-                    CLuaArguments contactDirB;
-                    contactDirB.PushNumber(1);
-                    contactDirB.PushNumber(ptB.getX());
-                    contactDirB.PushNumber(2);
-                    contactDirB.PushNumber(ptB.getY());
-                    contactDirB.PushNumber(3);
-                    contactDirB.PushNumber(ptB.getZ());
-                    singleContactB.PushNumber(3);
-                    singleContactB.PushTable(&contactDirB);
-
-                    ptA = pt.m_normalWorldOnB;
-                    CLuaArguments contactWorldNormal;
-
-                    contactWorldNormal.PushNumber(1);
-                    contactWorldNormal.PushNumber(ptB.getX());
-                    contactWorldNormal.PushNumber(2);
-                    contactWorldNormal.PushNumber(ptB.getY());
-                    contactWorldNormal.PushNumber(3);
-                    contactWorldNormal.PushNumber(ptB.getZ());
-
-                    sharedContactManifolds.PushNumber(1);
-                    sharedContactManifolds.PushTable(&contactWorldNormal);
-
-                    ContactA.PushTable(&singleContactA);
-                    ContactB.PushTable(&singleContactB);
-                    ContactShared.PushTable(&sharedContactManifolds);
-                    bHasContacts = true;
-                }
-            }
-
-            if (bHasContacts)
-            {
-                if (pRigidA)
-                {
-                    Arguments.PushPhysicsRigidBody(pRigidA.get());
-                }
-                else if (pStaticCollisionA)
-                {
-                    Arguments.PushPhysicsStaticCollision(pStaticCollisionA.get());
-                }
-                else
-                {
-                    Arguments.PushBoolean(false);
-                }
-
-                if (pRigidB)
-                {
-                    Arguments.PushPhysicsRigidBody(pRigidB.get());
-                }
-                else if (pStaticCollisionB)
-                {
-                    Arguments.PushPhysicsStaticCollision(pStaticCollisionB.get());
-                }
-                else
-                {
-                    Arguments.PushBoolean(false);
-                }
-
-                Arguments.PushArguments(ContactA);
-                Arguments.PushArguments(ContactB);
-                Arguments.PushArguments(ContactShared);
-
-                CallEvent("onPhysicsCollision", Arguments, true);
-            }
+        if (pStaticCollisionB)
+        {
+            m_vecLastContact.push_back(pStaticCollisionB);
+            pStaticCollisionB->ReportCollision(std::move(collisionReportA));
         }
     }
 }
@@ -884,8 +785,12 @@ bool CClientPhysics::CanDoPulse()
 
 void CClientPhysics::DrawDebugLines()
 {
-    for (auto const& line : m_pDebugDrawer->m_vecLines)
-        g_pCore->GetGraphics()->DrawLine3DQueued(line.from, line.to, m_pDebugDrawer->GetDebugLineWidth(), line.color, false);
+    if (m_bDrawDebugNextTime)
+    {
+        for (auto const& line : m_pDebugDrawer->m_vecLines)
+            g_pCore->GetGraphics()->DrawLine3DQueued(line.from, line.to, m_pDebugDrawer->GetDebugLineWidth(), line.color, false);
+        m_bDrawDebugNextTime = false;
+    }
 }
 
 struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
@@ -1013,7 +918,6 @@ void CClientPhysics::DoPulse()
             std::lock_guard guard(dynamicsWorldLock);
             m_pDynamicsWorld->debugDrawWorld();
         }
-        m_bDrawDebugNextTime = false;
     }
 
     {
@@ -1034,7 +938,8 @@ void CClientPhysics::DoPulse()
         }
     }
 
+    ProcessCollisions();
+
     isDuringSimulation = false;
     // ClearOutsideWorldRigidBodies();
-    // ProcessCollisions();
 }

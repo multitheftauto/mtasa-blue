@@ -15,6 +15,7 @@
 
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsigned int uiScriptID)
 {
+    std::lock_guard       lock(m_lock);
     CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)CIdArray::FindEntry(uiScriptID, EIdClass::RIGID_BODY);
     if (!pLuaRigidBody)
         return NULL;
@@ -26,15 +27,18 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsi
 
 CLuaPhysicsRigidBodyManager::~CLuaPhysicsRigidBodyManager()
 {
+    std::lock_guard lock(m_lock);
 }
 
 void CLuaPhysicsRigidBodyManager::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
 {
+    std::lock_guard lock(m_lock);
     m_RigidBodyList.push_back(pRigidBody);
 }
 
 void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
+    std::lock_guard lock(m_lock);
     assert(pRigidBody);
 
     // Check if already removed
@@ -46,11 +50,3 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
     pRigidBody->Unlink();
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
-{
-    for (auto& pRigidBody : m_RigidBodyList)
-        if (pRigidBody->GetBtRigidBody()->getCollisionShape() == pCollisionShape)
-            return pRigidBody;
-
-    return nullptr;
-}

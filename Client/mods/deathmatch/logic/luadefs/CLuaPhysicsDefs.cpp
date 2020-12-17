@@ -84,6 +84,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsOverlapBox", ArgumentParser<PhysicsOverlapBox>},
         {"physicsPredictTransform", ArgumentParser<PhysicsPredictTransform>},
         {"physicsClearForces", ArgumentParser<PhysicsClearForces>},
+        {"physicsGetContacts", ArgumentParser<PhysicsGetContacts>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1559,6 +1560,35 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
     std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
 
     pPhysics->QueryBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter), collisionMask.value_or(btBroadphaseProxy::AllFilter));
+    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
+        result;
+    result["rigidbodies"] = vecRigidBodies;
+    result["staticCollisions"] = vecStaticCollisions;
+    return result;
+}
+
+std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsGetContacts(std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variant)
+{
+    std::vector<CLuaPhysicsRigidBody*> vecRigidBodies;
+    std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
+
+    if (std::holds_alternative<CLuaPhysicsRigidBody*>(variant))
+    {
+        CLuaPhysicsRigidBody* pRigidBody = std::get<CLuaPhysicsRigidBody*>(variant);
+        std::vector<SPhysicsCollisionReport*>& collisionReports = pRigidBody->GetCollisionReports();
+        for (auto const& collisionReport : collisionReports)
+        {
+            if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast< CLuaPhysicsRigidBody*>(collisionReport->pElement.get()))
+            {
+                vecRigidBodies.push_back(pRigidBody);
+            }
+            else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(collisionReport->pElement.get()))
+            {
+                vecStaticCollisions.push_back(pStaticCollision);
+            }
+        }
+    }
+
     std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
         result;
     result["rigidbodies"] = vecRigidBodies;

@@ -29,9 +29,6 @@ public:
     void                                     AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
     void                                     RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     unsigned long                            GetRigidBodyCount() const { return m_StaticCollisionList.size(); }
-    std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape);
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisionsFromCollisionShape(const btCollisionShape* pCollisionShape);
-
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>::const_iterator IterBegin() { return m_StaticCollisionList.begin(); }
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>::const_iterator IterEnd() { return m_StaticCollisionList.end(); }
 

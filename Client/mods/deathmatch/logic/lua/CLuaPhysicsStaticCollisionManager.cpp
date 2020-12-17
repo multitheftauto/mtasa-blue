@@ -39,27 +39,3 @@ void CLuaPhysicsStaticCollisionManager::AddStaticCollision(std::shared_ptr<CLuaP
 {
     m_StaticCollisionList.push_back(pStaticCollision);
 }
-
-std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape)
-{
-    for (std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision : m_StaticCollisionList)
-    {
-        if (pStaticCollision->GetCollisionObject()->getCollisionShape() == pCollisionShape)
-            return pStaticCollision;
-    }
-
-    return nullptr;
-}
-
-std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> CLuaPhysicsStaticCollisionManager::GetStaticCollisionsFromCollisionShape(
-    const btCollisionShape* pCollisionShape)
-{
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> vecStaticCollisions;
-    for (std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision : m_StaticCollisionList)
-    {
-        if (pStaticCollision->GetCollisionObject()->getCollisionShape() == pCollisionShape)
-            vecStaticCollisions.push_back(pStaticCollision);
-    }
-
-    return vecStaticCollisions;
-}

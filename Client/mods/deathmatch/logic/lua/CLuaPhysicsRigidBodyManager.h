@@ -27,7 +27,6 @@ public:
     CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
 
     void                  AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
-    std::shared_ptr<CLuaPhysicsRigidBody> GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
     unsigned long GetRigidBodyCount() const { return m_RigidBodyList.size(); }
@@ -37,4 +36,5 @@ public:
 
 private:
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> m_RigidBodyList;
+    std::mutex                                         m_lock;
 };

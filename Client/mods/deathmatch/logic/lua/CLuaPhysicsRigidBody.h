@@ -125,6 +125,10 @@ public:
     void ClearForces();
     void NeedsActivation() const;
 
+    void ClearCollisionReport();
+    void ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport);
+    std::vector<SPhysicsCollisionReport*> GetCollisionReports();
+
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*                                  m_pShape;
@@ -136,5 +140,7 @@ private:
     mutable std::mutex                                 m_lock;
     mutable std::mutex                                 m_transformLock;
     mutable std::atomic<bool>                          m_bActivationRequested;
+
+    std::vector<std::unique_ptr<SPhysicsCollisionReport>> m_vecCollisionReports;
 
 };
