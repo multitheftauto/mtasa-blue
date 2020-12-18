@@ -128,8 +128,9 @@ public:
     void ClearCollisionReport();
     void ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport);
     std::vector<SPhysicsCollisionReport*> GetCollisionReports();
+    SPhysicsCollisionReport*              GetCollisionReport(CLuaPhysicsElement* pElement);
 
-private:
+        private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*                                  m_pShape;
     std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;

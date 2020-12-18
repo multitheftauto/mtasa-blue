@@ -607,6 +607,16 @@ std::vector<SPhysicsCollisionReport*> CLuaPhysicsRigidBody::GetCollisionReports(
     return vecCollisionReports;
 }
 
+SPhysicsCollisionReport* CLuaPhysicsRigidBody::GetCollisionReport(CLuaPhysicsElement* pElement)
+{
+    for (auto const& pCollisionReport : m_vecCollisionReports)
+    {
+        if (pCollisionReport->pElement.get() == pElement)
+            return pCollisionReport.get();
+    }
+    return nullptr;
+}
+
 void CLuaPhysicsRigidBody::Unlink()
 {
     if (m_pShape != nullptr && IsReady())

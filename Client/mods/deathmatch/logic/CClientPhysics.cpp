@@ -606,9 +606,6 @@ void CClientPhysics::ProcessCollisions()
         for (int j = 0; j < numContacts; j++)
         {
             btManifoldPoint& manifoldPoint = contactManifold->getContactPoint(j);
-            //if (pt.getAppliedImpulse() < m_fImpulseThreshold)            // if hit is strong enough
-            //{
-            //}
             std::shared_ptr<SPhysicsCollisionContact> contactA = std::make_shared<SPhysicsCollisionContact>();
             std::shared_ptr<SPhysicsCollisionContact> contactB = std::make_shared<SPhysicsCollisionContact>();
             contactA->vecPositionWorldOn = reinterpret_cast<const CVector&>(manifoldPoint.getPositionWorldOnA());

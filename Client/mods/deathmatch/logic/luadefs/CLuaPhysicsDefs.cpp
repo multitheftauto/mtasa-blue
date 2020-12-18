@@ -85,6 +85,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsPredictTransform", ArgumentParser<PhysicsPredictTransform>},
         {"physicsClearForces", ArgumentParser<PhysicsClearForces>},
         {"physicsGetContacts", ArgumentParser<PhysicsGetContacts>},
+        {"physicsGetContactDetails", ArgumentParser<PhysicsGetContactDetails>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1593,5 +1594,38 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
         result;
     result["rigidbodies"] = vecRigidBodies;
     result["staticCollisions"] = vecStaticCollisions;
+    return result;
+}
+
+std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> CLuaPhysicsDefs::PhysicsGetContactDetails(
+    std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB)
+{
+    std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> result;
+    if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantA))
+    {
+        CLuaPhysicsRigidBody* pRigidBodyA = std::get<CLuaPhysicsRigidBody*>(variantA);
+
+        if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantB))
+        {
+            CLuaPhysicsRigidBody* pRigidBodyB = std::get<CLuaPhysicsRigidBody*>(variantB);
+
+            SPhysicsCollisionReport* collisionReport = pRigidBodyA->GetCollisionReport(pRigidBodyB);
+            if (collisionReport)
+            {
+                for (auto const& contact : collisionReport->m_vecContacts)
+                {
+                    std::unordered_map<std::string, std::variant<CVector, float, int>> singleContactResult;
+
+                    singleContactResult["worldPosition"] = contact->vecPositionWorldOn;
+                    singleContactResult["localPoint"] = contact->vecLocalPoint;
+                    singleContactResult["lateralFrictionDir"] = contact->vecLateralFrictionDir;
+                    singleContactResult["contactTriangle"] = contact->contactTriangle;
+                    singleContactResult["appliedImpulse"] = contact->appliedImpulse;
+                    singleContactResult["appliedImpulseLiteral"] = contact->appliedImpulseLiteral;
+                    result.push_back(singleContactResult);
+                }
+            }
+        }
+    }
     return result;
 }
