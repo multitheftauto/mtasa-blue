@@ -403,6 +403,7 @@ void CClientPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConst
 {
     m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
     m_vecConstraints.push_back(pConstraint);
+    m_InitializeConstraintsQueue.push(pConstraint);
 }
 
 void CClientPhysics::SetDebugLineWidth(float fWidth) const
@@ -738,6 +739,21 @@ std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::CreateRigidBody(CLuaPhysic
     return pRigidBody;
 }
 
+std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA,
+                                                                                                CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                                bool                  bDisableCollisionsBetweenLinkedBodies)
+{
+    assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
+
+    CVector anchorA = pRigidBodyA->GetPosition() - pRigidBodyB->GetPosition();
+    CVector anchorB = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
+
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
+        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
+    AddConstraint(pConstraint);
+    return pConstraint;
+}
+
 std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position,
                                                                                                 CVector anchor, bool bDisableCollisionsBetweenLinkedBodies)
 {
@@ -871,6 +887,14 @@ void CClientPhysics::DoPulse()
         pRigidBody->Initialize(pRigidBody);
 
         m_InitializeRigidBodiesQueue.pop();
+    }
+
+    while (!m_InitializeConstraintsQueue.empty())
+    {
+        std::shared_ptr<CLuaPhysicsConstraint> pConstraint = m_InitializeConstraintsQueue.top();
+        pConstraint->Initialize();
+
+        m_InitializeConstraintsQueue.pop();
     }
 
     while (!m_StackRigidBodiesActivation.empty())

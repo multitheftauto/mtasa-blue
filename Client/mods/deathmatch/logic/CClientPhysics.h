@@ -119,6 +119,9 @@ public:
     // Links body to position
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
+    // Automatically calculate bodies offsets
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                    bool bDisableCollisionsBetweenLinkedBodies);
 
     std::shared_ptr<CLuaPhysicsFixedConstraint> CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                       bool bDisableCollisionsBetweenLinkedBodies);
@@ -205,6 +208,7 @@ public:
 
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsStaticCollision>> m_InitializeStaticCollisionsQueue;
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>> m_InitializeRigidBodiesQueue;
+    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsConstraint>> m_InitializeConstraintsQueue;
 
     SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_StackElementChanges;
     SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;

@@ -24,10 +24,18 @@ class CLuaPhysicsPointToPointConstraint : public CLuaPhysicsConstraint
 {
 public:
     CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& anchorA, CVector& anchorB,
-                                      bool bDisableCollisionsBetweenLinkedBodies);
-    CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CVector& position, CVector& anchor, bool bDisableCollisionsBetweenLinkedBodies);
+                                      bool bDisableCollisionsBetweenLinkedBodies = false);
+    CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CVector& position, CVector& anchor, bool bDisableCollisionsBetweenLinkedBodies = false);
     ~CLuaPhysicsPointToPointConstraint();
+    void Initialize();
 
     void SetPivotA(CVector& vecPivotA);
     void SetPivotB(CVector& vecPivotB);
+
+    void Unlink();
+
+private:
+    CVector m_vecAnchorA;
+    CVector m_vecAnchorB;
+    std::unique_ptr<btPoint2PointConstraint> m_pConstraint;
 };

@@ -22,7 +22,9 @@ enum ePhysicsConstraint;
 class CLuaPhysicsConstraint : public CLuaPhysicsElement
 {
 public:
-    CLuaPhysicsConstraint(CClientPhysics* pPhysics, ePhysicsConstraint constraintType, bool bDisableCollisionsBetweenLinkedBodies);
+    CLuaPhysicsConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBody, bool bDisableCollisionsBetweenLinkedBodies = true);
+    CLuaPhysicsConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                          bool bDisableCollisionsBetweenLinkedBodies = true);
     ~CLuaPhysicsConstraint();
 
     void  SetBreakingImpulseThreshold(float fThreshold);
@@ -32,16 +34,17 @@ public:
     bool IsBroken() const { return !m_pConstraint->isEnabled(); }
     bool BreakingStatusHasChanged();
 
-    btTypedConstraint* GetConstraint() const { return m_pConstraint.get(); }
+    btTypedConstraint* GetConstraint() const { return m_pConstraint; }
     btJointFeedback*   GetJoinFeedback() { return m_pJointFeedback.get(); }
 
-    void Initialize(std::unique_ptr<btTypedConstraint> pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB = nullptr);
+    virtual void Initialize(){};
+    virtual void Unlink();
 
-private:
+protected:
+    virtual void InternalInitialize(btTypedConstraint* pConstraint);
     bool                               m_bDisableCollisionsBetweenLinkedBodies;
-    ePhysicsConstraint                 m_eType;
     uint                               m_uiScriptID;
-    std::unique_ptr<btTypedConstraint> m_pConstraint;
+    btTypedConstraint* m_pConstraint;
     std::unique_ptr<btJointFeedback>   m_pJointFeedback;
     bool                               m_bLastBreakingStatus;
     CLuaPhysicsRigidBody*              m_pRigidBodyA;

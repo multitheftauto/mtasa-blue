@@ -118,7 +118,7 @@ public:
     CPhysicsRigidBodyProxy* GetBtRigidBody() const { return m_pRigidBodyProxy.get(); }
 
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
-    void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
+    void RemoveConstraint(CLuaPhysicsConstraint* pConstraint);
 
     void Unlink();
     btTransform& PredictTransform(float time) const;

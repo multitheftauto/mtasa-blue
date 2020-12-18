@@ -1261,19 +1261,15 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreateFixedConstr
     return pConstraint;
 }
 
-int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody,
-                                                                 CVector position, CVector anchor, std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(
+    CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
-    if (eConstraint != ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
-        throw std::invalid_argument("Invalid constraint type");
-
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    // lua_pushconstraint(luaVM, pConstraint);
-    return 1;
+        pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
+    return (CLuaPhysicsConstraint*)pConstraint.get();
 }
 
-int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
+int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
                                                                  CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
                                                                  std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {

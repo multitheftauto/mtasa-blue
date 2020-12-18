@@ -52,12 +52,12 @@ public:
     static bool PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
                                      std::optional<CVector> vecRotation);
 
-    static int PhysicsCreatePointToPointConstraintVariantA(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
+    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantA(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                     std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+
+    static int PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
                                                            CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
                                                            std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
-
-    static int PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody, CVector position,
-                                                           CVector anchor, std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);

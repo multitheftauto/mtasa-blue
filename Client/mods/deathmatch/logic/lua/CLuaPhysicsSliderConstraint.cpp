@@ -18,7 +18,7 @@
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,
                                                          CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
                                                          bool bDisableCollisionsBetweenLinkedBodies)
-    : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER, bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies)
 {
     btTransform transformA;
     btTransform transformB;
@@ -35,12 +35,12 @@ CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* p
     pConstraint->setLowerAngLimit(btScalar(0));
     pConstraint->setUpperAngLimit(btScalar(0));
 
-    Initialize(std::move(pConstraint), pRigidBodyA, pRigidBodyB);
+    //Initialize(std::move(pConstraint), pRigidBodyA, pRigidBodyB);
 }
 
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& vecPosition, CVector& vecRotation,
                                                          bool bDisableCollisionsBetweenLinkedBodies)
-    : CLuaPhysicsConstraint(pRigidBody->GetPhysics(), ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER, bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsConstraint(pRigidBody->GetPhysics(), pRigidBody, bDisableCollisionsBetweenLinkedBodies)
 {
     btTransform transform;
     transform.setIdentity();
@@ -53,7 +53,7 @@ CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* p
     pConstraint->setLowerAngLimit(btScalar(0));
     pConstraint->setUpperAngLimit(btScalar(0));
 
-    Initialize(std::move(pConstraint), pRigidBody);
+    //Initialize(std::move(pConstraint), pRigidBody);
 }
 
 CLuaPhysicsSliderConstraint::~CLuaPhysicsSliderConstraint()

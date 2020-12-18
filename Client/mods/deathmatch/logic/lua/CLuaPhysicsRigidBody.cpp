@@ -69,6 +69,11 @@ void CLuaPhysicsRigidBody::HasMoved()
 
 void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
 {
+    {
+        std::lock_guard guard(m_transformLock);
+        m_vecPosition = vecPosition;
+    }
+
     std::function<void()> change([&, vecPosition]() {
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
         CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
@@ -214,6 +219,11 @@ float CLuaPhysicsRigidBody::GetMass() const
 void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation)
 {
     std::lock_guard guard(m_lock);
+
+    {
+        std::lock_guard guard(m_transformLock);
+        m_vecRotation = vecRotation;
+    }
 
     if (IsReady())
     {
@@ -617,10 +627,22 @@ SPhysicsCollisionReport* CLuaPhysicsRigidBody::GetCollisionReport(CLuaPhysicsEle
     return nullptr;
 }
 
+void CLuaPhysicsRigidBody::RemoveConstraint(CLuaPhysicsConstraint* pConstraint)
+{
+    m_pRigidBodyProxy->removeConstraintRef(pConstraint->GetConstraint());
+    ListRemove(m_constraintList, pConstraint);
+}
+
 void CLuaPhysicsRigidBody::Unlink()
 {
     if (m_pShape != nullptr && IsReady())
     {
+        while (!m_constraintList.empty())
+        {
+            auto const& constraint = m_constraintList.back();
+            constraint->Unlink();
+        }
+
         m_pRigidBodyProxy.reset();
         //m_pShape->RemoveRigidBody(this);
         m_pShape = nullptr;
