@@ -749,7 +749,7 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointTo
     CVector anchorB = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
 
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
+        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorB/2, anchorA/2, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }
