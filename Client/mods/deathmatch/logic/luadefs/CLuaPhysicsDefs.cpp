@@ -86,6 +86,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsClearForces", ArgumentParser<PhysicsClearForces>},
         {"physicsGetContacts", ArgumentParser<PhysicsGetContacts>},
         {"physicsGetContactDetails", ArgumentParser<PhysicsGetContactDetails>},
+        {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1558,5 +1559,19 @@ std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> 
             }
         }
     }
+    return result;
+}
+
+std::unordered_map<std::string, long long int> CLuaPhysicsDefs::PhysicsGetPerformanceStats(CClientPhysics* pPhysics)
+{
+    std::unordered_map<std::string, long long int> result;
+
+    long long int total = 0;
+    for (auto const& timing : pPhysics->GetProfileTimings())
+    {
+        result[timing.first] = timing.second;
+        total += timing.second;
+    }
+    result["total"] = total;
     return result;
 }

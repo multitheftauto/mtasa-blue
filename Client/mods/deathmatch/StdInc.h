@@ -90,6 +90,7 @@
 #include <CClientWebBrowser.h>
 #include <CClientSearchLight.h>
 #include <CClientEffect.h>
+#include "CBulletPhysicsProfiler.h"
 #include <CClientPhysics.h>
 #include <CClientPhysicsManager.h>
 #include <CCustomData.h>

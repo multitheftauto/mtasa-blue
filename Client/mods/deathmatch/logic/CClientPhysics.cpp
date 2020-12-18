@@ -535,7 +535,7 @@ std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetRigidBodyFromCollisionS
     return nullptr;
 }
 
-void CClientPhysics::ProcessCollisions()
+void CClientPhysics::PostProcessCollisions()
 {
     int numManifolds;
     {
@@ -873,45 +873,62 @@ void CClientPhysics::DoPulse()
     std::lock_guard<std::mutex> guard(lock);
     assert(!isDuringSimulation);
 
-    while (!m_InitializeStaticCollisionsQueue.empty())
-    {
-        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = m_InitializeStaticCollisionsQueue.top();
-        pStaticCollision->Initialize(pStaticCollision);
+    CBulletPhysicsProfiler::Clear();
 
-        m_InitializeStaticCollisionsQueue.pop();
+    {
+        BT_PROFILE("initializeStaticCollisions");
+        while (!m_InitializeStaticCollisionsQueue.empty())
+        {
+            std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = m_InitializeStaticCollisionsQueue.top();
+            pStaticCollision->Initialize(pStaticCollision);
+
+            m_InitializeStaticCollisionsQueue.pop();
+        }
     }
 
-    while (!m_InitializeRigidBodiesQueue.empty())
     {
-        std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = m_InitializeRigidBodiesQueue.top();
-        pRigidBody->Initialize(pRigidBody);
+        BT_PROFILE("initializeRigidBodies");
+        while (!m_InitializeRigidBodiesQueue.empty())
+        {
+            std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = m_InitializeRigidBodiesQueue.top();
+            pRigidBody->Initialize(pRigidBody);
 
-        m_InitializeRigidBodiesQueue.pop();
+            m_InitializeRigidBodiesQueue.pop();
+        }
     }
 
-    while (!m_InitializeConstraintsQueue.empty())
     {
-        std::shared_ptr<CLuaPhysicsConstraint> pConstraint = m_InitializeConstraintsQueue.top();
-        pConstraint->Initialize();
+        BT_PROFILE("initializeConstraints");
+        while (!m_InitializeConstraintsQueue.empty())
+        {
+            std::shared_ptr<CLuaPhysicsConstraint> pConstraint = m_InitializeConstraintsQueue.top();
+            pConstraint->Initialize();
 
-        m_InitializeConstraintsQueue.pop();
+            m_InitializeConstraintsQueue.pop();
+        }
     }
 
-    while (!m_StackRigidBodiesActivation.empty())
     {
-        CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesActivation.top();
-        pRigidBody->Activate();
-        m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                          m_pDynamicsWorld->getDispatcher());
-        m_StackRigidBodiesActivation.pop();
+        BT_PROFILE("activateRigidBodies");
+        while (!m_StackRigidBodiesActivation.empty())
+        {
+            CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesActivation.top();
+            pRigidBody->Activate();
+            m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
+                                                                                              m_pDynamicsWorld->getDispatcher());
+            m_StackRigidBodiesActivation.pop();
+        }
     }
 
-    while (!m_StackElementChanges.empty())
     {
-        CLuaPhysicsElement* pElement = m_StackElementChanges.top();
-        pElement->ApplyChanges();
+        BT_PROFILE("applyChanges");
+        while (!m_StackElementChanges.empty())
+        {
+            CLuaPhysicsElement* pElement = m_StackElementChanges.top();
+            pElement->ApplyChanges();
 
-        m_StackElementChanges.pop();
+            m_StackElementChanges.pop();
+        }
     }
 
     CTickCount tickCountNow = CTickCount::Now();
@@ -930,7 +947,10 @@ void CClientPhysics::DoPulse()
     //}
 
     isDuringSimulation = true;
-    StepSimulation();
+    {
+        BT_PROFILE("stepSimulation");
+        StepSimulation();
+    }
 
     if (m_bDrawDebugNextTime)
     {
@@ -942,6 +962,7 @@ void CClientPhysics::DoPulse()
     }
 
     {
+        BT_PROFILE("cacheActiveRigidBodies");
         std::lock_guard guardVecActiveRigidBodies(m_vecActiveRigidBodiesLock);
         std::lock_guard guardDynamicsWorld(dynamicsWorldLock);
         m_vecActiveRigidBodies.clear();
@@ -959,7 +980,12 @@ void CClientPhysics::DoPulse()
         }
     }
 
-    ProcessCollisions();
+    {
+        BT_PROFILE("postProcessCollisions");
+        PostProcessCollisions();
+    }
+
+    m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
 
     isDuringSimulation = false;
     // ClearOutsideWorldRigidBodies();

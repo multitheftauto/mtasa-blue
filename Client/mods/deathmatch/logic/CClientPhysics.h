@@ -150,10 +150,13 @@ public:
     std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
     std::shared_ptr<CLuaPhysicsRigidBody>                    GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
 
-        private:
+    
+    const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
+
+private:
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
-    void ProcessCollisions();
+    void PostProcessCollisions();
 
     void Clear();
 
@@ -218,5 +221,5 @@ public:
     mutable std::mutex                 m_vecActiveRigidBodiesLock;
 
     std::vector<std::shared_ptr<CLuaPhysicsElement>> m_vecLastContact;
-
+    std::unordered_map<const char*, ProfilerTime>    m_mapProfileTimings;
 };

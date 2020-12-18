@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include <stack>
 #include <pthread.h>
+#include "CBulletPhysicsProfiler.h"
 
 using std::list;
 
@@ -20,12 +21,16 @@ CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
     m_pManager = pManager;
 
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2, 1);
+
+    CBulletPhysicsProfiler::Start();
 }
 
 CClientPhysicsManager::~CClientPhysicsManager()
 {
     WaitForSimulationsToFinish(true);
     // Make sure all the physics worlds are deleted
+
+    CBulletPhysicsProfiler::Stop();
     DeleteAll();
 }
 
