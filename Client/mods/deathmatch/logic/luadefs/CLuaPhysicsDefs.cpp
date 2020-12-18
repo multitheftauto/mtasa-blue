@@ -1261,101 +1261,36 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreateFixedConstr
     return pConstraint;
 }
 
-CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(
-    CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantA(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
+    if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
+        throw std::invalid_argument("Rigid bodies need to belong to the same physics world");
+
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
         pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
     return (CLuaPhysicsConstraint*)pConstraint.get();
 }
 
-int CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                 CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
-                                                                 std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(CLuaPhysicsRigidBody* pRigidBody, CVector vecPosition, CVector vecAnchor,
+                                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
-    if (eConstraint != ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
-        throw std::invalid_argument("Invalid constraint type");
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
+        pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, vecPosition, vecAnchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
+    return (CLuaPhysicsConstraint*)pConstraint.get();
+}
 
+CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantC(lua_State* luaVM, ePhysicsConstraint eConstraint,
+                                                                                    CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                    CVector anchorA, CVector anchorB,
+                                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+{
     if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
         throw std::invalid_argument("Rigid bodies need to belong to the same physics world");
 
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(
         pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    // lua_pushconstraint(luaVM, pConstraint);
-    return 1;
-    // CClientPhysics*       pPhysics;
-    // bool                  bDisableCollisionsBetweenLinkedBodies = true;
-    // CLuaPhysicsRigidBody* pRigidBodyA;
-    // CLuaPhysicsRigidBody* pRigidBodyB = nullptr;
-    // ePhysicsConstraint    eConstraint;
-    // CScriptArgReader      argStream(luaVM);
-    // argStream.ReadEnumString(eConstraint);
-    // if (argStream.NextIsBool())
-    //    argStream.ReadBool(bDisableCollisionsBetweenLinkedBodies, true);
-
-    // argStream.ReadUserData(pRigidBodyA);
-    // if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    //    argStream.ReadUserData(pRigidBodyB);
-
-    // if (pRigidBodyA && pRigidBodyB)
-    //{
-    //    if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
-    //    {
-    //        argStream.SetCustomError("Rigid bodies need to belong to the same physics world");
-    //    }
-    //}
-    // if (!argStream.HasErrors())
-    //{
-    //    pPhysics = pRigidBodyA->GetPhysics();
-    //    CLuaPhysicsConstraint* pConstraint = nullptr;
-    //    CVector                vector[4];
-    //    switch (eConstraint)
-    //    {
-    //        case PHYSICS_CONTRAINT_HIDGE:
-    //            argStream.ReadVector3D(vector[0]);
-    //            argStream.ReadVector3D(vector[1]);
-    //            argStream.ReadVector3D(vector[2]);
-    //            argStream.ReadVector3D(vector[3]);
-    //            pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
-    //            pConstraint->CreateHidgeConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
-    //            break;
-    //        case PHYSICS_CONTRAINT_FIXED:
-    //            if (pRigidBodyA && pRigidBodyB)
-    //            {
-    //                argStream.ReadVector3D(vector[0]);
-    //                argStream.ReadVector3D(vector[1]);
-    //                argStream.ReadVector3D(vector[2]);
-    //                argStream.ReadVector3D(vector[3]);
-    //                pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
-    //                pConstraint->CreateFixedConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
-    //            }
-    //            else
-    //            {
-    //                argStream.SetCustomError("Physics fixed constraint requires both rigid bodies");
-    //            }
-    //            break;
-    //        case PHYSICS_CONTRAINT_SLIDER:
-    //            argStream.ReadVector3D(vector[0]);
-    //            argStream.ReadVector3D(vector[1]);
-    //            argStream.ReadVector3D(vector[2]);
-    //            argStream.ReadVector3D(vector[3]);
-    //            pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
-    //            pConstraint->CreateSliderConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
-    //            break;
-    //    }
-    //    if (pConstraint)
-    //    {
-    //        lua_pushconstraint(luaVM, pConstraint);
-    //        return 1;
-    //    }
-    //}
-
-    // if (argStream.HasErrors())
-    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    //// Failed
-    // lua_pushboolean(luaVM, false);
-    // return 1;
+    return pConstraint.get();
 }
 
 bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)

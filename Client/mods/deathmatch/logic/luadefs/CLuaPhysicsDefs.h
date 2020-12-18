@@ -53,11 +53,14 @@ public:
                                      std::optional<CVector> vecRotation);
 
     static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantA(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                     std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+                                                                              std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
-    static int PhysicsCreatePointToPointConstraintVariantB(lua_State* luaVM, ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
-                                                           CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
-                                                           std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantB(CLuaPhysicsRigidBody* pRigidBody, CVector vecPosition, CVector vecAnchor,
+                                                                       std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantC(lua_State* luaVM, ePhysicsConstraint eConstraint,
+                                                                             CLuaPhysicsRigidBody* pRigidBodyA,
+                                                                       CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
+                                                                       std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
