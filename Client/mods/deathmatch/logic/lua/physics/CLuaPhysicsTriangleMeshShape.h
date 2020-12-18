@@ -14,8 +14,8 @@ class CLuaPhysicsTriangleMeshShape;
 #pragma once
 
 // Define includes
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
+#include "../LuaCommon.h"
+#include "../CLuaArguments.h"
 #include "CLuaPhysicsShape.h"
 
 class CLuaPhysicsTriangleMeshShape : public CLuaPhysicsShape

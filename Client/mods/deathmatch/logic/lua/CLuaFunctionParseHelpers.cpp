@@ -9,11 +9,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "lua/CLuaPhysicsSharedLogic.h"
-#include "lua/CLuaPhysicsRigidBodyManager.h"
-#include "lua/CLuaPhysicsStaticCollisionManager.h"
-#include "lua/CLuaPhysicsConstraintManager.h"
-#include "lua/CLuaPhysicsShapeManager.h"
+#include "lua/physics/CLuaPhysicsSharedLogic.h"
+#include "lua/physics/CLuaPhysicsRigidBodyManager.h"
+#include "lua/physics/CLuaPhysicsStaticCollisionManager.h"
+#include "lua/physics/CLuaPhysicsConstraintManager.h"
+#include "lua/physics/CLuaPhysicsShapeManager.h"
 
 //
 // enum values <-> script strings

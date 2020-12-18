@@ -14,9 +14,10 @@
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape)
+    : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
-    //pShape->AddStaticCollision(this);
+    // pShape->AddStaticCollision(this);
     m_pTempData = std::make_unique<CLuaPhysicsStaticCollisionTempData>();
     m_pShape = pShape;
 }
@@ -35,7 +36,7 @@ void CLuaPhysicsStaticCollision::Initialize(std::shared_ptr<CLuaPhysicsStaticCol
 
     SetPosition(m_pTempData->m_matrix.GetPosition());
     SetRotation(m_pTempData->m_matrix.GetRotation());
-    //SetScale(m_pTempData->m_matrix.GetScale());
+    // SetScale(m_pTempData->m_matrix.GetScale());
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition) const
@@ -111,7 +112,6 @@ CMatrix CLuaPhysicsStaticCollision::GetMatrix() const
     return m_pTempData->m_matrix;
 }
 
-
 void CLuaPhysicsStaticCollision::RemoveDebugColor() const
 {
     m_btCollisionObject->removeCustomDebugColor();
@@ -154,6 +154,6 @@ void CLuaPhysicsStaticCollision::Unlink()
     if (m_pShape)
     {
         m_pShape = nullptr;
-        //GetPhysics()->RemoveStaticCollision(GetCollisionObject());
+        // GetPhysics()->RemoveStaticCollision(GetCollisionObject());
     }
 }

@@ -11,25 +11,25 @@
 
 #include "StdInc.h"
 
-#include "lua/CLuaPhysicsRigidBodyManager.h"
-#include "lua/CLuaPhysicsStaticCollisionManager.h"
-#include "lua/CLuaPhysicsConstraintManager.h"
-#include "lua/CLuaPhysicsShapeManager.h"
-#include "lua/CLuaPhysicsSharedLogic.h"
+#include "lua/physics/CLuaPhysicsRigidBodyManager.h"
+#include "lua/physics/CLuaPhysicsStaticCollisionManager.h"
+#include "lua/physics/CLuaPhysicsConstraintManager.h"
+#include "lua/physics/CLuaPhysicsShapeManager.h"
+#include "lua/physics/CLuaPhysicsSharedLogic.h"
 
-#include "lua/CLuaPhysicsElement.h"
-#include "lua/CLuaPhysicsBoxShape.h"
-#include "lua/CLuaPhysicsCompoundShape.h"
-#include "lua/CLuaPhysicsSphereShape.h"
-#include "lua/CLuaPhysicsCapsuleShape.h"
-#include "lua/CLuaPhysicsConeShape.h"
-#include "lua/CLuaPhysicsCylinderShape.h"
-#include "lua/CLuaPhysicsConvexHullShape.h"
-#include "lua/CLuaPhysicsCompoundShape.h"
-#include "lua/CLuaPhysicsTriangleMeshShape.h"
-#include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
+#include "lua/physics/CLuaPhysicsElement.h"
+#include "lua/physics/CLuaPhysicsBoxShape.h"
+#include "lua/physics/CLuaPhysicsCompoundShape.h"
+#include "lua/physics/CLuaPhysicsSphereShape.h"
+#include "lua/physics/CLuaPhysicsCapsuleShape.h"
+#include "lua/physics/CLuaPhysicsConeShape.h"
+#include "lua/physics/CLuaPhysicsCylinderShape.h"
+#include "lua/physics/CLuaPhysicsConvexHullShape.h"
+#include "lua/physics/CLuaPhysicsCompoundShape.h"
+#include "lua/physics/CLuaPhysicsTriangleMeshShape.h"
+#include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
 
-#include "lua/CLuaPhysicsPointToPointConstraint.h"
+#include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
 
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
@@ -214,12 +214,12 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCylinderShape(lu
     return pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
 }
 
-std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics, std::optional<int> optionalInitialCapacity)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics,
+                                                                              std::optional<int> optionalInitialCapacity)
 {
     int iInitialCapacity = optionalInitialCapacity.value_or(0);
     if (iInitialCapacity < BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
-        throw std::invalid_argument(
-            SString("Initial capacity should be between 0 and %i", BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity).c_str());
+        throw std::invalid_argument(SString("Initial capacity should be between 0 and %i", BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity).c_str());
 
     return pPhysics->CreateCompoundShape(iInitialCapacity);
 }
@@ -236,7 +236,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
 {
     if (vecVertices.size() < 3)
         throw std::invalid_argument("Triangle mesh shape require at least 3 vertices");
-    
+
     if (vecVertices.size() % 3 != 0)
         throw std::invalid_argument("Triangle mesh needs vertices count divisible by 3");
 
@@ -256,7 +256,8 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
 }
 
 // Todo: Add support for greyscale texture as input
-std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY, std::vector<float> vecHeights)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY,
+                                                                                        std::vector<float> vecHeights)
 {
     if (sizeX < BulletPhysics::Limits::MinimumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MinimumHeightfieldTerrain)
         throw std::invalid_argument(SString("Minimum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MinimumHeightfieldTerrain).c_str());
@@ -266,7 +267,8 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerra
 
     if (sizeX * sizeY != vecHeights.size())
     {
-        throw std::invalid_argument(SString("Heigthfield of size %ix%i require %i floats, got %i floats", sizeX, sizeY, sizeX * sizeY, vecHeights.size()).c_str());
+        throw std::invalid_argument(
+            SString("Heigthfield of size %ix%i require %i floats, got %i floats", sizeX, sizeY, sizeX * sizeY, vecHeights.size()).c_str());
     }
 
     return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights);
@@ -365,7 +367,7 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CClientPhysics* pPhysics)
 }
 
 std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass,
-                                                              std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass)
+                                                                              std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass)
 {
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Terrain shape is not supported");
@@ -373,9 +375,9 @@ std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(lu
     if (fMass.value_or(1.f) < 0)
         throw std::invalid_argument("Mass can not be negative");
 
-    std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass),
-                                                                             vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
-                                                                             vecCenterOfMass.value_or(BulletPhysics::Defaults::RigidBodyCenterOfMass));
+    std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = pShape->GetPhysics()->CreateRigidBody(
+        pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass), vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
+        vecCenterOfMass.value_or(BulletPhysics::Defaults::RigidBodyCenterOfMass));
     return pRigidBody;
 }
 
@@ -385,8 +387,8 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateShapeFromModel(l
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
-                                                                          std::optional<CVector> rotation)
+std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape,
+                                                                                          std::optional<CVector> position, std::optional<CVector> rotation)
 {
     std::shared_ptr                             pSharedShape = pShape->GetPhysics()->GetSharedShape(pShape);
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
@@ -1255,7 +1257,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //}
 
 std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                     std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
+                                                                                     std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
 {
     std::shared_ptr<CLuaPhysicsFixedConstraint> pConstraint =
         pRigidBodyA->GetPhysics()->CreateFixedConstraint(pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
@@ -1473,7 +1475,7 @@ bool CLuaPhysicsDefs::PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody)
 std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float time, std::optional<bool> ignoreGravity)
 {
     btTransform& transform = pRigidBody->PredictTransform(time);
-    CVector position, rotation;
+    CVector      position, rotation;
 
     CLuaPhysicsSharedLogic::GetPosition(transform, position);
     CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
@@ -1486,32 +1488,32 @@ std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysic
 }
 
 std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsOverlapBox(
-    CClientPhysics* pPhysics, CVector min, CVector max, std::optional<short> collisionGroup,
-                                        std::optional<int> collisionMask)
+    CClientPhysics* pPhysics, CVector min, CVector max, std::optional<short> collisionGroup, std::optional<int> collisionMask)
 {
-    std::vector<CLuaPhysicsRigidBody*> vecRigidBodies;
+    std::vector<CLuaPhysicsRigidBody*>       vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
 
-    pPhysics->QueryBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter), collisionMask.value_or(btBroadphaseProxy::AllFilter));
-    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
-        result;
+    pPhysics->QueryBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter),
+                       collisionMask.value_or(btBroadphaseProxy::AllFilter));
+    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
     result["rigidbodies"] = vecRigidBodies;
     result["staticCollisions"] = vecStaticCollisions;
     return result;
 }
 
-std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsGetContacts(std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variant)
+std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsGetContacts(
+    std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variant)
 {
-    std::vector<CLuaPhysicsRigidBody*> vecRigidBodies;
+    std::vector<CLuaPhysicsRigidBody*>       vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
 
     if (std::holds_alternative<CLuaPhysicsRigidBody*>(variant))
     {
-        CLuaPhysicsRigidBody* pRigidBody = std::get<CLuaPhysicsRigidBody*>(variant);
+        CLuaPhysicsRigidBody*                  pRigidBody = std::get<CLuaPhysicsRigidBody*>(variant);
         std::vector<SPhysicsCollisionReport*>& collisionReports = pRigidBody->GetCollisionReports();
         for (auto const& collisionReport : collisionReports)
         {
-            if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast< CLuaPhysicsRigidBody*>(collisionReport->pElement.get()))
+            if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(collisionReport->pElement.get()))
             {
                 vecRigidBodies.push_back(pRigidBody);
             }
@@ -1522,8 +1524,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
         }
     }
 
-    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
-        result;
+    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
     result["rigidbodies"] = vecRigidBodies;
     result["staticCollisions"] = vecStaticCollisions;
     return result;

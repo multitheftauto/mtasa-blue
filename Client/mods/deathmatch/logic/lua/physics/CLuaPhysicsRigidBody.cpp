@@ -91,7 +91,6 @@ CVector CLuaPhysicsRigidBody::GetPosition() const
     return m_vecPosition;
 }
 
-
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
     std::lock_guard guard(m_lock);
@@ -304,9 +303,7 @@ CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
 
 void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce)
 {
-    std::function<void()> change([&, vecForce]() {
-       m_pRigidBodyProxy->applyCentralForce(reinterpret_cast<const btVector3&>(vecForce));
-    });
+    std::function<void()> change([&, vecForce]() { m_pRigidBodyProxy->applyCentralForce(reinterpret_cast<const btVector3&>(vecForce)); });
 
     CommitChange(change);
 
@@ -462,7 +459,7 @@ CMatrix CLuaPhysicsRigidBody::GetMatrix() const
     {
         CMatrix matrix;
         matrix.SetPosition(GetPosition());
-        matrix.SetRotation(GetRotation() / (180/PI));
+        matrix.SetRotation(GetRotation() / (180 / PI));
         matrix.SetScale(GetScale());
 
         return matrix;
@@ -644,7 +641,7 @@ void CLuaPhysicsRigidBody::Unlink()
         }
 
         m_pRigidBodyProxy.reset();
-        //m_pShape->RemoveRigidBody(this);
+        // m_pShape->RemoveRigidBody(this);
         m_pShape = nullptr;
     }
 }

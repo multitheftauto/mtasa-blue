@@ -12,24 +12,23 @@
 #include <list>
 #include "../Client/game_sa/CCameraSA.h"
 #include "../mods/deathmatch/logic/Utils.h"
-#include "lua/CLuaPhysicsSharedLogic.h"
-#include "lua/CLuaPhysicsRigidBodyManager.h"
-#include "lua/CLuaPhysicsStaticCollisionManager.h"
-#include "lua/CLuaPhysicsConstraintManager.h"
-#include "lua/CLuaPhysicsShapeManager.h"
-#include "bulletphysics3d/LinearMath/btRandom.h"
+#include "lua/physics/CLuaPhysicsSharedLogic.h"
+#include "lua/physics/CLuaPhysicsRigidBodyManager.h"
+#include "lua/physics/CLuaPhysicsStaticCollisionManager.h"
+#include "lua/physics/CLuaPhysicsConstraintManager.h"
+#include "lua/physics/CLuaPhysicsShapeManager.h"
 #include "CPhysicsDebugDrawer.h"
 
-#include "lua/CLuaPhysicsCompoundShape.h"
-#include "lua/CLuaPhysicsBoxShape.h"
-#include "lua/CLuaPhysicsSphereShape.h"
-#include "lua/CLuaPhysicsCapsuleShape.h"
-#include "lua/CLuaPhysicsConeShape.h"
-#include "lua/CLuaPhysicsCylinderShape.h"
-#include "lua/CLuaPhysicsCompoundShape.h"
-#include "lua/CLuaPhysicsConvexHullShape.h"
-#include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
-#include "lua/CLuaPhysicsTriangleMeshShape.h"
+#include "lua/physics/CLuaPhysicsCompoundShape.h"
+#include "lua/physics/CLuaPhysicsBoxShape.h"
+#include "lua/physics/CLuaPhysicsSphereShape.h"
+#include "lua/physics/CLuaPhysicsCapsuleShape.h"
+#include "lua/physics/CLuaPhysicsConeShape.h"
+#include "lua/physics/CLuaPhysicsCylinderShape.h"
+#include "lua/physics/CLuaPhysicsCompoundShape.h"
+#include "lua/physics/CLuaPhysicsConvexHullShape.h"
+#include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
+#include "lua/physics/CLuaPhysicsTriangleMeshShape.h"
 #include "lua/physics/CPhysicsRigidBodyProxy.h"
 #include "lua/physics/CPhysicsStaticCollisionProxy.h"
 
@@ -164,8 +163,6 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollisio
                                                                                   CVector vecRotation)
 {
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_shared<CLuaPhysicsStaticCollision>(pShape);
-    /* pStaticCollision->SetPosition(vecPosition);
-     pStaticCollision->SetRotation(vecRotation);*/
     AddStaticCollision(pStaticCollision);
     return pStaticCollision;
 }
@@ -806,32 +803,6 @@ void CClientPhysics::DrawDebugLines()
     }
 }
 
-struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
-{
-    btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
-    short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
-    BroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
-                           int collisionMask = btBroadphaseProxy::AllFilter)
-        : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
-    {
-        m_collisionObjectArray.resize(0);
-    }
-
-    SIMD_FORCE_INLINE bool needsCollision(const btBroadphaseProxy* proxy) const
-    {
-        bool collides = (proxy->m_collisionFilterGroup & m_collisionFilterMask) != 0;
-        collides = collides && (m_collisionFilterGroup & proxy->m_collisionFilterMask);
-        return collides;
-    }
-
-    virtual bool process(const btBroadphaseProxy* proxy)
-    {
-        if (needsCollision(proxy))
-            m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
-        return true;
-    }
-};
-
 void CClientPhysics::QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
                               std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {
@@ -843,7 +814,6 @@ void CClientPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
         m_pDynamicsWorld->getBroadphase()->aabbTest(reinterpret_cast<const btVector3&>(min), reinterpret_cast<const btVector3&>(max), callback);
     }
 
-    std::vector<btCollisionObject*> asd;
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
         auto const& btObject = callback.m_collisionObjectArray[i];
@@ -968,7 +938,6 @@ void CClientPhysics::DoPulse()
         m_vecActiveRigidBodies.clear();
 
         btAlignedObjectArray<btRigidBody*>& nonStaticRigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
-        int                                 a = 0;
         for (int i = 0; i < nonStaticRigidBodies.size(); i++)
         {
             if (nonStaticRigidBodies[i]->isActive())

@@ -28,10 +28,10 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/inspect.lua.h"
 
 // i can not use forward declaration here
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsShapeManager.h"
+#include "physics/CLuaPhysicsRigidBodyManager.h"
+#include "physics/CLuaPhysicsStaticCollisionManager.h"
+#include "physics/CLuaPhysicsConstraintManager.h"
+#include "physics/CLuaPhysicsShapeManager.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {

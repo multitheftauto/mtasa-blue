@@ -15,8 +15,8 @@ class CPhysicsRigidBodyProxy;
 
 #pragma once
 
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
+#include "../LuaCommon.h"
+#include "../CLuaArguments.h"
 #include "lua/physics/CPhysicsRigidBodyProxy.h"
 
 class CLuaPhysicsRigidBodyTempData
@@ -120,17 +120,17 @@ public:
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint);
 
-    void Unlink();
+    void         Unlink();
     btTransform& PredictTransform(float time) const;
-    void ClearForces();
-    void NeedsActivation() const;
+    void         ClearForces();
+    void         NeedsActivation() const;
 
-    void ClearCollisionReport();
-    void ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport);
+    void                                  ClearCollisionReport();
+    void                                  ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport);
     std::vector<SPhysicsCollisionReport*> GetCollisionReports();
     SPhysicsCollisionReport*              GetCollisionReport(CLuaPhysicsElement* pElement);
 
-        private:
+private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*                                  m_pShape;
     std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;
@@ -143,5 +143,4 @@ public:
     mutable std::atomic<bool>                          m_bActivationRequested;
 
     std::vector<std::unique_ptr<SPhysicsCollisionReport>> m_vecCollisionReports;
-
 };

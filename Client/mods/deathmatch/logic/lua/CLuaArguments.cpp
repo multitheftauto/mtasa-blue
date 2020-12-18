@@ -12,10 +12,10 @@
 #define DECLARE_PROFILER_SECTION_CLuaArguments
 #include "profiler/SharedUtil.Profiler.h"
 
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsShapeManager.h"
+#include "physics/CLuaPhysicsRigidBodyManager.h"
+#include "physics/CLuaPhysicsStaticCollisionManager.h"
+#include "physics/CLuaPhysicsConstraintManager.h"
+#include "physics/CLuaPhysicsShapeManager.h"
 
 using namespace std;
 

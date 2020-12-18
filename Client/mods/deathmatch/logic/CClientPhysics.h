@@ -17,17 +17,17 @@ class CClientPhysics;
 #include "CClientPhysicsManager.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 
-#include "lua/CLuaPhysicsBoxShape.h"
-#include "lua/CLuaPhysicsSphereShape.h"
-#include "lua/CLuaPhysicsCapsuleShape.h"
-#include "lua/CLuaPhysicsConeShape.h"
-#include "lua/CLuaPhysicsCylinderShape.h"
-#include "lua/CLuaPhysicsCompoundShape.h"
-#include "lua/CLuaPhysicsConvexHullShape.h"
-#include "lua/CLuaPhysicsTrianglemeshShape.h"
-#include "lua/CLuaPhysicsHeightfieldTerrainShape.h"
-#include "lua/CLuaPhysicsPointToPointConstraint.h"
-#include "lua/CLuaPhysicsFixedConstraint.h"
+#include "lua/physics/CLuaPhysicsBoxShape.h"
+#include "lua/physics/CLuaPhysicsSphereShape.h"
+#include "lua/physics/CLuaPhysicsCapsuleShape.h"
+#include "lua/physics/CLuaPhysicsConeShape.h"
+#include "lua/physics/CLuaPhysicsCylinderShape.h"
+#include "lua/physics/CLuaPhysicsCompoundShape.h"
+#include "lua/physics/CLuaPhysicsConvexHullShape.h"
+#include "lua/physics/CLuaPhysicsTrianglemeshShape.h"
+#include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
+#include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
+#include "lua/physics/CLuaPhysicsFixedConstraint.h"
 
 enum ePhysicsDebugMode;
 class CLuaPhysicsConstraint;
@@ -131,26 +131,23 @@ public:
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
 
-    std::shared_ptr<CLuaPhysicsRigidBody> GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const;
-    std::shared_ptr<CLuaPhysicsShape> GetSharedShape(CLuaPhysicsShape* pShape) const;
+    std::shared_ptr<CLuaPhysicsRigidBody>       GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const;
+    std::shared_ptr<CLuaPhysicsShape>           GetSharedShape(CLuaPhysicsShape* pShape) const;
     std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const;
 
     void UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const;
 
     std::atomic<bool> isDuringSimulation = false;
 
-
     void QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
-                  std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup,
-                  int collisionMask);
+                  std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask);
 
     void AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody);
     void AddToChangesStack(const CLuaPhysicsElement* pElement);
 
     std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
-    std::shared_ptr<CLuaPhysicsRigidBody>                    GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
+    std::shared_ptr<CLuaPhysicsRigidBody>       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
 
-    
     const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
 
 private:
@@ -210,10 +207,10 @@ private:
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
 
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsStaticCollision>> m_InitializeStaticCollisionsQueue;
-    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>> m_InitializeRigidBodiesQueue;
-    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsConstraint>> m_InitializeConstraintsQueue;
+    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>>       m_InitializeRigidBodiesQueue;
+    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsConstraint>>      m_InitializeConstraintsQueue;
 
-    SharedUtil::ConcurrentStack<CLuaPhysicsElement*> m_StackElementChanges;
+    SharedUtil::ConcurrentStack<CLuaPhysicsElement*>   m_StackElementChanges;
     SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;
 
     // Multithreaded
@@ -222,4 +219,30 @@ private:
 
     std::vector<std::shared_ptr<CLuaPhysicsElement>> m_vecLastContact;
     std::unordered_map<const char*, ProfilerTime>    m_mapProfileTimings;
+};
+
+struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
+{
+    btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
+    short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
+    BroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
+                           int collisionMask = btBroadphaseProxy::AllFilter)
+        : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
+    {
+        m_collisionObjectArray.resize(0);
+    }
+
+    SIMD_FORCE_INLINE bool needsCollision(const btBroadphaseProxy* proxy) const
+    {
+        bool collides = (proxy->m_collisionFilterGroup & m_collisionFilterMask) != 0;
+        collides = collides && (m_collisionFilterGroup & proxy->m_collisionFilterMask);
+        return collides;
+    }
+
+    virtual bool process(const btBroadphaseProxy* proxy)
+    {
+        if (needsCollision(proxy))
+            m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
+        return true;
+    }
 };

@@ -14,8 +14,8 @@ class CLuaPhysicsHeightfieldTerrainShape;
 #pragma once
 
 // Define includes
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
+#include "../LuaCommon.h"
+#include "../CLuaArguments.h"
 
 class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsShape
 {

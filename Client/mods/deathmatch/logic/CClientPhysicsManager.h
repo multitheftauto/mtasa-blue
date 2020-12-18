@@ -23,15 +23,13 @@ public:
     CClientPhysicsManager(CClientManager* pManager);
     ~CClientPhysicsManager();
 
-
     std::list<CClientPhysics*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CClientPhysics*>::const_iterator IterEnd() { return m_List.end(); };
-    void DrawDebug();
-    void DoPulse();
-    void WaitForSimulationsToFinish(bool bForceWait = false);
+    void                                       DrawDebug();
+    void                                       DoPulse();
+    void                                       WaitForSimulationsToFinish(bool bForceWait = false);
 
 private:
-
     void AddToList(CClientPhysics* pPhysics) { m_List.push_back(pPhysics); };
     void RemoveFromList(CClientPhysics* pPhysics);
     void DeleteAll();
@@ -45,5 +43,4 @@ private:
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
     std::atomic<int>                 m_numPhysicsLeft;
     bool                             m_bWaitForSimulationToFinish = true;
-
 };

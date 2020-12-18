@@ -9,11 +9,11 @@
  *
  *****************************************************************************/
 
-#include "lua/CLuaPhysicsShape.h"
-#include "lua/CLuaPhysicsStaticCollision.h"
-#include "lua/CLuaPhysicsCompoundShape.h"
-#include "lua/CLuaPhysicsPointToPointConstraint.h"
-#include "lua/CLuaPhysicsRigidBody.h"
+#include "lua/physics/CLuaPhysicsShape.h"
+#include "lua/physics/CLuaPhysicsStaticCollision.h"
+#include "lua/physics/CLuaPhysicsCompoundShape.h"
+#include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
+#include "lua/physics/CLuaPhysicsRigidBody.h"
 
 #pragma once
 #include "CLuaDefs.h"
@@ -56,11 +56,11 @@ public:
                                                                               std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantB(CLuaPhysicsRigidBody* pRigidBody, CVector vecPosition, CVector vecAnchor,
-                                                                       std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+                                                                              std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
     static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantC(lua_State* luaVM, ePhysicsConstraint eConstraint,
-                                                                             CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                       CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA, CVector anchorB,
-                                                                       std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+                                                                              CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                              CVector anchorA, CVector anchorB,
+                                                                              std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);

@@ -14,10 +14,10 @@ class CLuaPhysicsShape;
 
 #pragma once
 
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
-#include "lua/CLuaPhysicsShape.h"
-#include "lua/CLuaPhysicsBoxShape.h"
+#include "../LuaCommon.h"
+#include "../CLuaArguments.h"
+#include "lua/physics/CLuaPhysicsShape.h"
+#include "lua/physics/CLuaPhysicsBoxShape.h"
 
 class CLuaPhysicsBoxShape : public CLuaPhysicsShape
 {

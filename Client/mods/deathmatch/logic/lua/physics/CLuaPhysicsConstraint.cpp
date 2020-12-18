@@ -61,7 +61,7 @@ void CLuaPhysicsConstraint::InternalInitialize(btTypedConstraint* pConstraint)
 }
 
 //
-//void CLuaPhysicsConstraint::Initialize(std::unique_ptr<btTypedConstraint> pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+// void CLuaPhysicsConstraint::Initialize(std::unique_ptr<btTypedConstraint> pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
 //{
 //    assert(m_pConstraint == nullptr);
 //    m_pConstraint = std::move(pConstraint);
@@ -118,5 +118,4 @@ void CLuaPhysicsConstraint::Unlink()
         m_pRigidBodyA->RemoveConstraint(this);
     if (m_pRigidBodyB != nullptr)
         m_pRigidBodyB->RemoveConstraint(this);
-
 }

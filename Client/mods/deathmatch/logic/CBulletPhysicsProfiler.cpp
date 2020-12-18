@@ -20,7 +20,7 @@ std::unordered_map<DWORD, const char*>                                   CBullet
 std::unordered_map<DWORD, ProfilerTime>                                  CBulletPhysicsProfiler::m_mapTiming;
 std::mutex                                                               CBulletPhysicsProfiler::m_lock;
 #ifdef USE_NANOSECOND_TIMING
-    std::unique_ptr<btClock> CBulletPhysicsProfiler::m_clock;
+std::unique_ptr<btClock> CBulletPhysicsProfiler::m_clock;
 #endif
 
 void CBulletPhysicsProfiler::Start()

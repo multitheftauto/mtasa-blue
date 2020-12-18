@@ -15,7 +15,7 @@ class CLuaPhysicsStaticCollisionManager;
 
 #pragma once
 
-#include "LuaCommon.h"
+#include "../LuaCommon.h"
 #include <list>
 
 class CLuaPhysicsStaticCollisionManager

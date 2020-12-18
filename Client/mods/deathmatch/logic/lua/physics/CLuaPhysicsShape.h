@@ -15,8 +15,8 @@ class CLuaPhysicsElement;
 #pragma once
 
 // Define includes
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
+#include "../LuaCommon.h"
+#include "../CLuaArguments.h"
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsShape.h"
 
