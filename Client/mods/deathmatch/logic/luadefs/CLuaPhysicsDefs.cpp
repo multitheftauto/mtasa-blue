@@ -47,7 +47,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateCompoundShape", ArgumentParser<PhysicsCreateCompoundShape>},
         {"physicsCreateConvexHullShape", ArgumentParser<PhysicsCreateConvexHullShape>},
         {"physicsCreateTriangleMeshShape", ArgumentParser<PhysicsCreateTriangleMeshShape>},
-        {"physicsCreateGimpactTriangleMeshShape", ArgumentParser<PhysicsCreateGimpactTriangleMeshShape>},
+        {"physicsCreateGimpactMeshShape", ArgumentParser<PhysicsCreateGimpactMeshShape>},
         {"physicsCreateHeightfieldTerrainShape", ArgumentParser<PhysicsCreateHeightfieldTerrainShape>},
         {"physicsCreateShapeFromModel", ArgumentParser<PhysicsCreateShapeFromModel>},
         {"physicsAddChildShape", ArgumentParser<PhysicsAddChildShape>},
@@ -254,7 +254,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
     return pPhysics->CreateBhvTriangleMeshShape(vecVertices);
 }
 
-std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateGimpactMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices)
 {
     if (vecVertices.size() < 3)
         throw std::invalid_argument("Triangle mesh shape require at least 3 vertices");
