@@ -66,7 +66,7 @@ public:
     static std::unique_ptr<btCylinderShape> CreateCylinder(CVector& half);
     static std::unique_ptr<btCompoundShape> CreateCompound();
 
-    static std::unique_ptr<btBvhTriangleMeshShape>  CreateTriangleMesh(std::vector<CVector>& vecIndices);
+    static std::unique_ptr<btBvhTriangleMeshShape>  CreateBvhTriangleMesh(std::vector<CVector>& vecIndices);
     static std::unique_ptr<heightfieldTerrainShape> CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
     static std::unique_ptr<btConvexHullShape>       CreateConvexHull(std::vector<CVector>& vecPoints);
 

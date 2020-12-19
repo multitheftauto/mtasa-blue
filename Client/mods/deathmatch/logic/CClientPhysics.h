@@ -24,7 +24,7 @@ class CClientPhysics;
 #include "lua/physics/CLuaPhysicsCylinderShape.h"
 #include "lua/physics/CLuaPhysicsCompoundShape.h"
 #include "lua/physics/CLuaPhysicsConvexHullShape.h"
-#include "lua/physics/CLuaPhysicsTrianglemeshShape.h"
+#include "lua/physics/CLuaPhysicsBvhTriangleMeshShape.h"
 #include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
 #include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
 #include "lua/physics/CLuaPhysicsFixedConstraint.h"
@@ -109,8 +109,8 @@ public:
     std::shared_ptr<CLuaPhysicsCompoundShape>           CreateCompoundShape(int iInitialChildCapacity = 0);
     std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<float>& vecFloats);
     std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<CVector>& vecVertices);
-    std::shared_ptr<CLuaPhysicsTriangleMeshShape>       CreateTriangleMeshShape(std::vector<float>& vecFloats);
-    std::shared_ptr<CLuaPhysicsTriangleMeshShape>       CreateTriangleMeshShape(std::vector<CVector>& vecVertices);
+    std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape>    CreateBhvTriangleMeshShape(std::vector<float>& vecFloats);
+    std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape>    CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices);
     std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
     std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights);
 

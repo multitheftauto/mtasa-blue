@@ -211,7 +211,7 @@ std::shared_ptr<CLuaPhysicsShape> CClientPhysics::CreateShapeFromModel(unsigned 
             vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
         }
 
-        pCompoundShape->AddShape(CreateTriangleMeshShape(vecIndices), CVector(0, 0, 0));
+        pCompoundShape->AddShape(CreateBhvTriangleMeshShape(vecIndices), CVector(0, 0, 0));
     }
 
     AddShape(pCompoundShape);
@@ -713,23 +713,23 @@ std::shared_ptr<CLuaPhysicsConvexHullShape> CClientPhysics::CreateConvexHullShap
     return CreateConvexHullShape(vecPoints);
 }
 
-std::shared_ptr<CLuaPhysicsTriangleMeshShape> CClientPhysics::CreateTriangleMeshShape(std::vector<CVector>& vecVertices)
+std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> CClientPhysics::CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices)
 {
-    assert(vecVertices.size() > 3);
+    assert(vecVertices.size() >= 3);
 
-    std::shared_ptr<CLuaPhysicsTriangleMeshShape> pShape = std::make_shared<CLuaPhysicsTriangleMeshShape>(this, vecVertices);
+    std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> pShape = std::make_shared<CLuaPhysicsBvhTriangleMeshShape>(this, vecVertices);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsTriangleMeshShape> CClientPhysics::CreateTriangleMeshShape(std::vector<float>& vecFloats)
+std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> CClientPhysics::CreateBhvTriangleMeshShape(std::vector<float>& vecFloats)
 {
     std::vector<CVector> vecPoints;
     vecPoints.reserve(vecFloats.size() / 3);
     for (int i = 0; i < vecFloats.size(); i += 3)
         vecPoints.emplace_back(vecFloats[i], vecFloats[i + 1], vecFloats[i + 2]);
 
-    return CreateTriangleMeshShape(vecPoints);
+    return CreateBhvTriangleMeshShape(vecPoints);
 }
 
 std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CClientPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY)

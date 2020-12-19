@@ -2,14 +2,14 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsTriangleMeshShape.h
+ *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsBhvTriangleMeshShape.h
  *  PURPOSE:     Lua physics shape class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-class CLuaPhysicsTriangleMeshShape;
+class CLuaPhysicsBvhTriangleMeshShape;
 
 #pragma once
 
@@ -18,9 +18,9 @@ class CLuaPhysicsTriangleMeshShape;
 #include "../CLuaArguments.h"
 #include "CLuaPhysicsShape.h"
 
-class CLuaPhysicsTriangleMeshShape : public CLuaPhysicsShape
+class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsShape
 {
 public:
-    CLuaPhysicsTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecIndices);
-    ~CLuaPhysicsTriangleMeshShape();
+    CLuaPhysicsBvhTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecIndices);
+    ~CLuaPhysicsBvhTriangleMeshShape();
 };

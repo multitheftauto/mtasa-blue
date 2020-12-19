@@ -239,7 +239,7 @@ std::unique_ptr<btRigidBody> CLuaPhysicsSharedLogic::CreateRigidBody(btCollision
     return std::move(pRigidBody);
 }
 
-std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<CVector>& vecIndices)
+std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(std::vector<CVector>& vecIndices)
 {
     if (vecIndices.size() % 3 != 0 || vecIndices.size() == 0)
         return nullptr;
@@ -252,6 +252,7 @@ std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateTriangleMe
     }
 
     std::unique_ptr<btBvhTriangleMeshShape> triangleMeshShape = std::make_unique<btBvhTriangleMeshShape>(triangleMesh, true);
+    triangleMeshShape->buildOptimizedBvh();
     return std::move(triangleMeshShape);
 }
 

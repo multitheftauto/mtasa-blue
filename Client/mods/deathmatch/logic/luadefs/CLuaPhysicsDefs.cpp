@@ -25,7 +25,7 @@
 #include "lua/physics/CLuaPhysicsConeShape.h"
 #include "lua/physics/CLuaPhysicsCylinderShape.h"
 #include "lua/physics/CLuaPhysicsConvexHullShape.h"
-#include "lua/physics/CLuaPhysicsTriangleMeshShape.h"
+#include "lua/physics/CLuaPhysicsBvhTriangleMeshShape.h"
 #include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
 
 #include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
@@ -250,7 +250,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
                     .c_str());
         }
     }
-    return pPhysics->CreateTriangleMeshShape(vecVertices);
+    return pPhysics->CreateBhvTriangleMeshShape(vecVertices);
 }
 
 // Todo: Add support for greyscale texture as input
@@ -373,6 +373,8 @@ std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(CL
 {
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
         throw std::invalid_argument("Terrain shape is not supported");
+    if (pShape->GetType() == BroadphaseNativeTypes::TRIANGLE_MESH_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Triangle mesh shape is not supported");
 
     if (fMass.value_or(1.f) < 0)
         throw std::invalid_argument("Mass can not be negative");
