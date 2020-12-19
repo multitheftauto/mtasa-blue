@@ -275,7 +275,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerra
 
         return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights.value());
     }
-    return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights.value());
+    return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY);
 }
 
 bool CLuaPhysicsDefs::PhysicsDestroy(CLuaPhysicsElement* physicsElement)
