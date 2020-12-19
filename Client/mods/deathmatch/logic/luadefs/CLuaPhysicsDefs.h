@@ -90,7 +90,7 @@ public:
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConvexHullShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecPoints);
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateTriangleMeshShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecVertices);
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY,
-                                                                                  std::vector<float> vecHeights);
+                                                                                  std::optional<std::vector<float>> vecHeights);
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 

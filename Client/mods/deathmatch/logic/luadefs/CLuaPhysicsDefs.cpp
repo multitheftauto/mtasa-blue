@@ -257,7 +257,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
 
 // Todo: Add support for greyscale texture as input
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY,
-                                                                                        std::vector<float> vecHeights)
+                                                                                        std::optional<std::vector<float>> vecHeights)
 {
     if (sizeX < BulletPhysics::Limits::MinimumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MinimumHeightfieldTerrain)
         throw std::invalid_argument(SString("Minimum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MinimumHeightfieldTerrain).c_str());
@@ -265,13 +265,17 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerra
     if (sizeX > BulletPhysics::Limits::MaximumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MaximumHeightfieldTerrain)
         throw std::invalid_argument(SString("Maximum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MaximumHeightfieldTerrain).c_str());
 
-    if (sizeX * sizeY != vecHeights.size())
+    if (vecHeights.has_value())
     {
-        throw std::invalid_argument(
-            SString("Heigthfield of size %ix%i require %i floats, got %i floats", sizeX, sizeY, sizeX * sizeY, vecHeights.size()).c_str());
-    }
+        if (sizeX * sizeY != vecHeights.value().size())
+        {
+            throw std::invalid_argument(
+                SString("Heigthfield of size %ix%i require %i floats, got %i floats", sizeX, sizeY, sizeX * sizeY, vecHeights.value().size()).c_str());
+        }
 
-    return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights);
+        return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights.value());
+    }
+    return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights.value());
 }
 
 bool CLuaPhysicsDefs::PhysicsDestroy(CLuaPhysicsElement* physicsElement)
