@@ -654,8 +654,8 @@ std::shared_ptr<CLuaPhysicsSphereShape> CClientPhysics::CreateSphereShape(float 
 
 std::shared_ptr<CLuaPhysicsCapsuleShape> CClientPhysics::CreateCapsuleShape(float fRadius, float fHeight)
 {
-    assert(fRadius <= 0);
-    assert(fHeight <= 0);
+    assert(fRadius > 0);
+    assert(fHeight > 0);
 
     std::shared_ptr<CLuaPhysicsCapsuleShape> pShape = std::make_shared<CLuaPhysicsCapsuleShape>(this, fRadius, fHeight);
     AddShape(pShape);
@@ -664,8 +664,8 @@ std::shared_ptr<CLuaPhysicsCapsuleShape> CClientPhysics::CreateCapsuleShape(floa
 
 std::shared_ptr<CLuaPhysicsConeShape> CClientPhysics::CreateConeShape(float fRadius, float fHeight)
 {
-    assert(fRadius <= 0);
-    assert(fHeight <= 0);
+    assert(fRadius > 0);
+    assert(fHeight > 0);
 
     std::shared_ptr<CLuaPhysicsConeShape> pShape = std::make_shared<CLuaPhysicsConeShape>(this, fRadius, fHeight);
     AddShape(pShape);
@@ -674,9 +674,9 @@ std::shared_ptr<CLuaPhysicsConeShape> CClientPhysics::CreateConeShape(float fRad
 
 std::shared_ptr<CLuaPhysicsCylinderShape> CClientPhysics::CreateCylinderShape(CVector half)
 {
-    assert(half.fX <= 0);
-    assert(half.fY <= 0);
-    assert(half.fZ <= 0);
+    assert(half.fX > 0);
+    assert(half.fY > 0);
+    assert(half.fZ > 0);
 
     std::shared_ptr<CLuaPhysicsCylinderShape> pShape = std::make_shared<CLuaPhysicsCylinderShape>(this, half);
     AddShape(pShape);
@@ -685,7 +685,7 @@ std::shared_ptr<CLuaPhysicsCylinderShape> CClientPhysics::CreateCylinderShape(CV
 
 std::shared_ptr<CLuaPhysicsCompoundShape> CClientPhysics::CreateCompoundShape(int iInitialChildCapacity)
 {
-    assert(iInitialChildCapacity < 0);
+    assert(iInitialChildCapacity > 0);
 
     std::shared_ptr<CLuaPhysicsCompoundShape> pShape = std::make_shared<CLuaPhysicsCompoundShape>(this, iInitialChildCapacity);
     AddShape(pShape);
@@ -694,20 +694,42 @@ std::shared_ptr<CLuaPhysicsCompoundShape> CClientPhysics::CreateCompoundShape(in
 
 std::shared_ptr<CLuaPhysicsConvexHullShape> CClientPhysics::CreateConvexHullShape(std::vector<CVector>& vecPoints)
 {
-    assert(vecPoints.size() < 3);
+    assert(vecPoints.size() >= 3);
 
     std::shared_ptr<CLuaPhysicsConvexHullShape> pShape = std::make_shared<CLuaPhysicsConvexHullShape>(this, vecPoints);
     AddShape(pShape);
     return pShape;
 }
 
+std::shared_ptr<CLuaPhysicsConvexHullShape> CClientPhysics::CreateConvexHullShape(std::vector<float>& vecFloats)
+{
+    assert(vecFloats.size() >= 9);
+
+    std::vector<CVector> vecPoints;
+    vecPoints.reserve(vecFloats.size() / 3);
+    for (int i = 0; i < vecFloats.size(); i+=3)
+        vecPoints.emplace_back(vecFloats[i], vecFloats[i + 1], vecFloats[i + 2]);
+
+    return CreateConvexHullShape(vecPoints);
+}
+
 std::shared_ptr<CLuaPhysicsTriangleMeshShape> CClientPhysics::CreateTriangleMeshShape(std::vector<CVector>& vecVertices)
 {
-    assert(vecVertices.size() < 3);
+    assert(vecVertices.size() > 3);
 
     std::shared_ptr<CLuaPhysicsTriangleMeshShape> pShape = std::make_shared<CLuaPhysicsTriangleMeshShape>(this, vecVertices);
     AddShape(pShape);
     return pShape;
+}
+
+std::shared_ptr<CLuaPhysicsTriangleMeshShape> CClientPhysics::CreateTriangleMeshShape(std::vector<float>& vecFloats)
+{
+    std::vector<CVector> vecPoints;
+    vecPoints.reserve(vecFloats.size() / 3);
+    for (int i = 0; i < vecFloats.size(); i += 3)
+        vecPoints.emplace_back(vecFloats[i], vecFloats[i + 1], vecFloats[i + 2]);
+
+    return CreateTriangleMeshShape(vecPoints);
 }
 
 std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CClientPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY)

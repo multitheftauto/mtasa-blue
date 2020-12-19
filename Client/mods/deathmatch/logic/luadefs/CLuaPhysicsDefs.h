@@ -38,16 +38,16 @@ public:
     static bool        PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
     static bool        PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
     static std::string PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
-    static std::shared_ptr<CLuaPhysicsStaticCollision> PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
+    static std::shared_ptr<CLuaPhysicsStaticCollision> PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                                     std::optional<CVector> rotation);
-    static std::shared_ptr<CLuaPhysicsShape>           PhysicsCreateShapeFromModel(lua_State* luaVM, CClientPhysics* pPhysics, unsigned short usModel);
+    static std::shared_ptr<CLuaPhysicsShape>           PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel);
     static bool                                        PhysicsDrawDebug(CClientPhysics* pPhysics);
     static std::vector<std::shared_ptr<CLuaPhysicsShape>>           PhysicsGetShapes(CClientPhysics* pPhysics);
     static std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       PhysicsGetRigidBodies(CClientPhysics* pPhysics);
     static std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> PhysicsGetStaticCollisions(CClientPhysics* pPhysics);
     static std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      PhysicsGetConstraints(CClientPhysics* pPhysics);
     static bool                                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
-    static std::shared_ptr<CLuaPhysicsRigidBody> PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<float> fMass,
+    static std::shared_ptr<CLuaPhysicsRigidBody> PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass,
                                                                         std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass);
     static bool PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
                                      std::optional<CVector> vecRotation);
@@ -57,7 +57,7 @@ public:
 
     static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantB(CLuaPhysicsRigidBody* pRigidBody, CVector vecPosition, CVector vecAnchor,
                                                                               std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
-    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantC(lua_State* luaVM, ePhysicsConstraint eConstraint,
+    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantC(ePhysicsConstraint eConstraint,
                                                                               CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                               CVector anchorA, CVector anchorB,
                                                                               std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
@@ -78,18 +78,18 @@ public:
     static std::variant<CVector, float, bool, std::tuple<int, int, int, int>> PhysicsGetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision,
                                                                                                                   ePhysicsProperty            eProperty);
 
-    // static CLuaPhysicsShape* PhysicsCreateShape(lua_State* luaVM, CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float>
+    // static CLuaPhysicsShape* PhysicsCreateShape(CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float>
     // variant);
 
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateBoxShape(lua_State* luaVM, CClientPhysics* pPhysics, std::variant<CVector, float> variant);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateSphereShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCapsuleShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConeShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCylinderShape(lua_State* luaVM, CClientPhysics* pPhysics, float fRadius, float fHeight);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCompoundShape(lua_State* luaVM, CClientPhysics* pPhysics, std::optional<int> initialCapacity);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConvexHullShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecPoints);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateTriangleMeshShape(lua_State* luaVM, CClientPhysics* pPhysics, std::vector<CVector> vecVertices);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateHeightfieldTerrainShape(lua_State* luaVM, CClientPhysics* pPhysics, int sizeX, int sizeY,
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateBoxShape(CClientPhysics* pPhysics, std::variant<CVector, float> variant);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateSphereShape(CClientPhysics* pPhysics, float fRadius);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCapsuleShape(CClientPhysics* pPhysics, float fRadius, float fHeight);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConeShape(CClientPhysics* pPhysics, float fRadius, float fHeight);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCylinderShape(CClientPhysics* pPhysics, float fRadius, float fHeight);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCompoundShape(CClientPhysics* pPhysics, std::optional<int> initialCapacity);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConvexHullShape(CClientPhysics* pPhysics, std::vector<float> vecPoints);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateTriangleMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateHeightfieldTerrainShape(CClientPhysics* pPhysics, int sizeX, int sizeY,
                                                                                   std::optional<std::vector<float>> vecHeights);
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);

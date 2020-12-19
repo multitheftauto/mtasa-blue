@@ -107,7 +107,9 @@ public:
     std::shared_ptr<CLuaPhysicsConeShape>               CreateConeShape(float fRadius, float fHeight);
     std::shared_ptr<CLuaPhysicsCylinderShape>           CreateCylinderShape(CVector half);
     std::shared_ptr<CLuaPhysicsCompoundShape>           CreateCompoundShape(int iInitialChildCapacity = 0);
-    std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<CVector>& vecPoints);
+    std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<float>& vecFloats);
+    std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<CVector>& vecVertices);
+    std::shared_ptr<CLuaPhysicsTriangleMeshShape>       CreateTriangleMeshShape(std::vector<float>& vecFloats);
     std::shared_ptr<CLuaPhysicsTriangleMeshShape>       CreateTriangleMeshShape(std::vector<CVector>& vecVertices);
     std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
     std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights);
