@@ -89,6 +89,7 @@ public:
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCompoundShape(CClientPhysics* pPhysics, std::optional<int> initialCapacity);
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConvexHullShape(CClientPhysics* pPhysics, std::vector<float> vecPoints);
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateTriangleMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices);
+    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices);
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateHeightfieldTerrainShape(CClientPhysics* pPhysics, int sizeX, int sizeY,
                                                                                   std::optional<std::vector<float>> vecHeights);
 

@@ -11,14 +11,14 @@
 
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
-#include "CLuaPhysicsBvhTriangleMeshShape.h"
+#include "CLuaPhysicsGimpactTriangleMeshShape.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsBvhTriangleMeshShape::CLuaPhysicsBvhTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices)
-    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(vecVertices)))
+CLuaPhysicsGimpactTriangleMeshShape::CLuaPhysicsGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices)
+    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateGimpactMeshShape(vecVertices)))
 {
 }
 
-CLuaPhysicsBvhTriangleMeshShape::~CLuaPhysicsBvhTriangleMeshShape()
+CLuaPhysicsGimpactTriangleMeshShape::~CLuaPhysicsGimpactTriangleMeshShape()
 {
 }

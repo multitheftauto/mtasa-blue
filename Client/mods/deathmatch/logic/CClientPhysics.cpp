@@ -732,6 +732,25 @@ std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> CClientPhysics::CreateBhvTriang
     return CreateBhvTriangleMeshShape(vecPoints);
 }
 
+std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> CClientPhysics::CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices)
+{
+    assert(vecVertices.size() >= 3);
+
+    std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> pShape = std::make_shared<CLuaPhysicsGimpactTriangleMeshShape>(this, vecVertices);
+    AddShape(pShape);
+    return pShape;
+}
+
+std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> CClientPhysics::CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats)
+{
+    std::vector<CVector> vecPoints;
+    vecPoints.reserve(vecFloats.size() / 3);
+    for (int i = 0; i < vecFloats.size(); i += 3)
+        vecPoints.emplace_back(vecFloats[i], vecFloats[i + 1], vecFloats[i + 2]);
+
+    return CreateGimpactTriangleMeshShape(vecPoints);
+}
+
 std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CClientPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY)
 {
     std::vector<float> vecHeights(iSizeX * iSizeY, 0);

@@ -1,7 +1,15 @@
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
+#include "bulletphysics3d/btBulletDynamicsCommon.h"
+#include "bulletphysics3d/BulletCollision/Gimpact/btGImpactShape.h"
 #include "../Client/game_sa/CModelInfoSA.h"
 #include "../Client/game_sa/CColModelSA.h"
+
+class btGImpactMeshShape;
+class heightfieldTerrainShape;
+class CLuaPhysicsSharedLogic;
+
+#pragma once
 
 namespace BulletPhysics
 {
@@ -66,7 +74,9 @@ public:
     static std::unique_ptr<btCylinderShape> CreateCylinder(CVector& half);
     static std::unique_ptr<btCompoundShape> CreateCompound();
 
-    static std::unique_ptr<btBvhTriangleMeshShape>  CreateBvhTriangleMesh(std::vector<CVector>& vecIndices);
+    static std::unique_ptr<btBvhTriangleMeshShape>  CreateBvhTriangleMesh(std::vector<CVector>& vecVertices);
+    static std::unique_ptr<btGImpactMeshShape>      CreateGimpactMeshShape(std::vector<CVector>& vecVertices);
+
     static std::unique_ptr<heightfieldTerrainShape> CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
     static std::unique_ptr<btConvexHullShape>       CreateConvexHull(std::vector<CVector>& vecPoints);
 

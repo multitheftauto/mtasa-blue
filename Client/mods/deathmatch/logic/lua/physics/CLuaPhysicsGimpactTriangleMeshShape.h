@@ -9,7 +9,7 @@
  *
  *****************************************************************************/
 
-class CLuaPhysicsBvhTriangleMeshShape;
+class CLuaPhysicsGimpactTriangleMeshShape;
 
 #pragma once
 
@@ -18,9 +18,9 @@ class CLuaPhysicsBvhTriangleMeshShape;
 #include "../CLuaArguments.h"
 #include "CLuaPhysicsShape.h"
 
-class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsShape
+class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsShape
 {
 public:
-    CLuaPhysicsBvhTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices);
-    ~CLuaPhysicsBvhTriangleMeshShape();
+    CLuaPhysicsGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices);
+    ~CLuaPhysicsGimpactTriangleMeshShape();
 };

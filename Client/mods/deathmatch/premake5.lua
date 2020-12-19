@@ -43,7 +43,8 @@ project "Client Deathmatch"
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
 			"../../../vendor/sparsehash/src/",
-			"../../../vendor/bulletphysics3d/src/"
+			"../../../vendor/bulletphysics3d/src/",
+			"../../../vendor/bulletphysics3d/"
 	}
 
 	files {

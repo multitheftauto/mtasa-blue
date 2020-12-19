@@ -1,5 +1,4 @@
 #include "StdInc.h"
-#include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "CLuaPhysicsSharedLogic.h"
 
 #define ARRAY_ModelInfo 0xA9B0C8
@@ -239,20 +238,37 @@ std::unique_ptr<btRigidBody> CLuaPhysicsSharedLogic::CreateRigidBody(btCollision
     return std::move(pRigidBody);
 }
 
-std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(std::vector<CVector>& vecIndices)
+std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(std::vector<CVector>& vecVertices)
 {
-    if (vecIndices.size() % 3 != 0 || vecIndices.size() == 0)
+    if (vecVertices.size() % 3 != 0 || vecVertices.size() == 0)
         return nullptr;
 
     btTriangleMesh* triangleMesh = new btTriangleMesh();
-    for (int i = 0; i < vecIndices.size(); i += 3)
+    for (int i = 0; i < vecVertices.size(); i += 3)
     {
-        triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecIndices[i]), reinterpret_cast<btVector3&>(vecIndices[i + 1]),
-                                  reinterpret_cast<btVector3&>(vecIndices[i + 2]));
+        triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecVertices[i]), reinterpret_cast<btVector3&>(vecVertices[i + 1]),
+                                  reinterpret_cast<btVector3&>(vecVertices[i + 2]));
     }
 
     std::unique_ptr<btBvhTriangleMeshShape> triangleMeshShape = std::make_unique<btBvhTriangleMeshShape>(triangleMesh, true);
     triangleMeshShape->buildOptimizedBvh();
+    return std::move(triangleMeshShape);
+}
+
+std::unique_ptr<btGImpactMeshShape> CLuaPhysicsSharedLogic::CreateGimpactMeshShape(std::vector<CVector>& vecVertices)
+{
+    if (vecVertices.size() % 3 != 0 || vecVertices.size() == 0)
+        return nullptr;
+
+    btTriangleMesh* triangleMesh = new btTriangleMesh();
+    for (int i = 0; i < vecVertices.size(); i += 3)
+    {
+        triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecVertices[i]), reinterpret_cast<btVector3&>(vecVertices[i + 1]),
+                                  reinterpret_cast<btVector3&>(vecVertices[i + 2]));
+    }
+
+    std::unique_ptr<btGImpactMeshShape> triangleMeshShape = std::make_unique<btGImpactMeshShape>(triangleMesh);
+    triangleMeshShape->updateBound();
     return std::move(triangleMeshShape);
 }
 

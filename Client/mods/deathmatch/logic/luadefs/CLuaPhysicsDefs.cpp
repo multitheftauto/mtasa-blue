@@ -47,6 +47,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateCompoundShape", ArgumentParser<PhysicsCreateCompoundShape>},
         {"physicsCreateConvexHullShape", ArgumentParser<PhysicsCreateConvexHullShape>},
         {"physicsCreateTriangleMeshShape", ArgumentParser<PhysicsCreateTriangleMeshShape>},
+        {"physicsCreateGimpactTriangleMeshShape", ArgumentParser<PhysicsCreateGimpactTriangleMeshShape>},
         {"physicsCreateHeightfieldTerrainShape", ArgumentParser<PhysicsCreateHeightfieldTerrainShape>},
         {"physicsCreateShapeFromModel", ArgumentParser<PhysicsCreateShapeFromModel>},
         {"physicsAddChildShape", ArgumentParser<PhysicsAddChildShape>},
@@ -251,6 +252,28 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
         }
     }
     return pPhysics->CreateBhvTriangleMeshShape(vecVertices);
+}
+
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices)
+{
+    if (vecVertices.size() < 3)
+        throw std::invalid_argument("Triangle mesh shape require at least 3 vertices");
+
+    if (vecVertices.size() % 3 != 0)
+        throw std::invalid_argument("Triangle mesh needs vertices count divisible by 3");
+
+    int index = 0;
+    for (auto const& vertex : vecVertices)
+    {
+        index++;
+        if (std::abs(vertex) > BulletPhysics::Limits::MaximumPrimitiveSize)
+        {
+            throw std::invalid_argument(
+                SString("Vertex at index %i exceed limit of coord greater than %.2f units.", index, BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
+                    .c_str());
+        }
+    }
+    return pPhysics->CreateGimpactTriangleMeshShape(vecVertices);
 }
 
 // Todo: Add support for greyscale texture as input
