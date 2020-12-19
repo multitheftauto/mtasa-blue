@@ -16,8 +16,8 @@
 #include "lua/physics/CLuaPhysicsConstraintManager.h"
 #include "lua/physics/CLuaPhysicsShapeManager.h"
 #include "lua/physics/CLuaPhysicsSharedLogic.h"
-
 #include "lua/physics/CLuaPhysicsElement.h"
+
 #include "lua/physics/CLuaPhysicsBoxShape.h"
 #include "lua/physics/CLuaPhysicsCompoundShape.h"
 #include "lua/physics/CLuaPhysicsSphereShape.h"
@@ -25,7 +25,6 @@
 #include "lua/physics/CLuaPhysicsConeShape.h"
 #include "lua/physics/CLuaPhysicsCylinderShape.h"
 #include "lua/physics/CLuaPhysicsConvexHullShape.h"
-#include "lua/physics/CLuaPhysicsCompoundShape.h"
 #include "lua/physics/CLuaPhysicsTriangleMeshShape.h"
 #include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
 
