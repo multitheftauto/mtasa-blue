@@ -18,7 +18,7 @@ subject to the following restrictions:
 #ifndef _BT_POLYHEDRAL_FEATURES_H
 #define _BT_POLYHEDRAL_FEATURES_H
 
-#include "BulletPhysics3d/LinearMath/btTransform.h"
+#include <BulletPhysics3d/LinearMath/btTransform.h>
 #include "BulletPhysics3d/LinearMath/btAlignedObjectArray.h"
 
 #define TEST_INTERNAL_OBJECTS 1
