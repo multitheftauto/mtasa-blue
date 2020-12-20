@@ -256,11 +256,11 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateGimpactMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices)
 {
-    if (vecVertices.size() < 3)
-        throw std::invalid_argument("Triangle mesh shape require at least 3 vertices");
+    if (vecVertices.size() < 9)
+        throw std::invalid_argument("Gimpact mesh shape require at least 3 vertices");
 
-    if (vecVertices.size() % 3 != 0)
-        throw std::invalid_argument("Triangle mesh needs vertices count divisible by 3");
+    if (vecVertices.size() % 9 != 0)
+        throw std::invalid_argument("Gimpact mesh needs vertices count divisible by 3");
 
     int index = 0;
     for (auto const& vertex : vecVertices)
