@@ -13,7 +13,7 @@
 
 class CWaterManager;
 
-class CWater : public CElement
+class CWater final : public CElement
 {
 public:
     enum EWaterType
