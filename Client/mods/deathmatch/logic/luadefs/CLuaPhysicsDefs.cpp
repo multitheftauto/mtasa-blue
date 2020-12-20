@@ -283,7 +283,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerra
     if (sizeX < BulletPhysics::Limits::MinimumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MinimumHeightfieldTerrain)
         throw std::invalid_argument(SString("Minimum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MinimumHeightfieldTerrain).c_str());
 
-    if (sizeX > BulletPhysics::Limits::MaximumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MaximumHeightfieldTerrain)
+    if (sizeX > BulletPhysics::Limits::MaximumHeightfieldTerrain || sizeY > BulletPhysics::Limits::MaximumHeightfieldTerrain)
         throw std::invalid_argument(SString("Maximum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MaximumHeightfieldTerrain).c_str());
 
     if (vecHeights.has_value())
