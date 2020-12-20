@@ -107,7 +107,8 @@ public:
     // LUA_DECLARE(PhysicsSetProperties);
     // LUA_DECLARE(PhysicsGetProperties);
 
-    LUA_DECLARE(PhysicsGetDebugMode);
+    static std::variant<bool, float> PhysicsGetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
+
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsCreateConstraint);
 

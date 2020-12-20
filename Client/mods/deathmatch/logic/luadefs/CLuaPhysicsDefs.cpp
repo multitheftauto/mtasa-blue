@@ -17,6 +17,7 @@
 #include "lua/physics/CLuaPhysicsShapeManager.h"
 #include "lua/physics/CLuaPhysicsSharedLogic.h"
 #include "lua/physics/CLuaPhysicsElement.h"
+#include "CPhysicsDebugDrawer.h"
 
 #include "lua/physics/CLuaPhysicsBoxShape.h"
 #include "lua/physics/CLuaPhysicsCompoundShape.h"
@@ -68,7 +69,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetStaticCollisionProperties", ArgumentParser<PhysicsGetStaticCollisionProperties>},
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
-        {"physicsGetDebugMode", PhysicsGetDebugMode},
+        {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsApplyVelocityForce", ArgumentParser<PhysicsApplyVelocityForce>},
         {"physicsApplyVelocity", ArgumentParser<PhysicsApplyVelocity>},
@@ -341,48 +342,38 @@ bool CLuaPhysicsDefs::PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebu
 {
     switch (eDebugMode)
     {
-        case PHYSICS_DEBUG_LINE_WIDTH:
+        case ePhysicsDebugMode::PHYSICS_DEBUG_LINE_WIDTH:
             if (std::holds_alternative<float>(variant))
             {
-                pPhysics->SetDebugLineWidth(std::get<float>(variant));
+                pPhysics->GetDebug()->SetLineWidth(std::get<float>(variant));
                 return true;
             }
-            throw std::invalid_argument(SString("Property %s requires float as argument 3.", EnumToString(eDebugMode)).c_str());
+        case ePhysicsDebugMode::PHYSICS_DEBUG_DRAW_DISTANCE:
+            if (std::holds_alternative<float>(variant))
+            {
+                pPhysics->GetDebug()->SetDrawDistance(std::get<float>(variant));
+                return true;
+            }
         default:
             if (std::holds_alternative<float>(variant))
             {
-                pPhysics->SetDebugMode(eDebugMode, std::get<bool>(variant));
+                pPhysics->GetDebug()->setDebugMode(eDebugMode, std::get<bool>(variant));
                 return true;
             }
-            throw std::invalid_argument(SString("Property %s requires bool as argument 3.", EnumToString(eDebugMode)).c_str());
     }
+    throw std::invalid_argument(SString("Property %s requires float as argument 3.", EnumToString(eDebugMode)).c_str());
 }
 
-int CLuaPhysicsDefs::PhysicsGetDebugMode(lua_State* luaVM)
+std::variant<bool, float> CLuaPhysicsDefs::PhysicsGetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode)
 {
-    CClientPhysics*   pPhysics;
-    ePhysicsDebugMode eDebugMode;
-    CScriptArgReader  argStream(luaVM);
-    argStream.ReadUserData(pPhysics);
-    argStream.ReadEnumString(eDebugMode);
-    if (!argStream.HasErrors())
+    switch (eDebugMode)
     {
-        if (eDebugMode == PHYSICS_DEBUG_LINE_WIDTH)
-        {
-            lua_pushnumber(luaVM, pPhysics->GetDebugLineWidth());
-            return 1;
-        }
-        else
-        {
-            lua_pushboolean(luaVM, pPhysics->GetDebugMode(eDebugMode));
-            return 1;
-        }
+        case ePhysicsDebugMode::PHYSICS_DEBUG_LINE_WIDTH:
+            return pPhysics->GetDebug()->GetLineWidth();
+        case ePhysicsDebugMode::PHYSICS_DEBUG_DRAW_DISTANCE:
+            return pPhysics->GetDebug()->GetDrawDistance();
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return pPhysics->GetDebug()->getDebugMode(eDebugMode);
 }
 
 bool CLuaPhysicsDefs::PhysicsDrawDebug(CClientPhysics* pPhysics)

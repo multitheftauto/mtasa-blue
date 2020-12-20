@@ -30,7 +30,6 @@ class CClientPhysics;
 #include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
 #include "lua/physics/CLuaPhysicsFixedConstraint.h"
 
-enum ePhysicsDebugMode;
 class CLuaPhysicsConstraint;
 class CPhysicsDebugDrawer;
 
@@ -62,10 +61,6 @@ public:
     btCollisionWorld::ClosestRayResultCallback    RayCast(CVector from, CVector to, bool bFilterBackfaces) const;
     btCollisionWorld::AllHitsRayResultCallback    RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const;
 
-    bool                                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
-    bool                                        GetDebugMode(ePhysicsDebugMode eDebugMode) const;
-    void                                        SetDebugLineWidth(float fWidth) const;
-    float                                       GetDebugLineWidth() const;
     void                                        StartBuildCollisionFromGTA();
     void                                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                                        BuildCollisionFromGTA();
@@ -155,6 +150,8 @@ public:
     std::shared_ptr<CLuaPhysicsRigidBody>       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
 
     const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
+
+    CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
 
 private:
     void StepSimulation();

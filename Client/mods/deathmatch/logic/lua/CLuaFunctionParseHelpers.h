@@ -66,6 +66,7 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM_CLASS(eClientModelType);
+DECLARE_ENUM_CLASS(ePhysicsDebugMode);
 
 class CRemoteCall;
 
@@ -173,30 +174,6 @@ enum ePhysicsProperty
     PHYSICS_PROPERTY_IS_SOFT_BODY,
 };
 DECLARE_ENUM(ePhysicsProperty);
-
-enum ePhysicsDebugMode
-{
-    PHYSICS_DEBUG_NoDebug = -1,
-    PHYSICS_DEBUG_DrawWireframe,
-    PHYSICS_DEBUG_DrawAabb,
-    PHYSICS_DEBUG_DrawFeaturesText,
-    PHYSICS_DEBUG_DrawContactPoints,
-    PHYSICS_DEBUG_NoDeactivation,
-    PHYSICS_DEBUG_NoHelpText,
-    PHYSICS_DEBUG_DrawText,
-    PHYSICS_DEBUG_ProfileTimings,
-    PHYSICS_DEBUG_EnableSatComparison,
-    PHYSICS_DEBUG_DisableBulletLCP,
-    PHYSICS_DEBUG_EnableCCD,
-    PHYSICS_DEBUG_DrawConstraints,
-    PHYSICS_DEBUG_DrawConstraintLimits,
-    PHYSICS_DEBUG_FastWireframe,
-    PHYSICS_DEBUG_DrawNormals,
-    PHYSICS_DEBUG_DrawFrames,
-    PHYSICS_DEBUG_LINE_WIDTH,
-    PHYSICS_DEBUG_MAX_DEBUG_DRAW_MODE
-};
-DECLARE_ENUM(ePhysicsDebugMode);
 
 enum ePhysicsConstraint
 {

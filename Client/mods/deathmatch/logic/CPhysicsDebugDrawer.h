@@ -28,10 +28,15 @@ class CPhysicsDebugDrawer : public btIDebugDraw
     std::bitset<32>     m_debugMode = 0;
     SColorARGB          color = SColorARGB(255, 255, 0, 0);
     float               m_fLineWidth = 2.0f;
+    float               m_fDrawDistance = 100.0f;
+    CVector             m_vecCameraPosition;
 
 public:
-    void  SetDebugLineWidth(float fWidth) { m_fLineWidth = fWidth; }
-    float GetDebugLineWidth() const { return m_fLineWidth; }
+    void  SetLineWidth(float fWidth) { m_fLineWidth = fWidth; }
+    float GetLineWidth() const { return m_fLineWidth; }
+    void  SetDrawDistance(float fDistance) { m_fDrawDistance = fDistance; }
+    float GetDrawDistance() const { return m_fDrawDistance; }
+    void  SetCameraPosition(CVector vecPosition) { m_vecCameraPosition = vecPosition; }
 
     void Clear();
     void DrawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor);
@@ -51,13 +56,13 @@ public:
 
     void draw3dText(const btVector3& location, const char* textString);
 
-    void setDebugMode(byte bit, bool bEnabled) { m_debugMode.set(bit, bEnabled); };
+    void setDebugMode(ePhysicsDebugMode bit, bool bEnabled) { m_debugMode.set((size_t)bit, bEnabled); };
     void setDebugMode(int debugMode) { m_debugMode = debugMode; };
 
     void reset() { m_debugMode = 0; };
 
     int getDebugMode() const { return m_debugMode.to_ulong(); }
-    int getDebugMode(byte bit) const { return m_debugMode.test(bit); }
+    bool getDebugMode(ePhysicsDebugMode bit) const { return m_debugMode.test((size_t)bit); }
 
     std::vector<CPhysicsDebugLine> m_vecLines;
 };

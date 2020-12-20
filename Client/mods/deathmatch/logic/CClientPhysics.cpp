@@ -391,41 +391,41 @@ void CClientPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConst
     m_InitializeConstraintsQueue.push(pConstraint);
 }
 
-void CClientPhysics::SetDebugLineWidth(float fWidth) const
-{
-    m_pDebugDrawer->SetDebugLineWidth(fWidth);
-}
-
-float CClientPhysics::GetDebugLineWidth() const
-{
-    return m_pDebugDrawer->GetDebugLineWidth();
-}
-
-bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
-{
-    if (eDebugMode == PHYSICS_DEBUG_NoDebug)
-    {
-        if (bEnabled)
-        {
-            m_pDebugDrawer->reset();
-            return true;
-        }
-        return false;
-    }
-
-    m_pDebugDrawer->setDebugMode(eDebugMode, bEnabled);
-
-    return true;
-}
-bool CClientPhysics::GetDebugMode(ePhysicsDebugMode eDebugMode) const
-{
-    if (eDebugMode == PHYSICS_DEBUG_NoDebug)
-    {
-        return m_pDebugDrawer->getDebugMode() == 0;
-    }
-
-    return m_pDebugDrawer->getDebugMode(eDebugMode);
-}
+//void CClientPhysics::SetDebugLineWidth(float fWidth) const
+//{
+//    m_pDebugDrawer->SetDebugLineWidth(fWidth);
+//}
+//
+//float CClientPhysics::GetDebugLineWidth() const
+//{
+//    return m_pDebugDrawer->GetDebugLineWidth();
+//}
+//
+//bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
+//{
+//    if (eDebugMode == ePhysicsDebugMode::PHYSICS_DEBUG_NoDebug)
+//    {
+//        if (bEnabled)
+//        {
+//            m_pDebugDrawer->reset();
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    m_pDebugDrawer->setDebugMode(eDebugMode, bEnabled);
+//
+//    return true;
+//}
+//bool CClientPhysics::GetDebugMode(ePhysicsDebugMode eDebugMode) const
+//{
+//    if (eDebugMode == ePhysicsDebugMode::PHYSICS_DEBUG_NoDebug)
+//    {
+//        return m_pDebugDrawer->getDebugMode() == 0;
+//    }
+//
+//    return m_pDebugDrawer->getDebugMode(eDebugMode);
+//}
 
 void CClientPhysics::StepSimulation()
 {
@@ -835,7 +835,7 @@ void CClientPhysics::DrawDebugLines()
     if (m_bDrawDebugNextTime)
     {
         for (auto const& line : m_pDebugDrawer->m_vecLines)
-            g_pCore->GetGraphics()->DrawLine3DQueued(line.from, line.to, m_pDebugDrawer->GetDebugLineWidth(), line.color, false);
+            g_pCore->GetGraphics()->DrawLine3DQueued(line.from, line.to, m_pDebugDrawer->GetLineWidth(), line.color, false);
         m_bDrawDebugNextTime = false;
     }
 }
@@ -962,6 +962,11 @@ void CClientPhysics::DoPulse()
     if (m_bDrawDebugNextTime)
     {
         m_pDebugDrawer->Clear();
+
+        CVector vecPosition, vecLookAt;
+        float   fRoll, fFOV;
+        CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV);
+        m_pDebugDrawer->SetCameraPosition(vecPosition);
         {
             std::lock_guard guard(dynamicsWorldLock);
             m_pDynamicsWorld->debugDrawWorld();
