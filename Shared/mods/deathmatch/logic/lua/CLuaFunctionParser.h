@@ -87,6 +87,10 @@ struct CLuaFunctionParserBase
             return GetClassTypeName((T)0);
         else if constexpr (std::is_same_v<T, dummy_type>)
             return "";
+        else if constexpr (std::is_same_v<T, std::monostate>)
+        {
+            return "";
+        }
     }
 
     // Reads the parameter type (& value in some cases) at a given index
@@ -279,6 +283,9 @@ struct CLuaFunctionParserBase
         // thus it is only allowed if there are no further args on the Lua side
         if constexpr (std::is_same_v<T, dummy_type>)
             return iArgument == LUA_TNONE;
+
+        if constexpr (std::is_same_v<T, std::monostate>)
+            return iArgument == LUA_TNONE;
     }
 
     // Special PopUnsafe for variants
@@ -441,6 +448,10 @@ struct CLuaFunctionParserBase
             }
             ++index;
             return map;
+        }
+        else if constexpr (std::is_same_v<T, std::monostate>)
+        {
+            return T{};
         }
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
         {
