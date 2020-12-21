@@ -463,6 +463,16 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
         case CCLIENTVEHICLE:
         {
+            unsigned short usModelOriginal = usModel;
+            if (!CClientVehicleManager::IsStandardModel(usModel))
+            {
+                bitStream.Read(usModelOriginal);
+                if (!CClientVehicleManager::IsValidModel(usModel) && !g_pClientGame->GetManager()->GetModelManager()->RequestModel(usModel, usModelOriginal, eClientModelType::VEHICLE, g_pClientGame->GetManager()))
+                {
+                    usModelOriginal = 400;
+                }
+            }
+
             uchar ucVariant = 255, ucVariant2 = 255;
             if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
             {
@@ -475,11 +485,12 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
             if (usCurrentModel != usModel)
             {
-                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
+                pVehicle->SetModelBlocking(usModelOriginal, ucVariant, ucVariant2);
 
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);
                 Arguments.PushNumber(usModel);
+                Arguments.PushNumber(usModelOriginal);
                 pVehicle->CallEvent("onClientElementModelChange", Arguments, true);
             }
 

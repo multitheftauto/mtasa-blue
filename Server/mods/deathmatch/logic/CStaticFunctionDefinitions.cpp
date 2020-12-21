@@ -1645,7 +1645,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             if (pVehicle->GetModel() == usModel)
                 return false;
-            if (!CVehicleManager::IsValidModel(usModel))
+            if (!CVehicleManager::IsValidModel(usModel) && (!g_pGame->GetModelManager()->IsValidModel(usModel) || g_pGame->GetModelManager()->GetModelType(usModel) != eModelType::VEHICLE))
                 return false;
             CLuaArguments Arguments;
             Arguments.PushNumber(pVehicle->GetModel());            // Get the old model
@@ -1693,6 +1693,17 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
     BitStream.pBitStream->Write(usModel);
     if (pElement->GetType() == CElement::VEHICLE)
     {
+        if (!CVehicleManager::IsValidModel(usModel))
+        {
+            unsigned short usModelOriginal = usModel;
+            if (g_pGame->GetModelManager()->IsValidModel(usModel))
+                usModelOriginal = g_pGame->GetModelManager()->GetModelParent(usModel);
+            else
+                usModelOriginal = VT_LANDSTAL;
+
+            BitStream.pBitStream->Write(usModelOriginal);
+        }
+
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
         BitStream.pBitStream->Write(pVehicle->GetVariant());
         BitStream.pBitStream->Write(pVehicle->GetVariant2());
