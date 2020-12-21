@@ -120,6 +120,20 @@ bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, btVector3
     return true;
 }
 
+const CVector& CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform)
+{
+    const btVector3& vecPosition = transform.getOrigin();
+    return reinterpret_cast<const CVector&>(vecPosition);
+}
+
+const CVector& CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform)
+{
+    btVector3    rotation;
+    btQuaternion quanternion = transform.getRotation();
+    CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
+    return reinterpret_cast<const CVector&>(rotation);
+}
+
 bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, CVector& vecPosition)
 {
     vecPosition = reinterpret_cast<const CVector&>(transform.getOrigin());

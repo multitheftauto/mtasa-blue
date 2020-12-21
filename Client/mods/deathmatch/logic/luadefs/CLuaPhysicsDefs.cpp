@@ -56,7 +56,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetChildShapes", ArgumentParser<PhysicsGetChildShapes>},
         {"physicsGetChildShapeOffsetPosition", ArgumentParser<PhysicsGetChildShapeOffsetPosition>},
         {"physicsGetChildShapeOffsetRotation", ArgumentParser<PhysicsGetChildShapeOffsetRotation>},
-        {"physicsSetChildShapeOffsets", ArgumentParser<PhysicsSetChildShapeOffsets>},
+        {"physicsSetChildShapeOffsetPosition", ArgumentParser<PhysicsSetChildShapeOffsetPosition>},
+        {"physicsSetChildShapeOffsetRotation", ArgumentParser<PhysicsSetChildShapeOffsetRotation>},
         {"physicsGetShapes", ArgumentParser<PhysicsGetShapes>},
         {"physicsGetRigidBodies", ArgumentParser<PhysicsGetRigidBodies>},
         {"physicsGetStaticCollisions", ArgumentParser<PhysicsGetStaticCollisions>},
@@ -445,28 +446,36 @@ bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoun
 
 CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    CVector position, rotation;
-    if (pCompoundShape->GetChildShapeOffsets(iIndex, position, rotation))
-        return position;
+    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-    throw std::invalid_argument("Invalid shape index");
+    return pCompoundShape->GetChildShapePosition(iIndex);
 }
 
 CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    CVector position, rotation;
-    if (pCompoundShape->GetChildShapeOffsets(iIndex, position, rotation))
-        return rotation;
+    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-    throw std::invalid_argument("Invalid shape index");
+    return pCompoundShape->GetChildShapeRotation(iIndex);
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsets(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector position, CVector rotation)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecPosition)
 {
-    if (pCompoundShape->SetChildShapeOffsets(iIndex, position, rotation))
-        return true;
+    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-    throw std::invalid_argument("Invalid shape index");
+    pCompoundShape->SetChildShapePosition(iIndex, vecPosition);
+    return true;
+}
+
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecRotation)
+{
+    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
+        throw std::invalid_argument("Invalid child index");
+
+    pCompoundShape->SetChildShapeRotation(iIndex, vecRotation);
+    return true;
 }
 
 bool CLuaPhysicsDefs::PhysicsApplyVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative)

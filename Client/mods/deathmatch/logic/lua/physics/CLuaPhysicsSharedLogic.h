@@ -59,6 +59,9 @@ public:
     static bool GetRotation(const btTransform& transform, btVector3& vecRotation);
     static bool GetPosition(const btTransform& transform, btVector3& vecPosition);
 
+    static const CVector& GetPosition(const btTransform& transform);
+    static const CVector& GetRotation(const btTransform& transform);
+
     static bool SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition);
     static bool SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation);
     static bool GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
