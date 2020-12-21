@@ -782,13 +782,14 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointTo
                                                                                                 CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                                 bool                  bDisableCollisionsBetweenLinkedBodies)
 {
+    assert(pRigidBodyA != pRigidBodyB);
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
-    CVector anchorA = pRigidBodyA->GetPosition() - pRigidBodyB->GetPosition();
-    CVector anchorB = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
+    CVector vecPivotA = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
+    CVector vecPivotB = pRigidBodyA->GetPosition() - pRigidBodyB->GetPosition();
 
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorB/2, anchorA/2, bDisableCollisionsBetweenLinkedBodies);
+        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, vecPivotA / 2, vecPivotB / 2, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }
@@ -803,14 +804,15 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointTo
 }
 
 std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                                                CLuaPhysicsRigidBody* pRigidBodyB, const CVector& anchorA,
-                                                                                                const CVector& anchorB,
+                                                                                                CLuaPhysicsRigidBody* pRigidBodyB, const CVector& vecPivotA,
+                                                                                                const CVector& vecPivotB,
                                                                                                 bool           bDisableCollisionsBetweenLinkedBodies)
 {
+    assert(pRigidBodyA != pRigidBodyB);
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies);
+        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }

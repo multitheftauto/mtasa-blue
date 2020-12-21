@@ -1296,6 +1296,10 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
     if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantA))            // variant A or C
     {
         CLuaPhysicsRigidBody* pRigidBodyB = std::get<CLuaPhysicsRigidBody*>(variantA);
+        if (pRigidBodyB == pRigidBody)
+        {
+            throw std::invalid_argument("Make sure the two bodies are different.");
+        }
         if (variantB.index() == 0)            // collision does not declared, use default = true
         {
             bDisableCollisionsBetweenLinkedBodies = true;
@@ -1317,7 +1321,7 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
             CVector                                            vecPivotA = std::get<CVector>(variantB);
             CVector                                            vecPivotB = std::get<CVector>(variantC);
             std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-                pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBody, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
+                pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBodyB, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
         }
         std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
             pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies);
@@ -1346,27 +1350,6 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
 
     return nullptr;
 }
-
-//CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantB(CLuaPhysicsRigidBody* pRigidBody, CVector vecPosition, CVector vecAnchor,
-//                                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
-//{
-//    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-//        pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, vecPosition, vecAnchor, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-//    return (CLuaPhysicsConstraint*)pConstraint.get();
-//}
-//
-//CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraintVariantC(ePhysicsConstraint eConstraint,
-//                                                                                    CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-//                                                                                    CVector anchorA, CVector anchorB,
-//                                                                                    std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
-//{
-//    if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
-//        throw std::invalid_argument("Rigid bodies need to belong to the same physics world");
-//
-//    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint = pRigidBodyA->GetPhysics()->CreatePointToPointConstraint(
-//        pRigidBodyA, pRigidBodyB, anchorA, anchorB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-//    return pConstraint.get();
-//}
 
 bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {

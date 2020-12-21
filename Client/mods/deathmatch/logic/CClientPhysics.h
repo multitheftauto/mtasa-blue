@@ -114,7 +114,7 @@ public:
 
     // Links two bodies together
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                    const CVector& anchorA, const CVector& anchorB,
+                                                                                    const CVector& vecPivotA, const CVector& vecPivotB,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
 
     // Links body to position
