@@ -16,8 +16,8 @@
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(pShape)
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+    : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(std::move(pShape))
 {
     m_pTempData = std::make_unique<CLuaPhysicsRigidBodyTempData>();
     m_pTempData->m_fMass = fMass;
@@ -34,9 +34,7 @@ void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRig
 {
     assert(!IsReady());            // in case something goes wrong, or element get initialized twice
 
-    std::shared_ptr<CLuaPhysicsShape> pShape = GetPhysics()->GetSharedShape(m_pShape);
-
-    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(pShape, m_pTempData->m_fMass, m_pTempData->m_vecLocalInertia, m_pTempData->m_vecCenterOfMass);
+    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, m_pTempData->m_fMass, m_pTempData->m_vecLocalInertia, m_pTempData->m_vecCenterOfMass);
     m_pRigidBodyProxy->setUserPointer((void*)this);
 
     SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);

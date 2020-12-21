@@ -23,7 +23,7 @@ public:
     CLuaPhysicsShapeManager(){};
     ~CLuaPhysicsShapeManager(){};
 
-    CLuaPhysicsShape* GetShapeFromScriptID(unsigned int uiScriptID);
+    std::shared_ptr<CLuaPhysicsShape> GetShapeFromScriptID(unsigned int uiScriptID);
 
     void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape);
 

@@ -12,15 +12,15 @@
 #include <StdInc.h>
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiScriptID)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiScriptID)
 {
     CLuaPhysicsShape* pLuaShape = (CLuaPhysicsShape*)CIdArray::FindEntry(uiScriptID, EIdClass::SHAPE);
     if (!pLuaShape)
         return NULL;
 
-    if (!ListContainsSharedPointer(m_ShapeList, pLuaShape))
-        return NULL;
-    return pLuaShape;
+    
+    std::shared_ptr<CLuaPhysicsShape> pShape = ListGetSharedPtr(m_ShapeList, pLuaShape);
+    return pShape;
 }
 
 void CLuaPhysicsShapeManager::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)

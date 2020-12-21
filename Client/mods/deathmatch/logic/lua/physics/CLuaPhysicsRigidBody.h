@@ -52,7 +52,7 @@ public:
 class CLuaPhysicsRigidBody : public CLuaPhysicsElement
 {
 public:
-    CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
     void    SetPosition(const CVector& vecPosition);
@@ -132,7 +132,7 @@ public:
 
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
-    CLuaPhysicsShape*                                  m_pShape;
+    std::shared_ptr<CLuaPhysicsShape>                  m_pShape;
     std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;
     std::vector<CLuaPhysicsConstraint*>                m_constraintList;
     SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;

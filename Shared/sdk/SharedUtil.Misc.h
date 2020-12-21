@@ -351,6 +351,18 @@ namespace SharedUtil
                 return true;
         return false;
     }
+    
+    
+    // Remove all occurrences of item from itemList
+    template <typename T>
+    std::shared_ptr<T> ListGetSharedPtr(std::vector<std::shared_ptr<T>>& itemList, const T* item)
+    {
+        typename std::vector<std::shared_ptr<T>>::iterator it = itemList.begin();
+        for (; it != itemList.end(); ++it)
+            if (item == (*it).get())
+                return *it;
+        return nullptr;
+    }
 
 
     // Add item if it does not aleady exist in itemList

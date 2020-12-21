@@ -57,7 +57,7 @@ public:
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
-    btCollisionWorld::ClosestConvexResultCallback ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to) const;
+    btCollisionWorld::ClosestConvexResultCallback ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to) const;
     btCollisionWorld::ClosestRayResultCallback    RayCast(CVector from, CVector to, bool bFilterBackfaces) const;
     btCollisionWorld::AllHitsRayResultCallback    RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const;
 
@@ -95,7 +95,7 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
     std::shared_ptr<CLuaPhysicsBoxShape>                CreateBoxShape(CVector vector);
     std::shared_ptr<CLuaPhysicsSphereShape>             CreateSphereShape(float radius);

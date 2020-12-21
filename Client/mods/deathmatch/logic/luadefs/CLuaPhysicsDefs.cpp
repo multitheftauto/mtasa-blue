@@ -383,7 +383,7 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CClientPhysics* pPhysics)
     return true;
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass,
+std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, std::optional<float> fMass,
                                                                               std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass)
 {
     if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
@@ -406,62 +406,85 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateShapeFromModel(C
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape,
+std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape,
                                                                                           std::optional<CVector> position, std::optional<CVector> rotation)
 {
-    std::shared_ptr                             pSharedShape = pShape->GetPhysics()->GetSharedShape(pShape);
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
-        pSharedShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
+        pShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
 
     return pStaticCollision;
 }
 
-bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
+bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pShapeChildShape,
+                                           std::optional<CVector> vecPosition,
                                            std::optional<CVector> vecRotation)
 {
-    if (pCompoundShape->GetPhysics() != pShape->GetPhysics())
+    if (pShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
 
     if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape can not be compound");
+        throw std::invalid_argument("Shape is not be compound");
 
-    std::shared_ptr pSharedShape = pShape->GetPhysics()->GetSharedShape(pShape);
-    pCompoundShape->AddShape(pSharedShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
+    if (pShapeChildShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Child shape can not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShapeChildShape.get();
+    pCompoundShape->AddShape(pShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
                              vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
     return true;
 }
 
-std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape)
+std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildShapes(std::shared_ptr<CLuaPhysicsShape> pShape)
 {
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape is not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
     return pCompoundShape->GetChildShapes();
 }
 
-bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
+bool CLuaPhysicsDefs::PhysicsRemoveChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
 {
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape is not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
     if (pCompoundShape->RemoveChildShape(iIndex))
         return true;
 
     throw std::invalid_argument("Invalid shape index");
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
+CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
 {
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape is not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
     if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
         throw std::invalid_argument("Invalid child index");
 
     return pCompoundShape->GetChildShapePosition(iIndex);
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
+CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
 {
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape is not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
     if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
         throw std::invalid_argument("Invalid child index");
 
     return pCompoundShape->GetChildShapeRotation(iIndex);
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecPosition)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex, CVector vecPosition)
 {
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape is not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
     if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
         throw std::invalid_argument("Invalid child index");
 
@@ -469,8 +492,12 @@ bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsCompoundShap
     return true;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecRotation)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex, CVector vecRotation)
 {
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape is not be compound");
+
+    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
     if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
         throw std::invalid_argument("Invalid child index");
 
@@ -1430,7 +1457,8 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
 }
 
 std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
-CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition, CVector vecEndRotation)
+CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition,
+                                  CVector vecEndRotation)
 {
     switch (pShape->GetType())
     {

@@ -91,6 +91,8 @@ struct CLuaFunctionParserBase
         {
             return "";
         }
+        else if constexpr (std::is_same_v<T, std::shared_ptr<CLuaPhysicsShape>>)
+            return "physics-shape";
     }
 
     // Reads the parameter type (& value in some cases) at a given index
@@ -274,6 +276,10 @@ struct CLuaFunctionParserBase
             }
             return true;
         }
+
+        if constexpr (std::is_same_v<T, std::shared_ptr<CLuaPhysicsShape>>)
+            return iArgument == LUA_TLIGHTUSERDATA;
+
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
@@ -617,6 +623,18 @@ struct CLuaFunctionParserBase
                 return nullptr;
             }
             return static_cast<T>(result);
+        }
+        else if constexpr (std::is_same_v<T, std::shared_ptr<CLuaPhysicsShape>>)
+        {
+            int   iType = lua_type(L, index);
+            bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            void* pValue = lua::PopPrimitive<void*>(L, index);
+
+            if (std::shared_ptr<CLuaPhysicsShape> pShape = reinterpret_cast<std::shared_ptr<CLuaPhysicsShape>&>(pValue))
+                return pShape;
+
+            SetBadArgumentError(L, "physics-shape", index - 1, pValue, isLightUserData);
+            return T{};
         }
         else if constexpr (std::is_same_v<T, SColor>)
             return static_cast<unsigned long>(lua::PopPrimitive<int64_t>(L, index));

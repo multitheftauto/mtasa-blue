@@ -132,6 +132,11 @@ void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape)
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pShape->GetScriptID()));
 }
 
+void lua_pushshape(lua_State* luaVM, std::shared_ptr<CLuaPhysicsShape> pShape)
+{
+    lua_pushshape(luaVM, pShape.get());
+}
+
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
 {
     const char* szClass = NULL;
@@ -160,7 +165,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
-    else if (CLuaPhysicsShape* pShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, pData, luaVM))
+    else if (std::shared_ptr<CLuaPhysicsShape> pShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, pData, luaVM))
         return lua_pushshape(luaVM, pShape);
     else if (CLuaPhysicsRigidBody* pRigidBody = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, pData, luaVM))
         return lua_pushrigidbody(luaVM, pRigidBody);

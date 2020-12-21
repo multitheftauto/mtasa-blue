@@ -54,6 +54,7 @@ void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pElement);
 void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pElement);
 void lua_pushconstraint(lua_State* luaVM, CLuaPhysicsConstraint* pConstraint);
 void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape);
+void lua_pushshape(lua_State* luaVM, std::shared_ptr<CLuaPhysicsShape> pShape);
 
 // Converts any type to string
 const char* lua_makestring(lua_State* luaVM, int iArgument);

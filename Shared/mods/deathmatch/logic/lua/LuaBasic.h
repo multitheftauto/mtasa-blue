@@ -115,6 +115,12 @@ namespace lua
         return 1;
     }
     
+    inline int Push(lua_State* L, std::shared_ptr<CLuaPhysicsShape> value)
+    {
+        lua_pushshape(L, value);
+        return 1;
+    }
+    
     inline int Push(lua_State* L, CLuaPhysicsShape* value)
     {
         lua_pushshape(L, value);

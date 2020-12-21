@@ -275,7 +275,7 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to) const
+btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to) const
 {
     CVector fromPosition;
     CVector toPosition;
@@ -771,7 +771,8 @@ std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CClientPhysics::CreateHeight
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::CreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia,
+                                                                      CVector vecCenterOfMass)
 {
     std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = std::make_shared<CLuaPhysicsRigidBody>(pShape, fMass, vecLocalInertia, vecCenterOfMass);
     AddRigidBody(pRigidBody);
