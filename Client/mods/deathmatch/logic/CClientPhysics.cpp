@@ -62,6 +62,12 @@ void CClientPhysics::WaitForSimulationToFinish()
 
 void CClientPhysics::Clear()
 {
+    for (const auto& pConstraint : m_vecConstraints)
+    {
+        pConstraint->Unlink();
+    }
+    m_vecConstraints.clear();
+
     for (const auto& pRigidBody : m_vecRigidBodies)
     {
         pRigidBody->Unlink();
@@ -73,7 +79,6 @@ void CClientPhysics::Clear()
     m_vecRigidBodies.clear();
     m_vecShapes.clear();
     m_vecStaticCollisions.clear();
-    m_vecConstraints.clear();
 }
 
 void CClientPhysics::Unlink()
@@ -109,11 +114,11 @@ void CClientPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
     m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
 }
 
-void CClientPhysics::AddConstraint(btTypedConstraint* pBtTypedConstraint) const
+void CClientPhysics::AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->addConstraint(pBtTypedConstraint);
+    m_pDynamicsWorld->addConstraint(pBtTypedConstraint, bDisableCollisionsBetweenLinkedBodies);
 }
 
 void CClientPhysics::RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const
@@ -788,18 +793,19 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointTo
     return pConstraint;
 }
 
-std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position,
-                                                                                                CVector anchor, bool bDisableCollisionsBetweenLinkedBodies)
+std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
+                                                                                                bool bDisableCollisionsBetweenLinkedBodies)
 {
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, anchor, bDisableCollisionsBetweenLinkedBodies);
+        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }
 
 std::shared_ptr<CLuaPhysicsPointToPointConstraint> CClientPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                                                CLuaPhysicsRigidBody* pRigidBodyB, CVector anchorA,
-                                                                                                CVector anchorB, bool bDisableCollisionsBetweenLinkedBodies)
+                                                                                                CLuaPhysicsRigidBody* pRigidBodyB, const CVector& anchorA,
+                                                                                                const CVector& anchorB,
+                                                                                                bool           bDisableCollisionsBetweenLinkedBodies)
 {
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
@@ -991,10 +997,10 @@ void CClientPhysics::DoPulse()
         }
     }
 
-    {
-        BT_PROFILE("postProcessCollisions");
-        PostProcessCollisions();
-    }
+    //{
+    //    BT_PROFILE("postProcessCollisions");
+    //    PostProcessCollisions();
+    //}
 
     m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
 

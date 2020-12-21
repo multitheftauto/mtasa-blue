@@ -15,22 +15,21 @@
 #include "CLuaPhysicsPointToPointConstraint.h"
 #include "CLuaPhysicsSharedLogic.h"
 
-CLuaPhysicsPointToPointConstraint::CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& anchorA,
-                                                                     CVector& anchorB, bool bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsPointToPointConstraint::CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, const CVector& pivotA,
+                                                                     const CVector& pivotB, bool bDisableCollisionsBetweenLinkedBodies)
     : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies)
 {
-    m_vecAnchorA = anchorA;
-    m_vecAnchorB = anchorB;
-
-    // Initialize(std::move(pConstraint), pRigidBodyA, pRigidBodyB);
+    m_vecPivotA = pivotA;
+    m_vecPivotB = pivotB;
+    m_eVariant = eConstraintVariant::A;
 }
 
-CLuaPhysicsPointToPointConstraint::CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& position, CVector& anchor,
+CLuaPhysicsPointToPointConstraint::CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
                                                                      bool bDisableCollisionsBetweenLinkedBodies)
     : CLuaPhysicsConstraint(pRigidBody->GetPhysics(), pRigidBody, bDisableCollisionsBetweenLinkedBodies)
 {
-    // auto pConstraint = std::make_unique<btPoint2PointConstraint>(*pRigidBodyA->GetBtRigidBody(), reinterpret_cast<btVector3&>(anchor));
-    // Initialize(std::move(pConstraint), pRigidBodyA);
+    m_vecPosition = position;
+    m_eVariant = eConstraintVariant::B;
 }
 
 CLuaPhysicsPointToPointConstraint::~CLuaPhysicsPointToPointConstraint()
@@ -39,34 +38,44 @@ CLuaPhysicsPointToPointConstraint::~CLuaPhysicsPointToPointConstraint()
 
 void CLuaPhysicsPointToPointConstraint::Initialize()
 {
-    int a = 5;
-    if (m_pRigidBodyB)
+    std::unique_ptr<btPoint2PointConstraint> pConstraint;
+    switch (m_eVariant)
     {
-        m_pConstraint =
-            std::make_unique<btPoint2PointConstraint>(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(),
-                                                      reinterpret_cast<const btVector3&>(m_vecAnchorA), reinterpret_cast<const btVector3&>(m_vecAnchorB));
+        case eConstraintVariant::A:
+        case eConstraintVariant::C:
+            pConstraint =
+                std::make_unique<btPoint2PointConstraint>(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(),
+                                                          reinterpret_cast<const btVector3&>(m_vecPivotA), reinterpret_cast<const btVector3&>(m_vecPivotB));
+            break;
+        case eConstraintVariant::B:
+            pConstraint = std::make_unique<btPoint2PointConstraint>(*m_pRigidBodyA->GetBtRigidBody(), reinterpret_cast<const btVector3&>(m_vecPosition));
     }
-    else
+
+    CLuaPhysicsConstraint::InternalInitialize(std::move(pConstraint));
+
+    switch (m_eVariant)
     {
-        m_pConstraint = std::make_unique<btPoint2PointConstraint>(*m_pRigidBodyA->GetBtRigidBody(), reinterpret_cast<const btVector3&>(m_vecAnchorA));
+        case eConstraintVariant::B:
+            SetPivotA(CVector(0,0,0));
+            SetPivotB(m_vecPosition);
     }
-    CLuaPhysicsConstraint::InternalInitialize(m_pConstraint.get());
 }
 
-void CLuaPhysicsPointToPointConstraint::SetPivotA(CVector& vecPivotA)
+void CLuaPhysicsPointToPointConstraint::SetPivotA(const CVector& vecPivotA)
 {
+    m_vecPivotA = vecPivotA;
     btPoint2PointConstraint* pConstraint = (btPoint2PointConstraint*)GetConstraint();
-    pConstraint->setPivotA(reinterpret_cast<btVector3&>(vecPivotA));
+    pConstraint->setPivotA(reinterpret_cast<const btVector3&>(vecPivotA));
 }
 
-void CLuaPhysicsPointToPointConstraint::SetPivotB(CVector& vecPivotB)
+void CLuaPhysicsPointToPointConstraint::SetPivotB(const CVector& vecPivotB)
 {
+    m_vecPivotB = vecPivotB;
     btPoint2PointConstraint* pConstraint = (btPoint2PointConstraint*)GetConstraint();
-    pConstraint->setPivotB(reinterpret_cast<btVector3&>(vecPivotB));
+    pConstraint->setPivotB(reinterpret_cast<const btVector3&>(vecPivotB));
 }
 
 void CLuaPhysicsPointToPointConstraint::Unlink()
 {
-    m_pConstraint.reset();
     CLuaPhysicsConstraint::Unlink();
 }

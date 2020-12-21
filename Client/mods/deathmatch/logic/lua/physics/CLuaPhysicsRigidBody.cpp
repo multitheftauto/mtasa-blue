@@ -624,7 +624,7 @@ SPhysicsCollisionReport* CLuaPhysicsRigidBody::GetCollisionReport(CLuaPhysicsEle
     return nullptr;
 }
 
-void CLuaPhysicsRigidBody::RemoveConstraint(CLuaPhysicsConstraint* pConstraint)
+void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstraint)
 {
     m_pRigidBodyProxy->removeConstraintRef(pConstraint->GetConstraint());
     ListRemove(m_constraintList, pConstraint);
@@ -637,8 +637,10 @@ void CLuaPhysicsRigidBody::Unlink()
         while (!m_constraintList.empty())
         {
             auto const& constraint = m_constraintList.back();
-            constraint->Unlink();
+            RemoveConstraintRef(constraint);
+            GetPhysics()->DestroyElement(constraint);
         }
+        m_constraintList.clear();
 
         m_pRigidBodyProxy.reset();
         // m_pShape->RemoveRigidBody(this);

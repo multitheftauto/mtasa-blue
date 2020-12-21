@@ -52,15 +52,6 @@ public:
     static bool PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
                                      std::optional<CVector> vecRotation);
 
-    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantA(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                              std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
-
-    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantB(CLuaPhysicsRigidBody* pRigidBody, CVector vecPosition, CVector vecAnchor,
-                                                                              std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
-    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraintVariantC(ePhysicsConstraint eConstraint,
-                                                                              CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                              CVector anchorA, CVector anchorB,
-                                                                              std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
@@ -125,4 +116,9 @@ public:
         std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB);
 
     static std::unordered_map<std::string, long long int> PhysicsGetPerformanceStats(CClientPhysics* pPhysics);
+
+    static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreatePointToPointConstraint(CLuaPhysicsRigidBody*                        pRigidBody,
+                                                                                      std::variant<CLuaPhysicsRigidBody*, CVector> variantA,
+                                                                      std::variant<std::monostate, CVector, bool> variantB,
+                                                                      std::variant<std::monostate, CVector, bool> variantC, std::optional<bool> bBool);
 };

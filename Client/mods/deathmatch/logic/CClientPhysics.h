@@ -75,7 +75,7 @@ public:
     void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
     void AddRigidBody(btRigidBody* pBtRigidBody) const;
     void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
-    void AddConstraint(btTypedConstraint* pBtTypedConstraint) const;
+    void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
     void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
 
     void    SetGravity(const CVector& vecGravity) const;
@@ -114,11 +114,11 @@ public:
 
     // Links two bodies together
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                    CVector anchorA, CVector anchorB,
+                                                                                    const CVector& anchorA, const CVector& anchorB,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
 
     // Links body to position
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position, CVector anchor,
+    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
     // Automatically calculate bodies offsets
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,

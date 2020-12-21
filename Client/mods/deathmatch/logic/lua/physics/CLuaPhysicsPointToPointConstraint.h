@@ -20,22 +20,30 @@ class CLuaPhysicsPointToPointConstraint;
 
 enum ePhysicsConstraint;
 
+enum class eConstraintVariant
+{
+    A,
+    B,
+    C,
+};
+
 class CLuaPhysicsPointToPointConstraint : public CLuaPhysicsConstraint
 {
 public:
-    CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& anchorA, CVector& anchorB,
+    CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, const CVector& pivotA, const CVector& pivotB,
                                       bool bDisableCollisionsBetweenLinkedBodies = false);
-    CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CVector& position, CVector& anchor, bool bDisableCollisionsBetweenLinkedBodies = false);
+    CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, const CVector& position, bool bDisableCollisionsBetweenLinkedBodies = false);
     ~CLuaPhysicsPointToPointConstraint();
     void Initialize();
 
-    void SetPivotA(CVector& vecPivotA);
-    void SetPivotB(CVector& vecPivotB);
+    void SetPivotA(const CVector& vecPivotA);
+    void SetPivotB(const CVector& vecPivotB);
 
     void Unlink();
 
 private:
-    CVector m_vecAnchorA;
-    CVector m_vecAnchorB;
-    std::unique_ptr<btPoint2PointConstraint> m_pConstraint;
+    eConstraintVariant                       m_eVariant;
+    CVector m_vecPosition;
+    CVector m_vecPivotA;
+    CVector m_vecPivotB;
 };

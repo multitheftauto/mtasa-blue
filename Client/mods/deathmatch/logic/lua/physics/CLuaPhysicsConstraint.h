@@ -34,17 +34,17 @@ public:
     bool IsBroken() const { return !m_pConstraint->isEnabled(); }
     bool BreakingStatusHasChanged();
 
-    btTypedConstraint* GetConstraint() const { return m_pConstraint; }
+    btTypedConstraint* GetConstraint() const { return m_pConstraint.get(); }
     btJointFeedback*   GetJoinFeedback() { return m_pJointFeedback.get(); }
 
     virtual void Initialize(){};
     virtual void Unlink();
 
 protected:
-    virtual void InternalInitialize(btTypedConstraint* pConstraint);
+    virtual void InternalInitialize(std::unique_ptr<btTypedConstraint> pConstraint);
     bool                               m_bDisableCollisionsBetweenLinkedBodies;
     uint                               m_uiScriptID;
-    btTypedConstraint* m_pConstraint;
+    std::unique_ptr<btTypedConstraint> m_pConstraint;
     std::unique_ptr<btJointFeedback>   m_pJointFeedback;
     bool                               m_bLastBreakingStatus;
     CLuaPhysicsRigidBody*              m_pRigidBodyA;
