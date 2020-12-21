@@ -124,6 +124,15 @@ void CLuaPhysicsRigidBody::NeedsActivation() const
     }
 }
 
+void CLuaPhysicsRigidBody::NeedsAABBUpdate() const
+{
+    if (!m_bAABBUpdateRequested)
+    {
+        m_bAABBUpdateRequested = true;
+        GetPhysics()->AddToActivationStack(this);
+    }
+}
+
 void CLuaPhysicsRigidBody::Activate() const
 {
     m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);

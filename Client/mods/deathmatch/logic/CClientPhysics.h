@@ -128,15 +128,15 @@ public:
                                                                       bool bDisableCollisionsBetweenLinkedBodies);
 
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies() const { return m_vecRigidBodies; }
-    std::vector<std::shared_ptr<CLuaPhysicsShape>>           GetShapes() const { return m_vecShapes; }
+    const std::vector<std::shared_ptr<CLuaPhysicsShape>>&    GetShapes();
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
 
+    std::shared_ptr<CLuaPhysicsShape> Resolve(CLuaPhysicsShape* pLuaShape);
+
     std::shared_ptr<CLuaPhysicsRigidBody>       GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const;
-    std::shared_ptr<CLuaPhysicsShape>           GetSharedShape(CLuaPhysicsShape* pShape) const;
     std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const;
 
-    void UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const;
 
     std::atomic<bool> isDuringSimulation = false;
 
@@ -145,6 +145,8 @@ public:
 
     void AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody);
     void AddToChangesStack(const CLuaPhysicsElement* pElement);
+    void AddToUpdateAABBStack(const CLuaPhysicsRigidBody* pRigidBody);
+
 
     std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
     std::shared_ptr<CLuaPhysicsRigidBody>       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
@@ -166,7 +168,7 @@ private:
     void AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void DestroyShape(CLuaPhysicsShape* pLuaShape);
+    void DestroyShape(std::shared_ptr<CLuaPhysicsShape> pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
@@ -205,7 +207,7 @@ private:
     bool                                                                m_bObjectsCached = false;
 
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
-    std::vector<std::shared_ptr<CLuaPhysicsShape>>           m_vecShapes;
+    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsShape>> m_mapShapes;
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
 
@@ -215,6 +217,7 @@ private:
 
     SharedUtil::ConcurrentStack<CLuaPhysicsElement*>   m_StackElementChanges;
     SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;
+    SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesUpdateAABB;
 
     // Multithreaded
     std::vector<CLuaPhysicsRigidBody*> m_vecActiveRigidBodies;

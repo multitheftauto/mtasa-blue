@@ -77,7 +77,7 @@ void CClientPhysics::Clear()
         pStaticCollision->Unlink();
     }
     m_vecRigidBodies.clear();
-    m_vecShapes.clear();
+    m_mapShapes.clear();
     m_vecStaticCollisions.clear();
 }
 
@@ -325,7 +325,7 @@ void CClientPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
             DestroyRigidBody((CLuaPhysicsRigidBody*)pPhysicsElement);
             break;
         case EIdClassType::SHAPE:
-            DestroyShape((CLuaPhysicsShape*)pPhysicsElement);
+            DestroyShape(Resolve((CLuaPhysicsShape*)pPhysicsElement));
             break;
         case EIdClassType::STATIC_COLLISION:
             DestroyStaticCollision((CLuaPhysicsStaticCollision*)pPhysicsElement);
@@ -344,12 +344,16 @@ void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
     m_vecRigidBodies.erase(std::remove(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), *object));
 }
 
-void CClientPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
+std::shared_ptr<CLuaPhysicsShape> CClientPhysics::Resolve(CLuaPhysicsShape* pLuaShape)
+{
+    uint id = pLuaShape->GetScriptID();
+    return m_mapShapes[id];
+}
+
+void CClientPhysics::DestroyShape(std::shared_ptr<CLuaPhysicsShape> pLuaShape)
 {
     m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
-    std::vector<std::shared_ptr<CLuaPhysicsShape>>::iterator object =
-        std::find_if(m_vecShapes.begin(), m_vecShapes.end(), [&](std::shared_ptr<CLuaPhysicsShape>& obj) { return obj.get() == pLuaShape; });
-    m_vecShapes.erase(std::remove(m_vecShapes.begin(), m_vecShapes.end(), *object));
+    m_mapShapes.erase(pLuaShape->GetScriptID());
 }
 
 void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
@@ -379,7 +383,7 @@ void CClientPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollisi
 void CClientPhysics::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
 {
     m_pLuaMain->GetPhysicsShapeManager()->AddShape(pShape);
-    m_vecShapes.push_back(pShape);
+    m_mapShapes.emplace(pShape->GetScriptID(), pShape);
 }
 
 void CClientPhysics::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
@@ -467,21 +471,22 @@ void CClientPhysics::ClearOutsideWorldRigidBodies()
     }
 }
 
+const std::vector<std::shared_ptr<CLuaPhysicsShape>>& CClientPhysics::GetShapes()
+{
+    std::vector<std::shared_ptr<CLuaPhysicsShape>> shapes;
+    shapes.reserve(m_mapShapes.size());
+    for (auto kv : m_mapShapes)
+    {
+        shapes.push_back(kv.second);
+    }
+    return shapes;
+}
+
 std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const
 {
     auto it = m_vecRigidBodies.begin();
     for (; it != m_vecRigidBodies.end(); ++it)
         if (pRigidBody == (*it).get())
-            return *it;
-
-    assert(1 == 2);            // Should never happen
-}
-
-std::shared_ptr<CLuaPhysicsShape> CClientPhysics::GetSharedShape(CLuaPhysicsShape* pShape) const
-{
-    auto it = m_vecShapes.begin();
-    for (; it != m_vecShapes.end(); ++it)
-        if (pShape == (*it).get())
             return *it;
 
     assert(1 == 2);            // Should never happen
@@ -496,14 +501,6 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticColli
 
     assert(1 == 2);            // Should never happen
 }
-
-void CClientPhysics::UpdateSingleAabb(CLuaPhysicsRigidBody* pRigidBody) const
-{
-    std::lock_guard guard(dynamicsWorldLock);
-
-    m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
-}
-
 
 std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject)
 {
@@ -879,6 +876,11 @@ void CClientPhysics::AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody
     m_StackRigidBodiesActivation.push((CLuaPhysicsRigidBody*)pRigidBody);
 }
 
+void CClientPhysics::AddToUpdateAABBStack(const CLuaPhysicsRigidBody* pRigidBody)
+{
+    m_StackRigidBodiesUpdateAABB.push((CLuaPhysicsRigidBody*)pRigidBody);
+}
+
 void CClientPhysics::AddToChangesStack(const CLuaPhysicsElement* pElement)
 {
     m_StackElementChanges.push((CLuaPhysicsElement*)pElement);
@@ -933,6 +935,16 @@ void CClientPhysics::DoPulse()
             m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
                                                                                               m_pDynamicsWorld->getDispatcher());
             m_StackRigidBodiesActivation.pop();
+        }
+    }
+    {
+        BT_PROFILE("updateRigidBodiesAABB");
+        while (!m_StackRigidBodiesUpdateAABB.empty())
+        {
+            CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesUpdateAABB.top();
+            m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
+            pRigidBody->AABBUpdated();
+            m_StackRigidBodiesUpdateAABB.pop();
         }
     }
 

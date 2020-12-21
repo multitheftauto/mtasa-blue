@@ -138,8 +138,8 @@ void CLuaPhysicsShape::UpdateRigids()
 {
     for (auto const& rigidBody : m_vecRigidBodyList)
     {
-        rigidBody->UpdateAABB();
-        rigidBody->Activate();
+        rigidBody->NeedsAABBUpdate();
+        rigidBody->NeedsActivation();
         // rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
     }
 }

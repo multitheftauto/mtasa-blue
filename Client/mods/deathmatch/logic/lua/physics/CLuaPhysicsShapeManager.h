@@ -27,7 +27,7 @@ public:
 
     void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape);
 
-    void          RemoveShape(CLuaPhysicsShape* pShape);
+    void          RemoveShape(std::shared_ptr<CLuaPhysicsShape> pShape);
     unsigned long GetShapeCount() const { return m_ShapeList.size(); }
 
     std::vector<std::shared_ptr<CLuaPhysicsShape>>::const_iterator IterBegin() { return m_ShapeList.begin(); }

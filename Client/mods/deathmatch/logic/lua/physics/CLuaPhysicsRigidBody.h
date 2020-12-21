@@ -67,10 +67,6 @@ public:
     // Called every time if while simulation position, rotation has changed.
     void HasMoved();
 
-    void UpdateAABB() const
-    { /*GetPhysics()->UpdateSingleAabb((CLuaPhysicsRigidBody*)this);*/
-    }
-
     // Running on worker thread
     void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
 
@@ -124,11 +120,13 @@ public:
     btTransform& PredictTransform(float time) const;
     void         ClearForces();
     void         NeedsActivation() const;
+    void         NeedsAABBUpdate() const;
 
     void                                  ClearCollisionReport();
     void                                  ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport);
     std::vector<SPhysicsCollisionReport*> GetCollisionReports();
     SPhysicsCollisionReport*              GetCollisionReport(CLuaPhysicsElement* pElement);
+    void                                  AABBUpdated() { m_bAABBUpdateRequested = false; }
 
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
@@ -141,6 +139,7 @@ private:
     mutable std::mutex                                 m_lock;
     mutable std::mutex                                 m_transformLock;
     mutable std::atomic<bool>                          m_bActivationRequested;
+    mutable std::atomic<bool>                          m_bAABBUpdateRequested;
 
     std::vector<std::unique_ptr<SPhysicsCollisionReport>> m_vecCollisionReports;
 };
