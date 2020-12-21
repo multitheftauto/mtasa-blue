@@ -1320,8 +1320,10 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
             }
             CVector                                            vecPivotA = std::get<CVector>(variantB);
             CVector                                            vecPivotB = std::get<CVector>(variantC);
+            bDisableCollisionsBetweenLinkedBodies = bBool.value_or(true);
             std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
                 pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBodyB, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
+            return pConstraint;
         }
         std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
             pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies);
