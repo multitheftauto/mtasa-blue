@@ -630,8 +630,13 @@ struct CLuaFunctionParserBase
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
 
-            if (std::shared_ptr<CLuaPhysicsShape> pShape = reinterpret_cast<std::shared_ptr<CLuaPhysicsShape>&>(pValue))
+            auto cast = [pValue, L](auto null) { return UserDataCast<decltype(null)>(null, pValue, L);
+            };
+
+            if (std::shared_ptr<CLuaPhysicsShape> pShape = cast((CLuaPhysicsShape*)0); pShape != nullptr)
+            {
                 return pShape;
+            }
 
             SetBadArgumentError(L, "physics-shape", index - 1, pValue, isLightUserData);
             return T{};
