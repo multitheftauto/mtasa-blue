@@ -349,18 +349,21 @@ bool CLuaPhysicsDefs::PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebu
                 pPhysics->GetDebug()->SetLineWidth(std::get<float>(variant));
                 return true;
             }
+            break;
         case ePhysicsDebugMode::DRAW_DISTANCE:
             if (std::holds_alternative<float>(variant))
             {
                 pPhysics->GetDebug()->SetDrawDistance(std::get<float>(variant));
                 return true;
             }
+            break;
         default:
-            if (std::holds_alternative<float>(variant))
+            if (std::holds_alternative<bool>(variant))
             {
                 pPhysics->GetDebug()->setDebugMode(eDebugMode, std::get<bool>(variant));
                 return true;
             }
+            break;
     }
     throw std::invalid_argument(SString("Property %s requires float as argument 3.", EnumToString(eDebugMode)).c_str());
 }
@@ -1403,15 +1406,16 @@ CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector 
         return false;
 
     const btCollisionObject* pCollisionObject = callback.m_collisionObject;
-    const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
+    const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
     const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
 
-    assert(pShape);            // should never be nullptr if we hit something
+    if (!pCollisionShape)
+        return false; // should never happen
 
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
         {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
         {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld)},
-        {"shape", (CLuaPhysicsShape*)(pShape->getUserPointer())},
+        {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
     };
 
     if (pRigidBody != nullptr)
@@ -1432,15 +1436,16 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
     for (size_t i = 0; i < hitNum; i++)
     {
         const btCollisionObject* pCollisionObject = callback.m_collisionObjects[i];
-        const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
+        const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
         const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
 
-        assert(pShape);            // should never be nullptr if we hit something
+        if (!pCollisionShape)
+             continue;            // should never happen
 
         std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
             {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld[i])},
             {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld[i])},
-            {"shape", (CLuaPhysicsShape*)(pShape->getUserPointer())},
+            {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
         };
 
         if (pRigidBody != nullptr)
@@ -1502,7 +1507,8 @@ CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVec
     const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
     const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
 
-    assert(pCollisionShape);            // should never be nullptr if we hit something
+    if (!pCollisionShape)
+        return false;                   // should never happen
 
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
         {"shapeposition", reinterpret_cast<const CVector&>(vecShapePosition)},    {"shaperotation", reinterpret_cast<const CVector&>(vecShapeRotation)},
