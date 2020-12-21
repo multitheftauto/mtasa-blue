@@ -277,6 +277,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     //  vehicle createVehicle ( int model, float x, float y, float z, [float rx, float ry, float rz, string numberplate, bool bDirection, int variant1, int
     //  variant2] )
     ushort  usModel;
+    ushort  usModelOriginal;
     CVector vecPosition;
     CVector vecRotation;
     SString strNumberPlate;

@@ -758,6 +758,13 @@ enum eWeaponFlags
     WEAPONFLAGS_INSTANT_RELOAD,
 };
 
+enum eModelType
+{
+    PED,
+    OBJECT,
+    VEHICLE,
+};
+
 #include "json.h"
 // Prettify toJSON (see mantis #9210)
 enum eJSONPrettyType

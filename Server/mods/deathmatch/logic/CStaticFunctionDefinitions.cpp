@@ -4774,30 +4774,33 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
     if (ucVariant == 254 && ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
-    if (CVehicleManager::IsValidModel(usModel) && (ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
+    if (CVehicleManager::IsValidModel(usModel) || (g_pGame->GetModelManager()->IsValidModel(usModel) && g_pGame->GetModelManager()->GetModelType(usModel) == eModelType::VEHICLE))
     {
-        CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
-
-        if (!pVehicle)
-            return nullptr;
-
-        pVehicle->SetPosition(vecPosition);
-        pVehicle->SetRotationDegrees(vecRotation);
-        pVehicle->SetRespawnPosition(vecPosition);
-        pVehicle->SetRespawnRotationDegrees(vecRotation);
-
-        if (szRegPlate && szRegPlate[0])
-            pVehicle->SetRegPlate(szRegPlate);
-
-        // Only sync if the resource has started on client
-        if (pResource->IsClientSynced())
+        if ((ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
         {
-            CEntityAddPacket Packet;
-            Packet.Add(pVehicle);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
+            CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
 
-        return pVehicle;
+            if (!pVehicle)
+                return nullptr;
+
+            pVehicle->SetPosition(vecPosition);
+            pVehicle->SetRotationDegrees(vecRotation);
+            pVehicle->SetRespawnPosition(vecPosition);
+            pVehicle->SetRespawnRotationDegrees(vecRotation);
+
+            if (szRegPlate && szRegPlate[0])
+                pVehicle->SetRegPlate(szRegPlate);
+
+            // Only sync if the resource has started on client
+            if (pResource->IsClientSynced())
+            {
+                CEntityAddPacket Packet;
+                Packet.Add(pVehicle);
+                m_pPlayerManager->BroadcastOnlyJoined(Packet);
+            }
+
+            return pVehicle;
+        }
     }
 
     return nullptr;

@@ -358,6 +358,7 @@ private:
     SFixedArray<CPed*, MAX_VEHICLE_SEATS> m_pOccupants;
 
     unsigned short m_usModel;
+    unsigned short m_usModelOriginal;
     eVehicleType   m_eVehicleType;
     CVector        m_vecPosition;
     CVector        m_vecRotationDegrees;

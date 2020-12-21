@@ -433,7 +433,20 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // fit into a char?  Why doesn't someone document this?
                     //
                     // --slush
-                    BitStream.Write(static_cast<unsigned char>(pVehicle->GetModel() - 400));
+
+                    unsigned short usModel = pVehicle->GetModel();
+                    BitStream.Write(usModel);
+
+                    unsigned short usModelOriginal = usModel;
+                    if (!CVehicleManager::IsValidModel(usModel))
+                    {
+                        if (g_pGame->GetModelManager()->IsValidModel(usModel))
+                            usModelOriginal = g_pGame->GetModelManager()->GetModelParent(usModel);
+                        else
+                            usModelOriginal = VT_LANDSTAL;
+
+                        BitStream.Write(usModelOriginal);
+                    }
 
                     // Health
                     SVehicleHealthSync health;
@@ -472,8 +485,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(ucVariant2);
 
                     // If the vehicle has a turret, send its position too
-                    unsigned short usModel = pVehicle->GetModel();
-                    if (CVehicleManager::HasTurret(usModel))
+                    if (CVehicleManager::HasTurret(usModelOriginal))
                     {
                         SVehicleTurretSync specific;
                         specific.data.fTurretX = pVehicle->GetTurretPositionX();
@@ -482,13 +494,13 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     }
 
                     // If the vehicle has an adjustable property send its value
-                    if (CVehicleManager::HasAdjustableProperty(usModel))
+                    if (CVehicleManager::HasAdjustableProperty(usModelOriginal))
                     {
                         BitStream.WriteCompressed(pVehicle->GetAdjustableProperty());
                     }
 
                     // If the vehicle has doors, sync their open angle ratios.
-                    if (CVehicleManager::HasDoors(usModel))
+                    if (CVehicleManager::HasDoors(usModelOriginal))
                     {
                         SDoorOpenRatioSync door;
                         for (unsigned char i = 0; i < 6; ++i)

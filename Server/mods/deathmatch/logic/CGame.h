@@ -75,6 +75,7 @@ class CHTTPD;
 class CMainConfig;
 class CMapManager;
 class CMarkerManager;
+class CModelManager;
 class CObjectManager;
 class CPacket;
 class CPacketTranslator;
@@ -231,6 +232,7 @@ public:
     CPedManager*                     GetPedManager() { return m_pPedManager; }
     CResourceManager*                GetResourceManager() { return m_pResourceManager; }
     CMarkerManager*                  GetMarkerManager() { return m_pMarkerManager; }
+    CModelManager*                   GetModelManager() { return m_pModelManager; }
     CBlipManager*                    GetBlipManager() { return m_pBlipManager; }
     CPickupManager*                  GetPickupManager() { return m_pPickupManager; }
     CRadarAreaManager*               GetRadarAreaManager() { return m_pRadarAreaManager; }
@@ -530,6 +532,7 @@ private:
     CObjectSync* m_pObjectSync;
 #endif
     CMarkerManager*            m_pMarkerManager;
+    CModelManager*             m_pModelManager;
     CClock*                    m_pClock;
     CBanManager*               m_pBanManager;
     CTeamManager*              m_pTeamManager;

@@ -24,6 +24,7 @@ DECLARE_ENUM(eWeaponProperty);
 DECLARE_ENUM(eWeaponSkill);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
+DECLARE_ENUM(eModelType);
 DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);

@@ -234,6 +234,12 @@ ADD_ENUM(WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE, "shoot_if_out_of_range")
 ADD_ENUM(WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED, "shoot_if_blocked")
 IMPLEMENT_ENUM_END("weapon-flags")
 
+IMPLEMENT_ENUM_BEGIN(eModelType)
+ADD_ENUM(eModelType::PED, "ped")
+ADD_ENUM(eModelType::OBJECT, "object")
+ADD_ENUM(eModelType::VEHICLE, "vehicle")
+IMPLEMENT_ENUM_END("model-type")
+
 IMPLEMENT_ENUM_BEGIN(CAccessControlListRight::ERightType)
 ADD_ENUM(CAccessControlListRight::RIGHT_TYPE_COMMAND, "command")
 ADD_ENUM(CAccessControlListRight::RIGHT_TYPE_FUNCTION, "function")

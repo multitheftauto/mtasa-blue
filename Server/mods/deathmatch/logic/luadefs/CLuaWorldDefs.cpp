@@ -87,6 +87,9 @@ void CLuaWorldDefs::LoadFunctions()
         {"restoreWorldModel", RestoreWorldModel},
         {"restoreAllWorldModels", RestoreAllWorldModels},
         {"resetMoonSize", resetMoonSize},
+
+        // Custom models
+        {"requestModel", RequestModel},
     };
 
     // Add functions
@@ -1430,6 +1433,48 @@ int CLuaWorldDefs::getOcclusionsEnabled(lua_State* luaVM)
         lua_pushboolean(luaVM, bEnabled);
         return 1;
     }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::RequestModel(lua_State* luaVM)
+{
+    ushort usModelID = 0;
+    eModelType modelType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModelID);
+    argStream.ReadEnumString(modelType);
+
+    if (!argStream.HasErrors())
+    {
+        ushort usParentID = -1;
+        if (argStream.NextIsNumber())
+            argStream.ReadNumber(usParentID);
+        else
+        {
+            switch (modelType)
+            {
+            case eModelType::PED:
+                usParentID = 7; // male01
+                break;
+            case eModelType::OBJECT:
+                usParentID = 1337; // BinNt07_LA (trash can)
+                break;
+            case eModelType::VEHICLE:
+                usParentID = VT_LANDSTAL;
+                break;
+            default:
+                break;
+            }
+        }
+
+        lua_pushboolean(luaVM, g_pGame->GetModelManager()->RequestModel(usModelID, usParentID, modelType));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

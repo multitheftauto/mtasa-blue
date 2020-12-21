@@ -106,6 +106,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pLuaManager = NULL;
     m_pPacketTranslator = NULL;
     m_pMarkerManager = NULL;
+    m_pModelManager = NULL;
     m_pRadarAreaManager = NULL;
     m_pPlayerManager = NULL;
     m_pVehicleManager = NULL;
@@ -287,6 +288,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pRemoteCalls);
     SAFE_DELETE(m_pPacketTranslator);
     SAFE_DELETE(m_pMarkerManager);
+    SAFE_DELETE(m_pModelManager);
     SAFE_DELETE(m_pRadarAreaManager);
     SAFE_DELETE(m_pPlayerManager);
     SAFE_DELETE(m_pVehicleManager);
@@ -504,6 +506,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pPlayerManager = new CPlayerManager;
     m_pRadarAreaManager = new CRadarAreaManager;
     m_pMarkerManager = new CMarkerManager(m_pColManager);
+    m_pModelManager = new CModelManager;
     m_pHandlingManager = new CHandlingManager;
     m_pVehicleManager = new CVehicleManager;
     m_pPacketTranslator = new CPacketTranslator(m_pPlayerManager);

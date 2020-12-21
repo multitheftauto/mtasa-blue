@@ -3176,22 +3176,20 @@ retry:
                     SRotationDegreesSync rotationDegrees(false);
                     bitStream.Read(&rotationDegrees);
 
-                    // Read out the vehicle value as a char, then convert
-                    unsigned char ucModel = 0xFF;
-                    bitStream.Read(ucModel);
+                    // Read out the vehicle model
+                    unsigned short usModel = 400;
+                    bitStream.Read(usModel);
 
-                    // The server appears to subtract 400 from the vehicle id before
-                    // sending it to us, as to allow the value to fit into an unsigned
-                    // char.
-                    //
-                    // Too bad this was never documented.
-                    //
-                    // --slush
-                    unsigned short usModel = ucModel + 400;
-                    if (!CClientVehicleManager::IsValidModel(usModel))
+                    // Is invalid model -> need request model
+                    unsigned short usModelOriginal = usModel;
+                    if (!CClientVehicleManager::IsStandardModel(usModel))
                     {
-                        RaiseEntityAddError(39);
-                        return;
+                        bitStream.Read(usModelOriginal);
+                        if (!CClientVehicleManager::IsValidModel(usModel) && !g_pClientGame->m_pManager->GetModelManager()->RequestModel(usModel, usModelOriginal, eClientModelType::VEHICLE, g_pClientGame->m_pManager))
+                        {
+                            RaiseEntityAddError(39);
+                            return;
+                        }
                     }
 
                     // Read out the health
@@ -3272,7 +3270,7 @@ retry:
                     pVehicle->ResetDamageModelSync();
 
                     // If the vehicle has a turret, read out its position
-                    if (CClientVehicleManager::HasTurret(usModel))
+                    if (CClientVehicleManager::HasTurret(usModelOriginal))
                     {
                         SVehicleTurretSync specific;
                         bitStream.Read(&specific);
@@ -3280,7 +3278,7 @@ retry:
                     }
 
                     // If the vehicle has an adjustable property, read out its value
-                    if (CClientVehicleManager::HasAdjustableProperty(usModel))
+                    if (CClientVehicleManager::HasAdjustableProperty(usModelOriginal))
                     {
                         unsigned short usAdjustableProperty;
                         bitStream.ReadCompressed(usAdjustableProperty);
@@ -3288,7 +3286,7 @@ retry:
                     }
 
                     // If the vehicle has doors, read out the open angle ratio.
-                    if (CClientVehicleManager::HasDoors(usModel))
+                    if (CClientVehicleManager::HasDoors(usModelOriginal))
                     {
                         SDoorOpenRatioSync door;
                         for (unsigned char i = 0; i < 6; ++i)
@@ -3350,13 +3348,13 @@ retry:
                     bool bTaxiLightState = bitStream.ReadBit();
 
                     // If the vehicle has a landing gear, set landing gear state
-                    if (CClientVehicleManager::HasLandingGears(usModel))
+                    if (CClientVehicleManager::HasLandingGears(usModelOriginal))
                     {
                         pVehicle->SetLandingGearDown(bLandingGearDown);
                     }
 
                     // Set the taxi light state
-                    if (CClientVehicleManager::HasTaxiLight(usModel))
+                    if (CClientVehicleManager::HasTaxiLight(usModelOriginal))
                     {
                         pVehicle->SetTaxiLightOn(bTaxiLightState);
                     }
@@ -3367,7 +3365,7 @@ retry:
                     pVehicle->SetDoorsUndamageable(bDoorsUndamageable);
                     pVehicle->SetScriptCanBeDamaged(!bDamageProof);
                     pVehicle->SetFrozen(bFrozen);
-                    if (CClientVehicleManager::IsTrainModel(usModel))
+                    if (CClientVehicleManager::IsTrainModel(usModelOriginal))
                     {
                         pVehicle->SetDerailed(bDerailed);
                         pVehicle->SetDerailable(bIsDerailable);
@@ -3474,7 +3472,7 @@ retry:
                             }
                         }
                         // If the vehicle has sirens, set the siren state
-                        if (CClientVehicleManager::HasSirens(usModel) || pVehicle->DoesVehicleHaveSirens())
+                        if (CClientVehicleManager::HasSirens(usModelOriginal) || pVehicle->DoesVehicleHaveSirens())
                         {
                             pVehicle->SetSirenOrAlarmActive(bSirenesActive);
                         }

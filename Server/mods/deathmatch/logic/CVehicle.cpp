@@ -23,9 +23,13 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_usModel = usModel;
     m_pUpgrades = new CVehicleUpgrades(this);
 
+    m_usModelOriginal = usModel;
+    if (!CVehicleManager::IsValidModel(m_usModel) && g_pGame->GetModelManager()->IsValidModel(m_usModel))
+        m_usModelOriginal = g_pGame->GetModelManager()->GetModelParent(m_usModel);
+
     m_iType = CElement::VEHICLE;
     SetTypeName("vehicle");
-    m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
+    m_eVehicleType = CVehicleManager::GetVehicleType(m_usModelOriginal);
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fLastSyncedHealthHealth = DEFAULT_VEHICLE_HEALTH;
     m_llIdleTime = CTickCount::Now();
@@ -265,7 +269,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
     if (GetCustomDataInt("variant2", iTemp, true))
         m_ucVariant2 = static_cast<unsigned char>(iTemp);
     if (m_ucVariant == 254 && m_ucVariant2 == 254)
-        CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
+        CVehicleManager::GetRandomVariation(m_usModelOriginal, m_ucVariant, m_ucVariant2);
 
     // Grab the "turretX" data
     if (GetCustomDataFloat("turretX", m_fTurretPositionX, true))
@@ -496,10 +500,15 @@ void CVehicle::SetModel(unsigned short usModel)
     if (usModel != m_usModel)
     {
         m_usModel = usModel;
-        m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
+        m_usModelOriginal = usModel;
+
+        if (!CVehicleManager::IsValidModel(m_usModel) && g_pGame->GetModelManager()->IsValidModel(m_usModel))
+            m_usModelOriginal = g_pGame->GetModelManager()->GetModelParent(m_usModel);
+
+        m_eVehicleType = CVehicleManager::GetVehicleType(m_usModelOriginal);
         RandomizeColor();
         ResetDoors();
-        CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
+        CVehicleManager::GetRandomVariation(m_usModelOriginal, m_ucVariant, m_ucVariant2);
 
         // Generate new handling data to fit the vehicle
         GenerateHandlingData();
@@ -508,7 +517,7 @@ void CVehicle::SetModel(unsigned short usModel)
 
 bool CVehicle::HasValidModel()
 {
-    return CVehicleManager::IsValidModel(m_usModel);
+    return CVehicleManager::IsValidModel(m_usModelOriginal);
 }
 
 void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
@@ -520,7 +529,7 @@ void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
 CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
-    m_Color = m_pVehicleManager->GetRandomColor(m_usModel);
+    m_Color = m_pVehicleManager->GetRandomColor(m_usModelOriginal);
     return m_Color;
 }
 
@@ -657,7 +666,7 @@ void CVehicle::SetSyncer(CPlayer* pPlayer)
 
 unsigned char CVehicle::GetMaxPassengers()
 {
-    return ((m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED) ? CVehicleManager::GetMaxPassengers(m_usModel) : m_ucMaxPassengersOverride);
+    return ((m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED) ? CVehicleManager::GetMaxPassengers(m_usModelOriginal) : m_ucMaxPassengersOverride);
 }
 
 unsigned char CVehicle::GetFreePassengerSeat()
@@ -800,7 +809,7 @@ void CVehicle::SetPaintjob(unsigned char ucPaintjob)
 
 void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
+    switch (m_usModelOriginal)
     {
         case VT_BAGGAGE:
         case VT_BANDITO:
@@ -834,7 +843,7 @@ void CVehicle::GenerateHandlingData()
     if (m_pHandlingEntry == NULL)
         m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     // Apply the model handling info
-    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(static_cast<eVehicleTypes>(m_usModel)));
+    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(static_cast<eVehicleTypes>(m_usModelOriginal)));
 
     m_bHandlingChanged = false;
 }

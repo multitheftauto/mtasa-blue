@@ -233,6 +233,7 @@ struct SAclRequest;
 #include "CMapManager.h"
 #include "CMarker.h"
 #include "CMarkerManager.h"
+#include "CModelManager.h"
 #include "CObject.h"
 #include "CObjectManager.h"
 #include "CObjectSync.h"
