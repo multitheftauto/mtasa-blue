@@ -343,13 +343,13 @@ bool CLuaPhysicsDefs::PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebu
 {
     switch (eDebugMode)
     {
-        case ePhysicsDebugMode::PHYSICS_DEBUG_LINE_WIDTH:
+        case ePhysicsDebugMode::LINE_WIDTH:
             if (std::holds_alternative<float>(variant))
             {
                 pPhysics->GetDebug()->SetLineWidth(std::get<float>(variant));
                 return true;
             }
-        case ePhysicsDebugMode::PHYSICS_DEBUG_DRAW_DISTANCE:
+        case ePhysicsDebugMode::DRAW_DISTANCE:
             if (std::holds_alternative<float>(variant))
             {
                 pPhysics->GetDebug()->SetDrawDistance(std::get<float>(variant));
@@ -369,9 +369,9 @@ std::variant<bool, float> CLuaPhysicsDefs::PhysicsGetDebugMode(CClientPhysics* p
 {
     switch (eDebugMode)
     {
-        case ePhysicsDebugMode::PHYSICS_DEBUG_LINE_WIDTH:
+        case ePhysicsDebugMode::LINE_WIDTH:
             return pPhysics->GetDebug()->GetLineWidth();
-        case ePhysicsDebugMode::PHYSICS_DEBUG_DRAW_DISTANCE:
+        case ePhysicsDebugMode::DRAW_DISTANCE:
             return pPhysics->GetDebug()->GetDrawDistance();
     }
     return pPhysics->GetDebug()->getDebugMode(eDebugMode);

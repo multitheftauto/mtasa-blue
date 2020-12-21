@@ -1638,24 +1638,26 @@ namespace eObjectGroup
 
 enum class ePhysicsDebugMode
 {
-    PHYSICS_DEBUG_NoDebug = -1,
-    PHYSICS_DEBUG_DrawWireframe,
-    PHYSICS_DEBUG_DrawAabb,
-    PHYSICS_DEBUG_DrawFeaturesText,
-    PHYSICS_DEBUG_DrawContactPoints,
-    PHYSICS_DEBUG_NoDeactivation,
-    PHYSICS_DEBUG_NoHelpText,
-    PHYSICS_DEBUG_DrawText,
-    PHYSICS_DEBUG_ProfileTimings,
-    PHYSICS_DEBUG_EnableSatComparison,
-    PHYSICS_DEBUG_DisableBulletLCP,
-    PHYSICS_DEBUG_EnableCCD,
-    PHYSICS_DEBUG_DrawConstraints,
-    PHYSICS_DEBUG_DrawConstraintLimits,
-    PHYSICS_DEBUG_FastWireframe,
-    PHYSICS_DEBUG_DrawNormals,
-    PHYSICS_DEBUG_DrawFrames,
-    PHYSICS_DEBUG_LINE_WIDTH,
-    PHYSICS_DEBUG_DRAW_DISTANCE,
-    PHYSICS_DEBUG_MAX_DEBUG_DRAW_MODE
+    // Bullet physics specific
+    NoDebug = -1,
+    DrawWireframe,
+    DrawAabb,
+    DrawFeaturesText,
+    DrawContactPoints,
+    NoDeactivation,
+    NoHelpText,
+    DrawText,
+    ProfileTimings,
+    EnableSatComparison,
+    DisableBulletLCP,
+    EnableCCD,
+    DrawConstraints,
+    DrawConstraintLimits,
+    FastWireframe,
+    DrawNormals,
+    DrawFrames,
+    // Custom
+    LINE_WIDTH,
+    DRAW_DISTANCE,
+    MAX_DEBUG_DRAW_MODE
 };
