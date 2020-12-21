@@ -87,6 +87,10 @@ bool CClientModelManager::RequestModel(int iModelID, ushort usParentID, eClientM
     if (pModel != nullptr)
         return false;
 
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(iModelID, true);
+    if (pModelInfo->IsValid())
+        return false;
+
     pModel = std::make_shared<CClientModel>(pManager, iModelID, eModelType);
 
     Add(pModel);
