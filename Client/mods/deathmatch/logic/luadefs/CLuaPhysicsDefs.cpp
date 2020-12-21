@@ -509,28 +509,28 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
 {
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_GRAVITY:
+        case ePhysicsProperty::GRAVITY:
             if (std::holds_alternative<CVector>(argument))
             {
                 pPhysics->SetGravity(std::get<CVector>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_USE_CONTINOUS:
+        case ePhysicsProperty::USE_CONTINOUS:
             if (std::holds_alternative<bool>(argument))
             {
                 pPhysics->SetUseContinous(std::get<bool>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_SIMULATION_ENABLED:
+        case ePhysicsProperty::SIMULATION_ENABLED:
             if (std::holds_alternative<bool>(argument))
             {
                 pPhysics->SetSimulationEnabled(std::get<bool>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_SUBSTEPS:
+        case ePhysicsProperty::SUBSTEPS:
             if (std::holds_alternative<int>(argument))
             {
                 int subSteps = std::get<int>(argument);
@@ -545,28 +545,28 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysi
                 }
             }
             throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_TRIGGEREVENTS:
+        case ePhysicsProperty::TRIGGEREVENTS:
             if (std::holds_alternative<bool>(argument))
             {
                 pPhysics->SetTriggerEvents(std::get<bool>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
+        case ePhysicsProperty::TRIGGERCOLLISIONEVENTS:
             if (std::holds_alternative<bool>(argument))
             {
                 pPhysics->SetTriggerCollisionEvents(std::get<bool>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
+        case ePhysicsProperty::TRIGGERCONSTRAINTEVENTS:
             if (std::holds_alternative<bool>(argument))
             {
                 pPhysics->SetTriggerConstraintEvents(std::get<bool>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_WORLDSIZE:
+        case ePhysicsProperty::WORLDSIZE:
             if (std::holds_alternative<CVector>(argument))
             {
                 CVector size = std::get<CVector>(argument);
@@ -596,7 +596,7 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
 {
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_SLEEP:
+        case ePhysicsProperty::SLEEP:
             if (std::holds_alternative<bool>(argument1))
             {
                 if (!std::get<bool>(argument1))            // TODO
@@ -606,7 +606,7 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
                 }
             }
             throw std::invalid_argument(SString("Property '%s' boolean as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_MASS:
+        case ePhysicsProperty::MASS:
             if (std::holds_alternative<float>(argument1))
             {
                 float mass = std::get<float>(argument1);
@@ -619,7 +619,7 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
                 throw std::invalid_argument("Mass can not be negative");
             }
             throw std::invalid_argument(SString("Property '%s' requires float value as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
+        case ePhysicsProperty::SLEEPING_THRESHOLDS:
             if (std::holds_alternative<float>(argument1))
             {
                 if (argument2)
@@ -638,14 +638,14 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
                 }
             }
             throw std::invalid_argument(SString("Property '%s' requires two float values as arguments.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_RESTITUTION:
+        case ePhysicsProperty::RESTITUTION:
             if (std::holds_alternative<float>(argument1))
             {
                 pRigidBody->SetRestitution(std::get<float>(argument1));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' float value as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_SCALE:
+        case ePhysicsProperty::SCALE:
             if (std::holds_alternative<CVector>(argument1))
             {
                 CVector scale = std::get<CVector>(argument1);
@@ -657,7 +657,7 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
                 throw std::invalid_argument("Scale must be greater than 0 in each axis.");
             }
             throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_DEBUG_COLOR:
+        case ePhysicsProperty::DEBUG_COLOR:
             if (std::holds_alternative<bool>(argument1))
             {
                 if (std::get<bool>(argument1))
@@ -672,28 +672,28 @@ bool CLuaPhysicsDefs::PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigid
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires color as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_FILTER_MASK:
+        case ePhysicsProperty::FILTER_MASK:
             if (std::holds_alternative<int>(argument1))
             {
                 pRigidBody->SetFilterMask(std::get<int>(argument1));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_FILTER_GROUP:
+        case ePhysicsProperty::FILTER_GROUP:
             if (std::holds_alternative<int>(argument1))
             {
                 pRigidBody->SetFilterGroup(std::get<int>(argument1));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_MOTION_THRESHOLD:
+        case ePhysicsProperty::MOTION_THRESHOLD:
             if (std::holds_alternative<float>(argument1))
             {
                 pRigidBody->SetCcdMotionThreshold(std::get<float>(argument1));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
+        case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
             if (std::holds_alternative<float>(argument1))
             {
                 pRigidBody->SetSweptSphereRadius(std::get<float>(argument1));
@@ -709,7 +709,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 {
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_SCALE:
+        case ePhysicsProperty::SCALE:
             if (std::holds_alternative<CVector>(argument))
             {
                 CVector scale = std::get<CVector>(argument);
@@ -721,7 +721,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
                 throw std::invalid_argument("Scale must be greater than 0 in each axis.");
             }
             throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_DEBUG_COLOR:
+        case ePhysicsProperty::DEBUG_COLOR:
             if (std::holds_alternative<bool>(argument))
             {
                 if (std::get<bool>(argument))
@@ -737,14 +737,14 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
             }
             throw std::invalid_argument(SString("Property '%s' requires color as argument.", EnumToString(eProperty)).c_str());
             break;
-        case PHYSICS_PROPERTY_FILTER_MASK:
+        case ePhysicsProperty::FILTER_MASK:
             if (std::holds_alternative<int>(argument))
             {
                 pStaticCollision->SetFilterMask(std::get<int>(argument));
                 return true;
             }
             throw std::invalid_argument(SString("Property '%s' requires integer as argument.", EnumToString(eProperty)).c_str());
-        case PHYSICS_PROPERTY_FILTER_GROUP:
+        case ePhysicsProperty::FILTER_GROUP:
             if (std::holds_alternative<int>(argument))
             {
                 pStaticCollision->SetFilterGroup(std::get<int>(argument));
@@ -780,7 +780,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //        {
 //            switch (eProperty)
 //            {
-//                case PHYSICS_PROPERTY_STIFFNESS:
+//                case ePhysicsProperty::STIFFNESS:
 //                    argStream.ReadNumber(intNumber);
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    argStream.ReadBool(boolean);
@@ -790,7 +790,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_PIVOT_A:
+//                case ePhysicsProperty::PIVOT_A:
 //                    argStream.ReadVector3D(vector);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -798,7 +798,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_PIVOT_B:
+//                case ePhysicsProperty::PIVOT_B:
 //                    argStream.ReadVector3D(vector);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -806,7 +806,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_LOWER_LIN_LIMIT:
+//                case ePhysicsProperty::LOWER_LIN_LIMIT:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -814,7 +814,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_UPPER_LIN_LIMIT:
+//                case ePhysicsProperty::UPPER_LIN_LIMIT:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -822,7 +822,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_LOWER_ANG_LIMIT:
+//                case ePhysicsProperty::LOWER_ANG_LIMIT:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -830,7 +830,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_UPPER_ANG_LIMIT:
+//                case ePhysicsProperty::UPPER_ANG_LIMIT:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -838,7 +838,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        return 1;
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
+//                case ePhysicsProperty::BREAKING_IMPULSE_THRESHOLD:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -856,7 +856,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //        {
 //            switch (eProperty)
 //            {
-//                case PHYSICS_PROPERTY_SIZE:
+//                case ePhysicsProperty::SIZE:
 //                    if (argStream.NextIsVector3D())
 //                        argStream.ReadVector3D(vector);
 //                    else
@@ -887,7 +887,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        }
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_RADIUS:
+//                case ePhysicsProperty::RADIUS:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -912,7 +912,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        }
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_HEIGHT:
+//                case ePhysicsProperty::HEIGHT:
 //                    argStream.ReadNumber(floatNumber[0]);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -937,7 +937,7 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //                        }
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_SCALE:
+//                case ePhysicsProperty::SCALE:
 //                    argStream.ReadVector3D(vector);
 //                    if (!argStream.HasErrors())
 //                    {
@@ -972,17 +972,17 @@ std::variant<CVector, int, bool> CLuaPhysicsDefs::PhysicsGetWorldProperties(CCli
 {
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_GRAVITY:
+        case ePhysicsProperty::GRAVITY:
             return pPhysics->GetGravity();
-        case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
+        case ePhysicsProperty::TRIGGERCOLLISIONEVENTS:
             return pPhysics->GetTriggerCollisionEvents();
-        case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
+        case ePhysicsProperty::TRIGGERCONSTRAINTEVENTS:
             return pPhysics->GetTriggerConstraintvents();
-        case PHYSICS_PROPERTY_SIMULATION_ENABLED:
+        case ePhysicsProperty::SIMULATION_ENABLED:
             return pPhysics->GetSimulationEnabled();
-        case PHYSICS_PROPERTY_USE_CONTINOUS:
+        case ePhysicsProperty::USE_CONTINOUS:
             return pPhysics->GetUseContinous();
-        case PHYSICS_PROPERTY_SUBSTEPS:
+        case ePhysicsProperty::SUBSTEPS:
             return pPhysics->GetSubSteps();
     }
     throw std::invalid_argument(SString("Physics world does not support %s property.", EnumToString(eProperty)).c_str());
@@ -994,10 +994,10 @@ std::variant<CVector, float, bool, std::tuple<int, int, int, int>> CLuaPhysicsDe
     SColor color;
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_DEBUG_COLOR:
+        case ePhysicsProperty::DEBUG_COLOR:
             color = pStaticCollision->GetDebugColor();
             return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
-        case PHYSICS_PROPERTY_SCALE:
+        case ePhysicsProperty::SCALE:
             return pStaticCollision->GetScale();
             break;
     }
@@ -1011,25 +1011,25 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
     SColor color;
     switch (eProperty)
     {
-        case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
+        case ePhysicsProperty::SLEEPING_THRESHOLDS:
             pRigidBody->GetSleepingThresholds(fLinear, fAngular);
             return std::make_tuple(fLinear, fAngular);
-        case PHYSICS_PROPERTY_RESTITUTION:
+        case ePhysicsProperty::RESTITUTION:
             return pRigidBody->GetRestitution();
-        case PHYSICS_PROPERTY_SCALE:
+        case ePhysicsProperty::SCALE:
             return pRigidBody->GetScale();
-        case PHYSICS_PROPERTY_DEBUG_COLOR:
+        case ePhysicsProperty::DEBUG_COLOR:
             color = pRigidBody->GetDebugColor();
             return std::make_tuple((int)color.R, (int)color.G, (int)color.B, (int)color.A);
-        case PHYSICS_PROPERTY_MOTION_THRESHOLD:
+        case ePhysicsProperty::MOTION_THRESHOLD:
             return pRigidBody->GetCcdMotionThreshold();
-        case PHYSICS_PROPERTY_SWEPT_SPHERE_RADIUS:
+        case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
             return pRigidBody->GetSweptSphereRadius();
-        case PHYSICS_PROPERTY_SLEEP:
+        case ePhysicsProperty::SLEEP:
             return pRigidBody->IsSleeping();
-        case PHYSICS_PROPERTY_WANTS_SLEEPING:
+        case ePhysicsProperty::WANTS_SLEEPING:
             return pRigidBody->WantsSleeping();
-        case PHYSICS_PROPERTY_MASS:
+        case ePhysicsProperty::MASS:
             return pRigidBody->GetMass();
     }
     throw std::invalid_argument(SString("Physics rigid body does not support %s property.", EnumToString(eProperty)).c_str());
@@ -1070,7 +1070,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //            btCollisionShape* pBtShape;
 //            switch (eProperty)
 //            {
-//                case PHYSICS_PROPERTY_SIZE:
+//                case ePhysicsProperty::SIZE:
 //                    if (pShape->GetSize(vector))
 //                    {
 //                        pShape->GetMargin(floatNumber[0]);
@@ -1084,7 +1084,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                        argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_RADIUS:
+//                case ePhysicsProperty::RADIUS:
 //                    if (pShape->GetRadius(floatNumber[0]))
 //                    {
 //                        lua_pushnumber(luaVM, floatNumber[0]);
@@ -1095,7 +1095,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                        argStream.SetCustomError(SString("Shape '%s' does not support radius property", pShape->GetType()));
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_HEIGHT:
+//                case ePhysicsProperty::HEIGHT:
 //                    if (pShape->GetHeight(floatNumber[0]))
 //                    {
 //                        lua_pushnumber(luaVM, floatNumber[0]);
@@ -1106,7 +1106,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                        argStream.SetCustomError(SString("Shape '%s' does not support height property", pShape->GetType()));
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_SCALE:
+//                case ePhysicsProperty::SCALE:
 //                    if (pShape->GetScale(vector))
 //                    {
 //                        lua_pushnumber(luaVM, vector.fX);
@@ -1119,7 +1119,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                        argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_BOUNDING_BOX:
+//                case ePhysicsProperty::BOUNDING_BOX:
 //                    if (pShape->GetBoundingBox(vector, vector2))
 //                    {
 //                        lua_pushnumber(luaVM, vector.fX);
@@ -1135,7 +1135,7 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_BOUNDING_SPHERE:
+//                case ePhysicsProperty::BOUNDING_SPHERE:
 //                    if (pShape->GetBoundingSphere(vector, floatNumber[0]))
 //                    {
 //                        lua_pushnumber(luaVM, vector.fX);
@@ -1149,35 +1149,35 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
 //                    }
 //                    break;
-//                case PHYSICS_PROPERTY_IS_COMPOUND:
+//                case ePhysicsProperty::IS_COMPOUND:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isCompound());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_CONCAVE:
+//                case ePhysicsProperty::IS_CONCAVE:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isConcave());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_CONVEX:
+//                case ePhysicsProperty::IS_CONVEX:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isConvex());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_CONVEX2D:
+//                case ePhysicsProperty::IS_CONVEX2D:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isConvex2d());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_INFINITE:
+//                case ePhysicsProperty::IS_INFINITE:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isInfinite());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_NON_MOVING:
+//                case ePhysicsProperty::IS_NON_MOVING:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isNonMoving());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_POLYHEDRAL:
+//                case ePhysicsProperty::IS_POLYHEDRAL:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isPolyhedral());
 //                    return 1;
-//                case PHYSICS_PROPERTY_IS_SOFT_BODY:
+//                case ePhysicsProperty::IS_SOFT_BODY:
 //                    pBtShape = pShape->GetBtShape();
 //                    lua_pushboolean(luaVM, pBtShape->isSoftBody());
 //                    return 1;
@@ -1190,13 +1190,13 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //        {
 //            switch (eProperty)
 //            {
-//                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
+//                case ePhysicsProperty::BREAKING_IMPULSE_THRESHOLD:
 //                    lua_pushnumber(luaVM, pConstraint->GetBreakingImpulseThreshold());
 //                    return 1;
-//                case PHYSICS_PROPERTY_APPLIED_IMPULSE:
+//                case ePhysicsProperty::APPLIED_IMPULSE:
 //                    lua_pushnumber(luaVM, pConstraint->GetAppliedImpulse());
 //                    return 1;
-//                case PHYSICS_PROPERTY_JOINTS_FEEDBACK:
+//                case ePhysicsProperty::JOINTS_FEEDBACK:
 //                    pFeedback = pConstraint->GetJoinFeedback();
 //                    btVector = pFeedback->m_appliedForceBodyA;
 //                    lua_newtable(luaVM);
@@ -1243,21 +1243,21 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //                    lua_pushnumber(luaVM, btVector.getZ());
 //                    lua_settable(luaVM, -3);
 //                    return 4;
-//                case PHYSICS_PROPERTY_RIGID_BODY_A:
+//                case ePhysicsProperty::RIGID_BODY_A:
 //                    pRigidBody = pConstraint->GetRigidBodyA();
 //                    if (pRigidBody)
 //                        lua_pushrigidbody(luaVM, pRigidBody);
 //                    else
 //                        lua_pushboolean(luaVM, false);
 //                    return 1;
-//                case PHYSICS_PROPERTY_RIGID_BODY_B:
+//                case ePhysicsProperty::RIGID_BODY_B:
 //                    pRigidBody = pConstraint->GetRigidBodyB();
 //                    if (pRigidBody)
 //                        lua_pushrigidbody(luaVM, pRigidBody);
 //                    else
 //                        lua_pushboolean(luaVM, false);
 //                    return 1;
-//                case PHYSICS_PROPERTY_CONSTRAINT_BROKEN:
+//                case ePhysicsProperty::CONSTRAINT_BROKEN:
 //                    lua_pushboolean(luaVM, pConstraint->IsBroken());
 //                    return 1;
 //                default:
