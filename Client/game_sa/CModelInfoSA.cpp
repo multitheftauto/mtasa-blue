@@ -776,7 +776,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(*it);
-        MemPut<BYTE>((char*)CStreaming__ms_aInfoForModel + 20 * (*it), 0);
+        pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
     }
 }
 
