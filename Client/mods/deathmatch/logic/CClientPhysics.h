@@ -160,15 +160,15 @@ public:
     std::shared_ptr<CLuaPhysicsFixedConstraint> CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                       bool bDisableCollisionsBetweenLinkedBodies);
 
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies() const { return m_vecRigidBodies; }
-    const std::vector<std::shared_ptr<CLuaPhysicsShape>>&    GetShapes();
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
-    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
+    const std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>&       GetRigidBodies();
+    const std::vector<std::shared_ptr<CLuaPhysicsShape>>&           GetShapes();
+    const std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>& GetStaticCollisions();
+    const std::vector<std::shared_ptr<CLuaPhysicsConstraint>>&      GetConstraints();
 
     std::shared_ptr<CLuaPhysicsShape> Resolve(CLuaPhysicsShape* pLuaShape);
 
-    std::shared_ptr<CLuaPhysicsRigidBody>       GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const;
-    std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const;
+    std::shared_ptr<CLuaPhysicsRigidBody>       GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
 
     std::atomic<bool> isDuringSimulation = false;
@@ -240,10 +240,10 @@ private:
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;
 
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
-    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsShape>> m_mapShapes;
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
-    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
+    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsRigidBody>>       m_mapRigidBodies;
+    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsShape>>           m_mapShapes;
+    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsStaticCollision>> m_mapStaticCollisions;
+    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsConstraint>>      m_mapConstraints;
 
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsStaticCollision>> m_InitializeStaticCollisionsQueue;
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>>       m_InitializeRigidBodiesQueue;

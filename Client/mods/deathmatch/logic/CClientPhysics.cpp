@@ -62,23 +62,23 @@ void CClientPhysics::WaitForSimulationToFinish()
 
 void CClientPhysics::Clear()
 {
-    for (const auto& pConstraint : m_vecConstraints)
+    for (const auto& pair : m_mapConstraints)
     {
-        pConstraint->Unlink();
+        pair.second->Unlink();
     }
-    m_vecConstraints.clear();
 
-    for (const auto& pRigidBody : m_vecRigidBodies)
+    for (const auto& pRigidBody : m_mapRigidBodies)
     {
-        pRigidBody->Unlink();
+        pRigidBody.second->Unlink();
     }
-    for (const auto& pStaticCollision : m_vecStaticCollisions)
+    for (const auto& pStaticCollision : m_mapStaticCollisions)
     {
-        pStaticCollision->Unlink();
+        pStaticCollision.second->Unlink();
     }
-    m_vecRigidBodies.clear();
+    m_mapConstraints.clear();
+    m_mapRigidBodies.clear();
+    m_mapStaticCollisions.clear();
     m_mapShapes.clear();
-    m_vecStaticCollisions.clear();
 }
 
 void CClientPhysics::Unlink()
@@ -336,18 +336,16 @@ void CClientPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
     }
 }
 
-void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
-{
-    m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>::iterator object =
-        std::find_if(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), [&](std::shared_ptr<CLuaPhysicsRigidBody>& obj) { return obj.get() == pLuaRigidBody; });
-    m_vecRigidBodies.erase(std::remove(m_vecRigidBodies.begin(), m_vecRigidBodies.end(), *object));
-}
-
 std::shared_ptr<CLuaPhysicsShape> CClientPhysics::Resolve(CLuaPhysicsShape* pLuaShape)
 {
     uint id = pLuaShape->GetScriptID();
     return m_mapShapes[id];
+}
+
+void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
+{
+    m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
+    m_mapRigidBodies.erase(pLuaRigidBody->GetScriptID());
 }
 
 void CClientPhysics::DestroyShape(std::shared_ptr<CLuaPhysicsShape> pLuaShape)
@@ -359,24 +357,19 @@ void CClientPhysics::DestroyShape(std::shared_ptr<CLuaPhysicsShape> pLuaShape)
 void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
 {
     m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
-    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>::iterator object = std::find_if(
-        m_vecConstraints.begin(), m_vecConstraints.end(), [&](std::shared_ptr<CLuaPhysicsConstraint>& obj) { return obj.get() == pLuaConstraint; });
-    m_vecConstraints.erase(std::remove(m_vecConstraints.begin(), m_vecConstraints.end(), *object));
+    m_mapConstraints.erase(pLuaConstraint->GetScriptID());
 }
 
 void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>::iterator object =
-        std::find_if(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(),
-                     [&](std::shared_ptr<CLuaPhysicsStaticCollision>& obj) { return obj.get() == pStaticCollision; });
-    m_vecStaticCollisions.erase(std::remove(m_vecStaticCollisions.begin(), m_vecStaticCollisions.end(), *object));
+    m_mapStaticCollisions.erase(pStaticCollision->GetScriptID());
 }
 
 void CClientPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
-    m_vecStaticCollisions.push_back(pStaticCollision);
+    m_mapStaticCollisions.emplace(pStaticCollision->GetScriptID(), pStaticCollision);
     m_InitializeStaticCollisionsQueue.push(pStaticCollision);
 }
 
@@ -388,53 +381,17 @@ void CClientPhysics::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
 
 void CClientPhysics::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
 {
+    m_mapRigidBodies.emplace(pRigidBody->GetScriptID(), pRigidBody);
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
-    m_vecRigidBodies.push_back(pRigidBody);
     m_InitializeRigidBodiesQueue.push(pRigidBody);
 }
 
 void CClientPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint)
 {
+    m_mapConstraints.emplace(pConstraint->GetScriptID(), pConstraint);
     m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
-    m_vecConstraints.push_back(pConstraint);
     m_InitializeConstraintsQueue.push(pConstraint);
 }
-
-//void CClientPhysics::SetDebugLineWidth(float fWidth) const
-//{
-//    m_pDebugDrawer->SetDebugLineWidth(fWidth);
-//}
-//
-//float CClientPhysics::GetDebugLineWidth() const
-//{
-//    return m_pDebugDrawer->GetDebugLineWidth();
-//}
-//
-//bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
-//{
-//    if (eDebugMode == ePhysicsDebugMode::PHYSICS_DEBUG_NoDebug)
-//    {
-//        if (bEnabled)
-//        {
-//            m_pDebugDrawer->reset();
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    m_pDebugDrawer->setDebugMode(eDebugMode, bEnabled);
-//
-//    return true;
-//}
-//bool CClientPhysics::GetDebugMode(ePhysicsDebugMode eDebugMode) const
-//{
-//    if (eDebugMode == ePhysicsDebugMode::PHYSICS_DEBUG_NoDebug)
-//    {
-//        return m_pDebugDrawer->getDebugMode() == 0;
-//    }
-//
-//    return m_pDebugDrawer->getDebugMode(eDebugMode);
-//}
 
 void CClientPhysics::StepSimulation()
 {
@@ -475,31 +432,56 @@ const std::vector<std::shared_ptr<CLuaPhysicsShape>>& CClientPhysics::GetShapes(
 {
     std::vector<std::shared_ptr<CLuaPhysicsShape>> shapes;
     shapes.reserve(m_mapShapes.size());
-    for (auto kv : m_mapShapes)
+    for (const auto& pair : m_mapShapes)
     {
-        shapes.push_back(kv.second);
+        shapes.push_back(pair.second);
     }
     return shapes;
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody) const
+const std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>& CClientPhysics::GetRigidBodies()
 {
-    auto it = m_vecRigidBodies.begin();
-    for (; it != m_vecRigidBodies.end(); ++it)
-        if (pRigidBody == (*it).get())
-            return *it;
-
-    assert(1 == 2);            // Should never happen
+    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> rigidBodies;
+    rigidBodies.reserve(m_mapRigidBodies.size());
+    for (const auto& pair : m_mapRigidBodies)
+    {
+        rigidBodies.push_back(pair.second);
+    }
+    return rigidBodies;
 }
 
-std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision) const
+const std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>& CClientPhysics::GetStaticCollisions()
 {
-    auto it = m_vecStaticCollisions.begin();
-    for (; it != m_vecStaticCollisions.end(); ++it)
-        if (pStaticCollision == (*it).get())
-            return *it;
+    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> staticCollisions;
+    staticCollisions.reserve(m_mapStaticCollisions.size());
+    for (const auto& pair : m_mapStaticCollisions)
+    {
+        staticCollisions.push_back(pair.second);
+    }
+    return staticCollisions;
+}
 
-    assert(1 == 2);            // Should never happen
+const std::vector<std::shared_ptr<CLuaPhysicsConstraint>>& CClientPhysics::GetConstraints()
+{
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>> constraints;
+    constraints.reserve(m_mapConstraints.size());
+    for (const auto& pair : m_mapConstraints)
+    {
+        constraints.push_back(pair.second);
+    }
+    return constraints;
+}
+
+std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+{
+    uint id = pRigidBody->GetScriptID();
+    return m_mapRigidBodies[id];
+}
+
+std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    uint id = pStaticCollision->GetScriptID();
+    return m_mapStaticCollisions[id];
 }
 
 std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject)
