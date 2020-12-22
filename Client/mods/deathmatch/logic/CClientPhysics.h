@@ -143,9 +143,10 @@ public:
     void QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
                   std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask);
 
-    void AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody);
-    void AddToChangesStack(const CLuaPhysicsElement* pElement);
-    void AddToUpdateAABBStack(const CLuaPhysicsRigidBody* pRigidBody);
+    void AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody);
+    void AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody);
+    void AddToChangesStack(CLuaPhysicsElement* pElement);
+    void AddToUpdateStack(CLuaPhysicsElement* pElement);
 
 
     std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
@@ -216,6 +217,7 @@ private:
     SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsConstraint>>      m_InitializeConstraintsQueue;
 
     SharedUtil::ConcurrentStack<CLuaPhysicsElement*>   m_StackElementChanges;
+    SharedUtil::ConcurrentStack<CLuaPhysicsElement*>   m_StackElementUpdates;
     SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;
     SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesUpdateAABB;
 

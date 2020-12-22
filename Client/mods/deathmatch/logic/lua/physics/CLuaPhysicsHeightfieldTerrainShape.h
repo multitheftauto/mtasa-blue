@@ -23,6 +23,7 @@ public:
     CLuaPhysicsHeightfieldTerrainShape(CClientPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
     ~CLuaPhysicsHeightfieldTerrainShape();
 
+    void Update() {}
 
 private:
     std::vector<float> m_heightfieldTerrainData;

@@ -24,4 +24,5 @@ public:
                                CVector& axisB, bool bDisableCollisionsBetweenLinkedBodies);
     CLuaPhysicsHidgeConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& pivot, CVector& axis, bool bDisableCollisionsBetweenLinkedBodies);
     ~CLuaPhysicsHidgeConstraint();
+    void Update() {}
 };

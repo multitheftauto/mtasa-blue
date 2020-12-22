@@ -34,4 +34,5 @@ public:
     void  SetUpperLinLimit(float fLength);
     void  SetLowerAngLimit(float lowerLimit);
     void  SetUpperAngLimit(float upperLimit);
+    void  Update() {}
 };

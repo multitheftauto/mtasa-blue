@@ -89,6 +89,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetContacts", ArgumentParser<PhysicsGetContacts>},
         {"physicsGetContactDetails", ArgumentParser<PhysicsGetContactDetails>},
         {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
+        {"physicsSetVertexPosition", ArgumentParser<PhysicsSetVertexPosition>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1675,4 +1676,23 @@ std::unordered_map<std::string, long long int> CLuaPhysicsDefs::PhysicsGetPerfor
     }
     result["total"] = total;
     return result;
+}
+
+bool CLuaPhysicsDefs::PhysicsSetVertexPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, CVector vecPosition)
+{
+    if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMesh = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape.get()))
+    {
+        if (iVertexId > 0 && pTriangleMesh->GetVerticesNum() > iVertexId)
+        {
+            if (abs(vecPosition.fX) > BulletPhysics::Limits::MaximumPrimitiveSize || abs(vecPosition.fY) > BulletPhysics::Limits::MaximumPrimitiveSize ||
+                abs(vecPosition.fZ) > BulletPhysics::Limits::MaximumPrimitiveSize)
+                throw std::invalid_argument(
+                    SString("Vertex position out of bounds. x,y,z must be smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+            pTriangleMesh->SetVertexPosition(--iVertexId, vecPosition);
+            return true;
+        }
+        throw std::invalid_argument("Vertex index out of range");
+    }
+    throw std::invalid_argument(SString("Shape %s unsupported", pShape->GetName()).c_str());
 }

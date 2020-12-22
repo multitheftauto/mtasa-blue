@@ -871,19 +871,24 @@ void CClientPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
     }
 }
 
-void CClientPhysics::AddToActivationStack(const CLuaPhysicsRigidBody* pRigidBody)
+void CClientPhysics::AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_StackRigidBodiesActivation.push((CLuaPhysicsRigidBody*)pRigidBody);
+    m_StackRigidBodiesActivation.push(pRigidBody);
 }
 
-void CClientPhysics::AddToUpdateAABBStack(const CLuaPhysicsRigidBody* pRigidBody)
+void CClientPhysics::AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_StackRigidBodiesUpdateAABB.push((CLuaPhysicsRigidBody*)pRigidBody);
+    m_StackRigidBodiesUpdateAABB.push(pRigidBody);
 }
 
-void CClientPhysics::AddToChangesStack(const CLuaPhysicsElement* pElement)
+void CClientPhysics::AddToChangesStack(CLuaPhysicsElement* pElement)
 {
-    m_StackElementChanges.push((CLuaPhysicsElement*)pElement);
+    m_StackElementChanges.push(pElement);
+}
+
+void CClientPhysics::AddToUpdateStack(CLuaPhysicsElement* pElement)
+{
+    m_StackElementUpdates.push(pElement);
 }
 
 void CClientPhysics::DoPulse()
@@ -956,6 +961,17 @@ void CClientPhysics::DoPulse()
             pElement->ApplyChanges();
 
             m_StackElementChanges.pop();
+        }
+    }
+
+    {
+        BT_PROFILE("update");
+        while (!m_StackElementUpdates.empty())
+        {
+            CLuaPhysicsElement* pElement = m_StackElementUpdates.top();
+            pElement->Update();
+
+            m_StackElementUpdates.pop();
         }
     }
 

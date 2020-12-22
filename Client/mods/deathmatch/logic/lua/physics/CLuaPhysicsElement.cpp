@@ -52,7 +52,17 @@ void CLuaPhysicsElement::ApplyChanges()
         m_stackChanges.top()();
         m_stackChanges.pop();
     }
+    Update();
     m_bHasEnqueuedChanges = false;
+}
+
+void CLuaPhysicsElement::NeedsUpdate()
+{
+    if (!m_bNeedsUpdate)
+    {
+        m_bNeedsUpdate = true;
+        GetPhysics()->AddToUpdateStack(this);
+    }
 }
 
 void CLuaPhysicsElement::CommitChange(std::function<void()> change)

@@ -79,6 +79,7 @@ public:
 
     void Unlink();
 
+    void Update() {}
 private:
     std::unique_ptr<btCollisionObject> m_btCollisionObject;
     std::shared_ptr<CLuaPhysicsShape>  m_pShape;

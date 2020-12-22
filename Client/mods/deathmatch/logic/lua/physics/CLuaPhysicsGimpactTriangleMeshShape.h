@@ -23,4 +23,5 @@ class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsShape
 public:
     CLuaPhysicsGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices);
     ~CLuaPhysicsGimpactTriangleMeshShape();
+    void Update() {}
 };

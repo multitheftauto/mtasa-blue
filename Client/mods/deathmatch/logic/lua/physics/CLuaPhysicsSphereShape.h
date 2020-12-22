@@ -25,4 +25,5 @@ public:
 
     bool SetRadius(float fRadius);
     bool GetRadius(float& fRadius);
+    void Update() {}
 };

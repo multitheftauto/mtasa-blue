@@ -127,6 +127,7 @@ public:
     std::vector<SPhysicsCollisionReport*> GetCollisionReports();
     SPhysicsCollisionReport*              GetCollisionReport(CLuaPhysicsElement* pElement);
     void                                  AABBUpdated() { m_bAABBUpdateRequested = false; }
+    void                                  Update() {}
 
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;

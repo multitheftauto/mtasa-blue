@@ -27,4 +27,5 @@ public:
     CLuaPhysicsBoxShape(CClientPhysics* pPhysics, CVector half);
     bool GetSize(CVector& vecSize);
     bool SetSize(CVector& vecSize);
+    void Update() {}
 };

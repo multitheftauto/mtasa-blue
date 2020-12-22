@@ -22,4 +22,5 @@ class CLuaPhysicsConvexHullShape : public CLuaPhysicsShape
 public:
     CLuaPhysicsConvexHullShape(CClientPhysics* pPhysics, std::vector<CVector>& vecPoints);
     ~CLuaPhysicsConvexHullShape();
+    void Update() {}
 };

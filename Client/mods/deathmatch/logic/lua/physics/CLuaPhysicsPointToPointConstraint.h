@@ -40,6 +40,7 @@ public:
     void SetPivotB(const CVector& vecPivotB);
 
     void Unlink();
+    void Update() {}
 
 private:
     eConstraintVariant                       m_eVariant;

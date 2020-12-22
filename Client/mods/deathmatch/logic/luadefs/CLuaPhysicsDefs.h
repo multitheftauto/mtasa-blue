@@ -124,4 +124,6 @@ public:
                                                                                       std::variant<std::monostate, CVector, bool>  variantB,
                                                                                       std::variant<std::monostate, CVector, bool>  variantC,
                                                                                       std::optional<bool>                          bBool);
+
+    static bool PhysicsSetVertexPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, CVector vecPosition);
 };

@@ -120,7 +120,7 @@ void CLuaPhysicsRigidBody::NeedsActivation() const
     if (!m_bActivationRequested)
     {
         m_bActivationRequested = true;
-        GetPhysics()->AddToActivationStack(this);
+        GetPhysics()->AddToActivationStack((CLuaPhysicsRigidBody*)this);
     }
 }
 
@@ -129,7 +129,7 @@ void CLuaPhysicsRigidBody::NeedsAABBUpdate() const
     if (!m_bAABBUpdateRequested)
     {
         m_bAABBUpdateRequested = true;
-        GetPhysics()->AddToActivationStack(this);
+        GetPhysics()->AddToActivationStack((CLuaPhysicsRigidBody*)this);
     }
 }
 

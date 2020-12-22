@@ -20,7 +20,27 @@ class CLuaPhysicsBvhTriangleMeshShape;
 
 class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsShape
 {
+    struct SVertexUpdate
+    {
+        SVertexUpdate(int vertex, CVector position) : vertex(vertex), position(position) {}
+        int     vertex;
+        CVector position;
+    };
+
 public:
     CLuaPhysicsBvhTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices);
     ~CLuaPhysicsBvhTriangleMeshShape();
+
+    void SetVertexPosition(int iVertex, CVector vecPosition);
+
+    void Update();
+
+    int GetVerticesNum() const { return m_verticesCount; }
+
+private:
+    void InternalUpdateVerticesPositions();
+
+    int                        m_verticesCount = 0;
+    std::vector<SVertexUpdate> m_vecVerticesUpdate;
+    mutable std::mutex         m_lock;
 };
