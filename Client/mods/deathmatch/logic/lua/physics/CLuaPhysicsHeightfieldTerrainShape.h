@@ -20,11 +20,15 @@ class CLuaPhysicsHeightfieldTerrainShape;
 class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsShape
 {
 public:
-    CLuaPhysicsHeightfieldTerrainShape(CClientPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
+    CLuaPhysicsHeightfieldTerrainShape(CClientPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float> vecHeightData);
     ~CLuaPhysicsHeightfieldTerrainShape();
 
     void Update() {}
 
+    int  GetVerticesNum() const { return m_iSizeX * m_iSizeY; }
+    void SetHeight(int index, float fHeight);
+
 private:
-    std::vector<float> m_heightfieldTerrainData;
+    int                m_iSizeX;
+    int                m_iSizeY;
 };

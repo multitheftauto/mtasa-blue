@@ -293,7 +293,7 @@ std::unique_ptr<heightfieldTerrainShape> CLuaPhysicsSharedLogic::CreateHeightfie
 
     bool                                     flipQuadEdges = true;
     std::unique_ptr<heightfieldTerrainShape> heightfieldTerrain = std::make_unique<heightfieldTerrainShape>();
-    heightfieldTerrain->data = std::vector<float>(vecHeightData);
+    heightfieldTerrain->data = vecHeightData;
     float minHeight = 0;
     float maxHeight = 0;
 
@@ -304,7 +304,7 @@ std::unique_ptr<heightfieldTerrainShape> CLuaPhysicsSharedLogic::CreateHeightfie
     }
 
     std::unique_ptr<btHeightfieldTerrainShape> pHeightfieldTerrain = std::make_unique<btHeightfieldTerrainShape>(
-        iSizeX, iSizeY, &heightfieldTerrain->data[0], 1.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
+        iSizeX, iSizeY, &heightfieldTerrain->data[0], 100.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
 
     heightfieldTerrain->pHeightfieldTerrainShape = std::move(pHeightfieldTerrain);
     return std::move(heightfieldTerrain);

@@ -48,8 +48,12 @@ public:
     BroadphaseNativeTypes GetType();
     const char*           GetName();
 
+    // for CLuaPhysicsHeightfieldTerrainShape shape
+    float*                GetHeightfieldData() { return &m_vecHeightfieldData[0]; }
+
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;
+    std::vector<float> m_vecHeightfieldData;
 
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodyList;
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;

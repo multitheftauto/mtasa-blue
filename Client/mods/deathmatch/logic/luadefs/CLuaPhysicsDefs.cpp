@@ -90,6 +90,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetContactDetails", ArgumentParser<PhysicsGetContactDetails>},
         {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
         {"physicsSetVertexPosition", ArgumentParser<PhysicsSetVertexPosition>},
+        {"physicsSetHeight", ArgumentParser<PhysicsSetHeight>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1690,6 +1691,24 @@ bool CLuaPhysicsDefs::PhysicsSetVertexPosition(std::shared_ptr<CLuaPhysicsShape>
                     SString("Vertex position out of bounds. x,y,z must be smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
             pTriangleMesh->SetVertexPosition(--iVertexId, vecPosition);
+            return true;
+        }
+        throw std::invalid_argument("Vertex index out of range");
+    }
+    throw std::invalid_argument(SString("Shape %s unsupported", pShape->GetName()).c_str());
+}
+
+bool CLuaPhysicsDefs::PhysicsSetHeight(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, float fHeight)
+{
+    if (CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrain = dynamic_cast<CLuaPhysicsHeightfieldTerrainShape*>(pShape.get()))
+    {
+        if (iVertexId > 0 && pHeightfieldTerrain->GetVerticesNum() > iVertexId)
+        {
+            if (abs(fHeight) > BulletPhysics::Limits::MaximumPrimitiveSize)
+                throw std::invalid_argument(
+                    SString("Height must be smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+            pHeightfieldTerrain->SetHeight(--iVertexId, fHeight);
             return true;
         }
         throw std::invalid_argument("Vertex index out of range");

@@ -25,6 +25,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<btC
 
 CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<heightfieldTerrainShape> pHeightfieldTerrainShape) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
 {
+    m_vecHeightfieldData = std::move(pHeightfieldTerrainShape->data);
     m_pBtShape = std::move(pHeightfieldTerrainShape->pHeightfieldTerrainShape);
     m_pBtShape->setUserPointer((void*)this);
 }
