@@ -78,5 +78,12 @@ void CBulletPhysicsProfiler::OnProfileLeave()
     std::lock_guard guard(CBulletPhysicsProfiler::m_lock);
     ProfilerTime    time = CBulletPhysicsProfiler::m_clock->getTimeNanoseconds() - CBulletPhysicsProfiler::m_mapTiming[GetCurrentThreadId()];
     const char*     name = CBulletPhysicsProfiler::m_mapCurrentProfile[GetCurrentThreadId()];
-    CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()][name] = time;
+    if (CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()].find(name) == CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()].end())
+    {
+        CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()][name] = time;
+    }
+    else
+    {
+        CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()][name] += time;
+    }
 }
