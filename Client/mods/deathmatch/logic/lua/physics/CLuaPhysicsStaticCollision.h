@@ -57,11 +57,11 @@ public:
 
     void    SetPosition(const CVector& vecPosition) const;
     CVector GetPosition() const;
-    void    SetRotation(const CVector& vecRotation) const;
+    void    SetRotation(const CVector& vecRotation);
     CVector GetRotation() const;
     bool    SetScale(const CVector& vecScale) const;
     CVector GetScale() const;
-    bool    SetMatrix(const CMatrix& matrix) const;
+    bool    SetMatrix(const CMatrix& matrix);
     CMatrix GetMatrix() const;
 
     void Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);

@@ -290,9 +290,9 @@ btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(std::sha
     return result;
 }
 
-btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces) const
+SClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces) const
 {
-    btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    SClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
         RayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
 

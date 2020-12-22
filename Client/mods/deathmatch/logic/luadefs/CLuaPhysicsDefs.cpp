@@ -1399,10 +1399,28 @@ bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CV
     return pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true)).hasHit();
 }
 
-std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+void Barycentric(const CVector& point, const CVector& a, const CVector& b, const CVector& c, float& u, float& v, float& w)
+{
+    CVector v0 = b - a, v1 = c - a, v2 = point - a;
+    float   d00 = v0.DotProduct(&v0);
+    float   d01 = v0.DotProduct(&v1);
+    float   d11 = v1.DotProduct(&v1);
+    float   d20 = v2.DotProduct(&v0);
+    float   d21 = v2.DotProduct(&v1);
+    float   denom = d00 * d11 - d01 * d01;
+    v = (d11 * d20 - d01 * d21) / denom;
+    w = (d00 * d21 - d01 * d20) / denom;
+    u = 1.0f - v - w;
+}
+
+// CVector point(0, 0, 0);
+// float          u, v, w;
+// Barycentric(point, vecVertex1, vecVertex2, vecVertex3, u, v, w);
+
+std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>>>
 CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {
-    btCollisionWorld::ClosestRayResultCallback callback = pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true));
+    SClosestRayResultCallback callback = pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true));
 
     if (!callback.hasHit())
         return false;
@@ -1414,16 +1432,43 @@ CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector 
     if (!pCollisionShape)
         return false; // should never happen
 
-    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
+    CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pCollisionShape->getUserPointer());
+    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>> result{
         {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
         {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld)},
-        {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
+        {"shape", pShape},
     };
 
+    if (callback.m_hitShapePart >= 0)
+        result["childShapeIndex"] = callback.m_hitShapePart + 1;
+    
+    if (callback.m_hitTriangleIndex >= 0)
+        result["triangleIndex"] = callback.m_hitTriangleIndex + 1;
+
+    CMatrix matrix;
     if (pRigidBody != nullptr)
-        result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+    {
+        CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+        result["rigidbody"] = pLuaRigidBody;
+        matrix = pLuaRigidBody->GetMatrix();
+    }
     else
-        result["staticcollision"] = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+    {
+        CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+        result["staticcollision"] = pStaticCollision;
+        matrix = pStaticCollision->GetMatrix();
+    }
+
+    if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
+    {
+        STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(callback.m_hitTriangleIndex);
+        result["vertex1"] = triangleInfo.vertex1 + 1;
+        result["vertex2"] = triangleInfo.vertex2 + 1;
+        result["vertex3"] = triangleInfo.vertex3 + 1;
+        result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
+        result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
+        result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
+    }
 
     return result;
 }

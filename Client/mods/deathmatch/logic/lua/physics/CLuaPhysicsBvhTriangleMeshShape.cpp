@@ -71,3 +71,38 @@ void CLuaPhysicsBvhTriangleMeshShape::SetVertexPosition(int iVertex, CVector vec
 
     NeedsUpdate();
 }
+
+STriangleInfo CLuaPhysicsBvhTriangleMeshShape::GetTriangleInfo(int iTriangleIndex)
+{
+    btBvhTriangleMeshShape*  pShape = (btBvhTriangleMeshShape*)GetBtShape();
+    btStridingMeshInterface* pMeshInterface = pShape->getMeshInterface();
+
+    const CVector4D* vertexbase = 0;
+    const int*     indexbase = 0;
+    int            numverts;
+    int            vertexStride;
+    int            indexstride;
+    int            numfaces;
+    PHY_ScalarType scalarType;
+    PHY_ScalarType indicesScalarType;
+
+    pMeshInterface->getLockedReadOnlyVertexIndexBase((const unsigned char**)&vertexbase, numverts, scalarType, vertexStride, (const unsigned char**)&indexbase,
+                                                     indexstride, numfaces, indicesScalarType, 0);
+
+    if (scalarType == PHY_ScalarType::PHY_FLOAT)
+        if (indicesScalarType == PHY_ScalarType::PHY_INTEGER)
+        {
+            int vertex1 = indexbase[iTriangleIndex * 3];
+            int vertex2 = indexbase[iTriangleIndex * 3 + 1];
+            int vertex3 = indexbase[iTriangleIndex * 3 + 2];
+
+            STriangleInfo triangleInfo = STriangleInfo();
+            triangleInfo.vertex1 = vertex1;
+            triangleInfo.vertex2 = vertex2;
+            triangleInfo.vertex3 = vertex3;
+            triangleInfo.vecVertex1 = vertexbase[vertex1];
+            triangleInfo.vecVertex2 = vertexbase[vertex2];
+            triangleInfo.vecVertex3 = vertexbase[vertex3];
+            return triangleInfo;
+        }
+}
