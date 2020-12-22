@@ -75,13 +75,13 @@ public:
     void SetFilterGroup(int iGroup) const;
     int  GetFilterGroup() const;
 
-    btCollisionObject* GetCollisionObject() const { return m_btCollisionObject.get(); }
+    CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
 
     void Unlink();
 
     void Update() {}
 private:
-    std::unique_ptr<btCollisionObject> m_btCollisionObject;
+    std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
     std::shared_ptr<CLuaPhysicsShape>  m_pShape;
 
     std::unique_ptr<CLuaPhysicsStaticCollisionTempData> m_pTempData;

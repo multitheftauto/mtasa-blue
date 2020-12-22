@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/logic/lua/physics/CPhysicsRigidBodyProxy.cpp
+ *  FILE:        mods/shared_logic/logic/lua/physics/CPhysicsRigidBodyProxy.h
  *  PURPOSE:     Manages creation and destruction of rigid body
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -11,9 +11,11 @@
 
 class CPhysicsRigidBodyProxy;
 
+#include "CPhysicsProxyElement.h"
+
 #pragma once
 
-class CPhysicsRigidBodyProxy : public btRigidBody
+class CPhysicsRigidBodyProxy : public CPhysicsProxyElement, public btRigidBody
 {
 public:
     CPhysicsRigidBodyProxy(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0))
@@ -25,7 +27,7 @@ public:
     {
         delete getMotionState();
         delete getCollisionShape();
-        m_pPhysics->RemoveRigidBody(this);
+        SetEnabled(false);
     }
 
     static std::unique_ptr<CPhysicsRigidBodyProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass, const CVector& vecLocalInertia,
@@ -44,12 +46,23 @@ public:
 
         pRigidBody->m_pPhysics = pShape->GetPhysics();
 
-        pShape->GetPhysics()->AddRigidBody(pRigidBody.get());
+        pRigidBody->SetEnabled(true);
         return pRigidBody;
     }
 
-    CClientPhysics* GetPhysics() const { return m_pPhysics; }
-
-private:
-    CClientPhysics* m_pPhysics;
+    void SetEnabled(bool bEnabled)
+    {
+        if (bEnabled != m_bEnabled)
+        {
+            if (bEnabled)
+            {
+                GetPhysics()->AddRigidBody(this);
+            }
+            else
+            {
+                m_pPhysics->RemoveRigidBody(this);
+            }
+            m_bEnabled = bEnabled;
+        }
+    }
 };

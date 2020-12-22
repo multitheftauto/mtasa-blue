@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/logic/lua/physics/CPhysicsRigidBodyProxy.cpp
+ *  FILE:        mods/shared_logic/logic/lua/physics/CPhysicsRigidBodyProxy.h
  *  PURPOSE:     Manages creation and destruction of static collision
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -11,9 +11,11 @@
 
 class CPhysicsStaticCollisionProxy;
 
+#include "CPhysicsProxyElement.h"
+
 #pragma once
 
-class CPhysicsStaticCollisionProxy : public btCollisionObject
+class CPhysicsStaticCollisionProxy : public CPhysicsProxyElement, public btCollisionObject
 {
 public:
     //CPhysicsStaticCollisionProxy(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape,
@@ -25,7 +27,7 @@ public:
     ~CPhysicsStaticCollisionProxy()
     {
         delete getCollisionShape();
-        m_pPhysics->RemoveStaticCollision(this);
+        SetEnabled(false);
     }
 
     static std::unique_ptr<CPhysicsStaticCollisionProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape)
@@ -33,12 +35,23 @@ public:
         std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject = std::make_unique<CPhysicsStaticCollisionProxy>();
         m_btCollisionObject->m_pPhysics = pShape->GetPhysics();
         m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
-        m_btCollisionObject->GetPhysics()->AddStaticCollision(m_btCollisionObject.get());
+        m_btCollisionObject->SetEnabled(true);
         return std::move(m_btCollisionObject);
     }
 
-    CClientPhysics* GetPhysics() const { return m_pPhysics; }
-
-private:
-    CClientPhysics* m_pPhysics;
+    void SetEnabled(bool bEnabled)
+    {
+        if (bEnabled != m_bEnabled)
+        {
+            if (bEnabled)
+            {
+                GetPhysics()->AddStaticCollision(this);
+            }
+            else
+            {
+                m_pPhysics->RemoveStaticCollision(this);
+            }
+            m_bEnabled = bEnabled;
+        }
+    }
 };

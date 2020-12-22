@@ -91,6 +91,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
         {"physicsSetVertexPosition", ArgumentParser<PhysicsSetVertexPosition>},
         {"physicsSetHeight", ArgumentParser<PhysicsSetHeight>},
+        {"physicsSetEnabled", ArgumentParser<PhysicsSetEnabled>},
+        {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
     };
 
     for (const auto& [name, func] : functions)
@@ -1759,4 +1761,32 @@ bool CLuaPhysicsDefs::PhysicsSetHeight(std::shared_ptr<CLuaPhysicsShape> pShape,
         throw std::invalid_argument("Vertex index out of range");
     }
     throw std::invalid_argument(SString("Shape %s unsupported", pShape->GetName()).c_str());
+}
+
+bool CLuaPhysicsDefs::PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable)
+{
+    if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+    {
+        pRigidBody->GetBtRigidBody()->SetEnabled(bEnable);
+        return true;
+    }
+    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+    {
+        pStaticCollision->GetCollisionObject()->SetEnabled(bEnable);
+        return true;
+    }
+    throw std::invalid_argument("Unsupported physics element type");
+}
+
+bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
+{
+    if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+    {
+        return pRigidBody->GetBtRigidBody()->IsEnabled();
+    }
+    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+    {
+        return pStaticCollision->GetCollisionObject()->IsEnabled();
+    }
+    throw std::invalid_argument("Unsupported physics element type");
 }

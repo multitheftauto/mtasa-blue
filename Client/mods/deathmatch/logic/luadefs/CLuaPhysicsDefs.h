@@ -127,4 +127,7 @@ public:
 
     static bool PhysicsSetVertexPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, CVector vecPosition);
     static bool PhysicsSetHeight(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, float fHeight);
+
+    static bool PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable);
+    static bool PhysicsIsEnabled(CLuaPhysicsElement* pElement);
 };
