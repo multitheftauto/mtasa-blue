@@ -1571,7 +1571,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
     bool bFilterBackfaces = false;
     bool bEnrichResult = false;
     bool bSortByDistance = false;
-    int  iLimitResults = -1;
+    int  iLimitResults = BulletPhysics::Defaults::RaycastAllDefaultLimit;
     int  iFilterGroup = 0;
     int  iFilterMask = 0;
 
@@ -1613,8 +1613,10 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
     if (mapOptions.find("limitResults") != mapOptions.end())
     {
         if (!std::holds_alternative<int>(mapOptions["limitResults"]))
-            throw std::invalid_argument("'limitResults' value must be positive integer");
+            throw std::invalid_argument(SString("'limitResults' value must be between 1 and %i", BulletPhysics::Limits::RaycastAllUpperResultsLimit).c_str());
         iLimitResults = std::get<int>(mapOptions["limitResults"]);
+        if (iLimitResults > BulletPhysics::Limits::RaycastAllUpperResultsLimit)
+            throw std::invalid_argument(SString("'limitResults' value must be between 1 and %i", BulletPhysics::Limits::RaycastAllUpperResultsLimit).c_str());
     }
 
     SAllRayResultCallback rayCallback = pPhysics->RayCastAll(from, to, bFilterBackfaces);
