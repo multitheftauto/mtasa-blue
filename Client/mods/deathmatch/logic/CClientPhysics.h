@@ -33,6 +33,36 @@ class CClientPhysics;
 class CLuaPhysicsConstraint;
 class CPhysicsDebugDrawer;
 
+struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
+{
+    std::vector<int> m_hitTriangleIndices;
+    std::vector<int> m_hitShapeParts;
+
+    SAllRayResultCallback(const btVector3& rayFrom, const btVector3& rayTo)
+        : btCollisionWorld::AllHitsRayResultCallback(rayFrom, rayTo)
+    {
+    }
+
+    ~SAllRayResultCallback() {}
+
+    bool needsCollision(btBroadphaseProxy* proxy0) const { return true; }
+
+    btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
+    {
+        if (rayResult.m_localShapeInfo)
+        {
+            m_hitTriangleIndices.emplace_back(rayResult.m_localShapeInfo->m_triangleIndex);
+            m_hitShapeParts.emplace_back(rayResult.m_localShapeInfo->m_shapePart);
+        }
+        else
+        {
+            m_hitTriangleIndices.emplace_back(-1);
+            m_hitShapeParts.emplace_back(-1);
+        }
+        return AllHitsRayResultCallback::addSingleResult(rayResult, normalInWorldSpace);
+    }
+};
+
 struct SClosestRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
 {
     int                     m_hitTriangleIndex;
@@ -92,7 +122,7 @@ public:
 
     btCollisionWorld::ClosestConvexResultCallback ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to) const;
     SClosestRayResultCallback   RayCast(CVector from, CVector to, bool bFilterBackfaces) const;
-    btCollisionWorld::AllHitsRayResultCallback    RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const;
+    SAllRayResultCallback       RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const;
 
     void                                        StartBuildCollisionFromGTA();
     void                                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);

@@ -88,7 +88,7 @@ public:
                 PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
     static bool PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
 
-    static std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
+    static std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>>>
     PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
 
     static std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>

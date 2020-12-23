@@ -303,9 +303,9 @@ SClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool
     return RayCallback;
 }
 
-btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const
+SAllRayResultCallback CClientPhysics::RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const
 {
-    btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    SAllRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
     if (bFilterBackfaces)
         rayResult.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
 
