@@ -18,10 +18,10 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsi
     std::lock_guard       lock(m_lock);
     CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)CIdArray::FindEntry(uiScriptID, EIdClass::RIGID_BODY);
     if (!pLuaRigidBody)
-        return NULL;
+        return nullptr;
 
     if (!ListContainsSharedPointer(m_RigidBodyList, pLuaRigidBody))
-        return NULL;
+        return nullptr;
     return pLuaRigidBody;
 }
 

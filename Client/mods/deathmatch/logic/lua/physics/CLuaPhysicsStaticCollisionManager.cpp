@@ -28,10 +28,10 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
 {
     CLuaPhysicsStaticCollision* pLuaStaticCollision = (CLuaPhysicsStaticCollision*)CIdArray::FindEntry(uiScriptID, EIdClass::STATIC_COLLISION);
     if (!pLuaStaticCollision)
-        return NULL;
+        return nullptr;
 
     if (!ListContainsSharedPointer(m_StaticCollisionList, pLuaStaticCollision))
-        return NULL;
+        return nullptr;
     return pLuaStaticCollision;
 }
 

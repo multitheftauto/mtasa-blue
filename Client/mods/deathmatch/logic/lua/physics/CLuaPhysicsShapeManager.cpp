@@ -16,7 +16,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsShapeManager::GetShapeFromScriptID(
 {
     CLuaPhysicsShape* pLuaShape = (CLuaPhysicsShape*)CIdArray::FindEntry(uiScriptID, EIdClass::SHAPE);
     if (!pLuaShape)
-        return NULL;
+        return nullptr;
 
     return pLuaShape->GetPhysics()->Resolve(pLuaShape);
 }

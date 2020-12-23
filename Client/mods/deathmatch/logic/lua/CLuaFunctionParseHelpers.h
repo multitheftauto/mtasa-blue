@@ -579,7 +579,7 @@ CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* 
     {
         return pLuaMain->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
-    return NULL;
+    return nullptr;
 }
 
 //
@@ -593,7 +593,7 @@ CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr,
     {
         return pLuaMain->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
-    return NULL;
+    return nullptr;
 }
 
 //
@@ -607,7 +607,7 @@ CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State
     {
         return pLuaMain->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
-    return NULL;
+    return nullptr;
 }
 //
 // CLuaPhysicsShape from userdata
@@ -620,7 +620,7 @@ std::shared_ptr<CLuaPhysicsShape> UserDataCast(CLuaPhysicsShape*, void* ptr, lua
     {
         return pLuaMain->GetShapeFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
-    return NULL;
+    return nullptr;
 }
 //
 // CLuaPhysicsContraint from userdata
@@ -633,9 +633,8 @@ CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaV
     {
         return pLuaMain->GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
-    return NULL;
+    return nullptr;
 }
-
 
 //
 // CLuaVector2D from userdata

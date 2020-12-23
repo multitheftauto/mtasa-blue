@@ -28,10 +28,10 @@ CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(un
 {
     CLuaPhysicsConstraint* pLuaContraint = (CLuaPhysicsConstraint*)CIdArray::FindEntry(uiScriptID, EIdClass::CONSTRAINT);
     if (!pLuaContraint)
-        return NULL;
+        return nullptr;
 
     if (!ListContainsSharedPointer(m_List, pLuaContraint))
-        return NULL;
+        return nullptr;
 
     return pLuaContraint;
 }
