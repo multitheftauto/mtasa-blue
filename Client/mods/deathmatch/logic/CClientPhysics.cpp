@@ -428,7 +428,7 @@ void CClientPhysics::ClearOutsideWorldRigidBodies()
     }
 }
 
-const std::vector<std::shared_ptr<CLuaPhysicsShape>>& CClientPhysics::GetShapes()
+std::vector<std::shared_ptr<CLuaPhysicsShape>> CClientPhysics::GetShapes()
 {
     std::vector<std::shared_ptr<CLuaPhysicsShape>> shapes;
     shapes.reserve(m_mapShapes.size());
@@ -439,7 +439,7 @@ const std::vector<std::shared_ptr<CLuaPhysicsShape>>& CClientPhysics::GetShapes(
     return shapes;
 }
 
-const std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>& CClientPhysics::GetRigidBodies()
+std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> CClientPhysics::GetRigidBodies()
 {
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> rigidBodies;
     rigidBodies.reserve(m_mapRigidBodies.size());
@@ -450,7 +450,7 @@ const std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>& CClientPhysics::GetRig
     return rigidBodies;
 }
 
-const std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>& CClientPhysics::GetStaticCollisions()
+std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> CClientPhysics::GetStaticCollisions()
 {
     std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> staticCollisions;
     staticCollisions.reserve(m_mapStaticCollisions.size());
@@ -461,7 +461,7 @@ const std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>& CClientPhysics::
     return staticCollisions;
 }
 
-const std::vector<std::shared_ptr<CLuaPhysicsConstraint>>& CClientPhysics::GetConstraints()
+std::vector<std::shared_ptr<CLuaPhysicsConstraint>> CClientPhysics::GetConstraints()
 {
     std::vector<std::shared_ptr<CLuaPhysicsConstraint>> constraints;
     constraints.reserve(m_mapConstraints.size());

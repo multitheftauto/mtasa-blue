@@ -160,10 +160,10 @@ public:
     std::shared_ptr<CLuaPhysicsFixedConstraint> CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                       bool bDisableCollisionsBetweenLinkedBodies);
 
-    const std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>&       GetRigidBodies();
-    const std::vector<std::shared_ptr<CLuaPhysicsShape>>&           GetShapes();
-    const std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>>& GetStaticCollisions();
-    const std::vector<std::shared_ptr<CLuaPhysicsConstraint>>&      GetConstraints();
+    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies();
+    std::vector<std::shared_ptr<CLuaPhysicsShape>>           GetShapes();
+    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions();
+    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints();
 
     std::shared_ptr<CLuaPhysicsShape> Resolve(CLuaPhysicsShape* pLuaShape);
 
