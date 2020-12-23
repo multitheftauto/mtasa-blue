@@ -348,7 +348,7 @@ int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
         argStream.ReadUserData(pVehicle);
 
         if (!argStream.HasErrors())
-            ucModel = pVehicle->GetModel();
+            ucModel = pVehicle->GetModelOriginal();
     }
     else
     {
@@ -375,7 +375,7 @@ int CLuaVehicleDefs::IsVehicleTaxiLightOn(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420)
+        if (pVehicle->GetModelOriginal() == 438 || pVehicle->GetModelOriginal() == 420)
         {
             bool bLightState = pVehicle->IsTaxiLightOn();
             if (bLightState)
@@ -402,7 +402,7 @@ int CLuaVehicleDefs::SetVehicleTaxiLightOn(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420)
+        if (pVehicle->GetModelOriginal() == 438 || pVehicle->GetModelOriginal() == 420)
         {
             pVehicle->SetTaxiLightOn(bLightState);
             lua_pushboolean(luaVM, true);
@@ -515,7 +515,7 @@ int CLuaVehicleDefs::GetVehicleLandingGearDown(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Does the vehicle have landing gears?
-        if (CClientVehicleManager::HasLandingGears(pVehicle->GetModel()))
+        if (CClientVehicleManager::HasLandingGears(pVehicle->GetModelOriginal()))
         {
             // Return whether it has landing gears or not
             bool bLandingGear = pVehicle->IsLandingGearDown();
@@ -541,7 +541,7 @@ int CLuaVehicleDefs::GetVehicleMaxPassengers(lua_State* luaVM)
         argStream.ReadUserData(pVehicle);
 
         if (!argStream.HasErrors())
-            usModel = pVehicle->GetModel();
+            usModel = pVehicle->GetModelOriginal();
     }
     else
     {
@@ -603,7 +603,7 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Get the maximum amount of passengers
-        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModelOriginal());
 
         // Make sure that if the vehicle doesn't have any seats, the function returns false
         if (ucMaxPassengers == 255)
@@ -663,7 +663,7 @@ int CLuaVehicleDefs::GetVehicleSirensOn(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Does the vehicle have Sirens?
-        if (CClientVehicleManager::HasSirens(pVehicle->GetModel()) || pVehicle->DoesVehicleHaveSirens())
+        if (CClientVehicleManager::HasSirens(pVehicle->GetModelOriginal()) || pVehicle->DoesVehicleHaveSirens())
         {
             // Return whether it has its Sirens on or not
             bool bSirensOn = pVehicle->IsSirenOrAlarmActive();
@@ -1225,7 +1225,7 @@ int CLuaVehicleDefs::GetVehicleName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        const char* szVehicleName = CVehicleNames::GetVehicleName(pVehicle->GetModel());
+        const char* szVehicleName = CVehicleNames::GetVehicleName(pVehicle->GetModelOriginal());
         if (szVehicleName)
         {
             lua_pushstring(luaVM, szVehicleName);
@@ -1716,7 +1716,7 @@ int CLuaVehicleDefs::SetVehicleLandingGearDown(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CClientVehicleManager::HasLandingGears(pVehicle->GetModel()))
+        if (CClientVehicleManager::HasLandingGears(pVehicle->GetModelOriginal()))
         {
             // Do it
             if (CStaticFunctionDefinitions::SetVehicleLandingGearDown(*pVehicle, bLandingGearDown))
@@ -4049,7 +4049,7 @@ bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<
     unsigned char ucVariant2 = optVariant2.value_or(0xFE);
 
     if (ucVariant == 254 && ucVariant2 == 254)
-        CClientVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariant, ucVariant2);
+        CClientVehicleManager::GetRandomVariation(pVehicle->GetModelOriginal(), ucVariant, ucVariant2);
 
     if ((ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
     {
@@ -4117,7 +4117,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     if (wheel < 0 || wheel > 3)
         throw std::invalid_argument("Invalid wheel number");
 
-    if (CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) != CLIENTVEHICLE_CAR)
+    if (CClientVehicleManager::GetVehicleType(pVehicle->GetModelOriginal()) != CLIENTVEHICLE_CAR)
         throw std::invalid_argument("Invalid vehicle type");
 
     return pVehicle->GetWheelFrictionState(wheel);

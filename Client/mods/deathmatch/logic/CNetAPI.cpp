@@ -653,7 +653,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
     if (pVehicle && flags.data.bSyncingVehicle)
     {
         // Eventually read vehicle specific keysync data
-        ReadSmallVehicleSpecific(pVehicle, BitStream, pVehicle->GetModel());
+        ReadSmallVehicleSpecific(pVehicle, BitStream, pVehicle->GetModelOriginal());
 
         if (pVehicle->GetUpgrades()->HasUpgrade(1087))            // Hydraulics?
         {
@@ -666,7 +666,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
         }
 
         // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-        if (pVehicle->GetModel() == VT_RHINO)
+        if (pVehicle->GetModelOriginal() == VT_RHINO)
         {
             ControllerState.ButtonCircle = 0;
         }
@@ -1254,7 +1254,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     ReadFullKeysync(ControllerState, BitStream);
 
     // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-    if (pVehicle->GetModel() == VT_RHINO)
+    if (pVehicle->GetModelOriginal() == VT_RHINO)
     {
         ControllerState.ButtonCircle = 0;
     }
@@ -1270,7 +1270,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
 
     // Read the remote model to prevent desyncs when the remote model
     // differs from the local one (#8800)
-    int iModelID = pVehicle->GetModel();
+    int iModelID = pVehicle->GetModelOriginal();
     int iRemoteModelID = iModelID;
 
     if (BitStream.Version() >= 0x05F)
@@ -1863,7 +1863,7 @@ void CNetAPI::ReadSmallVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInt
         SVehicleTurretSync vehicle;
         BitStream.Read(&vehicle);
 
-        int iModelID = pVehicle->GetModel();
+        int iModelID = pVehicle->GetModelOriginal();
         if (CClientVehicleManager::HasTurret(iModelID))
         {
             pVehicle->SetTurretRotation(vehicle.data.fTurretX, vehicle.data.fTurretY);
@@ -1874,7 +1874,7 @@ void CNetAPI::ReadSmallVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInt
 void CNetAPI::WriteSmallVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
     // Turret states
-    int iModelID = pVehicle->GetModel();
+    int iModelID = pVehicle->GetModelOriginal();
     if (CClientVehicleManager::HasTurret(iModelID))
     {
         SVehicleTurretSync vehicle;
@@ -1887,7 +1887,7 @@ void CNetAPI::WriteSmallVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamIn
 void CNetAPI::ReadFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModelID)
 {
     // Turret states
-    int iModelID = pVehicle->GetModel();
+    int iModelID = pVehicle->GetModelOriginal();
     if (CClientVehicleManager::HasTurret(iRemoteModelID))
     {
         SVehicleTurretSync vehicle;
@@ -1927,7 +1927,7 @@ void CNetAPI::ReadFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInte
 void CNetAPI::WriteFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
     // Turret states
-    int iModelID = pVehicle->GetModel();
+    int iModelID = pVehicle->GetModelOriginal();
     if (CClientVehicleManager::HasTurret(iModelID))
     {
         // Grab the turret position

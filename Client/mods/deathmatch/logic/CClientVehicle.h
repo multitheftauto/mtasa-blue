@@ -207,6 +207,7 @@ public:
     void SetTurretRotation(float fHorizontal, float fVertical);
 
     unsigned short GetModel() { return m_usModel; };
+    unsigned short GetModelOriginal() { return m_usModelOriginal; };
     void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
 
     unsigned char GetVariant() { return m_ucVariation; };
@@ -534,6 +535,7 @@ protected:
     CClientVehicleManager*      m_pVehicleManager;
     CClientModelRequestManager* m_pModelRequester;
     unsigned short              m_usModel;
+    unsigned short              m_usModelOriginal;
     bool                        m_bHasLandingGear;
     eClientVehicleType          m_eVehicleType;
     unsigned char               m_ucMaxPassengers;

@@ -29,42 +29,42 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientVehicle"), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink,
                                            &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, NULL);
 
+    // Grab the model info
+    m_pModelInfo = g_pGame->GetModelInfo(usModel);
+
+    m_usModel = usModel;
+    m_usModelOriginal = usModel;
+
+    if (m_usModel < 400 || m_usModel > 611)
+        m_usModelOriginal = m_pModelInfo->GetParentID();
+
     // Initialize members
     m_pManager = pManager;
     m_pObjectManager = m_pManager->GetObjectManager();
     m_pVehicleManager = pManager->GetVehicleManager();
     m_pModelRequester = pManager->GetModelRequestManager();
-    m_usModel = usModel;
-    m_eVehicleType = CClientVehicleManager::GetVehicleType(usModel);
+    m_eVehicleType = CClientVehicleManager::GetVehicleType(m_usModelOriginal);
     m_bHasDamageModel = CClientVehicleManager::HasDamageModel(m_eVehicleType);
     m_pVehicle = NULL;
     m_pUpgrades = new CVehicleUpgrades(this);
     m_pClump = NULL;
 
-    // Grab the model info
-    m_pModelInfo = g_pGame->GetModelInfo(usModel);
-
-    // Apply handling
-    ushort usHandlingModelID = m_usModel;
-    if (m_usModel < 400 || m_usModel > 611)
-        usHandlingModelID = m_pModelInfo->GetParentID();
-
-    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(static_cast<eVehicleTypes>(m_usModelOriginal));
     m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
 
-    m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(static_cast<eVehicleTypes>(m_usModelOriginal));
     m_pFlyingHandlingEntry = g_pGame->GetHandlingManager()->CreateFlyingHandlingData();
     m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
 
-    m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(static_cast<eVehicleTypes>(m_usModelOriginal));
     if (m_pOriginalBoatHandlingEntry)
     {
         m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
         m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
     }
 
-    m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(static_cast<eVehicleTypes>(m_usModelOriginal));
     if (m_pOriginalBikeHandlingEntry)
     {
         m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
@@ -73,7 +73,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     SetTypeName("vehicle");
 
-    m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
+    m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(m_usModelOriginal);
 
     // Set our default properties
     m_pDriver = NULL;
@@ -179,7 +179,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // Check if we have landing gears
     m_bHasLandingGear = DoCheckHasLandingGear();
-    m_bHasAdjustableProperty = CClientVehicleManager::HasAdjustableProperty(m_usModel);
+    m_bHasAdjustableProperty = CClientVehicleManager::HasAdjustableProperty(m_usModelOriginal);
 
     // Add this vehicle to the vehicle list
     m_pVehicleManager->AddToList(this);
@@ -199,7 +199,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not changed the wheel scale
     m_bWheelScaleChanged = false;
-    m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
+    m_clientModel = pManager->GetModelManager()->FindModelByID(m_usModelOriginal);
 }
 
 CClientVehicle::~CClientVehicle()
@@ -879,7 +879,7 @@ void CClientVehicle::Fix()
 
     const char* szFixComponentName = NULL;
     for (uint i = 0; i < NUMELMS(fixRotationsList); i++)
-        if (GetModel() == fixRotationsList[i].usModelId)
+        if (m_usModelOriginal == fixRotationsList[i].usModelId)
             szFixComponentName = fixRotationsList[i].szComponentName;
 
     // Grab our component data
@@ -1421,7 +1421,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
     {
         usPropertyValue = m_pVehicle->GetAdjustablePropertyValue();
         // If it's a Hydra invert it with 5000 (as 0 is "forward"), so we can maintain a standard of 0 being "normal"
-        if (m_usModel == VT_HYDRA)
+        if (m_usModelOriginal == VT_HYDRA)
             usPropertyValue = 5000 - usPropertyValue;
     }
     else
@@ -1435,7 +1435,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
 
 void CClientVehicle::SetAdjustablePropertyValue(unsigned short usValue)
 {
-    if (m_usModel == VT_HYDRA)
+    if (m_usModelOriginal == VT_HYDRA)
         usValue = 5000 - usValue;
 
     _SetAdjustablePropertyValue(usValue);
@@ -1463,8 +1463,8 @@ void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
 
 bool CClientVehicle::HasMovingCollision()
 {
-    return (m_usModel == VT_FORKLIFT || m_usModel == VT_FIRELA || m_usModel == VT_ANDROM || m_usModel == VT_DUMPER || m_usModel == VT_DOZER ||
-            m_usModel == VT_PACKER);
+    return (m_usModelOriginal == VT_FORKLIFT || m_usModelOriginal == VT_FIRELA || m_usModelOriginal == VT_ANDROM || m_usModelOriginal == VT_DUMPER || m_usModelOriginal == VT_DOZER ||
+            m_usModelOriginal == VT_PACKER);
 }
 
 unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
@@ -2524,7 +2524,7 @@ void CClientVehicle::StreamedInPulse()
         }
 
         // Update doors
-        if (CClientVehicleManager::HasDoors(GetModel()))
+        if (CClientVehicleManager::HasDoors(m_usModelOriginal))
         {
             for (unsigned char i = 0; i < 6; ++i)
             {
@@ -2584,8 +2584,8 @@ void CClientVehicle::StreamOut()
 
 bool CClientVehicle::DoCheckHasLandingGear()
 {
-    return (m_usModel == VT_ANDROM || m_usModel == VT_AT400 || m_usModel == VT_NEVADA || m_usModel == VT_RUSTLER || m_usModel == VT_SHAMAL ||
-            m_usModel == VT_HYDRA || m_usModel == VT_STUNT);
+    return (m_usModelOriginal == VT_ANDROM || m_usModelOriginal == VT_AT400 || m_usModelOriginal == VT_NEVADA || m_usModelOriginal == VT_RUSTLER || m_usModelOriginal == VT_SHAMAL ||
+            m_usModelOriginal == VT_HYDRA || m_usModelOriginal == VT_STUNT);
 }
 
 void CClientVehicle::Create()
@@ -3397,7 +3397,7 @@ bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)
 {
-    if (GetModel() == 417)            // Leviathan
+    if (m_usModelOriginal == 417)            // Leviathan
     {
         if (m_pVehicle)
         {
@@ -3705,7 +3705,7 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
+    switch (m_usModelOriginal)
     {
         case VT_BAGGAGE:
         case VT_BANDITO:
@@ -4006,9 +4006,9 @@ bool CClientVehicle::IsEnterable()
         {
             if (GetHealth() > 0.0f)
             {
-                if (!IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT || m_usModel == 447 /* sea sparrow */
-                                     || m_usModel == 417                                        /* levithan */
-                                     || m_usModel == 460 /* skimmer */))
+                if (!IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT || m_usModelOriginal == 447 /* sea sparrow */
+                                     || m_usModelOriginal == 417                                        /* levithan */
+                                     || m_usModelOriginal == 460 /* skimmer */))
                 {
                     return true;
                 }
@@ -4027,7 +4027,7 @@ bool CClientVehicle::HasRadio()
 
 bool CClientVehicle::HasPoliceRadio()
 {
-    switch (m_usModel)
+    switch (m_usModelOriginal)
     {
         case VT_COPCARLA:
         case VT_COPCARSF:

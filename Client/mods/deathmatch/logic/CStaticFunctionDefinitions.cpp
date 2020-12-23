@@ -2909,7 +2909,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn(CClientEntity& Entity, bool 
         CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
 
         // Has Sirens and different state than before?
-        if (CClientVehicleManager::HasSirens(Vehicle.GetModel()) || Vehicle.DoesVehicleHaveSirens())
+        if (CClientVehicleManager::HasSirens(Vehicle.GetModelOriginal()) || Vehicle.DoesVehicleHaveSirens())
         {
             if (bSirensOn != Vehicle.IsSirenOrAlarmActive())
             {
@@ -3016,7 +3016,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
 
         if (ucDoor < MAX_DOORS)
         {
-            switch (Vehicle.GetModel())
+            switch (Vehicle.GetModelOriginal())
             {
                 case VT_BFINJECT:
                 case VT_RCBANDIT:
@@ -3402,7 +3402,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CClientEntity& Entity, 
 
 bool CStaticFunctionDefinitions::SetVehicleSirens(CClientVehicle& Vehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo)
 {
-    eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(Vehicle.GetModel());
+    eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(Vehicle.GetModelOriginal());
     // Won't work with below.
     if (vehicleType != CLIENTVEHICLE_PLANE && vehicleType != CLIENTVEHICLE_BOAT && vehicleType != CLIENTVEHICLE_TRAILER && vehicleType != CLIENTVEHICLE_HELI &&
         vehicleType != CLIENTVEHICLE_BIKE && vehicleType != CLIENTVEHICLE_BMX)
@@ -9722,7 +9722,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
             return false;
 
         // Valid seat id for that vehicle?
-        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModelOriginal());
         if (uiSeat > ucMaxPassengers || ucMaxPassengers == 255)
             return false;
 
