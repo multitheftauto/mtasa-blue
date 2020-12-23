@@ -290,9 +290,11 @@ btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(std::sha
     return result;
 }
 
-SClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool bFilterBackfaces) const
+bool CClientPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, int filterGroup, int filterMask) const
 {
-    SClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    RayCallback.m_collisionFilterGroup = filterGroup;
+    RayCallback.m_collisionFilterMask = filterMask;
     if (bFilterBackfaces)
         RayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
 
@@ -300,7 +302,24 @@ SClosestRayResultCallback CClientPhysics::RayCast(CVector from, CVector to, bool
         std::lock_guard guard(dynamicsWorldLock);
         m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
     }
-    return RayCallback;
+    return RayCallback.hasHit();
+}
+
+SClosestRayResultCallback CClientPhysics::RayCast(const CVector& from, const CVector& to, int iFilterGroup, int iFilterMask,
+                             bool bFilterBackfaces) const
+{
+
+    SClosestRayResultCallback rayCallback(from, to);
+     rayCallback.m_collisionFilterGroup = iFilterGroup;
+     rayCallback.m_collisionFilterMask = iFilterMask;
+
+    if (bFilterBackfaces)
+        rayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
+
+    std::lock_guard guard(dynamicsWorldLock);
+    m_pDynamicsWorld->rayTest(reinterpret_cast<const btVector3&>(from), reinterpret_cast<const btVector3&>(to), rayCallback);
+
+    return rayCallback;
 }
 
 SAllRayResultCallback CClientPhysics::RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const

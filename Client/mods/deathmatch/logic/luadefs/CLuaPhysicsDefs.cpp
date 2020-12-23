@@ -1414,9 +1414,36 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
     return nullptr;
 }
 
-bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
+bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
 {
-    return pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true)).hasHit();
+    RayOptions mapOptions = options.value_or(RayOptions());
+
+    bool bFilterBackfaces = true;
+    int  iFilterGroup = 1;
+    int  iFilterMask = -1;
+
+    if (mapOptions.find("filterBackfaces") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["filterBackfaces"]))
+            throw std::invalid_argument("'filterBackfaces' value must be boolean");
+        bFilterBackfaces = std::get<bool>(mapOptions["filterBackfaces"]);
+    }
+
+    if (mapOptions.find("filterGroup") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
+            throw std::invalid_argument("'filterGroup' value must be integer");
+        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
+    }
+    if (mapOptions.find("filterMask") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
+            throw std::invalid_argument("'filterMask' value must be integer");
+        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+    }
+
+    const SClosestRayResultCallback& rayCallback = pPhysics->RayCast(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
+    return rayCallback.hasHit();
 }
 
 void Barycentric(const CVector& point, const CVector& a, const CVector& b, const CVector& c, float& u, float& v, float& w)
@@ -1437,111 +1464,93 @@ void Barycentric(const CVector& point, const CVector& a, const CVector& b, const
 // float          u, v, w;
 // Barycentric(point, vecVertex1, vecVertex2, vecVertex3, u, v, w);
 
-std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
-CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to,
+                                                              std::optional<RayOptions> options)
 {
-    SClosestRayResultCallback callback = pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true));
+    RayOptions mapOptions = options.value_or(RayOptions());
 
-    if (!callback.hasHit())
+    bool bFilterBackfaces = false;
+    bool bEnrichResult = false;
+    int  iFilterGroup = 1;
+    int  iFilterMask = -1;
+
+    if (mapOptions.find("filterBackfaces") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["filterBackfaces"]))
+            throw std::invalid_argument("'filterBackfaces' value must be boolean");
+        bFilterBackfaces = std::get<bool>(mapOptions["filterBackfaces"]);
+    }
+
+    if (mapOptions.find("enrich") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["enrich"]))
+            throw std::invalid_argument("'enrich' value must be boolean");
+        bEnrichResult = std::get<bool>(mapOptions["enrich"]);
+    }
+
+    if (mapOptions.find("filterGroup") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
+            throw std::invalid_argument("'filterGroup' value must be integer");
+        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
+    }
+    if (mapOptions.find("filterMask") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
+            throw std::invalid_argument("'filterMask' value must be integer");
+        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+    }
+
+    SClosestRayResultCallback rayCallback = pPhysics->RayCast(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
+
+    if (!rayCallback.hasHit())
         return false;
 
-    const btCollisionObject* pCollisionObject = callback.m_collisionObject;
-    const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
-    const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
+    const btCollisionObject* pBtCollisionObject = rayCallback.m_collisionObject;
+    const btCollisionShape*  pBtCollisionShape = pBtCollisionObject->getCollisionShape();
+    const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
 
-    if (!pCollisionShape)
-        return false; // should never happen
+    if (!pBtCollisionObject)
+        return false;            // should never happen
 
-    CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pCollisionShape->getUserPointer());
-    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>> result{
-        {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
-        {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld)},
+    CLuaPhysicsShape*     pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
+
+    if (pRigidBody)
+        pRigidBody = (CLuaPhysicsRigidBody*) pBtRigidBody->getUserPointer();
+    CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
+
+    RayResult result{
+        {"hitpoint", reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld)},
+        {"hitnormal", reinterpret_cast<const CVector&>(rayCallback.m_hitNormalWorld)},
         {"shape", pShape},
-        {"distance", (reinterpret_cast<CVector&>(callback.m_hitPointWorld) - from).Length()},
+        {"distance", (reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld) - from).Length()},
     };
 
-    if (callback.m_hitShapePart >= 0)
-        result["childShapeIndex"] = callback.m_hitShapePart + 1;
-    
-    if (callback.m_hitTriangleIndex >= 0)
-        result["triangleIndex"] = callback.m_hitTriangleIndex + 1;
-
-    CMatrix matrix;
-    if (pRigidBody != nullptr)
-    {
-        CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
-        result["rigidbody"] = pLuaRigidBody;
-        matrix = pLuaRigidBody->GetMatrix();
-    }
-    else
-    {
-        CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+    if (pStaticCollision)
         result["staticcollision"] = pStaticCollision;
-        matrix = pStaticCollision->GetMatrix();
-    }
+    if (pRigidBody)
+        result["rigidbody"] = pRigidBody;
 
-    if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
+    if (bEnrichResult)
     {
-        STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(callback.m_hitTriangleIndex);
-        result["vertex1"] = triangleInfo.vertex1 + 1;
-        result["vertex2"] = triangleInfo.vertex2 + 1;
-        result["vertex3"] = triangleInfo.vertex3 + 1;
-        result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
-        result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
-        result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
-    }
-
-    return result;
-}
-
-std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
-CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
-{
-    SAllRayResultCallback callback = pPhysics->RayCastAll(from, to, bFilterBackfaces.value_or(true));
-    std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
-        results;
-
-    size_t hitNum = callback.m_hitPointWorld.size();
-    for (size_t i = 0; i < hitNum; i++)
-    {
-        const btCollisionObject* pCollisionObject = callback.m_collisionObjects[i];
-        const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
-        const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
-
-        if (!pCollisionShape)
-            continue;            // should never happen
-
-        CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pCollisionShape->getUserPointer());
-        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>> result{
-            {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld[i])},
-            {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld[i])},
-            {"shape", pShape},
-            {"distance", (reinterpret_cast<CVector&>(callback.m_hitPointWorld[i]) - from).Length()},
-        };
-
-        if (callback.m_hitShapeParts[i] >= 0)
-            result["childShapeIndex"] = callback.m_hitShapeParts[i] + 1;
-
-        if (callback.m_hitTriangleIndices[i] >= 0)
-            result["triangleIndex"] = callback.m_hitTriangleIndices[i] + 1;
-
         CMatrix matrix;
-        if (pRigidBody != nullptr)
-        {
-            CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
-            result["rigidbody"] = pLuaRigidBody;
-            matrix = pLuaRigidBody->GetMatrix();
-        }
-        else
-        {
-            CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
-            result["staticcollision"] = pStaticCollision;
+        if (pRigidBody)
+            matrix = pRigidBody->GetMatrix();
+        else if (pStaticCollision)
             matrix = pStaticCollision->GetMatrix();
-        }
 
-        if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
+        if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
         {
-            STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(callback.m_hitTriangleIndices[i]);
+            if (rayCallback.m_hitShapePart >= 0)
+                result["childShapeIndex"] = rayCallback.m_hitShapePart + 1;
+        }
+        else if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
+        {
+            if (rayCallback.m_hitTriangleIndex >= 0)
+                result["triangleIndex"] = rayCallback.m_hitTriangleIndex + 1;
+
+            STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(rayCallback.m_hitTriangleIndex);
             result["vertex1"] = triangleInfo.vertex1 + 1;
             result["vertex2"] = triangleInfo.vertex2 + 1;
             result["vertex3"] = triangleInfo.vertex3 + 1;
@@ -1549,11 +1558,137 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
             result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
             result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
         }
+    }
 
+    return result;
+}
+
+std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to,
+                                                          std::optional<RayOptions> options)
+{
+    RayOptions mapOptions = options.value_or(RayOptions());
+
+    bool bFilterBackfaces = false;
+    bool bEnrichResult = false;
+    bool bSortByDistance = false;
+    int  iLimitResults = -1;
+    int  iFilterGroup = 0;
+    int  iFilterMask = 0;
+
+    if (mapOptions.find("filterBackfaces") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["filterBackfaces"]))
+            throw std::invalid_argument("'filterBackfaces' value must be boolean");
+        bFilterBackfaces = std::get<bool>(mapOptions["filterBackfaces"]);
+    }
+
+    if (mapOptions.find("enrich") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["enrich"]))
+            throw std::invalid_argument("'enrich' value must be boolean");
+        bEnrichResult = std::get<bool>(mapOptions["enrich"]);
+    }
+
+    if (mapOptions.find("filterGroup") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
+            throw std::invalid_argument("'filterGroup' value must be integer");
+        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
+    }
+
+    if (mapOptions.find("filterMask") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
+            throw std::invalid_argument("'filterMask' value must be integer");
+        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+    }
+
+    if (mapOptions.find("sortByDistance") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["sortByDistance"]))
+            throw std::invalid_argument("'sortByDistance' value must be boolean");
+        bSortByDistance = std::get<bool>(mapOptions["sortByDistance"]);
+    }
+
+    if (mapOptions.find("limitResults") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["limitResults"]))
+            throw std::invalid_argument("'limitResults' value must be positive integer");
+        iLimitResults = std::get<int>(mapOptions["limitResults"]);
+    }
+
+    SAllRayResultCallback rayCallback = pPhysics->RayCastAll(from, to, bFilterBackfaces);
+    std::vector<RayResult> results;
+
+    size_t hitNum = rayCallback.m_hitPointWorld.size();
+    for (size_t i = 0; i < hitNum; i++)
+    {
+        const btCollisionObject* pBtCollisionObject = rayCallback.m_collisionObjects[i];
+        const btCollisionShape*  pBtCollisionShape = pBtCollisionObject->getCollisionShape();
+        const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
+
+        if (!pBtCollisionObject)
+            continue;            // should never happen
+
+        CLuaPhysicsShape*     pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
+        CLuaPhysicsRigidBody* pRigidBody = nullptr;
+
+        if (pRigidBody)
+            pRigidBody = (CLuaPhysicsRigidBody*)pBtRigidBody->getUserPointer();
+        CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
+
+        RayResult result{
+            {"hitpoint", reinterpret_cast<CVector&>(rayCallback.m_hitPointWorld[i])},
+            {"hitnormal", reinterpret_cast<CVector&>(rayCallback.m_hitNormalWorld[i])},
+            {"shape", pShape},
+            {"distance", (reinterpret_cast<CVector&>(rayCallback.m_hitPointWorld[i]) - from).Length()},
+        };
+
+        if (pStaticCollision)
+            result["staticcollision"] = pStaticCollision;
+        if (pRigidBody)
+            result["rigidbody"] = pRigidBody;
+
+        if (bEnrichResult)
+        {
+            if (rayCallback.m_hitShapeParts[i] >= 0)
+                result["childShapeIndex"] = rayCallback.m_hitShapeParts[i] + 1;
+
+            if (rayCallback.m_hitTriangleIndices[i] >= 0)
+                result["triangleIndex"] = rayCallback.m_hitTriangleIndices[i] + 1;
+
+            CMatrix matrix;
+            if (pRigidBody)
+                matrix = pRigidBody->GetMatrix();
+
+            else if (pStaticCollision)
+                matrix = pStaticCollision->GetMatrix();
+
+            if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
+            {
+                if (rayCallback.m_hitShapeParts[i] >= 0)
+                    result["childShapeIndex"] = rayCallback.m_hitShapeParts[i] + 1;
+            }
+            else if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
+            {
+                STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(rayCallback.m_hitTriangleIndices[i]);
+                result["vertex1"] = triangleInfo.vertex1 + 1;
+                result["vertex2"] = triangleInfo.vertex2 + 1;
+                result["vertex3"] = triangleInfo.vertex3 + 1;
+                result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
+                result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
+                result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
+            }
+        }
         results.push_back(result);
     }
 
-    // maybe sort them by distance?
+    if (bSortByDistance)
+        sort(results.begin(), results.end(),
+             [](RayResult& const a, RayResult& const b) -> bool { return std::get<float>(a["distance"]) < std::get<float>(b["distance"]); });
+
+    if (iLimitResults > 0)
+        results.resize(Min(iLimitResults, (int)results.size()));            // "min" to prevent resizing above results count
 
     return results;
 }

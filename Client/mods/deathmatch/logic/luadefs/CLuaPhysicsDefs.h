@@ -16,8 +16,13 @@
 #include "lua/physics/CLuaPhysicsRigidBody.h"
 
 #pragma once
+
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
+
+typedef std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int> RayResultValue;
+typedef std::unordered_map<std::string, RayResultValue>                                                          RayResult;
+typedef std::unordered_map<std::string, std::variant<bool, int>>                                                           RayOptions;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -84,13 +89,10 @@ public:
 
     static bool PhysicsSetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
 
-    static std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
-                PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
-    static bool PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
+    static std::variant<bool, RayResult> PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
+    static bool                          PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
 
-    static std::vector<
-        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
-    PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces);
+    static std::vector<RayResult> PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
 
     static std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
     PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition,
