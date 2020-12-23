@@ -449,3 +449,20 @@ void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3&
     result.setZ(z);
 #pragma warning(pop)
 }
+
+bool CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(const CVector& vector)
+{
+    if (abs(vector.fX) > BulletPhysics::Limits::MaximumPrimitiveSize || abs(vector.fY) > BulletPhysics::Limits::MaximumPrimitiveSize ||
+        abs(vector.fZ) > BulletPhysics::Limits::MaximumPrimitiveSize)
+        return false;
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::FitsInLowerPrimitiveLimits(const CVector& vector)
+{
+    if (abs(vector.fX) < BulletPhysics::Limits::MinimumPrimitiveSize || abs(vector.fY) < BulletPhysics::Limits::MinimumPrimitiveSize ||
+        abs(vector.fZ) < BulletPhysics::Limits::MinimumPrimitiveSize)
+        return false;
+    return true;
+}
+

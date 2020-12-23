@@ -17,8 +17,6 @@ class CLuaPhysicsFixedConstraint;
 #include "../LuaCommon.h"
 #include "../CLuaArguments.h"
 
-enum ePhysicsConstraint;
-
 class CLuaPhysicsFixedConstraint : public CLuaPhysicsConstraint
 {
 public:

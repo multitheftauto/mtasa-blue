@@ -145,15 +145,13 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateBoxShape(CClient
 
     half /= 2;
 
-    if (half.fX < BulletPhysics::Limits::MinimumPrimitiveSize || half.fY < BulletPhysics::Limits::MinimumPrimitiveSize ||
-        half.fZ < BulletPhysics::Limits::MinimumPrimitiveSize)
-        throw std::invalid_argument(
-            SString("Minimum width, height and length must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
-
-    if (half.fX > BulletPhysics::Limits::MaximumPrimitiveSize ||
-        half.fY > BulletPhysics::Limits::MaximumPrimitiveSize && half.fZ > BulletPhysics::Limits::MaximumPrimitiveSize)
+    if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(half))
         throw std::invalid_argument(
             SString("Maximum width, height and length must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
+    if (!CLuaPhysicsSharedLogic::FitsInLowerPrimitiveLimits(half))
+        throw std::invalid_argument(
+            SString("Minimum width, height and length must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 
     return pPhysics->CreateBoxShape(half);
 }
@@ -423,8 +421,8 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStatic
 }
 
 bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pShapeChildShape,
-                                           std::optional<CVector> vecPosition,
-                                           std::optional<CVector> vecRotation)
+                                           std::optional<CVector> vecOptionalPosition,
+                                           std::optional<CVector> vecOptionalRotation)
 {
     if (pShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
@@ -434,10 +432,17 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pSh
         throw std::invalid_argument("Child shape can not be compound");
     }
 
+    const CVector vecPosition = vecOptionalPosition.value_or(CVector(0, 0, 0));
+    const CVector vecRotation = vecOptionalRotation.value_or(CVector(0, 0, 0));
+
+    if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(vecPosition))
+        throw std::invalid_argument(
+            SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+
     if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
     {
-        pCompoundShape->AddShape(pShapeChildShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
-                                 vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
+        pCompoundShape->AddShape(pShapeChildShape, vecPosition,
+                                 vecRotation);
         return true;
     }
 
@@ -446,73 +451,83 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pSh
 
 std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildShapes(std::shared_ptr<CLuaPhysicsShape> pShape)
 {
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        return pCompoundShape->GetChildShapes();
+    }
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
-    return pCompoundShape->GetChildShapes();
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 bool CLuaPhysicsDefs::PhysicsRemoveChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
 {
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+            throw std::invalid_argument("Invalid child index");
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
-    if (pCompoundShape->RemoveChildShape(iIndex))
+        pCompoundShape->RemoveChildShape(iIndex);
         return true;
+    }
 
-    throw std::invalid_argument("Invalid shape index");
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
 {
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+            throw std::invalid_argument("Invalid child index");
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
-    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
-        throw std::invalid_argument("Invalid child index");
+        return pCompoundShape->GetChildShapePosition(iIndex);
+    }
 
-    return pCompoundShape->GetChildShapePosition(iIndex);
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
 {
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+            throw std::invalid_argument("Invalid child index");
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
-    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
-        throw std::invalid_argument("Invalid child index");
+        return pCompoundShape->GetChildShapeRotation(iIndex);
+    }
 
-    return pCompoundShape->GetChildShapeRotation(iIndex);
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex, CVector vecPosition)
 {
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
+    if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(vecPosition))
+        throw std::invalid_argument(SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
-    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
-        throw std::invalid_argument("Invalid child index");
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+            throw std::invalid_argument("Invalid child index");
 
-    pCompoundShape->SetChildShapePosition(iIndex, vecPosition);
-    return true;
+        pCompoundShape->SetChildShapePosition(iIndex, vecPosition);
+        return true;
+    }
+
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex, CVector vecRotation)
 {
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+            throw std::invalid_argument("Invalid child index");
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShape.get();
-    if (iIndex < 0 || pCompoundShape->GetChildShapesCounts() > iIndex)
-        throw std::invalid_argument("Invalid child index");
+        pCompoundShape->SetChildShapeRotation(iIndex, vecRotation);
+        return true;
+    }
 
-    pCompoundShape->SetChildShapeRotation(iIndex, vecRotation);
-    return true;
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 bool CLuaPhysicsDefs::PhysicsApplyVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative)

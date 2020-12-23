@@ -11,36 +11,6 @@ class CLuaPhysicsSharedLogic;
 
 #pragma once
 
-namespace BulletPhysics
-{
-    namespace Limits
-    {
-        inline constexpr CVector WorldMinimumSize(1.f, 1.f, 1.f);
-        inline constexpr CVector WorldMaximumSize(8192.f, 8192.f, 8192.f);
-        inline constexpr float   MinimumPrimitiveSize = 0.05f;
-        inline constexpr float   MaximumPrimitiveSize = 8196.f;
-        inline constexpr int     MaximumSubSteps = 256;
-        inline constexpr int     MaximumInitialCompoundShapeCapacity = 256;
-        inline constexpr int     MinimumHeightfieldTerrain = 2;
-        inline constexpr int     MaximumHeightfieldTerrain = 1024;
-    }            // namespace Limits
-    namespace Defaults
-    {
-        inline constexpr CVector Gravity(0.f, 0.f, -9.81f);
-        inline constexpr float   RigidBodyMass = 1.f;
-        inline constexpr CVector RigidBodyInertia(0.f, 0.f, 0.f);
-        inline constexpr CVector RigidBodyCenterOfMass(0.f, 0.f, 0.f);
-        inline constexpr CVector RigidBodyPosition(0.f, 0.f, 0.f);
-        inline constexpr CVector RigidBodyRotation(0.f, 0.f, 0.f);
-        inline constexpr CVector ChildShapePosition(0.f, 0.f, 0.f);
-        inline constexpr CVector ChildShapeRotation(0.f, 0.f, 0.f);
-        inline constexpr float RigidBodyLinearDumping = 0.005f; // 0.0 - 1.0
-        inline constexpr float RigidBodyAngularDumping = 0.005f; // 0.0 - 1.0
-        inline constexpr float RigidBodyLinearSleepingThreshold = 0.1f;
-        inline constexpr float RigidBodyAngularSleepingThreshold = 0.1f;
-    }            // namespace Defaults
-}            // namespace BulletPhysics
-
 struct heightfieldTerrainShape
 {
     std::unique_ptr<btHeightfieldTerrainShape> pHeightfieldTerrainShape;
@@ -92,4 +62,7 @@ public:
 
     static void EulerToQuaternion(btVector3 rotation, btQuaternion& result);
     static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
+
+    static bool FitsInUpperPrimitiveLimits(const CVector& vector);
+    static bool FitsInLowerPrimitiveLimits(const CVector& vector);
 };

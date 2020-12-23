@@ -51,8 +51,8 @@ public:
     static bool                                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
     static std::shared_ptr<CLuaPhysicsRigidBody>                    PhysicsCreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, std::optional<float> fMass,
                                                                                            std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass);
-    static bool PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pChildShape, std::optional<CVector> vecPosition,
-                                     std::optional<CVector> vecRotation);
+    static bool PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pChildShape, std::optional<CVector> vecOptionalPosition,
+                                     std::optional<CVector> vecOptionalRotation);
 
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
@@ -69,9 +69,6 @@ public:
         CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty);
     static std::variant<CVector, float, bool, std::tuple<int, int, int, int>> PhysicsGetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision,
                                                                                                                   ePhysicsProperty            eProperty);
-
-    // static CLuaPhysicsShape* PhysicsCreateShape(CClientPhysics* pPhysics, ePhysicsShapeType shapeType, std::variant<CVector, float>
-    // variant);
 
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateBoxShape(CClientPhysics* pPhysics, std::variant<CVector, float> variant);
     static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateSphereShape(CClientPhysics* pPhysics, float fRadius);

@@ -4,13 +4,11 @@
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CBulletPhysicsProfiler.cpp
- *  PURPOSE:     Physics profiler
+ *  PURPOSE:     Bullet Physics profiler
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-
-#define BT_ENABLE_PROFILE 1
 
 #include "bulletphysics3d/LinearMath/btQuickprof.h";
 #include "CBulletPhysicsProfiler.h"

@@ -17,8 +17,6 @@ class CLuaPhysicsConstraint;
 #include "../LuaCommon.h"
 #include "../CLuaArguments.h"
 
-enum ePhysicsConstraint;
-
 class CLuaPhysicsConstraint : public CLuaPhysicsElement
 {
 public:

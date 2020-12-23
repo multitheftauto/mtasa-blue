@@ -18,15 +18,6 @@ class CLuaPhysicsPointToPointConstraint;
 #include "../CLuaArguments.h"
 #include "lua/physics/CLuaPhysicsConstraint.h"
 
-enum ePhysicsConstraint;
-
-enum class eConstraintVariant
-{
-    A,
-    B,
-    C,
-};
-
 class CLuaPhysicsPointToPointConstraint : public CLuaPhysicsConstraint
 {
 public:

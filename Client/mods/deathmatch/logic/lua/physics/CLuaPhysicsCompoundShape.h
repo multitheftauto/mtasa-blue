@@ -28,7 +28,7 @@ public:
     std::vector<std::shared_ptr<CLuaPhysicsShape>> GetChildShapes() const { return m_vecChildShapes; }
 
     bool   RemoveChildShape(int index);
-    size_t GetChildShapesCounts() const noexcept { return m_vecChildShapes.size(); }
+    size_t GetChildShapesNum() const noexcept { return m_vecChildShapes.size(); }
     // Be sure index is valid using 'GetChildShapesCounts' method
     const CVector& GetChildShapePosition(int iIndex);
     // Be sure index is valid using 'GetChildShapesCounts' method
