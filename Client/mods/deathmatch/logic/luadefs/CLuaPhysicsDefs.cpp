@@ -224,7 +224,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCompoundShape(CC
                                                                               std::optional<int> optionalInitialCapacity)
 {
     int iInitialCapacity = optionalInitialCapacity.value_or(0);
-    if (iInitialCapacity < BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
+    if (iInitialCapacity < 0 || iInitialCapacity > BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
         throw std::invalid_argument(SString("Initial capacity should be between 0 and %i", BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity).c_str());
 
     return pPhysics->CreateCompoundShape(iInitialCapacity);
@@ -429,16 +429,19 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pSh
     if (pShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
 
-    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Shape is not be compound");
-
-    if (pShapeChildShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+    if (CLuaPhysicsCompoundShape* pCompoundChildShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShapeChildShape.get()))
+    {
         throw std::invalid_argument("Child shape can not be compound");
+    }
 
-    CLuaPhysicsCompoundShape* pCompoundShape = (CLuaPhysicsCompoundShape*)pShapeChildShape.get();
-    pCompoundShape->AddShape(pShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
-                             vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
-    return true;
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    {
+        pCompoundShape->AddShape(pShapeChildShape, vecPosition.value_or(BulletPhysics::Defaults::ChildShapePosition),
+                                 vecRotation.value_or(BulletPhysics::Defaults::ChildShapeRotation));
+        return true;
+    }
+
+    throw std::invalid_argument("Shape is not be compound");
 }
 
 std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildShapes(std::shared_ptr<CLuaPhysicsShape> pShape)
