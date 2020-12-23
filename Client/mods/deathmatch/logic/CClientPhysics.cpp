@@ -281,7 +281,7 @@ btCollisionWorld::ClosestConvexResultCallback CClientPhysics::ShapeCast(std::sha
     CVector toPosition;
     CLuaPhysicsSharedLogic::GetPosition(from, fromPosition);
     CLuaPhysicsSharedLogic::GetPosition(to, toPosition);
-    btCollisionWorld::ClosestConvexResultCallback result(reinterpret_cast<const btVector3&>(from), reinterpret_cast<const btVector3&>(to));
+    btCollisionWorld::ClosestConvexResultCallback result(reinterpret_cast<const btVector3&>(fromPosition), reinterpret_cast<const btVector3&>(toPosition));
 
     {
         std::lock_guard guard(dynamicsWorldLock);

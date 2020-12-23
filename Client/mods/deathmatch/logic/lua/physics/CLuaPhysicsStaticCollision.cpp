@@ -61,17 +61,25 @@ void CLuaPhysicsStaticCollision::SetRotation(const CVector& vecRotation)
 
 CVector CLuaPhysicsStaticCollision::GetPosition() const
 {
-    CVector position;
-    CLuaPhysicsSharedLogic::GetPosition(GetCollisionObject(), position);
-    return position;
+    if (IsReady())
+    {
+        CVector position;
+        CLuaPhysicsSharedLogic::GetPosition(GetCollisionObject(), position);
+        return position;
+    }
+    return m_pTempData->m_matrix.GetPosition();
 }
 
 CVector CLuaPhysicsStaticCollision::GetRotation() const
 {
-    CVector rotation;
-    CLuaPhysicsSharedLogic::GetRotation(GetCollisionObject(), rotation);
-    ConvertDegreesToRadians(rotation);
-    return rotation;
+    if (IsReady())
+    {
+        CVector rotation;
+        CLuaPhysicsSharedLogic::GetRotation(GetCollisionObject(), rotation);
+        ConvertDegreesToRadians(rotation);
+        return rotation;
+    }
+    return m_pTempData->m_matrix.GetRotation();
 }
 
 bool CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale) const

@@ -1696,8 +1696,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
 }
 
 std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
-CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition,
-                                  CVector vecEndRotation)
+CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition)
 {
     switch (pShape->GetType())
     {
@@ -1718,7 +1717,7 @@ CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVec
     CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
     CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartRotation);
     CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
-    CLuaPhysicsSharedLogic::SetRotation(endTransform, vecEndRotation);
+    CLuaPhysicsSharedLogic::SetRotation(endTransform, vecStartRotation);
 
     btCollisionWorld::ClosestConvexResultCallback callback = pPhysics->ShapeCast(pShape, startTransform, endTransform);
     if (!callback.hasHit())
@@ -1730,12 +1729,6 @@ CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVec
     CLuaPhysicsSharedLogic::GetPosition(endTransform, toPosition);
 
     btVector3    vecShapePosition = fromPosition.lerp(toPosition, callback.m_closestHitFraction);
-    btQuaternion startQuaternion = startTransform.getRotation();
-    btQuaternion endQuaternion = endTransform.getRotation();
-    btQuaternion shapeQuaternion = startQuaternion.slerp(endQuaternion, callback.m_closestHitFraction);
-
-    btVector3 vecShapeRotation;
-    CLuaPhysicsSharedLogic::QuaternionToEuler(shapeQuaternion, vecShapeRotation);
 
     const btCollisionObject* pCollisionObject = callback.m_hitCollisionObject;
     const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
@@ -1745,7 +1738,7 @@ CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVec
         return false;                   // should never happen
 
     std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
-        {"shapeposition", reinterpret_cast<const CVector&>(vecShapePosition)},    {"shaperotation", reinterpret_cast<const CVector&>(vecShapeRotation)},
+        {"position", reinterpret_cast<const CVector&>(vecShapePosition)},    {"rotation", vecStartRotation},
         {"hitpoint", reinterpret_cast<const CVector&>(callback.m_hitPointWorld)}, {"hitnormal", reinterpret_cast<const CVector&>(callback.m_hitNormalWorld)},
         {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
     };
