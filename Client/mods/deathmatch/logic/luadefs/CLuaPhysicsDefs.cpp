@@ -1437,7 +1437,7 @@ void Barycentric(const CVector& point, const CVector& a, const CVector& b, const
 // float          u, v, w;
 // Barycentric(point, vecVertex1, vecVertex2, vecVertex3, u, v, w);
 
-std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>>>
+std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
 CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {
     SClosestRayResultCallback callback = pPhysics->RayCast(from, to, bFilterBackfaces.value_or(true));
@@ -1453,10 +1453,11 @@ CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector 
         return false; // should never happen
 
     CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pCollisionShape->getUserPointer());
-    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>> result{
+    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>> result{
         {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld)},
         {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld)},
         {"shape", pShape},
+        {"distance", (reinterpret_cast<CVector&>(callback.m_hitPointWorld) - from).Length()},
     };
 
     if (callback.m_hitShapePart >= 0)
@@ -1493,11 +1494,12 @@ CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector 
     return result;
 }
 
-std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>>>
+std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
 CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<bool> bFilterBackfaces)
 {
     SAllRayResultCallback callback = pPhysics->RayCastAll(from, to, bFilterBackfaces.value_or(true));
-    std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>>> results;
+    std::vector<std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>>>
+        results;
 
     size_t hitNum = callback.m_hitPointWorld.size();
     for (size_t i = 0; i < hitNum; i++)
@@ -1510,10 +1512,11 @@ CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVect
             continue;            // should never happen
 
         CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pCollisionShape->getUserPointer());
-        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, int>> result{
+        std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int>> result{
             {"hitpoint", reinterpret_cast<CVector&>(callback.m_hitPointWorld[i])},
             {"hitnormal", reinterpret_cast<CVector&>(callback.m_hitNormalWorld[i])},
             {"shape", pShape},
+            {"distance", (reinterpret_cast<CVector&>(callback.m_hitPointWorld[i]) - from).Length()},
         };
 
         if (callback.m_hitShapeParts[i] >= 0)
