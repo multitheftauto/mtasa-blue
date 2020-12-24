@@ -16,7 +16,7 @@
 #include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(std::move(pShape))
+    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(std::move(pShape))
 {
     m_pTempData = std::make_unique<CLuaPhysicsRigidBodyTempData>();
     m_pTempData->m_fMass = fMass;

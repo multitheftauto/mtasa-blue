@@ -12,6 +12,8 @@ class CClientPhysics;
 
 #include "lua/physics/CLuaPhysicsSharedLogic.h"
 #include "lua/physics/CLuaPhysicsShape.h"
+#include "lua/physics/CLuaPhysicsElement.h"
+#include "lua/physics/CLuaPhysicsWorldElement.h"
 
 #pragma once
 

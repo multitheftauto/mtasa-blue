@@ -47,7 +47,7 @@ public:
     float   m_fSleepingThresholdAngular;
 };
 
-class CLuaPhysicsStaticCollision : public CLuaPhysicsElement
+class CLuaPhysicsStaticCollision : public CLuaPhysicsWorldElement
 {
 public:
     CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape);

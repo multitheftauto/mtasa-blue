@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 class CLuaPhysicsElement;
+class CLuaPhysicsWorldElement;
 class CLuaPhysicsRigidBody;
 class CPhysicsRigidBodyProxy;
 
@@ -47,7 +48,7 @@ public:
     float   m_fSleepingThresholdAngular;
 };
 
-class CLuaPhysicsRigidBody : public CLuaPhysicsElement
+class CLuaPhysicsRigidBody : public CLuaPhysicsWorldElement
 {
 public:
     CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);

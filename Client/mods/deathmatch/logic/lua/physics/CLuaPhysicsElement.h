@@ -15,22 +15,6 @@ struct SPhysicsCollisionReport;
 
 #pragma once
 
-struct SPhysicsCollisionContact
-{
-    CVector vecPositionWorldOn;
-    CVector vecLocalPoint;
-    CVector vecLateralFrictionDir;
-    int     contactTriangle;
-    float   appliedImpulse;
-    float   appliedImpulseLiteral;
-};
-
-struct SPhysicsCollisionReport
-{
-    std::shared_ptr<CLuaPhysicsElement>                    pElement;
-    std::vector<std::shared_ptr<SPhysicsCollisionContact>> m_vecContacts;
-};
-
 class ILuaPhysicsElement
 {
 public:

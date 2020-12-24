@@ -14,7 +14,7 @@
 #include "CLuaPhysicsStaticCollisionManager.h"
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape)
-    : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
+    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
     // pShape->AddStaticCollision(this);
     m_pTempData = std::make_unique<CLuaPhysicsStaticCollisionTempData>();
