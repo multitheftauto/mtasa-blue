@@ -13,11 +13,6 @@ class CLuaPhysicsGimpactTriangleMeshShape;
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
-#include "CLuaPhysicsShape.h"
-
 class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsShape
 {
 public:

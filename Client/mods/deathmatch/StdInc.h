@@ -53,7 +53,9 @@
 // Shared logic includes
 #include <Utils.h>
 #include <CClientCommon.h>
+
 #include "CBulletPhysicsCommon.h"
+
 #include <CClientManager.h>
 #include <CClient3DMarker.h>
 #include <CClientCheckpoint.h>

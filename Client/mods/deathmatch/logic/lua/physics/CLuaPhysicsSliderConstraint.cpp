@@ -13,7 +13,6 @@
 #include "CLuaPhysicsRigidBodyManager.h"
 #include "CLuaPhysicsConstraint.h"
 #include "CLuaPhysicsSliderConstraint.h"
-#include "CLuaPhysicsSharedLogic.h"
 
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,
                                                          CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,

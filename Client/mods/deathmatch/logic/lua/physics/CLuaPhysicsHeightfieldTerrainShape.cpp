@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsSharedLogic.h"
-#include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsHeightfieldTerrainShape.h"
 
 CLuaPhysicsHeightfieldTerrainShape::CLuaPhysicsHeightfieldTerrainShape(CClientPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float> vecHeightData)

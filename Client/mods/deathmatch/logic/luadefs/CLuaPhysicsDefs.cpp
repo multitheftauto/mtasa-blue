@@ -15,7 +15,6 @@
 #include "lua/physics/CLuaPhysicsStaticCollisionManager.h"
 #include "lua/physics/CLuaPhysicsConstraintManager.h"
 #include "lua/physics/CLuaPhysicsShapeManager.h"
-#include "lua/physics/CLuaPhysicsSharedLogic.h"
 #include "lua/physics/CLuaPhysicsElement.h"
 #include "CPhysicsDebugDrawer.h"
 

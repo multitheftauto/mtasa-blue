@@ -9,16 +9,12 @@
  *
  *****************************************************************************/
 
-class CLuaPhysicsShape;
 class CLuaPhysicsElement;
+class CLuaPhysicsShape;
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
 #include "CLuaPhysicsElement.h"
-#include "CLuaPhysicsShape.h"
 
 class heightfieldTerrainShape;
 

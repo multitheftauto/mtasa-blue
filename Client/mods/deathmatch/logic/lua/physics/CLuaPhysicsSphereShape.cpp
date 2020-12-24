@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsSharedLogic.h"
-#include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsSphereShape.h"
 
 CLuaPhysicsSphereShape::CLuaPhysicsSphereShape(CClientPhysics* pPhysics, float fRadius)

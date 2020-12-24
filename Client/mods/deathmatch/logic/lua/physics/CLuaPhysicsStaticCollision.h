@@ -14,8 +14,6 @@ class CLuaPhysicsStaticCollision;
 
 #pragma once
 
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
 #include "lua/physics/CPhysicsStaticCollisionProxy.h"
 
 class CLuaPhysicsStaticCollisionTempData

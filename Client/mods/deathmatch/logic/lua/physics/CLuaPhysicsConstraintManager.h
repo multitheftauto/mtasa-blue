@@ -13,9 +13,7 @@ class CLuaPhysicsConstraintManager;
 
 #pragma once
 
-#include "../LuaCommon.h"
 #include "CLuaPhysicsConstraint.h"
-#include <list>
 
 class CLuaPhysicsConstraintManager
 {

@@ -12,11 +12,6 @@
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
-#include "lua/physics/CLuaPhysicsShape.h"
-
 class CLuaPhysicsConvexHullShape : public CLuaPhysicsShape
 {
 public:

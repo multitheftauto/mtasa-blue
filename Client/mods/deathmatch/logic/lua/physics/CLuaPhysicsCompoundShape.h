@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsShape.h
+ *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsCompoundShape.h
  *  PURPOSE:     Lua physics compound shape class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -12,10 +12,6 @@
 class CLuaPhysicsCompoundShape;
 
 #pragma once
-
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
 
 class CLuaPhysicsCompoundShape : public CLuaPhysicsShape
 {

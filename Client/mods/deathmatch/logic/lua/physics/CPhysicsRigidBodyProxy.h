@@ -11,8 +11,6 @@
 
 class CPhysicsRigidBodyProxy;
 
-#include "CPhysicsProxyElement.h"
-
 #pragma once
 
 class CPhysicsRigidBodyProxy : public CPhysicsProxyElement, public btRigidBody

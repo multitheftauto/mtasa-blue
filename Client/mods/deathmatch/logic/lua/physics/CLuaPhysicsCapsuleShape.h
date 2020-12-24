@@ -13,10 +13,6 @@ class CLuaPhysicsCapsuleShape;
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
-
 class CLuaPhysicsCapsuleShape : public CLuaPhysicsShape
 {
 public:

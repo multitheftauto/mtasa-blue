@@ -13,10 +13,6 @@ class CLuaPhysicsShapeManager;
 
 #pragma once
 
-#include "../LuaCommon.h"
-#include "CLuaPhysicsShape.h"
-#include <list>
-
 class CLuaPhysicsShapeManager
 {
 public:

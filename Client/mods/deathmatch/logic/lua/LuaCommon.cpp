@@ -22,7 +22,6 @@
 #include "../lua/physics/CLuaPhysicsStaticCollision.h"
 #include "../lua/physics/CLuaPhysicsRigidBody.h"
 #include "../lua/physics/CLuaPhysicsConstraint.h"
-#include "../lua/physics/CLuaPhysicsShape.h"
 
 CClientEntity* lua_toelement(lua_State* luaVM, int iArgument)
 {

@@ -13,10 +13,6 @@ class CLuaPhysicsHidgeConstraint;
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
-
 class CLuaPhysicsHidgeConstraint : public CLuaPhysicsConstraint
 {
 public:

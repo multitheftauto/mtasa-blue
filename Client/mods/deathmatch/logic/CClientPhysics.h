@@ -10,6 +10,9 @@
 
 class CClientPhysics;
 
+#include "lua/physics/CLuaPhysicsSharedLogic.h"
+#include "lua/physics/CLuaPhysicsShape.h"
+
 #pragma once
 
 #include <list>

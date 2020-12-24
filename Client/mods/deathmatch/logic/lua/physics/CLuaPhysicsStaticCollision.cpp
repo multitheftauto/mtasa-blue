@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsSharedLogic.h"
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
 

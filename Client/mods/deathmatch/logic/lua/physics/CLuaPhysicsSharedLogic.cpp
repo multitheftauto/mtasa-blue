@@ -1,5 +1,4 @@
 #include "StdInc.h"
-#include "CLuaPhysicsSharedLogic.h"
 
 #define ARRAY_ModelInfo 0xA9B0C8
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;

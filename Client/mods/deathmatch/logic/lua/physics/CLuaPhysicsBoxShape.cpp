@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsSharedLogic.h"
-#include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsBoxShape.h"
 
 CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CClientPhysics* pPhysics, CVector half) : CLuaPhysicsShape(pPhysics, CLuaPhysicsSharedLogic::CreateBox(half))

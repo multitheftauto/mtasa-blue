@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsSharedLogic.h"
-#include "CLuaPhysicsShape.h"
 #include "CLuaPhysicsCompoundShape.h"
 
 CLuaPhysicsCompoundShape::CLuaPhysicsCompoundShape(CClientPhysics* pPhysics, int iInitialChildCapacity) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCompound()))

@@ -12,7 +12,6 @@
 #include <list>
 #include "../Client/game_sa/CCameraSA.h"
 #include "../mods/deathmatch/logic/Utils.h"
-#include "lua/physics/CLuaPhysicsSharedLogic.h"
 #include "lua/physics/CLuaPhysicsRigidBodyManager.h"
 #include "lua/physics/CLuaPhysicsStaticCollisionManager.h"
 #include "lua/physics/CLuaPhysicsConstraintManager.h"

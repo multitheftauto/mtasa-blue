@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsSharedLogic.h"
 #include "CLuaPhysicsShapeManager.h"
 #include "CLuaPhysicsConvexHullShape.h"
 

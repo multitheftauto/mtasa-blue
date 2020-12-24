@@ -13,11 +13,6 @@ class CLuaPhysicsBvhTriangleMeshShape;
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
-#include "CLuaPhysicsShape.h"
-
 struct STriangleInfo
 {
     int vertex1;

@@ -12,7 +12,6 @@
 #include <StdInc.h>
 #include "CLuaPhysicsRigidBodyManager.h"
 #include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsSharedLogic.h"
 #include "CLuaPhysicsFixedConstraint.h"
 
 CLuaPhysicsFixedConstraint::CLuaPhysicsFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,

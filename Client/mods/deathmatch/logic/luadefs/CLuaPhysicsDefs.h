@@ -9,7 +9,6 @@
  *
  *****************************************************************************/
 
-#include "lua/physics/CLuaPhysicsShape.h"
 #include "lua/physics/CLuaPhysicsStaticCollision.h"
 #include "lua/physics/CLuaPhysicsCompoundShape.h"
 #include "lua/physics/CLuaPhysicsPointToPointConstraint.h"

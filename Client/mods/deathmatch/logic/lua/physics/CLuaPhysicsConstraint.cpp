@@ -14,7 +14,6 @@
 #include "CLuaPhysicsStaticCollisionManager.h"
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
-#include "CLuaPhysicsSharedLogic.h"
 
 /*
 // todo:

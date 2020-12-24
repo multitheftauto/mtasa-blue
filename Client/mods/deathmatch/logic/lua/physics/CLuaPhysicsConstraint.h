@@ -13,10 +13,6 @@ class CLuaPhysicsConstraint;
 
 #pragma once
 
-// Define includes
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
-
 class CLuaPhysicsConstraint : public CLuaPhysicsElement
 {
 public:

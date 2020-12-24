@@ -15,8 +15,6 @@ class CPhysicsRigidBodyProxy;
 
 #pragma once
 
-#include "../LuaCommon.h"
-#include "../CLuaArguments.h"
 #include "lua/physics/CPhysicsRigidBodyProxy.h"
 
 class CLuaPhysicsRigidBodyTempData
