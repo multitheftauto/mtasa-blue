@@ -17,7 +17,6 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysi
     : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
     // pShape->AddStaticCollision(this);
-    m_pTempData = std::make_unique<CLuaPhysicsStaticCollisionTempData>();
     m_pShape = pShape;
 }
 

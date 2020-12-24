@@ -73,3 +73,4 @@ void CLuaPhysicsElement::CommitChange(std::function<void()> change)
     }
     m_stackChanges.push(change);
 }
+

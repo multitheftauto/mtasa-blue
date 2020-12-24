@@ -16,35 +16,6 @@ class CLuaPhysicsStaticCollision;
 
 #include "lua/physics/CPhysicsStaticCollisionProxy.h"
 
-class CLuaPhysicsStaticCollisionTempData
-{
-public:
-    float   m_fMass;
-    float   m_fLinearDamping;
-    float   m_fAngularDamping;
-    float   m_fCcdMotionThreshold;
-    float   m_fSweptSphereRadius;
-    float   m_fDumping;
-    CVector m_vecLocalInertia;
-    CVector m_vecCenterOfMass;
-    CVector m_vecLinearVelocity;
-    CVector m_vecAngularVelocity;
-    CVector m_vecApplyForceFrom;
-    CVector m_vecApplyForceTo;
-    CVector m_vecApplyImpulseFrom;
-    CVector m_vecApplyImpulseTo;
-    CVector m_vecApplyCentralForce;
-    CVector m_vecApplyCentralImpulse;
-    CVector m_vecApplyTorque;
-    CVector m_vecApplyTorqueImpulse;
-    float   m_fRestitution;
-    int     m_iFilterMask;
-    int     m_iFilterGroup;
-    SColor  m_debugColor;
-    float   m_fSleepingThresholdLinear;
-    float   m_fSleepingThresholdAngular;
-};
-
 class CLuaPhysicsStaticCollision : public CLuaPhysicsWorldElement
 {
 public:
@@ -79,8 +50,6 @@ public:
 private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
     std::shared_ptr<CLuaPhysicsShape>  m_pShape;
-
-    std::unique_ptr<CLuaPhysicsStaticCollisionTempData> m_pTempData;
 
     mutable std::mutex m_lock;
 };

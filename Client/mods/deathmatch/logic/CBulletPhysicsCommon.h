@@ -52,6 +52,25 @@ enum class eConstraintVariant
     C,
 };
 
+enum class eTempDataKey
+{
+    Mass,
+    LinearDumping,
+    AngularDumping,
+    CcdMotionThreshold,
+    SweptSphereRadius,
+    LinearVelocity,
+    AngularVelocity,
+    Restitution,
+    Mask,
+    Group,
+    SleepingThresholdLinear,
+    SleepingThresholdAngular,
+    LocalInertia,
+    CenterOfMass,
+    DebugColor,
+};
+
 struct SPhysicsCollisionContact
 {
     CVector vecPositionWorldOn;

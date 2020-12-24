@@ -15,6 +15,9 @@ struct SPhysicsCollisionReport;
 
 #pragma once
 
+#include <unordered_map>
+#include <variant>
+
 class ILuaPhysicsElement
 {
 public:
@@ -45,10 +48,30 @@ public:
     virtual void ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport) {}
     void         NeedsUpdate();
 
+    template<typename T>
+    bool GetTempData(eTempDataKey key, T& out) const // Multithread safe
+    {
+        std::lock_guard guard(m_tempDataLock);
+        auto            iter = m_mapTempData.find(key);
+        if (iter != m_mapTempData.end())
+        {
+            out = std::get<T>((*iter).second);
+            return true;
+        }
+        return false;
+    }
+
+    template <typename T>
+    void SetTempData(eTempDataKey key, const T& value) // Multithread safe
+    {
+        std::lock_guard guard(m_tempDataLock);
+        m_mapTempData[key] = value;
+    }
+
 protected:
     std::atomic<bool> m_bNeedsUpdate = false;
-
 private:
+
     void RemoveScriptID();
 
     std::atomic<bool>                                  m_isReady;
@@ -57,4 +80,8 @@ private:
     EIdClass::EIdClassType                             m_classType;
     uint                                               m_uiScriptID;
     SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
+
+    mutable std::mutex                                         m_tempDataLock;
+    // Stores information user set for get function while they are being permanently applied into specific element
+    std::unordered_map<eTempDataKey, std::variant<int, float, CVector, SColor>> m_mapTempData;
 };

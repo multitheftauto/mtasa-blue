@@ -18,35 +18,6 @@ class CPhysicsRigidBodyProxy;
 
 #include "lua/physics/CPhysicsRigidBodyProxy.h"
 
-class CLuaPhysicsRigidBodyTempData
-{
-public:
-    float   m_fMass;
-    float   m_fLinearDamping;
-    float   m_fAngularDamping;
-    float   m_fCcdMotionThreshold;
-    float   m_fSweptSphereRadius;
-    float   m_fDumping;
-    CVector m_vecLocalInertia;
-    CVector m_vecCenterOfMass;
-    CVector m_vecLinearVelocity;
-    CVector m_vecAngularVelocity;
-    CVector m_vecApplyForceFrom;
-    CVector m_vecApplyForceTo;
-    CVector m_vecApplyImpulseFrom;
-    CVector m_vecApplyImpulseTo;
-    CVector m_vecApplyCentralForce;
-    CVector m_vecApplyCentralImpulse;
-    CVector m_vecApplyTorque;
-    CVector m_vecApplyTorqueImpulse;
-    float   m_fRestitution;
-    int     m_iFilterMask;
-    int     m_iFilterGroup;
-    SColor  m_debugColor;
-    float   m_fSleepingThresholdLinear;
-    float   m_fSleepingThresholdAngular;
-};
-
 class CLuaPhysicsRigidBody : public CLuaPhysicsWorldElement
 {
 public:
@@ -94,13 +65,13 @@ public:
     CVector GetLinearVelocity() const;
     void    SetAngularVelocity(const CVector& vecVelocity);
     CVector GetAngularVelocity() const;
-    void    ApplyForce(const CVector& vecFrom, const CVector& vecTo) const;
+    void    ApplyForce(const CVector& vecFrom, const CVector& vecTo);
     void    ApplyCentralForce(const CVector& vecForce);
-    void    ApplyCentralImpulse(const CVector& vecForce) const;
-    void    ApplyDamping(float fDamping) const;
-    void    ApplyImpulse(const CVector& vecFrom, const CVector& vecTo) const;
-    void    ApplyTorque(const CVector& fTraque) const;
-    void    ApplyTorqueImpulse(const CVector& fTraque) const;
+    void    ApplyCentralImpulse(const CVector& vecForce);
+    void    ApplyDamping(float fDamping);
+    void    ApplyImpulse(const CVector& vecFrom, const CVector& vecTo);
+    void    ApplyTorque(const CVector& vecTraque);
+    void    ApplyTorqueImpulse(const CVector& vecTraque);
 
     void   SetSleepingThresholds(float fLinear, float fAngular);
     void   GetSleepingThresholds(float& fLinear, float& fAngular) const;
@@ -132,10 +103,8 @@ public:
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
     std::shared_ptr<CLuaPhysicsShape>                  m_pShape;
-    std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;
     std::vector<CLuaPhysicsConstraint*>                m_constraintList;
     SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
-    mutable std::mutex                                 m_lock;
     mutable std::atomic<bool>                          m_bActivationRequested;
     mutable std::atomic<bool>                          m_bAABBUpdateRequested;
 
