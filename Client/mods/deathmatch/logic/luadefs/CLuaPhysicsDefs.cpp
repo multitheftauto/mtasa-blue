@@ -2016,11 +2016,15 @@ bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
 {
     if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
     {
-        return pRigidBody->GetBtRigidBody()->IsEnabled();
+        if (pRigidBody->IsReady() && pRigidBody->GetBtRigidBody())
+            return pRigidBody->GetBtRigidBody()->IsEnabled();
+        return false; // not created yet
     }
     else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
     {
-        return pStaticCollision->GetCollisionObject()->IsEnabled();
+        if (pStaticCollision->IsReady() && pStaticCollision->GetCollisionObject())
+            return pStaticCollision->GetCollisionObject()->IsEnabled();
+        return false;
     }
     throw std::invalid_argument("Unsupported physics element type");
 }

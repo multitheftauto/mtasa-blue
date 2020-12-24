@@ -27,7 +27,6 @@ public:
     float   m_fCcdMotionThreshold;
     float   m_fSweptSphereRadius;
     float   m_fDumping;
-    CMatrix m_matrix;
     CVector m_vecLocalInertia;
     CVector m_vecCenterOfMass;
     CVector m_vecLinearVelocity;
@@ -55,17 +54,17 @@ public:
     ~CLuaPhysicsRigidBody();
 
     void    SetPosition(const CVector& vecPosition);
-    CVector GetPosition() const;
+    const CVector GetPosition() const;
     void    SetRotation(const CVector& vecRotation);
-    CVector GetRotation() const;
-    bool    SetScale(const CVector& vecScale);
-    CVector GetScale() const;
-    bool    SetMatrix(const CMatrix& matrix);
-    CMatrix GetMatrix() const;
+    const CVector GetRotation() const;
+    void          SetScale(const CVector& vecScale);
+    const CVector GetScale() const;
+    void          SetMatrix(const CMatrix& matrix);
+    const CMatrix GetMatrix() const;
 
     void          RemoveDebugColor();
     void          SetDebugColor(const SColor& color);
-    const SColor& GetDebugColor() const;
+    const SColor GetDebugColor() const;
 
     int  GetFilterGroup() const;
     void SetFilterGroup(int iGroup);
@@ -136,10 +135,7 @@ private:
     std::unique_ptr<CLuaPhysicsRigidBodyTempData>      m_pTempData;
     std::vector<CLuaPhysicsConstraint*>                m_constraintList;
     SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
-    CVector                                            m_vecPosition;
-    CVector                                            m_vecRotation;
     mutable std::mutex                                 m_lock;
-    mutable std::mutex                                 m_transformLock;
     mutable std::atomic<bool>                          m_bActivationRequested;
     mutable std::atomic<bool>                          m_bAABBUpdateRequested;
 

@@ -19,8 +19,6 @@ class CLuaPhysicsStaticCollision;
 class CLuaPhysicsStaticCollisionTempData
 {
 public:
-    CMatrix m_matrix;
-
     float   m_fMass;
     float   m_fLinearDamping;
     float   m_fAngularDamping;
@@ -56,17 +54,17 @@ public:
     void    Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void    SetPosition(const CVector& vecPosition);
-    CVector GetPosition() const;
+    const CVector GetPosition() const;
     void    SetRotation(const CVector& vecRotation);
-    CVector GetRotation() const;
-    bool    SetScale(const CVector& vecScale);
-    CVector GetScale() const;
-    bool    SetMatrix(const CMatrix& matrix);
-    CMatrix GetMatrix() const;
+    const CVector GetRotation() const;
+    void          SetScale(const CVector& vecScale);
+    const CVector GetScale() const;
+    void    SetMatrix(const CMatrix& matrix);
+    const CMatrix GetMatrix() const;
 
     void          RemoveDebugColor();
     void          SetDebugColor(const SColor& color);
-    const SColor& GetDebugColor() const;
+    const SColor GetDebugColor() const;
 
     int  GetFilterGroup() const;
     void SetFilterGroup(int iGroup);

@@ -23,20 +23,24 @@ protected:
 
 public:
     virtual void    SetPosition(const CVector& vecPosition) = 0;
-    virtual CVector GetPosition() const = 0;
+    virtual const CVector GetPosition() const = 0;
     virtual void    SetRotation(const CVector& vecRotation) = 0;
-    virtual CVector GetRotation() const = 0;
-    virtual bool    SetScale(const CVector& vecScale) = 0;
-    virtual CVector GetScale() const = 0;
-    virtual bool    SetMatrix(const CMatrix& matrix) = 0;
-    virtual CMatrix GetMatrix() const = 0;
+    virtual const CVector GetRotation() const = 0;
+    virtual void          SetScale(const CVector& vecScale) = 0;
+    virtual const CVector GetScale() const = 0;
+    virtual void          SetMatrix(const CMatrix& matrix) = 0;
+    virtual const CMatrix GetMatrix() const = 0;
 
     virtual void          RemoveDebugColor() = 0;
     virtual void          SetDebugColor(const SColor& color) = 0;
-    virtual const SColor& GetDebugColor() const = 0;
+    virtual const SColor GetDebugColor() const = 0;
 
     virtual int  GetFilterGroup() const = 0;
     virtual void SetFilterGroup(int iGroup) = 0;
     virtual int  GetFilterMask() const = 0;
     virtual void SetFilterMask(int mask) = 0;
+
+protected:
+    CMatrix            m_matrix;
+    mutable std::mutex m_matrixLock;
 };

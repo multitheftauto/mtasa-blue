@@ -37,9 +37,6 @@ public:
     static bool GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
     static bool GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 
-    static bool SetScale(btCollisionShape* pCollisionShape, const CVector& vecScale);
-    static bool GetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
-
     static std::unique_ptr<btBoxShape>      CreateBox(CVector& half, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
     static std::unique_ptr<btSphereShape>   CreateSphere(float fRadius, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
     static std::unique_ptr<btCapsuleShape>  CreateCapsule(float fRadius, float fHeight);

@@ -175,18 +175,6 @@ bool CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CV
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetScale(btCollisionShape* pCollisionShape, const CVector& vecScale)
-{
-    pCollisionShape->setLocalScaling(reinterpret_cast<const btVector3&>(vecScale));
-    return true;
-}
-
-bool CLuaPhysicsSharedLogic::GetScale(btCollisionShape* pCollisionShape, CVector& vecScale)
-{
-    vecScale = reinterpret_cast<const CVector&>(pCollisionShape->getLocalScaling());
-    return true;
-}
-
 std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
 {
     std::unique_ptr<btBoxShape> pBoxShape = std::make_unique<btBoxShape>(reinterpret_cast<btVector3&>(half));

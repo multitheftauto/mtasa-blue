@@ -41,34 +41,26 @@ void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRig
 
     Ready();
 
-    CVector tempPosition;
-    CVector tempRotation;
-
-    {
-        std::lock_guard guard(m_transformLock);
-        tempPosition = m_vecPosition;
-        tempRotation = m_vecRotation;
-    }
-
-    SetPosition(tempPosition);
-    SetRotation(tempRotation);
-    SetScale(m_pTempData->m_matrix.GetScale());
+    SetMatrix(m_matrix);
 }
 
 void CLuaPhysicsRigidBody::HasMoved()
 {
-    std::lock_guard guard(m_transformLock);
+    std::lock_guard guard(m_matrixLock);
 
     const btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
-    CLuaPhysicsSharedLogic::GetPosition(transform, m_vecPosition);
-    CLuaPhysicsSharedLogic::GetRotation(transform, m_vecRotation);
+    CVector            position, rotation;
+    CLuaPhysicsSharedLogic::GetPosition(transform, position);
+    CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
+    m_matrix.SetPosition(position);
+    m_matrix.SetRotation(rotation);
 }
 
 void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
 {
     {
-        std::lock_guard guard(m_transformLock);
-        m_vecPosition = vecPosition;
+        std::lock_guard guard(m_matrixLock);
+        m_matrix.SetPosition(vecPosition);
     }
 
     std::function<void()> change([&, vecPosition]() {
@@ -82,11 +74,86 @@ void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
     NeedsActivation();
 }
 
-CVector CLuaPhysicsRigidBody::GetPosition() const
+const CVector CLuaPhysicsRigidBody::GetPosition() const
 {
-    std::lock_guard guard(m_transformLock);
-    return m_vecPosition;
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix.GetPosition();
 }
+
+void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation)
+{
+    {
+        std::lock_guard guard(m_matrixLock);
+        CVector         vecNewRotation = vecRotation;
+        ConvertDegreesToRadians(vecNewRotation);
+        m_matrix.SetRotation(vecNewRotation);
+    }
+    
+    std::function<void()> change([&, vecRotation]() {
+        btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
+        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+        m_pRigidBodyProxy->proceedToTransform(transform);
+    });
+
+    CommitChange(change);
+
+    NeedsActivation();
+}
+
+const CVector CLuaPhysicsRigidBody::GetRotation() const
+{
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix.GetRotation();
+}
+
+void CLuaPhysicsRigidBody::SetScale(const CVector& vecScale)
+{
+    {
+        std::lock_guard guard(m_matrixLock);
+        m_matrix.SetScale(vecScale);
+    }
+
+    std::function<void()> change([&, vecScale]() {
+        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(vecScale));
+    });
+
+    CommitChange(change);
+
+    NeedsActivation();
+}
+
+const CVector CLuaPhysicsRigidBody::GetScale() const
+{
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix.GetScale();
+}
+
+void CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
+{
+    {
+        std::lock_guard guard(m_matrixLock);
+        m_matrix = matrix;
+    }
+
+    std::function<void()> change([&, matrix]() {
+        btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
+        CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetRotation());
+        CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
+        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(matrix.GetScale()));
+        m_pRigidBodyProxy->proceedToTransform(transform);
+    });
+
+    CommitChange(change);
+
+    NeedsActivation();
+}
+
+const CMatrix CLuaPhysicsRigidBody::GetMatrix() const
+{
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix;
+}
+
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
@@ -219,42 +286,6 @@ float CLuaPhysicsRigidBody::GetMass() const
         return m_pRigidBodyProxy->getMass();
     }
     return m_pTempData->m_fMass;
-}
-
-void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation)
-{
-    std::lock_guard guard(m_lock);
-
-    {
-        std::lock_guard guard(m_transformLock);
-        m_vecRotation = vecRotation;
-    }
-
-    if (IsReady())
-    {
-        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
-        m_pRigidBodyProxy->setWorldTransform(transform);
-        Activate();
-        return;
-    }
-
-    m_pTempData->m_matrix.SetRotation(vecRotation);
-}
-
-CVector CLuaPhysicsRigidBody::GetRotation() const
-{
-    std::lock_guard guard(m_lock);
-
-    if (IsReady())
-    {
-        CVector     rotation;
-        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
-        return rotation;
-    }
-
-    return m_pTempData->m_matrix.GetRotation();
 }
 
 void CLuaPhysicsRigidBody::SetLinearVelocity(const CVector& vecVelocity)
@@ -418,61 +449,6 @@ float CLuaPhysicsRigidBody::GetRestitution() const
     return m_pTempData->m_fRestitution;
 }
 
-bool CLuaPhysicsRigidBody::SetScale(const CVector& vecScale)
-{
-    std::lock_guard guard(m_lock);
-
-    if (IsReady())
-    {
-        CLuaPhysicsSharedLogic::SetScale(m_pRigidBodyProxy->getCollisionShape(), vecScale);
-        // prevents rigid from sleeping, otherwise it can overlap other collisions
-        Activate();
-        return true;
-    }
-    m_pTempData->m_matrix.SetScale(vecScale);
-    return true;
-}
-
-CVector CLuaPhysicsRigidBody::GetScale() const
-{
-    std::lock_guard guard(m_lock);
-
-    if (IsReady())
-    {
-        CVector scale;
-        CLuaPhysicsSharedLogic::GetScale(m_pRigidBodyProxy->getCollisionShape(), scale);
-        return scale;
-    }
-    return m_pTempData->m_matrix.GetScale();
-}
-
-bool CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
-{
-    if (IsReady())
-    {
-        SetPosition(matrix.GetPosition());
-        SetRotation(matrix.GetRotation());
-        SetScale(matrix.GetScale());
-        return true;
-    }
-    m_pTempData->m_matrix = matrix;
-    return true;
-}
-
-CMatrix CLuaPhysicsRigidBody::GetMatrix() const
-{
-    if (IsReady())
-    {
-        CMatrix matrix;
-        matrix.SetPosition(GetPosition());
-        matrix.SetRotation(GetRotation() / (180 / PI));
-        matrix.SetScale(GetScale());
-
-        return matrix;
-    }
-    return m_pTempData->m_matrix;
-}
-
 void CLuaPhysicsRigidBody::SetFilterMask(int mask)
 {
     std::lock_guard guard(m_lock);
@@ -529,7 +505,7 @@ void CLuaPhysicsRigidBody::RemoveDebugColor()
     m_pRigidBodyProxy->removeCustomDebugColor();
 }
 
-const SColor& CLuaPhysicsRigidBody::GetDebugColor() const
+const SColor CLuaPhysicsRigidBody::GetDebugColor() const
 {
     std::lock_guard guard(m_lock);
     SColor          color;
@@ -583,6 +559,10 @@ btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const
     if (m_pRigidBodyProxy)
     {
         m_pRigidBodyProxy->predictIntegratedTransform(time, predictedTransform);
+    }
+    else
+    {
+        int b = 5;
     }
     return predictedTransform;
 }

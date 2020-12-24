@@ -33,94 +33,96 @@ void CLuaPhysicsStaticCollision::Initialize(std::shared_ptr<CLuaPhysicsStaticCol
 
     Ready();
 
-    SetPosition(m_pTempData->m_matrix.GetPosition());
-    SetRotation(m_pTempData->m_matrix.GetRotation());
-    // SetScale(m_pTempData->m_matrix.GetScale());
+    SetMatrix(m_matrix);
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition)
 {
-    std::lock_guard guard(m_lock);
-
-    if (IsReady())
     {
-        CLuaPhysicsSharedLogic::SetPosition(GetCollisionObject(), vecPosition);
-        return;
+        std::lock_guard guard(m_matrixLock);
+        m_matrix.SetPosition(vecPosition);
     }
-    m_pTempData->m_matrix.SetPosition(vecPosition);
+
+    std::function<void()> change([&, vecPosition]() {
+        btTransform& transform = GetCollisionObject()->getWorldTransform();
+        CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        GetCollisionObject()->setWorldTransform(transform);
+    });
+
+    CommitChange(change);
 }
 
 void CLuaPhysicsStaticCollision::SetRotation(const CVector& vecRotation)
 {
+    {
+        std::lock_guard guard(m_matrixLock);
+        CVector vecNewRotation = vecRotation;
+        ConvertDegreesToRadians(vecNewRotation);
+        m_matrix.SetRotation(vecNewRotation);
+    }
+
     std::function<void()> change([&, vecRotation]() {
-        CLuaPhysicsSharedLogic::SetRotation(GetCollisionObject(), vecRotation);
+        btTransform& transform = GetCollisionObject()->getWorldTransform();
+        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+        GetCollisionObject()->setWorldTransform(transform);
     });
+
     CommitChange(change);
 }
 
-CVector CLuaPhysicsStaticCollision::GetPosition() const
+const CVector CLuaPhysicsStaticCollision::GetPosition() const
 {
-    if (IsReady())
-    {
-        CVector position;
-        CLuaPhysicsSharedLogic::GetPosition(GetCollisionObject(), position);
-        return position;
-    }
-    return m_pTempData->m_matrix.GetPosition();
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix.GetPosition();
 }
 
-CVector CLuaPhysicsStaticCollision::GetRotation() const
+const CVector CLuaPhysicsStaticCollision::GetRotation() const
 {
-    if (IsReady())
-    {
-        CVector rotation;
-        CLuaPhysicsSharedLogic::GetRotation(GetCollisionObject(), rotation);
-        ConvertDegreesToRadians(rotation);
-        return rotation;
-    }
-    return m_pTempData->m_matrix.GetRotation();
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix.GetRotation();
 }
 
-bool CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale)
+void CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale)
 {
-    return CLuaPhysicsSharedLogic::SetScale(m_btCollisionObject->getCollisionShape(), vecScale);
+    {
+        std::lock_guard guard(m_matrixLock);
+        m_matrix.SetScale(vecScale);
+    }
+
+    std::function<void()> change([&, vecScale]() {
+        m_btCollisionObject->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(vecScale));
+    });
+
+    CommitChange(change);
 }
 
-CVector CLuaPhysicsStaticCollision::GetScale() const
+const CVector CLuaPhysicsStaticCollision::GetScale() const
 {
-    CVector scale;
-    if (CLuaPhysicsSharedLogic::GetScale(m_btCollisionObject->getCollisionShape(), scale))
-    {
-        return scale;
-    }
-    return CVector(1, 1, 1);
+    std::lock_guard guard(m_matrixLock);
+    return m_matrix.GetScale();
 }
 
-bool CLuaPhysicsStaticCollision::SetMatrix(const CMatrix& matrix)
+void CLuaPhysicsStaticCollision::SetMatrix(const CMatrix& matrix)
 {
-    if (IsReady())
-    {
-        SetPosition(matrix.GetPosition());
-        SetRotation(matrix.GetRotation());
-        SetScale(matrix.GetScale());
-        return true;
-    }
-    m_pTempData->m_matrix = matrix;
-    return true;
+    std::lock_guard lock(m_matrixLock);
+    m_matrix = matrix;
+
+    std::function<void()> change([&, matrix]() {
+        btTransform& transform = GetCollisionObject()->getWorldTransform();
+        CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
+        CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
+        m_btCollisionObject->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(matrix.GetScale()));
+        GetCollisionObject()->setWorldTransform(transform);
+    });
+
+    CommitChange(change);
 }
 
-CMatrix CLuaPhysicsStaticCollision::GetMatrix() const
+const CMatrix CLuaPhysicsStaticCollision::GetMatrix() const
 {
-    if (IsReady())
-    {
-        CMatrix matrix;
-        matrix.SetPosition(GetPosition());
-        matrix.SetRotation(GetRotation());
-        matrix.SetScale(GetScale());
+    std::lock_guard lock(m_matrixLock);
 
-        return matrix;
-    }
-    return m_pTempData->m_matrix;
+    return m_matrix;
 }
 
 void CLuaPhysicsStaticCollision::RemoveDebugColor()
@@ -133,7 +135,7 @@ void CLuaPhysicsStaticCollision::SetDebugColor(const SColor& color)
     m_btCollisionObject->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
 }
 
-const SColor& CLuaPhysicsStaticCollision::GetDebugColor() const
+const SColor CLuaPhysicsStaticCollision::GetDebugColor() const
 {
     btVector3 btColor;
     m_btCollisionObject->getCustomDebugColor(btColor);
