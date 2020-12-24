@@ -10,6 +10,8 @@
 
 #pragma once
 
+class CLuaPhysicsElement;
+
 #define USE_NANOSECOND_TIMING 1            // use nanoseconds for profiling?
 #define BT_ENABLE_PROFILE     1
 
@@ -48,4 +50,20 @@ enum class eConstraintVariant
     A,
     B,
     C,
+};
+
+struct SPhysicsCollisionContact
+{
+    CVector vecPositionWorldOn;
+    CVector vecLocalPoint;
+    CVector vecLateralFrictionDir;
+    int     contactTriangle;
+    float   appliedImpulse;
+    float   appliedImpulseLiteral;
+};
+
+struct SPhysicsCollisionReport
+{
+    std::shared_ptr<CLuaPhysicsElement>                    pElement;
+    std::vector<std::shared_ptr<SPhysicsCollisionContact>> m_vecContacts;
 };

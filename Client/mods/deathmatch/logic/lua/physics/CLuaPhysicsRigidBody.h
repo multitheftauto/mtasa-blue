@@ -63,6 +63,15 @@ public:
     bool    SetMatrix(const CMatrix& matrix);
     CMatrix GetMatrix() const;
 
+    void          RemoveDebugColor();
+    void          SetDebugColor(const SColor& color);
+    const SColor& GetDebugColor() const;
+
+    int  GetFilterGroup() const;
+    void SetFilterGroup(int iGroup);
+    int  GetFilterMask() const;
+    void SetFilterMask(int mask);
+
     // Called every time if while simulation position, rotation has changed.
     void HasMoved();
 
@@ -98,14 +107,7 @@ public:
     void   GetSleepingThresholds(float& fLinear, float& fAngular) const;
     void   SetRestitution(float fRestitution);
     float  GetRestitution() const;
-    void   SetDebugColor(SColor color);
-    SColor GetDebugColor() const;
-    void   RemoveDebugColor();
-    void   SetFilterMask(int mask);
 
-    int   GetFilterMask() const;
-    void  SetFilterGroup(int sIndex);
-    int   GetFilterGroup() const;
     bool  IsSleeping() const;
     bool  WantsSleeping() const;
     float GetMass() const;

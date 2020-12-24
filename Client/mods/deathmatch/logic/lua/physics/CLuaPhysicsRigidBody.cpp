@@ -485,6 +485,11 @@ void CLuaPhysicsRigidBody::SetFilterMask(int mask)
     m_pTempData->m_iFilterMask = mask;
 }
 
+void CLuaPhysicsRigidBody::SetDebugColor(const SColor& color)
+{
+    m_pRigidBodyProxy->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
+}
+
 int CLuaPhysicsRigidBody::GetFilterMask() const
 {
     std::lock_guard guard(m_lock);
@@ -519,17 +524,12 @@ int CLuaPhysicsRigidBody::GetFilterGroup() const
     return m_pTempData->m_iFilterGroup;
 }
 
-void CLuaPhysicsRigidBody::SetDebugColor(SColor color)
-{
-    m_pRigidBodyProxy->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
-}
-
 void CLuaPhysicsRigidBody::RemoveDebugColor()
 {
     m_pRigidBodyProxy->removeCustomDebugColor();
 }
 
-SColor CLuaPhysicsRigidBody::GetDebugColor() const
+const SColor& CLuaPhysicsRigidBody::GetDebugColor() const
 {
     std::lock_guard guard(m_lock);
     SColor          color;

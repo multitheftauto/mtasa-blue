@@ -53,29 +53,29 @@ public:
     CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void    SetPosition(const CVector& vecPosition) const;
+    void    Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+
+    void    SetPosition(const CVector& vecPosition);
     CVector GetPosition() const;
     void    SetRotation(const CVector& vecRotation);
     CVector GetRotation() const;
-    bool    SetScale(const CVector& vecScale) const;
+    bool    SetScale(const CVector& vecScale);
     CVector GetScale() const;
     bool    SetMatrix(const CMatrix& matrix);
     CMatrix GetMatrix() const;
 
-    void Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+    void          RemoveDebugColor();
+    void          SetDebugColor(const SColor& color);
+    const SColor& GetDebugColor() const;
 
-    void    RemoveDebugColor() const;
-    void    SetDebugColor(const SColor& color) const;
-    SColor& GetDebugColor() const;
-
-    void SetFilterMask(int mask) const;
-
-    void SetFilterGroup(int iGroup) const;
     int  GetFilterGroup() const;
-
-    CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
+    void SetFilterGroup(int iGroup);
+    int  GetFilterMask() const;
+    void SetFilterMask(int mask);
 
     void Unlink();
+
+    CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
 
     void Update() {}
 private:

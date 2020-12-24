@@ -38,7 +38,7 @@ void CLuaPhysicsStaticCollision::Initialize(std::shared_ptr<CLuaPhysicsStaticCol
     // SetScale(m_pTempData->m_matrix.GetScale());
 }
 
-void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition) const
+void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition)
 {
     std::lock_guard guard(m_lock);
 
@@ -81,7 +81,7 @@ CVector CLuaPhysicsStaticCollision::GetRotation() const
     return m_pTempData->m_matrix.GetRotation();
 }
 
-bool CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale) const
+bool CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale)
 {
     return CLuaPhysicsSharedLogic::SetScale(m_btCollisionObject->getCollisionShape(), vecScale);
 }
@@ -123,17 +123,17 @@ CMatrix CLuaPhysicsStaticCollision::GetMatrix() const
     return m_pTempData->m_matrix;
 }
 
-void CLuaPhysicsStaticCollision::RemoveDebugColor() const
+void CLuaPhysicsStaticCollision::RemoveDebugColor()
 {
     m_btCollisionObject->removeCustomDebugColor();
 }
 
-void CLuaPhysicsStaticCollision::SetDebugColor(const SColor& color) const
+void CLuaPhysicsStaticCollision::SetDebugColor(const SColor& color)
 {
     m_btCollisionObject->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
 }
 
-SColor& CLuaPhysicsStaticCollision::GetDebugColor() const
+const SColor& CLuaPhysicsStaticCollision::GetDebugColor() const
 {
     btVector3 btColor;
     m_btCollisionObject->getCustomDebugColor(btColor);
@@ -145,12 +145,12 @@ SColor& CLuaPhysicsStaticCollision::GetDebugColor() const
     return color;
 }
 
-void CLuaPhysicsStaticCollision::SetFilterMask(int mask) const
+void CLuaPhysicsStaticCollision::SetFilterMask(int mask)
 {
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = mask;
 }
 
-void CLuaPhysicsStaticCollision::SetFilterGroup(int iGroup) const
+void CLuaPhysicsStaticCollision::SetFilterGroup(int iGroup)
 {
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup = iGroup;
 }
@@ -158,6 +158,11 @@ void CLuaPhysicsStaticCollision::SetFilterGroup(int iGroup) const
 int CLuaPhysicsStaticCollision::GetFilterGroup() const
 {
     return m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup;
+}
+
+int CLuaPhysicsStaticCollision::GetFilterMask() const
+{
+    return m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask;
 }
 
 void CLuaPhysicsStaticCollision::Unlink()
