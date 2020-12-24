@@ -1516,7 +1516,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pP
     CLuaPhysicsShape*     pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
-    if (pRigidBody)
+    if (pBtRigidBody)
         pRigidBody = (CLuaPhysicsRigidBody*) pBtRigidBody->getUserPointer();
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
@@ -1572,8 +1572,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
     bool bEnrichResult = false;
     bool bSortByDistance = false;
     int  iLimitResults = BulletPhysics::Defaults::RaycastAllDefaultLimit;
-    int  iFilterGroup = 0;
-    int  iFilterMask = 0;
+    int  iFilterGroup = 1;
+    int  iFilterMask = -1;
 
     if (mapOptions.find("filterBackfaces") != mapOptions.end())
     {
@@ -1619,7 +1619,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
             throw std::invalid_argument(SString("'limitResults' value must be between 1 and %i", BulletPhysics::Limits::RaycastAllUpperResultsLimit).c_str());
     }
 
-    SAllRayResultCallback rayCallback = pPhysics->RayCastAll(from, to, bFilterBackfaces);
+    SAllRayResultCallback  rayCallback = pPhysics->RayCastAll(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
     std::vector<RayResult> results;
 
     size_t hitNum = rayCallback.m_hitPointWorld.size();
@@ -1635,7 +1635,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
         CLuaPhysicsShape*     pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
         CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
-        if (pRigidBody)
+        if (pBtRigidBody)
             pRigidBody = (CLuaPhysicsRigidBody*)pBtRigidBody->getUserPointer();
         CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
@@ -1695,9 +1695,36 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
     return results;
 }
 
-std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
-CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition)
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecEndPosition, CVector vecRotation,
+                                  std::optional<RayOptions> options)
 {
+    RayOptions mapOptions = options.value_or(RayOptions());
+
+    bool bEnrichResult = false;
+    int  iFilterGroup = 1;
+    int  iFilterMask = -1;
+
+    if (mapOptions.find("enrich") != mapOptions.end())
+    {
+        if (!std::holds_alternative<bool>(mapOptions["enrich"]))
+            throw std::invalid_argument("'enrich' value must be boolean");
+        bEnrichResult = std::get<bool>(mapOptions["enrich"]);
+    }
+
+    if (mapOptions.find("filterGroup") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
+            throw std::invalid_argument("'filterGroup' value must be integer");
+        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
+    }
+
+    if (mapOptions.find("filterMask") != mapOptions.end())
+    {
+        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
+            throw std::invalid_argument("'filterMask' value must be integer");
+        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+    }
+
     switch (pShape->GetType())
     {
         case BOX_SHAPE_PROXYTYPE:
@@ -1715,38 +1742,68 @@ CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVec
     startTransform.setIdentity();
     endTransform.setIdentity();
     CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
-    CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartRotation);
+    CLuaPhysicsSharedLogic::SetRotation(startTransform, vecRotation);
     CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
-    CLuaPhysicsSharedLogic::SetRotation(endTransform, vecStartRotation);
+    CLuaPhysicsSharedLogic::SetRotation(endTransform, vecRotation);
 
-    btCollisionWorld::ClosestConvexResultCallback callback = pPhysics->ShapeCast(pShape, startTransform, endTransform);
-    if (!callback.hasHit())
+    SClosestConvexResultCallback rayCallback = pPhysics->ShapeCast(pShape, startTransform, endTransform, iFilterGroup, iFilterMask);
+    if (!rayCallback.hasHit())
         return false;
 
-    btVector3 fromPosition;
-    btVector3 toPosition;
-    CLuaPhysicsSharedLogic::GetPosition(startTransform, fromPosition);
-    CLuaPhysicsSharedLogic::GetPosition(endTransform, toPosition);
+    const btCollisionObject* pBtCollisionObject = rayCallback.m_hitCollisionObject;
+    const btCollisionShape*  pBtCollisionShape = pBtCollisionObject->getCollisionShape();
+    const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
 
-    btVector3    vecShapePosition = fromPosition.lerp(toPosition, callback.m_closestHitFraction);
+    if (!pBtCollisionObject)
+        return false;            // should never happen
 
-    const btCollisionObject* pCollisionObject = callback.m_hitCollisionObject;
-    const btCollisionShape*  pCollisionShape = pCollisionObject->getCollisionShape();
-    const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
+    CLuaPhysicsShape*     pHitShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
-    if (!pCollisionShape)
-        return false;                   // should never happen
+    if (pBtRigidBody)
+        pRigidBody = (CLuaPhysicsRigidBody*)pBtRigidBody->getUserPointer();
+    CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
-    std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>> result{
-        {"position", reinterpret_cast<const CVector&>(vecShapePosition)},    {"rotation", vecStartRotation},
-        {"hitpoint", reinterpret_cast<const CVector&>(callback.m_hitPointWorld)}, {"hitnormal", reinterpret_cast<const CVector&>(callback.m_hitNormalWorld)},
-        {"shape", (CLuaPhysicsShape*)(pCollisionShape->getUserPointer())},
+    RayResult result{
+        {"position", rayCallback.m_closestPosition},
+        {"hitpoint", reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld)},
+        {"hitnormal", reinterpret_cast<const CVector&>(rayCallback.m_hitNormalWorld)},
+        {"shape", pHitShape},
+        {"distance", (reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld) - vecStartPosition).Length()},
     };
 
-    if (pRigidBody != nullptr)
-        result["rigidbody"] = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
-    else
-        result["staticcollision"] = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+    if (pRigidBody)
+        result["rigidbody"] = pRigidBody;
+    if (pStaticCollision)
+        result["staticcollision"] = pStaticCollision;
+
+    if (bEnrichResult)
+    {
+        CMatrix matrix;
+        if (pRigidBody)
+            matrix = pRigidBody->GetMatrix();
+        else if (pStaticCollision)
+            matrix = pStaticCollision->GetMatrix();
+
+        if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pHitShape))
+        {
+            if (rayCallback.m_hitShapePart >= 0)
+                result["childShapeIndex"] = rayCallback.m_hitShapePart + 1;
+        }
+        else if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pHitShape))
+        {
+            if (rayCallback.m_hitTriangleIndex >= 0)
+                result["triangleIndex"] = rayCallback.m_hitTriangleIndex + 1;
+
+            STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(rayCallback.m_hitTriangleIndex);
+            result["vertex1"] = triangleInfo.vertex1 + 1;
+            result["vertex2"] = triangleInfo.vertex2 + 1;
+            result["vertex3"] = triangleInfo.vertex3 + 1;
+            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
+            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
+            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
+        }
+    }
 
     return result;
 }

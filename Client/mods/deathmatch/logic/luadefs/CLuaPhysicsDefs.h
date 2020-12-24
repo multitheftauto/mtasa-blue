@@ -94,8 +94,8 @@ public:
 
     static std::vector<RayResult> PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
 
-    static std::variant<bool, std::unordered_map<std::string, std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*>>>
-    PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecStartRotation, CVector vecEndPosition);
+    static std::variant<bool, RayResult> PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecEndPosition,
+                                                          CVector vecRotation, std::optional<RayOptions> options);
     // LUA_DECLARE(PhysicsSetProperties);
     // LUA_DECLARE(PhysicsGetProperties);
 

@@ -96,6 +96,39 @@ struct SClosestRayResultCallback : public btCollisionWorld::ClosestRayResultCall
     }
 };
 
+struct SClosestConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
+{
+    int m_hitTriangleIndex;
+    int m_hitShapePart;
+    CVector m_closestPosition;
+
+    SClosestConvexResultCallback(const CVector& rayFrom, const CVector& rayTo)
+        : btCollisionWorld::ClosestConvexResultCallback(reinterpret_cast<const btVector3&>(rayFrom), reinterpret_cast<const btVector3&>(rayTo)),
+          m_hitTriangleIndex(0),
+          m_hitShapePart(0)
+    {
+    }
+
+    ~SClosestConvexResultCallback() {}
+
+    bool needsCollision(btBroadphaseProxy* proxy0) const { return true; }
+
+    btScalar addSingleResult(btCollisionWorld::LocalConvexResult& rayResult, bool normalInWorldSpace)
+    {
+        if (rayResult.m_localShapeInfo)
+        {
+            m_hitTriangleIndex = rayResult.m_localShapeInfo->m_triangleIndex;
+            m_hitShapePart = rayResult.m_localShapeInfo->m_shapePart;
+        }
+        else
+        {
+            m_hitTriangleIndex = -1;
+            m_hitShapePart = -1;
+        }
+        return btCollisionWorld::ClosestConvexResultCallback::addSingleResult(rayResult, normalInWorldSpace);
+    }
+};
+
 class CClientPhysics : public CClientEntity
 {
     DECLARE_CLASS(CClientPhysics, CClientEntity)
@@ -120,13 +153,14 @@ public:
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
-    bool                                          LineCast(CVector from, CVector to, bool bFilterBackfaces, int filterGroup, int filterMask) const;
-    btCollisionWorld::ClosestConvexResultCallback ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to) const;
+    bool                                          LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const;
+    SClosestConvexResultCallback ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to, int iFilterGroup,
+                                           int iFilterMask) const;
 
     SClosestRayResultCallback RayCast(const CVector& from, const CVector& to, int iFilterGroup, int iFilterMask,
                                       bool bFilterBackfaces) const;
 
-    SAllRayResultCallback       RayCastAll(CVector from, CVector to, bool bFilterBackfaces) const;
+    SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
     void                                        StartBuildCollisionFromGTA();
     void                                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
