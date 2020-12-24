@@ -1537,6 +1537,13 @@ void CClientGame::DoVehicleInKeyCheck()
             else
             {
                 // Enter
+                // Are we holding the aim_weapon key?
+                SBindableGTAControl* pBind = g_pCore->GetKeyBinds()->GetBindableFromControl("aim_weapon");
+                if (pBind && pBind->bState)
+                {
+                    // Stop because the player is probably doing special attack
+                    return;
+                }
                 m_pLocalPlayer->EnterVehicle(nullptr, false);
             }
         }
