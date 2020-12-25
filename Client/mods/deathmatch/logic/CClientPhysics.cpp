@@ -9,15 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <list>
-#include "../Client/game_sa/CCameraSA.h"
-#include "../mods/deathmatch/logic/Utils.h"
+
 #include "lua/physics/CLuaPhysicsRigidBodyManager.h"
 #include "lua/physics/CLuaPhysicsStaticCollisionManager.h"
 #include "lua/physics/CLuaPhysicsConstraintManager.h"
 #include "lua/physics/CLuaPhysicsShapeManager.h"
 #include "CPhysicsDebugDrawer.h"
-#include "lua/physics/CPhysicsStaticCollisionProxy.h"
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
@@ -367,6 +364,18 @@ std::shared_ptr<CLuaPhysicsShape> CClientPhysics::Resolve(CLuaPhysicsShape* pLua
     return m_mapShapes[id];
 }
 
+std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::Resolve(CLuaPhysicsRigidBody* pRigidBody)
+{
+    uint id = pRigidBody->GetScriptID();
+    return m_mapRigidBodies[id];
+}
+
+std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::Resolve(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    uint id = pStaticCollision->GetScriptID();
+    return m_mapStaticCollisions[id];
+}
+
 void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
     m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
@@ -495,18 +504,6 @@ std::vector<std::shared_ptr<CLuaPhysicsConstraint>> CClientPhysics::GetConstrain
         constraints.push_back(pair.second);
     }
     return constraints;
-}
-
-std::shared_ptr<CLuaPhysicsRigidBody> CClientPhysics::GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody)
-{
-    uint id = pRigidBody->GetScriptID();
-    return m_mapRigidBodies[id];
-}
-
-std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
-{
-    uint id = pStaticCollision->GetScriptID();
-    return m_mapStaticCollisions[id];
 }
 
 std::shared_ptr<CLuaPhysicsStaticCollision> CClientPhysics::GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject)

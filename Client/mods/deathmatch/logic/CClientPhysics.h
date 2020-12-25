@@ -240,8 +240,8 @@ public:
 
     std::shared_ptr<CLuaPhysicsShape> Resolve(CLuaPhysicsShape* pLuaShape);
 
-    std::shared_ptr<CLuaPhysicsRigidBody>       GetSharedRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    std::shared_ptr<CLuaPhysicsStaticCollision> GetSharedStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    std::shared_ptr<CLuaPhysicsRigidBody>       Resolve(CLuaPhysicsRigidBody* pRigidBody);
+    std::shared_ptr<CLuaPhysicsStaticCollision> Resolve(CLuaPhysicsStaticCollision* pStaticCollision);
 
 
     std::atomic<bool> isDuringSimulation = false;
