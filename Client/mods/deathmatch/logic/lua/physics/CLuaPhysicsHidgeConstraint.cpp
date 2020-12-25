@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsHidgeConstraint.h"
 
 CLuaPhysicsHidgeConstraint::CLuaPhysicsHidgeConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& pivotA, CVector& pivotB,

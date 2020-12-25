@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsElement.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape)
     : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)

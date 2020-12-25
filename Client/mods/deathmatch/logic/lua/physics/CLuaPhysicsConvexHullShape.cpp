@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsShapeManager.h"
-#include "CLuaPhysicsConvexHullShape.h"
 
 CLuaPhysicsConvexHullShape::CLuaPhysicsConvexHullShape(CClientPhysics* pPhysics, std::vector<CVector>& vecPoints) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints)))
 {

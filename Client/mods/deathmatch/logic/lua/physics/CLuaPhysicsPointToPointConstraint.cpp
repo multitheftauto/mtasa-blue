@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsPointToPointConstraint.h"
 
 CLuaPhysicsPointToPointConstraint::CLuaPhysicsPointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, const CVector& pivotA,
                                                                      const CVector& pivotB, bool bDisableCollisionsBetweenLinkedBodies)

@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsShapeManager.h"
-#include "bulletphysics3d/BulletCollision/CollisionShapes/btConvexPolyhedron.h"
 
 CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics, std::unique_ptr<btCollisionShape> pShape) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
 {

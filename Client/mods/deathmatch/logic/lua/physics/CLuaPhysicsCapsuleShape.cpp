@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsCapsuleShape.h"
 
 CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CClientPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight)))
 {

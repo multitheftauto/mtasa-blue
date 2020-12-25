@@ -1418,8 +1418,8 @@ bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CV
     RayOptions mapOptions = options.value_or(RayOptions());
 
     bool bFilterBackfaces = true;
-    int  iFilterGroup = 1;
-    int  iFilterMask = -1;
+    int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
+    int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
     if (mapOptions.find("filterBackfaces") != mapOptions.end())
     {
@@ -1470,8 +1470,8 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pP
 
     bool bFilterBackfaces = false;
     bool bEnrichResult = false;
-    int  iFilterGroup = 1;
-    int  iFilterMask = -1;
+    int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
+    int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
     if (mapOptions.find("filterBackfaces") != mapOptions.end())
     {
@@ -1571,8 +1571,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
     bool bEnrichResult = false;
     bool bSortByDistance = false;
     int  iLimitResults = BulletPhysics::Defaults::RaycastAllDefaultLimit;
-    int  iFilterGroup = 1;
-    int  iFilterMask = -1;
+    int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
+    int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
     if (mapOptions.find("filterBackfaces") != mapOptions.end())
     {
@@ -1700,8 +1700,8 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
     RayOptions mapOptions = options.value_or(RayOptions());
 
     bool bEnrichResult = false;
-    int  iFilterGroup = 1;
-    int  iFilterMask = -1;
+    int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
+    int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
     if (mapOptions.find("enrich") != mapOptions.end())
     {
@@ -1724,22 +1724,13 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
         iFilterMask = std::get<int>(mapOptions["filterMask"]);
     }
 
-    switch (pShape->GetType())
-    {
-        case BOX_SHAPE_PROXYTYPE:
-        case SPHERE_SHAPE_PROXYTYPE:
-        case CONE_SHAPE_PROXYTYPE:
-        case CYLINDER_SHAPE_PROXYTYPE:
-            break;
-        default:
-            throw std::invalid_argument(SString("Shape casting does not support %s shape type.", pShape->GetName()).c_str());
-    }
+    if (!pShape->GetBtShape()->isConvex())
+        throw std::invalid_argument(SString("Shape casting does not support %s shape type.", pShape->GetName()).c_str());
 
     CClientPhysics* pPhysics = pShape->GetPhysics();
-    btTransform     startTransform;
-    btTransform     endTransform;
-    startTransform.setIdentity();
-    endTransform.setIdentity();
+    btTransform     startTransform = btTransform::getIdentity();
+    btTransform     endTransform = btTransform::getIdentity();
+
     CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
     CLuaPhysicsSharedLogic::SetRotation(startTransform, vecRotation);
     CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
@@ -1754,7 +1745,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
     const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
 
     if (!pBtCollisionObject)
-        return false;            // should never happen
+        assert(0); // should never happen
 
     CLuaPhysicsShape*     pHitShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
     CLuaPhysicsRigidBody* pRigidBody = nullptr;

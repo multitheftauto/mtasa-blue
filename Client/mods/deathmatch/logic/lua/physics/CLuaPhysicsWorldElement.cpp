@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsWorldElement::CLuaPhysicsWorldElement(CClientPhysics* pPhysics, EIdClass::EIdClassType classType) : CLuaPhysicsElement(pPhysics, classType)
 {

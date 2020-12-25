@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsCylinderShape.h"
 
 CLuaPhysicsCylinderShape::CLuaPhysicsCylinderShape(CClientPhysics* pPhysics, CVector half)
     : CLuaPhysicsShape(pPhysics, CLuaPhysicsSharedLogic::CreateCylinder(half))

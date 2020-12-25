@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
     : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(std::move(pShape))
@@ -198,7 +194,7 @@ void CLuaPhysicsRigidBody::NeedsAABBUpdate() const
 
 void CLuaPhysicsRigidBody::Activate() const
 {
-    assert(m_pRigidBodyProxy);
+    assert(IsReady());
 
     m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
     m_pRigidBodyProxy->setActivationState(ACTIVE_TAG);
@@ -221,7 +217,7 @@ float CLuaPhysicsRigidBody::GetCcdMotionThreshold() const
     if (GetTempData<float>(eTempDataKey::CcdMotionThreshold, fCcdMotionThreshold))
         return fCcdMotionThreshold;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return m_pRigidBodyProxy->getCcdMotionThreshold();
     return 0;
 }
@@ -248,14 +244,14 @@ float CLuaPhysicsRigidBody::GetSweptSphereRadius() const
 
 bool CLuaPhysicsRigidBody::IsSleeping() const
 {
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return !m_pRigidBodyProxy->isActive();
     return true;
 }
 
 bool CLuaPhysicsRigidBody::WantsSleeping() const
 {
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         m_pRigidBodyProxy->wantsSleeping();
     return false;
 }
@@ -266,7 +262,7 @@ float CLuaPhysicsRigidBody::GetMass() const
     if (GetTempData(eTempDataKey::Mass, fMass))
         return fMass;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return m_pRigidBodyProxy->getMass();
     return 0;
 }
@@ -286,7 +282,7 @@ CVector CLuaPhysicsRigidBody::GetLinearVelocity() const
     if (GetTempData(eTempDataKey::LinearVelocity, fLinearVelocity))
         return fLinearVelocity;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return reinterpret_cast<const CVector&>(m_pRigidBodyProxy->getLinearVelocity());
     return CVector(0, 0, 0);
 }
@@ -309,7 +305,7 @@ CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
     if (GetTempData(eTempDataKey::LinearVelocity, fLinearVelocity))
         return fLinearVelocity;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return reinterpret_cast<const CVector&>(m_pRigidBodyProxy->getAngularVelocity());
     return CVector(0, 0, 0);
 }
@@ -398,7 +394,7 @@ float CLuaPhysicsRigidBody::GetRestitution() const
     if (GetTempData(eTempDataKey::Restitution, fRestitution))
         return fRestitution;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return m_pRigidBodyProxy->getRestitution();
     return 0;
 
@@ -419,7 +415,7 @@ int CLuaPhysicsRigidBody::GetFilterMask() const
     if (GetTempData(eTempDataKey::Mask, iMask))
         return iMask;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterMask;
     return -1;
 }
@@ -449,7 +445,7 @@ int CLuaPhysicsRigidBody::GetFilterGroup() const
     if (GetTempData(eTempDataKey::Group, iGroup))
         return iGroup;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
         return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup;
     return -1;
 }
@@ -465,7 +461,7 @@ const SColor CLuaPhysicsRigidBody::GetDebugColor() const
     if (GetTempData(eTempDataKey::DebugColor, color))
         return color;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
     {
         btVector3 btColor;
         m_pRigidBodyProxy->getCustomDebugColor(btColor);
@@ -497,7 +493,7 @@ void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular
         if (GetTempData(eTempDataKey::SleepingThresholdAngular, fAngular))
             return;
 
-    if (m_pRigidBodyProxy)
+    if (IsReady())
     {
         fLinear = m_pRigidBodyProxy->getLinearSleepingThreshold();
         fAngular = m_pRigidBodyProxy->getAngularSleepingThreshold();
@@ -510,13 +506,9 @@ void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular
 btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const
 {
     btTransform predictedTransform = btTransform::getIdentity();
-    if (m_pRigidBodyProxy)
+    if (IsReady())
     {
         m_pRigidBodyProxy->predictIntegratedTransform(time, predictedTransform);
-    }
-    else
-    {
-        int b = 5;
     }
     return predictedTransform;
 }
@@ -572,7 +564,7 @@ void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstrain
 
 void CLuaPhysicsRigidBody::Unlink()
 {
-    if (m_pShape != nullptr && IsReady())
+    if (IsReady())
     {
         while (!m_constraintList.empty())
         {

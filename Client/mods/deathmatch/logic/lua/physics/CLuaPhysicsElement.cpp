@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsElement.h"
-#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsElement::CLuaPhysicsElement(CClientPhysics* pPhysics, EIdClass::EIdClassType classType)
 {
@@ -52,6 +50,7 @@ void CLuaPhysicsElement::ApplyChanges()
         m_stackChanges.pop();
     }
     Update();
+    ClearTempData();
     m_bHasEnqueuedChanges = false;
 }
 
@@ -74,3 +73,8 @@ void CLuaPhysicsElement::CommitChange(std::function<void()> change)
     m_stackChanges.push(change);
 }
 
+void CLuaPhysicsElement::ClearTempData()
+{
+    std::lock_guard guard(m_tempDataLock);
+    m_mapTempData.clear();
+}

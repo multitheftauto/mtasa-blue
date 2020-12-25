@@ -42,6 +42,8 @@ namespace BulletPhysics
         inline constexpr float   RigidBodyLinearSleepingThreshold = 0.1f;
         inline constexpr float   RigidBodyAngularSleepingThreshold = 0.1f;
         inline constexpr int     RaycastAllDefaultLimit = 64;
+        inline constexpr int     FilterGroup = 1;
+        inline constexpr int     FilterMask = -1;
     }            // namespace Defaults
 }            // namespace BulletPhysics
 

@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsGimpactTriangleMeshShape.h"
-#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsGimpactTriangleMeshShape::CLuaPhysicsGimpactTriangleMeshShape(CClientPhysics* pPhysics, std::vector<CVector>& vecVertices)
     : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateGimpactMeshShape(vecVertices)))

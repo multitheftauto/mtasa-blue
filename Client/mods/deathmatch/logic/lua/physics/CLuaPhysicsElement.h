@@ -36,10 +36,8 @@ public:
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
     void                   Destroy();
     bool                   IsReady() const { return m_isReady; }
-    void                   Ready() { m_isReady = true; }
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
-
 
     // Run changes on worker thread, let you modify element before get created
     void CommitChange(std::function<void()> change);
@@ -70,8 +68,10 @@ public:
 
 protected:
     std::atomic<bool> m_bNeedsUpdate = false;
+    void Ready() { m_isReady = true; }
 private:
 
+    void ClearTempData();            // Multithread safe
     void RemoveScriptID();
 
     std::atomic<bool>                                  m_isReady;
