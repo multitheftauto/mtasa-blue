@@ -21,6 +21,5 @@ public:
                                                            bool bDisableCollisionsBetweenLinkedBodies);
     ~CLuaPhysicsFixedConstraint();
 
-    void SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded);
     void Update() {}
 };

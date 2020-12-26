@@ -61,6 +61,9 @@ public:
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
+    static bool PhysicsSetElementProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty, std::variant<CVector, bool, int, float> argument,
+                                            std::optional<float> argument2, std::optional<bool> argument3);
+
     static bool PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument);
     static bool PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,
                                               std::variant<CVector, bool, float, int, SColor> argument1, std::optional<float> argument2);

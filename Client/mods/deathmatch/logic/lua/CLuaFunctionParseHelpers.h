@@ -148,7 +148,7 @@ enum class ePhysicsProperty
     RIGID_BODY_A,
     RIGID_BODY_B,
     JOINTS_FEEDBACK,
-    CONSTRAINT_BROKEN,
+    ENABLED,
 
     IS_COMPOUND,
     IS_CONCAVE,

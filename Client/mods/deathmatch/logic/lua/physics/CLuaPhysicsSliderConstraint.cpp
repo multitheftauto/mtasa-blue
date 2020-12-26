@@ -15,7 +15,7 @@
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,
                                                          CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
                                                          bool bDisableCollisionsBetweenLinkedBodies)
-    : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsbtGeneric6DofSpring2Constraint(pRigidBodyA->GetPhysics(), pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies)
 {
     btTransform transformA;
     btTransform transformB;
@@ -37,7 +37,7 @@ CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* p
 
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& vecPosition, CVector& vecRotation,
                                                          bool bDisableCollisionsBetweenLinkedBodies)
-    : CLuaPhysicsConstraint(pRigidBody->GetPhysics(), pRigidBody, bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsbtGeneric6DofSpring2Constraint(pRigidBody->GetPhysics(), pRigidBody, bDisableCollisionsBetweenLinkedBodies)
 {
     btTransform transform;
     transform.setIdentity();
@@ -56,12 +56,6 @@ CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* p
 CLuaPhysicsSliderConstraint::~CLuaPhysicsSliderConstraint()
 {
 
-}
-
-void CLuaPhysicsSliderConstraint::SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded)
-{
-    btFixedConstraint* pConstraint = (btFixedConstraint*)GetConstraint();
-    pConstraint->setStiffness(iIndex, fStiffness, bLimitIfNeeded);
 }
 
 void CLuaPhysicsSliderConstraint::SetPivotA(CVector& vecPivotA)

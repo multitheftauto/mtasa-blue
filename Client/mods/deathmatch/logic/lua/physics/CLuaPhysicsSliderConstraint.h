@@ -13,7 +13,7 @@ class CLuaPhysicsConstraint;
 
 #pragma once
 
-class CLuaPhysicsSliderConstraint : public CLuaPhysicsConstraint
+class CLuaPhysicsSliderConstraint : public CLuaPhysicsbtGeneric6DofSpring2Constraint
 {
 public:
     CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA, CVector& vecRotationA,
@@ -22,7 +22,6 @@ public:
     ~CLuaPhysicsSliderConstraint();
 
 
-    void  SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded);
     void  SetPivotA(CVector& vecPivotA);
     void  SetPivotB(CVector& vecPivotB);
     void  SetLowerLinLimit(float fLength);

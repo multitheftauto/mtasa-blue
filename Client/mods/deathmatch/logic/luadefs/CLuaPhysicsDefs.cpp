@@ -28,8 +28,6 @@
 #include "lua/physics/CLuaPhysicsBvhTriangleMeshShape.h"
 #include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
 
-#include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
-
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
@@ -565,6 +563,106 @@ bool CLuaPhysicsDefs::PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBo
     return true;
 }
 
+bool CLuaPhysicsDefs::PhysicsSetElementProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty, std::variant<CVector, bool, int, float> argument,
+                                                  std::optional<float> argument2, std::optional<bool> argument3)
+{
+    CClientPhysics* pPhysics = pElement->GetPhysics();
+    if (CLuaPhysicsShape* pShape = dynamic_cast<CLuaPhysicsShape*>(pElement))
+    {
+        switch (eProperty)
+        {
+        }
+    }
+    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+    {
+        switch (eProperty)
+        {
+        }
+    }
+    else if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+    {
+        switch (eProperty)
+        {
+            case ePhysicsProperty::MASS:
+                if (std::holds_alternative<float>(argument))
+                {
+                    float fMass = std::get<float>(argument);
+                    if (fMass >= 0)
+                    {
+                        pRigidBody->SetMass(fMass);
+                        return true;
+                    }
+                    else
+                    {
+                        throw std::invalid_argument("Mass can not be negative.");
+                    }
+                }
+                throw std::invalid_argument(SString("Property '%s' requires float as argument.", EnumToString(eProperty)).c_str());
+                break;
+            case ePhysicsProperty::SLEEPING_THRESHOLDS:
+                if (std::holds_alternative<float>(argument))
+                {
+                    pRigidBody->SetRestitution(std::get<float>(argument));
+                    return true;
+                }
+                throw std::invalid_argument(SString("Property '%s' requires float as argument.", EnumToString(eProperty)).c_str());
+                break;
+        }
+    }
+    else if (CLuaPhysicsConstraint* pConstraint = dynamic_cast<CLuaPhysicsConstraint*>(pElement))
+    {
+        switch (eProperty)
+        {
+            case ePhysicsProperty::STIFFNESS:
+                if (CLuaPhysicsbtGeneric6DofSpring2Constraint* pGeneric6DofSprint2Constraint =
+                        dynamic_cast<CLuaPhysicsbtGeneric6DofSpring2Constraint*>(pConstraint))
+                {
+                    if (std::holds_alternative<float>(argument))
+                    {
+                        if (argument2.has_value())
+                        {
+                            pGeneric6DofSprint2Constraint->SetStiffness(std::get<int>(argument), argument2.value_or(0), argument3.value_or(false));
+                            return true;
+                        }
+                    }
+                }
+        }
+        switch (eProperty)
+        {
+
+            case ePhysicsProperty::STIFFNESS:
+            case ePhysicsProperty::PIVOT_A:
+            case ePhysicsProperty::PIVOT_B:
+            case ePhysicsProperty::LOWER_LIN_LIMIT:
+            case ePhysicsProperty::UPPER_LIN_LIMIT:
+            case ePhysicsProperty::LOWER_ANG_LIMIT:
+            case ePhysicsProperty::UPPER_ANG_LIMIT:
+            case ePhysicsProperty::BREAKING_IMPULSE_THRESHOLD:
+            case ePhysicsProperty::APPLIED_IMPULSE:
+            case ePhysicsProperty::JOINTS_FEEDBACK:
+            case ePhysicsProperty::ENABLED:
+                break;
+        }
+    }
+    switch (eProperty)
+    {
+        case ePhysicsProperty::SCALE:
+        case ePhysicsProperty::DEBUG_COLOR:
+        case ePhysicsProperty::FILTER_MASK:
+        case ePhysicsProperty::FILTER_GROUP:
+        case ePhysicsProperty::SIZE:
+        case ePhysicsProperty::RADIUS:
+        case ePhysicsProperty::HEIGHT:
+        case ePhysicsProperty::GRAVITY:
+        case ePhysicsProperty::USE_CONTINOUS:
+        case ePhysicsProperty::MOTION_THRESHOLD:
+        case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
+        case ePhysicsProperty::SLEEP:
+            break;
+    }
+    throw std::invalid_argument(SString("Property '%s' is not supported", EnumToString(eProperty)).c_str());
+}
+
 bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument)
 {
     switch (eProperty)
@@ -840,16 +938,6 @@ bool CLuaPhysicsDefs::PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticColli
 //        {
 //            switch (eProperty)
 //            {
-//                case ePhysicsProperty::STIFFNESS:
-//                    argStream.ReadNumber(intNumber);
-//                    argStream.ReadNumber(floatNumber[0]);
-//                    argStream.ReadBool(boolean);
-//                    if (!argStream.HasErrors())
-//                    {
-//                        lua_pushboolean(luaVM, pStaticConstraint->SetStiffness(intNumber, floatNumber[0], boolean));
-//                        return 1;
-//                    }
-//                    break;
 //                case ePhysicsProperty::PIVOT_A:
 //                    argStream.ReadVector3D(vector);
 //                    if (!argStream.HasErrors())

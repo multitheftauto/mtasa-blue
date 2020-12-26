@@ -17,6 +17,8 @@ class CClientPhysics;
 
 #pragma once
 
+class CPhysicsDebugDrawer;
+
 #include <list>
 #include "CClientEntity.h"
 #include "CClientPhysicsManager.h"
@@ -32,11 +34,13 @@ class CClientPhysics;
 #include "lua/physics/CLuaPhysicsBvhTriangleMeshShape.h"
 #include "lua/physics/CLuaPhysicsgimpactTriangleMeshShape.h"
 #include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
+
+#include "lua/physics/CLuaPhysicsConstraint.h"
+#include "lua/physics/CLuaPhysicsbtGeneric6DofSpring2Constraint.h"
 #include "lua/physics/CLuaPhysicsPointToPointConstraint.h"
 #include "lua/physics/CLuaPhysicsFixedConstraint.h"
-
-class CLuaPhysicsConstraint;
-class CPhysicsDebugDrawer;
+#include "lua/physics/CLuaPhysicsHidgeConstraint.h"
+#include "lua/physics/CLuaPhysicsSliderConstraint.h"
 
 struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 {

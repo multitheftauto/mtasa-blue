@@ -32,9 +32,3 @@ CLuaPhysicsFixedConstraint::CLuaPhysicsFixedConstraint(CLuaPhysicsRigidBody* pRi
 CLuaPhysicsFixedConstraint::~CLuaPhysicsFixedConstraint()
 {
 }
-
-void CLuaPhysicsFixedConstraint::SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded)
-{
-    btFixedConstraint* pConstraint = (btFixedConstraint*)GetConstraint();
-    pConstraint->setStiffness(iIndex, fStiffness, bLimitIfNeeded);
-}

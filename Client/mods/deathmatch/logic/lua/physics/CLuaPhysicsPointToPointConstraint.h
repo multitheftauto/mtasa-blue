@@ -13,8 +13,6 @@ class CLuaPhysicsPointToPointConstraint;
 
 #pragma once
 
-#include "lua/physics/CLuaPhysicsConstraint.h"
-
 class CLuaPhysicsPointToPointConstraint : public CLuaPhysicsConstraint
 {
 public:
