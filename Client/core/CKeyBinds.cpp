@@ -2311,7 +2311,13 @@ void CKeyBinds::DoPostFramePulse()
         cs.ButtonTriangle = (g_bcControls[9].bState) ? 255 : 0;            // Enter Exit
         cs.Select = (g_bcControls[10].bState) ? 255 : 0;                   // Change View
 
-        GetJoystickManager()->ApplyAxes(cs, bInVehicle);
+        bool disableGameplayControls = m_pCore->IsCursorForcedVisible() && m_pCore->IsCursorControlsToggled();
+
+        if (!disableGameplayControls)
+        {
+            GetJoystickManager()->ApplyAxes(cs, bInVehicle);
+        }
+
         // m_pCore->GetMouseControl()->ApplyAxes ( cs );
     }
 
