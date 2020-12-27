@@ -61,10 +61,8 @@ public:
     static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
-    static bool PhysicsSetElementProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty, std::variant<CVector, bool, int, float> argument,
-                                            std::optional<float> argument2, std::optional<bool> argument3);
-
-    static bool PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument);
+    static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CClientPhysics*> variant, ePhysicsProperty eProperty,
+                                                      std::variant<CVector, bool, float, int> argument);
     static bool PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,
                                               std::variant<CVector, bool, float, int, SColor> argument1, std::optional<float> argument2);
     static bool PhysicsSetStaticCollisionProperties(CLuaPhysicsStaticCollision* pStaticCollision, ePhysicsProperty eProperty,
@@ -98,8 +96,6 @@ public:
 
     static std::variant<bool, RayResult> PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecEndPosition,
                                                           CVector vecRotation, std::optional<RayOptions> options);
-    // LUA_DECLARE(PhysicsSetProperties);
-    // LUA_DECLARE(PhysicsGetProperties);
 
     static std::variant<bool, float> PhysicsGetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
 
@@ -132,3 +128,56 @@ public:
     static bool PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable);
     static bool PhysicsIsEnabled(CLuaPhysicsElement* pElement);
 };
+
+
+// the variant to visit
+using var_t = std::variant<CLuaPhysicsSphereShape*, CLuaPhysicsCapsuleShape*, CLuaPhysicsCylinderShape*, CLuaPhysicsConeShape*>;
+
+// helper constant for the visitor #3
+template <class>
+inline constexpr bool always_false_v = false;
+
+// helper type for the visitor #4
+template <class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+// explicit deduction guide (not needed as of C++20)
+template <class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+//
+//template <typename F>
+//bool TryCall(var_t pElement, F&& func)
+//{
+//    bool result = std::visit(
+//        [func](auto&& arg) {
+//            using T = std::decay_t<decltype(arg)>;
+//            if constexpr (std::is_same_v<T, CLuaPhysicsSphereShape*>)
+//                return func(arg);
+//            else if constexpr (std::is_same_v<T, CLuaPhysicsCapsuleShape*>)
+//                return func(arg);
+//            else if constexpr (std::is_same_v<T, CLuaPhysicsCylinderShape*>)
+//                return func(arg);
+//            else if constexpr (std::is_same_v<T, CLuaPhysicsConeShape*>)
+//                return func(arg);
+//            static_assert(always_false_v<T>, "non-exhaustive visitor!");
+//        },
+//        pElement);
+//
+//    return result;
+//}
+
+template <typename F>
+bool CallAlternative(CLuaPhysicsElement* pElement, F&& func)
+{
+    if (CLuaPhysicsSphereShape* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
+        return func(pSphere);
+    if (CLuaPhysicsCapsuleShape* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
+        return func(pCapsule);
+    if (CLuaPhysicsCylinderShape* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        return func(pCylinder);
+    if (CLuaPhysicsConeShape* pCone = dynamic_cast<CLuaPhysicsConeShape*>(pElement))
+        return func(pCone);
+    return false;
+}

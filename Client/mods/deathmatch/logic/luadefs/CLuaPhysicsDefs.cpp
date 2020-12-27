@@ -59,7 +59,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetRigidBodies", ArgumentParser<PhysicsGetRigidBodies>},
         {"physicsGetStaticCollisions", ArgumentParser<PhysicsGetStaticCollisions>},
         {"physicsGetConstraints", ArgumentParser<PhysicsGetConstraints>},
-        {"physicsSetProperties", ArgumentParser<PhysicsSetWorldProperties>},
+        {"physicsSetProperties", ArgumentParser<PhysicsSetProperties>},
         {"physicsSetRigidBodyProperties", ArgumentParser<PhysicsSetRigidBodyProperties>},
         {"physicsSetStaticCollisionProperties", ArgumentParser<PhysicsSetStaticCollisionProperties>},
         {"physicsGetProperties", ArgumentParser<PhysicsGetWorldProperties>},
@@ -563,188 +563,113 @@ bool CLuaPhysicsDefs::PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBo
     return true;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetElementProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty, std::variant<CVector, bool, int, float> argument,
-                                                  std::optional<float> argument2, std::optional<bool> argument3)
+bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CClientPhysics*> variant, ePhysicsProperty eProperty,
+                                           std::variant<CVector, bool, float, int> argument)
 {
-    CClientPhysics* pPhysics = pElement->GetPhysics();
-    if (CLuaPhysicsShape* pShape = dynamic_cast<CLuaPhysicsShape*>(pElement))
+    if (std::holds_alternative<CLuaPhysicsElement*>(variant))
     {
+        CLuaPhysicsElement* pElement = std::get<CLuaPhysicsElement*>(variant);
+        CClientPhysics*     pPhysics = pElement->GetPhysics();
+
         switch (eProperty)
         {
-        }
-    }
-    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
-    {
-        switch (eProperty)
-        {
-        }
-    }
-    else if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
-    {
-        switch (eProperty)
-        {
-            case ePhysicsProperty::MASS:
+            case ePhysicsProperty::RADIUS:
                 if (std::holds_alternative<float>(argument))
                 {
-                    float fMass = std::get<float>(argument);
-                    if (fMass >= 0)
+                    float fRadius = std::get<float>(argument);
+                    return CallAlternative(pElement, overloaded{
+                        [fRadius](CLuaPhysicsSphereShape* pSphere) { return pSphere->SetRadius(fRadius); },
+                        [fRadius](CLuaPhysicsCapsuleShape* pCapsule) { return pCapsule->SetRadius(fRadius); },
+                        [fRadius](CLuaPhysicsCylinderShape* pCylinder) { return pCylinder->SetRadius(fRadius); },
+                        [fRadius](CLuaPhysicsConeShape* pCone) { return pCone->SetRadius(fRadius); }});
+                }
+                break;
+        }
+    }
+    else if (std::holds_alternative<CClientPhysics*>(variant))
+    {
+        CClientPhysics* pPhysics = std::get<CClientPhysics*>(variant);
+        switch (eProperty)
+        {
+            case ePhysicsProperty::GRAVITY:
+                if (std::holds_alternative<CVector>(argument))
+                {
+                    pPhysics->SetGravity(std::get<CVector>(argument));
+                    return true;
+                }
+                throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::USE_CONTINOUS:
+                if (std::holds_alternative<bool>(argument))
+                {
+                    pPhysics->SetUseContinous(std::get<bool>(argument));
+                    return true;
+                }
+                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::SIMULATION_ENABLED:
+                if (std::holds_alternative<bool>(argument))
+                {
+                    pPhysics->SetSimulationEnabled(std::get<bool>(argument));
+                    return true;
+                }
+                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::SUBSTEPS:
+                if (std::holds_alternative<int>(argument))
+                {
+                    int subSteps = std::get<int>(argument);
+                    if (subSteps >= 1 && subSteps <= BulletPhysics::Limits::MaximumSubSteps)
                     {
-                        pRigidBody->SetMass(fMass);
+                        pPhysics->SetSubSteps(subSteps);
                         return true;
                     }
                     else
                     {
-                        throw std::invalid_argument("Mass can not be negative.");
+                        throw std::invalid_argument(SString("Substeps must be between 1 and %i", BulletPhysics::Limits::MaximumSubSteps).c_str());
                     }
                 }
-                throw std::invalid_argument(SString("Property '%s' requires float as argument.", EnumToString(eProperty)).c_str());
-                break;
-            case ePhysicsProperty::SLEEPING_THRESHOLDS:
-                if (std::holds_alternative<float>(argument))
+                throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::TRIGGEREVENTS:
+                if (std::holds_alternative<bool>(argument))
                 {
-                    pRigidBody->SetRestitution(std::get<float>(argument));
+                    pPhysics->SetTriggerEvents(std::get<bool>(argument));
                     return true;
                 }
-                throw std::invalid_argument(SString("Property '%s' requires float as argument.", EnumToString(eProperty)).c_str());
-                break;
-        }
-    }
-    else if (CLuaPhysicsConstraint* pConstraint = dynamic_cast<CLuaPhysicsConstraint*>(pElement))
-    {
-        switch (eProperty)
-        {
-            case ePhysicsProperty::STIFFNESS:
-                if (CLuaPhysicsbtGeneric6DofSpring2Constraint* pGeneric6DofSprint2Constraint =
-                        dynamic_cast<CLuaPhysicsbtGeneric6DofSpring2Constraint*>(pConstraint))
+                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::TRIGGERCOLLISIONEVENTS:
+                if (std::holds_alternative<bool>(argument))
                 {
-                    if (std::holds_alternative<float>(argument))
+                    pPhysics->SetTriggerCollisionEvents(std::get<bool>(argument));
+                    return true;
+                }
+                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::TRIGGERCONSTRAINTEVENTS:
+                if (std::holds_alternative<bool>(argument))
+                {
+                    pPhysics->SetTriggerConstraintEvents(std::get<bool>(argument));
+                    return true;
+                }
+                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+            case ePhysicsProperty::WORLDSIZE:
+                if (std::holds_alternative<CVector>(argument))
+                {
+                    CVector size = std::get<CVector>(argument);
+
+                    CVector min = BulletPhysics::Limits::WorldMinimumSize;
+                    CVector max = BulletPhysics::Limits::WorldMaximumSize;
+
+                    if (size.fX < min.fX || size.fY < min.fY || size.fZ < min.fZ)
                     {
-                        if (argument2.has_value())
-                        {
-                            pGeneric6DofSprint2Constraint->SetStiffness(std::get<int>(argument), argument2.value_or(0), argument3.value_or(false));
-                            return true;
-                        }
+                        throw std::invalid_argument(SString("World size can not be smaller than %.2fx, %.2fy, %.2fy", min.fX, min.fY, min.fZ));
                     }
-                }
-        }
-        switch (eProperty)
-        {
+                    if (size.fX > max.fX || size.fY > max.fY || size.fZ > max.fZ)
+                    {
+                        throw std::invalid_argument(SString("World size can not be greater than %.2fx, %.2fy, %.2fy", max.fX, max.fY, max.fZ));
+                    }
 
-            case ePhysicsProperty::STIFFNESS:
-            case ePhysicsProperty::PIVOT_A:
-            case ePhysicsProperty::PIVOT_B:
-            case ePhysicsProperty::LOWER_LIN_LIMIT:
-            case ePhysicsProperty::UPPER_LIN_LIMIT:
-            case ePhysicsProperty::LOWER_ANG_LIMIT:
-            case ePhysicsProperty::UPPER_ANG_LIMIT:
-            case ePhysicsProperty::BREAKING_IMPULSE_THRESHOLD:
-            case ePhysicsProperty::APPLIED_IMPULSE:
-            case ePhysicsProperty::JOINTS_FEEDBACK:
-            case ePhysicsProperty::ENABLED:
-                break;
-        }
-    }
-    switch (eProperty)
-    {
-        case ePhysicsProperty::SCALE:
-        case ePhysicsProperty::DEBUG_COLOR:
-        case ePhysicsProperty::FILTER_MASK:
-        case ePhysicsProperty::FILTER_GROUP:
-        case ePhysicsProperty::SIZE:
-        case ePhysicsProperty::RADIUS:
-        case ePhysicsProperty::HEIGHT:
-        case ePhysicsProperty::GRAVITY:
-        case ePhysicsProperty::USE_CONTINOUS:
-        case ePhysicsProperty::MOTION_THRESHOLD:
-        case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
-        case ePhysicsProperty::SLEEP:
-            break;
-    }
-    throw std::invalid_argument(SString("Property '%s' is not supported", EnumToString(eProperty)).c_str());
-}
-
-bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CClientPhysics* pPhysics, ePhysicsProperty eProperty, std::variant<CVector, bool, int> argument)
-{
-    switch (eProperty)
-    {
-        case ePhysicsProperty::GRAVITY:
-            if (std::holds_alternative<CVector>(argument))
-            {
-                pPhysics->SetGravity(std::get<CVector>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::USE_CONTINOUS:
-            if (std::holds_alternative<bool>(argument))
-            {
-                pPhysics->SetUseContinous(std::get<bool>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::SIMULATION_ENABLED:
-            if (std::holds_alternative<bool>(argument))
-            {
-                pPhysics->SetSimulationEnabled(std::get<bool>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::SUBSTEPS:
-            if (std::holds_alternative<int>(argument))
-            {
-                int subSteps = std::get<int>(argument);
-                if (subSteps >= 1 && subSteps <= BulletPhysics::Limits::MaximumSubSteps)
-                {
-                    pPhysics->SetSubSteps(subSteps);
+                    pPhysics->SetWorldSize(size);
                     return true;
                 }
-                else
-                {
-                    throw std::invalid_argument(SString("Substeps must be between 1 and %i", BulletPhysics::Limits::MaximumSubSteps).c_str());
-                }
-            }
-            throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::TRIGGEREVENTS:
-            if (std::holds_alternative<bool>(argument))
-            {
-                pPhysics->SetTriggerEvents(std::get<bool>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::TRIGGERCOLLISIONEVENTS:
-            if (std::holds_alternative<bool>(argument))
-            {
-                pPhysics->SetTriggerCollisionEvents(std::get<bool>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::TRIGGERCONSTRAINTEVENTS:
-            if (std::holds_alternative<bool>(argument))
-            {
-                pPhysics->SetTriggerConstraintEvents(std::get<bool>(argument));
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-        case ePhysicsProperty::WORLDSIZE:
-            if (std::holds_alternative<CVector>(argument))
-            {
-                CVector size = std::get<CVector>(argument);
-
-                CVector min = BulletPhysics::Limits::WorldMinimumSize;
-                CVector max = BulletPhysics::Limits::WorldMaximumSize;
-
-                if (size.fX < min.fX || size.fY < min.fY || size.fZ < min.fZ)
-                {
-                    throw std::invalid_argument(SString("World size can not be smaller than %.2fx, %.2fy, %.2fy", min.fX, min.fY, min.fZ));
-                }
-                if (size.fX > max.fX || size.fY > max.fY || size.fZ > max.fZ)
-                {
-                    throw std::invalid_argument(SString("World size can not be greater than %.2fx, %.2fy, %.2fy", max.fX, max.fY, max.fZ));
-                }
-
-                pPhysics->SetWorldSize(size);
-                return true;
-            }
-            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+                throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        }
     }
     throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
 }
@@ -2080,12 +2005,18 @@ bool CLuaPhysicsDefs::PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnab
 {
     if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
     {
-        pRigidBody->GetBtRigidBody()->SetEnabled(bEnable);
+        if (pRigidBody->IsReady())
+        {
+            pRigidBody->GetBtRigidBody()->SetEnabled(bEnable);
+        }
         return true;
     }
     else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
     {
-        pStaticCollision->GetCollisionObject()->SetEnabled(bEnable);
+        if (pStaticCollision->IsReady())
+        {
+            pStaticCollision->GetCollisionObject()->SetEnabled(bEnable);
+        }
         return true;
     }
     throw std::invalid_argument("Unsupported physics element type");
