@@ -450,6 +450,13 @@ void CMainMenu::Update()
 
     if (m_bIsFullyVisible)
     {
+        static bool versionUpdaterChecked = false;
+        if (!versionUpdaterChecked)
+        {
+            versionUpdaterChecked = true;
+            GetVersionUpdater()->OnMainMenuFullyVisible();
+        }
+
         // Grab our cursor position
         tagPOINT cursor;
         GetCursorPos(&cursor);

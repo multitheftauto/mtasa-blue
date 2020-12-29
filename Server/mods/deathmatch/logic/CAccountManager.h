@@ -14,6 +14,8 @@ class CAccountManager;
 #pragma once
 
 #include "CAccount.h"
+#include <optional>
+
 typedef uint SDbConnectionId;
 
 #define GUEST_ACCOUNT_NAME          "guest"
@@ -130,7 +132,7 @@ public:
     CAccount* GetAccountFromScriptID(uint uiScriptID);
     SString   GetActiveCaseVariation(const SString& strName);
 
-    bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword);
+    bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, std::optional<SString> password);
     bool LogOut(CClient* pClient, CClient* pEchoClient);
 
     std::shared_ptr<CLuaArgument> GetAccountData(CAccount* pAccount, const char* szKey);
