@@ -71,5 +71,5 @@ private:
     bool                               m_bIsRawData = false;
     std::map<uint32, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
-    std::list<unsigned short> m_Replaced;
+    std::list<uint32> m_Replaced;
 };

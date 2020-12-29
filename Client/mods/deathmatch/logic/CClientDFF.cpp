@@ -188,7 +188,7 @@ bool CClientDFF::DoReplaceModel(uint32 usModel, bool bAlphaTransparency)
 bool CClientDFF::HasReplaced(uint32 usModel)
 {
     // See if we have a match in our list
-    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    std::list<uint32>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
         // Compare the models
@@ -212,7 +212,7 @@ void CClientDFF::RestoreModel(uint32 usModel)
 void CClientDFF::RestoreModels()
 {
     // Loop through our list over replaced models
-    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    std::list<uint32>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
         // Restore this model
