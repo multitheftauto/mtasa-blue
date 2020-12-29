@@ -1224,7 +1224,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
-    m_pCheckBoxAlwaysShowTransferBox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAlwaysShowTransferBoxClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -4380,14 +4379,6 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
               "\nbandwidth consumption.\n");
         CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
-    return true;
-}
-
-//
-// Always show transfer box
-//
-bool CSettings::OnAlwaysShowTransferBoxClick(CGUIElement* pElement)
-{
     return true;
 }
 

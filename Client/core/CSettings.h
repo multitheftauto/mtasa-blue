@@ -380,7 +380,6 @@ protected:
     bool OnVolumetricShadowsClick(CGUIElement* pElement);
     bool OnAllowScreenUploadClick(CGUIElement* pElement);
     bool OnAllowExternalSoundsClick(CGUIElement* pElement);
-    bool OnAlwaysShowTransferBoxClick(CGUIElement* pElement);
     bool OnCustomizedSAFilesClick(CGUIElement* pElement);
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
