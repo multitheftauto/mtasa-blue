@@ -315,7 +315,7 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     {
                         bool spawnFlyingComponent = true;
 
-                        if (bitStream.Version() >= 0x06D)
+                        if (bitStream.Can(eBitStreamVersion::SetVehicleDoorState_SpawnFlyingComponent))
                         {
                             if (!bitStream.ReadBit(spawnFlyingComponent))
                                 break;

@@ -63,6 +63,7 @@ public:
     LUA_DECLARE(IsTrainDerailable);
     LUA_DECLARE(GetTrainDirection);
     LUA_DECLARE(GetTrainSpeed);
+    static std::variant<uchar, bool> GetTrainTrack(CClientVehicle* pVehicle);
     LUA_DECLARE(GetTrainPosition);
     LUA_DECLARE(IsTrainChainEngine);
     LUA_DECLARE_OOP(GetVehicleGravity);
@@ -119,6 +120,7 @@ public:
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
     LUA_DECLARE(SetTrainSpeed);
+    static bool SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack);
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleGravity);
     LUA_DECLARE(SetVehicleHeadLightColor);
@@ -141,11 +143,13 @@ public:
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
+    static bool  SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> optVariant1, std::optional<unsigned char> optVariant2);
     static float GetVehicleWheelScale(CClientVehicle* const pVehicle);
-    static bool SetVehicleWheelScale(CClientVehicle* const pVehicle, const float fWheelScale);
+    static bool  SetVehicleWheelScale(CClientVehicle* const pVehicle, const float fWheelScale);
     static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
                                                                                                 const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
+    static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);

@@ -122,7 +122,6 @@ public:
     virtual void OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) override;
     virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects,
                          const void* buffer, int width, int height) override;
-    virtual void OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo) override;
 
     // CefLoadHandler methods
     virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType) override;
@@ -165,6 +164,7 @@ public:
     virtual bool OnTooltip(CefRefPtr<CefBrowser> browser, CefString& text) override;
     virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source,
                                   int line) override;
+    virtual bool OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo& cursorInfo) override;
 
     // CefContextMenuHandler methods
     virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params,

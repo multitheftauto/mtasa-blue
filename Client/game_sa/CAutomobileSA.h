@@ -56,34 +56,37 @@
 #define MAX_PASSENGER_COUNT     8
 #define MAX_DOORS               6 // also in CDamageManager
 
-enum eCarNodes
+namespace eCarNode
 {
-    CAR_NODE_NONE = 0,
-    CAR_NODE_CHASSIS = 1,
-    CAR_NODE_WHEEL_RF = 2,
-    CAR_NODE_WHEEL_RM = 3,
-    CAR_NODE_WHEEL_RB = 4,
-    CAR_NODE_WHEEL_LF = 5,
-    CAR_NODE_WHEEL_LM = 6,
-    CAR_NODE_WHEEL_LB = 7,
-    CAR_NODE_DOOR_RF = 8,
-    CAR_NODE_DOOR_RR = 9,
-    CAR_NODE_DOOR_LF = 10,
-    CAR_NODE_DOOR_LR = 11,
-    CAR_NODE_BUMP_FRONT = 12,
-    CAR_NODE_BUMP_REAR = 13,
-    CAR_NODE_WING_RF = 14,
-    CAR_NODE_WING_LF = 15,
-    CAR_NODE_BONNET = 16,
-    CAR_NODE_BOOT = 17,
-    CAR_NODE_WINDSCREEN = 18,
-    CAR_NODE_EXHAUST = 19,
-    CAR_NODE_MISC_A = 20,
-    CAR_NODE_MISC_B = 21,
-    CAR_NODE_MISC_C = 22,
-    CAR_NODE_MISC_D = 23,
-    CAR_NODE_MISC_E = 24,
-    CAR_NUM_NODES
+    enum
+    {
+        NONE = 0,
+        CHASSIS = 1,
+        WHEEL_RF = 2,
+        WHEEL_RM = 3,
+        WHEEL_RB = 4,
+        WHEEL_LF = 5,
+        WHEEL_LM = 6,
+        WHEEL_LB = 7,
+        DOOR_RF = 8,
+        DOOR_RR = 9,
+        DOOR_LF = 10,
+        DOOR_LR = 11,
+        BUMP_FRONT = 12,
+        BUMP_REAR = 13,
+        WING_RF = 14,
+        WING_LF = 15,
+        BONNET = 16,
+        BOOT = 17,
+        WINDSCREEN = 18,
+        EXHAUST = 19,
+        MISC_A = 20,
+        MISC_B = 21,
+        MISC_C = 22,
+        MISC_D = 23,
+        MISC_E = 24,
+        NUM_NODES
+    };
 };
 
 class CBouncingPanelSAInterface
@@ -101,8 +104,8 @@ class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
     CDamageManagerSAInterface m_damageManager;
-    CDoorSAInterface          m_doors[6];
-    RwFrame*                  m_aCarNodes[CAR_NUM_NODES];
+    CDoorSAInterface          m_doors[MAX_DOORS];
+    RwFrame*                  m_aCarNodes[eCarNode::NUM_NODES];
     CBouncingPanelSAInterface m_panels[3];
     CDoorSAInterface          m_swingingChassis;
     CColPointSAInterface      m_wheelColPoint[MAX_WHEELS];
@@ -180,7 +183,7 @@ public:
     char                      field_962;
     char                      field_963;
     float                     field_964;
-    int                       field_968[4];
+    int                       m_wheelFrictionState[4];
     void*                     pNitroParticle[2];
     char                      field_980;
     char                      field_981;

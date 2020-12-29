@@ -899,7 +899,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
                 m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
+                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
         // Unsubscribe all the players
@@ -1662,7 +1662,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 // Got a player in this seat and is it bigger than the supported amount
                 // of seats in this new vehicle
                 CPed* pPed = pVehicle->GetOccupant(i);
-                if (pPed && IS_PLAYER(pPed) && (i > ucMaxPassengers))
+                if (pPed && IS_PED(pPed) && (i > ucMaxPassengers))
                 {
                     // Throw him out
                     // TODO: Maybe relocate him in the future. Find a free seat if available and put him in it.
@@ -3357,7 +3357,7 @@ bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, 
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        if (pPlayer->GetBitStreamVersion() < 0x06E)
+        if (!pPlayer->CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
             return false;
 
         CBitStream bitStream;
@@ -3615,8 +3615,13 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
         // Is the ped alive?
         if (!pPed->IsDead() && pPed->IsSpawned())
         {
+            // Reset his vehicle action, but only if not jacking
+            // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+            // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+            if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+                pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
             // Remove him from any occupied vehicle
-            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
             CVehicle* pVehicle = pPed->GetOccupiedVehicle();
             if (pVehicle)
             {
@@ -4071,7 +4076,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
             {
                 CPed* pPreviousOccupant = pVehicle->GetOccupant(uiSeat);
                 // Make sure no one is entering or he will get stuck in the entry packet handshaking and network trouble
-                if (pPreviousOccupant == NULL || (pPreviousOccupant && pPreviousOccupant->GetVehicleAction() == CPlayer::VEHICLEACTION_NONE))
+                if (pPreviousOccupant == NULL || (pPreviousOccupant && pPreviousOccupant->GetVehicleAction() == CPed::VEHICLEACTION_NONE))
                 {
                     // Toss the previous player out of it if neccessary
                     if (pPreviousOccupant)
@@ -4093,7 +4098,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
 
                     // Put him in the new vehicle
                     pPed->SetOccupiedVehicle(pVehicle, uiSeat);
-                    pPed->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                     // If he's the driver, switch on the engine
                     if (uiSeat == 0)
@@ -4115,7 +4120,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                     else
                         PlayerVehicleArguments.PushBoolean(false);
                     // Leave onPlayerVehicleEnter for backwards compatibility
-                    pPed->CallEvent("onPlayerVehicleEnter", PlayerVehicleArguments);
+                    if (IS_PLAYER(pPed))
+                        pPed->CallEvent("onPlayerVehicleEnter", PlayerVehicleArguments);
+                    else
+                        pPed->CallEvent("onPedVehicleEnter", PlayerVehicleArguments);
 
                     // Call the vehicle->player event
                     CLuaArguments VehiclePlayerArguments;
@@ -4144,7 +4152,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
     assert(pElement);
     RUN_CHILDREN(RemovePedFromVehicle(*iter))
 
-    // Verify the player and the vehicle pointer
+    // Verify the ped and the vehicle pointer
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
@@ -4154,28 +4162,28 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
         unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
         if (pVehicle)
         {
-            CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-            if (pPlayer && IS_PLAYER(pElement))
-            {
-                CLuaArguments Arguments;
-                Arguments.PushElement(pVehicle);                 // vehicle
-                Arguments.PushNumber(ucOccupiedSeat);            // seat
-                Arguments.PushBoolean(false);                    // jacker
-                Arguments.PushBoolean(true);                     // forcedByScript
-                pPlayer->CallEvent("onPlayerVehicleExit", Arguments);
+            CLuaArguments Arguments;
+            Arguments.PushElement(pVehicle);                 // vehicle
+            Arguments.PushNumber(ucOccupiedSeat);            // seat
+            Arguments.PushBoolean(false);                    // jacker
+            Arguments.PushBoolean(true);                     // forcedByScript
+            if (IS_PLAYER(pPed))
+                pPed->CallEvent("onPlayerVehicleExit", Arguments);
+            else
+                pPed->CallEvent("onPedVehicleExit", Arguments);
 
-                // Call the vehicle->player event
-                CLuaArguments Arguments2;
-                Arguments2.PushElement(pPlayer);                  // player
-                Arguments2.PushNumber(ucOccupiedSeat);            // seat
-                Arguments2.PushBoolean(false);                    // jacker
-                Arguments2.PushBoolean(true);                     // forcedByScript
-                pVehicle->CallEvent("onVehicleExit", Arguments2);
-            }
+            // Call the vehicle->ped event
+            CLuaArguments Arguments2;
+            Arguments2.PushElement(pPed);                     // player / ped
+            Arguments2.PushNumber(ucOccupiedSeat);            // seat
+            Arguments2.PushBoolean(false);                    // jacker
+            Arguments2.PushBoolean(true);                     // forcedByScript
+            pVehicle->CallEvent("onVehicleExit", Arguments2);
+
             // Remove him from the vehicle
             pVehicle->SetOccupant(NULL, ucOccupiedSeat);
             pPed->SetOccupiedVehicle(NULL, 0);
-            pPed->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
             // Tell the players
             CBitStream BitStream;
@@ -4228,20 +4236,20 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            // Remove jetpack now so it doesn't stay on (#9522#c25612)
-            if (pPed->HasJetPack())
-                pPed->SetHasJetPack(false);
-
-            // Remove choking state
-            if (pPed->IsChoking())
-                pPed->SetChoking(false);
-
             // TODO: save their animation?
 
             // Tell the players
             CBitStream BitStream;
             if (!blockName.empty() && !animName.empty())
             {
+                // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                if (pPed->HasJetPack())
+                    pPed->SetHasJetPack(false);
+
+                // Remove choking state
+                if (pPed->IsChoking())
+                    pPed->SetChoking(false);
+
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(iTime);
@@ -9163,13 +9171,15 @@ bool CStaticFunctionDefinitions::SetAllElementWaterLevel(float fLevel)
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel)
+bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
-    g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel);
+    g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(fLevel);
     BitStream.pBitStream->WriteBit(bIncludeWorldNonSeaLevel);
+    BitStream.pBitStream->WriteBit(bIncludeWorldSeaLevel);
+    BitStream.pBitStream->WriteBit(bIncludeOutsideWorldLevel);
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WORLD_WATER_LEVEL, *BitStream.pBitStream));
     return true;
 }
@@ -10034,7 +10044,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     assert(szText);
 
     RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
-    
+
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
@@ -11345,11 +11355,6 @@ bool CStaticFunctionDefinitions::CopyAccountData(CAccount* pAccount, CAccount* p
 
     m_pAccountManager->CopyAccountData(pFromAccount, pAccount);
     return true;
-}
-
-bool CStaticFunctionDefinitions::LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword)
-{
-    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), szPassword);
 }
 
 bool CStaticFunctionDefinitions::LogOut(CPlayer* pPlayer)

@@ -116,71 +116,16 @@ const CLuaArgument& CLuaArgument::operator=(const CLuaArgument& Argument)
     return Argument;
 }
 
-bool CLuaArgument::operator==(const CLuaArgument& Argument)
+bool CLuaArgument::operator==(const CLuaArgument& Argument) const
 {
-    std::set<CLuaArguments*> knownTables;
-    return CompareRecursive(Argument, &knownTables);
+    std::set<const CLuaArguments*> knownTables;
+    return IsEqualTo(Argument, &knownTables);
 }
 
-bool CLuaArgument::operator!=(const CLuaArgument& Argument)
+bool CLuaArgument::operator!=(const CLuaArgument& Argument) const
 {
-    std::set<CLuaArguments*> knownTables;
-    return !CompareRecursive(Argument, &knownTables);
-}
-
-bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables)
-{
-    // If the types differ, they're not matching
-    if (Argument.m_iType != m_iType)
-        return false;
-
-    // Compare the variables depending on the type
-    switch (m_iType)
-    {
-        case LUA_TBOOLEAN:
-        {
-            return m_bBoolean == Argument.m_bBoolean;
-        }
-
-        case LUA_TUSERDATA:
-        case LUA_TLIGHTUSERDATA:
-        {
-            return m_pUserData == Argument.m_pUserData;
-        }
-
-        case LUA_TNUMBER:
-        {
-            return m_Number == Argument.m_Number;
-        }
-
-        case LUA_TTABLE:
-        {
-            if (m_pTableData->Count() != Argument.m_pTableData->Count())
-                return false;
-
-            vector<CLuaArgument*>::const_iterator iter = m_pTableData->IterBegin();
-            vector<CLuaArgument*>::const_iterator iterCompare = Argument.m_pTableData->IterBegin();
-            while (iter != m_pTableData->IterEnd() && iterCompare != Argument.m_pTableData->IterEnd())
-            {
-                if (pKnownTables->find(m_pTableData) == pKnownTables->end())
-                {
-                    pKnownTables->insert(m_pTableData);
-                    if (*iter != *iterCompare)
-                        return false;
-                }
-
-                ++iter;
-                ++iterCompare;
-            }
-            return true;
-        }
-        case LUA_TSTRING:
-        {
-            return m_strString == Argument.m_strString;
-        }
-    }
-
-    return true;
+    std::set<const CLuaArguments*> knownTables;
+    return !IsEqualTo(Argument, &knownTables);
 }
 
 void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
@@ -981,6 +926,39 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
         }
     }
     return NULL;
+}
+
+bool CLuaArgument::IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables) const
+{
+    if (m_iType != compareTo.m_iType)
+        return false;
+
+    switch (m_iType)
+    {
+        case LUA_TBOOLEAN:
+        {
+            return m_bBoolean == compareTo.m_bBoolean;
+        }
+        case LUA_TUSERDATA:
+        case LUA_TLIGHTUSERDATA:
+        {
+            return m_pUserData == compareTo.m_pUserData;
+        }
+        case LUA_TNUMBER:
+        {
+            return m_Number == compareTo.m_Number;
+        }
+        case LUA_TTABLE:
+        {
+            return m_pTableData->IsEqualTo(*compareTo.m_pTableData, knownTables);
+        }
+        case LUA_TSTRING:
+        {
+            return m_strString == compareTo.m_strString;
+        }
+    }
+
+    return false;
 }
 
 bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
