@@ -6867,11 +6867,32 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
     }
 }
 
-
 void PostCWorld_ProcessPedsAfterPreRender()
 {
     if (m_postWorldProcessPedsAfterPreRenderHandler)
         m_postWorldProcessPedsAfterPreRenderHandler();
+
+    // Scale the object entities
+    CPools* pools = pGameInterface->GetPools();
+    for (std::uint32_t i = 0; i < MAX_OBJECTS; i++)
+    {
+        CObject* objectEntity = pools->GetObjectFromIndex(i);
+        if (!objectEntity)
+            continue;
+        auto objectInterface = objectEntity->GetObjectInterface();
+        if (objectInterface && objectEntity->GetPreRenderRequired())
+        {
+            if (objectInterface->fScale != 1.0f || objectInterface->bUpdateScale)
+            {
+                objectEntity->SetScaleInternal(*objectEntity->GetScale());
+                objectInterface->bUpdateScale = false;
+            }
+            RpClump* clump = objectInterface->m_pRwObject;
+            if (clump && clump->object.type == RP_TYPE_CLUMP)
+                objectEntity->UpdateRpHAnim();
+            objectEntity->SetPreRenderRequired(false);
+        }
+    }
 }
 
 const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;

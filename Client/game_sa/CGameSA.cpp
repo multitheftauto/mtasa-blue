@@ -208,6 +208,7 @@ CGameSA::CGameSA()
 
     CEntitySAInterface::StaticSetHooks();
     CPhysicalSAInterface::StaticSetHooks();
+    CObjectSA::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();

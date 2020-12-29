@@ -138,7 +138,7 @@ struct SSirenInfo
 
 class CTrainTrack;
 
-class CVehicle : public CElement
+class CVehicle final : public CElement
 {
     friend class CPlayer;
 
