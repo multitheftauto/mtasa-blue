@@ -13,7 +13,7 @@
 
 void CLuaBlipDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createBlip", CreateBlip},
         {"createBlipAttachedTo", CreateBlipAttachedTo},
         {"getBlipIcon", GetBlipIcon},
@@ -30,10 +30,8 @@ void CLuaBlipDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBlipDefs::AddClass(lua_State* luaVM)
@@ -193,7 +191,6 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -213,7 +210,6 @@ int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -233,7 +229,6 @@ int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -256,7 +251,6 @@ int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -276,7 +270,6 @@ int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipVisibleDistance(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 

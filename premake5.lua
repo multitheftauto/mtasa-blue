@@ -98,7 +98,7 @@ workspace "MTASA"
 		}
 
 	filter {"system:windows", "configurations:Debug"}
-		buildoptions { "/MT" } -- Don't use debug runtime when static linking
+		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
 
 	filter "system:linux"
@@ -127,13 +127,13 @@ workspace "MTASA"
 
 		group "Vendor"
 		include "vendor/cef3"
+		include "vendor/freetype"
 		include "vendor/jpeg-9b"
 		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libopus"
-		include "vendor/discordgsdk"
 	end
 
 	filter {}

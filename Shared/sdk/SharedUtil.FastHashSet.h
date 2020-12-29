@@ -45,13 +45,15 @@ namespace SharedUtil
     //
     // CFastHashSet helpers
     //
+
+    // Return true if the insertion took place
     template <class T, class T2>
-    void MapInsert(CFastHashSet<T>& collection, const T2& item)
+    bool MapInsert(CFastHashSet<T>& collection, const T2& item)
     {
-        collection.insert(item);
+        return std::get<bool>(collection.insert(item));
     }
 
-    // Remove key from collection
+    // Return true if the remove took place
     template <class T, class T2>
     bool MapRemove(CFastHashSet<T>& collection, const T2& key)
     {

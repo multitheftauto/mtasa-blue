@@ -31,4 +31,12 @@ fi
 
 # Start manual building
 export GLIBC_COMPAT=true
-./linux-build.sh $BUILD_BITS
+
+# Set the default build target
+if [ -z "$BUILD_TARGET" ]
+then
+      BUILD_TARGET=release
+fi
+echo $BUILD_TARGET
+
+./linux-build.sh $BUILD_BITS $BUILD_TARGET

@@ -678,6 +678,15 @@ struct SVehiclePuresyncFlags : public ISyncStructure
     } data;
 };
 
+
+enum class eVehicleAimDirection : unsigned char
+{
+    FORWARDS = 0,
+    LEFT,
+    BACKWARDS,
+    RIGHT,
+};
+
 struct SDrivebyDirectionSync : public ISyncStructure
 {
     enum
@@ -690,7 +699,7 @@ struct SDrivebyDirectionSync : public ISyncStructure
 
     struct
     {
-        unsigned char ucDirection : 2;
+        eVehicleAimDirection ucDirection : 2;
     } data;
 };
 
@@ -863,7 +872,7 @@ struct SFullKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (bitStream.ReadBit())
             {
@@ -897,7 +906,7 @@ struct SFullKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
             {
@@ -952,7 +961,7 @@ struct SSmallKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (bitStream.ReadBit())
             {
@@ -986,7 +995,7 @@ struct SSmallKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
             {
@@ -1936,7 +1945,7 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
         else
             data4.bBadDrivebyHitboxes = 0;
-        if (bitStream.Version() >= 0x063)
+        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
         else
             data5.bQuickStand = 0;
@@ -1958,12 +1967,12 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
         if (bitStream.Version() >= 0x059)
             bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
-        if (bitStream.Version() >= 0x063)
+        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
 
         //// Example for adding item:
-        // if ( bitStream.Version() >= 0x999 )
-        //     bitStream.WriteBits ( reinterpret_cast < const char* > ( &data9 ), BITCOUNT9 );
+        // if (bitStream.Can(eBitStreamVersion::YourGlitch))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
     }
 
     struct

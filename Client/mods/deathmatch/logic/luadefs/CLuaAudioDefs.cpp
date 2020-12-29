@@ -13,7 +13,7 @@
 
 void CLuaAudioDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Audio funcs
         {"playSoundFrontEnd", PlaySoundFrontEnd},
         {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
@@ -65,10 +65,8 @@ void CLuaAudioDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaAudioDefs::AddClass(lua_State* luaVM)
@@ -87,7 +85,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setVolume", "setSoundVolume");
     lua_classfunction(luaVM, "setPaused", "setSoundPaused");
     lua_classfunction(luaVM, "setPan", "setSoundPan");
-    lua_classfunction(luaVM, "setPannningEnabled", "setSoundPanningEnabled");
+    lua_classfunction(luaVM, "setPanningEnabled", "setSoundPanningEnabled");
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
 
     lua_classfunction(luaVM, "getLength", "getSoundLength");
