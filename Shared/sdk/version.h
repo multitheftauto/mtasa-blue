@@ -24,11 +24,7 @@
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
-#ifdef MTA_CLIENT
-#include "../../Client/build_overrides_c.h"
-#else
-#include "../../Server/build_overrides_s.h"
-#endif
+#include "../../Shared/build_overrides.h"
 
 // Old version info
 #define MTA_DM_VERSION              ( ( ( MTASA_VERSION_MAJOR ) << 8 ) | ( ( MTASA_VERSION_MINOR ) << 4 ) | ( ( MTASA_VERSION_MAINTENANCE ) << 0 ) )
