@@ -401,9 +401,6 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
 
     bool bAllowed = TriggerKeyStrokeHandler(pKey->szKey, bState, bIsConsoleInputKey);
 
-    if (bState && !bAllowed)
-        keyState = false;
-
     // Search through binds
     bool                            bFound = false;
     CKeyBind*                       pBind = NULL;
