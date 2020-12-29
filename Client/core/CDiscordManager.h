@@ -10,23 +10,22 @@
 
 #pragma once
 
-#include <discord.h>
 #include <core/CDiscordManagerInterface.h>
 #include "SharedUtil.Thread.h"
+
+namespace discord
+{
+    enum class LogLevel;
+    class Core;
+    class Activity;
+}
 
 class CDiscordManager : public CDiscordManagerInterface
 {
 public:
-    CDiscordManager();
     ~CDiscordManager();
 
-    static void  DiscordLogCallback(discord::LogLevel level, const char* message);
-    static void  OnActivityJoin(const char* joinSecret);
-    static void* DiscordThread(void* arg);
-
     void Initialize();
-    void Reconnect(bool bOnInitialization = false);
-    void DoPulse();
 
     // ActivityManager
     void UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback);            // Change it all, or ...
@@ -41,26 +40,30 @@ public:
     void RegisterPlay(bool connected);
     void Disconnect();
 
-    discord::Activity GetStoredActivity() const { return m_StoredActivity; }            // For retrieving stored information in rich presence
-
-    bool NeedsSuicide() const { return m_Suicide; }
-    void SetDead() { m_Suicide = false; }
-    void DisconnectNotification();
-
     SString GetJoinSecret();
 
 private:
+    void Reconnect(bool bOnInitialization = false);
+    void DoPulse();
     void Restore();
 
-    discord::Core*    m_DiscordCore;
-    discord::Activity m_StoredActivity;
+    static void  DiscordLogCallback(discord::LogLevel level, const char* message);
+    static void  OnActivityJoin(const char* joinSecret);
+    static void* DiscordThread(void* arg);
 
-    bool m_WaitingForServerName;
+    bool NeedsSuicide() const { return m_Suicide; }
+    void SetDead() { m_Suicide = false; }
 
-    volatile bool m_Suicide;            // Thread kill command
+    discord::Core*    m_DiscordCore = nullptr;
+    discord::Activity* m_StoredActivity;
+
+    bool m_WaitingForServerName = false;
+    bool m_Initialized = false;
+
+    volatile bool m_Suicide = false;            // Thread kill command
 
     std::mutex                 m_ThreadSafety;
-    SharedUtil::CThreadHandle* m_Thread;
+    SharedUtil::CThreadHandle* m_Thread = nullptr;
 
     CElapsedTime   m_TimeForReconnection;
     CQueryReceiver m_QueryReceiver;

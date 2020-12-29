@@ -53,6 +53,7 @@ class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
 class CServerInfo;
+enum class eAnimID;
 
 struct SVehExtrapolateSettings
 {
@@ -189,6 +190,7 @@ public:
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
+        GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot
@@ -248,8 +250,6 @@ public:
 
     bool IsNickValid(const char* szNick);
     bool IsNametagValid(const char* szNick);
-
-    bool IsGettingIntoVehicle() { return m_bIsGettingIntoVehicle; };
 
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
@@ -343,11 +343,8 @@ public:
     bool           GetDamageSent() { return m_bDamageSent; }
     void           SetDamageSent(bool b) { m_bDamageSent = b; }
 
-    void ProcessVehicleInOutKey(bool bPassenger);
-
-    void ResetVehicleInOut();
-
     void SetAllDimensions(unsigned short usDimension);
+    void SetAllInteriors(unsigned char ucInterior);
 
     static bool StaticKeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey);
     bool        KeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey);
@@ -439,6 +436,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
+    void RestreamWorld();
 
     void TriggerDiscordJoin(SString strSecret);
 
@@ -460,7 +458,6 @@ private:
 
     // Network update functions
     void DoVehicleInKeyCheck();
-    void UpdateVehicleInOut();
     void UpdatePlayerTarget();
     void UpdatePlayerWeapons();
     void UpdateTrailers();
@@ -504,6 +501,7 @@ private:
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
+    static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
     static void                              StaticPreFxRenderHandler();
     static void                              StaticPreHudRenderHandler();
     static void                              StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
@@ -511,7 +509,7 @@ private:
     static CAnimBlendAssociationSAInterface* StaticAddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                               AssocGroupId animGroup, AnimationId animID);
     static bool                              StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
-                                                                                  CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+                                                                                  CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, eAnimID animID);
     static bool StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
                                                      int* pFlags, RpClump* pClump);
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
@@ -550,12 +548,13 @@ private:
     bool                              ChokingHandler(unsigned char ucWeaponType);
     void                              PreWorldProcessHandler();
     void                              PostWorldProcessHandler();
+    void                              PostWorldProcessPedsAfterPreRenderHandler();
     void                              CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     CAnimBlendAssociationSAInterface* AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     CAnimBlendAssociationSAInterface* AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                  AssocGroupId animGroup, AnimationId animID);
     bool        AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
-                                               AnimationId animID);
+                                               eAnimID animID);
     bool        BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
@@ -718,18 +717,6 @@ private:
     bool m_bGameLoaded;
     bool m_bTriggeredIngameAndConnected;
     bool m_bGracefulDisconnect;
-
-    // Network update vars
-    unsigned long  m_ulLastVehicleInOutTime;
-    bool           m_bIsGettingOutOfVehicle;
-    bool           m_bIsGettingIntoVehicle;
-    bool           m_bIsJackingVehicle;
-    bool           m_bIsGettingJacked;
-    ElementID      m_VehicleInOutID;
-    unsigned char  m_ucVehicleInOutSeat;
-    bool           m_bNoNewVehicleTask;
-    ElementID      m_NoNewVehicleTaskReasonID;
-    CClientPlayer* m_pGettingJackedBy;
 
     CEntity*       m_pTargetedGameEntity;
     CClientEntity* m_pTargetedEntity;

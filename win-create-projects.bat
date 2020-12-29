@@ -3,9 +3,6 @@
 rem Update CEF eventually
 utils\premake5.exe install_cef
 
-rem Install Discord SDK
-utils\premake5.exe install_discord
-
 rem Generate solutions
 utils\premake5.exe vs2019
 
@@ -21,4 +18,4 @@ set SCRIPTFILE="%TEMP%\CreateMyShortcut.vbs"
 cscript //nologo %SCRIPTFILE%
 del /f /q %SCRIPTFILE%
 
-pause
+if %0 == "%~0" pause

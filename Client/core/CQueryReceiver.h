@@ -57,7 +57,7 @@ public:
     void RequestQuery(const SString& address, ushort port);
     void InvalidateSocket();
 
-    SQueryInfo GetServerResponse(uint restrictions = 0);
+    SQueryInfo GetServerResponse();
 
     uint GetElapsedTimeSinceLastQuery() { return static_cast<uint>(m_ElapsedTime.Get()); };
 

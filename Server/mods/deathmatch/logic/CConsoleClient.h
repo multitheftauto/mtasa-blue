@@ -16,7 +16,7 @@
 #include "CConsole.h"
 #include "CLogger.h"
 
-class CConsoleClient : public CElement, public CClient
+class CConsoleClient final : public CElement, public CClient
 {
 public:
     CConsoleClient(CConsole* pConsole);

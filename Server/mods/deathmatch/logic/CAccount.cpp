@@ -119,17 +119,26 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
 
     if (pData)
     {
-        if (pData->GetType() == LUA_TBOOLEAN)
+        switch (pData->GetType())
         {
-            pResult->ReadBool(pData->GetStrValue() == "true");
-        }
-        else if (pData->GetType() == LUA_TNUMBER)
-        {
+        case LUA_TBOOLEAN:
+            pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
+            break;
+
+        case LUA_TNUMBER:
             pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
-        }
-        else
-        {
+            break;
+
+        case LUA_TNIL:
+            break;
+
+        case LUA_TSTRING:
             pResult->ReadString(pData->GetStrValue());
+            break;
+
+        default:
+            dassert(0); // It never should hit this, if so, something corrupted
+            break;
         }
     }
     else

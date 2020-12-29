@@ -57,6 +57,9 @@ CCore::CCore() : m_DiscordManager(new CDiscordManager())
     ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
 
+    // Initialize discord manager
+    m_DiscordManager->Initialize();
+
     // Create a logger instance.
     m_pConsoleLogger = new CConsoleLogger();
 
@@ -1006,9 +1009,6 @@ void CCore::CreateXML()
 
     // Load XML-dependant subsystems
     m_ClientVariables.Load();
-
-    // Initialize discord rich presence after client variables have been loaded completely as it is dependant on CVars
-    m_DiscordManager->Initialize();
 }
 
 void CCore::DestroyGame()

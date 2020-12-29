@@ -203,11 +203,11 @@ namespace SharedUtil
     // std::set helpers
     //
 
-    // Update or add an item
+    // Return true if the insertion took place
     template <class T, class TR, class T2>
-    void MapInsert(std::set<T, TR>& collection, const T2& item)
+    bool MapInsert(std::set<T, TR>& collection, const T2& item)
     {
-        collection.insert(item);
+        return std::get<bool>(collection.insert(item));
     }
 
 }            // namespace SharedUtil

@@ -5,6 +5,23 @@ labels: bug
 
 ---
 
+<!--
+  ___ __  __ ____   ___  ____ _____  _    _   _ _____ 
+ |_ _|  \/  |  _ \ / _ \|  _ \_   _|/ \  | \ | |_   _|
+  | || |\/| | |_) | | | | |_) || | / _ \ |  \| | | |  
+  | || |  | |  __/| |_| |  _ < | |/ ___ \| |\  | | |  
+ |___|_|  |_|_|    \___/|_| \_\|_/_/   \_\_| \_| |_|     
+
+IF YOU ARE REPORTING A CHEAT OR A SECURITY VULNERABILITY... STOP!
+
+DO NOT MAKE A PUBLIC POST. GO BACK. CLICK THE 'VIEW POLICY' BUTTON.
+
+IF YOU HAVE TROUBLE FINDING THE RIGHT LINK:
+
+  https://github.com/multitheftauto/mtasa-blue/security/policy
+
+-->
+
 **Describe the bug**
 <!-- A clear and concise description of what the bug is. -->
 

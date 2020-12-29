@@ -184,6 +184,22 @@ typedef struct eControlStatesSA
     DWORD dwKeyHeld;
 } eControlStatesSA;
 
+enum class eVehicleModelTypes
+{
+    AUTOMOBILE = 0,
+    MONSTERTRUCK,
+    QUADBIKE,
+    HELICOPTER,
+    PLANE,
+    BOAT,
+    TRAIN,
+    FHELI, // RC ?
+    FPLANE, // RC ?
+    BIKE,
+    BMX,
+    TRAILER,
+};
+
 enum eVehicleTypes
 {
     VT_LANDSTAL = 400,
@@ -1534,6 +1550,13 @@ enum eVehicleDummies
     EXHAUST_SECONDARY,
     WING_AIRTRAIL,
     VEH_GUN,
+};
+
+enum class eResizableVehicleWheelGroup
+{
+    FRONT_AXLE = 0,
+    REAR_AXLE,
+    ALL_WHEELS = 0xFF,
 };
 
 enum eObjectProperty

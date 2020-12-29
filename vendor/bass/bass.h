@@ -1,6 +1,6 @@
 /*
 	BASS 2.4 C/C++ header file
-	Copyright (c) 1999-2019 Un4seen Developments Ltd.
+	Copyright (c) 1999-2020 Un4seen Developments Ltd.
 
 	See the BASS.CHM file for more detailed documentation
 */
@@ -151,6 +151,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_WASAPI_PERSIST	65
 #define BASS_CONFIG_REC_WASAPI		66
 #define BASS_CONFIG_ANDROID_AAUDIO	67
+#define BASS_CONFIG_SAMPLE_ONEHANDLE	69
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
@@ -202,6 +203,7 @@ typedef struct {
 #define BASS_DEVICE_DEFAULT		2
 #define BASS_DEVICE_INIT		4
 #define BASS_DEVICE_LOOPBACK	8
+#define BASS_DEVICE_DEFAULTCOM	128
 
 #define BASS_DEVICE_TYPE_MASK			0xff000000
 #define BASS_DEVICE_TYPE_NETWORK		0x01000000
@@ -399,6 +401,7 @@ typedef struct {
 #define BASS_CTYPE_STREAM_CA	0x10007
 #define BASS_CTYPE_STREAM_MF	0x10008
 #define BASS_CTYPE_STREAM_AM	0x10009
+#define BASS_CTYPE_STREAM_SAMPLE	0x1000a
 #define BASS_CTYPE_STREAM_DUMMY		0x18000
 #define BASS_CTYPE_STREAM_DEVICE	0x18001
 #define BASS_CTYPE_STREAM_WAV	0x40000 // WAVE flag, LOWORD=codec
@@ -511,6 +514,10 @@ enum
 #define EAX_PRESET_DIZZY           EAX_ENVIRONMENT_DIZZY,0.139F,17.234F,0.666F
 #define EAX_PRESET_PSYCHOTIC       EAX_ENVIRONMENT_PSYCHOTIC,0.486F,7.563F,0.806F
 
+// BASS_SampleGetChannel flags
+#define BASS_SAMCHAN_NEW		1
+#define BASS_SAMCHAN_STREAM		2
+
 typedef DWORD (CALLBACK STREAMPROC)(HSTREAM handle, void *buffer, DWORD length, void *user);
 /* User stream callback function.
 handle : The stream that needs writing
@@ -521,7 +528,7 @@ RETURN : Number of bytes written. Set the BASS_STREAMPROC_END flag to end the st
 
 #define BASS_STREAMPROC_END		0x80000000	// end of user stream flag
 
-// special STREAMPROCs
+// Special STREAMPROCs
 #define STREAMPROC_DUMMY		(STREAMPROC*)0		// "dummy" stream
 #define STREAMPROC_PUSH			(STREAMPROC*)-1		// push stream
 #define STREAMPROC_DEVICE		(STREAMPROC*)-2		// device mix stream
@@ -631,6 +638,8 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_ATTRIB_BITRATE			12
 #define BASS_ATTRIB_BUFFER			13
 #define BASS_ATTRIB_GRANULE			14
+#define BASS_ATTRIB_USER			15
+#define BASS_ATTRIB_TAIL			16
 #define BASS_ATTRIB_MUSIC_AMPLIFY	0x100
 #define BASS_ATTRIB_MUSIC_PANSEP	0x101
 #define BASS_ATTRIB_MUSIC_PSCALER	0x102
@@ -646,6 +655,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 
 // BASS_ChannelGetData flags
 #define BASS_DATA_AVAILABLE	0			// query how much data is buffered
+#define BASS_DATA_NOREMOVE	0x10000000	// flag: don't remove data from recording buffer
 #define BASS_DATA_FIXED		0x20000000	// flag: return 8.24 fixed-point data
 #define BASS_DATA_FLOAT		0x40000000	// flag: return floating-point sample data
 #define BASS_DATA_FFT256	0x80000000	// 256 sample FFT
@@ -667,6 +677,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_LEVEL_STEREO	2
 #define BASS_LEVEL_RMS		4
 #define BASS_LEVEL_VOLPAN	8
+#define BASS_LEVEL_NOREMOVE	16
 
 // BASS_ChannelGetTags types : what's returned
 #define BASS_TAG_ID3		0	// ID3v1 tags : TAG_ID3 structure
@@ -685,6 +696,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_TAG_WAVEFORMAT	14	// WAVE format : WAVEFORMATEEX structure
 #define BASS_TAG_AM_MIME	15	// Android Media MIME type : ASCII string
 #define BASS_TAG_AM_NAME	16	// Android Media codec name : ASCII string
+#define BASS_TAG_ID3V2_2	17	// ID3v2 tags (2nd block) : variable length block
 #define BASS_TAG_RIFF_INFO	0x100 // RIFF "INFO" tags : series of null-terminated ANSI strings
 #define BASS_TAG_RIFF_BEXT	0x101 // RIFF/BWF "bext" tags : TAG_BEXT structure
 #define BASS_TAG_RIFF_CART	0x102 // RIFF/BWF "cart" tags : TAG_CART structure
@@ -1005,9 +1017,9 @@ status : The notification (BASS_IOSNOTIFY_xxx) */
 BOOL BASSDEF(BASS_SetConfig)(DWORD option, DWORD value);
 DWORD BASSDEF(BASS_GetConfig)(DWORD option);
 BOOL BASSDEF(BASS_SetConfigPtr)(DWORD option, const void *value);
-void *BASSDEF(BASS_GetConfigPtr)(DWORD option);
-DWORD BASSDEF(BASS_GetVersion)();
-int BASSDEF(BASS_ErrorGetCode)();
+const void *BASSDEF(BASS_GetConfigPtr)(DWORD option);
+DWORD BASSDEF(BASS_GetVersion)(void);
+int BASSDEF(BASS_ErrorGetCode)(void);
 BOOL BASSDEF(BASS_GetDeviceInfo)(DWORD device, BASS_DEVICEINFO *info);
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !(WINAPI_FAMILY && WINAPI_FAMILY!=WINAPI_FAMILY_DESKTOP_APP)
 BOOL BASSDEF(BASS_Init)(int device, DWORD freq, DWORD flags, HWND win, const GUID *dsguid);
@@ -1015,30 +1027,31 @@ BOOL BASSDEF(BASS_Init)(int device, DWORD freq, DWORD flags, HWND win, const GUI
 BOOL BASSDEF(BASS_Init)(int device, DWORD freq, DWORD flags, void *win, void *dsguid);
 #endif
 BOOL BASSDEF(BASS_SetDevice)(DWORD device);
-DWORD BASSDEF(BASS_GetDevice)();
-BOOL BASSDEF(BASS_Free)();
+DWORD BASSDEF(BASS_GetDevice)(void);
+BOOL BASSDEF(BASS_Free)(void);
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !(WINAPI_FAMILY && WINAPI_FAMILY!=WINAPI_FAMILY_DESKTOP_APP)
 void *BASSDEF(BASS_GetDSoundObject)(DWORD object);
 #endif
 BOOL BASSDEF(BASS_GetInfo)(BASS_INFO *info);
 BOOL BASSDEF(BASS_Update)(DWORD length);
-float BASSDEF(BASS_GetCPU)();
-BOOL BASSDEF(BASS_Start)();
-BOOL BASSDEF(BASS_Stop)();
-BOOL BASSDEF(BASS_Pause)();
-BOOL BASSDEF(BASS_IsStarted)();
+float BASSDEF(BASS_GetCPU)(void);
+BOOL BASSDEF(BASS_Start)(void);
+BOOL BASSDEF(BASS_Stop)(void);
+BOOL BASSDEF(BASS_Pause)(void);
+BOOL BASSDEF(BASS_IsStarted)(void);
 BOOL BASSDEF(BASS_SetVolume)(float volume);
-float BASSDEF(BASS_GetVolume)();
+float BASSDEF(BASS_GetVolume)(void);
 
 HPLUGIN BASSDEF(BASS_PluginLoad)(const char *file, DWORD flags);
 BOOL BASSDEF(BASS_PluginFree)(HPLUGIN handle);
+BOOL BASSDEF(BASS_PluginEnable)(HPLUGIN handle, BOOL enable);
 const BASS_PLUGININFO *BASSDEF(BASS_PluginGetInfo)(HPLUGIN handle);
 
 BOOL BASSDEF(BASS_Set3DFactors)(float distf, float rollf, float doppf);
 BOOL BASSDEF(BASS_Get3DFactors)(float *distf, float *rollf, float *doppf);
 BOOL BASSDEF(BASS_Set3DPosition)(const BASS_3DVECTOR *pos, const BASS_3DVECTOR *vel, const BASS_3DVECTOR *front, const BASS_3DVECTOR *top);
 BOOL BASSDEF(BASS_Get3DPosition)(BASS_3DVECTOR *pos, BASS_3DVECTOR *vel, BASS_3DVECTOR *front, BASS_3DVECTOR *top);
-void BASSDEF(BASS_Apply3D)();
+void BASSDEF(BASS_Apply3D)(void);
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !(WINAPI_FAMILY && WINAPI_FAMILY!=WINAPI_FAMILY_DESKTOP_APP)
 BOOL BASSDEF(BASS_SetEAXParameters)(int env, float vol, float decay, float damp);
 BOOL BASSDEF(BASS_GetEAXParameters)(DWORD *env, float *vol, float *decay, float *damp);
@@ -1054,7 +1067,7 @@ BOOL BASSDEF(BASS_SampleSetData)(HSAMPLE handle, const void *buffer);
 BOOL BASSDEF(BASS_SampleGetData)(HSAMPLE handle, void *buffer);
 BOOL BASSDEF(BASS_SampleGetInfo)(HSAMPLE handle, BASS_SAMPLE *info);
 BOOL BASSDEF(BASS_SampleSetInfo)(HSAMPLE handle, const BASS_SAMPLE *info);
-HCHANNEL BASSDEF(BASS_SampleGetChannel)(HSAMPLE handle, BOOL onlynew);
+DWORD BASSDEF(BASS_SampleGetChannel)(HSAMPLE handle, DWORD flags);
 DWORD BASSDEF(BASS_SampleGetChannels)(HSAMPLE handle, HCHANNEL *channels);
 BOOL BASSDEF(BASS_SampleStop)(HSAMPLE handle);
 
@@ -1070,8 +1083,8 @@ DWORD BASSDEF(BASS_StreamPutFileData)(HSTREAM handle, const void *buffer, DWORD 
 BOOL BASSDEF(BASS_RecordGetDeviceInfo)(DWORD device, BASS_DEVICEINFO *info);
 BOOL BASSDEF(BASS_RecordInit)(int device);
 BOOL BASSDEF(BASS_RecordSetDevice)(DWORD device);
-DWORD BASSDEF(BASS_RecordGetDevice)();
-BOOL BASSDEF(BASS_RecordFree)();
+DWORD BASSDEF(BASS_RecordGetDevice)(void);
+BOOL BASSDEF(BASS_RecordFree)(void);
 BOOL BASSDEF(BASS_RecordGetInfo)(BASS_RECORDINFO *info);
 const char *BASSDEF(BASS_RecordGetInputName)(int input);
 BOOL BASSDEF(BASS_RecordSetInput)(int input, DWORD flags, float volume);
