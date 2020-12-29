@@ -221,7 +221,7 @@ public:
     virtual void SetRotationDegrees(const CVector& vecDegrees);
 
     virtual inline unsigned short GetDimension() { return m_usDimension; }
-    virtual void                  SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    virtual void                  SetDimension(unsigned short usDimension);
 
     virtual void ModelRequestCallback(CModelInfo* pModelInfo){};
 

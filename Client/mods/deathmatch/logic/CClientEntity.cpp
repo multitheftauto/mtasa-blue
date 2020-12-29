@@ -593,6 +593,20 @@ void CClientEntity::SetRotationDegrees(const CVector& vecDegrees)
     SetRotationRadians(vecTemp);
 }
 
+void CClientEntity::SetDimension(unsigned short usDimension)
+{
+    if (m_usDimension == usDimension)
+        return;
+
+    unsigned int usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onClientElementDimensionChange", Arguments, true);
+}
+
 bool CClientEntity::IsOutOfBounds()
 {
     CVector vecPosition;

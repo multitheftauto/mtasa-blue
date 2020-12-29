@@ -13,30 +13,23 @@
 
 #include "CPacket.h"
 #include <CVector.h>
-#include "../CPlayerStats.h"
 
-struct sPlayerStat
-{
-    unsigned short id;
-    float          value;
-};
-
-class CPlayerStatsPacket : public CPacket
+class CPlayerStatsPacket final : public CPacket
 {
 public:
-    ~CPlayerStatsPacket();
+    ~CPlayerStatsPacket() = default;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_STATS; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_STATS; }
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
     void Add(unsigned short usID, float fValue);
-    void Remove(unsigned short usID, float fValue);
-    void Clear();
+    void Remove(unsigned short usID, float fValue) { m_map.erase(usID); }
 
-    int GetSize() { return m_List.size(); }
+    void   Clear() noexcept { m_map.clear(); }
+    size_t GetSize() const noexcept { return m_map.size(); }
 
 private:
-    map<unsigned short, sPlayerStat> m_List;
+    std::map<unsigned short, float> m_map;            // id - value pairs
 };

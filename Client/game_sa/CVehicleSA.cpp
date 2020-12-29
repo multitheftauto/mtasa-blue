@@ -18,60 +18,6 @@ bool            g_bVehiclePointerInvalid = false;
 
 namespace
 {
-    void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)
-    {
-        rwOutMatrix.right = (RwV3d&)mat.vRight;
-        rwOutMatrix.up = (RwV3d&)mat.vFront;
-        rwOutMatrix.at = (RwV3d&)mat.vUp;
-        rwOutMatrix.pos = (RwV3d&)mat.vPos;
-    }
-
-    void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut)
-    {
-        matOut.vRight = (CVector&)rwMatrix.right;
-        matOut.vFront = (CVector&)rwMatrix.up;
-        matOut.vUp = (CVector&)rwMatrix.at;
-        matOut.vPos = (CVector&)rwMatrix.pos;
-    }
-
-    void RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation)
-    {
-        CMatrix matTemp;
-        RwMatrixToCMatrix(rwMatrix, matTemp);
-        vecOutRotation = matTemp.GetRotation();
-    }
-
-    void RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation)
-    {
-        CMatrix matTemp;
-        RwMatrixToCMatrix(rwInOutMatrix, matTemp);
-        matTemp.SetRotation(vecRotation);
-        rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
-        rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
-        rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
-    }
-
-    void RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition) { vecOutPosition = (CVector&)rwMatrix.pos; }
-
-    void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) { rwInOutMatrix.pos = (RwV3d&)vecPosition; }
-
-    void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale)
-    {
-        CMatrix matTemp;
-        RwMatrixToCMatrix(rwMatrix, matTemp);
-        vecOutScale = matTemp.GetScale();
-    }
-
-    void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale)
-    {
-        CMatrix matTemp;
-        RwMatrixToCMatrix(rwInOutMatrix, matTemp);
-        matTemp.SetScale(vecScale);
-        rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
-        rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
-        rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
-    }
-
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
         CVehicleSA* pVehicleSA = (CVehicleSA*)data;
@@ -150,6 +96,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
     //                              ModelID, Position, IsMissionVehicle
 
     m_pHandlingData = NULL;
+    m_pFlyingHandlingData = NULL;
     m_pSuspensionLines = NULL;
 
     DWORD dwReturn = 0;
@@ -1881,12 +1828,25 @@ CHandlingEntry* CVehicleSA::GetHandlingData()
     return m_pHandlingData;
 }
 
+CFlyingHandlingEntry* CVehicleSA::GetFlyingHandlingData()
+{
+    return m_pFlyingHandlingData;
+}
+
 void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
 {
     // Store the handling and recalculate it
     m_pHandlingData = static_cast<CHandlingEntrySA*>(pHandling);
     GetVehicleInterface()->pHandlingData = m_pHandlingData->GetInterface();
     RecalculateHandling();
+}
+
+void CVehicleSA::SetFlyingHandlingData(CFlyingHandlingEntry* pFlyingHandling)
+{
+    if (!pFlyingHandling)
+        return;
+    m_pFlyingHandlingData = static_cast<CFlyingHandlingEntrySA*>(pFlyingHandling);
+    GetVehicleInterface()->pFlyingHandlingData = m_pFlyingHandlingData->GetInterface();
 }
 
 void CVehicleSA::RecalculateHandling()
@@ -2003,6 +1963,12 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
             break;
     }
     return false;
+}
+
+int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
+{
+    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
+    return vehicle->m_wheelFrictionState[eWheelPosition];
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
@@ -2388,7 +2354,7 @@ bool CVehicleSA::SetComponentRotation(const SString& vehicleComponent, const CVe
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixSetRotation(pComponent->pFrame->modelling, vecRotation);
+        pGame->GetRenderWareSA()->RwMatrixSetRotation(pComponent->pFrame->modelling, vecRotation);
         return true;
     }
     return false;
@@ -2399,7 +2365,7 @@ bool CVehicleSA::GetComponentRotation(const SString& vehicleComponent, CVector& 
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixGetRotation(pComponent->pFrame->modelling, vecRotation);
+        pGame->GetRenderWareSA()->RwMatrixGetRotation(pComponent->pFrame->modelling, vecRotation);
         return true;
     }
     return false;
@@ -2410,7 +2376,7 @@ bool CVehicleSA::SetComponentPosition(const SString& vehicleComponent, const CVe
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixSetPosition(pComponent->pFrame->modelling, vecPosition);
+        pGame->GetRenderWareSA()->RwMatrixSetPosition(pComponent->pFrame->modelling, vecPosition);
         return true;
     }
     return false;
@@ -2421,7 +2387,7 @@ bool CVehicleSA::GetComponentPosition(const SString& vehicleComponent, CVector& 
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixGetPosition(pComponent->pFrame->modelling, vecPositionModelling);
+        pGame->GetRenderWareSA()->RwMatrixGetPosition(pComponent->pFrame->modelling, vecPositionModelling);
         return true;
     }
     return false;
@@ -2432,7 +2398,7 @@ bool CVehicleSA::SetComponentScale(const SString& vehicleComponent, const CVecto
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixSetScale(pComponent->pFrame->modelling, vecScale);
+        pGame->GetRenderWareSA()->RwMatrixSetScale(pComponent->pFrame->modelling, vecScale);
         return true;
     }
     return false;
@@ -2443,7 +2409,7 @@ bool CVehicleSA::GetComponentScale(const SString& vehicleComponent, CVector& vec
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixGetScale(pComponent->pFrame->modelling, vecScaleModelling);
+        pGame->GetRenderWareSA()->RwMatrixGetScale(pComponent->pFrame->modelling, vecScaleModelling);
         return true;
     }
     return false;
@@ -2460,7 +2426,7 @@ bool CVehicleSA::GetComponentMatrix(const SString& vehicleComponent, CMatrix& ma
     // Check validty
     if (pComponent && pComponent->pFrame != NULL)
     {
-        RwMatrixToCMatrix(pComponent->pFrame->modelling, matOutOrientation);
+        pGame->GetRenderWareSA()->RwMatrixToCMatrix(pComponent->pFrame->modelling, matOutOrientation);
         return true;
     }
     return false;
@@ -2472,7 +2438,7 @@ bool CVehicleSA::SetComponentMatrix(const SString& vehicleComponent, const CMatr
     // Check validty
     if (pComponent && pComponent->pFrame != NULL)
     {
-        CMatrixToRwMatrix(matOrientation, pComponent->pFrame->modelling);
+        pGame->GetRenderWareSA()->CMatrixToRwMatrix(matOrientation, pComponent->pFrame->modelling);
         return true;
     }
     return false;
@@ -2493,7 +2459,7 @@ bool CVehicleSA::GetComponentParentToRootMatrix(const SString& vehicleComponent,
             if (pFrame)
             {
                 CMatrix matFrame;
-                RwMatrixToCMatrix(pFrame->modelling, matFrame);
+                pGame->GetRenderWareSA()->RwMatrixToCMatrix(pFrame->modelling, matFrame);
                 matCombo = matFrame * matCombo;
             }
         }
@@ -2697,7 +2663,7 @@ void CVehicleSA::UpdateLandingGearPosition()
             // Update Air Resistance
             float fDragCoeff = GetHandlingData()->GetDragCoeff();
 
-            const float& fFlyingHandlingGearUpR = pVehicle->pFlyingHandlingData->GearUpR;
+            const float& fFlyingHandlingGearUpR = pVehicle->pFlyingHandlingData->fGearUpR;
             pVehicle->m_fAirResistance = fDragCoeff / 1000.0f * 0.5f * fFlyingHandlingGearUpR;
         }
     }

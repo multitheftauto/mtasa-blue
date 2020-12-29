@@ -10430,22 +10430,22 @@ static const char* const playerClothesTex[] = {
     "zorro",
 };
 
-std::map<ushort, const char*> CModelNames::ms_ModelIDNameMap;
-std::map<SString, ushort>     CModelNames::ms_NameModelIDMap;
+std::map<uint32, const char*> CModelNames::ms_ModelIDNameMap;
+std::map<SString, uint32>     CModelNames::ms_NameModelIDMap;
 
-std::map<ushort, const char*> CModelNames::ms_ClothesModelIDNameMap;
-std::map<SString, ushort>     CModelNames::ms_NameClothesModelIDMap;
+std::map<uint32, const char*> CModelNames::ms_ClothesModelIDNameMap;
+std::map<SString, uint32>     CModelNames::ms_NameClothesModelIDMap;
 
-std::map<ushort, const char*> CModelNames::ms_ClothesTexIDNameMap;
-std::map<SString, ushort>     CModelNames::ms_NameClothesTexIDMap;
+std::map<uint32, const char*> CModelNames::ms_ClothesTexIDNameMap;
+std::map<SString, uint32>     CModelNames::ms_NameClothesTexIDMap;
 
 //
 // Get a model ID from its name (case insensitive)
 //
-ushort CModelNames::GetModelID(const SString& strName)
+uint32 CModelNames::GetModelID(const SString& strName)
 {
     InitializeMaps();
-    ushort* pusModelID = MapFind(ms_NameModelIDMap, strName.ToLower());
+    uint32* pusModelID = MapFind(ms_NameModelIDMap, strName.ToLower());
     if (pusModelID)
         return *pusModelID;
     return INVALID_MODEL_ID;
@@ -10454,10 +10454,10 @@ ushort CModelNames::GetModelID(const SString& strName)
 //
 // Get a clothes texture ID from its name (case insensitive)
 //
-ushort CModelNames::GetClothesTexID(const SString& strName)
+uint32 CModelNames::GetClothesTexID(const SString& strName)
 {
     InitializeMaps();
-    ushort* pusModelID = MapFind(ms_NameClothesTexIDMap, strName.ToLower());
+    uint32* pusModelID = MapFind(ms_NameClothesTexIDMap, strName.ToLower());
     if (pusModelID)
         return *pusModelID;
     return INVALID_MODEL_ID;
@@ -10466,7 +10466,7 @@ ushort CModelNames::GetClothesTexID(const SString& strName)
 //
 // Get a model name from its ID
 //
-const char* CModelNames::GetModelName(ushort usModelID)
+const char* CModelNames::GetModelName(uint32 usModelID)
 {
     InitializeMaps();
     const char** pszName = MapFind(ms_ModelIDNameMap, usModelID);
@@ -10479,7 +10479,7 @@ const char* CModelNames::GetModelName(ushort usModelID)
 // Get a model ID from a string which could be a name or a number.
 // If the name starts with "txd", assume it's refering to a global txd
 //
-ushort CModelNames::ResolveModelID(const SString& strModelName)
+uint32 CModelNames::ResolveModelID(const SString& strModelName)
 {
     // Check if it's a number
     bool bIsNumber = true;
@@ -10493,9 +10493,9 @@ ushort CModelNames::ResolveModelID(const SString& strModelName)
     // Check if it starts with "txd"
     if (strModelName.BeginsWithI("txd"))
     {
-        ushort usModelID = atoi(strModelName.SubStr(3));
+        uint32 usModelID = atoi(strModelName.SubStr(3));
         if (usModelID)
-            return 20000 + usModelID;            // Encode global txd as model id 20000+
+            return g_pGame->GetBaseIDforTXD() + usModelID;            // Encode global txd as model id 20000+
     }
 
     // Now search for the name
@@ -10505,7 +10505,7 @@ ushort CModelNames::ResolveModelID(const SString& strModelName)
 //
 // Get a file ID in player.img from a string which could be a name or a number.
 //
-ushort CModelNames::ResolveClothesTexID(const SString& strTexNameOrNumber)
+uint32 CModelNames::ResolveClothesTexID(const SString& strTexNameOrNumber)
 {
     // Check if it's a number
     uint bHasOnlyDigits = (!strTexNameOrNumber.empty() && strTexNameOrNumber.find_first_not_of("0123456789") == SString::npos);

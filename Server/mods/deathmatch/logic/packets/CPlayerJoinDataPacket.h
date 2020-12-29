@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include "../../Config.h"
 
-class CPlayerJoinDataPacket : public CPacket
+class CPlayerJoinDataPacket final : public CPacket
 {
 public:
     virtual bool  RequiresSourcePlayer() const { return false; }

@@ -9,7 +9,7 @@
  *****************************************************************************/
 #pragma once
 
-class CSyncSettingsPacket : public CPacket
+class CSyncSettingsPacket final : public CPacket
 {
 public:
     CSyncSettingsPacket(){};

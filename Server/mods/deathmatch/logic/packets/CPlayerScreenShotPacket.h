@@ -10,7 +10,7 @@
  *****************************************************************************/
 #pragma once
 
-class CPlayerScreenShotPacket : public CPacket
+class CPlayerScreenShotPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SCREENSHOT; };
