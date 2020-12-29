@@ -87,6 +87,21 @@ namespace lua
         return 1;
     }
 
+    template <typename... Ts>
+    int Push(lua_State* L, const std::variant<Ts...>&& val)
+    {
+        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
+    }
+
+    template <typename T>
+    int Push(lua_State* L, const std::optional<T>&& val)
+    {
+        if (val.has_value())
+            return Push(L, val.value());
+        else
+            return Push(L, nullptr);
+     }
+
     inline int Push(lua_State* L, const CVector2D& value)
     {
         lua_pushvector(L, value);
@@ -111,63 +126,6 @@ namespace lua
         return 1;
     }
 
-    // Overload for enum types only
-    template <typename T>
-    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T& val)
-    {
-        // Push<string> must be defined before this function, otherwise it wont compile
-        return Push(L, EnumToString(val));
-    }
-
-    // Overload for pointers to classes. We boldly assume that these are script entities
-    template <typename T>
-    std::enable_if_t<std::is_class_v<T>, int> Push(lua_State* L, T* val)
-    {
-        lua_pushelement(L, val);
-        return 1;
-    }
-
-    /*****************************************************************\
-    * The functions below may depend on each other, so they need to be
-    * forward declared.
-    * Please define functions that call `Push` after this line.
-    \*****************************************************************/
-
-    template <typename... Ts>
-    int Push(lua_State* L, const std::variant<Ts...>& val);
-
-    template <typename T>
-    int Push(lua_State* L, const std::optional<T>& val);
-
-    template <typename T, size_t N>
-    int Push(lua_State* L, const std::array<T, N>& val);
-
-    template <typename T>
-    int Push(lua_State* L, const std::vector<T>& val);
-
-    template <typename K, typename V>
-    int Push(lua_State* L, const std::unordered_map<K, V>& val);
-
-    template<typename... Ts>
-    int Push(lua_State* L, const std::tuple<Ts...>& tuple);
-
-    // Define after this line, declare above.
-
-    template <typename... Ts>
-    int Push(lua_State* L, const std::variant<Ts...>& val)
-    {
-        return std::visit([L](const auto& value) -> int { return Push(L, value); }, val);
-    }
-
-    template <typename T>
-    int Push(lua_State* L, const std::optional<T>& val)
-    {
-        if (val.has_value())
-            return Push(L, val.value());
-        else
-            return Push(L, nullptr);
-    }
-
     template <typename T, size_t N>
     int Push(lua_State* L, const std::array<T, N>& val)
     {
@@ -184,11 +142,11 @@ namespace lua
     }
 
     template <typename T>
-    int Push(lua_State* L, const std::vector<T>& val)
+    int Push(lua_State* L, const std::vector<T>&& val)
     {
         lua_newtable(L);
         int i = 1;
-        for (const auto& v : val)
+        for (auto&& v : val)
         {
             Push(L, i++);
             Push(L, v);
@@ -200,10 +158,10 @@ namespace lua
     }
 
     template <typename K, typename V>
-    int Push(lua_State* L, const std::unordered_map<K, V>& val)
+    int Push(lua_State* L, const std::unordered_map<K, V>&& val)
     {
         lua_newtable(L);
-        for (const auto& [k, v] : val)
+        for (auto&& [k, v] : val)
         {
             Push(L, k);
             Push(L, v);
@@ -216,10 +174,39 @@ namespace lua
 
     // Tuples can be used to return multiple results
     template<typename... Ts>
-    int Push(lua_State* L, const std::tuple<Ts...>& tuple)
+    int Push(lua_State* L, const std::tuple<Ts...>&& tuple)
     {
         // Call Push on each element of the tuple
         std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
         return sizeof...(Ts);
+    }
+
+    // Overload for enum types only
+    template <typename T>
+    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
+    {
+        return Push(L, EnumToString(val));
+    }
+
+    // Overload for pointers to classes. We boldly assume that these are script entities
+    template <typename T>
+    typename std::enable_if_t<(std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
+    {
+        lua_pushelement(L, val);
+        return 1;
+    }
+
+    template <typename T>
+    int Push(lua_State* L, const std::shared_ptr<T>& ptr)
+    {
+        lua_pushelement(L, ptr.get());
+        return 1;
+    }
+
+    template <typename T>
+    int Push(lua_State* L, const std::unique_ptr<T>& ptr)
+    {
+        lua_pushelement(L, ptr.get());
+        return 1;
     }
 }

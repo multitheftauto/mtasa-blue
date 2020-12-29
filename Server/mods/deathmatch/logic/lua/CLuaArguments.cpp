@@ -815,20 +815,3 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
     //        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
     return false;
 }
-
-bool CLuaArguments::IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables) const
-{
-    if (m_Arguments.size() != compareTo.m_Arguments.size())
-        return false;
-
-    if (knownTables != nullptr)
-    {
-        if (knownTables->find(&compareTo) != knownTables->end())
-            return true;
-
-        knownTables->insert(&compareTo);
-    }
-
-    return std::equal(std::begin(m_Arguments), std::end(m_Arguments), std::begin(compareTo.m_Arguments),
-                      [knownTables](const CLuaArgument* lhs, const CLuaArgument* rhs) { return lhs->IsEqualTo(*rhs, knownTables); });
-}

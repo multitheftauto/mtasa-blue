@@ -35,8 +35,8 @@ public:
     ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
-    bool                operator==(const CLuaArgument& Argument) const;
-    bool                operator!=(const CLuaArgument& Argument) const;
+    bool                operator==(const CLuaArgument& Argument);
+    bool                operator!=(const CLuaArgument& Argument);
 
     void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
     void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
@@ -65,8 +65,6 @@ public:
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
 
-    bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
-
 private:
     void LogUnableToPacketize(const char* szMessage) const;
 
@@ -84,5 +82,6 @@ private:
 #endif
 
     void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
+    bool CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables = NULL);
     void DeleteTableData();
 };
