@@ -22,7 +22,7 @@ namespace SharedUtil
     }
 
     // Unprotect fast mem areas
-    void SetInitialVirtualProtect(void)
+    void SetInitialVirtualProtect()
     {
         DWORD oldProt;
         VirtualProtect((LPVOID)0x4C0000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);

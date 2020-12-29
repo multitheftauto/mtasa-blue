@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CInputRPCs_H
-#define __CInputRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CInputRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(BindKey);
     DECLARE_RPC(UnbindKey);
@@ -30,5 +29,3 @@ public:
     DECLARE_RPC(ShowCursor);
     DECLARE_RPC(ShowChat);
 };
-
-#endif

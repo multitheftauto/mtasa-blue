@@ -91,20 +91,20 @@ struct SRegisterInfo
 class CEffectParameters : public CRenderItem
 {
     DECLARE_CLASS(CEffectParameters, CRenderItem)
-    CEffectParameters(void) : ClassInit(this) {}
-    bool                        ApplyCommonHandles(void);
-    bool                        ApplyMappedHandles(void);
+    CEffectParameters() : ClassInit(this) {}
+    bool                        ApplyCommonHandles();
+    bool                        ApplyMappedHandles();
     HRESULT                     Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true);
-    HRESULT                     End(void);
+    HRESULT                     End();
     void                        NotifyModifiedParameter(D3DXHANDLE hParameter);
-    const std::set<D3DXHANDLE>& GetModifiedParameters(void);
+    const std::set<D3DXHANDLE>& GetModifiedParameters();
     void                        RestoreParametersDefaultValue(const std::vector<D3DXHANDLE>& parameterList);
 
 protected:
-    void                 ReadParameterHandles(void);
+    void                 ReadParameterHandles();
     bool                 TryParseSpecialParameter(D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc);
     bool                 TryMappingParameterToRegister(D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc);
-    void                 ReadCommonHandles(void);
+    void                 ReadCommonHandles();
     const SRegisterInfo* GetRegisterInfo(EStateGroup stateGroup, const SString& strName);
     const STypeMapping*  MatchTypeMapping(EReadableAsType readableAsType, const D3DXPARAMETER_DESC& desc);
     void                 AddStateMappedParameter(EStateGroup stateGroup, const SStateVar& var);

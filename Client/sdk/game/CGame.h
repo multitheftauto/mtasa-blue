@@ -9,13 +9,12 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME
-#define __CGAME
+#pragma once
 
 // use this to check if you're using SA or VC headers
 #define GTA_SA
 
-typedef void(InRenderer)(void);
+typedef void(InRenderer)();
 
 #include "Common.h"
 
@@ -71,7 +70,6 @@ typedef void(InRenderer)(void);
 #include "CStreaming.h"
 #include "CTaskManagementSystem.h"
 #include "CTasks.h"
-#include "CText.h"
 #include "CTheCarGenerators.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
@@ -80,11 +78,14 @@ typedef void(InRenderer)(void);
 #include "CWeaponInfo.h"
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
+#include "CObjectGroupPhysicalProperties.h"
 
 #include <windows.h>
 
+enum eEntityType;
+
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
-typedef void(PostWeaponFireHandler)(void);
+typedef void(PostWeaponFireHandler)();
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
 enum eGameVersion
@@ -142,10 +143,8 @@ public:
     virtual CAudioEngine*             GetAudioEngine() = 0;
     virtual CAEAudioHardware*         GetAEAudioHardware() = 0;
     virtual CAESoundManager*          GetAESoundManager() = 0;
-    virtual CAudioEngine*             GetAudio() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CMenuManager*             GetMenuManager() = 0;
-    virtual CText*                    GetText() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
     virtual CFont*                    GetFont() = 0;
@@ -168,7 +167,7 @@ public:
     virtual CPointLights*             GetPointLights() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
-    virtual CModelInfo*  GetModelInfo(DWORD dwModelID) = 0;
+    virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;
@@ -184,33 +183,33 @@ public:
     virtual VOID         TakeScreenshot(char* szFileName) = 0;
     virtual DWORD*       GetMemoryValue(DWORD dwOffset) = 0;
     virtual void         SetTimeScale(float fTimeScale) = 0;
-    virtual float        GetFPS(void) = 0;
-    virtual float        GetTimeStep(void) = 0;
-    virtual float        GetOldTimeStep(void) = 0;
-    virtual float        GetTimeScale(void) = 0;
+    virtual float        GetFPS() = 0;
+    virtual float        GetTimeStep() = 0;
+    virtual float        GetOldTimeStep() = 0;
+    virtual float        GetTimeScale() = 0;
 
-    virtual void Initialize(void) = 0;
-    virtual void Reset(void) = 0;
-    virtual void Terminate(void) = 0;
+    virtual void Initialize() = 0;
+    virtual void Reset() = 0;
+    virtual void Terminate() = 0;
 
-    virtual BOOL InitLocalPlayer() = 0;
+    virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
-    virtual float GetGravity(void) = 0;
+    virtual float GetGravity() = 0;
     virtual void  SetGravity(float fGravity) = 0;
 
-    virtual float GetGameSpeed(void) = 0;
+    virtual float GetGameSpeed() = 0;
     virtual void  SetGameSpeed(float fSpeed) = 0;
 
-    virtual unsigned long GetMinuteDuration(void) = 0;
+    virtual unsigned long GetMinuteDuration() = 0;
     virtual void          SetMinuteDuration(unsigned long ulDelay) = 0;
 
-    virtual unsigned char GetBlurLevel(void) = 0;
+    virtual unsigned char GetBlurLevel() = 0;
     virtual void          SetBlurLevel(unsigned char ucLevel) = 0;
 
     virtual void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     virtual bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    virtual eGameVersion GetGameVersion(void) = 0;
+    virtual eGameVersion GetGameVersion() = 0;
 
     virtual bool IsCheatEnabled(const char* szCheatName) = 0;
     virtual bool SetCheatEnabled(const char* szCheatName, bool bEnable) = 0;
@@ -222,7 +221,7 @@ public:
     virtual bool IsMoonEasterEggEnabled() = 0;
     virtual void SetMoonEasterEggEnabled(bool bEnable) = 0;
 
-    virtual CWeapon*     CreateWeapon(void) = 0;
+    virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
     virtual bool VerifySADataFileNames() = 0;
@@ -233,20 +232,31 @@ public:
     virtual void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0) = 0;
     virtual bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false) = 0;
 
-    virtual bool HasCreditScreenFadedOut(void) = 0;
-    virtual void FlushPendingRestreamIPL(void) = 0;
-    virtual void ResetModelLodDistances(void) = 0;
-    virtual void ResetAlphaTransparencies(void) = 0;
-    virtual void DisableVSync(void) = 0;
+    virtual bool HasCreditScreenFadedOut() = 0;
+    virtual void FlushPendingRestreamIPL() = 0;
+    virtual void ResetModelLodDistances() = 0;
+    virtual void ResetAlphaTransparencies() = 0;
+    virtual void DisableVSync() = 0;
+    virtual void ResetModelTimes() = 0;
 
     virtual void  OnPedContextChange(CPed* pPedContext) = 0;
-    virtual CPed* GetPedContext(void) = 0;
+    virtual CPed* GetPedContext() = 0;
 
     virtual void GetShaderReplacementStats(SShaderReplacementStats& outStats) = 0;
 
     virtual void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) = 0;
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
-};
 
-#endif
+    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+
+    virtual int32_t GetBaseIDforDFF() = 0;
+    virtual int32_t GetBaseIDforTXD() = 0;
+    virtual int32_t GetBaseIDforCOL() = 0;
+    virtual int32_t GetBaseIDforIPL() = 0;
+    virtual int32_t GetBaseIDforDAT() = 0;
+    virtual int32_t GetBaseIDforIFP() = 0;
+    virtual int32_t GetBaseIDforRRR() = 0;
+    virtual int32_t GetBaseIDforSCM() = 0;
+    virtual int32_t GetCountOfAllFileIDs() = 0;
+};

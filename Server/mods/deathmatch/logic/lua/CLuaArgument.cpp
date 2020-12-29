@@ -19,7 +19,7 @@ extern CGame* g_pGame;
 
 using namespace std;
 
-CLuaArgument::CLuaArgument(void)
+CLuaArgument::CLuaArgument()
 {
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
@@ -33,12 +33,6 @@ CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArgume
     CopyRecursive(Argument, pKnownTables);
 }
 
-CLuaArgument::CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
-{
-    m_pTableData = NULL;
-    ReadFromBitStream(bitStream, pKnownTables);
-}
-
 CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
 {
     // Read the argument out of the lua VM
@@ -46,7 +40,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
     Read(luaVM, iArgument, pKnownTables);
 }
 
-CLuaArgument::~CLuaArgument(void)
+CLuaArgument::~CLuaArgument()
 {
     // Eventually destroy our table
     DeleteTableData();
@@ -122,71 +116,16 @@ const CLuaArgument& CLuaArgument::operator=(const CLuaArgument& Argument)
     return Argument;
 }
 
-bool CLuaArgument::operator==(const CLuaArgument& Argument)
+bool CLuaArgument::operator==(const CLuaArgument& Argument) const
 {
-    std::set<CLuaArguments*> knownTables;
-    return CompareRecursive(Argument, &knownTables);
+    std::set<const CLuaArguments*> knownTables;
+    return IsEqualTo(Argument, &knownTables);
 }
 
-bool CLuaArgument::operator!=(const CLuaArgument& Argument)
+bool CLuaArgument::operator!=(const CLuaArgument& Argument) const
 {
-    std::set<CLuaArguments*> knownTables;
-    return !CompareRecursive(Argument, &knownTables);
-}
-
-bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables)
-{
-    // If the types differ, they're not matching
-    if (Argument.m_iType != m_iType)
-        return false;
-
-    // Compare the variables depending on the type
-    switch (m_iType)
-    {
-        case LUA_TBOOLEAN:
-        {
-            return m_bBoolean == Argument.m_bBoolean;
-        }
-
-        case LUA_TUSERDATA:
-        case LUA_TLIGHTUSERDATA:
-        {
-            return m_pUserData == Argument.m_pUserData;
-        }
-
-        case LUA_TNUMBER:
-        {
-            return m_Number == Argument.m_Number;
-        }
-
-        case LUA_TTABLE:
-        {
-            if (m_pTableData->Count() != Argument.m_pTableData->Count())
-                return false;
-
-            vector<CLuaArgument*>::const_iterator iter = m_pTableData->IterBegin();
-            vector<CLuaArgument*>::const_iterator iterCompare = Argument.m_pTableData->IterBegin();
-            while (iter != m_pTableData->IterEnd() && iterCompare != Argument.m_pTableData->IterEnd())
-            {
-                if (pKnownTables->find(m_pTableData) == pKnownTables->end())
-                {
-                    pKnownTables->insert(m_pTableData);
-                    if (*iter != *iterCompare)
-                        return false;
-                }
-
-                ++iter;
-                ++iterCompare;
-            }
-            return true;
-        }
-        case LUA_TSTRING:
-        {
-            return m_strString == Argument.m_strString;
-        }
-    }
-
-    return true;
+    std::set<const CLuaArguments*> knownTables;
+    return !IsEqualTo(Argument, &knownTables);
 }
 
 void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
@@ -415,7 +354,7 @@ void CLuaArgument::ReadScriptID(uint uiScriptID)
     m_pUserData = reinterpret_cast<void*>(uiScriptID);
 }
 
-CElement* CLuaArgument::GetElement(void) const
+CElement* CLuaArgument::GetElement() const
 {
     ElementID ID = TO_ELEMENTID(m_pUserData);
     return CElementIDs::GetElement(ID);
@@ -515,7 +454,9 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             // Table type
             case LUA_TTABLE:
             {
-                m_pTableData = new CLuaArguments(bitStream, pKnownTables);
+                m_pTableData = new CLuaArguments();
+                if(!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                    return false;
                 m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
                 m_pTableData->ValidateTableKeys();
@@ -543,8 +484,10 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             {
                 // Read out the string length
                 unsigned short usLength;
-                if (bitStream.ReadCompressed(usLength) && usLength)
+                if (bitStream.ReadCompressed(usLength) && usLength > 0)
                 {
+                    if (!bitStream.CanReadNumberOfBytes(usLength))
+                        return false;
                     // Allocate a buffer and read the string into it
                     char* szValue = new char[usLength + 1];
                     if (bitStream.Read(szValue, usLength))
@@ -567,8 +510,11 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             {
                 // Read out the string length
                 uint uiLength;
-                if (bitStream.ReadCompressed(uiLength) && uiLength)
+                if (bitStream.ReadCompressed(uiLength) && uiLength > 0)
                 {
+                    if(!bitStream.CanReadNumberOfBytes(uiLength))
+                        return false;
+                        
                     bitStream.AlignReadToByteBoundary();
 
                     // Allocate a buffer and read the string into it
@@ -602,6 +548,8 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             }
         }
     }
+    else
+        return false;
     return true;
 }
 
@@ -978,6 +926,39 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
         }
     }
     return NULL;
+}
+
+bool CLuaArgument::IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables) const
+{
+    if (m_iType != compareTo.m_iType)
+        return false;
+
+    switch (m_iType)
+    {
+        case LUA_TBOOLEAN:
+        {
+            return m_bBoolean == compareTo.m_bBoolean;
+        }
+        case LUA_TUSERDATA:
+        case LUA_TLIGHTUSERDATA:
+        {
+            return m_pUserData == compareTo.m_pUserData;
+        }
+        case LUA_TNUMBER:
+        {
+            return m_Number == compareTo.m_Number;
+        }
+        case LUA_TTABLE:
+        {
+            return m_pTableData->IsEqualTo(*compareTo.m_pTableData, knownTables);
+        }
+        case LUA_TSTRING:
+        {
+            return m_strString == compareTo.m_strString;
+        }
+    }
+
+    return false;
 }
 
 bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)

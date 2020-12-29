@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKIK
-#define __CGAME_TASKIK
+#pragma once
 
 #include "Task.h"
 
@@ -19,19 +18,19 @@
 class CTaskSimpleIKChain : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleIKChain(void){};
+    virtual ~CTaskSimpleIKChain(){};
 };
 
 class CTaskSimpleIKLookAt : public virtual CTaskSimpleIKChain
 {
 public:
-    virtual ~CTaskSimpleIKLookAt(void){};
+    virtual ~CTaskSimpleIKLookAt(){};
 };
 
 class CTaskSimpleIKManager : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleIKManager(void){};
+    virtual ~CTaskSimpleIKManager(){};
 
     virtual int                 AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID = -1) = 0;
     virtual void                RemoveIKChainTask(int slotID) = 0;
@@ -43,7 +42,5 @@ public:
 class CTaskSimpleTriggerLookAt : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleTriggerLookAt(void){};
+    virtual ~CTaskSimpleTriggerLookAt(){};
 };
-
-#endif

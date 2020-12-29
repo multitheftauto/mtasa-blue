@@ -10,8 +10,7 @@
 
 class CClientCivilian;
 
-#ifndef __CCLIENTCIVILIAN_H
-#define __CCLIENTCIVILIAN_H
+#pragma once
 
 #include <game/CCivilianPed.h>
 #include <game/TaskGoTo.h>
@@ -26,24 +25,24 @@ class CClientCivilian : public CClientEntity
     friend class CClientCivilianManager;
 
 public:
-    ~CClientCivilian(void);
+    ~CClientCivilian();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTCIVILIAN; };
+    eClientEntityType GetType() const { return CCLIENTCIVILIAN; };
 
-    CCivilianPed* GetGameCivilian(void) { return m_pCivilianPed; }
+    CCivilianPed* GetGameCivilian() { return m_pCivilianPed; }
 
     void GetPosition(CVector& vecPosition) const { vecPosition = *m_pCivilianPed->GetPosition(); };
     void SetPosition(const CVector& vecPosition) { m_pCivilianPed->SetPosition(const_cast<CVector*>(&vecPosition)); };
     void GetRotationRadians(CVector& vecRotation) const;
     void SetRotationRadians(const CVector& vecRotation);
-    int  GetRotation(void);
+    int  GetRotation();
     void SetRotation(int iRotation);
 
     void ModelRequestCallback(unsigned short usModelID){};
 
-    float GetDistanceFromCentreOfMassToBaseOfModel(void);
+    float GetDistanceFromCentreOfMassToBaseOfModel();
 
     bool GetMatrix(CMatrix& Matrix) const;
     bool SetMatrix(const CMatrix& Matrix);
@@ -53,13 +52,13 @@ public:
     void GetTurnSpeed(CVector& vecTurnSpeed) const;
     void SetTurnSpeed(const CVector& vecTurnSpeed);
 
-    bool IsVisible(void);
+    bool IsVisible();
     void SetVisible(bool bVisible);
 
-    float GetHealth(void) const;
+    float GetHealth() const;
     void  SetHealth(float fHealth);
 
-    int  GetModelID(void);
+    int  GetModelID();
     void SetModelID(int iModelID);
 
 private:
@@ -68,9 +67,9 @@ private:
 
     void Dump(FILE* pFile, bool bDumpDetails, unsigned int uiIndex);
 
-    void Create(void);
-    void Destroy(void);
-    void ReCreate(void);
+    void Create();
+    void Destroy();
+    void ReCreate();
 
     class CClientCivilianManager* m_pCivilianManager;
 
@@ -78,5 +77,3 @@ private:
 
     CCivilianPed* m_pCivilianPed;
 };
-
-#endif

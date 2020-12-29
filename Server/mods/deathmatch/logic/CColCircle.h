@@ -16,15 +16,16 @@
 class CColCircle : public CColShape
 {
 public:
-    CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false);
+    CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, bool bIsPartnered = false);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_CIRCLE; }
+    eColShapeType GetShapeType() { return COLSHAPE_CIRCLE; }
 
     bool DoHitDetection(const CVector& vecNowPosition);
 
-    float GetRadius(void) { return m_fRadius; };
+    float GetRadius() { return m_fRadius; };
     void  SetRadius(float fRadius)
     {
         m_fRadius = fRadius;
@@ -32,7 +33,7 @@ public:
     };
 
 protected:
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     float m_fRadius;
 };

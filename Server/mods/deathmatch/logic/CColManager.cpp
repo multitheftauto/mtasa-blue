@@ -11,13 +11,13 @@
 
 #include "StdInc.h"
 
-CColManager::CColManager(void)
+CColManager::CColManager()
 {
     m_bCanRemoveFromList = true;
     m_bIteratingList = false;
 }
 
-CColManager::~CColManager(void)
+CColManager::~CColManager()
 {
     DeleteAll();
     TakeOutTheTrash();
@@ -183,7 +183,7 @@ bool CColManager::Exists(CColShape* pShape)
     return ListContains(m_List, pShape);
 }
 
-void CColManager::DeleteAll(void)
+void CColManager::DeleteAll()
 {
     // Delete all of them
     DeletePointersAndClearList(m_List);
@@ -205,7 +205,7 @@ void CColManager::RemoveFromList(CColShape* pShape)
     }
 }
 
-void CColManager::TakeOutTheTrash(void)
+void CColManager::TakeOutTheTrash()
 {
     vector<CColShape*>::const_iterator iter = m_TrashCan.begin();
     for (; iter != m_TrashCan.end(); iter++)

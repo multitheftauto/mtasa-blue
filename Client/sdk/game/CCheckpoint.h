@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CHECKPOINT
-#define __CGAME_CHECKPOINT
+#pragma once
 
 #include <CVector.h>
 #include "Common.h"
@@ -53,5 +52,3 @@ public:
     virtual FLOAT    GetPulseFraction() = 0;
     virtual VOID     Remove() = 0;
 };
-
-#endif

@@ -86,7 +86,7 @@ CClientGUIElement::CClientGUIElement(CClientManager* pManager, CLuaMain* pLuaMai
     m_pGUIManager->Add(this);
 }
 
-CClientGUIElement::~CClientGUIElement(void)
+CClientGUIElement::~CClientGUIElement()
 {
     // Remove us from the list in the manager
     Unlink();
@@ -95,7 +95,7 @@ CClientGUIElement::~CClientGUIElement(void)
         delete m_pCGUIElement;
 }
 
-void CClientGUIElement::Unlink(void)
+void CClientGUIElement::Unlink()
 {
     // Detach from any custom font
     if (m_pFontElement)

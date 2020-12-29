@@ -528,7 +528,7 @@ DWORD FindProcessId(const SString& processName)
 // Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector<DWORD> GetGTAProcessList(void)
+std::vector<DWORD> GetGTAProcessList()
 {
     std::vector<DWORD> result;
 
@@ -555,7 +555,7 @@ std::vector<DWORD> GetGTAProcessList(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IsGTARunning(void)
+bool IsGTARunning()
 {
     return !GetGTAProcessList().empty();
 }
@@ -567,7 +567,7 @@ bool IsGTARunning(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateGTAIfRunning(void)
+void TerminateGTAIfRunning()
 {
     std::vector<DWORD> processIdList = GetGTAProcessList();
 
@@ -590,7 +590,7 @@ void TerminateGTAIfRunning(void)
 // Get list of process id's with the image name ending with the same name as this process
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector<DWORD> GetOtherMTAProcessList(void)
+std::vector<DWORD> GetOtherMTAProcessList()
 {
     std::vector<DWORD> result;
 
@@ -617,7 +617,7 @@ std::vector<DWORD> GetOtherMTAProcessList(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IsOtherMTARunning(void)
+bool IsOtherMTARunning()
 {
     return !GetOtherMTAProcessList().empty();
 }
@@ -629,7 +629,7 @@ bool IsOtherMTARunning(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateOtherMTAIfRunning(void)
+void TerminateOtherMTAIfRunning()
 {
     std::vector<DWORD> processIdList = GetOtherMTAProcessList();
 
@@ -705,7 +705,7 @@ void SetMTASAPathSource(bool bReadFromRegistry)
     }
 }
 
-SString GetMTASAPath(void)
+SString GetMTASAPath()
 {
     if (g_strMTASAPath == "")
         SetMTASAPathSource(false);
@@ -740,7 +740,7 @@ bool LookForGtaProcess(SString& strOutPathFilename)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString DoUserAssistedSearch(void)
+SString DoUserAssistedSearch()
 {
     SString strResult;
 
@@ -789,38 +789,19 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             return GAME_PATH_UNICODE_CHARS;
     }
 
-    // Then step through looking for an existing file
-    bool    bFoundSteamExe = false;
-    SString strRegPath;
+    // Then step through looking for a known existing file
     for (uint i = 0; i < pathList.size(); i++)
     {
         if (pathList[i].empty())
             continue;
 
-        if (FileExists(PathJoin(pathList[i], MTA_GTAEXE_NAME)))
+        if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
         {
-            strRegPath = pathList[i];
-            break;
+            strOutResult = pathList[i];
+            // Update registry.
+            SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
+            return GAME_PATH_OK;
         }
-        if (FileExists(PathJoin(pathList[i], MTA_GTASTEAMEXE_NAME)))
-        {
-            bFoundSteamExe = true;
-        }
-    }
-
-    // Found an exe?
-    if (!strRegPath.empty())
-    {
-        strOutResult = strRegPath;
-        // Update registry.
-        SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
-        return GAME_PATH_OK;
-    }
-
-    // Found a steam exe?
-    if (bFoundSteamExe)
-    {
-        return GAME_PATH_STEAM;
     }
 
     // Try to find?
@@ -852,19 +833,13 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
     }
 
     // Check browse result
-    if (!FileExists(PathJoin(strOutResult, MTA_GTAEXE_NAME)))
+    if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
     {
-        if (FileExists(PathJoin(strOutResult, MTA_GTASTEAMEXE_NAME)))
-            return GAME_PATH_STEAM;
-
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch();
 
-        if (!FileExists(PathJoin(strOutResult, MTA_GTAEXE_NAME)))
+        if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
         {
-            if (FileExists(PathJoin(strOutResult, MTA_GTASTEAMEXE_NAME)))
-                return GAME_PATH_STEAM;
-
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
@@ -894,7 +869,7 @@ ePathResult DiscoverGTAPath(bool bFindIfMissing)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString GetGTAPath(void)
+SString GetGTAPath()
 {
     if (g_strGTAPath == "")
         DiscoverGTAPath(false);
@@ -908,7 +883,7 @@ SString GetGTAPath(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool HasGTAPath(void)
+bool HasGTAPath()
 {
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
@@ -1090,7 +1065,7 @@ void MakeRandomIndexList(int Size, std::vector<int>& outList)
 // Affected by compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SOSVersionInfo GetOSVersion(void)
+SOSVersionInfo GetOSVersion()
 {
     OSVERSIONINFO versionInfo;
     memset(&versionInfo, 0, sizeof(versionInfo));
@@ -1106,7 +1081,7 @@ SOSVersionInfo GetOSVersion(void)
 // Ignoring compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SOSVersionInfo GetRealOSVersion(void)
+SOSVersionInfo GetRealOSVersion()
 {
     static SOSVersionInfo versionInfo = {0};
 
@@ -1146,13 +1121,13 @@ SOSVersionInfo GetRealOSVersion(void)
 // Works around limit for applications not manifested for Windows 10
 //
 ///////////////////////////////////////////////////////////////
-bool IsWindows10OrGreater(void)
+bool IsWindows10OrGreater()
 {
     SOSVersionInfo info = GetRealOSVersion();
     return info.dwMajor >= 10;
 }
 
-bool IsWindows10Threshold2OrGreater(void)
+bool IsWindows10Threshold2OrGreater()
 {
     SOSVersionInfo info = GetRealOSVersion();
     return info.dwMajor > 10 || (info.dwMajor == 10 && info.dwBuild >= 10586);
@@ -1165,7 +1140,7 @@ bool IsWindows10Threshold2OrGreater(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-BOOL IsUserAdmin(VOID)
+BOOL IsUserAdmin()
 /*++
 Routine Description: This routine returns TRUE if the caller's
 process is a member of the Administrators local group. Caller is NOT
@@ -1247,7 +1222,7 @@ HMODULE GetLibraryHandle(const SString& strFilename, DWORD* pdwOutLastError)
 //
 //
 /////////////////////////////////////////////////////////////////////
-void FreeLibraryHandle(void)
+void FreeLibraryHandle()
 {
     if (hLibraryModule)
     {
@@ -1294,7 +1269,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         PFNINITNETREV pfnInitNetRev = static_cast<PFNINITNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "InitNetRev")));
         if (pfnInitNetRev)
             pfnInitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
-        typedef unsigned short (*PFNGETNETREV)(void);
+        typedef unsigned short (*PFNGETNETREV)();
         PFNGETNETREV pfnGetNetRev = static_cast<PFNGETNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "GetNetRev")));
         if (pfnGetNetRev)
             usNetRev = pfnGetNetRev();
@@ -1426,7 +1401,7 @@ void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CreateSingleInstanceMutex(void)
+bool CreateSingleInstanceMutex()
 {
     HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
 
@@ -1448,7 +1423,7 @@ bool CreateSingleInstanceMutex(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void ReleaseSingleInstanceMutex(void)
+void ReleaseSingleInstanceMutex()
 {
     assert(g_hMutex);
     CloseHandle(g_hMutex);
@@ -1525,8 +1500,8 @@ int GetFileAge(const SString& strPathFilename)
         FindClose(hFind);
         FILETIME ftNow;
         GetSystemTimeAsFileTime(&ftNow);
-        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime};
-        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, ftNow.dwHighDateTime};
+        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, static_cast<LONG>(findFileData.ftCreationTime.dwHighDateTime)};
+        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, static_cast<LONG>(ftNow.dwHighDateTime)};
         return static_cast<int>((timeNow.QuadPart - creationTime.QuadPart) / (LONGLONG)10000000);
     }
     return 0;
@@ -1539,7 +1514,7 @@ int GetFileAge(const SString& strPathFilename)
 // Remove old files from the download cache
 //
 ///////////////////////////////////////////////////////////////////////////
-void CleanDownloadCache(void)
+void CleanDownloadCache()
 {
     const uint uiMaxCleanTime = 5;                           // Limit clean time (seconds)
     const uint uiCleanFileAge = 60 * 60 * 24 * 7;            // Delete files older than this
@@ -1711,7 +1686,7 @@ stop_copy:
 // settings from a previous version
 //
 //////////////////////////////////////////////////////////
-void MaybeShowCopySettingsDialog(void)
+void MaybeShowCopySettingsDialog()
 {
     // Check if coreconfig.xml is present
     const SString strMTASAPath = GetMTASAPath();
@@ -1767,7 +1742,7 @@ void MaybeShowCopySettingsDialog(void)
 // Returns true if message was displayed
 //
 //////////////////////////////////////////////////////////
-bool CheckAndShowFileOpenFailureMessage(void)
+bool CheckAndShowFileOpenFailureMessage()
 {
     SString strFilename = GetApplicationSetting("diagnostics", "gta-fopen-fail");
 
@@ -1788,7 +1763,7 @@ bool CheckAndShowFileOpenFailureMessage(void)
 // Check for missing files that could cause a crash
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowMissingFileMessage(void)
+void CheckAndShowMissingFileMessage()
 {
     SString strFilename = PathJoin("text", "american.gxt");
 
@@ -1808,7 +1783,7 @@ void CheckAndShowMissingFileMessage(void)
 // Check for flagged model problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowModelProblems(void)
+void CheckAndShowModelProblems()
 {
     SString strReason;
     int     iModelId = 0;
@@ -1835,7 +1810,7 @@ void CheckAndShowModelProblems(void)
 // Check for flagged upgrade problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowUpgradeProblems(void)
+void CheckAndShowUpgradeProblems()
 {
     int     iModelId = 0, iUpgradeId, iFrame;
     CArgMap argMap;
@@ -1861,7 +1836,7 @@ void CheckAndShowUpgradeProblems(void)
 // Check for flagged img problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowImgProblems(void)
+void CheckAndShowImgProblems()
 {
     SString strFilename = GetApplicationSetting("diagnostics", "img-file-corrupt");
     SetApplicationSetting("diagnostics", "img-file-corrupt", "");
@@ -1899,7 +1874,7 @@ void* LoadFunction(const char* szLibName, const char* c, const char* a, const ch
 // Possible BSOD situation if a new mini-dump file was created after the last game was started
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionPreLaunch(void)
+void BsodDetectionPreLaunch()
 {
     // BSOD detection being handled elsewhere ?
     int iBsodDetectSkip = GetApplicationSettingInt(DIAG_BSOD_DETECT_SKIP);
@@ -1965,7 +1940,7 @@ void BsodDetectionPreLaunch(void)
 // Record game start time
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionOnGameBegin(void)
+void BsodDetectionOnGameBegin()
 {
     SetApplicationSetting("diagnostics", "game-begin-time", GetTimeString(true));
 }
@@ -1977,7 +1952,7 @@ void BsodDetectionOnGameBegin(void)
 // Unrecord game start time
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionOnGameEnd(void)
+void BsodDetectionOnGameEnd()
 {
     SetApplicationSetting("diagnostics", "game-begin-time", "");
 }
@@ -1989,7 +1964,7 @@ void BsodDetectionOnGameEnd(void)
 // Message to advise against running certain other programs
 //
 //////////////////////////////////////////////////////////
-void ForbodenProgramsMessage(void)
+void ForbodenProgramsMessage()
 {
     std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
     std::vector<SString> foundList;
@@ -2048,7 +2023,7 @@ bool VerifyEmbeddedSignature(const SString& strFilename)
 // Dump some settings to the log file to help debugging
 //
 //////////////////////////////////////////////////////////
-void LogSettings(void)
+void LogSettings()
 {
     struct
     {
@@ -2057,231 +2032,44 @@ void LogSettings(void)
         const char* szName;
         const char* szDesc;
     } const settings[] = {
-        {
-            false,
-            "general",
-            GENERAL_PROGRESS_ANIMATION_DISABLE,
-            "",
-        },
-        {
-            false,
-            "general",
-            "aero-enabled",
-            "",
-        },
-        {
-            false,
-            "general",
-            "aero-changeable",
-            "",
-        },
-        {
-            false,
-            "general",
-            "driver-overrides-disabled",
-            "",
-        },
-        {
-            false,
-            "general",
-            "device-selection-disabled",
-            "",
-        },
-        {
-            false,
-            "general",
-            "customized-sa-files-using",
-            "",
-        },
-        {
-            false,
-            "general",
-            "times-connected",
-            "",
-        },
-        {
-            false,
-            "general",
-            "times-connected-editor",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "nvidia",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-force-detection",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-export-enablement",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-rename-exe",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-alt-startup",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-force-windowed",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-dialog-skip",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-startup-option",
-            "",
-        },
-        {
-            true,
-            "watchdog",
-            "CR1",
-            "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME",
-        },
-        {
-            true,
-            "watchdog",
-            "CR2",
-            "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN",
-        },
-        {
-            true,
-            "watchdog",
-            "CR3",
-            "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU",
-        },
-        {
-            true,
-            "watchdog",
-            "L0",
-            "SECTION_NOT_CLEAN_GTA_EXIT",
-        },
-        {
-            true,
-            "watchdog",
-            "L1",
-            "SECTION_NOT_STARTED_ONLINE_GAME",
-        },
-        {
-            true,
-            "watchdog",
-            "L2",
-            "SECTION_NOT_SHOWN_LOADING_SCREEN",
-        },
-        {
-            true,
-            "watchdog",
-            "L3",
-            "SECTION_STARTUP_FREEZE",
-        },
-        {
-            true,
-            "watchdog",
-            "L4",
-            "SECTION_NOT_USED_MAIN_MENU",
-        },
-        {
-            true,
-            "watchdog",
-            "L5",
-            "SECTION_POST_INSTALL",
-        },
-        {
-            true,
-            "watchdog",
-            "lastruncrash",
-            "",
-        },
-        {
-            true,
-            "watchdog",
-            "preload-upgrades",
-            "",
-        },
-        {
-            true,
-            "watchdog",
-            "Q0",
-            "SECTION_IS_QUITTING",
-        },
-        {
-            true,
-            "watchdog",
-            "uncleanstop",
-            "",
-        },
-        {
-            false,
-            "diagnostics",
-            "send-dumps",
-            "",
-        },
-        {
-            true,
-            "diagnostics",
-            "last-minidump-time",
-            "",
-        },
-        {
-            true,
-            "diagnostics",
-            "user-confirmed-bsod-time",
-            "",
-        },
-        {
-            true,
-            DIAG_MINIDUMP_DETECTED_COUNT,
-            "",
-        },
-        {
-            true,
-            DIAG_MINIDUMP_CONFIRMED_COUNT,
-            "",
-        },
-        {
-            true,
-            DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
-            "",
-        },
-        {
-            false,
-            "general",
-            "noav-user-says-skip",
-            "",
-        },
-        {
-            false,
-            "general",
-            "noav-last-asked-time",
-            "",
-        },
+        {false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, ""},
+        {false, "general", "aero-enabled", ""},
+        {false, "general", "aero-changeable", ""},
+        {false, "general", "driver-overrides-disabled", ""},
+        {false, "general", "device-selection-disabled", ""},
+        {false, "general", "customized-sa-files-using", ""},
+        {false, "general", "times-connected", ""},
+        {false, "general", "times-connected-editor", ""},
+        {false, "nvhacks", "nvidia", ""},
+        {false, "nvhacks", "optimus-force-detection", ""},
+        {false, "nvhacks", "optimus-export-enablement", ""},
+        {false, "nvhacks", "optimus", ""},
+        {false, "nvhacks", "optimus-rename-exe", ""},
+        {false, "nvhacks", "optimus-alt-startup", ""},
+        {false, "nvhacks", "optimus-force-windowed", ""},
+        {false, "nvhacks", "optimus-dialog-skip", ""},
+        {false, "nvhacks", "optimus-startup-option", ""},
+        {true, "watchdog", "CR1", "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME"},
+        {true, "watchdog", "CR2", "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN"},
+        {true, "watchdog", "CR3", "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU"},
+        {true, "watchdog", "L0", "SECTION_NOT_CLEAN_GTA_EXIT"},
+        {true, "watchdog", "L1", "SECTION_NOT_STARTED_ONLINE_GAME"},
+        {true, "watchdog", "L2", "SECTION_NOT_SHOWN_LOADING_SCREEN"},
+        {true, "watchdog", "L3", "SECTION_STARTUP_FREEZE"},
+        {true, "watchdog", "L4", "SECTION_NOT_USED_MAIN_MENU"},
+        {true, "watchdog", "L5", "SECTION_POST_INSTALL"},
+        {true, "watchdog", "lastruncrash", ""},
+        {true, "watchdog", "preload-upgrades", ""},
+        {true, "watchdog", "Q0", "SECTION_IS_QUITTING"},
+        {true, "watchdog", "uncleanstop", ""},
+        {false, "diagnostics", "send-dumps", ""},
+        {true, "diagnostics", "last-minidump-time", ""},
+        {true, "diagnostics", "user-confirmed-bsod-time", ""},
+        {true, DIAG_MINIDUMP_DETECTED_COUNT, ""},
+        {true, DIAG_MINIDUMP_CONFIRMED_COUNT, ""},
+        {true, DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, ""},
+        {false, "general", "noav-user-says-skip", ""},
+        {false, "general", "noav-last-asked-time", ""},
     };
 
     for (uint i = 0; i < NUMELMS(settings); i++)
@@ -2340,9 +2128,10 @@ BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
     WINDOWINFO windowInfo;
     if (GetWindowInfo(hwnd, &windowInfo))
     {
-        if (windowInfo.atomWindowType == (WORD)WC_DIALOG)
+        if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
         {
-            SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+            // Ensure dialog is not hidden by other applications
+            SetForegroundWindow(hwnd);
             return false;
         }
     }

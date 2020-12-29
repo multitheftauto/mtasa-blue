@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFxSystemBPSA
-#define __CFxSystemBPSA
+#pragma once
 
 class CFxSystemBPSAInterface
 {
@@ -31,5 +30,3 @@ public:
     void*  pBoundingSphere;                 // 0x20
 };
 static_assert(sizeof(CFxSystemBPSAInterface) == 0x24, "Invalid size for CFxSystemBPSAInterface");
-
-#endif

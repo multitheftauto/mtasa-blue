@@ -25,6 +25,7 @@ class CPlayer;
 #include "packets/CPlayerStatsPacket.h"
 class CKeyBinds;
 class CPlayerCamera;
+enum class eVehicleAimDirection : unsigned char;
 
 enum eVoiceState
 {
@@ -38,7 +39,7 @@ enum eVoiceState
 
 struct SViewerInfo
 {
-    SViewerInfo(void) : iMoveToFarCountDown(0), iZone(0), llLastUpdateTime(0), bInPureSyncSimSendList(false) {}
+    SViewerInfo() : iMoveToFarCountDown(0), iZone(0), llLastUpdateTime(0), bInPureSyncSimSendList(false) {}
 
     int iMoveToFarCountDown;
 
@@ -64,7 +65,7 @@ struct SScreenShotInfo
     CBuffer   buffer;
 };
 
-class CPlayer : public CPed, public CClient
+class CPlayer final : public CPed, public CClient
 {
     friend class CElement;
     friend class CScriptDebugging;
@@ -72,188 +73,199 @@ class CPlayer : public CPed, public CClient
 public:
     ZERO_ON_NEW
     CPlayer(class CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket);
-    ~CPlayer(void);
+    ~CPlayer();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void Unlink(void);
-    bool ReadSpecialData(void) { return true; };
+    void Unlink();
 
-    bool DoNotSendEntities(void) { return m_bDoNotSendEntities; };
+    bool DoNotSendEntities() { return m_bDoNotSendEntities; };
     void SetDoNotSendEntities(bool bDont) { m_bDoNotSendEntities = bDont; };
 
-    int                GetClientType(void) { return CClient::CLIENT_PLAYER; };
-    unsigned long long GetTimeSinceConnected(void) { return m_ConnectedTimer.Get(); }
+    int                GetClientType() { return CClient::CLIENT_PLAYER; };
+    unsigned long long GetTimeSinceConnected() { return m_ConnectedTimer.Get(); }
 
-    const char* GetNick(void) { return m_strNick; };
+    const char* GetNick() { return m_strNick; };
     void        SetNick(const char* szNick);
 
-    int            GetGameVersion(void) { return m_iGameVersion; };
-    void           SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
-    unsigned short GetMTAVersion(void) { return m_usMTAVersion; };
-    void           SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
-    unsigned short GetBitStreamVersion(void) { return m_usBitStreamVersion; };
-    void           SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
-    void           SetPlayerVersion(const SString& strPlayerVersion);
-    const SString& GetPlayerVersion(void) { return m_strPlayerVersion; };
+    int                GetGameVersion() { return m_iGameVersion; };
+    void               SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
+    unsigned short     GetMTAVersion() { return m_usMTAVersion; };
+    void               SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
+    unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
+    void               SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
+    bool               CanBitStream(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(m_usBitStreamVersion) >= query; }
+    void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
+    const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
+    bool               ShouldIgnoreMinClientVersionChecks();
+    void               SetDiscordJoinSecret(const SString& joinSecret) { m_strDiscordJoinSecret = joinSecret; }
+    SString            GetDiscordJoinSecret() const { return m_strDiscordJoinSecret; }
 
-    bool IsMuted(void) { return m_bIsMuted; };
+    bool IsMuted() { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
-    bool IsJoined(void) { return m_bIsJoined; }
-    void SetJoined(void) { m_bIsJoined = true; }
+    bool IsJoined() { return m_bIsJoined; }
+    void SetJoined() { m_bIsJoined = true; }
 
-    float GetCameraRotation(void) { return m_fCameraRotation; };
+    bool SubscribeElementData(CElement* pElement, const std::string& strName);
+    bool UnsubscribeElementData(CElement* pElement, const std::string& strName);
+    bool UnsubscribeElementData(CElement* pElement);
+    bool IsSubscribed(CElement* pElement, const std::string& strName) const;
+
+    float GetCameraRotation() { return m_fCameraRotation; };
     void  SetCameraRotation(float fRotation) { m_fCameraRotation = fRotation; };
 
-    long GetMoney(void) { return m_lMoney; };
+    long GetMoney() { return m_lMoney; };
     void SetMoney(long lMoney) { m_lMoney = lMoney; };
 
-    const CVector& GetSniperSourceVector(void) { return m_vecSniperSource; };
+    const CVector& GetSniperSourceVector() { return m_vecSniperSource; };
     void           SetSniperSourceVector(const CVector& vecSource) { m_vecSniperSource = vecSource; };
     void           GetTargettingVector(CVector& vecTarget) { vecTarget = m_vecTargetting; };
     void           SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
-    float          GetAimDirection(void) { return m_fAimDirection; };
+    float          GetAimDirection() { return m_fAimDirection; };
     void           SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
-    unsigned char  GetDriveByDirection(void) { return m_ucDriveByDirection; };
-    void           SetDriveByDirection(unsigned char ucDirection) { m_ucDriveByDirection = ucDirection; };
-    bool           IsAkimboArmUp(void) { return m_bAkimboArmUp; };
+    eVehicleAimDirection GetDriveByDirection() { return m_ucDriveByDirection; };
+    void           SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
+    bool           IsAkimboArmUp() { return m_bAkimboArmUp; };
     void           SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
 
-    NetServerPlayerID& GetSocket(void) { return m_PlayerSocket; };
-    const char*        GetSourceIP(void);
-    unsigned short     GetSourcePort(void) { return m_PlayerSocket.GetPort(); };
+    NetServerPlayerID& GetSocket() { return m_PlayerSocket; };
+    const char*        GetSourceIP();
+    unsigned short     GetSourcePort() { return m_PlayerSocket.GetPort(); };
 
     void         SetPing(uint uiPing) { m_uiPing = uiPing; }
-    unsigned int GetPing(void) { return m_uiPing; }
+    unsigned int GetPing() { return m_uiPing; }
 
-    time_t GetNickChangeTime(void) { return m_tNickChange; };
+    time_t GetNickChangeTime() { return m_tNickChange; };
     void   SetNickChangeTime(time_t tNickChange) { m_tNickChange = tNickChange; };
 
     uint Send(const CPacket& Packet);
     void SendEcho(const char* szEcho);
     void SendConsole(const char* szEcho);
 
-    CPlayerTextManager* GetPlayerTextManager(void) { return m_pPlayerTextManager; };
+    CPlayerTextManager* GetPlayerTextManager() { return m_pPlayerTextManager; };
 
     void AddSyncingVehicle(CVehicle* pVehicle);
     void RemoveSyncingVehicle(CVehicle* pVehicle);
-    void RemoveAllSyncingVehicles(void);
+    void RemoveAllSyncingVehicles();
 
-    unsigned int                         CountSyncingVehicles(void) { return static_cast<unsigned int>(m_SyncingVehicles.size()); };
-    std::list<CVehicle*>::const_iterator IterSyncingVehicleBegin(void) { return m_SyncingVehicles.begin(); };
-    std::list<CVehicle*>::const_iterator IterSyncingVehicleEnd(void) { return m_SyncingVehicles.end(); };
+    unsigned int                         CountSyncingVehicles() { return static_cast<unsigned int>(m_SyncingVehicles.size()); };
+    std::list<CVehicle*>::const_iterator IterSyncingVehicleBegin() { return m_SyncingVehicles.begin(); };
+    std::list<CVehicle*>::const_iterator IterSyncingVehicleEnd() { return m_SyncingVehicles.end(); };
 
     void AddSyncingPed(CPed* pPed);
     void RemoveSyncingPed(CPed* pPed);
-    void RemoveAllSyncingPeds(void);
+    void RemoveAllSyncingPeds();
 
-    unsigned int                     CountSyncingPeds(void) { return static_cast<unsigned int>(m_SyncingPeds.size()); };
-    std::list<CPed*>::const_iterator IterSyncingPedBegin(void) { return m_SyncingPeds.begin(); };
-    std::list<CPed*>::const_iterator IterSyncingPedEnd(void) { return m_SyncingPeds.end(); };
+    unsigned int                     CountSyncingPeds() { return static_cast<unsigned int>(m_SyncingPeds.size()); };
+    std::list<CPed*>::const_iterator IterSyncingPedBegin() { return m_SyncingPeds.begin(); };
+    std::list<CPed*>::const_iterator IterSyncingPedEnd() { return m_SyncingPeds.end(); };
 
     void AddSyncingObject(CObject* pObject);
     void RemoveSyncingObject(CObject* pObject);
-    void RemoveAllSyncingObjects(void);
+    void RemoveAllSyncingObjects();
 
-    unsigned int                        CountSyncingObjects(void) { return static_cast<unsigned int>(m_SyncingObjects.size()); };
-    std::list<CObject*>::const_iterator IterSyncingObjectBegin(void) { return m_SyncingObjects.begin(); };
-    std::list<CObject*>::const_iterator IterSyncingObjectEnd(void) { return m_SyncingObjects.end(); };
+    unsigned int                        CountSyncingObjects() { return static_cast<unsigned int>(m_SyncingObjects.size()); };
+    std::list<CObject*>::const_iterator IterSyncingObjectBegin() { return m_SyncingObjects.begin(); };
+    std::list<CObject*>::const_iterator IterSyncingObjectEnd() { return m_SyncingObjects.end(); };
 
-    unsigned int GetScriptDebugLevel(void) { return m_uiScriptDebugLevel; };
+    unsigned int GetScriptDebugLevel() { return m_uiScriptDebugLevel; };
     bool         SetScriptDebugLevel(unsigned int uiLevel);
 
     void          SetDamageInfo(ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart);
-    void          ValidateDamageInfo(void);
-    ElementID     GetPlayerAttacker(void);
-    unsigned char GetAttackWeapon(void);
-    unsigned char GetAttackBodyPart(void);
+    void          ValidateDamageInfo();
+    ElementID     GetPlayerAttacker();
+    unsigned char GetAttackWeapon();
+    unsigned char GetAttackBodyPart();
 
-    CTeam* GetTeam(void) { return m_pTeam; }
+    CTeam* GetTeam() { return m_pTeam; }
     void   SetTeam(CTeam* pTeam, bool bChangeTeam = false);
 
-    CPad* GetPad(void) { return m_pPad; }
+    CPad* GetPad() { return m_pPad; }
 
-    bool IsDebuggerVisible(void) { return m_bDebuggerVisible; }
+    bool IsDebuggerVisible() { return m_bDebuggerVisible; }
     void SetDebuggerVisible(bool bVisible) { m_bDebuggerVisible = bVisible; }
 
-    unsigned int GetWantedLevel(void) { return m_uiWantedLevel; }
+    unsigned int GetWantedLevel() { return m_uiWantedLevel; }
     void         SetWantedLevel(unsigned int uiWantedLevel) { m_uiWantedLevel = uiWantedLevel; }
 
-    bool GetForcedScoreboard(void) { return m_bForcedScoreboard; }
+    bool GetForcedScoreboard() { return m_bForcedScoreboard; }
     void SetForcedScoreboard(bool bVisible) { m_bForcedScoreboard = bVisible; }
 
-    bool GetForcedMap(void) { return m_bForcedMap; }
+    bool GetForcedMap() { return m_bForcedMap; }
     void SetForcedMap(bool bVisible) { m_bForcedMap = bVisible; }
 
-    void Reset(void);
+    void Reset();
 
-    CPlayerCamera* GetCamera(void) { return m_pCamera; }
+    CPlayerCamera* GetCamera() { return m_pCamera; }
 
-    CKeyBinds* GetKeyBinds(void) { return m_pKeyBinds; }
+    CKeyBinds* GetKeyBinds() { return m_pKeyBinds; }
 
-    bool IsCursorShowing(void) { return m_bCursorShowing; }
+    bool IsCursorShowing() { return m_bCursorShowing; }
     void SetCursorShowing(bool bCursorShowing) { m_bCursorShowing = bCursorShowing; }
 
-    char* GetNametagText(void) { return m_szNametagText; }
+    char* GetNametagText() { return m_szNametagText; }
     void  SetNametagText(const char* szText);
     void  GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     void  SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB);
-    void  RemoveNametagOverrideColor(void);
-    bool  IsNametagColorOverridden(void) { return m_bNametagColorOverridden; }
+    void  RemoveNametagOverrideColor();
+    bool  IsNametagColorOverridden() { return m_bNametagColorOverridden; }
 
-    bool IsNametagShowing(void) { return m_bNametagShowing; }
+    bool IsNametagShowing() { return m_bNametagShowing; }
     void SetNametagShowing(bool bShowing) { m_bNametagShowing = bShowing; }
 
     const std::string& GetSerial(uint uiIndex = 0) { return m_strSerials[uiIndex % NUMELMS(m_strSerials)]; }
     void               SetSerial(const std::string& strSerial, uint uiIndex) { m_strSerials[uiIndex % NUMELMS(m_strSerials)] = strSerial; }
 
-    const std::string& GetSerialUser(void) { return m_strSerialUser; };
+    const std::string& GetSerialUser() { return m_strSerialUser; };
     void               SetSerialUser(const std::string& strUser) { m_strSerialUser = strUser; };
 
-    const std::string& GetCommunityID(void) { return m_strCommunityID; };
+    const std::string& GetCommunityID() { return m_strCommunityID; };
     void               SetCommunityID(const std::string& strID) { m_strCommunityID = strID; };
 
-    unsigned char GetBlurLevel(void) { return m_ucBlurLevel; }
+    unsigned char GetBlurLevel() { return m_ucBlurLevel; }
     void          SetBlurLevel(unsigned char ucBlurLevel) { m_ucBlurLevel = ucBlurLevel; }
 
-    bool IsTimeForPuresyncFar(void);
+    bool IsTimeForPuresyncFar();
 
     // Sync stuff
     void         SetSyncingVelocity(bool bSyncing) { m_bSyncingVelocity = bSyncing; }
-    bool         IsSyncingVelocity(void) const { return m_bSyncingVelocity; }
-    void         IncrementPuresync(void) { m_uiPuresyncPackets++; }
-    unsigned int GetPuresyncCount(void) const { return m_uiPuresyncPackets; }
+    bool         IsSyncingVelocity() const { return m_bSyncingVelocity; }
+    void         IncrementPuresync() { m_uiPuresyncPackets++; }
+    unsigned int GetPuresyncCount() const { return m_uiPuresyncPackets; }
 
-    void               NotifyReceivedSync(void) { m_LastReceivedSyncTimer.Reset(); }
-    unsigned long long GetTimeSinceReceivedSync(void) { return m_LastReceivedSyncTimer.Get(); }
-    bool               UhOhNetworkTrouble(void) { return GetTimeSinceReceivedSync() > 5000; }
+    void               NotifyReceivedSync() { m_LastReceivedSyncTimer.Reset(); }
+    unsigned long long GetTimeSinceReceivedSync() { return m_LastReceivedSyncTimer.Get(); }
+    bool               UhOhNetworkTrouble() { return GetTimeSinceReceivedSync() > 5000; }
 
     const std::string& GetAnnounceValue(const std::string& strKey) const;
     void               SetAnnounceValue(const std::string& strKey, const std::string& strValue);
 
     // Checks
     void SetWeaponCorrect(bool bWeaponCorrect);
-    bool GetWeaponCorrect(void);
+    bool GetWeaponCorrect();
 
-    void            MaybeUpdateOthersNearList(void);
-    void            UpdateOthersNearList(void);
+    void            MaybeUpdateOthersNearList();
+    void            UpdateOthersNearList();
     void            RefreshNearPlayer(CPlayer* pOther);
-    SViewerMapType& GetNearPlayerList(void) { return m_NearPlayerList; }
-    SViewerMapType& GetFarPlayerList(void) { return m_FarPlayerList; }
+    SViewerMapType& GetNearPlayerList() { return m_NearPlayerList; }
+    SViewerMapType& GetFarPlayerList() { return m_FarPlayerList; }
     void            AddPlayerToDistLists(CPlayer* pOther);
     void            RemovePlayerFromDistLists(CPlayer* pOther);
     void            MovePlayerToNearList(CPlayer* pOther);
     void            MovePlayerToFarList(CPlayer* pOther);
     bool            ShouldPlayerBeInNearList(CPlayer* pOther);
 
-    SScreenShotInfo& GetScreenShotInfo(void) { return m_ScreenShotInfo; }
+    SScreenShotInfo& GetScreenShotInfo() { return m_ScreenShotInfo; }
 
-    CPlayerStatsPacket* GetPlayerStatsPacket(void) { return m_pPlayerStatsPacket; }
+    CPlayerStatsPacket* GetPlayerStatsPacket() { return m_pPlayerStatsPacket; }
     void                SetPlayerStat(unsigned short usID, float fValue);
     float               GetWeaponRangeFromSlot(uint uiSlot = 0xFF);
 
-    CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
-    void      SetJackingVehicle(CVehicle* pVehicle);
+    void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
+    bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
+
+protected:
+    bool ReadSpecialData(const int iLine) override { return true; }
 
 public:
     //
@@ -288,38 +300,38 @@ public:
 
         bool m_bSyncPosition;
     };
-    SLightweightSyncData& GetLightweightSyncData(void) { return m_lightweightSyncData; }
+    SLightweightSyncData& GetLightweightSyncData() { return m_lightweightSyncData; }
 
     void      SetPosition(const CVector& vecPosition);
-    long long GetPositionLastChanged(void) { return m_llLastPositionHasChanged; }
-    void      MarkPositionAsChanged(void) { m_llLastPositionHasChanged = GetTickCount64_(); }
+    long long GetPositionLastChanged() { return m_llLastPositionHasChanged; }
+    void      MarkPositionAsChanged() { m_llLastPositionHasChanged = GetTickCount64_(); }
 
     //
     // End Light Sync
     //
 
-    eVoiceState GetVoiceState(void) { return m_VoiceState; }
+    eVoiceState GetVoiceState() { return m_VoiceState; }
     void        SetVoiceState(eVoiceState State) { m_VoiceState = State; }
 
-    std::list<CElement*>::const_iterator IterBroadcastListBegin(void) { return m_lstBroadcastList.begin(); };
-    std::list<CElement*>::const_iterator IterBroadcastListEnd(void) { return m_lstBroadcastList.end(); };
-    bool                                 IsVoiceMuted(void) { return m_lstBroadcastList.empty(); }
+    std::list<CElement*>::const_iterator IterBroadcastListBegin() { return m_lstBroadcastList.begin(); };
+    std::list<CElement*>::const_iterator IterBroadcastListEnd() { return m_lstBroadcastList.end(); };
+    bool                                 IsVoiceMuted() { return m_lstBroadcastList.empty(); }
     void                                 SetVoiceBroadcastTo(CElement* pElement);
     void                                 SetVoiceBroadcastTo(const std::list<CElement*>& lstElements);
 
     void                                 SetVoiceIgnoredElement(CElement* pElement);
     void                                 SetVoiceIgnoredList(const std::list<CElement*>& lstElements);
-    std::list<CElement*>::const_iterator IterIgnoredListBegin(void) { return m_lstIgnoredList.begin(); };
-    std::list<CElement*>::const_iterator IterIgnoredListEnd(void) { return m_lstIgnoredList.end(); };
+    std::list<CElement*>::const_iterator IterIgnoredListBegin() { return m_lstIgnoredList.begin(); };
+    std::list<CElement*>::const_iterator IterIgnoredListEnd() { return m_lstIgnoredList.end(); };
     bool                                 IsPlayerIgnoringElement(CElement* pElement);
 
     void           SetCameraOrientation(const CVector& vecPosition, const CVector& vecFwd);
     bool           IsTimeToReceivePuresyncNearFrom(CPlayer* pOther, SViewerInfo& nearInfo);
     int            GetPuresyncZone(CPlayer* pOther);
-    int            GetApproxPuresyncPacketSize(void);
-    const CVector& GetCamPosition(void) { return m_vecCamPosition; };
-    const CVector& GetCamFwd(void) { return m_vecCamFwd; };
-    const SString& GetQuitReasonForLog(void) { return m_strQuitReasonForLog; }
+    int            GetApproxPuresyncPacketSize();
+    const CVector& GetCamPosition() { return m_vecCamPosition; };
+    const CVector& GetCamFwd() { return m_vecCamFwd; };
+    const SString& GetQuitReasonForLog() { return m_strQuitReasonForLog; }
     void           SetQuitReasonForLog(const SString& strReason) { m_strQuitReasonForLog = strReason; }
 
     CFastHashSet<CPlayer*> m_PureSyncSimSendList;
@@ -333,8 +345,8 @@ public:
 private:
     SLightweightSyncData m_lightweightSyncData;
 
-    void WriteCameraModePacket(void);
-    void WriteCameraPositionPacket(void);
+    void WriteCameraModePacket();
+    void WriteCameraPositionPacket();
 
     class CPlayerManager*   m_pPlayerManager;
     class CScriptDebugging* m_pScriptDebugging;
@@ -346,9 +358,11 @@ private:
     int            m_iGameVersion;
     unsigned short m_usMTAVersion;
     unsigned short m_usBitStreamVersion;
-    SString        m_strPlayerVersion;
+    CMtaVersion    m_strPlayerVersion;
     bool           m_bIsMuted;
+    bool           m_bIsLeavingServer;
     bool           m_bIsJoined;
+    SString        m_strDiscordJoinSecret;
 
     bool m_bNametagColorOverridden;
 
@@ -357,7 +371,7 @@ private:
     CVector       m_vecSniperSource;
     CVector       m_vecTargetting;
     float         m_fAimDirection;
-    unsigned char m_ucDriveByDirection;
+    eVehicleAimDirection m_ucDriveByDirection;
 
     bool m_bAkimboArmUp;
 
@@ -422,6 +436,8 @@ private:
 
     std::map<std::string, std::string> m_AnnounceValues;
 
+    std::set<std::pair<CElement*, std::string>> m_DataSubscriptions;
+
     uint m_uiWeaponIncorrectCount;
 
     SViewerMapType m_NearPlayerList;
@@ -439,7 +455,6 @@ private:
     SScreenShotInfo m_ScreenShotInfo;
 
     CPlayerStatsPacket* m_pPlayerStatsPacket;
-    CVehicle*           m_pJackingVehicle;
 
     // Used to reduce calls when calculating weapon range
     float       m_fWeaponRangeLast;

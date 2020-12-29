@@ -17,8 +17,8 @@ public:
 
     CSimPedTaskPacket(ElementID PlayerID);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PED_TASK; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PED_TASK; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

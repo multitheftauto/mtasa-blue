@@ -13,11 +13,11 @@
 
 #include "CPacket.h"
 
-class CPlayerTimeoutPacket : public CPacket
+class CPlayerTimeoutPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID(void) const { return static_cast<ePacketID>(PACKET_ID_PLAYER_TIMEOUT); };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_PLAYER_TIMEOUT); };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream) { return true; };
     bool Write(NetBitStreamInterface& BitStream) const { return true; };

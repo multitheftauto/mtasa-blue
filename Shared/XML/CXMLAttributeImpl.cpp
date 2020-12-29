@@ -46,7 +46,7 @@ CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElemen
         m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-CXMLAttributeImpl::~CXMLAttributeImpl(void)
+CXMLAttributeImpl::~CXMLAttributeImpl()
 {
     // Remove from array over XML stuff
     if (m_bUsingIDs)
@@ -62,12 +62,12 @@ CXMLAttributeImpl::~CXMLAttributeImpl(void)
     m_Attributes.RemoveFromList(this);
 }
 
-const std::string CXMLAttributeImpl::GetName(void) const
+const std::string CXMLAttributeImpl::GetName() const
 {
     return std::string(m_Attribute.Name());
 }
 
-const std::string& CXMLAttributeImpl::GetValue(void) const
+const std::string& CXMLAttributeImpl::GetValue() const
 {
     return m_Attribute.ValueStr();
 }
@@ -119,7 +119,7 @@ void CXMLAttributeImpl::SetValue(float fValue)
     SetValue(szBuffer);
 }
 
-void CXMLAttributeImpl::DeleteWrapper(void)
+void CXMLAttributeImpl::DeleteWrapper()
 {
     // Delete us, but don't delete the attribute
     m_bDeleteAttribute = false;

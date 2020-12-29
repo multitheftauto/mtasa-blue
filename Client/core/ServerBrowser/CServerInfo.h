@@ -14,11 +14,11 @@ class CServerInfo;
 #pragma once
 
 // Update interval for the full server (in milliseconds)
-#define SERVER_UPDATE_INTERVAL        2500
+#define SERVER_UPDATE_INTERVAL 2500
 
 // Dimensions for our window
-#define INFO_WINDOW_DEFAULTWIDTH        370.0f
-#define INFO_WINDOW_DEFAULTHEIGHT       400.0f
+#define INFO_WINDOW_DEFAULTWIDTH 370.0f
+#define INFO_WINDOW_DEFAULTHEIGHT 400.0f
 
 #define INFO_WINDOW_HSPACING 20
 #define INFO_LABEL_VSPACING 0
@@ -46,17 +46,17 @@ class CServerInfo : public CSingleton<CServerInfo>
     friend class CCore;
 
 public:
-    explicit CServerInfo(void);
-    ~CServerInfo(void);
+    explicit CServerInfo();
+    ~CServerInfo();
 
-    bool IsVisible(void);
-    void Hide(void);
+    bool IsVisible();
+    void Hide();
     void Show(eWindowType WindowType);
     void Show(eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
 
     void SetServerInformation(const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
 
-    void DoPulse(void);
+    void DoPulse();
 
 protected:
     CGUIWindow* m_pWindow;
@@ -97,9 +97,9 @@ private:
     unsigned short m_usPort;
     SString        m_strPassword;
 
-    void Refresh(void);
-    void Connect(void);
-    void Reset(void);
+    void Refresh();
+    void Connect();
+    void Reset();
     void ResetServerGUI(CServerListItem* pServer);
 
     bool OnCloseClicked(CGUIElement* pElement);

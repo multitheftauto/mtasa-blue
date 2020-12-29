@@ -24,17 +24,17 @@ CResourceClientFileItem::CResourceClientFileItem(CResource* resource, const char
     m_bClientAutoDownload = bClientAutoDownload;
 }
 
-CResourceClientFileItem::~CResourceClientFileItem(void)
+CResourceClientFileItem::~CResourceClientFileItem()
 {
 }
 
-bool CResourceClientFileItem::Start(void)
+bool CResourceClientFileItem::Start()
 {
     // start somehow
     return true;
 }
 
-bool CResourceClientFileItem::Stop(void)
+bool CResourceClientFileItem::Stop()
 {
     return true;
 }

@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CARGENERATOR
-#define __CGAME_CARGENERATOR
+#pragma once
 
 class CCarGenerator
 {
 };
-
-#endif

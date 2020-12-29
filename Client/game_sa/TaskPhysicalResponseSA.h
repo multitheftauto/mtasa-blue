@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKPHYSICALRESPONSE
-#define __CGAMESA_TASKPHYSICALRESPONSE
+#pragma once
 
 #include <game/TaskPhysicalResponse.h>
 #include "TaskSA.h"
@@ -32,16 +31,14 @@ public:
 class CTaskSimpleChokingSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleChoking
 {
 public:
-    CTaskSimpleChokingSA(void){};
+    CTaskSimpleChokingSA(){};
     CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas);
 
-    CPed*        GetAttacker(void);
-    unsigned int GetTimeRemaining(void);
-    unsigned int GetTimeStarted(void);
-    bool         IsTeargas(void);
-    bool         IsFinished(void);
+    CPed*        GetAttacker();
+    unsigned int GetTimeRemaining();
+    unsigned int GetTimeStarted();
+    bool         IsTeargas();
+    bool         IsFinished();
 
     void UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTearGas);
 };
-
-#endif

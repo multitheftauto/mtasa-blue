@@ -44,7 +44,7 @@ typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
 // List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CElement*>, public CRefCountableST
+class CElementListSnapshot final : public std::vector<CElement*>, public CRefCountableST
 {
 };
 
@@ -78,28 +78,32 @@ public:
         WATER,
         WEAPON,
         DATABASE_CONNECTION,
+        TRAIN_TRACK,
         ROOT,
         UNKNOWN,
     };
 
 public:
-    CElement(CElement* pParent, CXMLNode* pNode = NULL);
-    virtual ~CElement(void);
+    CElement(CElement* pParent);
+    virtual ~CElement();
 
-    bool         IsBeingDeleted(void) { return m_bIsBeingDeleted; };
+    virtual CElement* Clone(bool* bAddEntity, CResource* pResource) { return nullptr; }
+    bool              IsCloneable();
+
+    bool         IsBeingDeleted() { return m_bIsBeingDeleted; };
     void         SetIsBeingDeleted(bool bBeingDeleted) { m_bIsBeingDeleted = bBeingDeleted; };
-    virtual void Unlink(void) = 0;
+    virtual void Unlink() = 0;
 
-    ElementID GetID(void) { return m_ID; };
+    ElementID GetID() { return m_ID; };
 
-    virtual const CVector& GetPosition(void);
+    virtual const CVector& GetPosition();
     virtual void           SetPosition(const CVector& vecPosition);
 
     virtual void GetRotation(CVector& vecRotation) { vecRotation = CVector(); }
     virtual void GetMatrix(CMatrix& matrix);
     virtual void SetMatrix(const CMatrix& matrix);
 
-    virtual bool IsPerPlayerEntity(void) { return false; };
+    virtual bool IsPerPlayerEntity() { return false; };
 
     CElement* FindChild(const char* szName, unsigned int uiIndex, bool bRecursive);
     CElement* FindChildByType(const char* szType, unsigned int uiIndex, bool bRecursive);
@@ -108,7 +112,7 @@ public:
     void      GetChildrenByType(const char* szType, lua_State* pLua);
     bool      IsMyChild(CElement* pElement, bool bRecursive);
     bool      IsMyParent(CElement* pElement, bool bRecursive);
-    void      ClearChildren(void);
+    void      ClearChildren();
     void      GetDescendantsByType(std::vector<CElement*>& outResult, EElementType elementType);
     void      GetDescendantsByTypeSlow(std::vector<CElement*>& outResult, uint uiTypeHash);
     template <class T>
@@ -117,29 +121,27 @@ public:
         GetDescendantsByType((std::vector<CElement*>&)outResult, elementType);
     }
 
-    CMapEventManager* GetEventManager(void) { return m_pEventManager; };
-    CElement*         GetParentEntity(void) { return m_pParent; };
-    CXMLNode*         GetXMLNode(void) { return m_pXMLNode; };
+    CMapEventManager* GetEventManager() { return m_pEventManager; };
+    CElement*         GetParentEntity() { return m_pParent; };
 
     CElement* SetParentObject(CElement* pParent, bool bUpdatePerPlayerEntities = true);
-    void      SetXMLNode(CXMLNode* pNode);
 
     bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                   float fPriorityMod);
     bool CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL);
     bool DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
-    void DeleteAllEvents(void);
+    void DeleteAllEvents();
 
-    void           ReadCustomData(CEvents* pEvents);
-    CCustomData*   GetCustomDataPointer(void) { return m_pCustomData; }
-    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = NULL);
+    void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
+    CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
+    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true);
+    void SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
     void DeleteCustomData(const char* szName);
     void SendAllCustomData(CPlayer* pPlayer);
 
@@ -147,59 +149,60 @@ public:
 
     void CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive);
 
-    unsigned int                            CountChildren(void) { return static_cast<unsigned int>(m_Children.size()); };
-    CChildListType ::const_iterator         IterBegin(void) { return m_Children.begin(); };
-    CChildListType ::const_iterator         IterEnd(void) { return m_Children.end(); };
-    CChildListType ::const_reverse_iterator IterReverseBegin(void) { return m_Children.rbegin(); };
-    CChildListType ::const_reverse_iterator IterReverseEnd(void) { return m_Children.rend(); };
-    CElementListSnapshot*                   GetChildrenListSnapshot(void);
+    unsigned int                            CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
+    CChildListType ::const_iterator         IterBegin() { return m_Children.begin(); };
+    CChildListType ::const_iterator         IterEnd() { return m_Children.end(); };
+    CChildListType ::const_reverse_iterator IterReverseBegin() { return m_Children.rbegin(); };
+    CChildListType ::const_reverse_iterator IterReverseEnd() { return m_Children.rend(); };
+    CElementListSnapshot*                   GetChildrenListSnapshot();
 
     static uint        GetTypeHashFromString(const SString& strTypeName);
-    EElementType       GetType(void) { return m_iType; };
-    virtual bool       IsEntity(void) { return false; };
-    unsigned int       GetTypeHash(void) { return m_uiTypeHash; };
-    const std::string& GetTypeName(void) { return m_strTypeName; };
+    EElementType       GetType() { return m_iType; };
+    virtual bool       IsEntity() { return false; };
+    unsigned int       GetTypeHash() { return m_uiTypeHash; };
+    const std::string& GetTypeName() { return m_strTypeName; };
     void               SetTypeName(const std::string& strTypeName);
 
-    const std::string& GetName(void) { return m_strName; };
+    const std::string& GetName() { return m_strName; };
     void               SetName(const std::string& strName) { m_strName = strName; };
 
-    bool LoadFromCustomData(CEvents* pEvents);
+    bool LoadFromCustomData(CEvents* pEvents, CXMLNode& Node);
 
     void OnSubtreeAdd(CElement* pElement);
     void OnSubtreeRemove(CElement* pElement);
 
-    virtual void UpdatePerPlayer(void){};
-    void         UpdatePerPlayerEntities(void);
+    virtual void UpdatePerPlayer(){};
+    void         UpdatePerPlayerEntities();
 
     void                                  AddCollision(class CColShape* pShape) { m_Collisions.push_back(pShape); }
     void                                  RemoveCollision(class CColShape* pShape) { m_Collisions.remove(pShape); }
     bool                                  CollisionExists(class CColShape* pShape);
-    void                                  RemoveAllCollisions(void);
-    std::list<class CColShape*>::iterator CollisionsBegin(void) { return m_Collisions.begin(); }
-    std::list<class CColShape*>::iterator CollisionsEnd(void) { return m_Collisions.end(); }
+    void                                  RemoveAllCollisions();
+    std::list<class CColShape*>::iterator CollisionsBegin() { return m_Collisions.begin(); }
+    std::list<class CColShape*>::iterator CollisionsEnd() { return m_Collisions.end(); }
 
-    unsigned short GetDimension(void) { return m_usDimension; }
-    void           SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    unsigned short GetDimension() { return m_usDimension; }
+    virtual void   SetDimension(unsigned short usDimension);
 
-    class CClient* GetClient(void);
+    class CClient* GetClient();
 
-    CElement*                            GetAttachedToElement(void) { return m_pAttachedTo; }
+    CElement*                            GetAttachedToElement() { return m_pAttachedTo; }
     virtual void                         AttachTo(CElement* pElement);
     virtual void                         GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     virtual void                         SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     void                                 AddAttachedElement(CElement* pElement);
     void                                 RemoveAttachedElement(CElement* pElement);
-    std::list<CElement*>::const_iterator AttachedElementsBegin(void) { return m_AttachedElements.begin(); }
-    std::list<CElement*>::const_iterator AttachedElementsEnd(void) { return m_AttachedElements.end(); }
-    const char*                          GetAttachToID(void) { return m_strAttachToID; }
+    std::list<CElement*>::const_iterator AttachedElementsBegin() { return m_AttachedElements.begin(); }
+    std::list<CElement*>::const_iterator AttachedElementsEnd() { return m_AttachedElements.end(); }
+    const char*                          GetAttachToID() { return m_strAttachToID; }
     bool                                 IsElementAttached(CElement* pElement);
-    virtual bool                         IsAttachable(void);
-    virtual bool                         IsAttachToable(void);
+    bool                                 IsAttachedToElement(CElement* pElement, bool bRecursive = true);
+    virtual bool                         IsAttachable();
+    virtual bool                         IsAttachToable();
     void                                 GetAttachedPosition(CVector& vecPosition);
     void                                 GetAttachedRotation(CVector& vecRotation);
 
-    CElementGroup* GetElementGroup(void) { return m_pElementGroup; }
+    CElementGroup* GetElementGroup() { return m_pElementGroup; }
     void           SetElementGroup(CElementGroup* elementGroup) { m_pElementGroup = elementGroup; }
 
     // This is used for realtime synced elements. Whenever a position/rotation change is
@@ -208,29 +211,32 @@ public:
     // If this value doesn't match the value from the sync packet, the packet should be
     // ignored. Note that if this value is 0, all sync packets should be accepted. This is
     // so we don't need this byte when the element is created first.
-    unsigned char GetSyncTimeContext(void) { return m_ucSyncTimeContext; };
-    unsigned char GenerateSyncTimeContext(void);
+    unsigned char GetSyncTimeContext() { return m_ucSyncTimeContext; };
+    unsigned char GenerateSyncTimeContext();
     bool          CanUpdateSync(unsigned char ucRemote);
 
     void AddOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.push_back(pPed); }
     void RemoveOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.remove(pPed); }
 
-    unsigned char GetInterior(void) { return m_ucInterior; }
+    unsigned char GetInterior() { return m_ucInterior; }
     void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
-    bool IsDoubleSided(void) { return m_bDoubleSided; }
+    bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
 
     // Spatial database
-    virtual CSphere GetWorldBoundingSphere(void);
-    virtual void    UpdateSpatialData(void);
+    virtual CSphere GetWorldBoundingSphere();
+    virtual void    UpdateSpatialData();
 
-    bool IsCallPropagationEnabled(void) { return m_bCallPropagationEnabled; }
+    bool IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
 
+    bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
+    void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
+
 protected:
-    CElement*    GetRootElement(void);
-    virtual bool ReadSpecialData(void) = 0;
+    CElement*    GetRootElement();
+    virtual bool ReadSpecialData(const int iLine) = 0;
 
     CElement* FindChildIndex(const char* szName, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
     CElement* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
@@ -245,8 +251,6 @@ protected:
     EElementType m_iType;
     ElementID    m_ID;
     CElement*    m_pParent;
-    CXMLNode*    m_pXMLNode;
-    unsigned int m_uiLine;
     bool         m_bIsBeingDeleted;
 
     CVector m_vecPosition;
@@ -278,7 +282,8 @@ protected:
     bool                   m_bDoubleSided;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
-
+    bool                   m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                       // have no effect on this element
     // Optimization for getElementsByType starting at root
 public:
     static void StartupEntitiesFromRoot();

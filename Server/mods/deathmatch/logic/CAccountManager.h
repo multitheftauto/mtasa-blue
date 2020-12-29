@@ -14,6 +14,8 @@ class CAccountManager;
 #pragma once
 
 #include "CAccount.h"
+#include <optional>
+
 typedef uint SDbConnectionId;
 
 #define GUEST_ACCOUNT_NAME          "guest"
@@ -33,8 +35,8 @@ public:
 
     // CMappedList functions
     bool     contains(CAccount* item) const { return Super::contains(item); }
-    iterator begin(void) { return Super::begin(); }
-    iterator end(void) { return Super::end(); }
+    iterator begin() { return Super::begin(); }
+    iterator end() { return Super::end(); }
 
     void push_back(CAccount* item)
     {
@@ -51,14 +53,14 @@ public:
         assert(m_NameAccountMap.size() == size());
     }
 
-    void clear(void)
+    void clear()
     {
         assert(m_NameAccountMap.size() == size());
         m_NameAccountMap.clear();
         Super::clear();
     }
 
-    size_t size(void) const { return Super::size(); }
+    size_t size() const { return Super::size(); }
 
     // Account functions
     void FindAccountMatches(std::vector<CAccount*>* pOutResults, const SString& strName, bool bCaseSensitive)
@@ -115,22 +117,22 @@ class CAccountManager
 
 public:
     CAccountManager(const SString& strDbPathFilename);
-    ~CAccountManager(void);
+    ~CAccountManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    bool Load(void);
+    bool Load();
     void Save(bool bForce = false);
     void Save(CAccount* pParent, bool bCheckForErrors = true);
 
-    bool SaveSettings(void);
-    bool IntegrityCheck(void);
+    bool SaveSettings();
+    bool IntegrityCheck();
 
-    CAccount* Get(const char* szName);
+    CAccount* Get(const char* szName, const char* szPassword = nullptr, bool caseSensitive = true);
     CAccount* GetAccountFromScriptID(uint uiScriptID);
     SString   GetActiveCaseVariation(const SString& strName);
 
-    bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword);
+    bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, std::optional<SString> password);
     bool LogOut(CClient* pClient, CClient* pEchoClient);
 
     std::shared_ptr<CLuaArgument> GetAccountData(CAccount* pAccount, const char* szKey);
@@ -160,10 +162,10 @@ protected:
     void ChangingName(CAccount* pAccount, const SString& strOldName, const SString& strNewName);
     void LoadAccountSerialUsage(CAccount* pAccount);
     void SaveAccountSerialUsage(CAccount* pAccount);
-    void ReconnectToDatabase(void);
+    void ReconnectToDatabase();
 
 public:
-    void        RemoveAll(void);
+    void        RemoveAll();
     static void StaticDbCallback(CDbJobData* pJobData, void* pContext);
     void        DbCallback(CDbJobData* pJobData);
     static bool IsValidAccountName(const SString& strName);
@@ -171,8 +173,8 @@ public:
     static bool IsValidNewAccountName(const SString& strName);
     static bool IsValidNewPassword(const SString& strPassword);
 
-    CMappedAccountList::const_iterator IterBegin(void) { return m_List.begin(); };
-    CMappedAccountList::const_iterator IterEnd(void) { return m_List.end(); };
+    CMappedAccountList::const_iterator IterBegin() { return m_List.begin(); };
+    CMappedAccountList::const_iterator IterEnd() { return m_List.end(); };
 
 protected:
     CMappedAccountList m_List;

@@ -11,8 +11,7 @@
 
 // INTERFACE for Lua dynamic modules
 
-#ifndef __ILUAMODULEMANAGER_H
-#define __ILUAMODULEMANAGER_H
+#pragma once
 
 #define MAX_INFO_LENGTH 128
 
@@ -64,5 +63,3 @@ public:
     virtual bool GetResourceName(lua_State* luaVM, char* szName, size_t length) = 0;
     virtual bool GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length) = 0;
 };
-
-#endif

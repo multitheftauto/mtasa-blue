@@ -40,12 +40,12 @@ struct SPacketStat
 class CBinaryFileInterface
 {
 public:
-    virtual ~CBinaryFileInterface(void) {}
+    virtual ~CBinaryFileInterface() {}
     virtual bool FOpen(const char* szFilename, const char* szMode, bool bValidate) = 0;
-    virtual void FClose(void) = 0;
-    virtual bool FEof(void) = 0;
-    virtual void FFlush(void) = 0;
-    virtual int  FTell(void) = 0;
+    virtual void FClose() = 0;
+    virtual bool FEof() = 0;
+    virtual void FFlush() = 0;
+    virtual int  FTell() = 0;
     virtual void FSeek(int iOffset, int iOrigin) = 0;
     virtual int  FRead(void* pData, uint uiSize) = 0;
     virtual int  FWrite(const void* pData, uint uiSize) = 0;
@@ -53,7 +53,7 @@ public:
 
 struct SNetOptions
 {
-    SNetOptions(void) { memset(this, 0, sizeof(*this)); }
+    SNetOptions() { memset(this, 0, sizeof(*this)); }
 
     struct
     {
@@ -103,14 +103,14 @@ public:
 
     // szIP can be NULL if autochoosing is wanted.
     virtual bool StartNetwork(const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName) = 0;
-    virtual void StopNetwork(void) = 0;
+    virtual void StopNetwork() = 0;
 
-    virtual void DoPulse(void) = 0;
+    virtual void DoPulse() = 0;
 
     virtual void RegisterPacketHandler(PPACKETHANDLER pfnPacketHandler) = 0;
 
     virtual bool               GetNetworkStatistics(NetStatistics* pDest, const NetServerPlayerID& PlayerID) = 0;
-    virtual const SPacketStat* GetPacketStats(void) = 0;
+    virtual const SPacketStat* GetPacketStats() = 0;
     virtual bool               GetBandwidthStatistics(SBandwidthStatistics* pDest) = 0;
     virtual bool               GetNetPerformanceStatistics(SNetPerformanceStatistics* pDest, bool bResetCounters) = 0;
     virtual void               GetPingStatus(SFixedString<32>* pstrStatus) = 0;
@@ -139,7 +139,7 @@ public:
     virtual void SetChecks(const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC,
                            const char* szImgMods) = 0;
 
-    virtual unsigned int GetPendingPacketCount(void) = 0;
+    virtual unsigned int GetPendingPacketCount() = 0;
     virtual void         GetNetRoute(SFixedString<32>* pstrRoute) = 0;
 
     virtual bool InitServerId(const char* szPath) = 0;
@@ -158,7 +158,7 @@ public:
         return false;
     }
     virtual bool        GetPlayerPacketUsageStats(uchar* packetIdList, uint uiNumPacketIds, SPlayerPacketUsage* pOutStats, uint uiTopCount) { return false; }
-    virtual const char* GetLogOutput(void) { return NULL; }
+    virtual const char* GetLogOutput() { return NULL; }
     virtual bool        IsValidSocket(const NetServerPlayerID& playerID)
     {
         assert(0);

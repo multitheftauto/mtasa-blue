@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void COffsetsMP::Initialize10EU(void)
+void COffsetsMP::Initialize10EU()
 {
     InitializeCommon10();
 
@@ -19,7 +19,7 @@ void COffsetsMP::Initialize10EU(void)
     CMultiplayerSA::ADDR_GotFocus = 0x74804E;
 }
 
-void COffsetsMP::Initialize10US(void)
+void COffsetsMP::Initialize10US()
 {
     InitializeCommon10();
 
@@ -27,7 +27,7 @@ void COffsetsMP::Initialize10US(void)
     CMultiplayerSA::ADDR_GotFocus = 0x748054;
 }
 
-void COffsetsMP::Initialize11(void)
+void COffsetsMP::Initialize11()
 {
     CMultiplayerSA::HOOKPOS_FindPlayerCoors = 0x56E4B0;            // 1.01
     CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld = 0x56E250;
@@ -45,12 +45,12 @@ void COffsetsMP::Initialize11(void)
     CMultiplayerSA::FUNC_CPlayerInfoBase = 0xB7CD98;
 }
 
-void COffsetsMP::Initialize20(void)
+void COffsetsMP::Initialize20()
 {
     // TODO
 }
 
-void COffsetsMP::InitializeCommon10(void)
+void COffsetsMP::InitializeCommon10()
 {
     CMultiplayerSA::HOOKPOS_FindPlayerCoors = 0x56E010;
     CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld = 0x56E250;

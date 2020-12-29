@@ -14,7 +14,7 @@
 using std::list;
 
 CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node)
-    : m_ulID(INVALID_XML_ID), m_bUsingIDs(pFile && pFile->IsUsingIDs()), m_pNode(&Node), m_Attributes(Node, pFile && pFile->IsUsingIDs())
+    : m_ulID(INVALID_XML_ID), m_bUsingIDs((!pFile) || pFile && pFile->IsUsingIDs()), m_pNode(&Node), m_Attributes(Node, (!pFile) || pFile && pFile->IsUsingIDs())
 {
     // Init
     m_pFile = pFile;
@@ -37,7 +37,7 @@ CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElem
         m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-CXMLNodeImpl::~CXMLNodeImpl(void)
+CXMLNodeImpl::~CXMLNodeImpl()
 {
     // Remove from array over XML stuff
     if (m_bUsingIDs)
@@ -74,6 +74,20 @@ CXMLNodeImpl::~CXMLNodeImpl(void)
     }
 }
 
+void CXMLNodeImpl::BuildFromDocument()
+{
+    TiXmlNode*    xmlChild = nullptr;
+    while (xmlChild = m_pNode->IterateChildren(xmlChild))
+    {
+        auto xmlChildElement = xmlChild->ToElement();
+        if (xmlChildElement)
+        {
+            auto xmlChildNode = new CXMLNodeImpl(nullptr, this, *xmlChildElement);
+            xmlChildNode->BuildFromDocument();
+        }
+    }
+}
+
 CXMLNode* CXMLNodeImpl::CreateSubNode(const char* szTagName, CXMLNode* pInsertAfter)
 {
     TiXmlElement* pNewNode;
@@ -100,7 +114,7 @@ CXMLNode* CXMLNodeImpl::CreateSubNode(const char* szTagName, CXMLNode* pInsertAf
     }
 }
 
-void CXMLNodeImpl::DeleteAllSubNodes(void)
+void CXMLNodeImpl::DeleteAllSubNodes()
 {
     // Don't let the nodes remove themselves from this list
     m_bCanRemoveFromList = false;
@@ -117,7 +131,7 @@ void CXMLNodeImpl::DeleteAllSubNodes(void)
     m_Children.clear();
 }
 
-unsigned int CXMLNodeImpl::GetSubNodeCount(void)
+unsigned int CXMLNodeImpl::GetSubNodeCount()
 {
     return static_cast<unsigned int>(m_Children.size());
 }
@@ -164,22 +178,22 @@ CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
     return NULL;
 }
 
-CXMLAttributes& CXMLNodeImpl::GetAttributes(void)
+CXMLAttributes& CXMLNodeImpl::GetAttributes()
 {
     return m_Attributes;
 }
 
-CXMLNode* CXMLNodeImpl::GetParent(void)
+CXMLNode* CXMLNodeImpl::GetParent()
 {
     return m_pParent;
 }
 
-int CXMLNodeImpl::GetLine(void)
+int CXMLNodeImpl::GetLine()
 {
     return m_pNode->Row();
 }
 
-const std::string& CXMLNodeImpl::GetTagName(void)
+const std::string& CXMLNodeImpl::GetTagName()
 {
     return m_pNode->ValueStr();
 }
@@ -189,7 +203,7 @@ void CXMLNodeImpl::SetTagName(const std::string& strString)
     m_pNode->SetValue(strString);
 }
 
-const std::string CXMLNodeImpl::GetTagContent(void)
+const std::string CXMLNodeImpl::GetTagContent()
 {
     // FIXME: This can be sort of misleading as sub-tags are not included
     const char* szSubText = m_pNode->GetText();
@@ -326,7 +340,7 @@ void CXMLNodeImpl::SetTagContentf(const char* szFormat, ...)
     SetTagContent(szBuffer);
 }
 
-TiXmlElement* CXMLNodeImpl::GetNode(void)
+TiXmlElement* CXMLNodeImpl::GetNode()
 {
     return m_pNode;
 }
@@ -411,7 +425,7 @@ bool CXMLNodeImpl::CopyChildrenInto(CXMLNode* pDestination, bool bRecursive)
     return true;
 }
 
-void CXMLNodeImpl::DeleteWrapper(void)
+void CXMLNodeImpl::DeleteWrapper()
 {
     // Don't let the nodes remove themselves from this list
     m_bCanRemoveFromList = false;
@@ -455,7 +469,7 @@ void CXMLNodeImpl::RemoveFromList(CXMLNode* pNode)
     }
 }
 
-void CXMLNodeImpl::RemoveAllFromList(void)
+void CXMLNodeImpl::RemoveAllFromList()
 {
     m_Children.clear();
 }
@@ -487,7 +501,7 @@ SString CXMLNodeImpl::GetAttributeValue(const SString& strAttributeName)
     return pAttribute ? pAttribute->GetValue() : "";
 }
 
-SString CXMLNodeImpl::GetCommentText(void)
+SString CXMLNodeImpl::GetCommentText()
 {
     SString    strComment;
     TiXmlNode* pCommentNode = m_pNode->PreviousSibling();

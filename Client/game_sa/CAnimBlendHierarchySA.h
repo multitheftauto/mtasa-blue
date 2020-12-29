@@ -10,9 +10,7 @@
  *****************************************************************************/
 
 /* CAnimBlendHierarchy: data tree on animation blending?*/
-
-#ifndef __CAnimBlendHierarchySA_H
-#define __CAnimBlendHierarchySA_H
+#pragma once
 
 #include <game/CAnimBlendHierarchy.h>
 #include "Common.h"
@@ -31,9 +29,9 @@ class CAnimBlendHierarchySAInterface
 {
 public:
     // Careful, GetIndex will not work for custom animations
-    int GetIndex(void);
+    int GetIndex();
 
-    unsigned int                   iHashKey;
+    unsigned int                   uiHashKey;
     CAnimBlendSequenceSAInterface* pSequences;
     unsigned short                 usNumSequences;
     bool                           bRunningCompressed;
@@ -48,25 +46,26 @@ class CAnimBlendHierarchySA : public CAnimBlendHierarchy
 {
 public:
     CAnimBlendHierarchySA(CAnimBlendHierarchySAInterface* pInterface) { m_pInterface = pInterface; }
-    void                            Initialize(void);
+    void                            Initialize();
     void                            SetName(const char* szName);
     void                            SetSequences(CAnimBlendSequenceSAInterface* pSequences) { m_pInterface->pSequences = pSequences; }
     void                            SetNumSequences(unsigned short uNumSequences) { m_pInterface->usNumSequences = uNumSequences; }
     void                            SetRunningCompressed(bool bCompressed) { m_pInterface->bRunningCompressed = bCompressed; }
     void                            SetAnimationBlockID(int iBlockID) { m_pInterface->iAnimBlockID = iBlockID; }
-    void                            RemoveAnimSequences(void);
-    void                            RemoveFromUncompressedCache(void);
-    void                            RemoveQuaternionFlips(void);
-    void                            CalculateTotalTime(void);
+    void                            RemoveAnimSequences();
+    void                            RemoveFromUncompressedCache();
+    void                            RemoveQuaternionFlips();
+    void                            CalculateTotalTime();
     CAnimBlendSequenceSAInterface*  GetSequence(DWORD dwIndex);
-    CAnimBlendSequenceSAInterface*  GetSequences(void) { return m_pInterface->pSequences; }
-    unsigned short                  GetNumSequences(void) { return m_pInterface->usNumSequences; }
-    bool                            isRunningCompressed(void) { return m_pInterface->bRunningCompressed; }
-    int                             GetAnimBlockID(void) { return m_pInterface->iAnimBlockID; }
-    CAnimBlendHierarchySAInterface* GetInterface(void) { return m_pInterface; }
+    CAnimBlendSequenceSAInterface*  GetSequences() { return m_pInterface->pSequences; }
+    unsigned short                  GetNumSequences() { return m_pInterface->usNumSequences; }
+    bool                            IsRunningCompressed() { return m_pInterface->bRunningCompressed; }
+    bool                            IsCustom() { return m_pInterface->iAnimBlockID == -1; }
+    int                             GetAnimBlockID() { return m_pInterface->iAnimBlockID; }
+    CAnimBlendHierarchySAInterface* GetInterface() { return m_pInterface; }
+    unsigned int                    GetNameHashKey() { return m_pInterface->uiHashKey; }
 
 protected:
     CAnimBlendHierarchySAInterface* m_pInterface;
 };
 
-#endif

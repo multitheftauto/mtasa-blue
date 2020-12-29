@@ -26,12 +26,12 @@ class CRegistry
 {
     friend class CRegistryManager;
     CRegistry(const std::string& strFileName);
-    ~CRegistry(void);
+    ~CRegistry();
 
 public:
     void SuspendBatching(uint uiTicks);
     void Load(const std::string& strFileName);
-    bool IntegrityCheck(void);
+    bool IntegrityCheck();
 
     void CreateTable(const std::string& strTable, const std::string& strDefinition, bool bSilent = false);
     void DropTable(const std::string& strTable);
@@ -45,7 +45,7 @@ public:
     bool Query(const char* szQuery, ...);
     bool Query(CRegistryResult* pResult, const char* szQuery, ...);
 
-    const SString& GetLastError(void) { return m_strLastErrorMessage; }
+    const SString& GetLastError() { return m_strLastErrorMessage; }
 
 protected:
     bool SetLastErrorMessage(const std::string& strLastErrorMessage, const std::string& strQuery);
@@ -53,8 +53,8 @@ protected:
     bool ExecInternal(const char* szQuery);
     bool Query(CRegistryResult* pResult, const char* szQuery, va_list vl);
     bool QueryInternal(const char* szQuery, CRegistryResult* pResult);
-    void BeginAutomaticTransaction(void);
-    void EndAutomaticTransaction(void);
+    void BeginAutomaticTransaction();
+    void EndAutomaticTransaction();
 
     sqlite3*  m_db;
     bool      m_bOpened;
@@ -70,7 +70,7 @@ private:
 
 struct CRegistryResultCell
 {
-    CRegistryResultCell(void)
+    CRegistryResultCell()
     {
         nType = SQLITE_NULL;
         nLength = 0;
@@ -89,7 +89,7 @@ struct CRegistryResultCell
             memcpy(pVal, cell.pVal, nLength);
         }
     };
-    ~CRegistryResultCell(void)
+    ~CRegistryResultCell()
     {
         if (pVal)
             delete[] pVal;
@@ -120,7 +120,7 @@ struct CRegistryResultCell
     }
 
     template <class T>
-    T GetNumber(void) const
+    T GetNumber() const
     {
         if (nType == SQLITE_INTEGER)
             return static_cast<T>(nVal);
@@ -142,7 +142,7 @@ typedef std::list<CRegistryResultRow>::const_iterator CRegistryResultIterator;
 
 struct CRegistryResultData
 {
-    CRegistryResultData(void)
+    CRegistryResultData()
     {
         nRows = 0;
         nColumns = 0;
@@ -150,7 +150,7 @@ struct CRegistryResultData
         ullLastInsertId = 0;
         pNextResult = nullptr;
     }
-    ~CRegistryResultData(void) { SAFE_DELETE(pNextResult); }
+    ~CRegistryResultData() { SAFE_DELETE(pNextResult); }
     std::vector<SString>          ColNames;
     std::list<CRegistryResultRow> Data;
     int                           nRows;
@@ -160,6 +160,6 @@ struct CRegistryResultData
     CRegistryResultData*          pNextResult;
 
     CRegistryResultData*    GetThis() { return this; }
-    CRegistryResultIterator begin(void) const { return Data.begin(); }
-    CRegistryResultIterator end(void) const { return Data.end(); }
+    CRegistryResultIterator begin() const { return Data.begin(); }
+    CRegistryResultIterator end() const { return Data.end(); }
 };

@@ -4,9 +4,9 @@
  *
  *  ml_base, External lua add-on module
  *
- *  Copyright © 2003-2008 MTA.  All Rights Reserved.
+ *  Copyright ï¿½ 2003-2018 MTA.  All Rights Reserved.
  *
- *  Grand Theft Auto is © 2002-2003 Rockstar North
+ *  Grand Theft Auto is ï¿½ 2002-2018 Rockstar North
  *
  *  THE FOLLOWING SOURCES ARE PART OF THE MULTI THEFT
  *  AUTO SOFTWARE DEVELOPMENT KIT AND ARE RELEASED AS
@@ -16,8 +16,7 @@
  *
  *********************************************************/
 
-#ifndef __CLUAARGUMENTS_H
-#define __CLUAARGUMENTS_H
+#pragma once
 
 extern "C"
 {
@@ -32,9 +31,9 @@ using namespace std;
 class CLuaArguments
 {
 public:
-    CLuaArguments(void){};
+    CLuaArguments(){};
     CLuaArguments(const CLuaArguments& Arguments);
-    ~CLuaArguments(void) { DeleteArguments(); };
+    ~CLuaArguments() { DeleteArguments(); };
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments);
 
@@ -43,20 +42,18 @@ public:
     void PushArguments(CLuaArguments& Arguments);
     bool Call(lua_State* luaVM, const char* szFunction) const;
 
-    CLuaArgument* PushNil(void);
+    CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);
     CLuaArgument* PushNumber(double dNumber);
     CLuaArgument* PushString(const char* szString);
     CLuaArgument* PushUserData(void* pUserData);
 
-    void DeleteArguments(void);
+    void DeleteArguments();
 
-    unsigned int                          Count(void) const { return static_cast<unsigned int>(m_Arguments.size()); };
-    vector<CLuaArgument*>::const_iterator IterBegin(void) { return m_Arguments.begin(); };
-    vector<CLuaArgument*>::const_iterator IterEnd(void) { return m_Arguments.end(); };
+    unsigned int                          Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
+    vector<CLuaArgument*>::const_iterator IterBegin() { return m_Arguments.begin(); };
+    vector<CLuaArgument*>::const_iterator IterEnd() { return m_Arguments.end(); };
 
 private:
     vector<CLuaArgument*> m_Arguments;
 };
-
-#endif

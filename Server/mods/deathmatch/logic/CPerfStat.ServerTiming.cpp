@@ -22,12 +22,12 @@ class CPerfStatServerTimingImpl : public CPerfStatServerTiming
 {
 public:
     ZERO_ON_NEW
-    CPerfStatServerTimingImpl(void);
-    virtual ~CPerfStatServerTimingImpl(void);
+    CPerfStatServerTimingImpl();
+    virtual ~CPerfStatServerTimingImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatServerTiming
@@ -65,7 +65,7 @@ CPerfStatServerTiming* CPerfStatServerTiming::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatServerTimingImpl::CPerfStatServerTimingImpl(void)
+CPerfStatServerTimingImpl::CPerfStatServerTimingImpl()
 {
     m_strCategoryName = "Server timing";
 }
@@ -77,7 +77,7 @@ CPerfStatServerTimingImpl::CPerfStatServerTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatServerTimingImpl::~CPerfStatServerTimingImpl(void)
+CPerfStatServerTimingImpl::~CPerfStatServerTimingImpl()
 {
 }
 
@@ -88,7 +88,7 @@ CPerfStatServerTimingImpl::~CPerfStatServerTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatServerTimingImpl::GetCategoryName(void)
+const SString& CPerfStatServerTimingImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -100,7 +100,7 @@ const SString& CPerfStatServerTimingImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatServerTimingImpl::DoPulse(void)
+void CPerfStatServerTimingImpl::DoPulse()
 {
     // Maybe turn off stats gathering if nobody is watching
     if (m_bIsActive && m_TimeSinceLastViewed.Get() > 15000)

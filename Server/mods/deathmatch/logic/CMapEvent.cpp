@@ -25,7 +25,7 @@ CMapEvent::CMapEvent(CLuaMain* pMain, const char* szName, const CLuaFunctionRef&
     m_strName.AssignLeft(szName, MAPEVENT_MAX_LENGTH_NAME);
 }
 
-CMapEvent::~CMapEvent(void)
+CMapEvent::~CMapEvent()
 {
 }
 

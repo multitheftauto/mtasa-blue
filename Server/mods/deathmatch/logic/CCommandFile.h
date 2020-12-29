@@ -19,10 +19,10 @@ class CCommandFile
 {
 public:
     CCommandFile(const char* szFilename, CConsole& Console, CClient& Client);
-    ~CCommandFile(void);
+    ~CCommandFile();
 
-    bool IsValid(void) { return m_pFile != NULL; };
-    bool Run(void);
+    bool IsValid() { return m_pFile != NULL; };
+    bool Run();
 
 private:
     bool Parse(char* szLine);

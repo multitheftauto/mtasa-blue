@@ -46,7 +46,7 @@ void CAnimBlendAssocGroupSA::InitEmptyAssociations(RpClump* pClump)
     }
 }
 
-bool CAnimBlendAssocGroupSA::IsCreated(void)
+bool CAnimBlendAssocGroupSA::IsCreated()
 {
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;
@@ -55,12 +55,12 @@ bool CAnimBlendAssocGroupSA::IsCreated(void)
     {
         mov     ecx, dwThis
         call    dwFunc
-        mov     al, bReturn
+        mov     bReturn, al
     }
     return bReturn;
 }
 
-int CAnimBlendAssocGroupSA::GetNumAnimations(void)
+int CAnimBlendAssocGroupSA::GetNumAnimations()
 {
     int   iReturn;
     DWORD dwThis = (DWORD)m_pInterface;
@@ -74,7 +74,7 @@ int CAnimBlendAssocGroupSA::GetNumAnimations(void)
     return iReturn;
 }
 
-CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock(void)
+CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
 {
     SetupAnimBlock();
 
@@ -97,7 +97,17 @@ CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int I
     return pReturn;
 }
 
-bool CAnimBlendAssocGroupSA::IsLoaded(void)
+eAnimGroup CAnimBlendAssocGroupSA::GetGroupID()
+{ 
+    if ((DWORD)m_pInterface < 0x250)
+    {
+        g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface",
+            SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
+    }
+    return static_cast<eAnimGroup>(m_pInterface->groupID); 
+};
+
+bool CAnimBlendAssocGroupSA::IsLoaded()
 {
     if (m_pInterface->pAnimBlock)
     {
@@ -118,7 +128,7 @@ void CAnimBlendAssocGroupSA::CreateAssociations(const char* szBlockName)
     }
 }
 
-void CAnimBlendAssocGroupSA::SetupAnimBlock(void)
+void CAnimBlendAssocGroupSA::SetupAnimBlock()
 {
     // Make sure our AnimBlock matches up with our interface's
     CAnimBlockSAInterface* pCurrent = (m_pAnimBlock) ? m_pAnimBlock->m_pInterface : NULL;

@@ -23,16 +23,16 @@ class CPerfStatBandwidthReductionImpl : public CPerfStatBandwidthReduction
 public:
     ZERO_ON_NEW
 
-    CPerfStatBandwidthReductionImpl(void);
-    virtual ~CPerfStatBandwidthReductionImpl(void);
+    CPerfStatBandwidthReductionImpl();
+    virtual ~CPerfStatBandwidthReductionImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatBandwidthReductionImpl
-    void RecordStats(void);
+    void RecordStats();
 
     long long  m_llNextRecordTime;
     SString    m_strCategoryName;
@@ -66,7 +66,7 @@ CPerfStatBandwidthReduction* CPerfStatBandwidthReduction::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatBandwidthReductionImpl::CPerfStatBandwidthReductionImpl(void)
+CPerfStatBandwidthReductionImpl::CPerfStatBandwidthReductionImpl()
 {
     m_strCategoryName = "Bandwidth reduction";
 }
@@ -78,7 +78,7 @@ CPerfStatBandwidthReductionImpl::CPerfStatBandwidthReductionImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatBandwidthReductionImpl::~CPerfStatBandwidthReductionImpl(void)
+CPerfStatBandwidthReductionImpl::~CPerfStatBandwidthReductionImpl()
 {
 }
 
@@ -89,7 +89,7 @@ CPerfStatBandwidthReductionImpl::~CPerfStatBandwidthReductionImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatBandwidthReductionImpl::GetCategoryName(void)
+const SString& CPerfStatBandwidthReductionImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -101,7 +101,7 @@ const SString& CPerfStatBandwidthReductionImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthReductionImpl::DoPulse(void)
+void CPerfStatBandwidthReductionImpl::DoPulse()
 {
     long long llTime = GetTickCount64_();
 
@@ -120,7 +120,7 @@ void CPerfStatBandwidthReductionImpl::DoPulse(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthReductionImpl::RecordStats(void)
+void CPerfStatBandwidthReductionImpl::RecordStats()
 {
     for (uint i = 0; i < ZONE_MAX; i++)
     {

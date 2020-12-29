@@ -120,7 +120,7 @@ void CLuaCFunctions::RegisterFunctionsWithVM(lua_State* luaVM)
     }
 }
 
-void CLuaCFunctions::RemoveAllFunctions(void)
+void CLuaCFunctions::RemoveAllFunctions()
 {
     // Delete all functions
     CFastHashMap<lua_CFunction, CLuaCFunction*>::iterator it;

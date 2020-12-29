@@ -3,43 +3,42 @@ project "Core"
 	kind "SharedLib"
 	targetname "core"
 	targetdir(buildpath("server"))
-	
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/current/src/windows" }
 		linkoptions { "/SAFESEH:NO" }
-	
+
 	filter {}
-		includedirs { 
-			"../sdk", 
+		includedirs {
+			"../sdk",
 			"../../vendor/google-breakpad/src",
 			"../../vendor/sparsehash/current/src/",
 		}
-	
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
 
-      
 	filter "system:windows"
 		libdirs {
 			"../../vendor/detours/lib"
 		}
-		includedirs { 
+		includedirs {
 			"../../vendor/detours/include"
 		}
 		links { "detours", "Imagehlp" }
-	
+
 	filter "system:not windows"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
@@ -47,6 +46,14 @@ project "Core"
 		links { "ncursesw", "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
-	
+
+	filter "system:macosx"
+		links { "ncurses", "breakpad", "CoreFoundation.framework" }
+		buildoptions { "-pthread" }
+		linkoptions { "-pthread" }
+
+		-- This makes ncurses `get_wch` work
+		defines { "_XOPEN_SOURCE_EXTENDED=1" }
+
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

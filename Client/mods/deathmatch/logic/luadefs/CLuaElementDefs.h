@@ -14,7 +14,7 @@
 class CLuaElementDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Element get functions
@@ -27,20 +27,23 @@ public:
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
     LUA_DECLARE(GetElementData);
+    LUA_DECLARE(HasElementData);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
     LUA_DECLARE_OOP(GetElementPosition);
     LUA_DECLARE_OOP(GetElementRotation);
     LUA_DECLARE_OOP(GetElementVelocity);
+    LUA_DECLARE_OOP(GetElementTurnVelocity);
     LUA_DECLARE(GetElementType);
     LUA_DECLARE(GetElementsByType);
     LUA_DECLARE(GetElementInterior);
     LUA_DECLARE(IsElementWithinColShape);
     LUA_DECLARE(IsElementWithinMarker);
     LUA_DECLARE(GetElementsWithinColShape);
+    LUA_DECLARE(GetElementsWithinRange);
     LUA_DECLARE(GetElementDimension);
     LUA_DECLARE(GetElementZoneName);
-    LUA_DECLARE(GetElementBoundingBox);
+    LUA_DECLARE_OOP(GetElementBoundingBox);
     LUA_DECLARE(GetElementRadius);
     LUA_DECLARE(IsElementAttached);
     LUA_DECLARE(GetElementAttachedTo);
@@ -76,6 +79,7 @@ public:
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);
     LUA_DECLARE(SetElementVelocity);
+    LUA_DECLARE(SetElementAngularVelocity);
     LUA_DECLARE(SetElementParent);
     LUA_DECLARE(SetElementInterior);
     LUA_DECLARE(SetElementDimension);

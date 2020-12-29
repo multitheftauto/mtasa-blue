@@ -12,12 +12,12 @@
 #include "game/CAnimBlendSequence.h"
 #include "game/CAnimBlendHierarchy.h"
 
-CIFPAnimations::~CIFPAnimations(void)
+CIFPAnimations::~CIFPAnimations()
 {
     DeleteAnimations();
 }
 
-void CIFPAnimations::DeleteAnimations(void)
+void CIFPAnimations::DeleteAnimations()
 {
     CAnimManager* pAnimManager = g_pGame->GetAnimManager();
     for (auto& Animation : vecAnimations)

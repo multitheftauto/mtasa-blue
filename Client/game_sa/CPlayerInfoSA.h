@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PLAYERINFO
-#define __CGAMESA_PLAYERINFO
+#pragma once
 
 #include <game/CPlayerInfo.h>
 #include "Common.h"
@@ -262,7 +261,7 @@ public:
         this->wanted = NULL;            // we can't init it yet, as our interface hasn't been inited yet
     }
 
-    ~CPlayerInfoSA(void)
+    ~CPlayerInfoSA()
     {
         if (wanted)
         {
@@ -270,19 +269,19 @@ public:
         }
     }
 
-    CPlayerInfoSAInterface* GetInterface(void) { return internalInterface; }
+    CPlayerInfoSAInterface* GetInterface() { return internalInterface; }
 
     CPlayerPed* GetPlayerPed();
     CWanted*    GetWanted();
-    long        GetPlayerMoney(void);
+    long        GetPlayerMoney();
     void        SetPlayerMoney(long lMoney, bool bInstant);
 
     void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY);
 
-    VOID GivePlayerParachute(VOID);
+    VOID GivePlayerParachute();
     VOID StreamParachuteWeapon(bool bAllowParachute);
 
-    short GetLastTimeEaten(void);
+    short GetLastTimeEaten();
     void  SetLastTimeEaten(short sTime);
 
     VOID MakePlayerSafe(BOOL boolSafe);
@@ -294,24 +293,22 @@ public:
     VOID      TakeRemoteControlledCarFromPlayer();
     CVehicle* GetPlayerRemoteControlledCar();
 
-    float GetFPSMoveHeading(void);
+    float GetFPSMoveHeading();
 
-    bool GetDoesNotGetTired(void);
+    bool GetDoesNotGetTired();
     void SetDoesNotGetTired(bool bDoesNotGetTired);
 
-    DWORD GetLastTimeBigGunFired(void);
+    DWORD GetLastTimeBigGunFired();
     void  SetLastTimeBigGunFired(DWORD dwTime);
 
     byte GetCamDrunkLevel();
     void SetCamDrunkLevel(byte level);
 
-    DWORD GetCarTwoWheelCounter(void) { return internalInterface->nCarTwoWheelCounter; }
-    float GetCarTwoWheelDist(void) { return internalInterface->fCarTwoWheelDist; }
-    DWORD GetCarLess3WheelCounter(void) { return internalInterface->nCarLess3WheelCounter; }
-    DWORD GetBikeRearWheelCounter(void) { return internalInterface->nBikeRearWheelCounter; }
-    float GetBikeRearWheelDist(void) { return internalInterface->fBikeRearWheelDist; }
-    DWORD GetBikeFrontWheelCounter(void) { return internalInterface->nBikeFrontWheelCounter; }
-    float GetBikeFrontWheelDist(void) { return internalInterface->fBikeFrontWheelDist; }
+    DWORD GetCarTwoWheelCounter() { return internalInterface->nCarTwoWheelCounter; }
+    float GetCarTwoWheelDist() { return internalInterface->fCarTwoWheelDist; }
+    DWORD GetCarLess3WheelCounter() { return internalInterface->nCarLess3WheelCounter; }
+    DWORD GetBikeRearWheelCounter() { return internalInterface->nBikeRearWheelCounter; }
+    float GetBikeRearWheelDist() { return internalInterface->fBikeRearWheelDist; }
+    DWORD GetBikeFrontWheelCounter() { return internalInterface->nBikeFrontWheelCounter; }
+    float GetBikeFrontWheelDist() { return internalInterface->fBikeFrontWheelDist; }
 };
-
-#endif

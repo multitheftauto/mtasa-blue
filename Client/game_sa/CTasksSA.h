@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKS
-#define __CGAMESA_TASKS
+#pragma once
 
 #include <game/CTasks.h>
 #include "Common.h"
@@ -37,8 +36,8 @@ private:
 public:
     CTasksSA(CTaskManagementSystemSA* pTaskManagementSystem);
 
-    CTaskSimplePlayerOnFoot* CreateTaskSimplePlayerOnFoot(void);
-    CTaskComplexFacial*      CreateTaskComplexFacial(void);
+    CTaskSimplePlayerOnFoot* CreateTaskSimplePlayerOnFoot();
+    CTaskComplexFacial*      CreateTaskComplexFacial();
 
     CTaskSimpleCarSetPedInAsDriver*    CreateTaskSimpleCarSetPedInAsDriver(CVehicle* pVehicle);
     CTaskSimpleCarSetPedInAsPassenger* CreateTaskSimpleCarSetPedInAsPassenger(CVehicle* pVehicle, int iTargetDoor);
@@ -91,7 +90,5 @@ public:
                                                    unsigned char bAimImmediate = false);
     CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
 
-    static void StaticSetHooks(void);
+    static void StaticSetHooks();
 };
-
-#endif

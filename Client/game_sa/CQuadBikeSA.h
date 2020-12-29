@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_QUADBIKE
-#define __CGAMESA_QUADBIKE
+#pragma once
 
 #include <game/CQuadBike.h>
 #include "CAutomobileSA.h"
@@ -27,7 +26,5 @@ public:
     CQuadBikeSA(CQuadBikeSAInterface* quadbike);
     CQuadBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CQuadBikeSA(void) {}
+    virtual ~CQuadBikeSA() {}
 };
-
-#endif

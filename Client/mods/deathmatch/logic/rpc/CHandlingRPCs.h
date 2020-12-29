@@ -9,20 +9,17 @@
  *
  *****************************************************************************/
 
-#ifndef __CHandlingRPCs_H
-#define __CHandlingRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CHandlingRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(SetVehicleHandling);
     DECLARE_ELEMENT_RPC(SetVehicleHandlingProperty);
     DECLARE_ELEMENT_RPC(RestoreVehicleHandlingProperty);
     DECLARE_ELEMENT_RPC(RestoreVehicleHandling);
 };
-
-#endif

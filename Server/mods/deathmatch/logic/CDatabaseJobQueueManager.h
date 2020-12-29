@@ -19,8 +19,8 @@ class CDatabaseJobQueueManager
 {
 public:
     ZERO_ON_NEW
-    ~CDatabaseJobQueueManager(void);
-    void        DoPulse(void);
+    ~CDatabaseJobQueueManager();
+    void        DoPulse();
     CDbJobData* AddCommand(EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData);
     bool        PollCommand(CDbJobData* pJobData, uint uiTimeout);
     bool        FreeCommand(CDbJobData* pJobData);
@@ -31,7 +31,7 @@ public:
 protected:
     CDatabaseJobQueue* GetQueueFromConnectCommand(const SString& strData);
     CDatabaseJobQueue* FindQueueFromConnection(SConnectionHandle connectionHandle);
-    SConnectionHandle  GetNextConnectionHandle(void);
+    SConnectionHandle  GetNextConnectionHandle();
 
     std::map<SString, CDatabaseJobQueue*> m_QueueNameMap;
     SConnectionHandle                     m_ConnectionHandleCounter;

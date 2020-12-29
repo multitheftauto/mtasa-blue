@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPedModelInfoSA_H
-#define __CPedModelInfoSA_H
+#pragma once
 
 #include "CModelInfoSA.h"
 #include <game/CPedModelInfo.h>
@@ -40,7 +39,7 @@ typedef long AssocGroupID;
 class CPedModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
-    CPedModelInfoSAInterface(void);
+    CPedModelInfoSAInterface();
 
     BYTE         pad[4];                         // 32
     AssocGroupID motionAnimGroup;                // 36   Motion anim group (AssocGroupID, long)
@@ -63,12 +62,10 @@ public:
 class CPedModelInfoSA : public CModelInfoSA, public CPedModelInfo
 {
 public:
-    CPedModelInfoSA(void);
-    CPedModelInfoSAInterface* GetPedModelInfoInterface(void) { return m_pPedModelInterface; }
+    CPedModelInfoSA();
+    CPedModelInfoSAInterface* GetPedModelInfoInterface() { return m_pPedModelInterface; }
     void                      SetMotionAnimGroup(AssocGroupId animGroup);
 
 private:
     CPedModelInfoSAInterface* m_pPedModelInterface;
 };
-
-#endif

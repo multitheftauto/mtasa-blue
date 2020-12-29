@@ -37,7 +37,7 @@ CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned sh
     UpdateStreamPosition(m_vecPosition = vecPosition);
 }
 
-CClientPickup::~CClientPickup(void)
+CClientPickup::~CClientPickup()
 {
     AttachTo(NULL);
 
@@ -48,9 +48,22 @@ CClientPickup::~CClientPickup(void)
     Unlink();
 }
 
-void CClientPickup::Unlink(void)
+void CClientPickup::Unlink()
 {
     m_pPickupManager->RemoveFromList(this);
+}
+
+void CClientPickup::GetPosition(CVector& vecPosition) const
+{
+    if (m_pAttachedToEntity)
+    {
+        m_pAttachedToEntity->GetPosition(vecPosition);
+        vecPosition += m_vecAttachedPosition;
+    }
+    else
+    {
+        vecPosition = m_vecPosition;
+    }
 }
 
 void CClientPickup::SetPosition(const CVector& vecPosition)
@@ -79,6 +92,17 @@ void CClientPickup::SetModel(unsigned short usModel)
     }
 }
 
+void CClientPickup::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
+    }
+}
+
 void CClientPickup::SetVisible(bool bVisible)
 {
     // Update the flag
@@ -103,13 +127,13 @@ void CClientPickup::StreamIn(bool bInstantly)
     NotifyCreate();
 }
 
-void CClientPickup::StreamOut(void)
+void CClientPickup::StreamOut()
 {
     // Destroy it
     Destroy();
 }
 
-void CClientPickup::Create(void)
+void CClientPickup::Create()
 {
     if (!m_pPickup && m_bVisible)
     {
@@ -133,6 +157,7 @@ void CClientPickup::Create(void)
             m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
             m_pCollision->SetHitCallback(this);
+            m_pCollision->SetCanBeDestroyedByScript(false);
 
             // Increment pickup counter
             ++m_pPickupManager->m_uiPickupCount;
@@ -140,11 +165,14 @@ void CClientPickup::Create(void)
             // Restore the attributes
             SetInterior(ucAreaCode);
             SetDimension(usDimension);
+
+            // Reattach to an entity + any entities attached to this
+            ReattachEntities();
         }
     }
 }
 
-void CClientPickup::Destroy(void)
+void CClientPickup::Destroy()
 {
     if (m_pCollision)
     {
@@ -163,7 +191,7 @@ void CClientPickup::Destroy(void)
     }
 }
 
-void CClientPickup::ReCreate(void)
+void CClientPickup::ReCreate()
 {
     // If we had a pickup, destroy and recreate it
     if (m_pPickup)

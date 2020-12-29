@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUAARGUMENT_H
-#define __CLUAARGUMENT_H
+#pragma once
 
 extern "C"
 {
@@ -28,11 +27,11 @@ class CLuaArguments;
 class CLuaArgument
 {
 public:
-    CLuaArgument(void);
+    CLuaArgument();
     CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    ~CLuaArgument(void);
+    ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
     bool                operator==(const CLuaArgument& Argument);
@@ -49,14 +48,14 @@ public:
 
     void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
 
-    int GetType(void) const { return m_iType; };
-    int GetIndex(void) const { return m_iIndex; };
+    int GetType() const { return m_iType; };
+    int GetIndex() const { return m_iIndex; };
 
-    bool           GetBoolean(void) const { return m_bBoolean; };
-    lua_Number     GetNumber(void) const { return m_Number; };
-    const SString& GetString(void) { return m_strString; };
-    void*          GetUserData(void) const { return m_pUserData; };
-    CClientEntity* GetElement(void) const;
+    bool           GetBoolean() const { return m_bBoolean; };
+    lua_Number     GetNumber() const { return m_Number; };
+    const SString& GetString() { return m_strString; };
+    void*          GetUserData() const { return m_pUserData; };
+    CClientEntity* GetElement() const;
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
@@ -83,7 +82,5 @@ private:
 
     void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     bool CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables = NULL);
-    void DeleteTableData(void);
+    void DeleteTableData();
 };
-
-#endif

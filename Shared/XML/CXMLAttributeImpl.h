@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTEIMPL_H
-#define __CXMLATTRIBUTEIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <string>
@@ -24,10 +23,10 @@ class CXMLAttributeImpl : public CXMLAttribute
 public:
     CXMLAttributeImpl(class CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName);
     CXMLAttributeImpl(class CXMLAttributesImpl& Attributes, TiXmlElement& Node, TiXmlAttribute& Attribute);
-    virtual ~CXMLAttributeImpl(void);
+    virtual ~CXMLAttributeImpl();
 
-    const std::string  GetName(void) const;
-    const std::string& GetValue(void) const;
+    const std::string  GetName() const;
+    const std::string& GetValue() const;
 
     void SetValue(const char* szValue);
     void SetValue(bool bValue);
@@ -35,11 +34,11 @@ public:
     void SetValue(unsigned int uiValue);
     void SetValue(float fValue);
 
-    eXMLClass     GetClassType(void) { return CXML_ATTR; };
-    unsigned long GetID(void) { return m_ulID; };
-    bool          IsUsingIDs(void) { return m_bUsingIDs; };
+    eXMLClass     GetClassType() { return CXML_ATTR; };
+    unsigned long GetID() { return m_ulID; };
+    bool          IsUsingIDs() { return m_bUsingIDs; };
 
-    void DeleteWrapper(void);
+    void DeleteWrapper();
 
 private:
     unsigned long m_ulID;
@@ -50,5 +49,3 @@ private:
     TiXmlElement&       m_Node;
     TiXmlAttribute&     m_Attribute;
 };
-
-#endif

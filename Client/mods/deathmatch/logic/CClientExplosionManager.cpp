@@ -24,7 +24,7 @@ CClientExplosionManager::CClientExplosionManager(CClientManager* pManager)
     m_pLastCreator = NULL;
 }
 
-CClientExplosionManager::~CClientExplosionManager(void)
+CClientExplosionManager::~CClientExplosionManager()
 {
     if (g_pExplosionManager == this)
         g_pExplosionManager = NULL;
@@ -41,87 +41,109 @@ bool CClientExplosionManager::Hook_StaticExplosionCreation(CEntity* pGameExplodi
 bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition,
                                                      eExplosionType explosionType)
 {
-    CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
+    CPools* const pPools = g_pGame->GetPools();
 
     // Grab the entity responsible
-    CClientEntity* pResponsible = NULL;
-    CEntity*       pResponsibleGameEntity = (pGameExplodingEntity) ? pGameExplodingEntity : pGameCreator;
-    if (pResponsibleGameEntity)
-        pResponsible = m_pManager->FindEntity(pResponsibleGameEntity, false);
+    CEntity* const pResponsibleGameEntity = pGameExplodingEntity ? pGameExplodingEntity : pGameCreator;
 
-    unsigned short usModel;
-    if (pResponsible && (pResponsible->IsLocalEntity() ||
-                         (CStaticFunctionDefinitions::GetElementModel(*pResponsible, usModel) && CClientObjectManager::IsBreakableModel(usModel))))
-        return true;            // Handle this explosion client side only if entity is local or breakable (i.e. barrel)
+    if (!pResponsibleGameEntity)
+        return false;
 
-    eWeaponType explosionWeaponType;
+    CClientEntity* const pResponsible = pPools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));;
+
+    if (!pResponsible)
+        return false;
+
+    // Determine the used weapon
+    eWeaponType explosionWeaponType = WEAPONTYPE_EXPLOSION;
+
     switch (explosionType)
     {
-        case EXP_TYPE_GRENADE:
-        {
-            // Grenade type explosions from vehicles should only be freefall bombs
-            // TODO: need a way to check if its a freefall bomb if creator is a ped
-            if (pGameCreator && pGameCreator->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                explosionWeaponType = WEAPONTYPE_FREEFALL_BOMB;
-            else
-                explosionWeaponType = WEAPONTYPE_GRENADE;
-            break;
-        }
-        case EXP_TYPE_MOLOTOV:
-            explosionWeaponType = WEAPONTYPE_MOLOTOV;
-            break;
-        case EXP_TYPE_ROCKET:
-        case EXP_TYPE_ROCKET_WEAK:
-            explosionWeaponType = WEAPONTYPE_ROCKET;
-            break;
-        case EXP_TYPE_TANK_GRENADE:
-            explosionWeaponType = WEAPONTYPE_TANK_GRENADE;
-            break;
-        default:
-            explosionWeaponType = WEAPONTYPE_EXPLOSION;
-            break;
-    }
-
-    // Got a responsible entity?
-    if (pResponsible)
+    case EXP_TYPE_GRENADE:
     {
-        // Is the local player responsible for this?
-        bool bLocal = ((pResponsible == pLocalPlayer) || (pResponsible == pLocalPlayer->GetOccupiedVehicle()) ||
-                       (g_pClientGame->GetUnoccupiedVehicleSync()->Exists(static_cast<CDeathmatchVehicle*>(pResponsible))));
+        // Grenade type explosions from vehicles should only be freefall bombs
+        // TODO: need a way to check if its a freefall bomb if creator is a ped
+        if (pGameCreator && pGameCreator->GetEntityType() == ENTITY_TYPE_VEHICLE)
+            explosionWeaponType = WEAPONTYPE_FREEFALL_BOMB;
+        else
+            explosionWeaponType = WEAPONTYPE_GRENADE;
+        break;
+    }
+    case EXP_TYPE_MOLOTOV:
+        explosionWeaponType = WEAPONTYPE_MOLOTOV;
+        break;
+    case EXP_TYPE_ROCKET:
+    case EXP_TYPE_ROCKET_WEAK:
+        explosionWeaponType = WEAPONTYPE_ROCKET;
+        break;
+    case EXP_TYPE_TANK_GRENADE:
+        explosionWeaponType = WEAPONTYPE_TANK_GRENADE;
+        break;
+    default:
+        break;
+    }
 
-        if (bLocal)
+    // Handle this explosion client side only if entity is local or breakable (i.e. barrel)
+    unsigned short usModel;
+    const bool     bHasModel = CStaticFunctionDefinitions::GetElementModel(*pResponsible, usModel);
+
+    if (pResponsible->IsLocalEntity() || (bHasModel && CClientObjectManager::IsBreakableModel(usModel)))
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(vecPosition.fX);
+        Arguments.PushNumber(vecPosition.fY);
+        Arguments.PushNumber(vecPosition.fZ);
+        Arguments.PushNumber(explosionWeaponType);
+        const bool bAllowExplosion = pResponsible->CallEvent("onClientExplosion", Arguments, true);
+        return bAllowExplosion;
+    }
+
+    // All explosions are handled server side (ATTENTION: always 'return false;' below)
+    CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
+
+    // Is the local player responsible for this?
+    const bool bIsLocalPlayer = pResponsible == pLocalPlayer;
+    const bool bIsLocalPlayerVehicle = pResponsible == pLocalPlayer->GetOccupiedVehicle();
+    const bool bIsUnoccupiedVehicleSynced = g_pClientGame->GetUnoccupiedVehicleSync()->Exists(static_cast<CDeathmatchVehicle*>(pResponsible));
+
+    if (!bIsLocalPlayer && !bIsLocalPlayerVehicle && !bIsUnoccupiedVehicleSynced)
+        return false;
+
+    CClientEntity* pOriginSource = nullptr;
+
+    // Is this an exploding vehicle?
+    if (pGameExplodingEntity && pGameExplodingEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
+    {
+        // Set our origin-source to the vehicle
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle(reinterpret_cast<DWORD*>(pGameExplodingEntity->GetInterface()));
+
+        if (pVehicleClientEntity)
         {
-            CClientEntity* pOriginSource = NULL;
+            pOriginSource = pVehicleClientEntity->pClientEntity;
+        }
+    }
+    // If theres other players, sync it relative to the closest (lag compensation)
+    else if (m_pManager->GetPlayerManager()->Count() > 1)
+    {
+        switch (explosionWeaponType)
+        {
+            case WEAPONTYPE_ROCKET:
+            case WEAPONTYPE_ROCKET_HS:
+            {
+                CClientPlayer* pPlayer = g_pClientGame->GetClosestRemotePlayer(vecPosition, 200.0f);
 
-            // Is this an exploding vehicle?
-            if (pGameExplodingEntity && pGameExplodingEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
-            {
-                // Set our origin-source to the vehicle
-                pOriginSource = m_pManager->FindEntity(pGameExplodingEntity, false);
-            }
-            // If theres other players, sync it relative to the closest (lag compensation)
-            else if (m_pManager->GetPlayerManager()->Count() > 1)
-            {
-                switch (explosionWeaponType)
+                if (pPlayer)
                 {
-                    case WEAPONTYPE_ROCKET:
-                    case WEAPONTYPE_ROCKET_HS:
-                    {
-                        CClientPlayer* pPlayer = g_pClientGame->GetClosestRemotePlayer(vecPosition, 200.0f);
-                        if (pPlayer)
-                        {
-                            pOriginSource = pPlayer;
-                        }
-                        break;
-                    }
+                    pOriginSource = pPlayer;
                 }
+
+                break;
             }
-            // Request a new explosion
-            g_pClientGame->SendExplosionSync(vecPosition, explosionType, pOriginSource);
         }
     }
 
-    // All explosions are handled server side
+    // Request a new explosion
+    g_pClientGame->SendExplosionSync(vecPosition, explosionType, pOriginSource);
     return false;
 }
 

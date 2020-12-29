@@ -67,7 +67,7 @@ CClientProjectile::CClientProjectile(class CClientManager* pManager, CProjectile
     }
 }
 
-CClientProjectile::~CClientProjectile(void)
+CClientProjectile::~CClientProjectile()
 {
     // If our creator is getting destroyed, this should be null
     if (m_pCreator)
@@ -107,7 +107,7 @@ CClientProjectile::~CClientProjectile(void)
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pCreator, &m_pTarget, NULL);
 }
 
-void CClientProjectile::Unlink(void)
+void CClientProjectile::Unlink()
 {
     // Are we still linked? (this bool will be set to false when our manager is being destroyed)
     if (m_bLinked)
@@ -124,7 +124,7 @@ void CClientProjectile::Unlink(void)
     }
 }
 
-void CClientProjectile::DoPulse(void)
+void CClientProjectile::DoPulse()
 {
     // We use initiate data to set values on creation (as it doesn't exist until a frame after our projectile hook)
     if (m_bInitiate)
@@ -189,7 +189,7 @@ void CClientProjectile::Destroy(bool bBlow)
     }
 }
 
-bool CClientProjectile::IsActive(void)
+bool CClientProjectile::IsActive()
 {
     // Ensure airbomb is cleaned up
     if (m_weaponType == WEAPONTYPE_FREEFALL_BOMB && GetTickCount64_() - m_llCreationTime > AIRBOMB_MAX_LIFETIME)
@@ -291,7 +291,7 @@ void CClientProjectile::SetVelocity(CVector& vecVelocity)
         m_pProjectile->SetMoveSpeed(&vecVelocity);
 }
 
-unsigned short CClientProjectile::GetModel(void)
+unsigned short CClientProjectile::GetModel()
 {
     if (m_pProjectile)
         return m_pProjectile->GetModelIndex();
@@ -310,14 +310,14 @@ void CClientProjectile::SetCounter(DWORD dwCounter)
         m_pProjectileInfo->SetCounter(dwCounter);
 }
 
-DWORD CClientProjectile::GetCounter(void)
+DWORD CClientProjectile::GetCounter()
 {
     if (m_pProjectile)
         return m_pProjectileInfo->GetCounter();
     return 0;
 }
 
-CClientEntity* CClientProjectile::GetSatchelAttachedTo(void)
+CClientEntity* CClientProjectile::GetSatchelAttachedTo()
 {
     if (!m_pProjectile)
         return NULL;
@@ -327,5 +327,6 @@ CClientEntity* CClientProjectile::GetSatchelAttachedTo(void)
     if (!pAttachedToSA)
         return NULL;
 
-    return m_pManager->FindEntity(pAttachedToSA, false);
+    CPools* pPools = g_pGame->GetPools();
+    return pPools->GetClientEntity((DWORD*)pAttachedToSA->GetInterface());
 }

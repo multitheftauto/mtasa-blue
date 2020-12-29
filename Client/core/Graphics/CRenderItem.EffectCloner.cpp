@@ -31,17 +31,23 @@ CEffectCloner::CEffectCloner(CRenderItemManager* pManager)
 //
 //
 ////////////////////////////////////////////////////////////////
-CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+    bool bDebug, const EffectMacroList& macros)
 {
+    SEffectInvariant invariant{
+        ConformPathForSorting(strFile),
+        macros
+    };
+
     // Do we have a match with the initial path
-    CEffectTemplate* pEffectTemplate = MapFindRef(m_ValidMap, ConformPathForSorting(strFilename));
+    CEffectTemplate* pEffectTemplate = MapFindRef(m_ValidMap, invariant);
     if (pEffectTemplate)
     {
         // Have files changed since create?
         if (pEffectTemplate->HaveFilesChanged())
         {
             // EffectTemplate is no good for cloning now, so move it to the old list
-            MapRemove(m_ValidMap, ConformPathForSorting(strFilename));
+            MapRemove(m_ValidMap, invariant);
             m_OldList.push_back(pEffectTemplate);
             pEffectTemplate = NULL;
         }
@@ -57,7 +63,7 @@ CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFilename, const SS
         HRESULT hr;
         for (uint i = 0; i < 2; i++)
         {
-            pEffectTemplate = NewEffectTemplate(m_pManager, strFilename, strRootPath, strOutStatus, bDebug, hr);
+            pEffectTemplate = NewEffectTemplate(m_pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros, hr);
             if (pEffectTemplate || hr != E_OUTOFMEMORY || i > 0)
             {
                 if (pEffectTemplate && i > 0)
@@ -75,14 +81,14 @@ CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFilename, const SS
         else
         {
             // Add to active map
-            MapSet(m_ValidMap, ConformPathForSorting(strFilename), pEffectTemplate);
+            m_ValidMap[std::move(invariant)] = pEffectTemplate;
         }
 
         if (!strReport.empty())
         {
             strReport += SString("[effects cur:%d created:%d dest:%d]", g_pDeviceState->MemoryState.Effect.iCurrentCount,
                                  g_pDeviceState->MemoryState.Effect.iCreatedCount, g_pDeviceState->MemoryState.Effect.iDestroyedCount);
-            AddReportLog(7544, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFilename));
+            AddReportLog(7544, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFile));
         }
         if (!pEffectTemplate)
             return NULL;
@@ -116,7 +122,7 @@ void CEffectCloner::ReleaseD3DEffect(CEffectWrap* pEffectWrap)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectCloner::DoPulse(void)
+void CEffectCloner::DoPulse()
 {
     MaybeTidyUp();
 }
@@ -157,7 +163,7 @@ void CEffectCloner::MaybeTidyUp(bool bForceDrasticMeasures)
 #endif
 
     // Valid Effect not used for a little while can go
-    for (std::map<SString, CEffectTemplate*>::iterator iter = m_ValidMap.begin(); iter != m_ValidMap.end();)
+    for (auto iter = m_ValidMap.begin(); iter != m_ValidMap.end();)
     {
         CEffectTemplate* pEffectTemplate = iter->second;
         if (pEffectTemplate->GetTicksSinceLastUsed() > (bForceDrasticMeasures ? 0 : iTicks))

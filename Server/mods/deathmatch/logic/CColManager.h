@@ -19,21 +19,21 @@ class CColManager
     friend class CColShape;
 
 public:
-    CColManager(void);
-    ~CColManager(void);
+    CColManager();
+    ~CColManager();
 
     void DoHitDetection(const CVector& vecNowPosition, CElement* pElement, CColShape* pJustThis = NULL, bool bChildren = false);
 
     bool Exists(CColShape* pShape);
-    void DeleteAll(void);
+    void DeleteAll();
 
-    std::vector<CColShape*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    std::vector<CColShape*>::const_iterator IterEnd(void) { return m_List.end(); }
+    std::vector<CColShape*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::vector<CColShape*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
     void AddToList(CColShape* pShape) { m_List.push_back(pShape); };
     void RemoveFromList(CColShape* pShape);
-    void TakeOutTheTrash(void);
+    void TakeOutTheTrash();
     void DoHitDetectionForColShape(CColShape* pShape);
     void DoHitDetectionForEntity(const CVector& vecNowPosition, CElement* pEntity);
     void HandleHitDetectionResult(bool bHit, CColShape* pShape, CElement* pEntity);

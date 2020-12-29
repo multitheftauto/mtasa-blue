@@ -11,41 +11,36 @@
 
 #include "StdInc.h"
 
-CPedManager::CPedManager(void)
+CPedManager::CPedManager()
 {
 }
 
-CPedManager::~CPedManager(void)
+CPedManager::~CPedManager()
 {
     DeleteAll();
 }
 
-CPed* CPedManager::Create(unsigned short usModel, CElement* pParent, CXMLNode* pNode)
+CPed* CPedManager::Create(unsigned short usModel, CElement* pParent)
 {
-    // Create the ped
-    CPed* pPed = new CPed(this, pParent, pNode, usModel);
+    CPed* const pPed = new CPed(this, pParent, usModel);
 
-    // Invalid ped id?
     if (pPed->GetID() == INVALID_ELEMENT_ID)
     {
         delete pPed;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created ped
     return pPed;
 }
 
 CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the Ped
-    CPed* pPed = new CPed(this, pParent, &Node, 400);
+    CPed* const pPed = new CPed(this, pParent, 400);
 
-    // Verify the Ped id and load the data from xml
-    if (pPed->GetID() == INVALID_ELEMENT_ID || !pPed->LoadFromCustomData(pEvents))
+    if (pPed->GetID() == INVALID_ELEMENT_ID || !pPed->LoadFromCustomData(pEvents, Node))
     {
         delete pPed;
-        return NULL;
+        return nullptr;
     }
 
     pPed->SetSpawned(true);
@@ -55,11 +50,10 @@ CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEv
         pPed->SetIsDead(false);
     }
 
-    // Return the created Ped
     return pPed;
 }
 
-void CPedManager::DeleteAll(void)
+void CPedManager::DeleteAll()
 {
     // Delete all items
     DeletePointersAndClearList(m_List);

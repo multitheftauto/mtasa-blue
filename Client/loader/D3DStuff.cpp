@@ -64,7 +64,7 @@ namespace
 // Try detecting optimus via NvAPI
 //
 //////////////////////////////////////////////////////////
-bool NvOptimusDetect(void)
+bool NvOptimusDetect()
 {
     if (NvAPI_Initialize() != NVAPI_OK)
     {
@@ -119,7 +119,7 @@ bool NvOptimusDetect(void)
 // Look all busy and important in case any graphic drivers are looking
 //
 //////////////////////////////////////////////////////////
-void BeginD3DStuff(void)
+void BeginD3DStuff()
 {
     pD3D9 = Direct3DCreate9(D3D_SDK_VERSION);
 
@@ -208,7 +208,7 @@ void BeginD3DStuff(void)
 // Clean up
 //
 //////////////////////////////////////////////////////////
-void EndD3DStuff(void)
+void EndD3DStuff()
 {
     for (uint i = 0; i < NUMELMS(pD3DVertexDeclarations); i++)
         SAFE_RELEASE(pD3DVertexDeclarations[i]);

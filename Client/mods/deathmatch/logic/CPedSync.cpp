@@ -23,7 +23,7 @@ CPedSync::CPedSync(CClientPedManager* pPedManager)
     m_ulLastSyncTime = 0;
 }
 
-CPedSync::~CPedSync(void)
+CPedSync::~CPedSync()
 {
 }
 
@@ -53,8 +53,19 @@ bool CPedSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& Bi
     return false;
 }
 
-void CPedSync::DoPulse(void)
+void CPedSync::DoPulse()
 {
+    // Got any items?
+    if (m_List.size() > 0)
+    {
+        for (auto iter = m_List.begin(); iter != m_List.end(); ++iter)
+        {
+            CClientPed* pPed = *iter;
+            // Update enter/exit sequence
+            pPed->UpdateVehicleInOut();
+        }
+    }
+
     // Has it been long enough since our last state's sync?
     unsigned long ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + PED_SYNC_RATE)
@@ -67,12 +78,15 @@ void CPedSync::DoPulse(void)
 void CPedSync::AddPed(CClientPed* pPed)
 {
     m_List.push_front(pPed);
+    pPed->SetSyncing(true);
 }
 
 void CPedSync::RemovePed(CClientPed* pPed)
 {
     if (!m_List.empty())
         m_List.remove(pPed);
+
+    pPed->SetSyncing(false);
 }
 
 bool CPedSync::Exists(CClientPed* pPed)
@@ -227,7 +241,7 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
     }
 }
 
-void CPedSync::Update(void)
+void CPedSync::Update()
 {
     // Got any items?
     if (m_List.size() > 0)

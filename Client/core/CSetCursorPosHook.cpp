@@ -15,7 +15,7 @@
 template <>
 CSetCursorPosHook* CSingleton<CSetCursorPosHook>::m_pSingleton = NULL;
 
-CSetCursorPosHook::CSetCursorPosHook(void)
+CSetCursorPosHook::CSetCursorPosHook()
 {
     WriteDebugEvent("CSetCursorPosHook::CSetCursorPosHook");
 
@@ -23,7 +23,7 @@ CSetCursorPosHook::CSetCursorPosHook(void)
     m_pfnSetCursorPos = NULL;
 }
 
-CSetCursorPosHook::~CSetCursorPosHook(void)
+CSetCursorPosHook::~CSetCursorPosHook()
 {
     WriteDebugEvent("CSetCursorPosHook::~CSetCursorPosHook");
 
@@ -33,14 +33,14 @@ CSetCursorPosHook::~CSetCursorPosHook(void)
     }
 }
 
-void CSetCursorPosHook::ApplyHook(void)
+void CSetCursorPosHook::ApplyHook()
 {
     // Hook SetCursorPos
     m_pfnSetCursorPos =
         reinterpret_cast<pSetCursorPos>(DetourFunction(DetourFindFunction("User32.dll", "SetCursorPos"), reinterpret_cast<PBYTE>(API_SetCursorPos)));
 }
 
-void CSetCursorPosHook::RemoveHook(void)
+void CSetCursorPosHook::RemoveHook()
 {
     // Remove hook
     if (m_pfnSetCursorPos)
@@ -53,17 +53,17 @@ void CSetCursorPosHook::RemoveHook(void)
     m_bCanCall = true;
 }
 
-void CSetCursorPosHook::DisableSetCursorPos(void)
+void CSetCursorPosHook::DisableSetCursorPos()
 {
     m_bCanCall = false;
 }
 
-void CSetCursorPosHook::EnableSetCursorPos(void)
+void CSetCursorPosHook::EnableSetCursorPos()
 {
     m_bCanCall = true;
 }
 
-bool CSetCursorPosHook::IsSetCursorPosEnabled(void)
+bool CSetCursorPosHook::IsSetCursorPosEnabled()
 {
     return m_bCanCall;
 }

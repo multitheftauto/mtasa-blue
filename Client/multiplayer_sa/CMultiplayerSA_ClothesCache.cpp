@@ -120,7 +120,7 @@ public:
     // Constructor
     //
     ///////////////////////////////////////
-    CClumpStore(void)
+    CClumpStore()
     {
         memset(&m_Stats, 0, sizeof(m_Stats));
         m_uiMaxSize = 4;
@@ -133,7 +133,7 @@ public:
     // Check if any clumps have become unused outside of the cache
     //
     //////////////////////////////////////////////////////////////
-    uint GetNumCached(void)
+    uint GetNumCached()
     {
         uint uiNumCached = 0;
         for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
@@ -208,7 +208,7 @@ public:
     //  256MB streaming = 32 MB for clothes
     //
     ///////////////////////////////////////
-    void UpdateCacheSize(void)
+    void UpdateCacheSize()
     {
         int iStreamingMemoryAvailableKB = *(int*)0x08A5A80;
 
@@ -222,7 +222,7 @@ public:
     // Remove clothes that have been unused the longest
     //
     ///////////////////////////////////////
-    bool RemoveOldestUnused(void)
+    bool RemoveOldestUnused()
     {
         uint                                   uiBestAge = -1;
         std::vector<SSavedClumpInfo>::iterator uiBestIndex;
@@ -304,7 +304,7 @@ CClumpStore ms_clumpStore;
 // Stop using old cached clumps
 //
 ////////////////////////////////////////////////
-void CMultiplayerSA::FlushClothesCache(void)
+void CMultiplayerSA::FlushClothesCache()
 {
     ms_clumpStore.m_iCacheRevision++;
 }
@@ -407,7 +407,7 @@ void CMultiplayerSA::GetClothesCacheStats(SClothesCacheStats& outStats)
 // Setup hooks for ClothesCache
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_ClothesCache(void)
+void CMultiplayerSA::InitHooks_ClothesCache()
 {
     EZHookInstall(CClothesBuilderCreateSkinnedClump);
     InitRwFunctions(pGameInterface->GetGameVersion());

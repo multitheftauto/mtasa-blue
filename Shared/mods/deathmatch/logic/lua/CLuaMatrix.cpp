@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaMatrix::CLuaMatrix(void) : CMatrix()
+CLuaMatrix::CLuaMatrix() : CMatrix()
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::MATRIX);
 }
@@ -21,7 +21,7 @@ CLuaMatrix::CLuaMatrix(const CMatrix& matrix) : CMatrix(matrix)
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::MATRIX);
 }
 
-CLuaMatrix::~CLuaMatrix(void)
+CLuaMatrix::~CLuaMatrix()
 {
     CIdArray::PushUniqueId(this, EIdClass::MATRIX, m_uiScriptID);
     m_uiScriptID = INVALID_ARRAY_ID;

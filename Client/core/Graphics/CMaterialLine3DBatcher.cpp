@@ -34,7 +34,7 @@ CMaterialLine3DBatcher::CMaterialLine3DBatcher(bool bPreGUI)
 //
 //
 ////////////////////////////////////////////////////////////////
-CMaterialLine3DBatcher::~CMaterialLine3DBatcher(void)
+CMaterialLine3DBatcher::~CMaterialLine3DBatcher()
 {
 }
 
@@ -57,7 +57,7 @@ void CMaterialLine3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fVi
 // Draw all pending lines
 //
 ////////////////////////////////////////////////////////////////
-void CMaterialLine3DBatcher::Flush(void)
+void CMaterialLine3DBatcher::Flush()
 {
     if (m_LineList.empty())
         return;

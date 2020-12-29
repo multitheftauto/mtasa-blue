@@ -4,31 +4,31 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2015-03-18 01:54+0000\n"
-"Last-Translator: mk124 <mk124a@gmail.com>\n"
+"PO-Revision-Date: 2018-06-22 05:58+0000\n"
+"Last-Translator: Jin <yin66236@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Jin Yin; mk124; ChineseGTA Li; LilDollaTechZone; hcyxsq; ccw\n"
+"Translators: Jin Yin; mk124; ChineseGTA Li; hcyxsq; LilDollaTechZone; ccw\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1426643650.0\n"
+"X-POOTLE-MTIME: 1529647120.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
 msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "您下载的MTA:SA并不支持 Windows XP or Vista. 请在www.mtasa.com下载相应版本."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
 msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
-msgstr ""
+msgstr "您下载的MTA:SA的版本是针对老系统专用的版本. 请在www.mtasa.com下载相应的系统版本."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -97,7 +97,7 @@ msgstr "增加到 Windows 游戏管理器 (如果存在的话)。"
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "安装或更新 DirectX （如果需要）"
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -195,7 +195,7 @@ msgstr "加入游戏管理器菜单"
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "安装 DIrectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
@@ -454,22 +454,22 @@ msgstr "安装类型: 升级"
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2353
 msgid "Online update"
-msgstr ""
+msgstr "在线更新"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2354
 msgid "Checking for update information"
-msgstr ""
+msgstr "正在检查更新信息"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2355
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "正在检查安装包更新信息..."
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2356
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "请确认您的防火墙没有阻止连接"
 
 #~ msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
 #~ msgstr "无法下载 Microsoft Visual Studio 2008 SP1 可再发行组件包"

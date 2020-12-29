@@ -9,20 +9,19 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIFONT_H
-#define __CGUIFONT_H
+#pragma once
 
 #include "CRect2D.h"
 
 class CGUIFont
 {
 public:
-    virtual ~CGUIFont(void){};
+    virtual ~CGUIFont(){};
 
     virtual void SetAntiAliasingEnabled(bool bAntialiased) = 0;
-    virtual bool IsAntiAliasingEnabled(void) = 0;
+    virtual bool IsAntiAliasingEnabled() = 0;
     virtual void SetAutoScalingEnabled(bool bAutoScaled) = 0;
-    virtual bool IsAutoScalingEnabled(void) = 0;
+    virtual bool IsAutoScalingEnabled() = 0;
 
     virtual void SetNativeResolution(int iX, int iY) = 0;
 
@@ -33,5 +32,3 @@ public:
     virtual void DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
                                 float fScaleY) = 0;
 };
-
-#endif

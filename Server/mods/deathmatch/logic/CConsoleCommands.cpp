@@ -602,6 +602,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
 
                                         // Send it to the player
                                         pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO));
+                                        break;
                                     }
                                     case CClient::CLIENT_SCRIPT:
                                     {
@@ -835,7 +836,7 @@ bool CConsoleCommands::LogIn(CConsole* pConsole, const char* szArguments, CClien
 
         if (CAccountManager::IsValidAccountName(szNick) && CAccountManager::IsValidPassword(szPassword))
         {
-            return g_pGame->GetAccountManager()->LogIn(pClient, pEchoClient, szNick, szPassword);
+            return g_pGame->GetAccountManager()->LogIn(pClient, pEchoClient, szNick, std::string(szPassword));
         }
         else
         {
@@ -1221,69 +1222,6 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
     return false;
 }
 
-bool CConsoleCommands::WhoWas(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
-{
-    // Got any arguments?
-    if (szArguments && strlen(szArguments) > 0)
-    {
-        // Is the nick requested anyone?
-        bool bAnyone = (SStringX(szArguments) == "*");
-
-        // Start iterating the whowas list
-        CWhoWas* pWhoWas = pConsole->GetWhoWas();
-        if (pWhoWas->Count() > 0)
-        {
-            // Start iterating the list
-            unsigned int                       uiCount = 0;
-            list<SWhoWasEntry>::const_iterator iter = pWhoWas->IterBegin();
-            for (; iter != pWhoWas->IterEnd(); iter++)
-            {
-                // Matches?
-                if (bAnyone || iter->strNick.ContainsI(szArguments))
-                {
-                    // Haven't got too many entries printed?
-                    if (++uiCount <= 20)
-                    {
-                        // Convert the IP to a string
-                        SString strIP = LongToDottedIP(iter->ulIP);
-
-                        // Populate a line about him
-                        SString strName = iter->strNick;
-                        if (iter->strAccountName != GUEST_ACCOUNT_NAME)
-                            strName += SString(" (%s)", *iter->strAccountName);
-                        pClient->SendEcho(
-                            SString("%s  -  IP:%s  serial:%s  version:%s", *strName, *strIP, iter->strSerial.c_str(), iter->strPlayerVersion.c_str()));
-                    }
-                    else
-                    {
-                        pClient->SendEcho("...");
-                        return true;
-                    }
-                }
-            }
-
-            // No matching entries?
-            if (uiCount == 0)
-            {
-                pClient->SendEcho("whowas: No matching nicks");
-                return false;
-            }
-
-            return true;
-        }
-        else
-        {
-            pClient->SendEcho("whowas: The whowas list is empty");
-        }
-    }
-    else
-    {
-        pClient->SendEcho("whowas: Syntax is 'whowas <nick>'");
-    }
-
-    return false;
-}
-
 bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     // Valid parameter?
@@ -1296,6 +1234,11 @@ bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, 
 
             // Convert to number
             int iLevel = atoi(szArguments);
+            if (iLevel == 0 && strcmp(szArguments, "0") != 0)
+            {
+                pEchoClient->SendEcho("debugscript: Syntax is 'debugscript <mode>'");
+                return false;
+            }
             if (iLevel != (int)pPlayer->GetScriptDebugLevel())
             {
                 // Between 0 and 3?
@@ -1340,32 +1283,51 @@ bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, 
 bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     // Help string
-    std::string strHelpText = "Available commands:\n\n";
-
-    // Loop through all added commands
-    int                                    iCount = 0;
-    list<CConsoleCommand*>::const_iterator iter = pConsole->CommandsBegin();
-    for (; iter != pConsole->CommandsEnd(); iter++)
+    if (!szArguments)
     {
-        // Add a new line every third command
-        if (iCount == 3)
+        std::string strHelpText = "Available commands:\n\n";
+        pEchoClient->SendConsole("help [command]");
+
+        // Loop through all added commands
+        int                                    iCount = 0;
+        for (CConsoleCommand* command : pConsole->CommandsList())
         {
-            iCount = 0;
-            strHelpText.append("\n");
+            // Add a new line every third command
+            if (iCount == 3)
+            {
+                iCount = 0;
+                strHelpText.append("\n");
+            }
+
+            // Add the commandname and pad it to 20 letters with spaces
+            const char* szCommand = (command)->GetCommand();
+            strHelpText.append(szCommand);
+            strHelpText.append(25 - strlen(szCommand), ' ');
+
+            // Increment count so we can keep track of how many we've put at one line
+            ++iCount;
         }
 
-        // Add the commandname and pad it to 20 letters with spaces
-        const char* szCommand = (*iter)->GetCommand();
-        strHelpText.append(szCommand);
-        strHelpText.append(25 - strlen(szCommand), ' ');
-
-        // Increment count so we can keep track of how many we've put at one line
-        ++iCount;
+        // Show it
+        pEchoClient->SendConsole(strHelpText.c_str());
+        return true;
     }
-
-    // Show it
-    pEchoClient->SendConsole(strHelpText.c_str());
-    return true;
+    else
+    {
+        // help [command]
+        if (szArguments && !strcmp(szArguments, "help") == 0)
+        {
+            CConsoleCommand* pConsoleCommand = pConsole->GetCommand(szArguments);
+            if (pConsoleCommand)
+            {
+                pEchoClient->SendConsole(pConsoleCommand->GetHelp());
+                return true;
+            }
+            else
+                pEchoClient->SendConsole("Couldn't find the command.");
+        }
+    }
+    return false;
 }
 
 bool CConsoleCommands::ReloadBans(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)

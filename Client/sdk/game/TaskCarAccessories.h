@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKCARACCESSORIES
-#define __CGAME_TASKCARACCESSORIES
+#pragma once
 
 #include "Task.h"
 
 class CTaskSimpleCarSetPedInAsDriver : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleCarSetPedInAsDriver(void){};
+    virtual ~CTaskSimpleCarSetPedInAsDriver(){};
 
     virtual void SetIsWarpingPedIntoCar() = 0;
     virtual void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear) = 0;
@@ -27,7 +26,7 @@ public:
 class CTaskSimpleCarSetPedOut : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleCarSetPedOut(void){};
+    virtual ~CTaskSimpleCarSetPedOut(){};
 
     virtual void SetIsWarpingPedOutOfCar() = 0;
     virtual void SetKnockedOffBike() = 0;
@@ -39,11 +38,9 @@ public:
 class CTaskSimpleCarSetPedInAsPassenger : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleCarSetPedInAsPassenger(void){};
+    virtual ~CTaskSimpleCarSetPedInAsPassenger(){};
 
     virtual void SetIsWarpingPedIntoCar() = 0;
     virtual void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear) = 0;
     virtual void SetNumGettingInToClear(const unsigned char nNumGettingInToClear) = 0;
 };
-
-#endif

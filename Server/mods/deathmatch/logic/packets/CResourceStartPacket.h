@@ -15,13 +15,13 @@
 #include "../packets/CPacket.h"
 #include "../CResource.h"
 
-class CResourceStartPacket : public CPacket
+class CResourceStartPacket final : public CPacket
 {
 public:
     CResourceStartPacket(const char* szResourceName, class CResource* pResource);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_RESOURCE_START; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_RESOURCE_START; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

@@ -1,4 +1,4 @@
-// fipsalgt.cpp - written and placed in the public domain by Wei Dai
+// fipsalgt.cpp - originally written and placed in the public domain by Wei Dai
 
 // This file implements the various algorithm tests needed to pass FIPS 140 validation.
 // They're preserved here (commented out) in case Crypto++ needs to be revalidated.
@@ -15,12 +15,11 @@
 #include "oids.h"
 
 USING_NAMESPACE(CryptoPP)
-USING_NAMESPACE(std)
 
 class LineBreakParser : public AutoSignaling<Bufferless<Filter> >
 {
 public:
-	LineBreakParser(BufferedTransformation *attachment=NULL, byte lineEnd='\n')
+	LineBreakParser(BufferedTransformation *attachment=NULLPTR, byte lineEnd='\n')
 		: m_lineEnd(lineEnd) {Detach(attachment);}
 
 	size_t Put2(const byte *begin, size_t length, int messageEnd, bool blocking)
@@ -400,7 +399,7 @@ protected:
 				return (Result *) new typename RSASS<PKCS1v15, H>::Signer;
 		}
 
-		return NULL;
+		return NULLPTR;
 	}
 
 	template <class Result>
@@ -417,7 +416,7 @@ protected:
 		else if (hash == "512")
 			return CreateRSA2<SHA512, Result>(standard);
 		else
-			return NULL;
+			return NULLPTR;
 	}
 
 	virtual void DoTest()
@@ -457,7 +456,7 @@ protected:
 					Integer p, q, h, g;
 					int counter;
 
-					SecByteBlock seed(SHA::DIGESTSIZE);
+					SecByteBlock seed(SHA1::DIGESTSIZE);
 					do
 					{
 						m_rng.GenerateBlock(seed, seed.size());
@@ -1259,7 +1258,7 @@ int FIPS_140_AlgorithmTest(int argc, char **argv)
 			test = "KAT";
 		bool encrypt = (filename.find("vrct") == std::string::npos);
 
-		BufferedTransformation *pSink = NULL;
+		BufferedTransformation *pSink = NULLPTR;
 
 		if (argc > 3)
 		{

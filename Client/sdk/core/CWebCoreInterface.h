@@ -49,14 +49,18 @@ class CWebCoreInterface
 {
 public:
     virtual ~CWebCoreInterface() {}
+    virtual bool Initialise() = 0;
+
     virtual CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                              bool bTransparent) = 0;
     virtual void               DestroyWebView(CWebViewInterface* pWebView) = 0;
     virtual void               DoPulse() = 0;
 
-    virtual void AddEventToEventQueue(std::function<void(void)> func, CWebView* pWebView, const SString& name) = 0;
+    virtual void AddEventToEventQueue(std::function<void()> func, CWebView* pWebView, const SString& name) = 0;
     virtual void RemoveWebViewEvents(CWebView* pWebView) = 0;
     virtual void DoEventQueuePulse() = 0;
+
+    virtual void WaitForTask(std::function<void(bool)> task, CWebView* webView) = 0;
 
     virtual eURLState                    GetDomainState(const SString& strURL, bool bOutputDebug = false) = 0;
     virtual SString                      GetDomainFromURL(const SString& strURL) = 0;

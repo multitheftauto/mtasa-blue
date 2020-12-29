@@ -59,7 +59,7 @@ namespace SharedUtil
             this->set_empty_key(GetEmptyMapKey((K*)NULL));
             this->set_deleted_key(GetDeletedMapKey((K*)NULL));
         }
-        CFastHashMap(void)
+        CFastHashMap()
         {
             this->set_empty_key(GetEmptyMapKey((K*)NULL));
             this->set_deleted_key(GetDeletedMapKey((K*)NULL));

@@ -32,11 +32,11 @@ class CLanBroadcast
 {
 public:
     CLanBroadcast(unsigned short usServerPort);
-    ~CLanBroadcast(void);
+    ~CLanBroadcast();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    unsigned short GetPort(void) { return SERVER_LIST_BROADCAST_PORT; };
+    unsigned short GetPort() { return SERVER_LIST_BROADCAST_PORT; };
 
 private:
     unsigned int m_Socket;

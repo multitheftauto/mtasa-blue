@@ -3,40 +3,40 @@ project "XML"
 	kind "SharedLib"
 	targetname "xmll"
 	targetdir(buildpath("server"))
-	
-	includedirs { 
+
+	includedirs {
 		"../sdk",
 		"../../vendor/tinyxml"
 	}
-	
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/**"] = "**.h",
 		["Sources/**"] = "*.cpp",
 		["*"] = "premake5.lua"
 	}
-	
+
 	links { "tinyxml" }
-	
+
 	defines {
 		"TIXML_USE_STL"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
-	
+
 	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mta"
 		}
-	
-	filter "system:not windows"
+
+	filter "system:linux"
 		links { "rt" }
-	
+
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

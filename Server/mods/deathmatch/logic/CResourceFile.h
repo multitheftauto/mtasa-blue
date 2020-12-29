@@ -48,24 +48,24 @@ protected:
 
 public:
     CResourceFile(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes);
-    virtual ~CResourceFile(void);
+    virtual ~CResourceFile();
 
     virtual ResponseCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
-    virtual bool Start(void) = 0;
-    virtual bool Stop(void) = 0;
-    virtual bool IsNoClientCache(void) const { return false; }
+    virtual bool Start() = 0;
+    virtual bool Stop() = 0;
+    virtual bool IsNoClientCache() const { return false; }
 
     eResourceType GetType() { return m_type; }
     const char*   GetName() { return m_strShortName.c_str(); }
     const char*   GetFullName() { return m_strResourceFileName.c_str(); }
     const char*   GetWindowsName() { return m_strWindowsName.c_str(); }
 
-    CChecksum GetLastChecksum(void) { return m_checksum; }
+    CChecksum GetLastChecksum() { return m_checksum; }
     void      SetLastChecksum(CChecksum checksum) { m_checksum = checksum; }
     void      SetLastFileSize(uint uiFileSize) { m_uiFileSize = uiFileSize; }
 
-    double  GetApproxSize(void) { return m_uiFileSize; }            // Only used by download counters
+    double  GetApproxSize() { return m_uiFileSize; }            // Only used by download counters
     string  GetMetaFileAttribute(const string& key) { return m_attributeMap[key]; }
     SString GetCachedPathFilename(bool bForceClientCachePath = false);
 };

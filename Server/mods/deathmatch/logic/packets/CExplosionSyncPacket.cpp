@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CExplosionSyncPacket::CExplosionSyncPacket(void)
+CExplosionSyncPacket::CExplosionSyncPacket()
 {
     m_OriginID = INVALID_ELEMENT_ID;
     m_ucType = EXPLOSION_SMALL;

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKJUMPFALL
-#define __CGAMESA_TASKJUMPFALL
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -54,7 +53,7 @@ public:
 class CTaskSimpleClimbSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleClimb
 {
 public:
-    CTaskSimpleClimbSA(void){};
+    CTaskSimpleClimbSA(){};
     CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
                        const bool bForceClimb = false);
 };
@@ -106,8 +105,6 @@ public:
 class CTaskSimpleJetPackSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleJetPack
 {
 public:
-    CTaskSimpleJetPackSA(void){};
+    CTaskSimpleJetPackSA(){};
     CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 };
-
-#endif

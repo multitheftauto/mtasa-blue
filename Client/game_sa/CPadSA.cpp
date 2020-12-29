@@ -49,7 +49,7 @@ VOID CPadSA::Restore()
     MemCpyFast(this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
 }
 
-bool CPadSA::IsEnabled(void)
+bool CPadSA::IsEnabled()
 {
     bool bEnabled = *(BYTE*)FUNC_CPad_UpdatePads == 0x56;
     return bEnabled;
@@ -65,7 +65,7 @@ VOID CPadSA::Disable(bool bDisable)
     // this->internalInterface->DisablePlayerControls = bDisable;
 }
 
-VOID CPadSA::Clear(void)
+VOID CPadSA::Clear()
 {
     CControllerState cs;            // create a null controller (class is inited to null)
     SetCurrentControllerState(&cs);
@@ -80,7 +80,7 @@ VOID CPadSA::SetHornHistoryValue(bool value)
     internalInterface->bHornHistory[internalInterface->iCurrHornHistory] = value;
 }
 
-long CPadSA::GetAverageWeapon(void)
+long CPadSA::GetAverageWeapon()
 {
     return internalInterface->AverageWeapon;
 }

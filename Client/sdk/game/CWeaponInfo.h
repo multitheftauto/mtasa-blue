@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CWEAPONINFO
-#define __CGAME_CWEAPONINFO
+#pragma once
 
 #include "Common.h"
 #include <CVector.h>
@@ -195,87 +194,85 @@ enum eWeaponModel
 class CWeaponInfo
 {
 public:
-    virtual eWeaponModel GetModel(void) = 0;
-    virtual eWeaponModel GetModel2(void) = 0;
+    virtual eWeaponModel GetModel() = 0;
+    virtual eWeaponModel GetModel2() = 0;
 
-    virtual float GetWeaponRange(void) = 0;
+    virtual float GetWeaponRange() = 0;
     virtual void  SetWeaponRange(float fRange) = 0;
 
-    virtual float GetTargetRange(void) = 0;
+    virtual float GetTargetRange() = 0;
     virtual void  SetTargetRange(float fRange) = 0;
 
-    virtual CVector* GetFireOffset(void) = 0;
+    virtual CVector* GetFireOffset() = 0;
     virtual void     SetFireOffset(CVector* vecFireOffset) = 0;
 
-    virtual short GetDamagePerHit(void) = 0;
+    virtual short GetDamagePerHit() = 0;
     virtual void  SetDamagePerHit(short sDamagePerHit) = 0;
 
-    virtual float GetAccuracy(void) = 0;
+    virtual float GetAccuracy() = 0;
     virtual void  SetAccuracy(float fAccuracy) = 0;
 
-    virtual short GetMaximumClipAmmo(void) = 0;
+    virtual short GetMaximumClipAmmo() = 0;
     virtual void  SetMaximumClipAmmo(short sAccuracy) = 0;
 
-    virtual float GetMoveSpeed(void) = 0;
+    virtual float GetMoveSpeed() = 0;
     virtual void  SetMoveSpeed(float fMoveSpeed) = 0;
 
     // projectile/areaeffect only
-    virtual float GetFiringSpeed(void) = 0;
+    virtual float GetFiringSpeed() = 0;
     virtual void  SetFiringSpeed(float fFiringSpeed) = 0;
 
     // area effect only
-    virtual float GetRadius(void) = 0;
+    virtual float GetRadius() = 0;
     virtual void  SetRadius(float fRadius) = 0;
 
-    virtual float GetLifeSpan(void) = 0;
+    virtual float GetLifeSpan() = 0;
     virtual void  SetLifeSpan(float fLifeSpan) = 0;
 
-    virtual float GetSpread(void) = 0;
+    virtual float GetSpread() = 0;
     virtual void  SetSpread(float fSpread) = 0;
 
-    virtual float GetAnimBreakoutTime(void) = 0;
+    virtual float GetAnimBreakoutTime() = 0;
     virtual void  SetAnimBreakoutTime(float fBreakoutTime) = 0;
 
-    virtual eWeaponSlot GetSlot(void) = 0;
+    virtual eWeaponSlot GetSlot() = 0;
     virtual void        SetSlot(eWeaponSlot dwSlot) = 0;
 
-    virtual eWeaponSkill GetSkill(void) = 0;
+    virtual eWeaponSkill GetSkill() = 0;
     virtual void         SetSkill(eWeaponSkill weaponSkill) = 0;
 
-    virtual float GetRequiredStatLevel(void) = 0;
+    virtual float GetRequiredStatLevel() = 0;
     virtual void  SetRequiredStatLevel(float fStatLevel) = 0;
 
     virtual void  SetFlags(int flags) = 0;
     virtual void  SetFlag(DWORD flag) = 0;
     virtual void  ClearFlag(DWORD flag) = 0;
     virtual bool  IsFlagSet(DWORD flag) = 0;
-    virtual short GetFlags(void) = 0;
+    virtual short GetFlags() = 0;
 
-    virtual DWORD GetAnimGroup(void) = 0;
+    virtual DWORD GetAnimGroup() = 0;
     virtual void  SetAnimGroup(DWORD dwAnimGroup) = 0;
 
-    virtual eFireType GetFireType(void) = 0;
+    virtual eFireType GetFireType() = 0;
 
-    virtual float GetWeaponAnimLoopStart(void) = 0;
+    virtual float GetWeaponAnimLoopStart() = 0;
 
-    virtual float GetWeaponAnimLoopStop(void) = 0;
+    virtual float GetWeaponAnimLoopStop() = 0;
 
-    virtual float GetWeaponAnimLoopFireTime(void) = 0;
+    virtual float GetWeaponAnimLoopFireTime() = 0;
     virtual void  SetWeaponAnimLoopFireTime(float animFireTime) = 0;
 
-    virtual float GetWeaponAnim2LoopStart(void) = 0;
+    virtual float GetWeaponAnim2LoopStart() = 0;
 
-    virtual float GetWeaponAnim2LoopStop(void) = 0;
+    virtual float GetWeaponAnim2LoopStop() = 0;
 
-    virtual float GetWeaponAnim2LoopFireTime(void) = 0;
+    virtual float GetWeaponAnim2LoopFireTime() = 0;
 
-    virtual float GetWeaponAnimBreakoutTime(void) = 0;
+    virtual float GetWeaponAnimBreakoutTime() = 0;
 
-    virtual float GetWeaponRadius(void) = 0;
+    virtual float GetWeaponRadius() = 0;
 
-    virtual short GetAimOffsetIndex(void) = 0;
-    virtual BYTE  GetDefaultCombo(void) = 0;
-    virtual BYTE  GetCombosAvailable(void) = 0;
+    virtual short GetAimOffsetIndex() = 0;
+    virtual BYTE  GetDefaultCombo() = 0;
+    virtual BYTE  GetCombosAvailable() = 0;
 };
-
-#endif

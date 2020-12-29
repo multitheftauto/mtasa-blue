@@ -20,17 +20,17 @@ class CGroups
     friend class CDummy;
 
 public:
-    CGroups(void) {}
-    ~CGroups(void) { DeleteAll(); }
+    CGroups() {}
+    ~CGroups() { DeleteAll(); }
 
     CDummy* Create(CElement* pParent);
     CDummy* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
 
     void Delete(CDummy* pDummy);
-    void DeleteAll(void);
+    void DeleteAll();
 
-    list<CDummy*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    list<CDummy*>::const_iterator IterEnd(void) { return m_List.end(); }
+    list<CDummy*>::const_iterator IterBegin() { return m_List.begin(); }
+    list<CDummy*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
     void AddToList(CDummy* pDummy) { m_List.push_back(pDummy); };

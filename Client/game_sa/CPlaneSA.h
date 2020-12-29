@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PLANE
-#define __CGAMESA_PLANE
+#pragma once
 
 #include <game/CPlane.h>
 #include "CAutomobileSA.h"
@@ -29,5 +28,3 @@ public:
     CPlaneSA(CPlaneSAInterface* plane);
     CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 };
-
-#endif

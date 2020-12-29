@@ -9,12 +9,12 @@
  *****************************************************************************/
 #pragma once
 
-class CPlayerNetworkStatusPacket : public CPacket
+class CPlayerNetworkStatusPacket final : public CPacket
 {
 public:
-    virtual bool  RequiresSourcePlayer(void) const { return true; }
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_NETWORK_STATUS; };
-    unsigned long GetFlags(void) const
+    virtual bool  RequiresSourcePlayer() const { return true; }
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_NETWORK_STATUS; };
+    unsigned long GetFlags() const
     {
         assert(0);
         return 0;

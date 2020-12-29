@@ -32,7 +32,7 @@ void CRenderItem::PostConstruct(CRenderItemManager* pManager, bool bIncludeInMem
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItem::~CRenderItem(void)
+CRenderItem::~CRenderItem()
 {
     assert(m_iRefCount == 0);
 }
@@ -44,7 +44,7 @@ CRenderItem::~CRenderItem(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::PreDestruct(void)
+void CRenderItem::PreDestruct()
 {
     assert(m_iRefCount == 0);
     m_pManager->NotifyDestructRenderItem(this);
@@ -57,7 +57,7 @@ void CRenderItem::PreDestruct(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::Release(void)
+void CRenderItem::Release()
 {
     assert(m_iRefCount > 0);
     if (--m_iRefCount > 0)
@@ -74,7 +74,7 @@ void CRenderItem::Release(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::AddRef(void)
+void CRenderItem::AddRef()
 {
     assert(m_iRefCount > 0);
     ++m_iRefCount;

@@ -14,7 +14,7 @@
 
 extern CCore* g_pCore;
 
-CQuestionBox::CQuestionBox(void)
+CQuestionBox::CQuestionBox()
 {
     m_pWindow = NULL;
     m_pMessage = NULL;
@@ -38,7 +38,7 @@ CQuestionBox::CQuestionBox(void)
     m_pMessage = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
 }
 
-CQuestionBox::~CQuestionBox(void)
+CQuestionBox::~CQuestionBox()
 {
     for (unsigned int i = 0; i < m_ButtonList.size(); i++)
         delete m_ButtonList[i];
@@ -46,12 +46,12 @@ CQuestionBox::~CQuestionBox(void)
     delete m_pWindow;
 }
 
-void CQuestionBox::Hide(void)
+void CQuestionBox::Hide()
 {
     m_pWindow->SetVisible(false);
 }
 
-void CQuestionBox::Show(void)
+void CQuestionBox::Show()
 {
     // Layout - Calc how many lines of text
     SString      strMsg = m_pMessage->GetText();
@@ -105,7 +105,7 @@ void CQuestionBox::Show(void)
     AddReportLog(9100, SString("QuestionBox::Show [%s] %s", m_pWindow->GetText().c_str(), *m_strMsg.Left(200).Replace("\n", "|")));
 }
 
-void CQuestionBox::Reset(void)
+void CQuestionBox::Reset()
 {
     Hide();
     m_uiLastButton = -1;
@@ -196,14 +196,14 @@ void CQuestionBox::SetOnLineHelpOption(const SString& strTroubleLink)
     SetCallback(CCore::ErrorMessageBoxCallBack, new SString(strTroubleLink));
 }
 
-unsigned int CQuestionBox::PollButtons(void)
+unsigned int CQuestionBox::PollButtons()
 {
     if (!m_pWindow->IsVisible())
         return -1;
     return m_uiLastButton;
 }
 
-bool CQuestionBox::IsVisible(void)
+bool CQuestionBox::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
@@ -227,7 +227,7 @@ void CQuestionBox::SetAutoCloseOnConnect(bool bEnable)
     m_bAutoCloseOnConnect = bEnable;
 }
 
-void CQuestionBox::OnConnect(void)
+void CQuestionBox::OnConnect()
 {
     if (m_bAutoCloseOnConnect)
         Hide();

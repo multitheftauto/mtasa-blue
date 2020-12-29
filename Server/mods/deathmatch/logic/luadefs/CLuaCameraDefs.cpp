@@ -11,18 +11,24 @@
 
 #include "StdInc.h"
 
-void CLuaCameraDefs::LoadFunctions(void)
+void CLuaCameraDefs::LoadFunctions()
 {
-    // Get functions
-    CLuaCFunctions::AddFunction("getCameraMatrix", getCameraMatrix);
-    CLuaCFunctions::AddFunction("getCameraTarget", getCameraTarget);
-    CLuaCFunctions::AddFunction("getCameraInterior", getCameraInterior);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Get functions
+        {"getCameraMatrix", getCameraMatrix},
+        {"getCameraTarget", getCameraTarget},
+        {"getCameraInterior", getCameraInterior},
 
-    // Set functions
-    CLuaCFunctions::AddFunction("setCameraMatrix", setCameraMatrix);
-    CLuaCFunctions::AddFunction("setCameraTarget", setCameraTarget);
-    CLuaCFunctions::AddFunction("setCameraInterior", setCameraInterior);
-    CLuaCFunctions::AddFunction("fadeCamera", fadeCamera);
+        // Set functions
+        {"setCameraMatrix", setCameraMatrix},
+        {"setCameraTarget", setCameraTarget},
+        {"setCameraInterior", setCameraInterior},
+        {"fadeCamera", fadeCamera},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaCameraDefs::getCameraMatrix(lua_State* luaVM)

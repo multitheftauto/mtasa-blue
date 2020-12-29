@@ -23,12 +23,12 @@ unsigned long EndianSwap32(unsigned long x)
     return y;
 }
 
-CAudioContainerSA::CAudioContainerSA(void)
+CAudioContainerSA::CAudioContainerSA()
 {
     m_pLookupTable = new CAudioContainerLookupTableSA("AUDIO\\CONFIG\\BankLkup.dat");
 }
 
-CAudioContainerSA::~CAudioContainerSA(void)
+CAudioContainerSA::~CAudioContainerSA()
 {
     if (m_pLookupTable != NULL)
     {

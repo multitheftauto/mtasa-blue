@@ -29,15 +29,14 @@ class CLuaArguments;
 class CLuaArgument
 {
 public:
-    CLuaArgument(void);
+    CLuaArgument();
     CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
-    CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    ~CLuaArgument(void);
+    ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
-    bool                operator==(const CLuaArgument& Argument);
-    bool                operator!=(const CLuaArgument& Argument);
+    bool                operator==(const CLuaArgument& Argument) const;
+    bool                operator!=(const CLuaArgument& Argument) const;
 
     void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
     void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
@@ -50,20 +49,23 @@ public:
     void ReadScriptID(uint uiScriptID);
     void ReadTable(class CLuaArguments* table);
 
-    int GetType(void) const { return m_iType; };
+    int GetType() const { return m_iType; };
 
-    bool               GetBoolean(void) const { return m_bBoolean; };
-    lua_Number         GetNumber(void) const { return m_Number; };
-    const std::string& GetString(void) { return m_strString; };
-    void*              GetUserData(void) const { return m_pUserData; };
-    CElement*          GetElement(void) const;
+    bool               GetBoolean() const { return m_bBoolean; };
+    lua_Number         GetNumber() const { return m_Number; };
+    const std::string& GetString() { return m_strString; };
+    void*              GetUserData() const { return m_pUserData; };
+    CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
 
+    
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
+
+    bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;
@@ -82,6 +84,5 @@ private:
 #endif
 
     void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
-    bool CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables = NULL);
-    void DeleteTableData(void);
+    void DeleteTableData();
 };

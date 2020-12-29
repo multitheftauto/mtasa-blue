@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EVENTGROUP
-#define __CGAMESA_EVENTGROUP
+#pragma once
 
 #include <game/CEventGroup.h>
 
@@ -31,5 +30,3 @@ public:
 protected:
     CEventGroupSAInterface* m_pInterface;
 };
-
-#endif

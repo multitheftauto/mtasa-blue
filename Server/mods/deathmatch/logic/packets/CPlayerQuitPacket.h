@@ -13,21 +13,21 @@
 
 #include "CPacket.h"
 
-class CPlayerQuitPacket : public CPacket
+class CPlayerQuitPacket final : public CPacket
 {
 public:
-    CPlayerQuitPacket(void);
+    CPlayerQuitPacket();
 
-    ePacketID     GetPacketID(void) const { return static_cast<ePacketID>(PACKET_ID_PLAYER_QUIT); };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_PLAYER_QUIT); };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream) { return true; };
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID GetPlayer(void) { return m_PlayerID; };
+    ElementID GetPlayer() { return m_PlayerID; };
     void      SetPlayer(ElementID PlayerID) { m_PlayerID = PlayerID; };
 
-    unsigned char GetQuitReason(void) { return m_ucQuitReason; }
+    unsigned char GetQuitReason() { return m_ucQuitReason; }
     void          SetQuitReason(unsigned char ucQuitReason) { m_ucQuitReason = ucQuitReason; }
 
 private:

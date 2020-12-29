@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLMANAGER_H
-#define __CCLIENTCOLMANAGER_H
+#pragma once
 
 #include "CClientCommon.h"
 #include <list>
@@ -22,15 +21,15 @@ class CClientColManager
     friend class CClientColShape;
 
 public:
-    ~CClientColManager(void);
+    ~CClientColManager();
 
-    void DoPulse(void);
+    void DoPulse();
     void DoHitDetection(const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape* pJustThis = NULL, bool bChildren = false);
 
     bool Exists(CClientColShape* pShape);
-    void DeleteAll(void);
+    void DeleteAll();
 
-    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); }
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
 
 protected:
     void AddToList(CClientColShape* pShape) { m_List.push_back(pShape); };
@@ -43,5 +42,3 @@ protected:
 
     std::vector<CClientColShape*> m_List;
 };
-
-#endif

@@ -17,10 +17,10 @@
 class CBanManager
 {
 public:
-    CBanManager(void);
-    virtual ~CBanManager(void);
+    CBanManager();
+    virtual ~CBanManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
     CBan* AddBan(CPlayer* pPlayer, const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0);
     CBan* AddBan(const SString& strIP, const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0);
@@ -47,17 +47,17 @@ public:
     unsigned int GetBansWithNick(const char* szNick);
     unsigned int GetBansWithBanner(const char* szBanner);
 
-    bool        LoadBanList(void);
-    bool        ReloadBanList(void);
-    void        SaveBanList(void);
+    bool        LoadBanList();
+    bool        ReloadBanList();
+    void        SaveBanList();
     void        SafeSetValue(CXMLNode* pNode, const char* szKey, const std::string& strValue);
     void        SafeSetValue(CXMLNode* pNode, const char* szKey, unsigned int);
     std::string SafeGetValue(CXMLNode* pNode, const char* szKey);
     bool        IsValidIP(const char* szIP);
-    static void SetBansModified(void) { ms_bSaveRequired = true; }
+    static void SetBansModified() { ms_bSaveRequired = true; }
 
-    list<CBan*>::const_iterator IterBegin(void) { return m_BanManager.begin(); };
-    list<CBan*>::const_iterator IterEnd(void) { return m_BanManager.end(); };
+    list<CBan*>::const_iterator IterBegin() { return m_BanManager.begin(); };
+    list<CBan*>::const_iterator IterEnd() { return m_BanManager.end(); };
 
 private:
     SString m_strPath;

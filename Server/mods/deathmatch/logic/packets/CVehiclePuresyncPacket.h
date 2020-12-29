@@ -17,15 +17,15 @@
 
 class CVehicle;
 
-class CVehiclePuresyncPacket : public CPacket
+class CVehiclePuresyncPacket final : public CPacket
 {
 public:
-    CVehiclePuresyncPacket(void){};
+    CVehiclePuresyncPacket(){};
     explicit CVehiclePuresyncPacket(class CPlayer* pPlayer) { m_pSourceElement = pPlayer; };
 
-    bool          HasSimHandler(void) const { return true; }
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    bool          HasSimHandler() const { return true; }
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

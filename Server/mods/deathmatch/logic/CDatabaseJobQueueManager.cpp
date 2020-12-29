@@ -20,7 +20,7 @@
 // Stop threads and delete everything
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueueManager::~CDatabaseJobQueueManager(void)
+CDatabaseJobQueueManager::~CDatabaseJobQueueManager()
 {
     for (auto iter : m_QueueNameMap)
     {
@@ -62,7 +62,7 @@ CDbJobData* CDatabaseJobQueueManager::AddCommand(EJobCommandType jobType, SConne
 // Check if any callback functions are due
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueManager::DoPulse(void)
+void CDatabaseJobQueueManager::DoPulse()
 {
     for (const auto iter : m_QueueNameMap)
     {
@@ -204,7 +204,7 @@ CDatabaseJobQueue* CDatabaseJobQueueManager::GetQueueFromConnectCommand(const SS
 // Return unused handle within correct range
 //
 ///////////////////////////////////////////////////////////////
-SConnectionHandle CDatabaseJobQueueManager::GetNextConnectionHandle(void)
+SConnectionHandle CDatabaseJobQueueManager::GetNextConnectionHandle()
 {
     do
     {

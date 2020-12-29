@@ -16,7 +16,7 @@
 #define CS_NAN -32768
 
 SFixedArray<short, MAX_GTA_CONTROLS>       CClientPad::m_sScriptedStates;
-SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedReadyToReset;
+SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedStatesNextFrameOverride;
 bool                                       CClientPad::m_bFlyWithMouse;
 bool                                       CClientPad::m_bSteerWithMouse;
 
@@ -106,7 +106,7 @@ const char* CClientPad::GetControlName(unsigned int uiIndex)
     return NULL;
 }
 
-CClientPad::CClientPad(void)
+CClientPad::CClientPad()
 {
     memset(&m_fStates, 0, sizeof(m_fStates));
 
@@ -119,7 +119,7 @@ CClientPad::CClientPad(void)
     for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
     {
         m_sScriptedStates[i] = CS_NAN;
-        m_bScriptedReadyToReset[i] = false;
+        m_bScriptedStatesNextFrameOverride[i] = false;
     }
 }
 
@@ -241,6 +241,8 @@ void CClientPad::DoPulse(CClientPed* pPed)
                 cs.LeftStickX =
                     (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
                                                                                                  : (m_fStates[5]) ? m_fStates[5] * -128 : m_fStates[6] * 128);
+
+                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;            // Get in/out and alternative fighting styles
 
                 cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;            // Jump
 
@@ -468,13 +470,13 @@ bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex
 }
 
 // Get the analog control state directly from a pad state.  Use for players.
-bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState)
+bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides)
 {
     unsigned int uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
-        // Do we have a script override?
-        if (m_sScriptedStates[uiIndex] != CS_NAN)
+        // If we are not ignoring overrides and have a script override
+        if (!bIgnoreOverrides && m_sScriptedStates[uiIndex] != CS_NAN)
             switch (uiIndex)
             {
                 case 0:
@@ -588,7 +590,7 @@ bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs,
     return false;
 }
 // Set the analog control state and store them temporarilly before they are actually applied.  Used for players.
-bool CClientPad::SetAnalogControlState(const char* szName, float fState)
+bool CClientPad::SetAnalogControlState(const char* szName, float fState, bool bFrameForced)
 {
     // Ensure values are between 0 and 1
     fState = Clamp<float>(0, fState, 1);
@@ -600,56 +602,82 @@ bool CClientPad::SetAnalogControlState(const char* szName, float fState)
             case 0:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[1] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[1] = false;
                 return true;            // Left
             case 1:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[0] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[0] = false;
                 return true;            // Right
             case 2:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[3] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[3] = false;
                 return true;            // Up
             case 3:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[2] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[2] = false;
                 return true;            // Down
             case 4:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[5] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[5] = false;
                 return true;            // Vehicle Left
             case 5:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[4] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[4] = false;
                 return true;            // Vehicle Right
             case 6:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[7] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[7] = false;
                 return true;            // Up
             case 7:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[6] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[6] = false;
                 return true;            // Down
             case 8:
                 m_sScriptedStates[uiIndex] = (short)(fState * 255.0f);
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
                 return true;            // Accel
             case 9:
                 m_sScriptedStates[uiIndex] = (short)(fState * 255.0f);
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
                 return true;            // Reverse
             case 10:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[11] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[11] = false;
                 return true;            // Special Left
             case 11:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[10] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[10] = false;
                 return true;            // Special Right
             case 12:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[13] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[13] = false;
                 return true;            // Special Up
             case 13:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[12] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[12] = false;
                 return true;            // Special Down
             default:
                 return false;
@@ -674,55 +702,77 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     {
         unsigned int uiIndex = 0;
 
-        ProcessControl(cs.LeftStickX, uiIndex, false);
-        uiIndex++;            // Left
-        ProcessControl(cs.LeftStickX, uiIndex, true);
-        uiIndex++;            // Right
-        ProcessControl(cs.LeftStickY, uiIndex, false);
-        uiIndex++;            // Up
-        ProcessControl(cs.LeftStickY, uiIndex, true);
-        uiIndex++;            // Down
+        ProcessControl(cs.LeftStickX, uiIndex); // Left
+        uiIndex++;            
+        ProcessControl(cs.LeftStickX, uiIndex); // Right
+        uiIndex++;            
+        ProcessControl(cs.LeftStickY, uiIndex); // Up
+        uiIndex++;            
+        ProcessControl(cs.LeftStickY, uiIndex); // Down
     }
     else
     {
         unsigned int uiIndex = 4;
 
-        ProcessControl(cs.LeftStickX, uiIndex, false);
-        uiIndex++;            // Left
-        ProcessControl(cs.LeftStickX, uiIndex, true);
-        uiIndex++;            // Right
-        ProcessControl(cs.LeftStickY, uiIndex, false);
-        uiIndex++;            // Up
-        ProcessControl(cs.LeftStickY, uiIndex, true);
-        uiIndex++;            // Down
-        ProcessControl(cs.ButtonCross, uiIndex, true);
-        uiIndex++;            // Accel
-        ProcessControl(cs.ButtonSquare, uiIndex, true);
-        uiIndex++;            // Brake
-        ProcessControl(cs.RightStickX, uiIndex, false);
-        uiIndex++;            // Special Left
-        ProcessControl(cs.RightStickX, uiIndex, true);
-        uiIndex++;            // Special Right
-        ProcessControl(cs.RightStickY, uiIndex, false);
-        uiIndex++;            // Special Up
-        ProcessControl(cs.RightStickY, uiIndex, true);
-        uiIndex++;            // Special Down
+        ProcessControl(cs.LeftStickX, uiIndex); // Left
+        uiIndex++;            
+        ProcessControl(cs.LeftStickX, uiIndex); // Right
+        uiIndex++;            
+        ProcessControl(cs.LeftStickY, uiIndex); // Up
+        uiIndex++;            
+        ProcessControl(cs.LeftStickY, uiIndex); // Down
+        uiIndex++;            
+        ProcessControl(cs.ButtonCross, uiIndex); // Accel
+        uiIndex++;            
+        ProcessControl(cs.ButtonSquare, uiIndex); // Brake
+        uiIndex++;            
+        ProcessControl(cs.RightStickX, uiIndex); // Special Left
+        uiIndex++;            
+        ProcessControl(cs.RightStickX, uiIndex); // Special Right
+        uiIndex++;            
+        ProcessControl(cs.RightStickY, uiIndex); // Special Up
+        uiIndex++;            
+        ProcessControl(cs.RightStickY, uiIndex); // Special Down
     }
 }
 
-void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex, bool bPositive)
+void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex)
 {
-    bool bResetCmp = bPositive ? (usControlValue > 0) : (usControlValue < 0);
-    if (!m_bScriptedReadyToReset[uiIndex])            // If we havent marked as ready to reset the control, find out if we are
-        m_bScriptedReadyToReset[uiIndex] = ((m_sScriptedStates[uiIndex] != CS_NAN) && (usControlValue == 0));
+    // Note:    control values can be 0, negative or positive
+    //          that's why we check unequals != 0
+    //          otherwise the values are already in their expected value boundaries
+    //
+    // usControlValue                       is the updated input value we get from the player
+    // m_sScriptedStates                    contains our script value
+    // m_bScriptedStatesNextFrameOverride   if the player input should be forcefully overriden for the next frame
+    //
+    //
+    // old behavior or (override == false)
+    //      - player input will not be overwitten if it's unequals to 0* and script input is set 0
+    //      - otherwise it will use the last set value after player input went 0*
+    //        and will keep this behavior for comming frames
+    //
+    // behavior with (override == true)
+    //      - will overwrite the player input even if not 0*
+    //        only for the next frame
+    //
+    // 0* = no key pressed or analog hardware controll touched
+    //
+    //
 
-    if (m_bScriptedReadyToReset[uiIndex] && bResetCmp)            // If we're ready to reset, and our reset comparision is passed
-        m_sScriptedStates[uiIndex] = CS_NAN;                      // Remove our scripted control state
-    else
-        // Only apply the control state of we're actually a number, and that we're positive when we want it to be and vice versa
+    if (m_bScriptedStatesNextFrameOverride[uiIndex])
+    {
+        m_bScriptedStatesNextFrameOverride[uiIndex] = false;
         if (m_sScriptedStates[uiIndex] != CS_NAN)
-        if ((bPositive && m_sScriptedStates[uiIndex] > 0) || (!bPositive && m_sScriptedStates[uiIndex] < 0))
-            usControlValue = m_sScriptedStates[uiIndex];            // Otherwise force the scripted control state
+            std::swap(usControlValue, m_sScriptedStates[uiIndex]);
+    }
+    else
+    {
+        if (usControlValue != 0)
+            m_sScriptedStates[uiIndex] = CS_NAN;
+        else if (m_sScriptedStates[uiIndex] != CS_NAN && m_sScriptedStates[uiIndex] != 0)
+            usControlValue = m_sScriptedStates[uiIndex];
+    }
 }
 
 // Process toggled controls and apply them directly to the pad state.  Used for players when keyboard input blocking is insufficient.

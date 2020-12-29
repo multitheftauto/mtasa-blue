@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientPad_H
-#define __CClientPad_H
+#pragma once
 
 #define MAX_GTA_CONTROLS 44
 #define MAX_GTA_ANALOG_CONTROLS 14
@@ -25,7 +24,7 @@ public:
 
     static bool GetAnalogControlIndex(const char* szName, unsigned int& uiIndex);
 
-    CClientPad(void);
+    CClientPad();
 
     bool GetControlState(const char* szName, bool& bState);
     bool SetControlState(const char* szName, bool bState);
@@ -35,24 +34,22 @@ public:
 
     void DoPulse(CClientPed* pPed);
 
-    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState);
-    static bool SetAnalogControlState(const char* szName, float fState);
+    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides);
+    static bool SetAnalogControlState(const char* szName, float fState, bool bFrameForced);
     static void RemoveSetAnalogControlState(const char* szName);
 
     static void ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot);
-    static void ProcessControl(short& usControlValue, unsigned int uiIndex, bool bResetCmp);
+    static void ProcessControl(short& usControlValue, unsigned int uiIndex);
 
     static void ProcessAllToggledControls(CControllerState& cs, bool bOnFoot);
     static bool ProcessToggledControl(const char* szName, CControllerState& cs, bool bOnFoot, bool bEnabled);
     static bool GetControlState(const char* szName, CControllerState& State, bool bOnFoot);
 
     static SFixedArray<short, MAX_GTA_CONTROLS>       m_sScriptedStates;
-    static SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> m_bScriptedReadyToReset;
+    static SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> m_bScriptedStatesNextFrameOverride;
     static bool                                       m_bFlyWithMouse;
     static bool                                       m_bSteerWithMouse;
 
 protected:
     SFixedArray<float, MAX_GTA_CONTROLS> m_fStates;
 };
-
-#endif

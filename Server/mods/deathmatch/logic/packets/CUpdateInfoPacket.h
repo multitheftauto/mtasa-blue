@@ -11,14 +11,14 @@
 
 #pragma once
 
-class CUpdateInfoPacket : public CPacket
+class CUpdateInfoPacket final : public CPacket
 {
 public:
-    CUpdateInfoPacket(void);
+    CUpdateInfoPacket();
     CUpdateInfoPacket(const SString& m_strType, const SString& strData);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_UPDATE_INFO; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_UPDATE_INFO; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

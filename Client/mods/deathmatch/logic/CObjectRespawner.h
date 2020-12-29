@@ -9,17 +9,16 @@
  *
  *****************************************************************************/
 
-#ifndef __COBJECTRESPAWNER_H
-#define __COBJECTRESPAWNER_H
+#pragma once
 
 class CObjectRespawner
 {
 public:
-    CObjectRespawner(void);
-    ~CObjectRespawner(void) { DoRespawnAll(); };
+    CObjectRespawner();
+    ~CObjectRespawner() { DoRespawnAll(); };
 
     void Respawn(CClientObject* pObject);
-    void DoRespawnAll(void);
+    void DoRespawnAll();
 
     bool IsBeingRespawned(CClientObject* pObject);
     void Unreference(CClientObject* pObject);
@@ -27,5 +26,3 @@ public:
 private:
     std::vector<CClientObject*> m_List;
 };
-
-#endif

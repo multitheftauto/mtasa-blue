@@ -47,7 +47,7 @@ public:
         iNumColumns++;
     }
 
-    SString* AddRow(void)
+    SString* AddRow()
     {
         iNumRows++;
         cellList.insert(cellList.end(), ColumnCount(), SString());
@@ -78,10 +78,10 @@ public:
 class CClientPerfStatModule
 {
 public:
-    virtual ~CClientPerfStatModule(void) {}
+    virtual ~CClientPerfStatModule() {}
 
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 };
 
@@ -92,8 +92,8 @@ class CClientPerfStatLuaTiming : public CClientPerfStatModule
 {
 public:
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CClientPerfStatLuaTiming
@@ -101,7 +101,7 @@ public:
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain) = 0;
     virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs) = 0;
 
-    static CClientPerfStatLuaTiming* GetSingleton(void);
+    static CClientPerfStatLuaTiming* GetSingleton();
 };
 
 //
@@ -111,15 +111,15 @@ class CClientPerfStatLuaMemory : public CClientPerfStatModule
 {
 public:
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CClientPerfStatLuaMemory
     virtual void OnLuaMainCreate(CLuaMain* pLuaMain) = 0;
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain) = 0;
 
-    static CClientPerfStatLuaMemory* GetSingleton(void);
+    static CClientPerfStatLuaMemory* GetSingleton();
 };
 
 //
@@ -129,13 +129,13 @@ class CClientPerfStatLibMemory : public CClientPerfStatModule
 {
 public:
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CClientPerfStatLibMemory
 
-    static CClientPerfStatLibMemory* GetSingleton(void);
+    static CClientPerfStatLibMemory* GetSingleton();
 };
 
 //
@@ -145,11 +145,11 @@ class CClientPerfStatPacketUsage : public CClientPerfStatModule
 {
 public:
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CClientPerfStatPacketUsage
 
-    static CClientPerfStatPacketUsage* GetSingleton(void);
+    static CClientPerfStatPacketUsage* GetSingleton();
 };

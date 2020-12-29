@@ -56,7 +56,7 @@ CGUILabel_Impl::CGUILabel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char
     }
 }
 
-CGUILabel_Impl::~CGUILabel_Impl(void)
+CGUILabel_Impl::~CGUILabel_Impl()
 {
     DestroyElement();
 }
@@ -72,7 +72,7 @@ void CGUILabel_Impl::SetVerticalAlign(CGUIVerticalAlign eAlign)
     reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->setVerticalFormatting(static_cast<CEGUI::StaticText::VertFormatting>(eAlign));
 }
 
-CGUIVerticalAlign CGUILabel_Impl::GetVerticalAlign(void)
+CGUIVerticalAlign CGUILabel_Impl::GetVerticalAlign()
 {
     return static_cast<CGUIVerticalAlign>(reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->getVerticalFormatting());
 }
@@ -82,7 +82,7 @@ void CGUILabel_Impl::SetHorizontalAlign(CGUIHorizontalAlign eAlign)
     reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->setHorizontalFormatting(static_cast<CEGUI::StaticText::HorzFormatting>(eAlign));
 }
 
-CGUIHorizontalAlign CGUILabel_Impl::GetHorizontalAlign(void)
+CGUIHorizontalAlign CGUILabel_Impl::GetHorizontalAlign()
 {
     return static_cast<CGUIHorizontalAlign>(reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->getHorizontalFormatting());
 }
@@ -97,7 +97,7 @@ void CGUILabel_Impl::SetTextColor(unsigned char ucRed, unsigned char ucGreen, un
     reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->setTextColours(CEGUI::colour(1.0f / 255.0f * ucRed, 1.0f / 255.0f * ucGreen, 1.0f / 255.0f * ucBlue));
 }
 
-CGUIColor CGUILabel_Impl::GetTextColor(void)
+CGUIColor CGUILabel_Impl::GetTextColor()
 {
     CGUIColor temp;
     GetTextColor(temp.R, temp.G, temp.B);
@@ -118,7 +118,7 @@ void CGUILabel_Impl::SetFrameEnabled(bool bFrameEnabled)
     reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->setFrameEnabled(bFrameEnabled);
 }
 
-bool CGUILabel_Impl::IsFrameEnabled(void)
+bool CGUILabel_Impl::IsFrameEnabled()
 {
     return reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->isFrameEnabled();
 }
@@ -129,7 +129,7 @@ float CGUILabel_Impl::GetCharacterWidth(int iCharIndex)
         return true;
 }
 
-float CGUILabel_Impl::GetFontHeight(void)
+float CGUILabel_Impl::GetFontHeight()
 {
     const CEGUI::Font* pFont = m_pWindow->getFont();
     if (pFont)
@@ -137,7 +137,7 @@ float CGUILabel_Impl::GetFontHeight(void)
     return 14.0f;
 }
 
-float CGUILabel_Impl::GetTextExtent(void)
+float CGUILabel_Impl::GetTextExtent()
 {
     const CEGUI::Font* pFont = m_pWindow->getFont();
     if (pFont)

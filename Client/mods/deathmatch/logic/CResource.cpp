@@ -21,7 +21,7 @@ extern CClientGame* g_pClientGame;
 int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                     const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP)
+                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
     m_usNetID = usNetID;
@@ -86,8 +86,14 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     }
 }
 
-CResource::~CResource(void)
+CResource::~CResource()
 {
+    // Deallocate all models that this resource allocated earlier
+    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
+
+    // Delete all the resource's locally created children (the server won't do that)
+    DeleteClientChildren();
+
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
     // Make sure we don't force the cursor on
     ShowCursor(false);
@@ -149,14 +155,6 @@ CResource::~CResource(void)
         delete (*iterc);
     }
     m_ConfigFiles.clear();
-
-    // Delete the exported functions
-    list<CExportedFunction*>::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for (; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction)
-    {
-        delete (*iterExportedFunction);
-    }
-    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
@@ -202,33 +200,19 @@ CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiD
     return pConfig;
 }
 
-void CResource::AddExportedFunction(const char* szFunctionName)
+bool CResource::CallExportedFunction(const SString& name, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
 {
-    m_exportedFunctions.push_back(new CExportedFunction(szFunctionName));
-}
-
-bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
-{
-    list<CExportedFunction*>::iterator iter = m_exportedFunctions.begin();
-    for (; iter != m_exportedFunctions.end(); ++iter)
-    {
-        if (strcmp((*iter)->GetFunctionName(), szFunctionName) == 0)
-        {
-            if (args.CallGlobal(m_pLuaVM, szFunctionName, &returns))
-            {
-                return true;
-            }
-        }
-    }
+    if (m_exportedFunctions.find(name) != m_exportedFunctions.end())
+        return args.CallGlobal(m_pLuaVM, name.c_str(), &returns);
     return false;
 }
 
-bool CResource::CanBeLoaded(void)
+bool CResource::CanBeLoaded()
 {
     return !IsActive() && !IsWaitingForInitialDownloads();
 }
 
-bool CResource::IsWaitingForInitialDownloads(void)
+bool CResource::IsWaitingForInitialDownloads()
 {
     for (std::list<CResourceConfigItem*>::iterator iter = m_ConfigFiles.begin(); iter != m_ConfigFiles.end(); ++iter)
         if ((*iter)->IsWaitingForDownload())
@@ -241,7 +225,7 @@ bool CResource::IsWaitingForInitialDownloads(void)
     return false;
 }
 
-void CResource::Load(void)
+void CResource::Load()
 {
     dassert(CanBeLoaded());
     m_pRootEntity = g_pClientGame->GetRootEntity();
@@ -319,7 +303,7 @@ void CResource::Load(void)
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
             {
             }
             else
@@ -345,7 +329,7 @@ void CResource::Load(void)
         assert(0);
 }
 
-void CResource::Stop(void)
+void CResource::Stop()
 {
     m_bStarting = false;
     m_bStopping = true;
@@ -354,7 +338,7 @@ void CResource::Stop(void)
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
 }
 
-SString CResource::GetState(void)
+SString CResource::GetState()
 {
     if (m_bStarting)
         return "starting";
@@ -366,7 +350,7 @@ SString CResource::GetState(void)
         return "loaded";
 }
 
-void CResource::DeleteClientChildren(void)
+void CResource::DeleteClientChildren()
 {
     // Run this on our resource entity if we have one
     if (m_pResourceEntity)
@@ -467,13 +451,24 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
 {
-    // Compose message
-    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-    SString strGotMd5 = ConvertDataToHexString(CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()).md5.data, sizeof(MD5));
-    SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+    auto checksumResult = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
+
+    SString errorMessage;
+    if (std::holds_alternative<std::string>(checksumResult))
+        errorMessage = std::get<std::string>(checksumResult);
+    else
+    {
+        CChecksum checksum = std::get<CChecksum>(checksumResult);
+
+        // Compose message
+        uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
+        SString strGotMd5 = ConvertDataToHexString(checksum.md5.data, sizeof(MD5));
+        SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+        errorMessage = SString("Got size:%d MD5:%s, wanted MD5:%s", uiGotFileSize, *strGotMd5, *strWantedMd5);
+    }
+
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
-    SString strMessage =
-        SString("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
+    SString strMessage = SString("HTTP server file mismatch! (%s) %s [%s]", GetName(), *strFilename, *errorMessage);
 
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);

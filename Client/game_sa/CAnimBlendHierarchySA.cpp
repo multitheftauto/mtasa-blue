@@ -12,12 +12,12 @@
 #include "StdInc.h"
 
 // Careful, GetIndex will not work for custom animations
-int CAnimBlendHierarchySAInterface::GetIndex(void)
+int CAnimBlendHierarchySAInterface::GetIndex()
 {
     return (((DWORD)this - ARRAY_CAnimManager_Animations) / 24);
 }
 
-void CAnimBlendHierarchySA::Initialize(void)
+void CAnimBlendHierarchySA::Initialize()
 {
     m_pInterface->pSequences = 0;
     m_pInterface->usNumSequences = 0;
@@ -40,7 +40,7 @@ void CAnimBlendHierarchySA::SetName(const char* szName)
     }
 }
 
-void CAnimBlendHierarchySA::RemoveAnimSequences(void)
+void CAnimBlendHierarchySA::RemoveAnimSequences()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveAnimSequences;
@@ -51,7 +51,7 @@ void CAnimBlendHierarchySA::RemoveAnimSequences(void)
     }
 }
 
-void CAnimBlendHierarchySA::RemoveFromUncompressedCache(void)
+void CAnimBlendHierarchySA::RemoveFromUncompressedCache()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache;
@@ -62,7 +62,7 @@ void CAnimBlendHierarchySA::RemoveFromUncompressedCache(void)
     }
 }
 
-void CAnimBlendHierarchySA::RemoveQuaternionFlips(void)
+void CAnimBlendHierarchySA::RemoveQuaternionFlips()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips;
@@ -73,7 +73,7 @@ void CAnimBlendHierarchySA::RemoveQuaternionFlips(void)
     }
 }
 
-void CAnimBlendHierarchySA::CalculateTotalTime(void)
+void CAnimBlendHierarchySA::CalculateTotalTime()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_CalculateTotalTime;

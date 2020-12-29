@@ -34,7 +34,7 @@ CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc
     OnEnterSector(m_pRow->FindOrCreateSector(m_vecPosition));
 }
 
-CClientStreamer::~CClientStreamer(void)
+CClientStreamer::~CClientStreamer()
 {
     // Clear our mainland rows
     list<CClientStreamSectorRow*>::iterator iter = m_WorldRows.begin();

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_REGISTEREDCORONA
-#define __CGAME_REGISTEREDCORONA
+#pragma once
 
 #include "Common.h"
 #include <CVector.h>
@@ -39,4 +38,3 @@ public:
     virtual VOID     Refresh() = 0;
     virtual VOID     Disable() = 0;
 };
-#endif

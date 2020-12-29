@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDINTELLIGENCE
-#define __CGAMESA_PEDINTELLIGENCE
+#pragma once
 
 #include <game/CPedIntelligence.h>
 #include "CEventSA.h"
@@ -61,15 +60,14 @@ private:
 
 public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
-    ~CPedIntelligenceSA(void);
-    CPedIntelligenceSAInterface*  GetInterface(void) { return this->internalInterface; }
-    bool                          IsRespondingToEvent(void);
-    int                           GetCurrentEventType(void);
-    CEvent*                       GetCurrentEvent(void);
-    CTaskManager*                 GetTaskManager(void);
-    CVehicleScanner*              GetVehicleScanner(void);
+    ~CPedIntelligenceSA();
+    CPedIntelligenceSAInterface*  GetInterface() { return this->internalInterface; }
+    bool                          IsRespondingToEvent();
+    int                           GetCurrentEventType();
+    CEvent*                       GetCurrentEvent();
+    CTaskManager*                 GetTaskManager();
+    CVehicleScanner*              GetVehicleScanner();
     bool                          TestForStealthKill(CPed* pPed, bool bUnk);
-    CTaskSimpleUseGunSAInterface* GetTaskUseGun(void);
+    CTaskSimpleUseGunSAInterface* GetTaskUseGun();
+    CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
 };
-
-#endif

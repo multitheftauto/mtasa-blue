@@ -13,14 +13,14 @@
 
 #include "CPacket.h"
 
-class CServerTextItemPacket : public CPacket
+class CServerTextItemPacket final : public CPacket
 {
 public:
     CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format,
                           unsigned char ucShadowAlpha, const char* szText);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_TEXT_ITEM; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_TEXT_ITEM; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

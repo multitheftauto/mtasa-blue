@@ -1,4 +1,4 @@
-// nbtheory.cpp - written and placed in the public domain by Wei Dai
+// nbtheory.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 
@@ -10,9 +10,7 @@
 #include "algparam.h"
 #include "smartptr.h"
 #include "misc.h"
-
-#include <math.h>
-#include <vector>
+#include "stdcpp.h"
 
 #ifdef _OPENMP
 # include <omp.h>
@@ -450,7 +448,7 @@ static bool ProvePrime(const Integer &p, const Integer &q)
 // this is the Quisquater test. Numbers p having passed the Lucas - Lehmer test
 // for q and verifying p < q^3 can only be built up of two factors, both = 1 mod q,
 // or be prime. The next two lines build the discriminant of a quadratic equation
-// which holds iff p is built up of two factors (excercise ... )
+// which holds iff p is built up of two factors (exercise ... )
 
 	Integer r = (p-1)/q;
 	if (((r%q).Squared()-4*(r/q)).IsSquare())
@@ -528,7 +526,7 @@ Integer MaurerProvablePrime(RandomNumberGenerator &rng, unsigned int bits)
 		const unsigned margin = bits > 50 ? 20 : (bits-10)/2;
 		double relativeSize;
 		do
-			relativeSize = pow(2.0, double(rng.GenerateWord32())/0xffffffff - 1);
+			relativeSize = std::pow(2.0, double(rng.GenerateWord32())/0xffffffff - 1);
 		while (bits * relativeSize >= bits - margin);
 
 		Integer a,b;
@@ -1023,14 +1021,14 @@ unsigned int FactoringWorkFactor(unsigned int n)
 	// extrapolated from the table in Odlyzko's "The Future of Integer Factorization"
 	// updated to reflect the factoring of RSA-130
 	if (n<5) return 0;
-	else return (unsigned int)(2.4 * pow((double)n, 1.0/3.0) * pow(log(double(n)), 2.0/3.0) - 5);
+	else return (unsigned int)(2.4 * std::pow((double)n, 1.0/3.0) * std::pow(log(double(n)), 2.0/3.0) - 5);
 }
 
 unsigned int DiscreteLogWorkFactor(unsigned int n)
 {
 	// assuming discrete log takes about the same time as factoring
 	if (n<5) return 0;
-	else return (unsigned int)(2.4 * pow((double)n, 1.0/3.0) * pow(log(double(n)), 2.0/3.0) - 5);
+	else return (unsigned int)(2.4 * std::pow((double)n, 1.0/3.0) * std::pow(log(double(n)), 2.0/3.0) - 5);
 }
 
 // ********************************************************

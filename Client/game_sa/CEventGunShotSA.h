@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventGunShotSA_H
-#define __CEventGunShotSA_H
+#pragma once
 
 #include <game/CEventGunShot.h>
 
@@ -29,12 +28,10 @@ public:
     CEventGunShotSA(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1);
     CEventGunShotSA(CEventGunShotSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CEventGunShotSAInterface* GetInterface(void) { return m_pInterface; }
+    CEventGunShotSAInterface* GetInterface() { return m_pInterface; }
 
     void Destroy(bool bDestroyInterface);
 
 private:
     CEventGunShotSAInterface* m_pInterface;
 };
-
-#endif

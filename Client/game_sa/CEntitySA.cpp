@@ -10,13 +10,63 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
+#include "BoneNode_cSA.h"
 
 extern CGameSA* pGame;
 
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
-CEntitySA::CEntitySA(void)
+void CEntitySAInterface::TransformFromObjectSpace(CVector& outPosn, CVector const& offset)
+{
+    ((void(__thiscall*)(CEntitySAInterface*, CVector&, CVector const&))0x533560)(this, outPosn, offset);
+}
+
+CVector* CEntitySAInterface::GetBoundCentre(CVector* pOutCentre)
+{
+    return ((CVector * (__thiscall*)(CEntitySAInterface*, CVector*))0x534250)(this, pOutCentre);
+}
+
+void CEntitySAInterface::UpdateRW()
+{
+    ((void(__thiscall*)(CEntitySAInterface*))0x446F90)(this);
+}
+
+void CEntitySAInterface::UpdateRpHAnim()
+{
+    ((void(__thiscall*)(CEntitySAInterface*))0x532B20)(this);
+}
+
+CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
+{
+    CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
+    CVector               vecMin = colModel->boundingBox.vecMin;
+    CVector               vecMax = colModel->boundingBox.vecMax;
+    CRect                 rect;
+    CVector               point;
+    TransformFromObjectSpace(point, vecMin);
+    rect.StretchToPoint(point.fX, point.fY);
+    TransformFromObjectSpace(point, vecMax);
+    rect.StretchToPoint(point.fX, point.fY);
+    float maxX = vecMax.fX;
+    vecMax.fX = vecMin.fX;
+    vecMin.fX = maxX;
+    TransformFromObjectSpace(point, vecMin);
+    rect.StretchToPoint(point.fX, point.fY);
+    TransformFromObjectSpace(point, vecMax);
+    rect.StretchToPoint(point.fX, point.fY);
+    *pRect = rect;
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    return pRect;
+}
+
+void CEntitySAInterface::StaticSetHooks()
+{
+    HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
+}
+
+CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
     m_pInterface = NULL;
@@ -25,6 +75,23 @@ CEntitySA::CEntitySA(void)
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
     m_ulArrayID = INVALID_POOL_ARRAY_ID;
+}
+
+void CEntitySA::UpdateRpHAnim()
+{
+    m_pInterface->UpdateRpHAnim();
+}
+
+bool CEntitySA::SetScaleInternal(const CVector& scale)
+{
+    m_pInterface->UpdateRW();
+    RpClump* clump = GetRpClump();
+    if (!clump)
+        return false;
+    RwFrame* frame = reinterpret_cast<RwFrame*>(clump->object.parent);
+    RwMatrixScale((RwMatrix*)&frame->modelling, (RwV3d*)&scale, TRANSFORM_BEFORE);
+    RwFrameUpdateObjects(frame);
+    return true;
 }
 
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
@@ -97,7 +164,7 @@ VOID CEntitySA::Teleport(float fX, float fY, float fZ)
     }
 }
 
-VOID CEntitySA::ProcessControl(void)
+VOID CEntitySA::ProcessControl()
 {
     DEBUG_TRACE("VOID CEntitySA::ProcessControl ( void )");
     DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
@@ -189,7 +256,7 @@ VOID CEntitySA::SetOrientation(float fX, float fY, float fZ)
     pGame->GetWorld()->Add(this, CEntity_SetOrientation);
 }
 
-VOID CEntitySA::FixBoatOrientation(void)
+VOID CEntitySA::FixBoatOrientation()
 {
     DEBUG_TRACE("VOID CEntitySA::FixBoatOrientation ( void )");
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
@@ -233,7 +300,7 @@ VOID CEntitySA::SetPosition(CVector* vecPosition)
         SetPosition(vecPosition->fX, vecPosition->fY, vecPosition->fZ);
 }
 
-void CEntitySA::RestoreLastGoodPhysicsState(void)
+void CEntitySA::RestoreLastGoodPhysicsState()
 {
     // Validate m_LastGoodPosition
     if (!IsValidPosition(m_LastGoodPosition))
@@ -248,7 +315,7 @@ void CEntitySA::RestoreLastGoodPhysicsState(void)
 //
 // Get entity position. Fixes bad numbers
 //
-CVector* CEntitySA::GetPosition(void)
+CVector* CEntitySA::GetPosition()
 {
     CVector* pPosition = GetPositionInternal();
     if (!IsValidPosition(*pPosition))
@@ -470,7 +537,7 @@ bool CEntitySA::IsOnScreen()
     return bReturn;
 }
 
-bool CEntitySA::IsFullyVisible(void)
+bool CEntitySA::IsFullyVisible()
 {
     if (m_pInterface->bDistanceFade)
         return false;
@@ -481,7 +548,7 @@ bool CEntitySA::IsFullyVisible(void)
     return true;
 }
 
-bool CEntitySA::IsVisible(void)
+bool CEntitySA::IsVisible()
 {
     return m_pInterface->bIsVisible;
 }
@@ -545,7 +612,105 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     else return false;
 }
 
-BYTE CEntitySA::GetAreaCode(void)
+RwMatrixTag* CEntitySA::GetBoneRwMatrix(eBone boneId)
+{
+    RpClump* clump = GetRpClump();
+    if (!clump)
+        return nullptr;
+    RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(clump);
+    if (hAnimHier)
+    {
+        int boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        if (boneAnimIdIndex != -1)
+            return &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+    }
+    return nullptr;
+}
+
+bool CEntitySA::SetBoneMatrix(eBone boneId, const CMatrix& matrix)
+{
+    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (rwBoneMatrix)
+    {
+        CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
+        boneMatrix.SetMatrix(matrix.vRight, matrix.vFront, matrix.vUp, matrix.vPos);
+        boneMatrix.UpdateRW();
+        return true;
+    }
+    return false;
+}
+
+bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll)
+{
+    RpClump* clump = GetRpClump();
+    if (clump)
+    {
+        // updating the bone frame orientation will also update its children
+        // This rotation is only applied when UpdateElementRpHAnim is called
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+        if (frameData)
+        {
+            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+            RwV3d   angles = {yaw, roll, pitch};
+            BoneNode_cSAInterface::QuatToEuler(boneOrientation, &angles);
+            yaw = angles.x;
+            roll = angles.y;
+            pitch = angles.z;
+            return true;
+        }
+    }
+    return false;
+
+}
+
+bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)
+{
+    RpClump* clump = GetRpClump();
+    if (clump)
+    {
+        // updating the bone frame orientation will also update its children
+        // This rotation is only applied when UpdateElementRpHAnim is called
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+        if (frameData)
+        {
+            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+            RwV3d   angles = {yaw, roll, pitch};
+            BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
+{
+    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (rwBoneMatrix)
+    {
+        const RwV3d& pos = rwBoneMatrix->pos;
+        position = {pos.x, pos.y, pos.z};
+        return true;
+    }
+    return false;
+}
+
+// NOTE: The position will be reset if UpdateElementRpHAnim is called after this.
+bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
+{
+    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (rwBoneMatrix)
+    {
+        CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
+        boneMatrix.SetTranslateOnly(position);
+        boneMatrix.UpdateRW();
+        return true;
+    }
+    return false;
+}
+
+BYTE CEntitySA::GetAreaCode()
 {
     return m_pInterface->m_areaCode;
 }
@@ -560,7 +725,7 @@ void CEntitySA::SetUnderwater(bool bUnderwater)
     m_pInterface->bUnderwater = bUnderwater;
 }
 
-bool CEntitySA::GetUnderwater(void)
+bool CEntitySA::GetUnderwater()
 {
     return m_pInterface->bUnderwater;
 }

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLSPHERE_H
-#define __CCLIENTCOLSPHERE_H
+#pragma once
 
 class CClientColSphere : public CClientColShape
 {
@@ -17,14 +16,14 @@ class CClientColSphere : public CClientColShape
 public:
     CClientColSphere(CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius);
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
     virtual void    DebugRender(const CVector& vecPosition, float fDrawRadius);
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_SPHERE; }
+    eColShapeType GetShapeType() { return COLSHAPE_SPHERE; }
 
     bool DoHitDetection(const CVector& vecNowPosition, float fRadius);
 
-    float GetRadius(void) { return m_fRadius; };
+    float GetRadius() { return m_fRadius; };
     void  SetRadius(float fRadius)
     {
         m_fRadius = fRadius;
@@ -34,5 +33,3 @@ public:
 protected:
     float m_fRadius;
 };
-
-#endif

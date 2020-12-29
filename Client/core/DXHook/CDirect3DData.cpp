@@ -16,7 +16,7 @@ using namespace std;
 template <>
 CDirect3DData* CSingleton<CDirect3DData>::m_pSingleton = NULL;
 
-CDirect3DData::CDirect3DData(void)
+CDirect3DData::CDirect3DData()
 {
     // Zero out our matricies.
     memset(&m_mViewMatrix, 0, sizeof(D3DMATRIX));
@@ -30,7 +30,7 @@ CDirect3DData::CDirect3DData(void)
     m_dwViewportHeight = 0;
 }
 
-CDirect3DData::~CDirect3DData(void)
+CDirect3DData::~CDirect3DData()
 {
 }
 
@@ -89,22 +89,22 @@ void CDirect3DData::StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwH
     m_dwViewportHeight = dwHeight;
 }
 
-DWORD CDirect3DData::GetViewportX(void)
+DWORD CDirect3DData::GetViewportX()
 {
     return m_dwViewportX;
 }
 
-DWORD CDirect3DData::GetViewportY(void)
+DWORD CDirect3DData::GetViewportY()
 {
     return m_dwViewportY;
 }
 
-DWORD CDirect3DData::GetViewportWidth(void)
+DWORD CDirect3DData::GetViewportWidth()
 {
     return m_dwViewportWidth;
 }
 
-DWORD CDirect3DData::GetViewportHeight(void)
+DWORD CDirect3DData::GetViewportHeight()
 {
     return m_dwViewportHeight;
 }

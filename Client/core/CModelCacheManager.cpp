@@ -14,7 +14,7 @@ namespace
 {
     struct SModelCacheInfo
     {
-        SModelCacheInfo(void) : fClosestDistSq(0), bIsModelCachedHere(false), bIsModelLoadedByGame(false) {}
+        SModelCacheInfo() : fClosestDistSq(0), bIsModelCachedHere(false), bIsModelLoadedByGame(false) {}
         CTickCount lastNeeded;
         CTickCount firstNeeded;
         float      fClosestDistSq;
@@ -36,20 +36,20 @@ public:
     ZERO_ON_NEW
 
     // CModelCacheManager interface
-    virtual void DoPulse(void);
+    virtual void DoPulse();
     virtual void GetStats(SModelCacheStats& outStats);
     virtual bool UnloadModel(ushort usModelId);
     virtual void OnRestreamModel(ushort usModelId);
-    virtual void OnClientClose(void);
+    virtual void OnClientClose();
     virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList);
     virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList);
     virtual void AddModelToPersistentCache(ushort usModelId);
 
     // CModelCacheManagerImpl methods
-    CModelCacheManagerImpl(void);
-    ~CModelCacheManagerImpl(void);
+    CModelCacheManagerImpl();
+    ~CModelCacheManagerImpl();
 
-    void PreLoad(void);
+    void PreLoad();
     void RemoveCacheRefs(std::map<ushort, SModelCacheInfo>& currentCacheInfoMap);
     void UpdateModelCaching(const std::map<ushort, float>& newNeededList, std::map<ushort, SModelCacheInfo>& currentCacheInfoMap, uint uiMaxCachedAllowed);
     int  GetModelRefCount(ushort usModelId);
@@ -84,7 +84,7 @@ CModelCacheManager* NewModelCacheManager()
 // CModelCacheManagerImpl::CModelCacheManagerImpl
 //
 ///////////////////////////////////////////////////////////////
-CModelCacheManagerImpl::CModelCacheManagerImpl(void)
+CModelCacheManagerImpl::CModelCacheManagerImpl()
 {
     m_pGame = CCore::GetSingleton().GetGame();
 }
@@ -96,7 +96,7 @@ CModelCacheManagerImpl::CModelCacheManagerImpl(void)
 // Clean up when quitting
 //
 ///////////////////////////////////////////////////////////////
-CModelCacheManagerImpl::~CModelCacheManagerImpl(void)
+CModelCacheManagerImpl::~CModelCacheManagerImpl()
 {
 }
 
@@ -107,7 +107,7 @@ CModelCacheManagerImpl::~CModelCacheManagerImpl(void)
 // Clean up when client.dll unloads
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::OnClientClose(void)
+void CModelCacheManagerImpl::OnClientClose()
 {
     // Remove all extra refs applied here
 }
@@ -125,7 +125,7 @@ void CModelCacheManagerImpl::OnClientClose(void)
 // Vehicles(500-599) KB:   14,888
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::PreLoad(void)
+void CModelCacheManagerImpl::PreLoad()
 {
     if (m_bDonePreLoad)
         return;
@@ -213,7 +213,7 @@ void CModelCacheManagerImpl::GetStats(SModelCacheStats& outStats)
 // CModelCacheManagerImpl::DoPulse
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::DoPulse(void)
+void CModelCacheManagerImpl::DoPulse()
 {
     m_TickCountNow = CTickCount::Now();
 

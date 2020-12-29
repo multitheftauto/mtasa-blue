@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITEXTURE_H
-#define __CGUITEXTURE_H
+#pragma once
 
 #include <d3d9.h>
 
@@ -19,14 +18,12 @@ struct IDirect3DTexture9;
 class CGUITexture
 {
 public:
-    virtual ~CGUITexture(void){};
+    virtual ~CGUITexture(){};
 
     virtual bool LoadFromFile(const char* szFilename) = 0;
     virtual void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight) = 0;
-    virtual void Clear(void) = 0;
+    virtual void Clear() = 0;
 
-    virtual IDirect3DTexture9* GetD3DTexture(void) = 0;
+    virtual IDirect3DTexture9* GetD3DTexture() = 0;
     virtual void               CreateTexture(unsigned int width, unsigned int height) = 0;
 };
-
-#endif

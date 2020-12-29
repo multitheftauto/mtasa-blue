@@ -72,9 +72,11 @@ FontManager::~FontManager(void)
 	Logger::getSingleton().logEvent((utf8*)"---- Begining cleanup of Font system ----");
 	destroyAllFonts();
 
+#if 0   // Crash
     System::getSingleton().getResourceProvider()->unloadRawDataContainer(d_subfntdata->fontData);
 	FT_Done_Face(d_subfntdata->fontFace);
 	delete d_subfntdata;
+#endif
 
 	FT_Done_FreeType(d_implData->d_ftlib);
 	delete d_implData;

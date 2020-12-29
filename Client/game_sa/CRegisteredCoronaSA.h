@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_REGISTEREDCORONA
-#define __CGAMESA_REGISTEREDCORONA
+#pragma once
 
 #include <game/CRegisteredCorona.h>
 
@@ -79,5 +78,3 @@ public:
     VOID     Disable();
     VOID     Refresh();
 };
-
-#endif

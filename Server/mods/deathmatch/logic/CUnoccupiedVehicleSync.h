@@ -21,7 +21,7 @@ class CUnoccupiedVehicleSync
 public:
     CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager);
 
-    void DoPulse(void);
+    void DoPulse();
     bool ProcessPacket(CPacket& Packet);
 
     void     OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer);
@@ -29,7 +29,7 @@ public:
     void     ResyncForPlayer(CPlayer* pPlayer);
 
 private:
-    void Update(void);
+    void Update();
     void UpdateVehicle(CVehicle* pVehicle);
     void FindSyncer(CVehicle* pVehicle);
 

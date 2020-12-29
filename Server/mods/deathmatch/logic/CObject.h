@@ -24,16 +24,16 @@ class CObject : public CElement
     friend class CPlayer;
 
 public:
-    explicit CObject(CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager, bool bIsLowLod);
+    explicit CObject(CElement* pParent, class CObjectManager* pObjectManager, bool bIsLowLod);
     explicit CObject(const CObject& Copy);
-    ~CObject(void);
+    ~CObject();
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    bool IsEntity(void) { return true; }
+    bool IsEntity() { return true; }
 
-    void Unlink(void);
-    bool ReadSpecialData(void);
+    void Unlink();
 
-    const CVector& GetPosition(void);
+    const CVector& GetPosition();
     void           SetPosition(const CVector& vecPosition);
 
     void GetRotation(CVector& vecRotation);
@@ -42,41 +42,44 @@ public:
     void GetMatrix(CMatrix& matrix);
     void SetMatrix(const CMatrix& matrix);
 
-    bool                              IsMoving(void);
+    bool                              IsMoving();
     void                              Move(const CPositionRotationAnimation& a_rMoveAnimation);
-    void                              StopMoving(void);
+    void                              StopMoving();
     const CPositionRotationAnimation* GetMoveAnimation();
 
-    unsigned char GetAlpha(void) { return m_ucAlpha; }
+    unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
-    unsigned short GetModel(void) { return m_usModel; }
+    unsigned short GetModel() { return m_usModel; }
     void           SetModel(unsigned short usModel) { m_usModel = usModel; }
 
-    const CVector& GetScale(void) { return m_vecScale; }
+    const CVector& GetScale() { return m_vecScale; }
     void           SetScale(const CVector& vecScale) { m_vecScale = vecScale; }
 
-    bool GetCollisionEnabled(void) { return m_bCollisionsEnabled; }
+    bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
-    bool IsFrozen(void) { return m_bIsFrozen; }
+    bool IsFrozen() { return m_bIsFrozen; }
     void SetFrozen(bool bFrozen) { m_bIsFrozen = bFrozen; }
 
-    float GetHealth(void) { return m_fHealth; }
+    float GetHealth() { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
 
-    bool IsSyncable(void) { return m_bSyncable; }
+    bool IsSyncable() { return m_bSyncable; }
     void SetSyncable(bool bSyncable) { m_bSyncable = bSyncable; }
 
-    CPlayer* GetSyncer(void) { return m_pSyncer; }
+    CPlayer* GetSyncer() { return m_pSyncer; }
     void     SetSyncer(CPlayer* pPlayer);
 
-    bool     IsLowLod(void);
+    bool     IsLowLod();
     bool     SetLowLodObject(CObject* pLowLodObject);
-    CObject* GetLowLodObject(void);
+    CObject* GetLowLodObject();
 
-    bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
+    bool IsVisibleInAllDimensions() { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     CObjectManager* m_pObjectManager;

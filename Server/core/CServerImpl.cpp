@@ -39,7 +39,7 @@ bool g_bNoCrashHandler = false;
 bool    g_bDaemonized = false;
 WINDOW* m_wndMenu = NULL;
 WINDOW* m_wndInput = NULL;
-bool    IsCursesActive(void)
+bool    IsCursesActive()
 {
     return m_wndInput != NULL;
 }
@@ -48,7 +48,7 @@ bool    IsCursesActive(void)
 #ifdef WIN32
 CServerImpl::CServerImpl(CThreadCommandQueue* pThreadCommandQueue)
 #else
-CServerImpl::CServerImpl(void)
+CServerImpl::CServerImpl()
 #endif
 {
     #ifdef WIN32
@@ -74,23 +74,23 @@ CServerImpl::CServerImpl(void)
     m_pModManager = new CModManagerImpl(this);
 }
 
-CServerImpl::~CServerImpl(void)
+CServerImpl::~CServerImpl()
 {
     // Destroy our stuff
     delete m_pModManager;
 }
 
-CNetServer* CServerImpl::GetNetwork(void)
+CNetServer* CServerImpl::GetNetwork()
 {
     return m_pNetwork;
 }
 
-CModManager* CServerImpl::GetModManager(void)
+CModManager* CServerImpl::GetModManager()
 {
     return m_pModManager;
 }
 
-CXML* CServerImpl::GetXML(void)
+CXML* CServerImpl::GetXML()
 {
     return m_pXML;
 }
@@ -131,7 +131,7 @@ void CServerImpl::Printf(const char* szFormat, ...)
     va_end(ap);
 }
 
-bool CServerImpl::IsRequestingExit(void)
+bool CServerImpl::IsRequestingExit()
 {
 #ifdef WIN32
     m_pThreadCommandQueue->Process(m_bRequestedQuit, NULL);
@@ -170,9 +170,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 {
     // Parse our arguments
     if (!ParseArguments(iArgumentCount, szArguments))
-    {
         return 1;
-    }
 
 #ifdef WIN32
     if (!m_fClientFeedback)
@@ -307,9 +305,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
     // Did we find the path? If not, assume our current
     if (m_strServerPath == "")
-    {
         m_strServerPath = GetSystemCurrentDirectory();
-    }
 
     // Convert all backslashes to forward slashes
     m_strServerPath = m_strServerPath.Replace("\\", "/");
@@ -439,7 +435,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     return ERROR_NO_ERROR;
 }
 
-void CServerImpl::MainLoop(void)
+void CServerImpl::MainLoop()
 {
 #ifdef WIN32
     timeBeginPeriod(1);            // Change sleep resolution to 1ms
@@ -479,9 +475,7 @@ void CServerImpl::MainLoop(void)
         m_pModManager->DoPulse();
 
         if (m_pModManager->IsFinished())
-        {
             m_bRequestedQuit = true;
-        }
 
         HandlePulseSleep();
     }
@@ -497,7 +491,7 @@ void CServerImpl::MainLoop(void)
 //
 // Limit the pulses to avoid heavy CPU usage
 //
-void CServerImpl::HandlePulseSleep(void)
+void CServerImpl::HandlePulseSleep()
 {
     // Get settings
     int iSleepBusyMs;
@@ -720,7 +714,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
 #endif
 }
 
-void CServerImpl::HandleInput(void)
+void CServerImpl::HandleInput()
 {
     wint_t iStdIn = 0;
 
@@ -736,9 +730,7 @@ void CServerImpl::HandleInput(void)
             iStdIn = 0;
     }
     else if (kbhit())
-    {
         iStdIn = _getwch();
-    }
 #else
     if (!g_bNoCurses)
     {
@@ -748,7 +740,6 @@ void CServerImpl::HandleInput(void)
     else
     {
         iStdIn = getwchar();
-
         if (iStdIn == WEOF)
             iStdIn = 0;
     }
@@ -763,9 +754,9 @@ void CServerImpl::HandleInput(void)
         case '\r':
 #ifdef WIN32
             // Echo a newline
-            Printf("\n");
+            Printf(" \n");
 #else
-            // set string termination (required for compare/string functions
+            // Set string termination (required for compare/string functions)
             m_szInputBuffer[m_uiInputCount] = 0;
 
             if (!g_bSilent && !g_bNoCurses)
@@ -798,21 +789,30 @@ void CServerImpl::HandleInput(void)
                 }
                 else
                 {
+                    SString szCommand = UTF16ToMbUTF8(m_szInputBuffer).c_str();
                     // Otherwise, pass the command to the mod's input handler
-                    m_pModManager->HandleInput(UTF16ToMbUTF8(m_szInputBuffer).c_str());
+                    m_pModManager->HandleInput(szCommand);
+
+                    // If the command is not empty and it isn't identical to the previous entry in history, add it to the history
+                    // The first string is the original command, the second string is for storing the edited command
+                    if (!szCommand.empty() && (m_vecCommandHistory.empty() || m_vecCommandHistory.back()[0] != szCommand))
+                        m_vecCommandHistory.push_back({szCommand, szCommand});
                 }
             }
 
+            // Reset command history edits to their original commands
+            for (auto& i : m_vecCommandHistory)
+                i[1] = i[0];
+
             memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
             m_uiInputCount = 0;
+            m_uiSelectedCommandHistoryEntry = 0;
             break;
 
         case KEY_BACKSPACE:            // Backspace
         case 0x7F:
             if (m_uiInputCount == 0)
-            {
                 break;
-            }
 
             // Insert a blank space + backspace
 #ifdef WIN32
@@ -836,13 +836,10 @@ void CServerImpl::HandleInput(void)
             switch (iStdIn)
             {
 #endif
-
                 case KEY_LEFT:
                 {
                     if (m_uiInputCount <= 0)
-                    {
                         break;
-                    }
 
 #ifdef WIN32
                     wchar_t szBuffer[255];
@@ -854,8 +851,8 @@ void CServerImpl::HandleInput(void)
 
                     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, --m_uiInputCount);
+                    if (!g_bSilent && !g_bNoCurses)
+                        wmove(m_wndInput, 0, --m_uiInputCount);
 #endif
                     break;
                 }
@@ -863,9 +860,7 @@ void CServerImpl::HandleInput(void)
                 case KEY_RIGHT:
                 {
                     if (m_uiInputCount == wcslen(m_szInputBuffer))
-                    {
                         break;
-                    }
 
 #ifdef WIN32
                     wchar_t szBuffer[255];
@@ -877,18 +872,41 @@ void CServerImpl::HandleInput(void)
 
                     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, ++m_uiInputCount);
+                    if (!g_bSilent && !g_bNoCurses)
+                        wmove(m_wndInput, 0, ++m_uiInputCount);
 #endif
                     break;
                 }
 
                 case KEY_UP:            // Up-arrow cursor
-                    break;
+                {
+                    // If there's nothing to select, break here
+                    if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 1)
+                        break;
 
+                    // Select the previous command
+                    int iEntry = m_uiSelectedCommandHistoryEntry;
+                    if (iEntry == 0)
+                        iEntry = m_vecCommandHistory.size() - 1;
+                    else
+                        iEntry--;
+
+                    // Select the previous command
+                    SelectCommandHistoryEntry(iEntry);
+
+                    break;
+                }
                 case KEY_DOWN:            // Down-arrow cursor
-                    break;
+                {
+                    // If there's nothing to select, break here
+                    if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 0)
+                        break;
 
+                    // Select the next command
+                    SelectCommandHistoryEntry(m_uiSelectedCommandHistoryEntry + 1);
+
+                    break;
+                }
 #ifdef WIN32    // WIN32: Close the switch again
             }
             // Restore the color
@@ -900,10 +918,8 @@ void CServerImpl::HandleInput(void)
 
         default:
             if (m_uiInputCount == sizeof(m_szInputBuffer) / sizeof(wchar_t) - 1)
-            {
                 // entered 254 characters, wait for user to confirm/remove
                 break;
-            }
 
 #ifdef WIN32
             // Color the text
@@ -928,6 +944,98 @@ void CServerImpl::HandleInput(void)
 #endif
             break;
     }
+}
+
+void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
+{
+    uint uiPreviouslySelectedCommandHistoryEntry = m_uiSelectedCommandHistoryEntry;
+
+    // Check if we're in bounds, otherwise clear selection
+    if (!m_vecCommandHistory.empty() && uiEntry > 0 && uiEntry < m_vecCommandHistory.size())
+        m_uiSelectedCommandHistoryEntry = uiEntry;
+    else
+        m_uiSelectedCommandHistoryEntry = 0;
+
+    // Save current input buffer to the command history entry as the second element
+    m_vecCommandHistory[uiPreviouslySelectedCommandHistoryEntry][1] = UTF16ToMbUTF8(m_szInputBuffer).c_str();
+
+    // Clear input
+    ClearInput();
+
+    // If the selected command is empty, let's just stop here
+    SString szInput = m_vecCommandHistory[m_uiSelectedCommandHistoryEntry][1];
+    if (szInput.empty())
+        return;
+
+    // Fill the input buffer
+    m_uiInputCount = szInput.length();
+    for (uint i = 0; i < szInput.length(); i++)
+        m_szInputBuffer[i] = szInput[i];
+
+    // Let's print it out
+    wchar_t szBuffer[255] = {};
+    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
+#ifdef WIN32
+    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
+#else
+    if (!g_bSilent && !g_bNoCurses)
+        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
+#endif
+}
+
+bool CServerImpl::ClearInput()
+{
+    if (m_uiInputCount > 0)
+    {
+        // Clear out old buffer
+        memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
+
+        // Couldn't get anything else working, so this is a way to clear the line
+#ifdef WIN32
+        for (uint i = 0; i < 80; i++)
+            Printf("%c %c", 0x08, 0x08);
+#else
+        for (uint i = 0; i < COLS; i++)
+            if (!g_bSilent && !g_bNoCurses)
+                wprintw(m_wndInput, "%c %c", 0x08, 0x08);
+#endif
+        // Reset our input count
+        m_uiInputCount = 0;
+
+        return true;
+    }
+    return false;
+}
+
+bool CServerImpl::ResetInput()
+{
+    if (m_uiInputCount > 0)
+    {
+        // Let's print our current input buffer
+#ifdef WIN32
+        // Echo a newline
+        Printf(" \n");
+#else
+        // Set string termination (required for compare/string functions)
+        m_szInputBuffer[m_uiInputCount] = 0;
+
+        if (!g_bSilent && !g_bNoCurses)
+        {
+            // Clear the input window
+            wclear(m_wndInput);
+            printw("%s\n", UTF16ToMbUTF8(m_szInputBuffer).c_str());
+        }
+#endif
+
+        // Clear our input buffer
+        ClearInput();
+
+        // Reset our command history entry
+        m_uiSelectedCommandHistoryEntry = 0;
+
+        return true;
+    }
+    return false;
 }
 
 bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
@@ -1027,9 +1135,7 @@ bool IsKeyPressed(int iKey)
     // Is the key pressed?
 #ifdef WIN32
     if (kbhit())
-    {
         return getch() == iKey;
-    }
 #else
     refresh();
     return getchar() == iKey;
@@ -1039,7 +1145,7 @@ bool IsKeyPressed(int iKey)
     return false;
 }
 
-void CServerImpl::DestroyWindow(void)
+void CServerImpl::DestroyWindow()
 {
 #ifndef WIN32
     if (!g_bSilent && !g_bNoCurses && m_wndInput)
@@ -1064,9 +1170,7 @@ void WaitForKey(int iKey)
         {
             // Is the key pressed?
             if (IsKeyPressed(iKey))
-            {
                 return;
-            }
 
             // Limit the looping a little to prevent heavy CPU usage
             Sleep(10);

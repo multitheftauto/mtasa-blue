@@ -306,7 +306,7 @@ public:
     }
 
     // Return false if should not use alloc tracking
-    bool Lock(void)
+    bool Lock()
     {
         thread_id dwThreadWanting = GetCurrentThreadId();
         if (dwThreadWanting == dwThreadUsing)
@@ -316,7 +316,7 @@ public:
         return true;
     }
 
-    void Unlock(void)
+    void Unlock()
     {
         dwThreadUsing = INVALID_THREAD_ID;
         cs.Unlock();

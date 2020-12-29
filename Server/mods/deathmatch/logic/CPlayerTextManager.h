@@ -35,10 +35,10 @@ private:
 
 public:
     CPlayerTextManager(CPlayer* player);
-    ~CPlayerTextManager(void);
+    ~CPlayerTextManager();
 
     void Update(CTextItem* textItem, bool bRemovedFromDisplay = false);
-    void Process(void);
+    void Process();
 
-    CPlayer* GetPlayer(void);
+    CPlayer* GetPlayer();
 };

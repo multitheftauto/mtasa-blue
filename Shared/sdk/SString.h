@@ -71,7 +71,7 @@ public:
 
     // Assignment
                 operator const char*() const { return c_str(); }            // Auto assign to const char* without using c_str()
-    const char* operator*(void)const { return c_str(); }
+    const char* operator*()const { return c_str(); }
 
     // Functions
     void           Split(const SString& strDelim, std::vector<SString>& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0) const;
@@ -82,9 +82,9 @@ public:
     SString        ReplaceI(const char* szOld, const char* szNew, bool bSearchJustReplaced = false) const;
     SString        TrimStart(const char* szOld) const;
     SString        TrimEnd(const char* szOld) const;
-    SString        ToLower(void) const;
-    SString        ToUpper(void) const;
-    SString        ConformLineEndings(void) const;
+    SString        ToLower() const;
+    SString        ToUpper() const;
+    SString        ConformLineEndings() const;
     bool           Contains(const SString& strOther) const;
     bool           ContainsI(const SString& strOther) const;
     bool           CompareI(const SString& strOther) const;
@@ -114,7 +114,7 @@ public:
 //
 struct SCharStringRef
 {
-    SCharStringRef(void) : pData(NULL), uiSize(0) {}
+    SCharStringRef() : pData(NULL), uiSize(0) {}
     char*  pData;
     size_t uiSize;
 };
@@ -127,7 +127,7 @@ template <class STRING_TYPE, class CHAR_TYPE>
 class TSplitString : public std::vector<const CHAR_TYPE*>
 {
 public:
-    TSplitString(void) {}
+    TSplitString() {}
     TSplitString(const STRING_TYPE& strInput, const STRING_TYPE& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0)
     {
         Split(strInput, strDelim, uiMaxAmount, uiMinAmount);

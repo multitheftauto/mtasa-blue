@@ -10,8 +10,7 @@
 
 class CClientEntity;
 
-#ifndef __CCLIENTENTITY_H
-#define __CCLIENTENTITY_H
+#pragma once
 
 #include "CElementArray.h"
 #include "CClientCommon.h"
@@ -37,7 +36,7 @@ class CClientManager;
 #define IS_PROJECTILE(entity) ((entity)->GetType()==CCLIENTPROJECTILE)
 #define IS_GUI(entity) ((entity)->GetType()==CCLIENTGUI)
 #define IS_IFP(entity) ((entity)->GetType()==CCLIENTIFP)
-#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==type)
+#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==(type))
 
 enum eClientEntityType
 {
@@ -151,17 +150,19 @@ class CClientEntity : public CClientEntityBase
     DECLARE_BASE_CLASS(CClientEntity)
 public:
     CClientEntity(ElementID ID);
-    virtual ~CClientEntity(void);
+    virtual ~CClientEntity();
 
-    virtual eClientEntityType GetType(void) const = 0;
-    bool                      IsLocalEntity(void) { return m_ID >= MAX_SERVER_ELEMENTS; };
+    virtual eClientEntityType GetType() const = 0;
+    bool                      IsLocalEntity() { return m_ID >= MAX_SERVER_ELEMENTS; };
+    bool                      IsSmartPointer() { return m_bSmartPointer; }
+    void                      SetSmartPointer(bool bSmartPointer) { m_bSmartPointer = bSmartPointer; }
 
     // System entity? A system entity means it can't be removed by the server
     // or the client scripts.
-    bool IsSystemEntity(void) { return m_bSystemEntity; };
-    void MakeSystemEntity(void) { m_bSystemEntity = true; };
+    bool IsSystemEntity() { return m_bSystemEntity; };
+    void MakeSystemEntity() { m_bSystemEntity = true; };
 
-    virtual void Unlink(void) = 0;
+    virtual void Unlink() = 0;
 
     // This is used for realtime synced elements. Whenever a position/rotation change is
     // forced from the server either in form of spawn or setElementPosition/rotation a new
@@ -169,34 +170,34 @@ public:
     // If this value doesn't match the value from the sync packet, the packet should be
     // ignored. Note that if this value is 0, all sync packets should be accepted. This is
     // so we don't need this byte when the element is created first.
-    unsigned char GetSyncTimeContext(void) { return m_ucSyncTimeContext; };
+    unsigned char GetSyncTimeContext() { return m_ucSyncTimeContext; };
     void          SetSyncTimeContext(unsigned char ucContext) { m_ucSyncTimeContext = ucContext; }
     bool          CanUpdateSync(unsigned char ucRemote);
 
-    const SString& GetName(void) const { return m_strName; }
+    const SString& GetName() const { return m_strName; }
     void           SetName(const char* szName) { m_strName.AssignLeft(szName, MAX_ELEMENT_NAME_LENGTH); }
 
-    const char*  GetTypeName(void) { return m_strTypeName; };
-    unsigned int GetTypeHash(void) { return m_uiTypeHash; };
-    void         SetTypeName(const char* szName);
+    const SString& GetTypeName() { return m_strTypeName; }
+    unsigned int   GetTypeHash() { return m_uiTypeHash; }
+    void           SetTypeName(const SString& name);
 
-    CClientEntity* GetParent(void) { return m_pParent; };
+    CClientEntity* GetParent() { return m_pParent; };
     CClientEntity* SetParent(CClientEntity* pParent);
     CClientEntity* AddChild(CClientEntity* pChild);
     bool           IsMyChild(CClientEntity* pEntity, bool bRecursive);
     bool           IsMyParent(CClientEntity* pEntity, bool bRecursive);
-    bool           IsBeingDeleted(void) { return m_bBeingDeleted; }
+    bool           IsBeingDeleted() { return m_bBeingDeleted; }
     void           SetBeingDeleted(bool bBeingDeleted) { m_bBeingDeleted = bBeingDeleted; }
-    void           ClearChildren(void);
+    void           ClearChildren();
 
-    CChildListType ::const_iterator IterBegin(void) { return m_Children.begin(); }
-    CChildListType ::const_iterator IterEnd(void) { return m_Children.end(); }
-    CElementListSnapshot*           GetChildrenListSnapshot(void);
+    CChildListType ::const_iterator IterBegin() { return m_Children.begin(); }
+    CChildListType ::const_iterator IterEnd() { return m_Children.end(); }
+    CElementListSnapshot*           GetChildrenListSnapshot();
 
-    ElementID GetID(void) { return m_ID; };
+    ElementID GetID() { return m_ID; };
     void      SetID(ElementID ID);
 
-    CCustomData*  GetCustomDataPointer(void) { return m_pCustomData; }
+    CCustomData*  GetCustomDataPointer() { return m_pCustomData; }
     CLuaArgument* GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
     bool          GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
     bool          GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
@@ -220,25 +221,26 @@ public:
     virtual void SetRotationRadians(const CVector& vecRadians);
     virtual void SetRotationDegrees(const CVector& vecDegrees);
 
-    virtual inline unsigned short GetDimension(void) { return m_usDimension; }
-    virtual void                  SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    virtual inline unsigned short GetDimension() { return m_usDimension; }
+    virtual void                  SetDimension(unsigned short usDimension);
 
     virtual void ModelRequestCallback(CModelInfo* pModelInfo){};
 
-    virtual bool IsOutOfBounds(void);
-    CModelInfo*  GetModelInfo(void) { return m_pModelInfo; };
+    virtual bool IsOutOfBounds();
+    CModelInfo*  GetModelInfo() { return m_pModelInfo; };
 
-    CClientEntity* GetAttachedTo(void) { return m_pAttachedToEntity; }
+    CClientEntity* GetAttachedTo() { return m_pAttachedToEntity; }
     virtual void   AttachTo(CClientEntity* pEntity);
     virtual void   GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     virtual void   SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     bool           IsEntityAttached(CClientEntity* pEntity);
-    uint           GetAttachedEntityCount(void) { return m_AttachedEntities.size(); }
+    bool           IsAttachedToElement(CClientEntity* pEntity, bool bRecursive = true);
+    uint           GetAttachedEntityCount() { return m_AttachedEntities.size(); }
     CClientEntity* GetAttachedEntity(uint uiIndex) { return m_AttachedEntities[uiIndex]; }
-    void           ReattachEntities(void);
-    virtual bool   IsAttachable(void);
-    virtual bool   IsAttachToable(void);
-    virtual void   DoAttaching(void);
+    void           ReattachEntities();
+    virtual bool   IsAttachable();
+    virtual bool   IsAttachToable();
+    virtual void   DoAttaching();
 
     bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                   float fPriorityMod);
@@ -247,7 +249,7 @@ public:
     void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource);
     bool DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction);
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
-    void DeleteAllEvents(void);
+    void DeleteAllEvents();
 
     void CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive);
 
@@ -258,7 +260,7 @@ public:
     void           FindAllChildrenByType(const char* szType, struct lua_State* luaVM, bool bStreamedIn = false);
     void           FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn = false);
 
-    unsigned int CountChildren(void) { return static_cast<unsigned int>(m_Children.size()); };
+    unsigned int CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
 
     void GetChildren(lua_State* luaVM);
     void GetChildrenByType(const char* szType, lua_State* luaVM);
@@ -270,21 +272,21 @@ public:
             m_Collisions.remove(pShape);
     }
     bool                                  CollisionExists(CClientColShape* pShape);
-    void                                  RemoveAllCollisions(void);
-    CFastList<CClientColShape*>::iterator CollisionsBegin(void) { return m_Collisions.begin(); }
-    CFastList<CClientColShape*>::iterator CollisionsEnd(void) { return m_Collisions.end(); }
+    void                                  RemoveAllCollisions();
+    CFastList<CClientColShape*>::iterator CollisionsBegin() { return m_Collisions.begin(); }
+    CFastList<CClientColShape*>::iterator CollisionsEnd() { return m_Collisions.end(); }
 
-    CElementGroup* GetElementGroup(void) { return m_pElementGroup; }
+    CElementGroup* GetElementGroup() { return m_pElementGroup; }
     void           SetElementGroup(CElementGroup* elementGroup) { m_pElementGroup = elementGroup; }
 
     static unsigned int GetTypeID(const char* szTypeName);
 
-    CMapEventManager* GetEventManager(void) { return m_pEventManager; };
+    CMapEventManager* GetEventManager() { return m_pEventManager; };
 
-    void DeleteClientChildren(void);
+    void DeleteClientChildren();
 
     // Returns true if this class is inherited by CClientStreamElement
-    virtual bool IsStreamingCompatibleClass(void) { return false; };
+    virtual bool IsStreamingCompatibleClass() { return false; };
 
     void AddOriginSourceUser(CClientPed* pModel) { m_OriginSourceUsers.push_back(pModel); }
     void RemoveOriginSourceUser(CClientPed* pModel) { m_OriginSourceUsers.remove(pModel); }
@@ -292,35 +294,38 @@ public:
     void AddContact(CClientPed* pModel) { m_Contacts.push_back(pModel); }
     void RemoveContact(CClientPed* pModel) { ListRemove(m_Contacts, pModel); }
 
-    virtual CEntity*       GetGameEntity(void) { return NULL; }
-    virtual const CEntity* GetGameEntity(void) const { return NULL; }
+    virtual CEntity*       GetGameEntity() { return NULL; }
+    virtual const CEntity* GetGameEntity() const { return NULL; }
 
     bool IsCollidableWith(CClientEntity* pEntity);
     void SetCollidableWith(CClientEntity* pEntity, bool bCanCollide);
 
-    bool IsDoubleSided(void);
+    bool IsDoubleSided();
     void SetDoubleSided(bool bEnable);
 
     // Game layer functions for CEntity/CPhysical
     virtual void     InternalAttachTo(CClientEntity* pEntity);
-    bool             IsStatic(void);
+    bool             IsStatic();
     void             SetStatic(bool bStatic);
-    unsigned char    GetInterior(void);
+    unsigned char    GetInterior();
     virtual void     SetInterior(unsigned char ucInterior);
-    bool             IsOnScreen(void);
-    virtual RpClump* GetClump(void);
+    bool             IsOnScreen();
+    virtual RpClump* GetClump();
     void             WorldIgnore(bool bIgnore);
 
     // Spatial database
-    virtual CSphere GetWorldBoundingSphere(void);
-    virtual void    UpdateSpatialData(void);
+    virtual CSphere GetWorldBoundingSphere();
+    virtual void    UpdateSpatialData();
 
     virtual void DebugRender(const CVector& vecPosition, float fDrawRadius) {}
 
     float GetDistanceBetweenBoundingSpheres(CClientEntity* pOther);
 
-    bool         IsCallPropagationEnabled(void) { return m_bCallPropagationEnabled; }
+    bool         IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     virtual void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
+
+    bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
+    void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
 protected:
     CClientManager*       m_pManager;
@@ -342,6 +347,7 @@ private:
     unsigned int m_uiTypeHash;
     SString      m_strTypeName;
     SString      m_strName;
+    bool         m_bSmartPointer;
 
 protected:
     unsigned char m_ucSyncTimeContext;
@@ -367,7 +373,8 @@ protected:
     bool                              m_bWorldIgnored;
     bool                              m_bCallPropagationEnabled;
     bool                              m_bDisallowCollisions;
-
+    bool                              m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                                  // have no effect on this element
 public:
     // Optimization for getElementsByType starting at root
     static void StartupEntitiesFromRoot();
@@ -384,5 +391,3 @@ private:
     static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClientEntity*, int>& mapResults);
 #endif
 };
-
-#endif

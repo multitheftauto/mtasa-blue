@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CColModelSA::CColModelSA(void)
+CColModelSA::CColModelSA()
 {
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
@@ -30,7 +30,7 @@ CColModelSA::CColModelSA(CColModelSAInterface* pInterface)
     m_bDestroyInterface = false;
 }
 
-CColModelSA::~CColModelSA(void)
+CColModelSA::~CColModelSA()
 {
     if (m_bDestroyInterface)
     {

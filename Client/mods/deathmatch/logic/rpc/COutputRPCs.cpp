@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "COutputRPCs.h"
 
-void COutputRPCs::LoadFunctions(void)
+void COutputRPCs::LoadFunctions()
 {
     AddHandler(TOGGLE_DEBUGGER, ToggleDebugger, "ToggleDebugger");
 }

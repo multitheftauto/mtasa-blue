@@ -34,12 +34,12 @@ class CPerfStatSqliteTimingImpl : public CPerfStatSqliteTiming
 {
 public:
     ZERO_ON_NEW
-    CPerfStatSqliteTimingImpl(void);
-    virtual ~CPerfStatSqliteTimingImpl(void);
+    CPerfStatSqliteTimingImpl();
+    virtual ~CPerfStatSqliteTimingImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatSqliteTiming
@@ -82,7 +82,7 @@ CPerfStatSqliteTiming* CPerfStatSqliteTiming::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatSqliteTimingImpl::CPerfStatSqliteTimingImpl(void)
+CPerfStatSqliteTimingImpl::CPerfStatSqliteTimingImpl()
 {
     m_strCategoryName = "Sqlite timing";
 }
@@ -94,7 +94,7 @@ CPerfStatSqliteTimingImpl::CPerfStatSqliteTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatSqliteTimingImpl::~CPerfStatSqliteTimingImpl(void)
+CPerfStatSqliteTimingImpl::~CPerfStatSqliteTimingImpl()
 {
 }
 
@@ -105,7 +105,7 @@ CPerfStatSqliteTimingImpl::~CPerfStatSqliteTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatSqliteTimingImpl::GetCategoryName(void)
+const SString& CPerfStatSqliteTimingImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -187,7 +187,7 @@ void CPerfStatSqliteTimingImpl::SetCurrentResource(lua_State* luaVM)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatSqliteTimingImpl::DoPulse(void)
+void CPerfStatSqliteTimingImpl::DoPulse()
 {
     long long llTime = GetTickCount64_();
     // Remove old stats

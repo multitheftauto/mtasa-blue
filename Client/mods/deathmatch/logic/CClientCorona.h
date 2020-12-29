@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCORONA_H
-#define __CCLIENTCORONA_H
+#pragma once
 
 #include "CClientMarker.h"
 class CClientMarker;
@@ -18,9 +17,9 @@ class CClientCorona : public CClientMarkerCommon
 {
 public:
     CClientCorona(CClientMarker* pThis);
-    ~CClientCorona(void);
+    ~CClientCorona();
 
-    unsigned int GetMarkerType(void) const { return CClientMarkerCommon::CLASS_CORONA; }
+    unsigned int GetMarkerType() const { return CClientMarkerCommon::CLASS_CORONA; }
 
     bool IsHit(const CVector& vecPosition) const;
 
@@ -30,21 +29,21 @@ public:
     void GetMatrix(CMatrix& mat) { mat = m_Matrix; }
     void SetMatrix(CMatrix& mat) { m_Matrix = mat; }
 
-    bool IsVisible(void) const { return m_bVisible; };
+    bool IsVisible() const { return m_bVisible; };
     void SetVisible(bool bVisible) { m_bVisible = bVisible; };
 
-    SColor GetColor(void) const { return m_Color; }
+    SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor& color) { m_Color = color; }
 
-    float GetSize(void) const { return m_fSize; };
+    float GetSize() const { return m_fSize; };
     void  SetSize(float fSize) { m_fSize = fSize; };
 
 protected:
-    bool IsStreamedIn(void) { return m_bStreamedIn; };
-    void StreamIn(void);
-    void StreamOut(void);
+    bool IsStreamedIn() { return m_bStreamedIn; };
+    void StreamIn();
+    void StreamOut();
 
-    void DoPulse(void);
+    void DoPulse();
 
 private:
     CClientMarkerPtr m_pThis;
@@ -56,5 +55,3 @@ private:
     SColor           m_Color;
     CCoronas*        m_pCoronas;
 };
-
-#endif

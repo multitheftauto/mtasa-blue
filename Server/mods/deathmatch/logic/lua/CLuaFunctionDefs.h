@@ -27,15 +27,13 @@ class CAccessControlListManager;
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 
+
 extern CTimeUsMarker<20> markerLatentEvent;            // For timing triggerLatentClientEvent
 
 class CLuaFunctionDefs
 {
 public:
     static void Initialize(class CLuaManager* pLuaManager, class CGame* pClientGame);
-
-    LUA_DECLARE(CallRemote);
-    LUA_DECLARE(FetchRemote);
 
     // Event functions
     LUA_DECLARE(AddEvent);
@@ -113,12 +111,9 @@ public:
     LUA_DECLARE(SetServerPassword);
     LUA_DECLARE(GetServerConfigSetting);
     LUA_DECLARE(SetServerConfigSetting);
+    LUA_DECLARE(ClearChatBox);
 
     LUA_DECLARE(shutdown);
-
-    // Util functions to make scripting easier for the end user
-    // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    LUA_DECLARE(GetTok);
 
     // Loaded Map Functions
     LUA_DECLARE(GetRootElement);

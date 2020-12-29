@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __COBJECTSYNC_H
-#define __COBJECTSYNC_H
+#pragma once
 
 #include <CClientCommon.h>
 #include "CDeathmatchObject.h"
@@ -23,14 +22,14 @@ public:
     CObjectSync(CClientObjectManager* pObjectManager);
 
     bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
-    void DoPulse(void);
+    void DoPulse();
 
     void AddObject(CDeathmatchObject* pObject);
     void RemoveObject(CDeathmatchObject* pObject);
-    void ClearObjects(void);
+    void ClearObjects();
 
-    std::list<CDeathmatchObject*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CDeathmatchObject*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CDeathmatchObject*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CDeathmatchObject*>::const_iterator IterEnd() { return m_List.end(); };
 
     bool Exists(CDeathmatchObject* pObject);
 
@@ -39,14 +38,12 @@ private:
     void Packet_ObjectStopSync(NetBitStreamInterface& BitStream);
     void Packet_ObjectSync(NetBitStreamInterface& BitStream);
 
-    void Sync(void);
+    void Sync();
     void WriteObjectInformation(NetBitStreamInterface* pBitStream, CDeathmatchObject* pObject);
 
     CClientObjectManager*           m_pObjectManager;
     CMappedList<CDeathmatchObject*> m_List;
     unsigned long                   m_ulLastSyncTime;
 };
-
-#endif
 
 #endif

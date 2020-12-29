@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_RESTART
-#define __CGAMESA_RESTART
+#pragma once
 
 #include <game/CRestart.h>
 #include <CVector.h>
@@ -46,5 +45,3 @@ class CRestartSA : public CRestart
     BOOL IsRestartingAfterArrest();
     BOOL IsRestartingAfterDeath();
 };
-
-#endif

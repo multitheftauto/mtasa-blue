@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EVENTLIST
-#define __CGAMESA_EVENTLIST
+#pragma once
 
 #include <game/CEventList.h>
 #include "CEventSA.h"
@@ -34,5 +33,3 @@ class CEventListSA : public CEventList
     CEventDamage* CreateEventDamage(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4);
     CEventGunShot* CreateEventGunShot(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1);
 };
-
-#endif

@@ -306,7 +306,7 @@ CClientPlayerClothes::CClientPlayerClothes(CClientPed* pPlayerModel)
     }
 }
 
-CClientPlayerClothes::~CClientPlayerClothes(void)
+CClientPlayerClothes::~CClientPlayerClothes()
 {
     RemoveAll(false);
 }
@@ -383,7 +383,7 @@ bool CClientPlayerClothes::RemoveClothes(unsigned char ucType, bool bRemoveFromM
     return false;
 }
 
-void CClientPlayerClothes::AddAllToModel(void)
+void CClientPlayerClothes::AddAllToModel()
 {
     if (m_pPlayerModel)
     {

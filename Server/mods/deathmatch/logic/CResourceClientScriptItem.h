@@ -17,10 +17,10 @@ class CResourceClientScriptItem : public CResourceFile
 {
 public:
     CResourceClientScriptItem(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes);
-    ~CResourceClientScriptItem(void);
+    ~CResourceClientScriptItem();
 
-    bool Start(void);
-    bool Stop(void);
+    bool Start();
+    bool Stop();
 
     bool           IsNoClientCache() const { return m_bIsNoClientCache; }
     const SString& GetSourceCode() const { return m_sourceCode; }

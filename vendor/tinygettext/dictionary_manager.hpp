@@ -51,7 +51,7 @@ private:
 
   Dictionary  empty_dict;
 
-  std::auto_ptr<FileSystem> filesystem;
+  std::unique_ptr<FileSystem> filesystem;
 
   void clear_cache();
 
@@ -85,7 +85,7 @@ public:
   /** Return a set of the available languages in their country code */
   std::set<Language> get_languages(const std::string& textdomain = "");
 
-  void set_filesystem(std::auto_ptr<FileSystem> filesystem);
+  void set_filesystem(std::unique_ptr<FileSystem> filesystem);
 
 private:
   DictionaryManager (const DictionaryManager&);

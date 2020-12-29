@@ -19,7 +19,7 @@ struct SBodyPartName
 SBodyPartName BodyPartNames[10] = {{"Unknown"},  {"Unknown"},   {"Unknown"},  {"Torso"},     {"Ass"},
                                    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}};
 
-CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel) : CElement(pParent, pNode)
+CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) : CElement(pParent)
 {
     // Init
     m_pPedManager = pPedManager;
@@ -54,7 +54,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigne
     memset(&m_Weapons[0], 0, sizeof(m_Weapons));
     m_ucAlpha = 255;
     m_pContactElement = NULL;
-    m_bIsDead = true;
+    m_bIsDead = false;
     m_bSpawned = false;
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
@@ -74,6 +74,8 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigne
 
     m_bCollisionsEnabled = true;
 
+    m_pJackingVehicle = NULL;
+
     // Add us to the Ped manager
     if (pPedManager)
     {
@@ -81,8 +83,25 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigne
     }
 }
 
-CPed::~CPed(void)
+CPed::~CPed()
 {
+    // Abort any jacking process
+    if (m_pJackingVehicle)
+    {
+        if (m_uiVehicleAction == VEHICLEACTION_JACKING)
+        {
+            CPed* pOccupant = m_pJackingVehicle->GetOccupant(0);
+            if (pOccupant)
+            {
+                m_pJackingVehicle->SetOccupant(NULL, 0);
+                pOccupant->SetOccupiedVehicle(NULL, 0);
+                pOccupant->SetVehicleAction(VEHICLEACTION_NONE);
+            }
+        }
+        if (m_pJackingVehicle->GetJackingPed() == this)
+            m_pJackingVehicle->SetJackingPed(NULL);
+    }
+
     // Make sure we've no longer occupied any vehicle
     if (m_pVehicle)
     {
@@ -101,7 +120,25 @@ CPed::~CPed(void)
     Unlink();
 }
 
-void CPed::Unlink(void)
+CElement* CPed::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CPed* const pTemp = m_pPedManager->Create(GetModel(), GetParentEntity());
+
+    if (pTemp)
+    {
+        pTemp->SetPosition(GetPosition());
+        pTemp->SetRotation(GetRotation());
+        pTemp->SetHealth(GetHealth());
+        pTemp->SetArmor(GetArmor());
+        pTemp->SetSyncable(IsSyncable());
+        pTemp->SetSpawned(IsSpawned());
+        pTemp->SetIsDead(IsDead());
+    }
+
+    return pTemp;
+}
+
+void CPed::Unlink()
 {
     // Remove us from the Ped manager
     if (m_pPedManager)
@@ -131,29 +168,30 @@ void CPed::SetMatrix(const CMatrix& matrix)
     SetRotation(vecRotation.fZ);
 }
 
-bool CPed::ReadSpecialData(void)
+bool CPed::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
+    // Grab the "rotZ" data
     float fRotation = 0.0f;
     GetCustomDataFloat("rotZ", fRotation, true);
     m_fRotation = ConvertDegreesToRadians(fRotation);
@@ -171,16 +209,17 @@ bool CPed::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <ped> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model' (%d) id specified in <ped> (line %d)\n", iTemp, iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
+    // Grab the "health" data
     if (GetCustomDataFloat("health", m_fHealth, true))
     {
         // Limit it to 0-100 (we can assume max health is 100 because they can't change stats here)
@@ -190,33 +229,41 @@ bool CPed::ReadSpecialData(void)
             m_fHealth = 0;
     }
     else
-    {
         // Set health to 100 if not defined
         m_fHealth = 100.0f;
-    }
 
+    // Grab the "armor" data
     GetCustomDataFloat("armor", m_fArmor, true);
 
+    // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
         m_ucInterior = static_cast<unsigned char>(iTemp);
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
+    // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
         m_bCollisionsEnabled = true;
 
+    // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
-    bool bFrozen;
-    if (GetCustomDataBool("frozen", bFrozen, true))
-        m_bFrozen = bFrozen;
+    // Grab the "frozen" data
+    GetCustomDataBool("frozen", m_bFrozen, true);
+
+    // Grab the "headless" data
+    GetCustomDataBool("headless", m_bHeadless, true);
+
+    // Grab the "walkingStyle" data
+    GetCustomDataInt("walkingStyle", m_iMoveAnim, true);
 
     return true;
 }
 
-bool CPed::HasValidModel(void)
+bool CPed::HasValidModel()
 {
     return CPedManager::IsValidModel(m_usModel);
 }
@@ -303,7 +350,7 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     }
 }
 
-float CPed::GetMaxHealth(void)
+float CPed::GetMaxHealth()
 {
     // TODO: Verify this formula
 
@@ -375,7 +422,7 @@ void CPed::SetVehicleAction(unsigned int uiAction)
     m_uiVehicleAction = uiAction;
 }
 
-bool CPed::IsAttachToable(void)
+bool CPed::IsAttachToable()
 {
     // We're not attachable if we're inside a vehicle (that would get messy)
     if (!GetOccupiedVehicle())
@@ -407,5 +454,66 @@ void CPed::SetSyncer(CPlayer* pPlayer)
 
         // Set it
         m_pSyncer = pPlayer;
+
+        // Check if we are in an enter/exit action
+        // We need to complete the process by warping the ped in or out, because the syncer changed
+        unsigned int uiAction = GetVehicleAction();
+        switch (uiAction)
+        {
+            case VEHICLEACTION_ENTERING:
+            {
+                CVehicle* pVehicle = GetOccupiedVehicle();
+                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                // Does it have an occupant and is the occupant us?
+                if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
+                {
+                    // Warp us into vehicle
+                    CStaticFunctionDefinitions::WarpPedIntoVehicle(this, pVehicle, ucOccupiedSeat);
+                }
+            }
+
+            case VEHICLEACTION_EXITING:
+            {
+                CVehicle* pVehicle = GetOccupiedVehicle();
+                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                // Does it have an occupant and is the occupant us?
+                if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
+                {
+                    // Warp us out of vehicle
+                    CStaticFunctionDefinitions::RemovePedFromVehicle(this);
+                }
+            }
+
+            case VEHICLEACTION_JACKING:
+            {
+                CVehicle* pVehicle = GetJackingVehicle();
+                if (pVehicle)
+                {
+                    // Warp us into vehicle in drivers seat
+                    // This will warp the existing driver out and reset both our and the jacked peds vehicle action
+                    CStaticFunctionDefinitions::WarpPedIntoVehicle(this, pVehicle, 0);
+                }
+            }
+        }
     }
+}
+
+void CPed::SetJackingVehicle(CVehicle* pVehicle)
+{
+    if (pVehicle == m_pJackingVehicle)
+        return;
+
+    // Remove old
+    if (m_pJackingVehicle)
+    {
+        CVehicle* pPrev = m_pJackingVehicle;
+        m_pJackingVehicle = NULL;
+        pPrev->SetJackingPed(NULL);
+    }
+
+    // Set new
+    m_pJackingVehicle = pVehicle;
+
+    if (m_pJackingVehicle)
+        m_pJackingVehicle->SetJackingPed(this);
 }

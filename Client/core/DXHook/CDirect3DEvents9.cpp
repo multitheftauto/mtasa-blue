@@ -196,7 +196,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 // Take a screenshot if required and able
 //
 /////////////////////////////////////////////////////////////
-void CDirect3DEvents9::CheckForScreenShot(void)
+void CDirect3DEvents9::CheckForScreenShot()
 {
     // Make a screenshot if needed
     if (CCore::GetSingleton().bScreenShot && !CScreenShot::IsSaving())
@@ -593,7 +593,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 // Finish the active shader if there is one
 //
 /////////////////////////////////////////////////////////////
-void CDirect3DEvents9::CloseActiveShader(void)
+void CDirect3DEvents9::CloseActiveShader()
 {
     if (!g_pActiveShader)
         return;

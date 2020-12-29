@@ -32,17 +32,17 @@ class CMapManager
 public:
     CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
                 CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
-                CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock, class CLuaManager* pLuaManager,
+                CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock,
                 CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter);
-    ~CMapManager(void);
+    ~CMapManager();
 
-    CBlendedWeather* GetWeather(void) { return m_pBlendedWeather; };
+    CBlendedWeather* GetWeather() { return m_pBlendedWeather; };
 
-    void DoPulse(void);
+    void DoPulse();
 
     CElement* LoadMapData(CResource& Loader, CElement& Parent, CXMLNode& Node);
 
-    void BroadcastMapInformation(void);
+    void BroadcastMapInformation();
     void SendMapInformation(CPlayer& Player);
     void SendBlips(CPlayer& Player);
     void SendPerPlayerEntities(CPlayer& Player);
@@ -55,19 +55,19 @@ public:
     void OnPlayerJoin(CPlayer& Player);
     void OnPlayerQuit(CPlayer& Player);
 
-    CDummy* GetRootElement(void) const { return m_pRootElement; };
+    CDummy* GetRootElement() const { return m_pRootElement; };
 
-    CClock* GetServerClock(void) { return m_pServerClock; }
+    CClock* GetServerClock() { return m_pServerClock; }
 
-    void SpawnPlayers(void);
+    void SpawnPlayers();
     void SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior = 0,
                      unsigned short usDimension = 0, CTeam* pTeam = NULL);
 
-    void DoRespawning(void);
-    void DoPickupRespawning(void);
-    void DoPlayerRespawning(void);
-    void DoVehicleRespawning(void);
-    void RespawnAllVehicles(void);
+    void DoRespawning();
+    void DoPickupRespawning();
+    void DoPlayerRespawning();
+    void DoVehicleRespawning();
+    void RespawnAllVehicles();
 
 private:
     void SetUpVisibleToReferences(CElement* pElement);
@@ -77,7 +77,7 @@ private:
     CElement* LoadNode(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart);
     bool      LoadSubNodes(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart);
     bool      HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart, CElement** pCreated);
-    void      LinkupElements(void);
+    void      LinkupElements();
 
     CBlipManager*           m_pBlipManager;
     CObjectManager*         m_pObjectManager;
@@ -91,7 +91,6 @@ private:
     CColManager*            m_pColManager;
     CWaterManager*          m_pWaterManager;
     CClock*                 m_pServerClock;
-    class CLuaManager*      m_pLuaManager;
     CGroups*                m_pGroups;
     CEvents*                m_pEvents;
     class CScriptDebugging* m_pScriptDebugging;

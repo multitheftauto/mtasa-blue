@@ -31,7 +31,7 @@ bool CClientColRectangle::DoHitDetection(const CVector& vecNowPosition, float fR
             vecNowPosition.fY <= m_vecPosition.fY + m_vecSize.fY);
 }
 
-CSphere CClientColRectangle::GetWorldBoundingSphere(void)
+CSphere CClientColRectangle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;

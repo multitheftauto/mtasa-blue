@@ -56,7 +56,7 @@ ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned shor
     m_strMtaAseVersion = MTA_DM_ASE_VERSION;
 }
 
-ASE::~ASE(void)
+ASE::~ASE()
 {
     _instance = NULL;
     ClearRules();
@@ -132,7 +132,7 @@ bool ASE::SetPortEnabled(bool bInternetEnabled, bool bLanEnabled)
     return true;
 }
 
-void ASE::DoPulse(void)
+void ASE::DoPulse()
 {
     if (m_SocketList.empty())
         return;
@@ -217,7 +217,7 @@ void ASE::DoPulse(void)
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lFullMinInterval
-const std::string* ASE::QueryFullCached(void)
+const std::string* ASE::QueryFullCached()
 {
     if (m_uiCurrentPlayerCount != m_uiFullLastPlayerCount || m_llCurrentTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "")
     {
@@ -228,7 +228,7 @@ const std::string* ASE::QueryFullCached(void)
     return &m_strFullCached;
 }
 
-std::string ASE::QueryFull(void)
+std::string ASE::QueryFull()
 {
     std::stringstream reply;
     std::stringstream temp;
@@ -328,7 +328,7 @@ std::string ASE::QueryFull(void)
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string* ASE::QueryXfireLightCached(void)
+const std::string* ASE::QueryXfireLightCached()
 {
     if (m_uiCurrentPlayerCount != m_uiXfireLightLastPlayerCount || m_llCurrentTime - m_llXfireLightLastTime > m_lXfireLightMinInterval ||
         m_strXfireLightCached == "")
@@ -340,7 +340,7 @@ const std::string* ASE::QueryXfireLightCached(void)
     return &m_strXfireLightCached;
 }
 
-std::string ASE::QueryXfireLight(void)
+std::string ASE::QueryXfireLight()
 {
     std::stringstream reply;
 
@@ -379,7 +379,7 @@ std::string ASE::QueryXfireLight(void)
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string* ASE::QueryLightCached(void)
+const std::string* ASE::QueryLightCached()
 {
     if (m_uiCurrentPlayerCount != m_uiLightLastPlayerCount || m_llCurrentTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "")
     {
@@ -390,7 +390,7 @@ const std::string* ASE::QueryLightCached(void)
     return &m_strLightCached;
 }
 
-std::string ASE::QueryLight(void)
+std::string ASE::QueryLight()
 {
     std::stringstream reply;
 
@@ -487,7 +487,7 @@ std::string ASE::QueryLight(void)
     return reply.str();
 }
 
-CLanBroadcast* ASE::InitLan(void)
+CLanBroadcast* ASE::InitLan()
 {
     return new CLanBroadcast(m_usPort);
 }
@@ -591,7 +591,7 @@ bool ASE::RemoveRuleValue(const char* szKey)
     return false;
 }
 
-void ASE::ClearRules(void)
+void ASE::ClearRules()
 {
     list<CASERule*>::iterator iter = m_Rules.begin();
     for (; iter != m_Rules.end(); iter++)

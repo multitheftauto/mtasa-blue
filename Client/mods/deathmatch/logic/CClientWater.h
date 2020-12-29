@@ -18,8 +18,8 @@ public:
     CClientWater(CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow = false);
     ~CClientWater();
 
-    bool Create(void);
-    bool Destroy(void);
+    bool Create();
+    bool Destroy();
     bool Exists() { return m_pPoly != nullptr; }
 
     eClientEntityType GetType() const { return CCLIENTWATER; }
@@ -40,7 +40,6 @@ private:
     bool                 m_bTriangle;            // Is this water a triangle or a quad type?
     bool                 m_bShallow;             // Shallow water?
     std::vector<CVector> m_Vertices;             // List of vertices for this water
-    unsigned short       m_usDimension;
 
     friend class CClientWaterManager;
 };

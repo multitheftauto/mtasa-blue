@@ -18,21 +18,23 @@
 class CConnectManager
 {
 public:
-    CConnectManager(void);
-    ~CConnectManager(void);
+    CConnectManager();
+    ~CConnectManager();
 
-    bool Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false);
+    bool Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false, const char* szSecret = nullptr);
     bool Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true);
 
-    bool Abort(void);
+    bool Abort();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void OnServerExists(void);
+    void OnServerExists();
 
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
     static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
+
+    SString GetJoinSecret();
 
     std::string    m_strLastHost;
     unsigned short m_usLastPort;
@@ -52,6 +54,7 @@ private:
     bool           m_bSave;
     time_t         m_tConnectStarted;
     bool           m_bHasTriedSecondConnect;
+    SString        m_strDiscordSecretJoin;
 
     GUI_CALLBACK* m_pOnCancelClick;
 

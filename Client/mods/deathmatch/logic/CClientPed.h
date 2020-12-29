@@ -10,8 +10,7 @@
 
 class CClientPed;
 
-#ifndef __CCLIENTPED_H
-#define __CCLIENTPED_H
+#pragma once
 
 #include "CAntiCheatModule.h"
 #include "CClientCommon.h"
@@ -19,6 +18,7 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include "CClientModel.h"
 #include <memory>
 
 class CClientCamera;
@@ -120,6 +120,27 @@ struct SReplacedAnimation
     CAnimBlendHierarchySAInterface* pAnimationHierarchy;
 };
 
+struct SAnimationCache
+{
+    SString strName;
+    int     iTime;
+    bool    bLoop;
+    bool    bUpdatePosition;
+    bool    bInterruptable;
+    bool    bFreezeLastFrame;
+    int     iBlend;
+
+    SAnimationCache()
+    {
+        iTime = -1;
+        bLoop = false;
+        bUpdatePosition = false;
+        bInterruptable = false;
+        bFreezeLastFrame = true;
+        iBlend = 250;
+    }
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -137,21 +158,23 @@ class CClientPed : public CClientStreamElement, public CAntiCheatModule
 
 public:
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID);
-    ~CClientPed(void);
+    ~CClientPed();
 
-    void Unlink(void){};
+    void Unlink(){};
 
-    virtual eClientEntityType GetType(void) const { return CCLIENTPED; }
+    virtual eClientEntityType GetType() const { return CCLIENTPED; }
 
-    CPlayerPed*    GetGamePlayer(void) { return m_pPlayerPed; }
-    CEntity*       GetGameEntity(void) { return m_pPlayerPed; }
-    const CEntity* GetGameEntity(void) const { return m_pPlayerPed; }
+    CPlayerPed*    GetGamePlayer() { return m_pPlayerPed; }
+    CEntity*       GetGameEntity() { return m_pPlayerPed; }
+    const CEntity* GetGameEntity() const { return m_pPlayerPed; }
 
-    bool IsLocalPlayer(void) { return m_bIsLocalPlayer; }
+    bool IsLocalPlayer() { return m_bIsLocalPlayer; }
+    bool IsSyncing() { return m_bIsSyncing; }
+    void SetSyncing(bool bIsSyncing);
 
     bool            GetMatrix(CMatrix& Matrix) const;
     bool            SetMatrix(const CMatrix& Matrix);
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
 
     void GetPosition(CVector& vecPosition) const;
     void SetPosition(const CVector& vecPosition) { SetPosition(vecPosition, true, true); }
@@ -177,14 +200,14 @@ public:
     // remove jetpack, etc...
     void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
 
-    void ResetInterpolation(void);
+    void ResetInterpolation();
 
-    float GetCurrentRotation(void);
+    float GetCurrentRotation();
     void  SetCurrentRotation(float fRotation, bool bIncludeTarget = true);
     void  SetTargetRotation(float fRotation);
     void  SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation);
 
-    float GetCameraRotation(void);
+    float GetCameraRotation();
     void  SetCameraRotation(float fRotation);
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
@@ -203,21 +226,21 @@ public:
 
     void SetTargetTarget(unsigned long ulDelay, const CVector& vecSource, const CVector& vecTarget);
 
-    int  GetVehicleInOutState(void) { return m_iVehicleInOutState; };
+    int  GetVehicleInOutState() { return m_iVehicleInOutState; };
     void SetVehicleInOutState(int iState) { m_iVehicleInOutState = iState; };
 
-    unsigned long GetModel(void) { return m_ulModel; };
+    unsigned long GetModel() { return m_ulModel; };
     bool          SetModel(unsigned long ulModel, bool bTemp = false);
 
-    bool GetCanBeKnockedOffBike(void);
+    bool GetCanBeKnockedOffBike();
     void SetCanBeKnockedOffBike(bool bCanBeKnockedOffBike);
 
-    bool            IsInVehicle(void) { return GetOccupiedVehicle() != NULL; };
-    CClientVehicle* GetOccupiedVehicle(void) { return m_pOccupiedVehicle; };
-    unsigned int    GetOccupiedVehicleSeat(void) { return m_uiOccupiedVehicleSeat; };
-    CClientVehicle* GetOccupyingVehicle(void) { return m_pOccupyingVehicle; };
+    bool            IsInVehicle() { return GetOccupiedVehicle() != NULL; };
+    CClientVehicle* GetOccupiedVehicle() { return m_pOccupiedVehicle; };
+    unsigned int    GetOccupiedVehicleSeat() { return m_uiOccupiedVehicleSeat; };
+    CClientVehicle* GetOccupyingVehicle() { return m_pOccupyingVehicle; };
 
-    CClientVehicle* GetRealOccupiedVehicle(void);
+    CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestVehicleInRange(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, bool bCheckStreamedOutVehicles,
                                              unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
@@ -229,57 +252,57 @@ public:
     void            WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0);
     CClientVehicle* RemoveFromVehicle(bool bIgnoreIfGettingOut = false);
 
-    bool IsVisible(void);
+    bool IsVisible();
     void SetVisible(bool bVisible);
-    bool GetUsesCollision(void);
+    bool GetUsesCollision();
     void SetUsesCollision(bool bUsesCollision);
 
-    float GetMaxHealth(void);
-    float GetHealth(void);
+    float GetMaxHealth();
+    float GetHealth();
     void  SetHealth(float fHealth);
     void  InternalSetHealth(float fHealth);
-    float GetArmor(void);
+    float GetArmor();
     void  SetArmor(float fArmor);
-    float GetOxygenLevel(void);
+    float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
 
     void LockHealth(float fHealth);
     void LockArmor(float fArmor);
-    void UnlockHealth(void) { m_bHealthLocked = false; };
-    void UnlockArmor(void) { m_bArmorLocked = false; };
-    bool IsHealthLocked(void) const { return m_bHealthLocked; };
-    bool IsArmorLocked(void) const { return m_bArmorLocked; };
+    void UnlockHealth() { m_bHealthLocked = false; };
+    void UnlockArmor() { m_bArmorLocked = false; };
+    bool IsHealthLocked() const { return m_bHealthLocked; };
+    bool IsArmorLocked() const { return m_bArmorLocked; };
 
-    bool IsDying(void);
-    bool IsDead(void);
+    bool IsDying();
+    bool IsDead();
     void SetIsDead(bool bDead) { m_bDead = bDead; };
     void Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0,
               AnimationId animID = 15);
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
-    int  GetRespawnState(void) { return m_pRespawnState; };
+    int  GetRespawnState() { return m_pRespawnState; };
     void SetRespawnState(int iRespawnState) { m_pRespawnState = iRespawnState; };
 
     CWeapon*    GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent = false);
     bool        SetCurrentWeaponSlot(eWeaponSlot weaponSlot);
-    eWeaponSlot GetCurrentWeaponSlot(void);
-    eWeaponType GetCurrentWeaponType(void);
+    eWeaponSlot GetCurrentWeaponSlot();
+    eWeaponType GetCurrentWeaponType();
     eWeaponType GetWeaponType(eWeaponSlot slot);
-    CWeapon*    GetWeapon(void);
+    CWeapon*    GetWeapon();
     CWeapon*    GetWeapon(eWeaponSlot weaponSlot);
     CWeapon*    GetWeapon(eWeaponType weaponType);
     bool        HasWeapon(eWeaponType weaponType);
     void        RemoveWeapon(eWeaponType weaponType);
-    void        RemoveAllWeapons(void);
-    bool        IsCurrentWeaponUsingBulletSync(void);
-    void        ValidateRemoteWeapons(void);
+    void        RemoveAllWeapons();
+    bool        IsCurrentWeaponUsingBulletSync();
+    void        ValidateRemoteWeapons();
 
     std::map<eMovementState, std::string> m_MovementStateNames;
-    eMovementState                        GetMovementState(void);
+    eMovementState                        GetMovementState();
     bool                                  GetMovementState(std::string& strStateName);
 
-    CTask* GetCurrentPrimaryTask(void);
+    CTask* GetCurrentPrimaryTask();
     bool   IsSimplestTask(int iTaskType);
     bool   HasTask(int iTaskType, int iTaskPriority = -1, bool bPrimary = true);
     bool   SetTask(CTask* pTask, int iTaskPriority);
@@ -298,23 +321,23 @@ public:
             fDirectionY = m_shotSyncData->m_fArmDirectionY;
         }
     };
-    CVector        GetAim(void) const;
-    const CVector& GetAimSource(void) { return m_shotSyncData->m_vecShotOrigin; };
-    const CVector& GetAimTarget(void) { return m_shotSyncData->m_vecShotTarget; };
-    unsigned char  GetVehicleAimAnim(void) { return m_shotSyncData->m_cInVehicleAimDirection; };
-    void           SetAim(float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim);
-    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, unsigned char cInVehicleAimAnim);
-    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, char cInVehicleAimAnim,
+    CVector        GetAim() const;
+    const CVector& GetAimSource() { return m_shotSyncData->m_vecShotOrigin; };
+    const CVector& GetAimTarget() { return m_shotSyncData->m_vecShotTarget; };
+    eVehicleAimDirection GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
+    void           SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim);
+    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
+    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
                                  CVector* pSource, bool bInterpolateAim);
 
     unsigned long GetMemoryValue(unsigned long ulOffset) { return (m_pPlayerPed) ? *m_pPlayerPed->GetMemoryValue(ulOffset) : 0; };
-    unsigned long GetGameBaseAddress(void) { return (m_pPlayerPed) ? (unsigned long)m_pPlayerPed->GetMemoryValue(0) : 0; };
+    unsigned long GetGameBaseAddress() { return (m_pPlayerPed) ? (unsigned long)m_pPlayerPed->GetMemoryValue(0) : 0; };
 
     void Duck(bool bDuck);
-    bool IsDucked(void);
+    bool IsDucked();
 
     void SetChoking(bool bChoking);
-    bool IsChoking(void);
+    bool IsChoking();
 
     void SetWearingGoggles(bool bWearing, bool animationEnabled = true);
     bool IsWearingGoggles(bool bCheckMoving = false);
@@ -322,126 +345,127 @@ public:
 
     void WorldIgnore(bool bIgnore);
 
-    void ResetToOutOfVehicleWeapon(void);
+    void ResetToOutOfVehicleWeapon();
 
     void  RebuildModel(bool bDelayChange = false);
     void  ProcessRebuildPlayer(bool bNeedsClothesUpdate);
     void  SetStat(unsigned short usStat, float fValue);
     float GetStat(unsigned short usStat);
-    void  ResetStats(void);
+    void  ResetStats();
 
-    CClientPlayerClothes* GetClothes(void) { return m_pClothes; }
+    CClientPlayerClothes* GetClothes() { return m_pClothes; }
 
     // This is kinda hacky, should be private but something depends on this. Should depend on some
     // streamer func. Perhaps use SetNeverStreamOut, but need something to reset that.
     void StreamIn(bool bInstantly);
-    void StreamOut(void);
+    void StreamOut();
 
     void StreamOutWeaponForABit(eWeaponSlot eSlot);
 
     bool SetHasJetPack(bool bHasJetPack);
-    bool HasJetPack(void);
+    bool HasJetPack();
 
-    float GetDistanceFromGround(void);
+    float GetDistanceFromGround();
 
     void SetInWater(bool bIsInWater) { m_bIsInWater = bIsInWater; };
-    bool IsInWater(void);
-    bool IsOnGround(void);
+    bool IsInWater();
+    bool IsOnGround();
 
-    bool          IsClimbing(void);
-    bool          IsRadioOn(void) { return m_bRadioOn; };
-    void          NextRadioChannel(void);
-    void          PreviousRadioChannel(void);
+    bool          IsClimbing();
+    bool          IsRadioOn() { return m_bRadioOn; };
+    void          NextRadioChannel();
+    void          PreviousRadioChannel();
     bool          SetCurrentRadioChannel(unsigned char ucChannel);
-    unsigned char GetCurrentRadioChannel(void) { return m_ucRadioChannel; };
+    unsigned char GetCurrentRadioChannel() { return m_ucRadioChannel; };
 
-    CTaskManager* GetTaskManager(void) { return m_pTaskManager; }
+    CTaskManager* GetTaskManager() { return m_pTaskManager; }
 
     bool    GetShotData(CVector* pvecOrigin, CVector* pvecTarget = NULL, CVector* pvecGunMuzzle = NULL, CVector* pvecFireOffset = NULL, float* fAimX = NULL,
                         float* fAimY = NULL);
     CVector AdjustShotOriginForWalls(const CVector& vecOrigin, const CVector& vecTarget, float fMaxPullBack);
 
-    eFightingStyle GetFightingStyle(void);
+    eFightingStyle GetFightingStyle();
     void           SetFightingStyle(eFightingStyle style);
 
-    eMoveAnim GetMoveAnim(void);
+    eMoveAnim GetMoveAnim();
     void      SetMoveAnim(eMoveAnim iAnim);
 
     void                                    AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
     void                                    RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }
-    std::list<CClientProjectile*>::iterator ProjectilesBegin(void) { return m_Projectiles.begin(); }
-    std::list<CClientProjectile*>::iterator ProjectilesEnd(void) { return m_Projectiles.end(); }
+    std::list<CClientProjectile*>::iterator ProjectilesBegin() { return m_Projectiles.begin(); }
+    std::list<CClientProjectile*>::iterator ProjectilesEnd() { return m_Projectiles.end(); }
     unsigned int                            CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
 
-    void RemoveAllProjectiles(void);
+    void RemoveAllProjectiles();
     void DestroySatchelCharges(bool bBlow = true, bool bDestroy = true);
 
-    CRemoteDataStorage* GetRemoteData(void) { return m_remoteDataStorage; }
+    CRemoteDataStorage* GetRemoteData() { return m_remoteDataStorage; }
 
-    bool IsEnteringVehicle(void);
-    bool IsLeavingVehicle(void);
-    bool IsGettingIntoVehicle(void);
-    bool IsGettingOutOfVehicle(void);
-    bool IsGettingJacked(void);
+    bool IsEnteringVehicle();
+    bool IsLeavingVehicle();
+    bool IsGettingIntoVehicle();
+    bool IsGettingOutOfVehicle();
+    bool IsGettingJacked();
 
-    CClientEntity* GetContactEntity(void);
+    CClientEntity* GetContactEntity();
 
-    bool HasAkimboPointingUpwards(void);
+    bool HasAkimboPointingUpwards();
 
-    float GetDistanceFromCentreOfMassToBaseOfModel(void);
+    float GetDistanceFromCentreOfMassToBaseOfModel();
 
-    unsigned char GetAlpha(void) { return m_ucAlpha; }
+    unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
 
-    bool           HasTargetPosition(void) { return (m_interp.pos.ulFinishTime != 0); }
-    CClientEntity* GetTargetOriginSource(void) { return m_interp.pTargetOriginSource; }
+    bool           HasTargetPosition() { return (m_interp.pos.ulFinishTime != 0); }
+    CClientEntity* GetTargetOriginSource() { return m_interp.pTargetOriginSource; }
     void           GetTargetPosition(CVector& vecPosition);
     void           SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL);
-    void           RemoveTargetPosition(void);
-    void           UpdateTargetPosition(void);
+    void           RemoveTargetPosition();
+    void           UpdateTargetPosition();
     void           UpdateUnderFloorFix(const CVector& vecTargetPosition, const CVector& vecOrigin);
 
-    CClientEntity* GetTargetedEntity(void);
-    CClientPed*    GetTargetedPed(void);
+    CClientEntity* GetTargetedEntity();
+    CClientPed*    GetTargetedPed();
 
-    CClientEntity* GetCurrentContactEntity(void) { return m_pCurrentContactEntity; }
+    CClientEntity* GetCurrentContactEntity() { return m_pCurrentContactEntity; }
     void           SetCurrentContactEntity(CClientEntity* pEntity) { m_pCurrentContactEntity = pEntity; }
 
-    bool IsSunbathing(void);
+    bool IsSunbathing();
     void SetSunbathing(bool bSunbathing, bool bStartStanding = true);
 
     bool LookAt(CVector vecOffset, int iTime = 1000, int iBlend = 1000, CClientEntity* pEntity = NULL);
     bool UseGun(CVector vecTarget, CClientEntity* pEntity);
 
-    bool               IsAttachToable(void);
+    bool               IsAttachToable();
     static const char* GetBodyPartName(unsigned char ucID);
 
-    bool IsDoingGangDriveby(void);
+    bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
-    bool        IsRunningAnimation(void);
-    void        RunAnimation(AssocGroupId animGroup, AnimationId animID);
-    void        RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true, bool bUpdatePosition = true,
-                                  bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false,
-                                  bool bHoldLastFrame = false);
-    void        KillAnimation(void);
-    CAnimBlock* GetAnimationBlock(void) { return m_pAnimationBlock; }
-    const char* GetAnimationName(void) { return m_strAnimationName; }
+    bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
+    bool IsRunningAnimation();
+    void RunAnimation(AssocGroupId animGroup, AnimationId animID);
+    void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
+                           bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
+                           bool bOffsetPed = false, bool bHoldLastFrame = false);
+    void KillAnimation();
+    std::unique_ptr<CAnimBlock> GetAnimationBlock();
+    const SAnimationCache&      GetAnimationCache() { return m_AnimationCache; }
 
-    bool IsUsingGun(void);
+    bool IsUsingGun();
 
-    bool IsHeadless(void) { return m_bHeadless; }
+    bool IsHeadless() { return m_bHeadless; }
     void SetHeadless(bool bHeadless);
 
-    bool IsFrozen(void) const { return m_bFrozen; }
+    bool IsFrozen() const { return m_bFrozen; }
     void SetFrozen(bool bFrozen);
-    bool IsFrozenWaitingForGroundToLoad(void) const;
+    bool IsFrozenWaitingForGroundToLoad() const;
     void SetFrozenWaitingForGroundToLoad(bool bFrozen);
 
-    bool IsFootBloodEnabled(void);
+    bool IsFootBloodEnabled();
     void SetFootBloodEnabled(bool bHasFootBlood);
 
-    bool IsOnFire(void);
+    bool IsOnFire();
     void SetOnFire(bool bOnFire);
 
     void GetVoice(short* psVoiceType, short* psVoiceID);
@@ -449,57 +473,59 @@ public:
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
 
-    bool IsSpeechEnabled(void);
+    bool IsSpeechEnabled();
     void SetSpeechEnabled(bool bEnabled);
 
-    void PostWeaponFire(void);
+    void PostWeaponFire();
     void SetBulletImpactData(CClientEntity* pVictim, const CVector& vecHitPosition);
     bool GetBulletImpactData(CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0);
-    void ClearBulletImpactData(void) { m_bBulletImpactData = false; }
+    void ClearBulletImpactData() { m_bBulletImpactData = false; }
 
-    bool CanReloadWeapon(void);
-    bool ReloadWeapon(void);
-    bool IsReloadingWeapon(void);
+    bool CanReloadWeapon();
+    bool ReloadWeapon();
+    bool IsReloadingWeapon();
 
-    bool ShouldBeStealthAiming(void);
-    bool IsStealthAiming(void) { return m_bStealthAiming; }
+    bool ShouldBeStealthAiming();
+    bool IsStealthAiming() { return m_bStealthAiming; }
     void SetStealthAiming(bool bAiming);
 
     std::unique_ptr<CAnimBlendAssociation> AddAnimation(AssocGroupId group, AnimationId id);
     std::unique_ptr<CAnimBlendAssociation> BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta);
     std::unique_ptr<CAnimBlendAssociation> GetAnimation(AnimationId id);
-    std::unique_ptr<CAnimBlendAssociation> GetFirstAnimation(void);
+    std::unique_ptr<CAnimBlendAssociation> GetFirstAnimation();
 
-    void                        DereferenceCustomAnimationBlock(void) { m_pCustomAnimationIFP = nullptr; }
-    std::shared_ptr<CClientIFP> GetCustomAnimationIFP(void) { return m_pCustomAnimationIFP; }
-    bool IsCustomAnimationPlaying(void) { return ((m_bRequestedAnimation || m_bLoopAnimation) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
-    void SetCustomAnimationUntriggerable(void)
+    void                        DereferenceCustomAnimationBlock() { m_pCustomAnimationIFP = nullptr; }
+    std::shared_ptr<CClientIFP> GetCustomAnimationIFP() { return m_pCustomAnimationIFP; }
+    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_AnimationCache.bLoop) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
+    void SetCustomAnimationUntriggerable()
     {
         m_bRequestedAnimation = false;
-        m_bLoopAnimation = false;
+        m_AnimationCache.bLoop = false;
     }
-    bool            IsNextAnimationCustom(void) { return m_bisNextAnimationCustom; }
+    bool            IsNextAnimationCustom() { return m_bisNextAnimationCustom; }
     void            SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
     void            SetCurrentAnimationCustom(bool bCustom) { m_bisCurrentAnimationCustom = bCustom; }
-    bool            IsCurrentAnimationCustom(void) { return m_bisCurrentAnimationCustom; }
-    CIFPAnimations* GetIFPAnimationsPointer(void) { return m_pIFPAnimations; }
+    bool            IsCurrentAnimationCustom() { return m_bisCurrentAnimationCustom; }
+    CIFPAnimations* GetIFPAnimationsPointer() { return m_pIFPAnimations; }
     void            SetIFPAnimationsPointer(CIFPAnimations* pIFPAnimations) { m_pIFPAnimations = pIFPAnimations; }
 
     // This will indicate that we have played custom animation, so next animation can be internal GTA animation
     // You must call this function after playing a custom animation
-    void                SetNextAnimationNormal(void) { m_bisNextAnimationCustom = false; }
-    const SString&      GetNextAnimationCustomBlockName(void) { return m_strCustomIFPBlockName; }
-    const SString&      GetNextAnimationCustomName(void) { return m_strCustomIFPAnimationName; }
-    const unsigned int& GetCustomAnimationBlockNameHash(void) { return m_u32CustomBlockNameHash; }
-    const unsigned int& GetCustomAnimationNameHash(void) { return m_u32CustomAnimationNameHash; }
+    void                SetNextAnimationNormal() { m_bisNextAnimationCustom = false; }
+    const SString&      GetNextAnimationCustomBlockName() { return m_strCustomIFPBlockName; }
+    const SString&      GetNextAnimationCustomName() { return m_strCustomIFPAnimationName; }
+    const unsigned int& GetCustomAnimationBlockNameHash() { return m_u32CustomBlockNameHash; }
+    const unsigned int& GetCustomAnimationNameHash() { return m_u32CustomAnimationNameHash; }
 
     void                ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                          CAnimBlendHierarchySAInterface* pCustomAnimHierarchy);
     void                RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy);
     void                RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP);
     void                RestoreAnimations(CAnimBlock& animationBlock);
-    void                RestoreAllAnimations(void);
+    void                RestoreAllAnimations();
     SReplacedAnimation* GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface);
+
+    std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -510,39 +536,52 @@ protected:
     void StreamedInPulse(bool bDoStandardPulses);
     void ApplyControllerStateFixes(CControllerState& Current);
 
-    void Interpolate(void);
+    void Interpolate();
     void UpdateKeysync(bool bCleanup = false);
 
     // Used to destroy the current game ped and create a new one in the same state.
-    void ReCreateModel(void);
+    void ReCreateModel();
 
-    void _CreateModel(void);
-    void _CreateLocalModel(void);
-    void _DestroyModel(void);
-    void _DestroyLocalModel(void);
-    void _ChangeModel(void);
+    void _CreateModel();
+    void _CreateLocalModel();
+    void _DestroyModel();
+    void _DestroyLocalModel();
+    void _ChangeModel();
 
     void ModelRequestCallback(CModelInfo* pModelInfo);
 
     void InternalWarpIntoVehicle(CVehicle* pGameVehicle);
     void InternalRemoveFromVehicle(CVehicle* pGameVehicle);
 
-    bool PerformChecks(void);
-    void HandleWaitingForGroundToLoad(void);
+    bool PerformChecks();
+    void HandleWaitingForGroundToLoad();
     void UpdateStreamPosition(const CVector& vecPosition);
 
     // Used to start and stop radio for local player
-    void StartRadio(void);
-    void StopRadio(void);
+    void StartRadio();
+    void StopRadio();
     bool m_bDontChangeRadio;
 
 public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
+    // Used to control and sync entering/exiting
+    bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger);
+    bool ExitVehicle();
+    void ResetVehicleInOut();
+    void UpdateVehicleInOut();
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
 
-    void NotifyCreate(void);
-    void NotifyDestroy(void);
+    void      SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
+    bool      IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
+    void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
+    eTaskType GetTaskTypeToBeRestoredOnAnimEnd() { return m_eTaskTypeToBeRestoredOnAnimEnd; }
+
+    bool IsWarpInToVehicleRequired() { return m_bWarpInToVehicleRequired; }
+    void SetWarpInToVehicleRequired(bool warp) { m_bWarpInToVehicleRequired = warp; }
+
+    void NotifyCreate();
+    void NotifyDestroy();
 
     CClientModelRequestManager* m_pRequester;
     CPlayerPed*                 m_pPlayerPed;
@@ -567,6 +606,7 @@ public:
     CStatsData*                              m_stats;
     CControllerState*                        m_currentControllerState;
     CControllerState*                        m_lastControllerState;
+    CControllerState                         m_rawControllerState; // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;
@@ -638,15 +678,9 @@ public:
     CClientPad                               m_Pad;
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
-    CAnimBlock*                              m_pAnimationBlock;
-    SString                                  m_strAnimationName;
+    std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     bool                                     m_bRequestedAnimation;
-    int                                      m_iTimeAnimation;
-    int                                      m_iBlendAnimation;
-    bool                                     m_bLoopAnimation;
-    bool                                     m_bUpdatePositionAnimation;
-    bool                                     m_bInterruptableAnimation;
-    bool                                     m_bFreezeLastFrameAnimation;
+    SAnimationCache                          m_AnimationCache;
     bool                                     m_bHeadless;
     bool                                     m_bFrozen;
     bool                                     m_bFrozenWaitingForGroundToLoad;
@@ -663,6 +697,7 @@ public:
     unsigned char                            m_ucLeavingDoor;
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
+    bool                                     m_bIsSyncing;
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;
@@ -708,6 +743,21 @@ public:
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
-};
+    bool              m_bTaskToBeRestoredOnAnimEnd;
+    eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
+    bool              m_bWarpInToVehicleRequired = false;
 
-#endif
+    // Enter/exit variables
+    unsigned long  m_ulLastVehicleInOutTime;    // Last tick where we sent an enter/exit request
+    bool           m_bIsGettingOutOfVehicle;    // Indicates we are exiting a vehicle
+    bool           m_bIsGettingIntoVehicle;     // Indicates we are entering a vehicle
+    bool           m_bIsJackingVehicle;         // Indicates we are jacking a vehicle
+    bool           m_bIsGettingJacked;          // Indicates we are getting jacked
+    ElementID      m_VehicleInOutID;            // ElementID of vehicle received from server
+    unsigned char  m_ucVehicleInOutSeat;        // Seat ID we are entering/exiting received from server
+    bool           m_bNoNewVehicleTask;         // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
+    ElementID      m_NoNewVehicleTaskReasonID;  // ElementID of the vehicle that we are waiting on
+    CClientPed*    m_pGettingJackedBy;          // The ped that is jacking us
+
+    std::shared_ptr<CClientModel> m_clientModel;
+};

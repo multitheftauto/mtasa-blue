@@ -63,12 +63,12 @@ struct SMemStatsInfo
 class CMemStatsInterface
 {
 public:
-    virtual ~CMemStatsInterface(void) {}
+    virtual ~CMemStatsInterface() {}
 
-    virtual void Draw(void) = 0;
+    virtual void Draw() = 0;
     virtual void SetEnabled(bool bEnabled) = 0;
-    virtual bool IsEnabled(void) = 0;
+    virtual bool IsEnabled() = 0;
     virtual void SampleState(SMemStatsInfo& memStatsInfo) = 0;
 };
 
-CMemStatsInterface* GetMemStats(void);
+CMemStatsInterface* GetMemStats();

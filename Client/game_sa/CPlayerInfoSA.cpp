@@ -66,7 +66,7 @@ void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 /**
  *
  */
-VOID CPlayerInfoSA::GivePlayerParachute(VOID)
+VOID CPlayerInfoSA::GivePlayerParachute()
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::GivePlayerParachute ( VOID )");
     DWORD dwFunction = FUNC_GivePlayerParachute;
@@ -207,12 +207,12 @@ CVehicle* CPlayerInfoSA::GetPlayerRemoteControlledCar()
     return (CVehicle*)VAR_PlayerRCCar;
 }
 
-float CPlayerInfoSA::GetFPSMoveHeading(void)
+float CPlayerInfoSA::GetFPSMoveHeading()
 {
     return this->GetInterface()->PlayerPedData.m_fFPSMoveHeading;
 }
 
-bool CPlayerInfoSA::GetDoesNotGetTired(void)
+bool CPlayerInfoSA::GetDoesNotGetTired()
 {
     return internalInterface->DoesNotGetTired;
 }
@@ -222,7 +222,7 @@ void CPlayerInfoSA::SetDoesNotGetTired(bool bDoesNotGetTired)
     internalInterface->DoesNotGetTired = bDoesNotGetTired;
 }
 
-short CPlayerInfoSA::GetLastTimeEaten(void)
+short CPlayerInfoSA::GetLastTimeEaten()
 {
     return internalInterface->TimeLastEaten;
 }
@@ -232,7 +232,7 @@ void CPlayerInfoSA::SetLastTimeEaten(short sTime)
     internalInterface->TimeLastEaten = sTime;
 }
 
-DWORD CPlayerInfoSA::GetLastTimeBigGunFired(void)
+DWORD CPlayerInfoSA::GetLastTimeBigGunFired()
 {
     return internalInterface->LastTimeBigGunFired;
 }

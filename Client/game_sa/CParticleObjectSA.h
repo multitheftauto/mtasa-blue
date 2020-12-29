@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PARTICLEOBJECT
-#define __CGAMESA_PARTICLEOBJECT
+#pragma once
 
 #include <game/CParticleObject.h>
 
@@ -25,5 +24,3 @@ private:
     //  CParticleObjectSAInterface      * internalInterface;
 public:
 };
-
-#endif

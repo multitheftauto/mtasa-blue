@@ -39,11 +39,11 @@ class CLine3DBatcher
 public:
     ZERO_ON_NEW
     CLine3DBatcher(bool bZTest);
-    ~CLine3DBatcher(void);
+    ~CLine3DBatcher();
 
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
-    void Flush(void);
-    bool HasItems(void) { return !m_LineList.empty(); }
+    void Flush();
+    bool HasItems() { return !m_LineList.empty(); }
     void AddLine3D(const CVector& vecFrom, const CVector& vecTo, float fWidth, ulong ulColor);
 
 protected:

@@ -54,7 +54,7 @@ namespace
 //
 //
 ///////////////////////////////////////////////////////////////
-CAdditionalVertexStreamManager::CAdditionalVertexStreamManager(void)
+CAdditionalVertexStreamManager::CAdditionalVertexStreamManager()
 {
 }
 
@@ -65,7 +65,7 @@ CAdditionalVertexStreamManager::CAdditionalVertexStreamManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager(void)
+CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 {
 }
 
@@ -76,7 +76,7 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager(void)
 // Static function
 //
 ///////////////////////////////////////////////////////////////
-CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton(void)
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
 {
     if (!ms_Singleton)
         ms_Singleton = new CAdditionalVertexStreamManager();
@@ -186,7 +186,7 @@ void CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
 //
 //
 ///////////////////////////////////////////////////////////////
-void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream(void)
+void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
 {
     HRESULT hr;
     if (m_pOldVertexDeclaration)

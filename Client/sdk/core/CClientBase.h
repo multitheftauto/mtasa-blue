@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTBASE_H
-#define __CCLIENTBASE_H
+#pragma once
 
 #include "CCoreInterface.h"
 #include "CExceptionInformation.h"
@@ -19,12 +18,12 @@ class CClientBase
 {
 public:
     virtual int  ClientInitialize(const char* szArguments, CCoreInterface* pCoreInterface) = 0;
-    virtual void ClientShutdown(void) = 0;
+    virtual void ClientShutdown() = 0;
 
-    virtual void PreFrameExecutionHandler(void) = 0;
+    virtual void PreFrameExecutionHandler() = 0;
     virtual void PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreateRenderTargets) = 0;
-    virtual void PostFrameExecutionHandler(void) = 0;
-    virtual void IdleHandler(void) = 0;
+    virtual void PostFrameExecutionHandler() = 0;
+    virtual void IdleHandler() = 0;
     virtual void RestreamModel(unsigned short usModel) = 0;
 
     virtual bool WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages) = 0;
@@ -34,6 +33,6 @@ public:
 
     virtual bool HandleException(CExceptionInformation* pExceptionInformation) = 0;
     virtual void GetPlayerNames(std::vector<SString>& vPlayerNames) = 0;
-};
 
-#endif
+    virtual void TriggerDiscordJoin(SString strSecret) = 0;
+};

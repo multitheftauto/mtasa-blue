@@ -126,8 +126,26 @@ ProcessResult MinidumpProcessor::Process(
   // Put a copy of the module list into ProcessState object.  This is not
   // necessarily a MinidumpModuleList, but it adheres to the CodeModules
   // interface, which is all that ProcessState needs to expose.
-  if (module_list)
+  if (module_list) {
     process_state->modules_ = module_list->Copy();
+    process_state->shrunk_range_modules_ =
+        process_state->modules_->GetShrunkRangeModules();
+    for (unsigned int i = 0;
+         i < process_state->shrunk_range_modules_.size();
+         i++) {
+      linked_ptr<const CodeModule> module =
+          process_state->shrunk_range_modules_[i];
+      BPLOG(INFO) << "The range for module " << module->code_file()
+                  << " was shrunk down by " << HexString(
+                      module->shrink_down_delta()) << " bytes. ";
+    }
+  }
+
+  MinidumpUnloadedModuleList *unloaded_module_list =
+      dump->GetUnloadedModuleList();
+  if (unloaded_module_list) {
+    process_state->unloaded_modules_ = unloaded_module_list->Copy();
+  }
 
   MinidumpMemoryList *memory_list = dump->GetMemoryList();
   if (memory_list) {
@@ -250,6 +268,7 @@ ProcessResult MinidumpProcessor::Process(
                                        context,
                                        thread_memory,
                                        process_state->modules_,
+                                       process_state->unloaded_modules_,
                                        frame_symbolizer_));
 
     scoped_ptr<CallStack> stack(new CallStack());
@@ -1016,6 +1035,9 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
           reason = "EXC_RPC_ALERT / ";
           reason.append(flags_string);
           break;
+        case MD_EXCEPTION_MAC_SIMULATED:
+          reason = "Simulated Exception";
+          break;
       }
       break;
     }
@@ -1165,6 +1187,9 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
         case MD_EXCEPTION_CODE_WIN_STACK_OVERFLOW:
           reason = "EXCEPTION_STACK_OVERFLOW";
           break;
+        case MD_EXCEPTION_CODE_WIN_BAD_FUNCTION_TABLE:
+          reason = "EXCEPTION_BAD_FUNCTION_TABLE";
+          break;
         case MD_EXCEPTION_CODE_WIN_POSSIBLE_DEADLOCK:
           reason = "EXCEPTION_POSSIBLE_DEADLOCK";
           break;
@@ -1174,8 +1199,14 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
         case MD_EXCEPTION_CODE_WIN_HEAP_CORRUPTION:
           reason = "EXCEPTION_HEAP_CORRUPTION";
           break;
+        case MD_EXCEPTION_OUT_OF_MEMORY:
+          reason = "Out of Memory";
+          break;
         case MD_EXCEPTION_CODE_WIN_UNHANDLED_CPP_EXCEPTION:
           reason = "Unhandled C++ Exception";
+          break;
+        case MD_EXCEPTION_CODE_WIN_SIMULATED:
+          reason = "Simulated Exception";
           break;
         default:
           BPLOG(INFO) << "Unknown exception reason " << reason;

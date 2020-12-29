@@ -32,7 +32,7 @@ void CEffectWrap::PostConstruct(CRenderItemManager* pManager, CEffectTemplate* p
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectWrap::PreDestruct(void)
+void CEffectWrap::PreDestruct()
 {
     SAFE_RELEASE(m_pEffectTemplate);
     Super::PreDestruct();
@@ -45,7 +45,7 @@ void CEffectWrap::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectWrap::IsValid(void)
+bool CEffectWrap::IsValid()
 {
     return m_pD3DEffect != NULL;
 }
@@ -57,7 +57,7 @@ bool CEffectWrap::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectWrap::OnLostDevice(void)
+void CEffectWrap::OnLostDevice()
 {
     // Handled in CEffectTemplate
 }
@@ -69,7 +69,7 @@ void CEffectWrap::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectWrap::OnResetDevice(void)
+void CEffectWrap::OnResetDevice()
 {
     // Handled in CEffectTemplate
 }
@@ -95,7 +95,7 @@ HRESULT CEffectWrap::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
 // Ensures secondary render targets are unset
 //
 ////////////////////////////////////////////////////////////////
-HRESULT CEffectWrap::End(void)
+HRESULT CEffectWrap::End()
 {
     return m_pEffectTemplate->End();
 }
@@ -108,7 +108,7 @@ HRESULT CEffectWrap::End(void)
 // Called before render
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectWrap::ApplyCommonHandles(void)
+bool CEffectWrap::ApplyCommonHandles()
 {
     return m_pEffectTemplate->ApplyCommonHandles();
 }
@@ -121,7 +121,7 @@ bool CEffectWrap::ApplyCommonHandles(void)
 // Called before render
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectWrap::ApplyMappedHandles(void)
+bool CEffectWrap::ApplyMappedHandles()
 {
     return m_pEffectTemplate->ApplyMappedHandles();
 }

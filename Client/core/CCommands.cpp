@@ -27,13 +27,13 @@ void TrimWhiteSpace(std::string& str)
 template <>
 CCommands* CSingleton<CCommands>::m_pSingleton = NULL;
 
-CCommands::CCommands(void)
+CCommands::CCommands()
 {
     WriteDebugEvent("CCommands::CCommands");
     m_pfnExecuteHandler = NULL;
 }
 
-CCommands::~CCommands(void)
+CCommands::~CCommands()
 {
     WriteDebugEvent("CCommands::~CCommands");
     DeleteAll();
@@ -61,7 +61,7 @@ void CCommands::Add(const char* szCommand, const char* szDescription, PFNCOMMAND
     m_CommandList.push_back(pCommand);
 }
 
-unsigned int CCommands::Count(void)
+unsigned int CCommands::Count()
 {
     return static_cast<unsigned int>(m_CommandList.size());
 }
@@ -230,7 +230,7 @@ void CCommands::Delete(const char* szCommand)
     }
 }
 
-void CCommands::DeleteAll(void)
+void CCommands::DeleteAll()
 {
     // Delete all the commands
     list<COMMANDENTRY*>::iterator iter = m_CommandList.begin();

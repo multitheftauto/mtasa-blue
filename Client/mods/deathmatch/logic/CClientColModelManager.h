@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLMODELMANAGER_H
-#define __CCLIENTCOLMODELMANAGER_H
+#pragma once
 
 #include <list>
 #include "CClientColModel.h"
@@ -20,9 +19,9 @@ class CClientColModelManager
 
 public:
     CClientColModelManager(class CClientManager* pManager);
-    ~CClientColModelManager(void);
+    ~CClientColModelManager();
 
-    void RemoveAll(void);
+    void RemoveAll();
     bool Exists(CClientColModel* pCol);
 
     CClientColModel* GetElementThatReplaced(unsigned short usModel, CClientColModel* pDontSearch = NULL);
@@ -30,8 +29,8 @@ public:
     static bool IsReplacableModel(unsigned short usModel);
     bool        RestoreModel(unsigned short usModel);
 
-    std::list<CClientColModel*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    std::list<CClientColModel*>::const_iterator IterEnd(void) { return m_List.end(); }
+    std::list<CClientColModel*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::list<CClientColModel*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
     void AddToList(CClientColModel* pCol) { m_List.push_back(pCol); }
@@ -40,5 +39,3 @@ private:
     std::list<CClientColModel*> m_List;
     bool                        m_bRemoveFromList;
 };
-
-#endif

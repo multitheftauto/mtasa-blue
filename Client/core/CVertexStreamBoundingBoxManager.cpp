@@ -46,7 +46,7 @@ namespace
 //
 //
 ///////////////////////////////////////////////////////////////
-CVertexStreamBoundingBoxManager::CVertexStreamBoundingBoxManager(void)
+CVertexStreamBoundingBoxManager::CVertexStreamBoundingBoxManager()
 {
 }
 
@@ -57,7 +57,7 @@ CVertexStreamBoundingBoxManager::CVertexStreamBoundingBoxManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CVertexStreamBoundingBoxManager::~CVertexStreamBoundingBoxManager(void)
+CVertexStreamBoundingBoxManager::~CVertexStreamBoundingBoxManager()
 {
 }
 
@@ -68,7 +68,7 @@ CVertexStreamBoundingBoxManager::~CVertexStreamBoundingBoxManager(void)
 // Static function
 //
 ///////////////////////////////////////////////////////////////
-CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetSingleton(void)
+CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetSingleton()
 {
     if (!ms_Singleton)
         ms_Singleton = new CVertexStreamBoundingBoxManager();

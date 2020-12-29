@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPedSyncPacket::~CPedSyncPacket(void)
+CPedSyncPacket::~CPedSyncPacket()
 {
     vector<SyncData*>::const_iterator iter = m_Syncs.begin();
     for (; iter != m_Syncs.end(); ++iter)

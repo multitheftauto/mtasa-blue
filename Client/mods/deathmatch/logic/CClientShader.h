@@ -14,8 +14,8 @@ class CClientShader : public CClientMaterial
 public:
     CClientShader(CClientManager* pManager, ElementID ID, CShaderItem* pShaderItem);
 
-    eClientEntityType GetType(void) const { return CCLIENTSHADER; }
+    eClientEntityType GetType() const { return CCLIENTSHADER; }
 
     // CClientShader methods
-    CShaderItem* GetShaderItem(void) { return (CShaderItem*)m_pRenderItem; }
+    CShaderItem* GetShaderItem() { return (CShaderItem*)m_pRenderItem; }
 };

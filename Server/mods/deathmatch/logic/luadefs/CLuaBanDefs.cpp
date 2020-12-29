@@ -13,26 +13,32 @@
 
 void CLuaBanDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("addBan", AddBan);
-    CLuaCFunctions::AddFunction("removeBan", RemoveBan);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"addBan", AddBan},
+        {"removeBan", RemoveBan},
 
-    CLuaCFunctions::AddFunction("getBans", GetBans);
-    CLuaCFunctions::AddFunction("reloadBans", ReloadBanList);
+        {"getBans", GetBans},
+        {"reloadBans", ReloadBanList},
 
-    CLuaCFunctions::AddFunction("getBanIP", GetBanIP);
-    CLuaCFunctions::AddFunction("getBanSerial", GetBanSerial);
-    CLuaCFunctions::AddFunction("getBanUsername", GetBanUsername);
-    CLuaCFunctions::AddFunction("getBanNick", GetBanNick);
-    CLuaCFunctions::AddFunction("getBanTime", GetBanTime);
-    CLuaCFunctions::AddFunction("getUnbanTime", GetUnbanTime);
-    CLuaCFunctions::AddFunction("getBanReason", GetBanReason);
-    CLuaCFunctions::AddFunction("getBanAdmin", GetBanAdmin);
+        {"getBanIP", GetBanIP},
+        {"getBanSerial", GetBanSerial},
+        {"getBanUsername", GetBanUsername},
+        {"getBanNick", GetBanNick},
+        {"getBanTime", GetBanTime},
+        {"getUnbanTime", GetUnbanTime},
+        {"getBanReason", GetBanReason},
+        {"getBanAdmin", GetBanAdmin},
 
-    CLuaCFunctions::AddFunction("setUnbanTime", SetUnbanTime);
-    CLuaCFunctions::AddFunction("setBanReason", SetBanReason);
-    CLuaCFunctions::AddFunction("setBanAdmin", SetBanAdmin);
-    CLuaCFunctions::AddFunction("setBanNick", SetBanNick);
-    CLuaCFunctions::AddFunction("isBan", IsBan);
+        {"setUnbanTime", SetUnbanTime},
+        {"setBanReason", SetBanReason},
+        {"setBanAdmin", SetBanAdmin},
+        {"setBanNick", SetBanNick},
+        {"isBan", IsBan},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBanDefs::AddClass(lua_State* luaVM)
@@ -58,12 +64,17 @@ void CLuaBanDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAdmin", "setBanAdmin");
 
     lua_classvariable(luaVM, "admin", "setBanAdmin", "getBanAdmin");
-    lua_classvariable(luaVM, "IP", NULL, "getBanIP");
+    lua_classvariable(luaVM, "ip", NULL, "getBanIP");
     lua_classvariable(luaVM, "serial", NULL, "getBanSerial");
     lua_classvariable(luaVM, "time", NULL, "getBanTime");
     lua_classvariable(luaVM, "unbanTime", "setUnbanTime", "getUnbanTime");
     lua_classvariable(luaVM, "reason", "setBanReason", "getBanReason");
     lua_classvariable(luaVM, "nick", "setBanNick", "getBanNick");
+
+    // Alias for backwards compatibility
+    // TODO(qaisjp): it appears this was always documented as ".ip", so perhaps
+    // nobody is using this attribute. Consider doing some metrics in the future to find out.
+    lua_classvariable(luaVM, "IP", NULL, "getBanIP");
 
     lua_registerclass(luaVM, "Ban");
 }

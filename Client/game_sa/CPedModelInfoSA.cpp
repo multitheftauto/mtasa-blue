@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPedModelInfoSAInterface::CPedModelInfoSAInterface(void)
+CPedModelInfoSAInterface::CPedModelInfoSAInterface()
 {
     MemSetFast(this, 0, sizeof(CPedModelInfoSAInterface));
     VFTBL = (CBaseModelInfo_SA_VTBL*)VAR_CPedModelInfo_VTBL;
@@ -19,7 +19,7 @@ CPedModelInfoSAInterface::CPedModelInfoSAInterface(void)
     MemPutFast<DWORD>(&pad, 0xFFFFFFFF);
 }
 
-CPedModelInfoSA::CPedModelInfoSA(void) : CModelInfoSA()
+CPedModelInfoSA::CPedModelInfoSA() : CModelInfoSA()
 {
     m_pPedModelInterface = new CPedModelInfoSAInterface;
 }

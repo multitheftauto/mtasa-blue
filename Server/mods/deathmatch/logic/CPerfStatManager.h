@@ -17,11 +17,11 @@
 class CPerfStatManager
 {
 public:
-    virtual ~CPerfStatManager(void) {}
+    virtual ~CPerfStatManager() {}
 
-    virtual void DoPulse(void) = 0;
+    virtual void DoPulse() = 0;
     virtual void GetStats(CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter) = 0;
-    virtual void Stop(void) = 0;
+    virtual void Stop() = 0;
 
     // Utility
     static SString   GetScaledByteString(long long Amount);
@@ -32,5 +32,5 @@ public:
     static SString   GetPerSecondString(long long llValue, double dDeltaTickCount);
     static SString   GetPercentString(long long llValue, long long llTotal);
 
-    static CPerfStatManager* GetSingleton(void);
+    static CPerfStatManager* GetSingleton();
 };

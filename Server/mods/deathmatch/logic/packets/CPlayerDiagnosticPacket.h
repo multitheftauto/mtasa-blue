@@ -11,11 +11,11 @@
 
 #pragma once
 
-class CPlayerDiagnosticPacket : public CPacket
+class CPlayerDiagnosticPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_DIAGNOSTIC; };
-    unsigned long GetFlags(void) const { return 0; };            // Not used
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_DIAGNOSTIC; };
+    unsigned long GetFlags() const { return 0; };            // Not used
 
     bool Read(NetBitStreamInterface& BitStream);
 

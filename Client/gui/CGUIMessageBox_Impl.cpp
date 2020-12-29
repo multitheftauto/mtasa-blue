@@ -88,7 +88,7 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl(CGUI_Impl* pGUI, const char* szTitle, c
     m_pWindow->Activate();
 }
 
-CGUIMessageBox_Impl::~CGUIMessageBox_Impl(void)
+CGUIMessageBox_Impl::~CGUIMessageBox_Impl()
 {
     if (m_pButton)
         delete m_pButton;
@@ -113,7 +113,7 @@ void CGUIMessageBox_Impl::SetAutoDestroy(bool bAutoDestroy)
     m_bAutoDestroy = bAutoDestroy;
 }
 
-bool CGUIMessageBox_Impl::GetAutoDestroy(void)
+bool CGUIMessageBox_Impl::GetAutoDestroy()
 {
     return m_bAutoDestroy;
 }
@@ -123,7 +123,7 @@ void CGUIMessageBox_Impl::SetVisible(bool bVisible)
     m_pWindow->SetVisible(true);
 }
 
-bool CGUIMessageBox_Impl::IsVisible(void)
+bool CGUIMessageBox_Impl::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
@@ -143,7 +143,7 @@ bool CGUIMessageBox_Impl::OnResponseHandler(CGUIElement* pElement)
     return true;
 }
 
-CGUIWindow* CGUIMessageBox_Impl::GetWindow(void)
+CGUIWindow* CGUIMessageBox_Impl::GetWindow()
 {
     return m_pWindow;
 }

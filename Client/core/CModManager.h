@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMODMANAGER_H
-#define __CMODMANAGER_H
+#pragma once
 
 #include <core/CModManagerInterface.h>
 #include <core/CClientBase.h>
@@ -26,30 +25,30 @@
 class CModManager : public CModManagerInterface, public CSingleton<CModManager>
 {
 public:
-    CModManager(void);
-    ~CModManager(void);
+    CModManager();
+    ~CModManager();
 
     void RequestLoad(const char* szModName, const char* szArguments);
     void RequestLoadDefault(const char* szArguments);
-    void RequestUnload(void);
-    void ClearRequest(void);
+    void RequestUnload();
+    void ClearRequest();
 
-    bool IsLoaded(void);
+    bool IsLoaded();
 
     CClientBase* Load(const char* szName, const char* szArguments);
-    void         Unload(void);
+    void         Unload();
 
-    void DoPulsePreFrame(void);
+    void DoPulsePreFrame();
     void DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets);
-    void DoPulsePostFrame(void);
+    void DoPulsePostFrame();
 
-    CClientBase* GetCurrentMod(void);
+    CClientBase* GetCurrentMod();
 
-    void RefreshMods(void);
+    void RefreshMods();
 
 private:
     void InitializeModList(const char* szModFolderPath);
-    void Clear(void);
+    void Clear();
 
     void VerifyAndAddEntry(const char* szModFolderPath, const char* szName);
 
@@ -63,5 +62,3 @@ private:
     SString m_strRequestedMod;
     SString m_strRequestedModArguments;
 };
-
-#endif

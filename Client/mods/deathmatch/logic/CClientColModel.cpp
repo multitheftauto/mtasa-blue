@@ -23,7 +23,7 @@ CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : Class
     m_pColModelManager->AddToList(this);
 }
 
-CClientColModel::~CClientColModel(void)
+CClientColModel::~CClientColModel()
 {
     // Remove us from DFF manager's list
     m_pColModelManager->RemoveFromList(this);
@@ -35,36 +35,46 @@ CClientColModel::~CClientColModel(void)
         delete m_pColModel;
 }
 
-bool CClientColModel::LoadCol(const SString& strFile, bool bIsRawData)
+bool CClientColModel::Load(bool isRaw, SString input)
 {
-    // Not already got a col model?
-    if (!m_pColModel)
+    if (m_pColModel)
+        return false;
+
+    if (isRaw)
     {
-        SString strFilename;
-        CBuffer buffer;
-        if (!bIsRawData)
-        {
-            strFilename = strFile;
-            buffer.LoadFromFile(strFilename);
-            g_pClientGame->GetResourceManager()->ValidateResourceFile(strFilename, buffer);
-        }
-        else
-        {
-            buffer = CBuffer(strFile, strFile.length());
-        }
-
-        if (!g_pCore->GetNetwork()->CheckFile("col", strFilename, buffer.GetData(), buffer.GetSize()))
-            return false;
-
-        // Load the collision file
-        m_pColModel = g_pGame->GetRenderWare()->ReadCOL(buffer);
-
-        // Success if the col model is != NULL
-        return (m_pColModel != NULL);
+        return LoadFromBuffer(std::move(input));
     }
+    else
+    {
+        return LoadFromFile(std::move(input));
+    }
+}
 
-    // Failed. Already loaded
-    return false;
+bool CClientColModel::LoadFromFile(SString filePath)
+{
+    SString buffer;
+
+    if (!FileLoad(std::nothrow, filePath, buffer))
+        return false;
+
+    g_pClientGame->GetResourceManager()->ValidateResourceFile(filePath, buffer.data(), buffer.size());
+
+    if (!g_pCore->GetNetwork()->CheckFile("col", filePath, buffer.data(), buffer.size()))
+        return false;
+
+    m_pColModel = g_pGame->GetRenderWare()->ReadCOL(std::move(buffer));
+
+    return m_pColModel != nullptr;
+}
+
+bool CClientColModel::LoadFromBuffer(SString buffer)
+{
+    if (!g_pCore->GetNetwork()->CheckFile("col", "", buffer.data(), buffer.size()))
+        return false;
+
+    m_pColModel = g_pGame->GetRenderWare()->ReadCOL(std::move(buffer));
+
+    return m_pColModel != nullptr;
 }
 
 bool CClientColModel::Replace(unsigned short usModel)
@@ -104,7 +114,7 @@ void CClientColModel::Restore(unsigned short usModel)
     m_Replaced.remove(usModel);
 }
 
-void CClientColModel::RestoreAll(void)
+void CClientColModel::RestoreAll()
 {
     // Loop through our replaced ids
     std::list<unsigned short>::iterator iter = m_Replaced.begin();

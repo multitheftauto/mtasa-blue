@@ -9,13 +9,12 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUI_CGUISIZE
-#define __CGUI_CGUISIZE
+#pragma once
 
 class CGUISize
 {
 public:
-    CGUISize(void) {}
+    CGUISize() {}
     CGUISize(float width, float height) : fWidth(width), fHeight(height) {}
 
     bool operator==(const CGUISize& other) const;
@@ -24,5 +23,3 @@ public:
     float fWidth;
     float fHeight;
 };
-
-#endif

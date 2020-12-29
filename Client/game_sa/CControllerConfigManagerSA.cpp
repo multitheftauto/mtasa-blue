@@ -112,7 +112,7 @@ void CControllerConfigManagerSA::SuspendSteerAndFlyWithMouse(bool bSuspend)
     ApplySteerAndFlyWithMouseSettings();
 }
 
-void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings(void)
+void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings()
 {
     if (m_bSuspendSteerAndFlyWithMouse)
     {

@@ -46,7 +46,6 @@ public:
     static bool AExec(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
 
     static bool WhoIs(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool WhoWas(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
 
     static bool DebugScript(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
 

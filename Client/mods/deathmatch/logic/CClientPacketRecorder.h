@@ -10,8 +10,7 @@
 
 class CClientPacketRecorder;
 
-#ifndef __CCLIENTPACKETRECORDER_H
-#define __CCLIENTPACKETRECORDER_H
+#pragma once
 
 #include "CClientManager.h"
 #include <ctime>
@@ -22,18 +21,18 @@ class CClientPacketRecorder
 
 public:
     CClientPacketRecorder(CClientManager* pManager);
-    ~CClientPacketRecorder(void);
+    ~CClientPacketRecorder();
 
     void SetPacketHandler(PPACKETHANDLER pfnPacketHandler);
 
     void StartPlayback(const char* szInput, bool bFrameBased);
     void StartRecord(const char* szOutput, bool bFrameBased);
-    void Stop(void);
+    void Stop();
 
-    bool IsPlaying(void);
-    bool IsRecording(void);
-    bool IsPlayingOrRecording(void);
-    bool IsFrameBased(void);
+    bool IsPlaying();
+    bool IsRecording();
+    bool IsPlayingOrRecording();
+    bool IsFrameBased();
 
     void SetFrameSkip(unsigned int uiFrameSkip);
 
@@ -43,7 +42,7 @@ public:
 private:
     void ReadLocalData(FILE* pFile);
 
-    void DoPulse(void);
+    void DoPulse();
 
     CClientManager* m_pManager;
     char*           m_szFilename;
@@ -61,5 +60,3 @@ private:
 
     unsigned int m_uiFrameSkip;
 };
-
-#endif

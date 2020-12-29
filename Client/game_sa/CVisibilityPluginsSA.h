@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVisibilityPluginsSA_H
-#define __CVisibilityPluginsSA_H
+#pragma once
 
 #define FUNC_CVisiblityPlugins_SetClumpAlpha    0x732B00
 #define FUNC_CVisibilityPlugins_GetAtomicId     0x732370
@@ -24,5 +23,3 @@ public:
     void SetClumpAlpha(RpClump* pClump, int iAlpha);
     int  GetAtomicId(RwObject* pAtomic);
 };
-
-#endif

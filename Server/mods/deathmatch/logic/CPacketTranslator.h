@@ -24,7 +24,7 @@ class CPacketTranslator
 {
 public:
     CPacketTranslator(CPlayerManager* pPlayerManager);
-    ~CPacketTranslator(void);
+    ~CPacketTranslator();
 
     CPacket* Translate(const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo);
 

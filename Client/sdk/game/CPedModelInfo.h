@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPedModelInfo_H
-#define __CPedModelInfo_H
+#pragma once
 
 #include "CModelInfo.h"
 
@@ -21,5 +20,3 @@ class CPedModelInfo
 public:
     virtual void SetMotionAnimGroup(AssocGroupId animGroup) = 0;
 };
-
-#endif

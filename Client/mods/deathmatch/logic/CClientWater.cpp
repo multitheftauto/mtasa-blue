@@ -54,7 +54,7 @@ CClientWater::~CClientWater()
     Destroy();
 }
 
-bool CClientWater::Create(void)
+bool CClientWater::Create()
 {
     if (m_pPoly)
         return false;
@@ -71,7 +71,7 @@ bool CClientWater::Create(void)
     return true;
 }
 
-bool CClientWater::Destroy(void)
+bool CClientWater::Destroy()
 {
     if (!m_pPoly)
         return false;

@@ -1,4 +1,4 @@
-// rsa.cpp - written and placed in the public domain by Wei Dai
+// rsa.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 #include "rsa.h"
@@ -9,19 +9,21 @@
 #include "nbtheory.h"
 #include "algparam.h"
 #include "fips140.h"
+#include "pkcspad.h"
 
-#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_DOXYGEN_PROCESSING) && !defined(CRYPTOPP_IS_DLL)
+#if defined(CRYPTOPP_DEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING) && !defined(CRYPTOPP_IS_DLL)
+#include "sha3.h"
 #include "pssr.h"
 NAMESPACE_BEGIN(CryptoPP)
 void RSA_TestInstantiations()
 {
-	RSASS<PKCS1v15, SHA>::Verifier x1(1, 1);
-	RSASS<PKCS1v15, SHA>::Signer x2(NullRNG(), 1);
-	RSASS<PKCS1v15, SHA>::Verifier x3(x2);
-	RSASS<PKCS1v15, SHA>::Verifier x4(x2.GetKey());
-	RSASS<PSS, SHA>::Verifier x5(x3);
+	RSASS<PKCS1v15, SHA1>::Verifier x1(1, 1);
+	RSASS<PKCS1v15, SHA1>::Signer x2(NullRNG(), 1);
+	RSASS<PKCS1v15, SHA1>::Verifier x3(x2);
+	RSASS<PKCS1v15, SHA1>::Verifier x4(x2.GetKey());
+	RSASS<PSS, SHA1>::Verifier x5(x3);
 #ifndef __MWERKS__
-	RSASS<PSSR, SHA>::Signer x6 = x2;
+	RSASS<PSSR, SHA1>::Signer x6 = x2;
 	x3 = x2;
 	x6 = x2;
 #endif
@@ -29,9 +31,13 @@ void RSA_TestInstantiations()
 #ifndef __GNUC__
 	RSAES<PKCS1v15>::Encryptor x8(x3);
 #endif
-	RSAES<OAEP<SHA> >::Encryptor x9(x2);
-
+	RSAES<OAEP<SHA1> >::Encryptor x9(x2);
 	x4 = x2.GetKey();
+
+	RSASS<PKCS1v15, SHA3_256>::Verifier x10(1, 1);
+	RSASS<PKCS1v15, SHA3_256>::Signer x11(NullRNG(), 1);
+	RSASS<PKCS1v15, SHA3_256>::Verifier x12(x11);
+	RSASS<PKCS1v15, SHA3_256>::Verifier x13(x11.GetKey());
 }
 NAMESPACE_END
 #endif
@@ -73,7 +79,9 @@ bool RSAFunction::Validate(RandomNumberGenerator& rng, unsigned int level) const
 
 	bool pass = true;
 	pass = pass && m_n > Integer::One() && m_n.IsOdd();
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_e > Integer::One() && m_e.IsOdd() && m_e < m_n;
+	CRYPTOPP_ASSERT(pass);
 	return pass;
 }
 
@@ -134,12 +142,12 @@ void InvertibleRSAFunction::GenerateRandom(RandomNumberGenerator &rng, const Nam
 
 	if (FIPS_140_2_ComplianceEnabled())
 	{
-		RSASS<PKCS1v15, SHA>::Signer signer(*this);
-		RSASS<PKCS1v15, SHA>::Verifier verifier(signer);
+		RSASS<PKCS1v15, SHA1>::Signer signer(*this);
+		RSASS<PKCS1v15, SHA1>::Verifier verifier(signer);
 		SignaturePairwiseConsistencyTest_FIPS_140_Only(signer, verifier);
 
-		RSAES<OAEP<SHA> >::Decryptor decryptor(*this);
-		RSAES<OAEP<SHA> >::Encryptor encryptor(decryptor);
+		RSAES<OAEP<SHA1> >::Decryptor decryptor(*this);
+		RSAES<OAEP<SHA1> >::Encryptor encryptor(decryptor);
 		EncryptionPairwiseConsistencyTest_FIPS_140_Only(encryptor, decryptor);
 	}
 }
@@ -247,21 +255,35 @@ Integer InvertibleRSAFunction::CalculateInverse(RandomNumberGenerator &rng, cons
 bool InvertibleRSAFunction::Validate(RandomNumberGenerator &rng, unsigned int level) const
 {
 	bool pass = RSAFunction::Validate(rng, level);
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_p > Integer::One() && m_p.IsOdd() && m_p < m_n;
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_q > Integer::One() && m_q.IsOdd() && m_q < m_n;
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_d > Integer::One() && m_d.IsOdd() && m_d < m_n;
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_dp > Integer::One() && m_dp.IsOdd() && m_dp < m_p;
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_dq > Integer::One() && m_dq.IsOdd() && m_dq < m_q;
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && m_u.IsPositive() && m_u < m_p;
+	CRYPTOPP_ASSERT(pass);
 	if (level >= 1)
 	{
 		pass = pass && m_p * m_q == m_n;
+		CRYPTOPP_ASSERT(pass);
 		pass = pass && m_e*m_d % LCM(m_p-1, m_q-1) == 1;
+		CRYPTOPP_ASSERT(pass);
 		pass = pass && m_dp == m_d%(m_p-1) && m_dq == m_d%(m_q-1);
+		CRYPTOPP_ASSERT(pass);
 		pass = pass && m_u * m_q % m_p == 1;
+		CRYPTOPP_ASSERT(pass);
 	}
 	if (level >= 2)
+	{
 		pass = pass && VerifyPrime(rng, m_p, level-2) && VerifyPrime(rng, m_q, level-2);
+		CRYPTOPP_ASSERT(pass);
+	}
 	return pass;
 }
 

@@ -12,12 +12,12 @@
 
 using std::list;
 
-CRegisteredCommands::CRegisteredCommands(void)
+CRegisteredCommands::CRegisteredCommands()
 {
     m_bIteratingList = false;
 }
 
-CRegisteredCommands::~CRegisteredCommands(void)
+CRegisteredCommands::~CRegisteredCommands()
 {
     ClearCommands();
 }
@@ -71,7 +71,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
             // Delete it and remove it from our list
             if (m_bIteratingList)
             {
-                m_TrashCan.push_back(*iter);
+                m_TrashCan.emplace(*iter);
             }
             else
             {
@@ -87,7 +87,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
     return bFound;
 }
 
-void CRegisteredCommands::ClearCommands(void)
+void CRegisteredCommands::ClearCommands()
 {
     // Delete all the commands
     list<SCommand*>::const_iterator iter = m_Commands.begin();
@@ -213,15 +213,52 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
     Arguments.Call(pLuaMain, iLuaFunction);
 }
 
-void CRegisteredCommands::TakeOutTheTrash(void)
+void CRegisteredCommands::GetCommands(lua_State* luaVM)
 {
-    list<SCommand*>::iterator iter = m_TrashCan.begin();
-    for (; iter != m_TrashCan.end(); iter++)
+    unsigned int uiIndex = 0;
+
+    lua_newtable(luaVM);
+
+    for (SCommand* pCommand : m_Commands)
     {
-        SCommand* pCommand = *iter;
-        if (!m_Commands.empty())
-            m_Commands.remove(pCommand);
-        delete pCommand;
+        // Create an entry table: {'command', resource}
+        lua_pushinteger(luaVM, ++uiIndex);
+        lua_createtable(luaVM, 0, 2);
+        {
+            lua_pushstring(luaVM, pCommand->strKey.c_str());
+            lua_rawseti(luaVM, -2, 1);
+
+            lua_pushresource(luaVM, pCommand->pLuaMain->GetResource());
+            lua_rawseti(luaVM, -2, 2);
+        }
+        lua_settable(luaVM, -3);
     }
+}
+
+void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain)
+{
+    unsigned int uiIndex = 0;
+
+    lua_newtable(luaVM);
+
+    for (SCommand* pCommand : m_Commands)
+    {
+        if (pCommand->pLuaMain == pTargetLuaMain)
+        {
+            lua_pushinteger(luaVM, ++uiIndex);
+            lua_pushstring(luaVM, pCommand->strKey.c_str());
+            lua_settable(luaVM, -3);
+        }
+    }
+}
+
+void CRegisteredCommands::TakeOutTheTrash()
+{
+    for (SCommand* command : m_TrashCan)
+    {
+        m_Commands.remove(command);
+        delete command;
+    }
+
     m_TrashCan.clear();
 }

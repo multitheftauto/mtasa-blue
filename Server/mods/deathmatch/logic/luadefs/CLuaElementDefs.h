@@ -15,7 +15,7 @@
 class CLuaElementDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Create/destroy
@@ -40,10 +40,12 @@ public:
     LUA_DECLARE_OOP(getElementPosition);
     LUA_DECLARE_OOP(getElementRotation);
     LUA_DECLARE_OOP(getElementVelocity);
+    LUA_DECLARE_OOP(getElementTurnVelocity);
     LUA_DECLARE(getElementType);
     LUA_DECLARE(getElementsByType);
     LUA_DECLARE(getElementInterior);
     LUA_DECLARE(getElementsWithinColShape);
+    LUA_DECLARE(getElementsWithinRange);
     LUA_DECLARE(getElementDimension);
     LUA_DECLARE(getElementZoneName);
     LUA_DECLARE(getElementColShape);
@@ -65,9 +67,13 @@ public:
     LUA_DECLARE(setElementVisibleTo);
 
     // Element data
-    LUA_DECLARE(getElementData);
+    LUA_DECLARE(GetElementData);
+    LUA_DECLARE(HasElementData);
     LUA_DECLARE(setElementData);
     LUA_DECLARE(removeElementData);
+    LUA_DECLARE(addElementDataSubscriber);
+    LUA_DECLARE(removeElementDataSubscriber);
+    LUA_DECLARE(hasElementDataSubscriber);
 
     // Attachement
     LUA_DECLARE(attachElements);
@@ -85,6 +91,7 @@ public:
     LUA_DECLARE(setElementPosition);
     LUA_DECLARE_OOP(setElementRotation);
     LUA_DECLARE(setElementVelocity);
+    LUA_DECLARE(setElementTurnVelocity);
     LUA_DECLARE(setElementInterior);
     LUA_DECLARE(setElementDimension);
     LUA_DECLARE(setElementAlpha);

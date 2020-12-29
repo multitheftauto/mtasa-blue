@@ -102,8 +102,9 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
     }
 }
 
-CGUI_Impl::~CGUI_Impl(void)
+CGUI_Impl::~CGUI_Impl()
 {
+    delete CEGUI::System::getSingletonPtr();
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
@@ -179,7 +180,7 @@ void CGUI_Impl::SubscribeToMouseEvents()
     pEvents->subscribeEvent("Window/" + CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber(&CGUI_Impl::Event_FocusLost, this));
 }
 
-CVector2D CGUI_Impl::GetResolution(void)
+CVector2D CGUI_Impl::GetResolution()
 {
     return CVector2D(m_pRenderer->getWidth(), m_pRenderer->getHeight());
 }
@@ -189,7 +190,7 @@ void CGUI_Impl::SetResolution(float fWidth, float fHeight)
     reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->setDisplaySize(CEGUI::Size(fWidth, fHeight));
 }
 
-void CGUI_Impl::Draw(void)
+void CGUI_Impl::Draw()
 {
     // Redraw the changed elements
     if (!m_RedrawQueue.empty())
@@ -214,12 +215,12 @@ void CGUI_Impl::Draw(void)
         m_RenderOkTimer.Reset();
 }
 
-void CGUI_Impl::Invalidate(void)
+void CGUI_Impl::Invalidate()
 {
     reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
 }
 
-void CGUI_Impl::Restore(void)
+void CGUI_Impl::Restore()
 {
     try
     {
@@ -232,7 +233,7 @@ void CGUI_Impl::Restore(void)
     }
 }
 
-void CGUI_Impl::DrawMouseCursor(void)
+void CGUI_Impl::DrawMouseCursor()
 {
     CEGUI::MouseCursor::getSingleton().draw();
 }
@@ -278,7 +279,7 @@ void CGUI_Impl::ProcessKeyboardInput(unsigned long ulKey, bool bIsDown)
     }
 }
 
-bool CGUI_Impl::GetGUIInputEnabled(void)
+bool CGUI_Impl::GetGUIInputEnabled()
 {
     switch (m_eInputMode)
     {
@@ -327,7 +328,7 @@ void CGUI_Impl::SetGUIInputMode(eInputMode a_eMode)
     m_eInputMode = a_eMode;
 }
 
-eInputMode CGUI_Impl::GetGUIInputMode(void)
+eInputMode CGUI_Impl::GetGUIInputMode()
 {
     return m_eInputMode;
 }
@@ -469,7 +470,7 @@ CGUIWebBrowser* CGUI_Impl::_CreateWebBrowser(CGUIElement_Impl* pParent)
     return new CGUIWebBrowser_Impl(this, pParent);
 }
 
-CGUITexture* CGUI_Impl::CreateTexture(void)
+CGUITexture* CGUI_Impl::CreateTexture()
 {
     return new CGUITexture_Impl(this);
 }
@@ -491,7 +492,7 @@ void CGUI_Impl::SetCursorEnabled(bool bEnabled)
     }
 }
 
-bool CGUI_Impl::IsCursorEnabled(void)
+bool CGUI_Impl::IsCursorEnabled()
 {
     return CEGUI::MouseCursor::getSingleton().isVisible();
 }
@@ -504,12 +505,12 @@ void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
         m_fCurrentServerCursorAlpha = fAlpha;
 }
 
-float CGUI_Impl::GetCurrentServerCursorAlpha(void)
+float CGUI_Impl::GetCurrentServerCursorAlpha()
 {
     return m_fCurrentServerCursorAlpha;
 }
 
-eCursorType CGUI_Impl::GetCursorType(void)
+eCursorType CGUI_Impl::GetCursorType()
 {
     auto image = CEGUI::MouseCursor::getSingleton().getImage();
 
@@ -569,32 +570,32 @@ bool CGUI_Impl::LoadImageset(const SString& strFilename)
     }
 }
 
-CEGUI::FontManager* CGUI_Impl::GetFontManager(void)
+CEGUI::FontManager* CGUI_Impl::GetFontManager()
 {
     return m_pFontManager;
 }
 
-CEGUI::ImagesetManager* CGUI_Impl::GetImageSetManager(void)
+CEGUI::ImagesetManager* CGUI_Impl::GetImageSetManager()
 {
     return m_pImageSetManager;
 }
 
-CEGUI::System* CGUI_Impl::GetGUISystem(void)
+CEGUI::System* CGUI_Impl::GetGUISystem()
 {
     return m_pSystem;
 }
 
-CEGUI::Renderer* CGUI_Impl::GetRenderer(void)
+CEGUI::Renderer* CGUI_Impl::GetRenderer()
 {
     return m_pRenderer;
 }
 
-CEGUI::SchemeManager* CGUI_Impl::GetSchemeManager(void)
+CEGUI::SchemeManager* CGUI_Impl::GetSchemeManager()
 {
     return m_pSchemeManager;
 }
 
-CEGUI::WindowManager* CGUI_Impl::GetWindowManager(void)
+CEGUI::WindowManager* CGUI_Impl::GetWindowManager()
 {
     return m_pWindowManager;
 }
@@ -626,37 +627,37 @@ bool CGUI_Impl::Event_CharacterKey(const CEGUI::EventArgs& Args)
     return true;
 }
 
-CGUIFont* CGUI_Impl::GetDefaultFont(void)
+CGUIFont* CGUI_Impl::GetDefaultFont()
 {
     return m_pDefaultFont;
 }
 
-CGUIFont* CGUI_Impl::GetSmallFont(void)
+CGUIFont* CGUI_Impl::GetSmallFont()
 {
     return m_pSmallFont;
 }
 
-CGUIFont* CGUI_Impl::GetBoldFont(void)
+CGUIFont* CGUI_Impl::GetBoldFont()
 {
     return m_pBoldFont;
 }
 
-CGUIFont* CGUI_Impl::GetClearFont(void)
+CGUIFont* CGUI_Impl::GetClearFont()
 {
     return m_pClearFont;
 }
 
-CGUIFont* CGUI_Impl::GetSAHeaderFont(void)
+CGUIFont* CGUI_Impl::GetSAHeaderFont()
 {
     return m_pSAHeaderFont;
 }
 
-CGUIFont* CGUI_Impl::GetSAGothicFont(void)
+CGUIFont* CGUI_Impl::GetSAGothicFont()
 {
     return m_pSAGothicFont;
 }
 
-CGUIFont* CGUI_Impl::GetSansFont(void)
+CGUIFont* CGUI_Impl::GetSansFont()
 {
     return m_pSansFont;
 }
@@ -1014,12 +1015,12 @@ void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
     ApplyGuiWorkingDirectory();
 }
 
-void CGUI_Impl::ApplyGuiWorkingDirectory(void)
+void CGUI_Impl::ApplyGuiWorkingDirectory()
 {
     CEGUI::System::getSingleton().SetGuiWorkingDirectory(m_GuiWorkingDirectoryStack.back());
 }
 
-const SString& CGUI_Impl::GetGuiWorkingDirectory(void) const
+const SString& CGUI_Impl::GetGuiWorkingDirectory() const
 {
     dassert(!m_GuiWorkingDirectoryStack.empty());
     return m_GuiWorkingDirectoryStack.back();
@@ -1040,7 +1041,7 @@ bool CGUI_Impl::Event_MouseClick(const CEGUI::EventArgs& Args)
 
     // Call global and object handlers
     if (pElement)
-        pElement->Event_OnClick();
+        pElement->Event_OnClick(Args);
 
     if (m_MouseClickHandlers[m_Channel])
     {
@@ -1559,7 +1560,7 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUIGridList* pParent)
     return _CreateStaticImage(wnd);
 }
 
-CGUIStaticImage* CGUI_Impl::CreateStaticImage(void)
+CGUIStaticImage* CGUI_Impl::CreateStaticImage()
 {
     return _CreateStaticImage(NULL);
 }
@@ -1576,12 +1577,12 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUITab* pParent)
     return _CreateTabPanel(wnd);
 }
 
-CGUITabPanel* CGUI_Impl::CreateTabPanel(void)
+CGUITabPanel* CGUI_Impl::CreateTabPanel()
 {
     return _CreateTabPanel(NULL);
 }
 
-CGUIScrollPane* CGUI_Impl::CreateScrollPane(void)
+CGUIScrollPane* CGUI_Impl::CreateScrollPane()
 {
     return _CreateScrollPane(NULL);
 }
@@ -1659,7 +1660,7 @@ void CGUI_Impl::ClearInputHandlers(eInputChannel channel)
     m_FocusLostHandlers[channel] = GUI_CALLBACK_FOCUS();
 }
 
-void CGUI_Impl::ClearSystemKeys(void)
+void CGUI_Impl::ClearSystemKeys()
 {
     // Unpress any held system keys
     unsigned int uiSysKeys = CEGUI::System::getSingleton().getSystemKeys();

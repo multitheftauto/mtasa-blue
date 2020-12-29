@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CMouseControl.h"
+#include <windowsx.h>
 #include <game/CGame.h>
 
 #define MOUSE_CONTROL_MULTIPLIER    35
@@ -24,7 +25,7 @@ extern CCore* g_pCore;
 //
 //
 ////////////////////////////////////////////////////
-CMouseControl::CMouseControl(void)
+CMouseControl::CMouseControl()
 {
     m_usLeftStickX = 0;
     m_usLeftStickY = 0;
@@ -37,7 +38,7 @@ CMouseControl::CMouseControl(void)
 //
 //
 ////////////////////////////////////////////////////
-CMouseControl::~CMouseControl(void)
+CMouseControl::~CMouseControl()
 {
 }
 
@@ -78,7 +79,7 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     // Let's calculate our mouse movement directions
     CVector2D resolution = g_pCore->GetGUI()->GetResolution();
-    int       iX = LOWORD(lParam), iY = HIWORD(lParam);
+    int       iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
     float     fX = (iX - resolution.fX * 0.5f) / resolution.fX;
 
     fX *= MOUSE_CONTROL_MULTIPLIER;
@@ -113,7 +114,7 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
 //
 //
 ////////////////////////////////////////////////////
-void CMouseControl::Reset(void)
+void CMouseControl::Reset()
 {
     m_usLeftStickX = 0;
     m_usLeftStickY = 0;

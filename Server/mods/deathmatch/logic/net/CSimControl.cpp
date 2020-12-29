@@ -25,7 +25,7 @@ namespace
 //
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::Startup(void)
+void CSimControl::Startup()
 {
     ms_pSimPlayerManager = new CSimPlayerManager();
 
@@ -43,7 +43,7 @@ void CSimControl::Startup(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::Shutdown(void)
+void CSimControl::Shutdown()
 {
     EnableSimSystem(false);
     SAFE_DELETE(ms_pSimPlayerManager);
@@ -71,7 +71,7 @@ void CSimControl::EnableSimSystem(bool bEnable, bool bApplyNow)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::DoPulse(void)
+void CSimControl::DoPulse()
 {
     if (ms_bEnableRequest == ms_bEnabled)
         return;
@@ -119,7 +119,7 @@ void CSimControl::DoPulse(void)
 // Check if sim system is on
 //
 ///////////////////////////////////////////////////////////////
-bool CSimControl::IsSimSystemEnabled(void)
+bool CSimControl::IsSimSystemEnabled()
 {
     return ms_bEnabled;
 }

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WEATHER
-#define __CGAMESA_WEATHER
+#pragma once
 
 #include <game/CWeather.h>
 #include "Common.h"
@@ -20,19 +19,19 @@ class CWeatherSA : public CWeather
     friend class COffsets;
 
 public:
-    unsigned char Get(void);
+    unsigned char Get();
     void          Set(unsigned char primary, unsigned char secondary);
     void          SetPrimary(unsigned char weather);
     void          SetSecondary(unsigned char weather);
 
     void ForceWeather(unsigned char weather);
     void ForceWeatherNow(unsigned char weather);
-    void Release(void);
+    void Release();
 
-    bool  IsRaining(void);
-    float GetAmountOfRain(void);
+    bool  IsRaining();
+    float GetAmountOfRain();
     void  SetAmountOfRain(float fAmount);
-    void  ResetAmountOfRain(void);
+    void  ResetAmountOfRain();
 
 private:
     static unsigned char* VAR_CurrentWeather;
@@ -42,5 +41,3 @@ private:
 
     static unsigned long FUNC_IsRaining;
 };
-
-#endif

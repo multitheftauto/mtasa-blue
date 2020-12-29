@@ -103,7 +103,7 @@ void CFxSystemSA::SetDrawDistance(float fDrawDistance)
     m_fDrawDistance = Clamp(0.f, fDrawDistance, 8191.f);
 }
 
-float CFxSystemSA::GetDrawDistance(void)
+float CFxSystemSA::GetDrawDistance()
 {
     if (HasCustomDrawDistance())
         return m_fDrawDistance;
@@ -111,7 +111,7 @@ float CFxSystemSA::GetDrawDistance(void)
         return m_pInterface->pBlueprint->usCullDistance / 256.f;
 }
 
-bool CFxSystemSA::HasCustomDrawDistance(void)
+bool CFxSystemSA::HasCustomDrawDistance()
 {
     return m_fDrawDistance != 0;
 }
@@ -138,7 +138,7 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Pre(CFxSystemSAInterface* 
         ms_fUsingDrawDistance = 0;
 }
 
-__declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post(void)
+__declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
 {
     if (ms_pUsingFxSystemSAInterface)
     {
@@ -206,7 +206,7 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Pre(CFxEmitterSAInterface*
     }
 }
 
-__declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post(void)
+__declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
 {
     if (ms_pUsingFxEmitterSAInterface)
     {
@@ -252,7 +252,7 @@ void _declspec(naked) HOOK_FxSystem_c_Update_MidB()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CFxSystemSA::StaticSetHooks(void)
+void CFxSystemSA::StaticSetHooks()
 {
     EZHookInstall(FxSystem_c_Update_MidA);
     EZHookInstall(FxSystem_c_Update_MidB);

@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CREMOTE
-#define __CGAME_CREMOTE
+#pragma once
 
 class CRemote
 {
 };
-
-#endif

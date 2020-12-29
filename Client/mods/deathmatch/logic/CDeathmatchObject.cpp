@@ -25,7 +25,7 @@ CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsMan
     m_pMoveAnimation = NULL;
 }
 
-CDeathmatchObject::~CDeathmatchObject(void)
+CDeathmatchObject::~CDeathmatchObject()
 {
     _StopMovement(true);
 
@@ -44,7 +44,7 @@ CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsMan
     m_pMoveAnimation = NULL;
 }
 
-CDeathmatchObject::~CDeathmatchObject(void)
+CDeathmatchObject::~CDeathmatchObject()
 {
     _StopMovement(true);
 }
@@ -71,7 +71,7 @@ void CDeathmatchObject::StartMovement(const CPositionRotationAnimation& a_rMoveA
     }
 }
 
-void CDeathmatchObject::StopMovement(void)
+void CDeathmatchObject::StopMovement()
 {
     _StopMovement(true);
 }
@@ -89,7 +89,7 @@ void CDeathmatchObject::_StopMovement(bool a_bUnregister)
     }
 }
 
-void CDeathmatchObject::UpdateMovement(void)
+void CDeathmatchObject::UpdateMovement()
 {
     SPositionRotation positionRotation;
     bool              bStillRunning = m_pMoveAnimation->GetValue(positionRotation);

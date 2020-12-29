@@ -23,29 +23,30 @@ class CPlayerManager
     friend class CPlayer;
 
 public:
-    CPlayerManager(void);
-    ~CPlayerManager(void);
+    CPlayerManager();
+    ~CPlayerManager();
 
-    void DoPulse(void);
-    void PulseZombieCheck(void);
+    void DoPulse();
+    void PulseZombieCheck();
 
     void SetScriptDebugging(class CScriptDebugging* pScriptDebugging) { m_pScriptDebugging = pScriptDebugging; };
 
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
-    void     DeleteAll(void);
+    void     DeleteAll();
 
-    unsigned int Count(void) { return static_cast<unsigned int>(m_Players.size()); }
-    unsigned int CountJoined(void);
+    unsigned int Count() { return static_cast<unsigned int>(m_Players.size()); }
+    unsigned int CountJoined();
     bool         Exists(CPlayer* pPlayer);
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
 
-    std::list<CPlayer*>::const_iterator IterBegin(void) { return m_Players.begin(); };
-    std::list<CPlayer*>::const_iterator IterEnd(void) { return m_Players.end(); };
+    std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
+    std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
     void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
     void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
+    void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
 
     static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);
@@ -54,9 +55,12 @@ public:
 
     static bool IsValidPlayerModel(unsigned short usPlayerModel);
 
-    void           ResetAll(void);
+    void ClearElementData(CElement* pElement, const std::string& name);
+    void ClearElementData(CElement* pElement);
+
+    void           ResetAll();
     void           OnPlayerJoin(CPlayer* pPlayer);
-    const SString& GetLowestConnectedPlayerVersion(void) { return m_strLowestConnectedPlayerVersion; }
+    const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
 
 private:
     void AddToList(CPlayer* pPlayer);
@@ -66,6 +70,6 @@ private:
 
     CMappedList<CPlayer*>                 m_Players;
     std::map<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;
-    SString                               m_strLowestConnectedPlayerVersion;
+    CMtaVersion                           m_strLowestConnectedPlayerVersion;
     CElapsedTime                          m_ZombieCheckTimer;
 };

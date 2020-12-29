@@ -12,20 +12,26 @@
 #include "StdInc.h"
 using std::list;
 
-void CLuaResourceDefs::LoadFunctions(void)
+void CLuaResourceDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("call", Call);
-    CLuaCFunctions::AddFunction("getThisResource", GetThisResource);
-    CLuaCFunctions::AddFunction("getResourceConfig", GetResourceConfig);
-    CLuaCFunctions::AddFunction("getResourceName", GetResourceName);
-    CLuaCFunctions::AddFunction("getResourceFromName", GetResourceFromName);
-    CLuaCFunctions::AddFunction("getResourceRootElement", GetResourceRootElement);
-    CLuaCFunctions::AddFunction("getResourceGUIElement", GetResourceGUIElement);
-    CLuaCFunctions::AddFunction("getResourceDynamicElementRoot", GetResourceDynamicElementRoot);
-    CLuaCFunctions::AddFunction("getResourceExportedFunctions", GetResourceExportedFunctions);
-    CLuaCFunctions::AddFunction("getResourceState", GetResourceState);
-    CLuaCFunctions::AddFunction("loadstring", LoadString);
-    CLuaCFunctions::AddFunction("load", Load);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"call", Call},
+        {"getThisResource", GetThisResource},
+        {"getResourceConfig", GetResourceConfig},
+        {"getResourceName", GetResourceName},
+        {"getResourceFromName", GetResourceFromName},
+        {"getResourceRootElement", GetResourceRootElement},
+        {"getResourceGUIElement", GetResourceGUIElement},
+        {"getResourceDynamicElementRoot", GetResourceDynamicElementRoot},
+        {"getResourceExportedFunctions", GetResourceExportedFunctions},
+        {"getResourceState", GetResourceState},
+        {"loadstring", LoadString},
+        {"load", Load},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaResourceDefs::AddClass(lua_State* luaVM)
@@ -387,16 +393,16 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
         }
     }
 
-    if (pResource)
+
+    // Push all functions into a key-value pair tableif (pResource)
     {
-        lua_newtable(luaVM);
-        unsigned int                       uiIndex = 0;
-        list<CExportedFunction*>::iterator iterd = pResource->IterBeginExportedFunctions();
-        for (; iterd != pResource->IterEndExportedFunctions(); iterd++)
+        lua_createtable(luaVM, 0, pResource->GetExportedFunctions().size());
+
+        unsigned int index = 1;
+        for (const auto& strName : pResource->GetExportedFunctions())
         {
-            lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, (*iterd)->GetFunctionName());
-            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, strName.c_str());
+            lua_rawseti(luaVM, -2, index++);
         }
         return 1;
     }

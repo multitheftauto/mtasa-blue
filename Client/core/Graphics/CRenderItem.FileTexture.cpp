@@ -41,7 +41,7 @@ void CFileTextureItem::PostConstruct(CRenderItemManager* pManager, const SString
 //
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::PreDestruct(void)
+void CFileTextureItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -54,7 +54,7 @@ void CFileTextureItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CFileTextureItem::IsValid(void)
+bool CFileTextureItem::IsValid()
 {
     return m_pD3DTexture != NULL;
 }
@@ -66,7 +66,7 @@ bool CFileTextureItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::OnLostDevice(void)
+void CFileTextureItem::OnLostDevice()
 {
     // Nothing required for CFileTextureItem
 }
@@ -78,7 +78,7 @@ void CFileTextureItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::OnResetDevice(void)
+void CFileTextureItem::OnResetDevice()
 {
     // Nothing required for CFileTextureItem
 }
@@ -280,7 +280,7 @@ void CFileTextureItem::CreateUnderlyingData(bool bMipMaps, uint uiSizeX, uint ui
 //
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::ReleaseUnderlyingData(void)
+void CFileTextureItem::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pD3DTexture);
 }

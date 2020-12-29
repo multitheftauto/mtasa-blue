@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CLOCK
-#define __CGAME_CLOCK
+#pragma once
 
 #include <windows.h>
 
@@ -20,5 +19,3 @@ public:
     virtual VOID Set(BYTE bHour, BYTE bMinute) = 0;
     virtual VOID Get(BYTE* bHour, BYTE* bMinute) = 0;
 };
-
-#endif

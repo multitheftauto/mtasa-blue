@@ -10,12 +10,12 @@
 class CSimPacket
 {
 public:
-    CSimPacket(void) { DEBUG_CREATE_COUNT("CSimPacket"); }
-    virtual ~CSimPacket(void) { DEBUG_DESTROY_COUNT("CSimPacket"); }
+    CSimPacket() { DEBUG_CREATE_COUNT("CSimPacket"); }
+    virtual ~CSimPacket() { DEBUG_DESTROY_COUNT("CSimPacket"); }
 
-    virtual ePacketID       GetPacketID(void) const = 0;
-    virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_DEFAULT; }
-    virtual unsigned long   GetFlags(void) const = 0;
+    virtual ePacketID       GetPacketID() const = 0;
+    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
+    virtual unsigned long   GetFlags() const = 0;
 
     virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
     virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
@@ -32,8 +32,8 @@ public:
     CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType, float WeaponRange,
                              CControllerState& sharedControllerState);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_PURESYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_PURESYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

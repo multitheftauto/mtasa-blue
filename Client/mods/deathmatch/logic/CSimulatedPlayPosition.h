@@ -28,7 +28,7 @@ class CSimulatedPlayPosition
 public:
     ///////////////////////////////////////////////////////
     // Validity
-    bool IsValid(void) const { return m_bValid; }
+    bool IsValid() const { return m_bValid; }
 
     void SetValid(bool bValid) { m_bValid = bValid; }
 
@@ -66,7 +66,7 @@ public:
 
     ///////////////////////////////////////////////////////
     // Get the simulated play position
-    double GetPlayPositionNow(void)
+    double GetPlayPositionNow()
     {
         // If paused, then no time compensation is needed
         if (m_bPaused)
@@ -91,7 +91,7 @@ public:
 
     ///////////////////////////////////////////////////////
     // Check if play position has reached the end
-    bool IsFinished(void)
+    bool IsFinished()
     {
         if (!m_bLoop && m_dLength > 0)
             return GetPlayPositionNow() == m_dLength;

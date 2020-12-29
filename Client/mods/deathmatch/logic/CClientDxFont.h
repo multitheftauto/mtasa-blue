@@ -14,9 +14,9 @@ class CClientDxFont : public CClientRenderElement
 public:
     CClientDxFont(CClientManager* pManager, ElementID ID, CDxFontItem* pFontItem);
 
-    eClientEntityType GetType(void) const { return CCLIENTDXFONT; }
+    eClientEntityType GetType() const { return CCLIENTDXFONT; }
 
     // CClientDxFont methods
-    CDxFontItem* GetDxFontItem(void) { return (CDxFontItem*)m_pRenderItem; }
-    ID3DXFont*   GetD3DXFont(void);
+    CDxFontItem* GetDxFontItem() { return (CDxFontItem*)m_pRenderItem; }
+    ID3DXFont*   GetD3DXFont();
 };

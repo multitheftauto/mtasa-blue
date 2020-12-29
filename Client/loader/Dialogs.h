@@ -9,27 +9,27 @@
  *****************************************************************************/
 
 void ShowSplash(HINSTANCE hInstance);
-void HideSplash(void);
+void HideSplash();
 
 void ShowProgressDialog(HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel = false);
-void HideProgressDialog(void);
+void HideProgressDialog();
 bool UpdateProgress(int iPos, int iMax, const SString& strMsg = "");
 
 void StartPseudoProgress(HINSTANCE hInstance, const SString& strTitle, const SString& strMsg);
-void StopPseudoProgress(void);
+void StopPseudoProgress();
 
 SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage);
-void    HideCrashedDialog(void);
+void    HideCrashedDialog();
 
 void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath);
-void HideD3dDllDialog(void);
+void HideD3dDllDialog();
 
 void ShowOptimusDialog(HINSTANCE hInstance);
-void HideOptimusDialog(void);
+void HideOptimusDialog();
 
 void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering);
-void HideNoAvDialog(void);
+void HideNoAvDialog();
 
 #ifdef MTA_DEBUG
-void TestDialogs(void);
+void TestDialogs();
 #endif

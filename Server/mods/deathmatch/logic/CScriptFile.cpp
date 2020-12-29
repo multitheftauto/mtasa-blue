@@ -23,7 +23,7 @@ CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long 
     m_pResource = nullptr;
 }
 
-CScriptFile::~CScriptFile(void)
+CScriptFile::~CScriptFile()
 {
     // Close the file
     Unload();
@@ -75,7 +75,7 @@ bool CScriptFile::Load(CResource* pResourceForFilePath, eMode Mode)
     return false;
 }
 
-void CScriptFile::Unload(void)
+void CScriptFile::Unload()
 {
     // Loaded?
     if (m_pFile)
@@ -89,7 +89,7 @@ void CScriptFile::Unload(void)
     }
 }
 
-bool CScriptFile::IsEOF(void)
+bool CScriptFile::IsEOF()
 {
     if (!m_pFile)
         return true;
@@ -98,7 +98,7 @@ bool CScriptFile::IsEOF(void)
     return feof(m_pFile) != 0;
 }
 
-long CScriptFile::GetPointer(void)
+long CScriptFile::GetPointer()
 {
     if (!m_pFile)
         return -1;
@@ -106,7 +106,7 @@ long CScriptFile::GetPointer(void)
     return ftell(m_pFile);
 }
 
-long CScriptFile::GetSize(void)
+long CScriptFile::GetSize()
 {
     if (!m_pFile)
         return -1;
@@ -161,7 +161,7 @@ void CScriptFile::SetSize(unsigned long ulNewSize)
         return;
 }
 
-void CScriptFile::Flush(void)
+void CScriptFile::Flush()
 {
     if (!m_pFile)
         return;
@@ -169,7 +169,7 @@ void CScriptFile::Flush(void)
     fflush(m_pFile);
 }
 
-long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
+long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
 {
     if (!m_pFile)
         return -1;
@@ -185,8 +185,16 @@ long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
         // Note: Read extra byte at end so EOF indicator gets set
     }
 
-    outBuffer.SetSize(ulSize);
-    return fread(outBuffer.GetData(), 1, ulSize, m_pFile);
+    try
+    {
+        outBuffer.resize(ulSize);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return -2;
+    }
+
+    return fread(outBuffer.data(), 1, ulSize, m_pFile);
 }
 
 long CScriptFile::Write(unsigned long ulSize, const char* pData)
@@ -198,7 +206,7 @@ long CScriptFile::Write(unsigned long ulSize, const char* pData)
     return fwrite(pData, 1, ulSize, m_pFile);
 }
 
-CResource* CScriptFile::GetResource(void)
+CResource* CScriptFile::GetResource()
 {
     return m_pResource;
 }

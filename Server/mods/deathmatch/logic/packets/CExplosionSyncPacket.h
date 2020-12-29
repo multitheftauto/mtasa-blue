@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CExplosionSyncPacket : public CPacket
+class CExplosionSyncPacket final : public CPacket
 {
 public:
     enum eExplosionType
@@ -34,11 +34,11 @@ public:
         EXPLOSION_TINY,
     };
 
-    CExplosionSyncPacket(void);
+    CExplosionSyncPacket();
     CExplosionSyncPacket(const CVector& vecPosition, unsigned char ucType);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_EXPLOSION; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_EXPLOSION; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

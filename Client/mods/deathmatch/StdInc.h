@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -16,6 +15,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <vector>
 #include <cstdio>
@@ -26,6 +26,7 @@
 // SDK includes
 #include <core/CLocalizationInterface.h>
 #include <core/CTrayIconInterface.h>
+#include <core/CDiscordManagerInterface.h>
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>
@@ -94,6 +95,7 @@
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
+#include <CClientModelManager.h>
 #include <CModelNames.h>
 #include <CIFPEngine.h>
 #include <CFileReader.h>
@@ -115,6 +117,7 @@
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaCameraDefs.h>
 #include <luadefs/CLuaColShapeDefs.h>
+#include <luadefs/CLuaCompatibilityDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
@@ -122,6 +125,7 @@
 #include <luadefs/CLuaFireDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
+#include <luadefs/CLuaNetworkDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
 #include <luadefs/CLuaPointLightDefs.h>
 #include <luadefs/CLuaPedDefs.h>
@@ -137,6 +141,7 @@
 #include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
+#include <luadefs/CLuaWorldDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes
@@ -152,7 +157,6 @@
 #include "CEvents.h"
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
-#include "logic/CGameEntityXRefManager.h"
 #include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"

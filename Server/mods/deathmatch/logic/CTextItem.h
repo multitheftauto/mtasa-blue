@@ -33,31 +33,31 @@ public:
     CTextItem(const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f,
               unsigned char ucFormat = 0, unsigned char ucShadowAlpha = 0);
     CTextItem(const CTextItem& TextItem);
-    ~CTextItem(void);
+    ~CTextItem();
 
     bool operator=(const CTextItem& TextItem);
 
     void           SetText(const char* szText);
-    const SString& GetText(void) { return m_strText; };
+    const SString& GetText() { return m_strText; };
 
-    const CVector2D& GetPosition(void) { return m_vecPosition; };
+    const CVector2D& GetPosition() { return m_vecPosition; };
     void             SetPosition(const CVector2D& vecPosition);
 
     void   SetColor(const SColor color);
-    SColor GetColor(void) const { return m_Color; }
+    SColor GetColor() const { return m_Color; }
 
-    float GetScale(void) { return m_fScale; };
+    float GetScale() { return m_fScale; };
     void  SetScale(float fScale);
 
-    unsigned char GetFormat(void) { return m_ucFormat; }
+    unsigned char GetFormat() { return m_ucFormat; }
     void          SetFormat(unsigned char ucFormat) { m_ucFormat = ucFormat; }
 
     void          SetPriority(eTextPriority Priority) { m_Priority = Priority; };
-    eTextPriority GetPriority(void) { return m_Priority; };
+    eTextPriority GetPriority() { return m_Priority; };
 
-    unsigned long GetUniqueID(void) { return m_ulUniqueId; };
-    bool          IsBeingDeleted(void) { return m_bDeletable; };
-    uint          GetScriptID(void) const { return m_uiScriptID; }
+    unsigned long GetUniqueID() { return m_ulUniqueId; };
+    bool          IsBeingDeleted() { return m_bDeletable; };
+    uint          GetScriptID() const { return m_uiScriptID; }
 
 private:
     SString       m_strText;
@@ -75,5 +75,5 @@ private:
 
     void AddObserver(CTextDisplay* pObserver);
     void RemoveObserver(CTextDisplay* pObserver) { m_Observers.remove(pObserver); };
-    void NotifyObservers(void);
+    void NotifyObservers();
 };

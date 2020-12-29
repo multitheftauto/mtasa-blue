@@ -76,9 +76,9 @@ private:
     SCurrentStateInfo2& operator=(const SCurrentStateInfo2& other);
 
 public:
-    SCurrentStateInfo2(void) { ZERO_POD_STRUCT(this); }
+    SCurrentStateInfo2() { ZERO_POD_STRUCT(this); }
 
-    ~SCurrentStateInfo2(void)
+    ~SCurrentStateInfo2()
     {
         SAFE_RELEASE(stream.pStreamData);
         SAFE_RELEASE(pIndexData);
@@ -123,15 +123,15 @@ class CVertexStreamBoundingBoxManager
 {
 public:
     ZERO_ON_NEW
-    CVertexStreamBoundingBoxManager(void);
-    virtual ~CVertexStreamBoundingBoxManager(void);
+    CVertexStreamBoundingBoxManager();
+    virtual ~CVertexStreamBoundingBoxManager();
 
     void  OnDeviceCreate(IDirect3DDevice9* pDevice);
     float GetDistanceSqToGeometry(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount);
     void  OnVertexBufferDestroy(IDirect3DVertexBuffer9* pStreamData);
     void  OnVertexBufferRangeInvalidated(IDirect3DVertexBuffer9* pStreamData, uint Offset, uint Size);
 
-    static CVertexStreamBoundingBoxManager* GetSingleton(void);
+    static CVertexStreamBoundingBoxManager* GetSingleton();
 
 protected:
     float CalcDistanceSq(const SCurrentStateInfo2& state, const CBox& boundingBox);

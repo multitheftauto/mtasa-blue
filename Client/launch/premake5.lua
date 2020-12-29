@@ -4,37 +4,37 @@ project "Client Launcher"
 	targetname "Multi Theft Auto"
 	targetdir(buildpath("."))
 	debugdir(buildpath("."))
-	
+
 	includedirs { "../sdk" }
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
-	
+
 	entrypoint "WinMainCRTStartup"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
 		["Resources/*"] = {"*.rc", "*.ico", "**.xml"},
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
-	
+
 	filter "system:windows"
-		flags { "StaticRuntime" } 
+		staticruntime "On"
 		files {
 			"NEU/GDFImp.gdf.xml",
 			"GDFImp.rc",
 			"launch.rc",
 			"mtaicon.ico"
 		}
-	
-	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
 		
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" }
+
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

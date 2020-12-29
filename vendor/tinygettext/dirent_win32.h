@@ -106,6 +106,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#if defined(_MSC_VER)  &&  _MSC_VER >= 1400
+    #include <windows.h>
+#endif
 
 /* Indicates that d_type field is available in dirent structure */
 #define _DIRENT_HAVE_D_TYPE
@@ -776,8 +779,8 @@ dirent_mbstowcs_s(
 
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    /* Microsoft Visual Studio 2005 or later */
-    error = mbstowcs_s (pReturnValue, wcstr, sizeInWords, mbstr, count);
+    wcscpy_s(wcstr, sizeInWords, *FromUTF8(mbstr));
+    error = 0;
 
 #else
 
@@ -826,8 +829,8 @@ dirent_wcstombs_s(
 
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    /* Microsoft Visual Studio 2005 or later */
-    error = wcstombs_s (pReturnValue, mbstr, sizeInBytes, wcstr, count);
+    strcpy_s(mbstr, sizeInBytes, *ToUTF8(wcstr));
+    error = 0;
 
 #else
 

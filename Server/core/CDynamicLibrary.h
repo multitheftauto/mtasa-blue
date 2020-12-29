@@ -20,12 +20,12 @@ typedef void (*FuncPtr_t)();
 class CDynamicLibrary
 {
 public:
-    CDynamicLibrary(void);
-    ~CDynamicLibrary(void);
+    CDynamicLibrary();
+    ~CDynamicLibrary();
 
     bool Load(const char* szFilename);
-    void Unload(void);
-    bool IsLoaded(void);
+    void Unload();
+    bool IsLoaded();
 
     FuncPtr_t GetProcedureAddress(const char* szProcName);
     bool      CheckMtaVersion(const char* szLibName);

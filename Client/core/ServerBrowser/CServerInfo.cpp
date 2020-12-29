@@ -18,7 +18,7 @@ extern CCore* g_pCore;
 template <>
 CServerInfo* CSingleton<CServerInfo>::m_pSingleton = NULL;
 
-CServerInfo::CServerInfo(void)
+CServerInfo::CServerInfo()
 {
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -181,7 +181,7 @@ CServerInfo::CServerInfo(void)
         false);            // Horizontally center align
 }
 
-CServerInfo::~CServerInfo(void)
+CServerInfo::~CServerInfo()
 {
     // Delete our GUI elements
     delete m_pWindow;
@@ -262,12 +262,12 @@ bool CServerInfo::OnJoinGameClicked(CGUIElement* pElement)
     return true;
 }
 
-bool CServerInfo::IsVisible(void)
+bool CServerInfo::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
 
-void CServerInfo::Hide(void)
+void CServerInfo::Hide()
 {
     m_pWindow->SetVisible(false);
 }
@@ -357,7 +357,7 @@ void CServerInfo::SetServerInformation(const char* szHost, unsigned short usPort
     Refresh();
 }
 
-void CServerInfo::DoPulse(void)
+void CServerInfo::DoPulse()
 {
     // Are we visible?
     if (IsVisible())
@@ -413,7 +413,7 @@ void CServerInfo::DoPulse(void)
     }
 }
 
-void CServerInfo::Refresh(void)
+void CServerInfo::Refresh()
 {
     // Reset the query variables
     m_Server.Init();
@@ -425,7 +425,7 @@ void CServerInfo::Refresh(void)
     m_Server.Query();
 }
 
-void CServerInfo::Reset(void)
+void CServerInfo::Reset()
 {
     // Set every GUI elements text to blank
     m_pServerNameLabel->SetText(_("Querying..."));
@@ -439,7 +439,7 @@ void CServerInfo::Reset(void)
     m_Server.Init();
 }
 
-void CServerInfo::Connect(void)
+void CServerInfo::Connect()
 {
     // Get the nick from the cfg
     std::string strNick;

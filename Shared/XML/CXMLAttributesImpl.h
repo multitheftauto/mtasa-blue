@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTESIMPL_H
-#define __CXMLATTRIBUTESIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <xml/CXMLAttributes.h>
@@ -21,30 +20,30 @@ class CXMLAttributesImpl : public CXMLAttributes
 {
 public:
     CXMLAttributesImpl(TiXmlElement& Node, bool bUseIDs);
-    ~CXMLAttributesImpl(void);
+    ~CXMLAttributesImpl();
 
-    unsigned int         Count(void);
+    unsigned int         Count();
     class CXMLAttribute* Find(const char* szName);
     class CXMLAttribute* Get(unsigned int uiIndex);
 
     class CXMLAttribute* Create(const char* szName);
     class CXMLAttribute* Create(const class CXMLAttribute& Copy);
     bool                 Delete(const char* szName);
-    void                 DeleteAll(void);
+    void                 DeleteAll();
 
-    TiXmlElement& GetNode(void);
+    TiXmlElement& GetNode();
 
     class CXMLAttribute* AddToList(class CXMLAttribute* pAttribute);
     void                 RemoveFromList(class CXMLAttribute* pAttribute);
 
-    std::list<CXMLAttribute*>::iterator ListBegin(void) { return m_Attributes.begin(); }
-    std::list<CXMLAttribute*>::iterator ListEnd(void) { return m_Attributes.end(); }
+    std::list<CXMLAttribute*>::iterator ListBegin() { return m_Attributes.begin(); }
+    std::list<CXMLAttribute*>::iterator ListEnd() { return m_Attributes.end(); }
 
-    bool IsUsingIDs(void) const { return m_bUsingIDs; }
+    bool IsUsingIDs() const { return m_bUsingIDs; }
 
 private:
-    void CreateAttributes(void);
-    void DeleteAttributes(void);
+    void CreateAttributes();
+    void DeleteAttributes();
 
     const bool    m_bUsingIDs;
     bool          m_bCanRemoveFromList;
@@ -52,5 +51,3 @@ private:
 
     std::list<CXMLAttribute*> m_Attributes;
 };
-
-#endif

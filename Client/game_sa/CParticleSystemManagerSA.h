@@ -9,13 +9,10 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PARTICLESYSTEMMANAGER
-#define __CGAMESA_PARTICLESYSTEMMANAGER
+#pragma once
 
 #include <game/CParticleSystemManager.h>
 
 class CParticleSystemManagerSA : public CParticleSystemManager
 {
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CARENTEREXIT
-#define __CGAME_CARENTEREXIT
+#pragma once
 
 #include "CPed.h"
 
@@ -23,5 +22,3 @@ public:
     virtual int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle) = 0;
     virtual bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0) = 0;
 };
-
-#endif

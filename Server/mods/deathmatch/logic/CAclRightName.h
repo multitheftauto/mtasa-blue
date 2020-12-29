@@ -37,10 +37,10 @@ public:
 
     bool operator==(const CAclRightName& other) const { return m_strFullName == other.m_strFullName; }
 
-    bool                                IsValid(void) const { return m_bValid; }
-    const SString&                      GetName(void) const { return m_strNamePart; }
-    CAccessControlListRight::ERightType GetType(void) const { return m_TypePart; }
-    const SString&                      GetFullName(void) const { return m_strFullName; }
+    bool                                IsValid() const { return m_bValid; }
+    const SString&                      GetName() const { return m_strNamePart; }
+    CAccessControlListRight::ERightType GetType() const { return m_TypePart; }
+    const SString&                      GetFullName() const { return m_strFullName; }
 
 protected:
     SString                             m_strNamePart;

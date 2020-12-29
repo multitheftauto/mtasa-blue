@@ -17,7 +17,7 @@ namespace SharedUtil
         DWORD oldProt;
     };
 
-    void      SetInitialVirtualProtect(void);
+    void      SetInitialVirtualProtect();
     bool      IsSlowMem(const void* pAddr, uint uiAmount);
     SMemWrite OpenMemWrite(const void* pAddr, uint uiAmount);
     void      CloseMemWrite(SMemWrite& hMem);

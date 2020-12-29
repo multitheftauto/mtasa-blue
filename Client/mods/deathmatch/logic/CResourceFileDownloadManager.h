@@ -24,13 +24,13 @@ public:
     ZERO_ON_NEW
     void AddServer(const SString& strUrl, int iMaxConnectionsPerClient, EDownloadModeType downloadChannel, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
     void AddPendingFileDownload(CDownloadableResource* pDownloadableResource);
-    void UpdatePendingDownloads(void);
+    void UpdatePendingDownloads();
     void OnRemoveResourceFile(CDownloadableResource* pResourceFile);
-    void DoPulse(void);
-    bool IsTransferringInitialFiles(void) { return m_bIsTransferingFiles; }
+    void DoPulse();
+    bool IsTransferringInitialFiles() { return m_bIsTransferingFiles; }
 
 protected:
-    CTransferBox*          GetTransferBox(void) { return g_pClientGame->GetTransferBox(); };
+    CTransferBox*          GetTransferBox() { return g_pClientGame->GetTransferBox(); };
     void                   AddDownloadSize(int iSize);
     bool                   DisableHttpServer(uint uiHttpServerIndex);
     bool                   BeginResourceFileDownload(CDownloadableResource* pDownloadableResource, uint uiHttpServerIndex);

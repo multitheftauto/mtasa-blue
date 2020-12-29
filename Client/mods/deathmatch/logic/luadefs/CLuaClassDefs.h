@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __LUACLASSES_H
-#define __LUACLASSES_H
+#pragma once
 
 extern "C"
 {
@@ -38,5 +37,3 @@ public:
     static const char* GetXmlNodeClass(CXMLNode* pXmlNode);
     static const char* GetEntityClass(CClientEntity* pEntity);
 };
-
-#endif

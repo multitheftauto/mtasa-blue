@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_POPULATION
-#define __CGAME_POPULATION
+#pragma once
 
 #include <windows.h>
 #include "CPed.h"
@@ -19,5 +18,3 @@ class CPopulation
 {
 public:
 };
-
-#endif

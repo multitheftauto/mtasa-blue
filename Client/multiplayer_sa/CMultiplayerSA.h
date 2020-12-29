@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYERSA
-#define __CMULTIPLAYERSA
+#pragma once
 
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
@@ -56,22 +55,27 @@ public:
     CMultiplayerSA();
     void                InitHooks();
     void                InitHooks_CrashFixHacks();
-    void                Init_13(void);
-    void                InitHooks_13(void);
-    void                InitMemoryCopies_13(void);
-    void                InitHooks_ClothesSpeedUp(void);
-    void                InitHooks_FixBadAnimId(void);
-    void                InitHooks_HookDestructors(void);
-    void                InitHooks_RwResources(void);
-    void                InitHooks_ClothesCache(void);
-    void                InitHooks_Files(void);
-    void                InitHooks_Weapons(void);
-    void                InitHooks_Rendering(void);
-    void                InitHooks_LicensePlate(void);
-    void                InitHooks_VehicleLights(void);
-    void                InitHooks_VehicleDamage(void);
-    void                InitHooks_Direct3D(void);
-    void                InitHooks_FixLineOfSightArgs(void);
+    void                Init_13();
+    void                InitHooks_13();
+    void                InitMemoryCopies_13();
+    void                InitHooks_ClothesSpeedUp();
+    void                InitHooks_FixBadAnimId();
+    void                InitHooks_HookDestructors();
+    void                InitHooks_RwResources();
+    void                InitHooks_ClothesCache();
+    void                InitHooks_Files();
+    void                InitHooks_Weapons();
+    void                InitHooks_Peds();
+    void                InitHooks_VehicleCollision();
+    void                InitHooks_Vehicles();
+    void                InitHooks_Rendering();
+    void                InitHooks_LicensePlate();
+    void                InitHooks_VehicleLights();
+    void                InitHooks_VehicleDamage();
+    void                InitHooks_VehicleWeapons();
+    void                InitHooks_Direct3D();
+    void                InitHooks_FixLineOfSightArgs();
+    void                InitHooks_Streaming();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -79,7 +83,7 @@ public:
     void                RemoveRemoteDataStorage(CPlayerPed* pPed);
     void                EnableHooks_ClothesMemFix(bool bEnable);
 
-    CPed* GetContextSwitchedPed(void);
+    CPed* GetContextSwitchedPed();
 
     CPopulationMP* GetPopulationMP() { return Population; }
     void           PreventLeavingVehicles();
@@ -106,9 +110,11 @@ public:
     void SetChokingHandler(ChokingHandler* pChokingHandler);
     void SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler);
     void SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler);
+    void SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler);
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
+    void DisableCallsToCAnimBlendNode(bool bDisableCalls);
     void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
     void SetAddAnimationHandler(AddAnimationHandler* pHandler);
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
@@ -127,9 +133,12 @@ public:
     void SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler);
     void SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler);
     void SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler);
+    void SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler);
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
+    void SetPedStepHandler(PedStepHandler* pHandler);
+    void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -140,9 +149,11 @@ public:
                       unsigned char BottomBlue);
     void  SetHeatHaze(const SHeatHazeSettings& settings);
     void  GetHeatHaze(SHeatHazeSettings& settings);
-    void  ResetHeatHaze(void);
+    void  ResetColorFilter();
+    void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color);
+    void  ResetHeatHaze();
     void  SetHeatHazeEnabled(bool bEnabled);
-    void  ApplyHeatHazeEnabled(void);
+    void  ApplyHeatHazeEnabled();
     void  ResetSky();
     bool  HasWaterColor();
     void  GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha);
@@ -156,16 +167,16 @@ public:
     void  SetInteriorFurnitureEnabled(char cRoomId, bool bEnabled);
     void  SetWindVelocity(float fX, float fY, float fZ);
     void  GetWindVelocity(float& fX, float& fY, float& fZ);
-    void  RestoreWindVelocity(void);
-    float GetFarClipDistance(void);
+    void  RestoreWindVelocity();
+    float GetFarClipDistance();
     void  SetFarClipDistance(float fDistance);
-    void  RestoreFarClipDistance(void);
-    float GetNearClipDistance(void);
+    void  RestoreFarClipDistance();
+    float GetNearClipDistance();
     void  SetNearClipDistance(float fDistance);
-    void  RestoreNearClipDistance(void);
-    float GetFogDistance(void);
+    void  RestoreNearClipDistance();
+    float GetFogDistance();
     void  SetFogDistance(float fDistance);
-    void  RestoreFogDistance(void);
+    void  RestoreFogDistance();
     void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen,
                       unsigned char& ucCoronaBlue);
     void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen,
@@ -178,8 +189,8 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void SetNightVisionEnabled(bool bEnabled);
-    void SetThermalVisionEnabled(bool bEnabled);
+    void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
+    void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
@@ -240,17 +251,17 @@ public:
     CLimits* GetLimits() { return &m_limits; }
 
     void SetSuspensionEnabled(bool bEnabled);
-    bool IsSuspensionEnabled(void) { return m_bSuspensionEnabled; };
+    bool IsSuspensionEnabled() { return m_bSuspensionEnabled; };
 
-    virtual void FlushClothesCache(void);
+    virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
     virtual void SetLODSystemEnabled(bool bEnable);
     virtual void SetAltWaterOrderEnabled(bool bEnable);
 
-    float GetAircraftMaxHeight(void) { return m_fAircraftMaxHeight; };
+    float GetAircraftMaxHeight() { return m_fAircraftMaxHeight; };
     void  SetAircraftMaxHeight(float fHeight) { m_fAircraftMaxHeight = fHeight; };
 
-    float GetAircraftMaxVelocity(void) { return m_fAircraftMaxVelocity; };
+    float GetAircraftMaxVelocity() { return m_fAircraftMaxVelocity; };
     void  SetAircraftMaxVelocity(float fVelocity)
     {
         m_fAircraftMaxVelocity = fVelocity;
@@ -260,8 +271,8 @@ public:
     void SetAutomaticVehicleStartupOnPedEnter(bool bSet);
 
     void SetPedTargetingMarkerEnabled(bool bEnable);
-    bool IsPedTargetingMarkerEnabled(void);
-    bool IsConnected(void);
+    bool IsPedTargetingMarkerEnabled();
+    bool IsConnected();
 
     virtual void GetRwResourceStats(SRwResourceStats& outStats);
     virtual void GetClothesCacheStats(SClothesCacheStats& outStats);
@@ -270,6 +281,16 @@ public:
 
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
+
+    void SetLastStaticAnimationPlayed(eAnimGroup dwGroupID, eAnimID dwAnimID, DWORD dwAnimArrayAddress)
+    {
+        m_dwLastStaticAnimGroupID = dwGroupID;
+        m_dwLastStaticAnimID = dwAnimID;
+        m_dwLastAnimArrayAddress = dwAnimArrayAddress;
+    }
+    eAnimGroup GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
+    eAnimID GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+    DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
@@ -291,6 +312,9 @@ private:
     bool                m_bHeatHazeCustomized;
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
+    eAnimGroup          m_dwLastStaticAnimGroupID;
+    eAnimID          m_dwLastStaticAnimID;
+    DWORD               m_dwLastAnimArrayAddress;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
@@ -335,5 +359,3 @@ private:
 
     static unsigned long FUNC_CPlayerInfoBase;
 };
-
-#endif

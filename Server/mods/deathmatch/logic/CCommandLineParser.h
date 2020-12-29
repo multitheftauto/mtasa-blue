@@ -16,7 +16,7 @@
 class CCommandLineParser
 {
 public:
-    CCommandLineParser(void);
+    CCommandLineParser();
 
     bool Parse(int iArgumentCount, char* szArguments[]);
 

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CRadarArea::CRadarArea(CRadarAreaManager* pRadarAreaManager, CElement* pParent, CXMLNode* pNode) : CPerPlayerEntity(pParent, pNode)
+CRadarArea::CRadarArea(CRadarAreaManager* pRadarAreaManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {
     // Init
     m_iType = CElement::RADAR_AREA;
@@ -24,45 +24,61 @@ CRadarArea::CRadarArea(CRadarAreaManager* pRadarAreaManager, CElement* pParent, 
     pRadarAreaManager->AddToList(this);
 }
 
-CRadarArea::~CRadarArea(void)
+CRadarArea::~CRadarArea()
 {
     // Unlink us from manager
     Unlink();
 }
 
-void CRadarArea::Unlink(void)
+CElement* CRadarArea::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CRadarArea* const pTemp = m_pRadarAreaManager->Create(GetParentEntity());
+
+    if (pTemp)
+    {
+        pTemp->SetSize(GetSize());
+        pTemp->SetColor(GetColor());
+        if (pResource->IsClientSynced())
+            pTemp->Sync(true);
+        *bAddEntity = false;
+    }
+
+    return pTemp;
+}
+
+void CRadarArea::Unlink()
 {
     // Remove us from the manager's list
     m_pRadarAreaManager->RemoveFromList(this);
 }
 
-bool CRadarArea::ReadSpecialData(void)
+bool CRadarArea::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <radararea> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <radararea> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <radararea> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <radararea> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "sizeX" data
     if (!GetCustomDataFloat("sizeX", m_vecSize.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'sizeX' attribute in <radararea> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'sizeX' attribute in <radararea> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "sizeY" data
     if (!GetCustomDataFloat("sizeY", m_vecSize.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'sizeY' attribute in <radararea> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'sizeY' attribute in <radararea> (line %d)\n", iLine);
         return false;
     }
 
@@ -73,7 +89,7 @@ bool CRadarArea::ReadSpecialData(void)
         // Convert it to RGBA
         if (!XMLColorToInt(szColor, m_Color.R, m_Color.G, m_Color.B, m_Color.A))
         {
-            CLogger::ErrorPrintf("Bad 'color' value specified in <radararea> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'color' value specified in <radararea> (line %d)\n", iLine);
             return false;
         }
     }

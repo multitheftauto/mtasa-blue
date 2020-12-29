@@ -10,8 +10,7 @@
 
 class CClientPathManager;
 
-#ifndef __CCLIENTPATHMANAGER_H
-#define __CCLIENTPATHMANAGER_H
+#pragma once
 
 #include "CClientPathNode.h"
 #include "CClientManager.h"
@@ -23,22 +22,22 @@ class CClientPathManager
     friend class CClientPathNode;
 
 public:
-    void DeleteAll(void);
+    void DeleteAll();
 
-    void DoPulse(void);
-    void LinkNodes(void);
+    void DoPulse();
+    void LinkNodes();
     void ReverseNodes(CClientPathNode* pPathNode);
     bool DetachEntity(CClientEntity* pEntity);
 
-    unsigned int            Count(void) { return static_cast<unsigned int>(m_PathNodeList.size()); }
+    unsigned int            Count() { return static_cast<unsigned int>(m_PathNodeList.size()); }
     static CClientPathNode* Get(ElementID ID);
 
-    std::list<CClientPathNode*>::iterator IterBegin(void) { return m_PathNodeList.begin(); }
-    std::list<CClientPathNode*>::iterator IterEnd(void) { return m_PathNodeList.end(); }
+    std::list<CClientPathNode*>::iterator IterBegin() { return m_PathNodeList.begin(); }
+    std::list<CClientPathNode*>::iterator IterEnd() { return m_PathNodeList.end(); }
 
 private:
     CClientPathManager(CClientManager* pManager);
-    ~CClientPathManager(void);
+    ~CClientPathManager();
 
     void AddToList(CClientPathNode* pPathNode) { m_PathNodeList.push_back(pPathNode); }
     void RemoveFromList(CClientPathNode* pPathNode);
@@ -47,5 +46,3 @@ private:
     std::list<CClientPathNode*> m_PathNodeList;
     bool                        m_bRemoveFromList;
 };
-
-#endif

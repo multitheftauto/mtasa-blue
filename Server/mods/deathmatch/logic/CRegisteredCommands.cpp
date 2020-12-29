@@ -17,7 +17,7 @@ CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* pACLManager)
     m_bIteratingList = false;
 }
 
-CRegisteredCommands::~CRegisteredCommands(void)
+CRegisteredCommands::~CRegisteredCommands()
 {
     ClearCommands();
 }
@@ -76,7 +76,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, c
             // Delete it and remove it from our list
             if (m_bIteratingList)
             {
-                m_TrashCan.push_back(*iter);
+                m_TrashCan.emplace(*iter);
                 ++iter;
             }
             else
@@ -94,7 +94,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, c
     return bFound;
 }
 
-void CRegisteredCommands::ClearCommands(void)
+void CRegisteredCommands::ClearCommands()
 {
     // Delete all the commands
     list<SCommand*>::const_iterator iter = m_Commands.begin();
@@ -258,63 +258,48 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
 void CRegisteredCommands::GetCommands(lua_State* luaVM)
 {
     unsigned int uiIndex = 0;
-    m_bIteratingList = true;
-    list<SCommand*>::iterator iter = m_Commands.begin();
 
-    // Create the main table
     lua_newtable(luaVM);
 
-    for (; iter != m_Commands.end(); iter++)
+    for (SCommand* pCommand : m_Commands)
     {
-        // Create a subtable ({'command', resource})
+        // Create an entry table: {'command', resource}
         lua_pushinteger(luaVM, ++uiIndex);
         lua_createtable(luaVM, 0, 2);
         {
-            lua_pushstring(luaVM, (*iter)->strKey);
+            lua_pushstring(luaVM, pCommand->strKey.c_str());
             lua_rawseti(luaVM, -2, 1);
 
-            lua_pushresource(luaVM, (*iter)->pLuaMain->GetResource());
+            lua_pushresource(luaVM, pCommand->pLuaMain->GetResource());
             lua_rawseti(luaVM, -2, 2);
         }
         lua_settable(luaVM, -3);
     }
-
-    m_bIteratingList = false;
 }
 
 void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain)
 {
     unsigned int uiIndex = 0;
-    m_bIteratingList = true;
-    list<SCommand*>::iterator iter = m_Commands.begin();
 
-    // Create the table
     lua_newtable(luaVM);
 
-    for (; iter != m_Commands.end(); iter++)
+    for (SCommand* pCommand : m_Commands)
     {
-        // Matching VMs?
-        if ((*iter)->pLuaMain == pTargetLuaMain)
+        if (pCommand->pLuaMain == pTargetLuaMain)
         {
             lua_pushinteger(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, (*iter)->strKey);
+            lua_pushstring(luaVM, pCommand->strKey.c_str());
             lua_settable(luaVM, -3);
         }
     }
-
-    // lua_settable ( luaVM, -3 );
-
-    m_bIteratingList = false;
 }
 
-void CRegisteredCommands::TakeOutTheTrash(void)
+void CRegisteredCommands::TakeOutTheTrash()
 {
-    list<SCommand*>::iterator iter = m_TrashCan.begin();
-
-    for (; iter != m_TrashCan.end(); iter++)
+    for (SCommand* command : m_TrashCan)
     {
-        m_Commands.remove(*iter);
-        delete *iter;
+        m_Commands.remove(command);
+        delete command;
     }
 
     m_TrashCan.clear();

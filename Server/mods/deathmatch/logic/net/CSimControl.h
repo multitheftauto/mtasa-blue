@@ -14,11 +14,11 @@
 class CSimControl
 {
 public:
-    static void Startup(void);
-    static void Shutdown(void);
-    static void DoPulse(void);
+    static void Startup();
+    static void Shutdown();
+    static void DoPulse();
     static void EnableSimSystem(bool bEnable, bool bApplyNow = true);
-    static bool IsSimSystemEnabled(void);
+    static bool IsSimSystemEnabled();
     static void AddSimPlayer(CPlayer* pPlayer);
     static void RemoveSimPlayer(CPlayer* pPlayer);
     static void UpdateSimPlayer(CPlayer* pPlayer);

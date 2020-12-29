@@ -103,3 +103,37 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
+{
+    // table getCommandHandlers ( [ resource sourceResource ] );
+    CResource* pResource = nullptr;
+
+    CScriptArgReader argStream(luaVM);
+
+    if (!argStream.NextIsNil() && !argStream.NextIsNone())
+        argStream.ReadUserData(pResource);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    if (pResource)
+    {
+        CLuaMain* pLuaMain = pResource->GetVM();
+
+        if (pLuaMain)
+            m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
+        else
+            lua_newtable(luaVM);
+    }
+    else
+    {
+        m_pRegisteredCommands->GetCommands(luaVM);
+    }
+
+    return 1;
+}

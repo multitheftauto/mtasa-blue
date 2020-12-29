@@ -18,7 +18,7 @@ using namespace LatentTransfer;
 //
 //
 ///////////////////////////////////////////////////////////////
-CLatentTransferManager::CLatentTransferManager(void)
+CLatentTransferManager::CLatentTransferManager()
 {
 }
 
@@ -29,7 +29,7 @@ CLatentTransferManager::CLatentTransferManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CLatentTransferManager::~CLatentTransferManager(void)
+CLatentTransferManager::~CLatentTransferManager()
 {
 }
 
@@ -40,7 +40,7 @@ CLatentTransferManager::~CLatentTransferManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CLatentTransferManager::DoPulse(void)
+void CLatentTransferManager::DoPulse()
 {
     // Update timing info
     CTickCount tickCountNow = CTickCount::Now();
@@ -156,7 +156,7 @@ SSendHandle CLatentTransferManager::AddSend(NetPlayerID remoteId, ushort usBitSt
 // Finished multiple sends
 //
 ///////////////////////////////////////////////////////////////
-void CLatentTransferManager::AddSendBatchEnd(void)
+void CLatentTransferManager::AddSendBatchEnd()
 {
 #ifndef MTA_CLIENT
     markerLatentEvent.SetAndStoreString(SString("BatchEnd (%d sends)", m_uiNumSends));

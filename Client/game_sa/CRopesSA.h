@@ -9,16 +9,13 @@
  *
  *****************************************************************************/
 
-#ifndef __CRopesSA_H
-#define __CRopesSA_H
+#pragma once
 
 #include <game/CRopes.h>
 
 #define ROPES_COUNT    8
 
 #define FUNC_CRopes_CreateRopeForSwatPed    0x558d10
-
-#define ARRAY_CRopes    0xB768B8
 
 class CRopesSAInterface
 {
@@ -45,6 +42,8 @@ class CRopesSA : public CRopes
 {
 public:
     int CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000);
-};
+    void RemoveEntityRope(CEntitySAInterface* pObject);
 
-#endif
+private:
+    static CRopesSAInterface (&ms_aRopes)[8];
+};

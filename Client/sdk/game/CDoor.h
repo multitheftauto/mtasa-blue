@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_DOOR
-#define __CGAME_DOOR
+#pragma once
 
 #include <windows.h>
 
@@ -25,5 +24,3 @@ public:
     virtual VOID       Open(float fRatio) = 0;
     virtual eDoorState GetDoorState() = 0;
 };
-
-#endif

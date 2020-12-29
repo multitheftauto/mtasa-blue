@@ -29,7 +29,7 @@ public:
         Public
     };
     CSettings(CResourceManager* pResourceManager);
-    ~CSettings(void);
+    ~CSettings();
 
     CXMLNode* Get(const char* szLocalResource, const char* szSetting, bool& bDeleteNode);
     bool      Set(const char* szLocalResource, const char* szSetting, const char* szContent);

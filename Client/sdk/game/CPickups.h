@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PICKCUPS
-#define __CGAME_PICKCUPS
+#pragma once
 
 #include "Common.h"
 #include "CPickup.h"
@@ -25,5 +24,3 @@ public:
                                   BYTE bPingOutOfPlayer = 0) = 0;
     virtual void     DisablePickupProcessing(bool bDisabled) = 0;
 };
-
-#endif

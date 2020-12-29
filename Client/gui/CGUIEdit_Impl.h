@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIEDIT_IMPL_H
-#define __CGUIEDIT_IMPL_H
+#pragma once
 
 #include <gui/CGUIEdit.h>
 #include "CGUIElement_Impl.h"
@@ -19,34 +18,34 @@ class CGUIEdit_Impl : public CGUIEdit, public CGUIElement_Impl, public CGUITabLi
 {
 public:
     CGUIEdit_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "");
-    ~CGUIEdit_Impl(void);
+    ~CGUIEdit_Impl();
 
     void SetReadOnly(bool bReadOnly);
-    bool IsReadOnly(void);
+    bool IsReadOnly();
     void SetMasked(bool bMasked);
-    bool IsMasked(void);
+    bool IsMasked();
 
     void         SetMaxLength(unsigned int uiMaxLength);
-    unsigned int GetMaxLength(void);
+    unsigned int GetMaxLength();
 
     void         SetSelection(unsigned int uiStart, unsigned int uiEnd);
-    unsigned int GetSelectionStart(void);
-    unsigned int GetSelectionEnd(void);
-    unsigned int GetSelectionLength(void);
+    unsigned int GetSelectionStart();
+    unsigned int GetSelectionEnd();
+    unsigned int GetSelectionLength();
 
     void         SetCaretIndex(unsigned int uiIndex);
-    void         SetCaretAtStart(void);
-    void         SetCaretAtEnd(void);
-    unsigned int GetCaretIndex(void);
+    void         SetCaretAtStart();
+    void         SetCaretAtEnd();
+    unsigned int GetCaretIndex();
 
     void SetTextAcceptedHandler(GUI_CALLBACK Callback);
     void SetTextChangedHandler(GUI_CALLBACK Callback);
     void SetRenderingEndedHandler(GUI_CALLBACK Callback);
     void SetRenderingStartedHandler(GUI_CALLBACK Callback);
 
-    bool ActivateOnTab(void);
+    bool ActivateOnTab();
 
-    eCGUIType GetType(void) { return CGUI_EDIT; };
+    eCGUIType GetType() { return CGUI_EDIT; };
 
     #include "CGUIElement_Inc.h"
 
@@ -61,5 +60,3 @@ protected:
     GUI_CALLBACK m_OnRenderingEnded;
     GUI_CALLBACK m_OnRenderingStarted;
 };
-
-#endif

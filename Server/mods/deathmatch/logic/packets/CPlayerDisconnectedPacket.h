@@ -13,7 +13,7 @@
 
 #include "../packets/CPacket.h"
 
-class CPlayerDisconnectedPacket : public CPacket
+class CPlayerDisconnectedPacket final : public CPacket
 {
 public:
     enum ePlayerDisconnectType
@@ -46,12 +46,12 @@ public:
     CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, const char* szReason = "");
     CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, time_t BanDuration = 0, const char* szReason = "");
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_SERVER_DISCONNECTED; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_SERVER_DISCONNECTED; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    const char* GetReason(void) { return m_strReason; }
+    const char* GetReason() { return m_strReason; }
     void        SetReason(const char* szReason) { m_strReason = szReason; }
 
 private:

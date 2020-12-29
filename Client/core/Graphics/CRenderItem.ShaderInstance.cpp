@@ -33,7 +33,7 @@ void CShaderInstance::PostConstruct(CRenderItemManager* pManager, CShaderItem* p
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderInstance::PreDestruct(void)
+void CShaderInstance::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -46,7 +46,7 @@ void CShaderInstance::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CShaderInstance::IsValid(void)
+bool CShaderInstance::IsValid()
 {
     return m_pEffectWrap && m_pEffectWrap->m_pD3DEffect;
 }
@@ -58,7 +58,7 @@ bool CShaderInstance::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CShaderInstance::OnLostDevice(void)
+void CShaderInstance::OnLostDevice()
 {
     // Nothing required for CShaderInstance
 }
@@ -70,7 +70,7 @@ void CShaderInstance::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CShaderInstance::OnResetDevice(void)
+void CShaderInstance::OnResetDevice()
 {
     // Nothing required for CShaderInstance
 }
@@ -122,7 +122,7 @@ void CShaderInstance::CreateUnderlyingData(CShaderItem* pShaderItem)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderInstance::ReleaseUnderlyingData(void)
+void CShaderInstance::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pEffectWrap);
 
@@ -252,7 +252,7 @@ SShaderValue* CShaderInstance::GetParam(D3DXHANDLE hHandle)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderInstance::ApplyShaderParameters(void)
+void CShaderInstance::ApplyShaderParameters()
 {
     // Update list of values that will require the default setting
     if (m_pEffectWrap->m_pEffectTemplate->m_uiModifiedParametersRevision != m_uiModifiedParametersRevision)

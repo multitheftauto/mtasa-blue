@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2016-10-02 20:26+0000\n"
-"Last-Translator: Ahmedly <mybehig100@gmail.com>\n"
+"PO-Revision-Date: 2019-09-29 16:57+0000\n"
+"Last-Translator: Haxardous <a9xa@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; KING-ABADY; ALBANDER; SoRa; ccw; Alnassre; UAEpro; Majed-HQ; Tete; TAPL; Ahmedly; 3BaDy; MR.NaiF-MTA D:; Tifa_1999; Avenger\n"
+"Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; Haxardous; KING-ABADY; ccw; ALBANDER; SoRa; Tete; Sam; Suspect san; Alnassre; Nawaf \"Live\" Alqarni; Majed-HQ; UAEpro; TAPL; Conolel; devmedoo; Ahmed Ly; Hani Rouatbi; N3xT; LoFFY; 3BaDy; MR.NaiF-MTA D:; Hamdy; #Bero; ibrahemdeeb.15; Bydlo; DABL; Zed159; #BrosS; Avenger; XyZ; xXHaMoDeXx Dante; Tifa_1999; Bullet7\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1475440010.0\n"
+"X-POOTLE-MTIME: 1569776233.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"النسخة التي حملتها لـ MTA:SA لا تدعم ويندوز XP أو Vista. يرجى تحميل نسخى "
+"بديلة من www.mtasa.com"
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"نسخة MTA:SA هذه مصممة لإصدارات الويندوز القديمة.  يرجى تحميل أحدث نسخة من "
+"www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -52,12 +56,12 @@ msgstr ""
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:189
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "مكان لعبة Grand Theft Auto: San Andreas "
+msgstr "مجلد Grand Theft Auto: San Andreas "
 
 #. DIRECTORY_Text_Dest
 #: ../Shared/installer/nightly.nsi:190
 msgid "Grand Theft Auto: San Andreas folder"
-msgstr "مجلد : Grand Theft Auto: San Andreas "
+msgstr "مكان لعبة Grand Theft Auto: San Andreas "
 
 #. DIRECTORY_Text_Top
 #: ../Shared/installer/nightly.nsi:191
@@ -70,9 +74,9 @@ msgid ""
 msgstr ""
 "الرجاء اختيار مجلد لعبة Grand Theft Auto: San Andreas.$\n"
 " $\n"
-" يجب ان تكون لديك نسخة من اللعبة Grand Theft Auto: San Andreas v.1.0 ( MTA ) لا تدعم اي نسخة اخرى .$\n"
+" يجب ان تكون لديك نسخة مثبتة من اللعبة MTA) ،Grand Theft Auto: San Andreas v1.0) لا تدعم اي نسخة اخرى.$\n"
 " $\n"
-"انقر فوق تثبيت لـ بدء التركيب ."
+"انقر فوق تثبيت لبدء التركيب."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
@@ -82,12 +86,12 @@ msgstr "إنشاء مجموعة في قائمة ابدأ للتطبيقات ال
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "انشاء اختصار في سطح المكتب لـ [ MTA : SA ]"
+msgstr "انشاء اختصار في سطح المكتب لـMTA:SA"
 
 #. DESC_Section12
 #: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "تسجيل بروتوكول mtasa:\\ في المتصفح قابل للنقر ."
+msgstr "تسجيل بروتوكل mtasa:// لكي يكون قابل للنقر في المتصفح."
 
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:197
@@ -97,12 +101,12 @@ msgstr "أضف الى مستكشف العاب ويندوز ( اذا كان مو�
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "ثبت أو حدث DirectX (إن كان ضروريا)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
 msgid "The core components required to run Multi Theft Auto."
-msgstr "العناصراللازمة لـ تشغيل Multi Theft Auto."
+msgstr "العناصراللازمة لـ تشغيل برنامج Multi Theft Auto."
 
 #. DESC_Section2
 #: ../Shared/installer/nightly.nsi:200
@@ -142,8 +146,8 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"الـ MTA:SA Map Editor يمكنك من انشاء ماب خاص بك يستخدم في قيم مود معين لـ "
-"MTA ."
+"الـ MTA:SA 1.0 Map Editor يمكنك من خلاله عمل خريطة خاص بك لكي تستعملها في "
+"أواضع لعب MTA ."
 
 #. DESC_Section9
 #: ../Shared/installer/nightly.nsi:209
@@ -164,17 +168,18 @@ msgstr "كود التطوير و الادوات تساعد الاعبين على
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr "البرنامج الرئيسي الذي تم تثبيتة هو الذي يمكنك من تشغيل الـ MTA للعب !"
+msgstr ""
+"التطبيق هو البرنامج الذي تشلغه من اجل اللعب في خادم في Multi Theft Auto"
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:409
 msgid "Client and Server"
-msgstr "كلنت - سيرفر ( خادم - للاعب نفسة ( عميل ) ) "
+msgstr "المستخدم و الخادم"
 
 #. INST_SERVER
 #: ../Shared/installer/nightly.nsi:410
 msgid "Server only"
-msgstr "للخادم فقط ( سيرفر )"
+msgstr "للخادم فقط"
 
 #. INST_STARTMENU_GROUP
 #: ../Shared/installer/nightly.nsi:424
@@ -189,7 +194,7 @@ msgstr "ايقونة سطح المكتب"
 #. INST_PROTOCOL
 #: ../Shared/installer/nightly.nsi:426
 msgid "Register mtasa:// protocol"
-msgstr "تسجيل mtasa:\\ البروتوكول "
+msgstr "تسجيل بروتوكول //:mtasa"
 
 #. INST_GAMES_EXPLORER
 #: ../Shared/installer/nightly.nsi:427
@@ -199,7 +204,7 @@ msgstr "اضافتة الى مستكشف الالعاب"
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "ثبت DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
@@ -269,7 +274,7 @@ msgstr "تطوير"
 #. UNINST_SUCCESS
 #: ../Shared/installer/nightly.nsi:1015
 msgid "$(^Name) was successfully removed from your computer."
-msgstr "$(^Name) تم ازالة بنجاح من كمبيوتركـ ."
+msgstr "تمت إزالة $(^Name) بنجاح من حاسبك الألكتروني."
 
 #. UNINST_FAIL
 #: ../Shared/installer/nightly.nsi:1022
@@ -292,6 +297,11 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
+"الغاء التثبيت قبل التحديث$\r"
+"$\n"
+"ليس ضروريا إلغاء التثبيت قبل تثبيت نسخة جديدة من MTA:SA$\r"
+"$\n"
+"شغل المثبت الجديد للتحديث و حفظ إعداداتك"
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1044
@@ -359,6 +369,10 @@ msgid ""
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr ""
+"MTA لا يمكن تثبيتها في نفس ملف GTA:SA$\n"
+"$\n"
+"هل تريد استعمال ملف التثبيت الأساسي؟$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: ../Shared/installer/nightly.nsi:1780
@@ -453,22 +467,22 @@ msgstr "نوع الثبيت : ترقية"
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2353
 msgid "Online update"
-msgstr ""
+msgstr "التحديث عبر الانترنت ."
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2354
 msgid "Checking for update information"
-msgstr ""
+msgstr "يتم التحقق من معلومات التحديث"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2355
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "جاري التحقق من معلومات مثبت التحديث..."
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2356
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "الرجاء التأكد أن جدار الحماية الخاص بك لا يمنع"
 
 #~ msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
 #~ msgstr "غير قادر على تحميل Microsoft Visual Studio 2008 SP1 ."

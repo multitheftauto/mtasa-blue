@@ -11,84 +11,97 @@
 
 #include "StdInc.h"
 
-void CLuaElementDefs::LoadFunctions(void)
+void CLuaElementDefs::LoadFunctions()
 {
-    // Create/destroy
-    CLuaCFunctions::AddFunction("createElement", createElement);
-    CLuaCFunctions::AddFunction("destroyElement", destroyElement);
-    CLuaCFunctions::AddFunction("cloneElement", cloneElement);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Create/destroy
+        {"createElement", createElement},
+        {"destroyElement", destroyElement},
+        {"cloneElement", cloneElement},
 
-    // Get
-    CLuaCFunctions::AddFunction("isElement", isElement);
-    CLuaCFunctions::AddFunction("isElementWithinColShape", isElementWithinColShape);
-    CLuaCFunctions::AddFunction("isElementWithinMarker", isElementWithinMarker);
-    CLuaCFunctions::AddFunction("isElementInWater", isElementInWater);
-    CLuaCFunctions::AddFunction("isElementFrozen", isElementFrozen);
-    CLuaCFunctions::AddFunction("isElementLowLOD", isElementLowLOD);
-    CLuaCFunctions::AddFunction("setElementCallPropagationEnabled", setElementCallPropagationEnabled);
-    CLuaCFunctions::AddFunction("isElementCallPropagationEnabled", isElementCallPropagationEnabled);
+        // Get
+        {"isElement", isElement},
+        {"isElementWithinColShape", isElementWithinColShape},
+        {"isElementWithinMarker", isElementWithinMarker},
+        {"isElementInWater", isElementInWater},
+        {"isElementFrozen", isElementFrozen},
+        {"isElementLowLOD", isElementLowLOD},
+        {"setElementCallPropagationEnabled", setElementCallPropagationEnabled},
+        {"isElementCallPropagationEnabled", isElementCallPropagationEnabled},
 
-    CLuaCFunctions::AddFunction("getElementByID", getElementByID);
-    CLuaCFunctions::AddFunction("getElementByIndex", getElementByIndex);
-    CLuaCFunctions::AddFunction("getElementChildren", getElementChildren);
-    CLuaCFunctions::AddFunction("getElementChild", getElementChild);
-    CLuaCFunctions::AddFunction("getElementChildrenCount", getElementChildrenCount);
-    CLuaCFunctions::AddFunction("getAllElementData", getAllElementData);
-    CLuaCFunctions::AddFunction("getElementID", getElementID);
-    CLuaCFunctions::AddFunction("getElementParent", getElementParent);
-    CLuaCFunctions::AddFunction("getElementMatrix", getElementMatrix);
-    CLuaCFunctions::AddFunction("getElementPosition", getElementPosition);
-    CLuaCFunctions::AddFunction("getElementRotation", getElementRotation);
-    CLuaCFunctions::AddFunction("getElementVelocity", getElementVelocity);
-    CLuaCFunctions::AddFunction("getElementsByType", getElementsByType);
-    CLuaCFunctions::AddFunction("getElementType", getElementType);
-    CLuaCFunctions::AddFunction("getElementInterior", getElementInterior);
-    CLuaCFunctions::AddFunction("getElementsWithinColShape", getElementsWithinColShape);
-    CLuaCFunctions::AddFunction("getElementDimension", getElementDimension);
-    CLuaCFunctions::AddFunction("getElementZoneName", getElementZoneName);
-    CLuaCFunctions::AddFunction("getElementColShape", getElementColShape);
-    CLuaCFunctions::AddFunction("getElementAlpha", getElementAlpha);
-    CLuaCFunctions::AddFunction("isElementDoubleSided", isElementDoubleSided);
-    CLuaCFunctions::AddFunction("getElementHealth", getElementHealth);
-    CLuaCFunctions::AddFunction("getElementModel", getElementModel);
-    CLuaCFunctions::AddFunction("getElementSyncer", getElementSyncer);
-    CLuaCFunctions::AddFunction("getElementCollisionsEnabled", getElementCollisionsEnabled);
-    CLuaCFunctions::AddFunction("getLowLODElement", getLowLODElement);
+        {"getElementByID", getElementByID},
+        {"getElementByIndex", getElementByIndex},
+        {"getElementChildren", getElementChildren},
+        {"getElementChild", getElementChild},
+        {"getElementChildrenCount", getElementChildrenCount},
+        {"getAllElementData", getAllElementData},
+        {"getElementID", getElementID},
+        {"getElementParent", getElementParent},
+        {"getElementMatrix", getElementMatrix},
+        {"getElementPosition", getElementPosition},
+        {"getElementRotation", getElementRotation},
+        {"getElementVelocity", getElementVelocity},
+        {"getElementAngularVelocity", getElementTurnVelocity},
+        {"getElementsByType", getElementsByType},
+        {"getElementType", getElementType},
+        {"getElementInterior", getElementInterior},
+        {"getElementsWithinColShape", getElementsWithinColShape},
+        {"getElementsWithinRange", getElementsWithinRange},
+        {"getElementDimension", getElementDimension},
+        {"getElementZoneName", getElementZoneName},
+        {"getElementColShape", getElementColShape},
+        {"getElementAlpha", getElementAlpha},
+        {"isElementDoubleSided", isElementDoubleSided},
+        {"getElementHealth", getElementHealth},
+        {"getElementModel", getElementModel},
+        {"getElementSyncer", getElementSyncer},
+        {"getElementCollisionsEnabled", getElementCollisionsEnabled},
+        {"getLowLODElement", getLowLODElement},
 
-    // Attachement
-    CLuaCFunctions::AddFunction("attachElements", attachElements);
-    CLuaCFunctions::AddFunction("detachElements", detachElements);
-    CLuaCFunctions::AddFunction("isElementAttached", isElementAttached);
-    CLuaCFunctions::AddFunction("getAttachedElements", getAttachedElements);
-    CLuaCFunctions::AddFunction("getElementAttachedTo", getElementAttachedTo);
-    CLuaCFunctions::AddFunction("setElementAttachedOffsets", setElementAttachedOffsets);
-    CLuaCFunctions::AddFunction("getElementAttachedOffsets", getElementAttachedOffsets);
+        // Attachement
+        {"attachElements", attachElements},
+        {"detachElements", detachElements},
+        {"isElementAttached", isElementAttached},
+        {"getAttachedElements", getAttachedElements},
+        {"getElementAttachedTo", getElementAttachedTo},
+        {"setElementAttachedOffsets", setElementAttachedOffsets},
+        {"getElementAttachedOffsets", getElementAttachedOffsets},
 
-    // Element data
-    CLuaCFunctions::AddFunction("getElementData", getElementData);
-    CLuaCFunctions::AddFunction("setElementData", setElementData);
-    CLuaCFunctions::AddFunction("removeElementData", removeElementData);
+        // Element data
+        {"getElementData", GetElementData},
+        {"hasElementData", HasElementData},
+        {"setElementData", setElementData},
+        {"removeElementData", removeElementData},
+        {"addElementDataSubscriber", addElementDataSubscriber},
+        {"removeElementDataSubscriber", removeElementDataSubscriber},
+        {"hasElementDataSubscriber", hasElementDataSubscriber},
 
-    // Set
-    CLuaCFunctions::AddFunction("setElementID", setElementID);
-    CLuaCFunctions::AddFunction("setElementParent", setElementParent);
-    CLuaCFunctions::AddFunction("setElementMatrix", setElementMatrix);
-    CLuaCFunctions::AddFunction("setElementPosition", setElementPosition);
-    CLuaCFunctions::AddFunction("setElementRotation", setElementRotation);
-    CLuaCFunctions::AddFunction("setElementVelocity", setElementVelocity);
-    CLuaCFunctions::AddFunction("setElementVisibleTo", setElementVisibleTo);
-    CLuaCFunctions::AddFunction("clearElementVisibleTo", clearElementVisibleTo);
-    CLuaCFunctions::AddFunction("isElementVisibleTo", isElementVisibleTo);
-    CLuaCFunctions::AddFunction("setElementInterior", setElementInterior);
-    CLuaCFunctions::AddFunction("setElementDimension", setElementDimension);
-    CLuaCFunctions::AddFunction("setElementAlpha", setElementAlpha);
-    CLuaCFunctions::AddFunction("setElementDoubleSided", setElementDoubleSided);
-    CLuaCFunctions::AddFunction("setElementHealth", setElementHealth);
-    CLuaCFunctions::AddFunction("setElementModel", setElementModel);
-    CLuaCFunctions::AddFunction("setElementSyncer", setElementSyncer);
-    CLuaCFunctions::AddFunction("setElementCollisionsEnabled", setElementCollisionsEnabled);
-    CLuaCFunctions::AddFunction("setElementFrozen", setElementFrozen);
-    CLuaCFunctions::AddFunction("setLowLODElement", setLowLODElement);
+        // Set
+        {"setElementID", setElementID},
+        {"setElementParent", setElementParent},
+        {"setElementMatrix", setElementMatrix},
+        {"setElementPosition", setElementPosition},
+        {"setElementRotation", setElementRotation},
+        {"setElementVelocity", setElementVelocity},
+        {"setElementAngularVelocity", setElementTurnVelocity},
+        {"setElementVisibleTo", setElementVisibleTo},
+        {"clearElementVisibleTo", clearElementVisibleTo},
+        {"isElementVisibleTo", isElementVisibleTo},
+        {"setElementInterior", setElementInterior},
+        {"setElementDimension", setElementDimension},
+        {"setElementAlpha", setElementAlpha},
+        {"setElementDoubleSided", setElementDoubleSided},
+        {"setElementHealth", setElementHealth},
+        {"setElementModel", setElementModel},
+        {"setElementSyncer", setElementSyncer},
+        {"setElementCollisionsEnabled", setElementCollisionsEnabled},
+        {"setElementFrozen", setElementFrozen},
+        {"setLowLODElement", setLowLODElement},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 // TODO: specials
@@ -99,6 +112,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getByID", "getElementByID");
     lua_classfunction(luaVM, "getAllByType", "getElementsByType");
     lua_classfunction(luaVM, "getByIndex", "getElementByIndex");
+    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
 
     lua_classfunction(luaVM, "create", "createElement");
     lua_classfunction(luaVM, "clone", "cloneElement");
@@ -107,9 +121,11 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "attach", "attachElements");
     lua_classfunction(luaVM, "detach", "detachElements");
     lua_classfunction(luaVM, "removeData", "removeElementData");
+    lua_classfunction(luaVM, "addDataSubscriber", "addElementDataSubscriber");
+    lua_classfunction(luaVM, "removeDataSubscriber", "removeElementDataSubscriber");
+    lua_classfunction(luaVM, "hasDataSubscriber", "hasElementDataSubscriber");
 
     lua_classfunction(luaVM, "setParent", "setElementParent");
-    lua_classfunction(luaVM, "setVelocity", "setElementVelocity");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
     lua_classfunction(luaVM, "setHealth", "setElementHealth");
     lua_classfunction(luaVM, "setModel", "setElementModel");
@@ -121,6 +137,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setPosition", "setElementPosition");
     lua_classfunction(luaVM, "setRotation", "setElementRotation");
     lua_classfunction(luaVM, "setVelocity", "setElementVelocity");
+    lua_classfunction(luaVM, "setAngularVelocity", "setElementAngularVelocity");
     lua_classfunction(luaVM, "setVisibleTo", "setElementVisibleTo");
     lua_classfunction(luaVM, "setMatrix", "setElementMatrix");
     lua_classfunction(luaVM, "setID", "setElementID");
@@ -137,6 +154,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAttachedElements", "getAttachedElements");
     lua_classfunction(luaVM, "getAttachedTo", "getElementAttachedTo");
     lua_classfunction(luaVM, "getVelocity", "getElementVelocity", OOP_getElementVelocity);
+    lua_classfunction(luaVM, "getAngularVelocity", "getElementAngularVelocity", OOP_getElementTurnVelocity);
     lua_classfunction(luaVM, "getID", "getElementID");
     lua_classfunction(luaVM, "getZoneName", "getElementZoneName");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
@@ -147,6 +165,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getData", "getElementData");
+    lua_classfunction(luaVM, "hasData", "hasElementData");
     lua_classfunction(luaVM, "getPosition", "getElementPosition", OOP_getElementPosition);
     lua_classfunction(luaVM, "getRotation", "getElementRotation", OOP_getElementRotation);
     lua_classfunction(luaVM, "getMatrix", "getElementMatrix", OOP_getElementMatrix);
@@ -191,10 +210,8 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "rotation", "setElementRotation", "getElementRotation", OOP_setElementRotation, OOP_getElementRotation);
     lua_classvariable(luaVM, "matrix", "setElementMatrix", "getElementMatrix", setElementMatrix, OOP_getElementMatrix);
     lua_classvariable(luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity);
+    lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
-    // lua_classvariable ( luaVM, "data", "setElementData", "getElementData", OOP_setElementData, OOP_getElementData );
-    // lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", OOP_setElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); //
-    // .visibility[john]=false
 
     lua_registerclass(luaVM, "Element");
 }
@@ -473,46 +490,6 @@ int CLuaElementDefs::getElementByIndex(lua_State* luaVM)
         {
             lua_pushelement(luaVM, pElement);
             return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::getElementData(lua_State* luaVM)
-{
-    //  var getElementData ( element theElement, string key [, inherit = true] )
-    CElement* pElement;
-    SString   strKey;
-    bool      bInherit;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
-    argStream.ReadBool(bInherit, true);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
-            if (pVariable)
-            {
-                pVariable->Push(luaVM);
-                return 1;
-            }
         }
     }
     else
@@ -828,6 +805,56 @@ int CLuaElementDefs::OOP_getElementVelocity(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::getElementTurnVelocity(lua_State* luaVM)
+{
+    //  float float float getElementAngularVelocity ( element theElement )
+    CElement* pElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the turn velocity
+        CVector vecTurnVelocity;
+        if (CStaticFunctionDefinitions::GetElementTurnVelocity(pElement, vecTurnVelocity))
+        {
+            // Return it
+            lua_pushnumber(luaVM, vecTurnVelocity.fX);
+            lua_pushnumber(luaVM, vecTurnVelocity.fY);
+            lua_pushnumber(luaVM, vecTurnVelocity.fZ);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::OOP_getElementTurnVelocity(lua_State* luaVM)
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecTurnVelocity;
+        CStaticFunctionDefinitions::GetElementTurnVelocity(pElement, vecTurnVelocity);
+
+        lua_pushvector(luaVM, vecTurnVelocity);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaElementDefs::getElementType(lua_State* luaVM)
 {
     //  string getElementType ( element theElement )
@@ -986,6 +1013,45 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
+{
+    CVector position;
+    float   radius;
+    SString elementType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(position);
+    argStream.ReadNumber(radius);
+    argStream.ReadString(elementType, "");
+
+    if (!argStream.HasErrors())
+    {
+        // Query the spatial database
+        CElementResult result;
+        GetSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
+
+        lua_newtable(luaVM);
+        unsigned int index = 0;
+
+        for (CElement* entity : result)
+        {
+            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
+            {
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, entity);
+                lua_settable(luaVM, -3);
+            }
+        }
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaElementDefs::getElementDimension(lua_State* luaVM)
 {
     //  int getElementDimension ( element theElement )
@@ -1064,7 +1130,7 @@ int CLuaElementDefs::isElementAttached(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -1491,42 +1557,47 @@ int CLuaElementDefs::setElementID(lua_State* luaVM)
 
 int CLuaElementDefs::setElementData(lua_State* luaVM)
 {
-    //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
+    //  bool setElementData ( element theElement, string key, var value, [var syncMode = true] )
     CElement*    pElement;
     SString      strKey;
     CLuaArgument value;
-    bool         bSynchronize;
+    ESyncType    syncType = ESyncType::BROADCAST;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadString(strKey);
     argStream.ReadLuaArgument(value);
-    argStream.ReadBool(bSynchronize, true);
+
+    if (argStream.NextIsBool())
+    {
+        bool bSynchronize;
+        argStream.ReadBool(bSynchronize, true);
+
+        syncType = bSynchronize ? ESyncType::BROADCAST : ESyncType::LOCAL;
+    }
+    else
+        argStream.ReadEnumString(syncType, ESyncType::BROADCAST);
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
         {
-            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+            // Warn and truncate if key is too long
+            m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+        }
 
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, bSynchronize))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1544,31 +1615,109 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
         {
-            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+            // Warn and truncate if key is too long
+            m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+        }
 
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            if (CStaticFunctionDefinitions::RemoveElementData(pElement, strKey))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        if (CStaticFunctionDefinitions::RemoveElementData(pElement, strKey))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
+{
+    //  bool addElementDataSubscriber ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer*  pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (CStaticFunctionDefinitions::AddElementDataSubscriber(pElement, strKey, pPlayer))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
+{
+    //  bool removeElementDataSubscriber ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer*  pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+  
+        if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, strKey, pPlayer))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
+{
+    //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        bool bResult = CStaticFunctionDefinitions::HasElementDataSubscriber(pElement, strKey, pPlayer);
+        lua_pushboolean(luaVM, bResult);
+        return 1;
+    }
+
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
 int CLuaElementDefs::setElementMatrix(lua_State* luaVM)
@@ -1779,6 +1928,32 @@ int CLuaElementDefs::setElementVelocity(lua_State* luaVM)
 
         // Set the velocity
         if (CStaticFunctionDefinitions::SetElementVelocity(pElement, vecVelocity))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::setElementTurnVelocity(lua_State* luaVM)
+{
+    //  bool setElementAngularVelocity ( element theElement, float spinX, float spinY, float spinZ )
+    CElement* pElement;
+    CVector   vecTurnVelocity;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadVector3D(vecTurnVelocity);
+
+    if (!argStream.HasErrors())
+    {
+        // Set the turn velocity
+        if (CStaticFunctionDefinitions::SetElementAngularVelocity(pElement, vecTurnVelocity))
         {
             lua_pushboolean(luaVM, true);
             return 1;

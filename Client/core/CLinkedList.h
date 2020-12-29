@@ -14,8 +14,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLINKEDLIST_H
-#define __CLINKEDLIST_H
+#pragma once
 
 // ignore the return type warning for the -> operator when we are potentially using pointers themselves
 #pragma warning(disable:4284)
@@ -348,5 +347,3 @@ public:
         m_pHead = m_pTail = NULL;
     };
 };
-
-#endif

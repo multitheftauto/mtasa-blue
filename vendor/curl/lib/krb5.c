@@ -1,8 +1,8 @@
 /* GSSAPI/krb5 support for FTP - loosely based on old krb4.c
  *
- * Copyright (c) 1995, 1996, 1997, 1998, 1999 Kungliga Tekniska Högskolan
+ * Copyright (c) 1995, 1996, 1997, 1998, 1999 Kungliga Tekniska HÃ¶gskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
- * Copyright (c) 2004 - 2017 Daniel Stenberg
+ * Copyright (c) 2004 - 2019 Daniel Stenberg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -206,7 +206,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
     if(maj != GSS_S_COMPLETE) {
       gss_release_name(&min, &gssname);
       if(service == srv_host) {
-        Curl_failf(data, "Error importing service name %s@%s", service, host);
+        failf(data, "Error importing service name %s@%s", service, host);
         return AUTH_ERROR;
       }
       service = srv_host;
@@ -265,6 +265,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
           result = CURLE_OUT_OF_MEMORY;
 
         free(p);
+        free(cmd);
 
         if(result) {
           ret = -2;
@@ -290,8 +291,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
                                       (unsigned char **)&_gssresp.value,
                                       &_gssresp.length);
           if(result) {
-            Curl_failf(data, "base64-decoding: %s",
-                       curl_easy_strerror(result));
+            failf(data, "base64-decoding: %s", curl_easy_strerror(result));
             ret = AUTH_CONTINUE;
             break;
           }
@@ -320,10 +320,8 @@ static void krb5_end(void *app_data)
     OM_uint32 min;
     gss_ctx_id_t *context = app_data;
     if(*context != GSS_C_NO_CONTEXT) {
-#ifdef DEBUGBUILD
-      OM_uint32 maj =
-#endif
-      gss_delete_sec_context(&min, context, GSS_C_NO_BUFFER);
+      OM_uint32 maj = gss_delete_sec_context(&min, context, GSS_C_NO_BUFFER);
+      (void)maj;
       DEBUGASSERT(maj == GSS_S_COMPLETE);
     }
 }

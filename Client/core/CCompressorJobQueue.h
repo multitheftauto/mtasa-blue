@@ -42,11 +42,11 @@ class CCompressJobData
 public:
     ZERO_ON_NEW
     bool SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, uint uiTimeSpentInQueue);
-    bool HasCallback(void);
-    void ProcessCallback(void);
+    bool HasCallback();
+    void ProcessCallback();
 
-    CCompressJobData(void) { DEBUG_CREATE_COUNT("CCompressJobData"); }
-    ~CCompressJobData(void) { DEBUG_DESTROY_COUNT("CCompressJobData"); }
+    CCompressJobData() { DEBUG_CREATE_COUNT("CCompressJobData"); }
+    ~CCompressJobData() { DEBUG_DESTROY_COUNT("CCompressJobData"); }
 
     EJobStageType stage;
 
@@ -83,13 +83,13 @@ public:
 class CCompressorJobQueue
 {
 public:
-    virtual ~CCompressorJobQueue(void) {}
+    virtual ~CCompressorJobQueue() {}
 
-    virtual void              DoPulse(void) = 0;
+    virtual void              DoPulse() = 0;
     virtual CCompressJobData* AddCommand(uint uiSizeX, uint uiSizeY, uint uiQuality, uint uiTimeSpentInQueue, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback,
                                          const CBuffer& buffer) = 0;
     virtual bool              PollCommand(CCompressJobData* pJobData, uint uiTimeout) = 0;
     virtual bool              FreeCommand(CCompressJobData* pJobData) = 0;
 };
 
-CCompressorJobQueue* NewCompressorJobQueue(void);
+CCompressorJobQueue* NewCompressorJobQueue();

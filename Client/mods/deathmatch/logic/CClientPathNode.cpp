@@ -30,7 +30,7 @@ CClientPathNode::CClientPathNode(CClientManager* pManager, CVector& vecPosition,
     m_pPathManager->AddToList(this);
 }
 
-CClientPathNode::~CClientPathNode(void)
+CClientPathNode::~CClientPathNode()
 {
     Unlink();
 
@@ -40,12 +40,12 @@ CClientPathNode::~CClientPathNode(void)
         m_pNextNode->SetPreviousNode(NULL);
 }
 
-void CClientPathNode::Unlink(void)
+void CClientPathNode::Unlink()
 {
     m_pPathManager->RemoveFromList(this);
 }
 
-void CClientPathNode::DoPulse(void)
+void CClientPathNode::DoPulse()
 {
     list<CClientEntity*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)

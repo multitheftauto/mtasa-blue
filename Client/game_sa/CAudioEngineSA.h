@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_AUDIOENGINE
-#define __CGAMESA_AUDIOENGINE
+#pragma once
 
 #include "Common.h"
 #include <game/CAudioEngine.h>
@@ -108,7 +107,7 @@ public:
     short          m_wPlayingState;                   // +104
     char           unk6[2];                           // +106
     float          m_fSoundHeadRoom;                  // +108
-    short          unk7;                              // +112
+    short          m_wSoundLength;                    // +112
     short          unk8;                              // +114
 };
 static_assert(sizeof(CAESound) == 0x74, "Invalid size for CAESound");
@@ -130,20 +129,20 @@ public:
     VOID          SetMissionAudioPosition(CVector* position, int slot = 1);
     bool          PlayLoadedMissionAudio(int slot = 1);
     VOID          PauseAllSound(bool bPaused);
-    VOID          StopRadio(void);
+    VOID          StopRadio();
     VOID          StartRadio(unsigned int station);
     void          PauseAmbientSounds(bool bPaused);
     VOID          SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled);
     bool          IsAmbientSoundEnabled(eAmbientSoundType eType);
-    void          ResetAmbientSounds(void);
+    void          ResetAmbientSounds();
     VOID          SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bEnabled, bool bImmediate);
     bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex);
-    void          ResetWorldSounds(void);
+    void          ResetWorldSounds();
     void          SetWorldSoundHandler(WorldSoundHandler* pHandler);
     void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2);
     void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical);
 
-    void UpdateAmbientSoundSettings(void);
+    void UpdateAmbientSoundSettings();
     bool OnWorldSound(CAESound* pAESound);
 
 private:
@@ -158,5 +157,3 @@ private:
 
     CAudioEngineSAInterface* m_pInterface;
 };
-
-#endif

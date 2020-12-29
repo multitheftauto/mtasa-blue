@@ -96,7 +96,7 @@ struct STexInfo
 
 struct SShaderInfoInstance
 {
-    SShaderInfoInstance(void) : pShaderInfo(NULL), bMixEntityAndNonEntity(false) {}
+    SShaderInfoInstance() : pShaderInfo(NULL), bMixEntityAndNonEntity(false) {}
 
     SShaderInfoInstance(SShaderInfo* pShaderInfo, bool bMixEntityAndNonEntity) : pShaderInfo(pShaderInfo), bMixEntityAndNonEntity(bMixEntityAndNonEntity) {}
 
@@ -133,7 +133,7 @@ struct SShaderInfoLayers
 //
 struct STexShaderReplacement
 {
-    STexShaderReplacement(void) : bSet(false) /*, pShaderInfo ( NULL )*/ {}
+    STexShaderReplacement() : bSet(false) /*, pShaderInfo ( NULL )*/ {}
     bool              bSet;
     SShaderInfoLayers shaderLayers;
 };
@@ -151,7 +151,7 @@ struct STexNameInfo
 #endif
     }
 
-    void ResetReplacementResults(void)
+    void ResetReplacementResults()
     {
         for (uint i = 0; i < NUMELMS(texNoEntityShaders); i++)
             texNoEntityShaders[i] = STexShaderReplacement();

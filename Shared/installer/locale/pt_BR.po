@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2017-08-08 05:51+0000\n"
-"Last-Translator: Zezin <netfixmta@gmail.com>\n"
+"PO-Revision-Date: 2019-08-02 06:50+0000\n"
+"Last-Translator: DNL291 <danilo_dnld@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano Teixeira; ccw; neves768; Davidhm; gustavorn; Talidan\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Francisco \"Vampire\"; ccw; Cristiano Teixeira; neves768; expert975; Davidhm; qaisjp; gustavorn; Talidan\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1502171474.0\n"
+"X-POOTLE-MTIME: 1564728641.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"A versão do MTA:SA que você baixou não suporta o Windows XP ou Vista. Por "
+"favor, baixe uma versão alternativa em www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Esta versão do MTA:SA foi projetada para versões antigas do Windows. Por "
+"favor, baixe a versão mais recente em www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -77,7 +81,7 @@ msgstr ""
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
-msgstr "Criar um grupo no Meu Iniciar para os aplicativos instalados"
+msgstr "Criar um grupo no Menu Iniciar para as aplicações instaladas"
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
@@ -99,7 +103,7 @@ msgstr "Adicionar ao Explorador de Jogos do Windows (se disponível)."
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Instalar ou atualizar o DirectX (se necessário)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -133,12 +137,12 @@ msgstr "A modificação MTA:SA para o servidor."
 #. DESC_Section6
 #: ../Shared/installer/nightly.nsi:206
 msgid "This is a set of required resources for your server."
-msgstr "Scripts fundamentais para o funcionamento correto do servidor."
+msgstr "É um conjunto de resources fundamentais para o servidor."
 
 #. DESC_Section7
 #: ../Shared/installer/nightly.nsi:207
 msgid "This is an optional set of gamemodes and maps for your server."
-msgstr "Pacote opcional de scripts e mapas para seu servidor."
+msgstr "É um conjunto opcional de gamemodes e mapas para o servidor."
 
 #. DESC_Section8
 #: ../Shared/installer/nightly.nsi:208
@@ -205,7 +209,7 @@ msgstr "Atalho na pasta Jogos do Windows"
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Instale o DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
@@ -256,12 +260,12 @@ msgstr ""
 # 'Resources' são os Recursos que rodam no servidor.
 #: ../Shared/installer/nightly.nsi:472
 msgid "Core Resources"
-msgstr "Recursos Principais"
+msgstr "Resources Principais"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: ../Shared/installer/nightly.nsi:473
 msgid "Optional Resources"
-msgstr "Recursos Opcionais"
+msgstr "Resources Opcionais"
 
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:474

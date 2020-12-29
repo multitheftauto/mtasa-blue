@@ -13,7 +13,7 @@
 
 struct SEventUsage
 {
-    SEventUsage(void) : iTotal(0), iEventOut(0), iElementDataOut(0), iElementDataRelay(0) {}
+    SEventUsage() : iTotal(0), iEventOut(0), iElementDataOut(0), iElementDataRelay(0) {}
     SString strName;
     int     iTotal;
     int     iEventOut;
@@ -33,12 +33,12 @@ class CPerfStatEventPacketUsageImpl : public CPerfStatEventPacketUsage
 public:
     ZERO_ON_NEW
 
-    CPerfStatEventPacketUsageImpl(void);
-    virtual ~CPerfStatEventPacketUsageImpl(void);
+    CPerfStatEventPacketUsageImpl();
+    virtual ~CPerfStatEventPacketUsageImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatEventPacketUsage
@@ -47,7 +47,7 @@ public:
     virtual void UpdateEventUsageOut(const char* szName, uint uiNumPlayers);
 
     // CPerfStatEventPacketUsageImpl
-    void MaybeRecordStats(void);
+    void MaybeRecordStats();
 
     bool                           m_bEnabled;
     CElapsedTime                   m_TimeSinceGetStats;
@@ -80,7 +80,7 @@ CPerfStatEventPacketUsage* CPerfStatEventPacketUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl(void)
+CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl()
 {
     m_strCategoryName = "Event Packet usage";
 }
@@ -92,7 +92,7 @@ CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatEventPacketUsageImpl::~CPerfStatEventPacketUsageImpl(void)
+CPerfStatEventPacketUsageImpl::~CPerfStatEventPacketUsageImpl()
 {
 }
 
@@ -103,7 +103,7 @@ CPerfStatEventPacketUsageImpl::~CPerfStatEventPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatEventPacketUsageImpl::GetCategoryName(void)
+const SString& CPerfStatEventPacketUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -115,7 +115,7 @@ const SString& CPerfStatEventPacketUsageImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::DoPulse(void)
+void CPerfStatEventPacketUsageImpl::DoPulse()
 {
     MaybeRecordStats();
 }
@@ -178,7 +178,7 @@ void CPerfStatEventPacketUsageImpl::UpdateEventUsageOut(const char* szName, uint
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::MaybeRecordStats(void)
+void CPerfStatEventPacketUsageImpl::MaybeRecordStats()
 {
     // Someone watching?
     if (m_TimeSinceGetStats.Get() < 10000)

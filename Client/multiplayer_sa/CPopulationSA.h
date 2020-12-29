@@ -17,8 +17,7 @@
 
 #include <list>
 
-#ifndef __CMULTIPLAYER_POPULATION
-#define __CMULTIPLAYER_POPULATION
+#pragma once
 
 #define HOOKPOS_EndOf_CPopulation__Add      0x612C76
 #define HOOKPOS_CPopulation__RemovePed      0x610F20
@@ -44,5 +43,3 @@ public:
     void          SetCivilianAddHandler(CivilianAddHandler* pCivilianAddHandler);
     void          SetCivilianRemoveHandler(CivilianAddHandler* pCivilianAddHandler);
 };
-
-#endif

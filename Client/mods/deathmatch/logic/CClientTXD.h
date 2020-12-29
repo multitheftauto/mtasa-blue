@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCLIENTTXD_H
-#define __CCLIENTTXD_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -19,19 +18,22 @@ class CClientTXD : public CClientEntity
     DECLARE_CLASS(CClientTXD, CClientEntity)
 public:
     CClientTXD(class CClientManager* pManager, ElementID ID);
-    ~CClientTXD(void);
+    ~CClientTXD();
 
-    void Unlink(void){};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    eClientEntityType GetType(void) const { return CCLIENTTXD; }
-    bool              LoadTXD(const SString& strFile, bool bFilteringEnabled, bool bIsRawData);
+    eClientEntityType GetType() const { return CCLIENTTXD; }
+    bool              Load(bool isRaw, SString input, bool enableFiltering);
     bool              Import(unsigned short usModelID);
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
 
-protected:
+private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     void Restream(unsigned short usModel);
     bool GetFilenameToUse(SString& strOutFilename);
 
@@ -39,8 +41,6 @@ protected:
     bool                 m_bFilteringEnabled;
     bool                 m_bIsRawData;
     bool                 m_bUsingFileDataForClothes;
-    CBuffer              m_FileData;
+    SString              m_FileData;
     SReplacementTextures m_ReplacementTextures;
 };
-
-#endif

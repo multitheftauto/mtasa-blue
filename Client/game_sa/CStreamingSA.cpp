@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 
+#include "CModelInfoSA.h"
+
+// count: 26316 in unmodified game
+CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;
+
 namespace
 {
     //
@@ -23,7 +28,7 @@ namespace
         DWORD numModelsRequested;
         DWORD memoryUsed;
 
-        void Record(void)
+        void Record()
         {
             #define VAR_CStreaming_bLoadingBigModel         0x08E4A58
             #define VAR_CStreaming_numPriorityRequests      0x08E4BA0
@@ -133,4 +138,17 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
+}
+
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint32 id)
+{
+    return &ms_aInfoForModel[id];
+}
+
+void CStreamingSA::ReinitStreaming()
+{
+    typedef int(__cdecl * Function_ReInitStreaming)();
+    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
+
+    reinitStreaming();
 }

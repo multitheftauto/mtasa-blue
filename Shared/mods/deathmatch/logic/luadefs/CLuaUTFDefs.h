@@ -14,7 +14,7 @@
 class CLuaUTFDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     LUA_DECLARE(UtfLen);
     LUA_DECLARE(UtfSeek);

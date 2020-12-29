@@ -14,25 +14,25 @@
 #include "../CCommon.h"
 #include "CPacket.h"
 
-class CPlayerSpawnPacket : public CPacket
+class CPlayerSpawnPacket final : public CPacket
 {
 public:
-    CPlayerSpawnPacket(void);
+    CPlayerSpawnPacket();
     CPlayerSpawnPacket(ElementID PlayerID, const CVector& vecSpawnPosition, float fSpawnRotation, unsigned short usPlayerSkin, unsigned char ucInterior,
                        unsigned short usDimension, ElementID Team, unsigned char ucTimeContext);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_SPAWN; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SPAWN; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID      GetPlayer(void) { return m_PlayerID; };
-    CVector&       GetSpawnPosition(void) { return m_vecSpawnPosition; };
-    float          GetSpawnRotation(void) { return m_fSpawnRotation; };
-    unsigned short GetPlayerSkin(void) { return m_usPlayerSkin; };
-    ElementID      GetTeam(void) { return m_Team; }
-    unsigned char  GetInterior(void) { return m_ucInterior; }
-    unsigned short GetDimension(void) { return m_usDimension; }
+    ElementID      GetPlayer() { return m_PlayerID; };
+    CVector&       GetSpawnPosition() { return m_vecSpawnPosition; };
+    float          GetSpawnRotation() { return m_fSpawnRotation; };
+    unsigned short GetPlayerSkin() { return m_usPlayerSkin; };
+    ElementID      GetTeam() { return m_Team; }
+    unsigned char  GetInterior() { return m_ucInterior; }
+    unsigned short GetDimension() { return m_usDimension; }
 
     void SetPlayer(ElementID PlayerID) { m_PlayerID = PlayerID; };
     void SetSpawnPosition(CVector& vecPosition) { m_vecSpawnPosition = vecPosition; };

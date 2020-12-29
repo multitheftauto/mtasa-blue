@@ -95,7 +95,7 @@ void RemoveTrack(void* pAddress)
     }
 }
 
-void DumpUnfreed(void)
+void DumpUnfreed()
 {
     // Make sure we got a list
     if (!pAllocList)
@@ -156,7 +156,7 @@ void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine)
 void RemoveTrack(void* pAddress)
 {
 }
-void DumpUnfreed(void)
+void DumpUnfreed()
 {
 }
 #endif

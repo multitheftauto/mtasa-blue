@@ -16,8 +16,8 @@ class CProxyDirect3DVertexDeclaration : public IDirect3DVertexDeclaration9
 public:
     /*** IUnknown methods ***/
     HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    ULONG __stdcall AddRef(void) { return m_pOriginal->AddRef(); }
-    ULONG __stdcall Release(void);
+    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
+    ULONG __stdcall Release();
 
     /*** IDirect3DVertexDeclaration9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice) { return m_pOriginal->GetDevice(ppDevice); }
@@ -25,9 +25,9 @@ public:
 
     // CProxyDirect3DVertexDeclaration
     CProxyDirect3DVertexDeclaration(IDirect3DDevice9* InD3DDevice9, IDirect3DVertexDeclaration9* InOriginal, CONST D3DVERTEXELEMENT9* pVertexElements);
-    virtual ~CProxyDirect3DVertexDeclaration(void);
+    virtual ~CProxyDirect3DVertexDeclaration();
 
-    IDirect3DVertexDeclaration9* GetOriginal(void) { return m_pOriginal; }
+    IDirect3DVertexDeclaration9* GetOriginal() { return m_pOriginal; }
 
 protected:
     IDirect3DVertexDeclaration9* m_pOriginal;

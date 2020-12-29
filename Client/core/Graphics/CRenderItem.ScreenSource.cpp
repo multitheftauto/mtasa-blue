@@ -35,7 +35,7 @@ void CScreenSourceItem::PostConstruct(CRenderItemManager* pManager, uint uiSizeX
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenSourceItem::PreDestruct(void)
+void CScreenSourceItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -48,7 +48,7 @@ void CScreenSourceItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CScreenSourceItem::IsValid(void)
+bool CScreenSourceItem::IsValid()
 {
     return m_pD3DTexture && m_pD3DRenderTargetSurface;
 }
@@ -60,7 +60,7 @@ bool CScreenSourceItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CScreenSourceItem::OnLostDevice(void)
+void CScreenSourceItem::OnLostDevice()
 {
     ReleaseUnderlyingData();
 }
@@ -72,7 +72,7 @@ void CScreenSourceItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CScreenSourceItem::OnResetDevice(void)
+void CScreenSourceItem::OnResetDevice()
 {
     CreateUnderlyingData();
 }
@@ -84,7 +84,7 @@ void CScreenSourceItem::OnResetDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenSourceItem::CreateUnderlyingData(void)
+void CScreenSourceItem::CreateUnderlyingData()
 {
     assert(!m_pD3DRenderTargetSurface);
     assert(!m_pD3DTexture);
@@ -132,7 +132,7 @@ void CScreenSourceItem::CreateUnderlyingData(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenSourceItem::ReleaseUnderlyingData(void)
+void CScreenSourceItem::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pD3DRenderTargetSurface)
     SAFE_RELEASE(m_pD3DTexture)

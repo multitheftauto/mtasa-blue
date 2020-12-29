@@ -1,4 +1,4 @@
-// zdeflate.cpp - written and placed in the public domain by Wei Dai
+// zdeflate.cpp - originally written and placed in the public domain by Wei Dai
 
 // Many of the algorithms and tables used here came from the deflate implementation
 // by Jean-loup Gailly, which was included in Crypto++ 4.0 and earlier. I completely
@@ -11,6 +11,15 @@
 #include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
+
+#if (defined(_MSC_VER) && (_MSC_VER < 1400)) && !defined(__MWERKS__)
+	// VC60 and VC7 workaround: built-in std::reverse_iterator has two template parameters, Dinkumware only has one
+	typedef std::reverse_bidirectional_iterator<unsigned int *, unsigned int> RevIt;
+#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
+	typedef std::reverse_iterator<unsigned int *, std::random_access_iterator_tag, unsigned int> RevIt;
+#else
+	typedef std::reverse_iterator<unsigned int *> RevIt;
+#endif
 
 LowFirstBitWriter::LowFirstBitWriter(BufferedTransformation *attachment)
 	: Filter(attachment), m_counting(false), m_bitCount(0), m_buffer(0)
@@ -89,7 +98,7 @@ HuffmanEncoder::HuffmanEncoder(const unsigned int *codeBits, unsigned int nCodes
 
 struct HuffmanNode
 {
-	// Coverity finding on uninitalized 'symbol' member
+	// Coverity finding on uninitialized 'symbol' member
 	HuffmanNode()
 		: symbol(0), parent(0) {}
 	HuffmanNode(const HuffmanNode& rhs)
@@ -291,7 +300,7 @@ void Deflator::Reset(bool forceReset)
 	m_detectCount = 1;
 	m_detectSkip = 0;
 
-	// m_prev will be initialized automaticly in InsertString
+	// m_prev will be initialized automatically in InsertString
 	std::fill(m_head.begin(), m_head.end(), byte(0));
 
 	std::fill(m_literalCounts.begin(), m_literalCounts.end(), byte(0));
@@ -529,7 +538,7 @@ size_t Deflator::Put2(const byte *str, size_t length, int messageEnd, bool block
 		Reset();
 	}
 
-	Output(0, NULL, 0, messageEnd, blocking);
+	Output(0, NULLPTR, 0, messageEnd, blocking);
 	return 0;
 }
 
@@ -661,26 +670,17 @@ void Deflator::EncodeBlock(bool eof, unsigned int blockType)
 	{
 		if (blockType == DYNAMIC)
 		{
-#if defined(_MSC_VER) && !defined(__MWERKS__) && (_MSC_VER <= 1300)
-			// VC60 and VC7 workaround: built-in std::reverse_iterator has two template parameters, Dinkumware only has one
-			typedef std::reverse_bidirectional_iterator<unsigned int *, unsigned int> RevIt;
-#elif defined(_RWSTD_NO_CLASS_PARTIAL_SPEC)
-			typedef std::reverse_iterator<unsigned int *, std::random_access_iterator_tag, unsigned int> RevIt;
-#else
-			typedef std::reverse_iterator<unsigned int *> RevIt;
-#endif
-
 			FixedSizeSecBlock<unsigned int, 286> literalCodeLengths;
 			FixedSizeSecBlock<unsigned int, 30> distanceCodeLengths;
 
 			m_literalCounts[256] = 1;
 			HuffmanEncoder::GenerateCodeLengths(literalCodeLengths, 15, m_literalCounts, 286);
 			m_dynamicLiteralEncoder.Initialize(literalCodeLengths, 286);
-			unsigned int hlit = (unsigned int)(std::find_if(RevIt(literalCodeLengths.end()), RevIt(literalCodeLengths.begin()+257), std::bind2nd(std::not_equal_to<unsigned int>(), 0)).base() - (literalCodeLengths.begin()+257));
+			unsigned int hlit = (unsigned int)(FindIfNot(RevIt(literalCodeLengths.end()), RevIt(literalCodeLengths.begin()+257), 0).base() - (literalCodeLengths.begin()+257));
 
 			HuffmanEncoder::GenerateCodeLengths(distanceCodeLengths, 15, m_distanceCounts, 30);
 			m_dynamicDistanceEncoder.Initialize(distanceCodeLengths, 30);
-			unsigned int hdist = (unsigned int)(std::find_if(RevIt(distanceCodeLengths.end()), RevIt(distanceCodeLengths.begin()+1), std::bind2nd(std::not_equal_to<unsigned int>(), 0)).base() - (distanceCodeLengths.begin()+1));
+			unsigned int hdist = (unsigned int)(FindIfNot(RevIt(distanceCodeLengths.end()), RevIt(distanceCodeLengths.begin()+1), 0).base() - (distanceCodeLengths.begin()+1));
 
 			SecBlockWithHint<unsigned int, 286+30> combinedLengths(hlit+257+hdist+1);
 			memcpy(combinedLengths, literalCodeLengths, (hlit+257)*sizeof(unsigned int));

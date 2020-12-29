@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PARTICLEOBJECT
-#define __CGAME_PARTICLEOBJECT
+#pragma once
 
 class CParticleObject
 {
 };
-
-#endif

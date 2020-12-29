@@ -23,7 +23,7 @@ CModManagerImpl::CModManagerImpl(CServerImpl* pServer)
     m_pBase = NULL;
 }
 
-CModManagerImpl::~CModManagerImpl(void)
+CModManagerImpl::~CModManagerImpl()
 {
     // Make sure the mod is unloaded
     Unload();
@@ -40,12 +40,12 @@ SString CModManagerImpl::GetAbsolutePath(const char* szRelative)
     return SString("%s/%s", m_strModPath.c_str(), szRelative);
 }
 
-bool CModManagerImpl::IsModLoaded(void)
+bool CModManagerImpl::IsModLoaded()
 {
     return m_pBase != NULL;
 }
 
-CServerBase* CModManagerImpl::GetCurrentMod(void)
+CServerBase* CModManagerImpl::GetCurrentMod()
 {
     return m_pBase;
 }
@@ -135,7 +135,7 @@ void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
     }
 }
 
-void CModManagerImpl::DoPulse(void)
+void CModManagerImpl::DoPulse()
 {
     // Got a mod loaded?
     if (m_pBase)
@@ -145,7 +145,7 @@ void CModManagerImpl::DoPulse(void)
     }
 }
 
-bool CModManagerImpl::IsFinished(void)
+bool CModManagerImpl::IsFinished()
 {
     if (m_pBase)
     {
@@ -155,7 +155,7 @@ bool CModManagerImpl::IsFinished(void)
     return true;
 }
 
-bool CModManagerImpl::PendingWorkToDo(void)
+bool CModManagerImpl::PendingWorkToDo()
 {
     if (m_pBase)
     {

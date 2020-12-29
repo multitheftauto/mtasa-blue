@@ -13,14 +13,14 @@ class CClientGuiFont : public CClientRenderElement
     DECLARE_CLASS(CClientGuiFont, CClientRenderElement)
 public:
     CClientGuiFont(CClientManager* pManager, ElementID ID, CGuiFontItem* pFontItem);
-    ~CClientGuiFont(void);
+    ~CClientGuiFont();
 
-    eClientEntityType GetType(void) const { return CCLIENTGUIFONT; }
-    void              Unlink(void);
+    eClientEntityType GetType() const { return CCLIENTGUIFONT; }
+    void              Unlink();
 
     // CClientGuiFont methods
-    CGuiFontItem*  GetGuiFontItem(void) { return (CGuiFontItem*)m_pRenderItem; }
-    const SString& GetCEGUIFontName(void);
+    CGuiFontItem*  GetGuiFontItem() { return (CGuiFontItem*)m_pRenderItem; }
+    const SString& GetCEGUIFontName();
     void           NotifyGUIElementAttach(CClientGUIElement* pGUIElement);
     void           NotifyGUIElementDetach(CClientGUIElement* pGUIElement);
 

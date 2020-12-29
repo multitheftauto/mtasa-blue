@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_GARAGES
-#define __CGAME_GARAGES
+#pragma once
 
 #include "CGarage.h"
 #include "Common.h"
@@ -23,5 +22,3 @@ public:
     virtual CGarage* GetGarage(DWORD dwID) = 0;
     virtual void     Initialize() = 0;
 };
-
-#endif

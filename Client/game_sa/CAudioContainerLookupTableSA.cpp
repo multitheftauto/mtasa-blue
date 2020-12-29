@@ -35,7 +35,7 @@ CAudioContainerLookupTableSA::CAudioContainerLookupTableSA(const SString& strPat
     fileHandle.close();
 }
 
-CAudioContainerLookupTableSA::~CAudioContainerLookupTableSA(void)
+CAudioContainerLookupTableSA::~CAudioContainerLookupTableSA()
 {
     for (int i = 0; i < 9; i++)
     {

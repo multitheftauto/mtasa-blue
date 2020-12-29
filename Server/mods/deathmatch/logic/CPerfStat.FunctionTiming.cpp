@@ -20,7 +20,7 @@ namespace
     //
     struct STiming
     {
-        STiming(void) : uiNumCalls(0), fTotalMs(0), fPeakMs(0), fResBiggestMs(0), uiTotalBytes(0), uiPeakBytes(0), uiResBiggestBytes(0) {}
+        STiming() : uiNumCalls(0), fTotalMs(0), fPeakMs(0), fResBiggestMs(0), uiTotalBytes(0), uiPeakBytes(0), uiResBiggestBytes(0) {}
 
         uint    uiNumCalls;
         float   fTotalMs;
@@ -36,7 +36,7 @@ namespace
 
     struct SFunctionTimingInfo
     {
-        SFunctionTimingInfo(void) : iPrevIndex(0) {}
+        SFunctionTimingInfo() : iPrevIndex(0) {}
         STiming                  now5s;
         STiming                  prev60s;
         int                      iPrevIndex;
@@ -86,12 +86,12 @@ class CPerfStatFunctionTimingImpl : public CPerfStatFunctionTiming
 {
 public:
     ZERO_ON_NEW
-    CPerfStatFunctionTimingImpl(void);
-    virtual ~CPerfStatFunctionTimingImpl(void);
+    CPerfStatFunctionTimingImpl();
+    virtual ~CPerfStatFunctionTimingImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatFunctionTiming
@@ -132,7 +132,7 @@ CPerfStatFunctionTiming* CPerfStatFunctionTiming::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatFunctionTimingImpl::CPerfStatFunctionTimingImpl(void)
+CPerfStatFunctionTimingImpl::CPerfStatFunctionTimingImpl()
 {
     m_strCategoryName = "Function stats";
     ms_PeakUsThresh = DEFAULT_THRESH_MS * 1000;
@@ -145,7 +145,7 @@ CPerfStatFunctionTimingImpl::CPerfStatFunctionTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatFunctionTimingImpl::~CPerfStatFunctionTimingImpl(void)
+CPerfStatFunctionTimingImpl::~CPerfStatFunctionTimingImpl()
 {
 }
 
@@ -156,7 +156,7 @@ CPerfStatFunctionTimingImpl::~CPerfStatFunctionTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatFunctionTimingImpl::GetCategoryName(void)
+const SString& CPerfStatFunctionTimingImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -168,7 +168,7 @@ const SString& CPerfStatFunctionTimingImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatFunctionTimingImpl::DoPulse(void)
+void CPerfStatFunctionTimingImpl::DoPulse()
 {
     // Maybe turn off stats gathering if nobody is watching
     if (m_bIsActive && m_TimeSinceLastViewed.Get() > 15000)

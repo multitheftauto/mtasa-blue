@@ -11,8 +11,7 @@
 
 #include "multiplayersa_init.h"
 
-#ifndef __CMULTIPLAYERSAKEYSYNC
-#define __CMULTIPLAYERSAKEYSYNC
+#pragma once
 
 #include <game/CPlayerPed.h>
 #include <game/CStats.h>
@@ -79,5 +78,3 @@ VOID HOOK_CHeli__ProcessControl();
 #define CODE_SetTargetRotation              0x535851
 
 #define VAR_CameraRotation                  0xB6F178
-
-#endif

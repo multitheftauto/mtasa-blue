@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CLOCK
-#define __CGAMESA_CLOCK
+#pragma once
 
 #include <game/CClock.h>
 #include "Common.h"
@@ -25,5 +24,3 @@ public:
     VOID Set(BYTE bHour, BYTE bMinute);
     VOID Get(BYTE* bHour, BYTE* bMinute);
 };
-
-#endif

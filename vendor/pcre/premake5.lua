@@ -1,27 +1,27 @@
 project "pcre"
 	language "C++"
 	targetname "pcre3"
-	
+
 	defines { "HAVE_CONFIG_H" }
 	includedirs { "." }
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = {"**.c", "**.cc"},
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.c",
 		"*.cc",
 		"*.h"
 	}
-	
+
 	filter "system:windows"
 		kind "SharedLib"
 		targetdir(buildpath("server/mods/deathmatch"))
-		
+
 	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mods/deathmatch"

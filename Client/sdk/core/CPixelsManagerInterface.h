@@ -29,11 +29,11 @@ using EPixelsFormat::EPixelsFormatType;
 class CPixels
 {
 public:
-    ~CPixels(void) { dassert(externalData.pData == NULL || buffer.GetSize() == 0); }
+    ~CPixels() { dassert(externalData.pData == NULL || buffer.GetSize() == 0); }
 
-    char*       GetData(void) { return externalData.pData ? externalData.pData : buffer.GetData(); }
-    const char* GetData(void) const { return externalData.pData ? externalData.pData : buffer.GetData(); }
-    uint        GetSize(void) const { return externalData.pData ? externalData.uiSize : buffer.GetSize(); }
+    char*       GetData() { return externalData.pData ? externalData.pData : buffer.GetData(); }
+    const char* GetData() const { return externalData.pData ? externalData.pData : buffer.GetData(); }
+    uint        GetSize() const { return externalData.pData ? externalData.uiSize : buffer.GetSize(); }
 
     void SetSize(uint uiSize)
     {
@@ -60,7 +60,7 @@ public:
 class CPixelsManagerInterface
 {
 public:
-    virtual ~CPixelsManagerInterface(void) {}
+    virtual ~CPixelsManagerInterface() {}
     virtual void OnDeviceCreate(IDirect3DDevice9* pDevice) = 0;
     virtual bool IsPixels(const CPixels& pixels) = 0;
     virtual bool GetTexturePixels(IDirect3DBaseTexture9* pD3DTexture, CPixels& outPixels, const RECT* pRect = NULL, uint uiSurfaceIndex = 0) = 0;
@@ -72,4 +72,4 @@ public:
     virtual bool              SetPixelColor(CPixels& pixels, uint uiPosX, uint uiPosY, const SColor color) = 0;
 };
 
-CPixelsManagerInterface* NewPixelsManager(void);
+CPixelsManagerInterface* NewPixelsManager();
