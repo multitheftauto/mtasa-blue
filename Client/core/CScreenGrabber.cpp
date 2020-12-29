@@ -29,21 +29,21 @@ class CScreenGrabber : public CScreenGrabberInterface
 {
 public:
     ZERO_ON_NEW
-    CScreenGrabber(void);
-    ~CScreenGrabber(void);
+    CScreenGrabber();
+    ~CScreenGrabber();
 
     // CScreenGrabberInterface
     virtual void OnDeviceCreate(IDirect3DDevice9* pDevice);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
-    virtual void DoPulse(void);
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
+    virtual void DoPulse();
     virtual void QueueScreenShot(uint uiSizeX, uint uiSizeY, uint uiQuality, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback);
-    virtual void ClearScreenShotQueue(void);
+    virtual void ClearScreenShotQueue();
     virtual bool GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& buffer, SString& strOutError);
-    virtual bool IsQueueEmpty(void);
+    virtual bool IsQueueEmpty();
 
     // CScreenGrabber
-    void ProcessScreenShotQueue(void);
+    void ProcessScreenShotQueue();
 
 protected:
     IDirect3DDevice9*               m_pDevice;
@@ -56,7 +56,7 @@ protected:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CScreenGrabberInterface* NewScreenGrabber(void)
+CScreenGrabberInterface* NewScreenGrabber()
 {
     return new CScreenGrabber();
 }
@@ -68,7 +68,7 @@ CScreenGrabberInterface* NewScreenGrabber(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CScreenGrabber::CScreenGrabber(void)
+CScreenGrabber::CScreenGrabber()
 {
     m_pCompressorJobQueue = NewCompressorJobQueue();
 }
@@ -80,7 +80,7 @@ CScreenGrabber::CScreenGrabber(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CScreenGrabber::~CScreenGrabber(void)
+CScreenGrabber::~CScreenGrabber()
 {
     SAFE_DELETE(m_pCompressorJobQueue);
 }
@@ -104,7 +104,7 @@ void CScreenGrabber::OnDeviceCreate(IDirect3DDevice9* pDevice)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenGrabber::OnLostDevice(void)
+void CScreenGrabber::OnLostDevice()
 {
     SAFE_RELEASE(m_pScreenShotTemp);
 }
@@ -116,7 +116,7 @@ void CScreenGrabber::OnLostDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenGrabber::OnResetDevice(void)
+void CScreenGrabber::OnResetDevice()
 {
 }
 
@@ -127,7 +127,7 @@ void CScreenGrabber::OnResetDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenGrabber::DoPulse(void)
+void CScreenGrabber::DoPulse()
 {
     m_pCompressorJobQueue->DoPulse();
     ProcessScreenShotQueue();
@@ -158,7 +158,7 @@ void CScreenGrabber::QueueScreenShot(uint uiSizeX, uint uiSizeY, uint uiQuality,
 // Process queued requests
 //
 ////////////////////////////////////////////////////////////////
-void CScreenGrabber::ProcessScreenShotQueue(void)
+void CScreenGrabber::ProcessScreenShotQueue()
 {
     // Check if busy
     if (m_pCompressJobData)
@@ -273,7 +273,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
 // Remove queued requests and finish current job
 //
 ////////////////////////////////////////////////////////////////
-void CScreenGrabber::ClearScreenShotQueue(void)
+void CScreenGrabber::ClearScreenShotQueue()
 {
     m_ScreenShotQueue.clear();
 
@@ -289,7 +289,7 @@ void CScreenGrabber::ClearScreenShotQueue(void)
 // Checks whether the queue is empty
 //
 ////////////////////////////////////////////////////////////////
-bool CScreenGrabber::IsQueueEmpty(void)
+bool CScreenGrabber::IsQueueEmpty()
 {
     return m_ScreenShotQueue.empty();
 }

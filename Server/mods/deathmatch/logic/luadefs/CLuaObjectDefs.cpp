@@ -13,18 +13,24 @@
 
 void CLuaObjectDefs::LoadFunctions()
 {
-    // Object create/destroy funcs
-    CLuaCFunctions::AddFunction("createObject", CreateObject);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Object create/destroy funcs
+        {"createObject", CreateObject},
 
-    // Object get funcs
-    CLuaCFunctions::AddFunction("getObjectRotation", GetObjectRotation);
-    CLuaCFunctions::AddFunction("getObjectScale", GetObjectScale);
+        // Object get funcs
+        {"getObjectRotation", GetObjectRotation},
+        {"getObjectScale", GetObjectScale},
 
-    // Object set funcs
-    CLuaCFunctions::AddFunction("setObjectRotation", SetObjectRotation);
-    CLuaCFunctions::AddFunction("setObjectScale", SetObjectScale);
-    CLuaCFunctions::AddFunction("moveObject", MoveObject);
-    CLuaCFunctions::AddFunction("stopObject", StopObject);
+        // Object set funcs
+        {"setObjectRotation", SetObjectRotation},
+        {"setObjectScale", SetObjectScale},
+        {"moveObject", MoveObject},
+        {"stopObject", StopObject},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaObjectDefs::AddClass(lua_State* luaVM)

@@ -17,7 +17,7 @@ class CStaticFunctionDefinitions
 {
 public:
     CStaticFunctionDefinitions(CGame* pGame);
-    ~CStaticFunctionDefinitions(void);
+    ~CStaticFunctionDefinitions();
 
     // Event funcs
     static bool AddEvent(CLuaMain* pLuaMain, const char* szName, const char* szArguments, bool bAllowRemoteTrigger);
@@ -31,7 +31,7 @@ public:
 
     static bool        CancelEvent(bool bCancel, const char* szReason);
     static const char* GetCancelReason();
-    static bool        WasEventCancelled(void);
+    static bool        WasEventCancelled();
 
     // Element create/destroy
     static CDummy*   CreateElement(CResource* pResource, const char* szTypeName, const char* szID);
@@ -50,6 +50,7 @@ public:
     static bool           GetElementPosition(CElement* pElement, CVector& vecPosition);
     static bool           GetElementRotation(CElement* pElement, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CElement* pElement, CVector& vecVelocity);
+    static bool           GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CElement* pElement, unsigned char& ucInterior);
     static bool           IsElementWithinColShape(CElement* pElement, CColShape* pColShape, bool& bWithin);
     static bool           IsElementWithinMarker(CElement* pElement, CMarker* pMarker, bool& bWithin);
@@ -74,13 +75,17 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize);
+    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
     static bool RemoveElementData(CElement* pElement, const char* szName);
+    static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
     static bool SetElementRotation(CElement* pElement, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool SetElementVelocity(CElement* pElement, const CVector& vecVelocity);
+    static bool SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity);
     static bool SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible);
     static bool SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool SetElementDimension(CElement* pElement, unsigned short usDimension);
@@ -98,12 +103,12 @@ public:
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
 
     // Player get funcs
-    static unsigned int       GetPlayerCount(void);
+    static unsigned int       GetPlayerCount();
     static CPlayer*           GetPlayerFromName(const char* szNick);
     static bool               GetPlayerPing(CPlayer* pPlayer, unsigned int& uiPing);
     static bool               GetPlayerMoney(CPlayer* pPlayer, long& lMoney);
     static bool               GetPlayerSourceIP(CPlayer* pPlayer, SString& strOutIP);
-    static CPlayer*           GetRandomPlayer(void);
+    static CPlayer*           GetRandomPlayer();
     static bool               IsPlayerMuted(CPlayer* pPlayer, bool& bMuted);
     static CTeam*             GetPlayerTeam(CPlayer* pPlayer);
     static bool               CanPlayerUseFunction(CPlayer* pPlayer, const char* szFunction, bool& bCanUse);
@@ -121,7 +126,7 @@ public:
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
-    static const SString&     GetPlayerVersion(CPlayer* pPlayer);
+    static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -130,6 +135,7 @@ public:
     static bool TakePlayerMoney(CElement* pElement, long lMoney);
     static bool ShowPlayerHudComponent(CElement* pElement, eHudComponent component, bool bShow);
     static bool SetPlayerDebuggerVisible(CElement* pElement, bool bVisible);
+    static bool SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel);
     static bool SetPlayerWantedLevel(CElement* pElement, unsigned int iLevel);
     static bool ForcePlayerMap(CElement* pElement, bool bVisible);
     static bool SetPlayerNametagText(CElement* pElement, const char* szText);
@@ -139,6 +145,7 @@ public:
                             unsigned short usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, unsigned char ucLevel);
+    static bool SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax);
     static bool RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword);
     static bool SetPlayerName(CElement* pElement, const char* szName);
     static bool DetonateSatchels(CElement* pElement);
@@ -195,9 +202,10 @@ public:
     static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0);
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
-    static bool SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptable, bool bFreezeLastFrame);
-    static bool SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress);
+    static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
+    static bool SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress);
+    static bool SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
     static bool SetPedHeadless(CElement* pElement, bool bIsHeadless);
     static bool SetPedFrozen(CElement* pElement, bool bIsFrozen);
@@ -260,7 +268,6 @@ public:
     static bool  IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable);
     static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
-    static bool  GetTrainTrack(CVehicle* pVehicle, uchar& ucTrack);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
     static bool  IsVehicleBlown(CVehicle* pVehicle);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
@@ -295,13 +302,16 @@ public:
     static bool AddVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CElement* pElement);
     static bool RemoveVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
-    static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState);
+    static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
-    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation);
+    static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
+    static bool GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation);
+    static bool SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation);
+    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition);
     static bool ToggleVehicleRespawn(CElement* pElement, bool bRespawn);
     static bool ResetVehicleExplosionTime(CElement* pElement);
     static bool ResetVehicleIdleTime(CElement* pElement);
@@ -320,14 +330,13 @@ public:
     static bool SetTrainDerailable(CVehicle* pVehicle, bool bDerailable);
     static bool SetTrainDirection(CVehicle* pVehicle, bool bDirection);
     static bool SetTrainSpeed(CVehicle* pVehicle, float fSpeed);
-    static bool SetTrainTrack(CVehicle* pVehicle, uchar ucTrack);
     static bool SetTrainPosition(CVehicle* pVehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color);
     static bool SetVehicleTurretPosition(CVehicle* pVehicle, float fHorizontal, float fVertical);
     static bool SetVehicleDoorOpenRatio(CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0);
     static bool SetVehiclePlateText(CElement* pElement, const SString& strPlateText);
 
-    // static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
+    // static bool SetVehicleHandling(CVehicle* pVehicle, bool bValue);
     static bool ResetVehicleHandling(CVehicle* pVehicle, bool bUseOriginal);
     static bool ResetVehicleHandlingProperty(CVehicle* pVehicle, eHandlingProperty eProperty, bool bUseOriginal);
     static bool SetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, float fValue);
@@ -446,6 +455,19 @@ public:
     static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void           RefreshColShapeColliders(CColShape* pColShape);
 
+    // Shape get functions
+    static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
+    
+    // Shape set functions
+    static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
+    static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex);
+
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);
     static bool           GetWeaponNameFromID(unsigned char ucID, char* szName);
@@ -522,11 +544,11 @@ public:
     static bool SetTeamFriendlyFire(CTeam* pTeam, bool bFriendlyFire);
 
     // Water funcs
-    static CWater* CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4);
+    static CWater* CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
     static bool    SetElementWaterLevel(CWater* pWater, float fLevel);
     static bool    SetAllElementWaterLevel(float fLevel);
-    static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel);
-    static bool    ResetWorldWaterLevel(void);
+    static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
+    static bool    ResetWorldWaterLevel();
     static bool    GetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool    SetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool    GetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
@@ -534,12 +556,15 @@ public:
     static bool    ResetWaterColor();
 
     // Standard server functions
-    static unsigned int GetMaxPlayers(void);
+    static unsigned int GetMaxPlayers();
     static bool         SetMaxPlayers(unsigned int uiMax);
     static bool OutputChatBox(const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded,
                               CLuaMain* pLuaMain);
+    static void OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
+                              bool bColorCoded);
     static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
+    static bool ClearChatBox(CElement* pElement);
 
     // General world get funcs
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMinute);
@@ -578,10 +603,10 @@ public:
                                unsigned char& ucBottomGreen, unsigned char& ucBottomBlue);
     static bool SetSkyGradient(unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed,
                                unsigned char ucBottomGreen, unsigned char ucBottomBlue);
-    static bool ResetSkyGradient(void);
+    static bool ResetSkyGradient();
     static bool GetHeatHaze(SHeatHazeSettings& heatHazeSettings);
     static bool SetHeatHaze(const SHeatHazeSettings& heatHazeSettings);
-    static bool ResetHeatHaze(void);
+    static bool ResetHeatHaze();
     static bool SetFPSLimit(unsigned short usLimit, bool bSave);
     static bool SetMinuteDuration(unsigned long ulDuration);
     static bool SetGarageOpen(unsigned char ucGarageID, bool bIsOpen);
@@ -590,7 +615,7 @@ public:
     static bool GetJetpackWeaponEnabled(eWeaponType weaponType, bool& bEnabled);
     static bool SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     static bool SetCloudsEnabled(bool bEnabled);
-    static bool GetCloudsEnabled(void);
+    static bool GetCloudsEnabled();
     static bool SetTrafficLightState(unsigned char ucState, bool bForced = false);
     static bool SetTrafficLightsLocked(bool bLocked);
     static bool SetJetpackMaxHeight(float fMaxHeight);
@@ -605,21 +630,21 @@ public:
     static bool SetAircraftMaxHeight(float fMaxHeight);
     static bool SetAircraftMaxVelocity(float fVelocity);
     static bool SetOcclusionsEnabled(bool bEnabled);
-    static bool ResetRainLevel(void);
-    static bool ResetSunSize(void);
-    static bool ResetSunColor(void);
-    static bool ResetWindVelocity(void);
-    static bool ResetFarClipDistance(void);
-    static bool ResetFogDistance(void);
+    static bool ResetRainLevel();
+    static bool ResetSunSize();
+    static bool ResetSunColor();
+    static bool ResetWindVelocity();
+    static bool ResetFarClipDistance();
+    static bool ResetFogDistance();
     static bool RemoveWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
     static bool RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
-    static bool RestoreAllWorldModels(void);
+    static bool RestoreAllWorldModels();
     static bool SendSyncIntervals(CPlayer* pPlayer = NULL);
     static bool SetMoonSize(int iMoonSize);
-    static bool ResetMoonSize(void);
+    static bool ResetMoonSize();
 
     // Loaded Map Functions
-    static CElement* GetRootElement(void);
+    static CElement* GetRootElement();
     static CElement* LoadMapData(CLuaMain* pLuaMain, CElement* pParent, CXMLNode* pNode);
     static CXMLNode* SaveMapData(CElement* pElement, CXMLNode* pNode, bool bChildren);
 
@@ -633,7 +658,7 @@ public:
     static bool        SetPlayerAnnounceValue(CElement* pElement, const std::string& strKey, const std::string& strValue);
 
     // Registry funcs
-    static const std::string& SQLGetLastError(void);
+    static const std::string& SQLGetLastError();
     static void               ExecuteSQLCreateTable(const std::string& strTable, const std::string& strDefinition);
     static void               ExecuteSQLDropTable(const std::string& strTable);
     static bool               ExecuteSQLDelete(const std::string& strTable, const std::string& strWhere);
@@ -644,7 +669,7 @@ public:
     static bool               ExecuteSQLQuery(const std::string& str, CLuaArguments* pArgs, CRegistryResult* pResult);
 
     // Account get funcs
-    static CAccount*                     GetAccount(const char* szName, const char* szPassword);
+    static CAccount*                     GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive = true);
     static void                          GetAccounts(lua_State* pLua);
     static CClient*                      GetAccountPlayer(CAccount* pAccount);
     static bool                          IsGuestAccount(CAccount* pAccount, bool& bGuest);
@@ -667,7 +692,6 @@ public:
     static bool      CopyAccountData(CAccount* pAccount, CAccount* pFromAccount);
 
     // Log in/out funcs
-    static bool LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword);
     static bool LogOut(CPlayer* pPlayer);
 
     // Admin funcs
@@ -680,7 +704,7 @@ public:
     static bool  RemoveBan(CBan* pBan, CPlayer* pResponsible = NULL);
 
     static bool GetBans(lua_State* luaVM);
-    static bool ReloadBanList(void);
+    static bool ReloadBanList();
 
     static bool GetBanIP(CBan* pBan, SString& strOutIP);
     static bool GetBanSerial(CBan* pBan, SString& strOutSerial);
@@ -723,5 +747,5 @@ public:
     static unsigned long GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
-    static SString       GetVersionSortable();
+    static CMtaVersion   GetVersionSortable();
 };

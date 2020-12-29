@@ -30,7 +30,7 @@ class WString : public std::wstring
 {
 public:
     // Constructors
-    WString(void) : std::wstring() {}
+    WString() : std::wstring() {}
 
     WString(const wchar_t* szText) : std::wstring(szText ? szText : L"") {}
 
@@ -73,7 +73,7 @@ public:
 
     // Assignment
                    operator const wchar_t*() const { return c_str(); }            // Auto assign to const wchar_t* without using c_str()
-    const wchar_t* operator*(void)const { return c_str(); }
+    const wchar_t* operator*()const { return c_str(); }
 
     // Functions
     void           Split(const WString& strDelim, std::vector<WString>& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0) const;
@@ -84,9 +84,9 @@ public:
     WString        ReplaceI(const wchar_t* szOld, const wchar_t* szNew, bool bSearchJustReplaced = false) const;
     WString        TrimStart(const wchar_t* szOld) const;
     WString        TrimEnd(const wchar_t* szOld) const;
-    WString        ToLower(void) const;
-    WString        ToUpper(void) const;
-    WString        ConformLineEndings(void) const;
+    WString        ToLower() const;
+    WString        ToUpper() const;
+    WString        ConformLineEndings() const;
     bool           Contains(const WString& strOther) const;
     bool           ContainsI(const WString& strOther) const;
     bool           CompareI(const WString& strOther) const;
@@ -100,7 +100,7 @@ public:
     static WString Join(const WString& strDelim, const std::vector<WString>& parts, int iFirst = 0, int iCount = 0x3fffffff);
     void           AssignLeft(const wchar_t* szOther, uint uiMaxLength);
 
-    SString ToAnsi(void) const;
+    SString ToAnsi() const;
 };
 
 class WStringX : public WString

@@ -58,6 +58,9 @@ class MicrodumpModules : public BasicCodeModules {
  public:
   // Takes over ownership of |module|.
   void Add(const CodeModule* module);
+
+  // Enables/disables module address range shrink.
+  void SetEnableModuleShrink(bool is_enabled);
 };
 
 // MicrodumpContext carries a CPU-specific context.
@@ -116,14 +119,17 @@ class Microdump {
   MicrodumpModules* GetModules() { return modules_.get(); }
   SystemInfo* GetSystemInfo() { return system_info_.get(); }
 
+  string GetCrashReason() { return crash_reason_; }
+  uint64_t GetCrashAddress() { return crash_address_; }
  private:
   scoped_ptr<MicrodumpContext> context_;
   scoped_ptr<MicrodumpMemoryRegion> stack_region_;
   scoped_ptr<MicrodumpModules> modules_;
   scoped_ptr<SystemInfo> system_info_;
+  string crash_reason_;
+  uint64_t crash_address_;
 };
 
 }  // namespace google_breakpad
 
 #endif  // GOOGLE_BREAKPAD_PROCESSOR_MICRODUMP_H__
-

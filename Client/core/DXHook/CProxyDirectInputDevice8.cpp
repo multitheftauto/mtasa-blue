@@ -52,12 +52,12 @@ HRESULT CProxyDirectInputDevice8::QueryInterface(REFIID riid, LPVOID* ppvObj)
     return m_pDevice->QueryInterface(riid, ppvObj);
 }
 
-ULONG CProxyDirectInputDevice8::AddRef(VOID)
+ULONG CProxyDirectInputDevice8::AddRef()
 {
     return m_pDevice->AddRef();
 }
 
-ULONG CProxyDirectInputDevice8::Release(VOID)
+ULONG CProxyDirectInputDevice8::Release()
 {
     // Call original function
     ULONG ulRefCount = m_pDevice->Release();
@@ -90,12 +90,12 @@ HRESULT CProxyDirectInputDevice8::SetProperty(REFGUID a, LPCDIPROPHEADER b)
     return m_pDevice->SetProperty(a, b);
 }
 
-HRESULT CProxyDirectInputDevice8::Acquire(VOID)
+HRESULT CProxyDirectInputDevice8::Acquire()
 {
     return m_pDevice->Acquire();
 }
 
-HRESULT CProxyDirectInputDevice8::Unacquire(VOID)
+HRESULT CProxyDirectInputDevice8::Unacquire()
 {
     return m_pDevice->Unacquire();
 }
@@ -229,7 +229,7 @@ HRESULT CProxyDirectInputDevice8::Escape(LPDIEFFESCAPE a)
     return m_pDevice->Escape(a);
 }
 
-HRESULT CProxyDirectInputDevice8::Poll(VOID)
+HRESULT CProxyDirectInputDevice8::Poll()
 {
     return m_pDevice->Poll();
 }

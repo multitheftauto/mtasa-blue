@@ -13,7 +13,7 @@
 #include "CAudioRPCs.h"
 #include "net/SyncStructures.h"
 
-void CAudioRPCs::LoadFunctions(void)
+void CAudioRPCs::LoadFunctions()
 {
     AddHandler(PLAY_SOUND, PlaySound, "PlaySound");
 }

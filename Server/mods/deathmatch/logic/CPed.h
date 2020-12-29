@@ -106,7 +106,7 @@ enum eBone
 class CWeapon
 {
 public:
-    CWeapon(void)
+    CWeapon()
     {
         ucType = 0;
         usAmmo = 0;
@@ -131,36 +131,36 @@ public:
         VEHICLEACTION_JACKED,
     };
 
-    CPed(class CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel);
-    ~CPed(void);
+    CPed(class CPedManager* pPedManager, CElement* pParent, unsigned short usModel);
+    ~CPed();
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    bool IsEntity(void) { return true; }
+    bool IsEntity() { return true; }
 
-    virtual void Unlink(void);
-    virtual bool ReadSpecialData(void);
+    virtual void Unlink();
 
-    bool HasValidModel(void);
+    bool HasValidModel();
 
-    bool           IsPlayer(void) { return m_bIsPlayer; }
-    unsigned short GetModel(void) { return m_usModel; };
+    bool           IsPlayer() { return m_bIsPlayer; }
+    unsigned short GetModel() { return m_usModel; };
     void           SetModel(unsigned short usModel) { m_usModel = usModel; };
 
-    bool IsDucked(void) { return m_bDucked; };
+    bool IsDucked() { return m_bDucked; };
     void SetDucked(bool bDucked) { m_bDucked = bDucked; };
 
-    bool IsChoking(void) { return m_bIsChoking; };
+    bool IsChoking() { return m_bIsChoking; };
     void SetChoking(bool bChoking) { m_bIsChoking = bChoking; };
 
-    bool IsWearingGoggles(void) { return m_bWearingGoggles; };
+    bool IsWearingGoggles() { return m_bWearingGoggles; };
     void SetWearingGoggles(bool bWearingGoggles) { m_bWearingGoggles = bWearingGoggles; };
 
-    bool IsOnFire(void) { return m_bIsOnFire; }
+    bool IsOnFire() { return m_bIsOnFire; }
     void SetOnFire(bool bOnFire) { m_bIsOnFire = bOnFire; }
 
     CWeapon*       GetWeapon(unsigned char ucSlot = 0xFF);
-    unsigned char  GetWeaponSlot(void) { return m_ucWeaponSlot; }
+    unsigned char  GetWeaponSlot() { return m_ucWeaponSlot; }
     void           SetWeaponSlot(unsigned char ucSlot);
-    unsigned char  GetCurrentWeaponState(void) { return m_ucCurrentWeaponState; };
+    unsigned char  GetCurrentWeaponState() { return m_ucCurrentWeaponState; };
     void           SetCurrentWeaponState(unsigned char ucWeaponState) { m_ucCurrentWeaponState = ucWeaponState; };
     unsigned char  GetWeaponType(unsigned char ucSlot = 0xFF);
     void           SetWeaponType(unsigned char ucType, unsigned char ucSlot = 0xFF);
@@ -169,10 +169,10 @@ public:
     unsigned short GetWeaponTotalAmmo(unsigned char ucSlot = 0xFF);
     void           SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot = 0xFF);
 
-    float GetMaxHealth(void);
-    float GetHealth(void) { return m_fHealth; }
+    float GetMaxHealth();
+    float GetHealth() { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
-    float GetArmor(void) { return m_fArmor; }
+    float GetArmor() { return m_fArmor; }
     void  SetArmor(float fArmor) { m_fArmor = fArmor; }
 
     float GetPlayerStat(unsigned short usStat) { return (usStat < NUM_PLAYER_STATS) ? m_fStats[usStat] : 0; }
@@ -182,88 +182,94 @@ public:
             m_fStats[usStat] = fValue;
     }
 
-    CPlayerClothes* GetClothes(void) { return m_pClothes; }
+    CPlayerClothes* GetClothes() { return m_pClothes; }
 
     static const char* GetBodyPartName(unsigned char ucID);
 
-    bool HasJetPack(void) { return m_bHasJetPack; }
+    bool HasJetPack() { return m_bHasJetPack; }
     void SetHasJetPack(bool bHasJetPack) { m_bHasJetPack = bHasJetPack; }
 
-    bool IsInWater(void) { return m_bInWater; }
+    bool IsInWater() { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
 
-    bool IsOnGround(void) { return m_bOnGround; }
+    bool IsOnGround() { return m_bOnGround; }
     void SetOnGround(bool bOnGround) { m_bOnGround = bOnGround; }
 
-    unsigned char GetAlpha(void) { return m_ucAlpha; }
+    unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
-    CPlayerTasks* GetTasks(void) { return m_pTasks; }
+    CPlayerTasks* GetTasks() { return m_pTasks; }
 
-    CElement* GetContactElement(void) { return m_pContactElement; }
+    CElement* GetContactElement() { return m_pContactElement; }
     void      SetContactElement(CElement* pElement);
 
     void GetContactPosition(CVector& vecPosition) { vecPosition = m_vecContactPosition; }
     void SetContactPosition(CVector& vecPosition) { m_vecContactPosition = vecPosition; }
 
-    bool IsDead(void) { return m_bIsDead; };
+    bool IsDead() { return m_bIsDead; };
     void SetIsDead(bool bDead);
 
-    bool IsSpawned(void) { return m_bSpawned; }
+    bool IsSpawned() { return m_bSpawned; }
     void SetSpawned(bool bSpawned) { m_bSpawned = bSpawned; }
 
-    float GetRotation(void) { return m_fRotation; }
+    float GetRotation() { return m_fRotation; }
     void  SetRotation(float fRotation) { m_fRotation = fRotation; }
 
     void GetRotation(CVector& vecRotation);
     void GetMatrix(CMatrix& matrix);
     void SetMatrix(const CMatrix& matrix);
 
-    CElement* GetTargetedElement(void) { return m_pTargetedEntity; }
+    CElement* GetTargetedElement() { return m_pTargetedEntity; }
     void      SetTargetedElement(CElement* pEntity) { m_pTargetedEntity = pEntity; }
 
-    unsigned char GetFightingStyle(void) { return m_ucFightingStyle; }
+    unsigned char GetFightingStyle() { return m_ucFightingStyle; }
     void          SetFightingStyle(unsigned char ucStyle) { m_ucFightingStyle = ucStyle; }
 
-    unsigned char GetMoveAnim(void) { return m_iMoveAnim; }
+    unsigned char GetMoveAnim() { return m_iMoveAnim; }
     void          SetMoveAnim(int iMoveAnim) { m_iMoveAnim = iMoveAnim; }
 
-    float GetGravity(void) { return m_fGravity; }
+    float GetGravity() { return m_fGravity; }
     void  SetGravity(float fGravity) { m_fGravity = fGravity; }
 
-    CVehicle*    GetOccupiedVehicle(void) { return m_pVehicle; };
-    unsigned int GetOccupiedVehicleSeat(void) { return m_uiVehicleSeat; };
+    CVehicle*    GetOccupiedVehicle() { return m_pVehicle; };
+    unsigned int GetOccupiedVehicleSeat() { return m_uiVehicleSeat; };
     CVehicle*    SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat);
 
-    unsigned int GetVehicleAction(void) { return m_uiVehicleAction; };
+    unsigned int GetVehicleAction() { return m_uiVehicleAction; };
     void         SetVehicleAction(unsigned int uiAction);
 
-    bool IsAttachToable(void);
+    bool IsAttachToable();
 
     void GetVelocity(CVector& vecVelocity) { vecVelocity = m_vecVelocity; };
     void SetVelocity(const CVector& vecVelocity) { m_vecVelocity = vecVelocity; };
 
-    bool IsDoingGangDriveby(void) { return m_bDoingGangDriveby; }
+    bool IsDoingGangDriveby() { return m_bDoingGangDriveby; }
     void SetDoingGangDriveby(bool bDriveby) { m_bDoingGangDriveby = bDriveby; }
 
-    bool IsHeadless(void) { return m_bHeadless; };
+    bool IsHeadless() { return m_bHeadless; };
     void SetHeadless(bool bHeadless) { m_bHeadless = bHeadless; };
 
-    bool IsFrozen(void) { return m_bFrozen; };
+    bool IsFrozen() { return m_bFrozen; };
     void SetFrozen(bool bFrozen) { m_bFrozen = bFrozen; };
 
-    class CPlayer* GetSyncer(void) { return m_pSyncer; };
+    class CPlayer* GetSyncer() { return m_pSyncer; };
     void           SetSyncer(class CPlayer* pPlayer);
 
-    bool     IsSyncable(void) { return m_bSyncable; };
+    bool     IsSyncable() { return m_bSyncable; };
     void     SetSyncable(bool bSynced) { m_bSyncable = bSynced; };
     CPlayer* m_pSyncer;
 
-    bool IsStealthAiming(void) { return m_bStealthAiming; }
+    CVehicle* GetJackingVehicle() { return m_pJackingVehicle; }
+    void      SetJackingVehicle(CVehicle* pVehicle);
+
+    bool IsStealthAiming() { return m_bStealthAiming; }
     void SetStealthAiming(bool bAiming) { m_bStealthAiming = bAiming; }
 
-    bool GetCollisionEnabled(void) { return m_bCollisionsEnabled; }
+    bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 protected:
     unsigned short                       m_usModel;
@@ -299,6 +305,7 @@ protected:
     bool                                 m_bHeadless;
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
+    CVehicle*                            m_pJackingVehicle;
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;

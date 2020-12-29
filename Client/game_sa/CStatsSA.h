@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_STATS
-#define __CGAMESA_STATS
+#pragma once
 
 #include <game/CStats.h>
 #define WIN32_LEAN_AND_MEAN
@@ -34,5 +33,3 @@ public:
 
     unsigned short GetSkillStatIndex(eWeaponType type);
 };
-
-#endif

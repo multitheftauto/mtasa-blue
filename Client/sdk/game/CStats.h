@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_STATS
-#define __CGAME_STATS
+#pragma once
 
 #include "CWeaponInfo.h"
 
@@ -557,5 +556,3 @@ public:
 
     virtual unsigned short GetSkillStatIndex(eWeaponType type) = 0;
 };
-
-#endif

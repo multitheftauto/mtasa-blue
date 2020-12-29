@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENTARRAY_H
-#define __CELEMENTARRAY_H
+#pragma once
 
 #include "Common.h"
 
@@ -18,17 +17,15 @@ class CClientEntity;
 class CElementIDs
 {
 public:
-    static void Initialize(void);
+    static void Initialize();
 
     static CClientEntity* GetElement(ElementID ID);
     static void           SetElement(ElementID ID, CClientEntity* pEntity);
 
-    static ElementID PopClientID(void);
+    static ElementID PopClientID();
     static void      PushClientID(ElementID ID);
 
 private:
     static SFixedArray<CClientEntity*, MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS> m_Elements;
     static CStack<ElementID, MAX_CLIENT_ELEMENTS - 2>                             m_ClientStack;
 };
-
-#endif

@@ -103,16 +103,16 @@ class CPerfStatPlayerPacketUsageImpl : public CPerfStatPlayerPacketUsage
 {
 public:
     ZERO_ON_NEW
-    CPerfStatPlayerPacketUsageImpl(void);
-    virtual ~CPerfStatPlayerPacketUsageImpl(void);
+    CPerfStatPlayerPacketUsageImpl();
+    virtual ~CPerfStatPlayerPacketUsageImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatPlayerPacketUsageImpl functions
-    void UpdatePlayerPacketUsage(void);
+    void UpdatePlayerPacketUsage();
     void GetPlayerPacketUsageStats(CPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter);
     void OutputTimeSpanBlock(CPerfStatResult* pResult, const CTimeSpanBlock& TimeSpanBlock, int iTopPos, int flags, const SString& BlockName, bool bDetail);
 
@@ -146,7 +146,7 @@ CPerfStatPlayerPacketUsage* CPerfStatPlayerPacketUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatPlayerPacketUsageImpl::CPerfStatPlayerPacketUsageImpl(void)
+CPerfStatPlayerPacketUsageImpl::CPerfStatPlayerPacketUsageImpl()
 {
     m_strCategoryName = "Player packet usage";
 }
@@ -158,7 +158,7 @@ CPerfStatPlayerPacketUsageImpl::CPerfStatPlayerPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatPlayerPacketUsageImpl::~CPerfStatPlayerPacketUsageImpl(void)
+CPerfStatPlayerPacketUsageImpl::~CPerfStatPlayerPacketUsageImpl()
 {
 }
 
@@ -169,7 +169,7 @@ CPerfStatPlayerPacketUsageImpl::~CPerfStatPlayerPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatPlayerPacketUsageImpl::GetCategoryName(void)
+const SString& CPerfStatPlayerPacketUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -181,7 +181,7 @@ const SString& CPerfStatPlayerPacketUsageImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatPlayerPacketUsageImpl::DoPulse(void)
+void CPerfStatPlayerPacketUsageImpl::DoPulse()
 {
     long long llTickCount = GetTickCount64_();
     long long llDelta = llTickCount - m_LastTickCount;
@@ -215,7 +215,7 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage(void)
+void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage()
 {
     // Get stats from net module
     uchar      packetIdList[] = {PACKET_ID_COMMAND, PACKET_ID_LUA_EVENT, PACKET_ID_CUSTOM_DATA};

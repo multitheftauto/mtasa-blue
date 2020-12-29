@@ -13,18 +13,19 @@
 
 CDummy* CGroups::Create(CElement* pParent)
 {
-    // Create and return it
-    CDummy* pTemp = new CDummy(this, pParent);
-    return pTemp;
+    return new CDummy(this, pParent);
 }
 
 CDummy* CGroups::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the item and load its custom data and events
-    CDummy* pTemp = new CDummy(this, pParent, &Node);
-    pTemp->LoadFromCustomData(pEvents);
+    CDummy* const pTemp = new CDummy(this, pParent);
 
-    // Return it
+    if (!pTemp->LoadFromCustomData(pEvents, Node))
+    {
+        delete pTemp;
+        return nullptr;
+    }
+
     return pTemp;
 }
 
@@ -33,7 +34,7 @@ void CGroups::Delete(CDummy* pDummy)
     delete pDummy;
 }
 
-void CGroups::DeleteAll(void)
+void CGroups::DeleteAll()
 {
     DeletePointersAndClearList(m_List);
 }

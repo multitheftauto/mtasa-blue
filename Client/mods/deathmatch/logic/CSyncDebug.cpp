@@ -34,7 +34,7 @@ CSyncDebug::CSyncDebug(CClientManager* pManager)
     m_usFakeLagPing = 0;
 }
 
-CSyncDebug::~CSyncDebug(void)
+CSyncDebug::~CSyncDebug()
 {
 }
 
@@ -54,12 +54,12 @@ void CSyncDebug::Attach(CClientPlayer& Player)
     OnUpdate();
 }
 
-void CSyncDebug::Detach(void)
+void CSyncDebug::Detach()
 {
     m_pPlayer = NULL;
 }
 
-void CSyncDebug::OnPulse(void)
+void CSyncDebug::OnPulse()
 {
     // Are we debugging some player?
     if (m_pPlayer)
@@ -75,7 +75,7 @@ void CSyncDebug::OnPulse(void)
     }
 }
 
-void CSyncDebug::OnDraw(void)
+void CSyncDebug::OnDraw()
 {
     NetStatistics stats;
     g_pNet->GetNetworkStatistics(&stats);
@@ -141,7 +141,7 @@ void CSyncDebug::OnDraw(void)
     m_pManager->GetDisplayManager()->DrawText2D(strBuffer, CVector(0.76f, 0.31f, 0), 1.0f, 0xFFFFFFFF);
 }
 
-void CSyncDebug::OnUpdate(void)
+void CSyncDebug::OnUpdate()
 {
     NetStatistics stats;
     g_pNet->GetNetworkStatistics(&stats);

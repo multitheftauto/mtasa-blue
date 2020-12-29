@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/lua/CLuaMain.cpp
+ *  FILE:        mods/deathmatch/logic/lua/CLuaMain.cpp
  *  PURPOSE:     Lua main
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -43,9 +44,9 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
 }
 
-CLuaMain::~CLuaMain(void)
+CLuaMain::~CLuaMain()
 {
-    g_pClientGame->GetRemoteCalls()->Remove(this);
+    g_pClientGame->GetRemoteCalls()->OnLuaMainDestroy(this);
     g_pClientGame->GetLatentTransferManager()->OnLuaMainDestroy(this);
     g_pClientGame->GetDebugHookManager()->OnLuaMainDestroy(this);
     g_pClientGame->GetScriptDebugging()->OnLuaMainDestroy(this);
@@ -61,18 +62,32 @@ CLuaMain::~CLuaMain(void)
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
 
-bool CLuaMain::BeingDeleted(void)
+bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
 }
 
-void CLuaMain::ResetInstructionCount(void)
+void CLuaMain::ResetInstructionCount()
 {
     m_FunctionEnterTimer.Reset();
 }
 
-void CLuaMain::InitSecurity(void)
+void CLuaMain::InitSecurity()
 {
+    // Disable dangerous Lua Os library functions
+    static const luaL_reg osfuncs[] =
+    {
+        { "execute", CLuaUtilDefs::DisabledFunction },
+        { "rename", CLuaUtilDefs::DisabledFunction },
+        { "remove", CLuaUtilDefs::DisabledFunction },
+        { "exit", CLuaUtilDefs::DisabledFunction },
+        { "getenv", CLuaUtilDefs::DisabledFunction },
+        { "tmpname", CLuaUtilDefs::DisabledFunction },
+        { "setlocale", CLuaUtilDefs::DisabledFunction },
+        { NULL, NULL }
+    };
+    luaL_register(m_luaVM, "os", osfuncs);
+
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "require", CLuaUtilDefs::DisabledFunction);
@@ -123,7 +138,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM(void)
+void CLuaMain::InitVM()
 {
     assert(!m_luaVM);
 
@@ -141,6 +156,7 @@ void CLuaMain::InitVM(void)
     luaopen_table(m_luaVM);
     luaopen_debug(m_luaVM);
     luaopen_utf8(m_luaVM);
+    luaopen_os(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
@@ -191,8 +207,7 @@ void CLuaMain::InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug)
             strAbortInf += pLuaMain->GetScriptName();
 
             // Error out
-            lua_pushstring(luaVM, strAbortInf);
-            lua_error(luaVM);
+            luaL_error(luaVM, strAbortInf);
         }
     }
 }
@@ -301,11 +316,11 @@ bool CLuaMain::LoadScript(const char* szLUAScript)
     return true;
 }
 
-void CLuaMain::Start(void)
+void CLuaMain::Start()
 {
 }
 
-void CLuaMain::UnloadScript(void)
+void CLuaMain::UnloadScript()
 {
     // ACHTUNG: UNLOAD MODULES!
 
@@ -335,7 +350,7 @@ void CLuaMain::UnloadScript(void)
     }
 }
 
-void CLuaMain::DoPulse(void)
+void CLuaMain::DoPulse()
 {
     m_pLuaTimerManager->DoPulse(this);
 }
@@ -348,45 +363,51 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
     return pFile;
 }
 
-void CLuaMain::DestroyXML(CXMLFile* pFile)
+CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    if (!m_XMLFiles.empty())
-        m_XMLFiles.remove(pFile);
-    delete pFile;
+    auto xmlStringNode = g_pCore->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
-void CLuaMain::DestroyXML(CXMLNode* pRootNode)
+bool CLuaMain::DestroyXML(CXMLFile* pFile)
 {
-    list<CXMLFile*>::iterator iter;
-    for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++)
+    if (m_XMLFiles.empty())
+        return false;
+    m_XMLFiles.remove(pFile);
+    delete pFile;
+    return true;
+}
+
+bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
+{
+    if (m_XMLFiles.empty())
+        return false;
+    for (CXMLFile* pFile : m_XMLFiles)
     {
-        CXMLFile* file = (*iter);
-        if (file)
+        if (pFile)
         {
-            if (file->GetRootNode() == pRootNode)
+            if (pFile->GetRootNode() == pRootNode)
             {
-                delete file;
-                m_XMLFiles.erase(iter);
+                m_XMLFiles.remove(pFile);
+                delete pFile;
                 break;
             }
         }
     }
+    return true;
 }
 
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 {
-    list<CXMLFile*>::iterator iter;
-    for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++)
-    {
-        CXMLFile* file = (*iter);
-        if (file)
-        {
-            if (file->GetRootNode() == pRootNode)
-            {
-                return file->Write();
-            }
-        }
-    }
+    for (CXMLFile* pFile : m_XMLFiles)
+        if (pFile)
+            if (pFile->GetRootNode() == pRootNode)
+                return pFile->Write();
     if (m_pResource)
     {
         list<CResourceConfigItem*>::iterator iter = m_pResource->ConfigIterBegin();
@@ -397,9 +418,7 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
             {
                 CXMLFile* pFile = pConfigItem->GetFile();
                 if (pFile)
-                {
                     return pFile->Write();
-                }
                 return false;
             }
         }
@@ -414,7 +433,7 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 //
 //
 ///////////////////////////////////////////////////////////////
-unsigned long CLuaMain::GetElementCount(void) const
+unsigned long CLuaMain::GetElementCount() const
 {
     if (m_pResource && m_pResource->GetElementGroup())
         return m_pResource->GetElementGroup()->GetCount();
@@ -490,49 +509,11 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
 int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 {
     TIMING_CHECKPOINT("+pcall");
-    std::exception_ptr pException{};
-
     g_pClientGame->ChangeFloatPrecision(true);
     g_pClientGame->GetScriptDebugging()->PushLuaMain(this);
-    int iret = 0;
-
-    try
-    {
-        iret = lua_pcall(L, nargs, nresults, errfunc);
-    }
-    catch (std::bad_alloc& e)
-    {
-        AddExceptionReportLog(7550, "std::bad_alloc", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::runtime_error& e)
-    {
-        AddExceptionReportLog(7551, "std::runtime_error", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::exception& e)
-    {
-        AddExceptionReportLog(7552, "std::exception", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::string& e)
-    {
-        AddExceptionReportLog(7553, "std::string", e.c_str());
-        pException = std::current_exception();
-    }
-    catch (...)
-    {
-        AddReportLog(7554, "CLuaMain::PCall - Unexpected exception thrown");
-    }
-
-    if (pException)
-    {
-        std::rethrow_exception(pException);
-    }
-
+    const int iret = lua_pcall(L, nargs, nresults, errfunc);
     g_pClientGame->GetScriptDebugging()->PopLuaMain(this);
     g_pClientGame->ChangeFloatPrecision(false);
-
     TIMING_CHECKPOINT("-pcall");
     return iret;
 }

@@ -9,22 +9,21 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLARRAY_H
-#define __CXMLARRAY_H
+#pragma once
 
 class CXMLCommon;
 
 class CXMLArray
 {
 public:
-    static void Initialize(void);
+    static void Initialize();
 
     static unsigned long PopUniqueID(CXMLCommon* pEntry);
     static void          PushUniqueID(CXMLCommon* pEntry);
 
     static CXMLCommon*   GetEntry(unsigned long ulID);
-    static unsigned long GetCapacity(void);
-    static unsigned long GetUnusedAmount(void);
+    static unsigned long GetCapacity();
+    static unsigned long GetUnusedAmount();
 
 private:
     static void ExpandBy(unsigned long ulAmount);
@@ -34,5 +33,3 @@ private:
     static std::vector<CXMLCommon*> m_Elements;
     static unsigned long            m_ulCapacity;
 };
-
-#endif

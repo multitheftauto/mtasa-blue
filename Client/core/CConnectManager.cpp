@@ -16,7 +16,7 @@ using namespace std;
 static CConnectManager* g_pConnectManager = NULL;
 extern CCore*           g_pCore;
 
-CConnectManager::CConnectManager(void)
+CConnectManager::CConnectManager()
 {
     g_pConnectManager = this;
 
@@ -34,7 +34,7 @@ CConnectManager::CConnectManager(void)
     m_bNotifyServerBrowser = false;
 }
 
-CConnectManager::~CConnectManager(void)
+CConnectManager::~CConnectManager()
 {
     if (m_pOnCancelClick)
     {
@@ -46,7 +46,7 @@ CConnectManager::~CConnectManager(void)
     g_pConnectManager = NULL;
 }
 
-bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser)
+bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser, const char* szSecret)
 {
     assert(szHost);
     assert(szNick);
@@ -99,6 +99,11 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     m_Address.s_addr = 0;
     m_usPort = usPort;
     m_bSave = true;
+
+    if (szSecret)
+        m_strDiscordSecretJoin = szSecret;
+    else
+        m_strDiscordSecretJoin.clear();
 
     m_strLastHost = m_strHost;
     m_usLastPort = m_usPort;
@@ -196,7 +201,7 @@ bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
     return true;
 }
 
-bool CConnectManager::Abort(void)
+bool CConnectManager::Abort()
 {
     // Stop the attempt
     CNet* pNet = CCore::GetSingleton().GetNetwork();
@@ -219,7 +224,7 @@ bool CConnectManager::Abort(void)
     return true;
 }
 
-void CConnectManager::DoPulse(void)
+void CConnectManager::DoPulse()
 {
     // Are we connecting?
     if (m_bIsConnecting)
@@ -323,7 +328,6 @@ void CConnectManager::DoPulse(void)
                 else            // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton().RemoveMessageBox(false);
-                    CCore::GetSingleton().HideQuickConnect();
                 }
 
                 CCore::GetSingleton().GetNetwork()->SetConnectionError(0);
@@ -370,11 +374,6 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
-
-                // If we connected from quick-connect, get rid of it
-                CQuickConnect* pQuickConnect = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuickConnectWindow();
-                if (pQuickConnect->IsVisible())
-                    pQuickConnect->SetVisible(false);
 
                 // Save the connection details into the config
                 if (g_pConnectManager->m_bSave)
@@ -449,7 +448,7 @@ bool CConnectManager::CheckNickProvided(const char* szNick)
 //
 // Called at least once (maybe more) if a MTA server exists at the current address/port
 //
-void CConnectManager::OnServerExists(void)
+void CConnectManager::OnServerExists()
 {
     if (m_bNotifyServerBrowser)
     {
@@ -479,17 +478,26 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
     if (usHttpPort)
     {
         // Send to server http port if known
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = uiTimeOut;
         SString strDummyUrl("http://%s:%d/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
-        g_pCore->GetNetwork()
-            ->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)
-            ->QueueFile(strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut);
+        g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
     if (usHttpPort == 0 || bHighPriority)
     {
         // Send to standard http port
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = uiTimeOut;
         SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
-        g_pCore->GetNetwork()
-            ->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)
-            ->QueueFile(strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut);
+        g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
+}
+
+SString CConnectManager::GetJoinSecret()
+{
+    SString dummy = m_strDiscordSecretJoin;
+    m_strDiscordSecretJoin.clear();
+    return dummy;
 }

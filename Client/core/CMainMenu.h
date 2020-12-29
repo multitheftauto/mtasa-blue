@@ -14,7 +14,6 @@ class CMainMenu;
 #pragma once
 
 #include "CCore.h"
-#include "CQuickConnect.h"
 #include "CQuestionBox.h"
 #include <ServerBrowser/CServerBrowser.h>
 #include <ServerBrowser/CServerInfo.h>
@@ -22,6 +21,7 @@ class CMainMenu;
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
 class CNewsBrowser;
+class CLanguageSelector;
 
 #define CORE_MTA_NEWS_ITEMS         3
 
@@ -37,40 +37,39 @@ struct sMenuItem
 
 class CMainMenu
 {
-    friend class CQuickConnect;
     friend class CServerBrowser;
     friend class CSettings;
     friend class CCredits;
 
 public:
     CMainMenu(CGUI* pManager);
-    ~CMainMenu(void);
+    ~CMainMenu();
 
-    void Update(void);
+    void Update();
 
     void Show(bool bOverlay);
-    void Hide(void);
+    void Hide();
 
     void SetVisible(bool bVisible, bool bOverlay = true, bool bFrameDelay = true);
-    bool IsVisible(void);
-    bool IsFading(void) { return m_ucFade == FADE_IN || m_ucFade == FADE_OUT; }
+    bool IsVisible();
+    bool IsFading() { return m_ucFade == FADE_IN || m_ucFade == FADE_OUT; }
 
     void SetIsIngame(bool bIsIngame);
-    bool GetIsIngame(void);
+    bool GetIsIngame();
 
-    CServerBrowser* GetServerBrowser(void) { return &m_ServerBrowser; };
-    CSettings*      GetSettingsWindow(void) { return &m_Settings; };
-    CQuickConnect*  GetQuickConnectWindow(void) { return &m_QuickConnect; };
-    CQuestionBox*   GetQuestionWindow(void) { return &m_QuestionBox; };
-    CNewsBrowser*   GetNewsBrowser(void) { return m_pNewsBrowser; };
+    CServerBrowser* GetServerBrowser() { return &m_ServerBrowser; };
+    CSettings*      GetSettingsWindow() { return &m_Settings; };
+    CQuestionBox*   GetQuestionWindow() { return &m_QuestionBox; };
+    CNewsBrowser*   GetNewsBrowser() { return m_pNewsBrowser; };
 
     void SetMenuVerticalPosition(int iPosY);
-    void SetMenuUnhovered(void);
+    void SetMenuUnhovered();
 
-    bool HasStarted(void) { return m_bStarted; };
+    bool HasStarted() { return m_bStarted; };
 
     void SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew);
-    void OnEscapePressedOffLine(void);
+    void ReloadNews();
+    void OnEscapePressedOffLine();
 
     static void StaticWantsToDisconnectCallBack(void* pData, uint uiButton);
     void        WantsToDisconnectCallBack(void* pData, uint uiButton);
@@ -82,19 +81,19 @@ private:
 
     bool OnMenuEnter(CGUIElement* pElement);
     bool OnMenuExit(CGUIElement* pElement);
-    bool OnMenuClick(CGUIElement* pElement);
-    bool OnQuickConnectButtonClick(CGUIElement* pElement);
+    bool OnMenuClick(CGUIMouseEventArgs Args);
+    bool OnQuickConnectButtonClick(CGUIElement* pElement, bool left);
     bool OnResumeButtonClick(CGUIElement* pElement);
     bool OnBrowseServersButtonClick(CGUIElement* pElement);
-    bool OnHostGameButtonClick(void);
+    bool OnHostGameButtonClick();
     bool OnDisconnectButtonClick(CGUIElement* pElement);
-    bool OnEditorButtonClick(void);
+    bool OnEditorButtonClick();
     bool OnSettingsButtonClick(CGUIElement* pElement);
     bool OnAboutButtonClick(CGUIElement* pElement);
     bool OnQuitButtonClick(CGUIElement* pElement);
     bool OnNewsButtonClick(CGUIElement* pElement);
 
-    void HideServerInfo(void);
+    void HideServerInfo();
 
     CGUI* m_pManager;
 
@@ -116,13 +115,13 @@ private:
     bool                   m_bMouseOverMenu;
 
     // Submenu classes
-    CQuestionBox   m_QuestionBox;
-    CQuickConnect  m_QuickConnect;
-    CSettings      m_Settings;
-    CNewsBrowser*  m_pNewsBrowser;
-    CCredits       m_Credits;
-    CServerBrowser m_ServerBrowser;
-    CServerInfo    m_ServerInfo;
+    CQuestionBox       m_QuestionBox;
+    CSettings          m_Settings;
+    CNewsBrowser*      m_pNewsBrowser;
+    CCredits           m_Credits;
+    CServerBrowser     m_ServerBrowser;
+    CServerInfo        m_ServerInfo;
+    CLanguageSelector* m_pLanguageSelector;
 
     // Properties
     bool m_bIsIngame;
@@ -167,6 +166,12 @@ private:
     std::unique_ptr<CGUITexture>     m_pFeatureBranchAlertTexture;
     std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
     std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
+#endif
+
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+    std::unique_ptr<CGUITexture> m_pAlertTexture;
+    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
+    std::unique_ptr<CGUILabel> m_pAlertLabel;
 #endif
 
     // Fade states

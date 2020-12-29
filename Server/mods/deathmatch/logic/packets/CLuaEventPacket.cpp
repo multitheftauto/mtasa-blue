@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CLuaEventPacket::CLuaEventPacket(void)
+CLuaEventPacket::CLuaEventPacket()
 {
     m_ElementID = INVALID_ELEMENT_ID;
     m_pArguments = &m_ArgumentsStore;
@@ -33,7 +33,8 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
         {
             // Faster than using a constructor
             m_ArgumentsStore.DeleteArguments();
-            m_ArgumentsStore.ReadFromBitStream(BitStream);
+            if(!m_ArgumentsStore.ReadFromBitStream(BitStream))
+                return false;
             m_pArguments = &m_ArgumentsStore;
 
             return true;

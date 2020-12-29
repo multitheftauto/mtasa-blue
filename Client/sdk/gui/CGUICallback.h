@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUICALLBACK_H
-#define __CGUICALLBACK_H
+#pragma once
 
 class CGUIElement;
 
@@ -65,7 +64,7 @@ class CGUICallback
 {
 public:
     // Default constructor
-    CGUICallback(void) { memset(m_Callback, 0, sizeof(m_Callback)); }
+    CGUICallback() { memset(m_Callback, 0, sizeof(m_Callback)); }
 
     // Construct from a static function pointer
     CGUICallback(Ret (*pF)(Arguments))
@@ -101,5 +100,3 @@ public:
 protected:
     char m_Callback[4 + 4 + 20];            // vtable + pObj + pMemFn
 };
-
-#endif

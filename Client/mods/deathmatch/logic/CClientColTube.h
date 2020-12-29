@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLTUBE_H
-#define __CCLIENTCOLTUBE_H
+#pragma once
 
 class CClientColTube : public CClientColShape
 {
@@ -17,20 +16,20 @@ class CClientColTube : public CClientColShape
 public:
     CClientColTube(CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius, float fHeight);
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
     virtual void    DebugRender(const CVector& vecPosition, float fDrawRadius);
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_TUBE; }
+    eColShapeType GetShapeType() { return COLSHAPE_TUBE; }
 
     bool DoHitDetection(const CVector& vecNowPosition, float fRadius);
 
-    float GetRadius(void) { return m_fRadius; };
+    float GetRadius() { return m_fRadius; };
     void  SetRadius(float fRadius)
     {
         m_fRadius = fRadius;
         SizeChanged();
     };
-    float GetHeight(void) { return m_fHeight; };
+    float GetHeight() { return m_fHeight; };
     void  SetHeight(float fHeight)
     {
         m_fHeight = fHeight;
@@ -41,5 +40,3 @@ protected:
     float m_fRadius;
     float m_fHeight;
 };
-
-#endif

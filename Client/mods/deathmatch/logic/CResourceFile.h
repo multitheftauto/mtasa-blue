@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCEFILE_H
-#define CRESOURCEFILE_H
+#pragma once
 
 #include "CDownloadableResource.h"
 
@@ -23,5 +22,3 @@ public:
     {
     }
 };
-
-#endif

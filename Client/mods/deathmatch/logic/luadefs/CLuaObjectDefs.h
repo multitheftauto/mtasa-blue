@@ -15,7 +15,7 @@
 class CLuaObjectDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Object create funcs
@@ -26,6 +26,8 @@ public:
     LUA_DECLARE(GetObjectScale);
     LUA_DECLARE(IsObjectBreakable);
     LUA_DECLARE(GetObjectMass);
+    LUA_DECLARE(GetObjectProperty);
+    LUA_DECLARE(GetObjectProperties);
 
     // Object set funcs
     LUA_DECLARE(SetObjectRotation);
@@ -38,4 +40,5 @@ public:
     LUA_DECLARE(RespawnObject);
     LUA_DECLARE(ToggleObjectRespawn);
     LUA_DECLARE(SetObjectMass);
+    LUA_DECLARE(SetObjectProperty);
 };

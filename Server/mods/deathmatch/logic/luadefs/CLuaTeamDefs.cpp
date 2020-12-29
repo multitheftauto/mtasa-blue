@@ -13,22 +13,28 @@
 
 void CLuaTeamDefs::LoadFunctions()
 {
-    // Team create/destroy functions
-    CLuaCFunctions::AddFunction("createTeam", CreateTeam);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Team create/destroy functions
+        {"createTeam", CreateTeam},
 
-    // Team get funcs
-    CLuaCFunctions::AddFunction("getTeamFromName", GetTeamFromName);
-    CLuaCFunctions::AddFunction("getTeamName", GetTeamName);
-    CLuaCFunctions::AddFunction("getTeamColor", GetTeamColor);
-    CLuaCFunctions::AddFunction("getTeamFriendlyFire", GetTeamFriendlyFire);
-    CLuaCFunctions::AddFunction("getPlayersInTeam", GetPlayersInTeam);
-    CLuaCFunctions::AddFunction("countPlayersInTeam", CountPlayersInTeam);
+        // Team get funcs
+        {"getTeamFromName", GetTeamFromName},
+        {"getTeamName", GetTeamName},
+        {"getTeamColor", GetTeamColor},
+        {"getTeamFriendlyFire", GetTeamFriendlyFire},
+        {"getPlayersInTeam", GetPlayersInTeam},
+        {"countPlayersInTeam", CountPlayersInTeam},
 
-    // Team set funcs
-    CLuaCFunctions::AddFunction("setPlayerTeam", SetPlayerTeam);
-    CLuaCFunctions::AddFunction("setTeamName", SetTeamName);
-    CLuaCFunctions::AddFunction("setTeamColor", SetTeamColor);
-    CLuaCFunctions::AddFunction("setTeamFriendlyFire", SetTeamFriendlyFire);
+        // Team set funcs
+        {"setPlayerTeam", SetPlayerTeam},
+        {"setTeamName", SetTeamName},
+        {"setTeamColor", SetTeamColor},
+        {"setTeamFriendlyFire", SetTeamFriendlyFire},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaTeamDefs::AddClass(lua_State* luaVM)
@@ -51,9 +57,8 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "playerCount", NULL, "countPlayersInTeam");
     lua_classvariable(luaVM, "friendlyFire", "setTeamFriendlyFire", "getTeamFriendlyFire");
-    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");            // todo: perhaps table.insert/nilvaluing?
+    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
     lua_classvariable(luaVM, "name", "setTeamName", "getTeamName");
-    // lua_classvariable ( luaVM, "color", "setTeamColor", "getTeamColor" );
 
     lua_registerclass(luaVM, "Team", "Element");
 }

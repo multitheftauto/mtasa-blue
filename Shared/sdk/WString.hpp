@@ -300,7 +300,7 @@ WString WString::TrimEnd(const wchar_t* szOld) const
 //
 // Change to all lower case characters.
 //
-WString WString::ToLower(void) const
+WString WString::ToLower() const
 {
     WString strResult = *this;
     std::transform(strResult.begin(), strResult.end(), strResult.begin(), ::tolower);
@@ -310,7 +310,7 @@ WString WString::ToLower(void) const
 //
 // Change to all upper case characters.
 //
-WString WString::ToUpper(void) const
+WString WString::ToUpper() const
 {
     WString strResult = *this;
     std::transform(strResult.begin(), strResult.end(), strResult.begin(), ::toupper);
@@ -320,7 +320,7 @@ WString WString::ToUpper(void) const
 //
 // Change '0x0a' or '0x0d' or '0x0d 0x0a' to '\n'.
 //
-WString WString::ConformLineEndings(void) const
+WString WString::ConformLineEndings() const
 {
     assert('\n' == '\x0A');
     if (std::count(begin(), end(), '\n'))
@@ -428,7 +428,7 @@ WString::WString(const char* szText)
     *this = FromUTF8(szText);
 }
 
-SString WString::ToAnsi(void) const
+SString WString::ToAnsi() const
 {
     return ToUTF8(*this);
 }

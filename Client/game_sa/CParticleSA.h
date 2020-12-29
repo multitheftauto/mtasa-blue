@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PARTICLE
-#define __CGAMESA_PARTICLE
+#pragma once
 
 #include <game/CParticle.h>
 
@@ -25,5 +24,3 @@ private:
 
 public:
 };
-
-#endif

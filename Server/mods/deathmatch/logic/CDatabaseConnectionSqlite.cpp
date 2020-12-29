@@ -23,23 +23,23 @@ class CDatabaseConnectionSqlite : public CDatabaseConnection
 public:
     ZERO_ON_NEW
     CDatabaseConnectionSqlite(CDatabaseType* pManager, const SString& strPath, const SString& strOptions);
-    virtual ~CDatabaseConnectionSqlite(void);
+    virtual ~CDatabaseConnectionSqlite();
 
     // CDatabaseConnection
-    virtual bool           IsValid(void);
-    virtual const SString& GetLastErrorMessage(void);
-    virtual uint           GetLastErrorCode(void);
-    virtual void           AddRef(void);
-    virtual void           Release(void);
+    virtual bool           IsValid();
+    virtual const SString& GetLastErrorMessage();
+    virtual uint           GetLastErrorCode();
+    virtual void           AddRef();
+    virtual void           Release();
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult);
-    virtual void           Flush(void);
-    virtual int            GetShareCount(void) { return m_iRefCount; }
+    virtual void           Flush();
+    virtual int            GetShareCount() { return m_iRefCount; }
 
     // CDatabaseConnectionSqlite
     void SetLastError(uint uiCode, const SString& strMessage);
     bool QueryInternal(const SString& strQuery, CRegistryResult& registryResult);
-    void BeginAutomaticTransaction(void);
-    void EndAutomaticTransaction(void);
+    void BeginAutomaticTransaction();
+    void EndAutomaticTransaction();
 
     int            m_iRefCount;
     CDatabaseType* m_pManager;
@@ -95,7 +95,7 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite(CDatabaseType* pManager, co
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseConnectionSqlite::~CDatabaseConnectionSqlite(void)
+CDatabaseConnectionSqlite::~CDatabaseConnectionSqlite()
 {
     Flush();
 
@@ -113,7 +113,7 @@ CDatabaseConnectionSqlite::~CDatabaseConnectionSqlite(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::AddRef(void)
+void CDatabaseConnectionSqlite::AddRef()
 {
     m_iRefCount++;
 }
@@ -125,7 +125,7 @@ void CDatabaseConnectionSqlite::AddRef(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::Release(void)
+void CDatabaseConnectionSqlite::Release()
 {
     if (--m_iRefCount > 0)
     {
@@ -144,7 +144,7 @@ void CDatabaseConnectionSqlite::Release(void)
 // Returns false if connection created all wrong
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionSqlite::IsValid(void)
+bool CDatabaseConnectionSqlite::IsValid()
 {
     return m_bOpened;
 }
@@ -156,7 +156,7 @@ bool CDatabaseConnectionSqlite::IsValid(void)
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-const SString& CDatabaseConnectionSqlite::GetLastErrorMessage(void)
+const SString& CDatabaseConnectionSqlite::GetLastErrorMessage()
 {
     return m_strLastErrorMessage;
 }
@@ -168,7 +168,7 @@ const SString& CDatabaseConnectionSqlite::GetLastErrorMessage(void)
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionSqlite::GetLastErrorCode(void)
+uint CDatabaseConnectionSqlite::GetLastErrorCode()
 {
     return m_uiLastErrorCode;
 }
@@ -313,7 +313,7 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::BeginAutomaticTransaction(void)
+void CDatabaseConnectionSqlite::BeginAutomaticTransaction()
 {
     if (m_bInAutomaticTransaction)
     {
@@ -337,7 +337,7 @@ void CDatabaseConnectionSqlite::BeginAutomaticTransaction(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::EndAutomaticTransaction(void)
+void CDatabaseConnectionSqlite::EndAutomaticTransaction()
 {
     if (m_bInAutomaticTransaction)
     {
@@ -354,7 +354,7 @@ void CDatabaseConnectionSqlite::EndAutomaticTransaction(void)
 // Flush caches
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::Flush(void)
+void CDatabaseConnectionSqlite::Flush()
 {
     EndAutomaticTransaction();
 }

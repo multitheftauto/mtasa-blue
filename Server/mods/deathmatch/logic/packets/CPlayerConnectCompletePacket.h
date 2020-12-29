@@ -13,11 +13,11 @@
 
 #include "CPacket.h"
 
-class CPlayerConnectCompletePacket : public CPacket
+class CPlayerConnectCompletePacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID(void) const { return static_cast<ePacketID>(PACKET_ID_SERVER_JOIN_COMPLETE); };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_SERVER_JOIN_COMPLETE); };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 };

@@ -31,7 +31,7 @@ public:
   virtual ~FileSystem() {}
 
   virtual bool open_directory(const std::string& pathname, std::vector<std::string>& files, std::vector<std::string>& dirs) =0;
-  virtual std::auto_ptr<std::istream> open_file(const std::string& filename)      =0;
+  virtual std::unique_ptr<std::istream> open_file(const std::string& filename) = 0;
   virtual bool file_exists(const std::string& filename) =0;
 };
 

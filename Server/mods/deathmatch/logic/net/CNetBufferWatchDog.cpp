@@ -48,7 +48,7 @@ CNetBufferWatchDog::CNetBufferWatchDog(CNetServerBuffer* pNetBuffer, bool bVerbo
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-CNetBufferWatchDog::~CNetBufferWatchDog(void)
+CNetBufferWatchDog::~CNetBufferWatchDog()
 {
     if (ms_bVerboseDebug)
         CLogger::LogPrintf("INFO: CNetBufferWatchDog stopped\n");
@@ -67,7 +67,7 @@ CNetBufferWatchDog::~CNetBufferWatchDog(void)
 // Stop the watch dog thread
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::StopThread(void)
+void CNetBufferWatchDog::StopThread()
 {
     // Stop the watch dog thread
     shared.m_Mutex.Lock();
@@ -116,7 +116,7 @@ void* CNetBufferWatchDog::StaticThreadProc(void* pContext)
 // Check thread loop
 //
 ///////////////////////////////////////////////////////////////
-void* CNetBufferWatchDog::ThreadProc(void)
+void* CNetBufferWatchDog::ThreadProc()
 {
     shared.m_Mutex.Lock();
     while (!shared.m_bTerminateThread)
@@ -139,7 +139,7 @@ void* CNetBufferWatchDog::ThreadProc(void)
 // Mutex should be locked:  yes
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::DoChecks(void)
+void CNetBufferWatchDog::DoChecks()
 {
     // Get queue sizes now
     uint uiFinishedList;
@@ -259,7 +259,7 @@ void CNetBufferWatchDog::UpdateQueueInfo(CQueueInfo& queueInfo, int iQueueSize, 
 //
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::BlockOutgoingSyncPackets(void)
+void CNetBufferWatchDog::BlockOutgoingSyncPackets()
 {
     if (!ms_bBlockOutgoingSyncPackets)
     {
@@ -275,7 +275,7 @@ void CNetBufferWatchDog::BlockOutgoingSyncPackets(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::AllowOutgoingSyncPackets(void)
+void CNetBufferWatchDog::AllowOutgoingSyncPackets()
 {
     if (ms_bBlockOutgoingSyncPackets)
     {
@@ -291,7 +291,7 @@ void CNetBufferWatchDog::AllowOutgoingSyncPackets(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::BlockIncomingSyncPackets(void)
+void CNetBufferWatchDog::BlockIncomingSyncPackets()
 {
     if (!ms_bBlockIncomingSyncPackets)
     {
@@ -307,7 +307,7 @@ void CNetBufferWatchDog::BlockIncomingSyncPackets(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::AllowIncomingSyncPackets(void)
+void CNetBufferWatchDog::AllowIncomingSyncPackets()
 {
     if (ms_bBlockIncomingSyncPackets)
     {
@@ -324,7 +324,7 @@ void CNetBufferWatchDog::AllowIncomingSyncPackets(void)
 // Check for critical sitayshun
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::DoPulse(void)
+void CNetBufferWatchDog::DoPulse()
 {
     if (CSimControl::IsSimSystemEnabled())
     {

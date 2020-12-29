@@ -59,6 +59,9 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
     // Other init stuff
     ClearPendingBrowseToSolution();
 
+    // Find GTA path to use
+    ValidateGTAPath();
+
     //
     // Update
     //
@@ -78,16 +81,15 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
 
     // Stuff
     HandleCustomStartMessage();
-    ForbodenProgramsMessage();
+    #ifndef MTA_DEBUG
+        ForbodenProgramsMessage();
+    #endif
     CycleEventLog();
     BsodDetectionPreLaunch();
     MaybeShowCopySettingsDialog();
 
     // Make sure GTA is not running
     HandleIfGTAIsAlreadyRunning();
-
-    // Find GTA path to use
-    ValidateGTAPath();
 
     // Maybe warn user if no anti-virus running
     CheckAntiVirusStatus();

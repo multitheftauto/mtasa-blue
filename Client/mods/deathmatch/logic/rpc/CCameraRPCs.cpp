@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CCameraRPCs.h"
 
-void CCameraRPCs::LoadFunctions(void)
+void CCameraRPCs::LoadFunctions()
 {
     AddHandler(SET_CAMERA_MATRIX, SetCameraMatrix, "SetCameraMatrix");
     AddHandler(SET_CAMERA_TARGET, SetCameraTarget, "SetCameraTarget");

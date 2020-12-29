@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CVoiceDataPacket::CVoiceDataPacket(void)
+CVoiceDataPacket::CVoiceDataPacket()
 {
     m_pBuffer = NULL;
     m_usDataBufferSize = 0;

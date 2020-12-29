@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CONTROLLER_CONFIG_MANAGER
-#define __CGAME_CONTROLLER_CONFIG_MANAGER
+#pragma once
 
 // FROM VC, unlikely that they were changed though
 #define GTA_KEY_NO_MOUSE_BUTTON 0
@@ -203,9 +202,8 @@ public:
     virtual void  SetFlyWithMouse(bool bFlyWithMouse) = 0;
     virtual void  SetSteerWithMouse(bool bSteerWithMouse) = 0;
     virtual void  SuspendSteerAndFlyWithMouse(bool bSuspend) = 0;
-    virtual float GetVerticalAimSensitivity(void) = 0;
+    virtual float GetVerticalAimSensitivity() = 0;
     virtual void  SetVerticalAimSensitivity(float fSensitivity) = 0;
-    virtual float GetVerticalAimSensitivityRawValue(void) = 0;
+    virtual float GetVerticalAimSensitivityRawValue() = 0;
     virtual void  SetVerticalAimSensitivityRawValue(float fRawValue) = 0;
 };
-#endif

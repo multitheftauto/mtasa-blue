@@ -112,10 +112,10 @@ static string StripSeparator(const string &original) {
 }
 
 // PrintStackContents prints the stack contents of the current frame to stdout.
-static void PrintStackContents(const std::string &indent,
+static void PrintStackContents(const string &indent,
                                const StackFrame *frame,
                                const StackFrame *prev_frame,
-                               const std::string &cpu,
+                               const string &cpu,
                                const MemoryRegion *memory,
                                const CodeModules* modules,
                                SourceLineResolverInterface *resolver) {
@@ -181,7 +181,7 @@ static void PrintStackContents(const std::string &indent,
 
     // Print data in hex.
     const int kBytesPerRow = 16;
-    std::string data_as_string;
+    string data_as_string;
     for (int i = 0; i < kBytesPerRow; ++i, ++address) {
       uint8_t value = 0;
       if (address < stack_end &&
@@ -607,7 +607,7 @@ static void PrintStack(const CallStack *stack,
 
     // Print stack contents.
     if (output_stack_contents && frame_index + 1 < frame_count) {
-      const std::string indent("    ");
+      const string indent("    ");
       PrintStackContents(indent, frame, stack->frames()->at(frame_index + 1),
                          cpu, memory, modules, resolver);
     }

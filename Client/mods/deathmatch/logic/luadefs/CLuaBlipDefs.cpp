@@ -11,21 +11,27 @@
 
 #include "StdInc.h"
 
-void CLuaBlipDefs::LoadFunctions(void)
+void CLuaBlipDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createBlip", CreateBlip);
-    CLuaCFunctions::AddFunction("createBlipAttachedTo", CreateBlipAttachedTo);
-    CLuaCFunctions::AddFunction("getBlipIcon", GetBlipIcon);
-    CLuaCFunctions::AddFunction("getBlipSize", GetBlipSize);
-    CLuaCFunctions::AddFunction("getBlipColor", GetBlipColor);
-    CLuaCFunctions::AddFunction("getBlipOrdering", GetBlipOrdering);
-    CLuaCFunctions::AddFunction("getBlipVisibleDistance", GetBlipVisibleDistance);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createBlip", CreateBlip},
+        {"createBlipAttachedTo", CreateBlipAttachedTo},
+        {"getBlipIcon", GetBlipIcon},
+        {"getBlipSize", GetBlipSize},
+        {"getBlipColor", GetBlipColor},
+        {"getBlipOrdering", GetBlipOrdering},
+        {"getBlipVisibleDistance", GetBlipVisibleDistance},
 
-    CLuaCFunctions::AddFunction("setBlipIcon", SetBlipIcon);
-    CLuaCFunctions::AddFunction("setBlipSize", SetBlipSize);
-    CLuaCFunctions::AddFunction("setBlipColor", SetBlipColor);
-    CLuaCFunctions::AddFunction("setBlipOrdering", SetBlipOrdering);
-    CLuaCFunctions::AddFunction("setBlipVisibleDistance", SetBlipVisibleDistance);
+        {"setBlipIcon", SetBlipIcon},
+        {"setBlipSize", SetBlipSize},
+        {"setBlipColor", SetBlipColor},
+        {"setBlipOrdering", SetBlipOrdering},
+        {"setBlipVisibleDistance", SetBlipVisibleDistance},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBlipDefs::AddClass(lua_State* luaVM)
@@ -185,7 +191,6 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -205,7 +210,6 @@ int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -225,7 +229,6 @@ int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -248,7 +251,6 @@ int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 
@@ -268,7 +270,6 @@ int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
 int CLuaBlipDefs::GetBlipVisibleDistance(lua_State* luaVM)
 {
     CClientRadarMarker* pMarker = NULL;
-    CVector             vecPosition;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
 

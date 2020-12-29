@@ -32,7 +32,7 @@ CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const st
         m_pManager->MarkAsChanged(this);            // Save if password upgraded
 }
 
-CAccount::~CAccount(void)
+CAccount::~CAccount()
 {
     CIdArray::PushUniqueId(this, EIdClass::ACCOUNT, m_uiScriptID);
     if (m_pClient)
@@ -96,7 +96,7 @@ void CAccount::SetPassword(const SString& strPassword)
     }
 }
 
-SString CAccount::GetPasswordHash(void)
+SString CAccount::GetPasswordHash()
 {
     return m_Password.GetPasswordHash();
 }
@@ -119,17 +119,26 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
 
     if (pData)
     {
-        if (pData->GetType() == LUA_TBOOLEAN)
+        switch (pData->GetType())
         {
-            pResult->ReadBool(pData->GetStrValue() == "true");
-        }
-        else if (pData->GetType() == LUA_TNUMBER)
-        {
+        case LUA_TBOOLEAN:
+            pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
+            break;
+
+        case LUA_TNUMBER:
             pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
-        }
-        else
-        {
+            break;
+
+        case LUA_TNIL:
+            break;
+
+        case LUA_TSTRING:
             pResult->ReadString(pData->GetStrValue());
+            break;
+
+        default:
+            dassert(0); // It never should hit this, if so, something corrupted
+            break;
         }
     }
     else
@@ -187,7 +196,7 @@ void CAccount::RemoveData(const std::string& strKey)
 //
 // Account serial usage is only recorded for accounts that require serial authorization,
 // and is only loaded when required.
-void CAccount::EnsureLoadedSerialUsage(void)
+void CAccount::EnsureLoadedSerialUsage()
 {
     if (!m_bLoadedSerialUsage)
     {
@@ -196,12 +205,12 @@ void CAccount::EnsureLoadedSerialUsage(void)
     }
 }
 
-bool CAccount::HasLoadedSerialUsage(void)
+bool CAccount::HasLoadedSerialUsage()
 {
     return m_bLoadedSerialUsage;
 }
 
-std::vector<CAccount::SSerialUsage>& CAccount::GetSerialUsageList(void)
+std::vector<CAccount::SSerialUsage>& CAccount::GetSerialUsageList()
 {
     EnsureLoadedSerialUsage();
     return m_SerialUsageList;
@@ -286,7 +295,7 @@ bool CAccount::RemoveSerial(const SString& strSerial)
 //
 // Cleanup unauthorized serials
 //
-void CAccount::RemoveUnauthorizedSerials(void)
+void CAccount::RemoveUnauthorizedSerials()
 {
     EnsureLoadedSerialUsage();
     for (auto iter = m_SerialUsageList.begin(); iter != m_SerialUsageList.end();)

@@ -20,7 +20,7 @@ namespace
     class CLibMemory
     {
     public:
-        CLibMemory(void) { memset(this, 0, sizeof(*this)); }
+        CLibMemory() { memset(this, 0, sizeof(*this)); }
 
         int Delta;
         int Current;
@@ -55,12 +55,12 @@ class CPerfStatLibMemoryImpl : public CPerfStatLibMemory
 {
 public:
     ZERO_ON_NEW
-    CPerfStatLibMemoryImpl(void);
-    virtual ~CPerfStatLibMemoryImpl(void);
+    CPerfStatLibMemoryImpl();
+    virtual ~CPerfStatLibMemoryImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatLibMemory
@@ -97,7 +97,7 @@ CPerfStatLibMemory* CPerfStatLibMemory::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatLibMemoryImpl::CPerfStatLibMemoryImpl(void)
+CPerfStatLibMemoryImpl::CPerfStatLibMemoryImpl()
 {
     m_strCategoryName = "Lib memory";
 }
@@ -109,7 +109,7 @@ CPerfStatLibMemoryImpl::CPerfStatLibMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatLibMemoryImpl::~CPerfStatLibMemoryImpl(void)
+CPerfStatLibMemoryImpl::~CPerfStatLibMemoryImpl()
 {
 }
 
@@ -120,7 +120,7 @@ CPerfStatLibMemoryImpl::~CPerfStatLibMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatLibMemoryImpl::GetCategoryName(void)
+const SString& CPerfStatLibMemoryImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -153,7 +153,7 @@ void CPerfStatLibMemoryImpl::UpdateLibMemory(const SString& strLibName, int iMem
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatLibMemoryImpl::DoPulse(void)
+void CPerfStatLibMemoryImpl::DoPulse()
 {
 }
 
@@ -218,6 +218,8 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
                 #endif
                 #ifdef WIN32
                 info.strName += ".dll";
+                #elif defined(__APPLE__)
+                info.strName += ".dylib";
                 #else
                 info.strName += ".so";
                 #endif

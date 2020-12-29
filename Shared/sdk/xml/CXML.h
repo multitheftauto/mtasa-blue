@@ -9,23 +9,26 @@
  *
  *****************************************************************************/
 
-#ifndef __CXML_H
-#define __CXML_H
+#pragma once
 
 class CXMLNode;
 class CXMLFile;
 class CXMLAttribute;
+typedef struct SXMLString
+{
+    CXMLNode* node;
+    virtual ~SXMLString(){};
+} SXMLString;
 
 class CXML
 {
 public:
-    virtual CXMLFile* CreateXML(const char* szFilename, bool bUseIDs = false, bool bReadOnly = false) = 0;
-    virtual void      DeleteXML(CXMLFile* pFile) = 0;
-    virtual CXMLNode* CreateDummyNode(void) = 0;
+    virtual CXMLFile*                   CreateXML(const char* szFilename, bool bUseIDs = false, bool bReadOnly = false) = 0;
+    virtual std::unique_ptr<SXMLString> ParseString(const char* strXmlContent) = 0;
+    virtual void                        DeleteXML(CXMLFile* pFile) = 0;
+    virtual CXMLNode*                   CreateDummyNode() = 0;
 
     virtual CXMLAttribute* GetAttrFromID(unsigned long ulID) = 0;
     virtual CXMLFile*      GetFileFromID(unsigned long ulID) = 0;
     virtual CXMLNode*      GetNodeFromID(unsigned long ulID) = 0;
 };
-
-#endif

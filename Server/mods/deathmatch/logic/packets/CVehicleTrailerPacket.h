@@ -15,24 +15,24 @@
 #include "../CCommon.h"
 #include "CPacket.h"
 
-class CVehicleTrailerPacket : public CPacket
+class CVehicleTrailerPacket final : public CPacket
 {
 public:
-    CVehicleTrailerPacket(void){};
+    CVehicleTrailerPacket(){};
     CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_VEHICLE_TRAILER; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_TRAILER; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID GetVehicle(void) { return m_Vehicle; };
-    ElementID GetAttachedVehicle(void) { return m_AttachedVehicle; };
-    bool      GetAttached(void) { return m_bAttached; }
-    CVector   GetPosition(void) { return m_vecPosition; }
-    CVector   GetRotationDegrees(void) { return m_vecRotationDegrees; }
-    CVector   GetTurnSpeed(void) { return m_vecTurnSpeed; }
+    ElementID GetVehicle() { return m_Vehicle; };
+    ElementID GetAttachedVehicle() { return m_AttachedVehicle; };
+    bool      GetAttached() { return m_bAttached; }
+    CVector   GetPosition() { return m_vecPosition; }
+    CVector   GetRotationDegrees() { return m_vecRotationDegrees; }
+    CVector   GetTurnSpeed() { return m_vecTurnSpeed; }
 
 private:
     ElementID m_Vehicle;

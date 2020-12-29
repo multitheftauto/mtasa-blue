@@ -9,11 +9,11 @@
  *
  *****************************************************************************/
 
-#ifndef __CWATERMANAGERSA_H
-#define __CWATERMANAGERSA_H
+#pragma once
 
 #include "CWaterSA.h"
 
+#define DEFAULT_WATER_LEVEL                0.0f
 #define DEFAULT_WAVE_LEVEL                 0.0f
 
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
@@ -140,9 +140,11 @@ public:
 
     void          RelocatePools();
     void          InstallHooks();
+    CWaterZoneSA* GetZone(int iCol, int iRow);
     CWaterZoneSA* GetZoneContaining(float fX, float fY);
     void          GetZonesContaining(CWaterPoly* pPoly, std::vector<CWaterZoneSA*>& out);
     void          GetZonesContaining(const CVector& v1, const CVector& v2, const CVector& v3, std::vector<CWaterZoneSA*>& out);
+    void          GetZonesIntersecting(const CVector& startPos, const CVector& endPos, std::vector<CWaterZoneSA*>& vecOut);
 
     CWaterVertex* CreateVertex(const CVector& vecPosition);
 
@@ -153,23 +155,25 @@ public:
 
     bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
 
-    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
+    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource);
-    void ResetWorldWaterLevel(void);
+    void SetOutsideWorldWaterLevel(float fLevel);
+    void ResetWorldWaterLevel();
 
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
     void  SetWaterDrawnLast(bool bEnable);
-    bool  IsWaterDrawnLast(void);
+    bool  IsWaterDrawnLast();
 
+    bool IsPointOutsideOfGameArea(const CVector& vecPos);
     bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision);
 
     void AddChange(void* pChangeSource, void* pChangedObject, CWaterChange* pChange);
     void UndoChanges(void* pChangeSource = NULL);
     void RebuildIndex();
     void Reset();
-    void UpdateRenderOrderRequirement(void);
+    void UpdateRenderOrderRequirement();
 
 private:
     CWaterVertexSA   m_Vertices[NUM_NewWaterVertices];
@@ -200,5 +204,3 @@ private:
     friend class CWaterZoneSA;
     friend class CWaterZoneSA::iterator;
 };
-
-#endif

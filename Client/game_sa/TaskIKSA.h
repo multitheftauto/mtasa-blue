@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKIK
-#define __CGAMESA_TASKIK
+#pragma once
 
 #include <game/TaskIK.h>
 
@@ -59,7 +58,7 @@ public:
 class CTaskSimpleIKChainSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleIKChain
 {
 public:
-    CTaskSimpleIKChainSA(void){};
+    CTaskSimpleIKChainSA(){};
     CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, CVector effectorVec, int pivotBoneTag, CEntity* pEntity, int offsetBoneTag, CVector offsetPos,
                          float speed, int time = 99999999, int blendTime = 1000);
 };
@@ -79,7 +78,7 @@ public:
 class CTaskSimpleIKLookAtSA : public virtual CTaskSimpleIKChainSA, public virtual CTaskSimpleIKLookAt
 {
 public:
-    CTaskSimpleIKLookAtSA(void){};
+    CTaskSimpleIKLookAtSA(){};
     CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
                           int blendTime = 1000, int m_priority = 3);
 };
@@ -104,7 +103,7 @@ private:
     CTaskManagementSystemSA* m_pTaskManagementSystem;
 
 public:
-    CTaskSimpleIKManagerSA(void);
+    CTaskSimpleIKManagerSA();
     // CTaskSimpleIKManagerSA    ( /*fill me*/ );
 
     int                 AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID = -1);
@@ -155,9 +154,7 @@ public:
 class CTaskSimpleTriggerLookAtSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleTriggerLookAt
 {
 public:
-    CTaskSimpleTriggerLookAtSA(void){};
+    CTaskSimpleTriggerLookAtSA(){};
     CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
                                int blendTime = 1000, int priority = 3);
 };
-
-#endif

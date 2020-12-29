@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTWEAPON_H
-#define __CCLIENTWEAPON_H
+#pragma once
 
 #include <game/CWeaponInfo.h>
 #include "CClientObject.h"
@@ -46,24 +45,24 @@ class CClientWeapon : public CClientObject
     DECLARE_CLASS(CClientWeapon, CClientObject)
 public:
     CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType type);
-    ~CClientWeapon(void);
+    ~CClientWeapon();
 
-    eClientEntityType GetType(void) const { return CCLIENTWEAPON; };
+    eClientEntityType GetType() const { return CCLIENTWEAPON; };
 
-    eWeaponType    GetWeaponType(void) { return m_Type; }
-    eWeaponState   GetWeaponState(void) { return m_State; }
+    eWeaponType    GetWeaponType() { return m_Type; }
+    eWeaponState   GetWeaponState() { return m_State; }
     void           SetWeaponState(eWeaponState state) { m_State = state; }
     void           SetWeaponTarget(CClientEntity* pTarget, int subTarget);
     void           SetWeaponTarget(CVector vecTarget);
-    CVector        GetWeaponVectorTarget(void);
-    CClientEntity* GetWeaponEntityTarget(void);
-    eTargetType    GetWeaponTargetType(void);
-    void           ResetWeaponTarget(void);
+    CVector        GetWeaponVectorTarget();
+    CClientEntity* GetWeaponEntityTarget();
+    eTargetType    GetWeaponTargetType();
+    void           ResetWeaponTarget();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void Create(void);
-    void Destroy(void);
+    void Create();
+    void Destroy();
 
     void Fire(bool bServerFire = false);
 
@@ -78,11 +77,11 @@ public:
     void           SetDirection(CVector& vecDirection);
     void           SetTargetDirection(CVector& vecDirection);
     void           LookAt(CVector& vecPosition, bool bInterpolate = false);
-    CWeaponStat*   GetWeaponStat(void) { return m_pWeaponStat; }
-    CClientPlayer* GetOwner(void) { return m_pOwner; }
+    CWeaponStat*   GetWeaponStat() { return m_pWeaponStat; }
+    CClientPlayer* GetOwner() { return m_pOwner; }
     void           SetOwner(CClientPlayer* pOwner) { m_pOwner = pOwner; }
     void           SetFireRotationNoTarget(const CVector& vecRotation) { m_vecFireRotationNoTarget = vecRotation; }
-    const CVector& GetFireRotationNoTarget(void) { return m_vecFireRotationNoTarget; }
+    const CVector& GetFireRotationNoTarget() { return m_vecFireRotationNoTarget; }
 
     bool SetFlags(eWeaponFlags flags, bool bData);
     bool SetFlags(const SLineOfSightFlags flags);
@@ -90,19 +89,19 @@ public:
 
     bool                 GetFlags(eWeaponFlags flags, bool& bData);
     bool                 GetFlags(SLineOfSightFlags& flags);
-    SWeaponConfiguration GetFlags(void) { return m_weaponConfig; }
+    SWeaponConfiguration GetFlags() { return m_weaponConfig; }
 
     void       DoGunShells(CVector vecOrigin, CVector vecDirection);
     static int GetWeaponFireTime(CWeaponStat* pWeaponStat);
     void       SetWeaponFireTime(int iWeaponFireTime);
-    int        GetWeaponFireTime(void);
-    void       ResetWeaponFireTime(void);
+    int        GetWeaponFireTime();
+    void       ResetWeaponFireTime();
 
     void SetClipAmmo(int iAmmo) { m_nAmmoInClip = iAmmo; }
-    int  GetClipAmmo(void) { return m_nAmmoInClip; }
+    int  GetClipAmmo() { return m_nAmmoInClip; }
 
     void SetAmmo(int iAmmo) { m_nAmmoTotal = iAmmo; }
-    int  GetAmmo(void) { return m_nAmmoTotal; }
+    int  GetAmmo() { return m_nAmmoTotal; }
 
 private:
     CClientManager*      m_pManager;
@@ -134,5 +133,3 @@ private:
     int                  m_iWeaponFireRate;
     CVector              m_vecFireRotationNoTarget;            // Rotation adjustment when firing directly forward
 };
-
-#endif

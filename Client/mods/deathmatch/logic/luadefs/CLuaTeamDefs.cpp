@@ -12,14 +12,20 @@
 #include "StdInc.h"
 using std::list;
 
-void CLuaTeamDefs::LoadFunctions(void)
+void CLuaTeamDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("getTeamFromName", GetTeamFromName);
-    CLuaCFunctions::AddFunction("getTeamName", GetTeamName);
-    CLuaCFunctions::AddFunction("getTeamColor", GetTeamColor);
-    CLuaCFunctions::AddFunction("getTeamFriendlyFire", GetTeamFriendlyFire);
-    CLuaCFunctions::AddFunction("getPlayersInTeam", GetPlayersInTeam);
-    CLuaCFunctions::AddFunction("countPlayersInTeam", CountPlayersInTeam);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"getTeamFromName", GetTeamFromName},
+        {"getTeamName", GetTeamName},
+        {"getTeamColor", GetTeamColor},
+        {"getTeamFriendlyFire", GetTeamFriendlyFire},
+        {"getPlayersInTeam", GetPlayersInTeam},
+        {"countPlayersInTeam", CountPlayersInTeam},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaTeamDefs::AddClass(lua_State* luaVM)
@@ -38,7 +44,6 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "friendlyFire", NULL, "getTeamFriendlyFire");
     lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
     lua_classvariable(luaVM, "name", NULL, "getTeamName");
-    // lua_classvariable ( luaVM, "color", NULL, "getTeamColor" );
 
     lua_registerclass(luaVM, "Team", "Element");
 }

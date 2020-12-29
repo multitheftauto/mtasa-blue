@@ -215,17 +215,54 @@ int CLuaFunctionDefs::TriggerServerEvent(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Trigger it
-        if (CStaticFunctionDefinitions::TriggerServerEvent(strName, *pCallWithEntity, Arguments))
+        if (!pCallWithEntity->IsLocalEntity())
         {
-            lua_pushboolean(luaVM, true);
+            if (CStaticFunctionDefinitions::TriggerServerEvent(strName, *pCallWithEntity, Arguments))
+            {
+                lua_pushboolean(luaVM, true);
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+
+                // Show a warning for clientside elements in the argument chain
+                for (uint i = 0; i < Arguments.Count(); ++i)
+                {
+                    CLuaArgument* pArgument = Arguments[i];
+
+                    if (!pArgument)
+                        continue;
+
+                    if (pArgument->GetType() != LUA_TLIGHTUSERDATA && pArgument->GetType() != LUA_TUSERDATA)
+                        continue;
+
+                    CClientEntity* pEntity = pArgument->GetElement();
+
+                    if (pEntity && !pEntity->IsLocalEntity())
+                        continue;
+
+                    // Extra arguments begin at argument 3
+                    if (pEntity)
+                    {
+                        m_pScriptDebugging->LogError(luaVM, "clientside element '%s' at argument %u @ 'triggerServerEvent'", 
+                                                     pEntity->GetTypeName().c_str(), i + 3);
+                    }
+                    else
+                    {
+                        m_pScriptDebugging->LogError(luaVM, "userdata at argument %u @ 'triggerServerEvent'", i + 3);
+                    }
+                }
+            }
+
             return 1;
         }
+
+        argStream.SetCustomError("element is clientside", "Bad source element");
     }
-    else
+    
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

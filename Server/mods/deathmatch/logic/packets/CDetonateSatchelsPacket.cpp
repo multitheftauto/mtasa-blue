@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CDetonateSatchelsPacket::CDetonateSatchelsPacket(void)
+CDetonateSatchelsPacket::CDetonateSatchelsPacket()
 {
 }
 

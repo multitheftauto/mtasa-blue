@@ -13,8 +13,7 @@
 #include <multiplayer/CMultiplayer.h>
 #include <core/CCoreInterface.h>
 
-#ifndef __CGAMESA_INIT
-#define __CGAMESA_INIT
+#pragma once
 
 extern CGameSA*        pGame;
 extern CCoreInterface* g_pCore;
@@ -112,5 +111,3 @@ void MemOrFast(U ptr, const T value)
 
 bool GetDebugIdEnabled(uint uiDebugId);
 void LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
-
-#endif

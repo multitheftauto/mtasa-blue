@@ -11,17 +11,17 @@
 #include <StdInc.h>
 
 // Turn off optimizations in this file because we're encrypting stuff
-#pragma optimize( "", off )
+#pragma optimize("", off)
 
 #define ANTICHEAT_CHECKS_PER_CYCLE 5
 
-CAntiCheat::CAntiCheat(void)
+CAntiCheat::CAntiCheat()
 {
     // Start at the first index
     m_LastEntry = m_Entries.begin();
 }
 
-CAntiCheat::~CAntiCheat(void)
+CAntiCheat::~CAntiCheat()
 {
     // All modules should've been removed now
     assert(m_Entries.size() == 0);
@@ -58,12 +58,12 @@ void CAntiCheat::RemoveModule(CAntiCheatModule& Module)
     }
 }
 
-void CAntiCheat::ClearModules(void)
+void CAntiCheat::ClearModules()
 {
     m_Entries.clear();
 }
 
-bool CAntiCheat::PerformChecks(void)
+bool CAntiCheat::PerformChecks()
 {
     // We have entries in our vector?
     if (m_Entries.size() > 0)
@@ -91,4 +91,35 @@ bool CAntiCheat::PerformChecks(void)
 }
 
 // Turn optimizations back on if enabled in project settings
-#pragma optimize( "", on )
+#pragma optimize("", on)
+
+SString CAntiCheat::GetInfo(const SString &acInfo, const SString &sdInfo)
+{
+    if (acInfo.empty())
+        return "[Undisclosed]";
+
+    SString strAllowedFiles = "None";
+    SString strVerifyFiles = acInfo.SplitLeft(",");
+    SString strEnabledSD = sdInfo == "" ? "None" : sdInfo;
+    SString strDisabledAC = acInfo.SplitRight(",");
+    strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
+
+    int iVerifyFiles = atoi(strVerifyFiles);
+    if (iVerifyFiles == 0)
+        strAllowedFiles = "All";
+    else if (iVerifyFiles != -1)
+    {
+        strAllowedFiles = "";
+        for (uint i = 0; i < 31; i++)
+        {
+            if ((iVerifyFiles & (1 << i)) == 0)
+            {
+                if (!strAllowedFiles.empty())
+                    strAllowedFiles += ",";
+                strAllowedFiles += SString("%d", i + 1);
+            }
+        }
+    }
+
+    return SString("[Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD);
+}

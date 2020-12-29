@@ -11,8 +11,7 @@
 
 class CGUI_Impl;
 
-#ifndef __CGUI_IMPL_H
-#define __CGUI_IMPL_H
+#pragma once
 
 #include <gui/CGUI.h>
 #include <list>
@@ -62,25 +61,25 @@ class CGUI_Impl : public CGUI, public CGUITabList
 {
 public:
     CGUI_Impl(IDirect3DDevice9* pDevice);
-    ~CGUI_Impl(void);
+    ~CGUI_Impl();
 
     void SetSkin(const char* szName);
     void SetBidiEnabled(bool bEnabled);
 
-    void Draw(void);
-    void Invalidate(void);
-    void Restore(void);
+    void Draw();
+    void Invalidate();
+    void Restore();
 
-    void DrawMouseCursor(void);
+    void DrawMouseCursor();
 
     void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton);
     void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown);
     void ProcessCharacter(unsigned long ulCharacter);
 
     //
-    bool                 GetGUIInputEnabled(void);
+    bool                 GetGUIInputEnabled();
     void                 SetGUIInputMode(eInputMode a_eMode);
-    eInputMode           GetGUIInputMode(void);
+    eInputMode           GetGUIInputMode();
     static CEGUI::String GetUTFString(const char* szInput);
     static CEGUI::String GetUTFString(const std::string& strInput);
     static CEGUI::String GetUTFString(const CEGUI::String& strInput);            // Not defined
@@ -116,15 +115,15 @@ public:
     CGUIStaticImage* CreateStaticImage(CGUIElement* pParent);
     CGUIStaticImage* CreateStaticImage(CGUITab* pParent);
     CGUIStaticImage* CreateStaticImage(CGUIGridList* pParent);
-    CGUIStaticImage* CreateStaticImage(void);
+    CGUIStaticImage* CreateStaticImage();
 
     CGUITabPanel* CreateTabPanel(CGUIElement* pParent);
     CGUITabPanel* CreateTabPanel(CGUITab* pParent);
-    CGUITabPanel* CreateTabPanel(void);
+    CGUITabPanel* CreateTabPanel();
 
     CGUIScrollPane* CreateScrollPane(CGUIElement* pParent);
     CGUIScrollPane* CreateScrollPane(CGUITab* pParent);
-    CGUIScrollPane* CreateScrollPane(void);
+    CGUIScrollPane* CreateScrollPane();
 
     CGUIScrollBar* CreateScrollBar(bool bHorizontal, CGUIElement* pParent = NULL);
     CGUIScrollBar* CreateScrollBar(bool bHorizontal, CGUITab* pParent = NULL);
@@ -138,41 +137,41 @@ public:
     CGUIWindow* CreateWnd(CGUIElement* pParent = NULL, const char* szCaption = "");
     //
 
-    CGUITexture* CreateTexture(void);
+    CGUITexture* CreateTexture();
     CGUIFont*    CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false);
 
     void        SetCursorEnabled(bool bEnabled);
-    bool        IsCursorEnabled(void);
+    bool        IsCursorEnabled();
     void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
-    float       GetCurrentServerCursorAlpha(void);
-    eCursorType GetCursorType(void);
+    float       GetCurrentServerCursorAlpha();
+    eCursorType GetCursorType();
 
     void                    AddChild(CGUIElement_Impl* pChild);
-    CEGUI::FontManager*     GetFontManager(void);
-    CEGUI::ImagesetManager* GetImageSetManager(void);
-    CEGUI::Renderer*        GetRenderer(void);
-    CEGUI::System*          GetGUISystem(void);
-    CEGUI::SchemeManager*   GetSchemeManager(void);
-    CEGUI::WindowManager*   GetWindowManager(void);
+    CEGUI::FontManager*     GetFontManager();
+    CEGUI::ImagesetManager* GetImageSetManager();
+    CEGUI::Renderer*        GetRenderer();
+    CEGUI::System*          GetGUISystem();
+    CEGUI::SchemeManager*   GetSchemeManager();
+    CEGUI::WindowManager*   GetWindowManager();
     void                    GetUniqueName(char* pBuf);
     CEGUI::Window*          GetMasterWindow(CEGUI::Window* Window);
 
-    CVector2D GetResolution(void);
+    CVector2D GetResolution();
     void      SetResolution(float fWidth, float fHeight);
 
-    CGUIFont* GetDefaultFont(void);
-    CGUIFont* GetSmallFont(void);
-    CGUIFont* GetBoldFont(void);
-    CGUIFont* GetClearFont(void);
-    CGUIFont* GetSAHeaderFont(void);
-    CGUIFont* GetSAGothicFont(void);
-    CGUIFont* GetSansFont(void);
+    CGUIFont* GetDefaultFont();
+    CGUIFont* GetSmallFont();
+    CGUIFont* GetBoldFont();
+    CGUIFont* GetClearFont();
+    CGUIFont* GetSAHeaderFont();
+    CGUIFont* GetSAGothicFont();
+    CGUIFont* GetSansFont();
     bool      IsFontPresent(const char* szFont) { return m_pFontManager->isFontPresent(szFont); }
 
     float GetTextExtent(const char* szText, const char* szFont = "default-normal");
     float GetMaxTextExtent(SString strFont, SString arg, ...);
 
-    const SString& GetGuiWorkingDirectory(void) const;
+    const SString& GetGuiWorkingDirectory() const;
     void           SetDefaultGuiWorkingDirectory(const SString& strDir);
     void           PushGuiWorkingDirectory(const SString& strDir);
     void           PopGuiWorkingDirectory(const SString& strDirCheck = "");
@@ -254,9 +253,9 @@ public:
         m_Channel = channel;
     }
     void ClearInputHandlers(eInputChannel channel);
-    void ClearSystemKeys(void);
+    void ClearSystemKeys();
 
-    bool IsTransferBoxVisible(void) { return m_bTransferBoxVisible; };
+    bool IsTransferBoxVisible() { return m_bTransferBoxVisible; };
     void SetTransferBoxVisible(bool bVisible) { m_bTransferBoxVisible = bVisible; };
 
     bool Event_CharacterKey(const CEGUI::EventArgs& e);
@@ -278,7 +277,7 @@ public:
     void AddToRedrawQueue(CGUIElement* pWindow);
     void RemoveFromRedrawQueue(CGUIElement* pWindow);
 
-    void        CleanDeadPool(void);
+    void        CleanDeadPool();
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
@@ -301,7 +300,7 @@ private:
     void      SubscribeToMouseEvents();
     CGUIFont* CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0,
                                    bool bAutoScale = false);
-    void      ApplyGuiWorkingDirectory(void);
+    void      ApplyGuiWorkingDirectory();
 
     IDirect3DDevice9* m_pDevice;
 
@@ -356,5 +355,3 @@ private:
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
 };
-
-#endif

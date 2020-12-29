@@ -40,7 +40,7 @@ CProxyDirect3DTexture::CProxyDirect3DTexture(IDirect3DDevice9* InD3DDevice9, IDi
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DTexture::~CProxyDirect3DTexture(void)
+CProxyDirect3DTexture::~CProxyDirect3DTexture()
 {
     m_stats.iCurrentCount--;
     m_stats.iCurrentBytes -= m_iMemUsed;
@@ -76,7 +76,7 @@ HRESULT CProxyDirect3DTexture::QueryInterface(REFIID riid, void** ppvObj)
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DTexture::Release(void)
+ULONG CProxyDirect3DTexture::Release()
 {
     // Call original function
     ULONG count = m_pOriginal->Release();

@@ -26,7 +26,7 @@ void CPedSoundSA::SetVoiceID(short sVoiceID)
     m_pInterface->m_sVoiceID = sVoiceID;
 }
 
-bool CPedSoundSA::IsSpeechDisabled(void)
+bool CPedSoundSA::IsSpeechDisabled()
 {
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;
@@ -40,7 +40,7 @@ bool CPedSoundSA::IsSpeechDisabled(void)
     return bReturn;
 }
 
-void CPedSoundSA::EnablePedSpeech(void)
+void CPedSoundSA::EnablePedSpeech()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAEPedSound__EnablePedSpeech;

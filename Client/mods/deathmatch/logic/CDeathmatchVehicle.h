@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDEATHMATCHVEHICLE_H
-#define __CDEATHMATCHVEHICLE_H
+#pragma once
 
 #include "CClientVehicle.h"
 
@@ -20,13 +19,13 @@ class CDeathmatchVehicle : public CClientVehicle
 public:
     CDeathmatchVehicle(CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel,
                        unsigned char ucVariant, unsigned char ucVariant2);
-    ~CDeathmatchVehicle(void);
+    ~CDeathmatchVehicle();
 
-    bool IsSyncing(void) { return m_bIsSyncing; };
+    bool IsSyncing() { return m_bIsSyncing; };
     void SetIsSyncing(bool bIsSyncing);
 
-    bool SyncDamageModel(void);
-    void ResetDamageModelSync(void);
+    bool SyncDamageModel();
+    void ResetDamageModelSync();
 
 private:
     class CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync;
@@ -37,5 +36,3 @@ private:
     SFixedArray<unsigned char, MAX_PANELS> m_ucLastPanelStates;
     SFixedArray<unsigned char, MAX_LIGHTS> m_ucLastLightStates;
 };
-
-#endif

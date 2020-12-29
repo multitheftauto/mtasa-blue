@@ -14,13 +14,13 @@
 class CLuaVector2D : public CVector2D
 {
 public:
-    CLuaVector2D(void);
+    CLuaVector2D();
     CLuaVector2D(const CVector2D& vector);
     CLuaVector2D(float fX, float fY);
 
-    ~CLuaVector2D(void);
+    ~CLuaVector2D();
 
-    unsigned int GetScriptID(void) const { return m_uiScriptID; }
+    unsigned int GetScriptID() const { return m_uiScriptID; }
 
     static CLuaVector2D* GetFromScriptID(unsigned int uiScriptID);
 

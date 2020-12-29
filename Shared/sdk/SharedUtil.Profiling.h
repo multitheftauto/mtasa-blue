@@ -39,7 +39,7 @@ namespace SharedUtil
             TIMEUS         timeStamp;
         };
 
-        CStatEvents(void);
+        CStatEvents();
         void SetEnabled(bool bEnabled);
         bool ClearBuffer(bool bCanResize);
         void Sample(class SStatCollection& m_StatCollection);
@@ -132,8 +132,8 @@ namespace SharedUtil
     class CStatResults
     {
     public:
-        CStatResults(void);
-        void FrameEnd(void);
+        CStatResults();
+        void FrameEnd();
 
         SStatResultCollection m_CollectionCombo;
         float                 m_fNextMaxClearTime;

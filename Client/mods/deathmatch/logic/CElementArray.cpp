@@ -15,7 +15,7 @@ using namespace std;
 SFixedArray<CClientEntity*, MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS> CElementIDs::m_Elements;
 CStack<ElementID, MAX_CLIENT_ELEMENTS - 2>                             CElementIDs::m_ClientStack;
 
-void CElementIDs::Initialize(void)
+void CElementIDs::Initialize()
 {
     memset(&m_Elements[0], 0, sizeof(m_Elements));
 }
@@ -45,7 +45,7 @@ void CElementIDs::SetElement(ElementID ID, CClientEntity* pEntity)
 #endif
 }
 
-ElementID CElementIDs::PopClientID(void)
+ElementID CElementIDs::PopClientID()
 {
     // Pop an unique ID
     ElementID ID;

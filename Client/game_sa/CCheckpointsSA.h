@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CHECKPOINTS
-#define __CGAMESA_CHECKPOINTS
+#pragma once
 
 // 00722c40      public: static class CCheckpoint * __cdecl CCheckpoints::PlaceMarker(unsigned int,unsigned short,class CVector &,class CVector &,float,unsigned
 // char,unsigned char,unsigned char,unsigned char,unsigned short,float,short)
@@ -33,11 +32,9 @@ private:
 public:
     // constructor
     CCheckpointsSA();
-    ~CCheckpointsSA(void);
+    ~CCheckpointsSA();
 
     CCheckpoint* CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
                                   const SColor color);
     CCheckpoint* FindFreeMarker();
 };
-
-#endif

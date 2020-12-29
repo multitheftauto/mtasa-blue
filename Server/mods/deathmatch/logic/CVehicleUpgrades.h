@@ -38,10 +38,10 @@ public:
     void               SetSlotState(unsigned char ucSlot, unsigned short usUpgrade);
     unsigned short     GetSlotState(unsigned char ucSlot);
     bool               AddUpgrade(unsigned short usUpgrade);
-    void               AddAllUpgrades(void);
+    void               AddAllUpgrades();
     bool               HasUpgrade(unsigned short usUpgrade);
-    const SSlotStates& GetSlotStates(void) { return m_SlotStates; }
-    unsigned char      Count(void);
+    const SSlotStates& GetSlotStates() { return m_SlotStates; }
+    unsigned char      Count();
 
     static const char* GetSlotName(unsigned char ucSlot);
     static bool        IsValidUpgrade(unsigned short usUpgrade);

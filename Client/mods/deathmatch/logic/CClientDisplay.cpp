@@ -22,7 +22,7 @@ CClientDisplay::CClientDisplay(CClientDisplayManager* pDisplayManager, unsigned 
     m_pDisplayManager->AddToList(this);
 }
 
-CClientDisplay::~CClientDisplay(void)
+CClientDisplay::~CClientDisplay()
 {
     // Remove us from the manager
     m_pDisplayManager->RemoveFromList(this);

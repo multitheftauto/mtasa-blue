@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTMARKERMANAGER_H
-#define __CCLIENTMARKERMANAGER_H
+#pragma once
 
 #include "CClientMarker.h"
 #include <list>
@@ -21,14 +20,14 @@ class CClientMarkerManager
     friend class CClientGame;
 
 public:
-    unsigned int          Count(void) { return static_cast<unsigned int>(m_Markers.size()); };
+    unsigned int          Count() { return static_cast<unsigned int>(m_Markers.size()); };
     static CClientMarker* Get(ElementID ID);
-    void                  DeleteAll(void);
+    void                  DeleteAll();
 
 private:
     CClientMarkerManager(class CClientManager* pManager);
-    ~CClientMarkerManager(void);
-    void DoPulse(void);
+    ~CClientMarkerManager();
+    void DoPulse();
     void AddToList(CClientMarker* pCheckpoint) { m_Markers.push_back(pCheckpoint); };
     void RemoveFromList(CClientMarker* pCheckpoint)
     {
@@ -40,5 +39,3 @@ private:
     CFastList<CClientMarker*> m_Markers;
     bool                      m_bCanRemoveFromList;
 };
-
-#endif

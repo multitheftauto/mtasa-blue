@@ -26,9 +26,9 @@ public:
     ZERO_ON_NEW
 
     CFunctionUseLogger(const SString& strLogFilename);
-    ~CFunctionUseLogger(void);
+    ~CFunctionUseLogger();
 
-    void Pulse(void);
+    void Pulse();
     void OnFunctionUse(lua_State* luaVM, const char* szFunctionName, const char* szArgs, uint uiArgsSize);
 
 protected:

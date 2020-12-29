@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_RESTART
-#define __CGAME_RESTART
+#pragma once
 
 class CRestart
 {
 };
-
-#endif

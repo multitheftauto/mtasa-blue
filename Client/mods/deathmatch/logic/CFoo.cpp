@@ -15,7 +15,7 @@
 
 bool bFoo_PlayerLimitCrash = false;
 
-void CFoo::DoPulse(void)
+void CFoo::DoPulse()
 {
     CClientManager* pManager = g_pClientGame->GetManager();
     if (pManager->IsGameLoaded())
@@ -194,7 +194,8 @@ void CFoo::Test(const char* szString)
 
     else if (stricmp(szString, "choke") == 0)
     {
-        g_pClientGame->GetLocalPlayer()->SetChoking(true);
+        if (g_pClientGame->GetLocalPlayer())
+            g_pClientGame->GetLocalPlayer()->SetChoking(true);
     }
 
     //
@@ -441,7 +442,7 @@ void CFoo::Test(const char* szString)
         fclose(pFile);
     }
 
-    else if (strnicmp(szString, "veh", 3) == 0)
+    /*else if (strnicmp(szString, "veh", 3) == 0)
     {
         int   i = 600;
         FILE* p = fopen("C:/dump.txt", "w+");
@@ -468,7 +469,7 @@ void CFoo::Test(const char* szString)
         }
 
         fclose(p);
-    }
+    }*/
 
     else if (strnicmp(szString, "groups", 6) == 0)
     {

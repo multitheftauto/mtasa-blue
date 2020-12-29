@@ -10,8 +10,8 @@
 // Base class for net function arguments
 struct SArgs
 {
-    SArgs(void) { DEBUG_CREATE_COUNT("SArgs"); }
-    virtual ~SArgs(void) { DEBUG_DESTROY_COUNT("SArgs"); }
+    SArgs() { DEBUG_CREATE_COUNT("SArgs"); }
+    virtual ~SArgs() { DEBUG_DESTROY_COUNT("SArgs"); }
     int type;
 };
 
@@ -23,28 +23,27 @@ typedef void (*PFN_NETRESULT)(class CNetJobData* pJobData, void* pContext);
 class CNetJobData
 {
 public:
-    ZERO_ON_NEW
     bool SetCallback(PFN_NETRESULT pfnNetResult, void* pContext);
-    bool HasCallback(void);
-    void ProcessCallback(void);
+    bool HasCallback();
+    void ProcessCallback();
 
-    CNetJobData(void) { DEBUG_CREATE_COUNT("CNetJobData"); }
-    ~CNetJobData(void)
+    CNetJobData() { DEBUG_CREATE_COUNT("CNetJobData"); }
+    ~CNetJobData()
     {
         SAFE_DELETE(pArgs);
         DEBUG_DESTROY_COUNT("CNetJobData");
     }
 
-    EJobStageType stage;
-    SArgs*        pArgs;
-    bool          bAutoFree;
+    EJobStageType stage = EJobStageType::NONE;
+    SArgs*        pArgs = nullptr;
+    bool          bAutoFree = false;
 
     struct
     {
-        PFN_NETRESULT pfnNetResult;
-        void*         pContext;
-        bool          bSet;
-        bool          bDone;
+        PFN_NETRESULT pfnNetResult = nullptr;
+        void*         pContext = nullptr;
+        bool          bSet = false;
+        bool          bDone = false;
     } callback;
 };
 
@@ -56,18 +55,18 @@ class CNetServerBuffer : public CNetServer
 public:
     ZERO_ON_NEW
     CNetServerBuffer(CSimPlayerManager* pSimPlayerManager);
-    virtual ~CNetServerBuffer(void);
+    virtual ~CNetServerBuffer();
 
     // CNetServer interface
     virtual bool StartNetwork(const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName);
-    virtual void StopNetwork(void);
+    virtual void StopNetwork();
 
-    virtual void DoPulse(void);
+    virtual void DoPulse();
 
     virtual void RegisterPacketHandler(PPACKETHANDLER pfnPacketHandler);
 
     virtual bool               GetNetworkStatistics(NetStatistics* pDest, const NetServerPlayerID& PlayerID);
-    virtual const SPacketStat* GetPacketStats(void);
+    virtual const SPacketStat* GetPacketStats();
     virtual bool               GetBandwidthStatistics(SBandwidthStatistics* pDest);
     virtual bool               GetNetPerformanceStatistics(SNetPerformanceStatistics* pDest, bool bResetCounters);
     virtual void               GetPingStatus(SFixedString<32>* pstrStatus);
@@ -96,7 +95,7 @@ public:
     virtual void SetChecks(const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC,
                            const char* szImgMods);
 
-    virtual unsigned int GetPendingPacketCount(void);
+    virtual unsigned int GetPendingPacketCount();
     virtual void         GetNetRoute(SFixedString<32>* pstrRoute);
 
     virtual bool InitServerId(const char* szPath);
@@ -164,20 +163,20 @@ public:
                         pNetExtraInfo);
 
     // Main thread functions
-    void         StopThread(void);
+    void         StopThread();
     CNetJobData* AddCommand(SArgs* pArgs, bool bAutoFree);
     void         AddCommandAndFree(SArgs* pArgs);
     void         AddCommandAndWait(SArgs* pArgs);
     void         AddCommandAndCallback(SArgs* pArgs, PFN_NETRESULT pfnNetResult, void* pContext);
     bool         PollCommand(CNetJobData* pJobData, uint uiTimeout);
-    CNetJobData* GetNewJobData(void);
-    void         ProcessIncoming(void);
+    CNetJobData* GetNewJobData();
+    void         ProcessIncoming();
     void         SetAutoPulseEnabled(bool bEnable);
     void         AddPacketStat(CNetServer::ENetworkUsageDirection eDirection, uchar ucPacketID, int iPacketSize, TIMEUS elapsedTime);
 
     // Sync thread functions
     static void* StaticThreadProc(void* pContext);
-    void*        ThreadProc(void);
+    void*        ThreadProc();
     void         ProcessCommand(CNetJobData* pJobData);
     static bool  StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
     void         ProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);

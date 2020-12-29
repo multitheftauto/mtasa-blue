@@ -17,39 +17,33 @@ CMarkerManager::CMarkerManager(CColManager* pColManager)
     m_pColManager = pColManager;
 }
 
-CMarker* CMarkerManager::Create(CElement* pParent, CXMLNode* pNode)
+CMarker* CMarkerManager::Create(CElement* pParent)
 {
-    // Create the marker
-    CMarker* pMarker = new CMarker(this, m_pColManager, pParent, pNode);
+    CMarker* const pMarker = new CMarker(this, m_pColManager, pParent);
 
-    // Load the data from XML
     if (pMarker->GetID() == INVALID_ELEMENT_ID)
     {
         delete pMarker;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created marker
     return pMarker;
 }
 
 CMarker* CMarkerManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the marker
-    CMarker* pMarker = new CMarker(this, m_pColManager, pParent, &Node);
+    CMarker* const pMarker = new CMarker(this, m_pColManager, pParent);
 
-    // Load the data from XML
-    if (pMarker->GetID() == INVALID_ELEMENT_ID || !pMarker->LoadFromCustomData(pEvents))
+    if (pMarker->GetID() == INVALID_ELEMENT_ID || !pMarker->LoadFromCustomData(pEvents, Node))
     {
         delete pMarker;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created marker
     return pMarker;
 }
 
-void CMarkerManager::DeleteAll(void)
+void CMarkerManager::DeleteAll()
 {
     // Delete all markers in the list
     DeletePointersAndClearList(m_Markers);

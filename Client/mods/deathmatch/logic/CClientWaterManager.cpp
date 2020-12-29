@@ -18,7 +18,7 @@ CClientWaterManager::CClientWaterManager(CClientManager* pManager)
     m_bDontRemoveFromList = false;
 }
 
-CClientWaterManager::~CClientWaterManager(void)
+CClientWaterManager::~CClientWaterManager()
 {
     DeleteAll();
 }
@@ -35,7 +35,7 @@ CClientWater* CClientWaterManager::Get(ElementID ID)
     return NULL;
 }
 
-void CClientWaterManager::DeleteAll(void)
+void CClientWaterManager::DeleteAll()
 {
     // Delete each water poly
     m_bDontRemoveFromList = true;
@@ -88,9 +88,9 @@ bool CClientWaterManager::SetPositionWaterLevel(const CVector& vecPosition, floa
     return g_pGame->GetWaterManager()->SetPositionWaterLevel(vecPosition, fLevel, pChangeSource);
 }
 
-bool CClientWaterManager::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel)
+bool CClientWaterManager::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
-    return g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel);
+    return g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 }
 
 bool CClientWaterManager::SetAllElementWaterLevel(float fLevel, void* pChangeSource)
@@ -103,7 +103,7 @@ bool CClientWaterManager::SetAllElementWaterLevel(float fLevel, void* pChangeSou
     return true;
 }
 
-void CClientWaterManager::ResetWorldWaterLevel(void)
+void CClientWaterManager::ResetWorldWaterLevel()
 {
     g_pGame->GetWaterManager()->ResetWorldWaterLevel();
 }

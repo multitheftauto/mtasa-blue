@@ -13,6 +13,17 @@
 
 extern CGameSA* pGame;
 
+AnimBlendFrameData* CAnimBlendClumpDataSAInterface::GetFrameDataByNodeId(unsigned int nodeId)
+{
+    for (int i = 0; i < m_dwNumBones; i++)
+    {
+        AnimBlendFrameData& frameData = m_frames[i];
+        if (frameData.m_nNodeId == nodeId)
+            return &frameData;
+    }
+    return nullptr;
+}
+
 CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(CAnimBlendStaticAssociationSAInterface& staticAssociationByReference)
 {
     DWORD DwFunc = 0x4CF080;
@@ -46,32 +57,28 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::InitializeForCustomAn
     m_pInterface->fBlendDelta = 0.0;
     m_pInterface->fCurrentTime = 0.0;
     m_pInterface->fTimeStep = 0.0;
-    m_pInterface->sFlags = 0;
+    m_pInterface->m_nFlags = 0;
     m_pInterface->uiCallbackType = 0;
     m_pInterface->vTable = reinterpret_cast<DWORD*>(0x85C6D0);
     m_pInterface->sAnimGroup = -1;
     m_pInterface->sAnimID = -1;
     m_pInterface->listEntry.prev = 0;
     m_pInterface->listEntry.next = 0;
-    InitializeWithHierarchy(pClump, pAnimHierarchy);
+    Init(pClump, pAnimHierarchy);
     return m_pInterface;
 }
 
-void CAnimBlendAssociationSA::InitializeWithHierarchy(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy)
+void CAnimBlendAssociationSA::Init(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy)
 {
-    const unsigned short cBlendNodes = 32;
-    m_pInterface->cNumBlendNodes = cBlendNodes;
-    AllocateAnimBlendNodeArray(cBlendNodes);
-    m_pInterface->pAnimHierarchy = pAnimHierarchy;
-    for (size_t i = 0; i < cBlendNodes; i++)
+    DWORD DwFunc = 0x4CED50;
+    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    _asm
     {
-        m_pInterface->pAnimBlendNodeArray[i].pAnimBlendAssociation = m_pInterface;
-        CAnimBlendSequenceSAInterface& sequence = pAnimHierarchy->pSequences[i];
-        if (sequence.sNumKeyFrames > 0)
-        {
-            m_pInterface->pAnimBlendNodeArray[i].pAnimSequence = &sequence;
-        }
-    }
+        mov     ecx, DwThisInterface
+        push    pAnimHierarchy
+        push    pClump
+        call    DwFunc
+    };
 }
 
 void CAnimBlendAssociationSA::AllocateAnimBlendNodeArray(int iCount)
@@ -86,7 +93,18 @@ void CAnimBlendAssociationSA::AllocateAnimBlendNodeArray(int iCount)
     };
 }
 
-std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy(void)
+void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
+{
+    DWORD DwFunc = 0x4CEA40;
+    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    _asm
+    {
+        mov     ecx, DwThisInterface
+        call    DwFunc
+    };
+}
+
+std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
 {
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
 }

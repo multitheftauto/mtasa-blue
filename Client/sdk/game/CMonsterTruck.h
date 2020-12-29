@@ -9,13 +9,10 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_MONSTERTRUCK
-#define __CGAME_MONSTERTRUCK
+#pragma once
 
 #include "CVehicle.h"
 
 class CMonsterTruck : public CVehicle
 {
 };
-
-#endif

@@ -13,14 +13,14 @@ class CClientRenderElement : public CClientEntity
     DECLARE_CLASS(CClientRenderElement, CClientEntity)
 public:
     CClientRenderElement(CClientManager* pManager, ElementID ID);
-    ~CClientRenderElement(void);
+    ~CClientRenderElement();
 
-    virtual void Unlink(void);
+    virtual void Unlink();
     void         GetPosition(CVector& vecPosition) const { vecPosition = CVector(); }
     void         SetPosition(const CVector& vecPosition) {}
 
     // CClientRenderElement methods
-    CRenderItem* GetRenderItem(void) { return m_pRenderItem; }
+    CRenderItem* GetRenderItem() { return m_pRenderItem; }
 
 protected:
     bool                         bDoneUnlink;

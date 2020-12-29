@@ -18,7 +18,7 @@
 #define DEBUGCOLOR_ERROR            255, 0, 0
 #define DEBUGCOLOR_INFO             0, 255, 0
 
-class CDebugEchoPacket : public CPacket
+class CDebugEchoPacket final : public CPacket
 {
 public:
     CDebugEchoPacket(const char* szMessage, unsigned int uiLevel = 0, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255)
@@ -30,9 +30,9 @@ public:
         m_uiLevel = uiLevel;
     }
 
-    ePacketID               GetPacketID(void) const { return PACKET_ID_DEBUG_ECHO; };
-    unsigned long           GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_CHAT; }
+    ePacketID               GetPacketID() const { return PACKET_ID_DEBUG_ECHO; };
+    unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

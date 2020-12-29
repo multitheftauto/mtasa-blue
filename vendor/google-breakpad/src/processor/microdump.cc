@@ -54,6 +54,7 @@ static const char kMicrodumpBegin[] = "-----BEGIN BREAKPAD MICRODUMP-----";
 static const char kMicrodumpEnd[] = "-----END BREAKPAD MICRODUMP-----";
 static const char kOsKey[] = ": O ";
 static const char kCpuKey[] = ": C ";
+static const char kCrashReasonKey[] = ": R ";
 static const char kGpuKey[] = ": G ";
 static const char kMmapKey[] = ": M ";
 static const char kStackKey[] = ": S ";
@@ -110,6 +111,9 @@ void MicrodumpModules::Add(const CodeModule* module) {
   }
 }
 
+void MicrodumpModules::SetEnableModuleShrink(bool is_enabled) {
+  map_.SetEnableShrinkDown(is_enabled);
+}
 
 //
 // MicrodumpContext
@@ -209,7 +213,9 @@ Microdump::Microdump(const string& contents)
   : context_(new MicrodumpContext()),
     stack_region_(new MicrodumpMemoryRegion()),
     modules_(new MicrodumpModules()),
-    system_info_(new SystemInfo()) {
+    system_info_(new SystemInfo()),
+    crash_reason_(),
+    crash_address_(0u) {
   assert(!contents.empty());
 
   bool in_microdump = false;
@@ -262,6 +268,7 @@ Microdump::Microdump(const string& contents)
       } else if (os_id == "A") {
         system_info_->os = "Android";
         system_info_->os_short = "android";
+        modules_->SetEnableModuleShrink(true);
       }
 
       // OS line also contains release and version for future use.
@@ -346,6 +353,15 @@ Microdump::Microdump(const string& contents)
       } else {
         std::cerr << "Unsupported architecture: " << arch << std::endl;
       }
+    } else if ((pos = line.find(kCrashReasonKey)) != string::npos) {
+      string crash_reason_str(line, pos + strlen(kCrashReasonKey));
+      std::istringstream crash_reason_tokens(crash_reason_str);
+      string signal;
+      string address;
+      crash_reason_tokens >> signal;
+      crash_reason_tokens >> crash_reason_;
+      crash_reason_tokens >> address;
+      crash_address_ = HexStrToL<uint64_t>(address);
     } else if ((pos = line.find(kGpuKey)) != string::npos) {
       string gpu_str(line, pos + strlen(kGpuKey));
       if (strcmp(gpu_str.c_str(), kGpuUnknown) != 0) {
@@ -378,4 +394,3 @@ Microdump::Microdump(const string& contents)
 }
 
 }  // namespace google_breakpad
-

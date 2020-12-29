@@ -33,7 +33,7 @@ void CDxFontItem::PostConstruct(CRenderItemManager* pManager, const SString& str
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::PreDestruct(void)
+void CDxFontItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -46,7 +46,7 @@ void CDxFontItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CDxFontItem::IsValid(void)
+bool CDxFontItem::IsValid()
 {
     return m_pFntNormal != NULL;
 }
@@ -58,7 +58,7 @@ bool CDxFontItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::OnLostDevice(void)
+void CDxFontItem::OnLostDevice()
 {
     m_pFntNormal->OnLostDevice();
 }
@@ -70,7 +70,7 @@ void CDxFontItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::OnResetDevice(void)
+void CDxFontItem::OnResetDevice()
 {
     m_pFntNormal->OnResetDevice();
 }
@@ -114,7 +114,7 @@ void CDxFontItem::CreateUnderlyingData(uint uiSize, bool bBold, DWORD ulQuality)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::ReleaseUnderlyingData(void)
+void CDxFontItem::ReleaseUnderlyingData()
 {
     // Release the D3DX font data
     CCore::GetSingleton().GetGraphics()->DestroyAdditionalDXFont(m_strFullFilePath, m_pFntNormal);

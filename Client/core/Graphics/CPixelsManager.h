@@ -21,7 +21,7 @@ class CAutoReleaseMe
 
 public:
     CAutoReleaseMe(T*& pPtr) : pPtr(pPtr) {}
-    ~CAutoReleaseMe(void) { SAFE_RELEASE(pPtr); }
+    ~CAutoReleaseMe() { SAFE_RELEASE(pPtr); }
 };
 
 ///////////////////////////////////////////////////////////////
@@ -34,8 +34,8 @@ class CPixelsManager : public CPixelsManagerInterface
 {
 public:
     ZERO_ON_NEW
-    CPixelsManager(void);
-    ~CPixelsManager(void);
+    CPixelsManager();
+    ~CPixelsManager();
 
     // CPixelsManagerInterface
     virtual void OnDeviceCreate(IDirect3DDevice9* pDevice);

@@ -28,6 +28,8 @@
 #ifndef _CEGUIFactoryModule_h_
 #define _CEGUIFactoryModule_h_
 
+// Using statically linked factory modules (e.g. falagard), so DYNAMIC_FACTORY_MODULE is not defined
+#ifdef DYNAMIC_FACTORY_MODULE
 /*************************************************************************
 	The following is basically taken from DynLib.h, which is part of
 	the Ogre project (http://www.ogre3d.org/)
@@ -56,7 +58,7 @@
 #    define DYNLIB_UNLOAD( a ) mac_unloadExeBundle( a )
 #    define DYNLIB_ERROR( ) mac_errorBundle()
 #endif
-
+#endif  // DYNAMIC_FACTORY_MODULE
 
 // Start of CEGUI namespace section
 namespace CEGUI
@@ -118,6 +120,7 @@ private:
 	/*************************************************************************
 		Implementation Data
 	*************************************************************************/
+#ifdef DYNAMIC_FACTORY_MODULE
 	static const char	RegisterFactoryFunctionName[];
     static const char   RegisterAllFunctionName[];
 
@@ -128,6 +131,7 @@ private:
     RegisterAllFunction d_regAllFunc;   //!< Pointer to a function called to register all factories in a module.
 	String			d_moduleName;		//!< Holds the name of the loaded module.
 	DYNLIB_HANDLE	d_handle;			//!< Pointer to a ImplDat derived class that can hold any required implementation data
+#endif
 };
 
 } // End of  CEGUI namespace section

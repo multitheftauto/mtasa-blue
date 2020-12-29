@@ -21,7 +21,7 @@ CScriptDebugging::CScriptDebugging(CLuaManager* pLuaManager)
     m_flushTimerHandle = NULL;
 }
 
-CScriptDebugging::~CScriptDebugging(void)
+CScriptDebugging::~CScriptDebugging()
 {
     // Flush any pending duplicate loggings
     m_DuplicateLineFilter.Flush();
@@ -117,7 +117,7 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
     return false;
 }
 
-void CScriptDebugging::UpdateLogOutput(void)
+void CScriptDebugging::UpdateLogOutput()
 {
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))

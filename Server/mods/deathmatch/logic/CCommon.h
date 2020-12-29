@@ -418,7 +418,7 @@ enum eHandlingTypes
     HT_UTIL_TR1,
     HT_ROLLER,
     HT_BIKE,
-    HT_MOPED,
+    HT_PIZZABOY,
     HT_DIRTBIKE,
     HT_FCR900,
     HT_NRG500,
@@ -465,6 +465,14 @@ enum eHandlingTypes
     HT_RCBARON,
     HT_RCGOBLIN,
     HT_RCRAIDER,
+    HT_HOTRINA,
+    HT_HOTRINB,
+    HT_SADLSHIT,
+    HT_GLENSHIT,
+    HT_FAGGIO,
+    HT_FIRELA,
+    HT_RNCHLURE,
+    HT_FREIBOX,
     HT_MAX
 };
 

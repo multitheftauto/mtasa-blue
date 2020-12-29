@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDEBUGVIEW_H
-#define __CDEBUGVIEW_H
+#pragma once
 
 #include "CGUI.h"
 #include <gui/CGUI.h>
@@ -29,7 +28,5 @@ public:
 
 protected:
     // Debug view doesn't support position changes unlike chat box
-    void UpdatePosition(void){};
+    void UpdatePosition() override {};
 };
-
-#endif

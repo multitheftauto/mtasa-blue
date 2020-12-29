@@ -70,7 +70,7 @@ namespace
     }
 
     // Unix time. Put here for easy changing when debugging
-    time_t UnixTimeNow(void)
+    time_t UnixTimeNow()
     {
         time_t tTime = time(NULL);
         return tTime;
@@ -95,20 +95,20 @@ class CPerfStatBandwidthUsageImpl : public CPerfStatBandwidthUsage
 public:
     ZERO_ON_NEW
 
-    CPerfStatBandwidthUsageImpl(void);
-    virtual ~CPerfStatBandwidthUsageImpl(void);
+    CPerfStatBandwidthUsageImpl();
+    virtual ~CPerfStatBandwidthUsageImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
-    virtual void           Stop(void);
+    virtual void           Stop();
 
     // CPerfStatBandwidthUsageImpl
-    void RecordStats(void);
+    void RecordStats();
     void AddSampleAtTime(time_t tTime, long long llGameRecv, long long llGameRecvBlocked, long long llGameSent, long long llGameResent, long long llHttpSent);
-    void LoadStats(void);
-    void SaveStats(void);
+    void LoadStats();
+    void SaveStats();
 
     long long                        m_llNextRecordTime;
     long long                        m_llNextSaveTime;
@@ -142,7 +142,7 @@ CPerfStatBandwidthUsage* CPerfStatBandwidthUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl(void)
+CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl()
 {
     m_strCategoryName = "Bandwidth usage";
     SString strDatabaseFilename = PathJoin(g_pGame->GetConfig()->GetSystemDatabasesPath(), "stats.db");
@@ -157,7 +157,7 @@ CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatBandwidthUsageImpl::~CPerfStatBandwidthUsageImpl(void)
+CPerfStatBandwidthUsageImpl::~CPerfStatBandwidthUsageImpl()
 {
 }
 
@@ -168,7 +168,7 @@ CPerfStatBandwidthUsageImpl::~CPerfStatBandwidthUsageImpl(void)
 // Save stats and clean up the database connection
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::Stop(void)
+void CPerfStatBandwidthUsageImpl::Stop()
 {
     SaveStats();
     g_pGame->GetDatabaseManager()->Disconnect(m_DatabaseConnection);
@@ -181,7 +181,7 @@ void CPerfStatBandwidthUsageImpl::Stop(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatBandwidthUsageImpl::GetCategoryName(void)
+const SString& CPerfStatBandwidthUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -193,7 +193,7 @@ const SString& CPerfStatBandwidthUsageImpl::GetCategoryName(void)
 // Load from permanent storage
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::LoadStats(void)
+void CPerfStatBandwidthUsageImpl::LoadStats()
 {
     SFixedArray<uint, BWSTAT_INDEX_COUNT> uiSizeList;
     uiSizeList[BWSTAT_INDEX_SPECIAL] = 1;
@@ -343,7 +343,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats(void)
 // Save to permanent storage
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::SaveStats(void)
+void CPerfStatBandwidthUsageImpl::SaveStats()
 {
     CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager();
 
@@ -375,7 +375,7 @@ void CPerfStatBandwidthUsageImpl::SaveStats(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::DoPulse(void)
+void CPerfStatBandwidthUsageImpl::DoPulse()
 {
     long long llTime = GetTickCount64_();
 
@@ -405,7 +405,7 @@ void CPerfStatBandwidthUsageImpl::DoPulse(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::RecordStats(void)
+void CPerfStatBandwidthUsageImpl::RecordStats()
 {
     // Sample new stats and calc the delta
     SBandwidthStatistics liveStats;

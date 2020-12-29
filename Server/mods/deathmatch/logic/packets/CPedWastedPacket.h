@@ -18,15 +18,15 @@ class CPed;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-class CPedWastedPacket : public CPacket
+class CPedWastedPacket final : public CPacket
 {
 public:
-    CPedWastedPacket(void);
+    CPedWastedPacket();
     CPedWastedPacket(CPed* pPed, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth, AssocGroupId animGroup = 0,
                      AnimationId animID = 15);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PED_WASTED; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PED_WASTED; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

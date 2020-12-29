@@ -13,12 +13,12 @@
 using std::list;
 using std::vector;
 
-CClientColManager::~CClientColManager(void)
+CClientColManager::~CClientColManager()
 {
     DeleteAll();
 }
 
-void CClientColManager::DoPulse(void)
+void CClientColManager::DoPulse()
 {
     // Don't use iterators here as the list may get modified
     for (uint i = 0; i < m_List.size(); i++)
@@ -195,7 +195,7 @@ bool CClientColManager::Exists(CClientColShape* pShape)
     return ListContains(m_List, pShape);
 }
 
-void CClientColManager::DeleteAll(void)
+void CClientColManager::DeleteAll()
 {
     // Delete all of them
     vector<CClientColShape*>                 cloneList = m_List;

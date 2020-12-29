@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientExplosionManager_H
-#define __CClientExplosionManager_H
+#pragma once
 
 #include "CClientCommon.h"
 
@@ -23,7 +22,7 @@ class CClientExplosionManager
 
 public:
     CClientExplosionManager(CClientManager* pManager);
-    ~CClientExplosionManager(void);
+    ~CClientExplosionManager();
 
     // * Game-layer wrapping *
     static bool Hook_StaticExplosionCreation(CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition, eExplosionType explosionType);
@@ -37,5 +36,3 @@ public:
 private:
     CClientManager* m_pManager;
 };
-
-#endif

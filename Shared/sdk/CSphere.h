@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSphere_H
-#define __CSphere_H
+#pragma once
 
 #include "CVector.h"
 
@@ -28,5 +27,3 @@ public:
 
     bool operator!=(const CSphere& other) const { return !operator==(other); }
 };
-
-#endif

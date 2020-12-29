@@ -1,5 +1,4 @@
 MODULE windows x86 99302CF6F3C244F2B8E048BA0268A12F1 omap_reorder_bbs.pdb
-INFO CODE_ID 517C17D711000 omap_reorder_bbs.exe
 FILE 1 c:\src\breakpad\src\src\tools\windows\dump_syms\testdata\dump_syms_regtest.cc
 FILE 2 f:\dd\public\sdk\inc\internal\pebteb.h
 FILE 3 f:\dd\public\sdk\inc\internal\ntldr.h

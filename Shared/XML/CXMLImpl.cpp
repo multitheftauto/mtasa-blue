@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        xml/CXMLImpl.cpp
  *  PURPOSE:     XML handler class
@@ -17,13 +17,13 @@
 #endif
 #include "SharedUtil.hpp"
 
-CXMLImpl::CXMLImpl(void)
+CXMLImpl::CXMLImpl()
 {
     // Init array stuff
     CXMLArray::Initialize();
 }
 
-CXMLImpl::~CXMLImpl(void)
+CXMLImpl::~CXMLImpl()
 {
 }
 
@@ -32,11 +32,8 @@ CXMLFile* CXMLImpl::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
     CXMLFile* xmlFile = new CXMLFileImpl(szFilename, bUseIDs, bReadOnly);
     if (xmlFile->IsValid())
         return xmlFile;
-    else
-    {
-        delete xmlFile;
-        return NULL;
-    }
+    delete xmlFile;
+    return nullptr;
 }
 
 void CXMLImpl::DeleteXML(CXMLFile* pFile)
@@ -44,16 +41,31 @@ void CXMLImpl::DeleteXML(CXMLFile* pFile)
     delete pFile;
 }
 
-CXMLNode* CXMLImpl::CreateDummyNode(void)
+std::unique_ptr<SXMLString> CXMLImpl::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = new CXMLNodeImpl(NULL, NULL, *new TiXmlElement("dummy_storage"));
+    TiXmlDocument* xmlDoc = new TiXmlDocument();
+    if (xmlDoc)
+    {   
+        xmlDoc->Parse(strXmlContent, 0, TIXML_DEFAULT_ENCODING);
+        if (!xmlDoc->Error())
+        {
+            TiXmlElement* xmlDocumentRoot = xmlDoc->RootElement();
+            CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
+            xmlBaseNode->BuildFromDocument();
+            return std::unique_ptr<SXMLString>(new SXMLStringImpl(xmlDoc, xmlBaseNode));
+        }
+    }
+    return nullptr;
+}
+
+
+CXMLNode* CXMLImpl::CreateDummyNode()
+{
+    CXMLNode* xmlNode = new CXMLNodeImpl(nullptr, nullptr, *new TiXmlElement("dummy_storage"));
     if (xmlNode->IsValid())
         return xmlNode;
-    else
-    {
-        delete xmlNode;
-        return NULL;
-    }
+    delete xmlNode;
+    return nullptr;
 }
 
 CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ulID)
@@ -61,12 +73,10 @@ CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ulID)
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
     if (pCommon && pCommon->GetClassType() == CXML_ATTR)
-    {
         return reinterpret_cast<CXMLAttribute*>(pCommon);
-    }
 
     // Doesn't exist or bad type
-    return NULL;
+    return nullptr;
 }
 
 CXMLFile* CXMLImpl::GetFileFromID(unsigned long ulID)
@@ -74,12 +84,10 @@ CXMLFile* CXMLImpl::GetFileFromID(unsigned long ulID)
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
     if (pCommon && pCommon->GetClassType() == CXML_FILE)
-    {
         return reinterpret_cast<CXMLFile*>(pCommon);
-    }
 
     // Doesn't exist or bad type
-    return NULL;
+    return nullptr;
 }
 
 CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ulID)
@@ -87,10 +95,8 @@ CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ulID)
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
     if (pCommon && pCommon->GetClassType() == CXML_NODE)
-    {
         return reinterpret_cast<CXMLNode*>(pCommon);
-    }
 
     // Doesn't exist or bad type
-    return NULL;
+    return nullptr;
 }

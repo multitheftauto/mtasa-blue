@@ -29,16 +29,16 @@ CResourceClientConfigItem::CResourceClientConfigItem(CResource* resource, const 
     m_type = RESOURCE_FILE_TYPE_CLIENT_CONFIG;
 }
 
-CResourceClientConfigItem::~CResourceClientConfigItem(void)
+CResourceClientConfigItem::~CResourceClientConfigItem()
 {
 }
 
-bool CResourceClientConfigItem::Start(void)
+bool CResourceClientConfigItem::Start()
 {
     return true;
 }
 
-bool CResourceClientConfigItem::Stop(void)
+bool CResourceClientConfigItem::Stop()
 {
     return true;
 }

@@ -251,9 +251,9 @@ class CAEVehicleAudioEntitySA : public CAEVehicleAudioEntity
 {
 public:
     CAEVehicleAudioEntitySA(CAEVehicleAudioEntitySAInterface* pInterface);
-    void JustGotInVehicleAsDriver(void);
-    void JustGotOutOfVehicleAsDriver(void);
-    void TurnOnRadioForVehicle(void);
+    void JustGotInVehicleAsDriver();
+    void JustGotOutOfVehicleAsDriver();
+    void TurnOnRadioForVehicle();
     void StopVehicleEngineSound(unsigned char ucSlot);
 
 private:

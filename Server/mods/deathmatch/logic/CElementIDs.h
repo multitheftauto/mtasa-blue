@@ -16,7 +16,7 @@
 class CElementIDs
 {
 public:
-    static void Initialize(void);
+    static void Initialize();
 
     static ElementID PopUniqueID(CElement* pElement);
     static void      PushUniqueID(ElementID ID);

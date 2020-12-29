@@ -11,13 +11,13 @@
 #include "StdInc.h"
 bool g_bAllowAspectRatioAdjustment = false;
 
-CMapEventManager::CMapEventManager(void)
+CMapEventManager::CMapEventManager()
 {
     m_bIteratingList = false;
     m_bHasEvents = false;
 }
 
-CMapEventManager::~CMapEventManager(void)
+CMapEventManager::~CMapEventManager()
 {
     // If this happens while we're iterating the list, we're screwed
     dassert(!m_bIteratingList);
@@ -100,7 +100,7 @@ bool CMapEventManager::Delete(CLuaMain* pLuaMain, const char* szName, const CLua
     return bRemovedSomeone;
 }
 
-void CMapEventManager::DeleteAll(void)
+void CMapEventManager::DeleteAll()
 {
     // Delete all the events
     EventsIter iter = m_EventsMap.begin();
@@ -302,7 +302,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
     return bCalled;
 }
 
-void CMapEventManager::TakeOutTheTrash(void)
+void CMapEventManager::TakeOutTheTrash()
 {
     // Loop through our trashcan deleting every item
     std::list<CMapEvent*>::const_iterator iterTrash = m_TrashCan.begin();

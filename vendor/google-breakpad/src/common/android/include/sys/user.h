@@ -34,42 +34,36 @@
 // glibc) and therefore avoid doing otherwise awkward #ifdefs in the code.
 // The following quirks are currently handled by this file:
 // - i386: Use the Android NDK but alias user_fxsr_struct > user_fpxregs_struct.
-// - aarch64: Add missing user_regs_struct and user_fpsimd_struct structs.
-// - Other platforms: Just use the Android NDK unchanged.
 
 // TODO(primiano): remove these changes after Chromium has stably rolled to
-// an NDK with the appropriate fixes.
+// an NDK with the appropriate fixes. https://crbug.com/358831
+
+// With traditional headers, <sys/user.h> forgot to do this. Unified headers get
+// it right.
+#include <sys/types.h>
 
 #include_next <sys/user.h>
 
-#ifdef __i386__
-#ifdef __cplusplus
-extern "C" {
-#endif  // __cplusplus
-typedef struct user_fxsr_struct user_fpxregs_struct;
-#ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
-#endif  // __i386__
+#include <android/api-level.h>
 
-#ifdef __aarch64__
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
-struct user_regs_struct {
- __u64 regs[31];
- __u64 sp;
- __u64 pc;
- __u64 pstate;
-};
-struct user_fpsimd_struct {
- __uint128_t vregs[32];
- __u32 fpsr;
- __u32 fpcr;
-};
+
+#if defined(__i386__)
+#if __ANDROID_API__ < 21 && !defined(__ANDROID_API_N__)
+
+// user_fpxregs_struct was called user_fxsr_struct in traditional headers before
+// API level 21. Unified headers call it user_fpxregs_struct regardless of the
+// chosen API level. __ANDROID_API_N__ is a proxy for determining whether
+// unified headers are in use. It’s only defined by unified headers.
+typedef struct user_fxsr_struct user_fpxregs_struct;
+
+#endif  // __ANDROID_API__ < 21 && !defined(__ANDROID_API_N__)
+#endif  // defined(__i386__)
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
-#endif  // __aarch64__
 
 #endif  // GOOGLE_BREAKPAD_COMMON_ANDROID_INCLUDE_SYS_USER_H

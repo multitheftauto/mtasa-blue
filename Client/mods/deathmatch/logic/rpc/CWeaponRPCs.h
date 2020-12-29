@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CWeaponRPCs_H
-#define __CWeaponRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CWeaponRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(GiveWeapon);
     DECLARE_ELEMENT_RPC(TakeWeapon);
@@ -27,5 +26,3 @@ public:
     DECLARE_ELEMENT_RPC(SetWeaponAmmo);
     DECLARE_ELEMENT_RPC(SetWeaponSlot);
 };
-
-#endif

@@ -65,20 +65,20 @@ class CNetBufferWatchDog
 public:
     ZERO_ON_NEW
     CNetBufferWatchDog(CNetServerBuffer* pNetBuffer, bool bVerboseDebug);
-    ~CNetBufferWatchDog(void);
+    ~CNetBufferWatchDog();
 
     // Main thread functions
-    void StopThread(void);
+    void StopThread();
 
     // Check thread functions
     static void* StaticThreadProc(void* pContext);
-    void*        ThreadProc(void);
-    void         DoChecks(void);
+    void*        ThreadProc();
+    void         DoChecks();
     void         UpdateQueueInfo(CQueueInfo& queueInfo, int iQueueSize, const char* szTag);
-    void         BlockOutgoingSyncPackets(void);
-    void         AllowOutgoingSyncPackets(void);
-    void         BlockIncomingSyncPackets(void);
-    void         AllowIncomingSyncPackets(void);
+    void         BlockOutgoingSyncPackets();
+    void         AllowOutgoingSyncPackets();
+    void         BlockIncomingSyncPackets();
+    void         AllowIncomingSyncPackets();
 
     // Main thread variables
     CThreadHandle* m_pServiceThreadHandle;
@@ -114,7 +114,7 @@ public:
     static uint          ms_uiInResultQueueSize;
 
     // Static functions
-    static void DoPulse(void);
+    static void DoPulse();
     static bool IsUnreliableSyncPacket(uchar ucPacketID);
     static bool CanSendPacket(uchar ucPacketID);
     static bool CanReceivePacket(uchar ucPacketID);

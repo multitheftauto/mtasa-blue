@@ -63,7 +63,7 @@ void CScreenShot::SetPath(const char* szPath)
     File::Mkdir(szPath);
 }
 
-int CScreenShot::GetScreenShots(void)
+int CScreenShot::GetScreenShots()
 {
     int              iNumberOfFiles = 0;
     HANDLE           hFind;
@@ -88,7 +88,7 @@ int CScreenShot::GetScreenShots(void)
     return iNumberOfFiles;
 }
 
-SString CScreenShot::GetValidScreenshotFilename(void)
+SString CScreenShot::GetValidScreenshotFilename()
 {
     // Get the system time
     SYSTEMTIME sysTime;
@@ -232,7 +232,7 @@ void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize
 }
 
 // Static function
-bool CScreenShot::IsSaving(void)
+bool CScreenShot::IsSaving()
 {
     return ms_bIsSaving;
 }

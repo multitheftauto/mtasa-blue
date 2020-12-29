@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CKeyGenSA_H
-#define __CKeyGenSA_H
+#pragma once
 
 #include <game/CKeyGen.h>
 
@@ -27,5 +26,3 @@ public:
     unsigned int GetUppercaseKey(const char* szString);
     unsigned int AppendStringToKey(unsigned int uiKey, const char* szString);
 };
-
-#endif

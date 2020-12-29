@@ -26,7 +26,7 @@ CDeathmatchVehicle::CDeathmatchVehicle(CClientManager* pManager, CUnoccupiedVehi
     SetIsSyncing(false);
 }
 
-CDeathmatchVehicle::~CDeathmatchVehicle(void)
+CDeathmatchVehicle::~CDeathmatchVehicle()
 {
     if (m_bIsSyncing && m_pUnoccupiedVehicleSync)
     {
@@ -40,7 +40,7 @@ void CDeathmatchVehicle::SetIsSyncing(bool bIsSyncing)
     SetSyncUnoccupiedDamage(m_bIsSyncing);
 }
 
-bool CDeathmatchVehicle::SyncDamageModel(void)
+bool CDeathmatchVehicle::SyncDamageModel()
 {
     SVehicleDamageSync damage(true, true, true, true, true);
     bool               bChanges = false;
@@ -122,7 +122,7 @@ bool CDeathmatchVehicle::SyncDamageModel(void)
     return false;
 }
 
-void CDeathmatchVehicle::ResetDamageModelSync(void)
+void CDeathmatchVehicle::ResetDamageModelSync()
 {
     for (int i = 0; i < MAX_DOORS; i++)
         m_ucLastDoorStates[i] = GetDoorStatus(i);

@@ -9,17 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __COutputRPCs_H
-#define __COutputRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class COutputRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(ToggleDebugger);
 };
-
-#endif

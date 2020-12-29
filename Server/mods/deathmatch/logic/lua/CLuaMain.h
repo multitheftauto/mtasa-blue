@@ -44,43 +44,44 @@ public:
     CLuaMain(class CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
              CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP);
 
-    ~CLuaMain(void);
+    ~CLuaMain();
 
     bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
     bool LoadScript(const char* szLUAScript);
-    void UnloadScript(void);
+    void UnloadScript();
 
-    void Start(void);
+    void Start();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    const char* GetScriptName(void) const { return m_strScriptName; }
+    const char* GetScriptName() const { return m_strScriptName; }
     void        SetScriptName(const char* szName) { m_strScriptName.AssignLeft(szName, MAX_SCRIPTNAME_LENGTH); }
 
-    lua_State*        GetVM(void) { return m_luaVM; };
-    CLuaTimerManager* GetTimerManager(void) const { return m_pLuaTimerManager; };
+    lua_State*        GetVM() { return m_luaVM; };
+    CLuaTimerManager* GetTimerManager() const { return m_pLuaTimerManager; };
 
-    CBlipManager*    GetBlipManager(void) const { return m_pBlipManager; };
-    CObjectManager*  GetObjectManager(void) const { return m_pObjectManager; };
-    CPlayerManager*  GetPlayerManager(void) const { return m_pPlayerManager; };
-    CVehicleManager* GetVehicleManager(void) const { return m_pVehicleManager; };
-    CMapManager*     GetMapManager(void) const { return m_pMapManager; };
+    CBlipManager*    GetBlipManager() const { return m_pBlipManager; };
+    CObjectManager*  GetObjectManager() const { return m_pObjectManager; };
+    CPlayerManager*  GetPlayerManager() const { return m_pPlayerManager; };
+    CVehicleManager* GetVehicleManager() const { return m_pVehicleManager; };
+    CMapManager*     GetMapManager() const { return m_pMapManager; };
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
-    void          DestroyXML(CXMLFile* pFile);
-    void          DestroyXML(CXMLNode* pRootNode);
+    CXMLNode*     ParseString(const char* strXmlContent);
+    bool          DestroyXML(CXMLFile* pFile);
+    bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
     bool          XMLExists(CXMLFile* pFile);
-    unsigned long GetXMLFileCount(void) const { return m_XMLFiles.size(); };
-    unsigned long GetOpenFileCount(void) const { return m_OpenFilenameList.size(); };
-    unsigned long GetTimerCount(void) const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
-    unsigned long GetElementCount(void) const { return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0; };
-    unsigned long GetTextDisplayCount(void) const { return m_Displays.size(); };
-    unsigned long GetTextItemCount(void) const { return m_TextItems.size(); };
+    unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
+    unsigned long GetOpenFileCount() const { return m_OpenFilenameList.size(); };
+    unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
+    unsigned long GetElementCount() const { return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0; };
+    unsigned long GetTextDisplayCount() const { return m_Displays.size(); };
+    unsigned long GetTextItemCount() const { return m_TextItems.size(); };
     void          OnOpenFile(const SString& strFilename);
     void          OnCloseFile(const SString& strFilename);
 
-    CTextDisplay* CreateDisplay(void);
+    CTextDisplay* CreateDisplay();
     void          DestroyDisplay(CTextDisplay* pDisplay);
     CTextItem*    CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f,
                                  unsigned char format = 0, unsigned char ucShadowAlpha = 0);
@@ -89,31 +90,31 @@ public:
     CTextDisplay* GetTextDisplayFromScriptID(uint uiScriptID);
     CTextItem*    GetTextItemFromScriptID(uint uiScriptID);
 
-    bool       BeingDeleted(void);
-    lua_State* GetVirtualMachine(void) const { return m_luaVM; };
+    bool       BeingDeleted();
+    lua_State* GetVirtualMachine() const { return m_luaVM; };
 
-    void ResetInstructionCount(void);
+    void ResetInstructionCount();
 
-    CResource* GetResource(void) { return m_pResource; }
+    CResource* GetResource() { return m_pResource; }
 
     void           SetResourceFile(class CResourceFile* resourceFile) { m_pResourceFile = resourceFile; }
-    CResourceFile* GetResourceFile(void) { return m_pResourceFile; }
+    CResourceFile* GetResourceFile() { return m_pResourceFile; }
 
-    void RegisterHTMLDFunctions(void);
+    void RegisterHTMLDFunctions();
 
-    void           InitVM(void);
+    void           InitVM();
     const SString& GetFunctionTag(int iFunctionNumber);
     int            PCall(lua_State* L, int nargs, int nresults, int errfunc);
-    void           CheckExecutionTime(void);
+    void           CheckExecutionTime();
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
 private:
-    void InitSecurity(void);
+    void InitSecurity();
     void InitClasses(lua_State* luaVM);
 
 public:
-    bool IsOOPEnabled(void) { return m_bEnableOOP; }
+    bool IsOOPEnabled() { return m_bEnableOOP; }
 
 private:
     static void InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug);
@@ -132,9 +133,10 @@ private:
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
 
-    list<CXMLFile*>     m_XMLFiles;
-    list<CTextDisplay*> m_Displays;
-    list<CTextItem*>    m_TextItems;
+    list<CXMLFile*>                                 m_XMLFiles;
+    std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
+    list<CTextDisplay*>                             m_Displays;
+    list<CTextItem*>                                m_TextItems;
 
     bool m_bEnableOOP;
 

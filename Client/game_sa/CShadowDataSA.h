@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_SHADOWDATA
-#define __CGAMESA_SHADOWDATA
+#pragma once
 
 #include <game/CPhysical.h>
 #include "CEntitySA.h"
@@ -43,5 +42,3 @@ public:
     CVector                     vecSunPosNormalized;
     uint32                      pad12;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CTaskManagementSystemSA;
 
-#ifndef __CGAMESA_TASKSYSTEM
-#define __CGAMESA_TASKSYSTEM
+#pragma once
 
 #include "TaskSA.h"
 #include "TaskCarAccessoriesSA.h"
@@ -25,8 +24,8 @@ class CTaskManagementSystemSA;
 class CTaskManagementSystemSA : public CTaskManagementSystem
 {
 public:
-    CTaskManagementSystemSA(void);
-    ~CTaskManagementSystemSA(void);
+    CTaskManagementSystemSA();
+    ~CTaskManagementSystemSA();
 
     CTask* AddTask(CTaskSA* pTask);
     void   RemoveTask(CTaskSAInterface* pTaskInterface);
@@ -42,5 +41,3 @@ private:
 
     std::list<STaskListItem*> m_TaskList;
 };
-
-#endif

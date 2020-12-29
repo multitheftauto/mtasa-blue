@@ -11,20 +11,20 @@ project "CEF"
 
 	files {
 		"premake5.lua",
-		"**.cc",
+		"libcef_dll/**.cc",
 		"**.h",
 	}
 
 	local path = buildpath(".")
 	local cef_path = "%{wks.location}/../Vendor/cef3/"
 	postbuildcommands {
-		"{COPY} "..cef_path.."Release/* "..path.."mta",
-		"{COPY} "..cef_path.."Resources/icudtl.dat "..path.."mta",
-		"{COPY} "..cef_path.."Resources/*.pak "..path.."mta/cef",
-		"{COPY} "..cef_path.."Resources/locales/* "..path.."mta/cef/locales"
+		"{COPY} \""..cef_path.."Release/*\" \""..path.."mta\"",
+		"{COPY} \""..cef_path.."Resources/icudtl.dat\" \""..path.."mta\"",
+		"{COPY} \""..cef_path.."Resources/*.pak\" \""..path.."mta/cef\"",
+		"{COPY} \""..cef_path.."Resources/locales/*\" \""..path.."mta/cef/locales\""
 	}
 
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

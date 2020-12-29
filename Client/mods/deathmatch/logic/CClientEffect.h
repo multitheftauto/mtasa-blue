@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTEFFECT_H
-#define __CCLIENTEFFECT_H
+#pragma once
 
 #include <game/CFxSystem.h>
 #include "CClientEntity.h"
@@ -21,8 +20,8 @@ class CClientEffect : public CClientEntity
     DECLARE_CLASS(CClientEffect, CClientEntity)
 public:
     CClientEffect(CClientManager* pManager, CFxSystem* pFx, SString strEffectName, ElementID ID);
-    ~CClientEffect(void);
-    void Unlink(void);
+    ~CClientEffect();
+    void Unlink();
 
     void GetPosition(CVector& vecPosition) const;
     void SetPosition(const CVector& vecPosition);
@@ -32,17 +31,17 @@ public:
     bool  GetMatrix(CMatrix& matrix) const;
     bool  SetMatrix(const CMatrix& matrix);
     void  SetEffectSpeed(float fSpeed);
-    float GetEffectSpeed(void) const;
+    float GetEffectSpeed() const;
     bool  SetEffectDensity(float fDensity);
-    float GetEffectDensity(void) const;
+    float GetEffectDensity() const;
     void  SetDrawDistance(float fDrawDistance);
-    float GetDrawDistance(void) const;
+    float GetDrawDistance() const;
 
-    eClientEntityType GetType(void) const { return CCLIENTEFFECT; };
+    eClientEntityType GetType() const { return CCLIENTEFFECT; };
 
 protected:
     friend class CClientEffectManager;
-    CFxSystem* GetFxSystem(void) const { return m_pFxSystem; }
+    CFxSystem* GetFxSystem() const { return m_pFxSystem; }
     void       SetFxSystem(CFxSystem* pFx) { m_pFxSystem = pFx; }
 
 private:
@@ -51,5 +50,3 @@ private:
     SString         m_strEffectName;
     float           m_fMaxDensity;
 };
-
-#endif

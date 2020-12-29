@@ -18,47 +18,51 @@ static const char* GetResourceName(lua_State* luaVM)
     return luaMain ? luaMain->GetScriptName() : "";
 }
 
-void CLuaACLDefs::LoadFunctions(void)
+void CLuaACLDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("aclReload", aclReload);
-    CLuaCFunctions::AddFunction("aclSave", aclSave);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"aclReload", aclReload},
+        {"aclSave", aclSave},
 
-    CLuaCFunctions::AddFunction("aclCreate", aclCreate);
-    CLuaCFunctions::AddFunction("aclDestroy", aclDestroy);
+        {"aclCreate", aclCreate},
+        {"aclDestroy", aclDestroy},
 
-    CLuaCFunctions::AddFunction("aclGet", aclGet);
+        {"aclGet", aclGet},
 
-    CLuaCFunctions::AddFunction("aclList", aclList);
-    CLuaCFunctions::AddFunction("aclGetName", aclGetName);
+        {"aclList", aclList},
+        {"aclGetName", aclGetName},
 
-    CLuaCFunctions::AddFunction("aclGetRight", aclGetRight);
-    CLuaCFunctions::AddFunction("aclSetRight", aclSetRight);
-    CLuaCFunctions::AddFunction("aclListRights", aclListRights);
-    CLuaCFunctions::AddFunction("aclRemoveRight", aclRemoveRight);
+        {"aclGetRight", aclGetRight},
+        {"aclSetRight", aclSetRight},
+        {"aclListRights", aclListRights},
+        {"aclRemoveRight", aclRemoveRight},
 
-    CLuaCFunctions::AddFunction("aclCreateGroup", aclCreateGroup);
-    CLuaCFunctions::AddFunction("aclDestroyGroup", aclDestroyGroup);
+        {"aclCreateGroup", aclCreateGroup},
+        {"aclDestroyGroup", aclDestroyGroup},
 
-    CLuaCFunctions::AddFunction("aclGetGroup", aclGetGroup);
-    CLuaCFunctions::AddFunction("aclGroupList", aclGroupList);
+        {"aclGetGroup", aclGetGroup},
+        {"aclGroupList", aclGroupList},
 
-    CLuaCFunctions::AddFunction("aclGroupGetName", aclGroupGetName);
-    CLuaCFunctions::AddFunction("aclGroupAddACL", aclGroupAddACL);
-    CLuaCFunctions::AddFunction("aclGroupListACL", aclGroupListACL);
-    CLuaCFunctions::AddFunction("aclGroupRemoveACL", aclGroupRemoveACL);
-    CLuaCFunctions::AddFunction("aclGroupAddObject", aclGroupAddObject);
-    CLuaCFunctions::AddFunction("aclGroupListObjects", aclGroupListObjects);
-    CLuaCFunctions::AddFunction("aclGroupRemoveObject", aclGroupRemoveObject);
+        {"aclGroupGetName", aclGroupGetName},
+        {"aclGroupAddACL", aclGroupAddACL},
+        {"aclGroupListACL", aclGroupListACL},
+        {"aclGroupRemoveACL", aclGroupRemoveACL},
+        {"aclGroupAddObject", aclGroupAddObject},
+        {"aclGroupListObjects", aclGroupListObjects},
+        {"aclGroupRemoveObject", aclGroupRemoveObject},
 
-    CLuaCFunctions::AddFunction("isObjectInACLGroup", isObjectInACLGroup);
-    CLuaCFunctions::AddFunction("hasObjectPermissionTo", hasObjectPermissionTo);
+        {"isObjectInACLGroup", isObjectInACLGroup},
+        {"hasObjectPermissionTo", hasObjectPermissionTo},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaACLDefs::AddClass(lua_State* luaVM)
 {
-    //////////////////////////
-    //  ACL class
-    //////////////////////////
+    // ACL class
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "save", "aclSave");
@@ -78,16 +82,10 @@ void CLuaACLDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setRight", "aclSetRight");
 
     lua_classvariable(luaVM, "name", NULL, "aclGetName");
-    // lua_classvariable ( luaVM, "rights", "", "aclListRights", NULL, CLuaOOPDefs::AclListRights ); // .rights[allowedType] = {..}
-    // lua_classvariable ( luaVM, "right", "aclSetRight", "aclGetRight", CLuaOOPDefs::AclSetRight, CLuaOOPDefs::AclGetRight ); // .right["e.y.e"] =
-    // "illuminati"; if value == nil then aclRemoveRight(self, key)
 
     lua_registerclass(luaVM, "ACL");
-    //////////////////////////
 
-    //////////////////////////
-    //  ACLGroup class
-    //////////////////////////
+    // ACLGroup class
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "get", "aclGetGroup");
@@ -105,8 +103,8 @@ void CLuaACLDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getName", "aclGroupGetName");
 
     lua_classvariable(luaVM, "name", NULL, "aclGroupGetName");
-    lua_classvariable(luaVM, "aclList", NULL, "aclGroupListACL");                // value nil = remove acl
-    lua_classvariable(luaVM, "objects", NULL, "aclGroupListObjects");            // value nil = remove object
+    lua_classvariable(luaVM, "aclList", NULL, "aclGroupListACL");
+    lua_classvariable(luaVM, "objects", NULL, "aclGroupListObjects");
 
     lua_registerclass(luaVM, "ACLGroup");
 }

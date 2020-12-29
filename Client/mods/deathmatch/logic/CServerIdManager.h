@@ -12,8 +12,8 @@
 class CServerIdManager
 {
 public:
-    virtual ~CServerIdManager(void) {}
+    virtual ~CServerIdManager() {}
     virtual SString GetConnectionPrivateDirectory(bool bPreviousVer = false) = 0;
 
-    static CServerIdManager* GetSingleton(void);
+    static CServerIdManager* GetSingleton();
 };

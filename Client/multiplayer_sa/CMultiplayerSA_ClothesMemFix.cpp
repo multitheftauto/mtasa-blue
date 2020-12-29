@@ -48,7 +48,7 @@ void CPedModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pSa
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 RwObject* pSavedModel0RwObject = NULL;
-void      OnMy_CClothesDeleteRwObject(void)
+void      OnMy_CClothesDeleteRwObject()
 {
     assert(!pSavedModel0RwObject);
     ushort                     usModelID = 0;
@@ -72,7 +72,7 @@ void _declspec(naked) HOOK_CClothesDeleteRwObject()
         // Do original code and continue
         mov     ecx, esi
         // Skip deletion
-        //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject(void)
+        //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
         jmp     RETURN_CClothesDeleteRwObject
     }
 }
@@ -82,7 +82,7 @@ void _declspec(naked) HOOK_CClothesDeleteRwObject()
 // Hook to restore pRwObject of model 0
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMy_PostCPedDress(void)
+void OnMy_PostCPedDress()
 {
     ushort                     usModelID = 0;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];

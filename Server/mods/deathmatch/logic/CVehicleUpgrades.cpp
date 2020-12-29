@@ -424,7 +424,7 @@ bool CVehicleUpgrades::AddUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-void CVehicleUpgrades::AddAllUpgrades(void)
+void CVehicleUpgrades::AddAllUpgrades()
 {
     unsigned short usUpgrade = 1000;
     for (; usUpgrade <= 1193; usUpgrade++)
@@ -445,7 +445,7 @@ bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-unsigned char CVehicleUpgrades::Count(void)
+unsigned char CVehicleUpgrades::Count()
 {
     unsigned char ucSlot = 0, ucCount = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)

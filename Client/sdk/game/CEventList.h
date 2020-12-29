@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_EVENTLIST
-#define __CGAME_EVENTLIST
+#pragma once
 
 #include "Common.h"
 #include "CEvent.h"
@@ -33,5 +32,3 @@ public:
                                              bool b_4) = 0;
     virtual CEventGunShot* CreateEventGunShot(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1) = 0;
 };
-
-#endif

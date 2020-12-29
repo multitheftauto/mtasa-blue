@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-CPedTaskPacket::CPedTaskPacket(void)
+CPedTaskPacket::CPedTaskPacket()
 {
     m_uiNumBitsInPacketBody = 0;
 }

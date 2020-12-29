@@ -141,18 +141,8 @@
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
-        <StateImagery name="Enabled">
-            <Layer>
-                <Section section="normal" />
-            </Layer>
-        </StateImagery>
-        <StateImagery name="Disabled">
-            <Layer>
-                <Section section="normal">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
-                </Section>
-            </Layer>
-        </StateImagery>
+        <StateImagery name="Enabled" />
+        <StateImagery name="Disabled" />
     </WidgetLook>
 	
     <WidgetLook name="CGUI/Titlebar">
@@ -773,7 +763,9 @@
         </StateImagery>
         <StateImagery name="Disabled">
             <Layer>
-
+                <Section section="thumb">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
             </Layer>
         </StateImagery>
     </WidgetLook>
@@ -811,7 +803,9 @@
         </StateImagery>
         <StateImagery name="Disabled">
             <Layer>
-
+                <Section section="thumb">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
             </Layer>
         </StateImagery>
     </WidgetLook>
@@ -844,6 +838,7 @@
             <Property name="NormalImage" value="set:CGUI-Images image:ScrollRightArrow" />
             <Property name="HoverImage" value="set:CGUI-Images image:ScrollRightArrow" />
             <Property name="PushedImage" value="set:CGUI-Images image:ScrollRightArrow" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollRightArrow" />
         </Child>
         <Child  type="CGUI/Button" nameSuffix="__auto_decbtn__">
             <Area>
@@ -857,6 +852,7 @@
             <Property name="NormalImage" value="set:CGUI-Images image:ScrollLeftArrow" />
             <Property name="HoverImage" value="set:CGUI-Images image:ScrollLeftArrow" />
             <Property name="PushedImage" value="set:CGUI-Images image:ScrollLeftArrow" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollLeftArrow" />
         </Child>
         <Child  type="CGUI/HorizontalScrollbarThumb" nameSuffix="__auto_thumb__">
             <Area>
@@ -889,9 +885,13 @@
             <Layer>
               <Section section="main" />
             </Layer>
-          </StateImagery>
-          <StateImagery name="Disabled">
-
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
         </StateImagery>
     </WidgetLook>
 
@@ -924,6 +924,7 @@
             <Property name="NormalImage" value="set:CGUI-Images image:ScrollDownArrow" />
             <Property name="HoverImage" value="set:CGUI-Images image:ScrollDownArrow" />
             <Property name="PushedImage" value="set:CGUI-Images image:ScrollDownArrow" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollDownArrow" />
         </Child>
         <Child  type="CGUI/Button" nameSuffix="__auto_decbtn__">
             <Area>
@@ -937,6 +938,7 @@
             <Property name="NormalImage" value="set:CGUI-Images image:ScrollUpArrow" />
             <Property name="HoverImage" value="set:CGUI-Images image:ScrollUpArrow" />
             <Property name="PushedImage" value="set:CGUI-Images image:ScrollUpArrow" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollUpArrow" />
         </Child>
         <Child  type="CGUI/VerticalScrollbarThumb" nameSuffix="__auto_thumb__">
             <Area>
@@ -972,7 +974,9 @@
         </StateImagery>
         <StateImagery name="Disabled">
             <Layer>
-
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
             </Layer>
         </StateImagery>
     </WidgetLook>
@@ -2137,7 +2141,7 @@
 	  <Property name="NormalImage" value="set:CGUI-Images image:ComboboxButtonNormal" />
 	  <Property name="HoverImage" value="set:CGUI-Images image:ComboboxButtonHover" />
       <Property name="PushedImage" value="set:CGUI-Images image:ComboboxButtonHover" />
-	  <Property name="DisabledImage" value="set:CGUI-Images image:ComboboxButtonHover" />
+	  <Property name="DisabledImage" value="set:CGUI-Images image:ComboboxButtonNormal" />
     </Child>
     <StateImagery name="Enabled" />
     <StateImagery name="Disabled" />

@@ -21,15 +21,15 @@ public:
     virtual bool        DeletePoly(CWaterPoly* pPoly) = 0;
 
     virtual bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown) = 0;
-    virtual bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel) = 0;
+    virtual bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel) = 0;
     virtual bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource) = 0;
     virtual bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource) = 0;
-    virtual void ResetWorldWaterLevel(void) = 0;
+    virtual void ResetWorldWaterLevel() = 0;
 
     virtual float GetWaveLevel() = 0;
     virtual void  SetWaveLevel(float fWaveLevel) = 0;
     virtual void  SetWaterDrawnLast(bool bEnable) = 0;
-    virtual bool  IsWaterDrawnLast(void) = 0;
+    virtual bool  IsWaterDrawnLast() = 0;
 
     virtual bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision) = 0;
 

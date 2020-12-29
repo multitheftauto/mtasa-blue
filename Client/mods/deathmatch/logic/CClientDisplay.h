@@ -10,8 +10,7 @@
 
 class CClientDisplay;
 
-#ifndef __ClientDisplay_H
-#define __ClientDisplay_H
+#pragma once
 
 #include "CClientCommon.h"
 
@@ -26,30 +25,30 @@ class CClientDisplay
 
 public:
     CClientDisplay(class CClientDisplayManager* pDisplayManager, unsigned long ulID);
-    virtual ~CClientDisplay(void);
+    virtual ~CClientDisplay();
 
-    unsigned long        GetID(void) { return m_ulID; }
-    virtual eDisplayType GetType(void) = 0;
+    unsigned long        GetID() { return m_ulID; }
+    virtual eDisplayType GetType() = 0;
 
-    unsigned long GetExpirationTime(void) { return m_ulExpirationTime; };
+    unsigned long GetExpirationTime() { return m_ulExpirationTime; };
     void          SetExpirationTime(unsigned long ulTime) { m_ulExpirationTime = ulTime; };
-    unsigned long GetTimeTillExpiration(void) { return m_ulExpirationTime - CClientTime::GetTime(); };
+    unsigned long GetTimeTillExpiration() { return m_ulExpirationTime - CClientTime::GetTime(); };
     void          SetTimeTillExpiration(unsigned long ulMs) { m_ulExpirationTime = CClientTime::GetTime() + ulMs; };
 
-    virtual const CVector& GetPosition(void) { return m_vecPosition; };
+    virtual const CVector& GetPosition() { return m_vecPosition; };
     virtual void           SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
 
-    virtual SColor GetColor(void) const { return m_Color; }
+    virtual SColor GetColor() const { return m_Color; }
     virtual void   SetColor(const SColor& color) { m_Color = color; }
     virtual void   SetColorAlpha(unsigned char ucAlpha);
 
-    virtual bool IsVisible(void) { return m_bVisible; };
+    virtual bool IsVisible() { return m_bVisible; };
     virtual void SetVisible(bool bVisible) { m_bVisible = bVisible; };
 
-    virtual void Render(void) = 0;
+    virtual void Render() = 0;
 
 protected:
-    bool IsExpired(void) { return (m_ulExpirationTime != 0 && (CClientTime::GetTime() > m_ulExpirationTime)); };
+    bool IsExpired() { return (m_ulExpirationTime != 0 && (CClientTime::GetTime() > m_ulExpirationTime)); };
 
     CClientDisplayManager* m_pDisplayManager;
 
@@ -59,5 +58,3 @@ protected:
     CVector       m_vecPosition;
     SColor        m_Color;
 };
-
-#endif

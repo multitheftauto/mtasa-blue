@@ -29,7 +29,7 @@ public:            // All public since it's only an internal class
         : m_eType(a_eType), m_fAmplitude(amplitude), m_fPeriod(period), m_fOvershoot(overshoot)
     {
     }
-    virtual ~CComplexEasingFunction(void) {}
+    virtual ~CComplexEasingFunction() {}
 
     virtual double valueForProgress(double a_fProgress) const = 0;
 

@@ -109,7 +109,7 @@ void CPad::NewControllerState(const CControllerState& State)
     SetCurrentControllerState(State);
 }
 
-void CPad::UpdateKeys(void)
+void CPad::UpdateKeys()
 {
     if (m_pPlayer)
     {
@@ -149,8 +149,8 @@ void CPad::UpdateKeys(void)
             m_ControlStates[20].bState = (m_csCurrentState.LeftStickX > 0);
             m_ControlStates[21].bState = (m_csCurrentState.LeftStickY < 0);
             m_ControlStates[22].bState = (m_csCurrentState.LeftStickY > 0);
-            m_ControlStates[23].bState = (m_csCurrentState.ButtonCross) ? true : false;
-            m_ControlStates[24].bState = (m_csCurrentState.ButtonSquare) ? true : false;
+            m_ControlStates[23].bState = (m_csCurrentState.ButtonCross > 0);
+            m_ControlStates[24].bState = (m_csCurrentState.ButtonSquare > 0);
             m_ControlStates[25].bState = (m_csCurrentState.DPadUp) ? true : false;
             m_ControlStates[26].bState = (m_csCurrentState.DPadDown) ? true : false;
             m_ControlStates[27].bState = (m_csCurrentState.m_bRadioTrackSkip) ? true : false;

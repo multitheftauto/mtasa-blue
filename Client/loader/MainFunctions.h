@@ -9,18 +9,18 @@
  *****************************************************************************/
 
 void InitLocalization(bool bShowErrors);
-void HandleSpecialLaunchOptions(void);
-void HandleDuplicateLaunching(void);
-void HandleCustomStartMessage(void);
-void PreLaunchWatchDogs(void);
+void HandleSpecialLaunchOptions();
+void HandleDuplicateLaunching();
+void HandleCustomStartMessage();
+void PreLaunchWatchDogs();
 void PostRunWatchDogs(int iReturnCode);
-void HandleIfGTAIsAlreadyRunning(void);
-void ValidateGTAPath(void);
-void CheckAntiVirusStatus(void);
-void CheckDataFiles(void);
-void CheckLibVersions(void);
+void HandleIfGTAIsAlreadyRunning();
+void ValidateGTAPath();
+void CheckAntiVirusStatus();
+void CheckDataFiles();
+void CheckLibVersions();
 int  LaunchGame(SString strCmdLine);
-void HandleOnQuitCommand(void);
+void HandleOnQuitCommand();
 
 #define EXIT_OK     (0)
 #define EXIT_ERROR  (1)

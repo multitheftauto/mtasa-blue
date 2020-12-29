@@ -15,7 +15,7 @@
 
 static CCriticalSection ms_criticalSection;
 static long long        ms_llTickCountAdd = 0;
-unsigned long           GetTickCountInternal(void);
+unsigned long           GetTickCountInternal();
 
 // Debugging
 void SharedUtil::AddTickCount(long long llTickCountAdd)
@@ -30,7 +30,7 @@ void SharedUtil::AddTickCount(long long llTickCountAdd)
 // This keeps the counter as low as possible to delay any precision or wrap around issues.
 // Note: Return value is module dependent
 //
-uint SharedUtil::GetTickCount32(void)
+uint SharedUtil::GetTickCount32()
 {
     return (uint)GetTickCount64_();
 }
@@ -42,7 +42,7 @@ uint SharedUtil::GetTickCount32(void)
 // an __int64 and will effectively never wrap. This is an emulated version for XP and down.
 // Note: Wrap around issue is only defeated if the gap between calls is less than 24 days.
 //
-long long SharedUtil::GetTickCount64_(void)
+long long SharedUtil::GetTickCount64_()
 {
     ms_criticalSection.Lock();
 
@@ -75,7 +75,7 @@ long long SharedUtil::GetTickCount64_(void)
 //
 // Retrieves the number of seconds that have elapsed since some arbitrary point in time.
 //
-double SharedUtil::GetSecondCount(void)
+double SharedUtil::GetSecondCount()
 {
     return GetTickCount64_() * (1 / 1000.0);
 }
@@ -134,7 +134,7 @@ template <class T, int BUFFER_SIZE = 4>
 class CThreadResultValue
 {
 public:
-    CThreadResultValue(void) : m_ucLastWrittenIndex(0) {}
+    CThreadResultValue() : m_ucLastWrittenIndex(0) {}
 
     void Initialize(const T& initialValue)
     {
@@ -158,7 +158,7 @@ public:
         }
     }
 
-    T GetValue(void)
+    T GetValue()
     {
         while (true)
         {
@@ -184,7 +184,7 @@ namespace SharedUtil
     class CPerModuleTickCount
     {
     public:
-        CPerModuleTickCount(void)
+        CPerModuleTickCount()
         {
     #ifdef MTA_DEBUG
             m_TimeSinceUpdated.SetMaxIncrement(500);
@@ -192,7 +192,7 @@ namespace SharedUtil
             m_ResultValue.Initialize(GetTickCount64_());
         }
 
-        long long Get(void)
+        long long Get()
         {
     #ifdef MTA_DEBUG
             if (m_TimeSinceUpdated.Get() > 10000)
@@ -204,7 +204,7 @@ namespace SharedUtil
             return m_ResultValue.GetValue();
         }
 
-        void Update(void)
+        void Update()
         {
     #ifdef MTA_DEBUG
             m_TimeSinceUpdated.Reset();
@@ -222,12 +222,12 @@ namespace SharedUtil
     CPerModuleTickCount ms_PerModuleTickCount;
 }            // namespace SharedUtil
 
-long long SharedUtil::GetModuleTickCount64(void)
+long long SharedUtil::GetModuleTickCount64()
 {
     return ms_PerModuleTickCount.Get();
 }
 
-void SharedUtil::UpdateModuleTickCount64(void)
+void SharedUtil::UpdateModuleTickCount64()
 {
     return ms_PerModuleTickCount.Update();
 }
@@ -237,13 +237,14 @@ void SharedUtil::UpdateModuleTickCount64(void)
 //   Returns the number of milliseconds since some fixed point in time.
 //   Wraps every 49.71 days and should always increase monotonically.
 //
+// TODO:
 // ACHTUNG: This function should be scrapped and replaced by a cross-platform time class
 //
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(__APPLE__)
 
 // Apple / Darwin platforms with Mach monotonic clock support
 #include <mach/mach_time.h>
-unsigned long GetTickCountInternal(void)
+unsigned long GetTickCountInternal()
 {
     mach_timebase_info_data_t info;
 
@@ -261,7 +262,7 @@ unsigned long GetTickCountInternal(void)
 #elif !defined(WIN32)
 
 // BSD / Linux platforms with POSIX monotonic clock support
-unsigned long GetTickCountInternal(void)
+unsigned long GetTickCountInternal()
 {
     #if !defined(CLOCK_MONOTONIC)
     #error "This platform does not have monotonic clock support."
@@ -287,7 +288,7 @@ unsigned long GetTickCountInternal(void)
     ** run-time. When this occurs simply fallback to other time source.
     */
     else
-        (void)gettimeofday(&now, NULL);
+        gettimeofday(&now, NULL);
 
     // ACHTUNG: Note that the above gettimeofday fallback is dangerous because it is a wall clock
     // and thus not guaranteed to be monotonic. Ideally, this function should throw a fatal error
@@ -302,7 +303,7 @@ unsigned long GetTickCountInternal(void)
 // Win32 platforms
 #include <Mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
-unsigned long GetTickCountInternal(void)
+unsigned long GetTickCountInternal()
 {
     // Uses timeGetTime() as Win32 GetTickCount() has a resolution of 16ms.
     //   (timeGetTime() has a resolution is 1ms assuming timeBeginPeriod(1) has been called at startup).

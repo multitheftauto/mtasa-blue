@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_OBJECT
-#define __CGAME_OBJECT
+#pragma once
 
 #include "CPhysical.h"
 
@@ -21,16 +20,18 @@ class CObjectSAInterface;
 class CObject : public virtual CPhysical
 {
 public:
-    virtual ~CObject(void){};
+    virtual ~CObject(){};
 
-    virtual CObjectSAInterface* GetObjectInterface(void) = 0;
+    virtual CObjectSAInterface* GetObjectInterface() = 0;
 
-    virtual void  Explode(void) = 0;
-    virtual void  Break(void) = 0;
+    virtual void  Explode() = 0;
+    virtual void  Break() = 0;
     virtual void  SetHealth(float fHealth) = 0;
-    virtual float GetHealth(void) = 0;
+    virtual float GetHealth() = 0;
     virtual void  SetModelIndex(unsigned long ulModel) = 0;
 
+    virtual void          SetPreRenderRequired(bool required) = 0;
+    virtual bool          GetPreRenderRequired() = 0;
     virtual void          SetAlpha(unsigned char ucAlpha) = 0;
     virtual unsigned char GetAlpha() = 0;
 
@@ -41,5 +42,3 @@ public:
     virtual CVector* GetScale() = 0;
     virtual void     ResetScale() = 0;
 };
-
-#endif

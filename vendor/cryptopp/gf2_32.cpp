@@ -1,4 +1,4 @@
-// gf2_32.cpp - written and placed in the public domain by Wei Dai
+// gf2_32.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 #include "misc.h"
@@ -23,12 +23,12 @@ GF2_32::Element GF2_32::Multiply(Element a, Element b) const
 	}
 
 #if CRYPTOPP_FAST_ROTATE(32)
-	b = rotrFixed(b, 30U);
+	b = rotrConstant<30>(b);
 	word32 result = table[b&2];
 
 	for (int i=29; i>=0; --i)
 	{
-		b = rotlFixed(b, 1U);
+		b = rotlConstant<1>(b);
 		result = (result<<1) ^ table[(b&2) + (result>>31)];
 	}
 

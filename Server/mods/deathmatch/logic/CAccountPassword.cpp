@@ -115,7 +115,7 @@ bool CAccountPassword::CanChangePasswordTo(const SString& strPassword)
 // Return password hash for saving
 //
 ///////////////////////////////////////////////////////////////
-SString CAccountPassword::GetPasswordHash(void)
+SString CAccountPassword::GetPasswordHash()
 {
     return m_strSha256 + m_strType + m_strSalt;
 }
@@ -127,7 +127,7 @@ SString CAccountPassword::GetPasswordHash(void)
 // Generate new random salt string
 //
 ///////////////////////////////////////////////////////////////
-SString CAccountPassword::GenerateSalt(void)
+SString CAccountPassword::GenerateSalt()
 {
     char randomData[16];
     g_pNetServer->GenerateRandomData(randomData, sizeof(randomData));

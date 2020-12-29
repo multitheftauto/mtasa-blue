@@ -10,8 +10,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPOSITIONROTATIONANIMATION_H
-#define __CPOSITIONROTATIONANIMATION_H
+#pragma once
 
 struct SPositionRotation
 {
@@ -63,5 +62,3 @@ public:
 protected:
     bool m_bDeltaRotationMode;            // defines if the rotation provided is a relative rotation
 };
-
-#endif

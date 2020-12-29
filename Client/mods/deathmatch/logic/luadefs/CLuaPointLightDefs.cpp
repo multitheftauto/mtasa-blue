@@ -11,16 +11,22 @@
 
 #include "StdInc.h"
 
-void CLuaPointLightDefs::LoadFunctions(void)
+void CLuaPointLightDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createLight", CreateLight);
-    CLuaCFunctions::AddFunction("getLightType", GetLightType);
-    CLuaCFunctions::AddFunction("getLightRadius", GetLightRadius);
-    CLuaCFunctions::AddFunction("setLightRadius", SetLightRadius);
-    CLuaCFunctions::AddFunction("getLightColor", GetLightColor);
-    CLuaCFunctions::AddFunction("setLightColor", SetLightColor);
-    CLuaCFunctions::AddFunction("getLightDirection", GetLightDirection);
-    CLuaCFunctions::AddFunction("setLightDirection", SetLightDirection);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createLight", CreateLight},
+        {"getLightType", GetLightType},
+        {"getLightRadius", GetLightRadius},
+        {"setLightRadius", SetLightRadius},
+        {"getLightColor", GetLightColor},
+        {"setLightColor", SetLightColor},
+        {"getLightDirection", GetLightDirection},
+        {"setLightDirection", SetLightDirection},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaPointLightDefs::AddClass(lua_State* luaVM)
@@ -40,7 +46,6 @@ void CLuaPointLightDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "type", nullptr, "getLightType");
     lua_classvariable(luaVM, "radius", "setLightRadius", "getLightRadius");
-    // lua_classvariable ( luaVM, "color", "setLightColor", "getLightColor" );
     lua_classvariable(luaVM, "direction", "setLightDirection", "getLightDirection");
 
     lua_registerclass(luaVM, "Light", "Element");

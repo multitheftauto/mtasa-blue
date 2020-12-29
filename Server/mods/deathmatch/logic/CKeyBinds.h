@@ -35,33 +35,33 @@ struct SBindableGTAControl
 class CKeyBind
 {
 public:
-    CKeyBind(void)
+    CKeyBind()
     {
         boundKey = NULL;
         luaMain = NULL;
         beingDeleted = false;
     }
-    virtual ~CKeyBind(void) {}
-    bool IsBeingDeleted(void) { return beingDeleted; }
+    virtual ~CKeyBind() {}
+    bool IsBeingDeleted() { return beingDeleted; }
 
     const SBindableKey*  boundKey;
     CLuaMain*            luaMain;
     bool                 beingDeleted;
-    virtual eKeyBindType GetType(void) = 0;
+    virtual eKeyBindType GetType() = 0;
 };
 
 class CKeyBindWithState : public CKeyBind
 {
 public:
-    CKeyBindWithState(void) { bHitState = true; }
+    CKeyBindWithState() { bHitState = true; }
     bool bHitState;
 };
 
 class CFunctionBind
 {
 public:
-    CFunctionBind(void) {}
-    ~CFunctionBind(void) {}
+    CFunctionBind() {}
+    ~CFunctionBind() {}
     CLuaFunctionRef m_iLuaFunction;
     CLuaArguments   m_Arguments;
 };
@@ -69,13 +69,13 @@ public:
 class CKeyFunctionBind : public CKeyBindWithState, public CFunctionBind
 {
 public:
-    eKeyBindType GetType(void) { return KEY_BIND_FUNCTION; }
+    eKeyBindType GetType() { return KEY_BIND_FUNCTION; }
 };
 
 class CControlFunctionBind : public CKeyBindWithState, public CFunctionBind
 {
 public:
-    eKeyBindType               GetType(void) { return KEY_BIND_CONTROL_FUNCTION; }
+    eKeyBindType               GetType() { return KEY_BIND_CONTROL_FUNCTION; }
     const SBindableGTAControl* boundControl;
 };
 
@@ -83,7 +83,7 @@ class CKeyBinds
 {
 public:
     CKeyBinds(class CPlayer* pPlayer);
-    ~CKeyBinds(void);
+    ~CKeyBinds();
 
     static const SBindableKey*        GetBindableFromKey(const char* szKey);
     static const SBindableGTAControl* GetBindableFromControl(const char* szControl);
@@ -94,8 +94,8 @@ public:
     void Call(CKeyBind* pKeyBind);
     bool ProcessKey(const char* szKey, bool bHitState, eKeyBindType bindType);
 
-    std::list<CKeyBind*>::iterator IterBegin(void) { return m_List.begin(); }
-    std::list<CKeyBind*>::iterator IterEnd(void) { return m_List.end(); }
+    std::list<CKeyBind*>::iterator IterBegin() { return m_List.begin(); }
+    std::list<CKeyBind*>::iterator IterEnd() { return m_List.end(); }
 
     // Key-function bind funcs
     bool AddKeyFunction(const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
@@ -117,7 +117,7 @@ public:
     void RemoveAllKeys(CLuaMain* pLuaMain);
 
     static bool IsMouse(const SBindableKey* pKey);
-    void        RemoveDeletedBinds(void);
+    void        RemoveDeletedBinds();
 
 protected:
     bool Remove(CKeyBind* pKeyBind);

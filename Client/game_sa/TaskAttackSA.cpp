@@ -158,7 +158,7 @@ void CTaskSimpleUseGunSA::Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecT
     }
 }
 
-int CTaskSimpleUseGunSA::GetTaskType(void)
+int CTaskSimpleUseGunSA::GetTaskType()
 {
     int   iReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetTaskType;
@@ -247,7 +247,7 @@ void CTaskSimpleUseGunSA::ClearAnim(CPed* pPed)
     }
 }
 
-signed char CTaskSimpleUseGunSA::GetCurrentCommand(void)
+signed char CTaskSimpleUseGunSA::GetCurrentCommand()
 {
     signed char bReturn;
     DWORD       dwFunc = FUNC_CTaskSimpleUseGun_GetCurrentCommand;
@@ -261,7 +261,7 @@ signed char CTaskSimpleUseGunSA::GetCurrentCommand(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::GetDoneFiring(void)
+bool CTaskSimpleUseGunSA::GetDoneFiring()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetDoneFiring;
@@ -275,7 +275,7 @@ bool CTaskSimpleUseGunSA::GetDoneFiring(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::GetIsFinished(void)
+bool CTaskSimpleUseGunSA::GetIsFinished()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsFinished;
@@ -289,7 +289,7 @@ bool CTaskSimpleUseGunSA::GetIsFinished(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::IsLineOfSightBlocked(void)
+bool CTaskSimpleUseGunSA::IsLineOfSightBlocked()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_IsLineOfSightBlocked;
@@ -303,7 +303,7 @@ bool CTaskSimpleUseGunSA::IsLineOfSightBlocked(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::GetIsFiring(void)
+bool CTaskSimpleUseGunSA::GetIsFiring()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsFiring;
@@ -317,7 +317,7 @@ bool CTaskSimpleUseGunSA::GetIsFiring(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::GetIsReloading(void)
+bool CTaskSimpleUseGunSA::GetIsReloading()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsReloading;
@@ -331,7 +331,7 @@ bool CTaskSimpleUseGunSA::GetIsReloading(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::GetSkipAim(void)
+bool CTaskSimpleUseGunSA::GetSkipAim()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetSkipAim;
@@ -345,7 +345,7 @@ bool CTaskSimpleUseGunSA::GetSkipAim(void)
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::PlayerPassiveControlGun(void)
+bool CTaskSimpleUseGunSA::PlayerPassiveControlGun()
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_PlayerPassiveControlGun;

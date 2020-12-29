@@ -9,11 +9,11 @@
  *****************************************************************************/
 #include "StdInc.h"
 
-CBuildingRemovalManager::CBuildingRemovalManager(void)
+CBuildingRemovalManager::CBuildingRemovalManager()
 {
 }
 
-CBuildingRemovalManager::~CBuildingRemovalManager(void)
+CBuildingRemovalManager::~CBuildingRemovalManager()
 {
     for (std::multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = m_BuildingRemovals.begin(); iter != m_BuildingRemovals.end(); iter++)
     {
@@ -51,7 +51,7 @@ void CBuildingRemovalManager::CreateBuildingRemoval(unsigned short usModel, floa
     m_BuildingRemovals.insert(std::pair<unsigned short, CBuildingRemoval*>(usModel, pBuildingRemoval));
 }
 
-void CBuildingRemovalManager::ClearBuildingRemovals(void)
+void CBuildingRemovalManager::ClearBuildingRemovals()
 {
     for (std::multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = m_BuildingRemovals.begin(); iter != m_BuildingRemovals.end(); iter++)
     {

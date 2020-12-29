@@ -25,11 +25,11 @@ class CDatabaseTypeMySql : public CDatabaseType
 {
 public:
     ZERO_ON_NEW
-    CDatabaseTypeMySql(void);
-    virtual ~CDatabaseTypeMySql(void);
+    CDatabaseTypeMySql();
+    virtual ~CDatabaseTypeMySql();
 
     // CDatabaseType
-    virtual SString              GetDataSourceTag(void);
+    virtual SString              GetDataSourceTag();
     virtual CDatabaseConnection* Connect(const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions);
     virtual void                 NotifyConnectionDeleted(CDatabaseConnection* pConnection);
     virtual void                 NotifyConnectionChanged(CDatabaseConnection* pConnection);
@@ -37,7 +37,7 @@ public:
     // CDatabaseTypeMySql
     CDatabaseConnection* CallNewDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword,
                                                         const SString& strOptions);
-    void                 UpdateStats(void);
+    void                 UpdateStats();
 
     CDynamicLibrary                         m_DbconmyLib;
     NewDatabaseConnectionMySql_t*           m_pfnNewDatabaseConnection;
@@ -49,7 +49,7 @@ public:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CDatabaseType* NewDatabaseTypeMySql(void)
+CDatabaseType* NewDatabaseTypeMySql()
 {
     return new CDatabaseTypeMySql();
 }
@@ -61,7 +61,7 @@ CDatabaseType* NewDatabaseTypeMySql(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseTypeMySql::CDatabaseTypeMySql(void)
+CDatabaseTypeMySql::CDatabaseTypeMySql()
 {
 }
 
@@ -72,7 +72,7 @@ CDatabaseTypeMySql::CDatabaseTypeMySql(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseTypeMySql::~CDatabaseTypeMySql(void)
+CDatabaseTypeMySql::~CDatabaseTypeMySql()
 {
     assert(m_SharedConnectionMap.empty());
     assert(m_AllConnectionMap.empty());
@@ -85,7 +85,7 @@ CDatabaseTypeMySql::~CDatabaseTypeMySql(void)
 // Return database type as a string
 //
 ///////////////////////////////////////////////////////////////
-SString CDatabaseTypeMySql::GetDataSourceTag(void)
+SString CDatabaseTypeMySql::GetDataSourceTag()
 {
     return "mysql";
 }
@@ -217,7 +217,7 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql(CDatabas
 // Tracking connections
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseTypeMySql::UpdateStats(void)
+void CDatabaseTypeMySql::UpdateStats()
 {
     // Remove all lines with this key
     CPerfStatDebugTable::GetSingleton()->RemoveLines(m_strStatsKeyHead + "*");

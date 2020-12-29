@@ -33,7 +33,7 @@
 #include <vector>
 #include <utility>
 #include "CEGUISingleton.h"
-
+template<typename Type> class CDuplicateLineFilter;
 
 #if defined(_MSC_VER)
 #	pragma warning(push)
@@ -56,6 +56,17 @@ enum LoggingLevel
 	Standard,		//!< Basic events will be logged (default level).
 	Informative,	//!< Useful tracing (object creations etc) information will be logged.
 	Insane			//!< Mostly everything gets logged (use for heavy tracing only, log WILL be big).
+};
+
+struct SLoggingLine
+{
+    String       message;
+    LoggingLevel level;
+    void         operator+=(const char* szAppend) { message += szAppend; }
+    bool         operator==(const SLoggingLine& other) const
+    {
+        return message == other.message && level == other.level;
+    }
 };
 
 /*!
@@ -151,7 +162,8 @@ protected:
     std::vector<std::pair<String, LoggingLevel> > d_cache;    //!< Used to cache log entries before log file is created.
     std::ostringstream d_workstream;//!< Used to build log entry strings. 
     bool d_caching;                 //!< true while log entries are beign cached (prior to logfile creation)
-    
+    CDuplicateLineFilter<SLoggingLine>* d_pDuplicateLineFilter;
+
 private:
 	/*************************************************************************
 		Copy constructor and assignment usage is denied.
@@ -159,6 +171,9 @@ private:
 	Logger(const Logger& logger) {}
 	Logger& operator=(const Logger& logger) {return *this;}
 
+    // Duplicate line handling
+    void updateLogOutput();
+	void logEventInternal(const String& message, LoggingLevel level);
 };
 
 /*************************************************************************

@@ -16,7 +16,7 @@
 #include <vector>
 #include "net/SyncStructures.h"
 
-class CUnoccupiedVehicleSyncPacket : public CPacket
+class CUnoccupiedVehicleSyncPacket final : public CPacket
 {
 public:
     struct SyncData
@@ -26,17 +26,17 @@ public:
     };
 
 public:
-    CUnoccupiedVehicleSyncPacket(void){};
-    ~CUnoccupiedVehicleSyncPacket(void);
+    CUnoccupiedVehicleSyncPacket(){};
+    ~CUnoccupiedVehicleSyncPacket();
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    std::vector<SyncData>::iterator IterBegin(void) { return m_Syncs.begin(); };
-    std::vector<SyncData>::iterator IterEnd(void) { return m_Syncs.end(); };
+    std::vector<SyncData>::iterator IterBegin() { return m_Syncs.begin(); };
+    std::vector<SyncData>::iterator IterEnd() { return m_Syncs.end(); };
 
     std::vector<SyncData> m_Syncs;
 };

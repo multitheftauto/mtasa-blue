@@ -17,31 +17,31 @@ class CLuaTimer;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL 50
+#define LUA_TIMER_MIN_INTERVAL 0
 
 class CLuaTimer
 {
 public:
     CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments);
-    ~CLuaTimer(void);
+    ~CLuaTimer();
 
-    void RemoveScriptID(void);
+    void RemoveScriptID();
 
-    CTickCount GetStartTime(void) const { return m_llStartTime; };
+    CTickCount GetStartTime() const { return m_llStartTime; };
     void       SetStartTime(CTickCount llStartTime) { m_llStartTime = llStartTime; };
 
-    CTickCount GetDelay(void) const { return m_llDelay; };
+    CTickCount GetDelay() const { return m_llDelay; };
     void       SetDelay(CTickCount llDelay) { m_llDelay = llDelay; };
 
-    unsigned int GetRepeats(void) const { return m_uiRepeats; };
+    unsigned int GetRepeats() const { return m_uiRepeats; };
     void         SetRepeats(unsigned int uiRepeats) { m_uiRepeats = uiRepeats; }
 
     void ExecuteTimer(class CLuaMain* pLuaMain);
 
-    CTickCount GetTimeLeft(void);
+    CTickCount GetTimeLeft();
 
-    uint                 GetScriptID(void) const { return m_uiScriptID; }
-    const SLuaDebugInfo& GetLuaDebugInfo(void) { return m_LuaDebugInfo; }
+    uint                 GetScriptID() const { return m_uiScriptID; }
+    const SLuaDebugInfo& GetLuaDebugInfo() { return m_LuaDebugInfo; }
     void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; }
 
 private:

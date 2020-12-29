@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTVEHICLEMANAGER_H
-#define __CCLIENTVEHICLEMANAGER_H
+#pragma once
 
 #include "CClientVehicle.h"
 
@@ -23,20 +22,19 @@ class CClientVehicleManager
 public:
     ZERO_ON_NEW
     CClientVehicleManager(CClientManager* pManager);
-    ~CClientVehicleManager(void);
+    ~CClientVehicleManager();
 
-    void DeleteAll(void);
+    void DeleteAll();
 
-    unsigned int           Count(void) { return static_cast<unsigned int>(m_List.size()); };
+    unsigned int           Count() { return static_cast<unsigned int>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
-    CClientVehicle*        Get(CVehicle* pVehicle, bool bValidatePointer);
-    CClientVehicle*        GetSafe(CEntity* pEntity);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
-    void DoPulse(void);
+    void DoPulse();
 
     static bool               IsTrainModel(unsigned long ulModel);
     static bool               IsValidModel(unsigned long ulModel);
+    static bool               IsStandardModel(unsigned long ulModel);
     static eClientVehicleType GetVehicleType(unsigned long ulModel);
     static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
     static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
@@ -55,15 +53,16 @@ public:
 
     bool Exists(CClientVehicle* pVehicle);
 
-    static bool IsVehicleLimitReached(void);
+    static bool IsVehicleLimitReached();
 
     void RestreamVehicles(unsigned short usModel);
+    void RestreamAllVehicles();
     void RestreamVehicleUpgrades(unsigned short usModel);
 
-    std::vector<CClientVehicle*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::vector<CClientVehicle*>::const_iterator IterEnd(void) { return m_List.end(); };
-    std::vector<CClientVehicle*>::const_iterator StreamedBegin(void) { return m_StreamedIn.begin(); };
-    std::vector<CClientVehicle*>::const_iterator StreamedEnd(void) { return m_StreamedIn.end(); };
+    std::vector<CClientVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::vector<CClientVehicle*>::const_iterator IterEnd() { return m_List.end(); };
+    std::vector<CClientVehicle*>::const_iterator StreamedBegin() { return m_StreamedIn.begin(); };
+    std::vector<CClientVehicle*>::const_iterator StreamedEnd() { return m_StreamedIn.end(); };
 
     void AddToList(CClientVehicle* pVehicle) { m_List.push_back(pVehicle); };
     void RemoveFromLists(CClientVehicle* pVehicle);
@@ -77,5 +76,3 @@ protected:
     CMappedArray<CClientVehicle*> m_List;
     CMappedArray<CClientVehicle*> m_StreamedIn;
 };
-
-#endif

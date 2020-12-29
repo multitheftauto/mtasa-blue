@@ -10,8 +10,7 @@
 
 class CClientPlayer;
 
-#ifndef __CCLIENTPLAYER_H
-#define __CCLIENTPLAYER_H
+#pragma once
 
 #include <game/CPlayerPed.h>
 
@@ -36,78 +35,78 @@ class CClientPlayer : public CClientPed
 
 public:
     CClientPlayer(CClientManager* pManager, ElementID ID, bool bIsLocalPlayer = false);
-    virtual ~CClientPlayer(void);
+    virtual ~CClientPlayer();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTPLAYER; }
+    eClientEntityType GetType() const { return CCLIENTPLAYER; }
 
-    const char* GetNick(void) const { return m_strNick; }
+    const char* GetNick() const { return m_strNick; }
     void        SetNick(const char* szNick);
 
-    unsigned int GetPing(void) { return (m_bIsLocalPlayer) ? g_pNet->GetPing() : m_uiPing; }
+    unsigned int GetPing() { return (m_bIsLocalPlayer) ? g_pNet->GetPing() : m_uiPing; }
     void         SetPing(unsigned int uiPing) { m_uiPing = uiPing; }
 
     void GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     void SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB);
-    void RemoveNametagOverrideColor(void);
-    bool IsNametagColorOverridden(void) { return m_bNametagColorOverridden; }
+    void RemoveNametagOverrideColor();
+    bool IsNametagColorOverridden() { return m_bNametagColorOverridden; }
 
-    const char*   GetNametagText(void) { return m_strNametag.c_str(); }
+    const char*   GetNametagText() { return m_strNametag.c_str(); }
     void          SetNametagText(const char* szText);
-    bool          IsNametagShowing(void) { return m_bNametagShowing; }
+    bool          IsNametagShowing() { return m_bNametagShowing; }
     void          SetNametagShowing(bool bShowing) { m_bNametagShowing = bShowing; }
-    unsigned long GetLastNametagShow(void) { return m_ulLastNametagShow; }
+    unsigned long GetLastNametagShow() { return m_ulLastNametagShow; }
     void          SetLastNametagShow(unsigned long ulTime) { m_ulLastNametagShow = ulTime; }
 
     void SetIsExtrapolatingAim(bool m_bExtrap) { m_bDoExtrapolatingAim = m_bExtrap; }
-    bool IsExtrapolatingAim(void) { return m_bDoExtrapolatingAim; }
+    bool IsExtrapolatingAim() { return m_bDoExtrapolatingAim; }
     void UpdateAimPosition(const CVector& vecAim);
 
-    unsigned short GetLatency(void) { return m_usLatency; }
+    unsigned short GetLatency() { return m_usLatency; }
     void           SetLatency(unsigned short usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
 
-    unsigned long  GetLastPuresyncTime(void) { return m_ulLastPuresyncTime; }
+    unsigned long  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
     void           SetLastPuresyncTime(unsigned long ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }
-    const CVector& GetLastPuresyncPosition(void) { return m_vecLastPuresyncPosition; }
+    const CVector& GetLastPuresyncPosition() { return m_vecLastPuresyncPosition; }
     void           SetLastPuresyncPosition(const CVector& vecPosition) { m_vecLastPuresyncPosition = vecPosition; }
-    bool           HasConnectionTrouble(void) { return m_bHasConnectionTrouble; }
+    bool           HasConnectionTrouble() { return m_bHasConnectionTrouble; }
     void           SetHasConnectionTrouble(bool bHasTrouble) { m_bHasConnectionTrouble = bHasTrouble; }
-    ePuresyncType  GetLastPuresyncType(void) { return m_LastPuresyncType; }
+    ePuresyncType  GetLastPuresyncType() { return m_LastPuresyncType; }
     void           SetLastPuresyncType(ePuresyncType LastPuresyncType) { m_LastPuresyncType = LastPuresyncType; }
     void           SetLightsyncCalcedVelocity(const CVector& vecVelocity) { m_vecLightsyncCalcedVelocity = vecVelocity; }
-    const CVector& GetLightsyncCalcedVelocity(void) { return m_vecLightsyncCalcedVelocity; }
-    void           IncrementPlayerSync(void) { ++m_uiPlayerSyncCount; }
-    void           IncrementKeySync(void) { ++m_uiKeySyncCount; }
-    void           IncrementVehicleSync(void) { ++m_uiVehicleSyncCount; }
+    const CVector& GetLightsyncCalcedVelocity() { return m_vecLightsyncCalcedVelocity; }
+    void           IncrementPlayerSync() { ++m_uiPlayerSyncCount; }
+    void           IncrementKeySync() { ++m_uiKeySyncCount; }
+    void           IncrementVehicleSync() { ++m_uiVehicleSyncCount; }
 
-    unsigned int GetPlayerSyncCount(void) { return m_uiPlayerSyncCount; }
-    unsigned int GetKeySyncCount(void) { return m_uiKeySyncCount; }
-    unsigned int GetVehicleSyncCount(void) { return m_uiVehicleSyncCount; }
+    unsigned int GetPlayerSyncCount() { return m_uiPlayerSyncCount; }
+    unsigned int GetKeySyncCount() { return m_uiKeySyncCount; }
+    unsigned int GetVehicleSyncCount() { return m_uiVehicleSyncCount; }
 
-    CClientTeam* GetTeam(void) { return m_pTeam; }
+    CClientTeam* GetTeam() { return m_pTeam; }
     void         SetTeam(CClientTeam* pTeam, bool bChangeTeam);
     bool         IsOnMyTeam(CClientPlayer* pPlayer);
 
-    CClientPlayerVoice* GetVoice(void) { return m_voice; }
+    CClientPlayerVoice* GetVoice() { return m_voice; }
     void                SetPlayerVoice(CClientPlayerVoice* voice) { m_voice = voice; }
 
-    float GetNametagDistance(void) { return m_fNametagDistance; }
+    float GetNametagDistance() { return m_fNametagDistance; }
     void  SetNametagDistance(float fDistance) { m_fNametagDistance = fDistance; }
 
-    bool IsDeadOnNetwork(void) { return m_bNetworkDead; }
+    bool IsDeadOnNetwork() { return m_bNetworkDead; }
     void SetDeadOnNetwork(bool bDead) { m_bNetworkDead = bDead; }
 
-    void Reset(void);
+    void Reset();
 
-    CClientManager* GetManager(void) { return m_pManager; }
+    CClientManager* GetManager() { return m_pManager; }
 
     void DischargeWeapon(eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fBackupDamage, uchar ucBackupHitZone,
                          CClientPlayer* pBackupDamagedPlayer);
 
     void   SetRemoteVersionInfo(ushort usBitstreamVersion, uint uiBuildNumber);
-    ushort GetRemoteBitstreamVersion(void);
-    uint   GetRemoteBuildNumber(void);
+    ushort GetRemoteBitstreamVersion();
+    uint   GetRemoteBuildNumber();
     bool   GetWasRecentlyInNetworkInterruption(uint uiMaxTicksAgo);
     void   SetIsInNetworkInterruption(bool bInNetworkInterruption);
 
@@ -177,5 +176,3 @@ public:
     bool IsShowingWepdata() const { return m_bShowingWepdata; }
 #endif
 };
-
-#endif

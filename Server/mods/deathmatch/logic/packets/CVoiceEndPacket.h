@@ -13,20 +13,20 @@
 
 #include "CPacket.h"
 
-class CVoiceEndPacket : public CPacket
+class CVoiceEndPacket final : public CPacket
 {
 public:
     CVoiceEndPacket(class CPlayer* pPlayer = NULL);
     ~CVoiceEndPacket();
 
-    ePacketID               GetPacketID(void) const { return PACKET_ID_VOICE_END; }
-    unsigned long           GetFlags(void) const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_VOICE; }
+    ePacketID               GetPacketID() const { return PACKET_ID_VOICE_END; }
+    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_VOICE; }
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID GetPlayer(void);
+    ElementID GetPlayer();
     void      SetPlayer(ElementID PlayerID);
 
 private:

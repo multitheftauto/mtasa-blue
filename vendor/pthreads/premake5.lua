@@ -3,17 +3,17 @@ project "pthread"
 	kind "SharedLib"
 	targetname "pthread"
 	targetdir(buildpath("server"))
-		
-	includedirs { 
+
+	includedirs {
 		"include"
 	}
 
-	vpaths { 
+	vpaths {
 		["Headers"] = "**.h",
 		["Sources"] = "**.c",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"include/pthread.c",
@@ -43,7 +43,7 @@ project "pthread"
 			-- Fix net.dll requiring the release build
 			"copy \"%{wks.location}..\\Bin\\server\\x64\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\x64\\pthread.dll\""
 		}
-	
+
 	filter {"system:windows", "platforms:x64"}
 		targetdir(buildpath("server/x64"))
 
@@ -52,5 +52,3 @@ project "pthread"
 			"HAVE_PTW32_CONFIG_H",
 			"PTW32_BUILD_INLINED"
 		}
-		
-	

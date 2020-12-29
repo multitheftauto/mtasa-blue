@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CKeyGen_H
-#define __CKeyGen_H
+#pragma once
 
 typedef unsigned long DWORD;
 
@@ -22,5 +21,3 @@ public:
     virtual unsigned int GetUppercaseKey(const char* szString) = 0;
     virtual unsigned int AppendStringToKey(unsigned int uiKey, const char* szString) = 0;
 };
-
-#endif

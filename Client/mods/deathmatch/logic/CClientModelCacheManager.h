@@ -10,11 +10,11 @@
 class CClientModelCacheManager
 {
 public:
-    virtual ~CClientModelCacheManager(void) {}
+    virtual ~CClientModelCacheManager() {}
 
     // CClientModelCacheManager interface
-    virtual void DoPulse(void) = 0;
+    virtual void DoPulse() = 0;
     virtual void OnRestreamModel(ushort usModelId) = 0;
 };
 
-CClientModelCacheManager* NewClientModelCacheManager(void);
+CClientModelCacheManager* NewClientModelCacheManager();

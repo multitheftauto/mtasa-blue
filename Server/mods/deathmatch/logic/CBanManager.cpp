@@ -12,14 +12,14 @@
 #include "StdInc.h"
 bool CBanManager::ms_bSaveRequired = false;
 
-CBanManager::CBanManager(void)
+CBanManager::CBanManager()
 {
     m_strPath = g_pServerInterface->GetModManager()->GetAbsolutePath(FILENAME_BANLIST);
     m_tUpdate = 0;
     m_bAllowSave = false;
 }
 
-CBanManager::~CBanManager(void)
+CBanManager::~CBanManager()
 {
     SaveBanList();
     list<CBan*>::const_iterator iter = m_BanManager.begin();
@@ -37,7 +37,7 @@ CBanManager::~CBanManager(void)
     m_BansBeingDeleted.clear();
 }
 
-void CBanManager::DoPulse(void)
+void CBanManager::DoPulse()
 {
     time_t tTime = time(NULL);
 
@@ -334,7 +334,7 @@ unsigned int CBanManager::GetBansWithBanner(const char* szBanner)
     return uiOccurrances;
 }
 
-bool CBanManager::LoadBanList(void)
+bool CBanManager::LoadBanList()
 {
     m_bAllowSave = true;
 
@@ -412,7 +412,7 @@ bool CBanManager::LoadBanList(void)
     return true;
 }
 
-bool CBanManager::ReloadBanList(void)
+bool CBanManager::ReloadBanList()
 {
     // Flush any pending saves - This is ok because reloadbans is for loading manual changes to banlist.xml
     // and manual changes are subject to being overwritten by server actions at any time.
@@ -431,7 +431,7 @@ bool CBanManager::ReloadBanList(void)
     return LoadBanList();
 }
 
-void CBanManager::SaveBanList(void)
+void CBanManager::SaveBanList()
 {
     // Only allow save after a load was attempted
     if (!m_bAllowSave)

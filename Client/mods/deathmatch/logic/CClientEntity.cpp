@@ -28,6 +28,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_bDoubleSided = false;
     m_bDoubleSidedInit = false;
     m_bCallPropagationEnabled = true;
+    m_bSmartPointer = false;
 
     // Need to generate a clientside ID?
     if (ID == INVALID_ELEMENT_ID)
@@ -54,13 +55,11 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_pElementGroup = NULL;
     m_pModelInfo = NULL;
 
-    g_pClientGame->GetGameEntityXRefManager()->OnClientEntityCreate(this);
-
     m_bWorldIgnored = false;
     g_pCore->UpdateDummyProgress();
 }
 
-CClientEntity::~CClientEntity(void)
+CClientEntity::~CClientEntity()
 {
     // Make sure we won't get deleted later by the element deleter if we've been requested so
     if (m_bBeingDeleted)
@@ -159,7 +158,6 @@ CClientEntity::~CClientEntity(void)
     if (!g_pClientGame->IsBeingDeleted())
         CClientEntityRefManager::OnEntityDelete(this);
 
-    g_pClientGame->GetGameEntityXRefManager()->OnClientEntityDelete(this);
     SAFE_RELEASE(m_pChildrenListSnapshot);
     g_pCore->GetGraphics()->GetRenderItemManager()->RemoveClientEntityRefs(this);
     g_pCore->UpdateDummyProgress();
@@ -250,7 +248,7 @@ bool CClientEntity::IsMyParent(CClientEntity* pEntity, bool bRecursive)
     return false;
 }
 
-void CClientEntity::ClearChildren(void)
+void CClientEntity::ClearChildren()
 {
     // Sanity check
     assert(m_pParent != this);
@@ -595,7 +593,21 @@ void CClientEntity::SetRotationDegrees(const CVector& vecDegrees)
     SetRotationRadians(vecTemp);
 }
 
-bool CClientEntity::IsOutOfBounds(void)
+void CClientEntity::SetDimension(unsigned short usDimension)
+{
+    if (m_usDimension == usDimension)
+        return;
+
+    unsigned int usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onClientElementDimensionChange", Arguments, true);
+}
+
+bool CClientEntity::IsOutOfBounds()
 {
     CVector vecPosition;
     GetPosition(vecPosition);
@@ -822,7 +834,7 @@ void CClientEntity::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
     }
 }
 
-void CClientEntity::DeleteAllEvents(void)
+void CClientEntity::DeleteAllEvents()
 {
     m_pEventManager->DeleteAll();
 }
@@ -1056,7 +1068,7 @@ bool CClientEntity::CollisionExists(CClientColShape* pShape)
     return ListContains(m_Collisions, pShape);
 }
 
-void CClientEntity::RemoveAllCollisions(void)
+void CClientEntity::RemoveAllCollisions()
 {
     CFastList<CClientColShape*>::iterator iter = m_Collisions.begin();
     for (; iter != m_Collisions.end(); iter++)
@@ -1072,7 +1084,28 @@ bool CClientEntity::IsEntityAttached(CClientEntity* pEntity)
     return ListContains(m_AttachedEntities, pEntity);
 }
 
-void CClientEntity::ReattachEntities(void)
+bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
+{
+    if (bRecursive)
+    {
+        std::set<CClientEntity*> history;
+
+        for (CClientEntity* pCurrent = this; pCurrent; pCurrent = pCurrent->GetAttachedTo())
+        {
+            if (pCurrent == pEntity)
+                return true;
+
+            if (!std::get<bool>(history.insert(pCurrent)))
+                break; // This should not be possible, but you never know
+        }
+
+        return false;
+    }
+
+    return m_pAttachedToEntity == pEntity;
+}
+
+void CClientEntity::ReattachEntities()
 {
     // Jax: this should be called on streamIn/creation
 
@@ -1088,7 +1121,7 @@ void CClientEntity::ReattachEntities(void)
     }
 }
 
-bool CClientEntity::IsAttachable(void)
+bool CClientEntity::IsAttachable()
 {
     switch (GetType())
     {
@@ -1113,7 +1146,7 @@ bool CClientEntity::IsAttachable(void)
     return false;
 }
 
-bool CClientEntity::IsAttachToable(void)
+bool CClientEntity::IsAttachToable()
 {
     switch (GetType())
     {
@@ -1139,7 +1172,7 @@ bool CClientEntity::IsAttachToable(void)
     return false;
 }
 
-void CClientEntity::DoAttaching(void)
+void CClientEntity::DoAttaching()
 {
     if (m_pAttachedToEntity)
     {
@@ -1184,7 +1217,7 @@ unsigned int CClientEntity::GetTypeID(const char* szTypeName)
         return CCLIENTUNKNOWN;
 }
 
-void CClientEntity::DeleteClientChildren(void)
+void CClientEntity::DeleteClientChildren()
 {
     // Gather a list over children (we can't use the list as it changes)
     std::list<CClientEntity*>       Children;
@@ -1212,12 +1245,12 @@ void CClientEntity::DeleteClientChildren(void)
     }
 }
 
-bool CClientEntity::IsStatic(void)
+bool CClientEntity::IsStatic()
 {
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
     {
-        return (pEntity->IsStatic() == TRUE);
+        return pEntity->IsStatic();
     }
     return false;
 }
@@ -1231,7 +1264,7 @@ void CClientEntity::SetStatic(bool bStatic)
     }
 }
 
-bool CClientEntity::IsDoubleSided(void)
+bool CClientEntity::IsDoubleSided()
 {
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
@@ -1253,7 +1286,7 @@ void CClientEntity::SetDoubleSided(bool bDoubleSided)
     m_bDoubleSided = bDoubleSided;
 }
 
-unsigned char CClientEntity::GetInterior(void)
+unsigned char CClientEntity::GetInterior()
 {
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
@@ -1273,7 +1306,7 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     m_ucInterior = ucInterior;
 }
 
-bool CClientEntity::IsOnScreen(void)
+bool CClientEntity::IsOnScreen()
 {
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
@@ -1283,7 +1316,7 @@ bool CClientEntity::IsOnScreen(void)
     return false;
 }
 
-RpClump* CClientEntity::GetClump(void)
+RpClump* CClientEntity::GetClump()
 {
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
@@ -1535,7 +1568,7 @@ void CClientEntity::SetCollidableWith(CClientEntity* pEntity, bool bCanCollide)
     pEntity->SetCollidableWith(this, bCanCollide);
 }
 
-CSphere CClientEntity::GetWorldBoundingSphere(void)
+CSphere CClientEntity::GetWorldBoundingSphere()
 {
     // Default to a point around the entity's position
     CVector vecPosition;
@@ -1543,7 +1576,7 @@ CSphere CClientEntity::GetWorldBoundingSphere(void)
     return CSphere(vecPosition, 0.f);
 }
 
-void CClientEntity::UpdateSpatialData(void)
+void CClientEntity::UpdateSpatialData()
 {
     GetClientSpatialDatabase()->UpdateEntity(this);
 }
@@ -1560,7 +1593,7 @@ float CClientEntity::GetDistanceBetweenBoundingSpheres(CClientEntity* pOther)
 //
 // Ensure children list snapshot is up to date and return it
 //
-CElementListSnapshot* CClientEntity::GetChildrenListSnapshot(void)
+CElementListSnapshot* CClientEntity::GetChildrenListSnapshot()
 {
     // See if list needs updating
     if (m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL)

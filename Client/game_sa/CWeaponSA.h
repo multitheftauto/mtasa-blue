@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WEAPON
-#define __CGAMESA_WEAPON
+#pragma once
 
 #include "CGameSA.h"
 #include <game/CWeapon.h>
@@ -70,7 +69,7 @@ public:
 
     VOID         SetAsCurrentWeapon();
     CWeaponInfo* GetInfo(eWeaponSkill skill) { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill); };
-    void         Destroy(void);
+    void         Destroy();
     void         Remove();
     void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed);
     void         Update(CPed* pPed);
@@ -86,5 +85,3 @@ public:
     int  GetWeaponReloadTime(CWeaponStat* pWeaponStat);
     static int GetWeaponFireTime(CWeaponStat* pWeaponStat);
 };
-
-#endif

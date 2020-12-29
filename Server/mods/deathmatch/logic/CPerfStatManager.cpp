@@ -22,18 +22,18 @@ std::unique_ptr<SStatData> g_pStats(new SStatData());
 class CPerfStatManagerImpl : public CPerfStatManager
 {
 public:
-    CPerfStatManagerImpl(void);
-    virtual ~CPerfStatManagerImpl(void);
+    CPerfStatManagerImpl();
+    virtual ~CPerfStatManagerImpl();
 
     // CPerfStatManager
-    virtual void DoPulse(void);
+    virtual void DoPulse();
     virtual void GetStats(CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter);
-    virtual void Stop(void);
+    virtual void Stop();
 
     // CPerfStatManagerImpl
     void             AddModule(CPerfStatModule* pModule);
     void             RemoveModule(CPerfStatModule* pModule);
-    uint             GetModuleCount(void);
+    uint             GetModuleCount();
     CPerfStatModule* GetModuleByIndex(uint uiIndex);
     CPerfStatModule* GetModuleByCategoryName(const SString& strCategory);
 
@@ -49,7 +49,7 @@ public:
 ///////////////////////////////////////////////////////////////
 static std::unique_ptr<CPerfStatManagerImpl> g_pPerfStatManagerImp;
 
-CPerfStatManager* CPerfStatManager::GetSingleton(void)
+CPerfStatManager* CPerfStatManager::GetSingleton()
 {
     // If we're stopping the server, do not create a PerfStatManager just to destroy it
     if (g_pGame->IsBeingDeleted())
@@ -67,7 +67,7 @@ CPerfStatManager* CPerfStatManager::GetSingleton(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatManagerImpl::CPerfStatManagerImpl(void)
+CPerfStatManagerImpl::CPerfStatManagerImpl()
 {
     AddModule(CPerfStatLuaTiming::GetSingleton());
     AddModule(CPerfStatLuaMemory::GetSingleton());
@@ -93,7 +93,7 @@ CPerfStatManagerImpl::CPerfStatManagerImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatManagerImpl::~CPerfStatManagerImpl(void)
+CPerfStatManagerImpl::~CPerfStatManagerImpl()
 {
 }
 
@@ -104,7 +104,7 @@ CPerfStatManagerImpl::~CPerfStatManagerImpl(void)
 // Stops all modules by invoking Stop() on all modules
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::Stop(void)
+void CPerfStatManagerImpl::Stop()
 {
     for (auto const& module : m_ModuleList)
         module->Stop();
@@ -144,7 +144,7 @@ void CPerfStatManagerImpl::RemoveModule(CPerfStatModule* pModule)
 //
 //
 ///////////////////////////////////////////////////////////////
-uint CPerfStatManagerImpl::GetModuleCount(void)
+uint CPerfStatManagerImpl::GetModuleCount()
 {
     return m_ModuleList.size();
 }
@@ -188,7 +188,7 @@ CPerfStatModule* CPerfStatManagerImpl::GetModuleByCategoryName(const SString& st
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::DoPulse(void)
+void CPerfStatManagerImpl::DoPulse()
 {
     for (uint i = 0; i < GetModuleCount(); i++)
     {

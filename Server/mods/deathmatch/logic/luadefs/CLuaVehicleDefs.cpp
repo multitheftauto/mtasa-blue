@@ -13,106 +13,115 @@
 
 void CLuaVehicleDefs::LoadFunctions()
 {
-    // Vehicle create/destroy funcs
-    CLuaCFunctions::AddFunction("createVehicle", CreateVehicle);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Vehicle create/destroy funcs
+        {"createVehicle", CreateVehicle},
 
-    // Vehicle get funcs
-    CLuaCFunctions::AddFunction("getVehicleType", GetVehicleType);
-    CLuaCFunctions::AddFunction("getVehicleVariant", GetVehicleVariant);
-    CLuaCFunctions::AddFunction("getVehicleColor", GetVehicleColor);
-    CLuaCFunctions::AddFunction("getVehicleModelFromName", GetVehicleModelFromName);
-    CLuaCFunctions::AddFunction("getVehicleLandingGearDown", GetVehicleLandingGearDown);
-    CLuaCFunctions::AddFunction("getVehicleName", GetVehicleName);
-    CLuaCFunctions::AddFunction("getVehicleNameFromModel", GetVehicleNameFromModel);
-    CLuaCFunctions::AddFunction("getVehicleOccupant", GetVehicleOccupant);
-    CLuaCFunctions::AddFunction("getVehicleOccupants", GetVehicleOccupants);
-    CLuaCFunctions::AddFunction("getVehicleController", GetVehicleController);
-    CLuaCFunctions::AddFunction("getVehicleRotation", GetVehicleRotation);
-    CLuaCFunctions::AddFunction("getVehicleSirensOn", GetVehicleSirensOn);
-    CLuaCFunctions::AddFunction("getVehicleTurnVelocity", GetVehicleTurnVelocity);
-    CLuaCFunctions::AddFunction("getVehicleTurretPosition", GetVehicleTurretPosition);
-    CLuaCFunctions::AddFunction("getVehicleMaxPassengers", GetVehicleMaxPassengers);
-    CLuaCFunctions::AddFunction("isVehicleLocked", IsVehicleLocked);
-    CLuaCFunctions::AddFunction("getVehiclesOfType", GetVehiclesOfType);
-    CLuaCFunctions::AddFunction("getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot);
-    CLuaCFunctions::AddFunction("getVehicleUpgrades", GetVehicleUpgrades);
-    CLuaCFunctions::AddFunction("getVehicleUpgradeSlotName", GetVehicleUpgradeSlotName);
-    CLuaCFunctions::AddFunction("getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades);
-    CLuaCFunctions::AddFunction("getVehicleDoorState", GetVehicleDoorState);
-    CLuaCFunctions::AddFunction("getVehicleWheelStates", GetVehicleWheelStates);
-    CLuaCFunctions::AddFunction("getVehicleLightState", GetVehicleLightState);
-    CLuaCFunctions::AddFunction("getVehiclePanelState", GetVehiclePanelState);
-    CLuaCFunctions::AddFunction("getVehicleOverrideLights", GetVehicleOverrideLights);
-    CLuaCFunctions::AddFunction("getVehicleTowedByVehicle", GetVehicleTowedByVehicle);
-    CLuaCFunctions::AddFunction("getVehicleTowingVehicle", GetVehicleTowingVehicle);
-    CLuaCFunctions::AddFunction("getVehiclePaintjob", GetVehiclePaintjob);
-    CLuaCFunctions::AddFunction("getVehiclePlateText", GetVehiclePlateText);
-    CLuaCFunctions::AddFunction("isVehicleDamageProof", IsVehicleDamageProof);
-    CLuaCFunctions::AddFunction("isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable);
-    CLuaCFunctions::AddFunction("isVehicleFrozen", IsVehicleFrozen);
-    CLuaCFunctions::AddFunction("isVehicleOnGround", IsVehicleOnGround);
-    CLuaCFunctions::AddFunction("getVehicleEngineState", GetVehicleEngineState);
-    CLuaCFunctions::AddFunction("isTrainDerailed", IsTrainDerailed);
-    CLuaCFunctions::AddFunction("isTrainDerailable", IsTrainDerailable);
-    CLuaCFunctions::AddFunction("getTrainDirection", GetTrainDirection);
-    CLuaCFunctions::AddFunction("getTrainSpeed", GetTrainSpeed);
-    // CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
-    CLuaCFunctions::AddFunction("getTrainPosition", GetTrainPosition);
-    CLuaCFunctions::AddFunction("isVehicleBlown", IsVehicleBlown);
-    CLuaCFunctions::AddFunction("getVehicleHeadLightColor", GetVehicleHeadLightColor);
-    CLuaCFunctions::AddFunction("getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio);
+        // Vehicle get funcs
+        {"getVehicleType", GetVehicleType},
+        {"getVehicleVariant", GetVehicleVariant},
+        {"getVehicleColor", GetVehicleColor},
+        {"getVehicleModelFromName", GetVehicleModelFromName},
+        {"getVehicleLandingGearDown", GetVehicleLandingGearDown},
+        {"getVehicleName", GetVehicleName},
+        {"getVehicleNameFromModel", GetVehicleNameFromModel},
+        {"getVehicleOccupant", GetVehicleOccupant},
+        {"getVehicleOccupants", GetVehicleOccupants},
+        {"getVehicleController", GetVehicleController},
+        {"getVehicleRotation", GetVehicleRotation},
+        {"getVehicleSirensOn", GetVehicleSirensOn},
+        {"getVehicleTurnVelocity", GetVehicleTurnVelocity},
+        {"getVehicleTurretPosition", GetVehicleTurretPosition},
+        {"getVehicleMaxPassengers", GetVehicleMaxPassengers},
+        {"isVehicleLocked", IsVehicleLocked},
+        {"getVehiclesOfType", GetVehiclesOfType},
+        {"getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot},
+        {"getVehicleUpgrades", GetVehicleUpgrades},
+        {"getVehicleUpgradeSlotName", GetVehicleUpgradeSlotName},
+        {"getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades},
+        {"getVehicleDoorState", GetVehicleDoorState},
+        {"getVehicleWheelStates", GetVehicleWheelStates},
+        {"getVehicleLightState", GetVehicleLightState},
+        {"getVehiclePanelState", GetVehiclePanelState},
+        {"getVehicleOverrideLights", GetVehicleOverrideLights},
+        {"getVehicleTowedByVehicle", GetVehicleTowedByVehicle},
+        {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
+        {"getVehiclePaintjob", GetVehiclePaintjob},
+        {"getVehiclePlateText", GetVehiclePlateText},
+        {"isVehicleDamageProof", IsVehicleDamageProof},
+        {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
+        {"isVehicleFrozen", IsVehicleFrozen},
+        {"isVehicleOnGround", IsVehicleOnGround},
+        {"getVehicleEngineState", GetVehicleEngineState},
+        {"isTrainDerailed", IsTrainDerailed},
+        {"isTrainDerailable", IsTrainDerailable},
+        {"getTrainDirection", GetTrainDirection},
+        {"getTrainSpeed", GetTrainSpeed},
+        {"getTrainTrack", ArgumentParser<GetTrainTrack>},
+        {"getTrainPosition", GetTrainPosition},
+        {"isVehicleBlown", IsVehicleBlown},
+        {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
+        {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
 
-    // Vehicle set funcs
-    CLuaCFunctions::AddFunction("fixVehicle", FixVehicle);
-    CLuaCFunctions::AddFunction("blowVehicle", BlowVehicle);
-    CLuaCFunctions::AddFunction("setVehicleRotation", SetVehicleRotation);
-    CLuaCFunctions::AddFunction("setVehicleTurnVelocity", SetVehicleTurnVelocity);
-    CLuaCFunctions::AddFunction("setVehicleColor", SetVehicleColor);
-    CLuaCFunctions::AddFunction("setVehicleLandingGearDown", SetVehicleLandingGearDown);
-    CLuaCFunctions::AddFunction("setVehicleLocked", SetVehicleLocked);
-    CLuaCFunctions::AddFunction("setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable);
-    CLuaCFunctions::AddFunction("setVehicleSirensOn", SetVehicleSirensOn);
-    CLuaCFunctions::AddFunction("setVehicleTaxiLightOn", SetVehicleTaxiLightOn);
-    CLuaCFunctions::AddFunction("isVehicleTaxiLightOn", IsVehicleTaxiLightOn);
-    CLuaCFunctions::AddFunction("addVehicleUpgrade", AddVehicleUpgrade);
-    CLuaCFunctions::AddFunction("removeVehicleUpgrade", RemoveVehicleUpgrade);
-    CLuaCFunctions::AddFunction("setVehicleDoorState", SetVehicleDoorState);
-    CLuaCFunctions::AddFunction("setVehicleWheelStates", SetVehicleWheelStates);
-    CLuaCFunctions::AddFunction("setVehicleLightState", SetVehicleLightState);
-    CLuaCFunctions::AddFunction("setVehiclePanelState", SetVehiclePanelState);
-    CLuaCFunctions::AddFunction("toggleVehicleRespawn", ToggleVehicleRespawn);
-    CLuaCFunctions::AddFunction("setVehicleRespawnDelay", SetVehicleRespawnDelay);
-    CLuaCFunctions::AddFunction("setVehicleIdleRespawnDelay", SetVehicleIdleRespawnDelay);
-    CLuaCFunctions::AddFunction("setVehicleRespawnPosition", SetVehicleRespawnPosition);
-    CLuaCFunctions::AddFunction("respawnVehicle", RespawnVehicle);
-    CLuaCFunctions::AddFunction("resetVehicleExplosionTime", ResetVehicleExplosionTime);
-    CLuaCFunctions::AddFunction("resetVehicleIdleTime", ResetVehicleIdleTime);
-    CLuaCFunctions::AddFunction("spawnVehicle", SpawnVehicle);
-    CLuaCFunctions::AddFunction("setVehicleOverrideLights", SetVehicleOverrideLights);
-    CLuaCFunctions::AddFunction("attachTrailerToVehicle", AttachTrailerToVehicle);
-    CLuaCFunctions::AddFunction("detachTrailerFromVehicle", DetachTrailerFromVehicle);
-    CLuaCFunctions::AddFunction("setVehicleEngineState", SetVehicleEngineState);
-    CLuaCFunctions::AddFunction("setVehicleDirtLevel", SetVehicleDirtLevel);
-    CLuaCFunctions::AddFunction("setVehicleDamageProof", SetVehicleDamageProof);
-    CLuaCFunctions::AddFunction("setVehiclePaintjob", SetVehiclePaintjob);
-    CLuaCFunctions::AddFunction("setVehicleFuelTankExplodable", SetVehicleFuelTankExplodable);
-    CLuaCFunctions::AddFunction("setVehicleFrozen", SetVehicleFrozen);
-    CLuaCFunctions::AddFunction("setTrainDerailed", SetTrainDerailed);
-    CLuaCFunctions::AddFunction("setTrainDerailable", SetTrainDerailable);
-    CLuaCFunctions::AddFunction("setTrainDirection", SetTrainDirection);
-    CLuaCFunctions::AddFunction("setTrainSpeed", SetTrainSpeed);
-    // CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
-    CLuaCFunctions::AddFunction("setTrainPosition", SetTrainPosition);
-    CLuaCFunctions::AddFunction("setVehicleHeadLightColor", SetVehicleHeadLightColor);
-    CLuaCFunctions::AddFunction("setVehicleTurretPosition", SetVehicleTurretPosition);
-    CLuaCFunctions::AddFunction("setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio);
-    CLuaCFunctions::AddFunction("setVehicleVariant", SetVehicleVariant);
-    CLuaCFunctions::AddFunction("addVehicleSirens", GiveVehicleSirens);
-    CLuaCFunctions::AddFunction("removeVehicleSirens", RemoveVehicleSirens);
-    CLuaCFunctions::AddFunction("setVehicleSirens", SetVehicleSirens);
-    CLuaCFunctions::AddFunction("getVehicleSirens", GetVehicleSirens);
-    CLuaCFunctions::AddFunction("getVehicleSirenParams", GetVehicleSirenParams);
-    CLuaCFunctions::AddFunction("setVehiclePlateText", SetVehiclePlateText);
+        // Vehicle set funcs
+        {"fixVehicle", FixVehicle},
+        {"blowVehicle", BlowVehicle},
+        {"setVehicleRotation", SetVehicleRotation},
+        {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
+        {"setVehicleColor", SetVehicleColor},
+        {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
+        {"setVehicleLocked", SetVehicleLocked},
+        {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
+        {"setVehicleSirensOn", SetVehicleSirensOn},
+        {"setVehicleTaxiLightOn", SetVehicleTaxiLightOn},
+        {"isVehicleTaxiLightOn", IsVehicleTaxiLightOn},
+        {"addVehicleUpgrade", AddVehicleUpgrade},
+        {"removeVehicleUpgrade", RemoveVehicleUpgrade},
+        {"setVehicleDoorState", SetVehicleDoorState},
+        {"setVehicleWheelStates", SetVehicleWheelStates},
+        {"setVehicleLightState", SetVehicleLightState},
+        {"setVehiclePanelState", SetVehiclePanelState},
+        {"toggleVehicleRespawn", ToggleVehicleRespawn},
+        {"setVehicleRespawnDelay", SetVehicleRespawnDelay},
+        {"setVehicleIdleRespawnDelay", SetVehicleIdleRespawnDelay},
+        {"setVehicleRespawnPosition", SetVehicleRespawnPosition},
+        {"setVehicleRespawnRotation", SetVehicleRespawnRotation},
+        {"getVehicleRespawnPosition", GetVehicleRespawnPosition},
+        {"getVehicleRespawnRotation", GetVehicleRespawnRotation},
+        {"respawnVehicle", RespawnVehicle},
+        {"resetVehicleExplosionTime", ResetVehicleExplosionTime},
+        {"resetVehicleIdleTime", ResetVehicleIdleTime},
+        {"spawnVehicle", SpawnVehicle},
+        {"setVehicleOverrideLights", SetVehicleOverrideLights},
+        {"attachTrailerToVehicle", AttachTrailerToVehicle},
+        {"detachTrailerFromVehicle", DetachTrailerFromVehicle},
+        {"setVehicleEngineState", SetVehicleEngineState},
+        {"setVehicleDirtLevel", SetVehicleDirtLevel},
+        {"setVehicleDamageProof", SetVehicleDamageProof},
+        {"setVehiclePaintjob", SetVehiclePaintjob},
+        {"setVehicleFuelTankExplodable", SetVehicleFuelTankExplodable},
+        {"setVehicleFrozen", SetVehicleFrozen},
+        {"setTrainDerailed", SetTrainDerailed},
+        {"setTrainDerailable", SetTrainDerailable},
+        {"setTrainDirection", SetTrainDirection},
+        {"setTrainSpeed", SetTrainSpeed},
+        {"setTrainTrack", ArgumentParser<SetTrainTrack>},
+        {"setTrainPosition", SetTrainPosition},
+        {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
+        {"setVehicleTurretPosition", SetVehicleTurretPosition},
+        {"setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio},
+        {"setVehicleVariant", SetVehicleVariant},
+        {"addVehicleSirens", GiveVehicleSirens},
+        {"removeVehicleSirens", RemoveVehicleSirens},
+        {"setVehicleSirens", SetVehicleSirens},
+        {"getVehicleSirens", GetVehicleSirens},
+        {"getVehicleSirenParams", GetVehicleSirenParams},
+        {"setVehiclePlateText", SetVehiclePlateText},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
@@ -155,7 +164,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSirens", "getVehicleSirens");
     lua_classfunction(luaVM, "getDirection", "getTrainDirection");
     lua_classfunction(luaVM, "getTrainSpeed", "getTrainSpeed");
-    // lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
+    lua_classfunction(luaVM, "getTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getHeadLightColor", "getVehicleHeadLightColor");
     lua_classfunction(luaVM, "getColor", "getVehicleColor");
@@ -184,6 +193,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
+    lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition");
+    lua_classfunction(luaVM, "getRespawnRotation", "getVehicleRespawnRotation");
 
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setDamageProof", "setVehicleDamageProof");
@@ -200,6 +211,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setPanelState", "setVehiclePanelState");
     lua_classfunction(luaVM, "setRespawnDelay", "setVehicleRespawnDelay");
     lua_classfunction(luaVM, "setRespawnPosition", "setVehicleRespawnPosition");
+    lua_classfunction(luaVM, "setRespawnRotation", "setVehicleRespawnRotation");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
     lua_classfunction(luaVM, "setTurretPosition", "setVehicleTurretPosition");
     lua_classfunction(luaVM, "setDoorOpenRatio", "setVehicleDoorOpenRatio");
@@ -214,7 +226,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
     lua_classfunction(luaVM, "setDirection", "setTrainDirection");
-    // lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
+    lua_classfunction(luaVM, "setTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
 
@@ -225,7 +237,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "blown", "blowVehicle", "isVehicleBlown");
     lua_classvariable(luaVM, "direction", "setTrainDirection", "getTrainDirection");
     lua_classvariable(luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed");
-    // lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
+    lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
     lua_classvariable(luaVM, "trainPosition", "setTrainPosition", "getTrainPosition");
     lua_classvariable(luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn");
     lua_classvariable(luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable");
@@ -248,21 +260,14 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
     lua_classvariable(luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", NULL);
     lua_classvariable(luaVM, "respawnDelay", "setVehicleRespawnDelay", NULL);
-    lua_classvariable(luaVM, "respawnPosition", "setVehicleRespawnPosition", NULL);
+    lua_classvariable(luaVM, "respawnPosition", "setVehicleRespawnPosition", "getVehicleRespawnPosition", SetVehicleRespawnPosition, OOP_GetVehicleRespawnPosition);
+    lua_classvariable(luaVM, "respawnRotation", "setVehicleRespawnRotation", "getVehicleRespawnRotation", SetVehicleRespawnRotation, OOP_GetVehicleRespawnRotation);
     lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "name", NULL, "getVehicleName");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
-    // lua_classvariable ( luaVM, "upgradeOnSlot", NULL, "getVehicleUpgradeOnSlot", NULL, CLuaOOPDefs::GetVehicleUpgradeOnSlot ); // .upgradeOnSlot[slot]=int
-    // lua_classvariable ( luaVM, "doorOpenRatio", "setVehicleDoorOpenRatio", "getVehicleDoorOpenRatio", CLuaOOPDefs::SetVehicleDoorOpenRation,
-    // CLuaOOPDefs::GetVehicleDoorOpenRatio ); // .doorOpenRatio[door]=ratio lua_classvariable ( luaVM, "doorState", "setVehicleDoorState",
-    // "getVehicleDoorState", CLuaOOPDefs::SetVehicleDoorState, CLuaOOPDefs::GetVehicleDoorState ); // .doorState[id]=state lua_classvariable ( luaVM,
-    // "lightState", "setVehicleLightState", "getVehicleLightState", CLuaOOPDefs::SetVehicleLightState, CLuaOOPDefs::GetVehicleLightState ); //
-    // .lightState[id]=state lua_classvariable ( luaVM, "panelState", "setVehiclePanelState", "getVehiclePanelState", CLuaOOPDefs::SetVehiclePanelState,
-    // CLuaOOPDefs::GetVehiclePanelState ); // .panelState[panel]=state lua_classvariable ( luaVM, "headLightColor", "setVehicleHeadLightColor",
-    // "getVehicleHeadLightColor" ); lua_classvariable ( luaVM, "color", "setVehicleColor", "getVehicleColor" );
-    lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");                   // TODO: support .sirens[point] = {...}
-    lua_classvariable(luaVM, "handling", nullptr, "getVehicleHandling");            // .handling[property]=value
-    lua_classvariable(luaVM, "occupant", NULL, "getVehicleOccupant");               // Currrently returns driver, support .occupant[seat]=ped
+    lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");
+    lua_classvariable(luaVM, "handling", nullptr, "getVehicleHandling");
+    lua_classvariable(luaVM, "occupant", NULL, "getVehicleOccupant");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -1690,27 +1695,14 @@ int CLuaVehicleDefs::GetTrainPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::GetTrainTrack(lua_State* luaVM)
+std::variant<CTrainTrack*, bool> CLuaVehicleDefs::GetTrainTrack(CVehicle* pVehicle)
 {
-    CVehicle* pVehicle;
+    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+        return false;
+    else if (pVehicle->IsDerailed())
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        uchar ucTrack;
-        if (CStaticFunctionDefinitions::GetTrainTrack(pVehicle, ucTrack))
-        {
-            lua_pushnumber(luaVM, ucTrack);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return pVehicle->GetTrainTrack();
 }
 
 int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
@@ -2070,15 +2062,17 @@ int CLuaVehicleDefs::SetVehicleDoorState(lua_State* luaVM)
     CElement*     pElement;
     unsigned char ucDoor;
     unsigned char ucState;
+    bool          spawnFlyingComponent;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucDoor);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleDoorState(pElement, ucDoor, ucState))
+        if (CStaticFunctionDefinitions::SetVehicleDoorState(pElement, ucDoor, ucState, spawnFlyingComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2221,20 +2215,161 @@ int CLuaVehicleDefs::SetVehicleRespawnDelay(lua_State* luaVM)
     return 1;
 }
 
+int CLuaVehicleDefs::OOP_GetVehicleRespawnRotation(lua_State* luaVM)
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecRotationDegress;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnRotation(pElement, vecRotationDegress))
+        {
+            lua_pushvector(luaVM, vecRotationDegress);
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleRespawnPosition(lua_State* luaVM)
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecPosition;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnPosition(pElement, vecPosition))
+        {
+            lua_pushvector(luaVM, vecPosition);
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleRespawnRotation(lua_State* luaVM)
+{
+    // float, float, float getVehicleRespawnRotation( vehicle theVehicle )
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecRotationDegress;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnRotation(pElement, vecRotationDegress))
+        {
+            lua_pushnumber(luaVM, vecRotationDegress.fX);
+            lua_pushnumber(luaVM, vecRotationDegress.fY);
+            lua_pushnumber(luaVM, vecRotationDegress.fZ);
+
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaVehicleDefs::SetVehicleRespawnPosition(lua_State* luaVM)
 {
     CElement* pElement;
     CVector   vecPosition;
-    CVector   vecRotation;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, CVector());
+
+    if (argStream.NextIsVector3D())
+    {
+        CVector vecRotation;
+        argStream.ReadVector3D(vecRotation);
+
+        if (!argStream.HasErrors())
+        {
+            if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition) &&
+                CStaticFunctionDefinitions::SetVehicleRespawnRotation(pElement, vecRotation))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    else if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleRespawnPosition(lua_State* luaVM)
+{
+    // float, float, float getVehicleRespawnPosition( vehicle theVehicle )
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition, vecRotation))
+        CVector vecPosition;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnPosition(pElement, vecPosition))
+        {
+            lua_pushnumber(luaVM, vecPosition.fX);
+            lua_pushnumber(luaVM, vecPosition.fY);
+            lua_pushnumber(luaVM, vecPosition.fZ);
+
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
+{
+    CElement* pElement;
+    CVector   vecRotation;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadVector3D(vecRotation);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetVehicleRespawnRotation(pElement, vecRotation))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2675,31 +2810,27 @@ int CLuaVehicleDefs::SetTrainSpeed(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::SetTrainTrack(lua_State* luaVM)
+bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack)
 {
-    CVehicle* pVehicle;
-    uchar     ucTrack;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(ucTrack);
-
-    if (ucTrack > 3)
-        argStream.SetCustomError("Invalid track number range (0-3)");
-
-    if (!argStream.HasErrors())
+    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+        return false;
+    else if (pVehicle->IsDerailed())
     {
-        if (CStaticFunctionDefinitions::SetTrainTrack(pVehicle, ucTrack))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        return false;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    // TODO(qaisjp, feature/custom-train-tracks): this needs to support non-default train tracks
+    if (!pTrainTrack->IsDefault())
+        throw std::invalid_argument("setTrainTrack only supports default train tracks");
+
+    pVehicle->SetTrainTrack(pTrainTrack);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pTrainTrack->GetDefaultTrackId());
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
+
+    return true;
 }
 
 int CLuaVehicleDefs::SetTrainPosition(lua_State* luaVM)

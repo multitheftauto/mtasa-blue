@@ -57,8 +57,8 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         // Write the declared min client version for this resource
         if (BitStream.Version() >= 0x32)
         {
-            BitStream.WriteString(m_pResource->GetMinServerReqFromMetaXml());
-            BitStream.WriteString(m_pResource->GetMinClientReqFromMetaXml());
+            BitStream.WriteString(m_pResource->GetMinServerRequirement());
+            BitStream.WriteString(m_pResource->GetMinClientRequirement());
         }
         if (BitStream.Version() >= 0x45)
         {

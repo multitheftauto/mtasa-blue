@@ -47,7 +47,7 @@ CClientCivilian::CClientCivilian(CClientManager* pManager, ElementID ID, CCivili
     m_pCivilianManager->AddToList(this);
 }
 
-CClientCivilian::~CClientCivilian(void)
+CClientCivilian::~CClientCivilian()
 {
     // Reset the stored pointer in the civilian ped if neccessary
     if (m_pCivilianPed)
@@ -62,12 +62,12 @@ CClientCivilian::~CClientCivilian(void)
     Unlink();
 }
 
-void CClientCivilian::Unlink(void)
+void CClientCivilian::Unlink()
 {
     m_pCivilianManager->RemoveFromList(this);
 }
 
-int CClientCivilian::GetRotation(void)
+int CClientCivilian::GetRotation()
 {
     int    iRotation = 0;
     double dRotation;
@@ -126,7 +126,7 @@ void CClientCivilian::SetRotation(int iRotation)
     m_pCivilianPed->SetMatrix(&pMat);
 }
 
-float CClientCivilian::GetDistanceFromCentreOfMassToBaseOfModel(void)
+float CClientCivilian::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     if (m_pCivilianPed)
     {
@@ -167,7 +167,7 @@ void CClientCivilian::SetTurnSpeed(const CVector& vecTurnSpeed)
     m_pCivilianPed->SetTurnSpeed(const_cast<CVector*>(&vecTurnSpeed));
 }
 
-bool CClientCivilian::IsVisible(void)
+bool CClientCivilian::IsVisible()
 {
     return m_pCivilianPed->IsVisible();
 }
@@ -178,7 +178,7 @@ void CClientCivilian::SetVisible(bool bVisible)
     m_pCivilianPed->SetUsesCollision(bVisible);
 }
 
-float CClientCivilian::GetHealth(void) const
+float CClientCivilian::GetHealth() const
 {
     return m_pCivilianPed->GetHealth();
 }
@@ -189,7 +189,7 @@ void CClientCivilian::SetHealth(float fHealth)
     m_pCivilianPed->SetHealth(fHealth);
 }
 
-int CClientCivilian::GetModelID(void)
+int CClientCivilian::GetModelID()
 {
     // return m_iVehicleModel;
     return 0;
@@ -203,15 +203,15 @@ void CClientCivilian::Dump(FILE* pFile, bool bDumpDetails, unsigned int uiIndex)
 {
 }
 
-void CClientCivilian::Create(void)
+void CClientCivilian::Create()
 {
 }
 
-void CClientCivilian::Destroy(void)
+void CClientCivilian::Destroy()
 {
 }
 
-void CClientCivilian::ReCreate(void)
+void CClientCivilian::ReCreate()
 {
     // Re-create the vehicle
     Destroy();

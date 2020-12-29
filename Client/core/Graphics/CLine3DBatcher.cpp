@@ -31,7 +31,7 @@ CLine3DBatcher::CLine3DBatcher(bool bZTest)
 //
 //
 ////////////////////////////////////////////////////////////////
-CLine3DBatcher::~CLine3DBatcher(void)
+CLine3DBatcher::~CLine3DBatcher()
 {
 }
 
@@ -54,7 +54,7 @@ void CLine3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSi
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CLine3DBatcher::Flush(void)
+void CLine3DBatcher::Flush()
 {
     if (m_LineList.empty())
         return;

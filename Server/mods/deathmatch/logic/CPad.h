@@ -54,14 +54,14 @@ public:
     // Sync'd keys
     bool LeftShoulder1;
     bool RightShoulder1;
-    bool ButtonSquare;
-    bool ButtonCross;
+    short ButtonSquare;
+    short ButtonCross;
     bool ButtonCircle;
     bool ButtonTriangle;
     bool ShockButtonL;
     bool m_bPedWalk;
 
-    CControllerState(void) { memset(this, 0, sizeof(CControllerState)); }
+    CControllerState() { memset(this, 0, sizeof(CControllerState)); }
     void Copy(const CControllerState& State) { memcpy(this, &State, sizeof(CControllerState)); }
 };
 
@@ -145,7 +145,7 @@ class CPad
 public:
     CPad(CPlayer* pPlayer);
 
-    const CControllerState& GetCurrentControllerState(void) { return m_csCurrentState; }
+    const CControllerState& GetCurrentControllerState() { return m_csCurrentState; }
     void                    SetCurrentControllerState(const CControllerState& State);
 
     void NewControllerState(const CControllerState& State);
@@ -161,7 +161,7 @@ public:
     void SetAllMTAControlsEnabled(bool bEnabled);
 
 protected:
-    void UpdateKeys(void);
+    void UpdateKeys();
 
     CPlayer* m_pPlayer;
 

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLPOLYGON_H
-#define __CCLIENTCOLPOLYGON_H
+#pragma once
 
 class CClientColPolygon : public CClientColShape
 {
@@ -18,29 +17,30 @@ class CClientColPolygon : public CClientColShape
 public:
     CClientColPolygon(CClientManager* pManager, ElementID ID, const CVector2D& vecPosition);
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
     virtual void    DebugRender(const CVector& vecPosition, float fDrawRadius);
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_POLYGON; }
+    eColShapeType GetShapeType() { return COLSHAPE_POLYGON; }
 
     bool DoHitDetection(const CVector& vecNowPosition, float fRadius);
 
     void SetPosition(const CVector& vecPosition);
 
-    void AddPoint(CVector2D vecPoint);
+    bool AddPoint(CVector2D vecPoint);
+    bool AddPoint(CVector2D vecPoint, unsigned int uiPointIndex);
+    bool SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint);
+    bool RemovePoint(unsigned int uiPointIndex);
 
-    unsigned int                           CountPoints(void) const { return static_cast<unsigned int>(m_Points.size()); };
-    std::vector<CVector2D>::const_iterator IterBegin(void) { return m_Points.begin(); };
-    std::vector<CVector2D>::const_iterator IterEnd(void) { return m_Points.end(); };
+    unsigned int                           CountPoints() const { return static_cast<unsigned int>(m_Points.size()); };
+    std::vector<CVector2D>::const_iterator IterBegin() { return m_Points.begin(); };
+    std::vector<CVector2D>::const_iterator IterEnd() { return m_Points.end(); };
 
 protected:
     std::vector<CVector2D> m_Points;
 
-    bool ReadSpecialData(void);
-
     bool IsInBounds(CVector vecPoint);
+    void CalculateRadius();
+    void CalculateRadius(const CVector2D& vecPoint);
 
     float m_fRadius;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIEDIT_H
-#define __CGUIEDIT_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -18,30 +17,28 @@
 class CGUIEdit : public CGUIElement
 {
 public:
-    virtual ~CGUIEdit(void){};
+    virtual ~CGUIEdit(){};
 
     virtual void SetReadOnly(bool bReadOnly) = 0;
-    virtual bool IsReadOnly(void) = 0;
+    virtual bool IsReadOnly() = 0;
     virtual void SetMasked(bool bMasked) = 0;
-    virtual bool IsMasked(void) = 0;
+    virtual bool IsMasked() = 0;
 
     virtual void         SetMaxLength(unsigned int uiMaxLength) = 0;
-    virtual unsigned int GetMaxLength(void) = 0;
+    virtual unsigned int GetMaxLength() = 0;
 
     virtual void         SetSelection(unsigned int uiStart, unsigned int uiEnd) = 0;
-    virtual unsigned int GetSelectionStart(void) = 0;
-    virtual unsigned int GetSelectionEnd(void) = 0;
-    virtual unsigned int GetSelectionLength(void) = 0;
+    virtual unsigned int GetSelectionStart() = 0;
+    virtual unsigned int GetSelectionEnd() = 0;
+    virtual unsigned int GetSelectionLength() = 0;
 
     virtual void         SetCaretIndex(unsigned int uiIndex) = 0;
-    virtual void         SetCaretAtStart(void) = 0;
-    virtual void         SetCaretAtEnd(void) = 0;
-    virtual unsigned int GetCaretIndex(void) = 0;
+    virtual void         SetCaretAtStart() = 0;
+    virtual void         SetCaretAtEnd() = 0;
+    virtual unsigned int GetCaretIndex() = 0;
 
     virtual void SetTextAcceptedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetTextChangedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetRenderingEndedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetRenderingStartedHandler(GUI_CALLBACK Callback) = 0;
 };
-
-#endif

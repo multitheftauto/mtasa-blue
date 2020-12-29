@@ -30,7 +30,7 @@ CClientDxFont::CClientDxFont(CClientManager* pManager, ElementID ID, CDxFontItem
 // Get D3DXFont for this custom font
 //
 ////////////////////////////////////////////////////////////////
-ID3DXFont* CClientDxFont::GetD3DXFont(void)
+ID3DXFont* CClientDxFont::GetD3DXFont()
 {
     return GetDxFontItem()->m_pFntNormal;
 }

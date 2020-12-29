@@ -41,7 +41,7 @@ public:
     virtual void AllQuery(CCameraQueryResult& outResult);
 
     // CCameraSpatialDatabaseImpl functions
-    void FlushUpdateQueue(void);
+    void FlushUpdateQueue();
     bool IsValidSphere(const CSphere& sphere);
 
     CItemTree                           m_Tree;
@@ -160,7 +160,7 @@ void CCameraSpatialDatabaseImpl::AllQuery(CCameraQueryResult& outResult)
 // Process all entities that have changed since the last call
 //
 ///////////////////////////////////////////////////////////////
-void CCameraSpatialDatabaseImpl::FlushUpdateQueue(void)
+void CCameraSpatialDatabaseImpl::FlushUpdateQueue()
 {
     std::map<CPlayerCamera*, int> updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear();

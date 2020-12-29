@@ -43,8 +43,8 @@ namespace SharedUtil
     class CMD5Hasher
     {
     public:
-        CMD5Hasher(void);
-        ~CMD5Hasher(void);
+        CMD5Hasher();
+        ~CMD5Hasher();
 
         bool Calculate(const char* szFilename, MD5& md5Result);
         bool Calculate(const void* pBuffer, size_t sizeLength, MD5& md5Result);
@@ -53,10 +53,10 @@ namespace SharedUtil
         static SString CalculateHexString(const char* szFilename);
         static SString CalculateHexString(const void* pBuffer, size_t sizeLength);
 
-        void                 Init(void);
+        void                 Init();
         void                 Update(unsigned char* input, unsigned int input_length);
-        void                 Finalize(void);
-        const unsigned char* GetResult(void) const;
+        void                 Finalize();
+        const unsigned char* GetResult() const;
 
     private:
         void Transform(unsigned char* pBuffer);

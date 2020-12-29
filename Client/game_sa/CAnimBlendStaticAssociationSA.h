@@ -9,10 +9,7 @@
  *
  *****************************************************************************/
 
-/* CAnimBlendStaticAssociation: 1 per uncompressed animation?*/
-
-#ifndef __CAnimBlendStaticAssociationSA_H
-#define __CAnimBlendStaticAssociationSA_H
+#pragma once
 
 #include <game/CAnimBlendStaticAssociation.h>
 #include "Common.h"
@@ -57,5 +54,3 @@ public:
 protected:
     CAnimBlendStaticAssociationSAInterface* m_pInterface;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLCOMMON_H
-#define __CXMLCOMMON_H
+#pragma once
 
 enum eXMLClass
 {
@@ -24,10 +23,8 @@ enum eXMLClass
 class CXMLCommon
 {
 public:
-    virtual ~CXMLCommon(void){};
+    virtual ~CXMLCommon(){};
 
-    virtual eXMLClass     GetClassType(void) = 0;
-    virtual unsigned long GetID(void) = 0;
+    virtual eXMLClass     GetClassType() = 0;
+    virtual unsigned long GetID() = 0;
 };
-
-#endif

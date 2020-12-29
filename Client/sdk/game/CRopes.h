@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRopes_H
-#define __CRopes_H
+#pragma once
 
 typedef unsigned long DWORD;
 class CVector;
@@ -19,6 +18,5 @@ class CRopes
 {
 public:
     virtual int CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000) = 0;
+    virtual void RemoveEntityRope(CEntitySAInterface* pObjectSA) = 0;
 };
-
-#endif

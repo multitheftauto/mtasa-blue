@@ -14,7 +14,7 @@
 class CLuaBitDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     // bitwise operators
     LUA_DECLARE(bitAnd);

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-int CAnimBlockSAInterface::GetIndex(void)
+int CAnimBlockSAInterface::GetIndex()
 {
     return (((DWORD)this - ARRAY_CAnimManager_AnimBlocks) / 32);
 }
@@ -21,7 +21,7 @@ void CAnimBlockSA::Request(EModelRequestType requestType, bool bAllowBlockingFai
     if (IsLoaded())
         return;
 
-    DWORD dwModelID = GetIndex() + 25575;
+    DWORD dwModelID = GetIndex() + pGame->GetBaseIDforIFP();
 
     if (requestType == BLOCKING)
     {

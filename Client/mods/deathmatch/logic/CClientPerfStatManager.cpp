@@ -20,17 +20,17 @@
 class CClientPerfStatManagerImpl : public CClientPerfStatManager
 {
 public:
-    CClientPerfStatManagerImpl(void);
-    virtual ~CClientPerfStatManagerImpl(void);
+    CClientPerfStatManagerImpl();
+    virtual ~CClientPerfStatManagerImpl();
 
     // CClientPerfStatManager
-    virtual void DoPulse(void);
+    virtual void DoPulse();
     virtual void GetStats(CClientPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter);
 
     // CClientPerfStatManagerImpl
     void                   AddModule(CClientPerfStatModule* pModule);
     void                   RemoveModule(CClientPerfStatModule* pModule);
-    uint                   GetModuleCount(void);
+    uint                   GetModuleCount();
     CClientPerfStatModule* GetModuleByIndex(uint uiIndex);
     CClientPerfStatModule* GetModuleByCategoryName(const SString& strCategory);
 
@@ -46,7 +46,7 @@ public:
 ///////////////////////////////////////////////////////////////
 static CClientPerfStatManagerImpl* g_pClientPerfStatManagerImp = NULL;
 
-CClientPerfStatManager* CClientPerfStatManager::GetSingleton(void)
+CClientPerfStatManager* CClientPerfStatManager::GetSingleton()
 {
     if (!g_pClientPerfStatManagerImp)
         g_pClientPerfStatManagerImp = new CClientPerfStatManagerImpl();
@@ -60,7 +60,7 @@ CClientPerfStatManager* CClientPerfStatManager::GetSingleton(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatManagerImpl::CClientPerfStatManagerImpl(void)
+CClientPerfStatManagerImpl::CClientPerfStatManagerImpl()
 {
     AddModule(CClientPerfStatLuaTiming::GetSingleton());
     AddModule(CClientPerfStatLuaMemory::GetSingleton());
@@ -75,7 +75,7 @@ CClientPerfStatManagerImpl::CClientPerfStatManagerImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl(void)
+CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl()
 {
     for (uint i = 0; i < GetModuleCount(); i++)
     {
@@ -118,7 +118,7 @@ void CClientPerfStatManagerImpl::RemoveModule(CClientPerfStatModule* pModule)
 //
 //
 ///////////////////////////////////////////////////////////////
-uint CClientPerfStatManagerImpl::GetModuleCount(void)
+uint CClientPerfStatManagerImpl::GetModuleCount()
 {
     return m_ModuleList.size();
 }
@@ -162,7 +162,7 @@ CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByCategoryName(const
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatManagerImpl::DoPulse(void)
+void CClientPerfStatManagerImpl::DoPulse()
 {
     for (uint i = 0; i < GetModuleCount(); i++)
     {

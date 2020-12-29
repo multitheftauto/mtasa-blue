@@ -33,25 +33,25 @@ enum
 class CPacket
 {
 public:
-    CPacket(void);
-    virtual ~CPacket(void){};
+    CPacket();
+    virtual ~CPacket(){};
 
-    virtual bool            RequiresSourcePlayer(void) const { return true; }
-    virtual bool            HasSimHandler(void) const { return false; }
-    virtual ePacketID       GetPacketID(void) const = 0;
-    virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_DEFAULT; }
-    virtual unsigned long   GetFlags(void) const = 0;
+    virtual bool            RequiresSourcePlayer() const { return true; }
+    virtual bool            HasSimHandler() const { return false; }
+    virtual ePacketID       GetPacketID() const = 0;
+    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
+    virtual unsigned long   GetFlags() const = 0;
 
     virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
     virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
 
     void                     SetSourceElement(CElement* pSource) { m_pSourceElement = pSource; };
-    CElement*                GetSourceElement(void) const { return m_pSourceElement; };
-    CPlayer*                 GetSourcePlayer(void);
+    CElement*                GetSourceElement() const { return m_pSourceElement; };
+    CPlayer*                 GetSourcePlayer();
     void                     SetSourceSocket(const NetServerPlayerID& Source) { m_Source = Source; };
-    const NetServerPlayerID& GetSourceSocket(void) const { return m_Source; };
-    unsigned long            GetSourceIP(void) const { return m_Source.GetBinaryAddress(); };
-    unsigned short           GetSourcePort(void) const { return m_Source.GetPort(); };
+    const NetServerPlayerID& GetSourceSocket() const { return m_Source; };
+    unsigned long            GetSourceIP() const { return m_Source.GetBinaryAddress(); };
+    unsigned short           GetSourcePort() const { return m_Source.GetPort(); };
 
 protected:
     CElement*         m_pSourceElement;

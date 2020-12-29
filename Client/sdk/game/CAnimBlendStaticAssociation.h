@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendStaticAssociation_H
-#define __CAnimBlendStaticAssociation_H
+#pragma once
 
 struct RpClump;
 class CAnimBlendHierarchySAInterface;
@@ -31,5 +30,3 @@ public:
     virtual CAnimBlendHierarchySAInterface*         GetAnimHierachyInterface() = 0;
     virtual CAnimBlendStaticAssociationSAInterface* GetInterface() = 0;
 };
-
-#endif

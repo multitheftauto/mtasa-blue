@@ -20,8 +20,8 @@ public:
     {
         pBitStream = g_pNetServer->AllocateNetServerBitStream(0, pData, uiDataSize, bCopyData);
     }
-    ~CBitStream(void) { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
-    NetBitStreamInterfaceNoVersion* operator->(void) { return pBitStream; }
+    ~CBitStream() { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
+    NetBitStreamInterfaceNoVersion* operator->() { return pBitStream; }
 
     NetBitStreamInterfaceNoVersion* pBitStream;
 };
@@ -31,8 +31,8 @@ class CPlayerBitStream
 {
 public:
     CPlayerBitStream(class CPlayer* pPlayer);            //  { pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() ); };
-    ~CPlayerBitStream(void) { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
-    NetBitStreamInterface* operator->(void) { return pBitStream; }
+    ~CPlayerBitStream() { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
+    NetBitStreamInterface* operator->() { return pBitStream; }
 
     NetBitStreamInterface* pBitStream;
 };

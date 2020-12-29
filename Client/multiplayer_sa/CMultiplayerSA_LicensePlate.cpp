@@ -185,7 +185,7 @@ void OnMY_CVehicleModelInfo_SetCarCustomPlate(CVehicleModelInfoSAInterface* pVeh
     info.plateMaterialList.clear();
 }
 
-void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post(void)
+void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post()
 {
     // Done
     ms_pProcessingVehicleModelInfo = NULL;
@@ -270,7 +270,7 @@ inner:
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_LicensePlate(void)
+void CMultiplayerSA::InitHooks_LicensePlate()
 {
     EZHookInstall(CAutomobile_CustomCarPlate_BeforeRenderingStart);
     EZHookInstall(CAutomobile_CustomCarPlate_AfterRenderingStop);

@@ -45,7 +45,7 @@ CGUITab_Impl::CGUITab_Impl(CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const cha
     }
 }
 
-CGUITab_Impl::~CGUITab_Impl(void)
+CGUITab_Impl::~CGUITab_Impl()
 {
     CGUIElement_Impl*  pParent = static_cast<CGUIElement_Impl*>(m_pParent);
     CEGUI::TabControl* pControl = reinterpret_cast<CEGUI::TabControl*>(((CGUITabPanel_Impl*)pParent)->m_pWindow);
@@ -67,7 +67,7 @@ void CGUITab_Impl::SetVisible(bool bVisible)
     pControl->requestChildWindowLayout();
 }
 
-bool CGUITab_Impl::IsVisible(void)
+bool CGUITab_Impl::IsVisible()
 {
     CGUIElement_Impl*  pParent = static_cast<CGUIElement_Impl*>(m_pParent);
     CEGUI::TabControl* pControl = reinterpret_cast<CEGUI::TabControl*>(((CGUITabPanel_Impl*)pParent)->m_pWindow);
@@ -81,7 +81,7 @@ void CGUITab_Impl::SetEnabled(bool bEnabled)
     pControl->getButtonForTabContents(m_pWindow)->setEnabled(bEnabled);
 }
 
-bool CGUITab_Impl::IsEnabled(void)
+bool CGUITab_Impl::IsEnabled()
 {
     CGUIElement_Impl*  pParent = static_cast<CGUIElement_Impl*>(m_pParent);
     CEGUI::TabControl* pControl = reinterpret_cast<CEGUI::TabControl*>(((CGUITabPanel_Impl*)pParent)->m_pWindow);

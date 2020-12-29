@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EXPLOSION
-#define __CGAMESA_EXPLOSION
+#pragma once
 
 #include <game/CExplosion.h>
 #include "CEntitySA.h"
@@ -49,22 +48,20 @@ public:
 
     CExplosionSAInterface* GetInterface() { return this->internalInterface; };
 
-    eExplosionType GetExplosionType(void);
-    CVector*       GetExplosionPosition(void);
+    eExplosionType GetExplosionType();
+    CVector*       GetExplosionPosition();
     void           SetExplosionPosition(const CVector* vecPosition);
-    CEntity*       GetExplosionCreator(void);
-    CEntity*       GetExplodingEntity(void);
-    BOOL           IsActive(void);
-    VOID           Remove(void);
-    float          GetExplosionForce(void);
+    CEntity*       GetExplosionCreator();
+    CEntity*       GetExplodingEntity();
+    BOOL           IsActive();
+    VOID           Remove();
+    float          GetExplosionForce();
     void           SetExplosionForce(float fForce);
     void           SetSilent(bool bSilent);
-    unsigned long  GetActivationTimer(void);
+    unsigned long  GetActivationTimer();
     void           SetActivationTimer(unsigned long ulActivationTime);
-    DWORD          GetExpiryTime(void);
+    DWORD          GetExpiryTime();
     void           SetExpiryTime(DWORD dwExpiryTime);
-    float          GetExplosionRadius(void);
+    float          GetExplosionRadius();
     void           SetExplosionRadius(float fRadius);
 };
-
-#endif

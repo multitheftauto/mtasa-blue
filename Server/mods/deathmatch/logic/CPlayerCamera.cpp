@@ -29,7 +29,7 @@ CPlayerCamera::CPlayerCamera(CPlayer* pPlayer)
     GetCameraSpatialDatabase()->UpdateItem(this);
 }
 
-CPlayerCamera::~CPlayerCamera(void)
+CPlayerCamera::~CPlayerCamera()
 {
     GetCameraSpatialDatabase()->RemoveItem(this);
 }
@@ -46,7 +46,7 @@ void CPlayerCamera::SetMode(eCameraMode Mode)
     }
 }
 
-const CVector& CPlayerCamera::GetPosition(void) const
+const CVector& CPlayerCamera::GetPosition() const
 {
     if (m_Mode == CAMERAMODE_PLAYER && m_pTarget)
     {
@@ -136,7 +136,7 @@ void CPlayerCamera::SetRotation(CVector& vecRotation)
     m_vecLookAt = vecNormal;
 }
 
-uchar CPlayerCamera::GenerateSyncTimeContext(void)
+uchar CPlayerCamera::GenerateSyncTimeContext()
 {
     // Increment the sync time index (skipping 0)
     m_ucSyncTimeContext = std::max<uchar>(1, m_ucSyncTimeContext + 1);

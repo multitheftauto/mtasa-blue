@@ -22,7 +22,7 @@ class CMainConfig;
 #define MAX_MAP_NAME_LENGTH 64
 class CMainConfig;
 
-typedef void (CMainConfig::*PFN_SettingChangeCallback)(void);
+typedef void (CMainConfig::*PFN_SettingChangeCallback)();
 
 struct SIntSetting
 {
@@ -40,89 +40,89 @@ class CMainConfig : public CXMLConfig
 {
 public:
     ZERO_ON_NEW
-    CMainConfig(CConsole* pConsole, class CLuaManager* pLuaMain);
+    CMainConfig(CConsole* pConsole);
 
-    bool Load(void);
-    bool LoadExtended(void);
-    bool Save(void);
+    bool Load();
+    bool LoadExtended();
+    bool Save();
 
-    const std::string& GetServerName(void) { return m_strServerName; };
-    SString            GetServerIP(void);
-    SString            GetServerIPList(void);
-    unsigned short     GetServerPort(void);
-    unsigned int       GetMaxPlayers(void);
-    unsigned int       GetHardMaxPlayers(void);
+    const std::string& GetServerName() { return m_strServerName; };
+    SString            GetServerIP();
+    SString            GetServerIPList();
+    unsigned short     GetServerPort();
+    unsigned int       GetMaxPlayers();
+    unsigned int       GetHardMaxPlayers();
     void               SetSoftMaxPlayers(unsigned int v) { m_uiSoftMaxPlayers = v; }
-    bool               IsHTTPEnabled(void) { return m_bHTTPEnabled; };
+    bool               IsHTTPEnabled() { return m_bHTTPEnabled; };
 
     bool               IsValidPassword(const char* szPassword);
-    bool               HasPassword(void) { return !m_strPassword.empty(); };
-    const std::string& GetPassword(void) { return m_strPassword; };
+    bool               HasPassword() { return !m_strPassword.empty(); };
+    const std::string& GetPassword() { return m_strPassword; };
     bool               SetPassword(const char* szPassword, bool bSave);
 
-    bool         IsVoiceEnabled(void);
-    unsigned int GetVoiceSampleRate(void) { return m_uiVoiceSampleRate; };
-    unsigned int GetVoiceQuality(void) { return m_ucVoiceQuality; };
-    unsigned int GetVoiceBitrate(void) { return m_uiVoiceBitrate; };
+    bool         IsVoiceEnabled();
+    unsigned int GetVoiceSampleRate() { return m_uiVoiceSampleRate; };
+    unsigned int GetVoiceQuality() { return m_ucVoiceQuality; };
+    unsigned int GetVoiceBitrate() { return m_uiVoiceBitrate; };
 
-    bool                        GetAseInternetPushEnabled(void) { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
-    bool                        GetAseInternetListenEnabled(void) { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
-    bool                        GetAseLanListenEnabled(void) { return m_bDontBroadcastLan ? false : true; }
-    unsigned short              GetHTTPPort(void);
-    eHTTPDownloadType           GetHTTPDownloadType(void) { return m_ucHTTPDownloadType; };
-    const std::string&          GetHTTPDownloadURL(void) { return m_strHTTPDownloadURL; };
-    int                         GetHTTPMaxConnectionsPerClient(void) { return m_iHTTPMaxConnectionsPerClient; };
-    int                         GetHTTPThreadCount(void) { return m_iHTTPThreadCount; };
-    int                         GetHTTPDosThreshold(void) { return m_iHTTPDosThreshold; };
-    const SString&              GetHTTPDosExclude(void) { return m_strHTTPDosExclude; };
-    int                         GetEnableClientChecks(void) { return m_iEnableClientChecks; };
-    const std::string&          GetLogFile(void) { return m_strLogFile; };
-    const std::string&          GetAuthFile(void) { return m_strAuthFile; };
-    bool                        GetJoinFloodProtectionEnabled(void) { return m_bJoinFloodProtectionEnabled; };
-    bool                        GetScriptDebugLogEnabled(void) { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
-    const std::string&          GetScriptDebugLogFile(void) { return m_strScriptDebugLogFile; };
-    unsigned int                GetScriptDebugLogLevel(void) { return m_uiScriptDebugLogLevel; };
-    const std::string&          GetAccessControlListFile(void) { return m_strAccessControlListFile; };
-    bool                        GetSerialVerificationEnabled(void) { return m_bVerifySerials; };
+    bool                        GetAseInternetPushEnabled() { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
+    bool                        GetAseInternetListenEnabled() { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
+    bool                        GetAseLanListenEnabled() { return m_bDontBroadcastLan ? false : true; }
+    unsigned short              GetHTTPPort();
+    eHTTPDownloadType           GetHTTPDownloadType() { return m_ucHTTPDownloadType; };
+    const std::string&          GetHTTPDownloadURL() { return m_strHTTPDownloadURL; };
+    int                         GetHTTPMaxConnectionsPerClient() { return m_iHTTPMaxConnectionsPerClient; };
+    int                         GetHTTPThreadCount() { return m_iHTTPThreadCount; };
+    int                         GetHTTPDosThreshold() { return m_iHTTPDosThreshold; };
+    const SString&              GetHTTPDosExclude() { return m_strHTTPDosExclude; };
+    int                         GetEnableClientChecks() { return m_iEnableClientChecks; };
+    const std::string&          GetLogFile() { return m_strLogFile; };
+    const std::string&          GetAuthFile() { return m_strAuthFile; };
+    bool                        GetJoinFloodProtectionEnabled() { return m_bJoinFloodProtectionEnabled; };
+    bool                        GetScriptDebugLogEnabled() { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
+    const std::string&          GetScriptDebugLogFile() { return m_strScriptDebugLogFile; };
+    unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
+    const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
+    bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
     bool                        IsEnableDiagnostic(const char* szTag) { return MapContains(m_EnableDiagnosticMap, szTag); };
-    SString                     GetMinClientVersion(void) { return m_strMinClientVersion; }
-    const SString&              GetRecommendedClientVersion(void) { return m_strRecommendedClientVersion; }
-    int                         GetMinClientVersionAutoUpdate(void) { return m_iMinClientVersionAutoUpdate; }
-    const SString&              GetIdFile(void) { return m_strIdFile; }
-    bool                        GetThreadNetEnabled(void) { return m_bThreadNetEnabled; }
-    const SString&              GetGlobalDatabasesPath(void) { return m_strGlobalDatabasesPath; }
-    const SString&              GetSystemDatabasesPath(void) { return m_strSystemDatabasesPath; }
-    const SString&              GetBackupPath(void) { return m_strBackupPath; }
-    int                         GetBackupInterval(void) { return m_iBackupInterval; }
-    int                         GetBackupAmount(void) { return m_iBackupAmount; }
-    void                        NotifyDidBackup(void);
-    bool                        ShouldCompactInternalDatabases(void);
-    unsigned short              GetFPSLimit(void) { return m_usFPSLimit; };
+    CMtaVersion                 GetMinClientVersion() { return m_strMinClientVersion; }
+    const CMtaVersion&          GetRecommendedClientVersion() { return m_strRecommendedClientVersion; }
+    int                         GetMinClientVersionAutoUpdate() { return m_iMinClientVersionAutoUpdate; }
+    const SString&              GetIdFile() { return m_strIdFile; }
+    bool                        GetThreadNetEnabled() { return m_bThreadNetEnabled; }
+    const SString&              GetGlobalDatabasesPath() { return m_strGlobalDatabasesPath; }
+    const SString&              GetSystemDatabasesPath() { return m_strSystemDatabasesPath; }
+    const SString&              GetBackupPath() { return m_strBackupPath; }
+    int                         GetBackupInterval() { return m_iBackupInterval; }
+    int                         GetBackupAmount() { return m_iBackupAmount; }
+    void                        NotifyDidBackup();
+    bool                        ShouldCompactInternalDatabases();
+    unsigned short              GetFPSLimit() { return m_usFPSLimit; };
     bool                        SetFPSLimit(unsigned short usFPS, bool bSave);
-    int                         GetPendingWorkToDoSleepTime(void);
-    int                         GetNoWorkToDoSleepTime(void);
-    int                         GetServerLogicFpsLimit(void) { return m_iServerLogicFpsLimit; };
-    const SString&              GetDbLogFilename(void) { return m_strDbLogFilename; }
-    bool                        GetSyncMapElementData(void) const { return m_bSyncMapElementData; }
+    int                         GetPendingWorkToDoSleepTime();
+    int                         GetNoWorkToDoSleepTime();
+    int                         GetServerLogicFpsLimit() { return m_iServerLogicFpsLimit; };
+    const SString&              GetDbLogFilename() { return m_strDbLogFilename; }
+    bool                        GetSyncMapElementData() const { return m_bSyncMapElementData; }
     void                        SetSyncMapElementData(bool bOn) { m_bSyncMapElementData = bOn; }
-    bool                        GetBulletSyncEnabled(void) const { return m_bBulletSyncEnabled != 0; }
-    int                         GetVehExtrapolatePercent(void) const { return m_iVehExtrapolatePercent; }
-    int                         GetVehExtrapolatePingLimit(void) const { return m_iVehExtrapolatePingLimit; }
-    bool                        GetUseAltPulseOrder(void) const { return m_bUseAltPulseOrder != 0; }
-    const SString&              GetLoadstringLogFilename(void) const { return m_strLoadstringLogFilename; }
-    bool                        GetLoadstringLogEnabled(void) const { return !m_strLoadstringLogFilename.empty(); }
-    bool                        GetCrashDumpUploadEnabled(void) const { return m_bCrashDumpUploadEnabled != 0; }
-    bool                        GetFilterDuplicateLogLinesEnabled(void) const { return m_bFilterDuplicateLogLinesEnabled != 0; }
+    bool                        GetBulletSyncEnabled() const { return m_bBulletSyncEnabled != 0; }
+    int                         GetVehExtrapolatePercent() const { return m_iVehExtrapolatePercent; }
+    int                         GetVehExtrapolatePingLimit() const { return m_iVehExtrapolatePingLimit; }
+    bool                        GetUseAltPulseOrder() const { return m_bUseAltPulseOrder != 0; }
+    const SString&              GetLoadstringLogFilename() const { return m_strLoadstringLogFilename; }
+    bool                        GetLoadstringLogEnabled() const { return !m_strLoadstringLogFilename.empty(); }
+    bool                        GetCrashDumpUploadEnabled() const { return m_bCrashDumpUploadEnabled != 0; }
+    bool                        GetFilterDuplicateLogLinesEnabled() const { return m_bFilterDuplicateLogLinesEnabled != 0; }
     bool                        IsAuthSerialGroup(const SString& strGroup) const { return ListContains(m_AuthSerialGroupList, strGroup); };
     bool                        IsAuthSerialHttpIpException(const SString& strIp) const { return ListContains(m_AuthSerialHttpIpExceptionList, strIp); }
-    bool                        GetAuthSerialEnabled(void) const { return !m_AuthSerialGroupList.empty(); };
-    bool                        GetAuthSerialHttpEnabled(void) const { return m_bAuthSerialHttpEnabled && GetAuthSerialEnabled(); };
-    const std::vector<SString>& GetAuthSerialGroupList(void) const { return m_AuthSerialGroupList; }
-    const std::vector<SString>& GetAuthSerialHttpIpExceptionList(void) const { return m_AuthSerialHttpIpExceptionList; }
-    const std::vector<SString>& GetOwnerEmailAddressList(void) const { return m_OwnerEmailAddressList; }
-    bool                        IsDatabaseCredentialsProtectionEnabled(void) const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
-    bool                        IsFakeLagCommandEnabled(void) const { return m_bFakeLagCommandEnabled != 0; }
+    bool                        GetAuthSerialEnabled() const { return !m_AuthSerialGroupList.empty(); };
+    bool                        GetAuthSerialHttpEnabled() const { return m_bAuthSerialHttpEnabled && GetAuthSerialEnabled(); };
+    const std::vector<SString>& GetAuthSerialGroupList() const { return m_AuthSerialGroupList; }
+    const std::vector<SString>& GetAuthSerialHttpIpExceptionList() const { return m_AuthSerialHttpIpExceptionList; }
+    const std::vector<SString>& GetOwnerEmailAddressList() const { return m_OwnerEmailAddressList; }
+    bool                        IsDatabaseCredentialsProtectionEnabled() const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
+    bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
 
     SString GetSetting(const SString& configSetting);
     bool    GetSetting(const SString& configSetting, SString& strValue);
@@ -130,23 +130,22 @@ public:
     bool    GetSettingTable(const SString& strName, CLuaArguments* outTable);
 
     void               SetCommandLineParser(CCommandLineParser* pCommandLineParser);
-    void               ApplyNetOptions(void);
-    void               ApplyBandwidthReductionMode(void);
-    void               ApplyThreadNetEnabled(void);
+    void               ApplyNetOptions();
+    void               ApplyBandwidthReductionMode();
+    void               ApplyThreadNetEnabled();
     void               SetFakeLag(int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit);
-    const SNetOptions& GetNetOptions(void) { return m_NetOptions; }
+    const SNetOptions& GetNetOptions() { return m_NetOptions; }
 
-    const std::vector<SIntSetting>& GetIntSettingList(void);
-    void                            OnTickRateChange(void);
-    void                            OnAseSettingChange(void);
+    const std::vector<SIntSetting>& GetIntSettingList();
+    void                            OnTickRateChange();
+    void                            OnAseSettingChange();
 
 private:
-    void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted);
+    void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
     bool GetSettingTable(const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable);
-    bool AddMissingSettings(void);
+    bool AddMissingSettings();
 
     CConsole*           m_pConsole;
-    CLuaManager*        m_pLuaManager;
     CXMLNode*           m_pRootNode;
     CCommandLineParser* m_pCommandLineParser;
 
@@ -189,8 +188,8 @@ private:
     bool                       m_bAuthSerialHttpEnabled;
     std::vector<SString>       m_AuthSerialHttpIpExceptionList;
     std::vector<SString>       m_OwnerEmailAddressList;
-    SString                    m_strMinClientVersion;
-    SString                    m_strRecommendedClientVersion;
+    CMtaVersion                m_strMinClientVersion;
+    CMtaVersion                m_strRecommendedClientVersion;
     SString                    m_strIdFile;
     SString                    m_strGlobalDatabasesPath;
     SString                    m_strSystemDatabasesPath;

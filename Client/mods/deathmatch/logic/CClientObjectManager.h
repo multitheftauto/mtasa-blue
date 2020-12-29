@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTOBJECTMANAGER_H
-#define __CCLIENTOBJECTMANAGER_H
+#pragma once
 
 class CClientManager;
 class CClientObject;
@@ -20,30 +19,30 @@ class CClientObjectManager
 public:
     ZERO_ON_NEW
     CClientObjectManager(class CClientManager* pManager);
-    ~CClientObjectManager(void);
+    ~CClientObjectManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void DeleteAll(void);
+    void DeleteAll();
 
-    unsigned int          Count(void) { return static_cast<unsigned int>(m_Objects.size()); };
-    unsigned int          CountCreatedObjects(void) { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
+    const CMappedArray<CClientObject*>& GetObjects() const { return m_Objects; };
+    unsigned int          Count() { return static_cast<unsigned int>(m_Objects.size()); };
+    unsigned int          CountCreatedObjects() { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
     static CClientObject* Get(ElementID ID);
-    CClientObject*        Get(CObject* pObject, bool bValidatePointer);
-    CClientObject*        GetSafe(CEntity* pEntity);
 
     static bool IsValidModel(unsigned long ulObjectModel);
     static bool IsBreakableModel(unsigned long ulObjectModel);
     bool        Exists(CClientObject* pObject);
     bool        ObjectsAroundPointLoaded(const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus = NULL);
 
-    static bool StaticIsObjectLimitReached(void);
-    static bool StaticIsLowLodObjectLimitReached(void);
-    bool        IsObjectLimitReached(void);
-    bool        IsLowLodObjectLimitReached(void);
-    bool        IsHardObjectLimitReached(void);
+    static bool StaticIsObjectLimitReached();
+    static bool StaticIsLowLodObjectLimitReached();
+    bool        IsObjectLimitReached();
+    bool        IsLowLodObjectLimitReached();
+    bool        IsHardObjectLimitReached();
 
     void RestreamObjects(unsigned short usModel);
+    void RestreamAllObjects();
 
     void AddToList(CClientObject* pObject) { m_Objects.push_back(pObject); }
     void RemoveFromLists(CClientObject* pObject);
@@ -52,7 +51,7 @@ public:
     void OnDestruction(CClientObject* pObject);
 
 protected:
-    void UpdateLimitInfo(void);
+    void UpdateLimitInfo();
 
     int  m_iEntryInfoNodeEntries;
     int  m_iPointerNodeSingleLinkEntries;
@@ -68,5 +67,3 @@ protected:
     CMappedArray<CClientObject*> m_Objects;
     CMappedArray<CClientObject*> m_StreamedIn;
 };
-
-#endif

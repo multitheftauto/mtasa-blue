@@ -11,81 +11,87 @@
 
 #include "StdInc.h"
 
-void CLuaWorldDefs::LoadFunctions(void)
+void CLuaWorldDefs::LoadFunctions()
 {
-    // Get
-    CLuaCFunctions::AddFunction("getTime", CLuaWorldDefs::getTime);
-    CLuaCFunctions::AddFunction("getWeather", CLuaWorldDefs::getWeather);
-    CLuaCFunctions::AddFunction("getZoneName", CLuaWorldDefs::getZoneName);
-    CLuaCFunctions::AddFunction("getGravity", CLuaWorldDefs::getGravity);
-    CLuaCFunctions::AddFunction("getGameSpeed", CLuaWorldDefs::getGameSpeed);
-    CLuaCFunctions::AddFunction("getWaveHeight", CLuaWorldDefs::getWaveHeight);
-    CLuaCFunctions::AddFunction("getFPSLimit", CLuaWorldDefs::getFPSLimit);
-    CLuaCFunctions::AddFunction("getMinuteDuration", CLuaWorldDefs::getMinuteDuration);
-    CLuaCFunctions::AddFunction("isGarageOpen", CLuaWorldDefs::isGarageOpen);
-    CLuaCFunctions::AddFunction("getTrafficLightState", CLuaWorldDefs::getTrafficLightState);
-    CLuaCFunctions::AddFunction("areTrafficLightsLocked", CLuaWorldDefs::areTrafficLightsLocked);
-    CLuaCFunctions::AddFunction("getJetpackMaxHeight", CLuaWorldDefs::getJetpackMaxHeight);
-    CLuaCFunctions::AddFunction("getSkyGradient", CLuaWorldDefs::getSkyGradient);
-    CLuaCFunctions::AddFunction("getHeatHaze", CLuaWorldDefs::getHeatHaze);
-    CLuaCFunctions::AddFunction("isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled);
-    CLuaCFunctions::AddFunction("setJetpackWeaponEnabled", CLuaWorldDefs::setJetpackWeaponEnabled);
-    CLuaCFunctions::AddFunction("getJetpackWeaponEnabled", CLuaWorldDefs::getJetpackWeaponEnabled);
-    CLuaCFunctions::AddFunction("getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled);
-    CLuaCFunctions::AddFunction("getInteriorSoundsEnabled", CLuaWorldDefs::getInteriorSoundsEnabled);
-    CLuaCFunctions::AddFunction("getRainLevel", CLuaWorldDefs::getRainLevel);
-    CLuaCFunctions::AddFunction("getSunSize", CLuaWorldDefs::getSunSize);
-    CLuaCFunctions::AddFunction("getSunColor", CLuaWorldDefs::getSunColor);
-    CLuaCFunctions::AddFunction("getWindVelocity", CLuaWorldDefs::getWindVelocity);
-    CLuaCFunctions::AddFunction("getFarClipDistance", CLuaWorldDefs::getFarClipDistance);
-    CLuaCFunctions::AddFunction("getFogDistance", CLuaWorldDefs::getFogDistance);
-    CLuaCFunctions::AddFunction("getAircraftMaxHeight", CLuaWorldDefs::getAircraftMaxHeight);
-    CLuaCFunctions::AddFunction("getAircraftMaxVelocity", CLuaWorldDefs::getAircraftMaxVelocity);
-    CLuaCFunctions::AddFunction("getOcclusionsEnabled", CLuaWorldDefs::getOcclusionsEnabled);
-    CLuaCFunctions::AddFunction("getMoonSize", CLuaWorldDefs::getMoonSize);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Get
+        {"getTime", getTime},
+        {"getWeather", getWeather},
+        {"getZoneName", getZoneName},
+        {"getGravity", getGravity},
+        {"getGameSpeed", getGameSpeed},
+        {"getWaveHeight", getWaveHeight},
+        {"getFPSLimit", getFPSLimit},
+        {"getMinuteDuration", getMinuteDuration},
+        {"isGarageOpen", isGarageOpen},
+        {"getTrafficLightState", getTrafficLightState},
+        {"areTrafficLightsLocked", areTrafficLightsLocked},
+        {"getJetpackMaxHeight", getJetpackMaxHeight},
+        {"getSkyGradient", getSkyGradient},
+        {"getHeatHaze", getHeatHaze},
+        {"isGlitchEnabled", isGlitchEnabled},
+        {"setJetpackWeaponEnabled", setJetpackWeaponEnabled},
+        {"getJetpackWeaponEnabled", getJetpackWeaponEnabled},
+        {"getCloudsEnabled", getCloudsEnabled},
+        {"getInteriorSoundsEnabled", getInteriorSoundsEnabled},
+        {"getRainLevel", getRainLevel},
+        {"getSunSize", getSunSize},
+        {"getSunColor", getSunColor},
+        {"getWindVelocity", getWindVelocity},
+        {"getFarClipDistance", getFarClipDistance},
+        {"getFogDistance", getFogDistance},
+        {"getAircraftMaxHeight", getAircraftMaxHeight},
+        {"getAircraftMaxVelocity", getAircraftMaxVelocity},
+        {"getOcclusionsEnabled", getOcclusionsEnabled},
+        {"getMoonSize", getMoonSize},
 
-    // Set
-    CLuaCFunctions::AddFunction("setTime", CLuaWorldDefs::setTime);
-    CLuaCFunctions::AddFunction("setWeather", CLuaWorldDefs::setWeather);
-    CLuaCFunctions::AddFunction("setWeatherBlended", CLuaWorldDefs::setWeatherBlended);
-    CLuaCFunctions::AddFunction("setGravity", CLuaWorldDefs::setGravity);
-    CLuaCFunctions::AddFunction("setGameSpeed", CLuaWorldDefs::setGameSpeed);
-    CLuaCFunctions::AddFunction("setWaveHeight", CLuaWorldDefs::setWaveHeight);
-    CLuaCFunctions::AddFunction("setSkyGradient", CLuaWorldDefs::setSkyGradient);
-    CLuaCFunctions::AddFunction("setHeatHaze", CLuaWorldDefs::setHeatHaze);
-    CLuaCFunctions::AddFunction("setFPSLimit", CLuaWorldDefs::setFPSLimit);
-    CLuaCFunctions::AddFunction("setMinuteDuration", CLuaWorldDefs::setMinuteDuration);
-    CLuaCFunctions::AddFunction("setGarageOpen", CLuaWorldDefs::setGarageOpen);
-    CLuaCFunctions::AddFunction("setGlitchEnabled", CLuaWorldDefs::setGlitchEnabled);
-    CLuaCFunctions::AddFunction("setCloudsEnabled", CLuaWorldDefs::setCloudsEnabled);
-    CLuaCFunctions::AddFunction("setTrafficLightState", CLuaWorldDefs::setTrafficLightState);
-    CLuaCFunctions::AddFunction("setTrafficLightsLocked", CLuaWorldDefs::setTrafficLightsLocked);
-    CLuaCFunctions::AddFunction("setJetpackMaxHeight", CLuaWorldDefs::setJetpackMaxHeight);
-    CLuaCFunctions::AddFunction("setInteriorSoundsEnabled", CLuaWorldDefs::setInteriorSoundsEnabled);
-    CLuaCFunctions::AddFunction("setRainLevel", CLuaWorldDefs::setRainLevel);
-    CLuaCFunctions::AddFunction("setSunSize", CLuaWorldDefs::setSunSize);
-    CLuaCFunctions::AddFunction("setSunColor", CLuaWorldDefs::setSunColor);
-    CLuaCFunctions::AddFunction("setWindVelocity", CLuaWorldDefs::setWindVelocity);
-    CLuaCFunctions::AddFunction("setFarClipDistance", CLuaWorldDefs::setFarClipDistance);
-    CLuaCFunctions::AddFunction("setFogDistance", CLuaWorldDefs::setFogDistance);
-    CLuaCFunctions::AddFunction("setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight);
-    CLuaCFunctions::AddFunction("setAircraftMaxVelocity", CLuaWorldDefs::setAircraftMaxVelocity);
-    CLuaCFunctions::AddFunction("setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled);
-    CLuaCFunctions::AddFunction("setMoonSize", CLuaWorldDefs::setMoonSize);
+        // Set
+        {"setTime", setTime},
+        {"setWeather", setWeather},
+        {"setWeatherBlended", setWeatherBlended},
+        {"setGravity", setGravity},
+        {"setGameSpeed", setGameSpeed},
+        {"setWaveHeight", setWaveHeight},
+        {"setSkyGradient", setSkyGradient},
+        {"setHeatHaze", setHeatHaze},
+        {"setFPSLimit", setFPSLimit},
+        {"setMinuteDuration", setMinuteDuration},
+        {"setGarageOpen", setGarageOpen},
+        {"setGlitchEnabled", setGlitchEnabled},
+        {"setCloudsEnabled", setCloudsEnabled},
+        {"setTrafficLightState", setTrafficLightState},
+        {"setTrafficLightsLocked", setTrafficLightsLocked},
+        {"setJetpackMaxHeight", setJetpackMaxHeight},
+        {"setInteriorSoundsEnabled", setInteriorSoundsEnabled},
+        {"setRainLevel", setRainLevel},
+        {"setSunSize", setSunSize},
+        {"setSunColor", setSunColor},
+        {"setWindVelocity", setWindVelocity},
+        {"setFarClipDistance", setFarClipDistance},
+        {"setFogDistance", setFogDistance},
+        {"setAircraftMaxHeight", setAircraftMaxHeight},
+        {"setAircraftMaxVelocity", setAircraftMaxVelocity},
+        {"setOcclusionsEnabled", setOcclusionsEnabled},
+        {"setMoonSize", setMoonSize},
 
-    // Reset
-    CLuaCFunctions::AddFunction("resetSkyGradient", CLuaWorldDefs::resetSkyGradient);
-    CLuaCFunctions::AddFunction("resetHeatHaze", CLuaWorldDefs::resetHeatHaze);
-    CLuaCFunctions::AddFunction("resetRainLevel", CLuaWorldDefs::resetRainLevel);
-    CLuaCFunctions::AddFunction("resetSunSize", CLuaWorldDefs::resetSunSize);
-    CLuaCFunctions::AddFunction("resetSunColor", CLuaWorldDefs::resetSunColor);
-    CLuaCFunctions::AddFunction("resetWindVelocity", CLuaWorldDefs::resetWindVelocity);
-    CLuaCFunctions::AddFunction("resetFarClipDistance", CLuaWorldDefs::resetFarClipDistance);
-    CLuaCFunctions::AddFunction("resetFogDistance", CLuaWorldDefs::resetFogDistance);
-    CLuaCFunctions::AddFunction("removeWorldModel", CLuaWorldDefs::RemoveWorldModel);
-    CLuaCFunctions::AddFunction("restoreWorldModel", CLuaWorldDefs::RestoreWorldModel);
-    CLuaCFunctions::AddFunction("restoreAllWorldModels", CLuaWorldDefs::RestoreAllWorldModels);
-    CLuaCFunctions::AddFunction("resetMoonSize", CLuaWorldDefs::resetMoonSize);
+        // Reset
+        {"resetSkyGradient", resetSkyGradient},
+        {"resetHeatHaze", resetHeatHaze},
+        {"resetRainLevel", resetRainLevel},
+        {"resetSunSize", resetSunSize},
+        {"resetSunColor", resetSunColor},
+        {"resetWindVelocity", resetWindVelocity},
+        {"resetFarClipDistance", resetFarClipDistance},
+        {"resetFogDistance", resetFogDistance},
+        {"removeWorldModel", RemoveWorldModel},
+        {"restoreWorldModel", RestoreWorldModel},
+        {"restoreAllWorldModels", RestoreAllWorldModels},
+        {"resetMoonSize", resetMoonSize},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaWorldDefs::getTime(lua_State* luaVM)

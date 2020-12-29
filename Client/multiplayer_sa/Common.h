@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYERCOMMONSA
-#define __CMULTIPLAYERCOMMONSA
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -42,5 +41,3 @@ typedef struct _GTA_CONTROLSET
     BYTE  bytePadding2[15];
     DWORD dwKeyHeld;
 } GTA_CONTROLSET;
-
-#endif

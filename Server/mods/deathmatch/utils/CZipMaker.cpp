@@ -48,7 +48,7 @@ CZipMaker::~CZipMaker()
 // Returns false if not valid
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::IsValid(void)
+bool CZipMaker::IsValid()
 {
     return m_uzFile != NULL;
 }
@@ -60,7 +60,7 @@ bool CZipMaker::IsValid(void)
 // Returns false if failed
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::Close(void)
+bool CZipMaker::Close()
 {
     if (!m_uzFile)
         return false;

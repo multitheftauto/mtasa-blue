@@ -58,22 +58,22 @@ class CServerBrowser : public CSingleton<CServerBrowser>
     friend class CCore;
 
 public:
-    explicit CServerBrowser(void);
-    ~CServerBrowser(void);
+    explicit CServerBrowser();
+    ~CServerBrowser();
 
-    void Update(void);
+    void Update();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
-    bool ConnectToSelectedServer(void);
+    bool ConnectToSelectedServer();
 
-    static void CompleteConnect(void);
+    static void CompleteConnect();
 
-    CServerList* GetInternetList(void) { return &m_ServersInternet; };
-    CServerList* GetFavouritesList(void) { return &m_ServersFavourites; };
-    CServerList* GetRecentList(void) { return &m_ServersRecent; };
-    CServerList* GetHistoryList(void) { return &m_ServersHistory; };
+    CServerList* GetInternetList() { return &m_ServersInternet; };
+    CServerList* GetFavouritesList() { return &m_ServersFavourites; };
+    CServerList* GetRecentList() { return &m_ServersRecent; };
+    CServerList* GetHistoryList() { return &m_ServersHistory; };
 
     void SaveRecentlyPlayedList();
     void SaveFavouritesList();
@@ -86,7 +86,7 @@ public:
 
     void        SetServerPassword(const std::string& strHost, const std::string& strPassword);
     std::string GetServerPassword(const std::string& strHost);
-    void        ClearServerPasswords(void);
+    void        ClearServerPasswords();
 
     void SetStatusText(std::string strStatus);
     void SetAddressBarText(std::string strText);
@@ -95,19 +95,19 @@ public:
     CServerListItem* FindServerFromRow(ServerBrowserType Type, int iRow);
     CServerListItem* FindServer(const std::string& strHost, unsigned short usPort);
     unsigned short   FindServerHttpPort(const std::string& strHost, unsigned short usPort);
-    int              FindRowFromServer(ServerBrowserType Type, const CServerListItem* pServer);
+    void             UpdateRowIndexMembers(ServerBrowserType Type);
     void             UpdateSelectedServerPlayerList(ServerBrowserType Type);
     void             GetVisibleEndPointList(std::vector<SAddressPort>& outEndpointList);
 
-    bool IsAddressBarAwaitingInput(void);
+    bool IsAddressBarAwaitingInput();
     void SetNextHistoryText(bool bDown);
 
-    void OnQuickConnectButtonClick(void);
+    void OnQuickConnectButtonClick();
     void NotifyServerExists(in_addr Address, ushort usPort);
 
     void TabSkip(bool bBackwards);
 
-    bool IsActive(void);
+    bool IsActive();
 
     void SetSelectedIndex(unsigned int uiIndex);
 
@@ -115,7 +115,7 @@ protected:
     bool OnMouseClick(CGUIMouseEventArgs Args);
     bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
 
-    void CreateHistoryList(void);
+    void CreateHistoryList();
     bool CanBrowseVersion(const SString& strVersion);
 
     int m_iSelectedServer[SERVER_BROWSER_TYPE_COUNT];
@@ -205,9 +205,10 @@ private:
     void DeleteTab(ServerBrowserType type);
 
     void         UpdateServerList(ServerBrowserType Type, bool bClearServerList = false);
-    void         UpdateHistoryList(void);
+    void         UpdateHistoryList();
     CServerList* GetServerList(ServerBrowserType Type);
-    void         AddServerToList(const CServerListItem* pServer, const ServerBrowserType Type);
+    void         AddServerToList(CServerListItem* pServer, const ServerBrowserType Type);
+    bool         RemoveSelectedServerFromRecentlyPlayedList();
 
     bool OnClick(CGUIElement* pElement);
     bool OnDoubleClick(CGUIElement* pElement);
@@ -232,9 +233,10 @@ private:
     bool OnAddressDefocused(CGUIElement* pElement);
 
     bool OnServerListChangeRow(CGUIKeyEventArgs Args);
+    bool OnServerListKeyDown(CGUIKeyEventArgs Args);
 
-    ServerBrowserType GetCurrentServerBrowserType(void);
-    ServerBrowserType GetCurrentServerBrowserTypeForSave(void);
+    ServerBrowserType GetCurrentServerBrowserType();
+    ServerBrowserType GetCurrentServerBrowserTypeForSave();
 
     CServerListInternet m_ServersInternet;
     CServerListLAN      m_ServersLAN;

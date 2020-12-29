@@ -169,7 +169,7 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
     return dwReturn != 0;
 }
 
-CEntity* CProjectileInfoSA::GetTarget(void)
+CEntity* CProjectileInfoSA::GetTarget()
 {
     CEntitySAInterface* pTargetInterface = internalInterface->pEntProjectileTarget;
     CEntity*            pTarget = NULL;
@@ -179,19 +179,14 @@ CEntity* CProjectileInfoSA::GetTarget(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pTarget = pGame->GetPools()->GetPed((DWORD*)pTargetInterface);
+                SClientEntity<CPedSA>* pPedClientEntity = pGame->GetPools()->GetPed((DWORD*)pTargetInterface);
+                pTarget = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
                 break;
             }
-
             case ENTITY_TYPE_VEHICLE:
             {
-                pTarget = pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface);
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                // pTarget = pGame->GetPools ()->GetObject ( (DWORD *) pExplodingEntityInterface );
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface);
+                pTarget = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
                 break;
             }
         }
@@ -206,7 +201,7 @@ void CProjectileInfoSA::SetTarget(CEntity* pEntity)
         internalInterface->pEntProjectileTarget = pEntitySA->GetInterface();
 }
 
-bool CProjectileInfoSA::IsActive(void)
+bool CProjectileInfoSA::IsActive()
 {
     return (internalInterface->bProjectileActive == 1 && internalInterface->dwProjectileType != 0);
 }

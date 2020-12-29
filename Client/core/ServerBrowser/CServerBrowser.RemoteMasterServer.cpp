@@ -16,25 +16,25 @@ class CRemoteMasterServer : public CRemoteMasterServerInterface
 {
 public:
     ZERO_ON_NEW
-    CRemoteMasterServer(void);
-    ~CRemoteMasterServer(void);
+    CRemoteMasterServer();
+    ~CRemoteMasterServer();
 
     // CRemoteMasterServerInterface
-    virtual void Refresh(void);
-    virtual bool HasData(void);
+    virtual void Refresh();
+    virtual bool HasData();
     virtual bool ParseList(CServerListItemList& itemList);
 
     // CRemoteMasterServer
     void Init(const SString& strURL);
 
 protected:
-    bool                              CheckParsable(void);
-    bool                              CheckParsableVer0(void);
-    bool                              CheckParsableVer2(void);
+    bool                              CheckParsable();
+    bool                              CheckParsableVer0();
+    bool                              CheckParsableVer2();
     bool                              ParseListVer0(CServerListItemList& itemList);
     bool                              ParseListVer2(CServerListItemList& itemList);
     CServerListItem*                  GetServerListItem(CServerListItemList& itemList, in_addr Address, ushort usGamePort);
-    CNetHTTPDownloadManagerInterface* GetHTTP(void);
+    CNetHTTPDownloadManagerInterface* GetHTTP();
     static void                       StaticDownloadFinished(const SHttpDownloadResult& result);
     void                              DownloadFinished(const SHttpDownloadResult& result);
 
@@ -65,7 +65,7 @@ CRemoteMasterServerInterface* NewRemoteMasterServer(const SString& strURL)
 //
 //
 ///////////////////////////////////////////////////////////////
-CRemoteMasterServer::CRemoteMasterServer(void)
+CRemoteMasterServer::CRemoteMasterServer()
 {
 }
 
@@ -76,7 +76,7 @@ CRemoteMasterServer::CRemoteMasterServer(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CRemoteMasterServer::~CRemoteMasterServer(void)
+CRemoteMasterServer::~CRemoteMasterServer()
 {
 }
 
@@ -100,7 +100,7 @@ void CRemoteMasterServer::Init(const SString& strURL)
 //
 //
 ///////////////////////////////////////////////////////////////
-CNetHTTPDownloadManagerInterface* CRemoteMasterServer::GetHTTP(void)
+CNetHTTPDownloadManagerInterface* CRemoteMasterServer::GetHTTP()
 {
     return g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CORE_ASE_LIST);
 }
@@ -112,7 +112,7 @@ CNetHTTPDownloadManagerInterface* CRemoteMasterServer::GetHTTP(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CRemoteMasterServer::Refresh(void)
+void CRemoteMasterServer::Refresh()
 {
     // If it's been less than a minute and we has data, don't send a new request
     if (GetTickCount64_() - m_llLastRefreshTime < 60000 && m_strStage == "hasdata")
@@ -122,7 +122,9 @@ void CRemoteMasterServer::Refresh(void)
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_();
     AddRef();            // Keep alive
-    GetHTTP()->QueueFile(m_strURL, NULL, NULL, 0, false, this, &CRemoteMasterServer::StaticDownloadFinished, false, 1);
+    SHttpRequestOptions options;
+    options.uiConnectionAttempts = 1;
+    GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -167,7 +169,7 @@ void CRemoteMasterServer::DownloadFinished(const SHttpDownloadResult& result)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::HasData(void)
+bool CRemoteMasterServer::HasData()
 {
     GetHTTP()->ProcessQueuedFiles();
     return m_strStage == "hasdata";
@@ -180,7 +182,7 @@ bool CRemoteMasterServer::HasData(void)
 // Return true if data looks usable
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::CheckParsable(void)
+bool CRemoteMasterServer::CheckParsable()
 {
     CBufferReadStream stream(m_Data, true);
 
@@ -207,7 +209,7 @@ bool CRemoteMasterServer::CheckParsable(void)
 // Return true if data looks usable
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::CheckParsableVer0(void)
+bool CRemoteMasterServer::CheckParsableVer0()
 {
     CBufferReadStream stream(m_Data, true);
 
@@ -234,7 +236,7 @@ bool CRemoteMasterServer::CheckParsableVer0(void)
 // Return true if data looks usable
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::CheckParsableVer2(void)
+bool CRemoteMasterServer::CheckParsableVer2()
 {
     CBufferReadStream stream(m_Data, true);
 
@@ -320,11 +322,8 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
         }
     }
 
-#if MTA_DEBUG
     OutputDebugLine(
         SString("[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
-#endif
-
     return true;
 }
 

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CFireSyncPacket::CFireSyncPacket(void)
+CFireSyncPacket::CFireSyncPacket()
 {
     // Default size
     m_fSize = 1.8f;

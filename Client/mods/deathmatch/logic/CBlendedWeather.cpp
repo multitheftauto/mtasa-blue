@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CBlendedWeather::CBlendedWeather(void)
+CBlendedWeather::CBlendedWeather()
 {
     // Init
     m_ucPrimaryWeather = 0;
@@ -26,7 +26,7 @@ CBlendedWeather::CBlendedWeather(void)
     m_pWeather = g_pGame->GetWeather();
 }
 
-void CBlendedWeather::DoPulse(void)
+void CBlendedWeather::DoPulse()
 {
     // Grab the current time
     unsigned char ucHour, ucMinute;
@@ -79,7 +79,7 @@ void CBlendedWeather::SetWeatherBlended(unsigned char ucWeather, unsigned char u
     }
 }
 
-unsigned char CBlendedWeather::GetWeather(void)
+unsigned char CBlendedWeather::GetWeather()
 {
     // If we're blending the weather, return the weather we started blending from
     if (m_ucBlendStopHour != 0xFF)

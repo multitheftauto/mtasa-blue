@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_HUD
-#define __CGAME_HUD
+#pragma once
 
 #include <windows.h>
 #include <CVector.h>
@@ -42,7 +41,7 @@ public:
     virtual VOID SetHelpMessage(char* szMessage) = 0;
     virtual VOID SetBigMessage(char* szBigMessage) = 0;
     virtual VOID Disable(bool bDisabled) = 0;
-    virtual bool IsDisabled(void) = 0;
+    virtual bool IsDisabled() = 0;
     // virtual VOID                DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor
     // )=0;
     virtual bool CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float* fX, float* fY, bool bSetting1, bool bSetting2) = 0;
@@ -53,7 +52,5 @@ public:
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;
-    virtual void ResetComponentAdjustment(void) = 0;
+    virtual void ResetComponentAdjustment() = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIRADIOBUTTON_IMPL_H
-#define __CGUIRADIOBUTTON_IMPL_H
+#pragma once
 
 #include <gui/CGUIRadioButton.h>
 #include "CGUIElement_Impl.h"
@@ -19,16 +18,14 @@ class CGUIRadioButton_Impl : public CGUIRadioButton, public CGUIElement_Impl
 {
 public:
     CGUIRadioButton_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");
-    ~CGUIRadioButton_Impl(void);
+    ~CGUIRadioButton_Impl();
 
     void SetSelected(bool bChecked);
-    bool GetSelected(void);
+    bool GetSelected();
 
-    eCGUIType GetType(void) { return CGUI_RADIOBUTTON; };
+    eCGUIType GetType() { return CGUI_RADIOBUTTON; };
 
     #include "CGUIElement_Inc.h"
 
 private:
 };
-
-#endif

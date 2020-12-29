@@ -11,8 +11,7 @@
 
 class CNetAPI;
 
-#ifndef __CNETAPI__
-#define __CNETAPI__
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientManager.h"
@@ -43,24 +42,24 @@ public:
     ZERO_ON_NEW
     CNetAPI(CClientManager* pManager);
 
-    void DoPulse(void);
+    void DoPulse();
     bool ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& bitStream);
 
-    void ResetReturnPosition(void);
+    void ResetReturnPosition();
 
     void AddInterpolation(const CVector& vecPosition);
     bool GetInterpolation(CVector& vecPosition, unsigned short usLatency);
     void SendBulletSyncFire(eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fDamage, uchar ucHitZone,
                             CClientPlayer* pRemoteDamagedPlayer);
     void SendBulletSyncCustomWeaponFire(CClientWeapon* pWeapon, const CVector& vecStart, const CVector& vecEnd);
-    bool IsNetworkTrouble(void) { return m_bIsNetworkTrouble; }
+    bool IsNetworkTrouble() { return m_bIsNetworkTrouble; }
 
     static bool IsWeaponIDAkimbo(unsigned char ucWeaponID);
     static bool IsDriveByWeapon(unsigned char ucWeaponID);
 
 private:
     bool IsSmallKeySyncNeeded(CClientPed* pPed);
-    bool IsPureSyncNeeded(void);
+    bool IsPureSyncNeeded();
 
     void ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream);
     void WriteKeysync(CClientPed* pPed, NetBitStreamInterface& BitStream);
@@ -95,7 +94,7 @@ private:
     void ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterface& BitStream);
 
 public:
-    bool IsCameraSyncNeeded(void);
+    bool IsCameraSyncNeeded();
     void WriteCameraSync(NetBitStreamInterface& BitStream);
 
     void RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream = NULL);
@@ -127,5 +126,3 @@ private:
     uchar            m_ucBulletSyncOrderCounter;
     uchar            m_ucCustomWeaponBulletSyncOrderCounter;
 };
-
-#endif

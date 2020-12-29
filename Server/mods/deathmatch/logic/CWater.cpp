@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode, EWaterType waterType) : CElement(pParent, pNode)
+CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, EWaterType waterType, bool bShallow) : CElement(pParent)
 {
     m_pWaterManager = pWaterManager;
 
@@ -24,6 +24,8 @@ CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode,
     m_Vertices[2] = CVector(-10.0f, 10.0f, 0.0f);
     if (m_WaterType == QUAD)
         m_Vertices[3] = CVector(10.0f, 10.0f, 0.0f);
+
+    m_bShallow = bShallow;
 
     if (m_pWaterManager)
         m_pWaterManager->AddToList(this);
@@ -79,7 +81,7 @@ void CWater::SetLevel(float fLevel)
     }
 }
 
-bool CWater::ReadSpecialData()
+bool CWater::ReadSpecialData(const int iLine)
 {
     char szPropName[10];
     m_WaterType = QUAD;
@@ -95,7 +97,7 @@ bool CWater::ReadSpecialData()
             }
             else
             {
-                CLogger::ErrorPrintf("Bad/missing 'posX%d' attribute in <water> (line %u)\n", i + 1, m_uiLine);
+                CLogger::ErrorPrintf("Bad/missing 'posX%d' attribute in <water> (line %d)\n", i + 1, iLine);
                 return false;
             }
         }
@@ -109,7 +111,7 @@ bool CWater::ReadSpecialData()
             }
             else
             {
-                CLogger::ErrorPrintf("Bad/missing 'posY%d' attribute in <water> (line %u)\n", i + 1, m_uiLine);
+                CLogger::ErrorPrintf("Bad/missing 'posY%d' attribute in <water> (line %d)\n", i + 1, iLine);
                 return false;
             }
         }
@@ -123,16 +125,19 @@ bool CWater::ReadSpecialData()
             }
             else
             {
-                CLogger::ErrorPrintf("Bad/missing 'posZ%d' attribute in <water> (line %u)\n", i + 1, m_uiLine);
+                CLogger::ErrorPrintf("Bad/missing 'posZ%d' attribute in <water> (line %d)\n", i + 1, iLine);
                 return false;
             }
         }
     }
 
+    if (!GetCustomDataBool("shallow", m_bShallow, true))
+        m_bShallow = false;
+
     RoundVertices();
     if (!Valid())
     {
-        CLogger::ErrorPrintf("Invalid <water> element (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Invalid <water> element (line %d)\n", iLine);
         return false;
     }
     return true;

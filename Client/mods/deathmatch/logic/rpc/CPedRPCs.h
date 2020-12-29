@@ -16,7 +16,7 @@
 class CPedRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(SetPedArmor);
     DECLARE_ELEMENT_RPC(SetPedRotation);
@@ -32,6 +32,7 @@ public:
     DECLARE_ELEMENT_RPC(SetPedDoingGangDriveby);
     DECLARE_ELEMENT_RPC(SetPedAnimation);
     DECLARE_ELEMENT_RPC(SetPedAnimationProgress);
+    DECLARE_ELEMENT_RPC(SetPedAnimationSpeed);
     DECLARE_ELEMENT_RPC(SetPedOnFire);
     DECLARE_ELEMENT_RPC(SetPedHeadless);
     DECLARE_ELEMENT_RPC(SetPedFrozen);

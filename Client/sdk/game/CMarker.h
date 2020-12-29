@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_MARKER
-#define __CGAME_MARKER
+#pragma once
 
 #include "Common.h"
 #include "CEntity.h"
@@ -41,5 +40,3 @@ public:
     virtual CEntity* GetEntity() = 0;
     virtual CVector* GetPosition() = 0;
 };
-
-#endif

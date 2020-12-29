@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CWaterRPCs.h"
 
-void CWaterRPCs::LoadFunctions(void)
+void CWaterRPCs::LoadFunctions()
 {
     AddHandler(SET_WORLD_WATER_LEVEL, SetWorldWaterLevel, "SetWorldWaterLevel");
     AddHandler(RESET_WORLD_WATER_LEVEL, ResetWorldWaterLevel, "ResetWorldWaterLevel");
@@ -26,11 +26,18 @@ void CWaterRPCs::LoadFunctions(void)
 void CWaterRPCs::SetWorldWaterLevel(NetBitStreamInterface& bitStream)
 {
     float fLevel;
-    bool  bIncludeWorldNonSeaLevel;
+    bool  bIncludeWorldNonSeaLevel = true;
+    bool  bIncludeWorldSeaLevel = true;
+    bool  bIncludeOutsideWorldLevel = false;
 
     if (bitStream.Read(fLevel) && bitStream.ReadBit(bIncludeWorldNonSeaLevel))
     {
-        m_pWaterManager->SetWorldWaterLevel(fLevel, NULL, bIncludeWorldNonSeaLevel);
+        if (bitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
+        {
+            bitStream.ReadBit(bIncludeWorldSeaLevel);
+            bitStream.ReadBit(bIncludeOutsideWorldLevel);
+        }
+        m_pWaterManager->SetWorldWaterLevel(fLevel, nullptr, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
     }
 }
 

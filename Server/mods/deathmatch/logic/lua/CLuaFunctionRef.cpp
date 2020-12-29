@@ -87,7 +87,7 @@ void luaM_dec_use(lua_State* luaVM, int iFunction, const void* pFuncPtr)
 // CLuaFunctionRef implementation
 //
 
-CLuaFunctionRef::CLuaFunctionRef(void) : m_ListNode(this)
+CLuaFunctionRef::CLuaFunctionRef() : m_ListNode(this)
 {
     m_luaVM = NULL;
     m_iFunction = LUA_REFNIL;
@@ -112,7 +112,7 @@ CLuaFunctionRef::CLuaFunctionRef(const CLuaFunctionRef& other) : m_ListNode(this
     luaM_inc_use(m_luaVM, m_iFunction, m_pFuncPtr);
 }
 
-CLuaFunctionRef::~CLuaFunctionRef(void)
+CLuaFunctionRef::~CLuaFunctionRef()
 {
     luaM_dec_use(m_luaVM, m_iFunction, m_pFuncPtr);
     dassert(ms_AllRefList.contains(this));
@@ -130,12 +130,12 @@ CLuaFunctionRef& CLuaFunctionRef::operator=(const CLuaFunctionRef& other)
     return *this;
 }
 
-int CLuaFunctionRef::ToInt(void) const
+int CLuaFunctionRef::ToInt() const
 {
     return m_iFunction;
 }
 
-lua_State* CLuaFunctionRef::GetLuaVM(void) const
+lua_State* CLuaFunctionRef::GetLuaVM() const
 {
     return m_luaVM;
 }

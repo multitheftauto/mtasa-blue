@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDYNAMICLIBRARY_H
-#define __CDYNAMICLIBRARY_H
+#pragma once
 
 #ifdef WIN32
 #include <windows.h>
@@ -19,12 +18,12 @@
 class CDynamicLibrary
 {
 public:
-    CDynamicLibrary(void);
-    ~CDynamicLibrary(void);
+    CDynamicLibrary();
+    ~CDynamicLibrary();
 
     bool Load(const char* szFilename);
-    void Unload(void);
-    bool IsLoaded(void);
+    void Unload();
+    bool IsLoaded();
 
     void* GetProcedureAddress(const char* szProcName);
 
@@ -35,5 +34,3 @@ private:
     void* m_hModule;
     #endif
 };
-
-#endif

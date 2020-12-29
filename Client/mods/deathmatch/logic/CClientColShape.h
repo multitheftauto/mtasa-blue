@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLSHAPE_H
-#define __CCLIENTCOLSHAPE_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -35,40 +34,42 @@ class CClientColShape : public CClientEntity
 
 public:
     CClientColShape(class CClientManager* pManager, ElementID ID);
-    ~CClientColShape(void);
+    ~CClientColShape();
 
-    void Unlink(void);
+    void Unlink();
 
-    virtual eColShapeType GetShapeType(void) = 0;
+    virtual eColShapeType GetShapeType() = 0;
 
-    void DoPulse(void);
-    bool IsAttachable(void);
+    void DoPulse();
+    bool IsAttachable();
 
-    eClientEntityType GetType(void) const { return CCLIENTCOLSHAPE; }
+    eClientEntityType GetType() const { return CCLIENTCOLSHAPE; }
 
     virtual void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     virtual void SetPosition(const CVector& vecPosition);
 
+    void AttachTo(CClientEntity* pEntity) override;
+
     virtual bool DoHitDetection(const CVector& vecNowPosition, float fRadius) = 0;
 
-    bool IsEnabled(void) { return m_bIsEnabled; };
+    bool IsEnabled() { return m_bIsEnabled; };
     void SetEnabled(bool bEnabled) { m_bIsEnabled = bEnabled; };
 
     void                CallHitCallback(CClientEntity& Entity);
     void                CallLeaveCallback(CClientEntity& Entity);
     CClientColCallback* SetHitCallback(CClientColCallback* pCallback) { return (m_pCallback = pCallback); };
 
-    bool GetAutoCallEvent(void) { return m_bAutoCallEvent; };
+    bool GetAutoCallEvent() { return m_bAutoCallEvent; };
     void SetAutoCallEvent(bool bAutoCallEvent) { m_bAutoCallEvent = bAutoCallEvent; };
 
     void                                AddCollider(CClientEntity* pEntity) { m_Colliders.push_back(pEntity); }
     void                                RemoveCollider(CClientEntity* pEntity) { m_Colliders.remove(pEntity); }
     bool                                ColliderExists(CClientEntity* pEntity);
-    void                                RemoveAllColliders(void);
-    CFastList<CClientEntity*>::iterator CollidersBegin(void) { return m_Colliders.begin(); }
-    CFastList<CClientEntity*>::iterator CollidersEnd(void) { return m_Colliders.end(); }
+    void                                RemoveAllColliders();
+    CFastList<CClientEntity*>::iterator CollidersBegin() { return m_Colliders.begin(); }
+    CFastList<CClientEntity*>::iterator CollidersEnd() { return m_Colliders.end(); }
 
-    void SizeChanged(void);
+    void SizeChanged();
 
 protected:
     CVector          m_vecPosition;
@@ -82,5 +83,3 @@ private:
     bool                      m_bAutoCallEvent;
     CFastList<CClientEntity*> m_Colliders;
 };
-
-#endif

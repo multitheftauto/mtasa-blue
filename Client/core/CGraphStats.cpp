@@ -33,13 +33,13 @@ class CGraphStats : public CGraphStatsInterface
 {
 public:
     ZERO_ON_NEW
-    CGraphStats(void);
-    ~CGraphStats(void);
+    CGraphStats();
+    ~CGraphStats();
 
     // CGraphStatsInterface methods
-    virtual void Draw(void);
+    virtual void Draw();
     virtual void SetEnabled(bool bEnabled);
-    virtual bool IsEnabled(void);
+    virtual bool IsEnabled();
     virtual void AddTimingPoint(const char* szName);
 
 protected:
@@ -55,7 +55,7 @@ protected:
 ///////////////////////////////////////////////////////////////
 CGraphStats* g_pGraphStats = NULL;
 
-CGraphStatsInterface* GetGraphStats(void)
+CGraphStatsInterface* GetGraphStats()
 {
     if (!g_pGraphStats)
         g_pGraphStats = new CGraphStats();
@@ -67,11 +67,11 @@ CGraphStatsInterface* GetGraphStats(void)
 // CGraphStats implementation
 //
 ///////////////////////////////////////////////////////////////
-CGraphStats::CGraphStats(void)
+CGraphStats::CGraphStats()
 {
 }
 
-CGraphStats::~CGraphStats(void)
+CGraphStats::~CGraphStats()
 {
 }
 
@@ -96,7 +96,7 @@ void CGraphStats::SetEnabled(bool bEnabled)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CGraphStats::IsEnabled(void)
+bool CGraphStats::IsEnabled()
 {
     return m_bEnabled;
 }
@@ -193,7 +193,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CGraphStats::Draw(void)
+void CGraphStats::Draw()
 {
     if (!m_bEnabled)
         return;
@@ -207,12 +207,14 @@ void CGraphStats::Draw(void)
     uint  uiSizeY = 150;
     uint  uiRangeY = 100;            // 100ms
     float fLineScale = 1 / 1000.f / uiRangeY * uiSizeY;
-    float fHalfLineHeight = pGraphics->GetDXFontHeight() / 2;
+    float fLineHeight = pGraphics->GetDXFontHeight();
 
     // Backgroung box
     pGraphics->DrawRectQueued(uiOriginX, uiOriginY - uiSizeY, uiSizeX, uiSizeY, SColorRGBA(0, 0, 0, 128), true);
 
-    // Draw data line.
+    // Draw data lines
+    float fLabelX = uiOriginX + uiSizeX + 22;
+    float fLabelY = uiOriginY - m_LineList.size() * fLineHeight;
     for (const auto& dataLine : m_LineList)
     {
         const SGraphStatLine& line = dataLine.second;
@@ -230,10 +232,15 @@ void CGraphStats::Draw(void)
                 iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
 
             pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, uiOriginX + i, uiOriginY - fY1, 1, line.color, true);
+
+            if (i == uiSizeX - 1)
+            {
+                // Line from graph to label
+                pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, fLabelX - 2, fLabelY + fLineHeight / 2, 1, line.color, true);
+            }
         }
 
-        float fX = uiOriginX + uiSizeX + 2;
-        float fY = uiOriginY - line.dataHistory[line.iDataPos] * fLineScale - fHalfLineHeight;
-        pGraphics->DrawStringQueued(fX, fY, fX, fY, line.color, line.strName.c_str(), 1.0f, 1.0f, DT_NOCLIP, nullptr, true);
+        pGraphics->DrawStringQueued(fLabelX, fLabelY, fLabelX, fLabelY, line.color, line.strName.c_str(), 1.0f, 1.0f, DT_NOCLIP, nullptr, true);
+        fLabelY += fLineHeight;
     }
 }

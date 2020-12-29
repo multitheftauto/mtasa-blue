@@ -24,5 +24,5 @@ public:
     ~CElementGroup();
     void         Add(CClientEntity* element);
     void         Remove(CClientEntity* element);
-    unsigned int GetCount(void);
+    unsigned int GetCount();
 };

@@ -22,17 +22,17 @@ class CDatabaseTypeSqlite : public CDatabaseType
 {
 public:
     ZERO_ON_NEW
-    CDatabaseTypeSqlite(void);
-    virtual ~CDatabaseTypeSqlite(void);
+    CDatabaseTypeSqlite();
+    virtual ~CDatabaseTypeSqlite();
 
     // CDatabaseType
-    virtual SString              GetDataSourceTag(void);
+    virtual SString              GetDataSourceTag();
     virtual CDatabaseConnection* Connect(const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions);
     virtual void                 NotifyConnectionDeleted(CDatabaseConnection* pConnection);
     virtual void                 NotifyConnectionChanged(CDatabaseConnection* pConnection);
 
     // CDatabaseTypeSqlite
-    void UpdateStats(void);
+    void UpdateStats();
 
     std::map<SString, CDatabaseConnection*> m_SharedConnectionMap;
     std::set<CDatabaseConnection*>          m_AllConnectionMap;
@@ -42,7 +42,7 @@ public:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CDatabaseType* NewDatabaseTypeSqlite(void)
+CDatabaseType* NewDatabaseTypeSqlite()
 {
     return new CDatabaseTypeSqlite();
 }
@@ -54,7 +54,7 @@ CDatabaseType* NewDatabaseTypeSqlite(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseTypeSqlite::CDatabaseTypeSqlite(void)
+CDatabaseTypeSqlite::CDatabaseTypeSqlite()
 {
 }
 
@@ -65,7 +65,7 @@ CDatabaseTypeSqlite::CDatabaseTypeSqlite(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseTypeSqlite::~CDatabaseTypeSqlite(void)
+CDatabaseTypeSqlite::~CDatabaseTypeSqlite()
 {
     assert(m_SharedConnectionMap.empty());
     assert(m_AllConnectionMap.empty());
@@ -78,7 +78,7 @@ CDatabaseTypeSqlite::~CDatabaseTypeSqlite(void)
 // Return database type as a string
 //
 ///////////////////////////////////////////////////////////////
-SString CDatabaseTypeSqlite::GetDataSourceTag(void)
+SString CDatabaseTypeSqlite::GetDataSourceTag()
 {
     return "sqlite";
 }
@@ -182,7 +182,7 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect(const SString& strHost, const 
 // Tracking connections
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseTypeSqlite::UpdateStats(void)
+void CDatabaseTypeSqlite::UpdateStats()
 {
     SString strModPath = PathConform(g_pServerInterface->GetModManager()->GetModPath());
 

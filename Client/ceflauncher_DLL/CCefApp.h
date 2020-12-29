@@ -30,7 +30,7 @@ public:
             // Tell MTA that we lost input focus
             auto message = CefProcessMessage::Create("InputFocus");
             message->GetArgumentList()->SetBool(0, false);
-            browser->SendProcessMessage(PID_BROWSER, message);
+            browser->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
 
             // Set variable to ensure that the event does not trigger twice
             m_bHasInputFocus = false;
@@ -45,7 +45,7 @@ public:
             {
                 auto message = CefProcessMessage::Create("InputFocus");
                 message->GetArgumentList()->SetBool(0, true);
-                browser->SendProcessMessage(PID_BROWSER, message);
+                browser->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
 
                 // Set variable to ensure that the event does not trigger twice
                 m_bHasInputFocus = true;
@@ -56,7 +56,7 @@ public:
     virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override
     {
         // Register custom MTA scheme (has to be called in all proceseses)
-        registrar->AddCustomScheme("mtalocal", false, false, false, false, false, true);
+        registrar->AddCustomScheme("mtalocal", CEF_SCHEME_OPTION_CSP_BYPASSING);
     }
 
     // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E)
@@ -83,7 +83,7 @@ public:
             return;
 
         CefRefPtr<CefProcessMessage> message = V8Helpers::SerialiseV8Arguments("TriggerLuaEvent", arguments);
-        frame->GetBrowser()->SendProcessMessage(PID_BROWSER, message);
+        frame->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
     }
 
 public:

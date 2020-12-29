@@ -168,6 +168,12 @@ NSDictionary *readConfigurationData(const char *configFile) {
 
 // Records the uploaded crash ID to the log file.
 - (void)logUploadWithID:(const char *)uploadID;
+
+// Builds an URL parameter for a given dictionary key. Uses Uploader's
+// parameters to provide its value. Returns nil if no item is stored for the
+// given key.
+- (NSURLQueryItem *)queryItemWithName:(NSString *)queryItemName
+                          forParamKey:(NSString *)key;
 @end
 
 @implementation Uploader
@@ -532,8 +538,46 @@ NSDictionary *readConfigurationData(const char *configFile) {
 }
 
 //=============================================================================
+- (NSURLQueryItem *)queryItemWithName:(NSString *)queryItemName
+                          forParamKey:(NSString *)key {
+  NSString *value = [parameters_ objectForKey:key];
+  NSString *escapedValue =
+    [value stringByAddingPercentEncodingWithAllowedCharacters:
+      [NSCharacterSet URLQueryAllowedCharacterSet]];
+  return [NSURLQueryItem queryItemWithName:queryItemName value:escapedValue];
+}
+
+//=============================================================================
 - (void)report {
   NSURL *url = [NSURL URLWithString:[parameters_ objectForKey:@BREAKPAD_URL]];
+
+  NSString *serverType = [parameters_ objectForKey:@BREAKPAD_SERVER_TYPE];
+  if ([serverType length] == 0 ||
+      [serverType isEqualToString:kGoogleServerType]) {
+    // when communicating to Google's crash collecting service, add URL params
+    // which identify the product
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithURL:url
+                                                resolvingAgainstBaseURL:false];
+    NSMutableArray *queryItemsToAdd = [urlComponents.queryItems mutableCopy];
+    if (queryItemsToAdd == nil) {
+      queryItemsToAdd = [[NSMutableArray alloc] init];
+    }
+
+    NSURLQueryItem *queryItemProduct =
+      [self queryItemWithName:@"product" forParamKey:@BREAKPAD_PRODUCT];
+    NSURLQueryItem *queryItemVersion =
+      [self queryItemWithName:@"version" forParamKey:@BREAKPAD_VERSION];
+    NSURLQueryItem *queryItemGuid =
+      [self queryItemWithName:@"guid" forParamKey:@"guid"];
+
+    if (queryItemProduct != nil) [queryItemsToAdd addObject:queryItemProduct];
+    if (queryItemVersion != nil) [queryItemsToAdd addObject:queryItemVersion];
+    if (queryItemGuid != nil) [queryItemsToAdd addObject:queryItemGuid];
+
+    urlComponents.queryItems = queryItemsToAdd;
+    url = [urlComponents URL];
+  }
+
   HTTPMultipartUpload *upload = [[HTTPMultipartUpload alloc] initWithURL:url];
   NSMutableDictionary *uploadParameters = [NSMutableDictionary dictionary];
 

@@ -11,8 +11,7 @@
 
 #include "multiplayersa_init.h"
 
-#ifndef __MULTIPLAYER_HOOKSYSTEM_INIT
-#define __MULTIPLAYER_HOOKSYSTEM_INIT
+#pragma once
 
 VOID  HookInstallMethod(DWORD dwInstallAddress, DWORD dwHookFunction);
 VOID  HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
@@ -98,5 +97,3 @@ struct SPokeInfo
     DWORD dwAddress;
     BYTE  ucValue;
 };
-
-#endif

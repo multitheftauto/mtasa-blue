@@ -18,7 +18,7 @@ CCustomWeaponManager::~CCustomWeaponManager()
 {
 }
 
-void CCustomWeaponManager::DoPulse(void)
+void CCustomWeaponManager::DoPulse()
 {
 }
 

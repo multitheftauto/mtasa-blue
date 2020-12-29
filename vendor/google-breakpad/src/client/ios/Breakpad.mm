@@ -36,14 +36,23 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <sys/sysctl.h>
+#include <TargetConditionals.h>
+
+#include <string>
 
 #import "client/ios/handler/ios_exception_minidump_generator.h"
 #import "client/mac/crash_generation/ConfigFile.h"
 #import "client/mac/handler/exception_handler.h"
 #import "client/mac/handler/minidump_generator.h"
-#import "client/mac/sender/uploader.h"
 #import "client/mac/handler/protected_memory_allocator.h"
-#import "common/simple_string_dictionary.h"
+#import "client/mac/sender/uploader.h"
+#import "common/long_string_dictionary.h"
+
+#if !TARGET_OS_TV && !TARGET_OS_WATCH
+#import "client/mac/handler/exception_handler.h"
+#else
+#import "client/ios/handler/exception_handler_no_mach.h"
+#endif  // !TARGET_OS_TV && !TARGET_OS_WATCH
 
 #if !defined(__EXCEPTIONS) || (__clang__ && !__has_feature(cxx_exceptions))
 // This file uses C++ try/catch (but shouldn't). Duplicate the macros from
@@ -59,7 +68,7 @@
 
 using google_breakpad::ConfigFile;
 using google_breakpad::EnsureDirectoryPathExists;
-using google_breakpad::SimpleStringDictionary;
+using google_breakpad::LongStringDictionary;
 
 //=============================================================================
 // We want any memory allocations which are used by breakpad during the
@@ -190,7 +199,7 @@ class Breakpad {
   // MachineExceptions.h, we have to explicitly name the handler.
   google_breakpad::ExceptionHandler *handler_; // The actual handler (STRONG)
 
-  SimpleStringDictionary  *config_params_; // Create parameters (STRONG)
+  LongStringDictionary *config_params_; // Create parameters (STRONG)
 
   ConfigFile config_file_;
 
@@ -306,7 +315,7 @@ Breakpad::~Breakpad() {
   // since they were allocated by ProtectedMemoryAllocator objects.
   //
   if (config_params_) {
-    config_params_->~SimpleStringDictionary();
+    config_params_->~LongStringDictionary();
   }
 
   if (handler_)
@@ -374,10 +383,10 @@ bool Breakpad::ExtractParameters(NSDictionary *parameters) {
   }
 
   config_params_ =
-      new (gKeyValueAllocator->Allocate(sizeof(SimpleStringDictionary)) )
-        SimpleStringDictionary();
+      new (gKeyValueAllocator->Allocate(sizeof(LongStringDictionary)))
+          LongStringDictionary();
 
-  SimpleStringDictionary &dictionary = *config_params_;
+  LongStringDictionary &dictionary = *config_params_;
 
   dictionary.SetKeyValue(BREAKPAD_SERVER_TYPE,     [serverType UTF8String]);
   dictionary.SetKeyValue(BREAKPAD_PRODUCT_DISPLAY, [display UTF8String]);
@@ -420,8 +429,8 @@ NSString *Breakpad::KeyValue(NSString *key) {
   if (!config_params_ || !key)
     return nil;
 
-  const char *value = config_params_->GetValueForKey([key UTF8String]);
-  return value ? [NSString stringWithUTF8String:value] : nil;
+  const std::string value = config_params_->GetValueForKey([key UTF8String]);
+  return value.empty() ? nil : [NSString stringWithUTF8String:value.c_str()];
 }
 
 //=============================================================================
@@ -495,8 +504,8 @@ void Breakpad::UploadData(NSData *data, NSString *name,
                           NSDictionary *server_parameters) {
   NSMutableDictionary *config = [NSMutableDictionary dictionary];
 
-  SimpleStringDictionary::Iterator it(*config_params_);
-  while (const SimpleStringDictionary::Entry *next = it.Next()) {
+  LongStringDictionary::Iterator it(*config_params_);
+  while (const LongStringDictionary::Entry *next = it.Next()) {
     [config setValue:[NSString stringWithUTF8String:next->value]
               forKey:[NSString stringWithUTF8String:next->key]];
   }
@@ -525,7 +534,7 @@ NSDictionary *Breakpad::GenerateReport(NSDictionary *server_parameters) {
   if (!success)
     return nil;
 
-  SimpleStringDictionary params = *config_params_;
+  LongStringDictionary params = *config_params_;
   for (NSString *key in server_parameters) {
     params.SetKeyValue([key UTF8String],
                        [[server_parameters objectForKey:key] UTF8String]);
@@ -560,7 +569,7 @@ bool Breakpad::HandleMinidump(const char *dump_dir,
 void Breakpad::HandleUncaughtException(NSException *exception) {
   // Generate the minidump.
   google_breakpad::IosExceptionMinidumpGenerator generator(exception);
-  const char *minidump_path =
+  const std::string minidump_path =
       config_params_->GetValueForKey(BREAKPAD_DUMP_DIRECTORY);
   std::string minidump_id;
   std::string minidump_filename = generator.UniqueNameInDirectory(minidump_path,
@@ -573,7 +582,7 @@ void Breakpad::HandleUncaughtException(NSException *exception) {
   // 2- If the application crash while trying to handle this exception, a usual
   //    report will be generated. This report must not contain these special
   //    keys.
-  SimpleStringDictionary params = *config_params_;
+  LongStringDictionary params = *config_params_;
   params.SetKeyValue(BREAKPAD_SERVER_PARAMETER_PREFIX "type", "exception");
   params.SetKeyValue(BREAKPAD_SERVER_PARAMETER_PREFIX "exceptionName",
                      [[exception name] UTF8String]);
@@ -582,9 +591,9 @@ void Breakpad::HandleUncaughtException(NSException *exception) {
 
   // And finally write the config file.
   ConfigFile config_file;
-  config_file.WriteFile(minidump_path,
+  config_file.WriteFile(minidump_path.c_str(),
                         &params,
-                        minidump_path,
+                        minidump_path.c_str(),
                         minidump_id.c_str());
 }
 
@@ -612,9 +621,9 @@ BreakpadRef BreakpadCreate(NSDictionary *parameters) {
 
     gKeyValueAllocator =
         new (gMasterAllocator->Allocate(sizeof(ProtectedMemoryAllocator)))
-            ProtectedMemoryAllocator(sizeof(SimpleStringDictionary));
+            ProtectedMemoryAllocator(sizeof(LongStringDictionary));
 
-    // Create a mutex for use in accessing the SimpleStringDictionary
+    // Create a mutex for use in accessing the LongStringDictionary
     int mutexResult = pthread_mutex_init(&gDictionaryMutex, NULL);
     if (mutexResult == 0) {
 

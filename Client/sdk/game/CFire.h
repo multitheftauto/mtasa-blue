@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_FIRE
-#define __CGAME_FIRE
+#pragma once
 
 #include <windows.h>
 #include <CVector.h>
@@ -41,5 +40,3 @@ public:
     virtual VOID            SetNumGenerationsAllowed(char generations) = 0;
     virtual CFireInterface* GetInterface() = 0;
 };
-
-#endif

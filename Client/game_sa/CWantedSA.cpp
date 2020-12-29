@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CWantedSA::CWantedSA(void)
+CWantedSA::CWantedSA()
 {
     // TODO: Call GTA's new operator for CWanted. Lack of proper initialization might be causing crashes.
 
@@ -27,7 +27,7 @@ CWantedSA::CWantedSA(CWantedSAInterface* wantedInterface)
     m_bDontDelete = true;
 }
 
-CWantedSA::~CWantedSA(void)
+CWantedSA::~CWantedSA()
 {
     if (!m_bDontDelete)
     {

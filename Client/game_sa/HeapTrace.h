@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __HEAPTRACE_H
-#define __HEAPTRACE_H
+#pragma once
 
 void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine);
 void RemoveTrack(void* pAddress);
-void DumpUnfreed(void);
-
-#endif
+void DumpUnfreed();

@@ -250,7 +250,7 @@ namespace SharedUtil
     // Hook adding
     //
     /////////////////////////////////////////////////////////////
-    void AddUtf8FileHooks(void)
+    void AddUtf8FileHooks()
     {
         #define ADDHOOK(module,name) \
                 pfn##name = reinterpret_cast < FUNC_##name > ( DetourFunction ( DetourFindFunction ( module, #name ), reinterpret_cast < PBYTE > ( My##name ) ) ); \
@@ -280,7 +280,7 @@ namespace SharedUtil
     // Hook taking away
     //
     /////////////////////////////////////////////////////////////
-    void RemoveUtf8FileHooks(void)
+    void RemoveUtf8FileHooks()
     {
         #define DELHOOK(name) \
             if ( pfn##name ) \

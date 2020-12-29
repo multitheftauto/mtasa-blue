@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONNAMES_H
-#define __CWEAPONNAMES_H
+#pragma once
 
 class CWeaponNames
 {
@@ -33,5 +32,3 @@ public:
         }
     }
 };
-
-#endif

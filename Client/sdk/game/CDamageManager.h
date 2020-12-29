@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_DAMAGEMANAGER
-#define __CGAME_DAMAGEMANAGER
+#pragma once
 
 #include <windows.h>
 
@@ -128,18 +127,18 @@ enum eLights
 class CDamageManager
 {
 public:
-    virtual BYTE          GetEngineStatus(void) = 0;
+    virtual BYTE          GetEngineStatus() = 0;
     virtual VOID          SetEngineStatus(BYTE bEngineState) = 0;
     virtual BYTE          GetDoorStatus(eDoors bDoor) = 0;
-    virtual VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus) = 0;
+    virtual VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent) = 0;
     virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
     virtual VOID          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
     virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;
-    virtual unsigned long GetPanelStatus(void) = 0;
+    virtual unsigned long GetPanelStatus() = 0;
     virtual VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus) = 0;
     virtual void          SetPanelStatus(unsigned long ulStatus) = 0;
     virtual BYTE          GetLightStatus(BYTE bLight) = 0;
-    virtual unsigned char GetLightStatus(void) = 0;
+    virtual unsigned char GetLightStatus() = 0;
     virtual VOID          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;
     virtual void          SetLightStatus(unsigned char ucStatus) = 0;
     virtual BYTE          GetAeroplaneCompStatus(BYTE CompID) = 0;
@@ -147,5 +146,3 @@ public:
 
     virtual VOID FuckCarCompletely(BOOL bKeepWheels) = 0;
 };
-
-#endif

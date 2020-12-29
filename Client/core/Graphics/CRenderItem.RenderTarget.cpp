@@ -36,7 +36,7 @@ void CRenderTargetItem::PostConstruct(CRenderItemManager* pManager, uint uiSizeX
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::PreDestruct(void)
+void CRenderTargetItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -49,7 +49,7 @@ void CRenderTargetItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderTargetItem::IsValid(void)
+bool CRenderTargetItem::IsValid()
 {
     return m_pD3DTexture && m_pD3DRenderTargetSurface && m_pD3DZStencilSurface;
 }
@@ -61,7 +61,7 @@ bool CRenderTargetItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::OnLostDevice(void)
+void CRenderTargetItem::OnLostDevice()
 {
     ReleaseUnderlyingData();
 }
@@ -73,7 +73,7 @@ void CRenderTargetItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::OnResetDevice(void)
+void CRenderTargetItem::OnResetDevice()
 {
     CreateUnderlyingData();
 }
@@ -85,7 +85,7 @@ void CRenderTargetItem::OnResetDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::CreateUnderlyingData(void)
+void CRenderTargetItem::CreateUnderlyingData()
 {
     assert(!m_pD3DRenderTargetSurface);
     assert(!m_pD3DTexture);
@@ -164,7 +164,7 @@ void CRenderTargetItem::CreateUnderlyingData(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::ReleaseUnderlyingData(void)
+void CRenderTargetItem::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pD3DRenderTargetSurface)
     SAFE_RELEASE(m_pD3DTexture)

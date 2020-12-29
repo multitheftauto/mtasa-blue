@@ -14,6 +14,8 @@ struct STrailerInfo
     CVector   m_TrailerRotationDeg;
 };
 
+enum class eVehicleAimDirection : unsigned char;
+
 class CSimVehiclePuresyncPacket : public CSimPacket
 {
 public:
@@ -22,8 +24,8 @@ public:
                               ushort usVehicleGotModel, uchar ucPlayerGotOccupiedVehicleSeat, uchar ucPlayerGotWeaponType, float fPlayerGotWeaponRange,
                               CControllerState& sharedControllerState, uint m_uiDamageInfoSendPhase, const SSimVehicleDamageInfo& damageInfo);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
@@ -85,7 +87,7 @@ private:
         CVector vecSniperSource;
         CVector vecTargetting;
 
-        uchar ucDriveByDirection;
+        eVehicleAimDirection ucDriveByDirection;
 
         float  fTurretX;
         float  fTurretY;

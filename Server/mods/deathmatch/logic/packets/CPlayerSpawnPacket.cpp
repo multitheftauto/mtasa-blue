@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerSpawnPacket::CPlayerSpawnPacket(void)
+CPlayerSpawnPacket::CPlayerSpawnPacket()
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     m_fSpawnRotation = 0;

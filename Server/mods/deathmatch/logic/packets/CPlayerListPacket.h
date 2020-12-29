@@ -14,19 +14,19 @@
 #include "CPacket.h"
 #include <list>
 
-class CPlayerListPacket : public CPacket
+class CPlayerListPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_LIST; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_LIST; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
     void AddPlayer(CPlayer* pPlayer) { m_List.push_back(pPlayer); };
     void RemovePlayer(CPlayer* pPlayer) { m_List.remove(pPlayer); };
-    void RemoveAllPlayers(void) { m_List.clear(); };
+    void RemoveAllPlayers() { m_List.clear(); };
 
-    bool GetShowInChat(void) { return m_bShowInChat; };
+    bool GetShowInChat() { return m_bShowInChat; };
     void SetShowInChat(bool bShowInChat) { m_bShowInChat = bShowInChat; };
 
 private:

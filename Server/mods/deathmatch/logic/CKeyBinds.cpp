@@ -170,7 +170,7 @@ CKeyBinds::CKeyBinds(CPlayer* pPlayer)
     m_pPlayer = pPlayer;
 }
 
-CKeyBinds::~CKeyBinds(void)
+CKeyBinds::~CKeyBinds()
 {
     Clear();
 }
@@ -609,7 +609,7 @@ bool CKeyBinds::IsMouse(const SBindableKey* pKey)
     return false;
 }
 
-void CKeyBinds::RemoveDeletedBinds(void)
+void CKeyBinds::RemoveDeletedBinds()
 {
     list<CKeyBind*>::iterator iter = m_List.begin();
     while (iter != m_List.end())

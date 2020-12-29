@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_GARAGE
-#define __CGAME_GARAGE
+#pragma once
 
 #include "Common.h"
 #include <CVector.h>
@@ -36,5 +35,3 @@ public:
 
     virtual CGarageInterface* GetInterface() = 0;
 };
-
-#endif

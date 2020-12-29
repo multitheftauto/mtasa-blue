@@ -15,8 +15,8 @@ class CProxyDirect3DEffect : public ID3DXEffect
 public:
     // ID3DXBaseEffect
     HRESULT __stdcall QueryInterface(REFIID iid, LPVOID* ppv);
-    ULONG __stdcall AddRef(void) { return m_pOriginal->AddRef(); }
-    ULONG __stdcall Release(void);
+    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
+    ULONG __stdcall Release();
 
     // Descs
     HRESULT __stdcall GetDesc(D3DXEFFECT_DESC* pDesc) { return m_pOriginal->GetDesc(pDesc); }
@@ -114,7 +114,7 @@ public:
 
     // Selecting and setting a technique
     HRESULT __stdcall SetTechnique(D3DXHANDLE hTechnique) { return m_pOriginal->SetTechnique(hTechnique); }
-    D3DXHANDLE __stdcall GetCurrentTechnique(void) { return m_pOriginal->GetCurrentTechnique(); }
+    D3DXHANDLE __stdcall GetCurrentTechnique() { return m_pOriginal->GetCurrentTechnique(); }
     HRESULT __stdcall ValidateTechnique(D3DXHANDLE hTechnique) { return m_pOriginal->ValidateTechnique(hTechnique); }
     HRESULT __stdcall FindNextValidTechnique(D3DXHANDLE hTechnique, D3DXHANDLE* pTechnique)
     {
@@ -131,22 +131,22 @@ public:
     // End             ends active technique
     HRESULT __stdcall Begin(UINT* pPasses, DWORD Flags) { return m_pOriginal->Begin(pPasses, Flags); }
     HRESULT __stdcall BeginPass(UINT Pass) { return m_pOriginal->BeginPass(Pass); }
-    HRESULT __stdcall CommitChanges(void) { return m_pOriginal->CommitChanges(); }
-    HRESULT __stdcall EndPass(void) { return m_pOriginal->EndPass(); }
-    HRESULT __stdcall End(void) { return m_pOriginal->End(); }
+    HRESULT __stdcall CommitChanges() { return m_pOriginal->CommitChanges(); }
+    HRESULT __stdcall EndPass() { return m_pOriginal->EndPass(); }
+    HRESULT __stdcall End() { return m_pOriginal->End(); }
 
     // Managing D3D Device
     HRESULT __stdcall GetDevice(LPDIRECT3DDEVICE9* ppDevice) { return m_pOriginal->GetDevice(ppDevice); }
-    HRESULT __stdcall OnLostDevice(void) { return m_pOriginal->OnLostDevice(); }
-    HRESULT __stdcall OnResetDevice(void) { return m_pOriginal->OnResetDevice(); }
+    HRESULT __stdcall OnLostDevice() { return m_pOriginal->OnLostDevice(); }
+    HRESULT __stdcall OnResetDevice() { return m_pOriginal->OnResetDevice(); }
 
     // Logging device calls
     HRESULT __stdcall SetStateManager(LPD3DXEFFECTSTATEMANAGER pManager) { return m_pOriginal->SetStateManager(pManager); }
     HRESULT __stdcall GetStateManager(LPD3DXEFFECTSTATEMANAGER* ppManager) { return m_pOriginal->GetStateManager(ppManager); }
 
     // Parameter blocks
-    HRESULT __stdcall BeginParameterBlock(void) { return m_pOriginal->BeginParameterBlock(); }
-    D3DXHANDLE __stdcall EndParameterBlock(void) { return m_pOriginal->EndParameterBlock(); }
+    HRESULT __stdcall BeginParameterBlock() { return m_pOriginal->BeginParameterBlock(); }
+    D3DXHANDLE __stdcall EndParameterBlock() { return m_pOriginal->EndParameterBlock(); }
     HRESULT __stdcall ApplyParameterBlock(D3DXHANDLE hParameterBlock) { return m_pOriginal->ApplyParameterBlock(hParameterBlock); }
     HRESULT __stdcall DeleteParameterBlock(D3DXHANDLE hParameterBlock) { return m_pOriginal->DeleteParameterBlock(hParameterBlock); }
 
@@ -161,9 +161,9 @@ public:
 
     // CProxyDirect3DEffect
     CProxyDirect3DEffect(IDirect3DDevice9* InD3DDevice9, ID3DXEffect* InOriginal);
-    virtual ~CProxyDirect3DEffect(void);
+    virtual ~CProxyDirect3DEffect();
 
-    ID3DXEffect* GetOriginal(void) { return m_pOriginal; }
+    ID3DXEffect* GetOriginal() { return m_pOriginal; }
 
 protected:
     ID3DXEffect*                            m_pOriginal;
@@ -172,3 +172,6 @@ protected:
 
 HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrcFile, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,
                                           LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT* ppEffect, LPD3DXBUFFER* ppCompilationErrors);
+
+HRESULT WINAPI MyD3DXCreateEffect(LPDIRECT3DDEVICE9 pDevice, LPCVOID pSrcData, UINT SrcDataLen, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,
+    LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT* ppEffect, LPD3DXBUFFER* ppCompilationErrors);

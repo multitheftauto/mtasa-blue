@@ -10,8 +10,7 @@
 
 class CClientTeam;
 
-#ifndef __CCLIENTTEAM_H
-#define __CCLIENTTEAM_H
+#pragma once
 
 #include "CClientEntity.h"
 #include "CClientPlayer.h"
@@ -25,36 +24,36 @@ class CClientTeam : public CClientEntity
 public:
     CClientTeam(CClientManager* pManager, ElementID ID, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
                 unsigned char ucBlue = 0);
-    ~CClientTeam(void);
+    ~CClientTeam();
 
-    eClientEntityType GetType(void) const { return CCLIENTTEAM; }
+    eClientEntityType GetType() const { return CCLIENTTEAM; }
 
-    void Unlink(void);
+    void Unlink();
 
-    unsigned char GetID(void) { return m_ucID; }
+    unsigned char GetID() { return m_ucID; }
 
-    const char* GetTeamName(void) { return m_strTeamName; }
+    const char* GetTeamName() { return m_strTeamName; }
     void        SetTeamName(const char* szName);
 
     void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
     void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 
-    bool GetFriendlyFire(void) { return m_bFriendlyFire; }
+    bool GetFriendlyFire() { return m_bFriendlyFire; }
     void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
 
     void AddPlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
     void RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
-    void RemoveAll(void);
+    void RemoveAll();
 
     bool Exists(CClientPlayer* pPlayer);
 
-    std::list<CClientPlayer*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    std::list<CClientPlayer*>::const_iterator IterEnd(void) { return m_List.end(); }
+    std::list<CClientPlayer*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::list<CClientPlayer*>::const_iterator IterEnd() { return m_List.end(); }
 
     void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }
 
-    unsigned int CountPlayers(void) { return static_cast<unsigned int>(m_List.size()); }
+    unsigned int CountPlayers() { return static_cast<unsigned int>(m_List.size()); }
 
 protected:
     CClientTeamManager* m_pTeamManager;
@@ -72,5 +71,3 @@ protected:
 
     CVector m_vecPosition;
 };
-
-#endif

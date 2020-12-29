@@ -9,20 +9,17 @@
  *
  *****************************************************************************/
 
-#ifndef __CCameraRPCs_H
-#define __CCameraRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CCameraRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetCameraMatrix);
     DECLARE_RPC(SetCameraTarget);
     DECLARE_RPC(SetCameraInterior);
     DECLARE_RPC(FadeCamera);
 };
-
-#endif

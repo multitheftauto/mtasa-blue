@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKTYPES
-#define __CGAME_TASKTYPES
+#pragma once
 
 enum eTaskType
 {
@@ -577,5 +576,3 @@ enum eTaskType
     */
     MAX_NUM_TASK_TYPES
 };
-
-#endif

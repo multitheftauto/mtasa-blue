@@ -17,7 +17,7 @@
 // Get group name for aclrequest acl
 //
 ///////////////////////////////////////////////////////////////
-SString CResource::GetAutoGroupName(void)
+SString CResource::GetAutoGroupName()
 {
     return SString("autoGroup_%s", GetName().c_str());
 }
@@ -29,7 +29,7 @@ SString CResource::GetAutoGroupName(void)
 // Get acl name for aclrequest items
 //
 ///////////////////////////////////////////////////////////////
-SString CResource::GetAutoAclName(void)
+SString CResource::GetAutoAclName()
 {
     return SString("autoACL_%s", GetName().c_str());
 }
@@ -42,7 +42,7 @@ SString CResource::GetAutoAclName(void)
 // Can't fail
 //
 ///////////////////////////////////////////////////////////////
-CAccessControlList* CResource::GetAutoAcl(void)
+CAccessControlList* CResource::GetAutoAcl()
 {
     return g_pGame->GetACLManager()->AddACL(GetAutoAclName());
 }
@@ -55,7 +55,7 @@ CAccessControlList* CResource::GetAutoAcl(void)
 // Will return NULL if it does not exist
 //
 ///////////////////////////////////////////////////////////////
-CAccessControlList* CResource::FindAutoAcl(void)
+CAccessControlList* CResource::FindAutoAcl()
 {
     return g_pGame->GetACLManager()->GetACL(GetAutoAclName());
 }
@@ -67,7 +67,7 @@ CAccessControlList* CResource::FindAutoAcl(void)
 // Remove group and acl used for aclrequest items
 //
 ///////////////////////////////////////////////////////////////
-void CResource::RemoveAutoPermissions(void)
+void CResource::RemoveAutoPermissions()
 {
     CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
 

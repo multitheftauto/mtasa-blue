@@ -41,12 +41,12 @@ class CTileBatcher
 {
 public:
     ZERO_ON_NEW
-    CTileBatcher(void);
-    ~CTileBatcher(void);
+    CTileBatcher();
+    ~CTileBatcher();
 
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
-    void OnZBufferModified(void);
-    void Flush(void);
+    void OnZBufferModified();
+    void Flush();
     void AddTile(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, CMaterialItem* pMaterial, float fRotation,
                  float fRotCenOffX, float fRotCenOffY, unsigned long ulColor);
 

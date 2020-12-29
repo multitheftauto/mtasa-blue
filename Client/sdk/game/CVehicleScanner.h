@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_VEHICLESCANNER
-#define __CGAME_VEHICLESCANNER
+#pragma once
 
 class CVehicle;
 
@@ -19,5 +18,3 @@ class CVehicleScanner
 public:
     virtual CVehicle* GetClosestVehicleInRange() = 0;
 };
-
-#endif

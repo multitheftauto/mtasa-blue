@@ -9,17 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITAB_H
-#define __CGUITAB_H
+#pragma once
 
 #include "CGUIElement.h"
 
 class CGUITab : public CGUIElement
 {
 public:
-    virtual ~CGUITab(void){};
+    virtual ~CGUITab(){};
 
     virtual void SetCaption(const char* szCaption) = 0;
 };
-
-#endif

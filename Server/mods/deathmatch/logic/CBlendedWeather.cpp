@@ -25,7 +25,7 @@ CBlendedWeather::CBlendedWeather(CClock* pClock)
     m_pClock = pClock;
 }
 
-void CBlendedWeather::DoPulse(void)
+void CBlendedWeather::DoPulse()
 {
     Update();
 }
@@ -54,7 +54,7 @@ void CBlendedWeather::SetWeatherBlended(unsigned char ucWeather, unsigned char u
     }
 }
 
-unsigned char CBlendedWeather::GetWeather(void)
+unsigned char CBlendedWeather::GetWeather()
 {
     // If we're blending the weather, return the weather we started blending from
     if (m_ucBlendStopHour != 0xFF)
@@ -66,7 +66,7 @@ unsigned char CBlendedWeather::GetWeather(void)
     return m_ucPrimaryWeather;
 }
 
-void CBlendedWeather::Update(void)
+void CBlendedWeather::Update()
 {
     // Grab the current time
     unsigned char ucHour, ucMinute;

@@ -42,7 +42,7 @@ CProxyDirect3DIndexBuffer::CProxyDirect3DIndexBuffer(IDirect3DDevice9* InD3DDevi
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DIndexBuffer::~CProxyDirect3DIndexBuffer(void)
+CProxyDirect3DIndexBuffer::~CProxyDirect3DIndexBuffer()
 {
     m_stats.iCurrentCount--;
     m_stats.iCurrentBytes -= m_iMemUsed;
@@ -78,7 +78,7 @@ HRESULT CProxyDirect3DIndexBuffer::QueryInterface(REFIID riid, void** ppvObj)
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DIndexBuffer::Release(void)
+ULONG CProxyDirect3DIndexBuffer::Release()
 {
     // Call original function
     ULONG count = m_pOriginal->Release();

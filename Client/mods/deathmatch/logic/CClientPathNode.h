@@ -10,8 +10,7 @@
 
 class CClientPathNode;
 
-#ifndef __CCLIENTPATHNODE_H
-#define __CCLIENTPATHNODE_H
+#pragma once
 
 #include "CClientManager.h"
 
@@ -28,23 +27,23 @@ public:
     };
     CClientPathNode(CClientManager* pManager, CVector& vecPosition, CVector& vecRotation, int iTime, ElementID ID, ePathNodeStyle PathStyle = PATH_STYLE_JUMP,
                     CClientPathNode* pNextNode = NULL);
-    ~CClientPathNode(void);
+    ~CClientPathNode();
 
-    void Unlink(void);
+    void Unlink();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    eClientEntityType GetType(void) const { return CCLIENTPATHNODE; }
+    eClientEntityType GetType() const { return CCLIENTPATHNODE; }
 
     void             GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void             SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }
     void             GetRotationRadians(CVector& vecRotation) const { vecRotation = m_vecRotation; }
     void             SetRotationRadians(const CVector& vecRotation) { m_vecRotation = vecRotation; }
-    int              GetTime(void) { return m_iTime; }
-    ePathNodeStyle   GetStyle(void) { return m_Style; }
-    CClientPathNode* GetPreviousNode(void) { return m_pPreviousNode; }
+    int              GetTime() { return m_iTime; }
+    ePathNodeStyle   GetStyle() { return m_Style; }
+    CClientPathNode* GetPreviousNode() { return m_pPreviousNode; }
     void             SetPreviousNode(CClientPathNode* pPathNode) { m_pPreviousNode = pPathNode; }
-    CClientPathNode* GetNextNode(void) { return m_pNextNode; }
+    CClientPathNode* GetNextNode() { return m_pNextNode; }
     void             SetNextNode(CClientPathNode* pPathNode) { m_pNextNode = pPathNode; }
     void             SetNextNodeID(ElementID ID) { m_NextNodeID = ID; }
 
@@ -56,8 +55,8 @@ public:
     }
     bool IsEntityAttached(CClientEntity* pEntity);
 
-    std::list<CClientEntity*>::iterator AttachedIterBegin(void) { return m_List.begin(); }
-    std::list<CClientEntity*>::iterator AttachedIterEnd(void) { return m_List.end(); }
+    std::list<CClientEntity*>::iterator AttachedIterBegin() { return m_List.begin(); }
+    std::list<CClientEntity*>::iterator AttachedIterEnd() { return m_List.end(); }
 
 private:
     CClientPathManager* m_pPathManager;
@@ -71,5 +70,3 @@ private:
 
     std::list<CClientEntity*> m_List;
 };
-
-#endif

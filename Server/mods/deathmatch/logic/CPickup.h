@@ -19,7 +19,7 @@ class CPickup;
 #include "CElement.h"
 #include "CEvents.h"
 
-class CPickup : public CElement, private CColCallback
+class CPickup final : public CElement, private CColCallback
 {
     friend class CPickupManager;
 
@@ -89,61 +89,64 @@ public:
         WEAPON_INVALID = 0xFF,
     };
 
-    CPickup(CElement* pParent, CXMLNode* pNode, class CPickupManager* pPickupManager, CColManager* pColManager);
-    ~CPickup(void);
+    CPickup(CElement* pParent, class CPickupManager* pPickupManager, CColManager* pColManager);
+    ~CPickup();
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    bool IsEntity(void) { return true; }
+    bool IsEntity() { return true; }
 
-    void Unlink(void);
-    bool ReadSpecialData(void);
+    void Unlink();
 
     void SetPosition(const CVector& vecPosition);
 
-    unsigned char GetPickupType(void) { return m_ucType; };
+    unsigned char GetPickupType() { return m_ucType; };
     void          SetPickupType(unsigned char ucType);
-    bool          IsTypeRandom(void) { return m_bIsTypeRandom; };
+    bool          IsTypeRandom() { return m_bIsTypeRandom; };
 
-    unsigned char GetWeaponType(void) { return m_ucWeaponType; };
+    unsigned char GetWeaponType() { return m_ucWeaponType; };
     void          SetWeaponType(unsigned char ucWeaponType);
-    bool          IsWeaponTypeRandom(void) { return m_bIsWeaponTypeRandom; };
+    bool          IsWeaponTypeRandom() { return m_bIsWeaponTypeRandom; };
 
-    unsigned short GetAmmo(void) { return m_usAmmo; };
+    unsigned short GetAmmo() { return m_usAmmo; };
     void           SetAmmo(unsigned short usAmmo) { m_usAmmo = usAmmo; };
 
-    float GetAmount(void) { return m_fAmount; }
+    float GetAmount() { return m_fAmount; }
     void  SetAmount(float fAmount) { m_fAmount = fAmount; }
-    bool  IsHealthRandom(void) { return m_bIsHealthRandom; };
+    bool  IsHealthRandom() { return m_bIsHealthRandom; };
 
-    unsigned long GetRespawnIntervals(void) { return m_ulRespawnIntervals; };
+    unsigned long GetRespawnIntervals() { return m_ulRespawnIntervals; };
     void          SetRespawnIntervals(unsigned long ulRespawnIntervals) { m_ulRespawnIntervals = ulRespawnIntervals; };
 
-    CTickCount GetLastUsedTime(void) { return m_LastUsedTime; }
-    CTickCount GetCreationTime(void) { return m_CreationTime; }
+    CTickCount GetLastUsedTime() { return m_LastUsedTime; }
+    CTickCount GetCreationTime() { return m_CreationTime; }
 
-    unsigned short GetModel(void) { return m_usModel; };
+    unsigned short GetModel() { return m_usModel; };
     void           SetModel(unsigned short usModel) { m_usModel = usModel; };
 
-    bool IsVisible(void) { return m_bVisible; };
+    bool IsVisible() { return m_bVisible; };
     void SetVisible(bool bVisible);
 
-    void Randomize(void);
+    void Randomize();
 
     bool CanUse(class CPlayer& Player, bool bOnfootCheck = true);
     void Use(class CPlayer& Player);
 
-    bool IsSpawned(void) { return m_bSpawned; }
+    bool IsSpawned() { return m_bSpawned; }
     void SetSpawned(bool bSpawned) { m_bSpawned = bSpawned; }
 
-    CColShape* GetColShape(void) { return m_pCollision; }
+    CColShape* GetColShape() { return m_pCollision; }
     void       SetEnabled(bool bEnabled)
     {
         if (m_pCollision)
             m_pCollision->SetEnabled(bEnabled);
     }
-    bool IsEnabled(void) { return m_pCollision && m_pCollision->IsEnabled(); }
+    bool IsEnabled() { return m_pCollision && m_pCollision->IsEnabled(); }
 
     void SetDoneDelayHack(bool bDone) { m_bDoneDelayHack = bDone; }
-    bool HasDoneDelayHack(void) { return m_bDoneDelayHack; }
+    bool HasDoneDelayHack() { return m_bDoneDelayHack; }
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     void Callback_OnCollision(CColShape& Shape, CElement& Element);

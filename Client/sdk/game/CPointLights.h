@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPointLights_H
-#define __CPointLights_H
+#pragma once
 
 enum ePointLightType
 {
@@ -29,5 +28,3 @@ public:
     virtual void PostRenderHeliLights() = 0;
     virtual void RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot) = 0;
 };
-
-#endif

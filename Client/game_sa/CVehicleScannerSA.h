@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_VEHICLESCANNER
-#define __CGAMESA_VEHICLESCANNER
+#pragma once
 
 #include <game/CVehicleScanner.h>
 
@@ -33,5 +32,3 @@ public:
 
     CVehicle* GetClosestVehicleInRange();
 };
-
-#endif

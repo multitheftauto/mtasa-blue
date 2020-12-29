@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventDamageSA_H
-#define __CEventDamageSA_H
+#pragma once
 
 #include <windows.h>
 #include <game/CEventDamage.h>
@@ -72,36 +71,34 @@ private:
 public:
     CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4);
     CEventDamageSA(CEventDamageSAInterface* pInterface);
-    ~CEventDamageSA(void);
+    ~CEventDamageSA();
 
-    CEventDamageSAInterface* GetInterface(void) { return m_pInterface; }
+    CEventDamageSAInterface* GetInterface() { return m_pInterface; }
 
-    void Destroy(void) { delete this; }
+    void Destroy() { delete this; }
 
     // Flag accessors
-    bool DidPedFallDown(void) { return (m_pInterface->ucFlags & 2) != 0; }
-    bool WasStealthAttack(void) { return (m_pInterface->ucFlags & 16) != 0; }
+    bool DidPedFallDown() { return (m_pInterface->ucFlags & 2) != 0; }
+    bool WasStealthAttack() { return (m_pInterface->ucFlags & 16) != 0; }
 
-    void MakePedFallDown(void) { m_pInterface->ucFlags |= 2; }
+    void MakePedFallDown() { m_pInterface->ucFlags |= 2; }
 
-    DWORD          GetDamageTime(void) { return m_pInterface->damageTime; }
-    eWeaponType    GetWeaponUsed(void) { return m_pInterface->weaponUsed; }
-    ePedPieceTypes GetPedPieceType(void) { return m_pInterface->pedPieceType; }
-    char           GetDirection(void) { return m_pInterface->ucDirection; }
+    DWORD          GetDamageTime() { return m_pInterface->damageTime; }
+    eWeaponType    GetWeaponUsed() { return m_pInterface->weaponUsed; }
+    ePedPieceTypes GetPedPieceType() { return m_pInterface->pedPieceType; }
+    char           GetDirection() { return m_pInterface->ucDirection; }
 
-    CEntity*            GetInflictingEntity(void);
-    CPedDamageResponse* GetDamageResponse(void) { return m_pDamageResponse; }
+    CEntity*            GetInflictingEntity();
+    CPedDamageResponse* GetDamageResponse() { return m_pDamageResponse; }
 
-    bool              HasKilledPed(void);
-    float             GetDamageApplied(void);
-    AssocGroupId      GetAnimGroup(void);
-    AnimationId       GetAnimId(void);
-    bool              GetAnimAdded(void);
+    bool              HasKilledPed();
+    float             GetDamageApplied();
+    AssocGroupId      GetAnimGroup();
+    AnimationId       GetAnimId();
+    bool              GetAnimAdded();
     void              ComputeDeathAnim(CPed* pPed, bool bUnk);
     void              ComputeDamageAnim(CPed* pPed, bool bUnk);
     bool              AffectsPed(CPed* pPed);
     void              SetDamageReason(EDamageReasonType damageReason) { m_DamageReason = damageReason; }
-    EDamageReasonType GetDamageReason(void) { return m_DamageReason; }
+    EDamageReasonType GetDamageReason() { return m_DamageReason; }
 };
-
-#endif

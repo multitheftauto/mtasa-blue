@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_3DMARKER
-#define __CGAMESA_3DMARKER
+#pragma once
 
 #include <game/C3DMarker.h>
 #include <CMatrix_Pad.h>
@@ -94,5 +93,3 @@ public:
     void     SetActive() { this->internalInterface->m_bIsUsed = true; };
     RpClump* GetRwObject() { return this->internalInterface->m_pRwObject; }
 };
-
-#endif

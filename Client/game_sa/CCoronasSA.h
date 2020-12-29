@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CORONAS
-#define __CGAMESA_CORONAS
+#pragma once
 
 #include <game/CCoronas.h>
 #include "CRegisteredCoronaSA.h"
@@ -39,5 +38,3 @@ public:
 
     void DisableSunAndMoon(bool bDisabled);
 };
-
-#endif

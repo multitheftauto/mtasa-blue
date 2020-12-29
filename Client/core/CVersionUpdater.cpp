@@ -27,116 +27,117 @@ public:
     ZERO_ON_NEW
 
     // CVersionUpdaterInterface interface
-    CVersionUpdater(void);
-    virtual ~CVersionUpdater(void);
-    virtual bool SaveConfigToXML(void);
+    CVersionUpdater();
+    virtual ~CVersionUpdater();
+    virtual bool SaveConfigToXML();
     virtual void EnableChecking(bool bOn);
-    virtual void DoPulse(void);
+    virtual void DoPulse();
     virtual void InitiateUpdate(const SString& strType, const SString& strData, const SString& strHost);
     virtual bool IsOptionalUpdateInfoRequired(const SString& strHost);
-    virtual void InitiateDataFilesFix(void);
-    virtual void InitiateManualCheck(void);
+    virtual void InitiateDataFilesFix();
+    virtual void InitiateManualCheck();
     virtual void GetAseServerList(std::vector<SString>& outResult);
     virtual void InitiateSidegradeLaunch(const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword);
     virtual void GetBrowseVersionMaps(std::map<SString, int>& outBlockedVersionMap, std::map<SString, int>& outAllowedVersionMap);
     virtual void GetNewsSettings(SString& strOutOldestPost, uint& uiOutMaxHistoryLength);
-    virtual const SString& GetDebugFilterString(void);
+    virtual const SString& GetDebugFilterString();
 
     // CVersionUpdater functions
-    bool EnsureLoadedConfigFromXML(void);
+    bool EnsureLoadedConfigFromXML();
 
     // Command lists
     void RunProgram(EUpdaterProgramType strProgramName);
 
-    void Program_VersionCheck(void);
-    void Program_ManualCheck(void);
-    void Program_ManualCheckSim(void);
-    void Program_ServerSaysUpdate(void);
-    void Program_ServerSaysRecommend(void);
-    void Program_ServerSaysDataFilesWrong(void);
-    void Program_MasterFetch(void);
-    void Program_SendCrashDump(void);
-    void Program_SendReportLog(void);
-    void Program_SidegradeLaunch(void);
-    void Program_NewsUpdate(void);
+    void Program_VersionCheck();
+    void Program_ManualCheck();
+    void Program_ManualCheckSim();
+    void Program_ServerSaysUpdate();
+    void Program_ServerSaysRecommend();
+    void Program_ServerSaysDataFilesWrong();
+    void Program_MasterFetch();
+    void Program_SendCrashDump();
+    void Program_SendReportLog();
+    void Program_SidegradeLaunch();
+    void Program_NewsUpdate();
 
     // Util
     CXMLNode*                         GetXMLConfigNode(bool bCreateIfRequired);
-    bool                              IsBusy(void);
-    void                              ResetEverything(void);
-    CReportWrap*                      GetReportWrap(void);
+    bool                              IsBusy();
+    void                              ResetEverything();
+    CReportWrap*                      GetReportWrap();
     static std::vector<SString>       MakeServerList(const CDataInfoSet& infoMap);
-    void                              PostChangeMasterConfig(void);
-    void                              OnPossibleConfigProblem(void);
-    CNetHTTPDownloadManagerInterface* GetHTTP(void);
+    void                              PostChangeMasterConfig();
+    void                              OnPossibleConfigProblem();
+    CNetHTTPDownloadManagerInterface* GetHTTP();
     void                              GetSaveLocationList(std::list<SString>& outSaveLocationList, const SString& strFilename);
     SString                           GetResumableSaveLocation(const SString& strFilename, const SString& strMD5, uint iFilesize);
     static void                       StaticDownloadFinished(const SHttpDownloadResult& result);
     void                              DownloadFinished(const SHttpDownloadResult& result);
 
     // Commands
-    void _UseMasterFetchURLs(void);
-    void _UseVersionQueryURLs(void);
-    void _UseProvidedURLs(void);
-    void _UseReportLogURLs(void);
-    void _UseCrashDumpQueryURLs(void);
-    void _UseCrashDumpURLs(void);
-    void _UseSidegradeURLs(void);
-    void _UseNewsUpdateURLs(void);
-    void _UseReportLogPostContent(void);
-    void _UseCrashDumpPostContent(void);
-    void _ShouldSendCrashDump(void);
-    void _ResetLastCrashDump(void);
-    void _ActionReconnect(void);
-    void _DialogHide(void);
-    void _ExitGame(void);
-    void _ResetVersionCheckTimer(void);
-    void _ResetNewsCheckTimer(void);
-    void _ResetMasterCheckTimer(void);
-    void _ResetManualCheckTimer(void);
-    void _PollQuestionNoYes(void);
-    void _PollAnyButton(void);
-    void _DialogConnectingWait(void);
-    void _DialogChecking(void);
-    void _DialogNoUpdate(void);
-    void _DialogDownloading(void);
-    void _DialogServerSaysUpdateQuestion(void);
-    void _DialogServerSaysRecommendQuestion(void);
-    void _DialogUpdateQuestion(void);
-    void _DialogUpdateQueryError(void);
-    void _DialogUpdateResult(void);
-    void _QUpdateResult(void);
-    void _QUpdateNewsResult(void);
-    void _DialogDataFilesQuestion(void);
-    void _DialogExeFilesResult(void);
-    void _StartDownload(void);
-    int  _PollDownload(void);
-    void _StartSendPost(void);
-    int  _PollSendPost(void);
-    void _CheckSidegradeRequirements(void);
-    void _DoSidegradeLaunch(void);
-    void _DialogSidegradeDownloadQuestion(void);
-    void _DialogSidegradeLaunchQuestion(void);
-    void _DialogSidegradeQueryError(void);
+    void _UseMasterFetchURLs();
+    void _UseVersionQueryURLs();
+    void _UseProvidedURLs();
+    void _UseReportLogURLs();
+    void _UseCrashDumpQueryURLs();
+    void _UseCrashDumpURLs();
+    void _UseSidegradeURLs();
+    void _UseNewsUpdateURLs();
+    void _UseReportLogPostContent();
+    void _UseCrashDumpPostContent();
+    void _ShouldSendCrashDump();
+    void _ResetLastCrashDump();
+    void _ActionReconnect();
+    void _DialogHide();
+    void _ExitGame();
+    void _ResetVersionCheckTimer();
+    void _ResetNewsCheckTimer();
+    void _ResetMasterCheckTimer();
+    void _ResetManualCheckTimer();
+    void _PollQuestionNoYes();
+    void _PollAnyButton();
+    void _DialogConnectingWait();
+    void _DialogChecking();
+    void _DialogNoUpdate();
+    void _DialogDownloading();
+    void _DialogServerSaysUpdateQuestion();
+    void _DialogServerSaysRecommendQuestion();
+    void _DialogUpdateQuestion();
+    void _DialogUpdateQueryError();
+    void _DialogUpdateResult();
+    void _QUpdateResult();
+    void _QUpdateNewsResult();
+    void _DialogDataFilesQuestion();
+    void _DialogExeFilesResult();
+    void _StartDownload();
+    int  _PollDownload();
+    void _StartSendPost();
+    int  _PollSendPost();
+    void _CheckSidegradeRequirements();
+    void _DoSidegradeLaunch();
+    void _DialogSidegradeDownloadQuestion();
+    void _DialogSidegradeLaunchQuestion();
+    void _DialogSidegradeQueryError();
 
-    void _ProcessCrashDumpQuery(void);
-    void _ProcessMasterFetch(void);
-    void _ProcessPatchFileQuery(void);
-    void _ProcessPatchFileDownload(void);
-    void _QuitCurrentProgram(void);
+    void _ProcessCrashDumpQuery();
+    void _ProcessMasterFetch();
+    void _ProcessPatchFileQuery();
+    void _ProcessPatchFileDownload();
+    void _QuitCurrentProgram();
 
     // Doers
-    int DoSendDownloadRequestToNextServer(void);
-    int DoPollDownload(void);
-    int DoSendPostToNextServer(void);
-    int DoPollPost(void);
+    int DoSendDownloadRequestToNextServer();
+    int DoPollDownload();
+    int DoSendPostToNextServer();
+    int DoPollPost();
+    void OnMainMenuFullyVisible();
 
     static void* StaticThreadProc(void* pContext);
-    void*        ThreadProc(void);
-    void         StopThread(void);
+    void*        ThreadProc();
+    void         StopThread();
     void         ProcessCommand(EUpdaterProgramType eProgramType);
-    void         MainStep(void);
-    void         UpdaterYield(void);
+    void         MainStep();
+    void         UpdaterYield();
 
     SJobInfo      m_JobInfo;
     long long     m_llTimeStart;
@@ -208,7 +209,7 @@ CVersionUpdaterInterface* GetVersionUpdater()
 //
 //
 ///////////////////////////////////////////////////////////////
-CVersionUpdater::CVersionUpdater(void)
+CVersionUpdater::CVersionUpdater()
 {
     shared.m_Mutex.Lock();
     m_pProgramThreadHandle = new CThreadHandle(CVersionUpdater::StaticThreadProc, this);
@@ -221,7 +222,7 @@ CVersionUpdater::CVersionUpdater(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CVersionUpdater::~CVersionUpdater(void)
+CVersionUpdater::~CVersionUpdater()
 {
     StopThread();
     SAFE_DELETE(m_pProgramThreadHandle);
@@ -235,7 +236,7 @@ CVersionUpdater::~CVersionUpdater(void)
 // Stop the updater processing thread
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::StopThread(void)
+void CVersionUpdater::StopThread()
 {
     shared.m_bTerminateThread = true;
     shared.m_Mutex.Signal();
@@ -288,7 +289,7 @@ CXMLNode* CVersionUpdater::GetXMLConfigNode(bool bCreateIfRequired)
 // Load settings
 //
 ///////////////////////////////////////////////////////////////
-bool CVersionUpdater::EnsureLoadedConfigFromXML(void)
+bool CVersionUpdater::EnsureLoadedConfigFromXML()
 {
     if (m_bLoadedConfig)
         return false;
@@ -357,7 +358,7 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML(void)
 // Save setting
 //
 ///////////////////////////////////////////////////////////////
-bool CVersionUpdater::SaveConfigToXML(void)
+bool CVersionUpdater::SaveConfigToXML()
 {
     if (!m_bLoadedConfig)
         return false;
@@ -447,7 +448,7 @@ CReportWrap* CVersionUpdater::GetReportWrap()
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::DoPulse(void)
+void CVersionUpdater::DoPulse()
 {
     if (!m_bEnabled)
         return;
@@ -597,7 +598,7 @@ bool CVersionUpdater::IsOptionalUpdateInfoRequired(const SString& strHost)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::InitiateDataFilesFix(void)
+void CVersionUpdater::InitiateDataFilesFix()
 {
     RunProgram(EUpdaterProgramType::ServerSaysDataFilesWrong);
 }
@@ -609,7 +610,7 @@ void CVersionUpdater::InitiateDataFilesFix(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::InitiateManualCheck(void)
+void CVersionUpdater::InitiateManualCheck()
 {
     if (GetQuestionBox().IsVisible())
     {
@@ -746,7 +747,7 @@ void CVersionUpdater::GetBrowseVersionMaps(std::map<SString, int>& outBlockedVer
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CVersionUpdater::GetDebugFilterString(void)
+const SString& CVersionUpdater::GetDebugFilterString()
 {
     EnsureLoadedConfigFromXML();
     return m_MasterConfig.misc.debug.strFilter;
@@ -759,7 +760,7 @@ const SString& CVersionUpdater::GetDebugFilterString(void)
 // Get the HTTP download manager used for all version updater stuff
 //
 ///////////////////////////////////////////////////////////////
-CNetHTTPDownloadManagerInterface* CVersionUpdater::GetHTTP(void)
+CNetHTTPDownloadManagerInterface* CVersionUpdater::GetHTTP()
 {
     return g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CORE_UPDATER);
 }
@@ -856,7 +857,7 @@ void CVersionUpdater::ResetEverything()
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CVersionUpdater::IsBusy(void)
+bool CVersionUpdater::IsBusy()
 {
     if (shared.m_CurrentProgram != EUpdaterProgramType::None)
         return true;
@@ -961,7 +962,7 @@ std::vector<SString> CVersionUpdater::MakeServerList(const CDataInfoSet& dataInf
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::OnPossibleConfigProblem(void)
+void CVersionUpdater::OnPossibleConfigProblem()
 {
     // Limit number of times this can be done
     if (m_iForceMasterConfigRefreshCount < 1)
@@ -1004,7 +1005,7 @@ void CVersionUpdater::RunProgram(EUpdaterProgramType strProgramName)
 // Let the updater thread have some time
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::MainStep(void)
+void CVersionUpdater::MainStep()
 {
     assert(IsMainThread());
     shared.m_Mutex.Signal();
@@ -1021,7 +1022,7 @@ void CVersionUpdater::MainStep(void)
 // Let the main thread continue
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::UpdaterYield(void)
+void CVersionUpdater::UpdaterYield()
 {
     assert(!IsMainThread());
     shared.m_Mutex.Signal();
@@ -1060,7 +1061,7 @@ void* CVersionUpdater::StaticThreadProc(void* pContext)
 // Job service loop
 //
 ///////////////////////////////////////////////////////////////
-void* CVersionUpdater::ThreadProc(void)
+void* CVersionUpdater::ThreadProc()
 {
     shared.m_Mutex.Lock();
     while (!shared.m_bTerminateThread)
@@ -1499,7 +1500,7 @@ noupdate:
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_CheckSidegradeRequirements(void)
+void CVersionUpdater::_CheckSidegradeRequirements()
 {
     // Is version allowed to be launched?
 
@@ -1544,7 +1545,7 @@ void CVersionUpdater::_CheckSidegradeRequirements(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DoSidegradeLaunch(void)
+void CVersionUpdater::_DoSidegradeLaunch()
 {
     SString strURL("mtasa://%s:%s@%s", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost);
     SetOnQuitCommand("open", m_strSidegradePath, strURL);
@@ -1558,7 +1559,7 @@ void CVersionUpdater::_DoSidegradeLaunch(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogSidegradeDownloadQuestion(void)
+void CVersionUpdater::_DialogSidegradeDownloadQuestion()
 {
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(SString(_("MTA:SA %s required"), *m_strSidegradeVersion));
@@ -1578,7 +1579,7 @@ void CVersionUpdater::_DialogSidegradeDownloadQuestion(void)
 // If can launch other version, ask for user confirmation
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogSidegradeLaunchQuestion(void)
+void CVersionUpdater::_DialogSidegradeLaunchQuestion()
 {
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(SString(_("MTA:SA %s required"), *m_strSidegradeVersion));
@@ -1596,7 +1597,7 @@ void CVersionUpdater::_DialogSidegradeLaunchQuestion(void)
 // No download file for other version
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogSidegradeQueryError(void)
+void CVersionUpdater::_DialogSidegradeQueryError()
 {
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(SString(_("MTA:SA %s required"), *m_strSidegradeVersion));
@@ -1613,7 +1614,7 @@ void CVersionUpdater::_DialogSidegradeQueryError(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ActionReconnect(void)
+void CVersionUpdater::_ActionReconnect()
 {
     CCommandFuncs::Reconnect(NULL);
 }
@@ -1637,7 +1638,7 @@ void CVersionUpdater::_DialogHide()
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_QuitCurrentProgram(void)
+void CVersionUpdater::_QuitCurrentProgram()
 {
     throw ExceptionQuitProgram();
 }
@@ -1649,7 +1650,7 @@ void CVersionUpdater::_QuitCurrentProgram(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ExitGame(void)
+void CVersionUpdater::_ExitGame()
 {
     shared.m_bExitGame = true;
     _QuitCurrentProgram();
@@ -1662,7 +1663,7 @@ void CVersionUpdater::_ExitGame(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ResetVersionCheckTimer(void)
+void CVersionUpdater::_ResetVersionCheckTimer()
 {
     OutputDebugLine(SStringX("[Updater] _ResetVersionCheckTimer"));
     m_VarConfig.version_lastCheckTime = CDateTime::Now();
@@ -1675,7 +1676,7 @@ void CVersionUpdater::_ResetVersionCheckTimer(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ResetNewsCheckTimer(void)
+void CVersionUpdater::_ResetNewsCheckTimer()
 {
     OutputDebugLine(SStringX("[Updater] _ResetNewsCheckTimer"));
     m_VarConfig.news_lastCheckTime = CDateTime::Now();
@@ -1688,7 +1689,7 @@ void CVersionUpdater::_ResetNewsCheckTimer(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ResetMasterCheckTimer(void)
+void CVersionUpdater::_ResetMasterCheckTimer()
 {
     m_VarConfig.master_lastCheckTime = CDateTime::Now();
     CCore::GetSingleton().SaveConfig();
@@ -1701,7 +1702,7 @@ void CVersionUpdater::_ResetMasterCheckTimer(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ResetManualCheckTimer(void)
+void CVersionUpdater::_ResetManualCheckTimer()
 {
     // Reset delay before recheck allowed
     m_llTimeLastManualCheck = GetTickCount64_();
@@ -1715,7 +1716,7 @@ void CVersionUpdater::_ResetManualCheckTimer(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_PollAnyButton(void)
+void CVersionUpdater::_PollAnyButton()
 {
     while (true)
     {
@@ -1741,7 +1742,7 @@ void CVersionUpdater::_PollAnyButton(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_PollQuestionNoYes(void)
+void CVersionUpdater::_PollQuestionNoYes()
 {
     while (true)
     {
@@ -1779,7 +1780,7 @@ void CVersionUpdater::_PollQuestionNoYes(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogConnectingWait(void)
+void CVersionUpdater::_DialogConnectingWait()
 {
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("Connecting"));
@@ -1795,7 +1796,7 @@ void CVersionUpdater::_DialogConnectingWait(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogChecking(void)
+void CVersionUpdater::_DialogChecking()
 {
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("CHECKING"));
@@ -1811,7 +1812,7 @@ void CVersionUpdater::_DialogChecking(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogNoUpdate(void)
+void CVersionUpdater::_DialogNoUpdate()
 {
     // Display message
     GetQuestionBox().Reset();
@@ -1829,7 +1830,7 @@ void CVersionUpdater::_DialogNoUpdate(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogDownloading(void)
+void CVersionUpdater::_DialogDownloading()
 {
     // Display dialog
     GetQuestionBox().Reset();
@@ -1846,7 +1847,7 @@ void CVersionUpdater::_DialogDownloading(void)
 // ServerSaysUpdateQuestion
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogServerSaysUpdateQuestion(void)
+void CVersionUpdater::_DialogServerSaysUpdateQuestion()
 {
     // Display message
     GetQuestionBox().Reset();
@@ -1865,7 +1866,7 @@ void CVersionUpdater::_DialogServerSaysUpdateQuestion(void)
 // ServerSaysRecommendQuestion
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogServerSaysRecommendQuestion(void)
+void CVersionUpdater::_DialogServerSaysRecommendQuestion()
 {
     // Display message
     GetQuestionBox().Reset();
@@ -1884,7 +1885,7 @@ void CVersionUpdater::_DialogServerSaysRecommendQuestion(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogUpdateQuestion(void)
+void CVersionUpdater::_DialogUpdateQuestion()
 {
     // Display message
     GetQuestionBox().Reset();
@@ -1904,7 +1905,7 @@ void CVersionUpdater::_DialogUpdateQuestion(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogUpdateQueryError(void)
+void CVersionUpdater::_DialogUpdateQueryError()
 {
     // Display message
     GetQuestionBox().Reset();
@@ -1922,7 +1923,7 @@ void CVersionUpdater::_DialogUpdateQueryError(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogUpdateResult(void)
+void CVersionUpdater::_DialogUpdateResult()
 {
     if (m_ConditionMap.IsConditionTrue("Download.Fail"))
     {
@@ -1997,7 +1998,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_QUpdateResult(void)
+void CVersionUpdater::_QUpdateResult()
 {
     if (m_ConditionMap.IsConditionTrue("Download.Ok"))
     {
@@ -2025,7 +2026,7 @@ void CVersionUpdater::_QUpdateResult(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_QUpdateNewsResult(void)
+void CVersionUpdater::_QUpdateNewsResult()
 {
     if (m_ConditionMap.IsConditionTrue("Download.Ok"))
     {
@@ -2069,7 +2070,7 @@ void CVersionUpdater::_QUpdateNewsResult(void)
 // Just displays information these days
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogDataFilesQuestion(void)
+void CVersionUpdater::_DialogDataFilesQuestion()
 {
     // If using customized SA files, advise user to stop using customized SA files
     if (GetApplicationSettingInt("customized-sa-files-using"))
@@ -2104,7 +2105,7 @@ void CVersionUpdater::_DialogDataFilesQuestion(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogExeFilesResult(void)
+void CVersionUpdater::_DialogExeFilesResult()
 {
     // Handle failure
     if (m_ConditionMap.IsConditionTrue("Download.Fail"))
@@ -2168,7 +2169,7 @@ void CVersionUpdater::_DialogExeFilesResult(void)
 // Called before starting the version check
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseVersionQueryURLs(void)
+void CVersionUpdater::_UseVersionQueryURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.version.serverInfoMap);
@@ -2182,7 +2183,7 @@ void CVersionUpdater::_UseVersionQueryURLs(void)
 // Called after getting the version check info from the server
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ProcessPatchFileQuery(void)
+void CVersionUpdater::_ProcessPatchFileQuery()
 {
     m_ConditionMap.SetCondition("ProcessResponse", "");
     m_ConditionMap.SetCondition("Download", "");
@@ -2307,7 +2308,7 @@ void CVersionUpdater::_ProcessPatchFileQuery(void)
 // Called before starting the master xml fetch
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseMasterFetchURLs(void)
+void CVersionUpdater::_UseMasterFetchURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList.push_back(UPDATER_MASTER_URL1);
@@ -2321,7 +2322,7 @@ void CVersionUpdater::_UseMasterFetchURLs(void)
 // Called after completing master xml fetch
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ProcessMasterFetch(void)
+void CVersionUpdater::_ProcessMasterFetch()
 {
     m_ConditionMap.SetCondition("ProcessResponse", "");
     m_ConditionMap.SetCondition("Download", "");
@@ -2384,7 +2385,7 @@ void CVersionUpdater::_ProcessMasterFetch(void)
 // Transfer certain settings from the master config
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::PostChangeMasterConfig(void)
+void CVersionUpdater::PostChangeMasterConfig()
 {
     // Update trouble url for far away modules
     std::vector<SString> serverList = MakeServerList(m_MasterConfig.trouble.serverInfoMap);
@@ -2424,7 +2425,7 @@ void CVersionUpdater::GetNewsSettings(SString& strOutOldestPost, uint& uiOutMaxH
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseSidegradeURLs(void)
+void CVersionUpdater::_UseSidegradeURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.sidegrade.serverInfoMap);
@@ -2437,7 +2438,7 @@ void CVersionUpdater::_UseSidegradeURLs(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseNewsUpdateURLs(void)
+void CVersionUpdater::_UseNewsUpdateURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.news.serverInfoMap);
@@ -2452,7 +2453,7 @@ void CVersionUpdater::_UseNewsUpdateURLs(void)
 // Called before starting the file download
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseProvidedURLs(void)
+void CVersionUpdater::_UseProvidedURLs()
 {
     if (m_JobInfo.slim.iFilesize > 0)
     {
@@ -2500,7 +2501,7 @@ void CVersionUpdater::_UseProvidedURLs(void)
 // Called after completing a file download
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ProcessPatchFileDownload(void)
+void CVersionUpdater::_ProcessPatchFileDownload()
 {
     // Check if the saved filename has already been set
     if (!m_JobInfo.strSaveLocation.empty())
@@ -2589,7 +2590,7 @@ void CVersionUpdater::_ProcessPatchFileDownload(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_StartDownload(void)
+void CVersionUpdater::_StartDownload()
 {
     if (!m_JobInfo.strFilename.empty())
     {
@@ -2687,7 +2688,7 @@ void CVersionUpdater::_StartDownload(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-int CVersionUpdater::_PollDownload(void)
+int CVersionUpdater::_PollDownload()
 {
     while (true)
     {
@@ -2718,7 +2719,7 @@ int CVersionUpdater::_PollDownload(void)
                     }
                     if (m_JobInfo.bShowDownloadPercent)
                         GetQuestionBox().SetMessage(
-                            SString(_("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / std::max<unsigned int>(1, m_JobInfo.iFilesize)));
+                            SString(_("%3d %% completed"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
                         GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000));
                     else
@@ -2748,7 +2749,7 @@ int CVersionUpdater::_PollDownload(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseReportLogURLs(void)
+void CVersionUpdater::_UseReportLogURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.report.serverInfoMap);
@@ -2761,7 +2762,7 @@ void CVersionUpdater::_UseReportLogURLs(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseReportLogPostContent(void)
+void CVersionUpdater::_UseReportLogPostContent()
 {
     // Remove unrequired items
 #ifndef MTA_DEBUG
@@ -2792,7 +2793,7 @@ void CVersionUpdater::_UseReportLogPostContent(void)
 // Check if upload is required by client
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ShouldSendCrashDump(void)
+void CVersionUpdater::_ShouldSendCrashDump()
 {
     m_ConditionMap.SetCondition("ProcessResponse", "");
 
@@ -2857,7 +2858,7 @@ void CVersionUpdater::_ShouldSendCrashDump(void)
 // Make sure last-dump-save is ignored next time
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ResetLastCrashDump(void)
+void CVersionUpdater::_ResetLastCrashDump()
 {
     SetApplicationSetting("diagnostics", "last-dump-save", "");
 }
@@ -2869,7 +2870,7 @@ void CVersionUpdater::_ResetLastCrashDump(void)
 // Check if upload is needed by server
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseCrashDumpQueryURLs(void)
+void CVersionUpdater::_UseCrashDumpQueryURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.crashdump.serverInfoMap);
@@ -2885,7 +2886,7 @@ void CVersionUpdater::_UseCrashDumpQueryURLs(void)
 // Called after completing a CrashDumpQuery
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_ProcessCrashDumpQuery(void)
+void CVersionUpdater::_ProcessCrashDumpQuery()
 {
     m_ConditionMap.SetCondition("ProcessResponse", "");
 
@@ -2906,7 +2907,7 @@ void CVersionUpdater::_ProcessCrashDumpQuery(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseCrashDumpURLs(void)
+void CVersionUpdater::_UseCrashDumpURLs()
 {
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.crashdump.serverInfoMap);
@@ -2919,7 +2920,7 @@ void CVersionUpdater::_UseCrashDumpURLs(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseCrashDumpPostContent(void)
+void CVersionUpdater::_UseCrashDumpPostContent()
 {
     // Get filename to send
     SString strPathFilename = GetApplicationSetting("diagnostics", "last-dump-save");
@@ -2947,7 +2948,7 @@ void CVersionUpdater::_UseCrashDumpPostContent(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_StartSendPost(void)
+void CVersionUpdater::_StartSendPost()
 {
     if (!m_JobInfo.postContent.size())
         return;
@@ -2988,7 +2989,7 @@ void CVersionUpdater::_StartSendPost(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-int CVersionUpdater::_PollSendPost(void)
+int CVersionUpdater::_PollSendPost()
 {
     while (true)
     {
@@ -3036,7 +3037,7 @@ int CVersionUpdater::_PollSendPost(void)
 // RES_OK   - Query sent
 //
 ///////////////////////////////////////////////////////////////
-int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
+int CVersionUpdater::DoSendDownloadRequestToNextServer()
 {
     if (++m_JobInfo.iRetryCount > m_JobInfo.iMaxServersToTry || m_JobInfo.serverList.size() == 0)
     {
@@ -3084,6 +3085,23 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
         }
     }
 
+    // Mem stats
+    MEMORYSTATUSEX memoryStatus = {sizeof(memoryStatus)};
+    GlobalMemoryStatusEx(&memoryStatus);
+
+    // Info required for hotfix update
+    int             iReqKB3033929 = -1;
+    int             iReqKB3035131 = -1;
+    SLibVersionInfo verInfoKernel32 = {}, verInfoNcrypt = {};
+    GetLibVersionInfo("kernel32.dll", &verInfoKernel32);
+    GetLibVersionInfo("ncrypt.dll", &verInfoNcrypt);
+    if (Is64BitOS() && GetApplicationSetting("real-os-version") == "6.1" && GetApplicationSetting("real-os-build") == "7601" &&
+        verInfoNcrypt.GetFileVersionString() < "6.1.7601.18741")
+    {
+        iReqKB3033929 = IsHotFixInstalled("KB3033929") ? 0 : 1;
+        iReqKB3035131 = IsHotFixInstalled("KB3035131") ? 0 : 1;
+    }
+
     bool bSecureBootEnabled =
         (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
     // Compile some system stats
@@ -3096,38 +3114,57 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
         "1_%d_%d_%d_%d_%d"
         "_%d%d%d%d"
         "_%s",
-        static_cast<int>(GetWMITotalPhysicalMemory() / 1024LL / 1024LL), g_pDeviceState->AdapterState.InstalledMemoryKB / 1024,
-        gameSettings->GetCurrentVideoMode(), gameSettings->GetFXQuality(), dxStatus.settings.iDrawDistance
+        static_cast<int>(GetWMITotalPhysicalMemory() / 1024LL / 1024LL),            //
+        g_pDeviceState->AdapterState.InstalledMemoryKB / 1024,                      //
+        gameSettings->GetCurrentVideoMode(),                                        //
+        gameSettings->GetFXQuality(),                                               //
+        dxStatus.settings.iDrawDistance,                                            //
 
-        ,
-        GetVideoModeManager()->IsWindowed(), GetVideoModeManager()->IsMultiMonitor(), dxStatus.settings.bVolumetricShadows, dxStatus.settings.bAllowScreenUpload
+        GetVideoModeManager()->IsWindowed(),                //
+        GetVideoModeManager()->IsMultiMonitor(),            //
+        dxStatus.settings.bVolumetricShadows,               //
+        dxStatus.settings.bAllowScreenUpload,               //
 
-        ,
-        *GetApplicationSetting("real-os-version"));
+        *GetApplicationSetting("real-os-version")            //
+    );
 
     SString strSystemStats2(
         "2_%d_%d_%d"
         "_%d_%d_%d"
         "_%d_%d_%d_%d_%d_%x",
-        g_pGraphics->GetViewportWidth(), g_pGraphics->GetViewportHeight(), dxStatus.settings.b32BitColor
+        g_pGraphics->GetViewportWidth(),             //
+        g_pGraphics->GetViewportHeight(),            //
+        dxStatus.settings.b32BitColor,               //
 
-        ,
-        GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE), GetApplicationSettingInt(DIAG_MINIDUMP_DETECTED_COUNT),
-        GetApplicationSettingInt(DIAG_MINIDUMP_CONFIRMED_COUNT)
+        GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE),            //
+        GetApplicationSettingInt(DIAG_MINIDUMP_DETECTED_COUNT),                   //
+        GetApplicationSettingInt(DIAG_MINIDUMP_CONFIRMED_COUNT),                  //
 
-            ,
-        atoi(dxStatus.videoCard.strPSVersion), dxStatus.videoCard.iNumSimultaneousRTs, dxStatus.settings.iAntiAliasing, dxStatus.settings.iAnisotropicFiltering,
-        (int)dxStatus.settings.fFieldOfView, dxStatus.videoCard.depthBufferFormat);
+        atoi(dxStatus.videoCard.strPSVersion),              //
+        dxStatus.videoCard.iNumSimultaneousRTs,             //
+        dxStatus.settings.iAntiAliasing,                    //
+        dxStatus.settings.iAnisotropicFiltering,            //
+        (int)dxStatus.settings.fFieldOfView,                //
+        dxStatus.videoCard.depthBufferFormat                //
+    );
 
     SString strSystemStats3(
         "3_0"            // Was VS2013 runtime installed
-        "_%s"
-        "_%s"
-        "_%d"
+        "_%s_%s_%d"
         "_0"            // Was VS2015 runtime version
-        "_%d",
-        *GetApplicationSetting("real-os-build"), *GetApplicationSetting("locale").Replace("_", "-"),
-        (uint)FileSize(PathJoin(GetSystemSystemPath(), "normaliz.dll")), bSecureBootEnabled);
+        "_%d_%d_%d_%d_%d_%s_%s",
+        *GetApplicationSetting("real-os-build"),                                    //
+        *GetApplicationSetting("locale").Replace("_", "-"),                         //
+        (uint)FileSize(PathJoin(GetSystemSystemPath(), "normaliz.dll")),            //
+
+        bSecureBootEnabled,                                               //
+        static_cast<int>(memoryStatus.ullTotalVirtual / 1024),            //
+        Is64BitOS(),                                                      //
+        iReqKB3033929,                                                    //
+        iReqKB3035131,                                                    //
+        *verInfoKernel32.GetFileVersionString(),                          //
+        *verInfoNcrypt.GetFileVersionString()                             //
+    );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt("times-connected-editor"), GetApplicationSettingInt("times-connected"));
     SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt("nvhacks", "optimus"), GetApplicationSettingInt("nvhacks", "optimus-startup-option"),
@@ -3154,6 +3191,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
     strQueryURL = strQueryURL.Replace("_USAGE_", strConnectUsage);
     strQueryURL = strQueryURL.Replace("_SCUT_", strSoundCut);
     strQueryURL = strQueryURL.Replace("_OPTIMUS_", strOptimusInfo);
+    strQueryURL = strQueryURL.Replace("_GTAMD5_", GetApplicationSetting("gta-exe-md5"));
 
     // See if this download qualifies for using a resumable file
     if (!m_JobInfo.strFilename.empty() && strQueryURL.EndsWith(m_JobInfo.strFilename))
@@ -3169,7 +3207,9 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
     m_JobInfo.downloadStatus = EDownloadStatus::Running;
     m_JobInfo.iDownloadResultCode = 0;
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile(strQueryURL, m_JobInfo.strResumableSaveLocation, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true);
+    SHttpRequestOptions options;
+    options.bResumeFile = true;
+    GetHTTP()->QueueFile(strQueryURL, m_JobInfo.strResumableSaveLocation, this, StaticDownloadFinished, options);
     m_strLastQueryURL = strQueryURL;
     OutputDebugLine(SString("[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size(), strQueryURL.c_str()));
     return RES_OK;
@@ -3214,7 +3254,7 @@ void CVersionUpdater::DownloadFinished(const SHttpDownloadResult& result)
 // RES_POLL   - Processing
 //
 ///////////////////////////////////////////////////////////////
-int CVersionUpdater::DoPollDownload(void)
+int CVersionUpdater::DoPollDownload()
 {
     m_ConditionMap.SetCondition("Download", "");
     GetHTTP()->ProcessQueuedFiles();
@@ -3225,7 +3265,7 @@ int CVersionUpdater::DoPollDownload(void)
     {
         m_llTimeStart = GetTickCount64_();
         m_JobInfo.uiBytesDownloaded = uiBytesDownloaded;
-        OutputDebugLine(SString("uiBytesDownloaded:%d", uiBytesDownloaded));
+        OutputDebugLine(SString("[Updater] uiBytesDownloaded:%d", uiBytesDownloaded));
     }
 
     // Are we done yet?
@@ -3275,7 +3315,7 @@ int CVersionUpdater::DoPollDownload(void)
 // RES_OK   - Query sent
 //
 ///////////////////////////////////////////////////////////////
-int CVersionUpdater::DoSendPostToNextServer(void)
+int CVersionUpdater::DoSendPostToNextServer()
 {
     if (++m_JobInfo.iRetryCount > 1 || m_JobInfo.serverList.size() == 0)
     {
@@ -3313,7 +3353,10 @@ int CVersionUpdater::DoSendPostToNextServer(void)
     // Send data. Doesn't check if it was received.
     //
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile(strQueryURL, NULL, &m_JobInfo.postContent.at(0), m_JobInfo.postContent.size(), m_JobInfo.bPostContentBinary);
+    SHttpRequestOptions options;
+    options.strPostData = SStringX(&m_JobInfo.postContent.at(0), m_JobInfo.postContent.size());
+    options.bPostBinary = m_JobInfo.bPostContentBinary;
+    GetHTTP()->QueueFile(strQueryURL, nullptr, nullptr, nullptr, options);
 
     return RES_OK;
 }
@@ -3327,11 +3370,33 @@ int CVersionUpdater::DoSendPostToNextServer(void)
 // RES_POLL   - Processing
 //
 ///////////////////////////////////////////////////////////////
-int CVersionUpdater::DoPollPost(void)
+int CVersionUpdater::DoPollPost()
 {
     if (!GetHTTP()->ProcessQueuedFiles())
     {
         return RES_POLL;
     }
     return RES_OK;
+}
+
+// Issue: #1708
+// Set the update settings to stable build if the user is on 1.5.8.
+// We do this only once, this is why we need to write to registry.
+void CVersionUpdater::OnMainMenuFullyVisible()
+{
+    if (MTASA_VERSION_BUILD != 20670)            // 20670 is the build number with PR #1712 merged.
+        return;
+    const std::string requiredValue = "discord-rich-presence";
+    const std::string lastSubKey = "version-revert-reason";
+    if (GetApplicationSetting(lastSubKey) != requiredValue)
+    {
+        SetApplicationSetting(lastSubKey, requiredValue);
+        // check if the MTA client version is 1.5.8
+        if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
+        {
+            CVARS_SET("update_build_type", 0);
+            std::string message = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
+            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO);
+        }
+    }
 }

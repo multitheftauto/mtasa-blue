@@ -19,36 +19,38 @@ class CTeam;
 
 #define MAX_TEAM_NAME 128
 
-class CTeam : public CElement
+class CTeam final : public CElement
 {
     friend class CTeamManager;
 
 public:
-    CTeam(CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
+    CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
           unsigned char ucBlue = 0);
-    ~CTeam(void);
+    ~CTeam();
 
-    void Unlink(void);
-    bool ReadSpecialData(void);
+    void Unlink();
 
-    const char* GetTeamName(void) { return m_strTeamName; }
+    const char* GetTeamName() { return m_strTeamName; }
     void        SetTeamName(const char* szName);
 
     void AddPlayer(CPlayer* pPlayer, bool bChangePlayer = false);
     void RemovePlayer(CPlayer* pPlayer, bool bChangePlayer = false);
-    void RemoveAllPlayers(void);
+    void RemoveAllPlayers();
     void GetPlayers(lua_State* luaVM);
 
     void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
     void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 
-    bool GetFriendlyFire(void) { return m_bFriendlyFire; }
+    bool GetFriendlyFire() { return m_bFriendlyFire; }
     void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
 
-    unsigned int CountPlayers(void) { return static_cast<unsigned int>(m_Players.size()); }
+    unsigned int CountPlayers() { return static_cast<unsigned int>(m_Players.size()); }
 
-    std::list<CPlayer*>::const_iterator PlayersBegin(void) { return m_Players.begin(); }
-    std::list<CPlayer*>::const_iterator PlayersEnd(void) { return m_Players.end(); }
+    std::list<CPlayer*>::const_iterator PlayersBegin() { return m_Players.begin(); }
+    std::list<CPlayer*>::const_iterator PlayersEnd() { return m_Players.end(); }
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     CTeamManager* m_pTeamManager;

@@ -35,7 +35,7 @@ void CWebBrowserItem::PostConstruct(CRenderItemManager* pRenderItemManager, uint
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::PreDestruct(void)
+void CWebBrowserItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -48,7 +48,7 @@ void CWebBrowserItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CWebBrowserItem::IsValid(void)
+bool CWebBrowserItem::IsValid()
 {
     return m_pD3DTexture && m_pD3DRenderTargetSurface;
 }
@@ -60,7 +60,7 @@ bool CWebBrowserItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::OnLostDevice(void)
+void CWebBrowserItem::OnLostDevice()
 {
 }
 
@@ -71,7 +71,7 @@ void CWebBrowserItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::OnResetDevice(void)
+void CWebBrowserItem::OnResetDevice()
 {
 }
 
@@ -93,6 +93,14 @@ void CWebBrowserItem::CreateUnderlyingData()
     if (!m_pD3DTexture)
         return;
 
+    // D3DXCreateTexture sets width and height to 1 if the argument value was 0
+    // See: https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3dxcreatetexture
+    if (m_uiSizeX == 0)
+        m_uiSizeX = 1;
+
+    if (m_uiSizeY == 0)
+        m_uiSizeY = 1;
+
     // Get the render target surface here for convenience
     ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel(0, &m_pD3DRenderTargetSurface);
 
@@ -112,7 +120,7 @@ void CWebBrowserItem::CreateUnderlyingData()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::ReleaseUnderlyingData(void)
+void CWebBrowserItem::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pD3DRenderTargetSurface)
     SAFE_RELEASE(m_pD3DTexture)

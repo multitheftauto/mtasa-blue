@@ -72,7 +72,7 @@ namespace SharedUtil
         return ucState;
     }
 
-    CVehicleColor::CVehicleColor(void)
+    CVehicleColor::CVehicleColor()
     {
         // Init
         m_ucPaletteColors[0] = 0;            // Palette color 0 is black
@@ -151,7 +151,7 @@ namespace SharedUtil
     }
 
     //  Can return: 1,2,3, or 4
-    int CVehicleColor::GetNumColorsUsed(void)
+    int CVehicleColor::GetNumColorsUsed()
     {
         // Find last unblack
         int i;
@@ -165,21 +165,21 @@ namespace SharedUtil
     }
 
     // Switching to RGB mode
-    void CVehicleColor::InvalidatePaletteColors(void)
+    void CVehicleColor::InvalidatePaletteColors()
     {
         m_bRGBColorsWrong = false;
         m_bPaletteColorsWrong = true;
     }
 
     // Switching to palette mode
-    void CVehicleColor::InvalidateRGBColors(void)
+    void CVehicleColor::InvalidateRGBColors()
     {
         m_bPaletteColorsWrong = false;
         m_bRGBColorsWrong = true;
     }
 
     // Ensure switched
-    void CVehicleColor::ValidateRGBColors(void)
+    void CVehicleColor::ValidateRGBColors()
     {
         if (m_bRGBColorsWrong)
         {
@@ -190,7 +190,7 @@ namespace SharedUtil
     }
 
     // Ensure switched
-    void CVehicleColor::ValidatePaletteColors(void)
+    void CVehicleColor::ValidatePaletteColors()
     {
         if (m_bPaletteColorsWrong)
         {

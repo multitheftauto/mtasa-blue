@@ -28,9 +28,10 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common/linux/google_crashdump_uploader.h"
-#include "third_party/linux/include/gflags/gflags.h"
 #include <string>
 #include <iostream>
+#include <gflags/gflags.h>
+#include <glog/logging.h>
 
 #include "common/using_std_string.h"
 

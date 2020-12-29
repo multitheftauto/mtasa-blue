@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PAD
-#define __CGAMESA_PAD
+#pragma once
 
 #include <game/CPad.h>
 #define WIN32_LEAN_AND_MEAN
@@ -78,12 +77,12 @@ public:
     VOID              SetLastControllerState(CControllerState* ControllerState);
     VOID              Store();
     VOID              Restore();
-    bool              IsEnabled(void);
+    bool              IsEnabled();
     VOID              Disable(bool bDisable);
-    VOID              Clear(void);
+    VOID              Clear();
     CPadSAInterface*  GetInterface() { return this->internalInterface; };
     VOID              SetHornHistoryValue(bool value);
-    long              GetAverageWeapon(void);
+    long              GetAverageWeapon();
     void              SetLastTimeTouched(DWORD dwTime);
 
     uint GetDrunkInputDelay() { return internalInterface->DrunkDrivingBufferUsed; };
@@ -92,5 +91,3 @@ public:
         internalInterface->DrunkDrivingBufferUsed = inputDelay;
     };            // Does not work yet, guess it's caused by MTA's control logic
 };
-
-#endif

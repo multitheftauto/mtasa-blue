@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PROJECTILEINFO
-#define __CGAME_PROJECTILEINFO
+#pragma once
 
 class CProjectile;
 class CPlayerPed;
@@ -26,13 +25,11 @@ public:
     virtual CProjectileInfo* GetProjectileInfo(DWORD Index) = 0;
     virtual void             RemoveAllProjectiles() = 0;
 
-    virtual CEntity* GetTarget(void) = 0;
+    virtual CEntity* GetTarget() = 0;
     virtual void     SetTarget(CEntity* pEntity) = 0;
 
-    virtual bool IsActive(void) = 0;
+    virtual bool IsActive() = 0;
 
     virtual void  SetCounter(DWORD dwCounter) = 0;
-    virtual DWORD GetCounter(void) = 0;
+    virtual DWORD GetCounter() = 0;
 };
-
-#endif

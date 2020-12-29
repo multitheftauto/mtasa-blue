@@ -44,7 +44,7 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer(IDirect3DDevice9* InD3DDe
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer(void)
+CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer()
 {
     CAdditionalVertexStreamManager::GetSingleton()->OnVertexBufferDestroy(m_pOriginal);
     CVertexStreamBoundingBoxManager::GetSingleton()->OnVertexBufferDestroy(m_pOriginal);
@@ -83,7 +83,7 @@ HRESULT CProxyDirect3DVertexBuffer::QueryInterface(REFIID riid, void** ppvObj)
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DVertexBuffer::Release(void)
+ULONG CProxyDirect3DVertexBuffer::Release()
 {
     // Call original function
     ULONG count = m_pOriginal->Release();

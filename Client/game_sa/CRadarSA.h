@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_RADAR
-#define __CGAMESA_RADAR
+#pragma once
 
 #include <game/CRadar.h>
 #include "CMarkerSA.h"
@@ -51,5 +50,3 @@ public:
 
     VOID DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color);
 };
-
-#endif

@@ -14,5 +14,5 @@ class CClientMaterial : public CClientRenderElement
 public:
     CClientMaterial(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientRenderElement(pManager, ID) {}
 
-    CMaterialItem* GetMaterialItem(void) { return (CMaterialItem*)m_pRenderItem; }
+    CMaterialItem* GetMaterialItem() { return (CMaterialItem*)m_pRenderItem; }
 };

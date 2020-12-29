@@ -87,7 +87,7 @@ no_corona:
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_VehicleLights(void)
+void CMultiplayerSA::InitHooks_VehicleLights()
 {
     EZHookInstallChecked(CVehicle_DoTailLightEffect_Mid);
     EZHookInstallChecked(CVehicle_DoTailLightEffect_Mid2);

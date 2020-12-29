@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_POPULATION
-#define __CGAMESA_POPULATION
+#pragma once
 
 #include <game/CPopulation.h>
 #include "CPedSA.h"
@@ -20,5 +19,3 @@
 class CPopulationSA : public CPopulation
 {
 };
-
-#endif

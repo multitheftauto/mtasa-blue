@@ -11,8 +11,7 @@
 class CClientSound;
 class CBassAudio;
 
-#ifndef __CCLIENTSOUND_H
-#define __CCLIENTSOUND_H
+#pragma once
 
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
@@ -25,11 +24,11 @@ class CClientSound : public CClientEntity
 
 public:
     CClientSound(CClientManager* pManager, ElementID ID);
-    ~CClientSound(void);
+    ~CClientSound();
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
 
-    eClientEntityType GetType(void) const { return CCLIENTSOUND; }
+    eClientEntityType GetType() const { return CCLIENTSOUND; }
 
     bool Play(const SString& strPath, bool bLoop);
     bool Play(void* pMemory, unsigned int uiLength, bool bLoop);
@@ -38,18 +37,19 @@ public:
     void PlayStream(const SString& strURL, bool bLoop, bool bThrottle, bool b3D = false);
 
     void SetPaused(bool bPaused);
-    bool IsPaused(void);
+    bool IsPaused();
 
-    void   SetPlayPosition(double dPosition);
-    double GetPlayPosition(void);
+    bool   SetPlayPosition(double dPosition);
+    double GetPlayPosition();
 
     double GetLength(bool bAvoidLoad = false);
+    double GetBufferLength();
 
     void  SetVolume(float fVolume, bool bStore = true);
-    float GetVolume(void);
+    float GetVolume();
 
     void  SetPlaybackSpeed(float fSpeed);
-    float GetPlaybackSpeed(void);
+    float GetPlaybackSpeed();
 
     void GetPosition(CVector& vecPosition) const;
     void SetPosition(const CVector& vecPosition);
@@ -58,19 +58,19 @@ public:
     void SetVelocity(const CVector& vecVelocity);
 
     void  SetMinDistance(float fDistance);
-    float GetMinDistance(void);
+    float GetMinDistance();
 
     void  SetMaxDistance(float fDistance);
-    float GetMaxDistance(void);
+    float GetMaxDistance();
 
     void   ApplyFXModifications(float fSampleRate, float fTempo, float fPitch, bool bReversed);
     void   GetFXModifications(float& fSampleRate, float& fTempo, float& fPitch, bool& bReversed);
     float* GetFFTData(int iLength);
     float* GetWaveData(int iLength);
-    bool   IsPanEnabled(void);
+    bool   IsPanEnabled();
     bool   SetPanEnabled(bool bPan);
-    DWORD  GetLevelData(void);
-    float  GetSoundBPM(void);
+    DWORD  GetLevelData();
+    float  GetSoundBPM();
 
     SString GetMetaTags(const SString& strFormat);
 
@@ -80,22 +80,22 @@ public:
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
 
-    void Unlink(void){};
+    void Unlink(){};
 
-    bool IsSoundStopped(void) { return m_pAudio == NULL; }
-    bool IsFinished(void);
+    bool IsSoundStopped() { return m_pAudio == NULL; }
+    bool IsFinished();
 
-    bool IsSound3D(void) { return m_b3D; }
-    bool IsSoundStream(void) { return m_bStream; }
+    bool IsSound3D() { return m_b3D; }
+    bool IsSoundStream() { return m_bStream; }
 
 protected:
     void Process3D(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
-    void BeginSimulationOfPlayPosition(void);
-    void EndSimulationOfPlayPositionAndApply(void);
-    void DistanceStreamIn(void);
-    void DistanceStreamOut(void);
-    bool Create(void);
-    void Destroy(void);
+    void BeginSimulationOfPlayPosition();
+    void EndSimulationOfPlayPositionAndApply();
+    void DistanceStreamIn();
+    void DistanceStreamOut();
+    bool Create();
+    void Destroy();
 
 private:
     CClientSoundManager*   m_pSoundManager;
@@ -135,5 +135,3 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     uint                m_uiFrameNumberCreated;
 };
-
-#endif

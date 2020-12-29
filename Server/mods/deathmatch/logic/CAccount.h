@@ -21,7 +21,7 @@ public:
     bool    SetPassword(const SString& strPassword);
     bool    IsPassword(const SString& strPassword);
     bool    CanChangePasswordTo(const SString& strPassword);
-    SString GetPasswordHash(void);
+    SString GetPasswordHash();
 
     enum EAccountPasswordType
     {
@@ -32,7 +32,7 @@ public:
     };
 
 protected:
-    SString GenerateSalt(void);
+    SString GenerateSalt();
 
     SString m_strSha256;
     SString m_strSalt;
@@ -61,56 +61,56 @@ public:
         SString strLastLoginIp;
         time_t  tLastLoginDate;
         time_t  tLastLoginHttpDate;
-        bool    IsAuthorized(void) const { return tAuthDate != 0; }
+        bool    IsAuthorized() const { return tAuthDate != 0; }
     };
 
     ZERO_ON_NEW
     CAccount(class CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword = "", int iUserID = 0,
              const std::string& strIP = "", const std::string& strSerial = "", const SString& strHttpPassAppend = "");
-    ~CAccount(void);
+    ~CAccount();
 
-    bool IsRegistered(void) { return m_AccountType != EAccountType::Guest; }
-    bool IsConsoleAccount(void) { return m_AccountType == EAccountType::Console; }
+    bool IsRegistered() { return m_AccountType != EAccountType::Guest; }
+    bool IsConsoleAccount() { return m_AccountType == EAccountType::Console; }
     void OnLoginSuccess(const SString& strSerial, const SString& strIp);
     void OnLoginHttpSuccess(const SString& strIp);
 
-    const SString& GetName(void) { return m_strName; }
+    const SString& GetName() { return m_strName; }
     void           SetName(const std::string& strName);
 
     void           SetPassword(const SString& strPassword);
     bool           IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend = nullptr);
-    SString        GetPasswordHash(void);
-    const SString& GetHttpPassAppend(void) { return m_strHttpPassAppend; }
+    SString        GetPasswordHash();
+    const SString& GetHttpPassAppend() { return m_strHttpPassAppend; }
     void           SetHttpPassAppend(const SString& strHttpPassAppend);
 
-    const std::string& GetIP(void) { return m_strIP; }
-    const std::string& GetSerial(void) { return m_strSerial; }
-    int                GetID(void) { return m_iUserID; }
+    const std::string& GetIP() { return m_strIP; }
+    const std::string& GetSerial() { return m_strSerial; }
+    int                GetID() { return m_iUserID; }
 
-    bool                       HasLoadedSerialUsage(void);
-    void                       EnsureLoadedSerialUsage(void);
-    std::vector<SSerialUsage>& GetSerialUsageList(void);
+    bool                       HasLoadedSerialUsage();
+    void                       EnsureLoadedSerialUsage();
+    std::vector<SSerialUsage>& GetSerialUsageList();
     SSerialUsage*              GetSerialUsage(const SString& strSerial);
     bool                       IsIpAuthorized(const SString& strIp);
     bool                       IsSerialAuthorized(const SString& strSerial);
     bool                       AddSerialForAuthorization(const SString& strSerial, const SString& strIp);
     bool                       AuthorizeSerial(const SString& strSerial, const SString& strWho);
     bool                       RemoveSerial(const SString& strSerial);
-    void                       RemoveUnauthorizedSerials(void);
+    void                       RemoveUnauthorizedSerials();
 
-    CClient* GetClient(void) { return m_pClient; }
+    CClient* GetClient() { return m_pClient; }
     void     SetClient(CClient* pClient);
 
     void SetChanged(bool bChanged) { m_bChanged = bChanged; }
-    bool HasChanged(void) { return m_bChanged; }
-    uint GetScriptID(void) const { return m_uiScriptID; }
+    bool HasChanged() { return m_bChanged; }
+    uint GetScriptID() const { return m_uiScriptID; }
 
     std::shared_ptr<CLuaArgument>             GetData(const std::string& strKey);
     bool                                      SetData(const std::string& strKey, const std::string& strValue, int iType);
     bool                                      HasData(const std::string& strKey);
     void                                      RemoveData(const std::string& strKey);
-    std::map<SString, CAccountData>::iterator DataBegin(void) { return m_Data.begin(); }
-    std::map<SString, CAccountData>::iterator DataEnd(void) { return m_Data.end(); }
+    std::map<SString, CAccountData>::iterator DataBegin() { return m_Data.begin(); }
+    std::map<SString, CAccountData>::iterator DataEnd() { return m_Data.end(); }
 
 protected:
     CAccountData* GetDataPointer(const std::string& strKey);
@@ -145,9 +145,9 @@ public:
         m_iType = iType;
     }
 
-    const std::string& GetKey(void) { return m_strKey; }
-    const std::string& GetStrValue(void) { return m_strValue; }
-    int                GetType(void) { return m_iType; }
+    const std::string& GetKey() { return m_strKey; }
+    const std::string& GetStrValue() { return m_strValue; }
+    int                GetType() { return m_iType; }
     void               SetStrValue(const std::string& strValue) { m_strValue = strValue; }
     void               SetType(int iType) { m_iType = iType; }
 

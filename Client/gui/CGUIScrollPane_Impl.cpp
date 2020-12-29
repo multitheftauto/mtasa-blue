@@ -47,7 +47,7 @@ CGUIScrollPane_Impl::CGUIScrollPane_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
     SetVerticalScrollStepSize(100.0f);
 }
 
-CGUIScrollPane_Impl::~CGUIScrollPane_Impl(void)
+CGUIScrollPane_Impl::~CGUIScrollPane_Impl()
 {
     DestroyElement();
 }
@@ -92,7 +92,7 @@ void CGUIScrollPane_Impl::SetVerticalScrollPosition(float fPosition)
     }
 }
 
-float CGUIScrollPane_Impl::GetHorizontalScrollPosition(void)
+float CGUIScrollPane_Impl::GetHorizontalScrollPosition()
 {
     try
     {
@@ -113,7 +113,7 @@ float CGUIScrollPane_Impl::GetHorizontalScrollPosition(void)
     }
 }
 
-float CGUIScrollPane_Impl::GetVerticalScrollPosition(void)
+float CGUIScrollPane_Impl::GetVerticalScrollPosition()
 {
     try
     {
@@ -156,7 +156,7 @@ void CGUIScrollPane_Impl::SetVerticalScrollStepSize(float fPosition)
     }
 }
 
-float CGUIScrollPane_Impl::GetHorizontalScrollStepSize(void)
+float CGUIScrollPane_Impl::GetHorizontalScrollStepSize()
 {
     try
     {
@@ -168,7 +168,7 @@ float CGUIScrollPane_Impl::GetHorizontalScrollStepSize(void)
     }
 }
 
-float CGUIScrollPane_Impl::GetVerticalScrollStepSize(void)
+float CGUIScrollPane_Impl::GetVerticalScrollStepSize()
 {
     try
     {

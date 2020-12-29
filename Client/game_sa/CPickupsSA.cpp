@@ -18,7 +18,7 @@ CPickupsSA::CPickupsSA()
         Pickups[i] = new CPickupSA((CPickupSAInterface*)(ARRAY_PICKUPS + i * sizeof(CPickupSAInterface)));
 }
 
-CPickupsSA::~CPickupsSA(void)
+CPickupsSA::~CPickupsSA()
 {
     for (int i = 0; i < MAX_PICKUPS; i++)
     {

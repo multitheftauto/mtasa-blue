@@ -1,5 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Microsoft documentation for VCXPROJ file format is located at -->
+  <!-- the following URL. The documentation leaves a lot to be desired. -->
+  <!-- https://msdn.microsoft.com/en-us/library/2208a1f2.aspx -->
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,23 +21,30 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <!-- Microsoft documentation clearly shows the Global property group -->
+  <!-- preceeds the import of Cpp.Default.props and Cpp.props -->
+  <!-- https://msdn.microsoft.com/en-us/library/2208a1f2.aspx -->
   <PropertyGroup Label="Globals">
     <ProjectGuid>{94a428a1-9ba8-4db2-b76e-bd2e3c08f257}</ProjectGuid>
     <RootNamespace>cryptdll</RootNamespace>
-    <PlatformToolset>v100</PlatformToolset>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
-
+  <!-- Use DefaultPlatformToolset after Microsoft.Cpp.Default.props -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <!-- Set DefaultPlatformToolset to v100 (VS2010) if not defined -->
+  <PropertyGroup Label="EmptyDefaultPlatformToolset">
+    <DefaultPlatformToolset Condition=" '$(DefaultPlatformToolset)' == '' ">v100</DefaultPlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="PlatformToolset">
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <!-- End of Visual Studio boilerplate -->
-
   <!-- All Configurations -->
   <PropertyGroup Label="All Configurations">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -46,15 +56,16 @@
     <OutDir>$(Platform)\DLL_Output\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
-
   <!-- All Configurations -->
   <ItemDefinitionGroup Label="All Configurations">
     <ClCompile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ErrorReporting>None</ErrorReporting>
       <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4231; 4251; 4275; 4355; 4505</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalOptions>$(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <ErrorReporting>NoErrorReport</ErrorReporting>
@@ -67,7 +78,6 @@
       <ImportLibrary>$(TargetDir)\cryptopp.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
-
   <!-- Debug Configurations -->
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'" Label="Debug Configuration">
     <ClCompile>
@@ -83,7 +93,6 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
-
   <!-- Release Configurations -->
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'" Label="Release Configuration">
     <ClCompile>
@@ -105,7 +114,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
   </ItemDefinitionGroup>
-
   <!-- X86 Configurations -->
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'" Label="X86 Configuration">
     <ClCompile>
@@ -116,17 +124,12 @@
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
-
   <!-- X64 Configurations -->
   <ItemDefinitionGroup Condition="'$(Platform)'=='x64'" Label="X64 Configuration">
-    <ClCompile>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-    </ClCompile>
     <Link>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-
   <!-- Win32/Debug cryptest.exe for DLL MAC'ing -->
   <!-- Broken at the moment; see http://stackoverflow.com/q/39900437 -->
   <!--   and http://stackoverflow.com/q/39929817/608639              -->
@@ -142,7 +145,6 @@
       Properties="Configuration=Debug;Platform=Win32;"/>
   </Target>
   -->
-
   <ItemDefinitionGroup Condition="!Exists('Win32\Output\Debug\cryptest.exe')" Label="MAC tool">
     <PreBuildEvent>
       <Message>Creating Win32/Debug cryptest.exe for MAC computation</Message>
@@ -152,7 +154,6 @@
       </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
-
   <!-- DLL MAC'ing performed by cryptest.exe -->
   <ItemDefinitionGroup Label="DLL MAC">
     <PostBuildEvent>
@@ -165,16 +166,14 @@
       <Outputs>$(OutDir)cryptopp.mac.done;%(Outputs)</Outputs>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-
   <!-- Original File with special treatment -->
   <ItemGroup>
     <CustomBuild Condition="'$(Platform)'=='x64' AND ('$(Configuration)'=='Debug' Or '$(Configuration)'=='Release')" Include="x64dll.asm">
       <Message>Building and assembling x64dll.asm</Message>
       <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Zi /Fo"$(IntDir)x64dll.obj" "%(FullPath)"</Command>
-      <Outputs>$(IntDir)x64dll.obj</Outputs>
+      <Outputs>$(IntDir)x64dll.obj;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
-
   <!-- Source Files -->
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -211,7 +210,9 @@
     <ClCompile Include="fips140.cpp" />
     <ClCompile Include="fipstest.cpp" />
     <ClCompile Include="gcm.cpp" />
+    <ClCompile Include="gcm_simd.cpp" />
     <ClCompile Include="gf2n.cpp" />
+    <ClCompile Include="gf2n_simd.cpp" />
     <ClCompile Include="gfpcrypt.cpp" />
     <ClCompile Include="hex.cpp" />
     <ClCompile Include="hmac.cpp" />
@@ -230,16 +231,17 @@
     <ClCompile Include="randpool.cpp" />
     <ClCompile Include="rdtables.cpp" />
     <ClCompile Include="rijndael.cpp" />
+    <ClCompile Include="rijndael_simd.cpp" />
     <ClCompile Include="rng.cpp" />
     <ClCompile Include="rsa.cpp" />
     <ClCompile Include="rw.cpp" />
     <ClCompile Include="sha.cpp" />
+    <ClCompile Include="sha_simd.cpp" />
     <ClCompile Include="simple.cpp" />
     <ClCompile Include="skipjack.cpp" />
+    <ClCompile Include="sse_simd.cpp" />
     <ClCompile Include="strciphr.cpp" />
-    <ClCompile Include="trdlocal.cpp" />
   </ItemGroup>
-
   <!-- Header Files -->
   <ItemGroup>
     <ClInclude Include="aes.h" />
@@ -263,6 +265,7 @@
     <ClInclude Include="ec2n.h" />
     <ClInclude Include="eccrypto.h" />
     <ClInclude Include="ecp.h" />
+    <ClInclude Include="ecpoint.h" />
     <ClInclude Include="emsa2.h" />
     <ClInclude Include="eprecomp.h" />
     <ClInclude Include="files.h" />
@@ -273,7 +276,6 @@
     <ClInclude Include="gf2n.h" />
     <ClInclude Include="gfpcrypt.h" />
     <ClInclude Include="hex.h" />
-    <ClInclude Include="hkdf.h" />
     <ClInclude Include="hmac.h" />
     <ClInclude Include="integer.h" />
     <ClInclude Include="iterhash.h" />
@@ -307,10 +309,8 @@
     <ClInclude Include="stdcpp.h" />
     <ClInclude Include="strciphr.h" />
     <ClInclude Include="trap.h" />
-    <ClInclude Include="trdlocal.h" />
     <ClInclude Include="words.h" />
   </ItemGroup>
-
   <!-- Back to Visual Studio boilerplate -->
   <ItemGroup>
     <ResourceCompile Include="cryptopp.rc" />

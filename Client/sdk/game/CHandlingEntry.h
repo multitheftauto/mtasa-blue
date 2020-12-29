@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CHANDLINGENTRY
-#define __CHANDLINGENTRY
+#pragma once
 
 #include <CVector.h>
 
@@ -89,57 +88,57 @@ public:
     };
 
     // Destructor
-    virtual ~CHandlingEntry(void){};
+    virtual ~CHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
     virtual void Assign(const CHandlingEntry* pData) = 0;
 
     // Get functions
-    virtual float          GetMass(void) const = 0;
-    virtual float          GetTurnMass(void) const = 0;
-    virtual float          GetDragCoeff(void) const = 0;
-    virtual const CVector& GetCenterOfMass(void) const = 0;
+    virtual float          GetMass() const = 0;
+    virtual float          GetTurnMass() const = 0;
+    virtual float          GetDragCoeff() const = 0;
+    virtual const CVector& GetCenterOfMass() const = 0;
 
-    virtual unsigned int GetPercentSubmerged(void) const = 0;
-    virtual float        GetTractionMultiplier(void) const = 0;
+    virtual unsigned int GetPercentSubmerged() const = 0;
+    virtual float        GetTractionMultiplier() const = 0;
 
-    virtual eDriveType    GetCarDriveType(void) const = 0;
-    virtual eEngineType   GetCarEngineType(void) const = 0;
-    virtual unsigned char GetNumberOfGears(void) const = 0;
+    virtual eDriveType    GetCarDriveType() const = 0;
+    virtual eEngineType   GetCarEngineType() const = 0;
+    virtual unsigned char GetNumberOfGears() const = 0;
 
-    virtual float GetEngineAcceleration(void) const = 0;
-    virtual float GetEngineInertia(void) const = 0;
-    virtual float GetMaxVelocity(void) const = 0;
+    virtual float GetEngineAcceleration() const = 0;
+    virtual float GetEngineInertia() const = 0;
+    virtual float GetMaxVelocity() const = 0;
 
-    virtual float GetBrakeDeceleration(void) const = 0;
-    virtual float GetBrakeBias(void) const = 0;
-    virtual bool  GetABS(void) const = 0;
+    virtual float GetBrakeDeceleration() const = 0;
+    virtual float GetBrakeBias() const = 0;
+    virtual bool  GetABS() const = 0;
 
-    virtual float GetSteeringLock(void) const = 0;
-    virtual float GetTractionLoss(void) const = 0;
-    virtual float GetTractionBias(void) const = 0;
+    virtual float GetSteeringLock() const = 0;
+    virtual float GetTractionLoss() const = 0;
+    virtual float GetTractionBias() const = 0;
 
-    virtual float GetSuspensionForceLevel(void) const = 0;
-    virtual float GetSuspensionDamping(void) const = 0;
-    virtual float GetSuspensionHighSpeedDamping(void) const = 0;
-    virtual float GetSuspensionUpperLimit(void) const = 0;
-    virtual float GetSuspensionLowerLimit(void) const = 0;
-    virtual float GetSuspensionFrontRearBias(void) const = 0;
-    virtual float GetSuspensionAntiDiveMultiplier(void) const = 0;
+    virtual float GetSuspensionForceLevel() const = 0;
+    virtual float GetSuspensionDamping() const = 0;
+    virtual float GetSuspensionHighSpeedDamping() const = 0;
+    virtual float GetSuspensionUpperLimit() const = 0;
+    virtual float GetSuspensionLowerLimit() const = 0;
+    virtual float GetSuspensionFrontRearBias() const = 0;
+    virtual float GetSuspensionAntiDiveMultiplier() const = 0;
 
-    virtual float GetCollisionDamageMultiplier(void) const = 0;
+    virtual float GetCollisionDamageMultiplier() const = 0;
 
-    virtual unsigned int GetHandlingFlags(void) const = 0;
-    virtual unsigned int GetModelFlags(void) const = 0;
-    virtual float        GetSeatOffsetDistance(void) const = 0;
-    virtual unsigned int GetMonetary(void) const = 0;
+    virtual unsigned int GetHandlingFlags() const = 0;
+    virtual unsigned int GetModelFlags() const = 0;
+    virtual float        GetSeatOffsetDistance() const = 0;
+    virtual unsigned int GetMonetary() const = 0;
 
-    virtual eLightType    GetHeadLight(void) const = 0;
-    virtual eLightType    GetTailLight(void) const = 0;
-    virtual unsigned char GetAnimGroup(void) const = 0;
+    virtual eLightType    GetHeadLight() const = 0;
+    virtual eLightType    GetTailLight() const = 0;
+    virtual unsigned char GetAnimGroup() const = 0;
 
-    virtual eVehicleTypes GetModel(void) const = 0;
-    virtual bool          HasSuspensionChanged(void) const = 0;
+    virtual eVehicleTypes GetModel() const = 0;
+    virtual bool          HasSuspensionChanged() const = 0;
 
     // Set functions
     virtual void SetMass(float fMass) = 0;
@@ -191,5 +190,3 @@ public:
     // all transmission/handling values according to the new values.
     virtual void Recalculate(unsigned short usModel) = 0;
 };
-
-#endif

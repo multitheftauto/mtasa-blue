@@ -175,7 +175,7 @@ namespace SharedUtil
     //
     //
     ////////////////////////////////////////////////
-    CStatEvents::CStatEvents(void) : m_bEnabled(false), m_ItemBuffer(0), m_BufferPos(0), m_BufferPosMax(0), m_BufferPosMaxUsing(0) { ClearBuffer(true); }
+    CStatEvents::CStatEvents() : m_bEnabled(false), m_ItemBuffer(0), m_BufferPos(0), m_BufferPosMax(0), m_BufferPosMaxUsing(0) { ClearBuffer(true); }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -346,7 +346,7 @@ namespace SharedUtil
     //
     //
     ///////////////////////////////////////////////////////////////
-    CStatResults::CStatResults(void) { m_fNextMaxClearTime = 0; }
+    CStatResults::CStatResults() { m_fNextMaxClearTime = 0; }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -355,7 +355,7 @@ namespace SharedUtil
     // Save all stats in a ResultCollection
     //
     ///////////////////////////////////////////////////////////////
-    void CStatResults::FrameEnd(void)
+    void CStatResults::FrameEnd()
     {
         CLOCK("Profiling", "Compile stats");
 

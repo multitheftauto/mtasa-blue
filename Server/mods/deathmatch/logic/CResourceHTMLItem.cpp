@@ -30,7 +30,7 @@ CResourceHTMLItem::CResourceHTMLItem(CResource* resource, const char* szShortNam
     m_bOOPEnabled = bOOPEnabled;
 }
 
-CResourceHTMLItem::~CResourceHTMLItem(void)
+CResourceHTMLItem::~CResourceHTMLItem()
 {
     Stop();
 }
@@ -149,7 +149,7 @@ bool CResourceHTMLItem::AppendToPageBuffer(const char* szText, size_t length)
     return true;
 }
 
-bool CResourceHTMLItem::Start(void)
+bool CResourceHTMLItem::Start()
 {
     if (!m_bIsRaw)
     {
@@ -305,7 +305,7 @@ void CResourceHTMLItem::GetMimeType(const char* szFilename)
         m_strMime = "text/html";
 }
 
-bool CResourceHTMLItem::Stop(void)
+bool CResourceHTMLItem::Stop()
 {
     if (m_pVM)
     {

@@ -21,7 +21,7 @@ public:
     {
     }
 
-    void Call(void)
+    void Call()
     {
         if (m_pLuaMain)
             m_Arguments.Call(m_pLuaMain, m_iLuaFunction);
@@ -36,6 +36,8 @@ public:
             m_Arguments.DeleteArguments();
         }
     }
+
+    bool IsValid() const noexcept { return m_pLuaMain != nullptr; }
 
 protected:
     CLuaMain*       m_pLuaMain;

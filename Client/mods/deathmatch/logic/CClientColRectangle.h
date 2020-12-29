@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLRECTANGLE_H
-#define __CCLIENTCOLRECTANGLE_H
+#pragma once
 
 class CClientColRectangle : public CClientColShape
 {
@@ -17,14 +16,14 @@ class CClientColRectangle : public CClientColShape
 public:
     CClientColRectangle(CClientManager* pManager, ElementID ID, const CVector2D& vecPosition, const CVector2D& vecSize);
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
     virtual void    DebugRender(const CVector& vecPosition, float fDrawRadius);
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_RECTANGLE; }
+    eColShapeType GetShapeType() { return COLSHAPE_RECTANGLE; }
 
     bool DoHitDetection(const CVector& vecNowPosition, float fRadius);
 
-    const CVector2D& GetSize(void) { return m_vecSize; };
+    const CVector2D& GetSize() { return m_vecSize; };
     void             SetSize(const CVector2D& vecSize)
     {
         m_vecSize = vecSize;
@@ -34,5 +33,3 @@ public:
 protected:
     CVector2D m_vecSize;
 };
-
-#endif

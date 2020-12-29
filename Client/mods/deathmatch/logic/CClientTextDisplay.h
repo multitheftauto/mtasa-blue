@@ -10,8 +10,7 @@
 
 class CClientTextDisplay;
 
-#ifndef __CCLIENTTEXTDISPLAY_H
-#define __CCLIENTTEXTDISPLAY_H
+#pragma once
 
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
@@ -23,9 +22,9 @@ class CClientTextDisplay : public CClientDisplay
 
 public:
     CClientTextDisplay(CClientDisplayManager* pDisplayManager, int ID = 0xFFFFFFFF);
-    ~CClientTextDisplay(void);
+    ~CClientTextDisplay();
 
-    eDisplayType GetType(void) { return DISPLAY_TEXT; }
+    eDisplayType GetType() { return DISPLAY_TEXT; }
 
     void SetCaption(const char* szCaption);
 
@@ -35,15 +34,15 @@ public:
     void SetColorAlpha(unsigned char ucAlpha);
     void SetShadowAlpha(unsigned char ucShadowAlpha);
 
-    float GetScale(void) { return m_fScale; };
+    float GetScale() { return m_fScale; };
     void  SetScale(float fScale);
 
-    unsigned long GetFormat(void) { return m_ulFormat; };
+    unsigned long GetFormat() { return m_ulFormat; };
     void          SetFormat(unsigned long ulFormat);
 
     void SetVisible(bool bVisible);
 
-    void Render(void);
+    void Render();
 
     static void SetGlobalScale(float fScale) { m_fGlobalScale = fScale; }
 
@@ -56,5 +55,3 @@ private:
 
     static float m_fGlobalScale;
 };
-
-#endif

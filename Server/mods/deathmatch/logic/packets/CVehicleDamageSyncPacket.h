@@ -15,13 +15,13 @@
 #include "../CVehicle.h"
 #include "net/SyncStructures.h"
 
-class CVehicleDamageSyncPacket : public CPacket
+class CVehicleDamageSyncPacket final : public CPacket
 {
 public:
     CVehicleDamageSyncPacket();
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_VEHICLE_DAMAGE_SYNC; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_DAMAGE_SYNC; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

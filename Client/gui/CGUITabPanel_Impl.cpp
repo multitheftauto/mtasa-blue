@@ -48,7 +48,7 @@ CGUITabPanel_Impl::CGUITabPanel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
     }
 }
 
-CGUITabPanel_Impl::~CGUITabPanel_Impl(void)
+CGUITabPanel_Impl::~CGUITabPanel_Impl()
 {
     DestroyElement();
 }
@@ -67,7 +67,7 @@ void CGUITabPanel_Impl::DeleteTab(CGUITab* pTab)
     return;
 }
 
-CGUITab* CGUITabPanel_Impl::GetSelectedTab(void)
+CGUITab* CGUITabPanel_Impl::GetSelectedTab()
 {
     CEGUI::TabControl* pControl = reinterpret_cast<CEGUI::TabControl*>(m_pWindow);
 
@@ -110,7 +110,7 @@ void CGUITabPanel_Impl::SetSelectedIndex(unsigned int uiIndex)
     };
 }
 
-unsigned int CGUITabPanel_Impl::GetSelectedIndex(void)
+unsigned int CGUITabPanel_Impl::GetSelectedIndex()
 {
     unsigned int uiIndex = 0;
     try
@@ -123,7 +123,7 @@ unsigned int CGUITabPanel_Impl::GetSelectedIndex(void)
     return uiIndex;
 }
 
-unsigned int CGUITabPanel_Impl::GetTabCount(void)
+unsigned int CGUITabPanel_Impl::GetTabCount()
 {
     unsigned int uiIndex = 0;
     try

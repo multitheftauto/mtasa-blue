@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MENUMANAGER
-#define __CGAMESA_MENUMANAGER
+#pragma once
 
 #include <game/CMenuManager.h>
 #define WIN32_LEAN_AND_MEAN
@@ -46,5 +45,3 @@ public:
     void SwitchToNewScreen(BYTE ScreenID);
     void DisplayHelpText(char* szHelpText);
 };
-
-#endif

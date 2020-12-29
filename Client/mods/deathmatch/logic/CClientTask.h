@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTTASK_H
-#define __CCLIENTTASK_H
+#pragma once
 
 #include <list>
 #include "lua/LuaCommon.h"
@@ -36,25 +35,25 @@ public:
     bool WriteElements(lua_State* luaVM, int iTableIndex);
     bool WriteParameters(lua_State* luaVM, int iTableIndex);
 
-    const char* GetTaskName(void) { return m_strTaskName.c_str(); };
+    const char* GetTaskName() { return m_strTaskName.c_str(); };
     void        SetTaskName(const char* szName) { m_strTaskName = szName ? szName : ""; };
 
-    static unsigned long GenerateUniqueIdentifier(void);
-    unsigned long        GetUniqueIdentifier(void) { return m_ulUniqueIdentifier; };
+    static unsigned long GenerateUniqueIdentifier();
+    unsigned long        GetUniqueIdentifier() { return m_ulUniqueIdentifier; };
     void                 SetUniqueIdentifier(unsigned long ulID) { m_ulUniqueIdentifier = ulID; };
 
     void AddElement(CClientEntity* pElement);
     void RemoveElement(CClientEntity* pElement);
-    void ClearElements(void);
+    void ClearElements();
 
     bool                        IsElementIn(CClientEntity* pElement);
-    const std::list<ElementID>& GetElements(void) { return m_Elements; };
+    const std::list<ElementID>& GetElements() { return m_Elements; };
 
-    const std::list<std::string>&  GetKeys(void) { return m_Keys; };
-    const std::list<CLuaArgument>& GetValues(void) { return m_Values; };
+    const std::list<std::string>&  GetKeys() { return m_Keys; };
+    const std::list<CLuaArgument>& GetValues() { return m_Values; };
     void                           SetParameter(const char* szKey, const CLuaArgument& Value);
     void                           SetParameters(const std::list<std::string>& Keys, const std::list<CLuaArgument>& Values);
-    void                           ClearParameters(void);
+    void                           ClearParameters();
 
     CLuaArgument* GetParameter(const char* szKey);
     bool          GetParameterBool(const char* szKey, bool& Bool);
@@ -79,5 +78,3 @@ private:
 
     static unsigned long m_ulLastUniqueIdentifier;
 };
-
-#endif

@@ -31,7 +31,7 @@ void CGuiFontItem::PostConstruct(CRenderItemManager* pManager, const SString& st
 //
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::PreDestruct(void)
+void CGuiFontItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -44,7 +44,7 @@ void CGuiFontItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CGuiFontItem::IsValid(void)
+bool CGuiFontItem::IsValid()
 {
     return m_pFntCEGUI != NULL;
 }
@@ -56,7 +56,7 @@ bool CGuiFontItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::OnLostDevice(void)
+void CGuiFontItem::OnLostDevice()
 {
     // Nothing required for CGuiFontItem
 }
@@ -68,7 +68,7 @@ void CGuiFontItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::OnResetDevice(void)
+void CGuiFontItem::OnResetDevice()
 {
     // Nothing required for CGuiFontItem
 }
@@ -123,7 +123,7 @@ void CGuiFontItem::CreateUnderlyingData(const SString& strFullFilePath, const SS
 //
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::ReleaseUnderlyingData(void)
+void CGuiFontItem::ReleaseUnderlyingData()
 {
     SAFE_DELETE(m_pFntCEGUI);
 }

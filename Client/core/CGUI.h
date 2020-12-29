@@ -11,8 +11,7 @@
 
 class CLocalGUI;
 
-#ifndef __CLOCALGUI_H
-#define __CLOCALGUI_H
+#pragma once
 
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL 0x20A // Defined only when including Windows.h -> Not getting defined? (<=XP only?)
@@ -30,7 +29,6 @@ class CLocalGUI;
 #include "CSetCursorPosHook.h"
 #include "CSingleton.h"
 #include "CVersionUpdater.h"
-#include "CNewsBrowser.h"
 
 #include <windows.h>
 
@@ -40,61 +38,61 @@ class CDebugView;
 class CLocalGUI : public CSingleton<CLocalGUI>
 {
 public:
-    CLocalGUI(void);
-    ~CLocalGUI(void);
+    CLocalGUI();
+    ~CLocalGUI();
 
     void SetSkin(const char* szName);
     void ChangeLocale(const char* szName);
 
     void CreateWindows(bool bGameIsAlreadyLoaded);
-    void DestroyWindows(void);
+    void DestroyWindows();
 
     void CreateObjects(IUnknown* pDevice);
-    void DestroyObjects(void);
+    void DestroyObjects();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void Draw(void);
-    void Invalidate(void);
-    void Restore(void);
+    void Draw();
+    void Invalidate();
+    void Restore();
 
-    void DrawMouseCursor(void);
+    void DrawMouseCursor();
     void SetCursorPos(int iX, int iY, bool bForce = false, bool overrideStored = true);
 
-    CConsole* GetConsole(void);
+    CConsole* GetConsole();
     void      SetConsoleVisible(bool bVisible);
-    bool      IsConsoleVisible(void);
+    bool      IsConsoleVisible();
     void      EchoConsole(const char* szText);
 
-    CMainMenu* GetMainMenu(void);
+    CMainMenu* GetMainMenu();
     void       SetMainMenuVisible(bool bVisible);
-    bool       IsMainMenuVisible(void);
+    bool       IsMainMenuVisible();
 
-    CChat* GetChat(void);
+    CChat* GetChat();
     void   SetChatBoxVisible(bool bVisible);
-    bool   IsChatBoxVisible(void);
+    bool   IsChatBoxVisible();
     void   SetChatBoxInputEnabled(bool bInputEnabled);
-    bool   IsChatBoxInputEnabled(void);
+    bool   IsChatBoxInputEnabled();
     void   EchoChat(const char* szText, bool bColorCoded);
 
-    bool IsWebRequestGUIVisible(void);
+    bool IsWebRequestGUIVisible();
 
-    CDebugView* GetDebugView(void);
+    CDebugView* GetDebugView();
     void        SetDebugViewVisible(bool bVisible);
-    bool        IsDebugViewVisible(void);
+    bool        IsDebugViewVisible();
     void        EchoDebug(const char* szText);
 
     bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    bool InputGoesToGUI(void);
-    bool IsCursorForcedVisible(void) { return m_bForceCursorVisible; }
+    bool InputGoesToGUI();
+    bool IsCursorForcedVisible() { return m_bForceCursorVisible; }
     void ForceCursorVisible(bool bVisible);
 
     void InitiateUpdate(const char* szType, const char* szData, const char* szHost) { m_pVersionUpdater->InitiateUpdate(szType, szData, szHost); }
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pVersionUpdater->IsOptionalUpdateInfoRequired(szHost); }
-    void InitiateDataFilesFix(void) { m_pVersionUpdater->InitiateDataFilesFix(); }
+    void InitiateDataFilesFix() { m_pVersionUpdater->InitiateDataFilesFix(); }
 
 private:
-    void UpdateCursor(void);
+    void UpdateCursor();
 
     DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
@@ -119,5 +117,3 @@ private:
     SString m_LastLocaleName;
     uint    m_LocaleChangeCounter;
 };
-
-#endif

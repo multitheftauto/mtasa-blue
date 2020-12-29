@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PLAYERPED
-#define __CGAMESA_PLAYERPED
+#pragma once
 
 #include <game/CPlayerPed.h>
 #include "CPedSA.h"
@@ -44,16 +43,16 @@ private:
 public:
     CPlayerPedSA(ePedModel pedType);
     CPlayerPedSA(CPlayerPedSAInterface* ped);
-    ~CPlayerPedSA(void);
+    ~CPlayerPedSA();
 
-    CWanted* GetWanted(void);
+    CWanted* GetWanted();
 
-    float GetSprintEnergy(void);
+    float GetSprintEnergy();
     void  SetSprintEnergy(float fSprintEnergy);
 
-    void SetInitialState(void);
+    void SetInitialState();
 
-    eMoveAnim GetMoveAnim(void);
+    eMoveAnim GetMoveAnim();
     void      SetMoveAnim(eMoveAnim iAnimGroup);
 
     /*  DWORD               GetCurrentWeaponType        ( void );
@@ -62,9 +61,7 @@ public:
         VOID                ResetToInitialState         ( void );
         VOID                ClearWeaponTarget           ( void );*/
 
-    CPlayerPedSAInterface* GetPlayerPedInterface(void) { return static_cast<CPlayerPedSAInterface*>(m_pInterface); };
+    CPlayerPedSAInterface* GetPlayerPedInterface() { return static_cast<CPlayerPedSAInterface*>(m_pInterface); };
 
-    static void StaticSetHooks(void);
+    static void StaticSetHooks();
 };
-
-#endif

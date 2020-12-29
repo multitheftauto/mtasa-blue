@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKMANAGEMENTSYSTEM
-#define __CGAME_TASKMANAGEMENTSYSTEM
+#pragma once
 
 class CTaskManagementSystem
 {
 };
-
-#endif

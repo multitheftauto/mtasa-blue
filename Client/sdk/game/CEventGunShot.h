@@ -9,17 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventGunShot_H
-#define __CEventGunShot_H
+#pragma once
 
 class CEventGunShotSAInterface;
 
 class CEventGunShot
 {
 public:
-    virtual CEventGunShotSAInterface* GetInterface(void) = 0;
+    virtual CEventGunShotSAInterface* GetInterface() = 0;
 
     virtual void Destroy(bool bDestroyInterface) = 0;
 };
-
-#endif

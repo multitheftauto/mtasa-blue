@@ -11,22 +11,28 @@
 
 #include "StdInc.h"
 
-void CLuaWaterDefs::LoadFunctions(void)
+void CLuaWaterDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createWater", CreateWater);
-    CLuaCFunctions::AddFunction("testLineAgainstWater", TestLineAgainstWater);
-    CLuaCFunctions::AddFunction("resetWaterColor", ResetWaterColor);
-    CLuaCFunctions::AddFunction("resetWaterLevel", ResetWaterLevel);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createWater", CreateWater},
+        {"testLineAgainstWater", TestLineAgainstWater},
+        {"resetWaterColor", ResetWaterColor},
+        {"resetWaterLevel", ResetWaterLevel},
 
-    CLuaCFunctions::AddFunction("setWaterColor", SetWaterColor);
-    CLuaCFunctions::AddFunction("setWaterLevel", SetWaterLevel);
-    CLuaCFunctions::AddFunction("setWaterVertexPosition", SetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("setWaterDrawnLast", SetWaterDrawnLast);
+        {"setWaterColor", SetWaterColor},
+        {"setWaterLevel", SetWaterLevel},
+        {"setWaterVertexPosition", SetWaterVertexPosition},
+        {"setWaterDrawnLast", SetWaterDrawnLast},
 
-    CLuaCFunctions::AddFunction("getWaterColor", GetWaterColor);
-    CLuaCFunctions::AddFunction("getWaterLevel", GetWaterLevel);
-    CLuaCFunctions::AddFunction("getWaterVertexPosition", GetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("isWaterDrawnLast", IsWaterDrawnLast);
+        {"getWaterColor", GetWaterColor},
+        {"getWaterLevel", GetWaterLevel},
+        {"getWaterVertexPosition", GetWaterVertexPosition},
+        {"isWaterDrawnLast", IsWaterDrawnLast},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaWaterDefs::AddClass(lua_State* luaVM)
@@ -56,14 +62,13 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "level", "setWaterLevel", "getWaterLevel");
     lua_classvariable(luaVM, "height", "setWaveHeight", "getWaveHeight");
-    // lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" );
 
     lua_registerclass(luaVM, "Water", "Element");
 }
 
 int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 {
-    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] )
+    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] [, bool bShallow = false ] )
     CVector v1;
     CVector v2;
     CVector v3;
@@ -235,20 +240,24 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     else
     {
         // Call type 3
-        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements )
+        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel )
         float fLevel;
         bool  bIncludeWorldNonSeaLevel;
         bool  bIncludeAllWaterElements;
+        bool  bIncludeWorldSeaLevel;
+        bool  bIncludeOutsideWorldLevel;
 
         argStream.ReadNumber(fLevel);
         argStream.ReadBool(bIncludeWorldNonSeaLevel, true);
         argStream.ReadBool(bIncludeAllWaterElements, true);
+        argStream.ReadBool(bIncludeWorldSeaLevel, true);
+        argStream.ReadBool(bIncludeOutsideWorldLevel, false);
 
         if (!argStream.HasErrors())
         {
             if (bIncludeAllWaterElements)
                 CStaticFunctionDefinitions::SetAllElementWaterLevel(fLevel, pResource);
-            if (CStaticFunctionDefinitions::SetWorldWaterLevel(fLevel, pResource, bIncludeWorldNonSeaLevel))
+            if (CStaticFunctionDefinitions::SetWorldWaterLevel(fLevel, pResource, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

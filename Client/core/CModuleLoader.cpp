@@ -72,7 +72,7 @@ PVOID CModuleLoader::GetFunctionPointer(const string& FunctionName)
         return NULL;
 }
 
-const SString& CModuleLoader::GetLastErrorMessage(void) const
+const SString& CModuleLoader::GetLastErrorMessage() const
 {
     return m_strLastError;
 }

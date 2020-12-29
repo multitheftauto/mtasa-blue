@@ -18,18 +18,18 @@ class CPedManager
     friend class CPed;
 
 public:
-    CPedManager(void);
-    ~CPedManager(void);
+    CPedManager();
+    ~CPedManager();
 
-    class CPed* Create(unsigned short usModel, CElement* pParent, CXMLNode* pNode = NULL);
+    class CPed* Create(unsigned short usModel, CElement* pParent);
     class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
-    void        DeleteAll(void);
+    void        DeleteAll();
 
-    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); };
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(class CPed* pPed);
 
-    list<class CPed*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    list<class CPed*>::const_iterator IterEnd(void) { return m_List.end(); }
+    list<class CPed*>::const_iterator IterBegin() { return m_List.begin(); }
+    list<class CPed*>::const_iterator IterEnd() { return m_List.end(); }
 
     static bool IsValidModel(unsigned short usModel);
 

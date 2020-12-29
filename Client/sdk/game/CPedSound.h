@@ -9,24 +9,21 @@
  *
  *****************************************************************************/
 
-#ifndef __CPedSound_H
-#define __CPedSound_H
+#pragma once
 
 class CPedSoundSAInterface;
 
 class CPedSound
 {
 public:
-    virtual CPedSoundSAInterface* GetInterface(void) = 0;
+    virtual CPedSoundSAInterface* GetInterface() = 0;
 
-    virtual short GetVoiceTypeID(void) = 0;
-    virtual short GetVoiceID(void) = 0;
+    virtual short GetVoiceTypeID() = 0;
+    virtual short GetVoiceID() = 0;
     virtual void  SetVoiceTypeID(short sVoiceType) = 0;
     virtual void  SetVoiceID(short sVoiceID) = 0;
 
-    virtual bool IsSpeechDisabled(void) = 0;
-    virtual void EnablePedSpeech(void) = 0;
+    virtual bool IsSpeechDisabled() = 0;
+    virtual void EnablePedSpeech() = 0;
     virtual void DisablePedSpeech(bool bStopCurrent) = 0;
 };
-
-#endif

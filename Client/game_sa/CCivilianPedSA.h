@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CIVILIANPED
-#define __CGAMESA_CIVILIANPED
+#pragma once
 
 #include <game/CCivilianPed.h>
 #include "CPedSA.h"
@@ -43,5 +42,3 @@ public:
     void        SetSprintEnergy ( float fSprintEnergy ) {};
     */
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PHYSICAL
-#define __CGAMESA_PHYSICAL
+#pragma once
 
 #include <game/CPhysical.h>
 #include "CEntitySA.h"
@@ -107,13 +106,16 @@ public:
     float                     m_fLighting;                                // 300
     float                     m_fLighting2;                               // 304
     class CShadowDataSA*      m_pShadowData;                              // 308
+
+    CRect*      GetBoundRect_(CRect* pRect);
+    static void StaticSetHooks();
 };
 static_assert(sizeof(CPhysicalSAInterface) == 0x138, "Invalid size for CPhysicalSAInterface");
 
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
 {
 public:
-    virtual void RestoreLastGoodPhysicsState(void);
+    virtual void RestoreLastGoodPhysicsState();
     CVector*     GetMoveSpeed(CVector* vecMoveSpeed);
     CVector*     GetTurnSpeed(CVector* vecTurnSpeed);
     CVector*     GetMoveSpeedInternal(CVector* vecMoveSpeed);
@@ -121,25 +123,29 @@ public:
     void         SetMoveSpeed(CVector* vecMoveSpeed);
     void         SetTurnSpeed(CVector* vecTurnSpeed);
 
-    float GetMass(void);
+    float GetMass();
     void  SetMass(float fMass);
-    float GetTurnMass(void);
+    float GetTurnMass();
     void  SetTurnMass(float fTurnMass);
-    float GetElasticity(void);
+    float GetAirResistance();
+    void  SetAirResistance(float fAirResistance);
+    float GetElasticity();
     void  SetElasticity(float fElasticity);
-    float GetBuoyancyConstant(void);
+    float GetBuoyancyConstant();
     void  SetBuoyancyConstant(float fBuoyancyConstant);
+    void  GetCenterOfMass(CVector& vecCenterOfMass);
+    void  SetCenterOfMass(CVector& vecCenterOfMass);
 
-    void ProcessCollision(void);
-    void AddToMovingList(void);
+    void ProcessCollision();
+    void AddToMovingList();
 
-    float    GetDamageImpulseMagnitude(void);
+    float    GetDamageImpulseMagnitude();
     void     SetDamageImpulseMagnitude(float fMagnitude);
-    CEntity* GetDamageEntity(void);
+    CEntity* GetDamageEntity();
     void     SetDamageEntity(CEntity* pEntity);
-    void     ResetLastDamage(void);
+    void     ResetLastDamage();
 
-    CEntity* GetAttachedEntity(void);
+    CEntity* GetAttachedEntity();
     void     AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosition, const CVector& vecRotation);
     void     DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, bool bUnk);
     void     GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
@@ -147,7 +153,7 @@ public:
 
     virtual bool InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation);
 
-    float GetLighting(void);
+    float GetLighting();
     void  SetLighting(float fLighting);
 
     void SetFrozen(bool bFrozen);
@@ -155,10 +161,6 @@ public:
     /*
     VOID        SetMassMultiplier(FLOAT fMassMultiplier);
     FLOAT       GetMassMultiplier();
-    VOID        SetAirResistance(FLOAT fAirResistance);
-    FLOAT       GetAirResistance();
-    VOID        SetCenterOfMass(CVector * vecCenterOfMass);
-    CVector * GetCenterOfMass();
 
     BOOL        GetExtraHeavy();
     VOID        SetExtraHeavy(BOOL bExtraHeavy);
@@ -173,5 +175,3 @@ public:
     BYTE        GetLevel();
     VOID        SetLevel(BYTE LivesInThisLevel);*/
 };
-
-#endif

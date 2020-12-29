@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILISTITEM_IMPL_H
-#define __CGUILISTITEM_IMPL_H
+#pragma once
 
 #include <gui/CGUIListItem.h>
 #include <CEGUI.h>
@@ -29,12 +28,12 @@ public:
     };
 
     CGUIListItem_Impl(const char* szText = "", unsigned int uiType = 0, CGUIStaticImage_Impl* pImage = NULL);
-    ~CGUIListItem_Impl(void);
+    ~CGUIListItem_Impl();
 
-    std::string GetText(void) const;
+    std::string GetText() const;
     void        SetText(const char* pszText, const char* pszSortText = NULL);
 
-    void* GetData(void) const { return m_pData; }
+    void* GetData() const { return m_pData; }
     void  SetData(void* pData, CGUICallback<void, void*> deleteDataCallback = NULL)
     {
         m_pData = pData;
@@ -46,13 +45,13 @@ public:
     void SetFont(const char* szFontName);
     void SetImage(CGUIStaticImage* Image);
 
-    bool GetSelectedState(void);
+    bool GetSelectedState();
     void SetSelectedState(bool bState);
 
     bool GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
     void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha);
 
-    CEGUI::ListboxItem* GetListItem(void);
+    CEGUI::ListboxItem* GetListItem();
 
     unsigned int ItemType;
 
@@ -62,5 +61,3 @@ private:
     std::string               m_strData;
     CGUICallback<void, void*> m_deleteDataCallback;
 };
-
-#endif

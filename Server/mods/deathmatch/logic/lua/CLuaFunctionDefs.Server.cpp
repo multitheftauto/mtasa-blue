@@ -43,10 +43,11 @@ int CLuaFunctionDefs::SetMaxPlayers(lua_State* luaVM)
 
 int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 {
-    // bool outputChatBox ( string text [, element visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
-    SString   ssChat;
-    CElement* pElement;
-    bool      bColorCoded;
+    // bool outputChatBox ( string text [, element/table visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
+    SString               ssChat;
+    std::vector<CPlayer*> sendList;
+    CElement*             pElement = nullptr;
+    bool                  bColorCoded;
     // Default
     unsigned char ucRed = 231;
     unsigned char ucGreen = 217;
@@ -54,7 +55,15 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(ssChat);
-    argStream.ReadUserData(pElement, m_pRootElement);
+
+    if (argStream.NextIsTable())
+    {
+        argStream.ReadUserDataTable(sendList);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement, m_pRootElement);
+    }
 
     if (argStream.NextIsNumber() && argStream.NextIsNumber(1) && argStream.NextIsNumber(2))
     {
@@ -72,9 +81,30 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            if (pElement)
+            {
+                if (IS_TEAM(pElement))
+                {
+                    CTeam* pTeam = static_cast<CTeam*>(pElement);
+                    for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
+                    {
+                        sendList.push_back(*iter);
+                    }
+                }
+                else
+                {
+                    CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+
+            if (sendList.size() > 0)
+            {
+                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
@@ -126,6 +156,29 @@ int CLuaFunctionDefs::OOP_OutputChatBox(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::ClearChatBox(lua_State* luaVM)
+{
+    CElement* pElement;
+
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadUserData(pElement, m_pRootElement);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::ClearChatBox(pElement))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::OutputConsole(lua_State* luaVM)
 {
     SString   strMessage;
@@ -161,18 +214,18 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     argStream.ReadAnyAsString(strMessage);
     argStream.ReadNumber(uiLevel, 3);
 
-    if (uiLevel == 0)
+    if (uiLevel == 0 || uiLevel == 4)
     {
-        argStream.ReadNumber(ucR, 0xFF);
-        argStream.ReadNumber(ucG, 0xFF);
-        argStream.ReadNumber(ucB, 0xFF);
+        argStream.ReadNumber(ucR, 255);
+        argStream.ReadNumber(ucG, 255);
+        argStream.ReadNumber(ucB, 255);
     }
 
     if (!argStream.HasErrors())
     {
-        if (uiLevel > 3)
+        if (uiLevel > 4)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-3)", lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-4)", lua_tostring(luaVM, lua_upvalueindex(1)));
 
             lua_pushboolean(luaVM, false);
             return 1;
@@ -190,9 +243,13 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
         {
             m_pScriptDebugging->LogInformation(luaVM, "%s", strMessage.c_str());
         }
-        else if (uiLevel == 0)
+        else if (uiLevel == 4)
         {
             m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
+        }
+        else if (uiLevel == 0)
+        {
+            m_pScriptDebugging->LogDebug(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
         }
         lua_pushboolean(luaVM, true);
         return 1;
@@ -315,41 +372,34 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
 int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
 {
     // table getCommandHandlers ( [ resource sourceResource ] );
-    CResource* pResource;
-    bool       bSpecificResource = false;
+    CResource* pResource = nullptr;
 
     CScriptArgReader argStream(luaVM);
-    if (!argStream.NextIsNone())
-    {
+
+    if (!argStream.NextIsNil() && !argStream.NextIsNone())
         argStream.ReadUserData(pResource);
-        bSpecificResource = true;
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
     }
 
-    if (!argStream.HasErrors())
+    if (pResource)
     {
-        if (bSpecificResource)
-        {
-            // Grab resource virtual machine
-            CLuaMain* pLuaMain = pResource->GetVirtualMachine();
+        CLuaMain* pLuaMain = pResource->GetVirtualMachine();
 
-            if (pLuaMain)
-            {
-                m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
-
-                return 1;
-            }
-        }
+        if (pLuaMain)
+            m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
         else
-        {
-            m_pRegisteredCommands->GetCommands(luaVM);
-
-            return 1;
-        }
+            lua_newtable(luaVM);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        m_pRegisteredCommands->GetCommands(luaVM);
+    }
 
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -513,186 +563,6 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-// Call a function on a remote server
-int CLuaFunctionDefs::CallRemote(lua_State* luaVM)
-{
-    /* Determine if the argument stream is either a remote-server resource call or a web call:
-     * a) bool callRemote ( string host [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], string resourceName, string
-     * functionName, callback callbackFunction, [ arguments... ] ) b) bool callRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int
-     * connectTimeout = 10000 ], callback callbackFunction, [ arguments... ] )
-     */
-    CScriptArgReader argStream(luaVM);
-    SString          strHost;
-    SString          strQueueName = CALL_REMOTE_DEFAULT_QUEUE_NAME;
-
-    argStream.ReadString(strHost);
-
-    /* Find out if the next parameter is the 'queueName' argument
-     * 1) string queueName, int connectionAttempts, ...
-     * 2) string queueName, callback callbackFunction, ...
-     * 3) string queueName, string resourceName, string functionName, ...
-     */
-    if (argStream.NextIsString() && (argStream.NextIsNumber(1) || argStream.NextIsFunction(1) || (argStream.NextIsString(1) && argStream.NextIsString(2))))
-    {
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used");
-        argStream.ReadString(strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
-    }
-
-    // Read connectionAttempts and connectTimeout arguments if given
-    uint uiConnectionAttempts = 10U;
-    uint uiConnectTimeoutMs = 10000U;
-
-    if (argStream.NextIsNumber())
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used");
-    argStream.ReadIfNextIsNumber(uiConnectionAttempts, 10U);
-
-    if (argStream.NextIsNumber())
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used");
-    argStream.ReadIfNextIsNumber(uiConnectTimeoutMs, 10000U);
-
-    // Continue with either call type a) or b)
-    CLuaFunctionRef iLuaFunction;
-    CLuaArguments   args;
-
-    if (argStream.NextIsString() && argStream.NextIsString(1) && argStream.NextIsFunction(2))
-    {
-        SString strResourceName;
-        SString strFunctionName;
-        argStream.ReadString(strResourceName);
-        argStream.ReadString(strFunctionName);
-        argStream.ReadFunction(iLuaFunction);
-        argStream.ReadLuaArguments(args);
-        argStream.ReadFunctionComplete();
-
-        if (!argStream.HasErrors())
-        {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                g_pGame->GetRemoteCalls()->Call(strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts,
-                                                uiConnectTimeoutMs);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else if (argStream.NextIsFunction())
-    {
-        argStream.ReadFunction(iLuaFunction);
-        argStream.ReadLuaArguments(args);
-        argStream.ReadFunctionComplete();
-
-        if (!argStream.HasErrors())
-        {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                g_pGame->GetRemoteCalls()->Call(strHost, &args, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-    {
-        argStream.SetCustomWarning("Unrecognized argument list for callRemote: bad arguments or missing arguments");
-    }
-
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-// Call a function on a remote server
-int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
-{
-    //  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string
-    //  postData, bool bPostBinary, arguments... ] ) bool fetchRemote ( string URL [, table options ], callback callbackFunction[, table callbackArguments ] )
-    CScriptArgReader    argStream(luaVM);
-    SString             strURL;
-    SString             strQueueName;
-    SHttpRequestOptions httpRequestOptions;
-    CLuaFunctionRef     iLuaFunction;
-    CLuaArguments       callbackArguments;
-
-    argStream.ReadString(strURL);
-    if (!argStream.NextIsTable())
-    {
-        if (argStream.NextIsString())
-            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used");
-        argStream.ReadIfNextIsString(strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
-        if (argStream.NextIsNumber())
-            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used");
-        argStream.ReadIfNextIsNumber(httpRequestOptions.uiConnectionAttempts, 10);
-        if (argStream.NextIsNumber())
-            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used");
-        argStream.ReadIfNextIsNumber(httpRequestOptions.uiConnectTimeoutMs, 10000);
-        argStream.ReadFunction(iLuaFunction);
-        argStream.ReadString(httpRequestOptions.strPostData, "");
-        argStream.ReadBool(httpRequestOptions.bPostBinary, false);
-        argStream.ReadLuaArguments(callbackArguments);
-        argStream.ReadFunctionComplete();
-
-        if (!argStream.HasErrors())
-        {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                httpRequestOptions.bIsLegacy = true;
-                g_pGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-    {
-        CStringMap optionsMap;
-
-        argStream.ReadStringMap(optionsMap);
-        argStream.ReadFunction(iLuaFunction);
-        if (argStream.NextIsTable())
-            argStream.ReadLuaArgumentsTable(callbackArguments);
-        argStream.ReadFunctionComplete();
-
-        optionsMap.ReadNumber("connectionAttempts", httpRequestOptions.uiConnectionAttempts, 10);
-        optionsMap.ReadNumber("connectTimeout", httpRequestOptions.uiConnectTimeoutMs, 10000);
-        optionsMap.ReadString("method", httpRequestOptions.strRequestMethod, "");
-        optionsMap.ReadString("queueName", strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
-        optionsMap.ReadString("postData", httpRequestOptions.strPostData, "");
-        optionsMap.ReadBool("postIsBinary", httpRequestOptions.bPostBinary, false);
-        optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
-        optionsMap.ReadString("username", httpRequestOptions.strUsername, "");
-        optionsMap.ReadString("password", httpRequestOptions.strPassword, "");
-        optionsMap.ReadStringMap("headers", httpRequestOptions.requestHeaders);
-        optionsMap.ReadStringMap("formFields", httpRequestOptions.formFields);
-
-        if (httpRequestOptions.formFields.empty())
-            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
-        else
-            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_OPTIONS_FORMFIELDS, "'formFields' is being used");
-
-        if (!argStream.HasErrors())
-        {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                g_pGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-
-    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -1186,28 +1056,30 @@ int CLuaFunctionDefs::GetVersion(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 {
-    if (lua_type(luaVM, 1) == LUA_TSTRING)
+    SString strModuleName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModuleName);
+
+    if (!argStream.HasErrors())
     {
-        list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-        list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-        SString                     strAttribute = lua_tostring(luaVM, 2);
-        SString                     strModuleName = lua_tostring(luaVM, 1);
-        for (; iter != lua_LoadedModules.end(); ++iter)
+        std::list<CLuaModule*> modules = m_pLuaModuleManager->GetLoadedModules();
+        for (const auto mod : modules)
         {
-            if (stricmp(strModuleName, (*iter)->_GetName().c_str()) == 0)
+            if (mod->_GetName() == strModuleName)
             {
                 lua_newtable(luaVM);
 
                 lua_pushstring(luaVM, "name");
-                lua_pushstring(luaVM, (*iter)->_GetFunctions().szModuleName);
+                lua_pushstring(luaVM, mod->_GetFunctions().szModuleName);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "author");
-                lua_pushstring(luaVM, (*iter)->_GetFunctions().szAuthor);
+                lua_pushstring(luaVM, mod->_GetFunctions().szAuthor);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "version");
-                SString strVersion("%.2f", (*iter)->_GetFunctions().fVersion);
+                SString strVersion("%.2f", mod->_GetFunctions().fVersion);
                 lua_pushstring(luaVM, strVersion);
                 lua_settable(luaVM, -3);
 
@@ -1215,8 +1087,10 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
             }
         }
     }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
-    m_pScriptDebugging->LogBadType(luaVM);
     return 1;
 }
 

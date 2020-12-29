@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTWEBBROWSER_H
-#define __CCLIENTWEBBROWSER_H
+#pragma once
 
 #include <core/CWebViewInterface.h>
 #include <core/CAjaxResourceHandlerInterface.h>
@@ -81,7 +80,7 @@ public:
     void Events_OnTooltip(const SString& strTooltip) override;
     void Events_OnInputFocusChanged(bool bGainedFocus) override;
     bool Events_OnResourcePathCheck(SString& strURL) override;
-    bool Events_OnResourceFileCheck(const SString& strURL) override;
+    bool Events_OnResourceFileCheck(const SString& strURL, CBuffer& outFileData) override;
     void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason) override;
     void Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL) override;
 
@@ -102,5 +101,3 @@ public:
 private:
     CClientWebBrowser* m_pBrowser;
 };
-
-#endif

@@ -23,16 +23,16 @@ class CClientPerfStatPacketUsageImpl : public CClientPerfStatPacketUsage
 public:
     ZERO_ON_NEW
 
-    CClientPerfStatPacketUsageImpl(void);
-    virtual ~CClientPerfStatPacketUsageImpl(void);
+    CClientPerfStatPacketUsageImpl();
+    virtual ~CClientPerfStatPacketUsageImpl();
 
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CClientPerfStatModuleImpl
-    void MaybeRecordStats(void);
+    void MaybeRecordStats();
 
     int                         m_iStatsCleared;
     CElapsedTime                m_TimeSinceGetStats;
@@ -66,7 +66,7 @@ CClientPerfStatPacketUsage* CClientPerfStatPacketUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatPacketUsageImpl::CClientPerfStatPacketUsageImpl(void)
+CClientPerfStatPacketUsageImpl::CClientPerfStatPacketUsageImpl()
 {
     m_strCategoryName = "Packet usage";
 }
@@ -78,7 +78,7 @@ CClientPerfStatPacketUsageImpl::CClientPerfStatPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatPacketUsageImpl::~CClientPerfStatPacketUsageImpl(void)
+CClientPerfStatPacketUsageImpl::~CClientPerfStatPacketUsageImpl()
 {
 }
 
@@ -89,7 +89,7 @@ CClientPerfStatPacketUsageImpl::~CClientPerfStatPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CClientPerfStatPacketUsageImpl::GetCategoryName(void)
+const SString& CClientPerfStatPacketUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -101,7 +101,7 @@ const SString& CClientPerfStatPacketUsageImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatPacketUsageImpl::DoPulse(void)
+void CClientPerfStatPacketUsageImpl::DoPulse()
 {
     MaybeRecordStats();
 }
@@ -113,7 +113,7 @@ void CClientPerfStatPacketUsageImpl::DoPulse(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatPacketUsageImpl::MaybeRecordStats(void)
+void CClientPerfStatPacketUsageImpl::MaybeRecordStats()
 {
     // Someone watching?
     if (m_TimeSinceGetStats.Get() < 10000)

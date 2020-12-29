@@ -21,7 +21,7 @@ CRegistry::CRegistry(const std::string& strFileName)
     Load(strFileName);
 }
 
-CRegistry::~CRegistry(void)
+CRegistry::~CRegistry()
 {
     EndAutomaticTransaction();
     CPerfStatSqliteTiming::GetSingleton()->OnSqliteClose(this);
@@ -65,7 +65,7 @@ void CRegistry::Load(const std::string& strFileName)
     }
 }
 
-bool CRegistry::IntegrityCheck(void)
+bool CRegistry::IntegrityCheck()
 {
     // Check database integrity
     {
@@ -377,7 +377,7 @@ bool CRegistry::Select(const std::string& strColumns, const std::string& strTabl
     return QueryInternal(strQuery.c_str(), pResult);
 }
 
-void CRegistry::BeginAutomaticTransaction(void)
+void CRegistry::BeginAutomaticTransaction()
 {
     if (!m_bInAutomaticTransaction)
     {
@@ -394,7 +394,7 @@ void CRegistry::BeginAutomaticTransaction(void)
     }
 }
 
-void CRegistry::EndAutomaticTransaction(void)
+void CRegistry::EndAutomaticTransaction()
 {
     if (m_bInAutomaticTransaction)
     {

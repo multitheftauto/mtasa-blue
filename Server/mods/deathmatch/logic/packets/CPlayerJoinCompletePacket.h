@@ -15,16 +15,16 @@
 #include "CPacket.h"
 #include <string.h>
 
-class CPlayerJoinCompletePacket : public CPacket
+class CPlayerJoinCompletePacket final : public CPacket
 {
 public:
-    CPlayerJoinCompletePacket(void);
+    CPlayerJoinCompletePacket();
     CPlayerJoinCompletePacket(ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType,
                               unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, int iEnableClientChecks,
                               bool bVoiceEnabled, unsigned char ucSampleRate, unsigned char ucVoiceQuality, unsigned int uiBitrate);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_SERVER_JOINEDGAME; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_SERVER_JOINEDGAME; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

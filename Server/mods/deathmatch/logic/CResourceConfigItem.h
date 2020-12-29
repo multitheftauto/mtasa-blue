@@ -22,12 +22,12 @@ class CResourceConfigItem : public CResourceFile
 {
 public:
     CResourceConfigItem(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes);
-    ~CResourceConfigItem(void);
+    ~CResourceConfigItem();
 
-    bool            Start(void);
-    bool            Stop(void);
-    class CXMLFile* GetFile(void) { return m_pXMLFile; }
-    class CXMLNode* GetRoot(void) { return m_pXMLRootNode; }
+    bool            Start();
+    bool            Stop();
+    class CXMLFile* GetFile() { return m_pXMLFile; }
+    class CXMLNode* GetRoot() { return m_pXMLRootNode; }
 
 private:
     class CXMLFile* m_pXMLFile;

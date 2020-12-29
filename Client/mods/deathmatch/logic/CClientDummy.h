@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef CClientDummy_H
-#define CClientDummy_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -18,12 +17,12 @@ class CClientDummy : public CClientEntity
     DECLARE_CLASS(CClientDummy, CClientEntity)
 public:
     CClientDummy(class CClientManager* pManager, ElementID ID, const char* szTypeName);
-    ~CClientDummy(void);
+    ~CClientDummy();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTDUMMY; }
-    const CVector&    GetPosition(void) { return m_vecPosition; };
+    eClientEntityType GetType() const { return CCLIENTDUMMY; }
+    const CVector&    GetPosition() { return m_vecPosition; };
     void              GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     void              SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
 
@@ -31,5 +30,3 @@ private:
     class CClientGroups* m_pGroups;
     CVector              m_vecPosition;
 };
-
-#endif

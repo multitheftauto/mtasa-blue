@@ -20,7 +20,7 @@ CLuaModuleManager::CLuaModuleManager(CLuaManager* pLuaManager)
     m_pLuaManager = pLuaManager;
 }
 
-CLuaModuleManager::~CLuaModuleManager(void)
+CLuaModuleManager::~CLuaModuleManager()
 {
     // Shutdown all our modules
     list<CLuaModule*>::iterator iter = m_Modules.begin();
@@ -44,7 +44,7 @@ void CLuaModuleManager::RegisterFunctions(lua_State* luaVM)
     }
 }
 
-void CLuaModuleManager::DoPulse(void)
+void CLuaModuleManager::DoPulse()
 {
     list<CLuaModule*>::iterator iter = m_Modules.begin();
     for (; iter != m_Modules.end(); iter++)

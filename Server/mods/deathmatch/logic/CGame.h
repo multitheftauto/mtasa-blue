@@ -57,12 +57,12 @@ class CGame;
 #include "lua/CLuaManager.h"
 
 #include "CLightsyncManager.h"
+#include "CBanManager.h"
 
 // Forward declarations
 class ASE;
 class CAccessControlListManager;
 class CAccountManager;
-class CBanManager;
 class CBlipManager;
 class CClock;
 class CColManager;
@@ -102,7 +102,7 @@ class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
-
+class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
@@ -182,99 +182,102 @@ public:
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
+        GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
 
 public:
-    CGame(void);
-    ~CGame(void);
+    CGame();
+    ~CGame();
 
     void GetTag(char* szInfoTag, int iInfoTag);
     void HandleInput(char* szCommand);
 
-    void DoPulse(void);
+    void DoPulse();
 
     bool Start(int iArgumentCount, char* szArguments[]);
-    void Stop(void);
+    void Stop();
 
     static bool StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
     bool        ProcessPacket(CPacket& Packet);
 
     void SetIsFinished(bool bFinished) { m_bIsFinished = bFinished; };
-    bool IsFinished(void) { return m_bIsFinished; };
+    bool IsFinished() { return m_bIsFinished; };
 
-    CMainConfig*            GetConfig(void) { return m_pMainConfig; }
-    CHandlingManager*       GetHandlingManager(void) { return m_pHandlingManager; }
-    CMapManager*            GetMapManager(void) { return m_pMapManager; }
-    CPlayerManager*         GetPlayerManager(void) { return m_pPlayerManager; }
-    CObjectManager*         GetObjectManager(void) { return m_pObjectManager; }
-    CVehicleManager*        GetVehicleManager(void) { return m_pVehicleManager; }
-    CTeamManager*           GetTeamManager(void) { return m_pTeamManager; }
-    CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync(void) { return m_pUnoccupiedVehicleSync; }
-    CPedSync*               GetPedSync(void) { return m_pPedSync; }
-    CRegisteredCommands*    GetRegisteredCommands(void) { return m_pRegisteredCommands; }
+    CMainConfig*            GetConfig() { return m_pMainConfig; }
+    CHandlingManager*       GetHandlingManager() { return m_pHandlingManager; }
+    CMapManager*            GetMapManager() { return m_pMapManager; }
+    CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
+    CObjectManager*         GetObjectManager() { return m_pObjectManager; }
+    CVehicleManager*        GetVehicleManager() { return m_pVehicleManager; }
+    CTeamManager*           GetTeamManager() { return m_pTeamManager; }
+    CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
+    CPedSync*               GetPedSync() { return m_pPedSync; }
+    CRegisteredCommands*    GetRegisteredCommands() { return m_pRegisteredCommands; }
 #ifdef WITH_OBJECT_SYNC
-    CObjectSync* GetObjectSync(void) { return m_pObjectSync; }
+    CObjectSync* GetObjectSync() { return m_pObjectSync; }
 #endif
-    CConsole*                        GetConsole(void) { return m_pConsole; }
-    CDatabaseManager*                GetDatabaseManager(void) { return m_pDatabaseManager; }
-    CLuaCallbackManager*             GetLuaCallbackManager(void) { return m_pLuaCallbackManager; }
-    CRegistryManager*                GetRegistryManager(void) { return m_pRegistryManager; }
-    CRegistry*                       GetRegistry(void) { return m_pRegistry; }
-    CAccountManager*                 GetAccountManager(void) { return m_pAccountManager; }
-    CScriptDebugging*                GetScriptDebugging(void) { return m_pScriptDebugging; }
-    CEvents*                         GetEvents(void) { return &m_Events; }
-    CColManager*                     GetColManager(void) { return m_pColManager; }
-    CLatentTransferManager*          GetLatentTransferManager(void) { return m_pLatentTransferManager; }
-    CDebugHookManager*               GetDebugHookManager(void) { return m_pDebugHookManager; }
-    CPedManager*                     GetPedManager(void) { return m_pPedManager; }
-    CResourceManager*                GetResourceManager(void) { return m_pResourceManager; }
-    CMarkerManager*                  GetMarkerManager(void) { return m_pMarkerManager; }
-    CBlipManager*                    GetBlipManager(void) { return m_pBlipManager; }
-    CPickupManager*                  GetPickupManager(void) { return m_pPickupManager; }
-    CRadarAreaManager*               GetRadarAreaManager(void) { return m_pRadarAreaManager; }
-    CGroups*                         GetGroups(void) { return m_pGroups; }
-    CElementDeleter*                 GetElementDeleter(void) { return &m_ElementDeleter; }
-    CConnectHistory*                 GetJoinFloodProtector(void) { return &m_FloodProtect; }
-    CHTTPD*                          GetHTTPD(void) { return m_pHTTPD; }
-    CSettings*                       GetSettings(void) { return m_pSettings; }
-    CAccessControlListManager*       GetACLManager(void) { return m_pACLManager; }
-    CBanManager*                     GetBanManager(void) { return m_pBanManager; }
-    CRemoteCalls*                    GetRemoteCalls(void) { return m_pRemoteCalls; }
-    CZoneNames*                      GetZoneNames(void) { return m_pZoneNames; }
-    CClock*                          GetClock(void) { return m_pClock; }
-    CWaterManager*                   GetWaterManager(void) { return m_pWaterManager; }
-    CLightsyncManager*               GetLightSyncManager(void) { return &m_lightsyncManager; }
-    CWeaponStatManager*              GetWeaponStatManager(void) { return m_pWeaponStatsManager; }
-    CBuildingRemovalManager*         GetBuildingRemovalManager(void) { return m_pBuildingRemovalManager; }
-    CCustomWeaponManager*            GetCustomWeaponManager(void) { return m_pCustomWeaponManager; }
-    CFunctionUseLogger*              GetFunctionUseLogger(void) { return m_pFunctionUseLogger; }
-    CMasterServerAnnouncer*          GetMasterServerAnnouncer(void) { return m_pMasterServerAnnouncer; }
-    SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler(void) { return m_pAsyncTaskScheduler; }
+    CConsole*                        GetConsole() { return m_pConsole; }
+    CDatabaseManager*                GetDatabaseManager() { return m_pDatabaseManager; }
+    CLuaCallbackManager*             GetLuaCallbackManager() { return m_pLuaCallbackManager; }
+    CRegistryManager*                GetRegistryManager() { return m_pRegistryManager; }
+    CRegistry*                       GetRegistry() { return m_pRegistry; }
+    CAccountManager*                 GetAccountManager() { return m_pAccountManager; }
+    CScriptDebugging*                GetScriptDebugging() { return m_pScriptDebugging; }
+    CEvents*                         GetEvents() { return &m_Events; }
+    CColManager*                     GetColManager() { return m_pColManager; }
+    CLatentTransferManager*          GetLatentTransferManager() { return m_pLatentTransferManager; }
+    CDebugHookManager*               GetDebugHookManager() { return m_pDebugHookManager; }
+    CPedManager*                     GetPedManager() { return m_pPedManager; }
+    CResourceManager*                GetResourceManager() { return m_pResourceManager; }
+    CMarkerManager*                  GetMarkerManager() { return m_pMarkerManager; }
+    CBlipManager*                    GetBlipManager() { return m_pBlipManager; }
+    CPickupManager*                  GetPickupManager() { return m_pPickupManager; }
+    CRadarAreaManager*               GetRadarAreaManager() { return m_pRadarAreaManager; }
+    CGroups*                         GetGroups() { return m_pGroups; }
+    CElementDeleter*                 GetElementDeleter() { return &m_ElementDeleter; }
+    CConnectHistory*                 GetJoinFloodProtector() { return &m_FloodProtect; }
+    CHTTPD*                          GetHTTPD() { return m_pHTTPD; }
+    CSettings*                       GetSettings() { return m_pSettings; }
+    CAccessControlListManager*       GetACLManager() { return m_pACLManager; }
+    CBanManager*                     GetBanManager() { return m_pBanManager; }
+    CRemoteCalls*                    GetRemoteCalls() { return m_pRemoteCalls; }
+    CZoneNames*                      GetZoneNames() { return m_pZoneNames; }
+    CClock*                          GetClock() { return m_pClock; }
+    CWaterManager*                   GetWaterManager() { return m_pWaterManager; }
+    CLightsyncManager*               GetLightSyncManager() { return &m_lightsyncManager; }
+    CWeaponStatManager*              GetWeaponStatManager() { return m_pWeaponStatsManager; }
+    CBuildingRemovalManager*         GetBuildingRemovalManager() { return m_pBuildingRemovalManager; }
+    CCustomWeaponManager*            GetCustomWeaponManager() { return m_pCustomWeaponManager; }
+    CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
+    CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
+    SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+
+    std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
     void JoinPlayer(CPlayer& Player);
     void InitialDataStream(CPlayer& Player);
     void QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None",
                     const char* szResponsiblePlayer = "None");
 
-    class CLuaManager* GetLuaManager(void) { return m_pLuaManager; };
+    class CLuaManager* GetLuaManager() { return m_pLuaManager; };
 
-    float GetGravity(void) { return m_fGravity; }
+    float GetGravity() { return m_fGravity; }
     void  SetGravity(float fGravity) { m_fGravity = fGravity; }
 
-    unsigned char GetTrafficLightState(void) { return m_ucTrafficLightState; }
+    unsigned char GetTrafficLightState() { return m_ucTrafficLightState; }
     void          SetTrafficLightState(unsigned char ucState) { m_ucTrafficLightState = ucState; }
 
-    bool GetTrafficLightsLocked(void) { return m_bTrafficLightsLocked; }
+    bool GetTrafficLightsLocked() { return m_bTrafficLightsLocked; }
     void SetTrafficLightsLocked(bool bLocked) { m_bTrafficLightsLocked = bLocked; }
 
-    float GetJetpackMaxHeight(void) { return m_fJetpackMaxHeight; }
+    float GetJetpackMaxHeight() { return m_fJetpackMaxHeight; }
     void  SetJetpackMaxHeight(float fMaxHeight) { m_fJetpackMaxHeight = fMaxHeight; }
 
-    float GetGameSpeed(void) { return m_fGameSpeed; }
+    float GetGameSpeed() { return m_fGameSpeed; }
     void  SetGameSpeed(float fGameSpeed) { m_fGameSpeed = fGameSpeed; }
 
-    bool HasSkyGradient(void) { return m_bHasSkyGradient; }
+    bool HasSkyGradient() { return m_bHasSkyGradient; }
     void SetHasSkyGradient(bool bHasSkyGradient) { m_bHasSkyGradient = bHasSkyGradient; }
 
     void GetSkyGradient(unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB)
@@ -296,16 +299,16 @@ public:
         m_ucSkyGradientBB = ucBB;
     }
 
-    bool HasHeatHaze(void) { return m_bHasHeatHaze; }
+    bool HasHeatHaze() { return m_bHasHeatHaze; }
     void SetHasHeatHaze(bool bHasHeatHaze) { m_bHasHeatHaze = bHasHeatHaze; }
 
     void GetHeatHaze(SHeatHazeSettings& heatHazeSettings) { heatHazeSettings = m_HeatHazeSettings; }
     void SetHeatHaze(const SHeatHazeSettings& heatHazeSettings) { m_HeatHazeSettings = heatHazeSettings; }
 
-    bool GetInteriorSoundsEnabled(void) { return m_bInteriorSoundsEnabled; }
+    bool GetInteriorSoundsEnabled() { return m_bInteriorSoundsEnabled; }
     void SetInteriorSoundsEnabled(bool bEnable) { m_bInteriorSoundsEnabled = bEnable; }
 
-    bool HasWaterColor(void) { return m_bOverrideWaterColor; }
+    bool HasWaterColor() { return m_bOverrideWaterColor; }
     void SetHasWaterColor(bool bOverrideWaterColor) { m_bOverrideWaterColor = bOverrideWaterColor; }
 
     void GetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
@@ -323,19 +326,19 @@ public:
         m_ucWaterAlpha = ucAlpha;
     }
 
-    bool HasRainLevel(void) { return m_bOverrideRainLevel; }
+    bool HasRainLevel() { return m_bOverrideRainLevel; }
     void SetHasRainLevel(bool bOverrideRainLevel) { m_bOverrideRainLevel = bOverrideRainLevel; }
 
-    float GetRainLevel(void) { return m_fRainLevel; }
+    float GetRainLevel() { return m_fRainLevel; }
     void  SetRainLevel(float& fRainLevel) { m_fRainLevel = fRainLevel; }
 
-    bool HasSunSize(void) { return m_bOverrideSunSize; }
+    bool HasSunSize() { return m_bOverrideSunSize; }
     void SetHasSunSize(bool bOverrideSunSize) { m_bOverrideSunSize = bOverrideSunSize; }
 
-    float GetSunSize(void) { return m_fSunSize; }
+    float GetSunSize() { return m_fSunSize; }
     void  SetSunSize(float& fSunSize) { m_fSunSize = fSunSize; }
 
-    bool HasSunColor(void) { return m_bOverrideSunColor; }
+    bool HasSunColor() { return m_bOverrideSunColor; }
     void SetHasSunColor(bool bOverrideSunColor) { m_bOverrideSunColor = bOverrideSunColor; }
 
     void GetSunColor(unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG,
@@ -359,7 +362,7 @@ public:
         m_ucSunCoronaB = ucCoronaB;
     }
 
-    bool HasWindVelocity(void) { return m_bOverrideWindVelocity; }
+    bool HasWindVelocity() { return m_bOverrideWindVelocity; }
     void SetHasWindVelocity(bool bOverrideWindVelocity) { m_bOverrideWindVelocity = bOverrideWindVelocity; }
 
     void GetWindVelocity(float& fVelX, float& fVelY, float& fVelZ)
@@ -375,38 +378,38 @@ public:
         m_fWindVelZ = fVelZ;
     }
 
-    bool HasFarClipDistance(void) { return m_bOverrideFarClip; }
+    bool HasFarClipDistance() { return m_bOverrideFarClip; }
     void SetHasFarClipDistance(bool bOverrideFarClip) { m_bOverrideFarClip = bOverrideFarClip; }
 
-    float GetFarClipDistance(void) { return m_fFarClipDistance; }
+    float GetFarClipDistance() { return m_fFarClipDistance; }
     void  SetFarClipDistance(float& fFarClipDistance) { m_fFarClipDistance = fFarClipDistance; }
 
-    bool HasFogDistance(void) { return m_bOverrideFogDistance; }
+    bool HasFogDistance() { return m_bOverrideFogDistance; }
     void SetHasFogDistance(bool bOverrideFogDistance) { m_bOverrideFogDistance = bOverrideFogDistance; }
 
-    float GetFogDistance(void) { return m_fFogDistance; }
+    float GetFogDistance() { return m_fFogDistance; }
     void  SetFogDistance(float& fFogDistance) { m_fFogDistance = fFogDistance; }
 
-    float GetAircraftMaxHeight(void) { return m_fAircraftMaxHeight; }
+    float GetAircraftMaxHeight() { return m_fAircraftMaxHeight; }
     void  SetAircraftMaxHeight(float fMaxHeight) { m_fAircraftMaxHeight = fMaxHeight; }
 
-    float GetAircraftMaxVelocity(void) { return m_fAircraftMaxVelocity; }
+    float GetAircraftMaxVelocity() { return m_fAircraftMaxVelocity; }
     void  SetAircraftMaxVelocity(float fVelocity)
     {
         m_fAircraftMaxVelocity = fVelocity;
         m_fAircraftMaxVelocity_Sq = fVelocity * fVelocity;
     }
 
-    bool GetOcclusionsEnabled(void) { return m_bOcclusionsEnabled; }
+    bool GetOcclusionsEnabled() { return m_bOcclusionsEnabled; }
     void SetOcclusionsEnabled(bool bOcclusionsEnabled) { m_bOcclusionsEnabled = bOcclusionsEnabled; }
 
-    SGarageStates& GetGarageStates(void) { return m_bGarageStates; }
+    SGarageStates& GetGarageStates() { return m_bGarageStates; }
 
-    void Lock(void);
-    void Unlock(void);
+    void Lock();
+    void Unlock();
 
-    bool IsBeingDeleted(void) { return m_bBeingDeleted; }
-    void ResetMapInfo(void);
+    bool IsBeingDeleted() { return m_bBeingDeleted; }
+    void ResetMapInfo();
 
     void        SetGlitchEnabled(const std::string& strGlitch, bool bEnabled);
     bool        IsGlitchEnabled(const std::string& strGlitch);
@@ -415,49 +418,49 @@ public:
     bool        IsGlitch(const std::string& strGlitch) { return m_GlitchNames.count(strGlitch) > 0; }
 
     void SetCloudsEnabled(bool bEnabled);
-    bool GetCloudsEnabled(void);
+    bool GetCloudsEnabled();
 
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    bool HasMoonSize(void) { return m_bOverrideMoonSize; }
+    bool HasMoonSize() { return m_bOverrideMoonSize; }
     void SetHasMoonSize(bool bOverrideMoonSize) { m_bOverrideMoonSize = bOverrideMoonSize; }
 
-    int  GetMoonSize(void) { return m_iMoonSize; }
+    int  GetMoonSize() { return m_iMoonSize; }
     void SetMoonSize(int iMoonSize) { m_iMoonSize = iMoonSize; }
 
-    void PrintLogOutputFromNetModule(void);
-    void StartOpenPortsTest(void);
+    void PrintLogOutputFromNetModule();
+    void StartOpenPortsTest();
 
-    bool IsServerFullyUp(void) { return m_bServerFullyUp; }
+    bool IsServerFullyUp() { return m_bServerFullyUp; }
 
-    ushort GetServerFPS(void) { return m_usFPS; }
-    int    GetSyncFPS(void) { return m_iSyncFPS; }
+    ushort GetServerFPS() { return m_usFPS; }
+    int    GetSyncFPS() { return m_iSyncFPS; }
     void   SetSyncFPS(int iSyncFPS) { m_iSyncFPS = iSyncFPS; }
 
-    void HandleBackup(void);
-    void HandleCrashDumpEncryption(void);
+    void HandleBackup();
+    void HandleCrashDumpEncryption();
     void EnableLatentSends(bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF);
     void SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
     bool SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
                     NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
                     ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
-    void SendPacketBatchEnd(void);
+    void SendPacketBatchEnd();
 
-    bool IsBulletSyncActive(void);
+    bool IsBulletSyncActive();
     void SendSyncSettings(CPlayer* pPlayer = NULL);
 
-    SString CalculateMinClientRequirement(void);
-    bool    IsBelowMinimumClient(const SString& strVersion);
-    bool    IsBelowRecommendedClient(const SString& strVersion);
-    void    ApplyAseSetting(void);
-    bool    IsUsingMtaServerConf(void) { return m_bUsingMtaServerConf; }
+    CMtaVersion CalculateMinClientRequirement();
+    bool    IsBelowMinimumClient(const CMtaVersion& strVersion);
+    bool    IsBelowRecommendedClient(const CMtaVersion& strVersion);
+    void    ApplyAseSetting();
+    bool    IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
 
     void SetDevelopmentMode(bool enabled) { m_DevelopmentModeEnabled = enabled; }
     bool GetDevelopmentMode() { return m_DevelopmentModeEnabled; }
 
 private:
-    void AddBuiltInEvents(void);
+    void AddBuiltInEvents();
     void RelayPlayerPuresync(class CPacket& Packet);
     void RelayNearbyPacket(class CPacket& Packet);
 
@@ -495,6 +498,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
+    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
@@ -551,6 +555,8 @@ private:
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;
+
+    std::shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
 
     CCustomWeaponManager* m_pCustomWeaponManager;
     CFunctionUseLogger*   m_pFunctionUseLogger;
@@ -637,9 +643,9 @@ private:
     CLuaMain* m_pLatentSendsLuaMain;
     ushort    m_usLatentSendsResourceNetId;
 
-    SString m_strPrevMinClientKickRequirement;
-    SString m_strPrevMinClientConnectRequirement;
-    SString m_strPrevLowestConnectedPlayerVersion;
+    CMtaVersion m_strPrevMinClientKickRequirement;
+    CMtaVersion m_strPrevMinClientConnectRequirement;
+    CMtaVersion m_strPrevLowestConnectedPlayerVersion;
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 

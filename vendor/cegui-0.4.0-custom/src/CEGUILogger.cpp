@@ -43,7 +43,8 @@ namespace CEGUI
     *************************************************************************/
     Logger::Logger(void) :
             d_level(Standard),
-            d_caching(true)
+            d_caching(true),
+            d_pDuplicateLineFilter(new CDuplicateLineFilter<SLoggingLine>(4, 60))
     {
         // create log header
         logEvent("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
@@ -61,9 +62,11 @@ namespace CEGUI
         if (d_ostream.is_open())
         {
             logEvent((utf8*)"CEGUI::Logger singleton destroyed.");
+            d_pDuplicateLineFilter->Flush();
+            updateLogOutput();
             d_ostream.close();
         }
-
+        delete d_pDuplicateLineFilter;
     }
 
     /*************************************************************************
@@ -71,12 +74,26 @@ namespace CEGUI
     *************************************************************************/
     void Logger::logEvent(const String& message, LoggingLevel level /* = Standard */)
     {
-        using namespace std;
-
 		// Early out if not relevant
         if ( d_level < level && !d_caching )
             return;
+        d_pDuplicateLineFilter->AddLine({message, level});
+        updateLogOutput();
+    }
 
+    // Handle duplicate lines
+    void Logger::updateLogOutput()
+    {
+        SLoggingLine line;
+        while (d_pDuplicateLineFilter->PopOutputLine(line))
+        {
+            logEventInternal(line.message, line.level);
+        }
+    }
+
+    void Logger::logEventInternal(const String& message, LoggingLevel level)
+    {
+        using namespace std;
         time_t  et;
         time(&et);
         tm* etm = localtime(&et);

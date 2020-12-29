@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFILE_H
-#define __CFILE_H
+#pragma once
 
 #include "CClientEntity.h"
 #include <stdio.h>
@@ -27,41 +26,44 @@ public:
     };
 
     CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize, eAccessType accessType);
-    ~CScriptFile(void);
+    ~CScriptFile();
 
     // Functions required for linking
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
     // Functions required by CClientEntity
-    eClientEntityType GetType(void) const { return SCRIPTFILE; };
-    void              Unlink(void){};
-    bool              ReadSpecialData(void) { return true; };
+    eClientEntityType GetType() const { return SCRIPTFILE; };
+    void              Unlink(){};
 
     // Load and unload routines
     bool           Load(CResource* pResourceForFilePath, eMode Mode);
-    void           Unload(void);
-    bool           IsLoaded(void) { return m_pFile != NULL; };
-    const SString& GetFilePath(void) { return m_strFilename; };
-    const SString& GetAbsPath(void) { return m_strAbsPath; };
+    void           Unload();
+    bool           IsLoaded() { return m_pFile != NULL; };
+    const SString& GetFilePath() { return m_strFilename; };
+    const SString& GetAbsPath() { return m_strAbsPath; };
 
     // Get the owning resource
-    CResource* GetResource(void);
+    CResource* GetResource();
 
-    // Only call functions belw this if you're sure that the file is loaded.
+    // Only call functions below this if you're sure that the file is loaded.
     // Or you will crash.
-    bool IsEOF(void);
-    long GetPointer(void);
-    long GetSize(void);
+    bool IsEOF();
+    long GetPointer();
+    long GetSize();
 
     long SetPointer(unsigned long ulPosition);
 
-    void Flush(void);
-    long Read(unsigned long ulSize, CBuffer& outBuffer);
+    void Flush();
+    long Read(unsigned long ulSize, SString& outBuffer);
     long Write(unsigned long ulSize, const char* pData);
 
+    // Debug info for garbage collected files
+    const SLuaDebugInfo& GetLuaDebugInfo() { return m_LuaDebugInfo; };
+    void SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
+
 private:
-    void DoResourceFileCheck(void);
+    void DoResourceFileCheck();
 
     CBinaryFileInterface* m_pFile;
     SString               m_strFilename;            // Resource relative
@@ -71,6 +73,5 @@ private:
     unsigned int          m_uiScriptId;
     CResource*            m_pResource;
     eAccessType           m_accessType;
+    SLuaDebugInfo         m_LuaDebugInfo;
 };
-
-#endif

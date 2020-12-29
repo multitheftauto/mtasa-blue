@@ -279,7 +279,7 @@ void CMultiplayerSA::GetRwResourceStats(SRwResourceStats& outStats)
 // Setup hooks for RwResources
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_RwResources(void)
+void CMultiplayerSA::InitHooks_RwResources()
 {
     memset(&ms_Stats, 0, sizeof(ms_Stats));
 

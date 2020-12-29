@@ -12,8 +12,7 @@
 #include "CVehicleSA.h"
 #include "CPedSA.h"
 
-#ifndef __CGAMESA_OBJECT
-#define __CGAMESA_OBJECT
+#pragma once
 
 #include <game/CObject.h>
 #include "CPhysicalSA.h"
@@ -127,20 +126,25 @@ private:
     unsigned char m_ucAlpha;
     bool          m_bIsAGangTag;
     CVector       m_vecScale;
+    bool          m_preRenderRequired = false;
 
 public:
+    static void StaticSetHooks();
+
     CObjectSA(CObjectSAInterface* objectInterface);
     CObjectSA(DWORD dwModel, bool bBreakingDisabled);
-    ~CObjectSA(void);
+    ~CObjectSA();
 
-    CObjectSAInterface* GetObjectInterface(void) { return (CObjectSAInterface*)GetInterface(); }
+    CObjectSAInterface* GetObjectInterface() { return (CObjectSAInterface*)GetInterface(); }
 
-    void  Explode(void);
-    void  Break(void);
+    void  Explode();
+    void  Break();
     void  SetHealth(float fHealth);
-    float GetHealth(void);
+    float GetHealth();
     void  SetModelIndex(unsigned long ulModel);
 
+    void          SetPreRenderRequired(bool required) { m_preRenderRequired = required; }
+    bool          GetPreRenderRequired() { return m_preRenderRequired; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
     unsigned char GetAlpha() { return m_ucAlpha; }
 
@@ -159,5 +163,3 @@ private:
 #define COBJECTSA_DEFINED
 #define COBJECTSAINTERFACE_DEFINED
 */
-
-#endif

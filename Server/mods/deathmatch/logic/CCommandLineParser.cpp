@@ -13,7 +13,7 @@
 
 using namespace std;
 
-CCommandLineParser::CCommandLineParser(void)
+CCommandLineParser::CCommandLineParser()
 {
     m_bMainConfig = false;
     m_bIP = false;

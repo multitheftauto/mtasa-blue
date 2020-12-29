@@ -12,29 +12,35 @@
 
 #include "StdInc.h"
 
-void CLuaCameraDefs::LoadFunctions(void)
+void CLuaCameraDefs::LoadFunctions()
 {
-    // Cam get funcs
-    CLuaCFunctions::AddFunction("getCamera", GetCamera);
-    CLuaCFunctions::AddFunction("getCameraViewMode", GetCameraViewMode);
-    CLuaCFunctions::AddFunction("getCameraMatrix", GetCameraMatrix);
-    CLuaCFunctions::AddFunction("getCameraTarget", GetCameraTarget);
-    CLuaCFunctions::AddFunction("getCameraInterior", GetCameraInterior);
-    CLuaCFunctions::AddFunction("getCameraGoggleEffect", GetCameraGoggleEffect);
-    CLuaCFunctions::AddFunction("getCameraShakeLevel", GetCameraShakeLevel);
-    CLuaCFunctions::AddFunction("getCameraFieldOfView", GetCameraFieldOfView);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Cam get funcs
+        {"getCamera", GetCamera},
+        {"getCameraViewMode", GetCameraViewMode},
+        {"getCameraMatrix", GetCameraMatrix},
+        {"getCameraTarget", GetCameraTarget},
+        {"getCameraInterior", GetCameraInterior},
+        {"getCameraGoggleEffect", GetCameraGoggleEffect},
+        {"getCameraShakeLevel", GetCameraShakeLevel},
+        {"getCameraFieldOfView", GetCameraFieldOfView},
 
-    // Cam set funcs
-    CLuaCFunctions::AddFunction("setCameraMatrix", SetCameraMatrix);
-    CLuaCFunctions::AddFunction("setCameraFieldOfView", SetCameraFieldOfView);
-    CLuaCFunctions::AddFunction("setCameraTarget", SetCameraTarget);
-    CLuaCFunctions::AddFunction("setCameraInterior", SetCameraInterior);
-    CLuaCFunctions::AddFunction("fadeCamera", FadeCamera);
-    CLuaCFunctions::AddFunction("setCameraClip", SetCameraClip);
-    CLuaCFunctions::AddFunction("getCameraClip", GetCameraClip);
-    CLuaCFunctions::AddFunction("setCameraViewMode", SetCameraViewMode);
-    CLuaCFunctions::AddFunction("setCameraGoggleEffect", SetCameraGoggleEffect);
-    CLuaCFunctions::AddFunction("setCameraShakeLevel", SetCameraShakeLevel);
+        // Cam set funcs
+        {"setCameraMatrix", SetCameraMatrix},
+        {"setCameraFieldOfView", SetCameraFieldOfView},
+        {"setCameraTarget", SetCameraTarget},
+        {"setCameraInterior", SetCameraInterior},
+        {"fadeCamera", FadeCamera},
+        {"setCameraClip", SetCameraClip},
+        {"getCameraClip", GetCameraClip},
+        {"setCameraViewMode", SetCameraViewMode},
+        {"setCameraGoggleEffect", SetCameraGoggleEffect},
+        {"setCameraShakeLevel", SetCameraShakeLevel},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaCameraDefs::AddClass(lua_State* luaVM)
@@ -455,9 +461,11 @@ int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 {
-    SString          strMode = "";
+    SString          strMode;
+    bool             bNoiseEnabled;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strMode);
+    argStream.ReadBool(bNoiseEnabled, true);
 
     if (!argStream.HasErrors())
     {
@@ -465,22 +473,22 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 
         if (strMode.compare("nightvision") == 0)
         {
-            g_pMultiplayer->SetNightVisionEnabled(true);
-            g_pMultiplayer->SetThermalVisionEnabled(false);
+            g_pMultiplayer->SetNightVisionEnabled(true, bNoiseEnabled);
+            g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
             bSuccess = true;
         }
         else if (strMode.compare("thermalvision") == 0)
         {
-            g_pMultiplayer->SetNightVisionEnabled(false);
-            g_pMultiplayer->SetThermalVisionEnabled(true);
+            g_pMultiplayer->SetNightVisionEnabled(false, true);
+            g_pMultiplayer->SetThermalVisionEnabled(true, bNoiseEnabled);
 
             bSuccess = true;
         }
         else if (strMode.compare("normal") == 0)
         {
-            g_pMultiplayer->SetNightVisionEnabled(false);
-            g_pMultiplayer->SetThermalVisionEnabled(false);
+            g_pMultiplayer->SetNightVisionEnabled(false, true);
+            g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
             bSuccess = true;
         }

@@ -19,7 +19,7 @@ CWeaponSA::CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot
     internalInterface = weaponInterface;
 }
 
-void CWeaponSA::Destroy(void)
+void CWeaponSA::Destroy()
 {
     if (!owner)
     {

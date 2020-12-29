@@ -10,8 +10,7 @@
 
 class CClientManager;
 
-#ifndef __CCLIENTMANAGER_H
-#define __CCLIENTMANAGER_H
+#pragma once
 
 #include "CAntiCheat.h"
 #include "CClientCamera.h"
@@ -43,6 +42,7 @@ class CClientManager;
 #include "CClientWeaponManager.h"
 #include "CClientEffectManager.h"
 #include "CClientPointLightsManager.h"
+#include "CClientModelManager.h"
 
 class CClientProjectileManager;
 class CClientExplosionManager;
@@ -51,64 +51,63 @@ class CClientManager
 {
 public:
     ZERO_ON_NEW
-    CClientManager(void);
-    ~CClientManager(void);
+    CClientManager();
+    ~CClientManager();
 
     void DoPulse(bool bDoStandardPulses, bool bDoVehicleManagerPulse);
-    void DoRender(void);
-    void UpdateStreamers(void);
+    void DoRender();
+    void UpdateStreamers();
 
-    CAntiCheat&                  GetAntiCheat(void) { return m_AntiCheat; }
-    CClientCamera*               GetCamera(void) { return m_pCamera; }
-    CClientCivilianManager*      GetCivilianManager(void) { return m_pCivilianManager; }
-    CClientColModelManager*      GetColModelManager(void) { return m_pColModelManager; }
-    CClientDFFManager*           GetDFFManager(void) { return m_pDFFManager; }
-    CClientGUIManager*           GetGUIManager(void) { return m_pGUIManager; }
-    CClientMarkerManager*        GetMarkerManager(void) { return m_pMarkerManager; }
-    CClientStreamer*             GetMarkerStreamer(void) { return m_pMarkerStreamer; }
-    CClientModelRequestManager*  GetModelRequestManager(void) { return m_pModelRequestManager; }
-    CClientObjectManager*        GetObjectManager(void) { return m_pObjectManager; }
-    CClientStreamer*             GetObjectStreamer(void) { return m_pObjectStreamer; }
-    CClientStreamer*             GetObjectLodStreamer(void) { return m_pObjectLodStreamer; }
-    CClientPathManager*          GetPathManager(void) { return m_pPathManager; }
-    CClientPickupManager*        GetPickupManager(void) { return m_pPickupManager; }
-    CClientStreamer*             GetPickupStreamer(void) { return m_pPickupStreamer; }
-    CClientPlayerManager*        GetPlayerManager(void) { return m_pPlayerManager; }
-    CClientStreamer*             GetPlayerStreamer(void) { return m_pPlayerStreamer; }
-    CClientRadarAreaManager*     GetRadarAreaManager(void) { return m_pRadarAreaManager; }
-    CClientRadarMarkerManager*   GetRadarMarkerManager(void) { return m_pRadarMarkerManager; }
-    CClientSoundManager*         GetSoundManager(void) { return m_pSoundManager; }
-    CClientRenderElementManager* GetRenderElementManager(void) { return m_pRenderElementManager; }
-    CClientTeamManager*          GetTeamManager(void) { return m_pTeamManager; }
-    CClientDisplayManager*       GetDisplayManager(void) { return m_pDisplayManager; }
-    CClientVehicleManager*       GetVehicleManager(void) { return m_pVehicleManager; }
-    CClientStreamer*             GetVehicleStreamer(void) { return m_pVehicleStreamer; }
-    CClientStreamer*             GetLightStreamer(void) { return m_pLightStreamer; }
-    CClientPedManager*           GetPedManager(void) { return m_pPedManager; }
-    CResourceManager*            GetResourceManager(void) { return m_pResourceManager; }
-    CClientColManager*           GetColManager(void) { return m_pColManager; }
-    CClientGroups*               GetGroups(void) { return m_pGroups; }
-    CClientProjectileManager*    GetProjectileManager(void) { return m_pProjectileManager; }
-    CClientExplosionManager*     GetExplosionManager(void) { return m_pExplosionManager; }
-    CClientPacketRecorder*       GetPacketRecorder(void) { return m_pPacketRecorder; }
-    CClientWaterManager*         GetWaterManager(void) { return m_pWaterManager; }
-    CClientWeaponManager*        GetWeaponManager(void) { return m_pWeaponManager; }
-    CClientEffectManager*        GetEffectManager(void) { return m_pEffectManager; }
-    CClientPointLightsManager*   GetPointLightsManager(void) { return m_pPointLightsManager; }
+    CAntiCheat&                  GetAntiCheat() { return m_AntiCheat; }
+    CClientCamera*               GetCamera() { return m_pCamera; }
+    CClientCivilianManager*      GetCivilianManager() { return m_pCivilianManager; }
+    CClientColModelManager*      GetColModelManager() { return m_pColModelManager; }
+    CClientDFFManager*           GetDFFManager() { return m_pDFFManager; }
+    CClientGUIManager*           GetGUIManager() { return m_pGUIManager; }
+    CClientMarkerManager*        GetMarkerManager() { return m_pMarkerManager; }
+    CClientStreamer*             GetMarkerStreamer() { return m_pMarkerStreamer; }
+    CClientModelManager*         GetModelManager() { return m_pModelManager; }
+    CClientModelRequestManager*  GetModelRequestManager() { return m_pModelRequestManager; }
+    CClientObjectManager*        GetObjectManager() { return m_pObjectManager; }
+    CClientStreamer*             GetObjectStreamer() { return m_pObjectStreamer; }
+    CClientStreamer*             GetObjectLodStreamer() { return m_pObjectLodStreamer; }
+    CClientPathManager*          GetPathManager() { return m_pPathManager; }
+    CClientPickupManager*        GetPickupManager() { return m_pPickupManager; }
+    CClientStreamer*             GetPickupStreamer() { return m_pPickupStreamer; }
+    CClientPlayerManager*        GetPlayerManager() { return m_pPlayerManager; }
+    CClientStreamer*             GetPlayerStreamer() { return m_pPlayerStreamer; }
+    CClientRadarAreaManager*     GetRadarAreaManager() { return m_pRadarAreaManager; }
+    CClientRadarMarkerManager*   GetRadarMarkerManager() { return m_pRadarMarkerManager; }
+    CClientSoundManager*         GetSoundManager() { return m_pSoundManager; }
+    CClientRenderElementManager* GetRenderElementManager() { return m_pRenderElementManager; }
+    CClientTeamManager*          GetTeamManager() { return m_pTeamManager; }
+    CClientDisplayManager*       GetDisplayManager() { return m_pDisplayManager; }
+    CClientVehicleManager*       GetVehicleManager() { return m_pVehicleManager; }
+    CClientStreamer*             GetVehicleStreamer() { return m_pVehicleStreamer; }
+    CClientStreamer*             GetLightStreamer() { return m_pLightStreamer; }
+    CClientPedManager*           GetPedManager() { return m_pPedManager; }
+    CResourceManager*            GetResourceManager() { return m_pResourceManager; }
+    CClientColManager*           GetColManager() { return m_pColManager; }
+    CClientGroups*               GetGroups() { return m_pGroups; }
+    CClientProjectileManager*    GetProjectileManager() { return m_pProjectileManager; }
+    CClientExplosionManager*     GetExplosionManager() { return m_pExplosionManager; }
+    CClientPacketRecorder*       GetPacketRecorder() { return m_pPacketRecorder; }
+    CClientWaterManager*         GetWaterManager() { return m_pWaterManager; }
+    CClientWeaponManager*        GetWeaponManager() { return m_pWeaponManager; }
+    CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
+    CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
 
-    bool IsGameLoaded(void) { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
-    bool IsBeingDeleted(void) { return m_bBeingDeleted; }
-    void SetGameUnloadedFlag(void) { m_bGameUnloadedFlag = true; }
+    bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
+    bool IsBeingDeleted() { return m_bBeingDeleted; }
+    void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
 
     void           InvalidateEntity(CClientEntity* pEntity);
     void           RestoreEntity(CClientEntity* pEntity);
     void           UnreferenceEntity(CClientEntity* pEntity);
-    CClientEntity* FindEntity(CEntity* pGameEntity, bool bValidatePointer = false);
-    CClientEntity* FindEntitySafe(CEntity* pGameEntity);
 
     void OnUpdateStreamPosition(CClientStreamElement* pElement);
-    void OnLowLODElementCreated(void);
-    void OnLowLODElementDestroyed(void);
+    void OnLowLODElementCreated();
+    void OnLowLODElementDestroyed();
 
 private:
     CAntiCheat                   m_AntiCheat;
@@ -147,10 +146,9 @@ private:
     CClientWeaponManager*        m_pWeaponManager;
     CClientEffectManager*        m_pEffectManager;
     CClientPointLightsManager*   m_pPointLightsManager;
+    CClientModelManager*         m_pModelManager;
     CClientPacketRecorder*       m_pPacketRecorder;
     bool                         m_bBeingDeleted;
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;
 };
-
-#endif

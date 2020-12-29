@@ -53,7 +53,7 @@ CGUIEdit_Impl::CGUIEdit_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* 
     }
 }
 
-CGUIEdit_Impl::~CGUIEdit_Impl(void)
+CGUIEdit_Impl::~CGUIEdit_Impl()
 {
     if (GetParent() == NULL)
     {
@@ -71,7 +71,7 @@ void CGUIEdit_Impl::SetReadOnly(bool bReadOnly)
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setReadOnly(bReadOnly);
 }
 
-bool CGUIEdit_Impl::IsReadOnly(void)
+bool CGUIEdit_Impl::IsReadOnly()
 {
     return reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->isReadOnly();
 }
@@ -81,7 +81,7 @@ void CGUIEdit_Impl::SetMasked(bool bMasked)
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setTextMasked(bMasked);
 }
 
-bool CGUIEdit_Impl::IsMasked(void)
+bool CGUIEdit_Impl::IsMasked()
 {
     return reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->isTextMasked();
 }
@@ -91,7 +91,7 @@ void CGUIEdit_Impl::SetMaxLength(unsigned int uiMaxLength)
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setMaxTextLength(uiMaxLength);
 }
 
-unsigned int CGUIEdit_Impl::GetMaxLength(void)
+unsigned int CGUIEdit_Impl::GetMaxLength()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getMaxTextLength());
 }
@@ -101,17 +101,17 @@ void CGUIEdit_Impl::SetSelection(unsigned int uiStart, unsigned int uiEnd)
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setSelection(uiStart, uiEnd);
 }
 
-unsigned int CGUIEdit_Impl::GetSelectionStart(void)
+unsigned int CGUIEdit_Impl::GetSelectionStart()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionStartIndex());
 }
 
-unsigned int CGUIEdit_Impl::GetSelectionEnd(void)
+unsigned int CGUIEdit_Impl::GetSelectionEnd()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionEndIndex());
 }
 
-unsigned int CGUIEdit_Impl::GetSelectionLength(void)
+unsigned int CGUIEdit_Impl::GetSelectionLength()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionLength());
 }
@@ -121,17 +121,17 @@ void CGUIEdit_Impl::SetCaretIndex(unsigned int uiIndex)
     return reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setCaratIndex(uiIndex);
 }
 
-void CGUIEdit_Impl::SetCaretAtStart(void)
+void CGUIEdit_Impl::SetCaretAtStart()
 {
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setCaratIndex(0);
 }
 
-void CGUIEdit_Impl::SetCaretAtEnd(void)
+void CGUIEdit_Impl::SetCaretAtEnd()
 {
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setCaratIndex(GetText().length());
 }
 
-unsigned int CGUIEdit_Impl::GetCaretIndex(void)
+unsigned int CGUIEdit_Impl::GetCaretIndex()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getCaratIndex());
 }
@@ -156,7 +156,7 @@ void CGUIEdit_Impl::SetRenderingStartedHandler(GUI_CALLBACK Callback)
     m_OnRenderingStarted = Callback;
 }
 
-bool CGUIEdit_Impl::ActivateOnTab(void)
+bool CGUIEdit_Impl::ActivateOnTab()
 {
     // Only select this as active if its visible and writable
     if (IsVisible() && !IsReadOnly())

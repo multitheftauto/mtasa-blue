@@ -18,16 +18,16 @@ class CVehicleSpawnPacket;
 
 class CVehicle;
 
-class CVehicleSpawnPacket : public CPacket
+class CVehicleSpawnPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID(void) const { return PACKET_ID_VEHICLE_SPAWN; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_SPAWN; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
     void Add(CVehicle* pVehicle) { m_List.push_back(pVehicle); };
-    void Clear(void) { m_List.clear(); };
+    void Clear() { m_List.clear(); };
 
 private:
     std::vector<CVehicle*> m_List;

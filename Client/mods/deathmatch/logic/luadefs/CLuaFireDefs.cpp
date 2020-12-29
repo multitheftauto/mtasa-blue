@@ -10,10 +10,16 @@
 #include "StdInc.h"
 #include "CLuaFireDefs.h"
 
-void CLuaFireDefs::LoadFunctions(void)
+void CLuaFireDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createFire", CLuaFireDefs::CreateFire);
-    CLuaCFunctions::AddFunction("extinguishFire", CLuaFireDefs::ExtinguishFire);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createFire", CreateFire},
+        {"extinguishFire", ExtinguishFire},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaFireDefs::CreateFire(lua_State* luaVM)

@@ -17,7 +17,7 @@ int                     ms_iNumNonDefaultAndNonZeroVertices = 0;
 // -----------------------------------------------------
 // Vertices
 
-CWaterVertexSA::CWaterVertexSA(void)
+CWaterVertexSA::CWaterVertexSA()
 {
     m_pInterface = NULL;
     m_bIsWorldWaterVertex = false;
@@ -87,7 +87,7 @@ void CWaterVertexSA::Init(bool bIsWorldWaterVertex)
 }
 
 // Restore initial state
-void CWaterVertexSA::Reset(void)
+void CWaterVertexSA::Reset()
 {
     if (m_bIsWorldWaterVertex)
     {
@@ -99,7 +99,7 @@ void CWaterVertexSA::Reset(void)
 }
 
 // Check if swimming pool etc.
-bool CWaterVertexSA::IsWorldNonSeaLevel(void)
+bool CWaterVertexSA::IsWorldNonSeaLevel()
 {
     return m_bIsWorldWaterVertex && m_fDefaultZ != 0.f;
 }

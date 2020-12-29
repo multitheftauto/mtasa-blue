@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerQuitPacket::CPlayerQuitPacket(void)
+CPlayerQuitPacket::CPlayerQuitPacket()
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     m_ucQuitReason = 0;

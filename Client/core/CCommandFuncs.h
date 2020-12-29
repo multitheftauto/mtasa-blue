@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOMMANDFUNCS_H
-#define __CCOMMANDFUNCS_H
+#pragma once
 
 #include <string>
 
@@ -26,6 +25,7 @@ public:
     DECLARE_COMMAND_HANDLER(Clear);
     DECLARE_COMMAND_HANDLER(Load);
     DECLARE_COMMAND_HANDLER(Unload);
+    DECLARE_COMMAND_HANDLER(ReloadNews);
 
     DECLARE_COMMAND_HANDLER(Vid);
     DECLARE_COMMAND_HANDLER(Window);
@@ -54,5 +54,3 @@ public:
     DECLARE_COMMAND_HANDLER(FakeLag);
     DECLARE_COMMAND_HANDLER(JingleBells);
 };
-
-#endif

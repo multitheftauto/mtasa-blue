@@ -11,10 +11,10 @@
 
 #include "StdInc.h"
 
-void CLuaBrowserDefs::LoadFunctions(void)
+void CLuaBrowserDefs::LoadFunctions()
 {
     // Define browser functions
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createBrowser", CreateBrowser},
         {"requestBrowserDomains", RequestBrowserDomains},
         {"loadBrowserURL", LoadBrowserURL},
@@ -49,10 +49,8 @@ void CLuaBrowserDefs::LoadFunctions(void)
     };
 
     // Add browser functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBrowserDefs::AddClass(lua_State* luaVM)
@@ -117,6 +115,22 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
     argStream.ReadVector2D(vecSize);
     argStream.ReadBool(bIsLocal);
     argStream.ReadBool(bTransparent, false);
+
+    if (!argStream.HasErrors())
+    {
+        if (vecSize.fX < 0)
+        {
+            argStream.SetCustomError("Browser width is smaller than 0", "Invalid parameter");
+        }
+        else if (vecSize.fY < 0)
+        {
+            argStream.SetCustomError("Browser height is smaller than 0", "Invalid parameter");
+        }
+        else if (vecSize.fX == 0 || vecSize.fY == 0)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+        }
+    }
 
     if (!argStream.HasErrors())
     {
@@ -885,6 +899,22 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (size.fX < 0)
+        {
+            argStream.SetCustomError("Browser width is smaller than 0", "Invalid parameter");
+        }
+        else if (size.fY < 0)
+        {
+            argStream.SetCustomError("Browser height is smaller than 0", "Invalid parameter");
+        }
+        else if (size.fX == 0 || size.fY == 0)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
         if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
         {
             lua_pushboolean(luaVM, false);
@@ -896,11 +926,20 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         {
             CClientGUIElement* pGUIElement =
                 CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
-            lua_pushelement(luaVM, pGUIElement);
-            return 1;
+
+            if (pGUIElement)
+            {
+                lua_pushelement(luaVM, pGUIElement);
+                return 1;
+            }
+            else
+            {
+                argStream.SetCustomError("Failed to create browser element", "Create browser");
+            }
         }
     }
-    else
+    
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);

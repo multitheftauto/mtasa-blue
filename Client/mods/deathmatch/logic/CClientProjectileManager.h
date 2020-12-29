@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTPROJECTILEMANAGER_H
-#define __CCLIENTPROJECTILEMANAGER_H
+#pragma once
 
 #include "CClientProjectile.h"
 #include <list>
@@ -23,14 +22,14 @@ class CClientProjectileManager
 
 public:
     CClientProjectileManager(CClientManager* pManager);
-    ~CClientProjectileManager(void);
+    ~CClientProjectileManager();
 
-    void               DoPulse(void);
-    void               RemoveAll(void);
+    void               DoPulse();
+    void               RemoveAll();
     bool               Exists(CClientProjectile* pProjectile);
     CClientProjectile* Get(CEntitySAInterface* pProjectile);
 
-    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); }
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
 
     // * Game-layer wrapping *
     static bool Hook_StaticProjectileAllow(CEntity* pGameCreator, eWeaponType weaponType, CVector* origin, float fForce, CVector* target,
@@ -46,7 +45,7 @@ protected:
     void AddToList(CClientProjectile* pProjectile) { m_List.push_back(pProjectile); }
     void RemoveFromList(CClientProjectile* pProjectile);
 
-    void TakeOutTheTrash(void);
+    void TakeOutTheTrash();
 
 private:
     CClientManager*               m_pManager;
@@ -58,5 +57,3 @@ private:
     bool                 m_bCreating;
     CClientProjectilePtr m_pLastCreated;
 };
-
-#endif

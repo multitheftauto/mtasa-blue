@@ -28,7 +28,7 @@ CResourceConfigItem::CResourceConfigItem(CResource* resource, const char* szShor
     m_type = RESOURCE_FILE_TYPE_CONFIG;
 }
 
-CResourceConfigItem::~CResourceConfigItem(void)
+CResourceConfigItem::~CResourceConfigItem()
 {
     if (m_pXMLFile)
     {
@@ -37,7 +37,7 @@ CResourceConfigItem::~CResourceConfigItem(void)
     }
 }
 
-bool CResourceConfigItem::Start(void)
+bool CResourceConfigItem::Start()
 {
     // Already started?
     if (m_pXMLFile)
@@ -71,7 +71,7 @@ bool CResourceConfigItem::Start(void)
     return !m_bInvalid;
 }
 
-bool CResourceConfigItem::Stop(void)
+bool CResourceConfigItem::Stop()
 {
     if (m_pXMLFile)
     {

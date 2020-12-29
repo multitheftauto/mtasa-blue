@@ -35,10 +35,10 @@ private:
     };
 
 public:
-    CRPCFunctions(void);
-    virtual ~CRPCFunctions(void);
+    CRPCFunctions();
+    virtual ~CRPCFunctions();
 
-    void        AddHandlers(void);
+    void        AddHandlers();
     static void AddHandler(unsigned char ucID, pfnRPCHandler Callback);
     void        ProcessPacket(const NetServerPlayerID& Socket, NetBitStreamInterface& bitStream);
 

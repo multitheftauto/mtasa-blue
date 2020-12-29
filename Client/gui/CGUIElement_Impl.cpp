@@ -18,7 +18,7 @@
 #define CGUI_NODRAW_TOP 9.0f
 #define CGUI_NODRAW_BOTTOM 9.0f
 
-CGUIElement_Impl::CGUIElement_Impl(void)
+CGUIElement_Impl::CGUIElement_Impl()
 {
     m_pData = NULL;
     m_pWindow = NULL;
@@ -26,7 +26,7 @@ CGUIElement_Impl::CGUIElement_Impl(void)
     m_pManager = NULL;
 }
 
-void CGUIElement_Impl::DestroyElement(void)
+void CGUIElement_Impl::DestroyElement()
 {
     m_pManager->RemoveFromRedrawQueue(reinterpret_cast<CGUIElement*>((m_pWindow)->getUserData()));
 
@@ -45,7 +45,7 @@ void CGUIElement_Impl::SetVisible(bool bVisible)
     m_pWindow->setVisible(bVisible);
 }
 
-bool CGUIElement_Impl::IsVisible(void)
+bool CGUIElement_Impl::IsVisible()
 {
     return m_pWindow->isVisible();
 }
@@ -56,7 +56,7 @@ void CGUIElement_Impl::SetEnabled(bool bEnabled)
     // m_pWindow->setZOrderingEnabled ( bEnabled );
 }
 
-bool CGUIElement_Impl::IsEnabled(void)
+bool CGUIElement_Impl::IsEnabled()
 {
     return !m_pWindow->isDisabled();
 }
@@ -66,17 +66,17 @@ void CGUIElement_Impl::SetZOrderingEnabled(bool bZOrderingEnabled)
     m_pWindow->setZOrderingEnabled(bZOrderingEnabled);
 }
 
-bool CGUIElement_Impl::IsZOrderingEnabled(void)
+bool CGUIElement_Impl::IsZOrderingEnabled()
 {
     return m_pWindow->isZOrderingEnabled();
 }
 
-void CGUIElement_Impl::BringToFront(void)
+void CGUIElement_Impl::BringToFront()
 {
     m_pWindow->moveToFront();
 }
 
-void CGUIElement_Impl::MoveToBack(void)
+void CGUIElement_Impl::MoveToBack()
 {
     m_pWindow->moveToBack();
 }
@@ -183,7 +183,7 @@ void CGUIElement_Impl::SetMinimumSize(const CVector2D& vecSize)
     m_pWindow->setMinimumSize(CEGUI::Size(vecSize.fX, vecSize.fY));
 }
 
-CVector2D CGUIElement_Impl::GetMinimumSize(void)
+CVector2D CGUIElement_Impl::GetMinimumSize()
 {
     const CEGUI::Size& TempSize = m_pWindow->getMinimumSize();
     return CVector2D(TempSize.d_width, TempSize.d_height);
@@ -201,7 +201,7 @@ void CGUIElement_Impl::SetMaximumSize(const CVector2D& vecSize)
     m_pWindow->setMaximumSize(CEGUI::Size(vecSize.fX, vecSize.fY));
 }
 
-CVector2D CGUIElement_Impl::GetMaximumSize(void)
+CVector2D CGUIElement_Impl::GetMaximumSize()
 {
     const CEGUI::Size& TempSize = m_pWindow->getMaximumSize();
     return CVector2D(TempSize.d_width, TempSize.d_height);
@@ -219,7 +219,7 @@ void CGUIElement_Impl::SetText(const char* szText)
     m_pWindow->setText(CGUI_Impl::GetUTFString(szText));
 }
 
-std::string CGUIElement_Impl::GetText(void)
+std::string CGUIElement_Impl::GetText()
 {
     return CGUI_Impl::GetUTFString(m_pWindow->getText().c_str()).c_str();
 }
@@ -229,12 +229,12 @@ void CGUIElement_Impl::SetAlpha(float fAlpha)
     m_pWindow->setAlpha(fAlpha);
 }
 
-float CGUIElement_Impl::GetAlpha(void)
+float CGUIElement_Impl::GetAlpha()
 {
     return m_pWindow->getAlpha();
 }
 
-float CGUIElement_Impl::GetEffectiveAlpha(void)
+float CGUIElement_Impl::GetEffectiveAlpha()
 {
     return m_pWindow->getEffectiveAlpha();
 }
@@ -244,22 +244,22 @@ void CGUIElement_Impl::SetInheritsAlpha(bool bInheritsAlpha)
     m_pWindow->setInheritsAlpha(bInheritsAlpha);
 }
 
-bool CGUIElement_Impl::GetInheritsAlpha(void)
+bool CGUIElement_Impl::GetInheritsAlpha()
 {
     return m_pWindow->inheritsAlpha();
 }
 
-void CGUIElement_Impl::Activate(void)
+void CGUIElement_Impl::Activate()
 {
     m_pWindow->activate();
 }
 
-void CGUIElement_Impl::Deactivate(void)
+void CGUIElement_Impl::Deactivate()
 {
     m_pWindow->deactivate();
 }
 
-bool CGUIElement_Impl::IsActive(void)
+bool CGUIElement_Impl::IsActive()
 {
     return m_pWindow->isActive();
 }
@@ -269,7 +269,7 @@ void CGUIElement_Impl::SetAlwaysOnTop(bool bAlwaysOnTop)
     m_pWindow->setAlwaysOnTop(bAlwaysOnTop);
 }
 
-bool CGUIElement_Impl::IsAlwaysOnTop(void)
+bool CGUIElement_Impl::IsAlwaysOnTop()
 {
     return m_pWindow->isAlwaysOnTop();
 }
@@ -317,7 +317,7 @@ void CGUIElement_Impl::SetParent(CGUIElement* pParent)
     m_pParent = pParent;
 }
 
-CGUIElement* CGUIElement_Impl::GetParent(void)
+CGUIElement* CGUIElement_Impl::GetParent()
 {
     // Validate
     if (m_pParent && m_pWindow && !m_pWindow->getParent())
@@ -326,12 +326,12 @@ CGUIElement* CGUIElement_Impl::GetParent(void)
     return m_pParent;
 }
 
-CEGUI::Window* CGUIElement_Impl::GetWindow(void)
+CEGUI::Window* CGUIElement_Impl::GetWindow()
 {
     return m_pWindow;
 }
 
-void CGUIElement_Impl::CorrectEdges(void)
+void CGUIElement_Impl::CorrectEdges()
 {
     CEGUI::Point currentPoint = m_pWindow->getPosition(CEGUI::Absolute);
     CEGUI::Size  currentSize = m_pWindow->getSize(CEGUI::Absolute);
@@ -368,7 +368,7 @@ bool CGUIElement_Impl::SetFont(const char* szFontName)
     }
 }
 
-std::string CGUIElement_Impl::GetFont(void)
+std::string CGUIElement_Impl::GetFont()
 {
     try
     {
@@ -413,7 +413,7 @@ std::string CGUIElement_Impl::GetProperty(const char* szProperty)
     return strValue.c_str();
 }
 
-void CGUIElement_Impl::FillProperties(void)
+void CGUIElement_Impl::FillProperties()
 {
     CEGUI::Window::PropertyIterator itPropertySet = ((CEGUI::PropertySet*)m_pWindow)->getIterator();
     while (!itPropertySet.isAtEnd())
@@ -430,7 +430,7 @@ void CGUIElement_Impl::FillProperties(void)
     }
 }
 
-void CGUIElement_Impl::EmptyProperties(void)
+void CGUIElement_Impl::EmptyProperties()
 {
     if (!m_Properties.empty())
     {
@@ -446,7 +446,7 @@ void CGUIElement_Impl::EmptyProperties(void)
     }
 }
 
-CGUIPropertyIter CGUIElement_Impl::GetPropertiesBegin(void)
+CGUIPropertyIter CGUIElement_Impl::GetPropertiesBegin()
 {
     try
     {
@@ -463,7 +463,7 @@ CGUIPropertyIter CGUIElement_Impl::GetPropertiesBegin(void)
     }
 }
 
-CGUIPropertyIter CGUIElement_Impl::GetPropertiesEnd(void)
+CGUIPropertyIter CGUIElement_Impl::GetPropertiesEnd()
 {
     try
     {
@@ -493,6 +493,11 @@ void CGUIElement_Impl::SetSizedHandler(GUI_CALLBACK Callback)
 void CGUIElement_Impl::SetClickHandler(GUI_CALLBACK Callback)
 {
     m_OnClick = Callback;
+}
+
+void CGUIElement_Impl::SetClickHandler(const GUI_CALLBACK_MOUSE& Callback)
+{
+    m_OnClickWithArgs = Callback;
 }
 
 void CGUIElement_Impl::SetDoubleClickHandler(GUI_CALLBACK Callback)
@@ -540,7 +545,7 @@ void CGUIElement_Impl::SetKeyDownHandler(const GUI_CALLBACK_KEY& Callback)
     m_OnKeyDownWithArgs = Callback;
 }
 
-void CGUIElement_Impl::AddEvents(void)
+void CGUIElement_Impl::AddEvents()
 {
     // Note: Mouse Click, Double Click, Enter, Leave and ButtonDown are handled by global events in CGUI_Impl
     // Register our events
@@ -565,35 +570,54 @@ bool CGUIElement_Impl::Event_OnSized(const CEGUI::EventArgs& e)
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnClick(void)
+bool CGUIElement_Impl::Event_OnClick(const CEGUI::EventArgs& eBase)
 {
+    const CEGUI::MouseEventArgs& e = reinterpret_cast<const CEGUI::MouseEventArgs&>(eBase);
+    CGUIElement*               pElement = reinterpret_cast<CGUIElement*>(this);
+
     if (m_OnClick)
-        m_OnClick(reinterpret_cast<CGUIElement*>(this));
+        m_OnClick(pElement);
+
+    if (m_OnClickWithArgs)
+    {
+        CGUIMouseEventArgs NewArgs;
+
+        // copy the variables
+        NewArgs.button = static_cast<CGUIMouse::MouseButton>(e.button);
+        NewArgs.moveDelta = CVector2D(e.moveDelta.d_x, e.moveDelta.d_y);
+        NewArgs.position = CGUIPosition(e.position.d_x, e.position.d_y);
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
+        NewArgs.pWindow = pElement;
+
+        m_OnClickWithArgs(NewArgs);
+    }
+
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnDoubleClick(void)
+bool CGUIElement_Impl::Event_OnDoubleClick()
 {
     if (m_OnDoubleClick)
         m_OnDoubleClick(reinterpret_cast<CGUIElement*>(this));
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnMouseEnter(void)
+bool CGUIElement_Impl::Event_OnMouseEnter()
 {
     if (m_OnMouseEnter)
         m_OnMouseEnter(reinterpret_cast<CGUIElement*>(this));
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnMouseLeave(void)
+bool CGUIElement_Impl::Event_OnMouseLeave()
 {
     if (m_OnMouseLeave)
         m_OnMouseLeave(reinterpret_cast<CGUIElement*>(this));
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnMouseButtonDown(void)
+bool CGUIElement_Impl::Event_OnMouseButtonDown()
 {
     if (m_OnMouseDown)
         m_OnMouseDown(reinterpret_cast<CGUIElement*>(this));
@@ -658,7 +682,7 @@ bool CGUIElement_Impl::Event_OnKeyDown(const CEGUI::EventArgs& e)
     return true;
 }
 
-inline void CGUIElement_Impl::ForceRedraw(void)
+inline void CGUIElement_Impl::ForceRedraw()
 {
     m_pWindow->forceRedraw();
 }

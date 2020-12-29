@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CRegistryManager::~CRegistryManager(void)
+CRegistryManager::~CRegistryManager()
 {
     // Current behaviour is that there should be no open DB's at this point
     assert(m_RegistryList.size() == 0);
@@ -19,7 +19,7 @@ CRegistryManager::~CRegistryManager(void)
         CloseRegistry(m_RegistryList.front());
 }
 
-void CRegistryManager::DoPulse(void)
+void CRegistryManager::DoPulse()
 {
     // End automatic transactions started in the previous pulse
     for (unsigned int i = 0; i < m_RegistryList.size(); i++)

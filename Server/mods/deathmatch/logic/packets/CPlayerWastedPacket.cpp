@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerWastedPacket::CPlayerWastedPacket(void)
+CPlayerWastedPacket::CPlayerWastedPacket()
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     m_Killer = INVALID_ELEMENT_ID;

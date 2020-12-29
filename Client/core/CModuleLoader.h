@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMODULELOADER_H
-#define __CMODULELOADER_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -26,7 +25,7 @@ public:
     void UnloadModule();
 
     bool           IsOk() const { return m_bStatus; }
-    const SString& GetLastErrorMessage(void) const;
+    const SString& GetLastErrorMessage() const;
 
     PVOID GetFunctionPointer(const std::string& FunctionName);
 
@@ -35,5 +34,3 @@ private:
     bool    m_bStatus;
     SString m_strLastError;
 };
-
-#endif

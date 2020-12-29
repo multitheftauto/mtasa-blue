@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKSECONDARY
-#define __CGAMESA_TASKSECONDARY
+#pragma once
 
 #include <game/TaskSecondary.h>
 
@@ -49,8 +48,6 @@ public:
 class CTaskSimpleDuckSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleDuck
 {
 public:
-    CTaskSimpleDuckSA(void){};
+    CTaskSimpleDuckSA(){};
     CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0, short nUseShotsWhizzingEvents = -1);
 };
-
-#endif

@@ -26,7 +26,7 @@ CLuaModule::CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* p
     m_bInitialised = false;
 }
 
-CLuaModule::~CLuaModule(void)
+CLuaModule::~CLuaModule()
 {
     if (m_hModule)
     {
@@ -61,7 +61,7 @@ bool IsModule32Bit(const SString& strExpectedPathFilename)
 }
 #endif
 
-int CLuaModule::_LoadModule(void)
+int CLuaModule::_LoadModule()
 {
     InitModuleFunc pfnInitFunc;
     // Load Module
@@ -173,7 +173,7 @@ int CLuaModule::_LoadModule(void)
     return 0;
 }
 
-void CLuaModule::_UnloadModule(void)
+void CLuaModule::_UnloadModule()
 {
     // Unload from memory
 #ifdef WIN32
@@ -188,7 +188,7 @@ void CLuaModule::_RegisterFunctions(lua_State* luaVM)
     m_FunctionInfo.RegisterFunctions(luaVM);
 }
 
-void CLuaModule::_UnregisterFunctions(void)
+void CLuaModule::_UnregisterFunctions()
 {
     list<CLuaMain*>::const_iterator liter = m_pLuaModuleManager->GetLuaManager()->IterBegin();
     for (; liter != m_pLuaModuleManager->GetLuaManager()->IterEnd(); ++liter)
@@ -207,7 +207,7 @@ void CLuaModule::_UnregisterFunctions(void)
     }
 }
 
-void CLuaModule::_DoPulse(void)
+void CLuaModule::_DoPulse()
 {
     m_FunctionInfo.DoPulse();
 }

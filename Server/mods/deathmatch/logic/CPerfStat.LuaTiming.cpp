@@ -113,12 +113,12 @@ class CPerfStatLuaTimingImpl : public CPerfStatLuaTiming
 {
 public:
     ZERO_ON_NEW
-    CPerfStatLuaTimingImpl(void);
-    virtual ~CPerfStatLuaTimingImpl(void);
+    CPerfStatLuaTimingImpl();
+    virtual ~CPerfStatLuaTimingImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatLuaTiming
@@ -160,7 +160,7 @@ CPerfStatLuaTiming* CPerfStatLuaTiming::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatLuaTimingImpl::CPerfStatLuaTimingImpl(void)
+CPerfStatLuaTimingImpl::CPerfStatLuaTimingImpl()
 {
     m_strCategoryName = "Lua timing";
 }
@@ -172,7 +172,7 @@ CPerfStatLuaTimingImpl::CPerfStatLuaTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatLuaTimingImpl::~CPerfStatLuaTimingImpl(void)
+CPerfStatLuaTimingImpl::~CPerfStatLuaTimingImpl()
 {
 }
 
@@ -183,7 +183,7 @@ CPerfStatLuaTimingImpl::~CPerfStatLuaTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatLuaTimingImpl::GetCategoryName(void)
+const SString& CPerfStatLuaTimingImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -256,7 +256,7 @@ void CPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const char* szE
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatLuaTimingImpl::DoPulse(void)
+void CPerfStatLuaTimingImpl::DoPulse()
 {
     long long llTickCount = GetTickCount64_();
     long long llDelta = llTickCount - m_LastTickCount;

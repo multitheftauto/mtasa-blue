@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CWorldRPCs_H
-#define __CWorldRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CWorldRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetTime);
     DECLARE_RPC(SetWeather);
@@ -65,6 +64,5 @@ public:
     DECLARE_RPC(SetMoonSize);
     DECLARE_RPC(ResetMoonSize);
     DECLARE_RPC(SetSyncIntervals);
+    DECLARE_RPC(SetDiscordJoinParams);
 };
-
-#endif

@@ -42,8 +42,8 @@ enum
 class CPlayerTasks
 {
 public:
-    CPlayerTasks(void);
-    ~CPlayerTasks(void);
+    CPlayerTasks();
+    ~CPlayerTasks();
 
     CPlayerTask* GetPriorityTask(unsigned int uiTaskType);
     bool         SetPriorityTask(unsigned int uiTaskType, CPlayerTask* pTask);
@@ -59,7 +59,7 @@ protected:
 class CPlayerTask
 {
 public:
-    CPlayerTask(void)
+    CPlayerTask()
     {
         m_usID = 0xFFFF;
         m_pSubTask = NULL;
@@ -69,11 +69,11 @@ public:
         m_usID = usID;
         m_pSubTask = NULL;
     }
-    ~CPlayerTask(void) { delete m_pSubTask; }
+    ~CPlayerTask() { delete m_pSubTask; }
 
-    unsigned short GetID(void) { return m_usID; }
-    char*          GetName(void) { return (m_usID < 1802) ? TaskNames[m_usID].szName : sNoTaskName; }
-    CPlayerTask*   GetSubTask(void) { return m_pSubTask; }
+    unsigned short GetID() { return m_usID; }
+    char*          GetName() { return (m_usID < 1802) ? TaskNames[m_usID].szName : sNoTaskName; }
+    CPlayerTask*   GetSubTask() { return m_pSubTask; }
     void           SetSubTask(CPlayerTask* pTask) { m_pSubTask = pTask; }
 
 protected:

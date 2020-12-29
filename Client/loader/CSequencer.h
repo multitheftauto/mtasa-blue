@@ -51,7 +51,7 @@ template <class T>
 class CBadLang
 {
 protected:
-    typedef SString (T::*PFNVOIDVOID)(void);
+    typedef SString (T::*PFNVOIDVOID)();
 
     std::map<SString, PFNVOIDVOID> m_FunctionMap;
     std::map<SString, SString>     m_VariableMap;
@@ -60,7 +60,7 @@ protected:
     T*                             m_pOuter;
 
 public:
-    CBadLang(void)
+    CBadLang()
     {
         m_uiCurrLine = 0;
         m_pOuter = 0;
@@ -129,7 +129,7 @@ public:
     }
 
     // Serializationish
-    SString SaveStateToString(void)
+    SString SaveStateToString()
     {
         // Save PC - Count valid lines between current line and previous label
         int iBackCount = 0;
@@ -180,10 +180,10 @@ public:
 
     bool IsLineLabel(const SString& strLine) { return CSourceLine(strLine).GetToken(0).EndsWith(":"); }
 
-    bool AtEnd(void) { return m_uiCurrLine >= m_LineList.size(); }
+    bool AtEnd() { return m_uiCurrLine >= m_LineList.size(); }
 
     // Process
-    void ProcessNextLine(void)
+    void ProcessNextLine()
     {
         if (!AtEnd())
             ProcessCommand(m_LineList[m_uiCurrLine++]);

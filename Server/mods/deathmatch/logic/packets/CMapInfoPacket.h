@@ -16,11 +16,13 @@
 struct SWorldWaterLevelInfo
 {
     bool  bNonSeaLevelSet;
+    bool  bOutsideLevelSet;
     float fSeaLevel;
     float fNonSeaLevel;
+    float fOutsideLevel;
 };
 
-class CMapInfoPacket : public CPacket
+class CMapInfoPacket final : public CPacket
 {
 public:
     explicit CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,
@@ -37,8 +39,8 @@ public:
                             bool bOverrideFarClipDistance = false, float fFarClip = 0, bool bOverrideFogDistance = false, float fFogDistance = 0,
                             float fAircraftMaxHeight = 800, float fAircraftMaxVelocity = 1.5f, bool bOverrideMoonSize = false, int iMoonSize = 3);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_MAP_INFO; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_MAP_INFO; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

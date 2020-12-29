@@ -33,11 +33,11 @@ class CMaterialLine3DBatcher
 public:
     ZERO_ON_NEW
     CMaterialLine3DBatcher(bool bPreGUI);
-    ~CMaterialLine3DBatcher(void);
+    ~CMaterialLine3DBatcher();
 
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
-    void Flush(void);
-    bool HasItems(void) { return !m_LineList.empty(); }
+    void Flush();
+    bool HasItems() { return !m_LineList.empty(); }
     void AddLine3D(const CVector& vecFrom, const CVector& vecTo, float fWidth, ulong ulColor, CMaterialItem* pMaterial, float fU, float fV, float fSizeU,
                    float fSizeV, bool bRelativeUV, bool bUseFaceToward, const CVector& vecFaceToward);
 

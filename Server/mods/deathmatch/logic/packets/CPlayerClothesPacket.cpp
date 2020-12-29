@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerClothesPacket::~CPlayerClothesPacket(void)
+CPlayerClothesPacket::~CPlayerClothesPacket()
 {
     vector<SPlayerClothes*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
@@ -40,8 +40,8 @@ bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const
         {
             char*         szTexture = (*iter)->szTexture;
             char*         szModel = (*iter)->szModel;
-            unsigned char ucTextureLength = strlen(szTexture);
-            unsigned char ucModelLength = strlen(szModel);
+            unsigned char ucTextureLength = static_cast<uchar>(strlen(szTexture));
+            unsigned char ucModelLength = static_cast<uchar>(strlen(szModel));
             BitStream.Write(ucTextureLength);
             BitStream.Write(szTexture, ucTextureLength);
             BitStream.Write(ucModelLength);

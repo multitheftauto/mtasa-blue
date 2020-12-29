@@ -13,18 +13,18 @@
 using std::list;
 using std::map;
 
-CClientGUIManager::CClientGUIManager(void)
+CClientGUIManager::CClientGUIManager()
 {
     m_bCanRemoveFromList = true;
 }
 
-CClientGUIManager::~CClientGUIManager(void)
+CClientGUIManager::~CClientGUIManager()
 {
     // Destroy all objects
     DeleteAll();
 }
 
-void CClientGUIManager::DeleteAll(void)
+void CClientGUIManager::DeleteAll()
 {
     // We must make sure the gui elements don't interrupt our list
     m_bCanRemoveFromList = false;
@@ -97,7 +97,7 @@ void CClientGUIManager::Remove(CClientGUIElement* pGUIElement)
     }
 }
 
-void CClientGUIManager::DoPulse(void)
+void CClientGUIManager::DoPulse()
 {
     FlushQueuedUpdates();
 }

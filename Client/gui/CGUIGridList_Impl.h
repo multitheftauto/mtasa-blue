@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIGRIDLIST_IMPL_H
-#define __CGUIGRIDLIST_IMPL_H
+#pragma once
 
 #include <gui/CGUIGridList.h>
 #include "CGUIElement_Impl.h"
@@ -21,7 +20,7 @@ class CGUIGridList_Impl : public CGUIGridList, public CGUIElement_Impl
 {
 public:
     CGUIGridList_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, bool bFrame = true);
-    ~CGUIGridList_Impl(void);
+    ~CGUIGridList_Impl();
 
     unsigned int AddColumn(const char* szTitle, float fWidth);
     void         RemoveColumn(unsigned int uiColumn);
@@ -31,14 +30,15 @@ public:
     void         SetColumnTitle(int hColumn, const char* szTitle);
     const char*  GetColumnTitle(int hColumn);
 
-    void SetSelectionMode(SelectionMode mode);
-    int  SetRowItemsText(int iRow, std::vector<std::pair<SString, bool> >* m_items);
+    void          SetSelectionMode(SelectionMode mode);
+    SelectionMode GetSelectionMode();
+    int           SetRowItemsText(int iRow, std::vector<std::pair<SString, bool> >* m_items);
 
-    void          ForceUpdate(void);
+    void          ForceUpdate();
     int           AddRow(bool bFast = false, std::vector<std::pair<SString, bool> >* m_items = NULL);
     void          RemoveRow(int iRow);
     int           InsertRowAfter(int iRow, std::vector<std::pair<SString, bool> >* m_items = NULL);
-    void          Clear(void);
+    void          Clear();
     CGUIListItem* GetItem(int iRow, int hColumn);
     const char*   GetItemText(int iRow, int hColumn);
     int  SetItemText(int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false, const char* szSortText = NULL);
@@ -50,11 +50,12 @@ public:
 
     void SetHorizontalScrollBar(bool bEnabled);
     void SetVerticalScrollBar(bool bEnabled);
-    void SetSorting(bool bEnabled);
+    void SetSortingEnabled(bool bEnabled);
+    bool IsSortingEnabled();
     void SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage);
 
-    float GetHorizontalScrollPosition(void);
-    float GetVerticalScrollPosition(void);
+    float GetHorizontalScrollPosition();
+    float GetVerticalScrollPosition();
     void  SetHorizontalScrollPosition(float fPosition);
     void  SetVerticalScrollPosition(float fPosition);
 
@@ -62,13 +63,13 @@ public:
     int           GetItemColumnIndex(CGUIListItem* pItem);
     int           GetItemRowIndex(CGUIListItem* pItem);
     void          GetVisibleRowRange(int& iFirst, int& iLast);
-    int           GetSelectedCount(void);
-    CGUIListItem* GetSelectedItem(void);
+    int           GetSelectedCount();
+    CGUIListItem* GetSelectedItem();
     CGUIListItem* GetNextSelectedItem(CGUIListItem* pItem);
-    int           GetSelectedItemRow(void);
-    int           GetSelectedItemColumn(void);
-    int           GetRowCount(void);
-    int           GetColumnCount(void);
+    int           GetSelectedItemRow();
+    int           GetSelectedItemColumn();
+    int           GetRowCount();
+    int           GetColumnCount();
 
     bool IsColumnSegmentSizingEnabled(int hColumn);
     void SetColumnSegmentSizingEnabled(int hColumn, bool bEnabled);
@@ -81,7 +82,7 @@ public:
     void SetSortColumnHandler(GUI_CALLBACK Callback);
 
     void      SetIgnoreTextSpacer(bool bIgnoreTextSpacer) { m_bIgnoreTextSpacer = bIgnoreTextSpacer; };
-    eCGUIType GetType(void) { return CGUI_GRIDLIST; };
+    eCGUIType GetType() { return CGUI_GRIDLIST; };
 
     #include "CGUIElement_Inc.h"
 
@@ -90,7 +91,7 @@ private:
 
     int m_iIndex;
 
-    unsigned int       GetUniqueHandle(void);
+    unsigned int       GetUniqueHandle();
     CGUIListItem_Impl* GetListItem(CEGUI::ListboxItem* pItem);
     unsigned int       m_hUniqueHandle;
 
@@ -100,5 +101,3 @@ private:
 
     bool m_bIgnoreTextSpacer;
 };
-
-#endif
