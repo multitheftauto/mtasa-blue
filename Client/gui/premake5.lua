@@ -17,9 +17,12 @@ project "GUI"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
+	defines {
+		"_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING"
+	}
+
 	links {
 		"CEGUI", "DirectX9GUIRenderer", "Falagard",
-		"../../vendor/cegui-0.4.0-custom/lib/freetype2412ST.lib", -- Todo: Select Debug variant, also move freetype to vendor
 		"d3dx9.lib",
 		"dxerr.lib"
 	}
@@ -35,10 +38,7 @@ project "GUI"
 		"*.h",
 		"*.cpp"
 	}
-
-	filter {"system:windows", "toolset:*_xp*"}
-		links { "Psapi.lib" }
-
+	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 

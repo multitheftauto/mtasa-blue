@@ -101,7 +101,6 @@ struct Cookie *Curl_cookie_getlist(struct CookieInfo *, const char *,
 void Curl_cookie_freelist(struct Cookie *cookies);
 void Curl_cookie_clearall(struct CookieInfo *cookies);
 void Curl_cookie_clearsess(struct CookieInfo *cookies);
-char *Curl_get_line(char *buf, int len, FILE *input);
 
 #if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_COOKIES)
 #define Curl_cookie_list(x) NULL
@@ -110,7 +109,7 @@ char *Curl_get_line(char *buf, int len, FILE *input);
 #define Curl_cookie_cleanup(x) Curl_nop_stmt
 #define Curl_flush_cookies(x,y) Curl_nop_stmt
 #else
-void Curl_flush_cookies(struct Curl_easy *data, int cleanup);
+void Curl_flush_cookies(struct Curl_easy *data, bool cleanup);
 void Curl_cookie_cleanup(struct CookieInfo *);
 struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
                                     const char *, struct CookieInfo *, bool);

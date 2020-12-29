@@ -17,6 +17,7 @@
 class CD3DDUMMY;
 class CClientEntityBase;
 class CShaderItem;
+class CPixels;
 typedef CShaderItem CSHADERDUMMY;
 
 // A list of custom textures to add to a model's txd
@@ -62,16 +63,16 @@ typedef void (*PFN_WATCH_CALLBACK)(CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNe
 class CRenderWare
 {
 public:
-    virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData,
+    virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
                                                       bool bFilteringEnabled) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
     virtual void             ClothesAddReplacementTxd(char* pFileData, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacementTxd(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
-    virtual RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData) = 0;
-    virtual RpClump*         ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
-    virtual CColModel*       ReadCOL(const CBuffer& fileData) = 0;
+    virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
+    virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
+    virtual CColModel*       ReadCOL(const SString& buffer) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
@@ -88,6 +89,7 @@ public:
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
     virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
+    virtual bool             GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames) = 0;
     virtual const char*      GetTextureName(CD3DDUMMY* pD3DData) = 0;
 
     virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask) = 0;
@@ -100,4 +102,13 @@ public:
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+
+    virtual void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix) = 0;
+    virtual void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut) = 0;
+    virtual void RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation) = 0;
+    virtual void RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation) = 0;
+    virtual void RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition) = 0;
+    virtual void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) = 0;
+    virtual void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale) = 0;
+    virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
 };

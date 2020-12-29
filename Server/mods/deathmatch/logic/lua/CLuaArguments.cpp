@@ -139,7 +139,7 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables)
+void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
 {
     // Ensure there is enough space on the Lua stack
     LUA_CHECKSTACK(luaVM, 4);
@@ -447,6 +447,17 @@ void CLuaArguments::DeleteArguments()
 
     // Clear the vector
     m_Arguments.clear();
+}
+
+// Gets rid of the last argument in the list
+void CLuaArguments::Pop()
+{
+    // Delete the last element
+    CLuaArgument* item = m_Arguments.back();
+    delete item;
+
+    // Pop it out of the vector
+    m_Arguments.pop_back();
 }
 
 void CLuaArguments::ValidateTableKeys()

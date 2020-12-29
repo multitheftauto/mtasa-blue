@@ -67,8 +67,9 @@ public:
     CMapManager*     GetMapManager() const { return m_pMapManager; };
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
-    void          DestroyXML(CXMLFile* pFile);
-    void          DestroyXML(CXMLNode* pRootNode);
+    CXMLNode*     ParseString(const char* strXmlContent);
+    bool          DestroyXML(CXMLFile* pFile);
+    bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
     bool          XMLExists(CXMLFile* pFile);
     unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
@@ -132,9 +133,10 @@ private:
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
 
-    list<CXMLFile*>     m_XMLFiles;
-    list<CTextDisplay*> m_Displays;
-    list<CTextItem*>    m_TextItems;
+    list<CXMLFile*>                                 m_XMLFiles;
+    std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
+    list<CTextDisplay*>                             m_Displays;
+    list<CTextItem*>                                m_TextItems;
 
     bool m_bEnableOOP;
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <list>
+#include <unordered_set>
 
 #define MAX_REGISTERED_COMMAND_LENGTH 64
 #define MAX_REGISTERED_COMMANDHANDLER_LENGTH 64
@@ -47,7 +48,7 @@ private:
 
     void TakeOutTheTrash();
 
-    std::list<SCommand*> m_Commands;
-    std::list<SCommand*> m_TrashCan;
-    bool                 m_bIteratingList;
+    std::list<SCommand*>          m_Commands;
+    std::unordered_set<SCommand*> m_TrashCan;
+    bool                          m_bIteratingList;
 };

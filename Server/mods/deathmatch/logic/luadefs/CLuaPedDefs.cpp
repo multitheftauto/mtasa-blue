@@ -13,7 +13,7 @@
 
 void CLuaPedDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Ped funcs
         {"createPed", CreatePed},
         {"getValidPedModels", GetValidPedModels},
@@ -78,10 +78,8 @@ void CLuaPedDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 // TODO: specials
@@ -103,7 +101,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeClothes", "removePedClothes");
     lua_classfunction(luaVM, "removeFromVehicle", "removePedFromVehicle");
     lua_classfunction(luaVM, "removeJetPack", "removePedJetPack");
-    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack"); // deprecated in 1.5.5-9.13846
+    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");            // deprecated in 1.5.5-9.13846
 
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
@@ -164,14 +162,12 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "target", NULL, "getPedTarget");
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
-    lua_classvariable(luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", OOP_WarpPedIntoVehicle,
-                      GetPedOccupiedVehicle);                            // what about removePedFromVehicle?
-    lua_classvariable(luaVM, "dead", "killPed", "isPedDead");            // Setting this to any value will still kill the ped. Should we special case this?
+    lua_classvariable(luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
-    // lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
-    // lua_classvariable ( luaVM, "controlState", "setPedControlState", "getPedControlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState
-    // ); // TODO: .controlState["control"] = value
+
+    // TODO(qaisjp): setting this to any value will kill the ped. add OOP_KillPed that only allows `true`.
+    lua_classvariable(luaVM, "dead", "killPed", "isPedDead");
 
     lua_registerclass(luaVM, "Ped", "Element");
 }
@@ -498,7 +494,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 10.0f)
         {
             if (CStaticFunctionDefinitions::SetPedAnimationSpeed(pElement, strAnimName, fSpeed))
             {

@@ -69,20 +69,74 @@ void CClientColPolygon::SetPosition(const CVector& vecPosition)
     // Add queued collider refresh for v1.1
 }
 
-void CClientColPolygon::AddPoint(CVector2D vecPoint)
+bool CClientColPolygon::AddPoint(CVector2D vecPoint)
 {
-    float fDistanceX = vecPoint.fX - m_vecPosition.fX;
-    float fDistanceY = vecPoint.fY - m_vecPosition.fY;
+    m_Points.push_back(vecPoint);
+    CalculateRadius(vecPoint);
+    return true;
+}
 
-    float fDist = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
+bool CClientColPolygon::AddPoint(CVector2D vecPoint, unsigned int uiPointIndex)
+{
+    if (uiPointIndex > m_Points.size())
+        return false;
 
-    if (fDist > m_fRadius)
+    m_Points.insert(m_Points.begin() + uiPointIndex, vecPoint);
+    CalculateRadius(vecPoint);
+
+    return true;
+}
+
+bool CClientColPolygon::RemovePoint(unsigned int uiPointIndex)
+{
+    if (m_Points.size() <= 3)
+        return false;
+
+    if (uiPointIndex >= m_Points.size())
+        return false;
+
+    m_Points.erase(m_Points.begin() + uiPointIndex);
+
+    CalculateRadius();
+    return true;
+}
+
+bool CClientColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint)
+{
+    if (uiPointIndex >= m_Points.size())
+        return false;
+
+    m_Points[uiPointIndex] = vecPoint;
+
+    CalculateRadius();
+    return true;
+}
+
+void CClientColPolygon::CalculateRadius()
+{
+    m_fRadius = 0.0f;
+    for (auto vecPoint : m_Points)
     {
-        m_fRadius = fDist;
-        SizeChanged();
+        CVector2D vecDistance = vecPoint - m_vecPosition;
+        float     fDistance = vecDistance.Length();
+
+        if (fDistance > m_fRadius)
+            m_fRadius = fDistance;
     }
 
-    m_Points.push_back(vecPoint);
+    SizeChanged();
+}
+
+void CClientColPolygon::CalculateRadius(const CVector2D& vecPoint)
+{
+    CVector2D vecDistance = vecPoint - m_vecPosition;
+    float     fDistance = vecDistance.Length();
+
+    if (fDistance > m_fRadius)
+    {
+        m_fRadius = fDistance;
+        SizeChanged();
+    }
 }
 
 bool CClientColPolygon::IsInBounds(CVector vecPoint)

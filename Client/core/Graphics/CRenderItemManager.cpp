@@ -232,7 +232,7 @@ CWebBrowserItem* CRenderItemManager::CreateWebBrowser(uint uiSizeX, uint uiSizeY
 //
 ////////////////////////////////////////////////////////////////
 CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
+                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros)
 {
     if (!CanCreateRenderItem(CShaderItem::GetClassId()))
         return NULL;
@@ -240,7 +240,7 @@ CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SStr
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem();
-    pShaderItem->PostConstruct(this, strFile, strRootPath, bIsRawData, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
+    pShaderItem->PostConstruct(this, strFile, strRootPath, bIsRawData, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask, macros);
 
     if (!pShaderItem->IsValid())
     {
@@ -755,6 +755,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.bHUDMatchAspectRatio = true;
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
+    outStatus.settings.bHighDetailPeds = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -765,6 +766,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio);
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
+    CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
 
     if (outStatus.settings.iFXQuality == 0)
     {

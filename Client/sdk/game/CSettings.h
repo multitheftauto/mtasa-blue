@@ -156,12 +156,14 @@ public:
     virtual float GetFieldOfViewVehicle() = 0;
     virtual float GetFieldOfViewVehicleMax() = 0;
 
-    virtual void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance) = 0;
-    virtual void ResetVehiclesLODDistance() = 0;
+    virtual void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript) = 0;
+    virtual void ResetVehiclesLODDistance(bool bFromScript) = 0;
+    virtual void ResetVehiclesLODDistanceFromScript() = 0;
     virtual void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance) = 0;
 
-    virtual void  SetPedsLODDistance(float fPedsLODDistance) = 0;
-    virtual void  ResetPedsLODDistance() = 0;
+    virtual void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript) = 0;
+    virtual void  ResetPedsLODDistance(bool bFromScript) = 0;
+    virtual void  ResetPedsLODDistanceFromScript() = 0;
     virtual float GetPedsLODDistance() = 0;
 
     virtual void Save() = 0;

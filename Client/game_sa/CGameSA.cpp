@@ -13,7 +13,10 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
+#include "D3DResourceSystemSA.h"
+#include "CFileLoaderSA.h"
 
+unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
 unsigned long* CGameSA::VAR_IsGameLoaded;
@@ -28,6 +31,8 @@ float*         CGameSA::VAR_OldTimeStep;
 float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
+unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
+
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
  */
@@ -38,6 +43,10 @@ CGameSA::CGameSA()
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
+
+    const unsigned int modelInfoMax = GetCountOfAllFileIDs(); 
+    ModelInfo = new CModelInfoSA[modelInfoMax];
+    ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
 
@@ -60,9 +69,15 @@ CGameSA::CGameSA()
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (int i = 0; i < MODELINFO_MAX; i++)
+    for (int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
+    }
+
+    // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
+    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    {
+        ObjectGroupsInfo[i].SetGroup(i);
     }
 
     DEBUG_TRACE("CGameSA::CGameSA()");
@@ -87,7 +102,6 @@ CGameSA::CGameSA()
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
-    this->m_pText = new CTextSA();
     this->m_pStats = new CStatsSA();
     this->m_pFont = new CFontSA();
     this->m_pPathFind = new CPathFindSA();
@@ -192,6 +206,9 @@ CGameSA::CGameSA()
     // Increase matrix array size
     MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);            // Default is 900
 
+    CEntitySAInterface::StaticSetHooks();
+    CPhysicalSAInterface::StaticSetHooks();
+    CObjectSA::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();
@@ -200,6 +217,8 @@ CGameSA::CGameSA()
     CPedSA::StaticSetHooks();
     CSettingsSA::StaticSetHooks();
     CFxSystemSA::StaticSetHooks();
+    CFileLoaderSA::StaticSetHooks();
+    D3DResourceSystemSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -224,7 +243,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
-    delete reinterpret_cast<CTextSA*>(m_pText);
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
@@ -246,6 +264,9 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+
+    delete[] ModelInfo;
+    delete[] ObjectGroupsInfo;
 }
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -294,24 +315,18 @@ bool CGameSA::IsInForeground()
     return *VAR_IsForegroundWindow;
 }
 
-CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID)
+CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
-    if (dwModelID < MODELINFO_MAX)
+    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
+    if (dwModelID < GetCountOfAllFileIDs())
     {
-        if (ModelInfo[dwModelID].IsValid())
+        if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
             return &ModelInfo[dwModelID];
         }
-        else
-        {
-            return NULL;
-        }
+        return nullptr;
     }
-    else
-    {
-        return NULL;
-    }
+    return nullptr;
 }
 
 /**
@@ -464,6 +479,12 @@ void CGameSA::Reset()
 
         // Restore model dummies' positions
         CModelInfoSA::ResetAllVehicleDummies();
+        CModelInfoSA::RestoreAllObjectsPropertiesGroups();
+        // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
+        CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
+
+        // Restore vehicle model wheel sizes
+        CModelInfoSA::ResetAllVehiclesWheelSizes();
     }
 }
 
@@ -483,6 +504,7 @@ void CGameSA::Initialize()
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
+    SetupBrokenModels();
     m_pRenderWare->Initialize();
 
     // *Sebas* Hide the GTA:SA Main menu.
@@ -803,6 +825,26 @@ void CGameSA::SetupSpecialCharacters()
     */
 }
 
+void CGameSA::FixModelCol(uint iFixModel, uint iFromModel)
+{
+    CBaseModelInfoSAInterface* pFixModelInterface = ModelInfo[iFixModel].GetInterface();
+    if (!pFixModelInterface || pFixModelInterface->pColModel)
+        return;
+
+    CBaseModelInfoSAInterface* pAviableModelInterface = ModelInfo[iFromModel].GetInterface();
+
+    if (!pAviableModelInterface)
+        return;
+
+    pFixModelInterface->pColModel = pAviableModelInterface->pColModel;
+}
+
+void CGameSA::SetupBrokenModels()
+{
+    FixModelCol(3118, 3059);
+    FixModelCol(3553, 3554);
+}
+
 // Well, has it?
 bool CGameSA::HasCreditScreenFadedOut()
 {
@@ -827,6 +869,11 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 void CGameSA::ResetModelLodDistances()
 {
     CModelInfoSA::StaticResetLodDistances();
+}
+
+void CGameSA::ResetModelTimes()
+{
+    CModelInfoSA::StaticResetModelTimes();
 }
 
 void CGameSA::ResetAlphaTransparencies()
@@ -861,4 +908,13 @@ CPed* CGameSA::GetPedContext()
     if (!m_pPedContext)
         m_pPedContext = pGame->GetPools()->GetPedFromRef((DWORD)1);
     return m_pPedContext;
+}
+
+CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
+{
+    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
+    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
+        return &ObjectGroupsInfo[ucObjectGroup];
+
+    return nullptr;
 }

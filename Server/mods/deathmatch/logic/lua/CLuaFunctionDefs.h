@@ -27,15 +27,13 @@ class CAccessControlListManager;
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 
+
 extern CTimeUsMarker<20> markerLatentEvent;            // For timing triggerLatentClientEvent
 
 class CLuaFunctionDefs
 {
 public:
     static void Initialize(class CLuaManager* pLuaManager, class CGame* pClientGame);
-
-    LUA_DECLARE(CallRemote);
-    LUA_DECLARE(FetchRemote);
 
     // Event functions
     LUA_DECLARE(AddEvent);

@@ -130,6 +130,7 @@ public:
     int DoPollDownload();
     int DoSendPostToNextServer();
     int DoPollPost();
+    void OnMainMenuFullyVisible();
 
     static void* StaticThreadProc(void* pContext);
     void*        ThreadProc();
@@ -3190,6 +3191,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     strQueryURL = strQueryURL.Replace("_USAGE_", strConnectUsage);
     strQueryURL = strQueryURL.Replace("_SCUT_", strSoundCut);
     strQueryURL = strQueryURL.Replace("_OPTIMUS_", strOptimusInfo);
+    strQueryURL = strQueryURL.Replace("_GTAMD5_", GetApplicationSetting("gta-exe-md5"));
 
     // See if this download qualifies for using a resumable file
     if (!m_JobInfo.strFilename.empty() && strQueryURL.EndsWith(m_JobInfo.strFilename))
@@ -3375,4 +3377,26 @@ int CVersionUpdater::DoPollPost()
         return RES_POLL;
     }
     return RES_OK;
+}
+
+// Issue: #1708
+// Set the update settings to stable build if the user is on 1.5.8.
+// We do this only once, this is why we need to write to registry.
+void CVersionUpdater::OnMainMenuFullyVisible()
+{
+    if (MTASA_VERSION_BUILD != 20670)            // 20670 is the build number with PR #1712 merged.
+        return;
+    const std::string requiredValue = "discord-rich-presence";
+    const std::string lastSubKey = "version-revert-reason";
+    if (GetApplicationSetting(lastSubKey) != requiredValue)
+    {
+        SetApplicationSetting(lastSubKey, requiredValue);
+        // check if the MTA client version is 1.5.8
+        if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
+        {
+            CVARS_SET("update_build_type", 0);
+            std::string message = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
+            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO);
+        }
+    }
 }

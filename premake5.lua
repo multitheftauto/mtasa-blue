@@ -4,6 +4,7 @@ require "compose_files"
 require "install_data"
 require "install_resources"
 require "install_cef"
+require "install_discord"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -85,13 +86,10 @@ workspace "MTASA"
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
-	filter {"system:windows", "toolset:*_xp*"}
-		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
-
 	filter "system:windows"
-		toolset "v141"
+		toolset "v142"
 		staticruntime "On"
-		defines { "WIN32", "_WIN32" }
+		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}
@@ -100,7 +98,7 @@ workspace "MTASA"
 		}
 
 	filter {"system:windows", "configurations:Debug"}
-		buildoptions { "/MT" } -- Don't use debug runtime when static linking
+		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
 
 	filter "system:linux"
@@ -130,6 +128,7 @@ workspace "MTASA"
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"
+		include "vendor/freetype"
 		include "vendor/jpeg-9b"
 		include "vendor/ksignals"
 		include "vendor/libpng"

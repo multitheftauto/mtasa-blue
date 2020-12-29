@@ -39,7 +39,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
 
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
-    m_ucDriveByDirection = 0;
+    m_ucDriveByDirection = eVehicleAimDirection::FORWARDS;
     m_bAkimboArmUp = false;
 
     m_VoiceState = VOICESTATE_IDLE;
@@ -145,23 +145,6 @@ CPlayer::~CPlayer()
     m_bDoNotSendEntities = true;
     SetParentObject(NULL);
 
-    // Do this
-    if (m_pJackingVehicle)
-    {
-        if (m_uiVehicleAction == VEHICLEACTION_JACKING)
-        {
-            CPed* pOccupant = m_pJackingVehicle->GetOccupant(0);
-            if (pOccupant)
-            {
-                m_pJackingVehicle->SetOccupant(NULL, 0);
-                pOccupant->SetOccupiedVehicle(NULL, 0);
-                pOccupant->SetVehicleAction(VEHICLEACTION_NONE);
-            }
-        }
-        if (m_pJackingVehicle->GetJackingPlayer() == this)
-            m_pJackingVehicle->SetJackingPlayer(NULL);
-    }
-
     CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CPlayer"), &m_pTeam, NULL);
     CElementRefManager::RemoveElementListRef(ELEMENT_REF_DEBUG(this, "CPlayer m_lstBroadcastList"), &m_lstBroadcastList);
     CElementRefManager::RemoveElementListRef(ELEMENT_REF_DEBUG(this, "CPlayer m_lstIgnoredList"), &m_lstIgnoredList);
@@ -204,6 +187,52 @@ void CPlayer::DoPulse()
 void CPlayer::SetNick(const char* szNick)
 {
     m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
+}
+
+// Ignore min client version checks if is a custom build and both player and server have build number of 0
+bool CPlayer::ShouldIgnoreMinClientVersionChecks()
+{
+#if (MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM) && (MTASA_VERSION_BUILD == 0)
+    if (GetPlayerVersion().GetBuildNumber() == 0)
+        return true;
+#endif
+    return false;
+}
+
+bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
+{
+    OutputDebugLine(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
+{
+    OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement)
+{
+    bool erased = false;
+
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
+    {
+        if (it->first == pElement)
+        {
+            OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+            it = m_DataSubscriptions.erase(it);
+            erased = true;
+        }
+        else
+            ++it;
+    }
+
+    return erased;
+}
+
+bool CPlayer::IsSubscribed(CElement* pElement, const std::string& strName) const
+{
+    return m_DataSubscriptions.find(std::make_pair(pElement, strName)) != m_DataSubscriptions.end();
 }
 
 const char* CPlayer::GetSourceIP()
@@ -1061,26 +1090,6 @@ void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)
     CPed::SetPlayerStat(usStat, fValue);
 }
 
-void CPlayer::SetJackingVehicle(CVehicle* pVehicle)
-{
-    if (pVehicle == m_pJackingVehicle)
-        return;
-
-    // Remove old
-    if (m_pJackingVehicle)
-    {
-        CVehicle* pPrev = m_pJackingVehicle;
-        m_pJackingVehicle = NULL;
-        pPrev->SetJackingPlayer(NULL);
-    }
-
-    // Set new
-    m_pJackingVehicle = pVehicle;
-
-    if (m_pJackingVehicle)
-        m_pJackingVehicle->SetJackingPlayer(this);
-}
-
 // Calculate weapon range using efficient stuffs
 float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
 {
@@ -1098,7 +1107,7 @@ float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
     return m_fWeaponRangeLast;
 }
 
-void CPlayer::SetPlayerVersion(const SString& strPlayerVersion)
+void CPlayer::SetPlayerVersion(const CMtaVersion& strPlayerVersion)
 {
     m_strPlayerVersion = strPlayerVersion;
 }

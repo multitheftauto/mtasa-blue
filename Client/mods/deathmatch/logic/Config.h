@@ -84,14 +84,6 @@ public:
 #define MIN_DISCONNECT_REASON_LENGTH 1
 #define MAX_DISCONNECT_REASON_LENGTH 127
 
-// Max kick string length that can be sent
-#define MIN_KICK_REASON_LENGTH 1
-#define MAX_KICK_REASON_LENGTH 64
-
-// Max ban string length that can be sent
-#define MIN_BAN_REASON_LENGTH 1
-#define MAX_BAN_REASON_LENGTH 64
-
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
     #error MAX_CHAT_LENGTH "macro can't exceed 255"

@@ -253,6 +253,15 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
     if (bitStream.Read(ucInterior) && bitStream.Read(ucSetPosition))
     {
         pSource->SetInterior(ucInterior);
+        if (pSource->GetType() == CCLIENTPLAYER)
+        {
+            CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pSource);
+            if (pPlayer->IsLocalPlayer())
+            {
+                // Update all of our streamers/managers to the local player's interior
+                m_pClientGame->SetAllInteriors(ucInterior);
+            }
+        }
 
         if (ucSetPosition == 1)
         {
@@ -436,7 +445,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTPLAYER:
         {
             CClientPed* pPed = static_cast<CClientPed*>(pSource);
-            const unsigned short usCurrentModel = pPed->GetModel();
+            const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
 
             if (usCurrentModel != usModel)
             {

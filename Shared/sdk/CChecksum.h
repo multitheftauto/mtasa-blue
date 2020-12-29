@@ -12,8 +12,9 @@
 #ifndef __CChecksum_H
 #define __CChecksum_H
 
-// Depends on CMD5Hasher and CRCGenerator
+#include <variant>
 
+// Depends on CMD5Hasher and CRCGenerator
 class CChecksum
 {
 public:
@@ -29,13 +30,33 @@ public:
 
     bool operator!=(const CChecksum& other) const { return !operator==(other); }
 
-    // static generators
-    static CChecksum GenerateChecksumFromFile(const SString& strFilename)
+    // GenerateChecksumFromFile returns either a CChecksum or an error message.
+    static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
-        CMD5Hasher().Calculate(strFilename, result.md5);
+
+        if (!result.ulCRC)
+            return SString("CRC could not open file: %s", std::strerror(errno));
+
+        bool success = CMD5Hasher().Calculate(strFilename, result.md5);
+        if (!success)
+            return SString("MD5 could not open file: %s", std::strerror(errno));
+
         return result;
+    }
+
+    // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.
+    // If it's the latter, please leave a code comment somewhere explaining why. Otherwise we'll think it's just code that hasn't been migrated yet.
+    static CChecksum GenerateChecksumFromFileUnsafe(const SString& strFilename)
+    {
+        auto result = GenerateChecksumFromFile(strFilename);
+
+        // If it holds an error message, just return a default CChecksum
+        if (std::holds_alternative<std::string>(result))
+            return CChecksum();
+
+        return std::get<CChecksum>(result);
     }
 
     static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, unsigned long ulLength)

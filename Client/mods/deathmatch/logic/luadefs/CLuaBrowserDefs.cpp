@@ -14,7 +14,7 @@
 void CLuaBrowserDefs::LoadFunctions()
 {
     // Define browser functions
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createBrowser", CreateBrowser},
         {"requestBrowserDomains", RequestBrowserDomains},
         {"loadBrowserURL", LoadBrowserURL},
@@ -49,10 +49,8 @@ void CLuaBrowserDefs::LoadFunctions()
     };
 
     // Add browser functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBrowserDefs::AddClass(lua_State* luaVM)
@@ -928,11 +926,20 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         {
             CClientGUIElement* pGUIElement =
                 CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
-            lua_pushelement(luaVM, pGUIElement);
-            return 1;
+
+            if (pGUIElement)
+            {
+                lua_pushelement(luaVM, pGUIElement);
+                return 1;
+            }
+            else
+            {
+                argStream.SetCustomError("Failed to create browser element", "Create browser");
+            }
         }
     }
-    else
+    
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);

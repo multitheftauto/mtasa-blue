@@ -27,7 +27,7 @@ CResourceManager::~CResourceManager()
 }
 
 CResource* CResourceManager::Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                                 const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP)
+                                 const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     CResource* pResource = new CResource(usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP);
     if (pResource)
@@ -125,9 +125,6 @@ void CResourceManager::Remove(CResource* pResource)
 {
     // Triggger the onStop event, and set resource state to 'stopping'
     pResource->Stop();
-
-    // Delete all the resource's locally created children (the server won't do that)
-    pResource->DeleteClientChildren();
 
     // Delete the resource
     m_resources.remove(pResource);
@@ -247,7 +244,7 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
 }
 
 // Check resource file data matches server checksum
-void CResourceManager::ValidateResourceFile(const SString& strInFilename, const CBuffer& fileData)
+void CResourceManager::ValidateResourceFile(const SString& strInFilename, const char* buffer, size_t bufferSize)
 {
     SString                strFilename = PathConform(strInFilename).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef(m_ResourceFileMap, strFilename);
@@ -262,10 +259,10 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
         else
         {
             CChecksum checksum;
-            if (!fileData.IsEmpty())
-                checksum = CChecksum::GenerateChecksumFromBuffer(fileData.GetData(), fileData.GetSize());
+            if (buffer)
+                checksum = CChecksum::GenerateChecksumFromBuffer(buffer, bufferSize);
             else
-                checksum = CChecksum::GenerateChecksumFromFile(strInFilename);
+                checksum = CChecksum::GenerateChecksumFromFileUnsafe(strInFilename);
             if (checksum != pResourceFile->GetServerChecksum())
             {
                 char szMd5[33];

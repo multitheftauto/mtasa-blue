@@ -33,9 +33,9 @@ BYTE CDamageManagerSA::GetDoorStatus(eDoors bDoor)
     return NULL;
 }
 
-VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus)
+VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent)
 {
-    DEBUG_TRACE("VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus )");
+    DEBUG_TRACE("VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent )");
 
     if (bDoor < MAX_DOORS)
     {
@@ -70,11 +70,11 @@ VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus)
                 DWORD dwFunc = 0x6B1600;
                 DWORD dwThis = (DWORD)internalEntityInterface;
                 DWORD dwDoor = (DWORD)bDoor;
-                bool  bUnknown = false;
+                bool  bQuiet = !spawnFlyingComponent;
                 _asm
                 {
                     mov     ecx, dwThis
-                    push    bUnknown
+                    push    bQuiet
                     push    dwDoor
                     call    dwFunc
                 }

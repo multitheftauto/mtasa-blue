@@ -67,6 +67,18 @@ void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSyste
         delete pFxSystemSA;
 }
 
+CFxSystemBPSAInterface* CFxManagerSA::GetFxSystemBlueprintByName(SString sName)
+{
+    using func_t = CFxSystemBPSAInterface*(__thiscall*)(CFxManagerSAInterface * pInterface, const char* pChars);
+    auto func = reinterpret_cast<func_t>(FUNC_FxManager_c__GetSystemByName);
+    return func(m_pInterface, sName);
+}
+
+bool CFxManagerSA::IsValidFxSystemBlueprintName(SString sName)
+{
+    return GetFxSystemBlueprintByName(sName) != nullptr;
+}
+
 //
 // AddToList/RemoveFromList called from CFxSystemSA constructor/destructor
 //

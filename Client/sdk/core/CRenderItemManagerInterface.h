@@ -126,8 +126,11 @@ struct SDxStatus
         bool         bHUDMatchAspectRatio;
         float        fFieldOfView;
         bool         bHighDetailVehicles;
+        bool         bHighDetailPeds;
     } settings;
 };
+
+using EffectMacroList = std::vector<std::pair<SString, SString>>;
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -149,7 +152,7 @@ public:
                                         uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                         ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1) = 0;
     virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
-                                       bool bLayered, bool bDebug, int iTypeMask) = 0;
+                                       bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros) = 0;
     virtual CRenderTargetItem* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
     virtual CScreenSourceItem* CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
     virtual CWebBrowserItem*   CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
@@ -353,12 +356,12 @@ class CShaderItem : public CMaterialItem
     DECLARE_CLASS(CShaderItem, CMaterialItem)
     CShaderItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                               float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask);
+                               float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
     virtual void OnResetDevice();
-    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug);
+    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug, const EffectMacroList& macros);
     void         ReleaseUnderlyingData();
     virtual bool SetValue(const SString& strName, CTextureItem* pTextureItem);
     virtual bool SetValue(const SString& strName, bool bValue);

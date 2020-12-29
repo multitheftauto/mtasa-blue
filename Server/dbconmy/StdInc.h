@@ -1,5 +1,4 @@
 #ifdef WIN32
-#pragma message("Compiling precompiled header.\n")
 
 #include <windows.h>
 #include <mmsystem.h>

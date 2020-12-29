@@ -16,7 +16,33 @@
 
 #define     MAX_JUMPCODE_SIZE           20
 
-BOOL  HookInstall(DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize);
+template <typename T>
+void* FunctionPointerToVoidP(T func)
+{
+    union
+    {
+        T     a;
+        void* b;
+    } c = {func};
+    return c.b;
+}
+
+template <typename T>
+BOOL HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)
+{
+    BYTE JumpBytes[MAX_JUMPCODE_SIZE];
+    MemSetFast(JumpBytes, 0x90, MAX_JUMPCODE_SIZE);
+    if (CreateJump(dwInstallAddress, (DWORD)FunctionPointerToVoidP(dwHookHandler), JumpBytes))
+    {
+        MemCpy((PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize);
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
+}
+
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
 // Auto detect requirement of US/EU hook installation

@@ -21,6 +21,12 @@ CColSphere::CColSphere(CColManager* pManager, CElement* pParent, const CVector& 
     UpdateSpatialData();
 }
 
+CElement* CColSphere::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColSphere* pColSphere = new CColSphere(m_pManager, GetParentEntity(), m_vecPosition, m_fRadius, IsPartnered());
+    return pColSphere;
+}
+
 bool CColSphere::DoHitDetection(const CVector& vecNowPosition)
 {
     // Do a simple distance check between now position and our position

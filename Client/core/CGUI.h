@@ -29,7 +29,6 @@ class CLocalGUI;
 #include "CSetCursorPosHook.h"
 #include "CSingleton.h"
 #include "CVersionUpdater.h"
-#include "CNewsBrowser.h"
 
 #include <windows.h>
 

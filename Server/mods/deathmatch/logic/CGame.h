@@ -57,12 +57,12 @@ class CGame;
 #include "lua/CLuaManager.h"
 
 #include "CLightsyncManager.h"
+#include "CBanManager.h"
 
 // Forward declarations
 class ASE;
 class CAccessControlListManager;
 class CAccountManager;
-class CBanManager;
 class CBlipManager;
 class CClock;
 class CColManager;
@@ -102,7 +102,7 @@ class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
-
+class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
@@ -182,6 +182,7 @@ public:
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
+        GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
 
@@ -251,6 +252,8 @@ public:
     CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+
+    std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
     void JoinPlayer(CPlayer& Player);
     void InitialDataStream(CPlayer& Player);
@@ -447,9 +450,9 @@ public:
     bool IsBulletSyncActive();
     void SendSyncSettings(CPlayer* pPlayer = NULL);
 
-    SString CalculateMinClientRequirement();
-    bool    IsBelowMinimumClient(const SString& strVersion);
-    bool    IsBelowRecommendedClient(const SString& strVersion);
+    CMtaVersion CalculateMinClientRequirement();
+    bool    IsBelowMinimumClient(const CMtaVersion& strVersion);
+    bool    IsBelowRecommendedClient(const CMtaVersion& strVersion);
     void    ApplyAseSetting();
     bool    IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
 
@@ -495,6 +498,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
+    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
@@ -551,6 +555,8 @@ private:
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;
+
+    std::shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
 
     CCustomWeaponManager* m_pCustomWeaponManager;
     CFunctionUseLogger*   m_pFunctionUseLogger;
@@ -637,9 +643,9 @@ private:
     CLuaMain* m_pLatentSendsLuaMain;
     ushort    m_usLatentSendsResourceNetId;
 
-    SString m_strPrevMinClientKickRequirement;
-    SString m_strPrevMinClientConnectRequirement;
-    SString m_strPrevLowestConnectedPlayerVersion;
+    CMtaVersion m_strPrevMinClientKickRequirement;
+    CMtaVersion m_strPrevMinClientConnectRequirement;
+    CMtaVersion m_strPrevLowestConnectedPlayerVersion;
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 

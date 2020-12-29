@@ -14,6 +14,8 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
     lua_newtable(luaVM);
+
+    // Gather GTASA default skins
     for (int i = 0; i <= 312; i++)
     {
         if (CClientPlayerManager::IsValidModel(i))
@@ -22,6 +24,15 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
             lua_pushnumber(luaVM, i);
             lua_settable(luaVM, -3);
         }
+    }
+
+    // Gather our custom skin model IDs allocated with engineRequestModel
+    // (there might be some < 313 as well, and since we don't want duplicates, we start at 313, others are already included by the loop above)
+    for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED, 313)) 
+    {
+        lua_pushnumber(luaVM, ++iIndex);
+        lua_pushnumber(luaVM, model->GetModelID());
+        lua_settable(luaVM, -3);
     }
 
     return 1;
@@ -199,6 +210,57 @@ int CLuaFunctionDefs::GetLocalization(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
+{
+    const char* readingLayout = "ltr";
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+    DWORD readingLayoutValue = 0;
+
+    if (::GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IREADINGLAYOUT | LOCALE_RETURN_NUMBER, reinterpret_cast<LPWSTR>(&readingLayoutValue),
+                          sizeof(readingLayoutValue) / sizeof(WCHAR)) != 0)
+    {
+        switch (readingLayoutValue)
+        {
+            case 0: // Left to right (English)
+                readingLayout = "ltr";
+                break;
+            case 1: // Right to left (Arabic, Hebrew)
+                readingLayout = "rtl";
+                break;
+            case 2: // Vertical top to bottom with columns to the left and also left to right (Japanese)
+                readingLayout = "ttb-rtl-ltr";
+                break;
+            case 3: // Vertical top to bottom with columns proceeding to the right (Mongolian)
+                readingLayout = "ttb-ltr";
+                break;
+            default:
+                break;
+        }
+    }
+
+#else
+    HKL             keyboardLayout = ::GetKeyboardLayout(0 /* current thread*/);
+    LCID            locale = MAKELCID(LOWORD(keyboardLayout), SORT_DEFAULT);
+    LOCALESIGNATURE localeSignature = {};
+
+    if (GetLocaleInfoW(locale, LOCALE_FONTSIGNATURE, reinterpret_cast<LPWSTR>(&localeSignature), sizeof(localeSignature) / sizeof(WCHAR)) != 0)
+    {
+        if ((localeSignature.lsUsb[3] & 0x08000000) != 0)
+        {
+            readingLayout = "rtl";
+        }
+    }
+#endif
+
+    lua_createtable(luaVM, 0, 1);
+    lua_pushstring(luaVM, "readingLayout");
+    lua_pushstring(luaVM, readingLayout);
+    lua_settable(luaVM, -3);
+    
+    return 1;
+}
+
 int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
 {
     //  table getPerformanceStats ( string category, string options, string filter )
@@ -291,9 +353,9 @@ int CLuaFunctionDefs::GetDevelopmentMode(lua_State* luaVM)
 
 int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
 {
-    SString          strFile = "";
+    SString          strFileInput = "";
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strFile);
+    argStream.ReadString(strFileInput);
 
     if (!argStream.HasErrors())
     {
@@ -302,22 +364,31 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
         if (pLuaMain)
         {
             // Grab its resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
+            CResource* pThisResource = pLuaMain->GetResource();
+            CResource* pOtherResource = pThisResource;
+
+            SString    strMetaPath;
+
+            // Resolve other resource from name
+            if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, NULL, &strMetaPath))
             {
-                std::list<CResourceFile*>::const_iterator iter = pResource->IterBeginResourceFiles();
-                for (; iter != pResource->IterEndResourceFiles(); iter++)
+                std::list<CResourceFile*>::const_iterator iter = pOtherResource->IterBeginResourceFiles();
+                for (; iter != pOtherResource->IterEndResourceFiles(); iter++)
                 {
-                    if (strcmp(strFile, (*iter)->GetShortName()) == 0)
+                    if (strcmp(strMetaPath, (*iter)->GetShortName()) == 0)
                     {
-                        if (CStaticFunctionDefinitions::DownloadFile(pResource, strFile, (*iter)->GetServerChecksum()))
+                        if (CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum()))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
                         }
                     }
                 }
-                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1)));
+                m_pScriptDebugging->LogCustom(luaVM, SString("%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1))));
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: Invalid path", lua_tostring(luaVM, lua_upvalueindex(1)));
             }
         }
     }

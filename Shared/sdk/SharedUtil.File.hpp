@@ -67,6 +67,110 @@ bool SharedUtil::FileLoad(const SString& strFilename, SString& strBuffer, int iM
     return true;
 }
 
+bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outBuffer, size_t maxSize, size_t offset) noexcept
+{
+    outBuffer.clear();
+
+    constexpr unsigned int GIBIBYTE = 1 * 1024 * 1024 * 1024;
+
+    if (offset > GIBIBYTE)
+        return false;
+
+#if WIN32
+    WString wideFilePath;
+
+    try
+    {
+        wideFilePath = FromUTF8(filePath);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return false;
+    }
+
+    WIN32_FILE_ATTRIBUTE_DATA fileAttributeData;
+
+    if (!GetFileAttributesExW(wideFilePath, GetFileExInfoStandard, &fileAttributeData))
+        return false;
+
+    if (fileAttributeData.nFileSizeHigh > 0 || fileAttributeData.nFileSizeLow > GIBIBYTE)
+        return false;
+
+    DWORD fileSize = fileAttributeData.nFileSizeLow;
+
+    if (fileSize == 0 || fileSize <= static_cast<DWORD>(offset))
+        return true;
+
+    HANDLE handle = CreateFileW(wideFilePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (handle == INVALID_HANDLE_VALUE)
+        return false;
+
+    DWORD numBytesToRead = fileSize - static_cast<DWORD>(offset);
+    
+    if (static_cast<size_t>(numBytesToRead) > maxSize)
+        numBytesToRead = static_cast<DWORD>(maxSize);
+
+    try
+    {
+        outBuffer.resize(static_cast<size_t>(numBytesToRead));
+    }
+    catch (const std::bad_alloc&)
+    {
+        CloseHandle(handle);
+        return false;
+    }
+
+    DWORD numBytesFromRead;
+
+    if (!ReadFile(handle, &outBuffer[0], numBytesToRead, &numBytesFromRead, nullptr) || numBytesFromRead != numBytesToRead)
+    {
+        CloseHandle(handle);
+        return false;
+    }
+
+    CloseHandle(handle);
+    return true;
+#else
+    struct stat64 info;
+    
+    if (stat64(filePath, &info) != 0)
+        return false;
+
+    size_t fileSize = static_cast<size_t>(info.st_size);
+
+    if (fileSize > GIBIBYTE)
+        return false;
+
+    if (fileSize == 0 || static_cast<size_t>(fileSize) <= offset)
+        return true;
+
+    size_t numBytesToRead = fileSize - offset;
+
+    if (numBytesToRead > maxSize)
+        numBytesToRead = maxSize;
+
+    try
+    {
+        outBuffer.resize(numBytesToRead);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return false;
+    }
+
+    FILE* handle = fopen(filePath, "rb");
+
+    if (!handle)
+        return false;
+
+    fseek(handle, static_cast<long>(offset), SEEK_SET);
+    size_t numBytesFromRead = fread(&outBuffer[0], 1, numBytesToRead, handle);
+    fclose(handle);
+    return numBytesToRead == numBytesFromRead;
+#endif
+}
+
 bool SharedUtil::FileSave(const SString& strFilename, const SString& strBuffer, bool bForce)
 {
     return FileSave(strFilename, strBuffer.length() ? &strBuffer.at(0) : NULL, strBuffer.length(), bForce);

@@ -18,7 +18,7 @@ CFileReader::CFileReader()
 
 void CFileReader::FreeFileReaderMemory()
 {
-    std::vector<char>().swap(m_vecFileDataBuffer);
+    SString().swap(m_buffer);
     m_u32BytesReadFromBuffer = 0;
 }
 
@@ -26,14 +26,14 @@ void CFileReader::ReadBytes(void* pDestination, const std::uint32_t u32BytesToRe
 {
     const std::uint32_t u32ReadOffset = m_u32BytesReadFromBuffer;
     m_u32BytesReadFromBuffer += u32BytesToRead;
-    memcpy(pDestination, &m_vecFileDataBuffer[u32ReadOffset], u32BytesToRead);
+    memcpy(pDestination, m_buffer.data() + u32ReadOffset, u32BytesToRead);
 }
 
 void CFileReader::ReadStringNullTerminated(char* pDestination, const std::uint32_t u32BytesToRead)
 {
     const std::uint32_t u32ReadOffset = m_u32BytesReadFromBuffer;
     m_u32BytesReadFromBuffer += u32BytesToRead;
-    memcpy(pDestination, &m_vecFileDataBuffer[u32ReadOffset], u32BytesToRead);
+    memcpy(pDestination, m_buffer.data() + u32ReadOffset, u32BytesToRead);
     *(pDestination + (u32BytesToRead - 1)) = '\0';
 }
 
@@ -42,36 +42,13 @@ void CFileReader::SkipBytes(const std::uint32_t u32BytesToSkip)
     m_u32BytesReadFromBuffer += u32BytesToSkip;
 }
 
-bool CFileReader::LoadFileToMemory(const SString& strFilePath)
+bool CFileReader::LoadFromFile(SString filePath) noexcept
 {
-    std::ifstream   fileStream(FromUTF8(strFilePath), std::ios::binary | std::ios::ate);
-    std::streamsize iFileSize = fileStream.tellg();
-    if (iFileSize == eIFSTREAM::SIZE_ERROR)
-    {
-        return false;
-    }
-
-    fileStream.seekg(0, std::ios::beg);
-    m_vecFileDataBuffer.reserve(static_cast<size_t>(iFileSize));
-    if (fileStream.read(m_vecFileDataBuffer.data(), iFileSize))
-    {
-        return true;
-    }
-    return false;
+    return FileLoad(std::nothrow, filePath, m_buffer);
 }
 
-bool CFileReader::LoadDataBufferToMemory(const SString& buffer)
+bool CFileReader::LoadFromBuffer(SString buffer) noexcept
 {
-    std::streamsize iBufferSize = buffer.size();
-    if (iBufferSize == eIFSTREAM::SIZE_ERROR)
-    {
-        return false;
-    }
-
-    m_vecFileDataBuffer.reserve(static_cast<size_t>(iBufferSize));
-    if (std::copy(buffer.begin(), buffer.end(), m_vecFileDataBuffer.data()))
-    {
-        return true;
-    }
-    return false;
+    m_buffer.swap(buffer);
+    return true;
 }

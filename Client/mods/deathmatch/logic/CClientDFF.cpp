@@ -54,8 +54,8 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         {
             if (g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
             {
-                g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strDffFilename, CBuffer());
-                info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, CBuffer(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
+                g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strDffFilename, nullptr, 0);
+                info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, SString(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
             }
         }
         else            // We have raw data
@@ -63,40 +63,28 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
             info.pClump = g_pGame->GetRenderWare()->ReadDFF(NULL, m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel(usModelId));
 
             // Remove raw data from memory (can only do one replace when using raw data)
-            m_RawDataBuffer = CBuffer();
+            SString().swap(m_RawDataBuffer);
         }
     }
 
     return info.pClump;
 }
 
-bool CClientDFF::LoadDFF(const SString& strFile, bool bIsRawData)
+bool CClientDFF::Load(bool isRaw, SString input)
 {
-    // Should only be called once, directly after construction
-    m_bIsRawData = bIsRawData;
-    if (!m_bIsRawData)            // If we have actual file
+    if (input.empty())
+        return false;
+
+    m_bIsRawData = isRaw;
+
+    if (isRaw)
     {
-        assert(m_strDffFilename.empty());
-
-        m_strDffFilename = strFile;
-        if (m_strDffFilename.empty())
-            return false;
-
-        if (!FileExists(m_strDffFilename))
-            return false;
-
-        if (!g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
-            return false;
+        return LoadFromBuffer(std::move(input));
     }
     else
     {
-        m_RawDataBuffer = CBuffer(strFile, strFile.length());
-        if (!g_pCore->GetNetwork()->CheckFile("dff", "", m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize()))
-            return false;
+        return LoadFromFile(std::move(input));
     }
-
-    // Do actual load later (in ReplaceModel)
-    return true;
 }
 
 void CClientDFF::UnloadDFF()
@@ -125,6 +113,27 @@ bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     return bResult;
 }
 
+bool CClientDFF::LoadFromFile(SString filePath)
+{
+    if (!FileExists(filePath))
+        return false;
+
+    if (!g_pCore->GetNetwork()->CheckFile("dff", filePath))
+        return false;
+
+    m_strDffFilename = std::move(filePath);
+    return true;
+}
+
+bool CClientDFF::LoadFromBuffer(SString buffer)
+{
+    if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
+        return false;
+
+    m_RawDataBuffer = std::move(buffer);
+    return true;
+}
+
 bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
 {
     if (!CClientDFFManager::IsReplacableModel(usModel))
@@ -151,6 +160,10 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         {
             return ReplaceVehicleModel(pClump, usModel, bAlphaTransparency);
         }
+        else if (CClientPlayerManager::IsValidModel(usModel))
+        {
+            return ReplacePedModel(pClump, usModel, bAlphaTransparency);
+        }
         else if (CClientObjectManager::IsValidModel(usModel))
         {
             if (CVehicleUpgrades::IsUpgrade(usModel))
@@ -165,10 +178,6 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
                 return ReplaceWeaponModel(pClump, usModel, bAlphaTransparency);
             }
             return ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
-        }
-        else if (CClientPlayerManager::IsValidModel(usModel))
-        {
-            return ReplacePedModel(pClump, usModel, bAlphaTransparency);
         }
     }
 
@@ -224,7 +233,14 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         // eventually stream them back in with async loading.
         m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
     }
-
+    // Is this an ped ID?
+    else if (CClientPlayerManager::IsValidModel(usModel))
+    {
+        // Stream the ped of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetPedManager()->RestreamPeds(usModel);
+    }
     // Is this an object ID?
     else if (CClientObjectManager::IsValidModel(usModel))
     {
@@ -242,19 +258,13 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         m_pManager->GetObjectManager()->RestreamObjects(usModel);
         g_pGame->GetModelInfo(usModel)->RestreamIPL();
     }
-    // Is this an ped ID?
-    else if (CClientPlayerManager::IsValidModel(usModel))
-    {
-        // Stream the ped of that model out so we have no
-        // loaded when we do the restore. The streamer will
-        // eventually stream them back in with async loading.
-        m_pManager->GetPedManager()->RestreamPeds(usModel);
-    }
     else
         return;
 
     // Restore all the models we replaced.
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    pModelInfo->ResetVehicleDummies(true);
+    pModelInfo->ResetVehicleWheelSizes();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
 
@@ -343,6 +353,8 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
     pModelInfo->SetCustomModel(pClump);
 
+    pModelInfo->ResetVehicleWheelSizes();
+
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
     // Remember that we've replaced that vehicle model
@@ -360,5 +372,5 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 // Return true if data looks like DFF file contents
 bool CClientDFF::IsDFFData(const SString& strData)
 {
-    return strData.length() > 32 && memcmp(strData, "\x10\x00\x00\x00", 4) == 0;
+    return strData.length() > 32 && (memcmp(strData, "\x10\x00\x00\x00", 4) == 0 || memcmp(strData, "\x2B\x00\x00\x00", 4) == 0);
 }

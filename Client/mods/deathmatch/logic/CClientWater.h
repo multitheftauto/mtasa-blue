@@ -40,7 +40,6 @@ private:
     bool                 m_bTriangle;            // Is this water a triangle or a quad type?
     bool                 m_bShallow;             // Shallow water?
     std::vector<CVector> m_Vertices;             // List of vertices for this water
-    unsigned short       m_usDimension;
 
     friend class CClientWaterManager;
 };

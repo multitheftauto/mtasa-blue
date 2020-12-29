@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.x
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaAudioDefs.cpp
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaAudioDefs.cpp
  *  PURPOSE:     Lua audio definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -13,7 +13,7 @@
 
 void CLuaAudioDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Audio funcs
         {"playSoundFrontEnd", PlaySoundFrontEnd},
         {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
@@ -65,10 +65,8 @@ void CLuaAudioDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaAudioDefs::AddClass(lua_State* luaVM)
@@ -87,7 +85,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setVolume", "setSoundVolume");
     lua_classfunction(luaVM, "setPaused", "setSoundPaused");
     lua_classfunction(luaVM, "setPan", "setSoundPan");
-    lua_classfunction(luaVM, "setPannningEnabled", "setSoundPanningEnabled");
+    lua_classfunction(luaVM, "setPanningEnabled", "setSoundPanningEnabled");
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
 
     lua_classfunction(luaVM, "getLength", "getSoundLength");
@@ -153,16 +151,23 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
             {
                 SString strFilename;
                 bool    bIsURL = false;
+                bool    bIsRawData = false;
                 if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
                     strSound = strFilename;
                 else
-                    bIsURL = true;
+                {
+                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0)
+                        && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
+                        bIsURL = true;
+                    else
+                        bIsRawData = true;
+                }
 
                 // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
                 // ) Fixes #6507 - Caz
                 if (pResource)
                 {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSound, bIsURL, bLoop, bThrottle);
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSound, bIsURL, bIsRawData, bLoop, bThrottle);
                     if (pSound)
                     {
                         // call onClientSoundStarted
@@ -206,16 +211,23 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
             {
                 SString strFilename;
                 bool    bIsURL = false;
+                bool    bIsRawData = false;
                 if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
                     strSound = strFilename;
                 else
-                    bIsURL = true;
+                {
+                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0)
+                        && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
+                        bIsURL = true;
+                    else
+                        bIsRawData = true;
+                }
 
                 // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
                 // ) Fixes #6507 - Caz
                 if (pResource)
                 {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSound, bIsURL, vecPosition, bLoop, bThrottle);
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSound, bIsURL, bIsRawData, vecPosition, bLoop, bThrottle);
                     if (pSound)
                     {
                         // call onClientSoundStarted

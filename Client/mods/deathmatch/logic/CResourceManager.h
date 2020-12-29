@@ -32,7 +32,7 @@ public:
     ~CResourceManager();
 
     CResource* Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                   const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP);
+                   const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
     CResource* GetResource(const char* szResourceName);
     CResource* GetResourceFromNetID(unsigned short usNetID);
     CResource* GetResourceFromScriptID(uint uiScriptID);
@@ -51,7 +51,7 @@ public:
     void                   OnDownloadedResourceFile(const SString& strFilename);
     bool                   IsResourceFile(const SString& strFilename);
     void                   OnFileModifedByScript(const SString& strFilename, const SString& strReason);
-    void                   ValidateResourceFile(const SString& strFilename, const CBuffer& fileData);
+    void                   ValidateResourceFile(const SString& strFilename, const char* buffer, size_t bufferSize);
     CDownloadableResource* GetDownloadableResourceFile(const SString& strFilename) { return MapFindRef(m_ResourceFileMap, strFilename); }
 
     static bool ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr);

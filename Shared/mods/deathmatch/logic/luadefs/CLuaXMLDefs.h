@@ -19,6 +19,7 @@ public:
 
     LUA_DECLARE(xmlCreateFile);
     LUA_DECLARE(xmlLoadFile);
+    LUA_DECLARE(xmlLoadString);
     LUA_DECLARE(xmlCopyFile);
     LUA_DECLARE(xmlSaveFile);
     LUA_DECLARE(xmlUnloadFile);

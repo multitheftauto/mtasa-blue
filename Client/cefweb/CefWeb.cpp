@@ -12,15 +12,16 @@
 #include "SharedUtil.hpp"
 
 CCoreInterface* g_pCore = NULL;
+CLocalizationInterface* g_pLocalization = nullptr;
 
 extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInterface* pCore)
 {
     g_pCore = pCore;
+    g_pLocalization = pCore->GetLocalization();
 
     // Ensure main thread identification is consistent
     IsMainThread();
 
     CWebCore* pWebCore = new CWebCore;
-    pWebCore->Initialise();
     return pWebCore;
 }

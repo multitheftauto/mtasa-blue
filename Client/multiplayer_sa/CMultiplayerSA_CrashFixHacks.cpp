@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CTrainSA.h"
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
+
+extern CCoreInterface* g_pCore;
 
 void CPlayerPed__ProcessControl_Abort();
 
@@ -142,14 +145,15 @@ DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
 DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
 void _declspec(naked) HOOK_CrashFix_Misc5()
 {
-    _asm
-    {
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+    _asm {
+        mov edi, dword ptr[ARRAY_ModelInfo]
+        mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont        // Skip much code if edi is zero (ped has no model)
+        je      cont            // Skip much code if edi is zero (ped has no model)
 
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+        mov edi, dword ptr[ARRAY_ModelInfo]
+        mov     edi, dword ptr [ecx*4+edi]
         jmp     RETURN_CrashFix_Misc5
     cont:
         push    5
@@ -996,20 +1000,9 @@ inner:
     }
 }
 
-struct CStreamingInfo
-{
-    DWORD gta_hash;
-    WORD  chain_next;
-    uchar flg;
-    uchar archiveId;
-    DWORD offsetInBlocks;
-    DWORD sizeInBlocks;
-    DWORD reqload;
-};
-
 CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 {
-    CStreamingInfo* pItemInfo = (CStreamingInfo*)(0x8E4CC0);
+    CStreamingInfo* pItemInfo = (CStreamingInfo*)(CStreaming__ms_aInfoForModel);
     return pItemInfo + id;
 }
 
@@ -1022,7 +1015,7 @@ CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 {
-    ushort                     usModelId = pEntity->m_nModelIndex;
+    uint32                     usModelId = pEntity->m_nModelIndex;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelId];
     if (!pModelInfo)
     {
@@ -1039,11 +1032,11 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         if (!pColModel)
         {
             // Crash will occur at offset 00134134
-            CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId(usModelId);
-            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d reqload:%d", pModelInfo->usNumberOfRefs,
+            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfoFromModelId(usModelId);
+            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
                                pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
                                pModelInfo->bCollisionWasStreamedWithModel, pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,
-                               pStreamingInfo->reqload);
+                               pStreamingInfo->loadState);
             LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
             CArgMap argMap;
             argMap.Set("id", usModelId);
@@ -1054,10 +1047,10 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_GetBoundRect                      0x53412A
-#define HOOKSIZE_CEntity_GetBoundRect                     7
+#define HOOKPOS_CEntity_GetBoundRect                      0x534131
+#define HOOKSIZE_CEntity_GetBoundRect                     5
 #define HOOKCHECK_CEntity_GetBoundRect                    0x8B
-DWORD RETURN_CEntity_GetBoundRect = 0x534131;
+DWORD RETURN_CEntity_GetBoundRect = 0x534136;
 void _declspec(naked) HOOK_CEntity_GetBoundRect()
 {
     _asm
@@ -1069,7 +1062,8 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
         popad
 
         // Continue replaced code
-        mov     ecx,dword ptr [eax*4+0A9B0C8h]
+        mov     eax, [ecx+14h]
+        mov     edx, [eax]
         jmp     RETURN_CEntity_GetBoundRect
     }
 }
@@ -1313,7 +1307,11 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         popad
 
         // Replaced code
-        mov     eax, 0x0A9B0C8[eax*4]
+        push    ecx
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
     }
 }
@@ -1521,6 +1519,272 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
     }
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CStreaming_AreAnimsUsedByRequestedModels
+//
+// GTA streamer will use this function to decide if IFP blocks should be unloaded or not.
+// We will return true to disable unloading.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
+{
+    // GTA SA possibly cannot have more than 200 IFP blocks since that's the limit
+    const int maximumIFPBlocks = 200;
+    if (modelID < 0 || modelID > maximumIFPBlocks)
+    {
+        return false;
+    }
+
+    std::unique_ptr<CAnimBlock> pInternalBlock = g_pCore->GetGame()->GetAnimManager()->GetAnimationBlock(modelID);
+    if (!pInternalBlock->IsLoaded())
+    {
+        return false;
+    }
+    return true;
+}
+
+// Hook info
+#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels                0x407AD5
+#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               7
+void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
+{
+    _asm
+    {
+        push    [esp + 4]
+        call    OnMY_CStreaming_AreAnimsUsedByRequestedModels
+        add     esp, 0x4
+        retn
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTrain::ProcessControl
+//
+// This hook overwrites the logic to wrap the train's rail distance, because in the
+// original game code this could cause an infinite loop
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6F8F83 | 88 9E CA 05 00 00 | mov     [esi + 5CAh], bl
+// >>> 0x6F8F89 | D9 86 A8 05 00 00 | fld     dword ptr [esi + 5A8h]
+//     0x6F8F8F | D8 1D 50 8B 85 00 | fcomp   ds: __real @00000000
+#define HOOKPOS_CTrain__ProcessControl         0x6F8F89
+#define HOOKSIZE_CTrain__ProcessControl        6
+static DWORD CONTINUE_CTrain__ProcessControl = 0x6F8FE5;
+
+// 0xC37FEC; float RailTrackLength[NUM_TRACKS]
+static float* RailTrackLength = reinterpret_cast<float*>(0xC37FEC);
+
+static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
+{
+    // Check if the train is driving on a valid rail track (id < NUM_TRACKS)
+    if (train->m_ucRailTrackID >= 4)
+    {
+        train->m_fTrainRailDistance = 0.0f;
+        return;
+    }
+
+    // Check if the current rail track has a valid length (>= 1.0f)
+    const float railTrackLength = RailTrackLength[train->m_ucRailTrackID];
+
+    if (railTrackLength < 1.0f)
+    {
+        train->m_fTrainRailDistance = 0.0f;
+        return;
+    }
+
+    // Check if the current rail distance is in the interval [0, railTrackLength)
+    float railDistance = train->m_fTrainRailDistance;
+
+    if (railDistance >= 0.0f && railDistance < railTrackLength)
+        return;
+
+    // Wrap the current rail distance
+    if (railDistance > 0.0f)
+    {
+        railDistance = std::fmodf(railDistance, railTrackLength);
+    }
+    else
+    {
+        railDistance = railTrackLength - std::fmodf(std::fabsf(railDistance), railTrackLength);
+    }
+
+    train->m_fTrainRailDistance = railDistance;
+}
+
+static void _declspec(naked) HOOK_CTrain__ProcessControl()
+{
+    _asm
+    {
+        pushad
+        push    esi            // CVehicleSAInterface*
+        call    WrapTrainRailDistance
+        add     esp, 4
+        popad
+        jmp     CONTINUE_CTrain__ProcessControl
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask
+//
+// This hook adds a null-pointer check for eax, which stores the ped's current vehicle.
+// Returning a null-pointer from this function will prevent the animation from being played.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x648AAC | C2 04 00             | retn   4
+// >>> 0x648AAF | 8B 80 84 03 00 00    | mov    eax, [eax + 384h]
+//     0x648AB5 | 0F B6 80 DE 00 00 00 | movzx  eax, byte ptr [eax + 0DEh]
+#define HOOKPOS_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask         0x648AAF
+#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask        6
+static DWORD CONTINUE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask = 0x648AB5;
+
+static void _cdecl LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
+{
+    LogEvent(819, "CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask", "eax is null", "");
+}
+
+static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
+{
+    _asm
+    {
+        test    eax, eax
+        jz      returnZeroTaskLocation
+        mov     eax, [eax + 384h]
+        jmp     CONTINUE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask
+
+        returnZeroTaskLocation:
+        pushad
+        call    LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask
+        popad
+        pop     edi
+        pop     esi
+        retn    4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVehicleModelInfo::LoadVehicleColours
+//
+// A modified data/carcols.dat can have entries with invalid model names and these cause
+// CModelInfo::GetModelInfo to return a null pointer, but the original code doesn't verify
+// the return value and tries to use the null pointer. This hook adds a null pointer check
+// and then skips the line if in the null case. There are two locations to hook.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void _cdecl LOG_CVehicleModelInfo__LoadVehicleColours(int location, const char* modelName)
+{
+    LogEvent(820 + location, "CVehicleModelInfo::LoadVehicleColours", "Could not find model by name:", modelName);
+}
+
+//     0x5B6B1B | E8 20 EE F0 FF | call  CModelInfo::GetModelInfo
+// >>> 0x5B6B20 | 8B F0          | mov   esi, eax
+//     0x5B6B22 | 8D 47 FF       | lea   eax, [edi - 1]
+//     0x5B6B25 | 99             | cdq
+#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_1         0x5B6B20
+#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_1        5
+static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6B25;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1     = 0x5B6D04;
+
+static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
+{
+    _asm
+    {
+        test    eax, eax
+        jnz     continueLoadingColorLineLocation
+        
+        pushad
+        lea     ecx, [esp + 55Ch - 440h]
+        push    ecx
+        push    0
+        call    LOG_CVehicleModelInfo__LoadVehicleColours
+        add     esp, 8
+        popad
+
+        add     esp, 54h
+        jmp     SKIP_CVehicleModelInfo__LoadVehicleColours_1
+
+        continueLoadingColorLineLocation:
+        mov     esi, eax
+        lea     eax, [edi - 1]
+        jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_1
+    }
+}
+
+//     0x5B6CA5 | E8 96 EC F0 FF | call  CModelInfo::GetModelInfo
+// >>> 0x5B6CAA | 8B F0          | mov   esi, eax
+//     0x5B6CAC | 8D 47 FF       | lea   eax, [edi - 1]
+//     0x5B6CAF | 99             | cdq
+#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_2         0x5B6CAA
+#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_2        5
+static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6CAF;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2     = 0x5B6D04;
+
+static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
+{
+    _asm
+    {
+        test    eax, eax
+        jnz     continueLoadingColorLineLocation
+        
+        pushad
+        lea     ecx, [esp + 59Ch - 440h]
+        push    ecx
+        push    1
+        call    LOG_CVehicleModelInfo__LoadVehicleColours
+        add     esp, 8
+        popad
+
+        add     esp, 94h
+        jmp     SKIP_CVehicleModelInfo__LoadVehicleColours_2
+
+        continueLoadingColorLineLocation:
+        mov     esi, eax
+        lea     eax, [edi - 1]
+        jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_2
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CPlaceName::Process
+//
+// Prevent the original game code from accessing the ped's vehicle, when it's a null pointer
+// and the ped flag bInVehicle is set by setting the ped flag to zero.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x571F37 | 8B F1             | mov   esi, ecx
+// >>> 0x571F39 | 8B 88 6C 04 00 00 | mov   ecx, [eax + 46Ch]
+//     0x571F3F | F6 C5 01          | test  ch, 1
+#define HOOKPOS_CPlaceName__Process         0x571F39
+#define HOOKSIZE_CPlaceName__Process        6
+static DWORD CONTINUE_CPlaceName__Process = 0x571F3F;
+
+static void _declspec(naked) HOOK_CPlaceName__Process()
+{
+    _asm
+    {
+        pushad
+        mov     ecx, [eax + 46Ch]
+        test    ch, 1                       // if (ped->pedFlags.bInVehicle
+        jz      continueAfterFixLocation
+        mov     ebx, [eax + 58Ch]           //     && !ped->m_pVehicle)
+        test    ebx, ebx
+        jnz     continueAfterFixLocation
+        and     ch, 0FEh
+        mov     dword ptr [eax + 46Ch], ecx // ped->pedFlags.bInVehicle = 0
+
+        continueAfterFixLocation:
+        popad
+        mov     ecx, [eax + 46Ch]
+        jmp     CONTINUE_CPlaceName__Process
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -1566,9 +1830,15 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CVolumetricShadowMgr_Update);
     EZHookInstallChecked(CAnimManager_CreateAnimAssocGroups);
     EZHookInstall(CAnimBlendNode_GetCurrentTranslation);
+    EZHookInstall(CStreaming_AreAnimsUsedByRequestedModels);
     EZHookInstall(CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask);
     EZHookInstallChecked(printf);
     EZHookInstallChecked(RwMatrixMultiply);
+    EZHookInstall(CTrain__ProcessControl);
+    EZHookInstall(CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask);
+    EZHookInstall(CVehicleModelInfo__LoadVehicleColours_1);
+    EZHookInstall(CVehicleModelInfo__LoadVehicleColours_2);
+    EZHookInstall(CPlaceName__Process);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

@@ -143,11 +143,11 @@ public:
     void ProcessMinClientVersion(CBitStream& bitStream)
     {
         int     iForceSetting = 0;
-        SString strResultMinClientVersion;
+        CMtaVersion strResultMinClientVersion;
 
         bitStream->Read(iForceSetting);
         bitStream->ReadStr(strResultMinClientVersion);
-        SString strSetttingsMinClientVersion = g_pGame->GetConfig()->GetMinClientVersion();
+        CMtaVersion strSetttingsMinClientVersion = g_pGame->GetConfig()->GetMinClientVersion();
         if (strResultMinClientVersion > strSetttingsMinClientVersion || iForceSetting)
         {
             g_pGame->GetConfig()->SetSetting("minclientversion", strResultMinClientVersion, true);

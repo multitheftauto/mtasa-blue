@@ -36,7 +36,7 @@ static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutC
 
 void CLuaGUIDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"guiGetInputEnabled", GUIGetInputEnabled},
         {"guiSetInputEnabled", GUISetInputEnabled},
         {"guiGetInputMode", GUIGetInputMode},
@@ -195,10 +195,8 @@ void CLuaGUIDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaGUIDefs::AddClass(lua_State* luaVM)
@@ -283,8 +281,6 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
-    lua_classvariable(luaVM, "screenSize", NULL, "guiGetScreenSize");
-    // lua_classvariable ( luaVM, "property" "guiSetProperty", "guiGetProperty" ); todo: .property[name] = value
 
     lua_registerclass(luaVM, "GuiElement", "Element");
 }
@@ -354,7 +350,6 @@ void CLuaGUIDefs::AddGuiLabelClass(lua_State* luaVM)
     lua_classvariable(luaVM, "verticalAlign", "guiLabelSetVerticalAlign", NULL);
     lua_classvariable(luaVM, "fontHeight", NULL, "guiLabelGetFontHeight");
     lua_classvariable(luaVM, "textExtent", NULL, "guiLabelGetTextExtent");
-    //    lua_classvariable ( luaVM, "color", "guiLabelGetColor", "guiLabelSetColor" );
 
     lua_registerclass(luaVM, "GuiLabel", "GuiElement");
 }
@@ -385,6 +380,7 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
+    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
 
@@ -543,10 +539,6 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classvariable(luaVM, "sortingEnabled", "guiGridListSetSortingEnabled", "guiGridListIsSortingEnabled");
     lua_classvariable(luaVM, "horizontalScrollPosition", "guiGridListSetHorizontalScrollPosition", "guiGridListGetHorizontalScrollPosition");
     lua_classvariable(luaVM, "verticalScrollPosition", "guiGridListGetVerticalScrollPosition", "guiGridListGetVerticalScrollPosition");
-    // lua_classvariable ( luaVM, "selectedItem", NULL, "guiGridListGetSelectedItem" ); table
-    // lua_classvariable ( luaVM, "selectedItem", "guiGridListSetSelectedItem", NULL ); .selectedItem[column] = row (row in column) table
-    // lua_classvariable ( luaVM, "itemColor", "setItemColor", "getItemColor" ); table
-    // lua_classvariable ( luaVM, "columnTitle", "setColumnTitle", "getColumnTitle" ); table
 
     lua_registerclass(luaVM, "GuiGridList", "GuiElement");
 }
@@ -794,9 +786,19 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
             SString    strPath;
             if (CResourceManager::ParseResourcePathInput(path, pResource, &strPath))
             {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                lua_pushelement(luaVM, pGUIElement);
-                return 1;
+                if (FileExists(strPath))
+                {
+                    CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
+                    if (pGUIElement != nullptr)
+                    {
+                        lua_pushelement(luaVM, pGUIElement);
+                        return 1;
+                    }
+                    else
+                        argStream.SetCustomError(path, "Failed to create static image");
+                }
+                else
+                    argStream.SetCustomError(path, "File not found");
             }
             else
                 argStream.SetCustomError(path, "Bad file path");
@@ -3186,7 +3188,7 @@ int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIEdit>(theElement);
-    
+
     if (!argStream.HasErrors())
     {
         bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
@@ -3468,7 +3470,7 @@ int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    
+
     // error: bad arguments
     lua_pushnil(luaVM);
     return 1;
@@ -3724,7 +3726,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                     else
                         lua_pushnumber(luaVM, fNumber);
                 }
-                
+
                 // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
                 if (bAll)
                     lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);

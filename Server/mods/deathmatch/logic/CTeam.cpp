@@ -53,7 +53,7 @@ bool CTeam::ReadSpecialData(const int iLine)
 
     // Grab the "color" data
     int iTemp;
-    if (GetCustomDataString("color", szTemp, MAX_TEAM_NAME, true))
+    if (GetCustomDataString("color", szTemp, 64, true))
     {
         // Convert it to RGBA
         unsigned char ucAlpha;
@@ -67,22 +67,14 @@ bool CTeam::ReadSpecialData(const int iLine)
     {
         if (GetCustomDataInt("colorR", iTemp, true))
             m_ucRed = static_cast<unsigned char>(iTemp);
-        else
-            m_ucRed = 255;
         if (GetCustomDataInt("colorG", iTemp, true))
             m_ucGreen = static_cast<unsigned char>(iTemp);
-        else
-            m_ucGreen = 255;
         if (GetCustomDataInt("colorB", iTemp, true))
             m_ucBlue = static_cast<unsigned char>(iTemp);
-        else
-            m_ucBlue = 255;
     }
 
     if (!GetCustomDataBool("friendlyfire", m_bFriendlyFire, true))
-    {
         m_bFriendlyFire = true;
-    }
 
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);

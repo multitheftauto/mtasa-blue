@@ -12,7 +12,9 @@
 #pragma once
 
 #include "CModelInfoSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
+#include <game/CStreaming.h>
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
@@ -32,7 +34,7 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_MAX                   26000       // Actual max is 25755
+extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -95,6 +97,9 @@ struct SCheatSA
         m_bCanBeSet = bCanBeSet;
     }
 };
+
+class CAnimBlendClumpDataSAInterface;
+
 class CGameSA : public CGame
 {
     friend class COffsets;
@@ -102,8 +107,8 @@ class CGameSA : public CGame
 
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA ModelInfo[MODELINFO_MAX];
-
+    CModelInfoSA* ModelInfo;
+    CObjectGroupPhysicalPropertiesSA* ObjectGroupsInfo;
 public:
     ZERO_ON_NEW
 
@@ -236,11 +241,6 @@ public:
         DEBUG_TRACE("CMenuManager         * GetMenuManager()");
         return m_pMenuManager;
     };
-    CText* GetText()
-    {
-        DEBUG_TRACE("CText                    * GetText()");
-        return m_pText;
-    };
     CStats* GetStats()
     {
         DEBUG_TRACE("CStats                   * GetStats()");
@@ -305,8 +305,19 @@ public:
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
-    CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*  GetModelInfo(DWORD dwModelID);
+    CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
+    CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
+
+    int32_t GetBaseIDforDFF() { return 0; }
+    int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
+    int32_t GetBaseIDforCOL() { return *(int32_t*)(0x410344 + 2); }
+    int32_t GetBaseIDforIPL() { return *(int32_t*)(0x4044F4 + 2); }
+    int32_t GetBaseIDforDAT() { return *(int32_t*)(0x44D064 + 2); }
+    int32_t GetBaseIDforIFP() { return *(int32_t*)(0x407124 + 2); }
+    int32_t GetBaseIDforRRR() { return *(int32_t*)(0x4594A1 + 2); }
+    int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
+    int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime()
     {
@@ -408,12 +419,15 @@ public:
     bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
+    void         FixModelCol(uint iFixModel, uint iFromModel);
+    void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
     void         FlushPendingRestreamIPL();
     void         ResetModelLodDistances();
     void         ResetAlphaTransparencies();
     void         DisableVSync();
+    void         ResetModelTimes();
 
     void  OnPedContextChange(CPed* pPedContext);
     CPed* GetPedContext();
@@ -423,45 +437,47 @@ public:
     void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
     void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
+    CAnimBlendClumpDataSAInterface** GetClumpData(RpClump* clump) { return RWPLUGINOFFSET(CAnimBlendClumpDataSAInterface*, clump, ClumpOffset); }
 
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
 private:
-    CPools*             m_pPools;
-    CPlayerInfo*        m_pPlayerInfo;
-    CProjectileInfo*    m_pProjectileInfo;
-    CRadar*             m_pRadar;
-    CRestart*           m_pRestart;
-    CClock*             m_pClock;
-    CCoronas*           m_pCoronas;
-    CCheckpoints*       m_pCheckpoints;
-    CEventList*         m_pEventList;
-    CFireManager*       m_pFireManager;
-    CGarages*           m_pGarages;
-    CHud*               m_pHud;
-    CWanted*            m_pWanted;
-    CWeather*           m_pWeather;
-    CWorld*             m_pWorld;
-    CCamera*            m_pCamera;
-    CModelInfo*         m_pModelInfo;
-    CPickups*           m_pPickups;
-    CWeaponInfo*        m_pWeaponInfo;
-    CExplosionManager*  m_pExplosionManager;
-    C3DMarkers*         m_p3DMarkers;
-    CRenderWareSA*      m_pRenderWare;
-    CHandlingManager*   m_pHandlingManager;
-    CAnimManager*       m_pAnimManager;
-    CStreaming*         m_pStreaming;
-    CVisibilityPlugins* m_pVisibilityPlugins;
-    CKeyGen*            m_pKeyGen;
-    CRopes*             m_pRopes;
-    CFx*                m_pFx;
-    CFxManagerSA*       m_pFxManager;
-    CWaterManager*      m_pWaterManager;
-    CWeaponStatManager* m_pWeaponStatsManager;
-    CPointLights*       m_pPointLights;
+    CPools*                         m_pPools;
+    CPlayerInfo*                    m_pPlayerInfo;
+    CProjectileInfo*                m_pProjectileInfo;
+    CRadar*                         m_pRadar;
+    CRestart*                       m_pRestart;
+    CClock*                         m_pClock;
+    CCoronas*                       m_pCoronas;
+    CCheckpoints*                   m_pCheckpoints;
+    CEventList*                     m_pEventList;
+    CFireManager*                   m_pFireManager;
+    CGarages*                       m_pGarages;
+    CHud*                           m_pHud;
+    CWanted*                        m_pWanted;
+    CWeather*                       m_pWeather;
+    CWorld*                         m_pWorld;
+    CCamera*                        m_pCamera;
+    CModelInfo*                     m_pModelInfo;
+    CPickups*                       m_pPickups;
+    CWeaponInfo*                    m_pWeaponInfo;
+    CExplosionManager*              m_pExplosionManager;
+    C3DMarkers*                     m_p3DMarkers;
+    CRenderWareSA*                  m_pRenderWare;
+    CHandlingManager*               m_pHandlingManager;
+    CAnimManager*                   m_pAnimManager;
+    CStreaming*                     m_pStreaming;
+    CVisibilityPlugins*             m_pVisibilityPlugins;
+    CKeyGen*                        m_pKeyGen;
+    CRopes*                         m_pRopes;
+    CFx*                            m_pFx;
+    CFxManagerSA*                   m_pFxManager;
+    CWaterManager*                  m_pWaterManager;
+    CWeaponStatManager*             m_pWeaponStatsManager;
+    CPointLights*                   m_pPointLights;
+    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;
@@ -471,7 +487,6 @@ private:
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
     CMenuManager*             m_pMenuManager;
-    CText*                    m_pText;
     CStats*                   m_pStats;
     CFont*                    m_pFont;
     CPathFind*                m_pPathFind;
@@ -489,6 +504,7 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
 
+    static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
     static unsigned long* VAR_IsGameLoaded;
@@ -508,6 +524,6 @@ private:
 
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
 
-    CPed*      m_pPedContext;
-    CTickCount m_llASyncLoadingAutoUnsuspendTime;
+    CPed*                m_pPedContext;
+    CTickCount           m_llASyncLoadingAutoUnsuspendTime;
 };

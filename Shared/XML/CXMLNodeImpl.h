@@ -24,6 +24,12 @@ public:
     CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
     ~CXMLNodeImpl();
 
+    // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying TiXmlElement.
+    //
+    // This is **only** used for xmlLoadString right now.
+    // Look elsewhere if you're thinking about XML files. It does things a different way.
+    void BuildFromDocument();
+
     CXMLNode* CreateSubNode(const char* szTagName, CXMLNode* pInsertBefore = nullptr);
     void      DeleteSubNode(CXMLNode* pNode) { delete pNode; };
     void      DeleteAllSubNodes();
@@ -59,7 +65,7 @@ public:
     eXMLClass     GetClassType() { return CXML_NODE; };
     unsigned long GetID()
     {
-        dassert(m_pFile && m_pFile->IsUsingIDs());
+        dassert((!m_pFile) || m_pFile && m_pFile->IsUsingIDs());
         return m_ulID;
     };
     bool IsUsingIDs() { return m_bUsingIDs; };

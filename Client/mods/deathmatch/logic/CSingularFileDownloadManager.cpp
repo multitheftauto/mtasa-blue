@@ -23,9 +23,9 @@ CSingularFileDownloadManager::~CSingularFileDownloadManager()
 }
 
 CSingularFileDownload* CSingularFileDownloadManager::AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL,
-                                                             CChecksum checksum)
+                                                             CResource* pRequestResource, CChecksum checksum)
 {
-    CSingularFileDownload* pFile = new CSingularFileDownload(pResource, szName, szNameShort, strHTTPURL, checksum);
+    CSingularFileDownload* pFile = new CSingularFileDownload(pResource, szName, szNameShort, strHTTPURL, pRequestResource, checksum);
     m_Downloads.push_back(pFile);
     return NULL;
 }

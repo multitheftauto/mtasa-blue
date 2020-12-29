@@ -271,6 +271,12 @@ ADD_ENUM(CAccountPassword::SHA256, "sha256")
 ADD_ENUM(CAccountPassword::MD5, "md5")
 IMPLEMENT_ENUM_END("account-password-type")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(ESyncType)
+ADD_ENUM(ESyncType::BROADCAST, "broadcast")
+ADD_ENUM(ESyncType::LOCAL, "local")
+ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
+IMPLEMENT_ENUM_CLASS_END("sync-mode")
+
 //
 // Get best guess at name of userdata type
 //
@@ -371,7 +377,7 @@ void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         CResource* pResource = pLuaMain->GetResource();
         if (pResource)
         {
-            if (pResource->GetMinServerReqFromMetaXml() < szVersionReq)
+            if (pResource->GetMinServerRequirement() < szVersionReq)
             {
                 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 argStream.SetVersionWarning(szVersionReq, "server", szReason);

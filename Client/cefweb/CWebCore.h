@@ -14,6 +14,7 @@
 #include <functional>
 #include <mutex>
 #include <unordered_set>
+#include <future>
 #include <core/CWebCoreInterface.h>
 #include <cef3/include/cef_app.h>
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
@@ -45,10 +46,18 @@ class CWebCore : public CWebCoreInterface
 #endif
     };
 
+    struct TaskEntry
+    {
+        std::packaged_task<void(bool)> task;
+        CWebView*                      webView;
+
+        TaskEntry(std::function<void(bool)> callback, CWebView* webView) : task(callback), webView(webView) {}
+    };
+
 public:
     CWebCore();
     ~CWebCore();
-    bool Initialise();
+    bool Initialise() override;
 
     CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
     void               DestroyWebView(CWebViewInterface* pWebViewInterface);
@@ -58,6 +67,10 @@ public:
     void AddEventToEventQueue(std::function<void()> func, CWebView* pWebView, const SString& name);
     void RemoveWebViewEvents(CWebView* pWebView);
     void DoEventQueuePulse();
+
+    void WaitForTask(std::function<void(bool)> task, CWebView* webView) override;
+    void RemoveWebViewTasks(CWebView* webView);
+    void DoTaskQueuePulse();
 
     eURLState                    GetDomainState(const SString& strURL, bool bOutputDebug = false);
     SString                      GetDomainFromURL(const SString& strURL);
@@ -108,6 +121,9 @@ private:
 
     std::list<EventEntry> m_EventQueue;
     std::mutex            m_EventQueueMutex;
+
+    std::list<TaskEntry> m_TaskQueue;
+    std::mutex           m_TaskQueueMutex;
 
     CFastHashMap<SString, WebFilterPair> m_Whitelist;
     std::unordered_set<SString>          m_PendingRequests;

@@ -43,6 +43,7 @@ public:
     DWORD Lights;            // 2 bits per light
     DWORD Panels;            // 4 bits per panel
 };
+static_assert(sizeof(CDamageManagerSAInterface) == 0x18, "Invalid size for CDamageManagerSAInterface");
 
 class CDamageManagerSA : public CDamageManager
 {
@@ -54,7 +55,7 @@ public:
     BYTE          GetEngineStatus();
     VOID          SetEngineStatus(BYTE bEngineState);
     BYTE          GetDoorStatus(eDoors bDoor);
-    VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus);
+    VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
     BYTE          GetWheelStatus(eWheelPosition bWheel);
     VOID          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
     BYTE          GetPanelStatus(BYTE bPanel);

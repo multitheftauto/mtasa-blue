@@ -103,9 +103,15 @@ void InitLocalization(bool bShowErrors)
     {
         if (!bShowErrors)
             return;
+#ifdef MTA_DEBUG
+        DisplayErrorMessageBox(("Loading core failed.  Please ensure that \n"
+                                "the latest DirectX is correctly installed and you executed win-install-data.bat"),
+                               _E("CL24"), "core-not-loadable");
+#else
         DisplayErrorMessageBox(("Loading core failed.  Please ensure that \n"
                                 "the latest DirectX is correctly installed."),
                                _E("CL24"), "core-not-loadable");
+#endif
         return ExitProcess(EXIT_ERROR);
     }
 
@@ -314,6 +320,10 @@ void HandleResetSettings()
             FileDelete(strSettingsFilenameBak);
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
+
+            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
+
             if (!FileExists(strSettingsFilename))
             {
                 AddReportLog(4053, "Deleted gta_sa.set");
@@ -621,20 +631,8 @@ void ValidateGTAPath()
             _E("CL13"));
         return ExitProcess(EXIT_ERROR);
     }
-    else if (iResult == GAME_PATH_STEAM)
-    {
-        DisplayErrorMessageBox(_("It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to "
-                                 "a page where you can find information to resolve this issue."),
-                               _E("CL14"));
-        BrowseToSolution("downgrade-steam");
-        return ExitProcess(EXIT_ERROR);
-    }
 
-    SString strGTAPath = GetGTAPath();
-
-    // We can now set this
-    SetCurrentDirectory(strGTAPath);
-
+    const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     if (strGTAPath.Contains(";") || strMTASAPath.Contains(";"))
     {
@@ -834,13 +832,21 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"03106071AFB388EA56EC634FB2890578", "bass.dll"},     {"1FBC05C021659A3005816587C824AF0B", "bass_aac.dll"},
-                              {"3935396799611AD3FDE5A66832D69DD6", "bass_ac3.dll"}, {"6ED2288A5B104BFB3AD6FBFD0FA0D976", "bass_fx.dll"},
-                              {"FCD2410EA754C38C26F99AEB99C59138", "bassflac.dll"}, {"A6E2583FEA78E31305CBEB077741A311", "bassmidi.dll"},
-                              {"39613507057827F338CFA4519ACCA7A9", "bassmix.dll"},  {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
-                              {"12E4FA4DF33BB7D6AEF6DC0EAA53BB10", "tags.dll"},     {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
-                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},      {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
+    } integrityCheckList[] = {{"07668DD2BA04DBD5E826A14C25972B2C", "bass.dll"},
+                              {"0867D67B8F5A822D20EDA6D55ADE0089", "bass_aac.dll"},
+                              {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
+                              {"03FB421991634C85D7AA7A914506381E", "bass_fx.dll"},
+                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
+                              {"0140838049533F988D8845AE522589FA", "bassmidi.dll"},
+                              {"7B00E76ABC6128AE2B29B2B7F77F49FC", "bassmix.dll"},
+                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
+                              {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
+                              {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
+                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
+                              {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},
+                              {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
@@ -865,9 +871,12 @@ void CheckDataFiles()
     }
 
     // Warning if d3d9.dll exists in the GTA install directory
-    if (FileExists(PathJoin(strGTAPath, "d3d9.dll")))
+    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
     {
-        ShowD3dDllDialog(g_hInstance, PathJoin(strGTAPath, "d3d9.dll"));
+        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
+        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+
+        ShowD3dDllDialog(g_hInstance, filePath);
         HideD3dDllDialog();
     }
 
@@ -1136,6 +1145,7 @@ int LaunchGame(SString strCmdLine)
     }
 
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
+    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Inject the core into GTA
     SetDllDirectory(strMtaDir);
@@ -1159,7 +1169,6 @@ int LaunchGame(SString strCmdLine)
         BsodDetectionOnGameBegin();
         // Show splash until game window is displayed (or max 20 seconds)
         DWORD status;
-        bool  bShownDeviceSelectionDialog = false;
         for (uint i = 0; i < 20; i++)
         {
             status = WaitForSingleObject(piLoadee.hProcess, 1000);
@@ -1172,16 +1181,18 @@ int LaunchGame(SString strCmdLine)
                 break;
             }
 
-            // Skip stuck process warning if DeviceSelection dialog is still open after 4 seconds
-            if (i >= 4)
-                bShownDeviceSelectionDialog |= IsDeviceSelectionDialogOpen(piLoadee.dwThreadId);
+            // Keep showing splash if the device selection dialog is open
+            if (IsDeviceSelectionDialogOpen(piLoadee.dwThreadId))
+            {
+                i--;
+            }
         }
 
         // Actually hide the splash
         HideSplash();
 
         // If hasn't shown the loading screen and gta_sa.exe process memory usage is not changing, give user option to terminate
-        if (status == WAIT_TIMEOUT && !bShownDeviceSelectionDialog)
+        if (status == WAIT_TIMEOUT)
         {
             CStuckProcessDetector stuckProcessDetector(piLoadee.hProcess, 5000);
             while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown

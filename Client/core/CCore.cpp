@@ -21,6 +21,7 @@
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -34,7 +35,7 @@ SString       g_strJingleBells;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-CCore::CCore()
+CCore::CCore() : m_DiscordManager(new CDiscordManager())
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -53,7 +54,11 @@ CCore::CCore()
 
     // Load our settings and localization as early as possible
     CreateXML();
+    ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
+
+    // Initialize discord manager
+    m_DiscordManager->Initialize();
 
     // Create a logger instance.
     m_pConsoleLogger = new CConsoleLogger();
@@ -137,6 +142,9 @@ CCore::~CCore()
     // and is not affected by the master volume setting.
     m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
+    // Remove input hook
+    CMessageLoopHook::GetSingleton().RemoveHook();
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
@@ -149,9 +157,6 @@ CCore::~CCore()
 
     // Remove global events
     g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE);
-
-    // Remove input hook
-    CMessageLoopHook::GetSingleton().RemoveHook();
 
     // Store core variables to cvars
     CVARS_SET("console_pos", m_pLocalGUI->GetConsole()->GetPosition());
@@ -552,7 +557,8 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetVehiclesLODDistance(false);
+    pGameSettings->ResetPedsLODDistance(false);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -563,6 +569,9 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (bConnected) m_DiscordManager->RegisterPlay(true);
+    else ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -777,6 +786,7 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
+            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -1064,6 +1074,7 @@ CWebCoreInterface* CCore::GetWebCore()
     if (m_pWebCore == nullptr)
     {
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
+        m_pWebCore->Initialise();
     }
     return m_pWebCore;
 }
@@ -1662,6 +1673,21 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::ApplyCoreInitSettings()
+{
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
+    bool bValue;
+    CVARS_GET("process_dpi_aware", bValue);
+
+    if (bValue)
+    {
+        // Minimum supported client for the function below is Windows Vista
+        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+        SetProcessDPIAware();
+    }
+#endif
+}
+
 //
 // Called just before GTA calculates frame time deltas
 //
@@ -1689,6 +1715,8 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Apply client config setting
     uint uiClientConfigRate;
     g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
+    if (uiClientConfigRate > 0)
+        uiClientConfigRate = std::max(45U, uiClientConfigRate);
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
         m_uiFrameRateLimit = uiClientConfigRate;
@@ -1838,6 +1866,10 @@ void CCore::OnDeviceRestore()
 void CCore::OnPreFxRender()
 {
     // Don't do nothing if nothing won't be drawn
+
+    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
+
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
@@ -1954,6 +1986,28 @@ uint CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
+}
+
+//
+// ResetDiscordRichPresence
+//
+void CCore::ResetDiscordRichPresence()
+{
+    time_t currentTime;
+    time(&currentTime);
+
+    // Set default parameters
+    SDiscordActivity activity;
+    activity.m_details = "In Main Menu";
+    activity.m_startTimestamp = currentTime;
+
+    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
+        if (res == DiscordRes_Ok)
+            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+        else
+            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+    });
+    m_DiscordManager->RegisterPlay(false);
 }
 
 //

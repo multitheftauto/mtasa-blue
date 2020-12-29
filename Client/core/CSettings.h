@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CSettings.h
  *  PURPOSE:     Header file for in-game settings window class
@@ -140,6 +140,7 @@ protected:
     CGUIComboBox*  m_pComboResolution;
     CGUICheckBox*  m_pCheckBoxMipMapping;
     CGUICheckBox*  m_pCheckBoxWindowed;
+    CGUICheckBox*  m_pCheckBoxDPIAware = nullptr;
     CGUICheckBox*  m_pCheckBoxHudMatchAspectRatio;
     CGUICheckBox*  m_pCheckBoxMinimize;
     CGUILabel*     m_pMapRenderingLabel;
@@ -151,11 +152,13 @@ protected:
     CGUICheckBox*  m_pCheckBoxDeviceSelectionDialog;
     CGUICheckBox*  m_pCheckBoxShowUnsafeResolutions;
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
+    CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;
     CGUICheckBox*  m_pCheckBoxTyreSmokeParticles;
     CGUICheckBox*  m_pCheckBoxHighDetailVehicles;
+    CGUICheckBox*  m_pCheckBoxHighDetailPeds;
     CGUILabel*     m_pFieldOfViewLabel;
     CGUIScrollBar* m_pFieldOfView;
     CGUILabel*     m_pFieldOfViewValueLabel;
@@ -375,9 +378,11 @@ protected:
     bool OnFxQualityChanged(CGUIElement* pElement);
     bool OnVolumetricShadowsClick(CGUIElement* pElement);
     bool OnAllowScreenUploadClick(CGUIElement* pElement);
+    bool OnAllowExternalSoundsClick(CGUIElement* pElement);
     bool OnCustomizedSAFilesClick(CGUIElement* pElement);
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
+    bool OnDPIAwareClick(CGUIElement* pElement);
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
@@ -440,6 +445,7 @@ private:
     DWORD m_dwFrameCount;
     bool  m_bShownVolumetricShadowsWarning;
     bool  m_bShownAllowScreenUploadMessage;
+    bool  m_bShownAllowExternalSoundsMessage;
     int   m_iMaxAnisotropic;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;

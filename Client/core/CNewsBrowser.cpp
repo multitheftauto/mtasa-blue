@@ -167,9 +167,16 @@ void CNewsBrowser::CreateGUI()
     m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
     m_pButtonOK->SetZOrderingEnabled(false);
 
+    // News link
+    m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
+    m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
+    m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
+    m_pButtonNewsLink->SetZOrderingEnabled(false);
+
     // Set up the events
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
     m_pButtonOK->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
+    m_pButtonNewsLink->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnNewsLinkButtonClick, this));
 
     // Create the tab panel and necessary tabs
     m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
@@ -371,6 +378,16 @@ bool CNewsBrowser::IsVisible()
 ////////////////////////////////////////////////////
 bool CNewsBrowser::OnOKButtonClick(CGUIElement* pElement)
 {
+    // Close the window
+    m_pWindow->SetVisible(false);
+    return true;
+}
+
+bool CNewsBrowser::OnNewsLinkButtonClick(CGUIElement* pElement)
+{
+    // Visit the website
+    ShellExecuteNonBlocking("open", "https://mtasa.com/news");
+
     // Close the window
     m_pWindow->SetVisible(false);
     return true;

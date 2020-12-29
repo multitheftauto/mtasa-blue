@@ -18,7 +18,7 @@ CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x", this));
+    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
 
     // Set our wrapped device.
     m_pDevice = pDevice;
@@ -45,7 +45,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
     pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
 
-    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.DeviceName) / 1024;
+    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
     // Just incase, fallback to using texture memory stats
     if (iVideoCardMemoryKBTotal < 16)

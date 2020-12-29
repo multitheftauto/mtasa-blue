@@ -60,11 +60,13 @@ void CUnoccupiedVehicleSync::OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer
 
 void CUnoccupiedVehicleSync::Update()
 {
-    // Update all the vehicle's sync states
-    list<CVehicle*>::const_iterator iter = m_pVehicleManager->IterBegin();
-    for (; iter != m_pVehicleManager->IterEnd();)
+    std::vector<CVehicle*> vehicles;
+    vehicles.reserve(m_pVehicleManager->GetVehicleCount());
+    std::copy(std::begin(m_pVehicleManager->GetVehicles()), std::end(m_pVehicleManager->GetVehicles()), std::back_inserter(vehicles));
+
+    for (CVehicle* vehicle : vehicles)
     {
-        UpdateVehicle(*(iter++));
+        UpdateVehicle(vehicle);
     }
 }
 
@@ -133,13 +135,11 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
 // Called when a player changes dimension
 void CUnoccupiedVehicleSync::ResyncForPlayer(CPlayer* pPlayer)
 {
-    list<CVehicle*>::const_iterator iter = m_pVehicleManager->IterBegin();
-    for (; iter != m_pVehicleManager->IterEnd(); ++iter)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        CVehicle* pVehicle = *iter;
-        if (pVehicle->GetDimension() == pPlayer->GetDimension() && !pVehicle->GetFirstOccupant() && pVehicle->IsUnoccupiedSyncable())
+        if (vehicle->GetDimension() == pPlayer->GetDimension() && !vehicle->GetFirstOccupant() && vehicle->IsUnoccupiedSyncable())
         {
-            pPlayer->Send(CVehicleResyncPacket(pVehicle));
+            pPlayer->Send(CVehicleResyncPacket(vehicle));
         }
     }
 }

@@ -103,10 +103,10 @@ public:
     void AddResourceToLists(CResource* pResource);
     void RemoveResourceFromLists(CResource* pResource);
 
-    void    ApplyMinClientRequirement(CResource* pResource, const SString& strMinClientRequirement);
+    void    ApplyMinClientRequirement(CResource* pResource, const CMtaVersion& strMinClientRequirement);
     void    RemoveMinClientRequirement(CResource* pResource);
     void    ReevaluateMinClientRequirement();
-    SString GetMinClientRequirement() { return m_strMinClientRequirement; }
+    CMtaVersion GetMinClientRequirement() { return m_strMinClientRequirement; }
 
     void ApplySyncMapElementDataOption(CResource* pResource, bool bSyncMapElementData);
     void RemoveSyncMapElementDataOption(CResource* pResource);
@@ -134,9 +134,9 @@ private:
 
     list<sResourceQueue> m_resourceQueue;
 
-    SString                           m_strMinClientRequirement;
-    CFastHashMap<CResource*, SString> m_MinClientRequirementMap;
-    CFastHashMap<CResource*, bool>    m_SyncMapElementDataOptionMap;
+    CMtaVersion                           m_strMinClientRequirement;
+    CFastHashMap<CResource*, CMtaVersion> m_MinClientRequirementMap;
+    CFastHashMap<CResource*, bool>        m_SyncMapElementDataOptionMap;
 
     ushort                     m_usNextNetId;
     std::map<SString, SString> m_BlockedFileReasonMap;

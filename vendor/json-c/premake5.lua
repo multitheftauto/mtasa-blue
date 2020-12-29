@@ -18,14 +18,9 @@ project "json-c"
 		"*.c"
 	}
 
-	filter "system:windows"
-		includedirs { "shipped_for_mta_win32" }
-		disablewarnings { "4244" }
-
-	filter "system:not windows"
-		includedirs { "shipped_for_mta_linux" }
-
 	filter "system:macosx"
+		defines {"HAVE_XLOCALE_H"}
+
 		-- `#include <machine/endian.h>` works fine but `#include <endian.h>` does not
 		-- see linkhash.c line 23 (introduced in b95bda01e80359e)
 		--
