@@ -74,6 +74,20 @@ CXMLNodeImpl::~CXMLNodeImpl()
     }
 }
 
+void CXMLNodeImpl::BuildFromDocument()
+{
+    TiXmlNode*    xmlChild = nullptr;
+    while (xmlChild = m_pNode->IterateChildren(xmlChild))
+    {
+        auto xmlChildElement = xmlChild->ToElement();
+        if (xmlChildElement)
+        {
+            auto xmlChildNode = new CXMLNodeImpl(nullptr, this, *xmlChildElement);
+            xmlChildNode->BuildFromDocument();
+        }
+    }
+}
+
 CXMLNode* CXMLNodeImpl::CreateSubNode(const char* szTagName, CXMLNode* pInsertAfter)
 {
     TiXmlElement* pNewNode;

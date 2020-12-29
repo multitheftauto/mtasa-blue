@@ -16,6 +16,7 @@
 enum eLuaType
 {
 };
+
 DECLARE_ENUM(eLuaType);
 DECLARE_ENUM(CGUIVerticalAlign);
 DECLARE_ENUM(CGUIHorizontalAlign);
@@ -57,12 +58,14 @@ DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
+DECLARE_ENUM_CLASS(eResizableVehicleWheelGroup);
 DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
 DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM_CLASS(eClientModelType);
 
 class CRemoteCall;
 
@@ -451,6 +454,11 @@ inline SString GetClassByTypeName(eObjectGroup::FxType*)
 inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
 {
     return "objectgroup-breakmode";
+}
+
+inline SString GetClassByTypeName(eClientModelType)
+{
+    return "client-model-type";
 }
 
 //

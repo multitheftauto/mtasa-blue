@@ -73,7 +73,19 @@ void CClientColShape::SetPosition(const CVector& vecPosition)
         UpdateSpatialData();
         CStaticFunctionDefinitions::RefreshColShapeColliders(this);
     }
-};
+}
+
+void CClientColShape::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+    if (pEntity && m_pAttachedToEntity)
+    {
+        CVector pVector;
+
+        pEntity->GetPosition(pVector);
+        SetPosition(pVector + m_vecAttachedPosition);
+    }
+}
 
 void CClientColShape::CallHitCallback(CClientEntity& Entity)
 {

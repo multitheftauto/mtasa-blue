@@ -4,24 +4,107 @@ premake.modules.install_cef = {}
 
 -- Config variables
 local CEF_PATH = "vendor/cef3/"
-local CEF_URL_PREFIX = "http://opensource.spotify.com/cefbuilds/cef_binary_"
+local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "80.0.4+g74f7b0c+chromium-80.0.3987.122"
-local CEF_HASH = "8FD8E24AF196F00FEAAA1553496BAE99D8196BA023D0DD0FE44EFEEE93B04DFC"
+local CEF_VERSION = "87.1.12+g03f9336+chromium-87.0.4280.88"
+local CEF_HASH = "05601037b0c27969d9cf46b8d652a1c0aeeaba24ebabfe960898dd8359cb1d07"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
+end
+
+function errormsg(title, message)
+	term.pushColor(term.red)
+	io.write(title)
+	if message then
+		term.setTextColor(term.purple)
+		print(" " .. message)
+	else
+		print()
+	end
+	term.popColor()
+end
+
+function update_install_cef(version, hash)
+	local filename = "utils/buildactions/install_cef.lua"
+	local f = io.open(filename)
+	local text = f:read("*all")
+	f:close()
+
+	-- Replace version and hash lines
+	local version_line = 'local CEF_VERSION = "' .. version .. '"'
+	local hash_line = 'local CEF_HASH = "' .. hash .. '"'
+	text = text:gsub('local CEF_VERSION = ".-"', version_line, 1)
+	text = text:gsub('local CEF_HASH = ".-"', hash_line, 1)
+
+	local f = io.open(filename, "w")
+	f:write(text)
+	f:close()
+end
+
+local function cef_version_comparator(a, b)
+	local a_major, a_minor, a_patch = a.cef_version:match("^(%d+).(%d+).(%d+)%+*")
+	local b_major, b_minor, c_patch = b.cef_version:match("^(%d+).(%d+).(%d+)%+*")
+
+	return a_major > b_major and a_minor > b_minor and a_patch > c_patch
 end
 
 newaction {
 	trigger = "install_cef",
 	description = "Downloads and installs CEF",
 
-	execute = function()
-		-- Only execute on Windows
-		if os.host() ~= "windows" then return end
+	execute = function(...)
+		local upgrade = _ARGS[1] == "upgrade"
+		if upgrade and _ARGS[2] then
+			local version = _ARGS[2]
+
+			if version == CEF_VERSION then
+				print(("CEF version is already %s"):format(version))
+				return
+			end
+
+			CEF_VERSION = version
+			CEF_HASH = ""
+		elseif upgrade then
+			print("Checking opensource.spotify.com for an update...")
+			resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
+			if result_str ~= "OK" or result_code ~= 200 then
+				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
+				return
+			end
+
+			local meta, err = json.decode(resource)
+			if err then
+				errormsg("Could not parse json meta data:", err)
+				return
+			end
+
+			local builds_by_version = table.filter(meta["windows32"]["versions"], function(build) return build.channel == "stable" end)
+			table.sort(builds_by_version, cef_version_comparator)
+			local latest_build = builds_by_version[1]
+
+			if latest_build.cef_version == CEF_VERSION then
+				print(("CEF is already up to date (%s)"):format(latest_build.cef_version))
+				return
+			end
+
+			io.write(("Does version '%s' look OK to you? (Y/n) "):format(latest_build.cef_version))
+			local input = io.read():lower()
+			if not (input == "y" or input == "yes") then
+				errormsg("Aborting due to user request.")
+				return
+			end
+
+			CEF_VERSION = latest_build.cef_version
+			CEF_HASH = ""
+		end
+
+		-- Only execute on Windows in normal scenarios
+		if os.host() ~= "windows" and not upgrade then
+			return
+		end
 
 		-- Check file hash
 		local archive_path = CEF_PATH.."temp.tar.bz2"
@@ -31,14 +114,35 @@ newaction {
 		end
 
 		-- Download CEF
-		print("Downloading CEF...")
+		print("Downloading CEF " .. CEF_VERSION ..  "...")
 		local result_str, response_code = http.download(make_cef_download_url(), archive_path)
-		if result_str ~= "OK" and response_code ~= 200 then
-			term.pushColor(term.red)
-			io.write(("Could not download CEF with status code %d: "):format(response_code))
-			term.setTextColor(term.purple)
-			print(result_str)
-			term.popColor()
+		if result_str ~= "OK" or response_code ~= 200 then
+			errormsg(("Could not download CEF with status code %s: "):format(response_code), result_str)
+			return
+		end
+
+		local downloaded_hash = os.sha256_file(archive_path)
+		if upgrade then
+			print("New CEF hash is:", downloaded_hash)
+			CEF_HASH = downloaded_hash
+
+			io.write(("Update `install_cef.lua` file? (Y/n) "):format(version))
+			local input = io.read():lower()
+			if (input == "y" or input == "yes") then
+				update_install_cef(CEF_VERSION, downloaded_hash)
+			end
+		end
+
+		if downloaded_hash == CEF_HASH then
+			print("CEF consistency checks succeeded")
+		else
+			errormsg("CEF consistency checks failed.", ("Expected %s, got %s"):format(CEF_HASH, downloaded_hash))
+			os.exit(1)
+			return
+		end
+
+		-- Seriously abort now if we're not using Windows
+		if os.host() ~= "windows" then
 			return
 		end
 

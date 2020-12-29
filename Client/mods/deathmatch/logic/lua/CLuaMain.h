@@ -95,7 +95,8 @@ private:
 
     class CResource* m_pResource;
 
-    std::list<CXMLFile*> m_XMLFiles;
+    std::list<CXMLFile*>                            m_XMLFiles;
+    std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
     static SString       ms_strExpectedUndumpHash;
 
     bool m_bEnableOOP;

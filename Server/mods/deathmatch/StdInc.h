@@ -113,6 +113,9 @@ struct SAclRequest;
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CDiscordJoinPacket.h"
 
+// has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
+#include "CRemoteCalls.h"
+
 // Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaAccountDefs.h"
@@ -123,11 +126,13 @@ struct SAclRequest;
 #include "luadefs/CLuaCameraDefs.h"
 #include "luadefs/CLuaClassDefs.h"
 #include "luadefs/CLuaColShapeDefs.h"
+#include "luadefs/CLuaCompatibilityDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaHandlingDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
+#include "luadefs/CLuaNetworkDefs.h"
 #include "luadefs/CLuaObjectDefs.h"
 #include "luadefs/CLuaPedDefs.h"
 #include "luadefs/CLuaPickupDefs.h"
@@ -141,9 +146,6 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
-
-// has to be included before CLuaFunctionParseHelpers to prevent "invalid use of incomplete type ‘class CRemoteCalls´
-#include "CRemoteCalls.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
@@ -247,7 +249,6 @@ struct SAclRequest;
 #include "CPlayerCamera.h"
 #include "CPlayerClothes.h"
 #include "CPlayerManager.h"
-#include "CPlayerStats.h"
 #include "CPlayerTasks.h"
 #include "CPlayerTextManager.h"
 #include "CRPCFunctions.h"
@@ -276,6 +277,8 @@ struct SAclRequest;
 #include "CTextDisplay.h"
 #include "CTextItem.h"
 #include "CTickRateSettings.h"
+#include "CTrainTrack.h"
+#include "CTrainTrackManager.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"

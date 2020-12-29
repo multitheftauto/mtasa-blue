@@ -57,6 +57,9 @@ CCore::CCore() : m_DiscordManager(new CDiscordManager())
     ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
 
+    // Initialize discord manager
+    m_DiscordManager->Initialize();
+
     // Create a logger instance.
     m_pConsoleLogger = new CConsoleLogger();
 

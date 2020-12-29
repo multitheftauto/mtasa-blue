@@ -64,4 +64,51 @@ public:
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
+
+protected:
+    // Old style: Only warn on failure. This should
+    // not be used for new functions. ReturnOnError 
+    // must be a value to use as result on invalid argument
+    template <auto ReturnOnError, auto T>
+    static inline int ArgumentParserWarn(lua_State* L)
+    {
+        return CLuaFunctionParser<false, ReturnOnError, T>()(L, m_pScriptDebugging);
+    }
+
+    // Special case for overloads
+    // This combines multiple functions into one (via CLuaOverloadParser)
+    template <auto ReturnOnError, auto FunctionA, auto FunctionB, auto... Functions>
+    static inline int ArgumentParserWarn(lua_State* L)
+    {
+        // Pad functions to have the same number of parameters by 
+        // filling both up to the larger number of parameters with dummy_type arguments
+        using PaddedFunctionA = pad_func_with_func<FunctionA, FunctionB>;
+        using PaddedFunctionB = pad_func_with_func<FunctionB, FunctionA>;
+        // Combine functions
+        using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
+
+        return ArgumentParserWarn<ReturnOnError, Overload::Call, Functions...>(L);
+    }
+
+    // New style: hard error on usage mistakes
+    template <auto T>
+    static inline int ArgumentParser(lua_State* L)
+    {
+        return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
+    }
+
+    // Special case for overloads
+    // This combines multiple functions into one (via CLuaOverloadParser)
+    template <auto FunctionA, auto FunctionB, auto... Functions>
+    static inline int ArgumentParser(lua_State* L)
+    {
+        // Pad functions to have the same number of parameters by
+        // filling both up to the larger number of parameters with dummy_type arguments
+        using PaddedFunctionA = pad_func_with_func<FunctionA, FunctionB>;
+        using PaddedFunctionB = pad_func_with_func<FunctionB, FunctionA>;
+        // Combine functions
+        using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
+
+        return ArgumentParser<Overload::Call, Functions...>(L);
+    }
 };
