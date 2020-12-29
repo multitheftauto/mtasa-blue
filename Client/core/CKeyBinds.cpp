@@ -397,9 +397,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
         bIsConsoleInputKey = false;
 
     bool& keyState = GetBindableKeyState(pKey);
-
-    if (!bState || bState && !bInputGoesToGUI)
-        keyState = bState;
+    keyState = bState;
 
     bool bAllowed = TriggerKeyStrokeHandler(pKey->szKey, bState, bIsConsoleInputKey);
 
