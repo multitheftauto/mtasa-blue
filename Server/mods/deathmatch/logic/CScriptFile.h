@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string>
 
-class CScriptFile : public CElement
+class CScriptFile final : public CElement
 {
 public:
     enum eMode
@@ -50,7 +50,7 @@ public:
     void SetSize(unsigned long ulNewSize);
 
     void Flush();
-    long Read(unsigned long ulSize, CBuffer& outBuffer);
+    long Read(unsigned long ulSize, SString& outBuffer);
     long Write(unsigned long ulSize, const char* pData);
 
     // Debug info for garbage collected files

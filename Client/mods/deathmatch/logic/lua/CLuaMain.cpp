@@ -46,7 +46,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
 
 CLuaMain::~CLuaMain()
 {
-    g_pClientGame->GetRemoteCalls()->Remove(this);
+    g_pClientGame->GetRemoteCalls()->OnLuaMainDestroy(this);
     g_pClientGame->GetLatentTransferManager()->OnLuaMainDestroy(this);
     g_pClientGame->GetDebugHookManager()->OnLuaMainDestroy(this);
     g_pClientGame->GetScriptDebugging()->OnLuaMainDestroy(this);
@@ -365,8 +365,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = g_pCore->GetXML()->ParseString(strXmlContent);
-    return xmlNode;
+    auto xmlStringNode = g_pCore->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)

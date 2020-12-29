@@ -130,7 +130,7 @@ public:
     virtual BYTE          GetEngineStatus() = 0;
     virtual VOID          SetEngineStatus(BYTE bEngineState) = 0;
     virtual BYTE          GetDoorStatus(eDoors bDoor) = 0;
-    virtual VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus) = 0;
+    virtual VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent) = 0;
     virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
     virtual VOID          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
     virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;

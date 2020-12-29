@@ -150,7 +150,7 @@ void CScriptFile::Flush()
     m_pFile->FFlush();
 }
 
-long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
+long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
 {
     if (!m_pFile)
         return -1;
@@ -168,8 +168,16 @@ long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
         // Note: Read extra byte at end so EOF indicator gets set
     }
 
-    outBuffer.SetSize(ulSize);
-    return m_pFile->FRead(outBuffer.GetData(), ulSize);
+    try
+    {
+        outBuffer.resize(ulSize);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return -2;
+    }
+
+    return m_pFile->FRead(outBuffer.data(), ulSize);
 }
 
 long CScriptFile::Write(unsigned long ulSize, const char* pData)
@@ -207,7 +215,7 @@ void CScriptFile::DoResourceFileCheck()
         m_pFile->FSeek(lCurrentPos, SEEK_SET);
 
         // Check file content
-        g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, buffer);
+        g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, buffer.GetData(), buffer.GetSize());
     }
 }
 

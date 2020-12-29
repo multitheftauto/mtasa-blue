@@ -112,8 +112,8 @@ bool CPixelsManager::GetVolumePixels(IDirect3DVolume9* pD3DSurface, CPixels& out
     D3DVOLUME_DESC SurfDesc;
     pD3DSurface->GetDesc(&SurfDesc);
 
-    POINT SurfSize = {SurfDesc.Width, SurfDesc.Height};
-    RECT  SurfRect = {0, 0, SurfDesc.Width, SurfDesc.Height};
+    POINT SurfSize = {static_cast<int>(SurfDesc.Width), static_cast<int>(SurfDesc.Height)};
+    RECT  SurfRect = {0, 0, static_cast<int>(SurfDesc.Width), static_cast<int>(SurfDesc.Height)};
     if (pRect)
         SurfRect = *pRect;
 
@@ -121,8 +121,8 @@ bool CPixelsManager::GetVolumePixels(IDirect3DVolume9* pD3DSurface, CPixels& out
     uint uiPixelsWidth = GetRectWidth(SurfRect);
     uint uiPixelsHeight = GetRectHeight(SurfRect);
 
-    POINT PixelsSize = {uiPixelsWidth, uiPixelsHeight};
-    RECT  PixelsRect = {0, 0, uiPixelsWidth, uiPixelsHeight};
+    POINT PixelsSize = {static_cast<int>(uiPixelsWidth), static_cast<int>(uiPixelsHeight)};
+    RECT  PixelsRect = {0, 0, static_cast<int>(uiPixelsWidth), static_cast<int>(uiPixelsHeight)};
 
     // Validate rects
     if (!ClipRects(PixelsSize, PixelsRect, SurfSize, SurfRect))
@@ -150,7 +150,17 @@ bool CPixelsManager::GetVolumePixels(IDirect3DVolume9* pD3DSurface, CPixels& out
 
     // Prepare pixels
     uint ulPixelsPitch = uiPixelsWidth * XRGB_BYTES_PER_PIXEL;
-    outPixels.SetSize(ulPixelsPitch * uiPixelsHeight + SIZEOF_PLAIN_TAIL);
+
+    try
+    {
+        outPixels.SetSize(ulPixelsPitch * uiPixelsHeight + SIZEOF_PLAIN_TAIL);
+    }
+    catch (const std::bad_alloc&)
+    {
+        pD3DSurface->UnlockBox();
+        return false;
+    }
+
     memset(outPixels.GetData(), 0x81, outPixels.GetSize());
     char* pPixelsData = outPixels.GetData();
     pPixelsData += PixelsRect.left * XRGB_BYTES_PER_PIXEL;
@@ -233,8 +243,8 @@ bool CPixelsManager::SetVolumePixels(IDirect3DVolume9* pD3DSurface, const CPixel
     D3DVOLUME_DESC SurfDesc;
     pD3DSurface->GetDesc(&SurfDesc);
 
-    POINT SurfSize = {SurfDesc.Width, SurfDesc.Height};
-    RECT  SurfRect = {0, 0, SurfDesc.Width, SurfDesc.Height};
+    POINT SurfSize = {static_cast<int>(SurfDesc.Width), static_cast<int>(SurfDesc.Height)};
+    RECT  SurfRect = {0, 0, static_cast<int>(SurfDesc.Width), static_cast<int>(SurfDesc.Height)};
     if (pRect)
         SurfRect = *pRect;
 
@@ -243,8 +253,8 @@ bool CPixelsManager::SetVolumePixels(IDirect3DVolume9* pD3DSurface, const CPixel
     if (!GetPlainDimensions(pixels, uiPixelsWidth, uiPixelsHeight))
         return false;
 
-    POINT PixelsSize = {uiPixelsWidth, uiPixelsHeight};
-    RECT  PixelsRect = {0, 0, uiPixelsWidth, uiPixelsHeight};
+    POINT PixelsSize = {static_cast<int>(uiPixelsWidth), static_cast<int>(uiPixelsHeight)};
+    RECT  PixelsRect = {0, 0, static_cast<int>(uiPixelsWidth), static_cast<int>(uiPixelsHeight)};
 
     // Validate rects
     if (!ClipRects(PixelsSize, PixelsRect, SurfSize, SurfRect))

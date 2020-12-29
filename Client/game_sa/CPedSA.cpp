@@ -1027,6 +1027,18 @@ int CPedSA::GetCustomMoveAnim()
     return m_iCustomMoveAnim;
 }
 
+bool CPedSA::IsDoingGangDriveby()
+{
+    auto   pTaskManager = m_pPedIntelligence->GetTaskManager();
+    CTask* pTask = pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+    if (pTask && pTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 /*
 bool CPedSA::CanPedReturnToState (  )
 {

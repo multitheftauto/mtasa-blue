@@ -82,17 +82,7 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     }
 
     // Create the new player
-    CPlayer* pPlayer = new CPlayer(this, m_pScriptDebugging, PlayerSocket);
-
-    // Invalid id?
-    if (pPlayer->GetID() == INVALID_ELEMENT_ID)
-    {
-        delete pPlayer;
-        return NULL;
-    }
-
-    // Return the created player
-    return pPlayer;
+    return new CPlayer(this, m_pScriptDebugging, PlayerSocket);
 }
 
 unsigned int CPlayerManager::CountJoined()
@@ -185,6 +175,25 @@ void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort 
         {
             if (pPlayer->GetDimension() == usDimension)
                 sendList.push_back(pPlayer);
+        }
+    }
+
+    CPlayerManager::Broadcast(Packet, sendList);
+}
+
+void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
+{
+    // Make a list of players to send this packet to
+    CSendList sendList;
+
+    // Send the packet to each ingame player on the server except the skipped one
+    list<CPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
+    {
+        CPlayer* pPlayer = *iter;
+        if (pPlayer != pSkip && pPlayer->IsJoined() && pPlayer->IsSubscribed(pElement, szName))
+        {
+            sendList.push_back(pPlayer);
         }
     }
 
@@ -317,6 +326,24 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
             (usPlayerModel >= 9 && usPlayerModel != 208 && usPlayerModel != 149 && usPlayerModel != 119 && usPlayerModel != 86 && usPlayerModel != 74 &&
              usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
             (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
+}
+
+void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
+{
+    list<CPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
+    {
+        CPlayer* pPlayer = *iter;
+        pPlayer->UnsubscribeElementData(pElement, name);
+    }
+}
+
+void CPlayerManager::ClearElementData(CElement* pElement)
+{
+    for (auto pPlayer : m_Players)
+    {
+        pPlayer->UnsubscribeElementData(pElement);
+    }
 }
 
 void CPlayerManager::ResetAll()

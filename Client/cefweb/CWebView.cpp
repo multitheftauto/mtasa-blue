@@ -42,9 +42,7 @@ CWebView::~CWebView()
     // Make sure we don't dead lock the CEF render thread
     m_RenderData.cv.notify_all();
 
-#ifdef MTA_DEBUG
     OutputDebugLine("CWebView::~CWebView");
-#endif
 }
 
 void CWebView::Initialise()
@@ -451,8 +449,7 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
             if (aborted)
                 return;
 
-            m_pEventsInterface->Events_OnResourcePathCheck(strPath);
-            result = true;
+            result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
     }, this);
 
     return result;
@@ -491,7 +488,17 @@ bool CWebView::ToggleDevTools(bool visible)
 
 bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    }, this);
+
+    return result;
 }
 
 bool CWebView::CanGoBack()
@@ -616,7 +623,7 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
         rect.height = 1;
         return;
     }
-    
+
     rect.width = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
     rect.height = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
 }
@@ -692,22 +699,6 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     // Wait for the main thread to handle drawing the texture
     std::unique_lock<std::mutex> lock(m_RenderData.cvMutex);
     m_RenderData.cv.wait(lock);
-}
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-// Implementation: CefRenderHandler::OnCursorChange               //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-void CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo)
-{
-    // Find the cursor index by the cursor handle
-    unsigned char cursorIndex = static_cast<unsigned char>(type);
-
-    // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -832,6 +823,8 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     if (!CefParseURL(request->GetURL(), urlParts))
         return RV_CANCEL;            // Cancel if invalid URL (this line will normally not be executed)
 
+    SString domain = UTF16ToMbUTF8(urlParts.host.str);
+
     // Add some information to the HTTP header
     {
         CefRequest::HeaderMap headerMap;
@@ -848,6 +841,10 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
             if (GetProperty("mobile", strPropertyValue) && strPropertyValue == "1")
                 iter->second = iter->second.ToString() + "; Mobile Android";
 
+            // Allow YouTube TV to work (#1162)
+            if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str) == "/tv")
+                iter->second = iter->second.ToString() + "; SMART-TV; Tizen 4.0";
+
             request->SetHeaderMap(headerMap);
         }
     }
@@ -855,7 +852,6 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     WString scheme = urlParts.scheme.str;
     if (scheme == L"http" || scheme == L"https")
     {
-        SString domain = UTF16ToMbUTF8(urlParts.host.str);
         if (domain != "mta")
         {
             if (IsLocal())
@@ -1030,6 +1026,24 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
     }
 
     return true;
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefDisplayHandler::OnCursorChange              //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo& cursorInfo)
+{
+    // Find the cursor index by the cursor handle
+    unsigned char cursorIndex = static_cast<unsigned char>(type);
+
+    // Queue event to run on the main thread
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
+
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////

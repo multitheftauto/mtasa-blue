@@ -56,7 +56,7 @@ void lua_pushtimer(lua_State* luaVM, CLuaTimer* pElement);
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement);
 void lua_pushuserdata(lua_State* luaVM, void* pData);
 
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject);
+void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
 
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector);
 void lua_pushvector(lua_State* luaVM, const CVector& vector);

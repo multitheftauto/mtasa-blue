@@ -16,6 +16,7 @@
 enum eLuaType
 {
 };
+
 DECLARE_ENUM(eLuaType);
 DECLARE_ENUM(CGUIVerticalAlign);
 DECLARE_ENUM(CGUIHorizontalAlign);
@@ -57,12 +58,16 @@ DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
+DECLARE_ENUM_CLASS(eResizableVehicleWheelGroup);
 DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
 DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM_CLASS(eClientModelType);
+
+class CRemoteCall;
 
 enum eDXHorizontalAlign
 {
@@ -215,6 +220,10 @@ inline SString GetClassTypeName(CClientTeam*)
 inline SString GetClassTypeName(CClientPed*)
 {
     return "ped";
+}
+inline SString GetClassTypeName(CRemoteCall*)
+{
+    return "remotecall";
 }
 inline SString GetClassTypeName(CClientProjectile*)
 {
@@ -447,6 +456,11 @@ inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
     return "objectgroup-breakmode";
 }
 
+inline SString GetClassByTypeName(eClientModelType)
+{
+    return "client-model-type";
+}
+
 //
 // CResource from userdata
 //
@@ -526,6 +540,20 @@ CClientEntity* UserDataCast(CClientEntity*, void* ptr, lua_State*)
     if (!pEntity || pEntity->IsBeingDeleted() || !pEntity->IsA(T::GetClassId()))
         return NULL;
     return pEntity;
+}
+
+//
+// CRemoteCall from userdata
+//
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
+    
+    if (pRemoteCall && g_pClientGame->GetRemoteCalls()->CallExists(pRemoteCall))
+        return pRemoteCall;
+
+    return nullptr;
 }
 
 //

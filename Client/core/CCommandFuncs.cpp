@@ -17,8 +17,6 @@ using std::list;
 extern CCore* g_pCore;
 extern bool   g_bBoundsChecker;
 
-#define MTA_HELP_SPACING    32
-
 void CCommandFuncs::Help(const char* szParameters)
 {
     CConsoleInterface* pConsole = g_pCore->GetConsole();
@@ -33,22 +31,9 @@ void CCommandFuncs::Help(const char* szParameters)
     // Loop through all the available commands
     list<COMMANDENTRY*>::iterator iter = CCommands::GetSingletonPtr()->IterBegin();
     list<COMMANDENTRY*>::iterator iterEnd = CCommands::GetSingletonPtr()->IterEnd();
-
-    char spacer[MTA_HELP_SPACING + 1];
     for (; iter != iterEnd; iter++)
     {
-        const char* szCommandName = (*iter)->szCommandName;
-        const char* szDescription = (*iter)->szDescription;
-
-        // Space out the name and description evenly (tab-like)
-        unsigned char spacing = MTA_HELP_SPACING - strlen(szCommandName);
-        if (spacing <= 0)
-            spacing = 1;
-
-        memset(&spacer[0], ' ', MTA_HELP_SPACING);
-        spacer[spacing] = NULL;
-
-        pConsole->Printf("* %s%s%s\n", (*iter)->szCommandName, &spacer[0], (*iter)->szDescription);
+        pConsole->Printf("* %-31s %s\n", (*iter)->szCommandName, (*iter)->szDescription);
     }
 
     pConsole->Printf("***[--------------]***\n");

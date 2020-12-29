@@ -77,19 +77,33 @@ end
 function os.expanddir_wildcard(from, to)
 	local dir = os.matchdirs(from)[1]
 	if not dir then return end
-	
+
 	-- TODO: Optimize this
 	os.copydir(dir, to)
 	os.rmdir(dir)
 end
 
-function os.md5_file(path)
-	if os.host() == "windows" then
-		local s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
-		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+function os.sha256_file(path)
+	local windows = os.host() == "windows"
+	local s, errc
+	if windows then
+		s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" SHA256", path))
 	else
-		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))
+		s, errc = os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end
+
+	-- Check for error
+	if errc ~= 0 then
+		print("Error os.sha256_file: ", errc)
+		return ""
+	end
+
+	-- Clean windows output
+	if windows then
+		s = (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+	end
+
+	return s:lower()
 end
 
 function os.extract_archive(archive_path, target_path, override)
@@ -105,10 +119,12 @@ end
 function http.download_print_errors(url, file, options)
 	local result_str, response_code = http.download(url, file, options)
 	if result_str ~= "OK" then
-		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str )
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str .. " (" .. response_code .. ")" )
 		if response_code == 0 then
 			-- No response code means server was unreachable
 			print( "Check premake5 is not blocked by firewall rules" )
 		end
+		return false
 	end
+	return true
 end

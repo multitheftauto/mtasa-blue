@@ -55,11 +55,7 @@ void CClientPickup::Unlink()
 
 void CClientPickup::GetPosition(CVector& vecPosition) const
 {
-    if (m_pObject)
-    {
-        vecPosition = *m_pObject->GetPosition();
-    }
-    else if (m_pAttachedToEntity)
+    if (m_pAttachedToEntity)
     {
         m_pAttachedToEntity->GetPosition(vecPosition);
         vecPosition += m_vecAttachedPosition;
@@ -161,6 +157,7 @@ void CClientPickup::Create()
             m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
             m_pCollision->SetHitCallback(this);
+            m_pCollision->SetCanBeDestroyedByScript(false);
 
             // Increment pickup counter
             ++m_pPickupManager->m_uiPickupCount;

@@ -54,8 +54,8 @@ public:
     // Sync'd keys
     bool LeftShoulder1;
     bool RightShoulder1;
-    bool ButtonSquare;
-    bool ButtonCross;
+    short ButtonSquare;
+    short ButtonCross;
     bool ButtonCircle;
     bool ButtonTriangle;
     bool ShockButtonL;

@@ -30,6 +30,7 @@
 #include "CWeaponRPCs.h"
 #include "CWaterRPCs.h"
 #include "CWorldRPCs.h"
+#include "CColShapeRPCs.h"
 
 CClientManager*            CRPCFunctions::m_pManager;
 CClientCamera*             CRPCFunctions::m_pCamera;
@@ -98,6 +99,7 @@ void CRPCFunctions::AddHandlers()
     CWeaponRPCs::LoadFunctions();
     CWaterRPCs::LoadFunctions();
     CWorldRPCs::LoadFunctions();
+    CColShapeRPCs::LoadFunctions(); 
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)

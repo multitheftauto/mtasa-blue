@@ -48,6 +48,8 @@ public:
     virtual void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     virtual void SetPosition(const CVector& vecPosition);
 
+    void AttachTo(CClientEntity* pEntity) override;
+
     virtual bool DoHitDetection(const CVector& vecNowPosition, float fRadius) = 0;
 
     bool IsEnabled() { return m_bIsEnabled; };

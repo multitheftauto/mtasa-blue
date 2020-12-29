@@ -64,7 +64,9 @@ const SDialogItemInfo g_D3dDllDialogItems[] = {
     {IDC_D3DDLL_TEXT2, 0,
      _td("The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
          "It is recommended that you remove or rename d3d9.dll")},
+    {IDC_NO_ACTION, 1, _td("Use this d3d9.dll, but also show this warning on next start")},
     {IDC_CHECK_NOT_AGAIN, 1, _td("Do not tell me about this d3d9.dll again")},
+    {IDC_APPLY_AUTOMATIC_CHANGES, 1, _td("Rename this d3d9.dll to d3d9.dll.bak")},
     {IDC_BUTTON_SHOW_DIR, 0, _td("Show me the file")},
     {IDOK, 0, _td("Play MTA:SA")},
     {IDCANCEL, 0, dialogStringsQuit},
@@ -84,7 +86,9 @@ const SDialogItemInfo g_OptimusDialogItems[] = {
     {IDC_RADIO7, 1, _td("G - Standard Intel with exe rename")},
     {IDC_RADIO8, 1, _td("H - Alternate Intel with exe rename")},
     {IDC_OPTIMUS_TEXT3, 0, _td("If you get desperate, this might help:")},
+    {IDC_OPTIMUS_TEXT4, 0, _td("If you have already selected an option that works, this might help:")},
     {IDC_CHECK_FORCE_WINDOWED, 1, _td("Force windowed mode")},
+    {IDC_CHECK_REMEMBER, 1, _td("Don't show again")},
     {IDC_BUTTON_HELP, 0, dialogStringsHelp},
     {IDOK, 0, dialogStringsOk},
     {-1},
@@ -443,6 +447,7 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
         dassert((GetWindowLong(hwndD3dDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
         InitDialogStrings(hwndD3dDllDialog, g_D3dDllDialogItems);
         SetWindowTextW(GetDlgItem(hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH), FromUTF8(strPath));
+        SendMessage(GetDlgItem(hwndD3dDllDialog, IDC_NO_ACTION), BM_SETCHECK, BST_CHECKED, 1);
     }
     SetForegroundWindow(hwndD3dDllDialog);
     SetWindowPos(hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
@@ -461,17 +466,29 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
         }
         Sleep(10);
     }
-
+    
     // Process input
-    LRESULT res = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0);
+    bool doNotCheckAgainOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0) == BST_CHECKED;
     SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", strFileHash);
-    SetApplicationSetting("diagnostics", "d3d9-dll-not-again", res ? "yes" : "no");
+    SetApplicationSetting("diagnostics", "d3d9-dll-not-again", doNotCheckAgainOption ? "yes" : "no");
 
-    if (bCancelPressed)
+    if (bOkPressed)
+    {
+        if (!doNotCheckAgainOption)
+        {
+            bool doRenameOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_APPLY_AUTOMATIC_CHANGES), BM_GETCHECK, 0, 0) == BST_CHECKED;
+
+            if (doRenameOption)
+            {
+                FileRename(strPath, strPath + ".bak");
+            }
+        }
+    }
+    else if (bCancelPressed)
     {
         ExitProcess(0);
     }
-    if (bOtherPressed)
+    else if (bOtherPressed)
     {
         if (ITEMIDLIST* pidl = ILCreateFromPathW(FromUTF8(strPath)))
         {
@@ -483,6 +500,7 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
 
         ExitProcess(0);
     }
+
     ResumeSplash();
 }
 
@@ -504,6 +522,11 @@ void HideD3dDllDialog()
 ///////////////////////////////////////////////////////////////
 void ShowOptimusDialog(HINSTANCE hInstance)
 {
+    if (GetApplicationSettingInt("nvhacks", "optimus-remember-option"))
+    {
+        return;
+    }
+
     if (GetApplicationSettingInt("nvhacks", "optimus-dialog-skip"))
     {
         SetApplicationSettingInt("nvhacks", "optimus-dialog-skip", 0);
@@ -559,11 +582,14 @@ void ShowOptimusDialog(HINSTANCE hInstance)
     }
     uint uiForceWindowed = (IsDlgButtonChecked(hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED) == BST_CHECKED) ? 1 : 0;
 
+    uint uiRememberOption = (IsDlgButtonChecked(hwndOptimusDialog, IDC_CHECK_REMEMBER) == BST_CHECKED) ? 1 : 0;
+
     SetApplicationSettingInt("nvhacks", "optimus-startup-option", uiStartupOption);
     SetApplicationSettingInt("nvhacks", "optimus-alt-startup", (uiStartupOption & 1) ? 1 : 0);
     SetApplicationSettingInt("nvhacks", "optimus-rename-exe", (uiStartupOption & 2) ? 1 : 0);
     SetApplicationSettingInt("nvhacks", "optimus-export-enablement", (uiStartupOption & 4) ? 0 : 1);
     SetApplicationSettingInt("nvhacks", "optimus-force-windowed", uiForceWindowed);
+    SetApplicationSettingInt("nvhacks", "optimus-remember-option", uiRememberOption);
 
     if (!GetInstallManager()->UpdateOptimusSymbolExport())
     {

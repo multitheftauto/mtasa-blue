@@ -14,6 +14,8 @@ struct STrailerInfo
     CVector   m_TrailerRotationDeg;
 };
 
+enum class eVehicleAimDirection : unsigned char;
+
 class CSimVehiclePuresyncPacket : public CSimPacket
 {
 public:
@@ -85,7 +87,7 @@ private:
         CVector vecSniperSource;
         CVector vecTargetting;
 
-        uchar ucDriveByDirection;
+        eVehicleAimDirection ucDriveByDirection;
 
         float  fTurretX;
         float  fTurretY;

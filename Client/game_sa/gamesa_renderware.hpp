@@ -54,6 +54,7 @@ void InitRwFunctions(eGameVersion version)
             RpGeometryLock = (RpGeometryLock_t)0x0074C820;
             RpAtomicCreate = (RpAtomicCreate_t)0x00749CA0;
             RwFrameCreate = (RwFrameCreate_t)0x007F0450;
+            RwFrameDestroy = (RwFrameDestroy_t)0x007F05E0;
             RpGeometryTransform = (RpGeometryTransform_t)0x0074C030;
             RwFrameSetIdentity = (RwFrameSetIdentity_t)0x007F10F0;
             RwMatrixCreate = (RwMatrixCreate_t)0x007F2A90;
@@ -70,6 +71,7 @@ void InitRwFunctions(eGameVersion version)
             RwMatrixInvert = (RwMatrixInvert_t)0x007F20B0;
             RpWorldAddClump = (RpWorldAddClump_t)0x00751350;
             RwFrameScale = (RwFrameScale_t)0x007F0F10;
+            RwFrameUpdateObjects = (RwFrameUpdateObjects_t)0x7F0950;
             RwV3dTransformVector = (RwV3dTransformVector_t)0x007EDE00;
             RpLightCreate = (RpLightCreate_t)0x00752160;
             RpClumpAddLight = (RpClumpAddLight_t)0x0074A540;
@@ -86,6 +88,10 @@ void InitRwFunctions(eGameVersion version)
             RwRasterCreate = (RwRasterCreate_t)0x007FB270;
             RwTextureCreate = (RwTextureCreate_t)0x007F3800;
             RpMaterialSetTexture = (RpMaterialSetTexture_t)0x0074DC10;
+            GetAnimHierarchyFromSkinClump = (GetAnimHierarchyFromSkinClump_t)0x734A40;
+            RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51E0;
+            RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5160;
+            RtQuatRotate = (RtQuatRotate_t)0x7EB800;
 
             SetTextureDict = (SetTextureDict_t)0x007319C0;
             LoadClumpFile = (LoadClumpFile_t)0x005371F0;
@@ -144,6 +150,7 @@ void InitRwFunctions(eGameVersion version)
             RpGeometryLock = (RpGeometryLock_t)0x0074C7D0;
             RpAtomicCreate = (RpAtomicCreate_t)0x00749C50;
             RwFrameCreate = (RwFrameCreate_t)0x007F0410;
+            RwFrameDestroy = (RwFrameDestroy_t)0x007F05A0;
             RpGeometryTransform = (RpGeometryTransform_t)0x0074BFE0;
             RwFrameSetIdentity = (RwFrameSetIdentity_t)0x007F10B0;
             RwMatrixCreate = (RwMatrixCreate_t)0x007F2A50;
@@ -160,6 +167,7 @@ void InitRwFunctions(eGameVersion version)
             RwMatrixInvert = (RwMatrixInvert_t)0x007F2070;
             RpWorldAddClump = (RpWorldAddClump_t)0x00751300;
             RwFrameScale = (RwFrameScale_t)0x007F0ED0;
+            RwFrameUpdateObjects = (RwFrameUpdateObjects_t)0x7F0910;
             RwV3dTransformVector = (RwV3dTransformVector_t)0x007EDDC0;
             RpLightCreate = (RpLightCreate_t)0x00752110;
             RpClumpAddLight = (RpClumpAddLight_t)0x0074A4F0;
@@ -176,6 +184,10 @@ void InitRwFunctions(eGameVersion version)
             RwRasterCreate = (RwRasterCreate_t)0x007FB230;
             RwTextureCreate = (RwTextureCreate_t)0x007F37C0;
             RpMaterialSetTexture = (RpMaterialSetTexture_t)0x0074DBC0;
+            GetAnimHierarchyFromSkinClump = (GetAnimHierarchyFromSkinClump_t)0x734A40;
+            RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
+            RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;
+            RtQuatRotate = (RtQuatRotate_t)0x7EB7C0;
 
             SetTextureDict = (SetTextureDict_t)0x007319C0;
             LoadClumpFile = (LoadClumpFile_t)0x005371F0;

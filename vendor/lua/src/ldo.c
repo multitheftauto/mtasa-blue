@@ -335,6 +335,8 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
         allowed = pPreCallHook ( *curr_func(L)->c.f, L );
     if ( allowed )
     {
+        // MTA Specific: Store number of expected results for lua_ncallresult
+        L->nexpectedresults = nresults;
         n = (*curr_func(L)->c.f)(L);  /* do the actual call */
         // MTA Specific
         if ( pPostCallHook )

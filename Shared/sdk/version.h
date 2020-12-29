@@ -20,7 +20,7 @@
 // New version info
 #define MTASA_VERSION_MAJOR         1
 #define MTASA_VERSION_MINOR         5
-#define MTASA_VERSION_MAINTENANCE   7
+#define MTASA_VERSION_MAINTENANCE   8
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
@@ -91,7 +91,9 @@
 #define _CLIENT_NET_MODULE_VERSION      0x0AB       // (0x000 - 0xfff) Lvl9 wizards only
 #define _SERVER_NET_MODULE_VERSION      0x0AB       // (0x000 - 0xfff) Lvl9 wizards only
 #define _NETCODE_VERSION                0x1DA       // (0x000 - 0xfff) Increment when net messages change (pre-release)
-#define MTA_DM_BITSTREAM_VERSION        0x06C       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
+
+// (0x000 - 0xfff) Update bitstream.h when net messages change (post-release). (Changing will also require additional backward compatibility code).
+#define MTA_DM_BITSTREAM_VERSION eBitStreamVersion::Latest
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_PUBLIC_CONNECTIONS)
@@ -118,7 +120,10 @@ MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE\n\
 Server will not work with release clients\n\
 -------------------------------------------------------------------------\n\
 If you want the server to work with release clients\n\
-set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h\n\
+set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in Server/version.h\n\
+\n\
+Client can't enter the game? Use Server net.dll from an official build.\n\
+(Official dll uses VERSION_TYPE_RELEASE, win-install-data gives UNSTABLE.)\n\
 -------------------------------------------------------------------------")
     #endif
 #endif

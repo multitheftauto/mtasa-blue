@@ -26,7 +26,10 @@ public:
 
     void SetPosition(const CVector& vecPosition);
 
-    void AddPoint(CVector2D vecPoint);
+    bool AddPoint(CVector2D vecPoint);
+    bool AddPoint(CVector2D vecPoint, unsigned int uiPointIndex);
+    bool SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint);
+    bool RemovePoint(unsigned int uiPointIndex);
 
     unsigned int                           CountPoints() const { return static_cast<unsigned int>(m_Points.size()); };
     std::vector<CVector2D>::const_iterator IterBegin() { return m_Points.begin(); };
@@ -36,6 +39,8 @@ protected:
     std::vector<CVector2D> m_Points;
 
     bool IsInBounds(CVector vecPoint);
+    void CalculateRadius();
+    void CalculateRadius(const CVector2D& vecPoint);
 
     float m_fRadius;
 };

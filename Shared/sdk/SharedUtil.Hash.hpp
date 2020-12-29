@@ -487,7 +487,8 @@ namespace SharedUtil
             std::generate_n(saltBuffer, sizeof(saltBuffer), generator);
 
             char saltBase64Buffer[30];
-            bcrypt::crypt_gensalt_rn("$2y$", cost, saltBuffer, sizeof(saltBuffer), saltBase64Buffer, sizeof(saltBase64Buffer));
+            if (!bcrypt::crypt_gensalt_rn("$2y$", cost, saltBuffer, sizeof(saltBuffer), saltBase64Buffer, sizeof(saltBase64Buffer)))
+                return "";
             salt = SStringX(saltBase64Buffer);
         }
         else
@@ -499,7 +500,8 @@ namespace SharedUtil
             return "";
 
         char hashBuffer[HashBufferSize];
-        bcrypt::crypt_rn(password.c_str(), salt.c_str(), hashBuffer, sizeof(hashBuffer));
+        if (!bcrypt::crypt_rn(password.c_str(), salt.c_str(), hashBuffer, sizeof(hashBuffer)))
+            return "";
 
         return SStringX(hashBuffer);
     }
@@ -507,7 +509,8 @@ namespace SharedUtil
     bool BcryptVerify(const SString& password, const SString& hash)
     {
         char checkedHashBuffer[HashBufferSize];
-        bcrypt::crypt_rn(password.c_str(), hash.c_str(), checkedHashBuffer, sizeof(checkedHashBuffer));
+        if (!bcrypt::crypt_rn(password.c_str(), hash.c_str(), checkedHashBuffer, sizeof(checkedHashBuffer)))
+            return false;
 
         return strcmp(checkedHashBuffer, hash.c_str()) == 0;
     }

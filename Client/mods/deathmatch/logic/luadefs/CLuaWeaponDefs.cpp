@@ -15,7 +15,7 @@
 
 void CLuaWeaponDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"getWeaponNameFromID", GetWeaponNameFromID},
         {"getWeaponIDFromName", GetWeaponIDFromName},
         {"getSlotFromWeapon", GetSlotFromWeapon},
@@ -42,10 +42,8 @@ void CLuaWeaponDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaWeaponDefs::AddClass(lua_State* luaVM)
@@ -78,8 +76,6 @@ void CLuaWeaponDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "state", "setWeaponState", "getWeaponState");
     lua_classvariable(luaVM, "ammo", "setWeaponAmmo", "getWeaponAmmo");
     lua_classvariable(luaVM, "clipAmmo", "setWeaponClipAmmo", "getWeaponClipAmmo");
-    // lua_classvariable ( luaVM, "property" "setWeaponProperty", "getWeaponProperty" ); todo: .property[wepID/name]["skill"] = property
-    // lua_classvariable ( luaVM, "flags" "setWeaponFlags", "getWeaponFlags" ); todo: .flags[flag] = value
 
     lua_registerclass(luaVM, "Weapon", "Element");
 }

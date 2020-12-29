@@ -45,9 +45,6 @@ project "Client Webbrowser"
 		"PSAPI_VERSION=1"
 	}
 
-	filter {"system:windows", "toolset:*_xp*"}
-		links { "Psapi.lib" }
-
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 

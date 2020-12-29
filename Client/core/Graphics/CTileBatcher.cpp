@@ -126,41 +126,21 @@ void CTileBatcher::Flush()
 {
     if (!m_Vertices.empty())
     {
-        //
-        // TODO - Optimize all this
-        //
-
-        if (m_bUseCustomMatrices && m_bZBufferDirty)
-        {
-            // Shaders with transforms will probably need a clear zbuffer
-            m_pDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
-            m_bZBufferDirty = false;
-        }
-
         // Set states
         if (g_pDeviceState->AdapterState.bRequiresClipping)
             m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
-        m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bUseCustomMatrices ? D3DZB_TRUE : D3DZB_FALSE);
-        m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-        m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
-        m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-        m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-        m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-        m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-        m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
-        m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-        m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-        m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
         if (m_bUseCustomMatrices)
         {
+            // Shaders with transforms will probably use the zbuffer
+            if (m_bZBufferDirty)
+            {
+                m_pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
+                m_bZBufferDirty = false;
+            }
+            m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+
+            // Set custom transforms
             m_pDevice->SetTransform(D3DTS_WORLD, &m_MatCustomWorld);
             m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
             m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatCustomProjection);
@@ -243,8 +223,8 @@ void CTileBatcher::Flush()
             // If we didn't get the effect to save the shader state, clear some things here
             if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
             {
-                m_pDevice->SetVertexShader(NULL);
-                m_pDevice->SetPixelShader(NULL);
+                m_pDevice->SetVertexShader(nullptr);
+                m_pDevice->SetPixelShader(nullptr);
             }
         }
 
@@ -252,13 +232,16 @@ void CTileBatcher::Flush()
         ListClearAndReserve(m_Indices);
         ListClearAndReserve(m_Vertices);
 
-        SetCurrentMaterial(NULL);
+        SetCurrentMaterial(nullptr);
         m_fCurrentRotation = 0;
         m_fCurrentRotCenX = 0;
         m_fCurrentRotCenY = 0;
 
+        // Restore render states
         if (g_pDeviceState->AdapterState.bRequiresClipping)
             m_pDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
+        if (m_bUseCustomMatrices)
+            m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
     }
 }
 

@@ -191,7 +191,6 @@ static CURLcode read_data(struct connectdata *conn,
                           struct krb5buffer *buf)
 {
   int len;
-  void *tmp = NULL;
   CURLcode result;
 
   result = socket_read(fd, &len, sizeof(len));
@@ -201,12 +200,11 @@ static CURLcode read_data(struct connectdata *conn,
   if(len) {
     /* only realloc if there was a length */
     len = ntohl(len);
-    tmp = Curl_saferealloc(buf->data, len);
+    buf->data = Curl_saferealloc(buf->data, len);
   }
-  if(tmp == NULL)
+  if(!len || !buf->data)
     return CURLE_OUT_OF_MEMORY;
 
-  buf->data = tmp;
   result = socket_read(fd, buf->data, len);
   if(result)
     return result;
@@ -238,7 +236,7 @@ static ssize_t sec_recv(struct connectdata *conn, int sockindex,
 
   /* Handle clear text response. */
   if(conn->sec_complete == 0 || conn->data_prot == PROT_CLEAR)
-      return read(fd, buffer, len);
+      return sread(fd, buffer, len);
 
   if(conn->in_buffer.eof_flag) {
     conn->in_buffer.eof_flag = 0;

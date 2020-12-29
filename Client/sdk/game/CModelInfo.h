@@ -28,6 +28,17 @@ public:
     float   fRadius;
 };
 
+enum class eModelInfoType : unsigned char
+{
+    ATOMIC = 1,
+    TIME = 3,
+    WEAPON = 4,
+    CLUMP = 5,
+    VEHICLE = 6,
+    PED = 7,
+    LOD_ATOMIC = 8,
+};
+
 enum eVehicleUpgradePosn
 {
     VEHICLE_UPGRADE_POSN_BONET = 0,
@@ -101,6 +112,7 @@ class CModelInfo
 public:
     virtual class CBaseModelInfoSAInterface* GetInterface() = 0;
 
+    virtual eModelInfoType GetModelType() = 0;
     virtual DWORD GetModel() = 0;
     virtual bool  IsPlayerModel() = 0;
     virtual BOOL  IsBoat() = 0;
@@ -118,16 +130,21 @@ public:
 
     virtual char* GetNameIfVehicle() = 0;
 
+    virtual BYTE           GetVehicleType() = 0;
     virtual VOID           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual BYTE           GetLevelFromPosition(CVector* vecPosition) = 0;
     virtual BOOL           IsLoaded() = 0;
     virtual BYTE           GetFlags() = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
     virtual bool           IsValid() = 0;
+    virtual bool           IsAllocatedInArchive() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
-    virtual void           SetLODDistance(float fDistance) = 0;
+    virtual float          GetOriginalLODDistance() = 0;
+    virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
     virtual void           RestreamIPL() = 0;
+    virtual bool           GetTime(char& hourOn, char& hourOff) = 0;
+    virtual bool           SetTime(char hourOn, char hourOff) = 0;
 
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
@@ -152,6 +169,10 @@ public:
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
     virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
     virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
+    virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
+    virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;
+    virtual void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;
+    virtual void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
@@ -172,6 +193,8 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
+    virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
+    virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
@@ -179,4 +202,9 @@ public:
     virtual void           SetObjectPropertiesGroup(unsigned short usObjectGroup) = 0;
     virtual unsigned short GetObjectPropertiesGroup() = 0;
     virtual void           RestoreObjectPropertiesGroup() = 0;
+
+    // Vehicle towing functions
+    virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
+
+    virtual unsigned int GetParentID() = 0;
 };

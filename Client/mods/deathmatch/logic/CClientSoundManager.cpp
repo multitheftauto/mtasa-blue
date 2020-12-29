@@ -123,13 +123,21 @@ void CClientSoundManager::SetDimension(unsigned short usDimension)
     m_usDimension = usDimension;
 }
 
-CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle)
+CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
     if (bIsURL)
     {
         pSound->PlayStream(strSound, bLoop, bThrottle);
         return pSound;
+    }
+    else if (bIsRawData)
+    {
+        size_t size = strSound.size();
+        void* pMemory = new char[size];
+        memcpy(pMemory, strSound.data(), size);
+        if (pSound->Play((void*)pMemory, size, bLoop))
+            return pSound;
     }
     else if (pSound->Play(strSound, bLoop))
         return pSound;
@@ -149,7 +157,7 @@ CClientSound* CClientSoundManager::PlaySound2D(void* pMemory, unsigned int uiLen
     return NULL;
 }
 
-CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle)
+CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
 
@@ -158,6 +166,17 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
         pSound->PlayStream(strSound, bLoop, bThrottle, true);
         pSound->SetPosition(vecPosition);
         return pSound;
+    }
+    else if (bIsRawData)
+    {
+        size_t size = strSound.size();
+        void* pMemory = new char[size];
+        memcpy(pMemory, strSound.data(), size);
+        if (pSound->Play3D((void*)pMemory, size, bLoop))
+        {
+            pSound->SetPosition(vecPosition);
+            return pSound;
+        }
     }
     else if (pSound->Play3D(strSound, bLoop))
     {
@@ -356,8 +375,11 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
         CSphere sphere = pSound->GetWorldBoundingSphere();
         float   fDistance = (vecListenerPosition - sphere.vecPosition).Length() - sphere.fRadius;
 
-        if ((fDistance > 40 || m_usDimension != pSound->GetDimension()) && MapContains(m_DistanceStreamedInMap, pSound))
-            pSound->DistanceStreamOut();
+        if (fDistance > 40 || m_usDimension != pSound->GetDimension())
+        {
+            if (MapContains(m_DistanceStreamedInMap, pSound))
+                pSound->DistanceStreamOut();
+        }
         else if (fDistance < 20) 
             pSound->DistanceStreamIn();
     }

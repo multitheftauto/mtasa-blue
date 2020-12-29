@@ -633,35 +633,6 @@ bool CClientSound::IsFxEffectEnabled(uint uiFxEffect)
 ////////////////////////////////////////////////////////////
 void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt)
 {
-    // If this is a stream
-    if (m_bStream)
-    {
-        // Check if we're allowed to play streams, otherwise just destroy the stream
-        // This way we can start the stream without the need to handle this edge case in scripting
-        if (g_pCore->GetCVars()->GetValue("allow_external_sounds", true))
-        {
-            if (!m_pAudio)
-            {
-                // call onClientSoundStarted
-                CLuaArguments Arguments;
-                Arguments.PushString("enabled");            // Reason
-                CallEvent("onClientSoundStarted", Arguments, false);
-                Create();
-            }
-        }
-        else
-        {
-            if (m_pAudio)
-            {
-                // call onClientSoundStopped
-                CLuaArguments Arguments;
-                Arguments.PushString("disabled");            // Reason
-                CallEvent("onClientSoundStopped", Arguments, false);
-                Destroy();
-            }
-        }
-    }
-
     // Update 3D things if required
     if (m_b3D)
     {
@@ -678,6 +649,36 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
             UpdateSpatialData();
         }
     }
+
+    // If this is a stream
+    if (m_bStream)
+    {
+        // Check if we're allowed to play streams, otherwise just destroy the stream
+        // This way we can start the stream without the need to handle this edge case in scripting
+        if (g_pCore->GetCVars()->GetValue("allow_external_sounds", true))
+        {
+            if (!m_pAudio)
+            {
+                if (m_pSoundManager->IsDistanceStreamedIn(this))
+                {
+                    if (Create())
+                    {
+                        CLuaArguments Arguments;
+                        Arguments.PushString("enabled");            // Reason
+                        CallEvent("onClientSoundStarted", Arguments, false);
+                    }
+                }
+            }
+        }
+        else if (m_pAudio)
+        {
+            Destroy();
+            CLuaArguments Arguments;
+            Arguments.PushString("disabled");            // Reason
+            CallEvent("onClientSoundStopped", Arguments, false);
+        }
+    }
+
     // If the sound isn't active, we don't need to process it
     // Moved after 3D updating as the streamer didn't know the position changed if a sound isn't streamed in when attached.
     if (!m_pAudio)

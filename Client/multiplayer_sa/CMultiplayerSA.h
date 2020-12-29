@@ -67,6 +67,7 @@ public:
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
     void                InitHooks_VehicleCollision();
+    void                InitHooks_Vehicles();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();
     void                InitHooks_VehicleLights();
@@ -74,6 +75,7 @@ public:
     void                InitHooks_VehicleWeapons();
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
+    void                InitHooks_Streaming();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -108,6 +110,7 @@ public:
     void SetChokingHandler(ChokingHandler* pChokingHandler);
     void SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler);
     void SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler);
+    void SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler);
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
@@ -146,6 +149,8 @@ public:
                       unsigned char BottomBlue);
     void  SetHeatHaze(const SHeatHazeSettings& settings);
     void  GetHeatHaze(SHeatHazeSettings& settings);
+    void  ResetColorFilter();
+    void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color);
     void  ResetHeatHaze();
     void  SetHeatHazeEnabled(bool bEnabled);
     void  ApplyHeatHazeEnabled();
@@ -277,14 +282,14 @@ public:
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
 
-    void SetLastStaticAnimationPlayed(DWORD dwGroupID, DWORD dwAnimID, DWORD dwAnimArrayAddress)
+    void SetLastStaticAnimationPlayed(eAnimGroup dwGroupID, eAnimID dwAnimID, DWORD dwAnimArrayAddress)
     {
         m_dwLastStaticAnimGroupID = dwGroupID;
         m_dwLastStaticAnimID = dwAnimID;
         m_dwLastAnimArrayAddress = dwAnimArrayAddress;
     }
-    DWORD GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
-    DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+    eAnimGroup GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
+    eAnimID GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     CVector      m_vecAkimboTarget;
@@ -307,8 +312,8 @@ private:
     bool                m_bHeatHazeCustomized;
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
-    DWORD               m_dwLastStaticAnimGroupID;
-    DWORD               m_dwLastStaticAnimID;
+    eAnimGroup          m_dwLastStaticAnimGroupID;
+    eAnimID          m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);

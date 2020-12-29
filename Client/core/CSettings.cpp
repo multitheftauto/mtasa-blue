@@ -2337,7 +2337,7 @@ void CSettings::ProcessKeyBinds()
     for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
-        unsigned char       ucType = reinterpret_cast<unsigned char>(m_pBindsList->GetItemData(i, m_hBind));
+        unsigned char       ucType = reinterpret_cast<unsigned int>(m_pBindsList->GetItemData(i, m_hBind));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
