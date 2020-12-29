@@ -254,8 +254,6 @@ public:
     bool IsNickValid(const char* szNick);
     bool IsNametagValid(const char* szNick);
 
-    bool IsGettingIntoVehicle() { return m_bIsGettingIntoVehicle; };
-
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
@@ -347,10 +345,6 @@ public:
     unsigned char  GetDamageBodyPiece() { return m_ucDamageBodyPiece; }
     bool           GetDamageSent() { return m_bDamageSent; }
     void           SetDamageSent(bool b) { m_bDamageSent = b; }
-
-    void ProcessVehicleInOutKey(bool bPassenger);
-
-    void ResetVehicleInOut();
 
     void SetAllDimensions(unsigned short usDimension);
     void SetAllInteriors(unsigned char ucInterior);
@@ -445,6 +439,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
+    void RestreamWorld();
 
     void TriggerDiscordJoin(SString strSecret);
 
@@ -466,7 +461,6 @@ private:
 
     // Network update functions
     void DoVehicleInKeyCheck();
-    void UpdateVehicleInOut();
     void UpdatePlayerTarget();
     void UpdatePlayerWeapons();
     void UpdateTrailers();
@@ -510,6 +504,7 @@ private:
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
+    static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
     static void                              StaticPreFxRenderHandler();
     static void                              StaticPreHudRenderHandler();
     static void                              StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
@@ -556,6 +551,7 @@ private:
     bool                              ChokingHandler(unsigned char ucWeaponType);
     void                              PreWorldProcessHandler();
     void                              PostWorldProcessHandler();
+    void                              PostWorldProcessPedsAfterPreRenderHandler();
     void                              CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     CAnimBlendAssociationSAInterface* AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     CAnimBlendAssociationSAInterface* AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
@@ -724,18 +720,6 @@ private:
     bool m_bGameLoaded;
     bool m_bTriggeredIngameAndConnected;
     bool m_bGracefulDisconnect;
-
-    // Network update vars
-    unsigned long  m_ulLastVehicleInOutTime;
-    bool           m_bIsGettingOutOfVehicle;
-    bool           m_bIsGettingIntoVehicle;
-    bool           m_bIsJackingVehicle;
-    bool           m_bIsGettingJacked;
-    ElementID      m_VehicleInOutID;
-    unsigned char  m_ucVehicleInOutSeat;
-    bool           m_bNoNewVehicleTask;
-    ElementID      m_NoNewVehicleTaskReasonID;
-    CClientPlayer* m_pGettingJackedBy;
 
     CEntity*       m_pTargetedGameEntity;
     CClientEntity* m_pTargetedEntity;

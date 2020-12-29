@@ -117,12 +117,14 @@
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaCameraDefs.h>
 #include <luadefs/CLuaColShapeDefs.h>
+#include <luadefs/CLuaCompatibilityDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
+#include <luadefs/CLuaNetworkDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
 #include <luadefs/CLuaPointLightDefs.h>
 #include <luadefs/CLuaPedDefs.h>
@@ -139,6 +141,7 @@
 #include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
+#include <luadefs/CLuaWorldDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

@@ -315,6 +315,7 @@ public:
     virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
     virtual float FindGroundZForPosition(float fX, float fY) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
+    virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;
     virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
     virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
     virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;

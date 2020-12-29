@@ -265,7 +265,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
     assert(ListContains(m_ActiveFileDownloadList, pResourceFile));
     if (result.bSuccess)
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName());
         if (checksum != pResourceFile->GetServerChecksum())
         {
             // Checksum failed - Try download on next server

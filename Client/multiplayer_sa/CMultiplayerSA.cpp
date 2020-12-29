@@ -285,6 +285,8 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
+const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
+const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
@@ -344,6 +346,7 @@ DrawRadarAreasHandler*      m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler*       m_pRender3DStuffHandler = NULL;
 PreWorldProcessHandler*     m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler*    m_pPostWorldProcessHandler = NULL;
+PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
 IdleHandler*                m_pIdleHandler = NULL;
 PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
@@ -503,6 +506,7 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
+void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -727,6 +731,7 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+    HookInstall(HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender, (DWORD)HOOK_Idle_CWorld_ProcessPedsAfterPreRender, 5);
 
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
@@ -1384,8 +1389,8 @@ void CMultiplayerSA::InitHooks()
     // Fix melee doesn't work outside the world bounds.
     MemSet((void*)0x5FFAEE, 0x90, 2);
     MemSet((void*)0x5FFB4B, 0x90, 2);
-    MemSet((void*)0x5FFBA5, 0x90, 2);
-    MemSet((void*)0x5FFC03, 0x90, 2);
+    MemSet((void*)0x5FFBA2, 0x90, 5);
+    MemSet((void*)0x5FFC00, 0x90, 5);
 
     // Fix shooting sniper doesn't work outside the world bounds (for local player).
     MemSet((void*)0x7361BF, 0x90, 6);
@@ -1503,6 +1508,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleDamage();
     InitHooks_VehicleLights();
     InitHooks_VehicleWeapons();
+
+    InitHooks_Streaming();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -1608,6 +1615,36 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.usRenderSizeX = *(int*)0xC4030C;
     settings.usRenderSizeY = *(int*)0xC40310;
     settings.bInsideBuilding = *(bool*)0xC402BA;
+}
+
+void CMultiplayerSA::ResetColorFilter()
+{
+    if (*(BYTE*)0x7036EC == 0xB8)
+    {
+        static BYTE DefaultBytes[5] = { 0xC1, 0xE0, 0x08, 0x0B, 0xC1 }; // shl     eax, 8
+                                                                        // or      eax, ecx
+        MemCpy((void*)0x7036EC, DefaultBytes, sizeof(DefaultBytes));
+        MemCpy((void*)0x70373D, DefaultBytes, sizeof(DefaultBytes));
+    }
+}
+
+void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
+{
+    const bool bEnabled = *(BYTE*)0x7036EC == 0xB8;
+
+    // Update a pass0 color if needed
+    if (!bEnabled || *(DWORD*)0x7036ED != dwPass0Color)
+    {
+        MemPut<BYTE>(0x7036EC, 0xB8); // mov eax
+        MemPut<DWORD>(0x7036ED, dwPass0Color);
+    }
+
+    // Update a pass1 color if needed
+    if (!bEnabled || *(DWORD*)0x70373E != dwPass1Color)
+    {
+        MemPut<BYTE>(0x70373D, 0xB8); // mov eax
+        MemPut<DWORD>(0x70373E, dwPass1Color);
+    }
 }
 
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
@@ -2213,6 +2250,11 @@ void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler)
 void CMultiplayerSA::SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler)
 {
     m_pPostWorldProcessHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler)
+{
+    m_postWorldProcessPedsAfterPreRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
@@ -6822,5 +6864,44 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
         fmul    kfTimeStepOriginal
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
+    }
+}
+
+void PostCWorld_ProcessPedsAfterPreRender()
+{
+    if (m_postWorldProcessPedsAfterPreRenderHandler)
+        m_postWorldProcessPedsAfterPreRenderHandler();
+
+    // Scale the object entities
+    CPools* pools = pGameInterface->GetPools();
+    for (std::uint32_t i = 0; i < MAX_OBJECTS; i++)
+    {
+        CObject* objectEntity = pools->GetObjectFromIndex(i);
+        if (!objectEntity)
+            continue;
+        auto objectInterface = objectEntity->GetObjectInterface();
+        if (objectInterface && objectEntity->GetPreRenderRequired())
+        {
+            if (objectInterface->fScale != 1.0f || objectInterface->bUpdateScale)
+            {
+                objectEntity->SetScaleInternal(*objectEntity->GetScale());
+                objectInterface->bUpdateScale = false;
+            }
+            RpClump* clump = objectInterface->m_pRwObject;
+            if (clump && clump->object.type == RP_TYPE_CLUMP)
+                objectEntity->UpdateRpHAnim();
+            objectEntity->SetPreRenderRequired(false);
+        }
+    }
+}
+
+const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;
+void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
+{
+    __asm
+    {
+       call CWorld_ProcessPedsAfterPreRender
+       call PostCWorld_ProcessPedsAfterPreRender
+       jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
     }
 }

@@ -85,6 +85,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
+        {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -141,6 +142,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
+        {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
     };
@@ -227,6 +229,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
+    lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -270,6 +273,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setGravity", "setVehicleGravity");
     lua_classfunction(luaVM, "setModelExhaustFumesPosition", "setVehicleModelExhaustFumesPosition");
     lua_classfunction(luaVM, "setVehicleModelDummyPosition", "setVehicleModelDummyPosition");
+    lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
 
@@ -4036,6 +4040,22 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
+bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> optVariant, std::optional<unsigned char> optVariant2)
+{
+    unsigned char ucVariant = optVariant.value_or(0xFE);
+    unsigned char ucVariant2 = optVariant2.value_or(0xFE);
+
+    if (ucVariant == 254 && ucVariant2 == 254)
+        CClientVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariant, ucVariant2);
+
+    if ((ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
+    {
+        pVehicle->SetVariant(ucVariant, ucVariant2);
+        return true;
+    }
+    return false;
+}
+
 float CLuaVehicleDefs::GetVehicleWheelScale(CClientVehicle* const pVehicle)
 {
     return pVehicle->GetWheelScale();
@@ -4087,4 +4107,15 @@ bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, con
     m_pVehicleManager->RestreamVehicles(usModel);
 
     return true;
+}
+
+int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel)
+{
+    if (wheel < 0 || wheel > 3)
+        throw std::invalid_argument("Invalid wheel number");
+
+    if (CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) != CLIENTVEHICLE_CAR)
+        throw std::invalid_argument("Invalid vehicle type");
+
+    return pVehicle->GetWheelFrictionState(wheel);
 }

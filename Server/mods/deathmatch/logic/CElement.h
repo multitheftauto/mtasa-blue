@@ -44,7 +44,7 @@ typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
 // List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CElement*>, public CRefCountableST
+class CElementListSnapshot final : public std::vector<CElement*>, public CRefCountableST
 {
 };
 
@@ -183,7 +183,7 @@ public:
     std::list<class CColShape*>::iterator CollisionsEnd() { return m_Collisions.end(); }
 
     unsigned short GetDimension() { return m_usDimension; }
-    void           SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    virtual void   SetDimension(unsigned short usDimension);
 
     class CClient* GetClient();
 

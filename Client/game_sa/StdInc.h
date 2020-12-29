@@ -55,7 +55,6 @@
 #include "CPadSA.h"
 #include "CAERadioTrackManagerSA.h"
 #include "CWeatherSA.h"
-#include "CTextSA.h"
 #include "CPedSA.h"
 #include "CPedSoundSA.h"
 #include "CAudioEngineSA.h"
@@ -118,4 +117,5 @@
 #include "CBuoyancySA.h"
 #include "CTrainTrackManagerSA.h"
 #include "CEventGroupSA.h"
+#include "CMatrixSA.h"
 #include "CTrainSA.h"

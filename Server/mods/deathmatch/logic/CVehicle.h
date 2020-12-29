@@ -140,7 +140,7 @@ struct SSirenInfo
 
 class CTrainTrack;
 
-class CVehicle : public CElement
+class CVehicle final : public CElement
 {
     friend class CPlayer;
 
@@ -272,8 +272,8 @@ public:
 
     void GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates);
 
-    CPlayer* GetJackingPlayer() { return m_pJackingPlayer; }
-    void     SetJackingPlayer(CPlayer* pPlayer);
+    CPed* GetJackingPed() { return m_pJackingPed; }
+    void  SetJackingPed(CPed* pPed);
 
     bool IsInWater() { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
@@ -324,8 +324,8 @@ public:
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
 
-    void            GenerateHandlingData();
-    CHandlingEntry* GetHandlingData() { return m_pHandlingEntry; }
+    void                  GenerateHandlingData();
+    CHandlingEntry*       GetHandlingData() { return m_pHandlingEntry; };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now(true) - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(true); }
@@ -398,7 +398,7 @@ private:
     bool                  m_bSmokeTrail;
     unsigned char         m_ucAlpha;
     bool                  m_bInWater;
-    CPlayer*              m_pJackingPlayer;
+    CPed*                 m_pJackingPed;
     SColor                m_HeadLightColor;
     bool                  m_bHeliSearchLightVisible;
 
