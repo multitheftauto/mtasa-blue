@@ -18,4 +18,4 @@ set SCRIPTFILE="%TEMP%\CreateMyShortcut.vbs"
 cscript //nologo %SCRIPTFILE%
 del /f /q %SCRIPTFILE%
 
-pause
+if %0 == "%~0" pause

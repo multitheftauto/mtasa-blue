@@ -38,6 +38,7 @@ protected:
     SString _InstallFiles();
     SString _ChangeToAdmin();
     SString _ShowCopyFailDialog();
+    SString _ProcessGtaVersionCheck();
     SString _ProcessLayoutChecks();
     SString _ProcessLangFileChecks();
     SString _ProcessExePatchChecks();

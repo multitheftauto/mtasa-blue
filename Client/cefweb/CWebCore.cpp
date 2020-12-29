@@ -252,7 +252,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com"};
+    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com", "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
     for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {

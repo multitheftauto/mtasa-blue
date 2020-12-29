@@ -296,25 +296,6 @@ struct CVehicleFlags
     unsigned char bUsedForReplay : 1;                         // This car is controlled by replay and should be removed when replay is done.
 };
 
-struct CTrainFlags
-{
-    unsigned char unknown1 : 3;
-    unsigned char bIsTheChainEngine : 1;            // Only the first created train on the chain gets this set to true, others get it set to false.
-    unsigned char unknown2 : 1;                     // This is always set to true in mission trains construction.
-    unsigned char bIsAtNode : 1;
-    unsigned char bDirection : 1;
-    unsigned char unknown3 : 1;            // If the mission train was placed at the node, this is set to false in construction.
-
-    unsigned char bIsDerailed : 1;
-    unsigned char unknown4 : 1;
-    unsigned char bIsDrivenByBrownSteak : 1;
-    unsigned char unknown5 : 5;
-
-    unsigned char unknown6 : 8;
-
-    unsigned char unknown7 : 8;
-};
-
 struct CTransmissionGear
 {
     float maxGearVelocity;
@@ -369,7 +350,7 @@ public:
     unsigned char m_colour1, m_colour2, m_colour3, m_colour4;
     char          m_comp1, m_comp2;
     short         m_upgrades[MAX_UPGRADES_ATTACHED];            // 1082
-    float         m_wheelScale;                                 // 1112
+    float         m_fWheelScale;                                // 1112
 
     unsigned short CarAlarmState;               // 1116
     unsigned short ForcedRandomSeed;            // if this is non-zero the random wander gets deterministic
@@ -456,78 +437,8 @@ public:
 
     // 1425
     BYTE Padding226[15];
-
-    // 1440
-    unsigned char m_ucTrackNodeID;            // Current node on train tracks
-    BYTE          Padding230[3];
-
-    // 1444
-    float m_fTrainSpeed;            // Speed along rails
-    // 1448
-    float m_fTrainRailDistance;            // Distance along rail starting from first rail node (determines train position when on rails)
-
-    // 1452
-    float m_fDistanceToNextCarriage;
-    DWORD padding240[2];
-
-    // 1464
-    CTrainFlags trainFlags;
-
-    // 1468
-    unsigned int m_uiLastTimeUpdated;
-
-    // 1472
-    BYTE m_ucRailTrackID;
-
-    // 1473
-    BYTE padding260[15];
-
-    // 1488
-    CVehicleSAInterface* m_prevCarriage;
-    CVehicleSAInterface* m_nextCarriage;
-
-    // 1496
-    BYTE padding270[112];
-    // 1608
-    RwFrame* pUnk0;
-    // 1612
-    RwFrame* pChassis;
-    RwFrame* pWheelFrontRight;
-    RwFrame* pWheelFromRightSpecial;
-    RwFrame* pWheelRearRight;
-    RwFrame* pWheelFrontLeft;
-    RwFrame* pWheelFrontLeftSpecial;
-    RwFrame* pWheelRearLeft;
-    RwFrame* pDoors[4];
-    RwFrame* pBumpers[2];
-    RwFrame* pWingRFDummy;
-    RwFrame* pWingLFDummy;
-    RwFrame* pBonet;
-    RwFrame* pBoot;
-    RwFrame* pWindscreen;
-    RwFrame* pExhaust;
-
-    // Hacked in from jb-contribs branch
-    RwFrame*             pSpecialParts[5];                  // 1688
-    RwFrame*             pExtraParts[5];                    // 1708
-    RwFrame*             pExtraParts2[5];                   // 1728
-    uint32               pad1[20];                          // 1708
-    CColPointSAInterface WheelFrontLeftColPoint;            // 1828
-    CColPointSAInterface WheelRearLeftColPoint;
-    CColPointSAInterface WheelFrontRightColPoint;
-    CColPointSAInterface WheelRearRightColPoint;
-
-    BYTE padding275[32];
-    // 2036
-    float wheelCollisionState[MAX_WHEELS];
-
-    // 2052
-    BYTE padding280[224];
-
-    // 2276
-    float m_fBurningTime;
 };
-static_assert(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 + 12, "Invalid size for CVehicleSAInterface");
+static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
@@ -537,6 +448,7 @@ private:
     CDamageManagerSA*                m_pDamageManager;
     CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity;
     CHandlingEntrySA*                m_pHandlingData;
+    CFlyingHandlingEntrySA*          m_pFlyingHandlingData;
     void*                            m_pSuspensionLines;
     bool                             m_bIsDerailable;
     unsigned char                    m_ucAlpha;
@@ -748,12 +660,16 @@ public:
     CHandlingEntry* GetHandlingData();
     void            SetHandlingData(CHandlingEntry* pHandling);
 
+    CFlyingHandlingEntry* GetFlyingHandlingData();
+    void                  SetFlyingHandlingData(CFlyingHandlingEntry* pHandling);
+
     void BurstTyre(BYTE bTyre);
 
     BYTE GetBikeWheelStatus(BYTE bWheel);
     void SetBikeWheelStatus(BYTE bWheel, BYTE bStatus);
 
     bool IsWheelCollided(BYTE eWheelPosition);
+    int  GetWheelFrictionState(BYTE eWheelPosition);
 
     void GetGravity(CVector* pvecGravity) const { *pvecGravity = m_vecGravity; }
     void SetGravity(const CVector* pvecGravity);
@@ -822,6 +738,8 @@ public:
     std::map<SString, SVehicleFrame>& GetComponentMap() { return m_ExtraFrames; }
     bool                              SetPlateText(const SString& strText);
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
+    float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
+    void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
 
     void UpdateLandingGearPosition();
 

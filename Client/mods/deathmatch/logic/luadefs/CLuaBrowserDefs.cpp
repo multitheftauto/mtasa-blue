@@ -14,7 +14,7 @@
 void CLuaBrowserDefs::LoadFunctions()
 {
     // Define browser functions
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createBrowser", CreateBrowser},
         {"requestBrowserDomains", RequestBrowserDomains},
         {"loadBrowserURL", LoadBrowserURL},
@@ -49,10 +49,8 @@ void CLuaBrowserDefs::LoadFunctions()
     };
 
     // Add browser functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBrowserDefs::AddClass(lua_State* luaVM)

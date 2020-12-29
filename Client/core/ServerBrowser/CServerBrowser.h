@@ -95,7 +95,7 @@ public:
     CServerListItem* FindServerFromRow(ServerBrowserType Type, int iRow);
     CServerListItem* FindServer(const std::string& strHost, unsigned short usPort);
     unsigned short   FindServerHttpPort(const std::string& strHost, unsigned short usPort);
-    int              FindRowFromServer(ServerBrowserType Type, const CServerListItem* pServer);
+    void             UpdateRowIndexMembers(ServerBrowserType Type);
     void             UpdateSelectedServerPlayerList(ServerBrowserType Type);
     void             GetVisibleEndPointList(std::vector<SAddressPort>& outEndpointList);
 
@@ -207,7 +207,7 @@ private:
     void         UpdateServerList(ServerBrowserType Type, bool bClearServerList = false);
     void         UpdateHistoryList();
     CServerList* GetServerList(ServerBrowserType Type);
-    void         AddServerToList(const CServerListItem* pServer, const ServerBrowserType Type);
+    void         AddServerToList(CServerListItem* pServer, const ServerBrowserType Type);
     bool         RemoveSelectedServerFromRecentlyPlayedList();
 
     bool OnClick(CGUIElement* pElement);

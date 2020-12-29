@@ -39,6 +39,7 @@ public:
     static bool           IsValidWeaponModel(DWORD dwModelID);
 
     void RestreamPeds(unsigned short usModel);
+    void RestreamAllPeds();
     void RestreamWeapon(unsigned short usModel);
 
 protected:
