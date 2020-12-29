@@ -29,6 +29,8 @@ void CElementDeleter::Delete(class CElement* pElement, bool bUnlink, bool bUpdat
                 m_List.push_back(pElement);
             }
 
+            g_pGame->GetPlayerManager()->ClearElementData(pElement);
+
             // Flag it as being deleted and unlink it from the tree/managers
             pElement->SetIsBeingDeleted(true);
             pElement->ClearChildren();

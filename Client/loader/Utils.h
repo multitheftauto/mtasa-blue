@@ -13,7 +13,6 @@ extern HINSTANCE g_hInstance;
 
 enum ePathResult
 {
-    GAME_PATH_STEAM,
     GAME_PATH_UNICODE_CHARS,
     GAME_PATH_MISSING,
     GAME_PATH_OK,

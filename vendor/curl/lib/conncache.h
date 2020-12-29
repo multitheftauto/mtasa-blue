@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2015 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2015 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (C) 2012 - 2014, Linus Nielsen Feltzing, <linus@haxx.se>
  *
  * This software is licensed as described in the file COPYING, which
@@ -45,21 +45,21 @@ struct conncache {
 #ifdef CURLDEBUG
 /* the debug versions of these macros make extra certain that the lock is
    never doubly locked or unlocked */
-#define CONN_LOCK(x) if((x)->share) {                                   \
+#define CONNCACHE_LOCK(x) if((x)->share) {                              \
     Curl_share_lock((x), CURL_LOCK_DATA_CONNECT, CURL_LOCK_ACCESS_SINGLE); \
     DEBUGASSERT(!(x)->state.conncache_lock);                            \
     (x)->state.conncache_lock = TRUE;                                   \
   }
 
-#define CONN_UNLOCK(x) if((x)->share) {                                 \
+#define CONNCACHE_UNLOCK(x) if((x)->share) {                            \
     DEBUGASSERT((x)->state.conncache_lock);                             \
     (x)->state.conncache_lock = FALSE;                                  \
     Curl_share_unlock((x), CURL_LOCK_DATA_CONNECT);                     \
   }
 #else
-#define CONN_LOCK(x) if((x)->share)                                     \
+#define CONNCACHE_LOCK(x) if((x)->share)                                \
     Curl_share_lock((x), CURL_LOCK_DATA_CONNECT, CURL_LOCK_ACCESS_SINGLE)
-#define CONN_UNLOCK(x) if((x)->share)                   \
+#define CONNCACHE_UNLOCK(x) if((x)->share)              \
     Curl_share_unlock((x), CURL_LOCK_DATA_CONNECT)
 #endif
 
@@ -77,10 +77,8 @@ void Curl_conncache_destroy(struct conncache *connc);
 struct connectbundle *Curl_conncache_find_bundle(struct connectdata *conn,
                                                  struct conncache *connc,
                                                  const char **hostp);
-void Curl_conncache_unlock(struct Curl_easy *data);
 /* returns number of connections currently held in the connection cache */
 size_t Curl_conncache_size(struct Curl_easy *data);
-size_t Curl_conncache_bundle_size(struct connectdata *conn);
 
 bool Curl_conncache_return_conn(struct Curl_easy *data,
                                 struct connectdata *conn);

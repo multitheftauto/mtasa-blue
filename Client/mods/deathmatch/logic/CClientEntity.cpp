@@ -593,6 +593,20 @@ void CClientEntity::SetRotationDegrees(const CVector& vecDegrees)
     SetRotationRadians(vecTemp);
 }
 
+void CClientEntity::SetDimension(unsigned short usDimension)
+{
+    if (m_usDimension == usDimension)
+        return;
+
+    unsigned int usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onClientElementDimensionChange", Arguments, true);
+}
+
 bool CClientEntity::IsOutOfBounds()
 {
     CVector vecPosition;
@@ -1068,6 +1082,27 @@ void CClientEntity::RemoveAllCollisions()
 bool CClientEntity::IsEntityAttached(CClientEntity* pEntity)
 {
     return ListContains(m_AttachedEntities, pEntity);
+}
+
+bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
+{
+    if (bRecursive)
+    {
+        std::set<CClientEntity*> history;
+
+        for (CClientEntity* pCurrent = this; pCurrent; pCurrent = pCurrent->GetAttachedTo())
+        {
+            if (pCurrent == pEntity)
+                return true;
+
+            if (!std::get<bool>(history.insert(pCurrent)))
+                break; // This should not be possible, but you never know
+        }
+
+        return false;
+    }
+
+    return m_pAttachedToEntity == pEntity;
 }
 
 void CClientEntity::ReattachEntities()

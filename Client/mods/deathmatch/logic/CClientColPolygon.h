@@ -26,7 +26,8 @@ public:
 
     void SetPosition(const CVector& vecPosition);
 
-    bool AddPoint(CVector2D vecPoint, int iPointIndex = -1);
+    bool AddPoint(CVector2D vecPoint);
+    bool AddPoint(CVector2D vecPoint, unsigned int uiPointIndex);
     bool SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint);
     bool RemovePoint(unsigned int uiPointIndex);
 
@@ -38,6 +39,8 @@ protected:
     std::vector<CVector2D> m_Points;
 
     bool IsInBounds(CVector vecPoint);
+    void CalculateRadius();
+    void CalculateRadius(const CVector2D& vecPoint);
 
     float m_fRadius;
 };

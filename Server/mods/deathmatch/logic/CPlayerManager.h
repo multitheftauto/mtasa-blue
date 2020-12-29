@@ -46,6 +46,7 @@ public:
 
     void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
     void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
+    void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
 
     static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);
@@ -53,6 +54,9 @@ public:
     static void Broadcast(const CPacket& Packet, const std::multimap<ushort, CPlayer*>& groupMap);
 
     static bool IsValidPlayerModel(unsigned short usPlayerModel);
+
+    void ClearElementData(CElement* pElement, const std::string& name);
+    void ClearElementData(CElement* pElement);
 
     void           ResetAll();
     void           OnPlayerJoin(CPlayer* pPlayer);

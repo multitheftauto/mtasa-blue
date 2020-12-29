@@ -24,7 +24,7 @@
 class CSingularFileDownload
 {
 public:
-    CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum);
+    CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource, CChecksum serverChecksum);
     ~CSingularFileDownload();
 
     static void DownloadFinishedCallBack(const SHttpDownloadResult& result);
@@ -49,6 +49,7 @@ protected:
     SString m_strNameShort;
 
     CResource* m_pResource;
+    CResource* m_pRequestResource;
 
     bool m_bComplete;
     bool m_bBeingDeleted;

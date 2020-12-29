@@ -9,6 +9,7 @@
  *****************************************************************************/
 #pragma once
 #include "CElementIDs.h"
+#include "CConsoleClient.h"
 
 // Forward declare enum reflection stuff
 enum eLuaType
@@ -26,6 +27,7 @@ DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
+DECLARE_ENUM_CLASS(ESyncType);
 
 enum eHudComponent
 {
@@ -117,6 +119,10 @@ inline eEntityType GetClassType(class CCustomWeapon*)
 inline SString GetClassTypeName(CElement*)
 {
     return "element";
+}
+inline SString GetClassTypeName(CClient*)
+{
+    return "client";
 }
 inline SString GetClassTypeName(CPlayer*)
 {
@@ -434,6 +440,24 @@ CPlayer* UserDataCast(CPlayer*, void* ptr, lua_State*)
     if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != CElement::PLAYER))
         return NULL;
     return (CPlayer*)pElement;
+}
+
+// CClient from CConsoleClient or a CPlayer
+template <class T>
+CClient* UserDataCast(CClient*, void* ptr, lua_State*)
+{
+    ElementID ID = TO_ELEMENTID(ptr);
+    CElement* pElement = CElementIDs::GetElement(ID);
+    if (!pElement || pElement->IsBeingDeleted())
+        return nullptr;
+
+    CClient* pClient = nullptr;
+    if (pElement->GetType() == CElement::PLAYER)
+        pClient = reinterpret_cast<CPlayer*>(pElement);
+    else if (pElement->GetType() == CElement::CONSOLE)
+        pClient = reinterpret_cast<CConsoleClient*>(pElement);
+
+    return pClient;
 }
 
 //

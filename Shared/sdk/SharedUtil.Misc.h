@@ -48,6 +48,11 @@ namespace SharedUtil
     #endif
 
     //
+    // Return full path and filename of parent exe
+    //
+    SString GetParentProcessPathFilename(int pid);
+
+    //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
@@ -786,6 +791,8 @@ namespace SharedUtil
         // list only
         typename LIST_TYPE ::iterator         begin() { return m_List.begin(); }
         typename LIST_TYPE ::iterator         end() { return m_List.end(); }
+        typename LIST_TYPE ::const_iterator   begin() const { return m_List.begin(); }
+        typename LIST_TYPE ::const_iterator   end() const { return m_List.end(); }
         typename LIST_TYPE ::reverse_iterator rbegin() { return m_List.rbegin(); }
         typename LIST_TYPE ::reverse_iterator rend() { return m_List.rend(); }
         uint                                  size() const { return m_List.size(); }

@@ -75,8 +75,11 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize);
+    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
     static bool RemoveElementData(CElement* pElement, const char* szName);
+    static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
@@ -124,7 +127,6 @@ public:
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
     static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
-    static bool               GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -143,6 +145,7 @@ public:
                             unsigned short usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, unsigned char ucLevel);
+    static bool SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax);
     static bool RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword);
     static bool SetPlayerName(CElement* pElement, const char* szName);
     static bool DetonateSatchels(CElement* pElement);
@@ -265,7 +268,6 @@ public:
     static bool  IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable);
     static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
-    static bool  GetTrainTrack(CVehicle* pVehicle, uchar& ucTrack);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
     static bool  IsVehicleBlown(CVehicle* pVehicle);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
@@ -328,7 +330,6 @@ public:
     static bool SetTrainDerailable(CVehicle* pVehicle, bool bDerailable);
     static bool SetTrainDirection(CVehicle* pVehicle, bool bDirection);
     static bool SetTrainSpeed(CVehicle* pVehicle, float fSpeed);
-    static bool SetTrainTrack(CVehicle* pVehicle, uchar ucTrack);
     static bool SetTrainPosition(CVehicle* pVehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color);
     static bool SetVehicleTurretPosition(CVehicle* pVehicle, float fHorizontal, float fVertical);
@@ -463,8 +464,9 @@ public:
     static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
     static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
 
-    static bool AddColPolygonPoint(CColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint);
-    static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint iPointIndex);
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex);
 
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);
@@ -545,7 +547,7 @@ public:
     static CWater* CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
     static bool    SetElementWaterLevel(CWater* pWater, float fLevel);
     static bool    SetAllElementWaterLevel(float fLevel);
-    static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel);
+    static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     static bool    ResetWorldWaterLevel();
     static bool    GetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool    SetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
@@ -690,7 +692,6 @@ public:
     static bool      CopyAccountData(CAccount* pAccount, CAccount* pFromAccount);
 
     // Log in/out funcs
-    static bool LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword);
     static bool LogOut(CPlayer* pPlayer);
 
     // Admin funcs

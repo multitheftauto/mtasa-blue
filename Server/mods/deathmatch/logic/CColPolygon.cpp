@@ -85,28 +85,20 @@ void CColPolygon::SetPosition(const CVector& vecPosition)
     // Add queued collider refresh for v1.1
 }
 
-bool CColPolygon::AddPoint(CVector2D vecPoint, int iPointIndex)
+bool CColPolygon::AddPoint(CVector2D vecPoint)
 {
-    if (iPointIndex < 0)
-    {
-        m_Points.push_back(vecPoint);
-    }
-    else
-    {
-        if (iPointIndex >= m_Points.size())
-            return false;
+    m_Points.push_back(vecPoint);
+    CalculateRadius(vecPoint);
+    return true;
+}
 
-        m_Points.insert(m_Points.begin() + iPointIndex, vecPoint);
-    }
+bool CColPolygon::AddPoint(CVector2D vecPoint, unsigned int uiPointIndex)
+{
+    if (uiPointIndex > m_Points.size())
+        return false;
 
-    CVector2D vecDistance = vecPoint - m_vecPosition;
-    float     fDistance = vecDistance.Length();
-
-    if (fDistance > m_fRadius)
-    {
-        m_fRadius = fDistance;
-        SizeChanged();
-    }
+    m_Points.insert(m_Points.begin() + uiPointIndex, vecPoint);
+    CalculateRadius(vecPoint);
 
     return true;
 }
@@ -118,18 +110,7 @@ bool CColPolygon::RemovePoint(unsigned int uiPointIndex)
 
     m_Points.erase(m_Points.begin() + uiPointIndex);
 
-    m_fRadius = 0.0f;
-    for (auto vecPoint : m_Points)
-    {
-        CVector2D vecDistance = vecPoint - m_vecPosition;
-        float     fDistance = vecDistance.Length();
-
-        if (fDistance > m_fRadius)
-            m_fRadius = fDistance;
-    }
-
-    SizeChanged();
-
+    CalculateRadius();
     return true;
 }
 
@@ -137,9 +118,15 @@ bool CColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& v
 {
     if (uiPointIndex >= m_Points.size())
         return false;
-    
+
     m_Points[uiPointIndex] = vecPoint;
 
+    CalculateRadius();
+    return true;
+}
+
+void CColPolygon::CalculateRadius()
+{
     m_fRadius = 0.0f;
     for (auto vecPoint : m_Points)
     {
@@ -151,8 +138,18 @@ bool CColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& v
     }
 
     SizeChanged();
+}
 
-    return true;
+void CColPolygon::CalculateRadius(const CVector2D& vecPoint)
+{
+    CVector2D vecDistance = vecPoint - m_vecPosition;
+    float     fDistance = vecDistance.Length();
+
+    if (fDistance > m_fRadius)
+    {
+        m_fRadius = fDistance;
+        SizeChanged();
+    }
 }
 
 bool CColPolygon::IsInBounds(CVector vecPoint)

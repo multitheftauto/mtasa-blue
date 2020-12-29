@@ -15,7 +15,7 @@
 #include <CVector.h>
 #include <vector>
 
-class CObjectSyncPacket : public CPacket
+class CObjectSyncPacket final : public CPacket
 {
 public:
     struct SyncData

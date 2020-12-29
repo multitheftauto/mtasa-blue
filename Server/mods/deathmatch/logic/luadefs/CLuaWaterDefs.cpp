@@ -13,7 +13,7 @@
 
 void CLuaWaterDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createWater", CreateWater},
         {"setWaterLevel", SetWaterLevel},
         {"resetWaterLevel", ResetWaterLevel},
@@ -25,10 +25,8 @@ void CLuaWaterDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaWaterDefs::AddClass(lua_State* luaVM)
@@ -132,20 +130,24 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     else
     {
         // Call type 2
-        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements )
+        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel )
         float fLevel;
         bool  bIncludeWorldNonSeaLevel;
         bool  bIncludeAllWaterElements;
+        bool  bIncludeWorldSeaLevel;
+        bool  bIncludeOutsideWorldLevel;
 
         argStream.ReadNumber(fLevel);
         argStream.ReadBool(bIncludeWorldNonSeaLevel, true);
         argStream.ReadBool(bIncludeAllWaterElements, true);
+        argStream.ReadBool(bIncludeWorldSeaLevel, true);
+        argStream.ReadBool(bIncludeOutsideWorldLevel, false);
 
         if (!argStream.HasErrors())
         {
             if (bIncludeAllWaterElements)
                 CStaticFunctionDefinitions::SetAllElementWaterLevel(fLevel);
-            if (CStaticFunctionDefinitions::SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel))
+            if (CStaticFunctionDefinitions::SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

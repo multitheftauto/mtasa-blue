@@ -18,6 +18,7 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include "CClientModel.h"
 #include <memory>
 
 class CClientCamera;
@@ -119,6 +120,27 @@ struct SReplacedAnimation
     CAnimBlendHierarchySAInterface* pAnimationHierarchy;
 };
 
+struct SAnimationCache
+{
+    SString strName;
+    int     iTime;
+    bool    bLoop;
+    bool    bUpdatePosition;
+    bool    bInterruptable;
+    bool    bFreezeLastFrame;
+    int     iBlend;
+
+    SAnimationCache()
+    {
+        iTime = -1;
+        bLoop = false;
+        bUpdatePosition = false;
+        bInterruptable = false;
+        bFreezeLastFrame = true;
+        iBlend = 250;
+    }
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -147,6 +169,8 @@ public:
     const CEntity* GetGameEntity() const { return m_pPlayerPed; }
 
     bool IsLocalPlayer() { return m_bIsLocalPlayer; }
+    bool IsSyncing() { return m_bIsSyncing; }
+    void SetSyncing(bool bIsSyncing);
 
     bool            GetMatrix(CMatrix& Matrix) const;
     bool            SetMatrix(const CMatrix& Matrix);
@@ -300,10 +324,10 @@ public:
     CVector        GetAim() const;
     const CVector& GetAimSource() { return m_shotSyncData->m_vecShotOrigin; };
     const CVector& GetAimTarget() { return m_shotSyncData->m_vecShotTarget; };
-    unsigned char  GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
-    void           SetAim(float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim);
-    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, unsigned char cInVehicleAimAnim);
-    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, char cInVehicleAimAnim,
+    eVehicleAimDirection GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
+    void           SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim);
+    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
+    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
                                  CVector* pSource, bool bInterpolateAim);
 
     unsigned long GetMemoryValue(unsigned long ulOffset) { return (m_pPlayerPed) ? *m_pPlayerPed->GetMemoryValue(ulOffset) : 0; };
@@ -418,6 +442,7 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
+    bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
     void RunAnimation(AssocGroupId animGroup, AnimationId animID);
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
@@ -425,7 +450,7 @@ public:
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
-    const char*                 GetAnimationName();
+    const SAnimationCache&      GetAnimationCache() { return m_AnimationCache; }
 
     bool IsUsingGun();
 
@@ -471,11 +496,11 @@ public:
 
     void                        DereferenceCustomAnimationBlock() { m_pCustomAnimationIFP = nullptr; }
     std::shared_ptr<CClientIFP> GetCustomAnimationIFP() { return m_pCustomAnimationIFP; }
-    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_bLoopAnimation) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
+    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_AnimationCache.bLoop) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
     void SetCustomAnimationUntriggerable()
     {
         m_bRequestedAnimation = false;
-        m_bLoopAnimation = false;
+        m_AnimationCache.bLoop = false;
     }
     bool            IsNextAnimationCustom() { return m_bisNextAnimationCustom; }
     void            SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
@@ -539,6 +564,11 @@ protected:
 
 public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
+    // Used to control and sync entering/exiting
+    bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger);
+    bool ExitVehicle();
+    void ResetVehicleInOut();
+    void UpdateVehicleInOut();
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
 
@@ -546,6 +576,9 @@ public:
     bool      IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
     void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
     eTaskType GetTaskTypeToBeRestoredOnAnimEnd() { return m_eTaskTypeToBeRestoredOnAnimEnd; }
+
+    bool IsWarpInToVehicleRequired() { return m_bWarpInToVehicleRequired; }
+    void SetWarpInToVehicleRequired(bool warp) { m_bWarpInToVehicleRequired = warp; }
 
     void NotifyCreate();
     void NotifyDestroy();
@@ -646,14 +679,8 @@ public:
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
-    SString                                  m_strAnimationName;
     bool                                     m_bRequestedAnimation;
-    int                                      m_iTimeAnimation;
-    int                                      m_iBlendAnimation;
-    bool                                     m_bLoopAnimation;
-    bool                                     m_bUpdatePositionAnimation;
-    bool                                     m_bInterruptableAnimation;
-    bool                                     m_bFreezeLastFrameAnimation;
+    SAnimationCache                          m_AnimationCache;
     bool                                     m_bHeadless;
     bool                                     m_bFrozen;
     bool                                     m_bFrozenWaitingForGroundToLoad;
@@ -670,6 +697,7 @@ public:
     unsigned char                            m_ucLeavingDoor;
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
+    bool                                     m_bIsSyncing;
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;
@@ -717,4 +745,19 @@ public:
     ReplacedAnim_type m_mapOfReplacedAnimations;
     bool              m_bTaskToBeRestoredOnAnimEnd;
     eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
+    bool              m_bWarpInToVehicleRequired = false;
+
+    // Enter/exit variables
+    unsigned long  m_ulLastVehicleInOutTime;    // Last tick where we sent an enter/exit request
+    bool           m_bIsGettingOutOfVehicle;    // Indicates we are exiting a vehicle
+    bool           m_bIsGettingIntoVehicle;     // Indicates we are entering a vehicle
+    bool           m_bIsJackingVehicle;         // Indicates we are jacking a vehicle
+    bool           m_bIsGettingJacked;          // Indicates we are getting jacked
+    ElementID      m_VehicleInOutID;            // ElementID of vehicle received from server
+    unsigned char  m_ucVehicleInOutSeat;        // Seat ID we are entering/exiting received from server
+    bool           m_bNoNewVehicleTask;         // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
+    ElementID      m_NoNewVehicleTaskReasonID;  // ElementID of the vehicle that we are waiting on
+    CClientPed*    m_pGettingJackedBy;          // The ped that is jacking us
+
+    std::shared_ptr<CClientModel> m_clientModel;
 };

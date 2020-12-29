@@ -108,6 +108,15 @@ public:
     bool               RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit);
     void               TxdForceUnload(ushort usTxdId, bool bDestroyTextures);
 
+    void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix);
+    void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut);
+    void RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation);
+    void RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation);
+    void RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition);
+    void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition);
+    void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale);
+    void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
+
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
     void                ResetStats();

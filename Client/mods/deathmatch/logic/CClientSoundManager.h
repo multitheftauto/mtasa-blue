@@ -27,9 +27,9 @@ public:
 
     void SetDimension(unsigned short usDimension);
 
-    CClientSound* PlaySound2D(const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle);
+    CClientSound* PlaySound2D(const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
     CClientSound* PlaySound2D(void* pMemory, unsigned int uiLength, bool bLoop);
-    CClientSound* PlaySound3D(const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    CClientSound* PlaySound3D(const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
     CClientSound* PlaySound3D(void* pMemory, unsigned int uiLength, const CVector& vecPosition, bool bLoop);
 
     CClientSound* PlayGTASFX(eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop = false);
