@@ -144,16 +144,6 @@ bool CTransferBox::SetServerVisibility(bool visible)
     return true;
 }
 
-bool CTransferBox::SetAlwaysVisible(bool visible)
-{
-    if (m_alwaysVisible == visible)
-        return false;
-
-    m_alwaysVisible = visible;
-    UpdateWindowVisibility();
-    return true;
-}
-
 void CTransferBox::UpdateWindowVisibility() const
 {
     bool visible = m_visible.all() || (m_visible[TB_VISIBILITY_MTA] && m_alwaysVisible);

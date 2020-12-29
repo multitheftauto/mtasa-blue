@@ -42,7 +42,6 @@ public:
     bool SetClientVisibility(bool visible);
     bool SetServerVisibility(bool visible);
 
-    bool SetAlwaysVisible(bool visible);
     bool IsAlwaysVisible() const { return m_alwaysVisible; }
 
 private:
