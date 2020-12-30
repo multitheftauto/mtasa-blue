@@ -125,7 +125,7 @@ void CLuaThread::LoadUserProvidedCode()
 void CLuaThread::LoadScript(const char* code)
 {
     // Run the script
-    if (!CLuaMain::LuaLoadBuffer(m_luaVM, code, strlen(code), NULL, true))
+    if (!CLuaMain::LuaLoadBuffer(m_luaVM, code, strlen(code), NULL))
     {
         int luaSavedTop = lua_gettop(m_luaVM);
         int iret = lua_pcall(m_luaVM, 0, LUA_MULTRET, 0);
