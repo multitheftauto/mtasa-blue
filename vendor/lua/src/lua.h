@@ -28,7 +28,7 @@
 
 /* option for multiple returns in `lua_pcall' and `lua_call' */
 #define LUA_MULTRET	(-1)
-#define WITH_STRING_DUMP 1
+
 
 /*
 ** pseudo-indices

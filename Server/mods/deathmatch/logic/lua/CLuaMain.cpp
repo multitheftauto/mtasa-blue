@@ -637,14 +637,11 @@ void CLuaMain::CheckExecutionTime()
 // luaL_loadbuffer call wrapper
 //
 ///////////////////////////////////////////////////////////////
-int CLuaMain::LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name, bool bSkipChecks)
+int CLuaMain::LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name)
 {
-    if (!bSkipChecks)
+    if (IsLuaCompiledScript(buff, sz))
     {
-        if (IsLuaCompiledScript(buff, sz))
-        {
-            ms_strExpectedUndumpHash = GenerateSha256HexString(buff, sz);
-        }
+        ms_strExpectedUndumpHash = GenerateSha256HexString(buff, sz);
     }
 
     int iResult = luaL_loadbuffer(L, buff, sz, name);
