@@ -20,6 +20,7 @@
 class CVector2D;
 class CVector;
 class CVector4D;
+class CLuaThread;
 
 namespace lua
 {
@@ -108,6 +109,12 @@ namespace lua
     inline int Push(lua_State* L, const CMatrix& value)
     {
         lua_pushmatrix(L, value);
+        return 1;
+    }
+    
+    inline int Push(lua_State* L, CLuaThread* value)
+    {
+        lua_pushluathread(L, value);
         return 1;
     }
 

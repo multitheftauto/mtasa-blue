@@ -76,9 +76,9 @@ CLuaThread* CLuaThreadManager::GetThreadFromScriptID(uint uiScriptID)
     return pLuaThread;
 }
 
-CLuaThread* CLuaThreadManager::AddThread(const std::string& code, const CLuaArguments& Arguments)
+CLuaThread* CLuaThreadManager::AddThread(const std::string& code)
 {
-    CLuaThread* pLuaThread = new CLuaThread(code, Arguments);
+    CLuaThread* pLuaThread = new CLuaThread(code);
     m_ThreadList.push_back(pLuaThread);
     return pLuaThread;
 }

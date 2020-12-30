@@ -15,11 +15,10 @@
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
-CLuaThread::CLuaThread(const std::string& code, const CLuaArguments& Arguments)
+CLuaThread::CLuaThread(const std::string& code)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::THREAD);
     m_strCode = code;
-    m_Arguments = Arguments;
     m_pAsyncTaskSheduler = std::make_unique<SharedUtil::CAsyncTaskScheduler>(1);
     SetState(EThreadState::INITIALIZING);
     m_pAsyncTaskSheduler->PushTask<bool>(
@@ -118,8 +117,7 @@ void CLuaThread::LoadUserProvidedCode()
     int iret = lua_pcall(m_luaVM, 0, LUA_MULTRET, 0);
 
     CScriptArgReader argStream(m_luaVM);
-    CLuaArguments Arguments;
-    argStream.ReadLuaArguments(Arguments);
+    argStream.ReadLuaArguments(m_returnArguments);
 
     {
         SetState(EThreadState::IDLE);

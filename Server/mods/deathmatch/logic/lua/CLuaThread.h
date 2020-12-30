@@ -20,7 +20,7 @@ class CLuaThread;
 class CLuaThread
 {
 public:
-    CLuaThread(const std::string& code, const CLuaArguments& Arguments);
+    CLuaThread(const std::string& code);
     ~CLuaThread();
 
     void RemoveScriptID();
@@ -34,7 +34,7 @@ private:
     void LoadUserProvidedCode();
 
     std::string                                      m_strCode;
-    CLuaArguments                                    m_Arguments;
+    CLuaArguments                                    m_returnArguments;
     std::unique_ptr<SharedUtil::CAsyncTaskScheduler> m_pAsyncTaskSheduler;
     uint                                             m_uiScriptID;
 

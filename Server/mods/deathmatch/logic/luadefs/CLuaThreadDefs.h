@@ -18,6 +18,6 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    static int CreateThread(lua_State* luaVM);
+    static CLuaThread*  CreateThread(lua_State* luaVM, std::string strCode);
     static EThreadState GetThreadState(CLuaThread* pThread);
 };

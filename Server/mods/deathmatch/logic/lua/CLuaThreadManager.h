@@ -31,7 +31,7 @@ public:
 
     CLuaThread* GetThreadFromScriptID(unsigned int uiScriptID);
 
-    CLuaThread*   AddThread(const std::string&, const CLuaArguments& Arguments);
+    CLuaThread*   AddThread(const std::string&);
     void          RemoveThread(CLuaThread* pLuaTimer);
     void          RemoveAllThreads();
     unsigned long GetThreadCount() const { return m_ThreadList.size(); }
