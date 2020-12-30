@@ -1,0 +1,3 @@
+[submodule "vendor/json-c"]
+	path = vendor/json-c
+	url = https://github.com/patrikjuvonen/json-c
