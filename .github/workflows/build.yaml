@@ -127,7 +127,7 @@ jobs:
 
   linux-release:
     name: linux-release
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
     container:
       image: docker://sbx320/mtasa-blue-azure:latest
     steps:
@@ -139,7 +139,7 @@ jobs:
 
   linux-debug:
     name: linux-debug
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
     container:
       image: docker://sbx320/mtasa-blue-azure:latest
     steps:
