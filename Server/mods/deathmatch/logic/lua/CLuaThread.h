@@ -32,13 +32,19 @@ public:
     void         Call(const std::string& functionName, const CLuaArguments& arguments, CLuaArguments& returns);
     void         Call(const std::string& functionName, const CLuaArguments& arguments);
 
+    bool GetReturnArguments(CLuaArguments& arguments);
+
 private:
     void SetState(EThreadState state);
     void LoadScript(const char* code);
     void LoadUserProvidedCode();
 
     std::string                                      m_strCode;
-    CLuaArguments                                    m_returnArguments;
+
+    std::mutex    m_lockReturnArguments;
+    bool          m_bHasReturnArguments = false;
+    CLuaArguments m_returnArguments;
+
     std::unique_ptr<SharedUtil::CAsyncTaskScheduler> m_pAsyncTaskSheduler;
     uint                                             m_uiScriptID;
 

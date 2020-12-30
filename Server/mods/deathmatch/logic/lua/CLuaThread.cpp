@@ -116,7 +116,11 @@ void CLuaThread::LoadUserProvidedCode()
     int iret = lua_pcall(m_luaVM, 0, LUA_MULTRET, 0);
 
     CScriptArgReader argStream(m_luaVM);
-    argStream.ReadLuaArguments(m_returnArguments);
+    {
+        std::lock_guard  guard(m_lockReturnArguments);
+        argStream.ReadLuaArguments(m_returnArguments);
+        m_bHasReturnArguments = true;
+    }
 
     SetState(EThreadState::IDLE);
     return;
@@ -174,6 +178,17 @@ EThreadState CLuaThread::GetState()
 {
     std::lock_guard guard(m_lock);
     return m_eState;
+}
+
+bool CLuaThread::GetReturnArguments(CLuaArguments& arguments)
+{
+    std::lock_guard guard(m_lockReturnArguments);
+    if (m_bHasReturnArguments)
+    {
+        arguments = m_returnArguments;
+        return true;
+    }
+    return false;
 }
 
 void CLuaThread::RemoveScriptID()

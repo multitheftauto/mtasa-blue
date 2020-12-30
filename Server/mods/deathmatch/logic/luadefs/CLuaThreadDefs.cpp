@@ -18,6 +18,7 @@ void CLuaThreadDefs::LoadFunctions()
         {"createThread", ArgumentParser<CreateThread>},
         {"getThreadState", ArgumentParser<GetThreadState>},
         {"threadCall", ArgumentParser<ThreadCall>},
+        {"getThreadResult", GetThreadResult},
     };
 
     // Add functions
@@ -63,4 +64,32 @@ bool CLuaThreadDefs::ThreadCall(CLuaThread* pThread, std::string strFunction, st
         },
         [](bool _) { });
     return true;
+}
+
+int CLuaThreadDefs::GetThreadResult(lua_State* luaVM)
+{
+    CLuaThread* pLuaThread;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pLuaThread);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaArguments arguments;
+        if (pLuaThread->GetReturnArguments(arguments))
+        {
+            arguments.PushArguments(luaVM);
+            return arguments.Count();
+        }
+        else
+        {
+            lua_pushnil(luaVM);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
