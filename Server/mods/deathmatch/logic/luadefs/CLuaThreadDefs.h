@@ -20,4 +20,5 @@ public:
 
     static CLuaThread*  CreateThread(lua_State* luaVM, std::string strCode);
     static EThreadState GetThreadState(CLuaThread* pThread);
+    static bool ThreadCall(CLuaThread* pThread, std::string strFunction, std::optional<std::vector<CLuaArgument>> optionalArguments);
 };

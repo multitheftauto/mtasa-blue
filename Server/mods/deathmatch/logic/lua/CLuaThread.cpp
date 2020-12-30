@@ -74,12 +74,13 @@ CLuaThread::CLuaThread(const std::string& code)
                 {
                     SetState(EThreadState::READY);
                 }
+
                 m_pAsyncTaskSheduler->PushTask<bool>(
                     [&] {
                         LoadUserProvidedCode();
                         return true;
                     },
-                    [](bool _) {});
+                    [&](bool _) { SetState(EThreadState::LOADED); });
             }
             else
             {
@@ -110,18 +111,14 @@ void CLuaThread::LoadUserProvidedCode()
         return;
     }
 
-    {
-        SetState(EThreadState::BUSY);
-    }
+    SetState(EThreadState::BUSY);
 
     int iret = lua_pcall(m_luaVM, 0, LUA_MULTRET, 0);
 
     CScriptArgReader argStream(m_luaVM);
     argStream.ReadLuaArguments(m_returnArguments);
 
-    {
-        SetState(EThreadState::IDLE);
-    }
+    SetState(EThreadState::IDLE);
     return;
 }
 
@@ -148,9 +145,29 @@ void CLuaThread::LoadScript(const char* code)
     }
 }
 
+void CLuaThread::Idle()
+{
+    SetState(EThreadState::IDLE);
+}
+
 void CLuaThread::DoPulse()
 {
     m_pAsyncTaskSheduler->CollectResults();
+}
+
+void CLuaThread::Call(const std::string& functionName, const CLuaArguments& arguments, CLuaArguments& returns)
+{
+    SetState(EThreadState::BUSY);
+    arguments.CallGlobal(m_luaVM, functionName.c_str(), &returns);
+    Idle();
+}
+
+void CLuaThread::Call(const std::string& functionName, const CLuaArguments& arguments)
+{
+    CLuaArguments returns;
+    SetState(EThreadState::BUSY);
+    arguments.CallGlobal(m_luaVM, functionName.c_str(), &returns);
+    Idle();
 }
 
 EThreadState CLuaThread::GetState()

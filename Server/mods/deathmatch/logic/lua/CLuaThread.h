@@ -25,9 +25,13 @@ public:
 
     void RemoveScriptID();
     void DoPulse();
+    void Idle();
 
-    uint GetScriptID() const { return m_uiScriptID; }
+    uint         GetScriptID() const { return m_uiScriptID; }
     EThreadState GetState();
+    void         Call(const std::string& functionName, const CLuaArguments& arguments, CLuaArguments& returns);
+    void         Call(const std::string& functionName, const CLuaArguments& arguments);
+
 private:
     void SetState(EThreadState state);
     void LoadScript(const char* code);
@@ -40,6 +44,7 @@ private:
 
     EThreadState m_eState;
     std::mutex   m_lock;
-    lua_State*  m_luaVM;
+    lua_State*   m_luaVM;
     std::string  m_strError;
+    bool         m_bIsBusy;
 };

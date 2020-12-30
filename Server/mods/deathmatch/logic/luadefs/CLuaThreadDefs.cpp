@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.x
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaTimerDefs.cpp
  *  PURPOSE:     Lua function definitions class
@@ -17,6 +17,7 @@ void CLuaThreadDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createThread", ArgumentParser<CreateThread>},
         {"getThreadState", ArgumentParser<GetThreadState>},
+        {"threadCall", ArgumentParser<ThreadCall>},
     };
 
     // Add functions
@@ -46,4 +47,20 @@ CLuaThread* CLuaThreadDefs::CreateThread(lua_State* luaVM, std::string strCode)
 EThreadState CLuaThreadDefs::GetThreadState(CLuaThread* pThread)
 {
     return pThread->GetState();
+}
+
+bool CLuaThreadDefs::ThreadCall(CLuaThread* pThread, std::string strFunction, std::optional<std::vector<CLuaArgument>> optionalArguments)
+{
+    std::vector<CLuaArgument> argumentList = optionalArguments.value_or(std::vector<CLuaArgument>());
+    CLuaArguments             arguments;
+    for (auto const& argument : argumentList)
+        arguments.PushArgument(argument);
+
+    CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+        [pThread, strFunction, arguments] {
+            pThread->Call(strFunction, arguments);
+            return true;
+        },
+        [](bool _) { });
+    return true;
 }
