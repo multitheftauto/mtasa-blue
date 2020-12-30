@@ -101,6 +101,8 @@ public:
     std::vector<CLuaArgument*>::const_iterator IterBegin() const { return m_Arguments.begin(); };
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
 
+    bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+
 private:
     std::vector<CLuaArgument*> m_Arguments;
 };

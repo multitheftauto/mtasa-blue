@@ -1183,8 +1183,8 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
-        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
-                                                                                                         RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair));
+
         if (pTexture)
         {
             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
