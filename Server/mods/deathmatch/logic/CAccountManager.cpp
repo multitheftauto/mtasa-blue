@@ -481,7 +481,7 @@ void CAccountManager::RemoveAll()
     DeletePointersAndClearList(m_List);
 }
 
-bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword, bool bCheckPassword)
+bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword)
 {
     // Is he already logged in?
     if (pClient->IsRegistered())
@@ -530,7 +530,7 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
             pEchoClient->SendEcho(SString("login: Account for '%s' is already in use", szAccountName).c_str());
         return false;
     }
-    if (bCheckPassword && (!IsValidPassword(szPassword) || !pAccount->IsPassword(szPassword)))
+    if (!IsValidPassword(szPassword) || !pAccount->IsPassword(szPassword))
     {
         if (pEchoClient)
             pEchoClient->SendEcho(SString("login: Invalid password for account '%s'", szAccountName).c_str());
