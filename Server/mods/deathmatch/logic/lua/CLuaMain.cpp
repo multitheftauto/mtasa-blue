@@ -37,6 +37,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_pResourceFile = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
+    m_pLuaThreadManager = new CLuaThreadManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
     m_WarningTimer.SetMaxIncrement(1000);
     m_uiOpenFileCountWarnThresh = 10;
@@ -70,6 +71,9 @@ CLuaMain::~CLuaMain()
 
     // Delete the timer manager
     delete m_pLuaTimerManager;
+
+    // Delete the thread manager
+    delete m_pLuaThreadManager;
 
     // Eventually delete the XML files the LUA script didn't
     for (auto& xmlFile : m_XMLFiles)
@@ -361,6 +365,9 @@ void CLuaMain::UnloadScript()
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers();
 
+    // Delete all timers and events
+    m_pLuaThreadManager->RemoveAllThreads();
+
     // Delete all keybinds
     list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
     for (; iter != m_pPlayerManager->IterEnd(); ++iter)
@@ -382,6 +389,7 @@ void CLuaMain::UnloadScript()
 void CLuaMain::DoPulse()
 {
     m_pLuaTimerManager->DoPulse(this);
+    m_pLuaThreadManager->DoPulse(this);
 }
 
 // Keep count of the number of open files in this resource and issue a warning if too high

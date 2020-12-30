@@ -34,6 +34,7 @@ class CAccount;
 class CBan;
 class CElement;
 class CLuaTimer;
+class CLuaThread;
 class CResource;
 class CTextDisplay;
 class CTextItem;
@@ -77,6 +78,7 @@ public:
     CLuaArgument* PushTextDisplay(CTextDisplay* pTextDisplay);
     CLuaArgument* PushTextItem(CTextItem* pTextItem);
     CLuaArgument* PushTimer(CLuaTimer* pLuaTimer);
+    CLuaArgument* PushThread(CLuaThread* pLuaThread);
     CLuaArgument* PushDbQuery(CDbJobData* pJobData);
 
     CLuaArgument* PushArgument(const CLuaArgument& argument);

@@ -34,6 +34,7 @@ void lua_pushresource(lua_State* luaVM, class CResource* pResource);
 void lua_pushtextdisplay(lua_State* luaVM, class CTextDisplay* pDisplay);
 void lua_pushtextitem(lua_State* luaVM, class CTextItem* pItem);
 void lua_pushtimer(lua_State* luaVM, class CLuaTimer* pTimer);
+void lua_pushluathread(lua_State* luaVM, class CLuaThread* pThread);
 void lua_pushxmlnode(lua_State* luaVM, class CXMLNode* pNode);
 void lua_pushban(lua_State* luaVM, class CBan* pBan);
 void lua_pushquery(lua_State* luaVM, class CDbJobData* pJobData);

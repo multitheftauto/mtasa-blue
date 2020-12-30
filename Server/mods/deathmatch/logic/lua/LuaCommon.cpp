@@ -132,6 +132,14 @@ void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pTimer->GetScriptID()));
 }
 
+void lua_pushluathread(lua_State* luaVM, CLuaThread* pThread)
+{
+    const char* szClass = NULL;
+    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pThread->GetScriptID()));
+}
+
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
 {
     const char* szClass = NULL;
@@ -174,6 +182,8 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushxmlnode(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
+    else if (CLuaThread* pThread = UserDataCast<CLuaThread>((CLuaThread*)NULL, pData, luaVM))
+        return lua_pushluathread(luaVM, pThread);
     else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))

@@ -290,6 +290,8 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaThread>((CLuaThread*)NULL, ptr, luaVM))            // Try thread
+        return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CAccount>((CAccount*)NULL, ptr, luaVM))
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CDbJobData>((CDbJobData*)NULL, ptr, luaVM))

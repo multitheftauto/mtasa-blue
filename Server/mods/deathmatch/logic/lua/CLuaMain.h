@@ -13,6 +13,7 @@ class CLuaMain;
 
 #pragma once
 #include "CLuaTimerManager.h"
+#include "CLuaThreadManager.h"
 #include "lua/CLuaVector2.h"
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"
@@ -59,6 +60,7 @@ public:
 
     lua_State*        GetVM() { return m_luaVM; };
     CLuaTimerManager* GetTimerManager() const { return m_pLuaTimerManager; };
+    CLuaThreadManager* GetThreadManager() const { return m_pLuaThreadManager; };
 
     CBlipManager*    GetBlipManager() const { return m_pBlipManager; };
     CObjectManager*  GetObjectManager() const { return m_pObjectManager; };
@@ -123,6 +125,7 @@ private:
 
     lua_State*        m_luaVM;
     CLuaTimerManager* m_pLuaTimerManager;
+    CLuaThreadManager* m_pLuaThreadManager;
 
     class CResource*     m_pResource;
     class CResourceFile* m_pResourceFile;

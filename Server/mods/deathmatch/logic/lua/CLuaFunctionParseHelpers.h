@@ -196,6 +196,10 @@ inline SString GetClassTypeName(CLuaTimer*)
 {
     return "lua-timer";
 }
+inline SString GetClassTypeName(CLuaThread*)
+{
+    return "lua-thread";
+}
 inline SString GetClassTypeName(CAccount*)
 {
     return "account";
@@ -275,6 +279,20 @@ CLuaTimer* UserDataCast(CLuaTimer*, void* ptr, lua_State* luaVM)
         return pLuaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
+}
+
+//
+// CLuaThread from userdata
+//
+template <class T>
+CLuaThread* UserDataCast(CLuaThread*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetThreadManager()->GetThreadFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return nullptr;
 }
 
 //

@@ -428,6 +428,14 @@ CLuaArgument* CLuaArguments::PushTimer(CLuaTimer* pLuaTimer)
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushThread(CLuaThread* pLuaThread)
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadScriptID(pLuaThread->GetScriptID());
+    m_Arguments.push_back(pArgument);
+    return pArgument;
+}
+
 CLuaArgument* CLuaArguments::PushDbQuery(CDbJobData* pJobData)
 {
     CLuaArgument* pArgument = new CLuaArgument;
