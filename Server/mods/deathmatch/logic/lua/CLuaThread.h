@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaThread.h
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua thread class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -17,8 +17,6 @@ class CLuaThread;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL 0
-
 class CLuaThread
 {
 public:
@@ -26,12 +24,22 @@ public:
     ~CLuaThread();
 
     void RemoveScriptID();
+    void DoPulse();
 
-
-    uint                 GetScriptID() const { return m_uiScriptID; }
-
+    uint GetScriptID() const { return m_uiScriptID; }
+    EThreadState GetState();
 private:
-    std::string   m_strCode;
-    CLuaArguments m_Arguments;
-    uint          m_uiScriptID;
+    void SetState(EThreadState state);
+    void LoadScript(const char* code);
+    void LoadUserProvidedCode();
+
+    std::string                                      m_strCode;
+    CLuaArguments                                    m_Arguments;
+    std::unique_ptr<SharedUtil::CAsyncTaskScheduler> m_pAsyncTaskSheduler;
+    uint                                             m_uiScriptID;
+
+    EThreadState m_eState;
+    std::mutex   m_lock;
+    lua_State*  m_luaVM;
+    std::string  m_strError;
 };

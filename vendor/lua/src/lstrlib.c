@@ -829,7 +829,7 @@ static const luaL_Reg strlib[] = {
   {"byte", str_byte},
   {"char", str_char},
 #ifdef WITH_STRING_DUMP
-  //{"dump", str_dump},
+  {"dump", str_dump},
 #endif
   {"find", str_find},
   {"format", str_format},

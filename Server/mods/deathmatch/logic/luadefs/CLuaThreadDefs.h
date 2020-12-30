@@ -19,4 +19,5 @@ public:
     static void AddClass(lua_State* luaVM);
 
     static int CreateThread(lua_State* luaVM);
+    static EThreadState GetThreadState(CLuaThread* pThread);
 };

@@ -109,7 +109,7 @@ void CLuaMain::ResetInstructionCount()
     m_FunctionEnterTimer.Reset();
 }
 
-void CLuaMain::InitSecurity()
+void CLuaMain::InitSecurity(lua_State* luaVM)
 {
     // Disable dangerous Lua Os library functions
     static const luaL_reg osfuncs[] =
@@ -123,17 +123,17 @@ void CLuaMain::InitSecurity()
         { "setlocale", CLuaUtilDefs::DisabledFunction },
         { NULL, NULL }
     };
-    luaL_register(m_luaVM, "os", osfuncs);
+    luaL_register(luaVM, "os", osfuncs);
 
-    lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "require", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "require", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
 }
 
-void CLuaMain::InitClasses(lua_State* luaVM)
+void CLuaMain::InitClasses(lua_State* luaVM, bool bEnableOOP)
 {
     lua_initclasses(luaVM);
     lua_newclass(luaVM);
@@ -145,7 +145,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaMatrixDefs ::AddClass(luaVM);
 
     // OOP based classes
-    if (!m_bEnableOOP)
+    if (!bEnableOOP)
         return;
 
     CLuaElementDefs ::AddClass(luaVM);            // keep this at the top because inheritance
@@ -192,13 +192,13 @@ void CLuaMain::InitVM()
     luaopen_os(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
+    InitSecurity(m_luaVM);
 
     // Registering C functions
     CLuaCFunctions::RegisterFunctionsWithVM(m_luaVM);
 
     // Create class metatables
-    InitClasses(m_luaVM);
+    InitClasses(m_luaVM, m_bEnableOOP);
 
     // Oli: Don't forget to add new ones to CLuaManager::LoadCFunctions. Thanks!
 
@@ -637,11 +637,14 @@ void CLuaMain::CheckExecutionTime()
 // luaL_loadbuffer call wrapper
 //
 ///////////////////////////////////////////////////////////////
-int CLuaMain::LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name)
+int CLuaMain::LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name, bool bSkipChecks)
 {
-    if (IsLuaCompiledScript(buff, sz))
+    if (!bSkipChecks)
     {
-        ms_strExpectedUndumpHash = GenerateSha256HexString(buff, sz);
+        if (IsLuaCompiledScript(buff, sz))
+        {
+            ms_strExpectedUndumpHash = GenerateSha256HexString(buff, sz);
+        }
     }
 
     int iResult = luaL_loadbuffer(L, buff, sz, name);

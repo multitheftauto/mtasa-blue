@@ -67,4 +67,27 @@ DECLARE_ENUM(EHashFunction::EHashFunctionType);
 DECLARE_ENUM_CLASS(PasswordHashFunction);
 DECLARE_ENUM_CLASS(StringEncryptFunction);
 
+
+enum class EThreadState
+{
+    // lua virtual machine is being creation
+    INITIALIZING,
+    // something went wrong while initializing
+    FAILURE,
+    // lua_State* get created,
+    READY,
+    // code provided by user get loaded
+    LOADED,
+    // thread is executing code
+    BUSY,
+    // does nothing, sleeping
+    IDLE,
+    // result is ready to collect
+    FINISHED,
+    // Internal state of thread get cleaned,
+    DEAD
+};
+
+DECLARE_ENUM_CLASS(EThreadState);
+
 DECLARE_ENUM(ePacketID);

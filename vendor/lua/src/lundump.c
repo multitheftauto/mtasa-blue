@@ -188,7 +188,7 @@ static Proto* LoadFunction(LoadState* S, TString* p)
  LoadCode(S,f);
  LoadConstants(S,f);
  LoadDebug(S,f);
- IF (!luaG_checkcode(f), "bad code");
+// IF (!luaG_checkcode(f), "bad code");
  S->L->top--;
  S->L->nCcalls--;
  return f;

@@ -18,6 +18,13 @@ void CLuaThreadManager::DoPulse(CLuaMain* pLuaMain)
     assert(!m_pProcessingThread);
 
     CTickCount llCurrentTime = CTickCount::Now();
+
+    // Delete all the Threads
+    CFastList<CLuaThread*>::const_iterator iter = m_ThreadList.begin();
+    for (; iter != m_ThreadList.end(); ++iter)
+    {
+        (*iter)->DoPulse();
+    }
 }
 
 void CLuaThreadManager::RemoveThread(CLuaThread* pLuaThread)
