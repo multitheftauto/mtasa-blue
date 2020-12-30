@@ -1273,6 +1273,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
         // FUNC_SetColModel resets bDoWeOwnTheColModel
         m_pInterface->bDoWeOwnTheColModel = false;
+        m_pInterface->bCollisionWasStreamedWithModel = false;
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
@@ -1327,8 +1328,6 @@ void CModelInfoSA::RestoreColModel()
                 push    dwOriginalColModelInterface
                 call    dwFunc
             }
-
-            m_pInterface->bDoWeOwnTheColModel = false;
 
             // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
             DWORD func = 0x5B2C20;
