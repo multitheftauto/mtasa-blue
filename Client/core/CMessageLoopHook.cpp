@@ -131,7 +131,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE)
         {
             GetVideoModeManager()->OnLoseFocus();
-            g_pCore->GetKeyBinds()->OnLoseFocus();
         }
         if (uMsg == WM_PAINT)
         {

@@ -255,24 +255,8 @@ const SDefaultCommandBind g_dcbDefaultCommands[] = {{"g", true, "enter_passenger
 
                                                     {"", false, NULL, NULL}};
 
-static bool bindableKeyStates[std::size(g_bkKeys)];
-
 // HACK: our current shift key states
 bool bPreLeftShift = false, bPreRightShift = false;
-
-enum eBindableKeys
-{
-    BK_MOUSE_WHEEL_UP = 5,
-    BK_MOUSE_WHEEL_DOWN = 6,
-};
-
-static bool& GetBindableKeyState(const SBindableKey* key)
-{
-    intptr_t base = reinterpret_cast<intptr_t>(&g_bkKeys[0]);
-    intptr_t offset = reinterpret_cast<intptr_t>(key);
-    size_t index = (offset - base) / sizeof(SBindableKey);
-    return bindableKeyStates[index];
-}
 
 // Ensure zero length strings are NULL
 static void NullEmptyStrings(const char*& a, const char*& b = *(const char**)NULL, const char*& c = *(const char**)NULL, const char*& d = *(const char**)NULL,
@@ -335,18 +319,6 @@ bool CKeyBinds::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return false;
 }
 
-void CKeyBinds::OnLoseFocus()
-{
-    for (size_t i = 0; i < std::size(bindableKeyStates); ++i)
-    {
-        if (bindableKeyStates[i] == true)
-        {
-            const SBindableKey* key = &g_bkKeys[i];
-            ProcessKeyStroke(key, false);
-        }
-    }
-}
-
 bool CKeyBinds::ProcessCharacter(WPARAM wChar)
 {
     if (m_CharacterKeyHandler && m_CharacterKeyHandler(wChar))
@@ -377,7 +349,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     if (m_pCore->IsCursorForcedVisible())
     {
         if (!bIsCursorForced)
-        {   
+        {
             if (m_pCore->IsCursorControlsToggled())
             {
                 SetAllControls(false);
@@ -395,9 +367,6 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     bool bIsConsoleInputKey = true;
     if ((pKey->ulCode >= VK_F1 && pKey->ulCode <= VK_F12) || (pKey->ulCode <= VK_MBUTTON))
         bIsConsoleInputKey = false;
-
-    bool& keyState = GetBindableKeyState(pKey);
-    keyState = bState;
 
     bool bAllowed = TriggerKeyStrokeHandler(pKey->szKey, bState, bIsConsoleInputKey);
 
@@ -1812,19 +1781,18 @@ bool CKeyBinds::ControlFunctionExists(SBindableGTAControl* pControl, ControlFunc
     return false;
 }
 
-const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey) const
+const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey)
 {
-    for (int i = 0; *g_bkKeys[i].szKey != 0; i++)
+    for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
-
         if (!stricmp(temp->szKey, szKey))
         {
             return temp;
         }
     }
 
-    return nullptr;
+    return NULL;
 }
 
 SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
@@ -1945,17 +1913,6 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
         }
     }
     return NULL;
-}
-
-bool CKeyBinds::GetKeyStateByName(const char* keyName, bool& state) const
-{
-    if (const SBindableKey* key = GetBindableFromKey(keyName); key != nullptr)
-    {
-        state = GetBindableKeyState(key);
-        return true;
-    }
-    
-    return false;
 }
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
@@ -2306,13 +2263,7 @@ void CKeyBinds::DoPostFramePulse()
         cs.ButtonTriangle = (g_bcControls[9].bState) ? 255 : 0;            // Enter Exit
         cs.Select = (g_bcControls[10].bState) ? 255 : 0;                   // Change View
 
-        bool disableGameplayControls = m_pCore->IsCursorForcedVisible() && m_pCore->IsCursorControlsToggled();
-
-        if (!disableGameplayControls)
-        {
-            GetJoystickManager()->ApplyAxes(cs, bInVehicle);
-        }
-
+        GetJoystickManager()->ApplyAxes(cs, bInVehicle);
         // m_pCore->GetMouseControl()->ApplyAxes ( cs );
     }
 
@@ -2348,10 +2299,6 @@ void CKeyBinds::DoPostFramePulse()
                 }
             }
         }
-
-        bindableKeyStates[BK_MOUSE_WHEEL_UP] = false;
-        bindableKeyStates[BK_MOUSE_WHEEL_DOWN] = false;
-        
         m_bMouseWheel = false;
     }
 }

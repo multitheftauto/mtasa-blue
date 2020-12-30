@@ -57,7 +57,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isTrainDerailable", IsTrainDerailable},
         {"getTrainDirection", GetTrainDirection},
         {"getTrainSpeed", GetTrainSpeed},
-        //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
+        {"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
         {"isTrainChainEngine", IsTrainChainEngine},
         {"getVehicleGravity", GetVehicleGravity},
@@ -118,7 +118,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
         {"setTrainSpeed", SetTrainSpeed},
-        //{"setTrainTrack", ArgumentParser<SetTrainTrack>},
+        {"setTrainTrack", ArgumentParser<SetTrainTrack>},
         {"setTrainPosition", SetTrainPosition},
         {"setVehicleTaxiLightOn", SetVehicleTaxiLightOn},
         {"setVehicleGravity", SetVehicleGravity},
@@ -179,7 +179,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getNitroLevel", "getVehicleNitroLevel");
     lua_classfunction(luaVM, "getDirection", "getTrainDirection");
     lua_classfunction(luaVM, "getTrainSpeed", "getTrainSpeed");
-    //lua_classfunction(luaVM, "getTrack", "getTrainTrack");
+    lua_classfunction(luaVM, "getTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getName", "getVehicleName");
     lua_classfunction(luaVM, "getVehicleType", "getVehicleType");
@@ -263,7 +263,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setNitroLevel", "setVehicleNitroLevel");
     lua_classfunction(luaVM, "setDirection", "setTrainDirection");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");
-    //lua_classfunction(luaVM, "setTrack", "setTrainTrack");
+    lua_classfunction(luaVM, "setTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
@@ -320,7 +320,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle");
     lua_classvariable(luaVM, "direction", "setTrainDirection", "getTrainDirection");
     lua_classvariable(luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed");
-    //lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
+    lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
     lua_classvariable(luaVM, "trainPosition", "setTrainPosition", "getTrainPosition");
     lua_classvariable(luaVM, "derailable", "setTrainDerailable", "isTrainDerailable");
     lua_classvariable(luaVM, "derailed", "setTrainDerailed", "isTrainDerailed");

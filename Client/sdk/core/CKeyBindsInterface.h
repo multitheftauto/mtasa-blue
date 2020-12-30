@@ -147,7 +147,6 @@ class CKeyBindsInterface
 {
 public:
     virtual bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
-    virtual void OnLoseFocus() = 0;
 
     // Basic funcs
     virtual void Add(CKeyBind* pKeyBind) = 0;
@@ -214,13 +213,11 @@ public:
 
     // Key/code funcs
     virtual const SBindableKey* GetBindableFromKey(const char* szKey) = 0;
-    virtual const SBindableKey* GetBindableFromKey(const char* szKey) const = 0;
     virtual const SBindableKey* GetBindableFromGTARelative(int iGTAKey) = 0;
     virtual bool                IsKey(const char* szKey) = 0;
     virtual const SBindableKey* GetBindableFromMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bState) = 0;
     virtual void                SetKeyStrokeHandler(KeyStrokeHandler Handler) = 0;
     virtual void                SetCharacterKeyHandler(CharacterKeyHandler Handler) = 0;
-    virtual bool                GetKeyStateByName(const char* keyName, bool& state) const = 0;
 
     // Control/action funcs
     virtual SBindableGTAControl* GetBindableFromControl(const char* szControl) = 0;

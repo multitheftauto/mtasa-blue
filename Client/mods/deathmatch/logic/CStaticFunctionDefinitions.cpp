@@ -6999,10 +6999,21 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
 
 bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
 {
-    if (szKey == nullptr || !g_pCore->IsFocused())
-        return false;
+    assert(szKey);
 
-    return g_pCore->GetKeyBinds()->GetKeyStateByName(szKey, bState);
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey(szKey);
+    if (pKey)
+    {
+        if (g_pCore->IsFocused())
+        {
+            bState = (::GetKeyState(pKey->ulCode) & 0x8000) ? true : false;
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bState)
