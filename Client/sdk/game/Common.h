@@ -12,6 +12,8 @@
 #pragma once
 
 #include <windows.h>
+#include <type_traits>
+#include <stdint.h>
 
 // Limits for MTA
 #define MAX_VEHICLES_MTA                    64          // Real limit is 110
@@ -184,17 +186,17 @@ typedef struct eControlStatesSA
     DWORD dwKeyHeld;
 } eControlStatesSA;
 
-enum class eVehicleModelTypes
+enum class VehicleClass : uint8_t
 {
-    AUTOMOBILE = 0,
-    MONSTERTRUCK,
-    QUADBIKE,
-    HELICOPTER,
+    AUTOMOBILE,
+    MONSTER_TRUCK,
+    QUAD,
+    HELI,
     PLANE,
     BOAT,
     TRAIN,
-    FHELI, // RC ?
-    FPLANE, // RC ?
+    FAKE_HELI,
+    FAKE_PLANE,
     BIKE,
     BMX,
     TRAILER,

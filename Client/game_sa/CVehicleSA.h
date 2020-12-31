@@ -326,9 +326,6 @@ class CAutoPilot
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
-/**
- * \todo GAME RELEASE: Update CVehicleSAInterface
- */
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
@@ -433,10 +430,12 @@ public:
     BYTE Padding225[4];
 
     // 1424
-    BYTE m_type;            // 0 = car/plane, 5 = boat, 6 = train, 9 = bike
+    uint8_t  m_vehicleClass;
+    uint32_t m_vehicleSubClass;
 
-    // 1425
-    BYTE Padding226[15];
+    int16_t    m_peviousRemapTxd;
+    int16_t    m_remapTxd;
+    RwTexture* m_pRemapTexture;
 };
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
 

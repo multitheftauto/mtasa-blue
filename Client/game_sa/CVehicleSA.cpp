@@ -1950,14 +1950,13 @@ void CVehicleSA::SetBikeWheelStatus(BYTE bWheel, BYTE bStatus)
 bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    switch (vehicle->m_type)
+    switch ((VehicleClass)vehicle->m_vehicleClass)
     {
-        case 0:
+        case VehicleClass::AUTOMOBILE:
             if (eWheelPosition < 4)
                 return vehicle->m_wheelCollisionState[eWheelPosition] == 4.f;
             break;
-
-        case 9:
+        case VehicleClass::BIKE:
             if (eWheelPosition < 2)
                 return *(float*)((DWORD)vehicle + 0x730 + eWheelPosition * 8) == 4.f || *(float*)((DWORD)vehicle + 0x734 + eWheelPosition * 8) == 4.f;
             break;
