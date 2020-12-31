@@ -1465,7 +1465,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     else
     {
         // Passenger seat
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModelOriginal, uiSeat);
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -4496,7 +4496,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
     else
     {
         // HACK: Grabs the closest passenger-door for bikes
-        eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->m_usModel);
+        eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->m_usModelOriginal);
         if (vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_QUADBIKE)
         {
             unsigned int uiTemp;
@@ -4506,7 +4506,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
             }
         }
 
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModelOriginal, uiSeat);
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)

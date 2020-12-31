@@ -199,7 +199,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not changed the wheel scale
     m_bWheelScaleChanged = false;
-    m_clientModel = pManager->GetModelManager()->FindModelByID(m_usModelOriginal);
+    m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 }
 
 CClientVehicle::~CClientVehicle()
@@ -1031,6 +1031,11 @@ void CClientVehicle::SetTurretRotation(float fHorizontal, float fVertical)
 
 void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
+    SetModelBlocking(usModel, usModel, ucVariant, ucVariant2);
+}
+
+void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned short usModelOriginal, unsigned char ucVariant, unsigned char ucVariant2)
+{
     // Different vehicle ID than we have now?
     if (m_usModel != usModel)
     {
@@ -1046,20 +1051,21 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
 
         // Are we swapping from a vortex or skimmer?
         bool bResetWheelAndDoorStates = (m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER ||
-                                         (m_eVehicleType == CLIENTVEHICLE_PLANE && m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel)));
+                                         (m_eVehicleType == CLIENTVEHICLE_PLANE && m_eVehicleType != CClientVehicleManager::GetVehicleType(usModelOriginal)));
 
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)
-            CClientVehicleManager::GetRandomVariation(usModel, ucVariant, ucVariant2);
+            CClientVehicleManager::GetRandomVariation(usModelOriginal, ucVariant, ucVariant2);
         m_ucVariation = ucVariant;
         m_ucVariation2 = ucVariant2;
 
         // Set the new vehicle id and type
         eClientVehicleType eOldVehicleType = m_eVehicleType;
         m_usModel = usModel;
-        if (m_clientModel && m_clientModel->GetModelID() != m_usModel)
+        m_usModelOriginal = usModelOriginal;
+        if (m_clientModel && m_clientModel->GetModelID() != usModel)
             m_clientModel = nullptr;
-        m_eVehicleType = CClientVehicleManager::GetVehicleType(usModel);
+        m_eVehicleType = CClientVehicleManager::GetVehicleType(usModelOriginal);
         m_bHasDamageModel = CClientVehicleManager::HasDamageModel(m_eVehicleType);
 
         if (bResetWheelAndDoorStates)
@@ -1090,12 +1096,10 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
 
         // Grab the model info and the bounding box
         m_pModelInfo = g_pGame->GetModelInfo(usModel);
-        m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
+        m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModelOriginal);
 
         // Reset handling to fit the vehicle
-        ushort usHandlingModelID = usModel;
-        if (usHandlingModelID < 400 || usHandlingModelID > 611)
-            usHandlingModelID = m_pModelInfo->GetParentID();
+        ushort usHandlingModelID = usModelOriginal;
 
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usHandlingModelID);
         m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);

@@ -209,6 +209,7 @@ public:
     unsigned short GetModel() { return m_usModel; };
     unsigned short GetModelOriginal() { return m_usModelOriginal; };
     void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    void           SetModelBlocking(unsigned short usModel, unsigned short usModelOriginal, unsigned char ucVariant, unsigned char ucVariant2);
 
     unsigned char GetVariant() { return m_ucVariation; };
     unsigned char GetVariant2() { return m_ucVariation2; };
