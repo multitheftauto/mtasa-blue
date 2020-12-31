@@ -134,6 +134,20 @@ namespace lua
         return 1;
     }
 
+    template <typename T>
+    int Push(lua_State* L, const std::shared_ptr<T>& ptr)
+    {
+        lua_pushelement(L, ptr.get());
+        return 1;
+    }
+
+    template <typename T>
+    int Push(lua_State* L, const std::unique_ptr<T>& ptr)
+    {
+        lua_pushelement(L, ptr.get());
+        return 1;
+    }
+
     /*****************************************************************\
     * The functions below may depend on each other, so they need to be
     * forward declared.
