@@ -161,6 +161,20 @@ namespace lua
         return 1;
     }
 
+    template <typename T>
+    int Push(lua_State* L, const std::shared_ptr<T>& ptr)
+    {
+        lua_pushelement(L, ptr.get());
+        return 1;
+    }
+
+    template <typename T>
+    int Push(lua_State* L, const std::unique_ptr<T>& ptr)
+    {
+        lua_pushelement(L, ptr.get());
+        return 1;
+    }
+
     /*****************************************************************\
     * The functions below may depend on each other, so they need to be
     * forward declared.
@@ -182,7 +196,7 @@ namespace lua
     template <typename K, typename V>
     int Push(lua_State* L, const std::unordered_map<K, V>& val);
 
-    template <typename... Ts>
+    template<typename... Ts>
     int Push(lua_State* L, const std::tuple<Ts...>& tuple);
 
     // Define after this line, declare above.
@@ -249,40 +263,11 @@ namespace lua
     }
 
     // Tuples can be used to return multiple results
-    template <typename... Ts>
+    template<typename... Ts>
     int Push(lua_State* L, const std::tuple<Ts...>& tuple)
     {
         // Call Push on each element of the tuple
         std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
         return sizeof...(Ts);
     }
-
-    // Overload for enum types only
-    template <typename T>
-    typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
-    {
-        return Push(L, EnumToString(val));
-    }
-
-    // Overload for pointers to classes. We boldly assume that these are script entities
-    template <typename T>
-    typename std::enable_if_t<(std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
-    {
-        lua_pushelement(L, val);
-        return 1;
-    }
-
-    template <typename T>
-    int Push(lua_State* L, const std::shared_ptr<T>& ptr)
-    {
-        Push(L, ptr.get());
-        return 1;
-    }
-
-    template <typename T>
-    int Push(lua_State* L, const std::unique_ptr<T>& ptr)
-    {
-        lua_pushelement(L, ptr.get());
-        return 1;
-    }
-};            // namespace lua
+}
