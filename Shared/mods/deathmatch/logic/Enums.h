@@ -74,18 +74,12 @@ enum class EThreadState
     INITIALIZING,
     // something went wrong while initializing
     FAILURE,
-    // lua_State* get created,
-    READY,
-    // code provided by user get loaded
-    LOADED,
     // thread is executing code
     BUSY,
     // does nothing, sleeping
     IDLE,
-    // result is ready to collect
-    FINISHED,
-    // Internal state of thread get cleaned,
-    DEAD
+    // thread exited
+    EXIT,
 };
 
 DECLARE_ENUM_CLASS(EThreadState);

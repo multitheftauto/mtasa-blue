@@ -66,31 +66,20 @@ CLuaThread::CLuaThread(const std::string& code)
             int stackSize = lua_gettop(m_luaVM);
             lua_pop(m_luaVM, stackSize);
 
+            LoadUserProvidedCode();
+
             return true;
         },
         [&](bool success) {
             if (success)
             {
-                {
-                    SetState(EThreadState::READY);
-                }
-
-                m_pAsyncTaskSheduler->PushTask<bool>(
-                    [&] {
-                        LoadUserProvidedCode();
-                        return true;
-                    },
-                    [&](bool _) { SetState(EThreadState::LOADED); });
-            }
-            else
-            {
-                SetState(EThreadState::FAILURE);
             }
         });
 }
 
 CLuaThread::~CLuaThread()
 {
+    Close();
     RemoveScriptID();
 }
 
@@ -100,6 +89,14 @@ void CLuaThread::SetState(EThreadState state)
     m_eState = state;
 }
 
+void CLuaThread::Close()
+{
+    if (m_luaVM)
+    {
+        lua_close(m_luaVM);
+        m_luaVM = nullptr;
+    }
+}
 void CLuaThread::LoadUserProvidedCode()
 {
     int iResult = luaL_loadbuffer(m_luaVM, reinterpret_cast<const char*>(m_strCode.c_str()), m_strCode.length(), "foo");
@@ -122,7 +119,7 @@ void CLuaThread::LoadUserProvidedCode()
         m_bHasReturnArguments = true;
     }
 
-    SetState(EThreadState::IDLE);
+    Idle();
     return;
 }
 
@@ -153,6 +150,10 @@ void CLuaThread::Idle()
 {
     SetState(EThreadState::IDLE);
 }
+void CLuaThread::Idle()
+{
+    SetState(EThreadState::IDLE);
+}
 
 void CLuaThread::DoPulse()
 {
@@ -168,10 +169,14 @@ void CLuaThread::Call(const std::string& functionName, const CLuaArguments& argu
 
 void CLuaThread::Call(const std::string& functionName, const CLuaArguments& arguments)
 {
-    CLuaArguments returns;
-    SetState(EThreadState::BUSY);
-    arguments.CallGlobal(m_luaVM, functionName.c_str(), &returns);
-    Idle();
+    m_pAsyncTaskSheduler->PushTask<bool>(
+        [&, arguments] {
+            CLuaArguments returns;
+            SetState(EThreadState::BUSY);
+            arguments.CallGlobal(m_luaVM, functionName.c_str(), &returns);
+            return true;
+        },
+        [&](bool _) { Idle(); });
 }
 
 EThreadState CLuaThread::GetState()

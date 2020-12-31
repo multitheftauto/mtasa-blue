@@ -35,6 +35,8 @@ public:
     bool GetReturnArguments(CLuaArguments& arguments);
 
 private:
+    void Close();
+
     void SetState(EThreadState state);
     void LoadScript(const char* code);
     void LoadUserProvidedCode();
