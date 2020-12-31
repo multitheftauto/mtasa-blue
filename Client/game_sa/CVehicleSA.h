@@ -465,6 +465,8 @@ private:
     unsigned char                    m_ucVariantCount;
     bool                             m_doorsUndamageable = false;
 
+    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+
 public:
     CVehicleSA();
     CVehicleSA(CVehicleSAInterface* vehicleInterface);
@@ -743,6 +745,11 @@ public:
     void UpdateLandingGearPosition();
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
+
+    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const override;
+    bool SetDummyPosition(eVehicleDummies dummy, CVector position) override;
+
+    CVector* GetDummyPositions() { return m_dummyPositions.data(); }
 
 private:
     void           RecalculateSuspensionLines();

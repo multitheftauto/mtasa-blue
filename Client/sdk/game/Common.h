@@ -1552,6 +1552,7 @@ enum eVehicleDummies
     EXHAUST_SECONDARY,
     WING_AIRTRAIL,
     VEH_GUN,
+    VEHICLE_DUMMY_COUNT,
 };
 
 enum class eResizableVehicleWheelGroup

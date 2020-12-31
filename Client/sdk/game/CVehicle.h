@@ -334,4 +334,7 @@ public:
     virtual float                             GetWheelScale() = 0;
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
+
+    virtual bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const = 0;
+    virtual bool SetDummyPosition(eVehicleDummies dummy, CVector position) = 0;
 };

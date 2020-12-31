@@ -204,6 +204,17 @@ void CVehicleSA::Init()
     GetVehicleInterface()->m_pVehicle = this;
     g_bVehiclePointerInvalid = false;
 
+    CModelInfo* modelInfo = pGame->GetModelInfo(GetModelIndex());
+
+    if (modelInfo != nullptr)
+    {
+        for (size_t i = 0; i < m_dummyPositions.size(); ++i)
+        {
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((eVehicleDummies)i);
+            m_dummyPositions[i].fZ += 1.0f;
+        }
+    }
+
     // Unlock doors as they spawn randomly with locked doors
     LockDoors(false);
 
@@ -2667,6 +2678,29 @@ void CVehicleSA::UpdateLandingGearPosition()
         }
     }
 }
+
+bool CVehicleSA::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        position = m_dummyPositions[dummy];
+        return true;
+    }
+
+    return false;
+}
+
+bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, CVector position)
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        m_dummyPositions[dummy] = position;
+        return true;
+    }
+
+    return false;
+}
+
 // Change plate text of existing vehicle
 bool CVehicleSA::SetPlateText(const SString& strText)
 {
