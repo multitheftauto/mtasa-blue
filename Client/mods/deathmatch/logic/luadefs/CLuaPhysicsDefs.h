@@ -129,22 +129,3 @@ public:
     static bool PhysicsIsEnabled(CLuaPhysicsElement* pElement);
 };
 
-template <class... Ts>
-struct overloaded : Ts...
-{
-    using Ts::operator()...;
-};
-
-template <typename F>
-bool CallAlternative(CLuaPhysicsElement* pElement, F&& func)
-{
-    if (CLuaPhysicsSphereShape* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
-        return func(pSphere);
-    if (CLuaPhysicsCapsuleShape* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
-        return func(pCapsule);
-    if (CLuaPhysicsCylinderShape* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
-        return func(pCylinder);
-    if (CLuaPhysicsConeShape* pCone = dynamic_cast<CLuaPhysicsConeShape*>(pElement))
-        return func(pCone);
-    return false;
-}

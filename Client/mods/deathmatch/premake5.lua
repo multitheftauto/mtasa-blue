@@ -3,11 +3,11 @@ project "Client Deathmatch"
 	kind "SharedLib"
 	targetname "client"
 	targetdir(buildpath("mods/deathmatch"))
-
+	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
-	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
+	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT", "CL=/Zm500" }
 	links {
 		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "BulletDynamics", "BulletCollision", "LinearMath",
 		"../../../vendor/bass/lib/bass",
@@ -61,7 +61,7 @@ project "Client Deathmatch"
 	}
 
 	configuration "windows"
-		buildoptions { "-Zm180" }
+		buildoptions { "-Zm500"}
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
