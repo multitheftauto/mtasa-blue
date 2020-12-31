@@ -93,6 +93,5 @@ public:
     LUA_DECLARE(RestoreAllWorldModels);
     LUA_DECLARE(resetMoonSize);
 
-    // Custom models
     LUA_DECLARE(RequestModel);
 };

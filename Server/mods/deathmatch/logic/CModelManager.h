@@ -23,5 +23,4 @@ public:
 private:
     std::map<unsigned short, unsigned short> m_ModelsParent;
     std::map<unsigned short, eModelType> m_ModelsType;
-    unsigned int m_modelCount = 0;
 };

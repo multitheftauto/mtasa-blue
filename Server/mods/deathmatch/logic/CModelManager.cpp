@@ -15,10 +15,8 @@ bool CModelManager::RequestModel(ushort modelID, ushort parentID, eModelType mod
     if (IsValidModel(modelID))
         return false;
 
-    MapSet(m_ModelsParent, modelID, parentID);
-    MapSet(m_ModelsType, modelID, modelType);
-
-    ++m_modelCount;
+    m_ModelsParent[modelID] = parentID;
+    m_ModelsType[modelID] = modelType;
     
     return true;
 }
