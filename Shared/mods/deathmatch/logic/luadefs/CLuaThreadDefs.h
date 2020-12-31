@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #pragma once
-#include "CLuaDefs.h"
 
 class CLuaThreadDefs : public CLuaDefs
 {

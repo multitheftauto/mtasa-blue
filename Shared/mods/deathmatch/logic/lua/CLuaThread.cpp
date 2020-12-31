@@ -11,10 +11,6 @@
 
 #include "StdInc.h"
 
-#include "luascripts/coroutine_debug.lua.h"
-#include "luascripts/exports.lua.h"
-#include "luascripts/inspect.lua.h"
-
 CLuaThread::CLuaThread(const std::string& code)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::THREAD);
@@ -108,7 +104,7 @@ void CLuaThread::LoadScript(const char* code)
         if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
         {
             std::string strRes = ConformResourcePath(lua_tostring(m_luaVM, -1));
-            g_pGame->GetScriptDebugging()->LogPCallError(m_luaVM, strRes);
+            //g_pGame->GetScriptDebugging()->LogPCallError(m_luaVM, strRes);
         }
         // Cleanup any return values
         if (lua_gettop(m_luaVM) > luaSavedTop)
@@ -117,7 +113,7 @@ void CLuaThread::LoadScript(const char* code)
     else
     {
         std::string strRes = ConformResourcePath(lua_tostring(m_luaVM, -1));
-        g_pGame->GetScriptDebugging()->LogError(m_luaVM, "Loading in-line script failed: %s", strRes.c_str());
+        //g_pGame->GetScriptDebugging()->LogError(m_luaVM, "Loading in-line script failed: %s", strRes.c_str());
     }
 }
 
@@ -147,7 +143,7 @@ void CLuaThread::Call(const std::string& functionName, const CLuaArguments& argu
             arguments.CallGlobal(m_luaVM, functionName.c_str(), &returns);
             return true;
         },
-        [&](bool _) { Idle(); });
+        [&](bool __) { Idle(); });
 }
 
 EThreadState CLuaThread::GetState()

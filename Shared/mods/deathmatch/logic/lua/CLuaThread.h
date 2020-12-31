@@ -13,10 +13,6 @@ class CLuaThread;
 
 #pragma once
 
-// Define includes
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
-
 class CLuaThread
 {
 public:

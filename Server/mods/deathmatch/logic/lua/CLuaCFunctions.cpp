@@ -13,6 +13,8 @@
 
 CFastHashMap<lua_CFunction, CLuaCFunction*> CLuaCFunctions::ms_Functions;
 CFastHashMap<SString, CLuaCFunction*>       CLuaCFunctions::ms_FunctionsByName;
+CFastHashMap<SString, CLuaCFunction*>       CLuaCFunctions::ms_ThreadSafeFunctionsByName;
+CFastHashMap<SString, CLuaCFunction*>       CLuaCFunctions::ms_ThreadFunctionsByName;
 void*                                       CLuaCFunctions::ms_pFunctionPtrLow = (void*)0xffffffff;
 void*                                       CLuaCFunctions::ms_pFunctionPtrHigh = 0;
 
@@ -42,7 +44,7 @@ CLuaCFunctions::~CLuaCFunctions()
     RemoveAllFunctions();
 }
 
-CLuaCFunction* CLuaCFunctions::AddFunction(const char* szName, lua_CFunction f, bool bRestricted)
+CLuaCFunction* CLuaCFunctions::AddFunction(const char* szName, lua_CFunction f, bool bRestricted, EFunctionApplication eFunctionApplication)
 {
     ms_pFunctionPtrLow = std::min<void*>(ms_pFunctionPtrLow, (void*)f);
     ms_pFunctionPtrHigh = std::max<void*>(ms_pFunctionPtrHigh, (void*)f);
@@ -59,7 +61,19 @@ CLuaCFunction* CLuaCFunctions::AddFunction(const char* szName, lua_CFunction f, 
         pFunction = new CLuaCFunction(szName, f, bRestricted);
         ms_Functions[f] = pFunction;
     }
-    ms_FunctionsByName[szName] = pFunction;
+
+    switch (eFunctionApplication)
+    {
+        case EFunctionApplication::MAIN_THREAD:
+            ms_FunctionsByName[szName] = pFunction;
+            break;
+        case EFunctionApplication::SHARED:
+            ms_ThreadSafeFunctionsByName[szName] = pFunction;
+            break;
+        case EFunctionApplication::WORKER_THREAD:
+            ms_ThreadFunctionsByName[szName] = pFunction;
+            break;
+    }
     return pFunction;
 }
 
@@ -113,6 +127,30 @@ void CLuaCFunctions::RegisterFunctionsWithVM(lua_State* luaVM)
     // Register all our functions to a lua VM
     CFastHashMap<SString, CLuaCFunction*>::iterator it;
     for (it = ms_FunctionsByName.begin(); it != ms_FunctionsByName.end(); ++it)
+    {
+        lua_pushstring(luaVM, it->first.c_str());
+        lua_pushcclosure(luaVM, it->second->GetAddress(), 1);
+        lua_setglobal(luaVM, it->first.c_str());
+    }
+}
+
+void CLuaCFunctions::RegisterThreadSafeFunctionsWithVM(lua_State* luaVM)
+{
+    // Register all our functions to a lua VM
+    CFastHashMap<SString, CLuaCFunction*>::iterator it;
+    for (it = ms_ThreadSafeFunctionsByName.begin(); it != ms_ThreadSafeFunctionsByName.end(); ++it)
+    {
+        lua_pushstring(luaVM, it->first.c_str());
+        lua_pushcclosure(luaVM, it->second->GetAddress(), 1);
+        lua_setglobal(luaVM, it->first.c_str());
+    }
+}
+
+void CLuaCFunctions::RegisterThreadFunctionsWithVM(lua_State* luaVM)
+{
+    // Register all our functions to a lua VM
+    CFastHashMap<SString, CLuaCFunction*>::iterator it;
+    for (it = ms_ThreadFunctionsByName.begin(); it != ms_ThreadFunctionsByName.end(); ++it)
     {
         lua_pushstring(luaVM, it->first.c_str());
         lua_pushcclosure(luaVM, it->second->GetAddress(), 1);

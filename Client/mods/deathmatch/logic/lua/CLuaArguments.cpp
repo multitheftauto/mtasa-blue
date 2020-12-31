@@ -314,6 +314,68 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     return true;
 }
 
+bool CLuaArguments::CallGlobal(lua_State* luaVM, const char* szFunction, CLuaArguments* returnValues) const
+{
+    assert(szFunction);
+    TIMEUS startTime = GetTimeUs();
+
+    // Add the function name to the stack and get the event from the table
+    assert(luaVM);
+    LUA_CHECKSTACK(luaVM, 1);
+    int luaStackPointer = lua_gettop(luaVM);
+    lua_pushstring(luaVM, szFunction);
+    lua_gettable(luaVM, LUA_GLOBALSINDEX);
+
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
+
+    // Push our arguments onto the stack
+    PushArguments(luaVM);
+
+    // Reset function call timer (checks long-running functions)
+    // pLuaMain->ResetInstructionCount();
+
+    // Call the function with our arguments
+    int iret = lua_pcall(luaVM, m_Arguments.size(), LUA_MULTRET, 0);
+    if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
+    {
+        std::string strRes = ConformResourcePath(lua_tostring(luaVM, -1));
+        g_pClientGame->GetScriptDebugging()->LogPCallError(luaVM, strRes);
+
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;            // the function call failed
+    }
+    else
+    {
+        int iReturns = lua_gettop(luaVM) - luaStackPointer;
+
+        if (returnValues != NULL)
+        {
+            for (int i = -iReturns; i <= -1; i++)
+            {
+                returnValues->ReadArgument(luaVM, i);
+            }
+        }
+
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+    }
+
+    // CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    return true;
+}
+
 CLuaArgument* CLuaArguments::PushNil()
 {
     CLuaArgument* pArgument = new CLuaArgument;

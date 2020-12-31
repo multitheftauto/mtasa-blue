@@ -460,6 +460,10 @@ inline SString GetClassByTypeName(eClientModelType)
 {
     return "client-model-type";
 }
+inline SString GetClassTypeName(CLuaThread*)
+{
+    return "lua-thread";
+}
 
 //
 // CResource from userdata

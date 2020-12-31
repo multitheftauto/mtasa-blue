@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/luadefs/CLuaTimerDefs.cpp
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaThreadDefs.cpp
  *  PURPOSE:     Lua function definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -62,7 +62,7 @@ bool CLuaThreadDefs::ThreadCall(CLuaThread* pThread, std::string strFunction, st
             pThread->Call(strFunction, arguments);
             return true;
         },
-        [](bool _) { });
+        [](bool __) { });
     return true;
 }
 

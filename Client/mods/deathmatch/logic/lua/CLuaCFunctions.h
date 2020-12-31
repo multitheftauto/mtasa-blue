@@ -48,6 +48,8 @@ public:
     static bool IsRestricted(const char* szName);
 
     static void RegisterFunctionsWithVM(lua_State* luaVM);
+    static void RegisterThreadSafeFunctionsWithVM(lua_State* luaVM);
+    static void RegisterThreadFunctionsWithVM(lua_State* luaVM);
 
     static void RemoveAllFunctions();
 };

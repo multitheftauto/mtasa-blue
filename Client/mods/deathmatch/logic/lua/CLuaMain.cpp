@@ -34,6 +34,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_luaVM = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
+    m_pLuaThreadManager = new CLuaThreadManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
     m_pResource = pResourceOwner;
@@ -58,6 +59,9 @@ CLuaMain::~CLuaMain()
     // Delete the timer manager
     delete m_pLuaTimerManager;
 
+    // Delete the thread manager
+    delete m_pLuaThreadManager;
+
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
@@ -72,7 +76,7 @@ void CLuaMain::ResetInstructionCount()
     m_FunctionEnterTimer.Reset();
 }
 
-void CLuaMain::InitSecurity()
+void CLuaMain::InitSecurity(lua_State* luaVM)
 {
     // Disable dangerous Lua Os library functions
     static const luaL_reg osfuncs[] =
@@ -86,14 +90,14 @@ void CLuaMain::InitSecurity()
         { "setlocale", CLuaUtilDefs::DisabledFunction },
         { NULL, NULL }
     };
-    luaL_register(m_luaVM, "os", osfuncs);
+    luaL_register(luaVM, "os", osfuncs);
 
-    lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "require", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "require", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
+    lua_register(luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
 }
 
 void CLuaMain::InitClasses(lua_State* luaVM)
@@ -159,7 +163,7 @@ void CLuaMain::InitVM()
     luaopen_os(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
+    InitSecurity(m_luaVM);
 
     // Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM(m_luaVM);

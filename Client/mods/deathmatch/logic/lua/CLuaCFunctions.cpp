@@ -11,6 +11,8 @@
 #include <StdInc.h>
 
 static std::vector<CLuaCFunction*>             m_sFunctions;
+static std::vector<CLuaCFunction*>             m_ThreadSafeFunctions;
+static std::vector<CLuaCFunction*>             m_ThreadFunctions;
 static std::map<lua_CFunction, CLuaCFunction*> ms_Functions;
 static void*                                   ms_pFunctionPtrLow = (void*)0xffffffff;
 static void*                                   ms_pFunctionPtrHigh = 0;
@@ -126,6 +128,30 @@ void CLuaCFunctions::RegisterFunctionsWithVM(lua_State* luaVM)
     // Register all our functions to a lua VM
     std::vector<CLuaCFunction*>::const_iterator iter = m_sFunctions.begin();
     for (; iter != m_sFunctions.end(); iter++)
+    {
+        lua_pushstring(luaVM, (*iter)->GetFunctionName());
+        lua_pushcclosure(luaVM, (*iter)->GetFunctionAddress(), 1);
+        lua_setglobal(luaVM, (*iter)->GetFunctionName());
+    }
+}
+
+void CLuaCFunctions::RegisterThreadSafeFunctionsWithVM(lua_State* luaVM)
+{
+    // Register all our functions to a lua VM
+    std::vector<CLuaCFunction*>::const_iterator iter = m_ThreadSafeFunctions.begin();
+    for (; iter != m_ThreadSafeFunctions.end(); iter++)
+    {
+        lua_pushstring(luaVM, (*iter)->GetFunctionName());
+        lua_pushcclosure(luaVM, (*iter)->GetFunctionAddress(), 1);
+        lua_setglobal(luaVM, (*iter)->GetFunctionName());
+    }
+}
+
+void CLuaCFunctions::RegisterThreadFunctionsWithVM(lua_State* luaVM)
+{
+    // Register all our functions to a lua VM
+    std::vector<CLuaCFunction*>::const_iterator iter = m_ThreadFunctions.begin();
+    for (; iter != m_ThreadFunctions.end(); iter++)
     {
         lua_pushstring(luaVM, (*iter)->GetFunctionName());
         lua_pushcclosure(luaVM, (*iter)->GetFunctionAddress(), 1);

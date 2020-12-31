@@ -15,6 +15,16 @@ class CLuaCFunctions;
 
 #include "LuaCommon.h"
 
+enum class EFunctionApplication
+{
+    // Can be used only in main thread. Default
+    MAIN_THREAD,
+    // Thread safe
+    SHARED,
+    // Everywhere except in main thread
+    WORKER_THREAD
+};
+
 class CLuaCFunction
 {
 public:
@@ -39,19 +49,24 @@ public:
     CLuaCFunctions();
     ~CLuaCFunctions();
 
-    static CLuaCFunction* AddFunction(const char* szName, lua_CFunction f, bool bRestricted = false);
+    static CLuaCFunction* AddFunction(const char* szName, lua_CFunction f, bool bRestricted = false,
+                                      EFunctionApplication eFunctionApplication = EFunctionApplication::MAIN_THREAD);
     static void           RemoveFunction(const SString& strName);
     static CLuaCFunction* GetFunction(lua_CFunction f);
     static CLuaCFunction* GetFunction(const char* szName);
     static bool           IsNotFunction(lua_CFunction f);
 
     static void RegisterFunctionsWithVM(lua_State* luaVM);
+    static void RegisterThreadSafeFunctionsWithVM(lua_State* luaVM);
+    static void RegisterThreadFunctionsWithVM(lua_State* luaVM);
 
     static void RemoveAllFunctions();
 
 private:
     static CFastHashMap<lua_CFunction, CLuaCFunction*> ms_Functions;
     static CFastHashMap<SString, CLuaCFunction*>       ms_FunctionsByName;
+    static CFastHashMap<SString, CLuaCFunction*>       ms_ThreadSafeFunctionsByName;
+    static CFastHashMap<SString, CLuaCFunction*>       ms_ThreadFunctionsByName;            // functions availiable only in thread
     static void*                                       ms_pFunctionPtrLow;
     static void*                                       ms_pFunctionPtrHigh;
 };

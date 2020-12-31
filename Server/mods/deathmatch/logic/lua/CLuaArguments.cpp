@@ -310,7 +310,6 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     return true;
 }
 
-
 bool CLuaArguments::CallGlobal(lua_State* luaVM, const char* szFunction, CLuaArguments* returnValues) const
 {
     assert(szFunction);

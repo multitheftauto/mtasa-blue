@@ -14,10 +14,12 @@ class CLuaMain;
 #pragma once
 
 #include "CLuaTimerManager.h"
+#include "./../Shared/mods/deathmatch/logic/lua/CLuaThreadManager.h"
 #include "lua/CLuaVector2.h"
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"
 #include "lua/CLuaMatrix.h"
+#include "lua/CLuaThread.h"
 
 #include "CLuaFunctionDefs.h"
 
@@ -26,6 +28,7 @@ class CLuaMain;
 #define MAX_SCRIPTNAME_LENGTH 64
 
 #include <list>
+CLuaThreadManager* a = new CLuaThreadManager();
 
 struct CRefInfo
 {
@@ -51,8 +54,9 @@ public:
     const char* GetScriptName() const { return m_strScriptName; }
     void        SetScriptName(const char* szName) { m_strScriptName.AssignLeft(szName, MAX_SCRIPTNAME_LENGTH); }
 
-    lua_State*        GetVM() { return m_luaVM; };
-    CLuaTimerManager* GetTimerManager() const { return m_pLuaTimerManager; };
+    lua_State*         GetVM() { return m_luaVM; };
+    CLuaTimerManager*  GetTimerManager() const { return m_pLuaTimerManager; };
+    CLuaThreadManager* GetThreadManager() const { return m_pLuaThreadManager; };
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };
@@ -79,15 +83,16 @@ public:
 
     bool IsOOPEnabled() { return m_bEnableOOP; }
 
+    static void InitSecurity(lua_State* luaVM);
 private:
-    void InitSecurity();
 
     static void InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug);
 
     SString m_strScriptName;
 
-    lua_State*        m_luaVM;
-    CLuaTimerManager* m_pLuaTimerManager;
+    lua_State*         m_luaVM;
+    CLuaTimerManager*  m_pLuaTimerManager;
+    CLuaThreadManager* m_pLuaThreadManager;
 
     bool m_bBeingDeleted;            // prevent it being deleted twice
 
