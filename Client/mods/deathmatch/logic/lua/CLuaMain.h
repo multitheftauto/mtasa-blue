@@ -91,6 +91,22 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
+    template <class T>
+    T* CreateElement()
+    {
+        if (m_pResource)
+        {
+            T*             pElement = new T(CLuaDefs::m_pManager, INVALID_ELEMENT_ID, this);
+            CElementGroup* pGroup = m_pResource->GetElementGroup();
+            if (pGroup)
+            {
+                pGroup->Add((CClientEntity*)pElement);
+            }
+            return pElement;
+        }
+        return nullptr;
+    }
+
     bool IsOOPEnabled() { return m_bEnableOOP; }
 
 private:

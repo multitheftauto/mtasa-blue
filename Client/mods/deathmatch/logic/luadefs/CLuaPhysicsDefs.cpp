@@ -134,15 +134,9 @@ CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        CResource* pResource = pLuaMain->GetResource();
-        if (pResource)
+        CClientPhysics* pPhysics = pLuaMain->CreateElement<CClientPhysics>();
+        if (pPhysics)
         {
-            CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain);
-            CElementGroup*  pGroup = pResource->GetElementGroup();
-            if (pGroup)
-            {
-                pGroup->Add((CClientEntity*)pPhysics);
-            }
             pPhysics->SetGravity(vecGravity.value_or(BulletPhysics::Defaults::Gravity));
             return pPhysics;
         }
