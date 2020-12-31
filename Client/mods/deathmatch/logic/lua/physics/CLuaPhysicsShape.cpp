@@ -118,7 +118,7 @@ bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
     return true;
 }
 
-BroadphaseNativeTypes CLuaPhysicsShape::GetType()
+BroadphaseNativeTypes CLuaPhysicsShape::GetType() const
 {
     return (BroadphaseNativeTypes)m_pBtShape->getShapeType();
 }
@@ -137,4 +137,16 @@ void CLuaPhysicsShape::UpdateRigids()
         rigidBody->NeedsActivation();
         // rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
     }
+}
+
+// Return true fo shapes that can be used as rigid body.
+bool CLuaPhysicsShape::SupportRigidBody() const
+{
+    switch (GetType())
+    {
+        case BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE:
+        case BroadphaseNativeTypes::TRIANGLE_MESH_SHAPE_PROXYTYPE:
+            return false;
+    }
+    return true;
 }

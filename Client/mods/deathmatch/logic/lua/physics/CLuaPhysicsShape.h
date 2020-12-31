@@ -41,12 +41,12 @@ public:
 
     void UpdateRigids();
 
-    BroadphaseNativeTypes GetType();
+    BroadphaseNativeTypes GetType() const;
     const char*           GetName();
 
     // for CLuaPhysicsHeightfieldTerrainShape shape
     float*                GetHeightfieldData() { return &m_vecHeightfieldData[0]; }
-
+    bool   SupportRigidBody() const;
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;
     std::vector<float> m_vecHeightfieldData;

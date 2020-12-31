@@ -18,16 +18,6 @@
 #include "lua/physics/CLuaPhysicsElement.h"
 #include "CPhysicsDebugDrawer.h"
 
-#include "lua/physics/CLuaPhysicsBoxShape.h"
-#include "lua/physics/CLuaPhysicsCompoundShape.h"
-#include "lua/physics/CLuaPhysicsSphereShape.h"
-#include "lua/physics/CLuaPhysicsCapsuleShape.h"
-#include "lua/physics/CLuaPhysicsConeShape.h"
-#include "lua/physics/CLuaPhysicsCylinderShape.h"
-#include "lua/physics/CLuaPhysicsConvexHullShape.h"
-#include "lua/physics/CLuaPhysicsBvhTriangleMeshShape.h"
-#include "lua/physics/CLuaPhysicsHeightfieldTerrainShape.h"
-
 template <class... Ts>
 struct overloaded : Ts...
 {
@@ -53,7 +43,7 @@ bool CallAlternative(CLuaPhysicsElement* pElement, F&& func)
 
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"physicsCreateWorld", ArgumentParser<PhysicsCreateWorld>},
         {"physicsDestroy", ArgumentParser<PhysicsDestroy>},
         {"physicsCreateRigidBody", ArgumentParser<PhysicsCreateRigidBody>},
@@ -167,7 +157,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateBoxShape(CClient
         throw std::invalid_argument(
             SString("Minimum width, height and length must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 
-    return pPhysics->CreateBoxShape(half);
+    return std::move(pPhysics->CreateBoxShape(half));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateSphereShape(CClientPhysics* pPhysics, float fRadius)
@@ -178,7 +168,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateSphereShape(CCli
     if (fRadius > BulletPhysics::Limits::MaximumPrimitiveSize)
         throw std::invalid_argument(SString("Maximum radius must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    return pPhysics->CreateSphereShape(fRadius);
+    return std::move(pPhysics->CreateSphereShape(fRadius));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCapsuleShape(CClientPhysics* pPhysics, float fRadius, float fHeight)
@@ -195,7 +185,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCapsuleShape(CCl
     if (fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
         throw std::invalid_argument(SString("Maximum height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    return pPhysics->CreateCapsuleShape(fRadius, fHeight);
+    return std::move(pPhysics->CreateCapsuleShape(fRadius, fHeight));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateConeShape(CClientPhysics* pPhysics, float fRadius, float fHeight)
@@ -212,7 +202,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateConeShape(CClien
     if (fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
         throw std::invalid_argument(SString("Maximum height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    return pPhysics->CreateConeShape(fRadius, fHeight);
+    return std::move(pPhysics->CreateConeShape(fRadius, fHeight));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCylinderShape(CClientPhysics* pPhysics, float fRadius, float fHeight)
@@ -229,17 +219,16 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCylinderShape(CC
     if (fHeight > BulletPhysics::Limits::MaximumPrimitiveSize)
         throw std::invalid_argument(SString("Maximum height must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    return pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
+    return std::move(pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius)));
 }
 
-std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCompoundShape(CClientPhysics* pPhysics,
-                                                                              std::optional<int> optionalInitialCapacity)
+std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateCompoundShape(CClientPhysics* pPhysics, std::optional<int> optionalInitialCapacity)
 {
     int iInitialCapacity = optionalInitialCapacity.value_or(0);
     if (iInitialCapacity < 0 || iInitialCapacity > BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity)
         throw std::invalid_argument(SString("Initial capacity should be between 0 and %i", BulletPhysics::Limits::MaximumInitialCompoundShapeCapacity).c_str());
 
-    return pPhysics->CreateCompoundShape(iInitialCapacity);
+    return std::move(pPhysics->CreateCompoundShape(iInitialCapacity));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateConvexHullShape(CClientPhysics* pPhysics, std::vector<float> vecPoints)
@@ -247,7 +236,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateConvexHullShape(
     if (vecPoints.size() < 3)
         throw std::invalid_argument("Convex hull shape require at least 3 vertices");
 
-    return pPhysics->CreateConvexHullShape(vecPoints);
+    return std::move(pPhysics->CreateConvexHullShape(vecPoints));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices)
@@ -269,7 +258,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateTriangleMeshShap
                     .c_str());
         }
     }
-    return pPhysics->CreateBhvTriangleMeshShape(vecVertices);
+    return std::move(pPhysics->CreateBhvTriangleMeshShape(vecVertices));
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateGimpactMeshShape(CClientPhysics* pPhysics, std::vector<float> vecVertices)
@@ -291,7 +280,7 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateGimpactMeshShape
                     .c_str());
         }
     }
-    return pPhysics->CreateGimpactTriangleMeshShape(vecVertices);
+    return std::move(pPhysics->CreateGimpactTriangleMeshShape(vecVertices));
 }
 
 // Todo: Add support for greyscale texture as input
@@ -312,9 +301,9 @@ std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateHeightfieldTerra
                 SString("Heigthfield of size %ix%i require %i floats, got %i floats", sizeX, sizeY, sizeX * sizeY, vecHeights.value().size()).c_str());
         }
 
-        return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights.value());
+        return std::move(pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY, vecHeights.value()));
     }
-    return pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY);
+    return std::move(pPhysics->CreateHeightfieldTerrainShape(sizeX, sizeY));
 }
 
 bool CLuaPhysicsDefs::PhysicsDestroy(CLuaPhysicsElement* physicsElement)
@@ -405,10 +394,8 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CClientPhysics* pPhysics)
 std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, std::optional<float> fMass,
                                                                               std::optional<CVector> vecLocalInertia, std::optional<CVector> vecCenterOfMass)
 {
-    if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Terrain shape is not supported");
-    if (pShape->GetType() == BroadphaseNativeTypes::TRIANGLE_MESH_SHAPE_PROXYTYPE)
-        throw std::invalid_argument("Triangle mesh shape is not supported");
+    if (!pShape->SupportRigidBody())
+        throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
 
     if (fMass.value_or(1.f) < 0)
         throw std::invalid_argument("Mass can not be negative");
@@ -416,13 +403,12 @@ std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(st
     std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = pShape->GetPhysics()->CreateRigidBody(
         pShape, fMass.value_or(BulletPhysics::Defaults::RigidBodyMass), vecLocalInertia.value_or(BulletPhysics::Defaults::RigidBodyInertia),
         vecCenterOfMass.value_or(BulletPhysics::Defaults::RigidBodyCenterOfMass));
-    return pRigidBody;
+    return std::move(pRigidBody);
 }
 
 std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel)
 {
-    std::shared_ptr<CLuaPhysicsShape> pShape = pPhysics->CreateShapeFromModel(usModel);
-    return pShape;
+    return std::move(pPhysics->CreateShapeFromModel(usModel));
 }
 
 std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape,
@@ -431,12 +417,11 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStatic
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
         pShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
 
-    return pStaticCollision;
+    return std::move(pStaticCollision);
 }
 
 bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pShapeChildShape,
-                                           std::optional<CVector> vecOptionalPosition,
-                                           std::optional<CVector> vecOptionalRotation)
+                                           std::optional<CVector> vecOptionalPosition, std::optional<CVector> vecOptionalRotation)
 {
     if (pShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
@@ -450,13 +435,11 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pSh
     const CVector vecRotation = vecOptionalRotation.value_or(CVector(0, 0, 0));
 
     if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(vecPosition))
-        throw std::invalid_argument(
-            SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+        throw std::invalid_argument(SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
     if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
     {
-        pCompoundShape->AddShape(pShapeChildShape, vecPosition,
-                                 vecRotation);
+        pCompoundShape->AddShape(std::move(pShapeChildShape), vecPosition, vecRotation);
         return true;
     }
 
@@ -594,11 +577,10 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CCl
                 if (std::holds_alternative<float>(argument))
                 {
                     float fRadius = std::get<float>(argument);
-                    return CallAlternative(pElement, overloaded{
-                        [fRadius](CLuaPhysicsSphereShape* pSphere) { return pSphere->SetRadius(fRadius); },
-                        [fRadius](CLuaPhysicsCapsuleShape* pCapsule) { return pCapsule->SetRadius(fRadius); },
-                        [fRadius](CLuaPhysicsCylinderShape* pCylinder) { return pCylinder->SetRadius(fRadius); },
-                        [fRadius](CLuaPhysicsConeShape* pCone) { return pCone->SetRadius(fRadius); }});
+                    return CallAlternative(pElement, overloaded{[fRadius](CLuaPhysicsSphereShape* pSphere) { return pSphere->SetRadius(fRadius); },
+                                                                [fRadius](CLuaPhysicsCapsuleShape* pCapsule) { return pCapsule->SetRadius(fRadius); },
+                                                                [fRadius](CLuaPhysicsCylinderShape* pCylinder) { return pCylinder->SetRadius(fRadius); },
+                                                                [fRadius](CLuaPhysicsConeShape* pCone) { return pCone->SetRadius(fRadius); }});
                 }
                 break;
         }
@@ -1408,16 +1390,16 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
             {
                 throw std::invalid_argument("");
             }
-            CVector                                            vecPivotA = std::get<CVector>(variantB);
-            CVector                                            vecPivotB = std::get<CVector>(variantC);
+            CVector vecPivotA = std::get<CVector>(variantB);
+            CVector vecPivotB = std::get<CVector>(variantC);
             bDisableCollisionsBetweenLinkedBodies = bBool.value_or(true);
             std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
                 pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBodyB, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
-            return pConstraint;
+            return std::move(pConstraint);
         }
         std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
             pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies);
-        return pConstraint;
+        return std::move(pConstraint);
         // create variant A
     }
     else if (std::holds_alternative<CVector>(variantA))            // variant B
@@ -1437,10 +1419,10 @@ std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreatePointToPoin
         CVector                                            vecPosition = std::get<CVector>(variantA);
         std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
             pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, vecPosition, bDisableCollisionsBetweenLinkedBodies);
-        return pConstraint;
+        return std::move(pConstraint);
     }
 
-    return nullptr;
+    throw std::invalid_argument("Todo error");
 }
 
 bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
@@ -1475,26 +1457,7 @@ bool CLuaPhysicsDefs::PhysicsLineCast(CClientPhysics* pPhysics, CVector from, CV
     return rayCallback.hasHit();
 }
 
-void Barycentric(const CVector& point, const CVector& a, const CVector& b, const CVector& c, float& u, float& v, float& w)
-{
-    CVector v0 = b - a, v1 = c - a, v2 = point - a;
-    float   d00 = v0.DotProduct(&v0);
-    float   d01 = v0.DotProduct(&v1);
-    float   d11 = v1.DotProduct(&v1);
-    float   d20 = v2.DotProduct(&v0);
-    float   d21 = v2.DotProduct(&v1);
-    float   denom = d00 * d11 - d01 * d01;
-    v = (d11 * d20 - d01 * d21) / denom;
-    w = (d00 * d21 - d01 * d20) / denom;
-    u = 1.0f - v - w;
-}
-
-// CVector point(0, 0, 0);
-// float          u, v, w;
-// Barycentric(point, vecVertex1, vecVertex2, vecVertex3, u, v, w);
-
-std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to,
-                                                              std::optional<RayOptions> options)
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
 {
     RayOptions mapOptions = options.value_or(RayOptions());
 
@@ -1546,7 +1509,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pP
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
     if (pBtRigidBody)
-        pRigidBody = (CLuaPhysicsRigidBody*) pBtRigidBody->getUserPointer();
+        pRigidBody = (CLuaPhysicsRigidBody*)pBtRigidBody->getUserPointer();
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
     RayResult result{
@@ -1592,8 +1555,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CClientPhysics* pP
     return result;
 }
 
-std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to,
-                                                          std::optional<RayOptions> options)
+std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
 {
     RayOptions mapOptions = options.value_or(RayOptions());
 
@@ -1724,8 +1686,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CClientPhysics* pPhysi
     return results;
 }
 
-std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecEndPosition, CVector vecRotation,
-                                  std::optional<RayOptions> options)
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecEndPosition,
+                                                                CVector vecRotation, std::optional<RayOptions> options)
 {
     RayOptions mapOptions = options.value_or(RayOptions());
 
@@ -1774,8 +1736,8 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
     const btCollisionShape*  pBtCollisionShape = pBtCollisionObject->getCollisionShape();
     const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
 
-    if (!pBtCollisionObject)
-        assert(0); // should never happen
+    if (pBtCollisionObject == nullptr)
+        assert(0);            // should never happen
 
     CLuaPhysicsShape*     pHitShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
@@ -2007,8 +1969,7 @@ bool CLuaPhysicsDefs::PhysicsSetHeight(std::shared_ptr<CLuaPhysicsShape> pShape,
         if (iVertexId > 0 && pHeightfieldTerrain->GetVerticesNum() > iVertexId)
         {
             if (abs(fHeight) > BulletPhysics::Limits::MaximumPrimitiveSize)
-                throw std::invalid_argument(
-                    SString("Height must be smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+                throw std::invalid_argument(SString("Height must be smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
             pHeightfieldTerrain->SetHeight(--iVertexId, fHeight);
             return true;
@@ -2045,7 +2006,7 @@ bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
     {
         if (pRigidBody->IsReady() && pRigidBody->GetBtRigidBody())
             return pRigidBody->GetBtRigidBody()->IsEnabled();
-        return false; // not created yet
+        return false;            // not created yet
     }
     else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
     {
