@@ -20,6 +20,8 @@
 #define FLOAT_EPSILON 0.0001f
 #include "CVector4D.h"
 
+#include "bulletphysics3d\LinearMath\btVector3.h"
+
 /**
  * CVector Structure used to store a 3D vertex.
  */
@@ -275,4 +277,7 @@ public:
     }
 
     inline bool operator!=(const CVector& param) const noexcept { return !(*this == param); }
+
+    CVector(const btVector3& other) : fX(other.x()), fY(other.y()), fZ(other.z()) {}
+    operator btVector3() const { return btVector3{fX, fY, fZ}; }
 };

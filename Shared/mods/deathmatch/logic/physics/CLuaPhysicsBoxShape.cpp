@@ -21,7 +21,7 @@ bool CLuaPhysicsBoxShape::SetSize(CVector& vecSize)
     vecSize.fX -= pInternalShape->getMargin();
     vecSize.fY -= pInternalShape->getMargin();
     vecSize.fZ -= pInternalShape->getMargin();
-    pInternalShape->setImplicitShapeDimensions(reinterpret_cast<btVector3&>(vecSize));
+    pInternalShape->setImplicitShapeDimensions(vecSize);
     UpdateRigids();
     return true;
 }

@@ -52,7 +52,7 @@ CBulletPhysics::CBulletPhysics(ElementID ID, CLuaMain* luaMain) : CElement(this)
         std::lock_guard guard(dynamicsWorldLock);
         m_pDynamicsWorld =
             std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
-        m_pDynamicsWorld->setGravity(reinterpret_cast<const btVector3&>(BulletPhysics::Defaults::Gravity));
+        m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
 #ifdef MTA_CLIENT
         m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
 #endif
@@ -145,13 +145,13 @@ void CBulletPhysics::RemoveConstraint(btTypedConstraint* pBtTypedConstraint) con
 void CBulletPhysics::SetGravity(const CVector& vecGravity) const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    m_pDynamicsWorld->setGravity(reinterpret_cast<const btVector3&>(vecGravity));
+    m_pDynamicsWorld->setGravity(vecGravity);
 }
 
 CVector CBulletPhysics::GetGravity() const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    return reinterpret_cast<const CVector&>(m_pDynamicsWorld->getGravity());
+    return m_pDynamicsWorld->getGravity();
 }
 
 bool CBulletPhysics::GetUseContinous() const
@@ -308,14 +308,14 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(std::shar
     }
 
     rayCallback.m_closestPosition =
-        reinterpret_cast<const CVector&>(rayCallback.m_convexFromWorld.lerp(rayCallback.m_convexToWorld, rayCallback.m_closestHitFraction));
+        rayCallback.m_convexFromWorld.lerp(rayCallback.m_convexToWorld, rayCallback.m_closestHitFraction);
 
     return rayCallback;
 }
 
 bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const
 {
-    btCollisionWorld::ClosestRayResultCallback rayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
     rayCallback.m_collisionFilterGroup = iFilterGroup;
     rayCallback.m_collisionFilterMask = iFilterMask;
     if (bFilterBackfaces)
@@ -323,7 +323,7 @@ bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, i
 
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayCallback);
+        m_pDynamicsWorld->rayTest(from, to, rayCallback);
     }
     return rayCallback.hasHit();
 }
@@ -339,14 +339,14 @@ CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(const CVector&
         rayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
 
     std::lock_guard guard(dynamicsWorldLock);
-    m_pDynamicsWorld->rayTest(reinterpret_cast<const btVector3&>(from), reinterpret_cast<const btVector3&>(to), rayCallback);
+    m_pDynamicsWorld->rayTest(from, to, rayCallback);
 
     return rayCallback;
 }
 
 CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const
 {
-    SAllRayResultCallback rayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    SAllRayResultCallback rayCallback(from, to);
     rayCallback.m_collisionFilterGroup = iFilterGroup;
     rayCallback.m_collisionFilterMask = iFilterMask;
     if (bFilterBackfaces)
@@ -354,7 +354,7 @@ CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, C
 
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayCallback);
+        m_pDynamicsWorld->rayTest(from, to, rayCallback);
     }
 
     return rayCallback;
@@ -621,12 +621,12 @@ void CBulletPhysics::PostProcessCollisions()
             btManifoldPoint& manifoldPoint = contactManifold->getContactPoint(j);
             std::shared_ptr<CLuaPhysicsElement::SPhysicsCollisionContact> contactA = std::make_shared<CLuaPhysicsElement::SPhysicsCollisionContact>();
             std::shared_ptr<CLuaPhysicsElement::SPhysicsCollisionContact> contactB = std::make_shared<CLuaPhysicsElement::SPhysicsCollisionContact>();
-            contactA->vecPositionWorldOn = reinterpret_cast<const CVector&>(manifoldPoint.getPositionWorldOnA());
-            contactB->vecPositionWorldOn = reinterpret_cast<const CVector&>(manifoldPoint.getPositionWorldOnB());
-            contactA->vecLocalPoint = reinterpret_cast<const CVector&>(manifoldPoint.m_localPointA);
-            contactB->vecLocalPoint = reinterpret_cast<const CVector&>(manifoldPoint.m_localPointB);
-            contactA->vecLateralFrictionDir = reinterpret_cast<const CVector&>(manifoldPoint.m_lateralFrictionDir1);
-            contactB->vecLateralFrictionDir = reinterpret_cast<const CVector&>(manifoldPoint.m_lateralFrictionDir2);
+            contactA->vecPositionWorldOn = manifoldPoint.getPositionWorldOnA();
+            contactB->vecPositionWorldOn = manifoldPoint.getPositionWorldOnB();
+            contactA->vecLocalPoint = manifoldPoint.m_localPointA;
+            contactB->vecLocalPoint = manifoldPoint.m_localPointB;
+            contactA->vecLateralFrictionDir = manifoldPoint.m_lateralFrictionDir1;
+            contactB->vecLateralFrictionDir = manifoldPoint.m_lateralFrictionDir2;
             contactA->contactTriangle = manifoldPoint.m_partId0;
             contactB->contactTriangle = manifoldPoint.m_partId1;
             contactA->appliedImpulse = manifoldPoint.getAppliedImpulse();
@@ -880,7 +880,7 @@ void CBulletPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
 
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->getBroadphase()->aabbTest(reinterpret_cast<const btVector3&>(min), reinterpret_cast<const btVector3&>(max), callback);
+        m_pDynamicsWorld->getBroadphase()->aabbTest(min, max, callback);
     }
 
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)

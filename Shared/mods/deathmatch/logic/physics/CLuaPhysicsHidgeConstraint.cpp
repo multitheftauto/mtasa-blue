@@ -17,8 +17,8 @@ CLuaPhysicsHidgeConstraint::CLuaPhysicsHidgeConstraint(CLuaPhysicsRigidBody* pRi
     : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies)
 {
     auto pConstraint =
-        std::make_unique<btHingeConstraint>(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivotA),
-                                            reinterpret_cast<btVector3&>(pivotB), reinterpret_cast<btVector3&>(axisA), reinterpret_cast<btVector3&>(axisB));
+        std::make_unique<btHingeConstraint>(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), pivotA,
+                                            pivotB, axisA, axisB);
 
     //Initialize(std::move(pConstraint), pRigidBodyA, pRigidBodyB);
 }
@@ -28,7 +28,7 @@ CLuaPhysicsHidgeConstraint::CLuaPhysicsHidgeConstraint(CLuaPhysicsRigidBody* pRi
     : CLuaPhysicsConstraint(pRigidBody->GetPhysics(), pRigidBody, bDisableCollisionsBetweenLinkedBodies)
 {
     auto pConstraint =
-        std::make_unique<btHingeConstraint>(*pRigidBody->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivot), reinterpret_cast<btVector3&>(axis));
+        std::make_unique<btHingeConstraint>(*pRigidBody->GetBtRigidBody(), pivot, axis);
 
     //Initialize(std::move(pConstraint), pRigidBody);
 }

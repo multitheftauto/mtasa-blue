@@ -61,7 +61,7 @@ void CLuaPhysicsSliderConstraint::SetPivotA(CVector& vecPivotA)
     btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
     btTransform         transformA = pConstraint->getFrameOffsetA();
     btTransform         transformB = pConstraint->getFrameOffsetB();
-    transformA.setOrigin(reinterpret_cast<btVector3&>(vecPivotA));
+    transformA.setOrigin(vecPivotA);
     pConstraint->setFrames(transformA, transformB);
 }
 
@@ -70,7 +70,7 @@ void CLuaPhysicsSliderConstraint::SetPivotB(CVector& vecPivotB)
     btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
     btTransform         transformA = pConstraint->getFrameOffsetA();
     btTransform         transformB = pConstraint->getFrameOffsetB();
-    transformB.setOrigin(reinterpret_cast<btVector3&>(vecPivotB));
+    transformB.setOrigin(vecPivotB);
     pConstraint->setFrames(transformA, transformB);
 }
 

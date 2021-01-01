@@ -114,7 +114,7 @@ void CLuaPhysicsRigidBody::SetScale(const CVector& vecScale)
     }
 
     std::function<void()> change([&, vecScale]() {
-        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(vecScale));
+        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(vecScale);
         NeedsActivation();
     });
 
@@ -138,7 +138,7 @@ void CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
         CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetRotation());
         CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
-        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(matrix.GetScale()));
+        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(matrix.GetScale());
         m_pRigidBodyProxy->proceedToTransform(transform);
         NeedsActivation();
     });
@@ -271,7 +271,7 @@ void CLuaPhysicsRigidBody::SetLinearVelocity(const CVector& vecVelocity)
 {
     SetTempData(eTempDataKey::LinearVelocity, vecVelocity);
 
-    std::function<void()> change([&, vecVelocity]() { m_pRigidBodyProxy->setLinearVelocity(reinterpret_cast<const btVector3&>(vecVelocity)); });
+    std::function<void()> change([&, vecVelocity]() { m_pRigidBodyProxy->setLinearVelocity(vecVelocity); });
 
     CommitChange(change);
 }
@@ -283,7 +283,7 @@ CVector CLuaPhysicsRigidBody::GetLinearVelocity() const
         return fLinearVelocity;
 
     if (IsReady())
-        return reinterpret_cast<const CVector&>(m_pRigidBodyProxy->getLinearVelocity());
+        return m_pRigidBodyProxy->getLinearVelocity();
     return CVector(0, 0, 0);
 }
 
@@ -292,7 +292,7 @@ void CLuaPhysicsRigidBody::SetAngularVelocity(const CVector& vecVelocity)
     SetTempData(eTempDataKey::AngularVelocity, vecVelocity);
 
     std::function<void()> change([&, vecVelocity]() {
-        m_pRigidBodyProxy->setAngularVelocity(reinterpret_cast<const btVector3&>(vecVelocity));
+        m_pRigidBodyProxy->setAngularVelocity(vecVelocity);
         NeedsActivation();
     });
 
@@ -306,14 +306,14 @@ CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
         return fLinearVelocity;
 
     if (IsReady())
-        return reinterpret_cast<const CVector&>(m_pRigidBodyProxy->getAngularVelocity());
+        return m_pRigidBodyProxy->getAngularVelocity();
     return CVector(0, 0, 0);
 }
 
 void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce)
 {
     std::function<void()> change([&, vecForce]() {
-        m_pRigidBodyProxy->applyCentralForce(reinterpret_cast<const btVector3&>(vecForce));
+        m_pRigidBodyProxy->applyCentralForce(vecForce);
         NeedsActivation();
     });
 
@@ -332,7 +332,7 @@ void CLuaPhysicsRigidBody::ApplyDamping(float fDamping)
 void CLuaPhysicsRigidBody::ApplyForce(const CVector& vecFrom, const CVector& vecTo)
 {
     std::function<void()> change([&, vecFrom, vecTo]() {
-        m_pRigidBodyProxy->applyForce(reinterpret_cast<const btVector3&>(vecFrom), reinterpret_cast<const btVector3&>(vecTo));
+        m_pRigidBodyProxy->applyForce(vecFrom, vecTo);
         NeedsActivation();
     });
 
@@ -342,7 +342,7 @@ void CLuaPhysicsRigidBody::ApplyForce(const CVector& vecFrom, const CVector& vec
 void CLuaPhysicsRigidBody::ApplyImpulse(const CVector& vecFrom, const CVector& vecTo)
 {
     std::function<void()> change([&, vecFrom, vecTo]() {
-        m_pRigidBodyProxy->applyImpulse(reinterpret_cast<const btVector3&>(vecFrom), reinterpret_cast<const btVector3&>(vecTo));
+        m_pRigidBodyProxy->applyImpulse(vecFrom, vecTo);
         NeedsActivation();
     });
 
@@ -352,7 +352,7 @@ void CLuaPhysicsRigidBody::ApplyImpulse(const CVector& vecFrom, const CVector& v
 void CLuaPhysicsRigidBody::ApplyCentralImpulse(const CVector& vecForce)
 {
     std::function<void()> change([&, vecForce]() {
-        m_pRigidBodyProxy->applyCentralImpulse(reinterpret_cast<const btVector3&>(vecForce));
+        m_pRigidBodyProxy->applyCentralImpulse(vecForce);
         NeedsActivation();
     });
 
@@ -362,7 +362,7 @@ void CLuaPhysicsRigidBody::ApplyCentralImpulse(const CVector& vecForce)
 void CLuaPhysicsRigidBody::ApplyTorque(const CVector& vecTraque)
 {
     std::function<void()> change([&, vecTraque]() {
-        m_pRigidBodyProxy->applyTorque(reinterpret_cast<const btVector3&>(vecTraque));
+        m_pRigidBodyProxy->applyTorque(vecTraque);
         NeedsActivation();
     });
 
@@ -372,7 +372,7 @@ void CLuaPhysicsRigidBody::ApplyTorque(const CVector& vecTraque)
 void CLuaPhysicsRigidBody::ApplyTorqueImpulse(const CVector& vecTraque)
 {
     std::function<void()> change([&, vecTraque]() {
-        m_pRigidBodyProxy->applyTorqueImpulse(reinterpret_cast<const btVector3&>(vecTraque));
+        m_pRigidBodyProxy->applyTorqueImpulse(vecTraque);
         NeedsActivation();
     });
 

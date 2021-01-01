@@ -18,8 +18,8 @@ void CPhysicsDebugDrawer::Clear()
 
 void CPhysicsDebugDrawer::DrawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    const CVector& vecFrom = reinterpret_cast<const CVector&>(from);
-    const CVector& vecTo = reinterpret_cast<const CVector&>(to);
+    const CVector& vecFrom = from;
+    const CVector& vecTo = to;
     const float    distance = DistanceBetweenPoints3D((vecFrom + vecTo) / 2, m_vecCameraPosition);
     if (distance < m_fDrawDistance) // 50, 500 - 10%
     {
@@ -46,7 +46,7 @@ void CPhysicsDebugDrawer::drawContactPoint(const btVector3& PointOnB, const btVe
 void CPhysicsDebugDrawer::draw3dText(const btVector3& location, const char* textString)
 {
     CVector vecScreen;
-    // if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector) reinterpret_cast<const CVector&>(location), vecScreen, 50.0f, false))
+    // if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector) location), vecScreen, 50.0f, false))
     //{
     //    m_pGraphics->DrawString(vecScreen.fX, vecScreen.fY, SColorARGB(255, 255, 255, 255), m_fLineWidth, textString);
     //}

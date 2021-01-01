@@ -118,7 +118,7 @@ public:
         int m_hitShapePart;
 
         SClosestRayResultCallback(const CVector& rayFrom, const CVector& rayTo)
-            : btCollisionWorld::ClosestRayResultCallback(reinterpret_cast<const btVector3&>(rayFrom), reinterpret_cast<const btVector3&>(rayTo)),
+            : btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo),
               m_hitTriangleIndex(0),
               m_hitShapePart(0)
         {
@@ -151,7 +151,7 @@ public:
         CVector m_closestPosition;
 
         SClosestConvexResultCallback(const CVector& rayFrom, const CVector& rayTo)
-            : btCollisionWorld::ClosestConvexResultCallback(reinterpret_cast<const btVector3&>(rayFrom), reinterpret_cast<const btVector3&>(rayTo)),
+            : btCollisionWorld::ClosestConvexResultCallback(rayFrom, rayTo),
               m_hitTriangleIndex(0),
               m_hitShapePart(0)
         {

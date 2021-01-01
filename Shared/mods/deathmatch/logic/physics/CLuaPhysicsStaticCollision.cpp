@@ -87,7 +87,7 @@ void CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale)
     }
 
     std::function<void()> change([&, vecScale]() {
-        m_btCollisionObject->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(vecScale));
+        m_btCollisionObject->getCollisionShape()->setLocalScaling(vecScale);
     });
 
     CommitChange(change);
@@ -108,7 +108,7 @@ void CLuaPhysicsStaticCollision::SetMatrix(const CMatrix& matrix)
         btTransform& transform = GetCollisionObject()->getWorldTransform();
         CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
         CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
-        m_btCollisionObject->getCollisionShape()->setLocalScaling(reinterpret_cast<const btVector3&>(matrix.GetScale()));
+        m_btCollisionObject->getCollisionShape()->setLocalScaling(matrix.GetScale());
         GetCollisionObject()->setWorldTransform(transform);
     });
 

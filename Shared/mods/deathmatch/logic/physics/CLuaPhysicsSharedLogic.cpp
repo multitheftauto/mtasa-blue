@@ -94,7 +94,7 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
 bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, const CVector& vecRotation)
 {
     btQuaternion quaternion = transform.getRotation();
-    EulerToQuaternion(reinterpret_cast<const btVector3&>(vecRotation), quaternion);
+    EulerToQuaternion(vecRotation, quaternion);
     transform.setRotation(quaternion);
     return true;
 }
@@ -104,7 +104,7 @@ bool CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, CVector& 
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
     CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
-    vecRotation = reinterpret_cast<CVector&>(rotation);
+    vecRotation = rotation;
     return true;
 }
 
@@ -124,7 +124,7 @@ bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, btVector3
 const CVector& CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform)
 {
     const btVector3& vecPosition = transform.getOrigin();
-    return reinterpret_cast<const CVector&>(vecPosition);
+    return vecPosition;
 }
 
 const CVector& CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform)
@@ -132,19 +132,19 @@ const CVector& CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform)
     btVector3    rotation;
     btQuaternion quanternion = transform.getRotation();
     CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
-    return reinterpret_cast<const CVector&>(rotation);
+    return rotation;
 }
 
 bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, CVector& vecPosition)
 {
-    vecPosition = reinterpret_cast<const CVector&>(transform.getOrigin());
+    vecPosition = transform.getOrigin();
     return true;
 }
 
 bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector& vecPosition)
 {
     btQuaternion quaternion;
-    transform.setOrigin(reinterpret_cast<const btVector3&>(vecPosition));
+    transform.setOrigin(vecPosition);
     return true;
 }
 
@@ -177,23 +177,23 @@ bool CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CV
     return true;
 }
 
-std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
+std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector vecPosition, CVector vecRotation)
 {
-    std::unique_ptr<btBoxShape> pBoxShape = std::make_unique<btBoxShape>(reinterpret_cast<btVector3&>(half));
+    std::unique_ptr<btBoxShape> pBoxShape = std::make_unique<btBoxShape>(half);
     btTransform transform = btTransform::getIdentity();
 
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecRotation);
+    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
 
     return std::move(pBoxShape);
 }
 
-std::unique_ptr<btSphereShape> CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecPosition, CVector& vecRotation)
+std::unique_ptr<btSphereShape> CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector vecPosition, CVector vecRotation)
 {
     std::unique_ptr<btSphereShape> pSphereShape = std::make_unique<btSphereShape>(fRadius);
     btTransform                    transform = btTransform::getIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecRotation);
+    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
 
     return std::move(pSphereShape);
 }
@@ -212,7 +212,7 @@ std::unique_ptr<btConeShape> CLuaPhysicsSharedLogic::CreateCone(float fRadius, f
 
 std::unique_ptr<btCylinderShape> CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
 {
-    std::unique_ptr<btCylinderShape> pCylinderShape = std::make_unique<btCylinderShape>(reinterpret_cast<btVector3&>(half));
+    std::unique_ptr<btCylinderShape> pCylinderShape = std::make_unique<btCylinderShape>(half);
 
     return std::move(pCylinderShape);
 }
@@ -246,8 +246,8 @@ std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateBvhTriangl
     btTriangleMesh* triangleMesh = new btTriangleMesh();
     for (int i = 0; i < vecVertices.size(); i += 3)
     {
-        triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecVertices[i]), reinterpret_cast<btVector3&>(vecVertices[i + 1]),
-                                  reinterpret_cast<btVector3&>(vecVertices[i + 2]));
+        triangleMesh->addTriangle(vecVertices[i], vecVertices[i + 1],
+                                  vecVertices[i + 2]);
     }
 
     std::unique_ptr<btBvhTriangleMeshShape> triangleMeshShape = std::make_unique<btBvhTriangleMeshShape>(triangleMesh, true);
@@ -263,8 +263,8 @@ std::unique_ptr<btGImpactMeshShape> CLuaPhysicsSharedLogic::CreateGimpactMeshSha
     btTriangleMesh* triangleMesh = new btTriangleMesh();
     for (int i = 0; i < vecVertices.size(); i += 3)
     {
-        triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecVertices[i]), reinterpret_cast<btVector3&>(vecVertices[i + 1]),
-                                  reinterpret_cast<btVector3&>(vecVertices[i + 2]));
+        triangleMesh->addTriangle(vecVertices[i], vecVertices[i + 1],
+                                  vecVertices[i + 2]);
     }
 
     std::unique_ptr<btGImpactMeshShape> triangleMeshShape = std::make_unique<btGImpactMeshShape>(triangleMesh);

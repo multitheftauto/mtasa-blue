@@ -1523,10 +1523,10 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
     RayResult result{
-        {"hitpoint", reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld)},
-        {"hitnormal", reinterpret_cast<const CVector&>(rayCallback.m_hitNormalWorld)},
+        {"hitpoint", rayCallback.m_hitPointWorld},
+        {"hitnormal", rayCallback.m_hitNormalWorld},
         {"shape", pShape},
-        {"distance", (reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld) - from).Length()},
+        {"distance", (rayCallback.m_hitPointWorld - from).length()},
     };
 
     if (pStaticCollision)
@@ -1641,10 +1641,10 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
         CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
         RayResult result{
-            {"hitpoint", reinterpret_cast<CVector&>(rayCallback.m_hitPointWorld[i])},
-            {"hitnormal", reinterpret_cast<CVector&>(rayCallback.m_hitNormalWorld[i])},
+            {"hitpoint", rayCallback.m_hitPointWorld[i]},
+            {"hitnormal", rayCallback.m_hitNormalWorld[i]},
             {"shape", pShape},
-            {"distance", (reinterpret_cast<CVector&>(rayCallback.m_hitPointWorld[i]) - from).Length()},
+            {"distance", (rayCallback.m_hitPointWorld[i] - from).length()},
         };
 
         if (pStaticCollision)
@@ -1758,10 +1758,10 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
 
     RayResult result{
         {"position", rayCallback.m_closestPosition},
-        {"hitpoint", reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld)},
-        {"hitnormal", reinterpret_cast<const CVector&>(rayCallback.m_hitNormalWorld)},
+        {"hitpoint", rayCallback.m_hitPointWorld},
+        {"hitnormal", rayCallback.m_hitNormalWorld},
         {"shape", pHitShape},
-        {"distance", (reinterpret_cast<const CVector&>(rayCallback.m_hitPointWorld) - vecStartPosition).Length()},
+        {"distance", (rayCallback.m_hitPointWorld - vecStartPosition).length()},
     };
 
     if (pRigidBody)
