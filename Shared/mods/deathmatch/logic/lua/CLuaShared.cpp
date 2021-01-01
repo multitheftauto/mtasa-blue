@@ -75,6 +75,7 @@ void CLuaShared::LoadFunctions()
     CLuaTrainTrackDefs::LoadFunctions();
     CLuaUTFDefs::LoadFunctions();
     CLuaUtilDefs::LoadFunctions();
+    CLuaPhysicsDefs::LoadFunctions();
 }
 
 void CLuaShared::AddClasses(lua_State* luaVM)

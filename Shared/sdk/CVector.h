@@ -20,7 +20,7 @@
 #define FLOAT_EPSILON 0.0001f
 #include "CVector4D.h"
 
-#include "bulletphysics3d\LinearMath\btVector3.h"
+#include "bulletphysics3d/LinearMath/btVector3.h"
 
 /**
  * CVector Structure used to store a 3D vertex.
