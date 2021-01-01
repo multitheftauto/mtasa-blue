@@ -840,22 +840,6 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CBulletPhysics::CreatePointTo
     return pConstraint;
 }
 
-std::shared_ptr<CLuaPhysicsFixedConstraint> CBulletPhysics::CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                  bool bDisableCollisionsBetweenLinkedBodies)
-{
-    assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
-
-    CVector vecPositionA = pRigidBodyA->GetPosition() - pRigidBodyB->GetPosition();
-    CVector vecRotationA;
-    CVector vecPositionB = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
-    CVector vecRotationB;
-
-    std::shared_ptr<CLuaPhysicsFixedConstraint> pConstraint = std::make_shared<CLuaPhysicsFixedConstraint>(
-        pRigidBodyA, pRigidBodyB, vecPositionA, vecRotationA, vecPositionB, vecRotationB, bDisableCollisionsBetweenLinkedBodies);
-    AddConstraint(pConstraint);
-    return pConstraint;
-}
-
 bool CBulletPhysics::CanDoPulse()
 {
     return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());

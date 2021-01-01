@@ -50,9 +50,6 @@ public:
     static bool PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pChildShape, std::optional<CVector> vecOptionalPosition,
                                      std::optional<CVector> vecOptionalRotation);
 
-    static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                               std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
-
     static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
                                                       std::variant<CVector, bool, float, int> argument);
     static bool PhysicsSetRigidBodyProperties(CLuaPhysicsRigidBody* pRigidBody, ePhysicsProperty eProperty,

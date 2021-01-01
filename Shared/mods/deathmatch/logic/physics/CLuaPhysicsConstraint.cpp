@@ -11,16 +11,6 @@
 
 #include <StdInc.h>
 
-/*
-// todo:
-btConeTwistConstraint, btHinge2Constraint,
-btMultiBodyConstraint, btMultiBodyFixedConstraint, btMultiBodyGearConstraint, btMultiBodyJointLimitConstraint, btMultiBodySliderConstraint,
-btSolverConstraint, btUniversalConstraint, btSolve2LinearConstraint, btGearConstraint, btGeneric6DofConstraint, btContactConstraint
-
-// finished:
-btPoint2PointConstraint, btHingeConstraint, btFixedConstraint, btSliderConstraint
-*/
-
 CLuaPhysicsConstraint::CLuaPhysicsConstraint(CBulletPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBody, bool bDisableCollisionsBetweenLinkedBodies)
     : CLuaPhysicsElement(pPhysics, EIdClass::CONSTRAINT)
 {

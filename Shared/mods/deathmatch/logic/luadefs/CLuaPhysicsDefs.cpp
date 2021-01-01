@@ -53,7 +53,6 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateRigidBody", ArgumentParser<PhysicsCreateRigidBody>},
         {"physicsCreateStaticCollision", ArgumentParser<PhysicsCreateStaticCollision>},
         {"physicsCreatePointToPointConstraint", ArgumentParser<PhysicsCreatePointToPointConstraint>},
-        {"physicsCreateFixedConstraint", ArgumentParser<PhysicsCreateFixedConstraint>},
         {"physicsCreateBoxShape", ArgumentParser<PhysicsCreateBoxShape>},
         {"physicsCreateSphereShape", ArgumentParser<PhysicsCreateSphereShape>},
         {"physicsCreateCapsuleShape", ArgumentParser<PhysicsCreateCapsuleShape>},
@@ -1356,13 +1355,6 @@ std::variant<CVector, float, bool, std::tuple<float, float>, std::tuple<int, int
 //    return 1;
 //}
 
-std::shared_ptr<CLuaPhysicsConstraint> CLuaPhysicsDefs::PhysicsCreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                     std::optional<bool> bDisableCollisionsBetweenLinkedBodies)
-{
-    std::shared_ptr<CLuaPhysicsFixedConstraint> pConstraint =
-        pRigidBodyA->GetPhysics()->CreateFixedConstraint(pRigidBodyA, pRigidBodyB, bDisableCollisionsBetweenLinkedBodies.value_or(true));
-    return pConstraint;
-}
 
 // --------- AAAAAAAAA  BBBB   CCCC
 // rigidbody rigidbody  bool                // variant A

@@ -49,11 +49,7 @@ class CLuaPhysicsShape;
 #include "physics/CLuaPhysicsGimpactTriangleMeshShape.h"
 #include "physics/CLuaPhysicsHeightfieldTerrainShape.h"
 
-#include "physics/CLuaPhysicsbtGeneric6DofSpring2Constraint.h"
 #include "physics/CLuaPhysicsPointToPointConstraint.h"
-#include "physics/CLuaPhysicsFixedConstraint.h"
-#include "physics/CLuaPhysicsHidgeConstraint.h"
-#include "physics/CLuaPhysicsSliderConstraint.h"
 #include "physics/CPhysicsStaticCollisionProxy.h"
 
 #pragma once
@@ -257,9 +253,6 @@ public:
     // Automatically calculate bodies offsets
     std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
-
-    std::shared_ptr<CLuaPhysicsFixedConstraint> CreateFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                      bool bDisableCollisionsBetweenLinkedBodies);
 
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies();
     std::vector<std::shared_ptr<CLuaPhysicsShape>>           GetShapes();
