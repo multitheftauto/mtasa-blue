@@ -336,5 +336,7 @@ public:
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
 
     virtual bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const = 0;
-    virtual bool SetDummyPosition(eVehicleDummies dummy, CVector position) = 0;
+    virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
+
+    virtual const CVector* GetDummyPositions() const = 0;
 };

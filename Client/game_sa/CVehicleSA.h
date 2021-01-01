@@ -747,9 +747,10 @@ public:
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
     bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const override;
-    bool SetDummyPosition(eVehicleDummies dummy, CVector position) override;
+    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) override;
 
-    CVector* GetDummyPositions() { return m_dummyPositions.data(); }
+    CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
+    const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
 
 private:
     void           RecalculateSuspensionLines();

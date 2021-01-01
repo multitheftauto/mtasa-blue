@@ -211,7 +211,14 @@ void CVehicleSA::Init()
         for (size_t i = 0; i < m_dummyPositions.size(); ++i)
         {
             m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((eVehicleDummies)i);
-            m_dummyPositions[i].fZ += 1.0f;
+        }
+
+        CVector& secondaryExhaust = m_dummyPositions[EXHAUST_SECONDARY];
+
+        if (secondaryExhaust.fX == 0.0f && secondaryExhaust.fY == 0.0f && secondaryExhaust.fZ == 0.0f)
+        {
+            secondaryExhaust = m_dummyPositions[EXHAUST];
+            secondaryExhaust.fX *= -1.0f;
         }
     }
 
@@ -2690,11 +2697,46 @@ bool CVehicleSA::GetDummyPosition(eVehicleDummies dummy, CVector& position) cons
     return false;
 }
 
-bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, CVector position)
+bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
 {
     if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
     {
         m_dummyPositions[dummy] = position;
+
+        bool isAnyExhaust = dummy == EXHAUST || dummy == EXHAUST_SECONDARY;
+
+        if (isAnyExhaust)
+        {
+            // NOTE(botder): The following code should be in CAutomobileSA::SetDummyPosition
+            //               but we don't use CAutomobileSA yet
+            uint8_t vehicleClass = reinterpret_cast<CVehicleSAInterface*>(m_pInterface)->m_vehicleClass;
+            bool isAutomobileClass = static_cast<VehicleClass>(vehicleClass) == VehicleClass::AUTOMOBILE;
+
+            if (isAutomobileClass)
+            {
+                auto                  automobile = reinterpret_cast<CAutomobileSAInterface*>(GetInterface());
+                CFxSystemSAInterface* nitro = nullptr;
+
+                if (dummy == EXHAUST)
+                {
+                    nitro = reinterpret_cast<CFxSystemSAInterface*>(automobile->pNitroParticle[0]);
+                }
+                else if (dummy == EXHAUST_SECONDARY)
+                {
+                    nitro = reinterpret_cast<CFxSystemSAInterface*>(automobile->pNitroParticle[1]);
+                }
+
+                if (nitro != nullptr)
+                {
+                    // Copied from: CFxSystemSA::SetPosition(const CVector& vecPos)
+                    nitro->matPosition.pos.x = position.fX;
+                    nitro->matPosition.pos.y = position.fY;
+                    nitro->matPosition.pos.z = position.fZ;
+                    nitro->matPosition.flags &= 0xFFFDFFFC;
+                }
+            }
+        }
+
         return true;
     }
 

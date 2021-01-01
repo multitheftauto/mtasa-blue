@@ -140,6 +140,9 @@ public:
     LUA_DECLARE(SetVehicleModelDummyPosition);
     LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
 
+    static bool                                                SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position);
+    static std::variant<bool, std::tuple<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
+
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 

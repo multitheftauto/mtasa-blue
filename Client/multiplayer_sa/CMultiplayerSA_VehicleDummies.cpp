@@ -13,7 +13,7 @@ static const DWORD CModelInfo__ms_modelInfoPtrs = 0xA9B0C8;
 
 static CVector* vehicleDummiesPositionArray = nullptr;
 
-static void _cdecl UpdateVehicleDummiesPositionArray(CVehicleSAInterface* vehicleInterface)
+static void __cdecl UpdateVehicleDummiesPositionArray(CVehicleSAInterface* vehicleInterface)
 {
     SClientEntity<CVehicleSA>* vehicle = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
     vehicleDummiesPositionArray = (vehicle != nullptr) ? vehicle->pEntity->GetDummyPositions() : nullptr;
@@ -103,7 +103,7 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// CAutomobile::DoNitroEffect
+// CAutomobile::DoNitroEffect (1 of 2)
 //
 // Required for: Position for vehicle nitro (+ recharge) effect particles
 //
@@ -112,11 +112,11 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
 // >>> 0x6A3BE2 | 8B 48 5C             | mov ecx, [eax+5Ch]
 //     0x6A3BE5 | 83 C1 48             | add ecx, 48h
 //     0x6A3BE8 | 8B 11                | mov edx, [ecx]
-#define HOOKPOS_CAutomobile_DoNitroEffect               0x6A3BE2
-#define HOOKSIZE_CAutomobile_DoNitroEffect              6
-static const DWORD CONTINUE_CAutomobile_DoNitroEffect = 0x6A3BE8;
+#define HOOKPOS_CAutomobile_DoNitroEffect_1               0x6A3BE2
+#define HOOKSIZE_CAutomobile_DoNitroEffect_1              6
+static const DWORD CONTINUE_CAutomobile_DoNitroEffect_1 = 0x6A3BE8;
 
-static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect()
+static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
 {
     _asm
     {
@@ -132,13 +132,69 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect()
         popad
         mov     ecx, vehicleDummiesPositionArray
         add     ecx, 48h
-        jmp     CONTINUE_CAutomobile_DoNitroEffect
+        jmp     CONTINUE_CAutomobile_DoNitroEffect_1
 
         continueWithOriginalCode:
         popad
         mov     ecx, [eax+5Ch]
         add     ecx, 48h
-        jmp     CONTINUE_CAutomobile_DoNitroEffect
+        jmp     CONTINUE_CAutomobile_DoNitroEffect_1
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAutomobile::DoNitroEffect (2 of 2)
+//
+// Required for: Position for vehicle secondary nitro (+ recharge) effect particles
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6A3C66 | 74 76             | jz   short loc_6A3CDE
+// >>> 0x6A3C68 | 8B 44 24 1C       | mov  eax, [esp+38h+position.z]
+//     0x6A3C6C | D9 44 24 14       | fld  [esp+38h+position.x]
+//     0x6A3C70 | D8 0D 1C 8C 85 00 | fmul -1.0f
+//     0x6A3C76 | 8B 4C 24 14       | mov  ecx, [esp+38h+position.x]
+//     0x6A3C7A | 8B 54 24 18       | mov  edx, [esp+38h+position.y]
+//     0x6A3C7E | 89 44 24 28       | mov  [esp+38h+secondaryNitroPos.z], eax
+//     0x6A3C82 | 85 7E 40          | test [esi+40h], edi
+//     0x6A3C85 | 89 4C 24 20       | mov  [esp+38h+secondaryNitroPos.x], ecx
+//     0x6A3C89 | D9 5C 24 20       | fstp [esp+38h+secondaryNitroPos.x]
+//     0x6A3C8D | 89 54 24 24       | mov  [esp+38h+secondaryNitroPos.y], edx
+//     0x6A3C91 | 74 4B             | jz   short loc_6A3CDE
+#define HOOKPOS_CAutomobile_DoNitroEffect_2               0x6A3C68
+#define HOOKSIZE_CAutomobile_DoNitroEffect_2              41
+static const DWORD CONTINUE_CAutomobile_DoNitroEffect_2 = 0x6A3C91;
+
+static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehicleInterface, CVector* secondaryExhaustPosition)
+{
+    UpdateVehicleDummiesPositionArray(vehicleInterface);
+
+    if (vehicleDummiesPositionArray != nullptr)
+    {
+        *secondaryExhaustPosition = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
+    }
+    else
+    {
+        secondaryExhaustPosition->fX = 0.0f;
+        secondaryExhaustPosition->fY = 0.0f;
+        secondaryExhaustPosition->fZ = 0.0f;
+    }
+}
+
+static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
+{
+    _asm
+    {
+        pushad
+        lea     eax, [esp+40h]
+        push    eax             // CVector*
+        push    esi             // CVehicleSAInterface*
+        call    ApplySecondaryExhaustNitroPosition
+        add     esp, 8
+        popad
+
+        test    [esi+40h], edi
+        jmp     CONTINUE_CAutomobile_DoNitroEffect_2
     }
 }
 
@@ -643,6 +699,255 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVehicle::GetPlaneOrdnancePosition
+//
+// Required for: Plane ordnance position (eVehicleDummies::VEH_GUN)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6D46E9 | 8B 04 BD C8 B0 A9 00 | mov eax, CModelInfo::ms_modelInfoPtrs
+// >>> 0x6D46F0 | 8B 40 5C             | mov eax, [eax+5Ch]
+//     0x6D46F3 | 05 9C 00 00 00       | add eax, 9Ch
+//     0x6D46F8 | 8B 08                | mov ecx, [eax]
+#define HOOKPOS_CVehicle_GetPlaneOrdnancePosition               0x6D46F0
+#define HOOKSIZE_CVehicle_GetPlaneOrdnancePosition              8
+static const DWORD CONTINUE_CVehicle_GetPlaneOrdnancePosition = 0x6D46F8;
+
+static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
+{
+    _asm
+    {
+        pushad
+        push    ecx            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     eax, vehicleDummiesPositionArray
+        add     eax, 9Ch
+        jmp     CONTINUE_CVehicle_GetPlaneOrdnancePosition
+
+        continueWithOriginalCode:
+        popad
+        mov     eax, [eax+5Ch]
+        add     eax, 9Ch
+        jmp     CONTINUE_CVehicle_GetPlaneOrdnancePosition
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVehicle::CanBeDriven
+//
+// Required for: Unknown (eVehicleDummies::LIGHT_REAR_SECONDARY ???)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6D5431 | 8B 04 85 C8 B0 A9 00 | mov eax, CModelInfo::ms_modelInfoPtrs
+// >>> 0x6D5438 | 83 78 3C 05          | cmp dword ptr [eax+3Ch], 5
+//     0x6D543C | 8B 40 5C             | mov eax, [eax+5Ch]
+//     0x6D543F | 74 03                | jz  short loc_6D5444
+#define HOOKPOS_CVehicle_CanBeDriven               0x6D5438
+#define HOOKSIZE_CVehicle_CanBeDriven              7
+static const DWORD CONTINUE_CVehicle_CanBeDriven = 0x6D543F;
+
+static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
+{
+    _asm
+    {
+        pushad
+        push    ecx            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        cmp     dword ptr [eax+3Ch], 5
+        mov     eax, vehicleDummiesPositionArray
+        jmp     CONTINUE_CVehicle_CanBeDriven
+
+        continueWithOriginalCode:
+        popad
+        cmp     dword ptr [eax+3Ch], 5
+        mov     eax, [eax+5Ch]
+        jmp     CONTINUE_CVehicle_CanBeDriven
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CPlane::PreRender (1 of 3)
+//
+// Required for: Unknown (eVehicleDummies::EXHAUST_SECONDARY ???)
+//               (CPlane might be using a different enum for dummies)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6C9716 | E8 95 24 ED FF    | call CMatrix::UpdateRW
+// >>> 0x6C971B | 8B 4D 5C          | mov  ecx, [ebp+5Ch]
+//     0x6C971E | 81 C1 84 00 00 00 | add  ecx, 84h
+//     0x6C9724 | 8B 11             | mov  edx, [ecx]
+#define HOOKPOS_CPlane_PreRender_1               0x6C971B
+#define HOOKSIZE_CPlane_PreRender_1              9
+static const DWORD CONTINUE_CPlane_PreRender_1 = 0x6C9724;
+
+static void _declspec(naked) HOOK_CPlane_PreRender_1()
+{
+    _asm
+    {
+        pushad
+        push    esi            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     ecx, vehicleDummiesPositionArray
+        add     ecx, 84h
+        jmp     CONTINUE_CPlane_PreRender_1
+
+        continueWithOriginalCode:
+        popad
+        mov     ecx, [ebp+5Ch]
+        add     ecx, 84h
+        jmp     CONTINUE_CPlane_PreRender_1
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CPlane::PreRender (2 of 3)
+//
+// Required for: Unknown (eVehicleDummies::TRAILER_ATTACH ???)
+//               (CPlane might be using a different enum for dummies)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6C98C4 | E8 E7 22 ED FF | call CMatrix::UpdateRW
+// >>> 0x6C98C9 | 8B 45 5C       | mov  eax, [ebp+5Ch]
+//     0x6C98CC | 83 C0 6C       | add  eax, 6Ch
+//     0x6C98CF | 8B 08          | mov  ecx, [eax]
+#define HOOKPOS_CPlane_PreRender_2               0x6C98C9
+#define HOOKSIZE_CPlane_PreRender_2              6
+static const DWORD CONTINUE_CPlane_PreRender_2 = 0x6C98CF;
+
+static void _declspec(naked) HOOK_CPlane_PreRender_2()
+{
+    _asm
+    {
+        pushad
+        push    esi            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     eax, vehicleDummiesPositionArray
+        add     eax, 6Ch
+        jmp     CONTINUE_CPlane_PreRender_2
+
+        continueWithOriginalCode:
+        popad
+        mov     eax, [ebp+5Ch]
+        add     eax, 6Ch
+        jmp     CONTINUE_CPlane_PreRender_2
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CPlane::PreRender (3 of 3)
+//
+// Required for: Unknown (eVehicleDummies::HAND_REST ???)
+//               (CPlane might be using a different enum for dummies)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6C9B51 | E8 5A 20 ED FF | call CMatrix::UpdateRW
+// >>> 0x6C9B56 | 8B 45 5C       | mov  eax, [ebp+5Ch]
+//     0x6C9B59 | 83 C0 78       | add  eax, 78h
+//     0x6C9B5C | 8B 08          | mov  ecx, [eax]
+#define HOOKPOS_CPlane_PreRender_3               0x6C9B56
+#define HOOKSIZE_CPlane_PreRender_3              6
+static const DWORD CONTINUE_CPlane_PreRender_3 = 0x6C9B5C;
+
+static void _declspec(naked) HOOK_CPlane_PreRender_3()
+{
+    _asm
+    {
+        pushad
+        push    esi            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     eax, vehicleDummiesPositionArray
+        add     eax, 78h
+        jmp     CONTINUE_CPlane_PreRender_3
+
+        continueWithOriginalCode:
+        popad
+        mov     eax, [ebp+5Ch]
+        add     eax, 78h
+        jmp     CONTINUE_CPlane_PreRender_3
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVehicle::DoHeadLightBeam
+//
+// Required for: Vehicle light beam start position (eVehicleDummies::LIGHT_FRONT_MAIN and ::LIGHT_FRONT_SECONDARY)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6E0E2D | 8B 0C 85 C8 B0 A9 00 | mov ecx, CModelInfo::ms_modelInfoPtrs
+// >>> 0x6E0E34 | 8B 49 5C             | mov ecx, [ecx+5Ch]
+//     0x6E0E37 | 8B 84 24 9C 00 00 00 | mov eax, [esp+98h+arg_0]
+//     0x6E0E3E | 83 F8 01             | cmp eax, 1
+#define HOOKPOS_CVehicle_DoHeadLightBeam               0x6E0E34
+#define HOOKSIZE_CVehicle_DoHeadLightBeam              10
+static const DWORD CONTINUE_CVehicle_DoHeadLightBeam = 0x6E0E3E;
+
+static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
+{
+    _asm
+    {
+        pushad
+        push    edi            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     ecx, vehicleDummiesPositionArray
+        mov     eax, [esp+98h+4h]
+        jmp     CONTINUE_CVehicle_DoHeadLightBeam
+
+        continueWithOriginalCode:
+        popad
+        mov     ecx, [ecx+5Ch]
+        mov     eax, [esp+98h+4h]
+        jmp     CONTINUE_CVehicle_DoHeadLightBeam
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_VehicleDummies
 //
 // Setup hooks
@@ -650,19 +955,26 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_VehicleDummies()
 {
-    EZHookInstall(CVehicle_AddExhaustParticles);
-    EZHookInstall(CFire_ProcessFire);
-    EZHookInstall(CAutomobile_DoNitroEffect);
     EZHookInstall(CVehicle_DoVehicleLights);
-    EZHookInstall(CAutomobile_ProcessCarOnFireAndExplode);
-    EZHookInstall(CBike_FixHandsToBars);
-    EZHookInstall(CPed_SetPedPositionInCar_1);
-    EZHookInstall(CPed_SetPedPositionInCar_2);
-    EZHookInstall(CPed_SetPedPositionInCar_3);
-    EZHookInstall(CPed_SetPedPositionInCar_4);
+    EZHookInstall(CVehicle_DoHeadLightBeam);
     EZHookInstall(CVehicle_DoHeadLightEffect);
     EZHookInstall(CVehicle_DoTailLightEffect);
     EZHookInstall(CVehicle_DoHeadLightReflectionSingle);
     EZHookInstall(CVehicle_DoHeadLightReflectionTwin);
     EZHookInstall(CVehicle_GetPlaneGunsPosition);
+    EZHookInstall(CVehicle_GetPlaneOrdnancePosition);
+    EZHookInstall(CVehicle_CanBeDriven);
+    EZHookInstall(CVehicle_AddExhaustParticles);
+    EZHookInstall(CAutomobile_DoNitroEffect_1);
+    EZHookInstall(CAutomobile_DoNitroEffect_2);
+    EZHookInstall(CAutomobile_ProcessCarOnFireAndExplode);
+    EZHookInstall(CBike_FixHandsToBars);
+    // EZHookInstall(CPlane_PreRender_1); Only changes plane wing orientation in weird ways
+    // EZHookInstall(CPlane_PreRender_2);
+    // EZHookInstall(CPlane_PreRender_3);
+    // EZHookInstall(CFire_ProcessFire); // No visible effect
+    // EZHookInstall(CPed_SetPedPositionInCar_1); Player's world and seat position breaks
+    // EZHookInstall(CPed_SetPedPositionInCar_2);
+    // EZHookInstall(CPed_SetPedPositionInCar_3);
+    // EZHookInstall(CPed_SetPedPositionInCar_4);
 }

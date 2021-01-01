@@ -83,6 +83,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
+        {"getVehicleDummyPosition", ArgumentParser<GetVehicleDummyPosition>},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
@@ -142,6 +143,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
+        {"setVehicleDummyPosition", ArgumentParser<SetVehicleDummyPosition>},
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
@@ -4121,4 +4123,19 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
         throw std::invalid_argument("Invalid vehicle type");
 
     return pVehicle->GetWheelFrictionState(wheel);
+}
+
+bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position)
+{
+    return vehicle->SetDummyPosition(dummy, position);
+}
+
+std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!vehicle->GetDummyPosition(dummy, position))
+        return false;
+
+    return std::tuple(position.fX, position.fY, position.fZ);
 }

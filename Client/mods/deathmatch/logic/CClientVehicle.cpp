@@ -1128,6 +1128,16 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // clear our component data to regenerate it
         m_ComponentData.clear();
 
+        // Reset stored dummy positions
+        m_copyDummyPositions = true;
+
+        for (CVector& position : m_dummyPositions)
+        {
+            position.fX = 0.0f;
+            position.fY = 0.0f;
+            position.fZ = 0.0f;
+        }
+
         // Create the vehicle if we're streamed in
         if (IsStreamedIn())
         {
@@ -3007,6 +3017,24 @@ void CClientVehicle::Create()
         }
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
+
+        // Copy or apply our vehicle dummy positions
+        if (m_copyDummyPositions)
+        {
+            const CVector* positions = m_pVehicle->GetDummyPositions();
+
+            for (size_t i = 0; i < VEHICLE_DUMMY_COUNT; ++i)
+            {
+                m_dummyPositions[i] = positions[i];
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < VEHICLE_DUMMY_COUNT; ++i)
+            {
+                m_pVehicle->SetDummyPosition(static_cast<eVehicleDummies>(i), m_dummyPositions[i]);
+            }
+        }
 
         // We've just been streamed in
         m_bJustStreamedIn = true;
@@ -5052,6 +5080,33 @@ bool CClientVehicle::OnVehicleFallThroughMap()
         }
     }
     // unhandled
+    return false;
+}
+
+bool CClientVehicle::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        position = m_dummyPositions[dummy];
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        m_dummyPositions[dummy] = position;
+        m_copyDummyPositions = false;
+
+        if (m_pVehicle != nullptr)
+            return m_pVehicle->SetDummyPosition(dummy, position);
+
+        return true;
+    }
+
     return false;
 }
 

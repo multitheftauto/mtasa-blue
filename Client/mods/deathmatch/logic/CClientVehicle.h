@@ -511,6 +511,9 @@ public:
 
     bool OnVehicleFallThroughMap();
 
+    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
+    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
+
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
     void ConvertComponentPositionBase(const SString& vehicleComponent, CVector& vecInOutPosition, EComponentBaseType inputBase, EComponentBaseType outputBase);
@@ -708,4 +711,7 @@ public:
     SSirenInfo                               m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData> m_ComponentData;
     bool                                     m_bAsyncLoadingDisabled;
+
+    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+    bool                                     m_copyDummyPositions = true;
 };
