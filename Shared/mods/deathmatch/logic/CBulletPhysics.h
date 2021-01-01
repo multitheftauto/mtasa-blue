@@ -46,7 +46,7 @@ class CLuaPhysicsShape;
 #include "physics/CLuaPhysicsCompoundShape.h"
 #include "physics/CLuaPhysicsConvexHullShape.h"
 #include "physics/CLuaPhysicsBvhTriangleMeshShape.h"
-#include "physics/CLuaPhysicsgimpactTriangleMeshShape.h"
+#include "physics/CLuaPhysicsGimpactTriangleMeshShape.h"
 #include "physics/CLuaPhysicsHeightfieldTerrainShape.h"
 
 #include "physics/CLuaPhysicsbtGeneric6DofSpring2Constraint.h"
