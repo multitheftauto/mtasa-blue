@@ -91,34 +91,30 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
     return "unknown";
 }
 
-bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, const CVector& vecRotation)
+void CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, const CVector& vecRotation)
 {
     btQuaternion quaternion = transform.getRotation();
     EulerToQuaternion(vecRotation, quaternion);
     transform.setRotation(quaternion);
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, CVector& vecRotation)
+void CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, CVector& vecRotation)
 {
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
     CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
     vecRotation = rotation;
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, btVector3& vecRotation)
+void CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform, btVector3& vecRotation)
 {
     btQuaternion quanternion = transform.getRotation();
     CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, vecRotation);
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, btVector3& vecPosition)
+void CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, btVector3& vecPosition)
 {
     vecPosition = transform.getOrigin();
-    return true;
 }
 
 const CVector& CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform)
@@ -135,46 +131,40 @@ const CVector& CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform)
     return rotation;
 }
 
-bool CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, CVector& vecPosition)
+void CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform, CVector& vecPosition)
 {
     vecPosition = transform.getOrigin();
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector& vecPosition)
+void CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector& vecPosition)
 {
-    btQuaternion quaternion;
     transform.setOrigin(vecPosition);
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation)
+void CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetRotation(transform, vecRotation);
     pCollisionObject->setWorldTransform(transform);
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition)
+void CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetPosition(transform, vecPosition);
     pCollisionObject->setWorldTransform(transform);
-    return true;
 }
-bool CLuaPhysicsSharedLogic::GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation)
+
+void CLuaPhysicsSharedLogic::GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     GetRotation(transform, vecRotation);
-    return true;
 }
 
-bool CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition)
+void CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     GetPosition(transform, vecPosition);
-    return true;
 }
 
 std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector vecPosition, CVector vecRotation)

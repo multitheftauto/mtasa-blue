@@ -34,8 +34,8 @@ public:
         SetEnabled(false);
     }
 
-    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass, const CVector& vecLocalInertia,
-                                                          const CVector& vecCenterOfMass);
+    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass, CVector vecLocalInertia,
+                                                          CVector vecCenterOfMass, CVector vecPosition, CVector vecRotation);
 
     void SetEnabled(bool bEnabled);
 };

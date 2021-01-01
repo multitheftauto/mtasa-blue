@@ -20,20 +20,20 @@ class CLuaPhysicsSharedLogic
 public:
     static const char* GetShapeName(btCollisionShape* pShape);
 
-    static bool SetPosition(btTransform& transform, const CVector& vecPosition);
-    static bool SetRotation(btTransform& transform, const CVector& vecRotation);
-    static bool GetRotation(const btTransform& transform, CVector& vecRotation);
-    static bool GetPosition(const btTransform& transform, CVector& vecPosition);
-    static bool GetRotation(const btTransform& transform, btVector3& vecRotation);
-    static bool GetPosition(const btTransform& transform, btVector3& vecPosition);
+    static void SetPosition(btTransform& transform, const CVector& vecPosition);
+    static void SetRotation(btTransform& transform, const CVector& vecRotation);
+    static void GetRotation(const btTransform& transform, CVector& vecRotation);
+    static void GetPosition(const btTransform& transform, CVector& vecPosition);
+    static void GetRotation(const btTransform& transform, btVector3& vecRotation);
+    static void GetPosition(const btTransform& transform, btVector3& vecPosition);
 
     static const CVector& GetPosition(const btTransform& transform);
     static const CVector& GetRotation(const btTransform& transform);
 
-    static bool SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition);
-    static bool SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation);
-    static bool GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
-    static bool GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
+    static void SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition);
+    static void SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation);
+    static void GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
+    static void GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 
     static std::unique_ptr<btBoxShape>      CreateBox(CVector& half, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
     static std::unique_ptr<btSphereShape>   CreateSphere(float fRadius, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));

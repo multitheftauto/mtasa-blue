@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/logic/physics/CPhysicsRigidBodyProxy.h
+ *  FILE:        mods/shared_logic/logic/physics/CPhysicsRigidBodyProxy.cpp
  *  PURPOSE:     Manages creation and destruction of rigid body
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -27,17 +27,19 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
     }
 }
 
-std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy:: Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass,
-                                                                             const CVector& vecLocalInertia,
-                                                      const CVector& vecCenterOfMass)
+std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass,
+                                                                       CVector vecLocalInertia, CVector vecCenterOfMass,
+                                                                       CVector vecPosition, CVector vecRotation)
 {
     btTransform           transform = btTransform::getIdentity();
     btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
-    motionstate->m_centerOfMassOffset.setOrigin(btVector3(vecCenterOfMass.fX, vecCenterOfMass.fY, vecCenterOfMass.fZ));
+
+    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    CLuaPhysicsSharedLogic::SetPosition(motionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->GetBtShape();
-    btVector3         localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);
-    pCollisionShape->calculateLocalInertia(fMass, localInertia);
-    const CPhysicsRigidBodyProxy::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pCollisionShape, localInertia);
+    pCollisionShape->calculateLocalInertia(fMass, (btVector3)vecLocalInertia);
+    const CPhysicsRigidBodyProxy::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pCollisionShape, vecLocalInertia);
     std::unique_ptr<CPhysicsRigidBodyProxy>                   pRigidBody = std::make_unique<CPhysicsRigidBodyProxy>(rigidBodyCI);
 
     pRigidBody->m_pPhysics = pShape->GetPhysics();

@@ -19,7 +19,7 @@ public:
     CLuaPhysicsSphereShape(CBulletPhysics* pPhysics, float radius);
     ~CLuaPhysicsSphereShape();
 
-    bool SetRadius(float fRadius);
+    void SetRadius(float fRadius);
     bool GetRadius(float& fRadius);
     void Update() {}
 };

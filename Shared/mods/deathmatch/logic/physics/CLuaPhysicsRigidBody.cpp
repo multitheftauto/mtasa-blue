@@ -34,7 +34,13 @@ void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRig
     GetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
     GetTempData(eTempDataKey::CenterOfMass, vecCenterOfMass);
 
-    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    CVector         position, rotation;
+    {
+        std::lock_guard guard(m_matrixLock);
+        position = m_matrix.GetPosition();
+        rotation = m_matrix.GetRotation();
+    }
+    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, position, rotation);
 
     m_pRigidBodyProxy->setUserPointer((void*)this);
 
@@ -58,12 +64,15 @@ void CLuaPhysicsRigidBody::HasMoved()
     m_matrix.SetRotation(rotation);
 }
 
-void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition)
+void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition, bool dontCommitChanges)
 {
     {
         std::lock_guard guard(m_matrixLock);
         m_matrix.SetPosition(vecPosition);
     }
+
+    if (dontCommitChanges)
+        return;
 
     std::function<void()> change([&, vecPosition]() {
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
@@ -81,7 +90,7 @@ const CVector CLuaPhysicsRigidBody::GetPosition() const
     return m_matrix.GetPosition();
 }
 
-void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation)
+void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation, bool dontCommitChanges)
 {
     {
         std::lock_guard guard(m_matrixLock);
@@ -89,6 +98,9 @@ void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation)
         ConvertDegreesToRadians(vecNewRotation);
         m_matrix.SetRotation(vecNewRotation);
     }
+
+    if (dontCommitChanges)
+        return;
 
     std::function<void()> change([&, vecRotation]() {
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
@@ -437,6 +449,26 @@ void CLuaPhysicsRigidBody::SetFilterGroup(int iGroup)
     std::function<void()> change([&, iGroup]() { m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup = iGroup; });
 
     CommitChange(change);
+}
+
+void CLuaPhysicsRigidBody::SetGravity(CVector vecGravity)
+{
+    SetTempData(eTempDataKey::Gravity, vecGravity);
+
+    std::function<void()> change([&, vecGravity]() { m_pRigidBodyProxy->setGravity(vecGravity); });
+
+    CommitChange(change);
+}
+
+CVector CLuaPhysicsRigidBody::GetGravity() const
+{
+    CVector vecGravity;
+    if (GetTempData(eTempDataKey::Gravity, vecGravity))
+        return vecGravity;
+
+    if (IsReady())
+        return m_pRigidBodyProxy->getGravity();
+    return {1, 1, 1};
 }
 
 int CLuaPhysicsRigidBody::GetFilterGroup() const

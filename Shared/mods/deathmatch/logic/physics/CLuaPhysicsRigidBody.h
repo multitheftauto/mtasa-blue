@@ -26,9 +26,9 @@ public:
     CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
-    void    SetPosition(const CVector& vecPosition);
+    void    SetPosition(const CVector& vecPosition, bool dontCommitChanges = false);
     const CVector GetPosition() const;
-    void    SetRotation(const CVector& vecRotation);
+    void          SetRotation(const CVector& vecRotation, bool dontCommitChanges = false);
     const CVector GetRotation() const;
     void          SetScale(const CVector& vecScale);
     const CVector GetScale() const;
@@ -41,6 +41,9 @@ public:
 
     int  GetFilterGroup() const;
     void SetFilterGroup(int iGroup);
+    CVector  GetGravity() const;
+    void SetGravity(CVector gravity);
+
     int  GetFilterMask() const;
     void SetFilterMask(int mask);
 

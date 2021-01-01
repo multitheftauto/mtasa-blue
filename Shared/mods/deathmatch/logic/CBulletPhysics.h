@@ -225,7 +225,9 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass = BulletPhysics::Limits::RigidBodyMassLimit,
+                                                          CVector vecLocalInertia = CVector(0, 0, 0),
+                                                          CVector vecCenterOfMass = CVector(0, 0, 0));
 
     std::shared_ptr<CLuaPhysicsBoxShape>                CreateBoxShape(CVector vector);
     std::shared_ptr<CLuaPhysicsSphereShape>             CreateSphereShape(float radius);

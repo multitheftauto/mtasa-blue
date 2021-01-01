@@ -49,6 +49,7 @@ public:
         LocalInertia,
         CenterOfMass,
         DebugColor,
+        Gravity,
     };
 
     struct SPhysicsCollisionContact

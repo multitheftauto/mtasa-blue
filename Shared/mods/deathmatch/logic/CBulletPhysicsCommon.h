@@ -42,13 +42,12 @@ namespace BulletPhysics
         inline constexpr int     MinimumHeightfieldTerrain = 2;
         inline constexpr int     MaximumHeightfieldTerrain = 1024;
         inline constexpr int     RaycastAllUpperResultsLimit = 8196;
+        inline constexpr float   RigidBodyMassLimit = 1000000.0f;
     }            // namespace Limits
     namespace Defaults
     {
         inline constexpr CVector Gravity(0.f, 0.f, -9.81f);
         inline constexpr float   RigidBodyMass = 1.f;
-        inline constexpr CVector RigidBodyInertia(0.f, 0.f, 0.f);
-        inline constexpr CVector RigidBodyCenterOfMass(0.f, 0.f, 0.f);
         inline constexpr CVector RigidBodyPosition(0.f, 0.f, 0.f);
         inline constexpr CVector RigidBodyRotation(0.f, 0.f, 0.f);
         inline constexpr float   RigidBodyLinearDumping = 0.005f;             // 0.0 - 1.0
