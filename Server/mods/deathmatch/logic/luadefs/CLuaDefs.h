@@ -31,6 +31,7 @@
 #include "../CVehicleManager.h"
 #include "../CRegistry.h"
 #include "../CDatabaseManager.h"
+#include "CBulletPhysicsManager.h"
 #include <lua/CLuaFunctionParser.h>
 
 // Used by script handlers to verify elements
@@ -85,6 +86,7 @@ protected:
     static CResourceManager*          m_pResourceManager;
     static CAccessControlListManager* m_pACLManager;
     static CMainConfig*               m_pMainConfig;
+    static CBulletPhysicsManager*     m_pPhysicsManager;
 
 protected:
     // Old style: Only warn on failure. This should

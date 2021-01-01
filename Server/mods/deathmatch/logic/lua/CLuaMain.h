@@ -30,6 +30,11 @@ class CPlayerManager;
 class CRadarAreaManager;
 class CVehicleManager;
 class CMapManager;
+class CLuaPhysicsRigidBodyManager;
+class CLuaPhysicsStaticCollisionManager;
+class CLuaPhysicsConstraintManager;
+class CLuaPhysicsShapeManager;
+class CLuaPhysicsElement;
 
 struct CRefInfo
 {
@@ -65,6 +70,16 @@ public:
     CPlayerManager*  GetPlayerManager() const { return m_pPlayerManager; };
     CVehicleManager* GetVehicleManager() const { return m_pVehicleManager; };
     CMapManager*     GetMapManager() const { return m_pMapManager; };
+
+    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
+    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
+    CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager; };
+    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
+    CLuaPhysicsConstraint*             GetContraintFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
+    std::shared_ptr<CLuaPhysicsShape>  GetShapeFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
     CXMLNode*     ParseString(const char* strXmlContent);
@@ -109,6 +124,23 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
+    template <class T>
+    T* CreateElement()
+    {
+        if (m_pResource)
+        {
+            T*             pElement = new T(INVALID_ELEMENT_ID, this);
+            CElementGroup* pGroup = m_pResource->GetElementGroup();
+            if (pGroup)
+            {
+                pGroup->Add((CElement*)pElement);
+            }
+            return pElement;
+        }
+        return nullptr;
+    }
+
+
 private:
     void InitSecurity();
     void InitClasses(lua_State* luaVM);
@@ -132,6 +164,11 @@ private:
     CRadarAreaManager*   m_pRadarAreaManager;
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
+
+    CLuaPhysicsRigidBodyManager*                    m_pLuaPhysicsRigidBodyManager;
+    CLuaPhysicsStaticCollisionManager*              m_pLuaPhysicsStaticCollisionManager;
+    CLuaPhysicsConstraintManager*                   m_pLuaPhysicsContraintManager;
+    CLuaPhysicsShapeManager*                        m_pLuaPhysicsShapeManager;
 
     list<CXMLFile*>                                 m_XMLFiles;
     std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;

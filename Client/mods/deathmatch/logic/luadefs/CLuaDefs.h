@@ -64,7 +64,7 @@ public:
     static CClientPickupManager*      m_pPickupManager;
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
-    static CClientPhysicsManager*     m_pPhysicsManager;
+    static CBulletPhysicsManager*     m_pPhysicsManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
 
 protected:

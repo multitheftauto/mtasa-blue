@@ -659,7 +659,7 @@ private:
     CClientPedManager*         m_pPedManager;
     CClientPointLightsManager* m_pPointLightsManager;
     CClientProjectileManager*  m_pProjectileManager;
-    CClientPhysicsManager*     m_pPhysicsManager;
+    CBulletPhysicsManager*     m_pPhysicsManager;
     CRPCFunctions*             m_pRPCFunctions;
     CUnoccupiedVehicleSync*    m_pUnoccupiedVehicleSync;
     CPedSync*                  m_pPedSync;

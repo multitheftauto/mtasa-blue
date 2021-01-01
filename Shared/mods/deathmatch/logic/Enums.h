@@ -67,4 +67,85 @@ DECLARE_ENUM(EHashFunction::EHashFunctionType);
 DECLARE_ENUM_CLASS(PasswordHashFunction);
 DECLARE_ENUM_CLASS(StringEncryptFunction);
 
+
+enum class ePhysicsDebugMode
+{
+    // Bullet physics specific
+    NoDebug = -1,
+    DrawWireframe,
+    DrawAabb,
+    DrawFeaturesText,
+    DrawContactPoints,
+    NoDeactivation,
+    NoHelpText,
+    DrawText,
+    ProfileTimings,
+    EnableSatComparison,
+    DisableBulletLCP,
+    EnableCCD,
+    DrawConstraints,
+    DrawConstraintLimits,
+    FastWireframe,
+    DrawNormals,
+    DrawFrames,
+    // Custom
+    LINE_WIDTH,
+    DRAW_DISTANCE,
+    MAX_DEBUG_DRAW_MODE
+};
+DECLARE_ENUM_CLASS(ePhysicsDebugMode);
+
+enum class ePhysicsProperty
+{
+    MASS,
+    SLEEPING_THRESHOLDS,
+    RESTITUTION,
+    SCALE,
+    DEBUG_COLOR,
+    FILTER_MASK,
+    FILTER_GROUP,
+    SIZE,
+    RADIUS,
+    HEIGHT,
+    BOUNDING_BOX,
+    BOUNDING_SPHERE,
+    GRAVITY,
+    USE_CONTINOUS,
+    MOTION_THRESHOLD,
+    SWEPT_SPHERE_RADIUS,
+    SLEEP,
+    WANTS_SLEEPING,
+    SIMULATION_ENABLED,
+    SUBSTEPS,
+    WORLDSIZE,
+    TRIGGEREVENTS,
+    TRIGGERCOLLISIONEVENTS,
+    TRIGGERCONSTRAINTEVENTS,
+
+    // constraints properties
+    STIFFNESS,
+    PIVOT_A,
+    PIVOT_B,
+    LOWER_LIN_LIMIT,
+    UPPER_LIN_LIMIT,
+    LOWER_ANG_LIMIT,
+    UPPER_ANG_LIMIT,
+    BREAKING_IMPULSE_THRESHOLD,
+    APPLIED_IMPULSE,
+    RIGID_BODY_A,
+    RIGID_BODY_B,
+    JOINTS_FEEDBACK,
+    ENABLED,
+
+    IS_COMPOUND,
+    IS_CONCAVE,
+    IS_CONVEX,
+    IS_CONVEX2D,
+    IS_INFINITE,
+    IS_NON_MOVING,
+    IS_POLYHEDRAL,
+    IS_SOFT_BODY,
+};
+DECLARE_ENUM_CLASS(ePhysicsProperty);
+
 DECLARE_ENUM(ePacketID);

@@ -26,6 +26,8 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
+			"../../../vendor/bulletphysics3d/src/",
+			"../../../vendor/bulletphysics3d/",
 			"logic",
 			"utils",
 			"."
@@ -34,6 +36,7 @@ project "Deathmatch"
 	defines { "SDK_WITH_BCRYPT" }
 	links {
 		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
+		"BulletDynamics", "BulletCollision", "LinearMath",
 	}
 
 	vpaths {

@@ -18,10 +18,11 @@ extern "C"
     #include "lauxlib.h"
 }
 
-class CLuaPhysicsShape;
+class CLuaPhysicsElement;
 class CLuaPhysicsRigidBody;
 class CLuaPhysicsStaticCollision;
 class CLuaPhysicsConstraint;
+class CLuaPhysicsShape;
 
 CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
@@ -39,6 +40,11 @@ void lua_pushresource(lua_State* luaVM, class CResource* pResource);
 void lua_pushtextdisplay(lua_State* luaVM, class CTextDisplay* pDisplay);
 void lua_pushtextitem(lua_State* luaVM, class CTextItem* pItem);
 void lua_pushtimer(lua_State* luaVM, class CLuaTimer* pTimer);
+void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pElement);
+void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pElement);
+void lua_pushconstraint(lua_State* luaVM, CLuaPhysicsConstraint* pConstraint);
+void lua_pushshape(lua_State* luaVM, std::shared_ptr<CLuaPhysicsShape> pShape);
+void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape);
 void lua_pushxmlnode(lua_State* luaVM, class CXMLNode* pNode);
 void lua_pushban(lua_State* luaVM, class CBan* pBan);
 void lua_pushquery(lua_State* luaVM, class CDbJobData* pJobData);

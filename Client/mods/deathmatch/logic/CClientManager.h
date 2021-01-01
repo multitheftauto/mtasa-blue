@@ -42,7 +42,7 @@ class CClientManager;
 #include "CClientWeaponManager.h"
 #include "CClientEffectManager.h"
 #include "CClientPointLightsManager.h"
-#include "CClientPhysicsManager.h"
+#include "CBulletPhysicsManager.h"
 #include "CClientModelManager.h"
 
 class CClientProjectileManager;
@@ -97,7 +97,7 @@ public:
     CClientWeaponManager*        GetWeaponManager() { return m_pWeaponManager; }
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
-    CClientPhysicsManager*       GetPhysicsManager() { return m_pPhysicsManager; }
+    CBulletPhysicsManager*       GetPhysicsManager() { return m_pPhysicsManager; }
 
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
@@ -150,7 +150,7 @@ private:
     CClientPointLightsManager*   m_pPointLightsManager;
     CClientModelManager*         m_pModelManager;
     CClientPacketRecorder*       m_pPacketRecorder;
-    CClientPhysicsManager*       m_pPhysicsManager;
+    CBulletPhysicsManager*       m_pPhysicsManager;
     bool                         m_bBeingDeleted;
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;

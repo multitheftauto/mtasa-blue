@@ -94,8 +94,8 @@
 #include <CClientSearchLight.h>
 #include <CClientEffect.h>
 #include "CBulletPhysicsProfiler.h"
-#include <CClientPhysics.h>
-#include <CClientPhysicsManager.h>
+#include "CBulletPhysics.h"
+#include "CBulletPhysicsManager.h"
 #include <CCustomData.h>
 #include <CElementArray.h>
 #include <CLogger.h>

@@ -18,11 +18,6 @@
 // Prevent the warning issued when doing unsigned short -> void*
 #pragma warning(disable:4312)
 
-#include "../lua/physics/CLuaPhysicsElement.h"
-#include "../lua/physics/CLuaPhysicsStaticCollision.h"
-#include "../lua/physics/CLuaPhysicsRigidBody.h"
-#include "../lua/physics/CLuaPhysicsConstraint.h"
-
 CClientEntity* lua_toelement(lua_State* luaVM, int iArgument)
 {
     if (lua_type(luaVM, iArgument) == LUA_TLIGHTUSERDATA)

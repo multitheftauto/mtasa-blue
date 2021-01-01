@@ -37,6 +37,12 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_pResourceFile = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
+
+    m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
+    m_pLuaPhysicsStaticCollisionManager = new CLuaPhysicsStaticCollisionManager;
+    m_pLuaPhysicsContraintManager = new CLuaPhysicsConstraintManager;
+    m_pLuaPhysicsShapeManager = new CLuaPhysicsShapeManager;
+
     m_FunctionEnterTimer.SetMaxIncrement(500);
     m_WarningTimer.SetMaxIncrement(1000);
     m_uiOpenFileCountWarnThresh = 10;
@@ -70,6 +76,17 @@ CLuaMain::~CLuaMain()
 
     // Delete the timer manager
     delete m_pLuaTimerManager;
+
+    // Physics
+    delete m_pLuaPhysicsRigidBodyManager;
+    delete m_pLuaPhysicsStaticCollisionManager;
+    delete m_pLuaPhysicsContraintManager;
+    delete m_pLuaPhysicsShapeManager;
+
+    m_pLuaPhysicsRigidBodyManager = nullptr;
+    m_pLuaPhysicsStaticCollisionManager = nullptr;
+    m_pLuaPhysicsContraintManager = nullptr;
+    m_pLuaPhysicsShapeManager = nullptr;
 
     // Eventually delete the XML files the LUA script didn't
     for (auto& xmlFile : m_XMLFiles)
@@ -660,4 +677,41 @@ int CLuaMain::OnUndump(const char* p, size_t n)
         return 0;
     }
     return 1;
+}
+
+CLuaPhysicsConstraint* CLuaMain::GetContraintFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsContraintManager->GetContraintFromScriptID(uiScriptID);
+}
+
+CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsRigidBodyManager->GetRigidBodyFromScriptID(uiScriptID);
+}
+
+CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsStaticCollisionManager->GetStaticCollisionFromScriptID(uiScriptID);
+}
+
+std::shared_ptr<CLuaPhysicsShape> CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsShapeManager->GetShapeFromScriptID(uiScriptID);
+}
+
+CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScriptID)
+{
+    auto pShape = GetShapeFromScriptID(uiScriptID);
+    if (pShape != nullptr)
+        return (CLuaPhysicsElement*)pShape.get();
+    auto pStaticCollision = GetStaticCollisionFromScriptID(uiScriptID);
+    if (pStaticCollision != nullptr)
+        return (CLuaPhysicsElement*)pStaticCollision;
+    auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
+    if (pRigidBody != nullptr)
+        return (CLuaPhysicsElement*)pRigidBody;
+    auto pConstraint = GetContraintFromScriptID(uiScriptID);
+    if (pConstraint != nullptr)
+        return (CLuaPhysicsElement*)pConstraint;
+    return nullptr;
 }

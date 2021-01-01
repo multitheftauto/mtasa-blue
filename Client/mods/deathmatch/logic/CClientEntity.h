@@ -77,7 +77,7 @@ enum eClientEntityType
     CCLIENTBROWSER,
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
-    CCLIENTPHYSICS,
+    CBULLETPHYSICS,
     CCLIENTUNKNOWN,
 };
 
@@ -143,7 +143,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
     CLASS_CClientSearchLight,
-    CLASS_CClientPhysics,
+    CLASS_CBulletPhysics,
 };
 
 class CClientEntity : public CClientEntityBase

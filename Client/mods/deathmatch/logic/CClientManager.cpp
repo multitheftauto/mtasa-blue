@@ -52,7 +52,7 @@ CClientManager::CClientManager()
     m_pWeaponManager = new CClientWeaponManager(this);
     m_pEffectManager = new CClientEffectManager(this);
     m_pPointLightsManager = new CClientPointLightsManager(this);
-    m_pPhysicsManager = new CClientPhysicsManager(this);
+    m_pPhysicsManager = new CBulletPhysicsManager(this);
     m_pModelManager = new CClientModelManager();
     m_pPacketRecorder = new CClientPacketRecorder(this);
 

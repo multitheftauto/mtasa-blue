@@ -532,6 +532,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
+    m_pPhysicsManager = new CBulletPhysicsManager();
+
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 
     // Parse the commandline

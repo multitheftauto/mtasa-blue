@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientPhysics.cpp
+ *  FILE:        mods/shared_logic/CBulletPhysics.cpp
  *  PURPOSE:     Physics debug drawer
  *
  *****************************************************************************/

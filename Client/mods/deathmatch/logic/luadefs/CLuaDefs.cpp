@@ -29,7 +29,7 @@ CClientMarkerManager*      CLuaDefs::m_pMarkerManager = NULL;
 CClientPickupManager*      CLuaDefs::m_pPickupManager = NULL;
 CClientDFFManager*         CLuaDefs::m_pDFFManager = NULL;
 CClientColModelManager*    CLuaDefs::m_pColModelManager = NULL;
-CClientPhysicsManager*     CLuaDefs::m_pPhysicsManager = NULL;
+CBulletPhysicsManager*     CLuaDefs::m_pPhysicsManager = NULL;
 CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands = NULL;
 bool                       ms_bRegisterdPostCallHook = false;
 

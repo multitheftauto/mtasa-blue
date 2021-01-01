@@ -66,7 +66,6 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM_CLASS(eClientModelType);
-DECLARE_ENUM_CLASS(ePhysicsDebugMode);
 
 class CRemoteCall;
 
@@ -107,59 +106,6 @@ enum eJSONPrettyType
     JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
 };
 DECLARE_ENUM(eJSONPrettyType);
-
-enum class ePhysicsProperty
-{
-    MASS,
-    SLEEPING_THRESHOLDS,
-    RESTITUTION,
-    SCALE,
-    DEBUG_COLOR,
-    FILTER_MASK,
-    FILTER_GROUP,
-    SIZE,
-    RADIUS,
-    HEIGHT,
-    BOUNDING_BOX,
-    BOUNDING_SPHERE,
-    GRAVITY,
-    USE_CONTINOUS,
-    MOTION_THRESHOLD,
-    SWEPT_SPHERE_RADIUS,
-    SLEEP,
-    WANTS_SLEEPING,
-    SIMULATION_ENABLED,
-    SUBSTEPS,
-    WORLDSIZE,
-    TRIGGEREVENTS,
-    TRIGGERCOLLISIONEVENTS,
-    TRIGGERCONSTRAINTEVENTS,
-
-    // constraints properties
-    STIFFNESS,
-    PIVOT_A,
-    PIVOT_B,
-    LOWER_LIN_LIMIT,
-    UPPER_LIN_LIMIT,
-    LOWER_ANG_LIMIT,
-    UPPER_ANG_LIMIT,
-    BREAKING_IMPULSE_THRESHOLD,
-    APPLIED_IMPULSE,
-    RIGID_BODY_A,
-    RIGID_BODY_B,
-    JOINTS_FEEDBACK,
-    ENABLED,
-
-    IS_COMPOUND,
-    IS_CONCAVE,
-    IS_CONVEX,
-    IS_CONVEX2D,
-    IS_INFINITE,
-    IS_NON_MOVING,
-    IS_POLYHEDRAL,
-    IS_SOFT_BODY,
-};
-DECLARE_ENUM_CLASS(ePhysicsProperty);
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)

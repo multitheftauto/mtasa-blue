@@ -1635,29 +1635,3 @@ namespace eObjectGroup
         SMASHABLE,
     };
 }
-
-enum class ePhysicsDebugMode
-{
-    // Bullet physics specific
-    NoDebug = -1,
-    DrawWireframe,
-    DrawAabb,
-    DrawFeaturesText,
-    DrawContactPoints,
-    NoDeactivation,
-    NoHelpText,
-    DrawText,
-    ProfileTimings,
-    EnableSatComparison,
-    DisableBulletLCP,
-    EnableCCD,
-    DrawConstraints,
-    DrawConstraintLimits,
-    FastWireframe,
-    DrawNormals,
-    DrawFrames,
-    // Custom
-    LINE_WIDTH,
-    DRAW_DISTANCE,
-    MAX_DEBUG_DRAW_MODE
-};

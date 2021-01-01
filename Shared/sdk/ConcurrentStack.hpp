@@ -1,6 +1,8 @@
 #include <stack>
 #include <mutex>
 
+#pragma once
+
 namespace SharedUtil
 {
     template <typename T>
