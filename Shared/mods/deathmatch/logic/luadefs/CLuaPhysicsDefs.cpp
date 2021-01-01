@@ -1827,11 +1827,11 @@ std::string CLuaPhysicsDefs::PhysicsGetElementType(CLuaPhysicsElement* pPhysicsE
         case EIdClassType::RIGID_BODY:
             return "rigidbody";
         case EIdClassType::SHAPE:
-            return "staticcollision";
-        case EIdClassType::STATIC_COLLISION:
-            return "constraint";
-        case EIdClassType::CONSTRAINT:
             return "shape";
+        case EIdClassType::STATIC_COLLISION:
+            return "staticcollision";
+        case EIdClassType::CONSTRAINT:
+            return "constraint";
         default:
             return "unknown";
     }
