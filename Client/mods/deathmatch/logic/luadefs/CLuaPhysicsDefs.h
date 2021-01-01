@@ -100,7 +100,6 @@ public:
     static std::variant<bool, float> PhysicsGetDebugMode(CClientPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
 
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
-    LUA_DECLARE(PhysicsCreateConstraint);
 
     static std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> PhysicsOverlapBox(
         CClientPhysics* pPhysics, CVector min, CVector max, std::optional<short> collisionGroup, std::optional<int> collisionMask);

@@ -88,17 +88,15 @@ bool CLuaPhysicsShape::SetScale(CVector scale)
     return true;
 }
 
-bool CLuaPhysicsShape::GetScale(CVector& scale)
+const CVector& CLuaPhysicsShape::GetScale()
 {
     btVector3 btScale = m_pBtShape->getLocalScaling();
-    scale = reinterpret_cast<CVector&>(btScale);
-    return true;
+    return reinterpret_cast<const CVector&>(btScale);
 }
 
 bool CLuaPhysicsShape::GetBoundingBox(CVector& vecMin, CVector& vecMax)
 {
-    btTransform transform;
-    transform.setIdentity();
+    btTransform transform = btTransform::getIdentity();
     btVector3 min, max;
     m_pBtShape->getAabb(transform, min, max);
     vecMin = reinterpret_cast<CVector&>(min);
@@ -108,8 +106,6 @@ bool CLuaPhysicsShape::GetBoundingBox(CVector& vecMin, CVector& vecMax)
 
 bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
 {
-    btTransform transform;
-    transform.setIdentity();
     btVector3 center;
     btScalar  radius;
     m_pBtShape->getBoundingSphere(center, radius);

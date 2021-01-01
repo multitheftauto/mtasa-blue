@@ -178,8 +178,8 @@ bool CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CV
 std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
 {
     std::unique_ptr<btBoxShape> pBoxShape = std::make_unique<btBoxShape>(reinterpret_cast<btVector3&>(half));
-    btTransform                 transform;
-    transform.setIdentity();
+    btTransform transform = btTransform::getIdentity();
+
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetPosition(transform, vecRotation);
 
@@ -189,8 +189,7 @@ std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVe
 std::unique_ptr<btSphereShape> CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecPosition, CVector& vecRotation)
 {
     std::unique_ptr<btSphereShape> pSphereShape = std::make_unique<btSphereShape>(fRadius);
-    btTransform                    transform;
-    transform.setIdentity();
+    btTransform                    transform = btTransform::getIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetPosition(transform, vecRotation);
 
@@ -225,10 +224,8 @@ std::unique_ptr<btCompoundShape> CLuaPhysicsSharedLogic::CreateCompound()
 
 std::unique_ptr<btRigidBody> CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
-    btTransform transformZero;
-    transformZero.setIdentity();
-    transformZero.setOrigin(btVector3(0, 0, 0));
-    btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
+    btTransform transform = btTransform::getIdentity();
+    btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
     motionstate->m_centerOfMassOffset.setOrigin(btVector3(vecCenterOfMass.fX, vecCenterOfMass.fY, vecCenterOfMass.fZ));
 
     btVector3 localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);

@@ -34,7 +34,7 @@ public:
     void                           RemoveStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     bool SetScale(CVector scale);
-    bool GetScale(CVector& scale);
+    const CVector& GetScale();
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
     bool GetBoundingSphere(CVector& vecCenter, float& fRadius);
     void GetMargin(float& fMargin);

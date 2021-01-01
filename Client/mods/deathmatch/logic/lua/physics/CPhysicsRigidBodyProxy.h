@@ -31,10 +31,8 @@ public:
     static std::unique_ptr<CPhysicsRigidBodyProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass, const CVector& vecLocalInertia,
                                                           const CVector& vecCenterOfMass)
     {
-        btTransform transformZero;
-        transformZero.setIdentity();
-        transformZero.setOrigin(btVector3(0, 0, 0));
-        btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
+        btTransform transform = btTransform::getIdentity();
+        btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
         motionstate->m_centerOfMassOffset.setOrigin(btVector3(vecCenterOfMass.fX, vecCenterOfMass.fY, vecCenterOfMass.fZ));
         btCollisionShape* pCollisionShape = pShape->GetBtShape();
         btVector3         localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);

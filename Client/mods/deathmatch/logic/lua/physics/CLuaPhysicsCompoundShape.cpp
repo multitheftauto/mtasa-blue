@@ -23,8 +23,7 @@ CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
 void CLuaPhysicsCompoundShape::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation)
 {
     btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    btTransform      transform;
-    transform.setIdentity();
+    btTransform      transform = btTransform::getIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     pCompound->addChildShape(transform, pShape->GetBtShape());
