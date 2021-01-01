@@ -1965,6 +1965,12 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
     return false;
 }
 
+int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
+{
+    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
+    return vehicle->m_wheelFrictionState[eWheelPosition];
+}
+
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
 {
     DEBUG_TRACE("void CVehicleSA::SetTaxiLight ( bool bLightOn )");

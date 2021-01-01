@@ -251,6 +251,7 @@ public:
     virtual void SetBikeWheelStatus(BYTE bWheel, BYTE bStatus) = 0;
 
     virtual bool IsWheelCollided(BYTE bWheel) = 0;
+    virtual int  GetWheelFrictionState(BYTE bWheel) = 0;
 
     virtual class CVehicleSAInterface* GetVehicleInterface() = 0;
 

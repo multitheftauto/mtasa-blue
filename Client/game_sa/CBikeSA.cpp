@@ -49,7 +49,7 @@ void CBikeSA::SetBikeHandlingData(CBikeHandlingEntry* pBikeHandling)
     if (!pBikeHandling)
         return;
     m_pBikeHandlingData = static_cast<CBikeHandlingEntrySA*>(pBikeHandling);
-    GetBikeInterface()->pBikeHandlingData = m_pBikeHandlingData->GetInterface();
+    GetBikeInterface()->m_pBikeHandlingData = m_pBikeHandlingData->GetInterface();
     RecalculateBikeHandling();
 }
 

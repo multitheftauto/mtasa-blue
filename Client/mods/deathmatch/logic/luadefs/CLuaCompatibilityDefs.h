@@ -1,19 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CText.h
- *  PURPOSE:     Game text interface
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
+#include "CLuaDefs.h"
 
-class CText
+class CLuaCompatibilityDefs : public CLuaDefs
 {
 public:
-    virtual char* GetText(char* szKey) = 0;
-    virtual void  SetText(char* szKey, char* szValue) = 0;
+    static void LoadFunctions();
 };

@@ -28,7 +28,8 @@ public:
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
-    CStreamingInfo* GetStreamingInfoFromModelId(ushort id);
+    CStreamingInfo* GetStreamingInfoFromModelId(uint32 id);
+
 private:
-    static CStreamingInfo (&ms_aInfoForModel)[26316];
+    static CStreamingInfo* ms_aInfoForModel; // count: 26316 in unmodified game
 };

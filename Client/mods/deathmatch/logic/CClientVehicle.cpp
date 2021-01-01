@@ -199,6 +199,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not changed the wheel scale
     m_bWheelScaleChanged = false;
+    m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 }
 
 CClientVehicle::~CClientVehicle()
@@ -274,6 +275,7 @@ CClientVehicle::~CClientVehicle()
     delete m_LastSyncedData;
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle,
                                               &m_pPickedUpWinchEntity, NULL);
+    m_clientModel = nullptr;
 }
 
 void CClientVehicle::Unlink()
@@ -1055,6 +1057,8 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Set the new vehicle id and type
         eClientVehicleType eOldVehicleType = m_eVehicleType;
         m_usModel = usModel;
+        if (m_clientModel && m_clientModel->GetModelID() != m_usModel)
+            m_clientModel = nullptr;
         m_eVehicleType = CClientVehicleManager::GetVehicleType(usModel);
         m_bHasDamageModel = CClientVehicleManager::HasDamageModel(m_eVehicleType);
 
@@ -1167,12 +1171,6 @@ void CClientVehicle::SetEngineBroken(bool bEngineBroken)
     {
         m_pVehicle->SetEngineBroken(bEngineBroken);
         m_pVehicle->SetEngineOn(!bEngineBroken);
-
-        // We need to recreate the vehicle if we're going from broken to unbroken
-        if (!bEngineBroken && m_pVehicle->IsEngineBroken())
-        {
-            ReCreate();
-        }
     }
     m_bEngineBroken = bEngineBroken;
 }
@@ -1513,6 +1511,11 @@ bool CClientVehicle::IsWheelCollided(unsigned char ucWheel)
         return m_pVehicle->IsWheelCollided(ucWheel);
     }
     return true;
+}
+
+int CClientVehicle::GetWheelFrictionState(unsigned char ucWheel)
+{
+    return m_pVehicle->GetWheelFrictionState(ucWheel);
 }
 
 unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
