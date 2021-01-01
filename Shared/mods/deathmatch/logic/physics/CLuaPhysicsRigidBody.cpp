@@ -64,7 +64,7 @@ void CLuaPhysicsRigidBody::HasMoved()
     m_matrix.SetRotation(rotation);
 }
 
-void CLuaPhysicsRigidBody::SetPosition(const CVector& vecPosition, bool dontCommitChanges)
+void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChanges)
 {
     {
         std::lock_guard guard(m_matrixLock);
@@ -90,7 +90,7 @@ const CVector CLuaPhysicsRigidBody::GetPosition() const
     return m_matrix.GetPosition();
 }
 
-void CLuaPhysicsRigidBody::SetRotation(const CVector& vecRotation, bool dontCommitChanges)
+void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool dontCommitChanges)
 {
     {
         std::lock_guard guard(m_matrixLock);

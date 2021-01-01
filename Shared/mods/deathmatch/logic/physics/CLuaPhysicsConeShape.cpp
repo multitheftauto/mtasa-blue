@@ -20,11 +20,10 @@ CLuaPhysicsConeShape::~CLuaPhysicsConeShape()
 
 }
 
-bool CLuaPhysicsConeShape::SetRadius(float fRadius)
+void CLuaPhysicsConeShape::SetRadius(float fRadius)
 {
     ((btConeShape*)GetBtShape())->setRadius(fRadius);
     UpdateRigids();
-    return true;
 }
 
 bool CLuaPhysicsConeShape::GetRadius(float& fRadius)

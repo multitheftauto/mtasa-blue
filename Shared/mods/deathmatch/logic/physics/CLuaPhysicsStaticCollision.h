@@ -24,9 +24,9 @@ public:
 
     void    Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
-    void    SetPosition(const CVector& vecPosition);
+    void          SetPosition(CVector vecPosition, bool dontCommitChanges = false);
     const CVector GetPosition() const;
-    void    SetRotation(const CVector& vecRotation);
+    void          SetRotation(CVector vecRotation, bool dontCommitChanges = false);
     const CVector GetRotation() const;
     void          SetScale(const CVector& vecScale);
     const CVector GetScale() const;

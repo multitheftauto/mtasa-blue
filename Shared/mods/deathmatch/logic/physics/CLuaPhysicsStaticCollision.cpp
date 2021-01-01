@@ -33,12 +33,15 @@ void CLuaPhysicsStaticCollision::Initialize(std::shared_ptr<CLuaPhysicsStaticCol
     SetMatrix(m_matrix);
 }
 
-void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition)
+void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition, bool dontCommitChanges)
 {
     {
         std::lock_guard guard(m_matrixLock);
         m_matrix.SetPosition(vecPosition);
     }
+
+    if (dontCommitChanges)
+        return;
 
     std::function<void()> change([&, vecPosition]() {
         btTransform& transform = GetCollisionObject()->getWorldTransform();
@@ -49,7 +52,7 @@ void CLuaPhysicsStaticCollision::SetPosition(const CVector& vecPosition)
     CommitChange(change);
 }
 
-void CLuaPhysicsStaticCollision::SetRotation(const CVector& vecRotation)
+void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation, bool dontCommitChanges)
 {
     {
         std::lock_guard guard(m_matrixLock);
@@ -57,6 +60,9 @@ void CLuaPhysicsStaticCollision::SetRotation(const CVector& vecRotation)
         ConvertDegreesToRadians(vecNewRotation);
         m_matrix.SetRotation(vecNewRotation);
     }
+
+    if (dontCommitChanges)
+        return;
 
     std::function<void()> change([&, vecRotation]() {
         btTransform& transform = GetCollisionObject()->getWorldTransform();

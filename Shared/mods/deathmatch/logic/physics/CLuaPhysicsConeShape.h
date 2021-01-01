@@ -19,7 +19,7 @@ public:
     CLuaPhysicsConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
     ~CLuaPhysicsConeShape();
 
-    bool SetRadius(float fRadius);
+    void SetRadius(float fRadius);
     bool GetRadius(float& fRadius);
     bool SetHeight(float fHeight);
     bool GetHeight(float& fHeight);

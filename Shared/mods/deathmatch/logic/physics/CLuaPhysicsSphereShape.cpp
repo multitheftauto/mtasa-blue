@@ -21,10 +21,9 @@ CLuaPhysicsSphereShape::~CLuaPhysicsSphereShape()
 
 }
 
-bool CLuaPhysicsSphereShape::SetRadius(float fRadius)
+void CLuaPhysicsSphereShape::SetRadius(float fRadius)
 {
     ((btSphereShape*)GetBtShape())->setUnscaledRadius(fRadius);
-    return true;
 }
 
 bool CLuaPhysicsSphereShape::GetRadius(float& fRadius)
