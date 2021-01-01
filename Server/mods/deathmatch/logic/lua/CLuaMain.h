@@ -129,7 +129,7 @@ public:
     {
         if (m_pResource)
         {
-            T*             pElement = new T(INVALID_ELEMENT_ID, this);
+            T*             pElement = new T(m_pResource->GetDynamicElementRoot(), this);
             CElementGroup* pGroup = m_pResource->GetElementGroup();
             if (pGroup)
             {

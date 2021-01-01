@@ -62,23 +62,17 @@ class CLuaPhysicsShape;
 class CBulletPhysics : public CClientEntity
 {
     DECLARE_CLASS(CBulletPhysics, CClientEntity)
-#else
-class CBulletPhysics : public CElement
-{
-#endif
-public:
-
-#ifdef MTA_CLIENT
     CBulletPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain);
     ~CBulletPhysics();
     eClientEntityType GetType() const { return CBULLETPHYSICS; }
 #else
-
-    CBulletPhysics::CBulletPhysics(ElementID ID, CLuaMain* luaMain);
+class CBulletPhysics : public CElement
+{
+public:
+    CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain);
     ~CBulletPhysics();
-    bool ReadSpecialData(const int iLine) { return true; }
 #endif
-
+    bool ReadSpecialData(const int iLine) { return true; }
 
     // Sorta a hack that these are required by CClientEntity...
     void Unlink();

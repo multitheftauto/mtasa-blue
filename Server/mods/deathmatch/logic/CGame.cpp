@@ -473,7 +473,7 @@ void CGame::DoPulse()
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););
 
     CLOCK_CALL1(m_pLatentTransferManager->DoPulse(););
-
+    m_pPhysicsManager->DoPulse();
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););

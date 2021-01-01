@@ -1523,8 +1523,8 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
     RayResult result{
-        {"hitpoint", rayCallback.m_hitPointWorld},
-        {"hitnormal", rayCallback.m_hitNormalWorld},
+        {"hitpoint", ((CVector)rayCallback.m_hitPointWorld).AsArray()},
+        {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld).AsArray()},
         {"shape", pShape},
         {"distance", (rayCallback.m_hitPointWorld - from).length()},
     };
@@ -1556,9 +1556,9 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
             result["vertex1"] = triangleInfo.vertex1 + 1;
             result["vertex2"] = triangleInfo.vertex2 + 1;
             result["vertex3"] = triangleInfo.vertex3 + 1;
-            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
-            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
-            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
+            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsArray();
+            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsArray();
+            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsArray();
         }
     }
 
@@ -1641,8 +1641,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
         CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
         RayResult result{
-            {"hitpoint", rayCallback.m_hitPointWorld[i]},
-            {"hitnormal", rayCallback.m_hitNormalWorld[i]},
+            {"hitpoint", ((CVector)rayCallback.m_hitPointWorld[i]).AsArray()},
+            {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld[i]).AsArray()},
             {"shape", pShape},
             {"distance", (rayCallback.m_hitPointWorld[i] - from).length()},
         };
@@ -1678,9 +1678,9 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
                 result["vertex1"] = triangleInfo.vertex1 + 1;
                 result["vertex2"] = triangleInfo.vertex2 + 1;
                 result["vertex3"] = triangleInfo.vertex3 + 1;
-                result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
-                result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
-                result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
+                result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsArray();
+                result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsArray();
+                result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsArray();
             }
         }
         results.push_back(result);
@@ -1757,9 +1757,9 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
     RayResult result{
-        {"position", rayCallback.m_closestPosition},
-        {"hitpoint", rayCallback.m_hitPointWorld},
-        {"hitnormal", rayCallback.m_hitNormalWorld},
+        {"position", rayCallback.m_closestPosition.AsArray()},
+        {"hitpoint", ((CVector)rayCallback.m_hitPointWorld).AsArray()},
+        {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld).AsArray()},
         {"shape", pHitShape},
         {"distance", (rayCallback.m_hitPointWorld - vecStartPosition).length()},
     };
@@ -1791,9 +1791,9 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<
             result["vertex1"] = triangleInfo.vertex1 + 1;
             result["vertex2"] = triangleInfo.vertex2 + 1;
             result["vertex3"] = triangleInfo.vertex3 + 1;
-            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1);
-            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2);
-            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3);
+            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsArray();
+            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsArray();
+            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsArray();
         }
     }
 

@@ -13,7 +13,7 @@
 #include "lua/CLuaFunctionParser.h"
 #include "Enums.h"
 
-typedef std::variant<CVector, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int> RayResultValue;
+typedef std::variant<PositionArray, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int> RayResultValue;
 typedef std::unordered_map<std::string, RayResultValue>                                                          RayResult;
 typedef std::unordered_map<std::string, std::variant<bool, int>>                                                 RayOptions;
 

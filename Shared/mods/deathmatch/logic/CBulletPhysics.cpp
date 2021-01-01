@@ -22,7 +22,7 @@
 #ifdef MTA_CLIENT
 CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this),CClientEntity(ID)
 #else
-CBulletPhysics::CBulletPhysics(ElementID ID, CLuaMain* luaMain) : CElement(this)
+CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(parent)
 #endif
 {
     // Init
