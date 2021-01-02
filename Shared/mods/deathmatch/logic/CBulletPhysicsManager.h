@@ -11,6 +11,7 @@
 #pragma once
 
 class btDiscreteDynamicsWorld;
+class CBulletPhysics;
 
 class CBulletPhysicsManager
 {
