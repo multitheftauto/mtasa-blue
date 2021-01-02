@@ -115,11 +115,6 @@ inline eEntityType GetClassType(class CCustomWeapon*)
     return CElement::WEAPON;
 }
 
-inline eEntityType GetClassType(class CBulletPhysics*)
-{
-    return CElement::CBULLETPHYSICS;
-}
-
 // class -> class name
 inline SString GetClassTypeName(CElement*)
 {
@@ -248,26 +243,6 @@ inline SString GetClassTypeName(CLuaVector4D*)
 inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
-}
-inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
-{
-    return "physics-rigid-body";
-}
-inline SString GetClassTypeName(CLuaPhysicsStaticCollision*)
-{
-    return "physics-static-collision";
-}
-inline SString GetClassTypeName(CLuaPhysicsConstraint*)
-{
-    return "physics-constraint";
-}
-inline SString GetClassTypeName(CLuaPhysicsShape*)
-{
-    return "physics-shape";
-}
-inline SString GetClassTypeName(CLuaPhysicsElement*)
-{
-    return "physics-element";
 }
 
 //
@@ -483,74 +458,6 @@ CClient* UserDataCast(CClient*, void* ptr, lua_State*)
         pClient = reinterpret_cast<CConsoleClient*>(pElement);
 
     return pClient;
-}
-
-//
-// CLuaPhysicsRigidBody from userdata
-//
-template <class T>
-CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM)
-{
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsRigidBodyManager()->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
-}
-
-//
-// CLuaPhysicsStaticCollision from userdata
-//
-template <class T>
-CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM)
-{
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
-}
-
-//
-// CLuaPhysicsContraint from userdata
-//
-template <class T>
-CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State* luaVM)
-{
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsConstraintManager()->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
-}
-//
-// CLuaPhysicsShape from userdata
-//
-template <class T>
-std::shared_ptr<CLuaPhysicsShape> UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
-{
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsShapeManager()->GetShapeFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
-}
-//
-// CLuaPhysicsContraint from userdata
-//
-template <class T>
-CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM)
-{
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
 }
 
 //

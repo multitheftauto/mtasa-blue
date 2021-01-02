@@ -154,6 +154,7 @@ struct SAclRequest;
 #include "CEasingCurve.h"
 #include "CBanManager.h"
 #include "lua/CLuaFunctionParseHelpers.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
