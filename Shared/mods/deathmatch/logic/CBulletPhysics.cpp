@@ -33,7 +33,6 @@ CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(par
     m_pPhysicsManager = g_pGame->GetBulletPhysicsManager();
 #endif
     m_pLuaMain = luaMain;
-    m_bBuildWorld = false;
 
     SetTypeName("physics");
 
@@ -173,123 +172,6 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::CreateStaticCollisio
     AddStaticCollision(pStaticCollision);
     return pStaticCollision;
 }
-
-#ifdef MTA_CLIENT
-std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
-{
-    std::shared_ptr<CLuaPhysicsShape> pShape = CreateShapeFromModel(usModelId);
-    if (pShape == nullptr)
-        return nullptr;
-
-    std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = CreateStaticCollision(pShape, vecPosition, vecRotation);
-    return pStaticCollision;
-}
-
-std::shared_ptr<CLuaPhysicsShape> CBulletPhysics::CreateShapeFromModel(unsigned short usModelId)
-{
-    CColDataSA* pColData = CLuaPhysicsSharedLogic::GetModelColData(usModelId);
-    if (pColData == nullptr)
-        return nullptr;            // model has no collision
-
-    int iInitialSize = pColData->numColBoxes + pColData->numColSpheres;
-
-    if (iInitialSize == 0 && pColData->numColTriangles == 0)
-        return nullptr;            // don't create empty collisions
-
-    CColSphereSA   pColSphere;
-    CColBoxSA      pColBox;
-    CColTriangleSA pColTriangle;
-    CVector        position, halfSize;
-
-    if (pColData->numColTriangles > 0)
-        iInitialSize++;
-
-    std::shared_ptr<CLuaPhysicsCompoundShape> pCompoundShape = std::make_shared<CLuaPhysicsCompoundShape>(this, iInitialSize);
-
-    for (uint i = 0; pColData->numColBoxes > i; i++)
-    {
-        pColBox = pColData->pColBoxes[i];
-        position = (pColBox.max + pColBox.min) / 2;
-        halfSize = (pColBox.max - pColBox.min) * 0.5;
-        pCompoundShape->AddShape(CreateBoxShape(halfSize), position);
-    }
-
-    for (uint i = 0; pColData->numColSpheres > i; i++)
-    {
-        pColSphere = pColData->pColSpheres[i];
-        pCompoundShape->AddShape(CreateSphereShape(pColSphere.fRadius), position);
-    }
-
-    if (pColData->numColTriangles > 0)
-    {
-        std::vector<CVector> vecIndices;
-        for (uint i = 0; pColData->numColTriangles > i; i++)
-        {
-            pColTriangle = pColData->pColTriangles[i];
-            vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[0]].getVector());
-            vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[1]].getVector());
-            vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
-        }
-
-        pCompoundShape->AddShape(CreateBhvTriangleMeshShape(vecIndices), CVector(0, 0, 0));
-    }
-
-    AddShape(pCompoundShape);
-    return pCompoundShape;
-}
-
-void CBulletPhysics::StartBuildCollisionFromGTA()
-{
-    if (m_bBuildWorld)
-        return;
-
-    m_bBuildWorld = true;
-    if (!m_bObjectsCached)
-    {
-        CLuaPhysicsSharedLogic::CacheWorldObjects(pWorldObjects);
-        m_bObjectsCached = true;
-    }
-}
-
-void CBulletPhysics::BuildCollisionFromGTAInRadius(CVector& center, float fRadius)
-{
-    if (!m_bObjectsCached)
-    {
-        CLuaPhysicsSharedLogic::CacheWorldObjects(pWorldObjects);
-        m_bObjectsCached = true;
-    }
-
-    if (pWorldObjects.size() > 0)
-    {
-        for (auto it = pWorldObjects.begin(); it != pWorldObjects.end(); it++)
-        {
-            if (DistanceBetweenPoints3D(it->second.first, center) < fRadius)
-            {
-                if (CLuaPhysicsSharedLogic::GetModelColData(it->first))
-                {
-                    CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second);
-                    pWorldObjects.erase(it--);
-                }
-            }
-        }
-    }
-}
-
-void CBulletPhysics::BuildCollisionFromGTA()
-{
-    if (pWorldObjects.size() > 0)
-    {
-        for (auto it = pWorldObjects.begin(); it != pWorldObjects.end(); it++)
-        {
-            if (CLuaPhysicsSharedLogic::GetModelColData(it->first))
-            {
-                CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second / 180 / PI);
-                pWorldObjects.erase(it--);
-            }
-        }
-    }
-}
-#endif
 
 CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to,
                                                        int iFilterGroup, int iFilterMask) const
@@ -987,17 +869,7 @@ void CBulletPhysics::DoPulse()
     CTickCount tickCountNow = CTickCount::Now();
 
     m_iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
-    int iDeltaTimeBuildWorld = (int)(tickCountNow - m_LastTimeBuildWorld).ToLongLong();
     m_LastTimeMs = tickCountNow;
-
-    // if (m_bBuildWorld)
-    //{
-    //    if (iDeltaTimeBuildWorld > 1000)
-    //    {
-    //        m_LastTimeBuildWorld = tickCountNow;
-    //        BuildCollisionFromGTA();
-    //    }
-    //}
 
     StepSimulation();
 

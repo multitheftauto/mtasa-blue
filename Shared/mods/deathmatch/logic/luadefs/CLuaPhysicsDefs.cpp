@@ -118,8 +118,6 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetEnabled", ArgumentParser<PhysicsSetEnabled>},
         {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
 #ifdef MTA_CLIENT
-        {"physicsCreateShapeFromModel", ArgumentParser<PhysicsCreateShapeFromModel>},
-        {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
@@ -1452,43 +1450,6 @@ bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
 }
 
 #ifdef MTA_CLIENT
-
-std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsDefs::PhysicsCreateShapeFromModel(CBulletPhysics* pPhysics, unsigned short usModel)
-{
-    return std::move(pPhysics->CreateShapeFromModel(usModel));
-}
-
-int CLuaPhysicsDefs::PhysicsBuildCollisionFromGTA(lua_State* luaVM)
-{
-    CBulletPhysics*  pPhysics;
-    bool             bBuildByRadius = false;
-    CVector          vecPosition;
-    float            fRadius;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPhysics);
-    if (argStream.NextIsVector4D())
-    {
-        argStream.ReadVector3D(vecPosition);
-        argStream.ReadNumber(fRadius);
-        bBuildByRadius = true;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (bBuildByRadius)
-        {
-            pPhysics->BuildCollisionFromGTAInRadius(vecPosition, fRadius);
-        }
-        else
-        {
-            pPhysics->StartBuildCollisionFromGTA();
-        }
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    lua_pushboolean(luaVM, true);
-    return 1;
-}
 
 bool CLuaPhysicsDefs::PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant)
 {

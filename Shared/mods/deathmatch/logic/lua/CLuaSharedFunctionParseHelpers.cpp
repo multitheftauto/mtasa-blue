@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/deathmatch/logic/lua/CLuaSharedFunctionParseHelpers.cpp
+ *  FILE:        shared/mods/deathmatch/logic/lua/CLuaSharedFunctionParseHelpers.cpp
  *  PURPOSE:
  *
  *****************************************************************************/

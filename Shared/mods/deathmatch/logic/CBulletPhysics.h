@@ -188,17 +188,7 @@ public:
 
     CBulletPhysics::SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
-#ifdef MTA_CLIENT
-    void                                        StartBuildCollisionFromGTA();
-    void                                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
-    void                                        BuildCollisionFromGTA();
-    std::shared_ptr<CLuaPhysicsShape>           CreateShapeFromModel(unsigned short usModelId);
-
-    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
-                                                                               CVector vecRotation = CVector(0, 0, 0));
-#endif
-
-        std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition = CVector(0, 0, 0),
+    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition = CVector(0, 0, 0),
                                                                       CVector vecRotation = CVector(0, 0, 0));
 
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
@@ -325,8 +315,6 @@ private:
 
     bool               m_canDoPulse = false;
     CTickCount         m_LastTimeMs;
-    CTickCount         m_LastTimeBuildWorld;
-    bool               m_bBuildWorld;
     std::atomic<float> m_fSpeed = 1.0f;
     bool               m_bDuringSimulation = false;
     std::atomic<int>   m_iSubSteps = 10;

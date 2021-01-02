@@ -102,10 +102,6 @@ public:
 
     
 #ifdef MTA_CLIENT
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateShapeFromModel(CBulletPhysics* pPhysics, unsigned short usModel);
-
-    LUA_DECLARE(PhysicsBuildCollisionFromGTA);
-
     static bool PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float> PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);

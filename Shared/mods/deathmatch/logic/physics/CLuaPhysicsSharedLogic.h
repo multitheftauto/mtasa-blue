@@ -50,14 +50,6 @@ public:
 
     static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
-    
-#ifdef MTA_CLIENT
-    static void        QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
-    static void        CacheWorldObjects(std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
-    static void        QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
-    static CColDataSA* GetModelColData(ushort usModel);
-#endif
-
     static void EulerToQuaternion(btVector3 rotation, btQuaternion& result);
     static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
 
