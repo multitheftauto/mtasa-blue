@@ -62,6 +62,47 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVehicle::AddDamagedVehicleParticles
+//
+// Required for: Position for vehicle engine damage particles (eVehicleDummies::ENGINE)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6D2B02 | 8B 0C 8D C8 B0 A9 00 | mov  ecx, CModelInfo::ms_modelInfoPtrs
+// >>> 0x6D2B09 | 8B 49 5C             | mov  ecx, [ecx+5Ch]
+// >>> 0x6D2B0C | 83 C1 54             | add  ecx, 54h
+//     0x6D2B0F | 84 D2                | test dl, dl
+#define HOOKPOS_CVehicle_AddDamagedVehicleParticles               0x6D2B09
+#define HOOKSIZE_CVehicle_AddDamagedVehicleParticles              6
+static const DWORD CONTINUE_CVehicle_AddDamagedVehicleParticles = 0x6D2B0F;
+
+static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
+{
+    _asm
+    {
+        pushad
+        push    esi // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     ecx, vehicleDummiesPositionArray
+        add     ecx, 54h
+        jmp     CONTINUE_CVehicle_AddDamagedVehicleParticles
+
+        continueWithOriginalCode:
+        popad
+        mov     ecx, [edi+5Ch]
+        add     ecx, 54h
+        jmp     CONTINUE_CVehicle_AddDamagedVehicleParticles
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CFire::ProcessFire
 //
 // Required for: Update vehicle fire position
@@ -972,6 +1013,7 @@ void CMultiplayerSA::InitHooks_VehicleDummies()
     EZHookInstall(CVehicle_GetPlaneOrdnancePosition);
     EZHookInstall(CVehicle_CanBeDriven);
     EZHookInstall(CVehicle_AddExhaustParticles);
+    EZHookInstall(CVehicle_AddDamagedVehicleParticles);
     EZHookInstall(CAutomobile_DoNitroEffect_1);
     EZHookInstall(CAutomobile_DoNitroEffect_2);
     EZHookInstall(CAutomobile_ProcessCarOnFireAndExplode);

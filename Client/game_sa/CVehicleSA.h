@@ -326,6 +326,8 @@ class CAutoPilot
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
+class CParticleSAInterface;
+
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
@@ -421,13 +423,18 @@ public:
     unsigned int m_isUsingHornOrSecondarySiren;
 
     // 1304
-    BYTE Padding220[112];
+    uint8_t Padding220[96];
+
+    // 1400
+    CFxSystemSAInterface* m_overheatParticle;
+    CFxSystemSAInterface* m_fireParticle;
+    CFxSystemSAInterface* m_dustParticle;
+    uint32_t m_renderLights;
 
     // 1416
     RwTexture* m_pCustomPlateTexture;
 
-    // 1420
-    BYTE Padding225[4];
+    float m_steeringLeftRight;
 
     // 1424
     uint8_t  m_vehicleClass;
@@ -438,6 +445,8 @@ public:
     RwTexture* m_pRemapTexture;
 };
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
+
+class CAutomobileSAInterface;
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
@@ -753,6 +762,8 @@ public:
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
 
 private:
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
+
     void           RecalculateSuspensionLines();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);

@@ -2691,48 +2691,47 @@ bool CVehicleSA::GetDummyPosition(eVehicleDummies dummy, CVector& position) cons
 
 bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
 {
-    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    if (dummy < 0 || dummy >= VEHICLE_DUMMY_COUNT)
+        return false;
+
+    auto vehicle = reinterpret_cast<CVehicleSAInterface*>(m_pInterface);
+
+    m_dummyPositions[dummy] = position;
+
+    if (dummy == ENGINE)
     {
-        m_dummyPositions[dummy] = position;
+        if (vehicle->m_overheatParticle != nullptr)
+            CFxSystemSA::SetPosition(vehicle->m_overheatParticle, position);
 
-        bool isAnyExhaust = dummy == EXHAUST || dummy == EXHAUST_SECONDARY;
-
-        if (isAnyExhaust)
-        {
-            // NOTE(botder): The following code should be in CAutomobileSA::SetDummyPosition
-            //               but we don't use CAutomobileSA yet
-            uint8_t vehicleClass = reinterpret_cast<CVehicleSAInterface*>(m_pInterface)->m_vehicleClass;
-            bool    isAutomobileClass = static_cast<VehicleClass>(vehicleClass) == VehicleClass::AUTOMOBILE;
-
-            if (isAutomobileClass)
-            {
-                auto                  automobile = reinterpret_cast<CAutomobileSAInterface*>(GetInterface());
-                CFxSystemSAInterface* nitro = nullptr;
-
-                if (dummy == EXHAUST)
-                {
-                    nitro = reinterpret_cast<CFxSystemSAInterface*>(automobile->pNitroParticle[0]);
-                }
-                else if (dummy == EXHAUST_SECONDARY)
-                {
-                    nitro = reinterpret_cast<CFxSystemSAInterface*>(automobile->pNitroParticle[1]);
-                }
-
-                if (nitro != nullptr)
-                {
-                    // Copied from: CFxSystemSA::SetPosition(const CVector& vecPos)
-                    nitro->matPosition.pos.x = position.fX;
-                    nitro->matPosition.pos.y = position.fY;
-                    nitro->matPosition.pos.z = position.fZ;
-                    nitro->matPosition.flags &= 0xFFFDFFFC;
-                }
-            }
-        }
-
-        return true;
+        if (vehicle->m_fireParticle != nullptr)
+            CFxSystemSA::SetPosition(vehicle->m_fireParticle, position);
     }
 
-    return false;
+    bool isAutomobileClass = static_cast<VehicleClass>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
+
+    if (isAutomobileClass)
+    {
+        SetAutomobileDummyPosition(reinterpret_cast<CAutomobileSAInterface*>(m_pInterface), dummy, position);
+    }
+
+    return true;
+}
+
+//
+// NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
+//
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position)
+{
+    if (dummy == EXHAUST)
+    {
+        if (automobile->pNitroParticle[0] != nullptr)
+            CFxSystemSA::SetPosition(automobile->pNitroParticle[0], position);
+    }
+    else if (dummy == EXHAUST_SECONDARY)
+    {
+        if (automobile->pNitroParticle[1] != nullptr)
+            CFxSystemSA::SetPosition(automobile->pNitroParticle[1], position);
+    }
 }
 
 // Change plate text of existing vehicle
