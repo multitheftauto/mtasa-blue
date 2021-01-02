@@ -18,9 +18,7 @@
 #include "physics/CLuaPhysicsElement.h"
 
 #include "Enums.h"
-#ifdef MTA_CLIENT
-    #include "CPhysicsDebugDrawer.h"
-#endif
+#include "physics/CPhysicsDebugDrawer.h"
 
 template <class... Ts>
 struct overloaded : Ts...
@@ -117,6 +115,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetHeight", ArgumentParser<PhysicsSetHeight>},
         {"physicsSetEnabled", ArgumentParser<PhysicsSetEnabled>},
         {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
+        {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
 #ifdef MTA_CLIENT
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
@@ -1498,3 +1497,11 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
     return true;
 }
 #endif
+
+// from, to, color
+std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition,
+                                                                                                               float fRadius)
+{
+    std::vector<std::vector<float>> lines = pPhysics->GetDebugLines(vecPosition, fRadius);
+    return lines;
+}

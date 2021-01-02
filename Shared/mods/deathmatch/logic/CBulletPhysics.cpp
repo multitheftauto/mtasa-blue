@@ -14,10 +14,7 @@
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
 #include "physics/CLuaPhysicsConstraintManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
-
-#ifdef MTA_CLIENT
-    #include "CPhysicsDebugDrawer.h"
-#endif
+#include "physics/CPhysicsDebugDrawer.h"
 
 #ifdef MTA_CLIENT
 CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this),CClientEntity(ID)
@@ -41,10 +38,10 @@ CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(par
     m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
     m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
 
-#ifdef MTA_CLIENT
     m_pDebugDrawer = std::make_unique<CPhysicsDebugDrawer>();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-#else
+
+#ifndef MTA_CLIENT
     m_iType = CElement::CBULLETPHYSICS;
 #endif
     {
@@ -52,9 +49,7 @@ CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(par
         m_pDynamicsWorld =
             std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
         m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
-#ifdef MTA_CLIENT
         m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
-#endif
     }
 
     // Add us to Physics manager's list
@@ -729,6 +724,26 @@ bool CBulletPhysics::CanDoPulse()
     return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
 }
 
+std::vector<std::vector<float>> CBulletPhysics::GetDebugLines(CVector vecPosition, float radius)
+{
+    m_pDebugDrawer->Clear();
+
+    m_pDebugDrawer->SetCameraPosition(vecPosition);
+    m_pDebugDrawer->SetDrawDistance(radius);
+    {
+        std::lock_guard guard(dynamicsWorldLock);
+        m_pDynamicsWorld->debugDrawWorld();
+    }
+
+    std::vector<std::vector<float>> vecLines;
+    vecLines.reserve(vecLines.size());
+    for (auto const& line : m_pDebugDrawer->m_vecLines)
+    {
+        vecLines.push_back({line.from.fX, line.from.fY, line.from.fZ, line.to.fX, line.to.fY, line.to.fZ, (float)line.color.ulARGB});
+    }
+    return vecLines;
+}
+
 #ifdef MTA_CLIENT
 void CBulletPhysics::DrawDebugLines()
 {
@@ -740,6 +755,7 @@ void CBulletPhysics::DrawDebugLines()
     }
 }
 #endif
+
 void CBulletPhysics::QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
                               std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {

@@ -10,6 +10,7 @@
 
 class CBulletPhysics;
 class CLuaPhysicsShape;
+class CPhysicsDebugDrawer;
 
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
@@ -30,7 +31,6 @@ class CLuaPhysicsShape;
 
 #include <list>
 #ifdef MTA_CLIENT
-    class CPhysicsDebugDrawer;
     #include "CClientEntity.h"
 #else
     #include "./../Server/mods/deathmatch/logic/CElement.h"
@@ -170,6 +170,7 @@ public:
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DrawDebugLines();
 #endif
+    std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
     // Running on worker thread
     void DoPulse();
@@ -273,9 +274,7 @@ public:
 
     const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
 
-#ifdef MTA_CLIENT
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
-#endif
 
 private:
     void StepSimulation();
@@ -303,9 +302,7 @@ private:
     std::unique_ptr<btDefaultCollisionConfiguration>     m_pCollisionConfiguration;
     std::unique_ptr<btDiscreteDynamicsWorld>             m_pDynamicsWorld;
 
-#ifdef MTA_CLIENT
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
-#endif
 
     std::atomic<int> m_iDeltaTimeMs = 0;
     bool             m_bDrawDebugNextTime = false;

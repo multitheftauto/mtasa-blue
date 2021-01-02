@@ -100,7 +100,8 @@ public:
     static bool PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable);
     static bool PhysicsIsEnabled(CLuaPhysicsElement* pElement);
 
-    
+    static std::vector<std::vector<float>> PhysicsGetDebugLines(
+        CBulletPhysics * pPhysics, CVector vecPosition, float fRadius);
 #ifdef MTA_CLIENT
     static bool PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float> PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
