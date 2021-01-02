@@ -42,7 +42,7 @@ public:
     bool SetLooped(bool bLoop);
     bool IsLooped() const;
 
-    bool SetPlayPosition(double dPosition);
+    bool   SetPlayPosition(double dPosition);
     double GetPlayPosition();
 
     double GetLength(bool bAvoidLoad = false);
