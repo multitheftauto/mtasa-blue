@@ -38,7 +38,13 @@ std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(std::shar
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     CLuaPhysicsSharedLogic::SetPosition(motionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->GetBtShape();
-    pCollisionShape->calculateLocalInertia(fMass, (btVector3)vecLocalInertia);
+    if (vecLocalInertia.LengthSquared() == 0)
+    {
+        btVector3 localInertia;
+        pCollisionShape->calculateLocalInertia(fMass, localInertia);
+        vecLocalInertia = localInertia;
+    }
+
     const CPhysicsRigidBodyProxy::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pCollisionShape, vecLocalInertia);
     std::unique_ptr<CPhysicsRigidBodyProxy>                   pRigidBody = std::make_unique<CPhysicsRigidBodyProxy>(rigidBodyCI);
 
