@@ -11,8 +11,8 @@ class CLuaPhysicsSharedLogic;
 
 struct heightfieldTerrainShape
 {
-    std::unique_ptr<btHeightfieldTerrainShape> pHeightfieldTerrainShape;
-    std::vector<float>                         data;
+    btHeightfieldTerrainShape* pHeightfieldTerrainShape;
+    std::vector<float>         data;
 };
 
 class CLuaPhysicsSharedLogic
@@ -35,18 +35,18 @@ public:
     static void GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
     static void GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 
-    static std::unique_ptr<btBoxShape>      CreateBox(CVector& half, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
-    static std::unique_ptr<btSphereShape>   CreateSphere(float fRadius, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
-    static std::unique_ptr<btCapsuleShape>  CreateCapsule(float fRadius, float fHeight);
-    static std::unique_ptr<btConeShape>     CreateCone(float fRadius, float fHeight);
-    static std::unique_ptr<btCylinderShape> CreateCylinder(CVector& half);
-    static std::unique_ptr<btCompoundShape> CreateCompound();
+    static btBoxShape*      CreateBox(CVector& half, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
+    static btSphereShape*   CreateSphere(float fRadius, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
+    static btCapsuleShape*  CreateCapsule(float fRadius, float fHeight);
+    static btConeShape*     CreateCone(float fRadius, float fHeight);
+    static btCylinderShape* CreateCylinder(CVector& half);
+    static btCompoundShape* CreateCompound();
 
-    static std::unique_ptr<btBvhTriangleMeshShape>  CreateBvhTriangleMesh(std::vector<CVector>& vecVertices);
-    static std::unique_ptr<btGImpactMeshShape>      CreateGimpactMeshShape(std::vector<CVector>& vecVertices);
+    static btBvhTriangleMeshShape*  CreateBvhTriangleMesh(std::vector<CVector>& vecVertices);
+    static btGImpactMeshShape*      CreateGimpactMeshShape(std::vector<CVector>& vecVertices);
 
-    static std::unique_ptr<heightfieldTerrainShape> CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
-    static std::unique_ptr<btConvexHullShape>       CreateConvexHull(std::vector<CVector>& vecPoints);
+    static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
+    static btConvexHullShape*       CreateConvexHull(std::vector<CVector>& vecPoints);
 
     static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 

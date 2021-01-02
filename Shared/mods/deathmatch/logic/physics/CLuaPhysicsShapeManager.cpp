@@ -12,23 +12,34 @@
 #include <StdInc.h>
 #include "CLuaPhysicsShapeManager.h"
 
-std::shared_ptr<CLuaPhysicsShape> CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiScriptID)
+CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiScriptID)
 {
+    std::lock_guard   guard(m_lock);
     CLuaPhysicsShape* pLuaShape = (CLuaPhysicsShape*)CIdArray::FindEntry(uiScriptID, EIdClass::SHAPE);
     if (!pLuaShape)
         return nullptr;
 
-    return pLuaShape->GetPhysics()->Resolve(pLuaShape);
+    return pLuaShape;
 }
 
-void CLuaPhysicsShapeManager::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
+void CLuaPhysicsShapeManager::AddShape(CLuaPhysicsShape* pShape)
 {
-    m_ShapeList.push_back(std::move(pShape));
+    std::lock_guard guard(m_lock);
+    m_ShapeList.push_back(pShape);
 }
 
-void CLuaPhysicsShapeManager::RemoveShape(std::shared_ptr<CLuaPhysicsShape> pShape)
+void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
 {
     assert(pShape);
 
+    std::lock_guard guard(m_lock);
     ListRemove(m_ShapeList, pShape);
+}
+
+bool CLuaPhysicsShapeManager::IsShapeValid(CLuaPhysicsShape* pShape)
+{
+    assert(pShape);
+
+    std::lock_guard guard(m_lock);
+    return ListContains(m_ShapeList, pShape);
 }

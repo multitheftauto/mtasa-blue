@@ -23,7 +23,7 @@ class CLuaPhysicsConstraint;
 class CLuaPhysicsRigidBody : public CLuaPhysicsWorldElement
 {
 public:
-    CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
     void    SetPosition(CVector vecPosition, bool dontCommitChanges = false);
@@ -51,7 +51,7 @@ public:
     void HasMoved();
 
     // Running on worker thread
-    void Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    void Initialize();
 
     void Activate() const;
 
@@ -107,7 +107,7 @@ public:
 
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
-    std::shared_ptr<CLuaPhysicsShape>                  m_pShape;
+    CLuaPhysicsShape*                  m_pShape;
     std::vector<CLuaPhysicsConstraint*>                m_constraintList;
     mutable std::atomic<bool>                          m_bActivationRequested;
     mutable std::atomic<bool>                          m_bAABBUpdateRequested;

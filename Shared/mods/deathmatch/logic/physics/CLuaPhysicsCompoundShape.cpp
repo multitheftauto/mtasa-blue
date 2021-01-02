@@ -20,7 +20,7 @@ CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
 
 }
 
-void CLuaPhysicsCompoundShape::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation)
+void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
 {
     btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
     btTransform      transform = btTransform::getIdentity();
@@ -28,6 +28,7 @@ void CLuaPhysicsCompoundShape::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     pCompound->addChildShape(transform, pShape->GetBtShape());
     pCompound->recalculateLocalAabb();
+    m_vecChildShapes.push_back(pShape);
 }
 
 bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)

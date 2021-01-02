@@ -80,15 +80,15 @@ IMPLEMENT_ENUM_CLASS_END("physics-debug-mode")
 
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM)
 {
-    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)nullptr, ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)nullptr, ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)nullptr, ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, ptr, luaVM))
-        return GetClassTypeName(pVar.get());
-    if (auto* pVar = UserDataCast<CLuaPhysicsElement>((CLuaPhysicsElement*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)nullptr, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaPhysicsElement>((CLuaPhysicsElement*)nullptr, ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";

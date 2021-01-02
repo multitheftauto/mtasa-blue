@@ -179,7 +179,7 @@ public:
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
     bool                                          LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const;
-    CBulletPhysics::SClosestConvexResultCallback ShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, const btTransform& from, const btTransform& to,
+    CBulletPhysics::SClosestConvexResultCallback ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to,
                                                          int iFilterGroup,
                                            int iFilterMask) const;
 
@@ -188,7 +188,7 @@ public:
 
     CBulletPhysics::SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
-    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition = CVector(0, 0, 0),
+    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition = CVector(0, 0, 0),
                                                                       CVector vecRotation = CVector(0, 0, 0));
 
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
@@ -215,7 +215,7 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass = BulletPhysics::Limits::RigidBodyMassLimit,
+    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Limits::RigidBodyMassLimit,
                                                           CVector vecLocalInertia = CVector(0, 0, 0),
                                                           CVector vecCenterOfMass = CVector(0, 0, 0));
 
@@ -288,7 +288,7 @@ private:
     void AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void DestroyShape(std::shared_ptr<CLuaPhysicsShape> pLuaShape);
+    void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
@@ -329,9 +329,9 @@ private:
     std::unordered_map<uint, std::shared_ptr<CLuaPhysicsStaticCollision>> m_mapStaticCollisions;
     std::unordered_map<uint, std::shared_ptr<CLuaPhysicsConstraint>>      m_mapConstraints;
 
-    SharedUtil::ConcurrentList<std::shared_ptr<CLuaPhysicsStaticCollision>>  m_InitializeStaticCollisionsList;
-    SharedUtil::ConcurrentList<std::shared_ptr<CLuaPhysicsRigidBody>>       m_InitializeRigidBodiesList;
-    SharedUtil::ConcurrentList<std::shared_ptr<CLuaPhysicsConstraint>>       m_InitializeConstraintsList;
+    SharedUtil::ConcurrentList<CLuaPhysicsStaticCollision*>  m_InitializeStaticCollisionsList;
+    SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>       m_InitializeRigidBodiesList;
+    SharedUtil::ConcurrentList<CLuaPhysicsConstraint*>       m_InitializeConstraintsList;
 
     SharedUtil::ConcurrentList<CLuaPhysicsElement*>    m_elementChangesList;
     SharedUtil::ConcurrentList<CLuaPhysicsElement*>    m_elementUpdatesList;

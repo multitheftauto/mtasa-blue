@@ -159,13 +159,13 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
-    else if (std::shared_ptr<CLuaPhysicsShape> pShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, pData, luaVM))
+    else if (auto pShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, pData, luaVM))
         return lua_pushshape(luaVM, pShape);
-    else if (CLuaPhysicsRigidBody* pRigidBody = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, pData, luaVM))
+    else if (auto pRigidBody = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, pData, luaVM))
         return lua_pushrigidbody(luaVM, pRigidBody);
-    else if (CLuaPhysicsStaticCollision* pStaticCollision = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, pData, luaVM))
+    else if (auto pStaticCollision = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, pData, luaVM))
         return lua_pushstaticcollision(luaVM, pStaticCollision);
-    else if (CLuaPhysicsConstraint* pConstraint = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, pData, luaVM))
+    else if (auto pConstraint = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, pData, luaVM))
         return lua_pushconstraint(luaVM, pConstraint);
 
     lua_pushobject(luaVM, NULL, pData);

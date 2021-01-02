@@ -24,10 +24,7 @@ public:
 
     //CPhysicsStaticCollisionProxy(const btRigidBodyConstructionInfo& constructionInfo) : btRigidBody(constructionInfo){};
 
-    ~CPhysicsStaticCollisionProxy()
-    {
-        SetEnabled(false);
-    }
+    ~CPhysicsStaticCollisionProxy();
 
     static std::unique_ptr<CPhysicsStaticCollisionProxy> Create(CLuaPhysicsShape* pShape);
     void SetEnabled(bool bEnabled);

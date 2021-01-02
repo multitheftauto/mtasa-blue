@@ -22,7 +22,7 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void    Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
+    void    Initialize();
 
     void          SetPosition(CVector vecPosition, bool dontCommitChanges = false);
     const CVector GetPosition() const;
@@ -45,6 +45,7 @@ public:
     void Unlink();
 
     CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
+    CLuaPhysicsShape*             GetShape() const { return m_pShape; }
 
     void Update() {}
 private:

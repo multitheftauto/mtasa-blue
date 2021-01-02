@@ -19,9 +19,9 @@ public:
     CLuaPhysicsCompoundShape(CBulletPhysics* pPhysics, int iInitialChildCapacity);
     ~CLuaPhysicsCompoundShape();
 
-    void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
+    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
 
-    std::vector<std::shared_ptr<CLuaPhysicsShape>> GetChildShapes() const { return m_vecChildShapes; }
+    std::vector<CLuaPhysicsShape*> GetChildShapes() const { return m_vecChildShapes; }
 
     bool   RemoveChildShape(int index);
     size_t GetChildShapesNum() const noexcept { return m_vecChildShapes.size(); }
@@ -37,5 +37,5 @@ public:
     void Update() {}
 
 private:
-    std::vector<std::shared_ptr<CLuaPhysicsShape>> m_vecChildShapes;
+    std::vector<CLuaPhysicsShape*> m_vecChildShapes;
 };

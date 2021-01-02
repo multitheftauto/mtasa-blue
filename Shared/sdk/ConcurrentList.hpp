@@ -23,6 +23,12 @@ namespace SharedUtil
             return firstElement;
         }
 
+        void remove(T element)
+        {
+            std::lock_guard<std::mutex> guard(m_mutex);
+            m_list.remove(element);
+        }
+
         bool empty() const
         {
             std::lock_guard<std::mutex> guard(m_mutex);

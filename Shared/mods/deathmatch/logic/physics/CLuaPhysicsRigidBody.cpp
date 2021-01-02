@@ -11,8 +11,8 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(std::move(pShape))
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(pShape)
 {
     SetTempData(eTempDataKey::Mass, fMass);
     SetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
@@ -24,7 +24,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
     Unlink();
 }
 
-void CLuaPhysicsRigidBody::Initialize(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
+void CLuaPhysicsRigidBody::Initialize()
 {
     assert(!IsReady());            // in case something goes wrong, or element get initialized twice
 

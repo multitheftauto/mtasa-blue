@@ -78,7 +78,7 @@ public:
     CLuaPhysicsConstraint*             GetContraintFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
-    std::shared_ptr<CLuaPhysicsShape>  GetShapeFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);

@@ -103,7 +103,7 @@ CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State
 // CLuaPhysicsShape from userdata
 //
 template <class T>
-std::shared_ptr<CLuaPhysicsShape> UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
+CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
 {
 #ifdef MTA_CLIENT
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);

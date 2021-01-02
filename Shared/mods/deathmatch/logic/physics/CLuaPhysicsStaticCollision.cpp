@@ -23,7 +23,7 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
     Unlink();
 }
 
-void CLuaPhysicsStaticCollision::Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
+void CLuaPhysicsStaticCollision::Initialize()
 {
     m_btCollisionObject = CPhysicsStaticCollisionProxy::Create(m_pShape);
     m_btCollisionObject->setUserPointer((void*)this);
@@ -174,6 +174,7 @@ void CLuaPhysicsStaticCollision::Unlink()
 {
     if (m_btCollisionObject)
     {
+        m_btCollisionObject->setCollisionShape(nullptr);
         m_btCollisionObject->SetEnabled(false);
         m_btCollisionObject = nullptr;
     }

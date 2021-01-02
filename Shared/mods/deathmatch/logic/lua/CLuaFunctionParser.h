@@ -624,23 +624,6 @@ struct CLuaFunctionParserBase
             }
             return static_cast<T>(result);
         }
-        else if constexpr (std::is_same_v<T, std::shared_ptr<CLuaPhysicsShape>>)
-        {
-            int   iType = lua_type(L, index);
-            bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
-            void* pValue = lua::PopPrimitive<void*>(L, index);
-
-            auto cast = [pValue, L](auto null) { return UserDataCast<decltype(null)>(null, pValue, L);
-            };
-
-            if (std::shared_ptr<CLuaPhysicsShape> pShape = cast((CLuaPhysicsShape*)0); pShape != nullptr)
-            {
-                return pShape;
-            }
-
-            SetBadArgumentError(L, "physics-shape", index - 1, pValue, isLightUserData);
-            return T{};
-        }
         else if constexpr (std::is_same_v<T, SColor>)
             return static_cast<unsigned long>(lua::PopPrimitive<int64_t>(L, index));
         else if constexpr (std::is_same_v<T, CLuaArgument>)

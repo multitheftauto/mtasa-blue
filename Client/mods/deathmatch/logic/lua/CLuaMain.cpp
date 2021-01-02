@@ -103,7 +103,7 @@ CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned in
     return m_pLuaPhysicsStaticCollisionManager->GetStaticCollisionFromScriptID(uiScriptID);
 }
 
-std::shared_ptr<CLuaPhysicsShape> CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
+CLuaPhysicsShape* CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
 {
     return m_pLuaPhysicsShapeManager->GetShapeFromScriptID(uiScriptID);
 }
@@ -112,7 +112,7 @@ CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScrip
 {
     auto pShape = GetShapeFromScriptID(uiScriptID);
     if (pShape != nullptr)
-        return (CLuaPhysicsElement*)pShape.get();
+        return (CLuaPhysicsElement*)pShape;
     auto pStaticCollision = GetStaticCollisionFromScriptID(uiScriptID);
     if (pStaticCollision != nullptr)
         return (CLuaPhysicsElement*)pStaticCollision;

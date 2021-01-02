@@ -27,7 +27,7 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
     }
 }
 
-std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(std::shared_ptr<CLuaPhysicsShape> pShape, const float fMass,
+std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass,
                                                                        CVector vecLocalInertia, CVector vecCenterOfMass,
                                                                        CVector vecPosition, CVector vecRotation)
 {

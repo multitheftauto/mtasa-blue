@@ -330,7 +330,7 @@ bool CLuaPhysicsDefs::PhysicsDestroy(CLuaPhysicsElement* physicsElement)
     return true;
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(std::shared_ptr<CLuaPhysicsShape> pShape, std::optional<RigidBodyOptions> options)
+std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
 {
     if (!pShape->SupportRigidBody())
         throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
@@ -361,7 +361,7 @@ std::shared_ptr<CLuaPhysicsRigidBody> CLuaPhysicsDefs::PhysicsCreateRigidBody(st
     return pShape->GetPhysics()->CreateRigidBody(pShape);
 }
 
-std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape,
+std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape,
                                                                                           std::optional<CVector> position, std::optional<CVector> rotation)
 {
     std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
@@ -370,13 +370,13 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CLuaPhysicsDefs::PhysicsCreateStatic
     return std::move(pStaticCollision);
 }
 
-bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, std::shared_ptr<CLuaPhysicsShape> pShapeChildShape,
+bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysicsShape* pShapeChildShape,
                                            std::optional<CVector> vecOptionalPosition, std::optional<CVector> vecOptionalRotation)
 {
     if (pShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
 
-    if (CLuaPhysicsCompoundShape* pCompoundChildShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShapeChildShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundChildShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShapeChildShape))
     {
         throw std::invalid_argument("Child shape can not be compound");
     }
@@ -387,18 +387,18 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(std::shared_ptr<CLuaPhysicsShape> pSh
     if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(vecPosition))
         throw std::invalid_argument(SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
-        pCompoundShape->AddShape(std::move(pShapeChildShape), vecPosition, vecRotation);
+        pCompoundShape->AddShape(pShapeChildShape, vecPosition, vecRotation);
         return true;
     }
 
     throw std::invalid_argument("Shape is not be compound");
 }
 
-std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildShapes(std::shared_ptr<CLuaPhysicsShape> pShape)
+std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsShape* pShape)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
         return pCompoundShape->GetChildShapes();
     }
@@ -406,9 +406,9 @@ std::vector<std::shared_ptr<CLuaPhysicsShape>> CLuaPhysicsDefs::PhysicsGetChildS
     throw std::invalid_argument("Shape is not be compound");
 }
 
-bool CLuaPhysicsDefs::PhysicsRemoveChildShape(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
+bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsShape* pShape, int iIndex)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
         if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
             throw std::invalid_argument("Invalid child index");
@@ -420,9 +420,9 @@ bool CLuaPhysicsDefs::PhysicsRemoveChildShape(std::shared_ptr<CLuaPhysicsShape> 
     throw std::invalid_argument("Shape is not be compound");
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
+CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsShape* pShape, int iIndex)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
         if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
             throw std::invalid_argument("Invalid child index");
@@ -433,9 +433,9 @@ CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(std::shared_ptr<CLua
     throw std::invalid_argument("Shape is not be compound");
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex)
+CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsShape* pShape, int iIndex)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
         if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
             throw std::invalid_argument("Invalid child index");
@@ -446,12 +446,12 @@ CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(std::shared_ptr<CLua
     throw std::invalid_argument("Shape is not be compound");
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex, CVector vecPosition)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsShape* pShape, int iIndex, CVector vecPosition)
 {
     if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(vecPosition))
         throw std::invalid_argument(SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
         if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
             throw std::invalid_argument("Invalid child index");
@@ -463,9 +463,9 @@ bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(std::shared_ptr<CLuaPhy
     throw std::invalid_argument("Shape is not be compound");
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(std::shared_ptr<CLuaPhysicsShape> pShape, int iIndex, CVector vecRotation)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(CLuaPhysicsShape* pShape, int iIndex, CVector vecRotation)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape.get()))
+    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
         if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
             throw std::invalid_argument("Invalid child index");
@@ -1117,7 +1117,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
     return results;
 }
 
-std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecStartPosition, CVector vecEndPosition,
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition,
                                                                 CVector vecRotation, std::optional<RayOptions> options)
 {
     RayOptions mapOptions = options.value_or(RayOptions());
@@ -1374,9 +1374,9 @@ std::unordered_map<std::string, long long int> CLuaPhysicsDefs::PhysicsGetPerfor
     return result;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetVertexPosition(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, CVector vecPosition)
+bool CLuaPhysicsDefs::PhysicsSetVertexPosition(CLuaPhysicsShape* pShape, int iVertexId, CVector vecPosition)
 {
-    if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMesh = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape.get()))
+    if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMesh = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
     {
         if (iVertexId > 0 && pTriangleMesh->GetVerticesNum() > iVertexId)
         {
@@ -1393,9 +1393,9 @@ bool CLuaPhysicsDefs::PhysicsSetVertexPosition(std::shared_ptr<CLuaPhysicsShape>
     throw std::invalid_argument(SString("Shape %s unsupported", pShape->GetName()).c_str());
 }
 
-bool CLuaPhysicsDefs::PhysicsSetHeight(std::shared_ptr<CLuaPhysicsShape> pShape, int iVertexId, float fHeight)
+bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsShape* pShape, int iVertexId, float fHeight)
 {
-    if (CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrain = dynamic_cast<CLuaPhysicsHeightfieldTerrainShape*>(pShape.get()))
+    if (CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrain = dynamic_cast<CLuaPhysicsHeightfieldTerrainShape*>(pShape))
     {
         if (iVertexId > 0 && pHeightfieldTerrain->GetVerticesNum() > iVertexId)
         {
