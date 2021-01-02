@@ -117,9 +117,9 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
         {"physicsWorldHasChanged", ArgumentParser<PhysicsWorldHasChanged>},
-#ifdef MTA_CLIENT
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
+#ifdef MTA_CLIENT
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
 #endif
     };
@@ -1309,7 +1309,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
     if (std::holds_alternative<CLuaPhysicsRigidBody*>(variant))
     {
         CLuaPhysicsRigidBody*                                      pRigidBody = std::get<CLuaPhysicsRigidBody*>(variant);
-        std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& collisionReports = pRigidBody->GetCollisionReports();
+        const std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& collisionReports = pRigidBody->GetCollisionReports();
         for (auto const& collisionReport : collisionReports)
         {
             if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(collisionReport->pElement.get()))
@@ -1450,7 +1450,6 @@ bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
     throw std::invalid_argument("Unsupported physics element type");
 }
 
-#ifdef MTA_CLIENT
 
 bool CLuaPhysicsDefs::PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant)
 {
@@ -1493,6 +1492,7 @@ std::variant<bool, float> CLuaPhysicsDefs::PhysicsGetDebugMode(CBulletPhysics* p
     return pPhysics->GetDebug()->getDebugMode(eDebugMode);
 }
 
+#ifdef MTA_CLIENT
 bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
 {
     pPhysics->DrawDebug();
@@ -1504,6 +1504,7 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
 std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition,
                                                                                                                float fRadius)
 {
+    pPhysics->FlushAllChanges();
     std::vector<std::vector<float>> lines = pPhysics->GetDebugLines(vecPosition, fRadius);
     return lines;
 }

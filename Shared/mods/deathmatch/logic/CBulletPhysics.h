@@ -275,7 +275,7 @@ public:
 
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
     void                 FlushAllChanges();
-    bool                 WorldHasChanged() const { return m_bWorldHasChanged; }
+    bool                 WorldHasChanged();
 
 private:
     void StepSimulation();
@@ -316,7 +316,8 @@ private:
     std::atomic<float> m_fSpeed = 1.0f;
     bool               m_bDuringSimulation = false;
     std::atomic<int>   m_iSubSteps = 10;
-    std::atomic<bool>  m_bWorldHasChanged = false;
+    bool               m_bWorldHasChanged = false;
+    std::mutex         m_lockWorldHasChanged;
     float              m_fImpulseThreshold = 0.01f;
     std::atomic<bool>  m_bSimulationEnabled = true;
     bool               m_bTriggerEvents = true;

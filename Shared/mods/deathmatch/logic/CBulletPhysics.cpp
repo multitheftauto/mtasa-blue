@@ -4,7 +4,7 @@
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CBulletPhysics.cpp
- *  PURPOSE:     Physics entity class
+ *  PURPOSE:     Bullet dhysics entity class
  *
  *****************************************************************************/
 
@@ -172,6 +172,7 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::CreateStaticCollisio
 CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to,
                                                        int iFilterGroup, int iFilterMask) const
 {
+    BT_PROFILE("shapeCast");
     CVector fromPosition;
     CVector toPosition;
     CLuaPhysicsSharedLogic::GetPosition(from, fromPosition);
@@ -193,6 +194,7 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
 
 bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const
 {
+    BT_PROFILE("lineCast");
     btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
     rayCallback.m_collisionFilterGroup = iFilterGroup;
     rayCallback.m_collisionFilterMask = iFilterMask;
@@ -209,6 +211,7 @@ bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, i
 CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(const CVector& from, const CVector& to, int iFilterGroup, int iFilterMask,
                                                                 bool bFilterBackfaces) const
 {
+    BT_PROFILE("rayCast");
     SClosestRayResultCallback rayCallback(from, to);
     rayCallback.m_collisionFilterGroup = iFilterGroup;
     rayCallback.m_collisionFilterMask = iFilterMask;
@@ -224,6 +227,7 @@ CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(const CVector&
 
 CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const
 {
+    BT_PROFILE("rayCastAll");
     SAllRayResultCallback rayCallback(from, to);
     rayCallback.m_collisionFilterGroup = iFilterGroup;
     rayCallback.m_collisionFilterMask = iFilterMask;
@@ -351,6 +355,7 @@ void CBulletPhysics::StepSimulation()
 
 void CBulletPhysics::ClearOutsideWorldRigidBodies()
 {
+    BT_PROFILE("clearOutsideWorldRigidBodies");
     CLuaPhysicsRigidBodyManager*                       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> vecRigidBodiesToRemove;
     CVector                                            vecRigidBody;
@@ -818,8 +823,15 @@ void CBulletPhysics::AddToUpdateStack(CLuaPhysicsElement* pElement)
     m_bWorldHasChanged = true;
 }
 
+bool CBulletPhysics::WorldHasChanged()
+{
+    std::lock_guard guard(m_lockWorldHasChanged);
+    return m_bWorldHasChanged;
+}
+
 void CBulletPhysics::FlushAllChanges()
 {
+    std::lock_guard guard(m_lockWorldHasChanged);
     if (!m_bWorldHasChanged)
         return;
 

@@ -100,7 +100,7 @@ public:
 
     void                                  ClearCollisionReport();
     void                                                      ReportCollision(std::unique_ptr<CLuaPhysicsElement::SPhysicsCollisionReport> pCollisionReport);
-    std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*> GetCollisionReports();
+    const std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& GetCollisionReports();
     CLuaPhysicsElement::SPhysicsCollisionReport*                GetCollisionReport(CLuaPhysicsElement* pElement);
     void                                  AABBUpdated() { m_bAABBUpdateRequested = false; }
     void                                  Update() {}

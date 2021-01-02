@@ -276,7 +276,7 @@ float CLuaPhysicsRigidBody::GetMass() const
 
     if (IsReady())
         return m_pRigidBodyProxy->getMass();
-    return 0;
+    return BulletPhysics::Defaults::RigidBodyMass;
 }
 
 void CLuaPhysicsRigidBody::SetLinearVelocity(const CVector& vecVelocity)
@@ -296,7 +296,7 @@ CVector CLuaPhysicsRigidBody::GetLinearVelocity() const
 
     if (IsReady())
         return m_pRigidBodyProxy->getLinearVelocity();
-    return CVector(0, 0, 0);
+    return {0, 0, 0};
 }
 
 void CLuaPhysicsRigidBody::SetAngularVelocity(const CVector& vecVelocity)
@@ -319,7 +319,7 @@ CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
 
     if (IsReady())
         return m_pRigidBodyProxy->getAngularVelocity();
-    return CVector(0, 0, 0);
+    return {0, 0, 0};
 }
 
 void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce)
@@ -479,7 +479,7 @@ int CLuaPhysicsRigidBody::GetFilterGroup() const
 
     if (IsReady())
         return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup;
-    return -1;
+    return BulletPhysics::Defaults::FilterGroup;
 }
 
 void CLuaPhysicsRigidBody::RemoveDebugColor()
@@ -503,7 +503,7 @@ const SColor CLuaPhysicsRigidBody::GetDebugColor() const
         color.A = 255;
         return color;
     }
-    return SColor(0); // #TODO, set white
+    return 0; // #TODO, set white
 }
 
 void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)
@@ -568,7 +568,7 @@ void CLuaPhysicsRigidBody::ReportCollision(std::unique_ptr<SPhysicsCollisionRepo
     m_vecCollisionReports.push_back(std::move(pCollisionReport));
 }
 
-std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*> CLuaPhysicsRigidBody::GetCollisionReports()
+const std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& CLuaPhysicsRigidBody::GetCollisionReports()
 {
     std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*> vecCollisionReports;
     for (auto const& pCollisionReport : m_vecCollisionReports)
