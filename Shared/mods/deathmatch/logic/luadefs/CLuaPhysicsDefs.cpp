@@ -31,23 +31,26 @@ struct overloaded : Ts...
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
-template <typename R = void, typename F, typename... Ty>
-R VisitElement(CLuaPhysicsElement* pElement, F&& func, Ty ...args)
+template <typename R = void, typename F>
+R VisitElement(CLuaPhysicsElement* pElement, F&& func)
 {
-    if (CLuaPhysicsSphereShape* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
-        return func(pSphere, args...);
-    else if (CLuaPhysicsCapsuleShape* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
-        return func(pCapsule, args...);
-    else if (CLuaPhysicsCylinderShape* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
-        return func(pCylinder, args...);
-    else if (CLuaPhysicsConeShape* pCone = dynamic_cast<CLuaPhysicsConeShape*>(pElement))
-        return func(pCone, args...);
-    else if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
-        return func(pRigidBody, args...);
-    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
-        return func(pStaticCollision, args...);
-    assert(0);
-    throw std::invalid_argument("nope");
+    if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
+        return func(pSphere);
+    else if (auto* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
+        return func(pCapsule);
+    else if (auto* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        return func(pCylinder);
+    else if (auto* pCone = dynamic_cast<CLuaPhysicsConeShape*>(pElement))
+        return func(pCone);
+    else if (auto* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+        return func(pRigidBody);
+    else if (auto* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+        return func(pStaticCollision);
+
+    else if (auto* pAnyShape = dynamic_cast<CLuaPhysicsShape*>(pElement)) // always at the end
+        return func(pAnyShape);
+
+    throw std::invalid_argument("todo ...");
 }
 
 template <typename T, typename U>
@@ -518,133 +521,6 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
 {
     if (std::holds_alternative<CLuaPhysicsElement*>(variant))
     {
-        CLuaPhysicsElement* pElement = std::get<CLuaPhysicsElement*>(variant);
-        CBulletPhysics*     pPhysics = pElement->GetPhysics();
-
-        switch (eProperty)
-        {
-            case ePhysicsProperty::MASS:
-                if (std::holds_alternative<float>(argument))
-                {
-                    float fMass = std::get<float>(argument);
-                    if (fMass < 0)
-                        throw std::invalid_argument("Mass can not be negative");
-                    if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
-                        throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
-
-                    //VisitElement(pElement, overloaded{[fMass](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetMass(fMass); }});
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::SLEEPING_THRESHOLDS:
-                if (std::holds_alternative<float>(argument) && std::holds_alternative<float>(argument2))
-                {
-                    float fLinear = std::get<float>(argument);
-                    float fAngular = std::get<float>(argument2);
-                    if (fLinear < 0)
-                        throw std::invalid_argument("Linear threshold can not be negative");
-                    if (fAngular < 0)
-                        throw std::invalid_argument("Angular threshold can not be negative");
-
-                    /*CallAlternative(
-                        pElement, overloaded{[fLinear, fAngular](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetSleepingThresholds(fLinear, fAngular); }});*/
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::RESTITUTION:
-                if (std::holds_alternative<float>(argument) && std::holds_alternative<float>(argument2))
-                {
-                    float fRestitution = std::get<float>(argument);
-
-                    /*CallAlternative(pElement, overloaded{[fRestitution](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetRestitution(fRestitution); }});*/
-
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::SCALE:
-            case ePhysicsProperty::DEBUG_COLOR:
-                if (std::holds_alternative<SColor>(argument))
-                {
-                    SColor debugColor = std::get<SColor>(argument);
-
-                   /* CallAlternative(pElement, overloaded{
-                            [debugColor](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetDebugColor(debugColor); },
-                            [debugColor](CLuaPhysicsStaticCollision* pStaticCollision) { pStaticCollision->SetDebugColor(debugColor); }});*/
-
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::FILTER_MASK:
-                if (std::holds_alternative<int>(argument))
-                {
-                    int iFilterMask = std::get<int>(argument);
-                    /*CallAlternative(
-                        pElement,
-                        overloaded{[iFilterMask](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetFilterMask(iFilterMask); },
-                                             [iFilterMask](CLuaPhysicsStaticCollision* pStaticCollision) { pStaticCollision->SetFilterMask(iFilterMask); }});*/
-
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::FILTER_GROUP:
-                if (std::holds_alternative<int>(argument))
-                {
-                    int iFilterGroup = std::get<int>(argument);
-                    /*CallAlternative(
-                        pElement,
-                        overloaded{[iFilterGroup](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetFilterGroup(iFilterGroup); },
-                                             [iFilterGroup](CLuaPhysicsStaticCollision* pStaticCollision) { pStaticCollision->SetFilterGroup(iFilterGroup); }});*/
-
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::RADIUS:
-                if (std::holds_alternative<float>(argument))
-                {
-                    float fRadius = std::get<float>(argument);
-                    if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
-                        throw std::invalid_argument("Radius is too small");
-                    
-                    VisitElement(pElement, overloaded{[fRadius](CLuaPhysicsSphereShape* pSphere) { pSphere->SetRadius(fRadius); },
-                                                         [fRadius](CLuaPhysicsCapsuleShape* pCapsule) { pCapsule->SetRadius(fRadius); },
-                                                         [fRadius](CLuaPhysicsConeShape* pCone) { pCone->SetRadius(fRadius); },
-                                                         [fRadius](CLuaPhysicsCylinderShape* pCylinder) { pCylinder->SetRadius(fRadius); },
-                                                         [](CLuaPhysicsElement* __) { assert(0); }});
-
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::HEIGHT:
-                if (std::holds_alternative<float>(argument))
-                {
-                    float fHeight = std::get<float>(argument);
-                    if (fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
-                        throw std::invalid_argument("Height is too small");
-                    /*CallAlternative(pElement, overloaded{[fHeight](CLuaPhysicsCapsuleShape* pCapsule) { pCapsule->SetHeight(fHeight); },
-                                                                [fHeight](CLuaPhysicsCylinderShape* pCylinder) { pCylinder->SetHeight(fHeight); },
-                                                                [fHeight](CLuaPhysicsConeShape* pCone) { pCone->SetHeight(fHeight); }});*/
-
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::GRAVITY:
-                if (std::holds_alternative<CVector>(argument))
-                {
-                    CVector vecGravity = std::get<CVector>(argument);
-
-                    //CallAlternative(pElement, overloaded{[vecGravity](CLuaPhysicsRigidBody* pRigidbody) { pRigidbody->SetGravity(vecGravity); }});
-                    return true;
-                }
-                break;
-            case ePhysicsProperty::MOTION_THRESHOLD:
-            case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
-            case ePhysicsProperty::SLEEP:
-            case ePhysicsProperty::WANTS_SLEEPING:
-                break;
-        }
-    }
-    else if (std::holds_alternative<CBulletPhysics*>(variant))
-    {
         CBulletPhysics* pPhysics = std::get<CBulletPhysics*>(variant);
         switch (eProperty)
         {
@@ -727,12 +603,168 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
                 }
                 throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
         }
+        return false;
+    }
+
+    CLuaPhysicsElement* pElement = std::get<CLuaPhysicsElement*>(variant);
+    switch (eProperty)
+    {
+        case ePhysicsProperty::MASS:
+            if (std::holds_alternative<float>(argument))
+            {
+                float fMass = std::get<float>(argument);
+                if (fMass < 0)
+                    throw std::invalid_argument("Mass can not be negative");
+                if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
+                    throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
+
+                VisitElement(pElement,
+                             overloaded{[fMass](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetMass(fMass); }, [](CLuaPhysicsElement* __) { assert(0); }});
+                return true;
+            }
+            break;
+        case ePhysicsProperty::SLEEPING_THRESHOLDS:
+            if (std::holds_alternative<float>(argument) && std::holds_alternative<float>(argument2))
+            {
+                float fLinear = std::get<float>(argument);
+                float fAngular = std::get<float>(argument2);
+                if (fLinear < 0)
+                    throw std::invalid_argument("Linear threshold can not be negative");
+                if (fAngular < 0)
+                    throw std::invalid_argument("Angular threshold can not be negative");
+
+                VisitElement(pElement,
+                             overloaded{[fLinear, fAngular](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetSleepingThresholds(fLinear, fAngular); },
+                                        [](CLuaPhysicsElement* __) { assert(0); }});
+                return true;
+            }
+            break;
+        case ePhysicsProperty::RESTITUTION:
+            if (std::holds_alternative<float>(argument) && std::holds_alternative<float>(argument2))
+            {
+                float fRestitution = std::get<float>(argument);
+
+                VisitElement(pElement, overloaded{[fRestitution](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetRestitution(fRestitution); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+
+                return true;
+            }
+            break;
+        case ePhysicsProperty::SCALE:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                CVector vecScale = std::get<CVector>(argument);
+
+                VisitElement(pElement,
+                             overloaded{[vecScale](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetScale(vecScale); },
+                                        [vecScale](CLuaPhysicsShape* pShape) { pShape->SetScale(vecScale); }, [](CLuaPhysicsElement* __) { assert(0); }});
+            }
+            break;
+        case ePhysicsProperty::DEBUG_COLOR:
+            if (std::holds_alternative<SColor>(argument))
+            {
+                SColor debugColor = std::get<SColor>(argument);
+
+                VisitElement(pElement, overloaded{[debugColor](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetDebugColor(debugColor); },
+                                                  [debugColor](CLuaPhysicsStaticCollision* pStaticCollision) { pStaticCollision->SetDebugColor(debugColor); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+
+                return true;
+            }
+            break;
+        case ePhysicsProperty::FILTER_MASK:
+            if (std::holds_alternative<int>(argument))
+            {
+                int iFilterMask = std::get<int>(argument);
+                VisitElement(pElement, overloaded{[iFilterMask](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetFilterMask(iFilterMask); },
+                                                  [iFilterMask](CLuaPhysicsStaticCollision* pStaticCollision) { pStaticCollision->SetFilterMask(iFilterMask); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+
+                return true;
+            }
+            break;
+        case ePhysicsProperty::FILTER_GROUP:
+            if (std::holds_alternative<int>(argument))
+            {
+                int iFilterGroup = std::get<int>(argument);
+                VisitElement(pElement,
+                             overloaded{[iFilterGroup](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetFilterGroup(iFilterGroup); },
+                                        [iFilterGroup](CLuaPhysicsStaticCollision* pStaticCollision) { pStaticCollision->SetFilterGroup(iFilterGroup); },
+                                        [](CLuaPhysicsElement* __) { assert(0); }});
+
+                return true;
+            }
+            break;
+        case ePhysicsProperty::RADIUS:
+            if (std::holds_alternative<float>(argument))
+            {
+                float fRadius = std::get<float>(argument);
+                if (fRadius < BulletPhysics::Limits::MinimumPrimitiveSize)
+                    throw std::invalid_argument("Radius is too small");
+
+                VisitElement(pElement, overloaded{[fRadius](CLuaPhysicsSphereShape* pSphere) { pSphere->SetRadius(fRadius); },
+                                                  [fRadius](CLuaPhysicsCapsuleShape* pCapsule) { pCapsule->SetRadius(fRadius); },
+                                                  [fRadius](CLuaPhysicsConeShape* pCone) { pCone->SetRadius(fRadius); },
+                                                  [fRadius](CLuaPhysicsCylinderShape* pCylinder) { pCylinder->SetRadius(fRadius); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+
+                return true;
+            }
+            break;
+        case ePhysicsProperty::HEIGHT:
+            if (std::holds_alternative<float>(argument))
+            {
+                float fHeight = std::get<float>(argument);
+                if (fHeight < BulletPhysics::Limits::MinimumPrimitiveSize)
+                    throw std::invalid_argument("Height is too small");
+                VisitElement(pElement,
+                             overloaded{[fHeight](CLuaPhysicsCapsuleShape* pCapsule) { pCapsule->SetHeight(fHeight); },
+                                        [fHeight](CLuaPhysicsCylinderShape* pCylinder) { pCylinder->SetHeight(fHeight); },
+                                        [fHeight](CLuaPhysicsConeShape* pCone) { pCone->SetHeight(fHeight); }, [](CLuaPhysicsElement* __) { assert(0); }});
+
+                return true;
+            }
+            break;
+        case ePhysicsProperty::GRAVITY:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                CVector vecGravity = std::get<CVector>(argument);
+
+                VisitElement(pElement, overloaded{[vecGravity](CLuaPhysicsRigidBody* pRigidbody) { pRigidbody->SetGravity(vecGravity); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+                return true;
+            }
+            break;
+        case ePhysicsProperty::MOTION_CCD_THRESHOLD:
+            if (std::holds_alternative<float>(argument))
+            {
+                float vecThreshold = std::get<float>(argument);
+
+                VisitElement(pElement, overloaded{[vecThreshold](CLuaPhysicsRigidBody* pRigidbody) { pRigidbody->SetCcdMotionThreshold(vecThreshold); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+                return true;
+            }
+            break;
+        case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
+            if (std::holds_alternative<float>(argument))
+            {
+                float fSweptSphereRadius = std::get<float>(argument);
+
+                VisitElement(pElement,
+                             overloaded{[fSweptSphereRadius](CLuaPhysicsRigidBody* pRigidbody) { pRigidbody->SetSweptSphereRadius(fSweptSphereRadius); },
+                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+                return true;
+            }
+            break;
+        case ePhysicsProperty::SLEEP:
+        case ePhysicsProperty::WANTS_SLEEPING:
+            break;
     }
     throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
 }
 
-
-std::variant<CVector, bool, int, float> CLuaPhysicsDefs::PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty)
+std::variant<CVector, bool, int, float> CLuaPhysicsDefs::PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant,
+                                                                              ePhysicsProperty                                   eProperty)
 {
     if (std::holds_alternative<CBulletPhysics*>(variant))
     {
@@ -754,7 +786,6 @@ std::variant<CVector, bool, int, float> CLuaPhysicsDefs::PhysicsGetProperties(st
         }
         throw std::invalid_argument(SString("Physics world does not support %s property.", EnumToString(eProperty)).c_str());
     }
-
 }
 
 // --------- AAAAAAAAA  BBBB   CCCC
@@ -1014,7 +1045,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
     }
 
     CBulletPhysics::SAllRayResultCallback rayCallback = pPhysics->RayCastAll(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
-    std::vector<RayResult> results;
+    std::vector<RayResult>                results;
 
     size_t hitNum = rayCallback.m_hitPointWorld.size();
     for (size_t i = 0; i < hitNum; i++)
@@ -1278,7 +1309,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
 
     if (std::holds_alternative<CLuaPhysicsRigidBody*>(variant))
     {
-        CLuaPhysicsRigidBody*                  pRigidBody = std::get<CLuaPhysicsRigidBody*>(variant);
+        CLuaPhysicsRigidBody*                                      pRigidBody = std::get<CLuaPhysicsRigidBody*>(variant);
         std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& collisionReports = pRigidBody->GetCollisionReports();
         for (auto const& collisionReport : collisionReports)
         {
@@ -1419,7 +1450,6 @@ bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
     }
     throw std::invalid_argument("Unsupported physics element type");
 }
-
 
 #ifdef MTA_CLIENT
 
