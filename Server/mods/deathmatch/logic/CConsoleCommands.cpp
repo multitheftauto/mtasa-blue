@@ -836,7 +836,7 @@ bool CConsoleCommands::LogIn(CConsole* pConsole, const char* szArguments, CClien
 
         if (CAccountManager::IsValidAccountName(szNick) && CAccountManager::IsValidPassword(szPassword))
         {
-            return g_pGame->GetAccountManager()->LogIn(pClient, pEchoClient, szNick, std::string(szPassword));
+            return g_pGame->GetAccountManager()->LogIn(pClient, pEchoClient, szNick, szPassword);
         }
         else
         {
