@@ -44,10 +44,9 @@ bool CLuaPhysicsElement::IsSafeToAccess() const
 
 void CLuaPhysicsElement::ApplyChanges()
 {
-    while (!m_stackChanges.empty())
+    while (!m_listChanges.empty())
     {
-        m_stackChanges.top()();
-        m_stackChanges.pop();
+        m_listChanges.pop()();
     }
     Update();
     ClearTempData();
@@ -70,7 +69,7 @@ void CLuaPhysicsElement::CommitChange(std::function<void()> change)
         m_bHasEnqueuedChanges = true;
         GetPhysics()->AddToChangesStack(this);
     }
-    m_stackChanges.push(change);
+    m_listChanges.push(change);
 }
 
 void CLuaPhysicsElement::ClearTempData()

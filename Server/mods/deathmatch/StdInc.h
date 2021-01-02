@@ -177,7 +177,7 @@ struct SAclRequest;
 #include "lua/CLuaShared.h"
 
 // Logic includes
-#include "ConcurrentStack.hpp"
+#include "ConcurrentList.hpp"
 #include "CBulletPhysicsCommon.h"
 #include <CBulletPhysics.h>
 #include <CBulletPhysicsManager.h>

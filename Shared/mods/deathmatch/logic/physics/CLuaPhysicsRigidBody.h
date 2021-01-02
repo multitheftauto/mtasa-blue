@@ -109,7 +109,6 @@ private:
     std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
     std::shared_ptr<CLuaPhysicsShape>                  m_pShape;
     std::vector<CLuaPhysicsConstraint*>                m_constraintList;
-    SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
     mutable std::atomic<bool>                          m_bActivationRequested;
     mutable std::atomic<bool>                          m_bAABBUpdateRequested;
 

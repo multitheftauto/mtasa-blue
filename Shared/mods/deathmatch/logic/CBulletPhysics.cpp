@@ -425,7 +425,7 @@ void CBulletPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollisi
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
     m_mapStaticCollisions.emplace(pStaticCollision->GetScriptID(), pStaticCollision);
-    m_InitializeStaticCollisionsQueue.push(pStaticCollision);
+    m_InitializeStaticCollisionsList.push(pStaticCollision);
 }
 
 void CBulletPhysics::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
@@ -438,14 +438,14 @@ void CBulletPhysics::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBo
 {
     m_mapRigidBodies.emplace(pRigidBody->GetScriptID(), pRigidBody);
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
-    m_InitializeRigidBodiesQueue.push(pRigidBody);
+    m_InitializeRigidBodiesList.push(pRigidBody);
 }
 
 void CBulletPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint)
 {
     m_mapConstraints.emplace(pConstraint->GetScriptID(), pConstraint);
     m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
-    m_InitializeConstraintsQueue.push(pConstraint);
+    m_InitializeConstraintsList.push(pConstraint);
 }
 
 void CBulletPhysics::StepSimulation()
@@ -453,6 +453,8 @@ void CBulletPhysics::StepSimulation()
     if (!m_bSimulationEnabled)
         return;
 
+    BT_PROFILE("stepSimulation");
+    isDuringSimulation = true;
     std::lock_guard guard(dynamicsWorldLock);
     m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
 }
@@ -883,22 +885,22 @@ void CBulletPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
 
 void CBulletPhysics::AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_StackRigidBodiesActivation.push(pRigidBody);
+    m_rigidBodiesActivationList.push(pRigidBody);
 }
 
 void CBulletPhysics::AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_StackRigidBodiesUpdateAABB.push(pRigidBody);
+    m_rigidBodiesUpdateAABBList.push(pRigidBody);
 }
 
 void CBulletPhysics::AddToChangesStack(CLuaPhysicsElement* pElement)
 {
-    m_StackElementChanges.push(pElement);
+    m_elementChangesList.push(pElement);
 }
 
 void CBulletPhysics::AddToUpdateStack(CLuaPhysicsElement* pElement)
 {
-    m_StackElementUpdates.push(pElement);
+    m_elementUpdatesList.push(pElement);
 }
 
 void CBulletPhysics::DoPulse()
@@ -908,80 +910,77 @@ void CBulletPhysics::DoPulse()
 
     CBulletPhysicsProfiler::Clear();
 
+    if (!m_InitializeStaticCollisionsList.empty())
     {
+        
         BT_PROFILE("initializeStaticCollisions");
-        while (!m_InitializeStaticCollisionsQueue.empty())
+        while (!m_InitializeStaticCollisionsList.empty())
         {
-            std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = m_InitializeStaticCollisionsQueue.top();
+            std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = m_InitializeStaticCollisionsList.pop();
             pStaticCollision->Initialize(pStaticCollision);
-
-            m_InitializeStaticCollisionsQueue.pop();
         }
     }
 
+    if (!m_InitializeRigidBodiesList.empty())
     {
         BT_PROFILE("initializeRigidBodies");
-        while (!m_InitializeRigidBodiesQueue.empty())
+        while (!m_InitializeRigidBodiesList.empty())
         {
-            std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = m_InitializeRigidBodiesQueue.top();
+            std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = m_InitializeRigidBodiesList.pop();
             pRigidBody->Initialize(pRigidBody);
-
-            m_InitializeRigidBodiesQueue.pop();
         }
     }
 
+    if (!m_InitializeConstraintsList.empty())
     {
         BT_PROFILE("initializeConstraints");
-        while (!m_InitializeConstraintsQueue.empty())
+        while (!m_InitializeConstraintsList.empty())
         {
-            std::shared_ptr<CLuaPhysicsConstraint> pConstraint = m_InitializeConstraintsQueue.top();
+            std::shared_ptr<CLuaPhysicsConstraint> pConstraint = m_InitializeConstraintsList.pop();
             pConstraint->Initialize();
-
-            m_InitializeConstraintsQueue.pop();
         }
     }
 
+    if (!m_rigidBodiesActivationList.empty())
     {
         BT_PROFILE("activateRigidBodies");
-        while (!m_StackRigidBodiesActivation.empty())
+        while (!m_rigidBodiesActivationList.empty())
         {
-            CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesActivation.top();
+            CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesActivationList.pop();
             pRigidBody->Activate();
             m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
                                                                                               m_pDynamicsWorld->getDispatcher());
-            m_StackRigidBodiesActivation.pop();
         }
     }
+
+    if (!m_rigidBodiesUpdateAABBList.empty())
     {
         BT_PROFILE("updateRigidBodiesAABB");
-        while (!m_StackRigidBodiesUpdateAABB.empty())
+        while (!m_rigidBodiesUpdateAABBList.empty())
         {
-            CLuaPhysicsRigidBody* pRigidBody = m_StackRigidBodiesUpdateAABB.top();
+            CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesUpdateAABBList.pop();
             m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
             pRigidBody->AABBUpdated();
-            m_StackRigidBodiesUpdateAABB.pop();
         }
     }
 
+    if (!m_elementChangesList.empty())
     {
         BT_PROFILE("applyChanges");
-        while (!m_StackElementChanges.empty())
+        while (!m_elementChangesList.empty())
         {
-            CLuaPhysicsElement* pElement = m_StackElementChanges.top();
+            CLuaPhysicsElement* pElement = m_elementChangesList.pop();
             pElement->ApplyChanges();
-
-            m_StackElementChanges.pop();
         }
     }
 
+    if (!m_elementUpdatesList.empty())
     {
         BT_PROFILE("update");
-        while (!m_StackElementUpdates.empty())
+        while (!m_elementUpdatesList.empty())
         {
-            CLuaPhysicsElement* pElement = m_StackElementUpdates.top();
+            CLuaPhysicsElement* pElement = m_elementUpdatesList.pop();
             pElement->Update();
-
-            m_StackElementUpdates.pop();
         }
     }
 
@@ -1000,11 +999,7 @@ void CBulletPhysics::DoPulse()
     //    }
     //}
 
-    isDuringSimulation = true;
-    {
-        BT_PROFILE("stepSimulation");
-        StepSimulation();
-    }
+    StepSimulation();
 
 #ifdef MTA_CLIENT
     if (m_bDrawDebugNextTime)

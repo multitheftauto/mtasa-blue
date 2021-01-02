@@ -1,4 +1,4 @@
-#include <stack>
+#include <list>
 #include <mutex>
 
 #pragma once
@@ -6,33 +6,31 @@
 namespace SharedUtil
 {
     template <typename T>
-    class ConcurrentStack
+    class ConcurrentList
     {
     public:
         void push(const T& item)
         {
             std::lock_guard<std::mutex> guard(m_mutex);
-            m_stack.push(item);
+            m_list.push_back(item);
         }
-        void pop()
+
+        T pop()
         {
             std::lock_guard<std::mutex> guard(m_mutex);
-            m_stack.pop();
-        }
-        T top() const
-        {
-            std::lock_guard<std::mutex> guard(m_mutex);
-            return m_stack.top();
+            T firstElement = m_list.front();
+            m_list.pop_front();
+            return firstElement;
         }
 
         bool empty() const
         {
             std::lock_guard<std::mutex> guard(m_mutex);
-            return m_stack.empty();
+            return m_list.empty();
         }
 
     private:
         mutable std::mutex m_mutex;
-        std::stack<T>      m_stack;
+        std::list<T>       m_list;
     };
 }            // namespace SharedUtil

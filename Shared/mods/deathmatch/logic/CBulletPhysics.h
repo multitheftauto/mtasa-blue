@@ -345,14 +345,14 @@ private:
     std::unordered_map<uint, std::shared_ptr<CLuaPhysicsStaticCollision>> m_mapStaticCollisions;
     std::unordered_map<uint, std::shared_ptr<CLuaPhysicsConstraint>>      m_mapConstraints;
 
-    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsStaticCollision>> m_InitializeStaticCollisionsQueue;
-    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsRigidBody>>       m_InitializeRigidBodiesQueue;
-    SharedUtil::ConcurrentStack<std::shared_ptr<CLuaPhysicsConstraint>>      m_InitializeConstraintsQueue;
+    SharedUtil::ConcurrentList<std::shared_ptr<CLuaPhysicsStaticCollision>>  m_InitializeStaticCollisionsList;
+    SharedUtil::ConcurrentList<std::shared_ptr<CLuaPhysicsRigidBody>>       m_InitializeRigidBodiesList;
+    SharedUtil::ConcurrentList<std::shared_ptr<CLuaPhysicsConstraint>>       m_InitializeConstraintsList;
 
-    SharedUtil::ConcurrentStack<CLuaPhysicsElement*>   m_StackElementChanges;
-    SharedUtil::ConcurrentStack<CLuaPhysicsElement*>   m_StackElementUpdates;
-    SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesActivation;
-    SharedUtil::ConcurrentStack<CLuaPhysicsRigidBody*> m_StackRigidBodiesUpdateAABB;
+    SharedUtil::ConcurrentList<CLuaPhysicsElement*>    m_elementChangesList;
+    SharedUtil::ConcurrentList<CLuaPhysicsElement*>    m_elementUpdatesList;
+    SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>  m_rigidBodiesActivationList;
+    SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>  m_rigidBodiesUpdateAABBList;
 
     // Multithreaded
     std::vector<CLuaPhysicsRigidBody*> m_vecActiveRigidBodies;

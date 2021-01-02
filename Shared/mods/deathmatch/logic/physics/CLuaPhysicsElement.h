@@ -13,7 +13,7 @@ class CLuaPhysicsElement;
 
 #pragma once
 
-#include "ConcurrentStack.hpp"
+#include "ConcurrentList.hpp"
 #include <unordered_map>
 #include <variant>
 
@@ -117,7 +117,7 @@ private:
     CBulletPhysics*                                    m_pPhysics;
     EIdClass::EIdClassType                             m_classType;
     unsigned int                                       m_uiScriptID;
-    SharedUtil::ConcurrentStack<std::function<void()>> m_stackChanges;
+    SharedUtil::ConcurrentList<std::function<void()>>  m_listChanges;
 
     mutable std::mutex                                         m_tempDataLock;
     // Stores information user set for get function while they are being permanently applied into specific element
