@@ -139,8 +139,8 @@ bool IsValidOrganizationPath(const char* szPath);
 unsigned int HexToInt(const char* szHex);
 bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
 bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
-bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount, bool bIgnoreAlpha = false);
-inline bool ColorStringToRGB(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount)
+bool         ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount, bool bIgnoreAlpha = false);
+inline bool  ColorStringToRGB(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount)
 {
     return ColorStringToRGBA(szColor, defaultColor, vecColors, ucCount, true);
 }
