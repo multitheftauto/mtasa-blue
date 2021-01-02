@@ -102,6 +102,10 @@ void CLocalGUI::ChangeLocale(const char* szName)
 {
     bool guiWasLoaded = m_pMainMenu != NULL;
     assert(guiWasLoaded);
+
+    CVector2D vPos = m_pConsole->GetPosition();
+    CVector2D vSize = m_pConsole->GetSize();
+
     if (guiWasLoaded)
         DestroyWindows();
 
@@ -112,7 +116,15 @@ void CLocalGUI::ChangeLocale(const char* szName)
     m_LastLocaleName = szName;
 
     if (guiWasLoaded)
+    {
         CreateWindows(guiWasLoaded);
+
+        if (m_pConsole != nullptr)
+        {
+            m_pConsole->SetPosition(vPos);
+            m_pConsole->SetSize(vSize);
+        }
+    }
 }
 
 void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
