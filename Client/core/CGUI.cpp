@@ -249,7 +249,7 @@ void CLocalGUI::DoPulse()
                 m_LastSettingsRevision = cvars->GetRevision() - 1;
 
                 if (m_LocaleChangeCounter == 2)
-                    CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("PLEASE WAIT...................."), MB_ICON_INFO);
+                    CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing Language, please wait..."), MB_ICON_INFO);
             }
             else
             {
