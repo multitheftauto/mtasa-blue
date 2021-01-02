@@ -21,42 +21,118 @@ static void __cdecl UpdateVehicleDummiesPositionArray(CVehicleSAInterface* vehic
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// CVehicle::AddExhaustParticles
+// CVehicle::AddExhaustParticles (1 of 2)
 //
 // Required for: Position for vehicle exhaust particles (eVehicleDummies::EXHAUST)
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-//     0x6DE2EA | 8B 3C 8D C8 B0 A9 00 | mov edi, CModelInfo::ms_modelInfoPtrs
-// >>> 0x6DE2F1 | 8B 57 5C             | mov edx, [edi+5Ch]
-// >>> 0x6DE2F4 | 83 C2 48             | add edx, 48h
-//     0x6DE2F7 | 8B 02                | mov eax, [edx]
-#define HOOKPOS_CVehicle_AddExhaustParticles               0x6DE2F1
-#define HOOKSIZE_CVehicle_AddExhaustParticles              6
-static const DWORD CONTINUE_CVehicle_AddExhaustParticles = 0x6DE2F7;
+//     0x6DE2EA | 8B 3C 8D C8 B0 A9 00 | mov  edi, CModelInfo::ms_modelInfoPtrs
+// >>> 0x6DE2F1 | 8B 57 5C             | mov  edx, [edi+5Ch]
+// >>> 0x6DE2F4 | 83 C2 48             | add  edx, 48h
+// >>> 0x6DE2F7 | 8B 02                | mov  eax, [edx]
+// >>> 0x6DE2F9 | 89 44 24 64          | mov  [esp+0D0h+var_70.y], eax
+// >>> 0x6DE2FD | 8B 4A 04             | mov  ecx, [edx+4]
+// >>> 0x6DE300 | D9 44 24 64          | fld  [esp+0D0h+var_70.y]
+// >>> 0x6DE304 | 89 4C 24 68          | mov  [esp+0D0h+var_70.z], ecx
+// >>> 0x6DE308 | 8B 52 08             | mov  edx, [edx+8]
+// >>> 0x6DE30B | D8 0D 1C 8C 85 00    | fmul 1-.0f
+// >>> 0x6DE311 | 89 4C 24 40          | mov  [esp+0D0h+var_98.z], ecx
+// >>> 0x6DE315 | 89 44 24 3C          | mov  [esp+0D0h+var_98.y], eax
+// >>> 0x6DE319 | 53                   | push ebx
+// >>> 0x6DE31A | 8D 8C 24 80 00 00 00 | lea  ecx, [esp+0D4h+var_58.right.y]
+// >>> 0x6DE321 | D9 5C 24 40          | fstp [esp+0D4h+var_98.y]
+// >>> 0x6DE325 | 89 54 24 70          | mov  [esp+0D4h+var_64.x], edx
+// >>> 0x6DE329 | 89 54 24 48          | mov  [esp+0D4h+var_8C], edx
+//     0x6DE32D | E8 BE D9 EB FF       | call CMatrix::CMatrix(CMatrix const &)
+#define HOOKPOS_CVehicle_AddExhaustParticles_1               0x6DE2F1
+#define HOOKSIZE_CVehicle_AddExhaustParticles_1              59
+static const DWORD CONTINUE_CVehicle_AddExhaustParticles_1 = 0x6DE32D;
 
-static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles()
+static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleInterface, CVector* mainPosition, CVector* secondaryPosition)
+{
+    UpdateVehicleDummiesPositionArray(vehicleInterface);
+
+    if (vehicleDummiesPositionArray != nullptr)
+    {
+        *mainPosition = vehicleDummiesPositionArray[EXHAUST];
+        *secondaryPosition  = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
+
+        if (secondaryPosition->fX == 0.0 && secondaryPosition->fY == 0.0 && secondaryPosition->fZ == 0.0)
+        {
+            *secondaryPosition = *mainPosition;
+            secondaryPosition->fX *= -1.0f;
+        }
+    }
+    else
+    {
+        mainPosition->fX = 0.0f;
+        mainPosition->fY = 0.0f;
+        mainPosition->fZ = 0.0f;
+        secondaryPosition->fX = 0.0f;
+        secondaryPosition->fY = 0.0f;
+        secondaryPosition->fZ = 0.0f;
+    }
+}
+
+static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
 {
     _asm
     {
         pushad
-        push    esi // CVehicleSAInterface*
-        call    UpdateVehicleDummiesPositionArray
-        add     esp, 4
+        lea     eax, [esp+5Ch]
+        lea     ebx, [esp+84h]
+        push    eax             // CVector*
+        push    ebx             // CVector*
+        push    esi             // CVehicleSAInterface*
+        call    ApplyExhaustParticlesPosition
+        add     esp, 12
+        popad
 
+        mov     edx, vehicleDummiesPositionArray
+        add     edx, 48h
+        mov     edx, [edx+8]
+        push    ebx
+        lea     ecx, [esp+0D4h-54h]
+        mov     [esp+0D4h-64h], edx
+        mov     [esp+0D4h-8Ch], edx
+        jmp     CONTINUE_CVehicle_AddExhaustParticles_1
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVehicle::AddExhaustParticles (2 of 2)
+//
+// Required for: Position for NRG-500 secondary exhaust particles (eVehicleDummies::EXHAUST_SECONDARY)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6DE39C | 75 31             | jnz short loc_6DE3CF
+// >>> 0x6DE39E | 8B 57 5C          | mov edx, [edi+5Ch]
+// >>> 0x6DE3A1 | 81 C2 84 00 00 00 | add edx, 84h
+//     0x6DE3A7 | 8B 02             | mov eax, [edx]
+#define HOOKPOS_CVehicle_AddExhaustParticles_2               0x6DE39E
+#define HOOKSIZE_CVehicle_AddExhaustParticles_2              9
+static const DWORD CONTINUE_CVehicle_AddExhaustParticles_2 = 0x6DE3A7;
+
+static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
+{
+    _asm
+    {
+        pushad
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
         jz      continueWithOriginalCode
 
         popad
         mov     edx, vehicleDummiesPositionArray
-        add     edx, 48h
-        jmp     CONTINUE_CVehicle_AddExhaustParticles
+        add     edx, 84h
+        jmp     CONTINUE_CVehicle_AddExhaustParticles_2
 
         continueWithOriginalCode:
         popad
         mov     edx, [edi+5Ch]
-        add     edx, 48h
-        jmp     CONTINUE_CVehicle_AddExhaustParticles
+        add     edx, 84h
+        jmp     CONTINUE_CVehicle_AddExhaustParticles_2
     }
 }
 
@@ -1012,7 +1088,8 @@ void CMultiplayerSA::InitHooks_VehicleDummies()
     EZHookInstall(CVehicle_GetPlaneGunsPosition);
     EZHookInstall(CVehicle_GetPlaneOrdnancePosition);
     EZHookInstall(CVehicle_CanBeDriven);
-    EZHookInstall(CVehicle_AddExhaustParticles);
+    EZHookInstall(CVehicle_AddExhaustParticles_1);
+    EZHookInstall(CVehicle_AddExhaustParticles_2);
     EZHookInstall(CVehicle_AddDamagedVehicleParticles);
     EZHookInstall(CAutomobile_DoNitroEffect_1);
     EZHookInstall(CAutomobile_DoNitroEffect_2);
