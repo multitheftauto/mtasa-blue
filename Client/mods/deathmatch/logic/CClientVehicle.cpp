@@ -5110,6 +5110,40 @@ bool CClientVehicle::SetDummyPosition(eVehicleDummies dummy, const CVector& posi
     return false;
 }
 
+bool CClientVehicle::ResetDummyPositions()
+{
+    if (m_pVehicle)
+    {
+        std::array<CVector, VEHICLE_DUMMY_COUNT> positions;
+
+        if (!m_pModelInfo->GetVehicleDummyDefaultPositions(positions))
+            return false;
+
+        for (size_t i = 0; i < positions.size(); ++i)
+        {
+            SetDummyPosition(static_cast<eVehicleDummies>(i), positions[i]);
+        }
+
+        return true;
+    }
+    else
+    {
+        if (m_copyDummyPositions)
+            return false;
+
+        m_copyDummyPositions = true;
+
+        for (CVector& position : m_dummyPositions)
+        {
+            position.fX = 0.0f;
+            position.fY = 0.0f;
+            position.fZ = 0.0f;
+        }
+
+        return true;
+    }
+}
+
 bool CClientVehicle::DoesNeedToWaitForGroundToLoad()
 {
     if (!g_pGame->IsASyncLoadingEnabled())

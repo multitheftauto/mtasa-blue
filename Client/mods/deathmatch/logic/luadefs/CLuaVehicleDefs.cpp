@@ -83,6 +83,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
+        {"getVehicleModelDummyDefaultPosition", ArgumentParser<GetVehicleModelDummyDefaultPosition>},
         {"getVehicleDummyPosition", ArgumentParser<GetVehicleDummyPosition>},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
@@ -143,6 +144,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
+        {"resetVehicleDummyPositions", ArgumentParser<ResetVehicleDummyPositions>},
         {"setVehicleDummyPosition", ArgumentParser<SetVehicleDummyPosition>},
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
@@ -4125,6 +4127,16 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     return pVehicle->GetWheelFrictionState(wheel);
 }
 
+std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(vehicleModel, dummy, position))
+        return false;
+
+    return std::tuple(position.fX, position.fY, position.fZ);
+}
+
 bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position)
 {
     return vehicle->SetDummyPosition(dummy, position);
@@ -4138,4 +4150,9 @@ std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleD
         return false;
 
     return std::tuple(position.fX, position.fY, position.fZ);
+}
+
+bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
+{
+    return vehicle->ResetDummyPositions();
 }

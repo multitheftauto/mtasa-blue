@@ -212,14 +212,6 @@ void CVehicleSA::Init()
         {
             m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((eVehicleDummies)i);
         }
-
-        CVector& secondaryExhaust = m_dummyPositions[EXHAUST_SECONDARY];
-
-        if (secondaryExhaust.fX == 0.0f && secondaryExhaust.fY == 0.0f && secondaryExhaust.fZ == 0.0f)
-        {
-            secondaryExhaust = m_dummyPositions[EXHAUST];
-            secondaryExhaust.fX *= -1.0f;
-        }
     }
 
     // Unlock doors as they spawn randomly with locked doors
@@ -2710,7 +2702,7 @@ bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position
             // NOTE(botder): The following code should be in CAutomobileSA::SetDummyPosition
             //               but we don't use CAutomobileSA yet
             uint8_t vehicleClass = reinterpret_cast<CVehicleSAInterface*>(m_pInterface)->m_vehicleClass;
-            bool isAutomobileClass = static_cast<VehicleClass>(vehicleClass) == VehicleClass::AUTOMOBILE;
+            bool    isAutomobileClass = static_cast<VehicleClass>(vehicleClass) == VehicleClass::AUTOMOBILE;
 
             if (isAutomobileClass)
             {

@@ -25,6 +25,8 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
+// std::array<
+
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
@@ -247,9 +249,9 @@ BYTE CModelInfoSA::GetVehicleType()
     return bReturn;
 }
 
-BOOL CModelInfoSA::IsVehicle()
+bool CModelInfoSA::IsVehicle() const
 {
-    return GetVehicleType() != 0xFF;
+    return m_pInterface != nullptr && reinterpret_cast<intptr_t>(m_pInterface->VFTBL) == 0x85C5C8;
 }
 
 bool CModelInfoSA::IsPlayerModel()
@@ -1014,6 +1016,55 @@ CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
 void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
 {
     return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
+}
+
+bool CModelInfoSA::GetVehicleDummyDefaultPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const
+{
+    if (!IsVehicle())
+        return false;
+
+    CVector* dummyPositions = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface)->pVisualInfo->vecDummies;
+
+    for (size_t i = 0; i < positions.size(); ++i)
+    {
+        positions[i] = dummyPositions[i];
+    }
+
+    auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
+
+    if (iter != ms_ModelDefaultDummiesPosition.end())
+    {
+        for (const auto& dummyDefault : iter->second)
+        {
+            positions[dummyDefault.first] = dummyDefault.second;
+        }
+    }
+
+    return true;
+}
+
+CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
+{
+    if (!IsVehicle())
+        return CVector();
+
+    auto dummyIter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
+
+    if (dummyIter != ms_ModelDefaultDummiesPosition.end())
+    {
+        auto positionIter = dummyIter->second.find(eDummy);
+
+        if (positionIter != dummyIter->second.end())
+        {
+            return positionIter->second;
+        }
+    }
+
+    if (!IsLoaded())
+        Request(BLOCKING, "GetVehicleDummyDefaultPosition");
+
+    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return modelInfo->pVisualInfo->vecDummies[eDummy];
 }
 
 CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)

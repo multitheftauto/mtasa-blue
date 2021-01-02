@@ -172,6 +172,12 @@ static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehi
     if (vehicleDummiesPositionArray != nullptr)
     {
         *secondaryExhaustPosition = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
+
+        if (secondaryExhaustPosition->fX == 0.0 && secondaryExhaustPosition->fY == 0.0 && secondaryExhaustPosition->fZ == 0.0)
+        {
+            *secondaryExhaustPosition = vehicleDummiesPositionArray[EXHAUST];
+            secondaryExhaustPosition->fX *= -1.0f;
+        }
     }
     else
     {

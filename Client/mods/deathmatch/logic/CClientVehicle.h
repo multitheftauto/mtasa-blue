@@ -513,6 +513,7 @@ public:
 
     bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
     bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
+    bool ResetDummyPositions();
 
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
