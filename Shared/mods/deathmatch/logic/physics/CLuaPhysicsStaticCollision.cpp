@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape)
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
     : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
     // pShape->AddStaticCollision(this);
@@ -172,9 +172,9 @@ int CLuaPhysicsStaticCollision::GetFilterMask() const
 
 void CLuaPhysicsStaticCollision::Unlink()
 {
-    if (m_pShape)
+    if (m_btCollisionObject)
     {
-        m_pShape = nullptr;
-        // GetPhysics()->RemoveStaticCollision(GetCollisionObject());
+        m_btCollisionObject->SetEnabled(false);
+        m_btCollisionObject = nullptr;
     }
 }

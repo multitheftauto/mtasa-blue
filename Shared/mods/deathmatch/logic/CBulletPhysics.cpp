@@ -163,7 +163,7 @@ void CBulletPhysics::SetUseContinous(bool bUse) const
 std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::CreateStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape, CVector vecPosition,
                                                                                   CVector vecRotation)
 {
-    std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_shared<CLuaPhysicsStaticCollision>(pShape);
+    std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_shared<CLuaPhysicsStaticCollision>(pShape.get());
     AddStaticCollision(pStaticCollision);
     return pStaticCollision;
 }

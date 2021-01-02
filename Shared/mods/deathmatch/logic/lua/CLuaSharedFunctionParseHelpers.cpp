@@ -77,3 +77,19 @@ ADD_ENUM(ePhysicsDebugMode::DrawFrames, "drawframes")
 ADD_ENUM(ePhysicsDebugMode::LINE_WIDTH, "linewidth")
 ADD_ENUM(ePhysicsDebugMode::DRAW_DISTANCE, "drawdistance")
 IMPLEMENT_ENUM_CLASS_END("physics-debug-mode")
+
+SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM)
+{
+    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar.get());
+    if (auto* pVar = UserDataCast<CLuaPhysicsElement>((CLuaPhysicsElement*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+
+    return "";
+}

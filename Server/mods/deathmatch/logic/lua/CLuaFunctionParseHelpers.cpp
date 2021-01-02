@@ -316,7 +316,7 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, ptr, luaVM))
         return GetClassTypeName(pVar);
 
-    return "";
+    return GetSharedUserDataClassName(ptr, luaVM);
 }
 
 //

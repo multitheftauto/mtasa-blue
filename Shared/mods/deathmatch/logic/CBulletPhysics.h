@@ -172,8 +172,7 @@ public:
 #endif
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
-    // Running on worker thread
-    void DoPulse();
+    void DoPulse(); // Running on worker thread
     bool CanDoPulse();
     void WaitForSimulationToFinish();
 

@@ -26,10 +26,9 @@ public:
 
     ~CPhysicsStaticCollisionProxy()
     {
-        delete getCollisionShape();
         SetEnabled(false);
     }
 
-    static std::unique_ptr<CPhysicsStaticCollisionProxy> Create(std::shared_ptr<CLuaPhysicsShape> pShape);
+    static std::unique_ptr<CPhysicsStaticCollisionProxy> Create(CLuaPhysicsShape* pShape);
     void SetEnabled(bool bEnabled);
 };

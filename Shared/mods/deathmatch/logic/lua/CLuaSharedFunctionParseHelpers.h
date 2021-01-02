@@ -133,3 +133,5 @@ CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaV
     }
     return nullptr;
 }
+
+SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM);

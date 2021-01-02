@@ -709,7 +709,7 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, ptr, luaVM))
         return GetClassTypeName(pVar);
 
-    return "";
+    return GetSharedUserDataClassName(ptr, luaVM);
 }
 
 //

@@ -19,7 +19,7 @@ class CLuaPhysicsStaticCollision;
 class CLuaPhysicsStaticCollision : public CLuaPhysicsWorldElement
 {
 public:
-    CLuaPhysicsStaticCollision(std::shared_ptr<CLuaPhysicsShape> pShape);
+    CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
     void    Initialize(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
@@ -49,7 +49,7 @@ public:
     void Update() {}
 private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
-    std::shared_ptr<CLuaPhysicsShape>  m_pShape;
+    CLuaPhysicsShape*  m_pShape;
 
     mutable std::mutex m_lock;
 };

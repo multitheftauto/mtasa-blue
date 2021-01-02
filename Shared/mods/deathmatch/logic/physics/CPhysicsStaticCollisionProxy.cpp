@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::Create(std::shared_ptr<CLuaPhysicsShape> pShape)
+std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::Create(CLuaPhysicsShape* pShape)
 {
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject = std::make_unique<CPhysicsStaticCollisionProxy>();
     m_btCollisionObject->m_pPhysics = pShape->GetPhysics();
