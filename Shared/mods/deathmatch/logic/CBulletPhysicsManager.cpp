@@ -125,6 +125,7 @@ void CBulletPhysicsManager::DoPulse()
         isLocked = true;
         for (auto const& pPhysics : vecPhysics)
         {
+            m_pAsyncTaskScheduler->CollectResults(); // flush previous call
             m_pAsyncTaskScheduler->PushTask<long>(
                 [pPhysics] {
                     long start = GetTickCount64_();
