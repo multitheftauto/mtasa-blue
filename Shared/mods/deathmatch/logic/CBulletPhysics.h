@@ -274,6 +274,8 @@ public:
     const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
 
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
+    void                 FlushAllChanges();
+    bool                 WorldHasChanged() const { return m_bWorldHasChanged; }
 
 private:
     void StepSimulation();
@@ -314,6 +316,7 @@ private:
     std::atomic<float> m_fSpeed = 1.0f;
     bool               m_bDuringSimulation = false;
     std::atomic<int>   m_iSubSteps = 10;
+    std::atomic<bool>  m_bWorldHasChanged = false;
     float              m_fImpulseThreshold = 0.01f;
     std::atomic<bool>  m_bSimulationEnabled = true;
     bool               m_bTriggerEvents = true;

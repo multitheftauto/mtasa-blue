@@ -116,6 +116,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetEnabled", ArgumentParser<PhysicsSetEnabled>},
         {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
+        {"physicsWorldHasChanged", ArgumentParser<PhysicsWorldHasChanged>},
 #ifdef MTA_CLIENT
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
@@ -924,6 +925,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
         iFilterMask = std::get<int>(mapOptions["filterMask"]);
     }
 
+    pPhysics->FlushAllChanges();
     CBulletPhysics::SClosestRayResultCallback rayCallback = pPhysics->RayCast(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
 
     if (!rayCallback.hasHit())
@@ -1504,4 +1506,9 @@ std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhy
 {
     std::vector<std::vector<float>> lines = pPhysics->GetDebugLines(vecPosition, fRadius);
     return lines;
+}
+
+bool CLuaPhysicsDefs::PhysicsWorldHasChanged(CBulletPhysics* pPhysics)
+{
+    return pPhysics->WorldHasChanged();
 }

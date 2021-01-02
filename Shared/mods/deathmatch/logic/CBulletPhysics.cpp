@@ -246,11 +246,7 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
             DestroyRigidBody((CLuaPhysicsRigidBody*)pPhysicsElement);
             break;
         case EIdClassType::SHAPE:
-            {
-                CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)pPhysicsElement;
-                pShape->Unlink();
-                DestroyShape(pShape);
-            }
+            DestroyShape((CLuaPhysicsShape*)pPhysicsElement);
             break;
         case EIdClassType::STATIC_COLLISION:
             DestroyStaticCollision((CLuaPhysicsStaticCollision*)pPhysicsElement);
@@ -287,6 +283,8 @@ void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
+    pLuaShape->Unlink();
+
     const std::vector<CLuaPhysicsRigidBody*>& rigidBodies = pLuaShape->GetRigidBodies();
     const std::vector<CLuaPhysicsStaticCollision*>& staticCollisions = pLuaShape->GetStaticCollisions();
     assert(rigidBodies.size() == 0);
@@ -307,6 +305,7 @@ void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticC
     m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
     m_mapStaticCollisions.erase(pStaticCollision->GetScriptID());
     m_InitializeStaticCollisionsList.remove(pStaticCollision);
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
@@ -314,6 +313,7 @@ void CBulletPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollisi
     m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
     m_mapStaticCollisions.emplace(pStaticCollision->GetScriptID(), pStaticCollision);
     m_InitializeStaticCollisionsList.push(pStaticCollision.get());
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
@@ -327,6 +327,7 @@ void CBulletPhysics::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBo
     m_mapRigidBodies.emplace(pRigidBody->GetScriptID(), pRigidBody);
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
     m_InitializeRigidBodiesList.push(pRigidBody.get());
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint)
@@ -334,6 +335,7 @@ void CBulletPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConst
     m_mapConstraints.emplace(pConstraint->GetScriptID(), pConstraint);
     m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
     m_InitializeConstraintsList.push(pConstraint.get());
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::StepSimulation()
@@ -795,33 +797,34 @@ void CBulletPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
 void CBulletPhysics::AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody)
 {
     m_rigidBodiesActivationList.push(pRigidBody);
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody)
 {
     m_rigidBodiesUpdateAABBList.push(pRigidBody);
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddToChangesStack(CLuaPhysicsElement* pElement)
 {
     m_elementChangesList.push(pElement);
+    m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddToUpdateStack(CLuaPhysicsElement* pElement)
 {
     m_elementUpdatesList.push(pElement);
+    m_bWorldHasChanged = true;
 }
 
-void CBulletPhysics::DoPulse()
+void CBulletPhysics::FlushAllChanges()
 {
-    std::lock_guard<std::mutex> guard(lock);
-    assert(!isDuringSimulation);
-
-    CBulletPhysicsProfiler::Clear();
+    if (!m_bWorldHasChanged)
+        return;
 
     if (!m_InitializeStaticCollisionsList.empty())
     {
-        
         BT_PROFILE("initializeStaticCollisions");
         while (!m_InitializeStaticCollisionsList.empty())
         {
@@ -895,6 +898,17 @@ void CBulletPhysics::DoPulse()
             pElement->Update();
         }
     }
+    m_bWorldHasChanged = false;
+}
+
+void CBulletPhysics::DoPulse()
+{
+    std::lock_guard<std::mutex> guard(lock);
+    assert(!isDuringSimulation);
+
+    CBulletPhysicsProfiler::Clear();
+
+    FlushAllChanges();
 
     CTickCount tickCountNow = CTickCount::Now();
 
