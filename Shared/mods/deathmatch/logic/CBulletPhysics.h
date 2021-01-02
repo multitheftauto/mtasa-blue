@@ -65,7 +65,7 @@ class CBulletPhysics : public CClientEntity
 class CBulletPhysics : public CElement
 {
 public:
-    CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain);
+    CBulletPhysics(CDummy* parent, CLuaMain* luaMain);
     ~CBulletPhysics();
 #endif
     bool ReadSpecialData(const int iLine) { return true; }
