@@ -550,22 +550,42 @@ int CLuaElementDefs::getElementParent(lua_State* luaVM)
 int CLuaElementDefs::getElementPosition(lua_State* luaVM)
 {
     //  float, float, float getElementPosition ( element theElement )
-    CElement* pElement;
+    CElement*             pElement;
+    CLuaPhysicsRigidBody* pPhysicsWorldElement = nullptr;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    {
+        argStream.ReadUserData(pPhysicsWorldElement);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
 
     if (!argStream.HasErrors())
     {
-        // Grab the position
-        CVector vecPosition;
-        if (CStaticFunctionDefinitions::GetElementPosition(pElement, vecPosition))
+        if (pPhysicsWorldElement)
         {
+            const CVector vecPosition = pPhysicsWorldElement->GetPosition();
             // Return it
             lua_pushnumber(luaVM, vecPosition.fX);
             lua_pushnumber(luaVM, vecPosition.fY);
             lua_pushnumber(luaVM, vecPosition.fZ);
             return 3;
+        }
+        else
+        {
+            // Grab the position
+            CVector vecPosition;
+            if (CStaticFunctionDefinitions::GetElementPosition(pElement, vecPosition))
+            {
+                // Return it
+                lua_pushnumber(luaVM, vecPosition.fX);
+                lua_pushnumber(luaVM, vecPosition.fY);
+                lua_pushnumber(luaVM, vecPosition.fZ);
+                return 3;
+            }
         }
     }
     else
@@ -1790,12 +1810,21 @@ int CLuaElementDefs::setElementParent(lua_State* luaVM)
 int CLuaElementDefs::setElementPosition(lua_State* luaVM)
 {
     //  bool setElementPosition ( element theElement, float x, float y, float z [, bool warp = true ] )
-    CElement* pElement;
+    CElement*             pElement;
+    CLuaPhysicsRigidBody* pPhysicsWorldElement = nullptr;
     CVector   vecPosition;
     bool      bWarp;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    {
+        argStream.ReadUserData(pPhysicsWorldElement);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
+
     if (!argStream.HasErrors() && pElement->GetType() == CElement::RADAR_AREA)
     {
         // radar areas only take x and y
@@ -1813,13 +1842,22 @@ int CLuaElementDefs::setElementPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        // Set the position
-        if (CStaticFunctionDefinitions::SetElementPosition(pElement, vecPosition, bWarp))
+        if (pPhysicsWorldElement)
         {
+            pPhysicsWorldElement->SetPosition(vecPosition);
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+        else
+        {
+            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+            // Set the position
+            if (CStaticFunctionDefinitions::SetElementPosition(pElement, vecPosition, bWarp))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else

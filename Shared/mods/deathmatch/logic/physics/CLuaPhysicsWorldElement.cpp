@@ -19,3 +19,18 @@ CLuaPhysicsWorldElement::~CLuaPhysicsWorldElement()
 {
 
 }
+
+void CLuaPhysicsWorldElement::ClearCollisionContacts()
+{
+    m_vecCollisionContacts.clear();
+}
+
+void CLuaPhysicsWorldElement::ReportCollisionContact(CLuaPhysicsWorldElement* pElement)
+{
+    m_vecCollisionContacts.push_back(pElement);
+}
+
+void CLuaPhysicsWorldElement::GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement)
+{
+
+}

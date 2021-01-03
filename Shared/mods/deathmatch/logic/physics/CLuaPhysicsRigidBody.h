@@ -98,19 +98,13 @@ public:
     void         NeedsActivation() const;
     void         NeedsAABBUpdate() const;
 
-    void                                  ClearCollisionReport();
-    void                                                      ReportCollision(std::unique_ptr<CLuaPhysicsElement::SPhysicsCollisionReport> pCollisionReport);
-    const std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& GetCollisionReports();
-    CLuaPhysicsElement::SPhysicsCollisionReport*                GetCollisionReport(CLuaPhysicsElement* pElement);
-    void                                  AABBUpdated() { m_bAABBUpdateRequested = false; }
-    void                                  Update() {}
+    void                                    AABBUpdated() { m_bAABBUpdateRequested = false; }
+    void                                    Update() {}
 
 private:
-    std::unique_ptr<CPhysicsRigidBodyProxy>            m_pRigidBodyProxy = nullptr;
-    CLuaPhysicsShape*                  m_pShape;
-    std::vector<CLuaPhysicsConstraint*>                m_constraintList;
-    mutable std::atomic<bool>                          m_bActivationRequested;
-    mutable std::atomic<bool>                          m_bAABBUpdateRequested;
-
-    std::vector<std::unique_ptr<SPhysicsCollisionReport>> m_vecCollisionReports;
+    std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;
+    CLuaPhysicsShape*                       m_pShape;
+    std::vector<CLuaPhysicsConstraint*>     m_constraintList;
+    mutable std::atomic<bool>               m_bActivationRequested;
+    mutable std::atomic<bool>               m_bAABBUpdateRequested;
 };

@@ -71,10 +71,10 @@ public:
     CVehicleManager* GetVehicleManager() const { return m_pVehicleManager; };
     CMapManager*     GetMapManager() const { return m_pMapManager; };
 
-    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
-    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
-    CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager; };
-    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
+    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager.get(); };
+    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager.get(); };
+    CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager.get(); };
+    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager.get(); };
     CLuaPhysicsConstraint*             GetContraintFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
@@ -165,10 +165,10 @@ private:
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
 
-    CLuaPhysicsRigidBodyManager*                    m_pLuaPhysicsRigidBodyManager;
-    CLuaPhysicsStaticCollisionManager*              m_pLuaPhysicsStaticCollisionManager;
-    CLuaPhysicsConstraintManager*                   m_pLuaPhysicsContraintManager;
-    CLuaPhysicsShapeManager*                        m_pLuaPhysicsShapeManager;
+    std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;
+    std::unique_ptr<CLuaPhysicsStaticCollisionManager> m_pLuaPhysicsStaticCollisionManager;
+    std::unique_ptr<CLuaPhysicsConstraintManager>      m_pLuaPhysicsContraintManager;
+    std::unique_ptr<CLuaPhysicsShapeManager>           m_pLuaPhysicsShapeManager;
 
     list<CXMLFile*>                                 m_XMLFiles;
     std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;

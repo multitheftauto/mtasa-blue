@@ -17,7 +17,7 @@
 #include "physics/CPhysicsDebugDrawer.h"
 
 #ifdef MTA_CLIENT
-CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this),CClientEntity(ID)
+CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
     m_pManager = pManager;
     m_pPhysicsManager = pManager->GetPhysicsManager();
@@ -68,23 +68,6 @@ void CBulletPhysics::WaitForSimulationToFinish()
 
 void CBulletPhysics::Clear()
 {
-    for (const auto& pair : m_mapConstraints)
-    {
-        pair.second->Unlink();
-    }
-
-    for (const auto& pRigidBody : m_mapRigidBodies)
-    {
-        pRigidBody.second->Unlink();
-    }
-    for (const auto& pStaticCollision : m_mapStaticCollisions)
-    {
-        pStaticCollision.second->Unlink();
-    }
-    m_mapConstraints.clear();
-    m_mapRigidBodies.clear();
-    m_mapStaticCollisions.clear();
-    m_mapShapes.clear();
 }
 
 void CBulletPhysics::Unlink()
@@ -158,17 +141,16 @@ void CBulletPhysics::SetUseContinous(bool bUse) const
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
 
-std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition,
-                                                                                  CVector vecRotation)
+CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
 {
-    std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_shared<CLuaPhysicsStaticCollision>(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
     AddStaticCollision(pStaticCollision);
-    pShape->AddStaticCollision(pStaticCollision.get());
+    pShape->AddStaticCollision(pStaticCollision);
     return pStaticCollision;
 }
 
 CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to,
-                                                       int iFilterGroup, int iFilterMask) const
+                                                                       int iFilterGroup, int iFilterMask) const
 {
     BT_PROFILE("shapeCast");
     CVector fromPosition;
@@ -184,8 +166,7 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
         m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, rayCallback, 0.0f);
     }
 
-    rayCallback.m_closestPosition =
-        rayCallback.m_convexFromWorld.lerp(rayCallback.m_convexToWorld, rayCallback.m_closestHitFraction);
+    rayCallback.m_closestPosition = rayCallback.m_convexFromWorld.lerp(rayCallback.m_convexToWorld, rayCallback.m_closestHitFraction);
 
     return rayCallback;
 }
@@ -207,7 +188,7 @@ bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, i
 }
 
 CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(const CVector& from, const CVector& to, int iFilterGroup, int iFilterMask,
-                                                                bool bFilterBackfaces) const
+                                                                  bool bFilterBackfaces) const
 {
     BT_PROFILE("rayCast");
     SClosestRayResultCallback rayCallback(from, to);
@@ -245,98 +226,63 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
     switch (pPhysicsElement->GetClassType())
     {
         case EIdClassType::RIGID_BODY:
-            DestroyRigidBody((CLuaPhysicsRigidBody*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody((CLuaPhysicsRigidBody*)pPhysicsElement);
             break;
         case EIdClassType::SHAPE:
-            DestroyShape((CLuaPhysicsShape*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsShapeManager()->RemoveShape((CLuaPhysicsShape*)pPhysicsElement);
             break;
         case EIdClassType::STATIC_COLLISION:
-            DestroyStaticCollision((CLuaPhysicsStaticCollision*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision((CLuaPhysicsStaticCollision*)pPhysicsElement);
             break;
         case EIdClassType::CONSTRAINT:
-            DestroyCostraint((CLuaPhysicsConstraint*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint((CLuaPhysicsConstraint*)pPhysicsElement);
             break;
     }
 }
 
-std::shared_ptr<CLuaPhysicsShape> CBulletPhysics::Resolve(CLuaPhysicsShape* pLuaShape)
-{
-    uint id = pLuaShape->GetScriptID();
-    return m_mapShapes[id];
-}
-
-std::shared_ptr<CLuaPhysicsRigidBody> CBulletPhysics::Resolve(CLuaPhysicsRigidBody* pRigidBody)
-{
-    uint id = pRigidBody->GetScriptID();
-    return m_mapRigidBodies[id];
-}
-
-std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::Resolve(CLuaPhysicsStaticCollision* pStaticCollision)
-{
-    uint id = pStaticCollision->GetScriptID();
-    return m_mapStaticCollisions[id];
-}
-
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
-    m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
-    m_mapRigidBodies.erase(pLuaRigidBody->GetScriptID());
+    ListRemove(m_vecRigidBodies, pLuaRigidBody);
 }
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
-    pLuaShape->Unlink();
-
-    const std::vector<CLuaPhysicsRigidBody*>& rigidBodies = pLuaShape->GetRigidBodies();
-    const std::vector<CLuaPhysicsStaticCollision*>& staticCollisions = pLuaShape->GetStaticCollisions();
-    assert(rigidBodies.size() == 0);
-    assert(staticCollisions.size() == 0);
-
-    m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
-    m_mapShapes.erase(pLuaShape->GetScriptID());
+    ListRemove(m_vecShapes, pLuaShape);
 }
 
 void CBulletPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
 {
-    m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
-    m_mapConstraints.erase(pLuaConstraint->GetScriptID());
+    ListRemove(m_vecConstraints, pLuaConstraint);
 }
 
 void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
-    m_mapStaticCollisions.erase(pStaticCollision->GetScriptID());
-    m_InitializeStaticCollisionsList.remove(pStaticCollision);
-    m_bWorldHasChanged = true;
+    ListRemove(m_vecStaticCollisions, pStaticCollision);
 }
 
-void CBulletPhysics::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
+void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
-    m_mapStaticCollisions.emplace(pStaticCollision->GetScriptID(), pStaticCollision);
-    m_InitializeStaticCollisionsList.push(pStaticCollision.get());
+    m_InitializeStaticCollisionsList.push(pStaticCollision);
     m_bWorldHasChanged = true;
 }
 
-void CBulletPhysics::AddShape(std::shared_ptr<CLuaPhysicsShape> pShape)
+void CBulletPhysics::AddShape(CLuaPhysicsShape* pShape)
 {
-    m_pLuaMain->GetPhysicsShapeManager()->AddShape(pShape.get());
-    m_mapShapes.emplace(pShape->GetScriptID(), pShape);
+    m_pLuaMain->GetPhysicsShapeManager()->AddShape(pShape);
 }
 
-void CBulletPhysics::AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody)
+void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_mapRigidBodies.emplace(pRigidBody->GetScriptID(), pRigidBody);
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
-    m_InitializeRigidBodiesList.push(pRigidBody.get());
+    m_InitializeRigidBodiesList.push(pRigidBody);
     m_bWorldHasChanged = true;
 }
 
-void CBulletPhysics::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint)
+void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 {
-    m_mapConstraints.emplace(pConstraint->GetScriptID(), pConstraint);
     m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
-    m_InitializeConstraintsList.push(pConstraint.get());
+    m_InitializeConstraintsList.push(pConstraint);
     m_bWorldHasChanged = true;
 }
 
@@ -354,12 +300,12 @@ void CBulletPhysics::StepSimulation()
 void CBulletPhysics::ClearOutsideWorldRigidBodies()
 {
     BT_PROFILE("clearOutsideWorldRigidBodies");
-    CLuaPhysicsRigidBodyManager*                       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> vecRigidBodiesToRemove;
-    CVector                                            vecRigidBody;
+    CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
+    std::vector<CLuaPhysicsRigidBody*> vecRigidBodiesToRemove;
+    CVector                            vecRigidBody;
     for (auto iter = pRigidBodyManager->IterBegin(); iter != pRigidBodyManager->IterEnd(); ++iter)
     {
-        std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = *iter;
+        CLuaPhysicsRigidBody* pRigidBody = *iter;
         if (!pRigidBody->IsSleeping())
         {
             vecRigidBody = pRigidBody->GetPosition();
@@ -369,62 +315,18 @@ void CBulletPhysics::ClearOutsideWorldRigidBodies()
             }
         }
     }
-    for (std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody : vecRigidBodiesToRemove)
+    for (CLuaPhysicsRigidBody* pRigidBody : vecRigidBodiesToRemove)
     {
-        //CLuaArguments Arguments;
-        //Arguments.PushPhysicsRigidBody(pRigidBody.get());
-        //if (!CallEvent("onPhysicsRigidBodyFallOutsideWorld", Arguments, true))
+        // CLuaArguments Arguments;
+        // Arguments.PushPhysicsRigidBody(pRigidBody.get());
+        // if (!CallEvent("onPhysicsRigidBodyFallOutsideWorld", Arguments, true))
         //    pRigidBodyManager->RemoveRigidBody(pRigidBody.get());
     }
 }
 
-std::vector<std::shared_ptr<CLuaPhysicsShape>> CBulletPhysics::GetShapes()
+CLuaPhysicsStaticCollision* CBulletPhysics::GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject)
 {
-    std::vector<std::shared_ptr<CLuaPhysicsShape>> shapes;
-    shapes.reserve(m_mapShapes.size());
-    for (const auto& pair : m_mapShapes)
-    {
-        shapes.push_back(pair.second);
-    }
-    return shapes;
-}
-
-std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> CBulletPhysics::GetRigidBodies()
-{
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> rigidBodies;
-    rigidBodies.reserve(m_mapRigidBodies.size());
-    for (const auto& pair : m_mapRigidBodies)
-    {
-        rigidBodies.push_back(pair.second);
-    }
-    return rigidBodies;
-}
-
-std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> CBulletPhysics::GetStaticCollisions()
-{
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> staticCollisions;
-    staticCollisions.reserve(m_mapStaticCollisions.size());
-    for (const auto& pair : m_mapStaticCollisions)
-    {
-        staticCollisions.push_back(pair.second);
-    }
-    return staticCollisions;
-}
-
-std::vector<std::shared_ptr<CLuaPhysicsConstraint>> CBulletPhysics::GetConstraints()
-{
-    std::vector<std::shared_ptr<CLuaPhysicsConstraint>> constraints;
-    constraints.reserve(m_mapConstraints.size());
-    for (const auto& pair : m_mapConstraints)
-    {
-        constraints.push_back(pair.second);
-    }
-    return constraints;
-}
-
-std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject)
-{
-    for (std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision : GetStaticCollisions())
+    for (CLuaPhysicsStaticCollision* pStaticCollision : GetStaticCollisions())
     {
         if (pStaticCollision->GetCollisionObject() == pCollisionObject)
             return pStaticCollision;
@@ -433,7 +335,7 @@ std::shared_ptr<CLuaPhysicsStaticCollision> CBulletPhysics::GetStaticCollisionFr
     return nullptr;
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CBulletPhysics::GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject)
+CLuaPhysicsRigidBody* CBulletPhysics::GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject)
 {
     for (auto& pRigidBody : GetRigidBodies())
         if (pRigidBody->GetBtRigidBody() == pCollisionObject)
@@ -444,18 +346,20 @@ std::shared_ptr<CLuaPhysicsRigidBody> CBulletPhysics::GetRigidBodyFromCollisionS
 
 void CBulletPhysics::PostProcessCollisions()
 {
-    int numManifolds;
+    BT_PROFILE("postProcessCollisions");
+    std::lock_guard guard(dynamicsWorldLock);
+
+    int numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
+
+    if (numManifolds > 0)
     {
-        std::lock_guard guard(dynamicsWorldLock);
-        numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
+        for (const auto& element : m_vecLastContact)
+            element->ClearCollisionContacts();
+
+        m_vecLastContact.clear();
     }
 
-    for (const auto& element : m_vecLastContact)
-        element->ClearCollisionReport();
-
-    m_vecLastContact.clear();
-
-    //if (m_bTriggerConstraintEvents)
+    // if (m_bTriggerConstraintEvents)
     //{
     //    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>::const_iterator iter = pConstraintManager->IterBegin();
     //    for (; iter != pConstraintManager->IterEnd(); iter++)
@@ -484,167 +388,166 @@ void CBulletPhysics::PostProcessCollisions()
         if (contactManifold == nullptr)
             continue;
 
-        int numContacts = contactManifold->getNumContacts();
-        if (numContacts == 0)
+        if (contactManifold->getNumContacts() == 0)
             continue;
 
         objectA = (btCollisionObject*)(contactManifold->getBody0());
         objectB = (btCollisionObject*)(contactManifold->getBody1());
-        shapeA = objectA->getCollisionShape();
-        shapeB = objectB->getCollisionShape();
 
-        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidRigidA = GetRigidBodyFromCollisionShape(objectA);
-        std::shared_ptr<CLuaPhysicsRigidBody>       pRigidRigidB = GetRigidBodyFromCollisionShape(objectB);
-        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionA = GetStaticCollisionFromCollisionShape(objectA);
-        std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollisionB = GetStaticCollisionFromCollisionShape(objectB);
-
-        std::unique_ptr<CLuaPhysicsElement::SPhysicsCollisionReport> collisionReportA = std::make_unique<CLuaPhysicsElement::SPhysicsCollisionReport>();
-        std::unique_ptr<CLuaPhysicsElement::SPhysicsCollisionReport> collisionReportB = std::make_unique<CLuaPhysicsElement::SPhysicsCollisionReport>();
-
-        if (pRigidRigidA)
-            collisionReportA->pElement = pRigidRigidA;
-        else
-            collisionReportA->pElement = pStaticCollisionA;
-
-        if (pRigidRigidB)
-            collisionReportB->pElement = pRigidRigidB;
-        else
-            collisionReportB->pElement = pStaticCollisionB;
-
-        for (int j = 0; j < numContacts; j++)
-        {
-            btManifoldPoint& manifoldPoint = contactManifold->getContactPoint(j);
-            std::shared_ptr<CLuaPhysicsElement::SPhysicsCollisionContact> contactA = std::make_shared<CLuaPhysicsElement::SPhysicsCollisionContact>();
-            std::shared_ptr<CLuaPhysicsElement::SPhysicsCollisionContact> contactB = std::make_shared<CLuaPhysicsElement::SPhysicsCollisionContact>();
-            contactA->vecPositionWorldOn = manifoldPoint.getPositionWorldOnA();
-            contactB->vecPositionWorldOn = manifoldPoint.getPositionWorldOnB();
-            contactA->vecLocalPoint = manifoldPoint.m_localPointA;
-            contactB->vecLocalPoint = manifoldPoint.m_localPointB;
-            contactA->vecLateralFrictionDir = manifoldPoint.m_lateralFrictionDir1;
-            contactB->vecLateralFrictionDir = manifoldPoint.m_lateralFrictionDir2;
-            contactA->contactTriangle = manifoldPoint.m_partId0;
-            contactB->contactTriangle = manifoldPoint.m_partId1;
-            contactA->appliedImpulse = manifoldPoint.getAppliedImpulse();
-            contactB->appliedImpulse = manifoldPoint.getAppliedImpulse();
-            contactA->appliedImpulseLiteral = manifoldPoint.m_appliedImpulseLateral1;
-            contactB->appliedImpulseLiteral = manifoldPoint.m_appliedImpulseLateral2;
-            collisionReportA->m_vecContacts.push_back(std::move(contactA));
-            collisionReportB->m_vecContacts.push_back(std::move(contactB));
-        }
+        CLuaPhysicsRigidBody*       pRigidRigidA = GetRigidBodyFromCollisionShape(objectA);
+        CLuaPhysicsRigidBody*       pRigidRigidB = GetRigidBodyFromCollisionShape(objectB);
+        CLuaPhysicsStaticCollision* pStaticCollisionA = GetStaticCollisionFromCollisionShape(objectA);
+        CLuaPhysicsStaticCollision* pStaticCollisionB = GetStaticCollisionFromCollisionShape(objectB);
 
         if (pRigidRigidA)
         {
+            if (pRigidRigidB)
+            {
+                pRigidRigidA->ReportCollisionContact(pRigidRigidB);
+            }
+            else if (pStaticCollisionA)
+            {
+                pRigidRigidA->ReportCollisionContact(pStaticCollisionA);
+            }
+            else if (pStaticCollisionB)
+            {
+                pRigidRigidA->ReportCollisionContact(pStaticCollisionB);
+            }
             m_vecLastContact.push_back(pRigidRigidA);
-            pRigidRigidA->ReportCollision(std::move(collisionReportB));
         }
 
         if (pRigidRigidB)
         {
+            if (pRigidRigidA)
+            {
+                pRigidRigidB->ReportCollisionContact(pRigidRigidA);
+            }
+            else if (pStaticCollisionA)
+            {
+                pRigidRigidB->ReportCollisionContact(pStaticCollisionA);
+            }
+            else if (pStaticCollisionB)
+            {
+                pRigidRigidB->ReportCollisionContact(pStaticCollisionB);
+            }
             m_vecLastContact.push_back(pRigidRigidB);
-            pRigidRigidB->ReportCollision(std::move(collisionReportA));
         }
 
         if (pStaticCollisionA)
         {
+            if (pRigidRigidA)
+            {
+                pStaticCollisionA->ReportCollisionContact(pRigidRigidA);
+            }
+            if (pRigidRigidB)
+            {
+                pStaticCollisionA->ReportCollisionContact(pRigidRigidB);
+            }
             m_vecLastContact.push_back(pStaticCollisionA);
-            pStaticCollisionA->ReportCollision(std::move(collisionReportB));
         }
 
         if (pStaticCollisionB)
         {
+            if (pRigidRigidA)
+            {
+                pStaticCollisionB->ReportCollisionContact(pRigidRigidA);
+            }
+            if (pRigidRigidB)
+            {
+                pStaticCollisionB->ReportCollisionContact(pRigidRigidB);
+            }
             m_vecLastContact.push_back(pStaticCollisionB);
-            pStaticCollisionB->ReportCollision(std::move(collisionReportA));
         }
     }
 }
 
-std::shared_ptr<CLuaPhysicsBoxShape> CBulletPhysics::CreateBoxShape(CVector vector)
+CLuaPhysicsBoxShape* CBulletPhysics::CreateBoxShape(CVector vector)
 {
-    std::shared_ptr<CLuaPhysicsBoxShape> pShape = std::make_shared<CLuaPhysicsBoxShape>(this, vector);
+    CLuaPhysicsBoxShape* pShape = new CLuaPhysicsBoxShape(this, vector);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsSphereShape> CBulletPhysics::CreateSphereShape(float radius)
+CLuaPhysicsSphereShape* CBulletPhysics::CreateSphereShape(float radius)
 {
     assert(radius > 0);
 
-    std::shared_ptr<CLuaPhysicsSphereShape> pShape = std::make_shared<CLuaPhysicsSphereShape>(this, radius);
+    CLuaPhysicsSphereShape* pShape = new CLuaPhysicsSphereShape(this, radius);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsCapsuleShape> CBulletPhysics::CreateCapsuleShape(float fRadius, float fHeight)
+CLuaPhysicsCapsuleShape* CBulletPhysics::CreateCapsuleShape(float fRadius, float fHeight)
 {
     assert(fRadius > 0);
     assert(fHeight > 0);
 
-    std::shared_ptr<CLuaPhysicsCapsuleShape> pShape = std::make_shared<CLuaPhysicsCapsuleShape>(this, fRadius, fHeight);
+    CLuaPhysicsCapsuleShape* pShape = new CLuaPhysicsCapsuleShape(this, fRadius, fHeight);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsConeShape> CBulletPhysics::CreateConeShape(float fRadius, float fHeight)
+CLuaPhysicsConeShape* CBulletPhysics::CreateConeShape(float fRadius, float fHeight)
 {
     assert(fRadius > 0);
     assert(fHeight > 0);
 
-    std::shared_ptr<CLuaPhysicsConeShape> pShape = std::make_shared<CLuaPhysicsConeShape>(this, fRadius, fHeight);
+    CLuaPhysicsConeShape* pShape = new CLuaPhysicsConeShape(this, fRadius, fHeight);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsCylinderShape> CBulletPhysics::CreateCylinderShape(CVector half)
+CLuaPhysicsCylinderShape* CBulletPhysics::CreateCylinderShape(CVector half)
 {
     assert(half.fX > 0);
     assert(half.fY > 0);
     assert(half.fZ > 0);
 
-    std::shared_ptr<CLuaPhysicsCylinderShape> pShape = std::make_shared<CLuaPhysicsCylinderShape>(this, half);
+    CLuaPhysicsCylinderShape* pShape = new CLuaPhysicsCylinderShape(this, half);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsCompoundShape> CBulletPhysics::CreateCompoundShape(int iInitialChildCapacity)
+CLuaPhysicsCompoundShape* CBulletPhysics::CreateCompoundShape(int iInitialChildCapacity)
 {
     assert(iInitialChildCapacity > 0);
 
-    std::shared_ptr<CLuaPhysicsCompoundShape> pShape = std::make_shared<CLuaPhysicsCompoundShape>(this, iInitialChildCapacity);
+    CLuaPhysicsCompoundShape* pShape = new CLuaPhysicsCompoundShape(this, iInitialChildCapacity);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsConvexHullShape> CBulletPhysics::CreateConvexHullShape(std::vector<CVector>& vecPoints)
+CLuaPhysicsConvexHullShape* CBulletPhysics::CreateConvexHullShape(std::vector<CVector>& vecPoints)
 {
     assert(vecPoints.size() >= 3);
 
-    std::shared_ptr<CLuaPhysicsConvexHullShape> pShape = std::make_shared<CLuaPhysicsConvexHullShape>(this, vecPoints);
+    CLuaPhysicsConvexHullShape* pShape = new CLuaPhysicsConvexHullShape(this, vecPoints);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsConvexHullShape> CBulletPhysics::CreateConvexHullShape(std::vector<float>& vecFloats)
+CLuaPhysicsConvexHullShape* CBulletPhysics::CreateConvexHullShape(std::vector<float>& vecFloats)
 {
     assert(vecFloats.size() >= 9);
 
     std::vector<CVector> vecPoints;
     vecPoints.reserve(vecFloats.size() / 3);
-    for (int i = 0; i < vecFloats.size(); i+=3)
+    for (int i = 0; i < vecFloats.size(); i += 3)
         vecPoints.emplace_back(vecFloats[i], vecFloats[i + 1], vecFloats[i + 2]);
 
     return CreateConvexHullShape(vecPoints);
 }
 
-std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> CBulletPhysics::CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices)
+CLuaPhysicsBvhTriangleMeshShape* CBulletPhysics::CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices)
 {
     assert(vecVertices.size() >= 3);
 
-    std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> pShape = std::make_shared<CLuaPhysicsBvhTriangleMeshShape>(this, vecVertices);
+    CLuaPhysicsBvhTriangleMeshShape* pShape = new CLuaPhysicsBvhTriangleMeshShape(this, vecVertices);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> CBulletPhysics::CreateBhvTriangleMeshShape(std::vector<float>& vecFloats)
+CLuaPhysicsBvhTriangleMeshShape* CBulletPhysics::CreateBhvTriangleMeshShape(std::vector<float>& vecFloats)
 {
     std::vector<CVector> vecPoints;
     vecPoints.reserve(vecFloats.size() / 3);
@@ -654,16 +557,16 @@ std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape> CBulletPhysics::CreateBhvTriang
     return CreateBhvTriangleMeshShape(vecPoints);
 }
 
-std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> CBulletPhysics::CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices)
+CLuaPhysicsGimpactTriangleMeshShape* CBulletPhysics::CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices)
 {
     assert(vecVertices.size() >= 3);
 
-    std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> pShape = std::make_shared<CLuaPhysicsGimpactTriangleMeshShape>(this, vecVertices);
+    CLuaPhysicsGimpactTriangleMeshShape* pShape = new CLuaPhysicsGimpactTriangleMeshShape(this, vecVertices);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> CBulletPhysics::CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats)
+CLuaPhysicsGimpactTriangleMeshShape* CBulletPhysics::CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats)
 {
     std::vector<CVector> vecPoints;
     vecPoints.reserve(vecFloats.size() / 3);
@@ -673,32 +576,30 @@ std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> CBulletPhysics::CreateGimpa
     return CreateGimpactTriangleMeshShape(vecPoints);
 }
 
-std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CBulletPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY)
+CLuaPhysicsHeightfieldTerrainShape* CBulletPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY)
 {
-    std::vector<float> vecHeights(iSizeX * iSizeY, 0);
-    std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> pShape = std::make_shared<CLuaPhysicsHeightfieldTerrainShape>(this, iSizeX, iSizeY, vecHeights);
+    std::vector<float>                  vecHeights(iSizeX * iSizeY, 0);
+    CLuaPhysicsHeightfieldTerrainShape* pShape = new CLuaPhysicsHeightfieldTerrainShape(this, iSizeX, iSizeY, vecHeights);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CBulletPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights)
+CLuaPhysicsHeightfieldTerrainShape* CBulletPhysics::CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights)
 {
-    std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> pShape = std::make_shared<CLuaPhysicsHeightfieldTerrainShape>(this, iSizeX, iSizeY, vecHeights);
+    CLuaPhysicsHeightfieldTerrainShape* pShape = new CLuaPhysicsHeightfieldTerrainShape(this, iSizeX, iSizeY, vecHeights);
     AddShape(pShape);
     return pShape;
 }
 
-std::shared_ptr<CLuaPhysicsRigidBody> CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia,
-                                                                      CVector vecCenterOfMass)
+CLuaPhysicsRigidBody* CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
-    std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody = std::make_shared<CLuaPhysicsRigidBody>(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
     AddRigidBody(pRigidBody);
     return pRigidBody;
 }
 
-std::shared_ptr<CLuaPhysicsPointToPointConstraint> CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                                                CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                                bool                  bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                bool bDisableCollisionsBetweenLinkedBodies)
 {
     assert(pRigidBodyA != pRigidBodyB);
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
@@ -706,31 +607,29 @@ std::shared_ptr<CLuaPhysicsPointToPointConstraint> CBulletPhysics::CreatePointTo
     CVector vecPivotA = pRigidBodyB->GetPosition() - pRigidBodyA->GetPosition();
     CVector vecPivotB = pRigidBodyA->GetPosition() - pRigidBodyB->GetPosition();
 
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, vecPivotA / 2, vecPivotB / 2, bDisableCollisionsBetweenLinkedBodies);
+    CLuaPhysicsPointToPointConstraint* pConstraint =
+        new CLuaPhysicsPointToPointConstraint(pRigidBodyA, pRigidBodyB, vecPivotA / 2, vecPivotB / 2, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }
 
-std::shared_ptr<CLuaPhysicsPointToPointConstraint> CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
-                                                                                                bool bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
+                                                                                bool bDisableCollisionsBetweenLinkedBodies)
 {
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBody, position, bDisableCollisionsBetweenLinkedBodies);
+    CLuaPhysicsPointToPointConstraint* pConstraint = new CLuaPhysicsPointToPointConstraint(pRigidBody, position, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }
 
-std::shared_ptr<CLuaPhysicsPointToPointConstraint> CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                                                CLuaPhysicsRigidBody* pRigidBodyB, const CVector& vecPivotA,
-                                                                                                const CVector& vecPivotB,
-                                                                                                bool           bDisableCollisionsBetweenLinkedBodies)
+CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+                                                                                const CVector& vecPivotA, const CVector& vecPivotB,
+                                                                                bool bDisableCollisionsBetweenLinkedBodies)
 {
     assert(pRigidBodyA != pRigidBodyB);
     assert(pRigidBodyA->GetPhysics() == pRigidBodyB->GetPhysics());
 
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> pConstraint =
-        std::make_shared<CLuaPhysicsPointToPointConstraint>(pRigidBodyA, pRigidBodyB, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
+    CLuaPhysicsPointToPointConstraint* pConstraint =
+        new CLuaPhysicsPointToPointConstraint(pRigidBodyA, pRigidBodyB, vecPivotA, vecPivotB, bDisableCollisionsBetweenLinkedBodies);
     AddConstraint(pConstraint);
     return pConstraint;
 }
@@ -961,10 +860,7 @@ void CBulletPhysics::DoPulse()
         }
     }
 
-    //{
-    //    BT_PROFILE("postProcessCollisions");
-    //    PostProcessCollisions();
-    //}
+    PostProcessCollisions();
 
     m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
 

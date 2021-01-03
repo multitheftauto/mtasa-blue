@@ -29,13 +29,13 @@ public:
 
     ~CPhysicsRigidBodyProxy()
     {
+        setCollisionShape(nullptr); // prevent from destryoing shape
         delete getMotionState();
-        delete getCollisionShape();
         SetEnabled(false);
     }
 
     static std::unique_ptr<CPhysicsRigidBodyProxy> Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
-                                                          CVector vecCenterOfMass, CVector vecPosition, CVector vecRotation);
+                                                          CVector vecCenterOfMass);
 
     void SetEnabled(bool bEnabled);
 };

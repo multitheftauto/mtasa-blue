@@ -39,14 +39,14 @@ public:
     static bool        PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
     static bool        PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
     static std::string PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
-    static std::shared_ptr<CLuaPhysicsStaticCollision>              PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
+    static CLuaPhysicsStaticCollision*              PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                                                  std::optional<CVector> rotation);
-    static std::vector<std::shared_ptr<CLuaPhysicsShape>>           PhysicsGetShapes(CBulletPhysics* pPhysics);
-    static std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       PhysicsGetRigidBodies(CBulletPhysics* pPhysics);
-    static std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> PhysicsGetStaticCollisions(CBulletPhysics* pPhysics);
-    static std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      PhysicsGetConstraints(CBulletPhysics* pPhysics);
+    static std::vector<CLuaPhysicsShape*>           PhysicsGetShapes(CBulletPhysics* pPhysics);
+    static std::vector<CLuaPhysicsRigidBody*>       PhysicsGetRigidBodies(CBulletPhysics* pPhysics);
+    static std::vector<CLuaPhysicsStaticCollision*> PhysicsGetStaticCollisions(CBulletPhysics* pPhysics);
+    static std::vector<CLuaPhysicsConstraint*>      PhysicsGetConstraints(CBulletPhysics* pPhysics);
     static bool                                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
-    static std::shared_ptr<CLuaPhysicsRigidBody> PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
+    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
 
         static bool PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysicsShape* pChildShape, std::optional<CVector> vecOptionalPosition,
                                      std::optional<CVector> vecOptionalRotation);
@@ -54,16 +54,16 @@ public:
     static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
                                                       std::variant<CVector, SColor, bool, float, int> argument, std::variant<float> argument2);
     static std::variant<CVector, bool, int, float>   PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> varian, ePhysicsProperty eProperty);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fRadius);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCylinderShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateCompoundShape(CBulletPhysics* pPhysics, std::optional<int> initialCapacity);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateConvexHullShape(CBulletPhysics* pPhysics, std::vector<float> vecPoints);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateGimpactMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
-    static std::shared_ptr<CLuaPhysicsShape> PhysicsCreateHeightfieldTerrainShape(CBulletPhysics* pPhysics, int sizeX, int sizeY,
+    static CLuaPhysicsShape* PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
+    static CLuaPhysicsShape* PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fRadius);
+    static CLuaPhysicsShape* PhysicsCreateCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateCylinderShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateCompoundShape(CBulletPhysics* pPhysics, std::optional<int> initialCapacity);
+    static CLuaPhysicsShape* PhysicsCreateConvexHullShape(CBulletPhysics* pPhysics, std::vector<float> vecPoints);
+    static CLuaPhysicsShape* PhysicsCreateTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
+    static CLuaPhysicsShape* PhysicsCreateGimpactMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
+    static CLuaPhysicsShape* PhysicsCreateHeightfieldTerrainShape(CBulletPhysics* pPhysics, int sizeX, int sizeY,
                                                                                   std::optional<std::vector<float>> vecHeights);
 
     static std::variant<bool, RayResult> PhysicsRayCast(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
@@ -81,14 +81,14 @@ public:
     static bool                         PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody);
 
     static std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> PhysicsGetContacts(
-        std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variant);
+        CLuaPhysicsElement* pElement);
 
     static std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> PhysicsGetContactDetails(
         std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB);
 
     static std::unordered_map<std::string, long long int> PhysicsGetPerformanceStats(CBulletPhysics* pPhysics);
 
-    static std::shared_ptr<CLuaPhysicsConstraint> PhysicsCreatePointToPointConstraint(CLuaPhysicsRigidBody*                        pRigidBody,
+    static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraint(CLuaPhysicsRigidBody*                        pRigidBody,
                                                                                       std::variant<CLuaPhysicsRigidBody*, CVector> variantA,
                                                                                       std::variant<std::monostate, CVector, bool>  variantB,
                                                                                       std::variant<std::monostate, CVector, bool>  variantC,

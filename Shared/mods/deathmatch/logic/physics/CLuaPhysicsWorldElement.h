@@ -33,8 +33,8 @@ public:
     virtual void          SetMatrix(const CMatrix& matrix) = 0;
     virtual const CMatrix GetMatrix() const = 0;
 
-    virtual void          RemoveDebugColor() = 0;
-    virtual void          SetDebugColor(const SColor& color) = 0;
+    virtual void         RemoveDebugColor() = 0;
+    virtual void         SetDebugColor(const SColor& color) = 0;
     virtual const SColor GetDebugColor() const = 0;
 
     virtual int  GetFilterGroup() const = 0;
@@ -42,7 +42,14 @@ public:
     virtual int  GetFilterMask() const = 0;
     virtual void SetFilterMask(int mask) = 0;
 
+    void                                         ClearCollisionContacts();
+    void                                         ReportCollisionContact(CLuaPhysicsWorldElement* pElement);
+    const std::vector<CLuaPhysicsWorldElement*>& GetAllContacts() const { return m_vecCollisionContacts; }
+    void                                         GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement);
+
 protected:
     CMatrix            m_matrix;
     mutable std::mutex m_matrixLock;
+
+    std::vector<CLuaPhysicsWorldElement*> m_vecCollisionContacts;
 };

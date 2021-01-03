@@ -17,7 +17,9 @@ class CLuaPhysicsShapeManager
 {
 public:
     CLuaPhysicsShapeManager(){};
-    ~CLuaPhysicsShapeManager(){};
+    ~CLuaPhysicsShapeManager();
+
+    void RemoveAllShapes();
 
     CLuaPhysicsShape* GetShapeFromScriptID(unsigned int uiScriptID);
 

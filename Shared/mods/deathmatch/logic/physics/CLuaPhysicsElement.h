@@ -52,23 +52,6 @@ public:
         Gravity,
     };
 
-    struct SPhysicsCollisionContact
-    {
-        CVector vecPositionWorldOn;
-        CVector vecLocalPoint;
-        CVector vecLateralFrictionDir;
-        int     contactTriangle;
-        float   appliedImpulse;
-        float   appliedImpulseLiteral;
-    };
-
-    struct SPhysicsCollisionReport
-    {
-        std::shared_ptr<CLuaPhysicsElement>                    pElement;
-        std::vector<std::shared_ptr<SPhysicsCollisionContact>> m_vecContacts;
-    };
-
-
     CBulletPhysics*        GetPhysics() const { return m_pPhysics; }
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
@@ -80,8 +63,6 @@ public:
     // Run changes on worker thread, let you modify element before get created
     void CommitChange(std::function<void()> change);
 
-    virtual void ClearCollisionReport() {}
-    virtual void ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport) {}
     void         NeedsUpdate();
 
     template<typename T>

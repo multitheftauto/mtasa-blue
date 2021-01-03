@@ -12,6 +12,17 @@
 #include <StdInc.h>
 #include "CLuaPhysicsShapeManager.h"
 
+CLuaPhysicsShapeManager::~CLuaPhysicsShapeManager()
+{
+    RemoveAllShapes();
+}
+
+void CLuaPhysicsShapeManager::RemoveAllShapes()
+{
+    while (m_ShapeList.size())
+        RemoveShape(*(m_ShapeList.begin()));
+}
+
 CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiScriptID)
 {
     std::lock_guard   guard(m_lock);
@@ -33,7 +44,10 @@ void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
     assert(pShape);
 
     std::lock_guard guard(m_lock);
+    pShape->Unlink();
+    pShape->GetPhysics()->DestroyShape(pShape);
     ListRemove(m_ShapeList, pShape);
+    delete pShape;
 }
 
 bool CLuaPhysicsShapeManager::IsShapeValid(CLuaPhysicsShape* pShape)

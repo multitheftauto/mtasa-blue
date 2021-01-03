@@ -28,14 +28,11 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
 }
 
 std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass,
-                                                                       CVector vecLocalInertia, CVector vecCenterOfMass,
-                                                                       CVector vecPosition, CVector vecRotation)
+                                                                       CVector vecLocalInertia, CVector vecCenterOfMass)
 {
     btTransform           transform = btTransform::getIdentity();
     btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
 
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     CLuaPhysicsSharedLogic::SetPosition(motionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->GetBtShape();
     if (vecLocalInertia.LengthSquared() == 0)

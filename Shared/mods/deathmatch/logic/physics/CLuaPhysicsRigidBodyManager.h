@@ -22,17 +22,18 @@ public:
     CLuaPhysicsRigidBodyManager(){};
     ~CLuaPhysicsRigidBodyManager();
 
+    void                  RemoveAllRigidBodies();
     CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
 
-    void                  AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
     unsigned long GetRigidBodyCount() const { return m_RigidBodyList.size(); }
 
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>::const_iterator IterBegin() { return m_RigidBodyList.begin(); }
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>::const_iterator IterEnd() { return m_RigidBodyList.end(); }
+    std::vector<CLuaPhysicsRigidBody*>::const_iterator IterBegin() { return m_RigidBodyList.begin(); }
+    std::vector<CLuaPhysicsRigidBody*>::const_iterator IterEnd() { return m_RigidBodyList.end(); }
 
 private:
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>> m_RigidBodyList;
+    std::vector<CLuaPhysicsRigidBody*> m_RigidBodyList;
     std::mutex                                         m_lock;
 };

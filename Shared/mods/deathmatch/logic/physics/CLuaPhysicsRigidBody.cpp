@@ -40,7 +40,7 @@ void CLuaPhysicsRigidBody::Initialize()
         position = m_matrix.GetPosition();
         rotation = m_matrix.GetRotation();
     }
-    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, position, rotation);
+    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
     m_pRigidBodyProxy->setUserPointer((void*)this);
 
@@ -48,7 +48,8 @@ void CLuaPhysicsRigidBody::Initialize()
     SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
 
     Ready();
-
+    SetPosition(position);
+    SetRotation(rotation);
     SetMatrix(m_matrix);
 }
 
@@ -556,36 +557,6 @@ void CLuaPhysicsRigidBody::ClearForces()
     });
 
     CommitChange(change);
-}
-
-void CLuaPhysicsRigidBody::ClearCollisionReport()
-{
-    m_vecCollisionReports.clear();
-}
-
-void CLuaPhysicsRigidBody::ReportCollision(std::unique_ptr<SPhysicsCollisionReport> pCollisionReport)
-{
-    m_vecCollisionReports.push_back(std::move(pCollisionReport));
-}
-
-const std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*>& CLuaPhysicsRigidBody::GetCollisionReports()
-{
-    std::vector<CLuaPhysicsElement::SPhysicsCollisionReport*> vecCollisionReports;
-    for (auto const& pCollisionReport : m_vecCollisionReports)
-    {
-        vecCollisionReports.push_back(pCollisionReport.get());
-    }
-    return vecCollisionReports;
-}
-
-CLuaPhysicsElement::SPhysicsCollisionReport* CLuaPhysicsRigidBody::GetCollisionReport(CLuaPhysicsElement* pElement)
-{
-    for (auto const& pCollisionReport : m_vecCollisionReports)
-    {
-        if (pCollisionReport->pElement.get() == pElement)
-            return pCollisionReport.get();
-    }
-    return nullptr;
 }
 
 void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstraint)

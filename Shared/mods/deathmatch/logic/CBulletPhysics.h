@@ -188,7 +188,7 @@ public:
 
     CBulletPhysics::SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
-    std::shared_ptr<CLuaPhysicsStaticCollision> CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition = CVector(0, 0, 0),
+    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition = CVector(0, 0, 0),
                                                                       CVector vecRotation = CVector(0, 0, 0));
 
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
@@ -215,47 +215,36 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    std::shared_ptr<CLuaPhysicsRigidBody> CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Limits::RigidBodyMassLimit,
+    CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Limits::RigidBodyMassLimit,
                                                           CVector vecLocalInertia = CVector(0, 0, 0),
                                                           CVector vecCenterOfMass = CVector(0, 0, 0));
 
-    std::shared_ptr<CLuaPhysicsBoxShape>                CreateBoxShape(CVector vector);
-    std::shared_ptr<CLuaPhysicsSphereShape>             CreateSphereShape(float radius);
-    std::shared_ptr<CLuaPhysicsCapsuleShape>            CreateCapsuleShape(float fRadius, float fHeight);
-    std::shared_ptr<CLuaPhysicsConeShape>               CreateConeShape(float fRadius, float fHeight);
-    std::shared_ptr<CLuaPhysicsCylinderShape>           CreateCylinderShape(CVector half);
-    std::shared_ptr<CLuaPhysicsCompoundShape>           CreateCompoundShape(int iInitialChildCapacity = 0);
-    std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<float>& vecFloats);
-    std::shared_ptr<CLuaPhysicsConvexHullShape>         CreateConvexHullShape(std::vector<CVector>& vecVertices);
-    std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape>    CreateBhvTriangleMeshShape(std::vector<float>& vecFloats);
-    std::shared_ptr<CLuaPhysicsBvhTriangleMeshShape>    CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices);
-    std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape>    CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats);
-    std::shared_ptr<CLuaPhysicsGimpactTriangleMeshShape> CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices);
-    std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
-    std::shared_ptr<CLuaPhysicsHeightfieldTerrainShape> CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights);
+    CLuaPhysicsBoxShape*                CreateBoxShape(CVector vector);
+    CLuaPhysicsSphereShape*             CreateSphereShape(float radius);
+    CLuaPhysicsCapsuleShape*            CreateCapsuleShape(float fRadius, float fHeight);
+    CLuaPhysicsConeShape*               CreateConeShape(float fRadius, float fHeight);
+    CLuaPhysicsCylinderShape*           CreateCylinderShape(CVector half);
+    CLuaPhysicsCompoundShape*           CreateCompoundShape(int iInitialChildCapacity = 0);
+    CLuaPhysicsConvexHullShape*         CreateConvexHullShape(std::vector<float>& vecFloats);
+    CLuaPhysicsConvexHullShape*         CreateConvexHullShape(std::vector<CVector>& vecVertices);
+    CLuaPhysicsBvhTriangleMeshShape*    CreateBhvTriangleMeshShape(std::vector<float>& vecFloats);
+    CLuaPhysicsBvhTriangleMeshShape*    CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices);
+    CLuaPhysicsGimpactTriangleMeshShape*    CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats);
+    CLuaPhysicsGimpactTriangleMeshShape* CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices);
+    CLuaPhysicsHeightfieldTerrainShape* CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
+    CLuaPhysicsHeightfieldTerrainShape* CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights);
 
     // Links two bodies together
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                     const CVector& vecPivotA, const CVector& vecPivotB,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
 
     // Links body to position
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
+    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
     // Automatically calculate bodies offsets
-    std::shared_ptr<CLuaPhysicsPointToPointConstraint> CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
+    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                                     bool bDisableCollisionsBetweenLinkedBodies);
-
-    std::vector<std::shared_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies();
-    std::vector<std::shared_ptr<CLuaPhysicsShape>>           GetShapes();
-    std::vector<std::shared_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions();
-    std::vector<std::shared_ptr<CLuaPhysicsConstraint>>      GetConstraints();
-
-    std::shared_ptr<CLuaPhysicsShape> Resolve(CLuaPhysicsShape* pLuaShape);
-
-    std::shared_ptr<CLuaPhysicsRigidBody>       Resolve(CLuaPhysicsRigidBody* pRigidBody);
-    std::shared_ptr<CLuaPhysicsStaticCollision> Resolve(CLuaPhysicsStaticCollision* pStaticCollision);
-
 
     std::atomic<bool> isDuringSimulation = false;
 
@@ -268,8 +257,8 @@ public:
     void AddToUpdateStack(CLuaPhysicsElement* pElement);
 
 
-    std::shared_ptr<CLuaPhysicsStaticCollision> GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
-    std::shared_ptr<CLuaPhysicsRigidBody>       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
+    CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
+    CLuaPhysicsRigidBody*       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
 
     const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
 
@@ -277,22 +266,32 @@ public:
     void                 FlushAllChanges();
     bool                 WorldHasChanged();
 
+    std::vector<CLuaPhysicsShape*>           GetShapes() const { return m_vecShapes; }
+    std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const { return m_vecRigidBodies; }
+    std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
+    std::vector<CLuaPhysicsConstraint*>      GetConstraints() const { return m_vecConstraints; }
+
+    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
+    void DestroyShape(CLuaPhysicsShape* pLuaShape);
+    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
+    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+
 private:
+    std::vector<CLuaPhysicsShape*> m_vecShapes;
+    std::vector<CLuaPhysicsRigidBody*> m_vecRigidBodies;
+    std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
+    std::vector<CLuaPhysicsConstraint*> m_vecConstraints;
+
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
     void PostProcessCollisions();
 
     void Clear();
 
-    void AddShape(std::shared_ptr<CLuaPhysicsShape> pShape);
-    void AddRigidBody(std::shared_ptr<CLuaPhysicsRigidBody> pRigidBody);
-    void AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint);
-    void AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
-
-    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void DestroyShape(CLuaPhysicsShape* pLuaShape);
-    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
-    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void AddShape(CLuaPhysicsShape* pShape);
+    void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void AddConstraint(CLuaPhysicsConstraint* pConstraint);
+    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     std::mutex         lock;
     mutable std::mutex dynamicsWorldLock;
@@ -328,11 +327,6 @@ private:
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;
 
-    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsRigidBody>>       m_mapRigidBodies;
-    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsShape>>           m_mapShapes;
-    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsStaticCollision>> m_mapStaticCollisions;
-    std::unordered_map<uint, std::shared_ptr<CLuaPhysicsConstraint>>      m_mapConstraints;
-
     SharedUtil::ConcurrentList<CLuaPhysicsStaticCollision*>  m_InitializeStaticCollisionsList;
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>       m_InitializeRigidBodiesList;
     SharedUtil::ConcurrentList<CLuaPhysicsConstraint*>       m_InitializeConstraintsList;
@@ -346,7 +340,7 @@ private:
     std::vector<CLuaPhysicsRigidBody*> m_vecActiveRigidBodies;
     mutable std::mutex                 m_vecActiveRigidBodiesLock;
 
-    std::vector<std::shared_ptr<CLuaPhysicsElement>> m_vecLastContact;
+    std::vector<CLuaPhysicsWorldElement*> m_vecLastContact;
     std::unordered_map<const char*, ProfilerTime>    m_mapProfileTimings;
 };
 

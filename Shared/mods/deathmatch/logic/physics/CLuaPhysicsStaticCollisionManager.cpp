@@ -12,16 +12,17 @@
 #include <StdInc.h>
 #include "CLuaPhysicsStaticCollisionManager.h"
 
-void CLuaPhysicsStaticCollisionManager::RemoveStaticCollision(CLuaPhysicsStaticCollision* pLuaStaticCollision)
+CLuaPhysicsStaticCollisionManager::~CLuaPhysicsStaticCollisionManager()
 {
-    assert(pLuaStaticCollision);
+    RemoveAllStaticCollisions();
+}
 
-    // Check if already removed
-    if (!ListContainsSharedPointer(m_StaticCollisionList, pLuaStaticCollision))
-        return;
-
-    // Remove all references
-    ListRemoveSharedPointer(m_StaticCollisionList, pLuaStaticCollision);
+void CLuaPhysicsStaticCollisionManager::RemoveAllStaticCollisions()
+{
+    while (m_StaticCollisionList.size())
+    {
+        RemoveStaticCollision(*(m_StaticCollisionList.begin()));
+    }
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
@@ -30,12 +31,26 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
     if (!pLuaStaticCollision)
         return nullptr;
 
-    if (!ListContainsSharedPointer(m_StaticCollisionList, pLuaStaticCollision))
+    if (!ListContains(m_StaticCollisionList, pLuaStaticCollision))
         return nullptr;
     return pLuaStaticCollision;
 }
 
-void CLuaPhysicsStaticCollisionManager::AddStaticCollision(std::shared_ptr<CLuaPhysicsStaticCollision> pStaticCollision)
+void CLuaPhysicsStaticCollisionManager::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     m_StaticCollisionList.push_back(pStaticCollision);
+}
+
+void CLuaPhysicsStaticCollisionManager::RemoveStaticCollision(CLuaPhysicsStaticCollision* pLuaStaticCollision)
+{
+    assert(pLuaStaticCollision);
+
+    // Check if already removed
+    if (!ListContains(m_StaticCollisionList, pLuaStaticCollision))
+        return;
+
+    // Remove all references
+    pLuaStaticCollision->Unlink();
+    pLuaStaticCollision->GetPhysics()->DestroyStaticCollision(pLuaStaticCollision);
+    ListRemove(m_StaticCollisionList, pLuaStaticCollision);
 }

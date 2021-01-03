@@ -38,10 +38,10 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
 
-    m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
-    m_pLuaPhysicsStaticCollisionManager = new CLuaPhysicsStaticCollisionManager;
-    m_pLuaPhysicsContraintManager = new CLuaPhysicsConstraintManager;
-    m_pLuaPhysicsShapeManager = new CLuaPhysicsShapeManager;
+    m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
+    m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
+    m_pLuaPhysicsContraintManager = std::make_unique<CLuaPhysicsConstraintManager>();
+    m_pLuaPhysicsShapeManager = std::make_unique<CLuaPhysicsShapeManager>();
 
     m_FunctionEnterTimer.SetMaxIncrement(500);
     m_WarningTimer.SetMaxIncrement(1000);
@@ -76,17 +76,6 @@ CLuaMain::~CLuaMain()
 
     // Delete the timer manager
     delete m_pLuaTimerManager;
-
-    // Physics
-    delete m_pLuaPhysicsRigidBodyManager;
-    delete m_pLuaPhysicsStaticCollisionManager;
-    delete m_pLuaPhysicsContraintManager;
-    delete m_pLuaPhysicsShapeManager;
-
-    m_pLuaPhysicsRigidBodyManager = nullptr;
-    m_pLuaPhysicsStaticCollisionManager = nullptr;
-    m_pLuaPhysicsContraintManager = nullptr;
-    m_pLuaPhysicsShapeManager = nullptr;
 
     // Eventually delete the XML files the LUA script didn't
     for (auto& xmlFile : m_XMLFiles)

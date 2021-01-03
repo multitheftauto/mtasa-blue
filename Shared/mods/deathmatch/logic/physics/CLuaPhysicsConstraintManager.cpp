@@ -17,11 +17,11 @@ void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pConst
     assert(pConstraint);
 
     // Check if already removed
-    if (!ListContainsSharedPointer(m_List, pConstraint))
+    if (!ListContains(m_List, pConstraint))
         return;
 
     // Remove all references
-    ListRemoveSharedPointer(m_List, pConstraint);
+    ListRemove(m_List, pConstraint);
 }
 
 CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(unsigned int uiScriptID)
@@ -30,13 +30,13 @@ CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(un
     if (!pLuaContraint)
         return nullptr;
 
-    if (!ListContainsSharedPointer(m_List, pLuaContraint))
+    if (!ListContains(m_List, pLuaContraint))
         return nullptr;
 
     return pLuaContraint;
 }
 
-void CLuaPhysicsConstraintManager::AddConstraint(std::shared_ptr<CLuaPhysicsConstraint> pConstraint)
+void CLuaPhysicsConstraintManager::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 {
     m_List.push_back(pConstraint);
 }
