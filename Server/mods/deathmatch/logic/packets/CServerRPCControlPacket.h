@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <list>
 #include "../packets/CPacket.h"
 
 class CServerRPCControlPacket final : public CPacket
@@ -19,8 +18,8 @@ class CServerRPCControlPacket final : public CPacket
 public:
     CServerRPCControlPacket(const std::map<eServerRPCFunctions, bool> map);
 
-    ePacketID     GetPacketID() const { return PACKET_ID_SERVER_RPC_CONTROL; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID     GetPacketID() const { return PACKET_ID_SERVER_RPC_CONTROL; };
+    inline unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

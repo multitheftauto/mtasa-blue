@@ -5,13 +5,13 @@
  *  FILE:        mods/deathmatch/logic/packets/CServerRPCControlPacket.cpp
  *  PURPOSE:     Server RPC function control packet
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 
-CServerRPCControlPacket::CServerRPCControlPacket(const std::map<eServerRPCFunctions, bool> map) : m_map(map){};
+CServerRPCControlPacket::CServerRPCControlPacket(const std::map<eServerRPCFunctions, bool> map) : m_map(map) {};
 
 bool CServerRPCControlPacket::Write(NetBitStreamInterface& BitStream) const
 {
