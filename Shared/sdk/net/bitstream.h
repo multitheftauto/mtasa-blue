@@ -452,10 +452,6 @@ enum class eBitStreamVersion : unsigned short
     // 2020-11-10 0x71
     PedEnterExit,
 
-    // Server RPC function control
-    // 2021-01-04 0x72
-    ServerRPCControl,
-
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

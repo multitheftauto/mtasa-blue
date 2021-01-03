@@ -1246,19 +1246,16 @@ void CGame::JoinPlayer(CPlayer& Player)
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Control server RPC functions
-    if (Player.CanBitStream(eBitStreamVersion::ServerRPCControl))
-    {
-        std::map<eServerRPCFunctions, bool> toggleMap;
+    std::map<eServerRPCFunctions, bool> toggleMap;
 
-        // Disable CURSOR_EVENT RPC by default
-        toggleMap.insert(std::make_pair(eServerRPCFunctions::CURSOR_EVENT, true));
+    // Disable CURSOR_EVENT RPC by default
+    toggleMap.insert(std::make_pair(eServerRPCFunctions::CURSOR_EVENT, true));
 
-        // If suitable event exists (e.g. onPlayerClick/onElementClicked), tell client to enable RPC function instead
-        if (!m_pMapManager->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunctions::CURSOR_EVENT).empty())
-            toggleMap.insert_or_assign(eServerRPCFunctions::CURSOR_EVENT, false);
+    // If suitable event exists (e.g. onPlayerClick/onElementClicked), tell client to enable RPC function instead
+    if (!m_pMapManager->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunctions::CURSOR_EVENT).empty())
+        toggleMap.insert_or_assign(eServerRPCFunctions::CURSOR_EVENT, false);
 
-        Player.Send(CServerRPCControlPacket(toggleMap));
-    }
+    Player.Send(CServerRPCControlPacket(toggleMap));
 
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
