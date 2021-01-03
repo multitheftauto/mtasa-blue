@@ -55,9 +55,25 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
     if (vehicleDummiesPositionArray != nullptr)
     {
         *mainPosition = vehicleDummiesPositionArray[EXHAUST];
-        *secondaryPosition  = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
+        *secondaryPosition = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
 
-        if (secondaryPosition->fX == 0.0 && secondaryPosition->fY == 0.0 && secondaryPosition->fZ == 0.0)
+        bool    applyNegativeMainPosition = false;
+        int16_t extras = vehicleInterface->m_upgrades[0];
+
+        if (vehicleInterface->m_nModelIndex == VT_NRG500)
+        {
+            applyNegativeMainPosition = extras != 0 && extras != 1;
+        }
+        else if (vehicleInterface->m_nModelIndex == VT_BF400)
+        {
+            applyNegativeMainPosition = extras != 2;
+        }
+        else if (vehicleInterface->m_nModelIndex == VT_FCR900)
+        {
+            applyNegativeMainPosition = extras != 1;
+        }
+
+        if (applyNegativeMainPosition || secondaryPosition->fX == 0.0 && secondaryPosition->fY == 0.0 && secondaryPosition->fZ == 0.0)
         {
             *secondaryPosition = *mainPosition;
             secondaryPosition->fX *= -1.0f;
