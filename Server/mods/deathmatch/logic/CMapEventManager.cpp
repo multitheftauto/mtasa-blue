@@ -461,15 +461,3 @@ const std::vector<CMapEvent*> CMapEventManager::GetHandlesByServerRPCFunction(eS
     }
     return vecResult;
 }
-
-const std::vector<CMapEvent*> CMapEventManager::GetAllHandles() const
-{
-    std::vector<CMapEvent*> vecResult;
-    for (auto&& [strName, pMapEvent] : m_EventsMap)
-    {
-        SEvent* pOtherEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
-        if (pOtherEvent)
-            vecResult.push_back(pMapEvent);
-    }
-    return vecResult;
-}

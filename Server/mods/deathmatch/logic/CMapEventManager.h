@@ -28,7 +28,6 @@ public:
     bool                          HasEvents() const { return m_bHasEvents; }
     void                          GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM);
     const std::vector<CMapEvent*> GetHandlesByServerRPCFunction(eServerRPCFunctions eServerRPCFunction) const;
-    const std::vector<CMapEvent*> GetAllHandles() const;
 
     bool Call(const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, class CPlayer* pCaller = NULL);
 
