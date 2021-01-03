@@ -57,6 +57,9 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
         *mainPosition = vehicleDummiesPositionArray[EXHAUST];
         *secondaryPosition = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
 
+        // NOTE(botder): Certain bike models (NRG-500, BF-400, FCR-900) actually use the secondary exhaust position
+        //               and we can't abuse it for these models to position double exhausts here.
+        //               Bikes use the secondary exhaust position in case they have extras (read: exhausts) installed
         bool    applyNegativeMainPosition = false;
         int16_t extras = vehicleInterface->m_upgrades[0];
 
