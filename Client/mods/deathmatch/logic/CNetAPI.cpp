@@ -1993,6 +1993,9 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
 
 void CNetAPI::RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream)
 {
+    if (!g_pClientGame->IsServerRPCFunctionEnabled(ID))
+        return;
+
     NetBitStreamInterface* pRPCBitStream = g_pNet->AllocateNetBitStream();
     if (pRPCBitStream)
     {
