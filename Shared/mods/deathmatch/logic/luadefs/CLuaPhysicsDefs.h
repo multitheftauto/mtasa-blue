@@ -17,6 +17,7 @@ typedef std::variant<PositionArray, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CL
 typedef std::unordered_map<std::string, RayResultValue>                                                          RayResult;
 typedef std::unordered_map<std::string, std::variant<bool, int>>                                                 RayOptions;
 typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            RigidBodyOptions;
+typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            CreateWorldOptions;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -24,7 +25,7 @@ public:
     static void LoadFunctions(void);
     static void AddClass(lua_State* luaVM);
 
-    static CBulletPhysics*                                PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
+    static CBulletPhysics*                                PhysicsCreateWorld(lua_State* luaVM, std::optional<CreateWorldOptions> vecGravity);
     static bool                                           IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement);
     static std::vector<CLuaPhysicsShape*>                 PhysicsGetChildShapes(CLuaPhysicsShape* pShape);
     static bool                                           PhysicsRemoveChildShape(CLuaPhysicsShape* pShape, int iIndex);

@@ -139,7 +139,7 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
     lua_registerstaticclass(luaVM, "Physics");
 }
 
-CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity)
+CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optional<CreateWorldOptions> options)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -147,7 +147,9 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
         CBulletPhysics* pPhysics = pLuaMain->CreateElement<CBulletPhysics>();
         if (pPhysics)
         {
-            pPhysics->SetGravity(vecGravity.value_or(BulletPhysics::Defaults::Gravity));
+            CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
+            CVector            gravity = getOption(mapOptions, "gravity", BulletPhysics::Defaults::Gravity);
+            pPhysics->SetGravity(gravity);
             return pPhysics;
         }
     }
