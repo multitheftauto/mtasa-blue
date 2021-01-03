@@ -413,6 +413,8 @@ void CGame::DoPulse()
     g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE)->ProcessQueuedFiles();
     UNCLOCK1("HTTPDownloadManager");
 
+    m_pPhysicsManager->WaitForSimulationsToFinish();
+
     CLOCK_CALL1(m_pPlayerManager->DoPulse(););
 
     // Pulse the net interface
@@ -473,14 +475,14 @@ void CGame::DoPulse()
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););
 
     CLOCK_CALL1(m_pLatentTransferManager->DoPulse(););
-    m_pPhysicsManager->DoPulse();
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
+
+    m_pPhysicsManager->DoPulse();
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
 
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
-
     // Unlock the critical section again
     Unlock();
 }

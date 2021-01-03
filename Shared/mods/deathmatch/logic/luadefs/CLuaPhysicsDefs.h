@@ -103,6 +103,7 @@ public:
     static std::vector<std::vector<float>> PhysicsGetDebugLines(
         CBulletPhysics * pPhysics, CVector vecPosition, float fRadius);
     static bool PhysicsWorldHasChanged(CBulletPhysics* pPhysics);
+    static bool PhysicsIsDuringSimulation(CBulletPhysics* pPhysics);
     static bool PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float> PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
 #ifdef MTA_CLIENT

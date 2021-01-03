@@ -117,6 +117,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
         {"physicsWorldHasChanged", ArgumentParser<PhysicsWorldHasChanged>},
+        {"physicsIsDuringSimulation", ArgumentParser<PhysicsIsDuringSimulation>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
 #ifdef MTA_CLIENT
@@ -1512,4 +1513,9 @@ std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhy
 bool CLuaPhysicsDefs::PhysicsWorldHasChanged(CBulletPhysics* pPhysics)
 {
     return pPhysics->WorldHasChanged();
+}
+
+bool CLuaPhysicsDefs::PhysicsIsDuringSimulation(CBulletPhysics* pPhysics)
+{
+    return pPhysics->isDuringSimulation;
 }

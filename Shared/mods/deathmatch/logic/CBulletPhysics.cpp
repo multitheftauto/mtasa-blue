@@ -18,17 +18,15 @@
 
 #ifdef MTA_CLIENT
 CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this),CClientEntity(ID)
-#else
-CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(parent)
-#endif
 {
-    // Init
-#ifdef MTA_CLIENT
     m_pManager = pManager;
     m_pPhysicsManager = pManager->GetPhysicsManager();
 #else
+CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(parent)
+{
     m_pPhysicsManager = g_pGame->GetBulletPhysicsManager();
 #endif
+
     m_pLuaMain = luaMain;
 
     SetTypeName("physics");
