@@ -210,8 +210,8 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ServerInfoSync(bitStream);
             return true;
 
-        case PACKET_ID_SERVER_RPC_GATE:
-            Packet_ServerRPCGate(bitStream);
+        case PACKET_ID_SERVER_RPC_CONTROL:
+            Packet_ServerRPCControl(bitStream);
             return true;
 
         default:
@@ -5318,7 +5318,7 @@ void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
     }
 }
 
-void CPacketHandler::Packet_ServerRPCGate(NetBitStreamInterface& bitStream)
+void CPacketHandler::Packet_ServerRPCControl(NetBitStreamInterface& bitStream)
 {
     unsigned short usNumFunctions;
     if (bitStream.ReadCompressed(usNumFunctions))
@@ -5326,12 +5326,12 @@ void CPacketHandler::Packet_ServerRPCGate(NetBitStreamInterface& bitStream)
         for (unsigned short us = 0; us < usNumFunctions; us++)
         {
             SString strServerRPCFunction;
-            bool    bOpen;
-            if (bitStream.ReadString(strServerRPCFunction) && bitStream.ReadBit(bOpen))
+            bool    bDisabled;
+            if (bitStream.ReadString(strServerRPCFunction) && bitStream.ReadBit(bDisabled))
             {
                 eServerRPCFunctions eServerRPCFunction;
                 StringToEnum(strServerRPCFunction, eServerRPCFunction);
-                g_pClientGame->SetServerRPCFunctionEnabled(eServerRPCFunction, bOpen);
+                g_pClientGame->SetServerRPCFunctionDisabled(eServerRPCFunction, bDisabled);
             }
         }
     }

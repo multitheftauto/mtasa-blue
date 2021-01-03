@@ -440,17 +440,17 @@ public:
 
     void TriggerDiscordJoin(SString strSecret);
 
-    inline const bool IsServerRPCFunctionEnabled(const eServerRPCFunctions eServerRPCFunction) const
+    inline const bool IsServerRPCFunctionDisabled(const eServerRPCFunctions eServerRPCFunction) const
     {
-        return std::find(m_enabledServerRPCFunctions.begin(), m_enabledServerRPCFunctions.end(), eServerRPCFunction) != m_enabledServerRPCFunctions.end();
+        return std::find(m_disabledServerRPCFunctions.begin(), m_disabledServerRPCFunctions.end(), eServerRPCFunction) != m_disabledServerRPCFunctions.end();
     };
-    inline void SetServerRPCFunctionEnabled(const eServerRPCFunctions eServerRPCFunction, const bool bEnabled = false)
+    inline void SetServerRPCFunctionDisabled(const eServerRPCFunctions eServerRPCFunction, const bool bDisabled = true)
     {
-        auto iter = std::find(m_enabledServerRPCFunctions.begin(), m_enabledServerRPCFunctions.end(), eServerRPCFunction);
-        if (iter == m_enabledServerRPCFunctions.end() && bEnabled)
-            m_enabledServerRPCFunctions.push_back(eServerRPCFunction);
-        else if (iter != m_enabledServerRPCFunctions.end() && !bEnabled)
-            m_enabledServerRPCFunctions.erase(iter);
+        auto iter = std::find(m_disabledServerRPCFunctions.begin(), m_disabledServerRPCFunctions.end(), eServerRPCFunction);
+        if (iter == m_disabledServerRPCFunctions.end() && bDisabled)
+            m_disabledServerRPCFunctions.push_back(eServerRPCFunction);
+        else if (iter != m_disabledServerRPCFunctions.end() && !bDisabled)
+            m_disabledServerRPCFunctions.erase(iter);
     };
 
 private:
@@ -837,7 +837,7 @@ private:
     SString                 m_strACInfo;
     std::map<uint, uint>    m_SentMessageIds;
 
-    std::vector<eServerRPCFunctions> m_enabledServerRPCFunctions;
+    std::vector<eServerRPCFunctions> m_disabledServerRPCFunctions;
 
     bool              m_bLastKeyWasEscapeCancelled;
     std::set<SString> m_AllowKeyUpMap;

@@ -345,42 +345,9 @@ bool CMapEventManager::HandleExists(CLuaMain* pLuaMain, const char* szName, cons
 void CMapEventManager::DeleteInternal(CMapEvent* pMapEvent)
 {
     SEvent* pEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
-    if (pEvent && pEvent->eServerRPCFunction < eServerRPCFunctions::NUM_SERVER_RPC_FUNCS)
-    {
-        bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-        if (!bFound)
-        {
-            bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
 
-            if (!bFound)
-            {
-                auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
-                for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
-                {
-                    bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-                    if (bFound)
-                        break;
-                }
-
-                // Let players know
-                if (!bFound)
-                {
-                    std::map<eServerRPCFunctions, bool> map;
-                    map.insert(std::make_pair(pEvent->eServerRPCFunction, false));
-                    CServerRPCGatePacket Packet(map);
-                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
-                }
-            }
-        }
-    }
-
-    delete pMapEvent;
-}
-
-void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
-{
-    SEvent* pEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
-    if (pEvent && pEvent->eServerRPCFunction < eServerRPCFunctions::NUM_SERVER_RPC_FUNCS)
+    // For now we only care about CURSOR_EVENT
+    if (pEvent && pEvent->eServerRPCFunction == eServerRPCFunctions::CURSOR_EVENT)
     {
         bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
         if (!bFound)
@@ -402,7 +369,44 @@ void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
                 {
                     std::map<eServerRPCFunctions, bool> map;
                     map.insert(std::make_pair(pEvent->eServerRPCFunction, true));
-                    CServerRPCGatePacket Packet(map);
+                    CServerRPCControlPacket Packet(map);
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
+                }
+            }
+        }
+    }
+
+    delete pMapEvent;
+}
+
+void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
+{
+    SEvent* pEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
+
+    // For now we only care about CURSOR_EVENT
+    if (pEvent && pEvent->eServerRPCFunction == eServerRPCFunctions::CURSOR_EVENT)
+    {
+        bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+        if (!bFound)
+        {
+            bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+
+            if (!bFound)
+            {
+                auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
+                for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
+                {
+                    bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+                    if (bFound)
+                        break;
+                }
+
+                // Let players know
+                if (!bFound)
+                {
+                    std::map<eServerRPCFunctions, bool> map;
+                    map.insert(std::make_pair(pEvent->eServerRPCFunction, false));
+                    CServerRPCControlPacket Packet(map);
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
                 }
             }

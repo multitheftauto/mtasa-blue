@@ -2,8 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/packets/CServerRPCGatePacket.h
- *  PURPOSE:     Server RPC function gate packet
+ *  FILE:        mods/deathmatch/logic/packets/CServerRPCControlPacket.h
+ *  PURPOSE:     Server RPC function control packet
  *
  *  Multi Theft Auto is available from https://multitheftauto.com/
  *
@@ -14,12 +14,12 @@
 #include <list>
 #include "../packets/CPacket.h"
 
-class CServerRPCGatePacket final : public CPacket
+class CServerRPCControlPacket final : public CPacket
 {
 public:
-    CServerRPCGatePacket(const std::map<eServerRPCFunctions, bool> map);
+    CServerRPCControlPacket(const std::map<eServerRPCFunctions, bool> map);
 
-    ePacketID     GetPacketID() const { return PACKET_ID_SERVER_RPC_GATE; };
+    ePacketID     GetPacketID() const { return PACKET_ID_SERVER_RPC_CONTROL; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;

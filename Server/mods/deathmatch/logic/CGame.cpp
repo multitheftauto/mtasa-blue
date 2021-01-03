@@ -1245,29 +1245,19 @@ void CGame::JoinPlayer(CPlayer& Player)
     if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
-    // Announce server RPC functions
-    if (Player.CanBitStream(eBitStreamVersion::ServerRPCFunctionsGate))
+    // Control server RPC functions
+    if (Player.CanBitStream(eBitStreamVersion::ServerRPCControl))
     {
-        std::map<eServerRPCFunctions, bool> map;
-        for (auto&& pMapEvent : m_pMapManager->GetRootElement()->GetEventManager()->GetAllHandles())
-        {
-            SEvent* pEvent = m_Events.Get(pMapEvent->GetName());
-            if (pEvent && pEvent->eServerRPCFunction < eServerRPCFunctions::NUM_SERVER_RPC_FUNCS)
-                map.try_emplace(pEvent->eServerRPCFunction, true);
-        }
+        std::map<eServerRPCFunctions, bool> toggleMap;
 
-        auto iter = m_pMapManager->GetRootElement()->IterBegin();
-        for (; iter != m_pMapManager->GetRootElement()->IterEnd(); iter++)
-        {
-            for (auto&& pMapEvent : (*iter)->GetEventManager()->GetAllHandles())
-            {
-                SEvent* pEvent = m_Events.Get(pMapEvent->GetName());
-                if (pEvent && pEvent->eServerRPCFunction < eServerRPCFunctions::NUM_SERVER_RPC_FUNCS)
-                    map.try_emplace(pEvent->eServerRPCFunction, true);
-            }
-        }
+        // Disable CURSOR_EVENT RPC by default
+        toggleMap.insert(std::make_pair(eServerRPCFunctions::CURSOR_EVENT, true));
 
-        Player.Send(CServerRPCGatePacket(map));
+        // If suitable event exists (e.g. onPlayerClick/onElementClicked), tell client to enable RPC function instead
+        if (!m_pMapManager->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunctions::CURSOR_EVENT).empty())
+            toggleMap.insert_or_assign(eServerRPCFunctions::CURSOR_EVENT, false);
+
+        Player.Send(CServerRPCControlPacket(toggleMap));
     }
 
     // Add debug info if wanted
