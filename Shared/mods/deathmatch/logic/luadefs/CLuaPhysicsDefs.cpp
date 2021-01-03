@@ -149,6 +149,8 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
         {
             CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
             CVector            gravity = getOption(mapOptions, "gravity", BulletPhysics::Defaults::Gravity);
+            int                parallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
+            pPhysics->Initialize(parallelSolvers);
             pPhysics->SetGravity(gravity);
             return pPhysics;
         }

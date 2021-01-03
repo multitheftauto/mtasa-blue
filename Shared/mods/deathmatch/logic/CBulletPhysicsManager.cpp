@@ -21,6 +21,8 @@ using std::list;
 CBulletPhysicsManager::CBulletPhysicsManager(CClientManager* pManager)
 {
     // Init
+    m_pBtTaskScheduler.reset(btCreateDefaultTaskScheduler());
+    btSetTaskScheduler(m_pBtTaskScheduler.get()); 
     m_pManager = pManager;
 
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2, 1);
@@ -32,6 +34,8 @@ CBulletPhysicsManager::CBulletPhysicsManager(CClientManager* pManager)
 
 CBulletPhysicsManager::CBulletPhysicsManager()
 {
+    m_pBtTaskScheduler.reset(btCreateDefaultTaskScheduler());
+    btSetTaskScheduler(m_pBtTaskScheduler.get()); 
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2, 1);
 
     CBulletPhysicsProfiler::Start();

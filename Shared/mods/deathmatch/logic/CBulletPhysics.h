@@ -16,6 +16,9 @@ class CPhysicsDebugDrawer;
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "bulletphysics3d/BulletCollision/Gimpact/btGImpactShape.h"
+#include "bulletphysics3d/BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
+#include "bulletphysics3d/BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"
+#include "bulletphysics3d/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h"
 
 #include "physics/CLuaPhysicsSharedLogic.h"
 #include "physics/CLuaPhysicsElement.h"
@@ -75,6 +78,7 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
+    void Initialize(int parallelSolvers);
     struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
     {
         std::vector<int> m_hitTriangleIndices;
@@ -297,10 +301,14 @@ private:
     mutable std::mutex dynamicsWorldLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver> m_pSolver;
-    std::unique_ptr<btBroadphaseInterface>               m_pOverlappingPairCache;
-    std::unique_ptr<btCollisionDispatcher>               m_pDispatcher;
-    std::unique_ptr<btDefaultCollisionConfiguration>     m_pCollisionConfiguration;
-    std::unique_ptr<btDiscreteDynamicsWorld>             m_pDynamicsWorld;
+    std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;
+    std::unique_ptr<btConstraintSolverPoolMt>              m_pMtSolverPool;
+    std::unique_ptr<btBroadphaseInterface>                 m_pOverlappingPairCache;
+    std::unique_ptr<btCollisionDispatcher>                 m_pDispatcher;
+    std::unique_ptr<btDefaultCollisionConfiguration>       m_pCollisionConfiguration;
+    std::unique_ptr<btDiscreteDynamicsWorldMt>             m_pDynamicsWorldMt;
+    std::unique_ptr<btDiscreteDynamicsWorld>               m_pDynamicsWorld;
+    bool                                                   m_bUseMt = false; // true when multithreaded world is in use
 
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 

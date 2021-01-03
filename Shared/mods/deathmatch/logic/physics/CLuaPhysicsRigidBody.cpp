@@ -196,14 +196,18 @@ void CLuaPhysicsRigidBody::NeedsAABBUpdate() const
     }
 }
 
-void CLuaPhysicsRigidBody::Activate() const
+bool CLuaPhysicsRigidBody::Activate() const
 {
-    assert(IsReady());
-
-    m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
-    m_pRigidBodyProxy->setActivationState(ACTIVE_TAG);
-    m_pRigidBodyProxy->activate(true);
+    if (!m_pRigidBodyProxy->isActive()) // prevent activation when you eg. set position directly after create
+    {
+        m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
+        m_pRigidBodyProxy->setActivationState(ACTIVE_TAG);
+        m_pRigidBodyProxy->activate(true);
+        m_bActivationRequested = false;
+        return true;
+    }
     m_bActivationRequested = false;
+    return false;
 }
 
 void CLuaPhysicsRigidBody::SetCcdMotionThreshold(float fThreshold)

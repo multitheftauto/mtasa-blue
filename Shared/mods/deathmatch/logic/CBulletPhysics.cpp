@@ -25,33 +25,43 @@ CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(parent)
 {
     m_pPhysicsManager = g_pGame->GetBulletPhysicsManager();
+    m_iType = CElement::CBULLETPHYSICS;
 #endif
 
     m_pLuaMain = luaMain;
 
     SetTypeName("physics");
 
+    // Add us to Physics manager's list
+    m_pPhysicsManager->AddToList(this);
+}
+
+void CBulletPhysics::Initialize(int parallelSolvers)
+{
     m_pOverlappingPairCache = std::make_unique<btDbvtBroadphase>();
     m_pCollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
     m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
-    m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
-
     m_pDebugDrawer = std::make_unique<CPhysicsDebugDrawer>();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 
-#ifndef MTA_CLIENT
-    m_iType = CElement::CBULLETPHYSICS;
-#endif
+    if (parallelSolvers > 1)
     {
-        std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld =
-            std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
+        m_pSolverMt = std::make_unique<btSequentialImpulseConstraintSolverMt>();
+        m_pMtSolverPool = std::make_unique<btConstraintSolverPoolMt>(parallelSolvers);
+        m_pDynamicsWorldMt = std::make_unique<btDiscreteDynamicsWorldMt>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pMtSolverPool.get(),
+                                                                       m_pSolverMt.get(), m_pCollisionConfiguration.get());
+        m_bUseMt = true;
+        m_pDynamicsWorldMt->setGravity(BulletPhysics::Defaults::Gravity);
+        m_pDynamicsWorldMt->setDebugDrawer(m_pDebugDrawer.get());
+    }
+    else
+    {
+        m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
+        m_pDynamicsWorld = std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
         m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
         m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
+        m_bUseMt = false;
     }
-
-    // Add us to Physics manager's list
-    m_pPhysicsManager->AddToList(this);
 }
 
 CBulletPhysics::~CBulletPhysics()
@@ -79,66 +89,97 @@ void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) c
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->addCollisionObject(pBtCollisionObject);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->addCollisionObject(pBtCollisionObject);
+    else
+        m_pDynamicsWorld->addCollisionObject(pBtCollisionObject);
 }
 
 void CBulletPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->removeCollisionObject(pBtCollisionObject);
+    else
+        m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
 }
 
 void CBulletPhysics::AddRigidBody(btRigidBody* pBtRigidBody) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->addRigidBody(pBtRigidBody);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->addRigidBody(pBtRigidBody);
+    else
+        m_pDynamicsWorld->addRigidBody(pBtRigidBody);
 }
 
 void CBulletPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->removeRigidBody(pBtRigidBody);
+    else
+        m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
 }
 
 void CBulletPhysics::AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->addConstraint(pBtTypedConstraint, bDisableCollisionsBetweenLinkedBodies);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->addConstraint(pBtTypedConstraint, bDisableCollisionsBetweenLinkedBodies);
+    else
+        m_pDynamicsWorld->addConstraint(pBtTypedConstraint, bDisableCollisionsBetweenLinkedBodies);
 }
 
 void CBulletPhysics::RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
-    m_pDynamicsWorld->removeConstraint(pBtTypedConstraint);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->removeConstraint(pBtTypedConstraint);
+    else
+        m_pDynamicsWorld->removeConstraint(pBtTypedConstraint);
 }
 
 void CBulletPhysics::SetGravity(const CVector& vecGravity) const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    m_pDynamicsWorld->setGravity(vecGravity);
+
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->setGravity(vecGravity);
+    else
+        m_pDynamicsWorld->setGravity(vecGravity);
 }
 
 CVector CBulletPhysics::GetGravity() const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    return m_pDynamicsWorld->getGravity();
+    if (m_bUseMt)
+        return m_pDynamicsWorldMt->getGravity();
+    else
+        return m_pDynamicsWorld->getGravity();
 }
 
 bool CBulletPhysics::GetUseContinous() const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
+    if (m_bUseMt)
+        return m_pDynamicsWorldMt->getDispatchInfo().m_useContinuous;
+    else
+        return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
 }
 
 void CBulletPhysics::SetUseContinous(bool bUse) const
 {
     std::lock_guard guard(dynamicsWorldLock);
-    m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->getDispatchInfo().m_useContinuous = bUse;
+    else
+        m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
 
 CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
@@ -161,7 +202,10 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
     rayCallback.m_collisionFilterMask = iFilterMask;
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, rayCallback, 0.0f);
+        if (m_bUseMt)
+            m_pDynamicsWorldMt->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, rayCallback, 0.0f);
+        else
+            m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, rayCallback, 0.0f);
     }
 
     rayCallback.m_closestPosition = rayCallback.m_convexFromWorld.lerp(rayCallback.m_convexToWorld, rayCallback.m_closestHitFraction);
@@ -180,7 +224,10 @@ bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, i
 
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->rayTest(from, to, rayCallback);
+        if (m_bUseMt)
+            m_pDynamicsWorldMt->rayTest(from, to, rayCallback);
+        else
+            m_pDynamicsWorld->rayTest(from, to, rayCallback);
     }
     return rayCallback.hasHit();
 }
@@ -197,7 +244,10 @@ CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(const CVector&
         rayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
 
     std::lock_guard guard(dynamicsWorldLock);
-    m_pDynamicsWorld->rayTest(from, to, rayCallback);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->rayTest(from, to, rayCallback);
+    else
+        m_pDynamicsWorld->rayTest(from, to, rayCallback);
 
     return rayCallback;
 }
@@ -213,7 +263,10 @@ CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, C
 
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->rayTest(from, to, rayCallback);
+        if (m_bUseMt)
+            m_pDynamicsWorldMt->rayTest(from, to, rayCallback);
+        else
+            m_pDynamicsWorld->rayTest(from, to, rayCallback);
     }
 
     return rayCallback;
@@ -296,7 +349,11 @@ void CBulletPhysics::StepSimulation()
     BT_PROFILE("stepSimulation");
     isDuringSimulation = true;
     std::lock_guard guard(dynamicsWorldLock);
-    m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
+    else
+        m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
+
     isDuringSimulation = false;
 }
 
@@ -352,7 +409,11 @@ void CBulletPhysics::PostProcessCollisions()
     BT_PROFILE("postProcessCollisions");
     std::lock_guard guard(dynamicsWorldLock);
 
-    int numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
+    int numManifolds;
+    if (m_bUseMt)
+        numManifolds = m_pDynamicsWorldMt->getDispatcher()->getNumManifolds();
+    else
+        numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
 
     if (numManifolds > 0)
     {
@@ -387,7 +448,12 @@ void CBulletPhysics::PostProcessCollisions()
 
     for (int i = 0; i < numManifolds; i++)
     {
-        btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+        btPersistentManifold* contactManifold;
+        if (m_bUseMt)
+            contactManifold = m_pDynamicsWorldMt->getDispatcher()->getManifoldByIndexInternal(i);
+        else
+            contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+
         if (contactManifold == nullptr)
             continue;
 
@@ -650,7 +716,10 @@ std::vector<std::vector<float>> CBulletPhysics::GetDebugLines(CVector vecPositio
     m_pDebugDrawer->SetDrawDistance(radius);
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->debugDrawWorld();
+        if (m_bUseMt)
+            m_pDynamicsWorldMt->debugDrawWorld();
+        else
+            m_pDynamicsWorld->debugDrawWorld();
     }
 
     std::vector<std::vector<float>> vecLines;
@@ -682,7 +751,10 @@ void CBulletPhysics::QueryBox(const CVector& min, const CVector& max, std::vecto
 
     {
         std::lock_guard guard(dynamicsWorldLock);
-        m_pDynamicsWorld->getBroadphase()->aabbTest(min, max, callback);
+        if (m_bUseMt)
+            m_pDynamicsWorldMt->getBroadphase()->aabbTest(min, max, callback);
+        else
+            m_pDynamicsWorld->getBroadphase()->aabbTest(min, max, callback);
     }
 
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
@@ -774,7 +846,10 @@ void CBulletPhysics::FlushAllChanges()
         while (!m_rigidBodiesUpdateAABBList.empty())
         {
             CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesUpdateAABBList.pop();
-            m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
+            if (m_bUseMt)
+                m_pDynamicsWorldMt->updateSingleAabb(pRigidBody->GetBtRigidBody());
+            else
+                m_pDynamicsWorld->updateSingleAabb(pRigidBody->GetBtRigidBody());
             pRigidBody->AABBUpdated();
         }
     }
@@ -802,12 +877,21 @@ void CBulletPhysics::FlushAllChanges()
     if (!m_rigidBodiesActivationList.empty())
     {
         BT_PROFILE("activateRigidBodies");
+        CLuaPhysicsRigidBody* pRigidBody;
+
         while (!m_rigidBodiesActivationList.empty())
         {
-            CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesActivationList.pop();
-            pRigidBody->Activate();
-            m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                              m_pDynamicsWorld->getDispatcher());
+            
+            pRigidBody = m_rigidBodiesActivationList.pop();
+            if (pRigidBody->Activate())
+            {
+                if (m_bUseMt)
+                    m_pDynamicsWorldMt->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
+                                                                                                        m_pDynamicsWorldMt->getDispatcher());
+                else
+                    m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
+                                                                                                  m_pDynamicsWorld->getDispatcher());
+            }
         }
     }
 
@@ -841,7 +925,10 @@ void CBulletPhysics::DoPulse()
         m_pDebugDrawer->SetCameraPosition(vecPosition);
         {
             std::lock_guard guard(dynamicsWorldLock);
-            m_pDynamicsWorld->debugDrawWorld();
+            if (m_bUseMt)
+                m_pDynamicsWorldMt->debugDrawWorld();
+            else
+                m_pDynamicsWorld->debugDrawWorld();
         }
     }
 #endif
@@ -852,7 +939,12 @@ void CBulletPhysics::DoPulse()
         std::lock_guard guardDynamicsWorld(dynamicsWorldLock);
         m_vecActiveRigidBodies.clear();
 
-        btAlignedObjectArray<btRigidBody*>& nonStaticRigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
+        btAlignedObjectArray<btRigidBody*> nonStaticRigidBodies;
+        if (m_bUseMt)
+            nonStaticRigidBodies = m_pDynamicsWorldMt->getNonStaticRigidBodies();
+        else
+            nonStaticRigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
+
         for (int i = 0; i < nonStaticRigidBodies.size(); i++)
         {
             if (nonStaticRigidBodies[i]->isActive())

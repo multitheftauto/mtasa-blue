@@ -17,7 +17,7 @@ typedef std::variant<PositionArray, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CL
 typedef std::unordered_map<std::string, RayResultValue>                                                          RayResult;
 typedef std::unordered_map<std::string, std::variant<bool, int>>                                                 RayOptions;
 typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            RigidBodyOptions;
-typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            CreateWorldOptions;
+typedef std::unordered_map<std::string, std::variant<int, CVector>>                                            CreateWorldOptions;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {

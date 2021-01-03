@@ -35,6 +35,13 @@ namespace SharedUtil
             return m_list.empty();
         }
 
+        void lock() { m_mutex.lock(); }
+        void unlock() { m_mutex.unlock(); }
+        
+        auto IterBegin() { return m_list.begin(); }
+        auto IterEnd() { return m_list.end(); }
+
+
     private:
         mutable std::mutex m_mutex;
         std::list<T>       m_list;

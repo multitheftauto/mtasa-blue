@@ -28,7 +28,7 @@ class CLuaPhysicsElement;
 
 #define USE_NANOSECOND_TIMING 1            // use nanoseconds for profiling?
 #define BT_ENABLE_PROFILE     1
-
+#define BT_THREADSAFE 1
 namespace BulletPhysics
 {
     namespace Limits
@@ -57,5 +57,6 @@ namespace BulletPhysics
         inline constexpr int     RaycastAllDefaultLimit = 64;
         inline constexpr int     FilterGroup = 1;
         inline constexpr int     FilterMask = -1;
+        inline constexpr int     ParallelSolvers = 1;
     }            // namespace Defaults
 }            // namespace BulletPhysics

@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 
+#include "LinearMath/btThreads.h"
+
 #pragma once
 
 class btDiscreteDynamicsWorld;
@@ -48,4 +50,5 @@ private:
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
     std::atomic<int>                 m_numPhysicsLeft;
     bool                             m_bWaitForSimulationToFinish = true;
+    std::unique_ptr<btITaskScheduler> m_pBtTaskScheduler;
 };

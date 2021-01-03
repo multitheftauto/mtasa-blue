@@ -53,7 +53,7 @@ public:
     // Running on worker thread
     void Initialize();
 
-    void Activate() const;
+    bool Activate() const;
 
     // both from 0.0f to 1.0f
     void SetDumping(float fLinearDamping, float fAngularDamping);
