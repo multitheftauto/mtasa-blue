@@ -17,10 +17,11 @@
 
 struct SEvent
 {
-    class CLuaMain* pLuaMain;
-    std::string     strName;
-    std::string     strArguments;
-    bool            bAllowRemoteTrigger;
+    class CLuaMain*     pLuaMain;
+    std::string         strName;
+    std::string         strArguments;
+    bool                bAllowRemoteTrigger;
+    eServerRPCFunctions eServerRPCFunction;
 };
 
 class CEvents
@@ -29,7 +30,8 @@ public:
     CEvents();
     ~CEvents() { RemoveAllEvents(); };
 
-    bool AddEvent(const char* szName, const char* szArguments, class CLuaMain* pLuaMain, bool bAllowRemoteTrigger);
+    bool AddEvent(const char* szName, const char* szArguments, class CLuaMain* pLuaMain, bool bAllowRemoteTrigger,
+                  eServerRPCFunctions eServerRPCFunction = eServerRPCFunctions::NUM_SERVER_RPC_FUNCS);
     void RemoveEvent(SEvent* pEvent);
     void RemoveEvent(const char* szName);
     void RemoveAllEvents(class CLuaMain* pMain);

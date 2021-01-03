@@ -440,6 +440,19 @@ public:
 
     void TriggerDiscordJoin(SString strSecret);
 
+    inline const bool IsServerRPCFunctionEnabled(const eServerRPCFunctions eServerRPCFunction) const
+    {
+        return std::find(m_enabledServerRPCFunctions.begin(), m_enabledServerRPCFunctions.end(), eServerRPCFunction) != m_enabledServerRPCFunctions.end();
+    };
+    inline void SetServerRPCFunctionEnabled(const eServerRPCFunctions eServerRPCFunction, const bool bEnabled = false)
+    {
+        auto iter = std::find(m_enabledServerRPCFunctions.begin(), m_enabledServerRPCFunctions.end(), eServerRPCFunction);
+        if (iter == m_enabledServerRPCFunctions.end() && bEnabled)
+            m_enabledServerRPCFunctions.push_back(eServerRPCFunction);
+        else if (iter != m_enabledServerRPCFunctions.end() && !bEnabled)
+            m_enabledServerRPCFunctions.erase(iter);
+    };
+
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
@@ -823,6 +836,8 @@ private:
     uint                    m_uiAltPulseOrderCounter;
     SString                 m_strACInfo;
     std::map<uint, uint>    m_SentMessageIds;
+
+    std::vector<eServerRPCFunctions> m_enabledServerRPCFunctions;
 
     bool              m_bLastKeyWasEscapeCancelled;
     std::set<SString> m_AllowKeyUpMap;

@@ -283,4 +283,6 @@ enum eServerRPCFunctions
     KEY_BIND,
     CURSOR_EVENT,
     REQUEST_STEALTH_KILL,
+
+    NUM_SERVER_RPC_FUNCS // Add above this line
 };

@@ -78,11 +78,12 @@ bool CMapEventManager::Delete(CLuaMain* pLuaMain, const char* szName, const CLua
                     }
                     else
                     {
-                        // Delete the object
-                        delete pMapEvent;
-
                         // Remove from list and remember that we deleted something
                         m_EventsMap.erase(iter++);
+
+                        // Delete the object
+                        DeleteInternal(pMapEvent);
+
                         bRemovedSomeone = true;
                         continue;
                     }
@@ -111,8 +112,8 @@ void CMapEventManager::DeleteAll()
         // Delete it if it's not already being destroyed
         if (!pMapEvent->IsBeingDestroyed())
         {
-            delete pMapEvent;
             m_EventsMap.erase(iter++);
+            DeleteInternal(pMapEvent);
         }
         else
             ++iter;
@@ -300,7 +301,7 @@ void CMapEventManager::TakeOutTheTrash()
         }
 
         // Delete it
-        delete pMapEvent;
+        DeleteInternal(pMapEvent);
     }
 
     m_bHasEvents = !m_EventsMap.empty();
@@ -341,18 +342,82 @@ bool CMapEventManager::HandleExists(CLuaMain* pLuaMain, const char* szName, cons
     return false;
 }
 
-void CMapEventManager::AddInternal(CMapEvent* pEvent)
+void CMapEventManager::DeleteInternal(CMapEvent* pMapEvent)
 {
+    SEvent* pEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
+    if (pEvent && pEvent->eServerRPCFunction < eServerRPCFunctions::NUM_SERVER_RPC_FUNCS)
+    {
+        bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+        if (!bFound)
+        {
+            bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+
+            if (!bFound)
+            {
+                auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
+                for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
+                {
+                    bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+                    if (bFound)
+                        break;
+                }
+
+                // Let players know
+                if (!bFound)
+                {
+                    std::map<eServerRPCFunctions, bool> map;
+                    map.insert(std::make_pair(pEvent->eServerRPCFunction, false));
+                    CServerRPCGatePacket Packet(map);
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
+                }
+            }
+        }
+    }
+
+    delete pMapEvent;
+}
+
+void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
+{
+    SEvent* pEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
+    if (pEvent && pEvent->eServerRPCFunction < eServerRPCFunctions::NUM_SERVER_RPC_FUNCS)
+    {
+        bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+        if (!bFound)
+        {
+            bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+
+            if (!bFound)
+            {
+                auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
+                for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
+                {
+                    bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
+                    if (bFound)
+                        break;
+                }
+
+                // Let players know
+                if (!bFound)
+                {
+                    std::map<eServerRPCFunctions, bool> map;
+                    map.insert(std::make_pair(pEvent->eServerRPCFunction, true));
+                    CServerRPCGatePacket Packet(map);
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
+                }
+            }
+        }
+    }
+
     // Find place to insert
-    EventsIterPair itPair = m_EventsMap.equal_range(pEvent->GetName());
+    EventsIterPair itPair = m_EventsMap.equal_range(pMapEvent->GetName());
     EventsIter     iter;
     for (iter = itPair.first; iter != itPair.second; ++iter)
-    {
-        if (pEvent->IsHigherPriorityThan(iter->second))
+        if (pMapEvent->IsHigherPriorityThan(iter->second))
             break;
-    }
+
     // Do insert
-    m_EventsMap.insert(iter, std::pair<SString, CMapEvent*>(pEvent->GetName(), pEvent));
+    m_EventsMap.insert(iter, std::pair<SString, CMapEvent*>(pMapEvent->GetName(), pMapEvent));
 }
 
 void CMapEventManager::GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM)
@@ -379,4 +444,28 @@ void CMapEventManager::GetHandles(CLuaMain* pLuaMain, const char* szName, lua_St
             }
         }
     }
+}
+
+const std::vector<CMapEvent*> CMapEventManager::GetHandlesByServerRPCFunction(eServerRPCFunctions eServerRPCFunction) const
+{
+    std::vector<CMapEvent*> vecResult;
+    for (auto&& [strName, pMapEvent] : m_EventsMap)
+    {
+        SEvent* pOtherEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
+        if (pOtherEvent && pOtherEvent->eServerRPCFunction == eServerRPCFunction)
+            vecResult.push_back(pMapEvent);
+    }
+    return vecResult;
+}
+
+const std::vector<CMapEvent*> CMapEventManager::GetAllHandles() const
+{
+    std::vector<CMapEvent*> vecResult;
+    for (auto&& [strName, pMapEvent] : m_EventsMap)
+    {
+        SEvent* pOtherEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
+        if (pOtherEvent)
+            vecResult.push_back(pMapEvent);
+    }
+    return vecResult;
 }

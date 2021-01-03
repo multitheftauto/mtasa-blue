@@ -210,6 +210,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ServerInfoSync(bitStream);
             return true;
 
+        case PACKET_ID_SERVER_RPC_GATE:
+            Packet_ServerRPCGate(bitStream);
+            return true;
+
         default:
             break;
     }
@@ -5311,6 +5315,25 @@ void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
             return;
 
         g_pClientGame->GetServerInfo()->SetMaxPlayers(maxPlayersCount);
+    }
+}
+
+void CPacketHandler::Packet_ServerRPCGate(NetBitStreamInterface& bitStream)
+{
+    unsigned short usNumFunctions;
+    if (bitStream.ReadCompressed(usNumFunctions))
+    {
+        for (unsigned short us = 0; us < usNumFunctions; us++)
+        {
+            SString strServerRPCFunction;
+            bool    bOpen;
+            if (bitStream.ReadString(strServerRPCFunction) && bitStream.ReadBit(bOpen))
+            {
+                eServerRPCFunctions eServerRPCFunction;
+                StringToEnum(strServerRPCFunction, eServerRPCFunction);
+                g_pClientGame->SetServerRPCFunctionEnabled(eServerRPCFunction, bOpen);
+            }
+        }
     }
 }
 

@@ -2308,29 +2308,33 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             Arguments.PushBoolean(false);
                         m_pRootEntity->CallEvent("onClientClick", Arguments, false);
 
-                        // Send the button, cursor position, 3d position and the entity collided with
-                        CBitStream bitStream;
-
-                        SMouseButtonSync button;
-                        button.data.ucButton = ucButtonHit;
-                        bitStream.pBitStream->Write(&button);
-
-                        bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fX));
-                        bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fY));
-
-                        SPositionSync position(false);
-                        position.data.vecPosition = vecCollision;
-                        bitStream.pBitStream->Write(&position);
-
-                        if (CollisionEntityID != INVALID_ELEMENT_ID)
+                        // Send to server if they want it
+                        if (IsServerRPCFunctionEnabled(CURSOR_EVENT))
                         {
-                            bitStream.pBitStream->WriteBit(true);
-                            bitStream.pBitStream->Write(CollisionEntityID);
-                        }
-                        else
-                            bitStream.pBitStream->WriteBit(false);
+                            // Send the button, cursor position, 3d position and the entity collided with
+                            CBitStream bitStream;
 
-                        m_pNetAPI->RPC(CURSOR_EVENT, bitStream.pBitStream);
+                            SMouseButtonSync button;
+                            button.data.ucButton = ucButtonHit;
+                            bitStream.pBitStream->Write(&button);
+
+                            bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fX));
+                            bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fY));
+
+                            SPositionSync position(false);
+                            position.data.vecPosition = vecCollision;
+                            bitStream.pBitStream->Write(&position);
+
+                            if (CollisionEntityID != INVALID_ELEMENT_ID)
+                            {
+                                bitStream.pBitStream->WriteBit(true);
+                                bitStream.pBitStream->Write(CollisionEntityID);
+                            }
+                            else
+                                bitStream.pBitStream->WriteBit(false);
+
+                            m_pNetAPI->RPC(CURSOR_EVENT, bitStream.pBitStream);
+                        }
 
                         if (strcmp(szState, "down") == 0)
                         {
