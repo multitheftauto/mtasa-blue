@@ -20,20 +20,15 @@ class CLuaPhysicsSharedLogic
 public:
     static const char* GetShapeName(btCollisionShape* pShape);
 
-    static void SetPosition(btTransform& transform, const CVector& vecPosition);
-    static void SetRotation(btTransform& transform, const CVector& vecRotation);
-    static void GetRotation(const btTransform& transform, CVector& vecRotation);
-    static void GetPosition(const btTransform& transform, CVector& vecPosition);
-    static void GetRotation(const btTransform& transform, btVector3& vecRotation);
-    static void GetPosition(const btTransform& transform, btVector3& vecPosition);
+    static void      SetPosition(btTransform& transform, CVector vecPosition);
+    static void      SetRotation(btTransform& transform, CVector vecRotation);
+    static void      SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition);
+    static void      SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation);
+    static CVector   GetRotation(const btTransform& transform);
+    static CVector   GetPosition(const btTransform& transform);
 
-    static const CVector& GetPosition(const btTransform& transform);
-    static const CVector& GetRotation(const btTransform& transform);
-
-    static void SetPosition(btCollisionObject* pCollisionObject, const CVector& vecPosition);
-    static void SetRotation(btCollisionObject* pCollisionObject, const CVector& vecRotation);
-    static void GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
-    static void GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
+    static CVector GetPosition(btCollisionObject* pCollisionObject);
+    static CVector GetRotation(btCollisionObject* pCollisionObject);
 
     static btBoxShape*      CreateBox(CVector& half, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
     static btSphereShape*   CreateSphere(float fRadius, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));

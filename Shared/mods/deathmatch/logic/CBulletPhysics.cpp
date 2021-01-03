@@ -153,10 +153,8 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
                                                                        int iFilterGroup, int iFilterMask) const
 {
     BT_PROFILE("shapeCast");
-    CVector fromPosition;
-    CVector toPosition;
-    CLuaPhysicsSharedLogic::GetPosition(from, fromPosition);
-    CLuaPhysicsSharedLogic::GetPosition(to, toPosition);
+    CVector fromPosition = CLuaPhysicsSharedLogic::GetPosition(from);
+    CVector toPosition = CLuaPhysicsSharedLogic::GetPosition(to);
     SClosestConvexResultCallback rayCallback(fromPosition, toPosition);
 
     rayCallback.m_collisionFilterGroup = iFilterGroup;
@@ -264,17 +262,20 @@ void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticColli
 {
     m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
     m_InitializeStaticCollisionsList.push(pStaticCollision);
+    m_vecStaticCollisions.push_back(pStaticCollision);
     m_bWorldHasChanged = true;
 }
 
 void CBulletPhysics::AddShape(CLuaPhysicsShape* pShape)
 {
     m_pLuaMain->GetPhysicsShapeManager()->AddShape(pShape);
+    m_vecShapes.push_back(pShape);
 }
 
 void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
     m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
+    m_vecRigidBodies.push_back(pRigidBody);
     m_InitializeRigidBodiesList.push(pRigidBody);
     m_bWorldHasChanged = true;
 }
@@ -282,6 +283,7 @@ void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 {
     m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
+    m_vecConstraints.push_back(pConstraint);
     m_InitializeConstraintsList.push(pConstraint);
     m_bWorldHasChanged = true;
 }
@@ -295,6 +297,7 @@ void CBulletPhysics::StepSimulation()
     isDuringSimulation = true;
     std::lock_guard guard(dynamicsWorldLock);
     m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
+    isDuringSimulation = false;
 }
 
 void CBulletPhysics::ClearOutsideWorldRigidBodies()
@@ -765,18 +768,6 @@ void CBulletPhysics::FlushAllChanges()
         }
     }
 
-    if (!m_rigidBodiesActivationList.empty())
-    {
-        BT_PROFILE("activateRigidBodies");
-        while (!m_rigidBodiesActivationList.empty())
-        {
-            CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesActivationList.pop();
-            pRigidBody->Activate();
-            m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                              m_pDynamicsWorld->getDispatcher());
-        }
-    }
-
     if (!m_rigidBodiesUpdateAABBList.empty())
     {
         BT_PROFILE("updateRigidBodiesAABB");
@@ -807,6 +798,19 @@ void CBulletPhysics::FlushAllChanges()
             pElement->Update();
         }
     }
+
+    if (!m_rigidBodiesActivationList.empty())
+    {
+        BT_PROFILE("activateRigidBodies");
+        while (!m_rigidBodiesActivationList.empty())
+        {
+            CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesActivationList.pop();
+            pRigidBody->Activate();
+            m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
+                                                                                              m_pDynamicsWorld->getDispatcher());
+        }
+    }
+
     m_bWorldHasChanged = false;
 }
 
@@ -863,7 +867,5 @@ void CBulletPhysics::DoPulse()
     PostProcessCollisions();
 
     m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
-
-    isDuringSimulation = false;
     // ClearOutsideWorldRigidBodies();
 }

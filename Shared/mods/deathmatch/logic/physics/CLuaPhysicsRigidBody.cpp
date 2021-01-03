@@ -34,12 +34,6 @@ void CLuaPhysicsRigidBody::Initialize()
     GetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
     GetTempData(eTempDataKey::CenterOfMass, vecCenterOfMass);
 
-    CVector         position, rotation;
-    {
-        std::lock_guard guard(m_matrixLock);
-        position = m_matrix.GetPosition();
-        rotation = m_matrix.GetRotation();
-    }
     m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
     m_pRigidBodyProxy->setUserPointer((void*)this);
@@ -48,9 +42,7 @@ void CLuaPhysicsRigidBody::Initialize()
     SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
 
     Ready();
-    SetPosition(position);
-    SetRotation(rotation);
-    SetMatrix(m_matrix);
+    //SetMatrix(m_matrix);
 }
 
 void CLuaPhysicsRigidBody::HasMoved()
@@ -58,11 +50,8 @@ void CLuaPhysicsRigidBody::HasMoved()
     std::lock_guard guard(m_matrixLock);
 
     const btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
-    CVector            position, rotation;
-    CLuaPhysicsSharedLogic::GetPosition(transform, position);
-    CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
-    m_matrix.SetPosition(position);
-    m_matrix.SetRotation(rotation);
+    m_matrix.SetPosition(CLuaPhysicsSharedLogic::GetPosition(transform));
+    m_matrix.SetRotation(CLuaPhysicsSharedLogic::GetRotation(transform));
 }
 
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChanges)
@@ -76,8 +65,10 @@ void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChang
         return;
 
     std::function<void()> change([&, vecPosition]() {
-        btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
+        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
         CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
+        m_pRigidBodyProxy->setWorldTransform(transform);
         m_pRigidBodyProxy->proceedToTransform(transform);
         NeedsActivation();
     });

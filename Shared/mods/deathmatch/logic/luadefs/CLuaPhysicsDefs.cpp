@@ -1275,10 +1275,9 @@ bool CLuaPhysicsDefs::PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody)
 std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float time, std::optional<bool> ignoreGravity)
 {
     btTransform& transform = pRigidBody->PredictTransform(time);
-    CVector      position, rotation;
 
-    CLuaPhysicsSharedLogic::GetPosition(transform, position);
-    CLuaPhysicsSharedLogic::GetRotation(transform, rotation);
+    CVector position = CLuaPhysicsSharedLogic::GetPosition(transform);
+    CVector rotation = CLuaPhysicsSharedLogic::GetRotation(transform);
     if (!ignoreGravity.value_or(false))
     {
         CVector gravityFactor = pRigidBody->GetPhysics()->GetGravity() * time * time * 0.5;

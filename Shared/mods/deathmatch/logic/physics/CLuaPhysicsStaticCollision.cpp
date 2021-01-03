@@ -30,7 +30,7 @@ void CLuaPhysicsStaticCollision::Initialize()
 
     Ready();
 
-    SetMatrix(m_matrix);
+    //SetMatrix(m_matrix);
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition, bool dontCommitChanges)
