@@ -664,7 +664,8 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
     template <typename T>
     inline int PushResult(lua_State* L, const T& value)
     {
-        return lua::Push(L, value);
+        lua::Push(L, value);
+        return 1;
     }
 
     inline int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
