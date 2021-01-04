@@ -642,13 +642,29 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
             }
             else
             {
-                return lua::Push(L, Func(std::forward<Params>(ps)...));
+                return PushResult(L, Func(std::forward<Params>(ps)...));
             }
         }
         else
         {
             return Call(L, ps..., Pop<typename nth_element_impl<sizeof...(Params), Args...>::type>(L, iIndex));
         }
+    }
+
+    // Tuples can be used to return multiple results
+    template <typename... Ts>
+    inline int PushResult(lua_State* L, const std::tuple<Ts...>& tuple)
+    {
+        // Call Push on each element of the tuple
+        std::apply([L](const auto&... value) { (lua::Push(L, value), ...); }, tuple);
+        return sizeof...(Ts);
+    }
+
+    // If `T` is not a tuple, defer to Push to push the value onto the stack
+    template <typename T>
+    inline int PushResult(lua_State* L, const T& value)
+    {
+        return lua::Push(L, value);
     }
 
     inline int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)

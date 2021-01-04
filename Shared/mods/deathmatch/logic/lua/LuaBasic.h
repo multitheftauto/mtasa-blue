@@ -144,7 +144,7 @@ namespace lua
     /*****************************************************************\
     * The functions below may depend on each other, so they need to be
     * forward declared.
-    * Please define functions that call `Push` after this line.
+    * Please declare functions that call `Push` after this line.
     \*****************************************************************/
 
     template <typename... Ts>
@@ -228,12 +228,25 @@ namespace lua
         return 1;
     }
 
-    // Tuples can be used to return multiple results
+    // Tuples can be used to build fixed-size tables
+    // e.g. `std::tuple<float, int, bool>` will be pushed as { float, int, bool }
     template<typename... Ts>
     int Push(lua_State* L, const std::tuple<Ts...>& tuple)
     {
         // Call Push on each element of the tuple
-        std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
-        return sizeof...(Ts);
+        lua_createtable(L, sizeof...(Ts), 0);
+        
+        std::apply([L](const auto&... values) {
+            int  key = 1;
+            auto PushTable = [](lua_State* L, int& key, const auto& value)
+            {
+                Push(L, key++);
+                Push(L, value);
+                lua_settable(L, -3);
+            };
+
+            (PushTable(L, key, values), ...);
+        }, tuple);
+        return 1;
     }
 }
