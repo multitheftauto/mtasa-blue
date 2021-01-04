@@ -125,13 +125,13 @@ void CResourceFileDownloadManager::DoPulse()
         return;
 
     // Pulse the http downloads
-    uint uiDownloadSizeTotal = 0;
+    uint uiDownloadedSizeTotal = 0;
 
     for (auto serverInfo : m_HttpServerList)
     {
         CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(serverInfo.downloadChannel);
         pHTTP->ProcessQueuedFiles();
-        uiDownloadSizeTotal += pHTTP->GetDownloadSizeNow();
+        uiDownloadedSizeTotal += pHTTP->GetDownloadSizeNow();
     }
 
     // Handle fatal error
@@ -148,12 +148,12 @@ void CResourceFileDownloadManager::DoPulse()
     }
 
     // Update progress box
-    GetTransferBox()->SetDownloadProgress(uiDownloadSizeTotal);
+    GetTransferBox()->SetDownloadProgress(uiDownloadedSizeTotal);
     GetTransferBox()->DoPulse();
 
     // Call Lua event 'onClientTransferBoxProgressChange'
     CLuaArguments arguments;
-    arguments.PushNumber(uiDownloadSizeTotal);
+    arguments.PushNumber(uiDownloadedSizeTotal);
     arguments.PushNumber(GetTransferBox()->GetDownloadTotalSize());
 
     g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxProgressChange", arguments, false);

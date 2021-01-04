@@ -96,13 +96,13 @@ void CTransferBox::Hide()
     m_downloadTotalSize = 0;
 }
 
-void CTransferBox::SetDownloadProgress(uint64_t downloadBytesCurrent)
+void CTransferBox::SetDownloadProgress(uint64_t downloadedSizeTotal)
 {
-    SString current = GetDataUnit(downloadBytesCurrent);
+    SString current = GetDataUnit(downloadedSizeTotal);
     SString total = GetDataUnit(m_downloadTotalSize);
     SString progress = m_titleProgressPrefix + " " + SString(_("%s of %s"), current.c_str(), total.c_str());
     m_window->SetText(progress.c_str());
-    m_progressBar->SetProgress(static_cast<float>(static_cast<double>(downloadBytesCurrent) / m_downloadTotalSize));
+    m_progressBar->SetProgress(static_cast<float>(static_cast<double>(downloadedSizeTotal) / m_downloadTotalSize));
 }
 
 void CTransferBox::DoPulse()

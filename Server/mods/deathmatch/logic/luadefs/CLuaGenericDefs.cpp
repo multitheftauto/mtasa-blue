@@ -14,17 +14,12 @@
 void CLuaGenericDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
+        {"setTransferBoxVisible", ArgumentParser<CStaticFunctionDefinitions::SetClientTransferBoxVisible>},
         {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
     };
 
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
-}
-
-bool CLuaGenericDefs::SetTransferBoxVisible(bool visible)
-{
-    return CStaticFunctionDefinitions::SetClientTransferBoxVisible(visible);
 }
 
 bool CLuaGenericDefs::IsTransferBoxVisible()

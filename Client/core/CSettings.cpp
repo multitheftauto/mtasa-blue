@@ -384,7 +384,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Always show download window"), false));
     m_pCheckBoxAlwaysShowTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
-    m_pCheckBoxAlwaysShowTransferBox->AutoSize(NULL, 20.0f);
+    m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));

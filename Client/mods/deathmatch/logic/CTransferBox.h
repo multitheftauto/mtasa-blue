@@ -11,8 +11,6 @@
 
 #pragma once
 
-// #include "CClientCommon.h"
-// #include <gui/CGUI.h>
 #include <memory>
 #include <bitset>
 
@@ -34,7 +32,7 @@ public:
 
     bool IsVisible() const { return m_visible[TB_VISIBILITY_MTA]; }
 
-    void SetDownloadProgress(uint64_t downloadBytesCurrent);
+    void SetDownloadProgress(uint64_t downloadedSizeTotal);
 
     void     AddToDownloadTotalSize(uint64 bytes) { m_downloadTotalSize += bytes; }
     uint64_t GetDownloadTotalSize() const { return m_downloadTotalSize; }
