@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsHeightfieldTerrainShape::CLuaPhysicsHeightfieldTerrainShape(CBulletPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float> vecHeightData)
-    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData)))
+    : CLuaPhysicsConcaveShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData)))
 {
     m_iSizeX = iSizeX;
     m_iSizeY = iSizeY;

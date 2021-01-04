@@ -13,7 +13,7 @@ class CLuaPhysicsHeightfieldTerrainShape;
 
 #pragma once
 
-class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsShape
+class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsConcaveShape
 {
 public:
     CLuaPhysicsHeightfieldTerrainShape(CBulletPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float> vecHeightData);

@@ -13,7 +13,7 @@ class CLuaPhysicsCapsuleShape;
 
 #pragma once
 
-class CLuaPhysicsCapsuleShape : public CLuaPhysicsShape
+class CLuaPhysicsCapsuleShape : public CLuaPhysicsConvexShape
 {
 public:
     CLuaPhysicsCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);

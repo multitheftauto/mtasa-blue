@@ -23,7 +23,7 @@ struct STriangleInfo
     CVector vecVertex3;
 };
 
-class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsShape
+class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsConcaveShape
 {
     struct SVertexUpdate
     {

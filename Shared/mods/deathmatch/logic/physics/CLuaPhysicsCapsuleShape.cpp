@@ -11,7 +11,8 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight)))
+CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
+    : CLuaPhysicsConvexShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight)))
 {
 }
 

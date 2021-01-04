@@ -11,7 +11,8 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsConeShape::CLuaPhysicsConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight)))
+CLuaPhysicsConeShape::CLuaPhysicsConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
+    : CLuaPhysicsConvexShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight)))
 {
 }
 

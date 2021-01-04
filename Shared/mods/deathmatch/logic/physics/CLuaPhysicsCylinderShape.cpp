@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsCylinderShape::CLuaPhysicsCylinderShape(CBulletPhysics* pPhysics, CVector half)
-    : CLuaPhysicsShape(pPhysics, CLuaPhysicsSharedLogic::CreateCylinder(half))
+    : CLuaPhysicsConvexShape(pPhysics, CLuaPhysicsSharedLogic::CreateCylinder(half))
 {
 }
 

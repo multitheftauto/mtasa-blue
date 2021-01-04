@@ -13,7 +13,7 @@ class CLuaPhysicsCylinderShape;
 
 #pragma once
 
-class CLuaPhysicsCylinderShape : public CLuaPhysicsShape
+class CLuaPhysicsCylinderShape : public CLuaPhysicsConvexShape
 {
 public:
     CLuaPhysicsCylinderShape(CBulletPhysics* pPhysics, CVector half);

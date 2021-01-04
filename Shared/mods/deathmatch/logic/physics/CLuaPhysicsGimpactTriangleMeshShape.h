@@ -13,7 +13,7 @@ class CLuaPhysicsGimpactTriangleMeshShape;
 
 #pragma once
 
-class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsShape
+class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsConcaveShape
 {
 public:
     CLuaPhysicsGimpactTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecVertices);

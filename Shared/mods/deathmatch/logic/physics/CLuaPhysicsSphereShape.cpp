@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsSphereShape::CLuaPhysicsSphereShape(CBulletPhysics* pPhysics, float fRadius)
-    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateSphere(fRadius)))
+    : CLuaPhysicsConvexShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateSphere(fRadius)))
 {
 }
 

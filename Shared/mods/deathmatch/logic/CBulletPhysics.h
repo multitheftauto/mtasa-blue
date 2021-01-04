@@ -25,6 +25,8 @@ class CPhysicsDebugDrawer;
 #include "physics/CLuaPhysicsElement.h"
 #include "physics/CLuaPhysicsWorldElement.h"
 #include "physics/CLuaPhysicsShape.h"
+#include "physics/CLuaPhysicsConvexShape.h"
+#include "physics/CLuaPhysicsConcaveShape.h"
 
 #include "CBulletPhysicsProfiler.h"
 
