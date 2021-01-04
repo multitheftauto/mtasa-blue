@@ -10640,6 +10640,27 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
     return true;
 }
 
+void CStaticFunctionDefinitions::SendClientTransferBoxVisibility(CPlayer* player)
+{
+    CBitStream BitStream;
+    BitStream->WriteBit(g_pGame->IsClientTransferBoxVisible());
+
+    if (player)
+        player->Send(CLuaPacket(SET_TRANSFER_BOX_VISIBILITY, *BitStream.pBitStream));
+    else
+        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_TRANSFER_BOX_VISIBILITY, *BitStream.pBitStream));
+}
+
+bool CStaticFunctionDefinitions::SetClientTransferBoxVisible(bool visible)
+{
+    if (g_pGame->IsClientTransferBoxVisible() == visible)
+        return false;
+
+    g_pGame->SetClientTransferBoxVisible(visible);
+    SendClientTransferBoxVisibility();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetWeather(unsigned char ucWeather)
 {
     // Verify it's within the max valid weather id

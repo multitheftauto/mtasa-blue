@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"
+#include "../luadefs/CLuaClientDefs.h"
 
 using std::list;
 
@@ -277,5 +278,6 @@ void CLuaManager::LoadCFunctions()
     CLuaWeaponDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
+    CLuaClientDefs::LoadFunctions();
     CLuaPhysicsDefs::LoadFunctions();
 }
