@@ -381,6 +381,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
     m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAlwaysShowTransferBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Always show download window"), false));
+    m_pCheckBoxAlwaysShowTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
+    m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1506,20 +1511,6 @@ void CSettings::UpdateVideoTab()
     bool bShowUnsafeResolutions;
     CVARS_GET("show_unsafe_resolutions", bShowUnsafeResolutions);
     m_pCheckBoxShowUnsafeResolutions->SetSelected(bShowUnsafeResolutions);
-
-    // Allow screen upload
-    bool bAllowScreenUploadEnabled;
-    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
-    m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
-
-    // Allow external sounds
-    bool bAllowExternalSoundsEnabled;
-    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
-    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
-
-    // Customized sa files
-    m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
-    m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
 
     // Grass
     bool bGrassEnabled;
@@ -2931,6 +2922,25 @@ void CSettings::LoadData()
     CVARS_GET("auto_refresh_browser", bVar);
     m_pAutoRefreshBrowser->SetSelected(bVar);
 
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled;
+    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
+    m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled;
+    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
+    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
+
+    // Always show transfer box
+    bool alwaysShowTransferBox = false;
+    CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
+    m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
+
+    // Customized sa files
+    m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
+    m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
+
     // Controls
     CVARS_GET("invert_mouse", bVar);
     m_pInvertMouse->SetSelected(bVar);
@@ -3347,6 +3357,9 @@ void CSettings::SaveData()
     // Allow external sounds
     bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
     CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
+
+    // Always show transfer box
+    CVARS_SET("always_show_transferbox", m_pCheckBoxAlwaysShowTransferBox->GetSelected());
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
