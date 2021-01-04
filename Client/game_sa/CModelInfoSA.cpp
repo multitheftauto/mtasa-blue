@@ -25,8 +25,6 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
-// std::array<
-
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
