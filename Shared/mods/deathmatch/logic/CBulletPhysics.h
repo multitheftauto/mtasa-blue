@@ -175,12 +175,26 @@ public:
     struct CIslandCallback : public btSimulationIslandManager::IslandCallback
     {
     public:
-        std::unordered_map<int, int> m_islandBodies;
+        int                                     iTargetIsland = -1;
+        std::unordered_map<int, int>            m_islandBodies;
+        std::vector<CLuaPhysicsRigidBody*> m_bodies;
         ~CIslandCallback() {}
         void processIsland(btCollisionObject** bodies, int numBodies, class btPersistentManifold** manifolds, int numManifolds, int islandId)
         {
-            if (numBodies > 0)
-                m_islandBodies[islandId] = numBodies;
+            if (iTargetIsland != -1)
+            {
+                if (iTargetIsland == islandId)
+                {
+                    m_bodies.reserve(numBodies);
+                    for (int i = 0; i < numBodies; i++)
+                        m_bodies.push_back((CLuaPhysicsRigidBody*)(bodies[i]->getUserPointer()));
+                }
+            }
+            else
+            {
+                if (numBodies > 0)
+                    m_islandBodies[islandId] = numBodies;
+            }
         }
     };
 
@@ -233,7 +247,7 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    void    UpdateSimulationIslandCache();
+    void    UpdateSimulationIslandCache(int iTargetIsland = -1);
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
                                                           CVector vecLocalInertia = CVector(0, 0, 0),

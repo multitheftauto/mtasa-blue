@@ -121,6 +121,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
         {"physicsGetSimulationIslands", ArgumentParser<PhysicsGetSimulationIslands>},
+        {"physicsGetIslandRigidBodies", ArgumentParser<PhysicsGetIslandRigidBodies>},
 #ifdef MTA_CLIENT
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
 #endif
@@ -1498,6 +1499,17 @@ std::variant<bool, float> CLuaPhysicsDefs::PhysicsGetDebugMode(CBulletPhysics* p
             return pPhysics->GetDebug()->GetDrawDistance();
     }
     return pPhysics->GetDebug()->getDebugMode(eDebugMode);
+}
+
+std::vector<CLuaPhysicsRigidBody*> CLuaPhysicsDefs::PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iIsland)
+{
+    if (iIsland >= 0)
+    {
+        pPhysics->UpdateSimulationIslandCache(iIsland);
+        CBulletPhysics::CIslandCallback* callback = pPhysics->GetSimulationIslandCallback();
+        return callback->m_bodies;
+    }
+    return std::vector<CLuaPhysicsRigidBody*>();
 }
 
 std::unordered_map<int, int> CLuaPhysicsDefs::PhysicsGetSimulationIslands(CBulletPhysics* pPhysics)

@@ -108,6 +108,7 @@ public:
     static bool PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float> PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
     static std::unordered_map<int, int> PhysicsGetSimulationIslands(CBulletPhysics* pPhysics);
+    static std::vector<CLuaPhysicsRigidBody*> PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iIsland);
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
 #endif
