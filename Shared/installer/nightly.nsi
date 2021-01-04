@@ -739,7 +739,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\cgui\sagothic.ttf"
             File "${FILES_ROOT}\mta\cgui\saheader.ttf"
             File "${FILES_ROOT}\mta\cgui\sans.ttf"
-            File "${FILES_ROOT}\mta\cgui\unifont-5.1.20080907.ttf"
+            File "${FILES_ROOT}\mta\cgui\unifont-13.0.04.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
             File "${FILES_ROOT}\mta\cgui\images\*.png"
