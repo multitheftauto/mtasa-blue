@@ -57,7 +57,7 @@ U getOption(const T& options, const std::string& szProperty, const U& default)
     if (const auto it = options.find(szProperty); it != options.end())
     {
         if (!std::holds_alternative<U>(it->second))
-            throw std::invalid_argument(SString("'%s' value must be ...", szProperty).c_str());
+            throw std::invalid_argument(SString("'%s' value must be ...", szProperty.c_str()).c_str());
         return std::get<U>(it->second);
     }
     return default;
@@ -120,6 +120,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsIsDuringSimulation", ArgumentParser<PhysicsIsDuringSimulation>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
+        {"physicsGetSimulationIslands", ArgumentParser<PhysicsGetSimulationIslands>},
 #ifdef MTA_CLIENT
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
 #endif
@@ -149,8 +150,10 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
         {
             CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
             CVector            gravity = getOption(mapOptions, "gravity", BulletPhysics::Defaults::Gravity);
-            int                parallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
-            pPhysics->Initialize(parallelSolvers);
+            int                iParallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
+            int                iGrainSize = getOption(mapOptions, "grainSize", BulletPhysics::Defaults::GrainSize);
+            double             ulSeed = getOption(mapOptions, "seed", BulletPhysics::Defaults::Seed);
+            pPhysics->Initialize(iParallelSolvers, iGrainSize, (unsigned long)ulSeed);
             pPhysics->SetGravity(gravity);
             return pPhysics;
         }
@@ -1495,6 +1498,13 @@ std::variant<bool, float> CLuaPhysicsDefs::PhysicsGetDebugMode(CBulletPhysics* p
             return pPhysics->GetDebug()->GetDrawDistance();
     }
     return pPhysics->GetDebug()->getDebugMode(eDebugMode);
+}
+
+std::unordered_map<int, int> CLuaPhysicsDefs::PhysicsGetSimulationIslands(CBulletPhysics* pPhysics)
+{
+    pPhysics->UpdateSimulationIslandCache();
+    CBulletPhysics::CIslandCallback* callback = pPhysics->GetSimulationIslandCallback();
+    return callback->m_islandBodies;
 }
 
 #ifdef MTA_CLIENT

@@ -17,7 +17,7 @@ typedef std::variant<PositionArray, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CL
 typedef std::unordered_map<std::string, RayResultValue>                                                          RayResult;
 typedef std::unordered_map<std::string, std::variant<bool, int>>                                                 RayOptions;
 typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            RigidBodyOptions;
-typedef std::unordered_map<std::string, std::variant<int, CVector>>                                            CreateWorldOptions;
+typedef std::unordered_map<std::string, std::variant<int, double, CVector>>                                            CreateWorldOptions;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -107,6 +107,7 @@ public:
     static bool PhysicsIsDuringSimulation(CBulletPhysics* pPhysics);
     static bool PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float> PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
+    static std::unordered_map<int, int> PhysicsGetSimulationIslands(CBulletPhysics* pPhysics);
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
 #endif

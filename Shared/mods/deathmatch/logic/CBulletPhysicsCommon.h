@@ -58,5 +58,7 @@ namespace BulletPhysics
         inline constexpr int     FilterGroup = 1;
         inline constexpr int     FilterMask = -1;
         inline constexpr int     ParallelSolvers = 1;
+        inline constexpr int     GrainSize = 40;
+        inline constexpr double  Seed = 0;
     }            // namespace Defaults
 }            // namespace BulletPhysics

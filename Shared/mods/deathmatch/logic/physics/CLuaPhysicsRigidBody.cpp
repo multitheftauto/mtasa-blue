@@ -35,7 +35,6 @@ void CLuaPhysicsRigidBody::Initialize()
     GetTempData(eTempDataKey::CenterOfMass, vecCenterOfMass);
 
     m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass);
-
     m_pRigidBodyProxy->setUserPointer((void*)this);
 
     SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);

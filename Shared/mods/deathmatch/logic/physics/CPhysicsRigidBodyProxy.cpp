@@ -11,6 +11,23 @@
 
 #include "StdInc.h"
 
+MotionState::MotionState(const btTransform& startTrans, const btTransform& centerOfMassOffset)
+    : m_graphicsWorldTrans(startTrans), m_centerOfMassOffset(centerOfMassOffset), m_startWorldTrans(startTrans)
+{
+}
+
+void MotionState::getWorldTransform(btTransform& centerOfMassWorldTrans) const
+{
+    std::lock_guard guard(m_lock);
+    centerOfMassWorldTrans = m_graphicsWorldTrans * m_centerOfMassOffset.inverse();
+}
+
+void MotionState::setWorldTransform(const btTransform& centerOfMassWorldTrans)
+{
+    std::lock_guard guard(m_lock);
+    m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset;
+}
+
 void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
 {
     if (bEnabled != m_bEnabled)
@@ -27,11 +44,11 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
     }
 }
 
-std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass,
-                                                                       CVector vecLocalInertia, CVector vecCenterOfMass)
+std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
+                                                                       CVector vecCenterOfMass)
 {
     btTransform           transform = btTransform::getIdentity();
-    btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
+    MotionState* motionstate = new MotionState(transform);
 
     CLuaPhysicsSharedLogic::SetPosition(motionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->GetBtShape();

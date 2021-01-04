@@ -19,10 +19,26 @@ class CPhysicsRigidBodyProxy;
 class CLuaPhysicsShape;
 class CBulletPhysics;
 
+
+class MotionState : public btMotionState
+{
+public:
+    MotionState(const btTransform& startTrans = btTransform::getIdentity(), const btTransform& centerOfMassOffset = btTransform::getIdentity());
+    void getWorldTransform(btTransform& centerOfMassWorldTrans) const;
+    void setWorldTransform(const btTransform& centerOfMassWorldTrans);
+
+    btTransform m_graphicsWorldTrans;
+    btTransform m_centerOfMassOffset;
+    btTransform m_startWorldTrans;
+private:
+    mutable std::mutex m_lock;
+};
+
+
 class CPhysicsRigidBodyProxy : public CPhysicsProxyElement, public btRigidBody
 {
 public:
-    CPhysicsRigidBodyProxy(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0))
+    CPhysicsRigidBodyProxy(btScalar mass, MotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0))
         : btRigidBody(mass, motionState, collisionShape, localInertia){};
 
     CPhysicsRigidBodyProxy(const btRigidBodyConstructionInfo& constructionInfo) : btRigidBody(constructionInfo){};

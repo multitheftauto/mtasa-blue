@@ -19,6 +19,7 @@ class CPhysicsDebugDrawer;
 #include "bulletphysics3d/BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
 #include "bulletphysics3d/BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"
 #include "bulletphysics3d/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h"
+#include "bulletphysics3d/BulletCollision/CollisionDispatch/btCollisionDispatcherMt.h"
 
 #include "physics/CLuaPhysicsSharedLogic.h"
 #include "physics/CLuaPhysicsElement.h"
@@ -78,7 +79,7 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    void Initialize(int parallelSolvers);
+    void Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed);
     struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
     {
         std::vector<int> m_hitTriangleIndices;
@@ -170,6 +171,19 @@ public:
             return btCollisionWorld::ClosestConvexResultCallback::addSingleResult(rayResult, normalInWorldSpace);
         }
     };
+
+    struct CIslandCallback : public btSimulationIslandManager::IslandCallback
+    {
+    public:
+        std::unordered_map<int, int> m_islandBodies;
+        ~CIslandCallback() {}
+        void processIsland(btCollisionObject** bodies, int numBodies, class btPersistentManifold** manifolds, int numManifolds, int islandId)
+        {
+            if (numBodies > 0)
+                m_islandBodies[islandId] = numBodies;
+        }
+    };
+
 #ifdef MTA_CLIENT
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DrawDebugLines();
@@ -218,6 +232,8 @@ public:
     bool    GetTriggerConstraintvents() const { return m_bTriggerConstraintEvents; }
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
+
+    void    UpdateSimulationIslandCache();
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
                                                           CVector vecLocalInertia = CVector(0, 0, 0),
@@ -275,6 +291,8 @@ public:
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<CLuaPhysicsConstraint*>      GetConstraints() const { return m_vecConstraints; }
 
+    CIslandCallback* GetSimulationIslandCallback() const { return m_pIslandCallback.get(); }
+
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
@@ -305,6 +323,7 @@ private:
     std::unique_ptr<btConstraintSolverPoolMt>              m_pMtSolverPool;
     std::unique_ptr<btBroadphaseInterface>                 m_pOverlappingPairCache;
     std::unique_ptr<btCollisionDispatcher>                 m_pDispatcher;
+    std::unique_ptr<btCollisionDispatcherMt>               m_pDispatcherMt;
     std::unique_ptr<btDefaultCollisionConfiguration>       m_pCollisionConfiguration;
     std::unique_ptr<btDiscreteDynamicsWorldMt>             m_pDynamicsWorldMt;
     std::unique_ptr<btDiscreteDynamicsWorld>               m_pDynamicsWorld;
@@ -326,7 +345,7 @@ private:
     bool               m_bWorldHasChanged = false;
     std::mutex         m_lockWorldHasChanged;
     float              m_fImpulseThreshold = 0.01f;
-    std::atomic<bool>  m_bSimulationEnabled = true;
+    std::atomic<bool>  m_bSimulationEnabled = false;
     bool               m_bTriggerEvents = true;
     bool               m_bTriggerCollisionEvents = false;            // spam alert
     bool               m_bTriggerConstraintEvents = false;
@@ -350,6 +369,7 @@ private:
 
     std::vector<CLuaPhysicsWorldElement*> m_vecLastContact;
     std::unordered_map<const char*, ProfilerTime>    m_mapProfileTimings;
+    std::unique_ptr<CIslandCallback>              m_pIslandCallback;
 };
 
 struct BroadphaseAabbCallback : public btBroadphaseAabbCallback

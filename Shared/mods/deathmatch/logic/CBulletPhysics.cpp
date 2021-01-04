@@ -32,36 +32,43 @@ CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(par
 
     SetTypeName("physics");
 
+    m_pIslandCallback = std::make_unique<CIslandCallback>();
     // Add us to Physics manager's list
     m_pPhysicsManager->AddToList(this);
 }
 
-void CBulletPhysics::Initialize(int parallelSolvers)
+void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed)
 {
     m_pOverlappingPairCache = std::make_unique<btDbvtBroadphase>();
     m_pCollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
-    m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
     m_pDebugDrawer = std::make_unique<CPhysicsDebugDrawer>();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 
-    if (parallelSolvers > 1)
+    if (iParallelSolvers > 1)
     {
         m_pSolverMt = std::make_unique<btSequentialImpulseConstraintSolverMt>();
-        m_pMtSolverPool = std::make_unique<btConstraintSolverPoolMt>(parallelSolvers);
-        m_pDynamicsWorldMt = std::make_unique<btDiscreteDynamicsWorldMt>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pMtSolverPool.get(),
+        m_pSolverMt->setRandSeed(ulSeed);
+        m_pMtSolverPool = std::make_unique<btConstraintSolverPoolMt>(iParallelSolvers);
+        m_pDispatcherMt = std::make_unique<btCollisionDispatcherMt>(m_pCollisionConfiguration.get(), iGrainSize);
+        m_pDynamicsWorldMt = std::make_unique<btDiscreteDynamicsWorldMt>(m_pDispatcherMt.get(), m_pOverlappingPairCache.get(), m_pMtSolverPool.get(),
                                                                        m_pSolverMt.get(), m_pCollisionConfiguration.get());
         m_bUseMt = true;
         m_pDynamicsWorldMt->setGravity(BulletPhysics::Defaults::Gravity);
         m_pDynamicsWorldMt->setDebugDrawer(m_pDebugDrawer.get());
+        m_pDynamicsWorldMt->getSimulationIslandManager()->setSplitIslands(true);
     }
     else
     {
+        m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
         m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
+        m_pSolver->setRandSeed(ulSeed);
         m_pDynamicsWorld = std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
         m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
         m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
+        m_pDynamicsWorld->getSimulationIslandManager()->setSplitIslands(true);
         m_bUseMt = false;
     }
+    m_bSimulationEnabled = true;
 }
 
 CBulletPhysics::~CBulletPhysics()
@@ -343,18 +350,30 @@ void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 
 void CBulletPhysics::StepSimulation()
 {
-    if (!m_bSimulationEnabled)
-        return;
-
     BT_PROFILE("stepSimulation");
     isDuringSimulation = true;
     std::lock_guard guard(dynamicsWorldLock);
+
+    //if (m_bUseMt)
+    //    m_pDynamicsWorldMt->getSimulationIslandManager()->buildIslands(m_pDispatcherMt.get(), m_pDynamicsWorldMt.get());
+    //else
+    //    m_pDynamicsWorld->getSimulationIslandManager()->buildIslands(m_pDispatcher.get(), m_pDynamicsWorld.get());
+    //
     if (m_bUseMt)
         m_pDynamicsWorldMt->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
     else
         m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
 
     isDuringSimulation = false;
+}
+
+void CBulletPhysics::UpdateSimulationIslandCache()
+{
+    m_pIslandCallback->m_islandBodies.clear();
+    if (m_bUseMt)
+        m_pDynamicsWorldMt->getSimulationIslandManager()->processIslands(m_pDispatcherMt.get(), m_pDynamicsWorldMt.get(), m_pIslandCallback.get());
+    else
+        m_pDynamicsWorld->getSimulationIslandManager()->processIslands(m_pDispatcher.get(), m_pDynamicsWorld.get(), m_pIslandCallback.get());
 }
 
 void CBulletPhysics::ClearOutsideWorldRigidBodies()
@@ -705,6 +724,8 @@ CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(
 
 bool CBulletPhysics::CanDoPulse()
 {
+    if (!m_bSimulationEnabled)
+        return false;
     return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
 }
 
