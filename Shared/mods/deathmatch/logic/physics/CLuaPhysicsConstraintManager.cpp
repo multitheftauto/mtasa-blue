@@ -12,31 +12,16 @@
 #include <StdInc.h>
 #include "CLuaPhysicsConstraintManager.h"
 
-void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pConstraint)
+void CLuaPhysicsConstraintManager::Remove(CLuaPhysicsConstraint* pConstraint)
 {
     assert(pConstraint);
 
     // Check if already removed
-    if (!ListContains(m_List, pConstraint))
+    if (!ListContains(m_elementsList, pConstraint))
         return;
 
     // Remove all references
-    ListRemove(m_List, pConstraint);
-}
-
-CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(unsigned int uiScriptID)
-{
-    CLuaPhysicsConstraint* pLuaContraint = (CLuaPhysicsConstraint*)CIdArray::FindEntry(uiScriptID, EIdClass::CONSTRAINT);
-    if (!pLuaContraint)
-        return nullptr;
-
-    if (!ListContains(m_List, pLuaContraint))
-        return nullptr;
-
-    return pLuaContraint;
-}
-
-void CLuaPhysicsConstraintManager::AddConstraint(CLuaPhysicsConstraint* pConstraint)
-{
-    m_List.push_back(pConstraint);
+    pConstraint->Unlink();
+    pConstraint->GetPhysics()->DestroyConstraint(pConstraint);
+    ListRemove(m_elementsList, pConstraint);
 }

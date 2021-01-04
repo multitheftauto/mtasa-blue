@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 
+#include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
 #include "physics/CLuaPhysicsConstraintManager.h"
@@ -284,16 +285,16 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
     switch (pPhysicsElement->GetClassType())
     {
         case EIdClassType::RIGID_BODY:
-            m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody((CLuaPhysicsRigidBody*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsRigidBodyManager()->Remove((CLuaPhysicsRigidBody*)pPhysicsElement);
             break;
         case EIdClassType::SHAPE:
-            m_pLuaMain->GetPhysicsShapeManager()->RemoveShape((CLuaPhysicsShape*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsShapeManager()->Remove((CLuaPhysicsShape*)pPhysicsElement);
             break;
         case EIdClassType::STATIC_COLLISION:
-            m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision((CLuaPhysicsStaticCollision*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsStaticCollisionManager()->Remove((CLuaPhysicsStaticCollision*)pPhysicsElement);
             break;
         case EIdClassType::CONSTRAINT:
-            m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint((CLuaPhysicsConstraint*)pPhysicsElement);
+            m_pLuaMain->GetPhysicsConstraintManager()->Remove((CLuaPhysicsConstraint*)pPhysicsElement);
             break;
     }
 }
@@ -308,7 +309,7 @@ void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
     ListRemove(m_vecShapes, pLuaShape);
 }
 
-void CBulletPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
+void CBulletPhysics::DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint)
 {
     ListRemove(m_vecConstraints, pLuaConstraint);
 }
@@ -320,7 +321,7 @@ void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticC
 
 void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
+    m_pLuaMain->GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
     m_InitializeStaticCollisionsList.push(pStaticCollision);
     m_vecStaticCollisions.push_back(pStaticCollision);
     m_bWorldHasChanged = true;
@@ -328,13 +329,13 @@ void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticColli
 
 void CBulletPhysics::AddShape(CLuaPhysicsShape* pShape)
 {
-    m_pLuaMain->GetPhysicsShapeManager()->AddShape(pShape);
+    m_pLuaMain->GetPhysicsShapeManager()->Add(pShape);
     m_vecShapes.push_back(pShape);
 }
 
 void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
+    m_pLuaMain->GetPhysicsRigidBodyManager()->Add(pRigidBody);
     m_vecRigidBodies.push_back(pRigidBody);
     m_InitializeRigidBodiesList.push(pRigidBody);
     m_bWorldHasChanged = true;
@@ -342,7 +343,7 @@ void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 
 void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 {
-    m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
+    m_pLuaMain->GetPhysicsConstraintManager()->Add(pConstraint);
     m_vecConstraints.push_back(pConstraint);
     m_InitializeConstraintsList.push(pConstraint);
     m_bWorldHasChanged = true;

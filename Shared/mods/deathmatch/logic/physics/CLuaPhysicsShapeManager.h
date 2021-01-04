@@ -13,26 +13,10 @@ class CLuaPhysicsShapeManager;
 
 #pragma once
 
-class CLuaPhysicsShapeManager
+class CLuaPhysicsShapeManager : public CLuaPhysicsBaseManager<CLuaPhysicsShape*>
 {
 public:
-    CLuaPhysicsShapeManager(){};
-    ~CLuaPhysicsShapeManager();
-
-    void RemoveAllShapes();
-
-    CLuaPhysicsShape* GetShapeFromScriptID(unsigned int uiScriptID);
-
-    void AddShape(CLuaPhysicsShape* pShape);
-
-    void          RemoveShape(CLuaPhysicsShape* pShape);
-    bool          IsShapeValid(CLuaPhysicsShape* pShape);
-    unsigned long GetShapeCount() const { return m_ShapeList.size(); }
-
-    std::vector<CLuaPhysicsShape*>::const_iterator IterBegin() { return m_ShapeList.begin(); }
-    std::vector<CLuaPhysicsShape*>::const_iterator IterEnd() { return m_ShapeList.end(); }
-
-private:
-    std::vector<CLuaPhysicsShape*> m_ShapeList;
-    std::mutex                     m_lock;
+    CLuaPhysicsShapeManager() : CLuaPhysicsBaseManager<CLuaPhysicsShape*>(EIdClassType::SHAPE) {}
+    void Remove(CLuaPhysicsShape* pShape);
+    bool IsShapeValid(CLuaPhysicsShape* pShape);
 };

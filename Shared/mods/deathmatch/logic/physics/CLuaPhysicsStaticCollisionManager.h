@@ -15,21 +15,9 @@ class CLuaPhysicsStaticCollisionManager;
 
 #pragma once
 
-class CLuaPhysicsStaticCollisionManager
+class CLuaPhysicsStaticCollisionManager : public CLuaPhysicsBaseManager<CLuaPhysicsStaticCollision*>
 {
 public:
-    CLuaPhysicsStaticCollisionManager(){};
-    ~CLuaPhysicsStaticCollisionManager();
-
-    void                        RemoveAllStaticCollisions();
-    CLuaPhysicsStaticCollision* GetStaticCollisionFromScriptID(unsigned int uiScriptID);
-
-    void                                     AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    void                                     RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    unsigned long                            GetRigidBodyCount() const { return m_StaticCollisionList.size(); }
-    std::vector<CLuaPhysicsStaticCollision*>::const_iterator IterBegin() { return m_StaticCollisionList.begin(); }
-    std::vector<CLuaPhysicsStaticCollision*>::const_iterator IterEnd() { return m_StaticCollisionList.end(); }
-
-private:
-    std::vector<CLuaPhysicsStaticCollision*> m_StaticCollisionList;
+    CLuaPhysicsStaticCollisionManager() : CLuaPhysicsBaseManager<CLuaPhysicsStaticCollision*>(EIdClassType::STATIC_COLLISION) {}
+    void                                     Remove(CLuaPhysicsStaticCollision* pStaticCollision);
 };

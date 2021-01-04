@@ -11,6 +11,7 @@
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
 
+#include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
 #include "physics/CLuaPhysicsConstraintManager.h"

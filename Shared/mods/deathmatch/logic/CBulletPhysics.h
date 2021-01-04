@@ -30,6 +30,7 @@ class CPhysicsDebugDrawer;
 
 #include "CBulletPhysicsProfiler.h"
 
+#include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsConstraintManager.h"
@@ -311,7 +312,7 @@ public:
 
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
-    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
+    void DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
 private:

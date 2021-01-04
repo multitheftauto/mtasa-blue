@@ -16,24 +16,9 @@ class CLuaPhysicsRigidBodyManager;
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsRigidBody.h"
 
-class CLuaPhysicsRigidBodyManager
+class CLuaPhysicsRigidBodyManager : public CLuaPhysicsBaseManager<CLuaPhysicsRigidBody*>
 {
 public:
-    CLuaPhysicsRigidBodyManager(){};
-    ~CLuaPhysicsRigidBodyManager();
-
-    void                  RemoveAllRigidBodies();
-    CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
-
-    void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-
-    unsigned long GetRigidBodyCount() const { return m_RigidBodyList.size(); }
-
-    std::vector<CLuaPhysicsRigidBody*>::const_iterator IterBegin() { return m_RigidBodyList.begin(); }
-    std::vector<CLuaPhysicsRigidBody*>::const_iterator IterEnd() { return m_RigidBodyList.end(); }
-
-private:
-    std::vector<CLuaPhysicsRigidBody*> m_RigidBodyList;
-    std::mutex                                         m_lock;
+    CLuaPhysicsRigidBodyManager() : CLuaPhysicsBaseManager<CLuaPhysicsRigidBody*>(EIdClassType::RIGID_BODY) {}
+    void Remove(CLuaPhysicsRigidBody* pRigidBody);
 };

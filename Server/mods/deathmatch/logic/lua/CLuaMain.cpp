@@ -670,22 +670,22 @@ int CLuaMain::OnUndump(const char* p, size_t n)
 
 CLuaPhysicsConstraint* CLuaMain::GetContraintFromScriptID(unsigned int uiScriptID)
 {
-    return m_pLuaPhysicsContraintManager->GetContraintFromScriptID(uiScriptID);
+    return m_pLuaPhysicsContraintManager->GetFromScriptID(uiScriptID);
 }
 
 CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
 {
-    return m_pLuaPhysicsRigidBodyManager->GetRigidBodyFromScriptID(uiScriptID);
+    return m_pLuaPhysicsRigidBodyManager->GetFromScriptID(uiScriptID);
 }
 
 CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
 {
-    return m_pLuaPhysicsStaticCollisionManager->GetStaticCollisionFromScriptID(uiScriptID);
+    return m_pLuaPhysicsStaticCollisionManager->GetFromScriptID(uiScriptID);
 }
 
 CLuaPhysicsShape* CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
 {
-    return m_pLuaPhysicsShapeManager->GetShapeFromScriptID(uiScriptID);
+    return m_pLuaPhysicsShapeManager->GetFromScriptID(uiScriptID);
 }
 
 CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScriptID)

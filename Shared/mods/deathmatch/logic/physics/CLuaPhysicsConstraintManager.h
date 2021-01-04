@@ -15,22 +15,9 @@ class CLuaPhysicsConstraintManager;
 
 #include "CLuaPhysicsConstraint.h"
 
-class CLuaPhysicsConstraintManager
+class CLuaPhysicsConstraintManager : public CLuaPhysicsBaseManager<CLuaPhysicsConstraint*>
 {
 public:
-    CLuaPhysicsConstraintManager(){};
-    ~CLuaPhysicsConstraintManager(){};
-
-    CLuaPhysicsConstraint* GetContraintFromScriptID(unsigned int uiScriptID);
-
-    void                   AddConstraint(CLuaPhysicsConstraint* pConstraint);
-    void                   RemoveContraint(CLuaPhysicsConstraint* pLuaPhysicsConstraint);
-
-    unsigned long GetContraintCount() const { return m_List.size(); }
-
-    std::vector<CLuaPhysicsConstraint*>::const_iterator IterBegin() { return m_List.begin(); }
-    std::vector<CLuaPhysicsConstraint*>::const_iterator IterEnd() { return m_List.end(); }
-
-private:
-    std::vector<CLuaPhysicsConstraint*> m_List;
+    CLuaPhysicsConstraintManager() : CLuaPhysicsBaseManager<CLuaPhysicsConstraint*>(EIdClassType::CONSTRAINT) {}
+    void Remove(CLuaPhysicsConstraint* pConstraint);
 };

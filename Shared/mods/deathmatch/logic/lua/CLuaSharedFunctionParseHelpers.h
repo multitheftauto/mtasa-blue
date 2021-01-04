@@ -59,7 +59,7 @@ CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* 
 #endif
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsRigidBodyManager()->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetPhysicsRigidBodyManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return nullptr;
 }
@@ -77,7 +77,7 @@ CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr,
 #endif
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetPhysicsStaticCollisionManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return nullptr;
 }
@@ -95,7 +95,7 @@ CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State
 #endif
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsConstraintManager()->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetPhysicsConstraintManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return nullptr;
 }
@@ -112,7 +112,7 @@ CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
 #endif
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsShapeManager()->GetShapeFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetPhysicsShapeManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return nullptr;
 }
