@@ -128,23 +128,25 @@ jobs:
   linux-release:
     name: linux-release
     runs-on: ubuntu-20.04
-    container:
-      image: docker://sbx320/mtasa-blue-azure:latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
       - name: Run Build
-        run: ./linux-build.sh
+        uses: ./
+        with:
+          entrypoint: /bin/bash
+          args: ./linux-build.sh
 
   linux-debug:
     name: linux-debug
     runs-on: ubuntu-20.04
-    container:
-      image: docker://sbx320/mtasa-blue-azure:latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
       - name: Run Build
-        run: ./linux-build.sh "" debug
+        uses: ./
+        with:
+          entrypoint: /bin/bash
+          args: ./linux-build.sh "" debug
