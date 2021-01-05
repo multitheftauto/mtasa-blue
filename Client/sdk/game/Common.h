@@ -12,7 +12,6 @@
 #pragma once
 
 #include <windows.h>
-#include <type_traits>
 #include <stdint.h>
 
 // Limits for MTA

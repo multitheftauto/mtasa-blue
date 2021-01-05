@@ -383,9 +383,9 @@ public:
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
-    bool         GetVehicleDummyDefaultPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const override;
     CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
+    bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();

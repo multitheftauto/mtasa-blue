@@ -167,9 +167,9 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
-    virtual bool         GetVehicleDummyDefaultPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const = 0;
     virtual CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) = 0;
     virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
+    virtual bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const = 0;
     virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
     virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;

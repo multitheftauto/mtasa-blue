@@ -1016,28 +1016,13 @@ void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
     return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
 }
 
-bool CModelInfoSA::GetVehicleDummyDefaultPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const
+bool CModelInfoSA::GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const
 {
     if (!IsVehicle())
         return false;
 
     CVector* dummyPositions = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface)->pVisualInfo->vecDummies;
-
-    for (size_t i = 0; i < positions.size(); ++i)
-    {
-        positions[i] = dummyPositions[i];
-    }
-
-    auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
-
-    if (iter != ms_ModelDefaultDummiesPosition.end())
-    {
-        for (const auto& dummyDefault : iter->second)
-        {
-            positions[dummyDefault.first] = dummyDefault.second;
-        }
-    }
-
+    std::copy(dummyPositions, dummyPositions + positions.size(), positions.begin());
     return true;
 }
 

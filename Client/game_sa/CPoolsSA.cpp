@@ -97,7 +97,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
-        VehicleClass vehicleClass = (VehicleClass)pGame->GetModelInfo(eVehicleType)->GetVehicleType();
+        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
         
         switch (vehicleClass)
 	    {

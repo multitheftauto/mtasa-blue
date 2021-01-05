@@ -231,6 +231,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getModelExhaustFumesPosition", OOP_GetVehicleModelExhaustFumesPosition);
     lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
+    lua_classfunction(luaVM, "getVehicleModelDummyDefaultPosition", ArgumentParser<OOP_GetVehicleModelDummyDefaultPosition>);
+    lua_classfunction(luaVM, "getDummyPosition", ArgumentParser<OOP_GetVehicleDummyPosition>);
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
@@ -277,6 +279,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setGravity", "setVehicleGravity");
     lua_classfunction(luaVM, "setModelExhaustFumesPosition", "setVehicleModelExhaustFumesPosition");
     lua_classfunction(luaVM, "setVehicleModelDummyPosition", "setVehicleModelDummyPosition");
+    lua_classfunction(luaVM, "setDummyPosition", "setVehicleDummyPosition");
+    lua_classfunction(luaVM, "resetDummyPositions", "resetVehicleDummyPositions");
     lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
@@ -4137,6 +4141,16 @@ std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleM
     return std::tuple(position.fX, position.fY, position.fZ);
 }
 
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(vehicleModel, dummy, position))
+        return false;
+
+    return position;
+}
+
 bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position)
 {
     return vehicle->SetDummyPosition(dummy, position);
@@ -4150,6 +4164,16 @@ std::variant<bool, std::tuple<float, float, float>> CLuaVehicleDefs::GetVehicleD
         return false;
 
     return std::tuple(position.fX, position.fY, position.fZ);
+}
+
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!vehicle->GetDummyPosition(dummy, position))
+        return false;
+
+    return position;
 }
 
 bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)

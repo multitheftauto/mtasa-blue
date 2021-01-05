@@ -326,8 +326,6 @@ class CAutoPilot
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
-class CParticleSAInterface;
-
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:

@@ -1130,13 +1130,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
 
         // Reset stored dummy positions
         m_copyDummyPositions = true;
-
-        for (CVector& position : m_dummyPositions)
-        {
-            position.fX = 0.0f;
-            position.fY = 0.0f;
-            position.fZ = 0.0f;
-        }
+        m_dummyPositions = {};
 
         // Create the vehicle if we're streamed in
         if (IsStreamedIn())
@@ -3022,11 +3016,7 @@ void CClientVehicle::Create()
         if (m_copyDummyPositions)
         {
             const CVector* positions = m_pVehicle->GetDummyPositions();
-
-            for (size_t i = 0; i < VEHICLE_DUMMY_COUNT; ++i)
-            {
-                m_dummyPositions[i] = positions[i];
-            }
+            std::copy(positions, positions + VEHICLE_DUMMY_COUNT, m_dummyPositions.begin());
         }
         else
         {
@@ -5116,7 +5106,7 @@ bool CClientVehicle::ResetDummyPositions()
     {
         std::array<CVector, VEHICLE_DUMMY_COUNT> positions;
 
-        if (!m_pModelInfo->GetVehicleDummyDefaultPositions(positions))
+        if (!m_pModelInfo->GetVehicleDummyPositions(positions))
             return false;
 
         for (size_t i = 0; i < positions.size(); ++i)
@@ -5132,14 +5122,7 @@ bool CClientVehicle::ResetDummyPositions()
             return false;
 
         m_copyDummyPositions = true;
-
-        for (CVector& position : m_dummyPositions)
-        {
-            position.fX = 0.0f;
-            position.fY = 0.0f;
-            position.fZ = 0.0f;
-        }
-
+        m_dummyPositions = {};
         return true;
     }
 }
