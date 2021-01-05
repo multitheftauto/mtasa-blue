@@ -316,7 +316,7 @@ void CModManager::RefreshMods()
 
 bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const
 {
-    if (!m_pClientBase || commandNameLength == 0)
+    if (!m_pClientBase || commandName == nullptr || commandNameLength == 0)
         return false;
 
     return m_pClientBase->ProcessCommand(commandName, commandNameLength, userdata, userdataSize);

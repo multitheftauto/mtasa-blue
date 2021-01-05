@@ -254,11 +254,14 @@ bool CClient::WebsiteRequestResultHandler(const std::unordered_set<SString>& new
 
 bool CClient::ProcessCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize)
 {
+    if (commandName == nullptr || commandNameLength == 0)
+        return false;
+
     std::string_view command{commandName, commandNameLength};
 
     if (command == mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX)
     {
-        if (sizeof(bool) != userdataSize)
+        if (userdata == nullptr || sizeof(bool) != userdataSize)
             return false;
 
         auto& alwaysShowTransferBox = *reinterpret_cast<const bool*>(userdata);
