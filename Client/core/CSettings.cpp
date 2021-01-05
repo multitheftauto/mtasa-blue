@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CClientCommands.h>
 #include <game/CGame.h>
 
 using namespace std;
@@ -3359,7 +3360,9 @@ void CSettings::SaveData()
     CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
 
     // Always show transfer box
-    CVARS_SET("always_show_transferbox", m_pCheckBoxAlwaysShowTransferBox->GetSelected());
+    bool alwaysShowTransferBox = m_pCheckBoxAlwaysShowTransferBox->GetSelected();
+    CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
+    g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();

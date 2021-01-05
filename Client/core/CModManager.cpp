@@ -314,6 +314,14 @@ void CModManager::RefreshMods()
     InitializeModList(CalcMTASAPath("mods\\"));
 }
 
+bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const
+{
+    if (!m_pClientBase || commandNameLength == 0)
+        return false;
+
+    return m_pClientBase->ProcessCommand(commandName, commandNameLength, userdata, userdataSize);
+}
+
 void CModManager::InitializeModList(const char* szModFolderPath)
 {
     // Variables used to search the mod directory
