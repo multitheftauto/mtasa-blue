@@ -30,7 +30,7 @@ project "curl"
 	}
 
 	filter { "system:windows" }
-		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN", "WANT_IDN_PROTOTYPES" }
+		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN", "WANT_IDN_PROTOTYPES", "USE_IPV6" }
 		links { "crypt32", "Normaliz" }
 
 	filter { "system:macosx" }
