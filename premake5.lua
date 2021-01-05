@@ -90,6 +90,7 @@ workspace "MTASA"
 		toolset "v142"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
+		buildoptions { "/Zc:__cplusplus" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}
@@ -129,7 +130,7 @@ workspace "MTASA"
 		include "vendor/portaudio"
 		include "vendor/cef3"
 		include "vendor/freetype"
-		include "vendor/jpeg-9b"
+		include "vendor/jpeg-9d"
 		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"

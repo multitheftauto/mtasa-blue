@@ -1273,6 +1273,9 @@ void CGame::InitialDataStream(CPlayer& Player)
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals(&Player);
 
+    // Tell client the transfer box visibility
+    CStaticFunctionDefinitions::SendClientTransferBoxVisibility(&Player);
+
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
 
