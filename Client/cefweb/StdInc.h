@@ -1,5 +1,6 @@
 
-#include <winsock.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
