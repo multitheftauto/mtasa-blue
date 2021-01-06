@@ -11,18 +11,19 @@
 
 #include "StdInc.h"
 
-CServerRPCControlPacket::CServerRPCControlPacket(const std::map<eServerRPCFunctions, bool> map) : m_map(map) {};
+CServerRPCControlPacket::CServerRPCControlPacket(const std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions)
+    : m_disabledServerRPCFunctions(disabledServerRPCFunctions){};
 
 bool CServerRPCControlPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    if (m_map.size() == 0)
+    if (m_disabledServerRPCFunctions.size() == 0)
         return false;
 
-    BitStream.WriteCompressed(static_cast<unsigned short>(m_map.size()));
-    for (auto&& [eServerRPCFunction, bDisabled] : m_map)
+    BitStream.WriteCompressed(static_cast<unsigned short>(m_disabledServerRPCFunctions.size()));
+    for (unsigned int i = 0; i < m_disabledServerRPCFunctions.size(); i++)
     {
-        BitStream.WriteString(EnumToString(eServerRPCFunction));
-        BitStream.WriteBit(bDisabled);
+        BitStream.Write(i);
+        BitStream.WriteBit(m_disabledServerRPCFunctions[i]);
     }
 
     return true;

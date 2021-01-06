@@ -367,9 +367,9 @@ void CMapEventManager::DeleteInternal(CMapEvent* pMapEvent)
                 // Let players know
                 if (!bFound)
                 {
-                    std::map<eServerRPCFunctions, bool> map;
-                    map.insert(std::make_pair(pEvent->eServerRPCFunction, true));
-                    CServerRPCControlPacket Packet(map);
+                    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
+                    disabledServerRPCFunctions[pEvent->eServerRPCFunction] = true;
+                    CServerRPCControlPacket Packet(disabledServerRPCFunctions);
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
                 }
             }
@@ -404,9 +404,9 @@ void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
                 // Let players know
                 if (!bFound)
                 {
-                    std::map<eServerRPCFunctions, bool> map;
-                    map.insert(std::make_pair(pEvent->eServerRPCFunction, false));
-                    CServerRPCControlPacket Packet(map);
+                    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
+                    disabledServerRPCFunctions[pEvent->eServerRPCFunction] = false;
+                    CServerRPCControlPacket Packet(disabledServerRPCFunctions);
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
                 }
             }

@@ -5325,14 +5325,10 @@ void CPacketHandler::Packet_ServerRPCControl(NetBitStreamInterface& bitStream)
     {
         for (unsigned short us = 0; us < usNumFunctions; us++)
         {
-            SString strServerRPCFunction;
-            bool    bDisabled;
-            if (bitStream.ReadString(strServerRPCFunction) && bitStream.ReadBit(bDisabled))
-            {
-                eServerRPCFunctions eServerRPCFunction;
-                StringToEnum(strServerRPCFunction, eServerRPCFunction);
-                g_pClientGame->SetServerRPCFunctionDisabled(eServerRPCFunction, bDisabled);
-            }
+            unsigned int uiServerRPCFunction;
+            bool         bDisabled;
+            if (bitStream.Read(uiServerRPCFunction) && bitStream.ReadBit(bDisabled))
+                g_pClientGame->SetServerRPCFunctionDisabled(static_cast<eServerRPCFunctions>(uiServerRPCFunction), bDisabled);
         }
     }
 }

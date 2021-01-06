@@ -1246,16 +1246,16 @@ void CGame::JoinPlayer(CPlayer& Player)
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Control server RPC functions
-    std::map<eServerRPCFunctions, bool> toggleMap;
+    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
 
     // Disable CURSOR_EVENT RPC by default
-    toggleMap.insert(std::make_pair(eServerRPCFunctions::CURSOR_EVENT, true));
+    disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = true;
 
     // If suitable event exists (e.g. onPlayerClick/onElementClicked), tell client to enable RPC function instead
     if (!m_pMapManager->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunctions::CURSOR_EVENT).empty())
-        toggleMap.insert_or_assign(eServerRPCFunctions::CURSOR_EVENT, false);
+        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = false;
 
-    Player.Send(CServerRPCControlPacket(toggleMap));
+    Player.Send(CServerRPCControlPacket(disabledServerRPCFunctions));
 
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
