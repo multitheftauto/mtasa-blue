@@ -4,7 +4,10 @@ on:
   push:
     branches:
     - master
- 
+    paths: 
+    - '.github/**'
+    - 'Dockerfile'
+
 jobs:
   build:
     runs-on: ubuntu-latest
