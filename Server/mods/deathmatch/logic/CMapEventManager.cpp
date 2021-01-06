@@ -342,39 +342,40 @@ bool CMapEventManager::HandleExists(CLuaMain* pLuaMain, const char* szName, cons
     return false;
 }
 
+void CMapEventManager::ToggleServerRPCFunction(eServerRPCFunctions eServerRPCFunction, bool bDisabled)
+{
+    // Check no active handle exists here
+    bool bFound = !GetHandlesByServerRPCFunction(eServerRPCFunction).empty();
+    if (bFound)
+        return;
+
+    // Check no active handle exists on root
+    if (bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunction).empty())
+        return;
+
+    // Check no active handle exists under root
+    auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
+    for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
+    {
+        bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunction).empty();
+        if (bFound)
+            return;
+    }
+
+    // Let players know that the function got toggled
+    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
+    disabledServerRPCFunctions[eServerRPCFunction] = bDisabled;
+    CServerRPCControlPacket Packet(disabledServerRPCFunctions);
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
+}
+
 void CMapEventManager::DeleteInternal(CMapEvent* pMapEvent)
 {
     SEvent* pEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
 
     // For now we only care about CURSOR_EVENT
     if (pEvent && pEvent->eServerRPCFunction == eServerRPCFunctions::CURSOR_EVENT)
-    {
-        bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-        if (!bFound)
-        {
-            bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-
-            if (!bFound)
-            {
-                auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
-                for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
-                {
-                    bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-                    if (bFound)
-                        break;
-                }
-
-                // Let players know
-                if (!bFound)
-                {
-                    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
-                    disabledServerRPCFunctions[pEvent->eServerRPCFunction] = true;
-                    CServerRPCControlPacket Packet(disabledServerRPCFunctions);
-                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
-                }
-            }
-        }
-    }
+        ToggleServerRPCFunction(pEvent->eServerRPCFunction, true);            // Disable RPC if no longer used
 
     delete pMapEvent;
 }
@@ -385,33 +386,7 @@ void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
 
     // For now we only care about CURSOR_EVENT
     if (pEvent && pEvent->eServerRPCFunction == eServerRPCFunctions::CURSOR_EVENT)
-    {
-        bool bFound = !GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-        if (!bFound)
-        {
-            bFound = !g_pGame->GetMapManager()->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-
-            if (!bFound)
-            {
-                auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
-                for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
-                {
-                    bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(pEvent->eServerRPCFunction).empty();
-                    if (bFound)
-                        break;
-                }
-
-                // Let players know
-                if (!bFound)
-                {
-                    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
-                    disabledServerRPCFunctions[pEvent->eServerRPCFunction] = false;
-                    CServerRPCControlPacket Packet(disabledServerRPCFunctions);
-                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
-                }
-            }
-        }
-    }
+        ToggleServerRPCFunction(pEvent->eServerRPCFunction, false);            // Enable RPC if used
 
     // Find place to insert
     EventsIterPair itPair = m_EventsMap.equal_range(pMapEvent->GetName());
