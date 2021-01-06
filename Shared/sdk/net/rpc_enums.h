@@ -270,6 +270,7 @@ enum eElementRPCFunctions
     UPDATE_COLPOLYGON_POINT,
   
     SET_DISCORD_JOIN_PARAMETERS,
+    SET_TRANSFER_BOX_VISIBILITY,
 
     NUM_RPC_FUNCS // Add above this line
 };
