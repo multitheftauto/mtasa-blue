@@ -13,13 +13,13 @@ class CLuaPhysicsBoxShape;
 
 #pragma once
 
-class CLuaPhysicsBoxShape : public CLuaPhysicsShape
+class CLuaPhysicsBoxShape : public CLuaPhysicsConvexShape
 {
     friend class CBulletPhysics;
 
 public:
     CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half);
-    bool GetSize(CVector& vecSize);
+    CVector GetSize();
     bool SetSize(CVector& vecSize);
     void Update() {}
 };

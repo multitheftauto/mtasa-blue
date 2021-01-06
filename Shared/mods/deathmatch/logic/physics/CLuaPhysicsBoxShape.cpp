@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half) : CLuaPhysicsShape(pPhysics, CLuaPhysicsSharedLogic::CreateBox(half))
+CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half) : CLuaPhysicsConvexShape(pPhysics, CLuaPhysicsSharedLogic::CreateBox(half))
 {
 }
 
@@ -26,12 +26,10 @@ bool CLuaPhysicsBoxShape::SetSize(CVector& vecSize)
     return true;
 }
 
-bool CLuaPhysicsBoxShape::GetSize(CVector& vecSize)
+CVector CLuaPhysicsBoxShape::GetSize()
 {
     btConvexInternalShape* pInternalShape = (btConvexInternalShape*)GetBtShape();
-    const btVector3        pSize = pInternalShape->getImplicitShapeDimensions();
-    vecSize.fX = pSize.getX();
-    vecSize.fY = pSize.getY();
-    vecSize.fZ = pSize.getZ();
-    return true;
+    CVector                vecHalfSize = pInternalShape->getImplicitShapeDimensions();
+    vecHalfSize += pInternalShape->getMargin();
+    return vecHalfSize * 2;
 }

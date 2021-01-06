@@ -91,8 +91,6 @@ struct CLuaFunctionParserBase
         {
             return "";
         }
-        else if constexpr (std::is_same_v<T, std::shared_ptr<CLuaPhysicsShape>>)
-            return "physics-shape";
     }
 
     // Reads the parameter type (& value in some cases) at a given index

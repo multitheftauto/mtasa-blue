@@ -30,26 +30,63 @@ struct overloaded : Ts...
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
-template <typename R = void, typename F>
-R VisitElement(CLuaPhysicsElement* pElement, F&& func)
+template <typename... Args>
+constexpr bool return_void(void(Args...))
+{
+    return true;
+}
+
+const char* GetPhysicsElementName(CLuaPhysicsElement* pElement)
 {
     if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
-        return func(pSphere);
+        return "physics-sphere-shape";
     else if (auto* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
-        return func(pCapsule);
+        return "physics-capsule-shape";
     else if (auto* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
-        return func(pCylinder);
+        return "physics-cylinder-shape";
     else if (auto* pCone = dynamic_cast<CLuaPhysicsConeShape*>(pElement))
-        return func(pCone);
+        return "physics-cone-shape";
+    else if (auto* pBox = dynamic_cast<CLuaPhysicsBoxShape*>(pElement))
+        return "physics-box-shape";
     else if (auto* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
-        return func(pRigidBody);
+        return "physics-rigid-body";
     else if (auto* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
-        return func(pStaticCollision);
+        return "physics-static-collision";
 
-    else if (auto* pAnyShape = dynamic_cast<CLuaPhysicsShape*>(pElement)) // always at the end
-        return func(pAnyShape);
+    return "physics-element"; // threat as a unsupported
+}
 
-    throw std::invalid_argument("todo ...");
+template <typename R = void, typename F>
+R VisitElement(CLuaPhysicsElement* pElement, F func)
+{
+    if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pSphere)>>)
+            return func(pSphere);
+    if (auto* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCapsule)>>)
+            return func(pCapsule);
+    if (auto* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCylinder)>>)
+            return func(pCylinder);
+    if (auto* pCone = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCone)>>)
+            return func(pCone);
+    if (auto* pBox = dynamic_cast<CLuaPhysicsBoxShape*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pBox)>>)
+            return func(pBox);
+    if (auto* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pRigidBody)>>)
+            return func(pRigidBody);
+    if (auto* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pStaticCollision)>>)
+            return func(pStaticCollision);
+
+    if (auto* pAnyShape = dynamic_cast<CLuaPhysicsShape*>(pElement))
+        if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pAnyShape)>>)
+            return func(pAnyShape);
+
+    if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(func), decltype(pElement)>>)
+        func(pElement);
 }
 
 template <typename T, typename U>
@@ -771,7 +808,7 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
     throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
 }
 
-std::variant<CVector, bool, int, float> CLuaPhysicsDefs::PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant,
+std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant,
                                                                               ePhysicsProperty                                   eProperty)
 {
     if (std::holds_alternative<CBulletPhysics*>(variant))
@@ -793,6 +830,22 @@ std::variant<CVector, bool, int, float> CLuaPhysicsDefs::PhysicsGetProperties(st
                 return pPhysics->GetSubSteps();
         }
         throw std::invalid_argument(SString("Physics world does not support %s property.", EnumToString(eProperty)).c_str());
+    }
+
+    CLuaPhysicsElement* pElement = std::get<CLuaPhysicsElement*>(variant);
+
+    auto unsupported = [eProperty](CLuaPhysicsElement* pElement) {
+        throw std::invalid_argument(
+            SString("Physics element '%s' does not support '%s' property.", GetPhysicsElementName(pElement), EnumToString(eProperty).c_str()).c_str());
+    };
+
+    switch (eProperty)
+    {
+        case ePhysicsProperty::SIZE:
+            return VisitElement<std::vector<float>>(
+                pElement, overloaded{[](CLuaPhysicsBoxShape* pBox) { return pBox->GetSize().AsVector(); }, unsupported
+                    });
+            break;
     }
 }
 
@@ -956,8 +1009,8 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
     RayResult result{
-        {"hitpoint", ((CVector)rayCallback.m_hitPointWorld).AsArray()},
-        {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld).AsArray()},
+        {"hitpoint", ((CVector)rayCallback.m_hitPointWorld).AsVector()},
+        {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld).AsVector()},
         {"shape", pShape},
         {"distance", (rayCallback.m_hitPointWorld - from).length()},
     };
@@ -989,9 +1042,9 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
             result["vertex1"] = triangleInfo.vertex1 + 1;
             result["vertex2"] = triangleInfo.vertex2 + 1;
             result["vertex3"] = triangleInfo.vertex3 + 1;
-            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsArray();
-            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsArray();
-            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsArray();
+            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsVector();
+            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsVector();
+            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsVector();
         }
     }
 
@@ -1074,8 +1127,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
         CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
         RayResult result{
-            {"hitpoint", ((CVector)rayCallback.m_hitPointWorld[i]).AsArray()},
-            {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld[i]).AsArray()},
+            {"hitpoint", ((CVector)rayCallback.m_hitPointWorld[i]).AsVector()},
+            {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld[i]).AsVector()},
             {"shape", pShape},
             {"distance", (rayCallback.m_hitPointWorld[i] - from).length()},
         };
@@ -1111,9 +1164,9 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
                 result["vertex1"] = triangleInfo.vertex1 + 1;
                 result["vertex2"] = triangleInfo.vertex2 + 1;
                 result["vertex3"] = triangleInfo.vertex3 + 1;
-                result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsArray();
-                result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsArray();
-                result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsArray();
+                result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsVector();
+                result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsVector();
+                result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsVector();
             }
         }
         results.push_back(result);
@@ -1190,9 +1243,9 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape
     CLuaPhysicsStaticCollision* pStaticCollision = (CLuaPhysicsStaticCollision*)(pBtCollisionObject->getUserPointer());
 
     RayResult result{
-        {"position", rayCallback.m_closestPosition.AsArray()},
-        {"hitpoint", ((CVector)rayCallback.m_hitPointWorld).AsArray()},
-        {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld).AsArray()},
+        {"position", rayCallback.m_closestPosition.AsVector()},
+        {"hitpoint", ((CVector)rayCallback.m_hitPointWorld).AsVector()},
+        {"hitnormal", ((CVector)rayCallback.m_hitNormalWorld).AsVector()},
         {"shape", pHitShape},
         {"distance", (rayCallback.m_hitPointWorld - vecStartPosition).length()},
     };
@@ -1224,9 +1277,9 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape
             result["vertex1"] = triangleInfo.vertex1 + 1;
             result["vertex2"] = triangleInfo.vertex2 + 1;
             result["vertex3"] = triangleInfo.vertex3 + 1;
-            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsArray();
-            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsArray();
-            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsArray();
+            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsVector();
+            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsVector();
+            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsVector();
         }
     }
 

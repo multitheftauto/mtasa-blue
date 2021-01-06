@@ -22,9 +22,6 @@
 
 #include "bulletphysics3d/LinearMath/btVector3.h"
 
-typedef std::tuple<float, float, float> Position;
-typedef std::vector<float> PositionArray;
-
 /**
  * CVector Structure used to store a 3D vertex.
  */
@@ -281,8 +278,8 @@ public:
 
     inline bool operator!=(const CVector& param) const noexcept { return !(*this == param); }
 
-    PositionArray AsArray() const { return PositionArray{fX, fY, fZ}; }
-    Position      AsXYZ() const { return {fX, fY, fZ}; }
+    std::vector<float>              AsVector() const { return std::vector<float>{fX, fY, fZ}; }
+    std::tuple<float, float, float> AsXYZ() const { return {fX, fY, fZ}; }
     CVector(const btVector3& other) : fX(other.x()), fY(other.y()), fZ(other.z()) {}
     operator btVector3() const { return btVector3{fX, fY, fZ}; }
 };

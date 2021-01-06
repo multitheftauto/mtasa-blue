@@ -13,7 +13,7 @@
 #include "lua/CLuaFunctionParser.h"
 #include "Enums.h"
 
-typedef std::variant<PositionArray, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int> RayResultValue;
+typedef std::variant<std::vector<float>, CLuaPhysicsShape*, CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*, float, int> RayResultValue;
 typedef std::unordered_map<std::string, RayResultValue>                                                          RayResult;
 typedef std::unordered_map<std::string, std::variant<bool, int>>                                                 RayOptions;
 typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            RigidBodyOptions;
@@ -54,7 +54,8 @@ public:
 
     static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
                                                       std::variant<CVector, SColor, bool, float, int> argument, std::variant<float> argument2);
-    static std::variant<CVector, bool, int, float>   PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> varian, ePhysicsProperty eProperty);
+    static std::variant<CVector, bool, int, float, std::vector<float>> PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> varian,
+                                                                                                ePhysicsProperty                                   eProperty);
     static CLuaPhysicsShape* PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
     static CLuaPhysicsShape* PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fRadius);
     static CLuaPhysicsShape* PhysicsCreateCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
