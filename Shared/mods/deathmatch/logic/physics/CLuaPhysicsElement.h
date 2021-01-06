@@ -61,6 +61,10 @@ public:
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Shape; }
+
+    const char* GetName() { return EnumToString(GetType()); }
+
     // Run changes on worker thread, let you modify element before get created
     void CommitChange(std::function<void()> change);
 

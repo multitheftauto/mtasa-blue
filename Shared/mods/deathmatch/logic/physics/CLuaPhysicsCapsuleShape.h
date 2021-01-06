@@ -23,5 +23,7 @@ public:
     bool GetRadius(float& fRadius);
     bool SetHeight(float fHeight);
     bool GetHeight(float& fHeight);
-    void Update() {}
+    void                        Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BvhTriangleMeshShape; }
 };

@@ -36,6 +36,8 @@ public:
 
     void Update() {}
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::CompoundShape; }
+
 private:
     std::vector<CLuaPhysicsShape*> m_vecChildShapes;
 };

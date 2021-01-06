@@ -43,6 +43,8 @@ public:
     int GetVerticesNum() const { return m_verticesCount; }
     STriangleInfo GetTriangleInfo(int iTriangleIndex);
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BvhTriangleMeshShape; }
+
 private:
     void InternalUpdateVerticesPositions();
 

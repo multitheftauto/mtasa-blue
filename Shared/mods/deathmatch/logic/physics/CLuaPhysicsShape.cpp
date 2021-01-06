@@ -26,7 +26,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, heightfieldTerrainS
 
 void CLuaPhysicsShape::Unlink()
 {
-    if (GetType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
+    if (GetBtType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
     {
     }
 
@@ -113,12 +113,12 @@ bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
     return true;
 }
 
-BroadphaseNativeTypes CLuaPhysicsShape::GetType() const
+BroadphaseNativeTypes CLuaPhysicsShape::GetBtType() const
 {
     return (BroadphaseNativeTypes)m_pBtShape->getShapeType();
 }
 
-const char* CLuaPhysicsShape::GetName()
+const char* CLuaPhysicsShape::GetBtName()
 {
     return CLuaPhysicsSharedLogic::GetShapeName(GetBtShape());
 }

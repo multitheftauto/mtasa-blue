@@ -42,8 +42,8 @@ public:
 
     void UpdateRigids();
 
-    BroadphaseNativeTypes GetType() const;
-    const char*           GetName();
+    BroadphaseNativeTypes GetBtType() const;
+    const char*           GetBtName();
 
     // for CLuaPhysicsHeightfieldTerrainShape shape
     float*                GetHeightfieldData() { return &m_vecHeightfieldData[0]; }
@@ -51,6 +51,8 @@ public:
 
     const std::vector<CLuaPhysicsRigidBody*>& GetRigidBodies() const { return m_vecRigidBodyList; }
     const std::vector<CLuaPhysicsStaticCollision*>& GetStaticCollisions() const { return m_vecStaticCollisions; }
+    
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Shape; }
 
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;

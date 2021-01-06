@@ -18,4 +18,6 @@ public:
     CLuaPhysicsConvexHullShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecPoints);
     ~CLuaPhysicsConvexHullShape();
     void Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConvexHullShape; }
 };

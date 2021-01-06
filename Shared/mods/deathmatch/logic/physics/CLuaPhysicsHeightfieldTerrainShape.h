@@ -24,6 +24,8 @@ public:
     int  GetVerticesNum() const { return m_iSizeX * m_iSizeY; }
     void SetHeight(int index, float fHeight);
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::HeightfieldTerrainShape; }
+
 private:
     int                m_iSizeX;
     int                m_iSizeY;

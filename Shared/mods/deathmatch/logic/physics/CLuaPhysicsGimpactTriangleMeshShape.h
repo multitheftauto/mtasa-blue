@@ -19,4 +19,6 @@ public:
     CLuaPhysicsGimpactTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecVertices);
     ~CLuaPhysicsGimpactTriangleMeshShape();
     void Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::GimpactTriangleMeshShape; }
 };

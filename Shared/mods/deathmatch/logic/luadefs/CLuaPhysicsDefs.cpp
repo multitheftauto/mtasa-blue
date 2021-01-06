@@ -21,44 +21,10 @@
 #include "Enums.h"
 #include "physics/CPhysicsDebugDrawer.h"
 
-template <class... Ts>
-struct overloaded : Ts...
-{
-    using Ts::operator()...;
-};
-
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-
-template <typename... Args>
-constexpr bool return_void(void(Args...))
-{
-    return true;
-}
-
-const char* GetPhysicsElementName(CLuaPhysicsElement* pElement)
-{
-    if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
-        return "physics-sphere-shape";
-    else if (auto* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
-        return "physics-capsule-shape";
-    else if (auto* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
-        return "physics-cylinder-shape";
-    else if (auto* pCone = dynamic_cast<CLuaPhysicsConeShape*>(pElement))
-        return "physics-cone-shape";
-    else if (auto* pBox = dynamic_cast<CLuaPhysicsBoxShape*>(pElement))
-        return "physics-box-shape";
-    else if (auto* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
-        return "physics-rigid-body";
-    else if (auto* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
-        return "physics-static-collision";
-
-    return "physics-element"; // threat as a unsupported
-}
-
 template <typename R = void, typename F>
 R VisitElement(CLuaPhysicsElement* pElement, F func)
 {
+    ePhysicsElementType e = pElement->GetType();
     if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
         if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pSphere)>>)
             return func(pSphere);
@@ -87,18 +53,6 @@ R VisitElement(CLuaPhysicsElement* pElement, F func)
 
     if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(func), decltype(pElement)>>)
         func(pElement);
-}
-
-template <typename T, typename U>
-U getOption(const T& options, const std::string& szProperty, const U& default)
-{
-    if (const auto it = options.find(szProperty); it != options.end())
-    {
-        if (!std::holds_alternative<U>(it->second))
-            throw std::invalid_argument(SString("'%s' value must be ...", szProperty.c_str()).c_str());
-        return std::get<U>(it->second);
-    }
-    return default;
 }
 
 void CLuaPhysicsDefs::LoadFunctions(void)
@@ -141,7 +95,6 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsRayCast", ArgumentParser<PhysicsRayCast>},
         {"physicsRayCastAll", ArgumentParser<PhysicsRayCastAll>},
         {"physicsShapeCast", ArgumentParser<PhysicsShapeCast>},
-        {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
         {"physicsOverlapBox", ArgumentParser<PhysicsOverlapBox>},
         {"physicsPredictTransform", ArgumentParser<PhysicsPredictTransform>},
@@ -429,8 +382,8 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysics
         throw std::invalid_argument("Child shape can not be compound");
     }
 
-    const CVector vecPosition = vecOptionalPosition.value_or(CVector(0, 0, 0));
-    const CVector vecRotation = vecOptionalRotation.value_or(CVector(0, 0, 0));
+    const CVector vecPosition = vecOptionalPosition.value_or(CVector{0, 0, 0});
+    const CVector vecRotation = vecOptionalRotation.value_or(CVector{0, 0, 0});
 
     if (!CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(vecPosition))
         throw std::invalid_argument(SString("Child shape is too far, position must be below %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
@@ -836,15 +789,13 @@ std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::Phy
 
     auto unsupported = [eProperty](CLuaPhysicsElement* pElement) {
         throw std::invalid_argument(
-            SString("Physics element '%s' does not support '%s' property.", GetPhysicsElementName(pElement), EnumToString(eProperty).c_str()).c_str());
+            SString("Physics element '%s' does not support '%s' property.", pElement->GetName(), EnumToString(eProperty).c_str()).c_str());
     };
 
     switch (eProperty)
     {
         case ePhysicsProperty::SIZE:
-            return VisitElement<std::vector<float>>(
-                pElement, overloaded{[](CLuaPhysicsBoxShape* pBox) { return pBox->GetSize().AsVector(); }, unsupported
-                    });
+            return VisitElement<std::vector<float>>(pElement, overloaded{[](CLuaPhysicsBoxShape* pBox) { return pBox->GetSize().AsVector(); }, unsupported});
             break;
     }
 }
@@ -922,30 +873,16 @@ CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraint(CLua
 
 bool CLuaPhysicsDefs::PhysicsLineCast(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
 {
-    RayOptions mapOptions = options.value_or(RayOptions());
-
-    bool bFilterBackfaces = true;
+    bool bFilterBackfaces = false;
+    bool bEnrichResult = false;
     int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
     int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
-    if (mapOptions.find("filterBackfaces") != mapOptions.end())
+    if (options.has_value() && !options.value().empty())
     {
-        if (!std::holds_alternative<bool>(mapOptions["filterBackfaces"]))
-            throw std::invalid_argument("'filterBackfaces' value must be boolean");
-        bFilterBackfaces = std::get<bool>(mapOptions["filterBackfaces"]);
-    }
-
-    if (mapOptions.find("filterGroup") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
-            throw std::invalid_argument("'filterGroup' value must be integer");
-        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
-    }
-    if (mapOptions.find("filterMask") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
-            throw std::invalid_argument("'filterMask' value must be integer");
-        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+        bFilterBackfaces = getOption(options.value(), "filterBackfaces", false);
+        iFilterGroup = getOption(options.value(), "filterGroup", BulletPhysics::Defaults::FilterGroup);
+        iFilterMask = getOption(options.value(), "filterMask", BulletPhysics::Defaults::FilterMask);
     }
 
     const CBulletPhysics::SClosestRayResultCallback& rayCallback = pPhysics->RayCast(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
@@ -954,38 +891,17 @@ bool CLuaPhysicsDefs::PhysicsLineCast(CBulletPhysics* pPhysics, CVector from, CV
 
 std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
 {
-    RayOptions mapOptions = options.value_or(RayOptions());
-
     bool bFilterBackfaces = false;
     bool bEnrichResult = false;
     int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
     int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
-    if (mapOptions.find("filterBackfaces") != mapOptions.end())
+    if (options.has_value() && !options.value().empty())
     {
-        if (!std::holds_alternative<bool>(mapOptions["filterBackfaces"]))
-            throw std::invalid_argument("'filterBackfaces' value must be boolean");
-        bFilterBackfaces = std::get<bool>(mapOptions["filterBackfaces"]);
-    }
-
-    if (mapOptions.find("enrich") != mapOptions.end())
-    {
-        if (!std::holds_alternative<bool>(mapOptions["enrich"]))
-            throw std::invalid_argument("'enrich' value must be boolean");
-        bEnrichResult = std::get<bool>(mapOptions["enrich"]);
-    }
-
-    if (mapOptions.find("filterGroup") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
-            throw std::invalid_argument("'filterGroup' value must be integer");
-        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
-    }
-    if (mapOptions.find("filterMask") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
-            throw std::invalid_argument("'filterMask' value must be integer");
-        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+        bFilterBackfaces = getOption(options.value(), "filterBackfaces", false);
+        bEnrichResult = getOption(options.value(), "enrich", false);
+        iFilterGroup = getOption(options.value(), "filterGroup", BulletPhysics::Defaults::FilterGroup);
+        iFilterMask = getOption(options.value(), "filterMask", BulletPhysics::Defaults::FilterMask);
     }
 
     pPhysics->FlushAllChanges();
@@ -1053,8 +969,6 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
 
 std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)
 {
-    RayOptions mapOptions = options.value_or(RayOptions());
-
     bool bFilterBackfaces = false;
     bool bEnrichResult = false;
     bool bSortByDistance = false;
@@ -1062,49 +976,18 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
     int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
     int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
-    if (mapOptions.find("filterBackfaces") != mapOptions.end())
+    if (options.has_value() && !options.value().empty())
     {
-        if (!std::holds_alternative<bool>(mapOptions["filterBackfaces"]))
-            throw std::invalid_argument("'filterBackfaces' value must be boolean");
-        bFilterBackfaces = std::get<bool>(mapOptions["filterBackfaces"]);
+        bFilterBackfaces = getOption(options.value(), "filterBackfaces", false);
+        bEnrichResult = getOption(options.value(), "enrich", false);
+        iFilterGroup = getOption(options.value(), "filterGroup", BulletPhysics::Defaults::FilterGroup);
+        iFilterMask = getOption(options.value(), "filterMask", BulletPhysics::Defaults::FilterMask);
+        bSortByDistance = getOption(options.value(), "sortByDistance", false);
+        iLimitResults = getOption(options.value(), "limitResults", false);
     }
 
-    if (mapOptions.find("enrich") != mapOptions.end())
-    {
-        if (!std::holds_alternative<bool>(mapOptions["enrich"]))
-            throw std::invalid_argument("'enrich' value must be boolean");
-        bEnrichResult = std::get<bool>(mapOptions["enrich"]);
-    }
-
-    if (mapOptions.find("filterGroup") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
-            throw std::invalid_argument("'filterGroup' value must be integer");
-        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
-    }
-
-    if (mapOptions.find("filterMask") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
-            throw std::invalid_argument("'filterMask' value must be integer");
-        iFilterMask = std::get<int>(mapOptions["filterMask"]);
-    }
-
-    if (mapOptions.find("sortByDistance") != mapOptions.end())
-    {
-        if (!std::holds_alternative<bool>(mapOptions["sortByDistance"]))
-            throw std::invalid_argument("'sortByDistance' value must be boolean");
-        bSortByDistance = std::get<bool>(mapOptions["sortByDistance"]);
-    }
-
-    if (mapOptions.find("limitResults") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["limitResults"]))
-            throw std::invalid_argument(SString("'limitResults' value must be between 1 and %i", BulletPhysics::Limits::RaycastAllUpperResultsLimit).c_str());
-        iLimitResults = std::get<int>(mapOptions["limitResults"]);
-        if (iLimitResults > BulletPhysics::Limits::RaycastAllUpperResultsLimit)
-            throw std::invalid_argument(SString("'limitResults' value must be between 1 and %i", BulletPhysics::Limits::RaycastAllUpperResultsLimit).c_str());
-    }
+    if (iLimitResults > BulletPhysics::Limits::RaycastAllUpperResultsLimit || iLimitResults < 1)
+        throw std::invalid_argument(SString("'limitResults' value must be between 1 and %i", BulletPhysics::Limits::RaycastAllUpperResultsLimit).c_str());
 
     CBulletPhysics::SAllRayResultCallback rayCallback = pPhysics->RayCastAll(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
     std::vector<RayResult>                results;
@@ -1185,31 +1068,15 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
 std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition,
                                                                 CVector vecRotation, std::optional<RayOptions> options)
 {
-    RayOptions mapOptions = options.value_or(RayOptions());
-
     bool bEnrichResult = false;
     int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
     int  iFilterMask = BulletPhysics::Defaults::FilterMask;
 
-    if (mapOptions.find("enrich") != mapOptions.end())
+    if (options.has_value() && !options.value().empty())
     {
-        if (!std::holds_alternative<bool>(mapOptions["enrich"]))
-            throw std::invalid_argument("'enrich' value must be boolean");
-        bEnrichResult = std::get<bool>(mapOptions["enrich"]);
-    }
-
-    if (mapOptions.find("filterGroup") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterGroup"]))
-            throw std::invalid_argument("'filterGroup' value must be integer");
-        iFilterGroup = std::get<int>(mapOptions["filterGroup"]);
-    }
-
-    if (mapOptions.find("filterMask") != mapOptions.end())
-    {
-        if (!std::holds_alternative<int>(mapOptions["filterMask"]))
-            throw std::invalid_argument("'filterMask' value must be integer");
-        iFilterMask = std::get<int>(mapOptions["filterMask"]);
+        bEnrichResult = getOption(options.value(), "enrich", false);
+        iFilterGroup = getOption(options.value(), "filterGroup", BulletPhysics::Defaults::FilterGroup);
+        iFilterMask = getOption(options.value(), "filterMask", BulletPhysics::Defaults::FilterMask);
     }
 
     if (!pShape->GetBtShape()->isConvex())
@@ -1304,23 +1171,6 @@ std::vector<CLuaPhysicsStaticCollision*> CLuaPhysicsDefs::PhysicsGetStaticCollis
 std::vector<CLuaPhysicsConstraint*> CLuaPhysicsDefs::PhysicsGetConstraints(CBulletPhysics* pPhysics)
 {
     return pPhysics->GetConstraints();
-}
-
-std::string CLuaPhysicsDefs::PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement)
-{
-    switch (pPhysicsElement->GetClassType())
-    {
-        case EIdClassType::RIGID_BODY:
-            return "rigidbody";
-        case EIdClassType::SHAPE:
-            return "shape";
-        case EIdClassType::STATIC_COLLISION:
-            return "staticcollision";
-        case EIdClassType::CONSTRAINT:
-            return "constraint";
-        default:
-            return "unknown";
-    }
 }
 
 bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)

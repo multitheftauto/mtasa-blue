@@ -98,6 +98,8 @@ public:
     void                                    AABBUpdated() { m_bAABBUpdateRequested = false; }
     void                                    Update() {}
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::RigidBody; }
+
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*                       m_pShape;

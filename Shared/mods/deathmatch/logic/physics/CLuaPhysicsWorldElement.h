@@ -47,6 +47,8 @@ public:
     const std::vector<CLuaPhysicsWorldElement*>& GetAllContacts() const { return m_vecCollisionContacts; }
     void                                         GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement);
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::WorldElement; }
+
 protected:
     std::vector<CLuaPhysicsWorldElement*> m_vecCollisionContacts;
 };

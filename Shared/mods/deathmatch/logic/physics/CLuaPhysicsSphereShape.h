@@ -22,4 +22,6 @@ public:
     void SetRadius(float fRadius);
     bool GetRadius(float& fRadius);
     void Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::SphereShape; }
 };

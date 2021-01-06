@@ -22,4 +22,6 @@ public:
     CVector GetSize();
     bool SetSize(CVector& vecSize);
     void Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BoxShape; }
 };

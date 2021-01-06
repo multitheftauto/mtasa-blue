@@ -148,4 +148,31 @@ enum class ePhysicsProperty
 };
 DECLARE_ENUM_CLASS(ePhysicsProperty);
 
+enum class ePhysicsElementType
+{
+    Unknown,
+    WorldElement,
+    RigidBody,
+    StaticCollision,
+
+    // Shapes
+    Shape,
+    ConvexShape,
+    ConcaveShape,
+    BoxShape,
+    SphereShape,
+    ConeShape,
+    BvhTriangleMeshShape,
+    CompoundShape,
+    ConvexHullShape,
+    CylinderShape,
+    GimpactTriangleMeshShape,
+    HeightfieldTerrainShape,
+
+    // Constraints
+    Constraint,
+    PointToPointConstraint,
+};
+DECLARE_ENUM_CLASS(ePhysicsElementType);
+
 DECLARE_ENUM(ePacketID);

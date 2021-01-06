@@ -17,6 +17,9 @@ class CLuaPhysicsConcaveShape;
 
 class CLuaPhysicsConcaveShape : public CLuaPhysicsShape
 {
+public:
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConcaveShape; }
+
 protected:
     CLuaPhysicsConcaveShape(CBulletPhysics* pPhysics, btCollisionShape* pShape);
     CLuaPhysicsConcaveShape(CBulletPhysics* pPhysics, heightfieldTerrainShape* pHeightfieldTerrainShape);

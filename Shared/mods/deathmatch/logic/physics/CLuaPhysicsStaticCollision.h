@@ -48,6 +48,9 @@ public:
     CLuaPhysicsShape*             GetShape() const { return m_pShape; }
 
     void Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::StaticCollision; }
+
 private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
     CLuaPhysicsShape*  m_pShape;

@@ -19,6 +19,15 @@ typedef std::unordered_map<std::string, std::variant<bool, int>>                
 typedef std::unordered_map<std::string, std::variant<float, CVector>>                                            RigidBodyOptions;
 typedef std::unordered_map<std::string, std::variant<int, double, CVector>>                                            CreateWorldOptions;
 
+template <class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+
+template <class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
 class CLuaPhysicsDefs : public CLuaDefs
 {
 public:
@@ -39,7 +48,6 @@ public:
     static bool        PhysicsApplyDamping(CLuaPhysicsRigidBody* pRigidBody, float fDamping);
     static bool        PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
     static bool        PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
-    static std::string PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
     static CLuaPhysicsStaticCollision*              PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                                                  std::optional<CVector> rotation);
     static std::vector<CLuaPhysicsShape*>           PhysicsGetShapes(CBulletPhysics* pPhysics);
@@ -113,5 +121,18 @@ public:
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
 #endif
+
+    
+    template <typename T, typename U>
+    static U getOption(const T& options, const std::string& szProperty, const U& default)
+    {
+        if (const auto it = options.find(szProperty); it != options.end())
+        {
+            if (!std::holds_alternative<U>(it->second))
+                throw std::invalid_argument(SString("'%s' value must be ...", szProperty.c_str()).c_str());
+            return std::get<U>(it->second);
+        }
+        return default;
+    }
 };
 

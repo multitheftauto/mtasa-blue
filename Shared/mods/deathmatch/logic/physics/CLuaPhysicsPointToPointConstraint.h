@@ -28,6 +28,8 @@ public:
     void Unlink();
     void Update() {}
 
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::PointToPointConstraint; }
+
 private:
     eConstraintVariant                       m_eVariant;
     CVector m_vecPosition;

@@ -24,4 +24,6 @@ public:
     bool SetHeight(float fHeight);
     bool GetHeight(float& fHeight);
     void Update() {}
+
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::CylinderShape; }
 };
