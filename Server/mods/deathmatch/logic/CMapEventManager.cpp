@@ -425,11 +425,10 @@ void CMapEventManager::GetHandles(CLuaMain* pLuaMain, const char* szName, lua_St
 const std::vector<CMapEvent*> CMapEventManager::GetHandlesByServerRPCFunction(eServerRPCFunctions eServerRPCFunction) const
 {
     std::vector<CMapEvent*> vecResult;
+    SEvent*                 pOtherEvent;
     for (auto&& [strName, pMapEvent] : m_EventsMap)
-    {
-        SEvent* pOtherEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName());
-        if (pOtherEvent && pOtherEvent->eServerRPCFunction == eServerRPCFunction)
+        if ((pOtherEvent = g_pGame->GetEvents()->Get(pMapEvent->GetName())) && pOtherEvent->eServerRPCFunction == eServerRPCFunction)
             vecResult.push_back(pMapEvent);
-    }
+
     return vecResult;
 }
