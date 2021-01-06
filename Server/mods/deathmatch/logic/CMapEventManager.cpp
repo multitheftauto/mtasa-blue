@@ -342,7 +342,7 @@ bool CMapEventManager::HandleExists(CLuaMain* pLuaMain, const char* szName, cons
     return false;
 }
 
-void CMapEventManager::ToggleServerRPCFunction(eServerRPCFunctions eServerRPCFunction, bool bDisabled)
+void CMapEventManager::DisableServerRPCFunction(eServerRPCFunctions eServerRPCFunction, bool bDisable)
 {
     // Check no active handle exists here
     bool bFound = !GetHandlesByServerRPCFunction(eServerRPCFunction).empty();
@@ -361,7 +361,7 @@ void CMapEventManager::ToggleServerRPCFunction(eServerRPCFunctions eServerRPCFun
 
     // Let players know that the function got toggled
     std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
-    disabledServerRPCFunctions[eServerRPCFunction] = bDisabled;
+    disabledServerRPCFunctions[eServerRPCFunction] = bDisable;
     CServerRPCControlPacket Packet(disabledServerRPCFunctions);
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Packet);
 }
@@ -372,7 +372,7 @@ void CMapEventManager::DeleteInternal(CMapEvent* pMapEvent)
 
     // For now we only care about CURSOR_EVENT
     if (pEvent && pEvent->eServerRPCFunction == eServerRPCFunctions::CURSOR_EVENT)
-        ToggleServerRPCFunction(pEvent->eServerRPCFunction, true);            // Disable RPC if no longer used
+        DisableServerRPCFunction(pEvent->eServerRPCFunction, true);            // Disable RPC if no longer used
 
     delete pMapEvent;
 }
@@ -383,7 +383,7 @@ void CMapEventManager::AddInternal(CMapEvent* pMapEvent)
 
     // For now we only care about CURSOR_EVENT
     if (pEvent && pEvent->eServerRPCFunction == eServerRPCFunctions::CURSOR_EVENT)
-        ToggleServerRPCFunction(pEvent->eServerRPCFunction, false);            // Enable RPC if used
+        DisableServerRPCFunction(pEvent->eServerRPCFunction, false);            // Enable RPC if used
 
     // Find place to insert
     EventsIterPair itPair = m_EventsMap.equal_range(pMapEvent->GetName());

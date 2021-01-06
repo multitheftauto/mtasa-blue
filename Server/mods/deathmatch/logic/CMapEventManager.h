@@ -35,7 +35,7 @@ private:
     void TakeOutTheTrash();
     void AddInternal(CMapEvent* pMapEvent);
     void DeleteInternal(CMapEvent* pMapEvent);
-    void ToggleServerRPCFunction(eServerRPCFunctions eServerRPCFunction, bool bDisabled);
+    void DisableServerRPCFunction(eServerRPCFunctions eServerRPCFunction, bool bDisable = true);
 
     bool                               m_bHasEvents;
     bool                               m_bIteratingList;
