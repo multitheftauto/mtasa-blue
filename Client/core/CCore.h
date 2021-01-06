@@ -28,7 +28,6 @@ class CCore;
 #include "CMessageLoopHook.h"
 #include "CConsoleLogger.h"
 #include "CModManager.h"
-#include <core/CClientBase.h>
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include <DXHook/CDirect3DData.h>

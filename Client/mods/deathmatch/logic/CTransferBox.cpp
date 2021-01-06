@@ -31,6 +31,8 @@ CTransferBox::CTransferBox(TransferBoxType transferType) : m_GUI(g_pCore->GetGUI
     m_visible.set(TB_VISIBILITY_CLIENT_SCRIPT);
     m_visible.set(TB_VISIBILITY_SERVER_SCRIPT);
 
+    g_pCore->GetCVars()->Get("always_show_transferbox", m_alwaysVisible);
+
     CreateTransferWindow();
 }
 
@@ -113,14 +115,6 @@ void CTransferBox::DoPulse()
         m_iconImages[m_iconIndex]->SetVisible(false);
         m_iconIndex = (m_iconIndex + 1) % m_iconImages.size();
         m_iconImages[m_iconIndex]->SetVisible(true);
-
-        bool alwaysShowTransferBox = false;
-
-        if (g_pCore->GetCVars()->Get("always_show_transferbox", alwaysShowTransferBox); m_alwaysVisible != alwaysShowTransferBox)
-        {
-            m_alwaysVisible = alwaysShowTransferBox;
-            UpdateWindowVisibility();
-        }
     }
 }
 
@@ -140,6 +134,16 @@ bool CTransferBox::SetServerVisibility(bool visible)
         return false;
 
     m_visible.set(TB_VISIBILITY_SERVER_SCRIPT, visible);
+    UpdateWindowVisibility();
+    return true;
+}
+
+bool CTransferBox::SetAlwaysVisible(bool visible)
+{
+    if (m_alwaysVisible == visible)
+        return false;
+
+    m_alwaysVisible = visible;
     UpdateWindowVisibility();
     return true;
 }
