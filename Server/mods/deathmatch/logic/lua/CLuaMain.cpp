@@ -99,6 +99,10 @@ CLuaMain::~CLuaMain()
 
     CPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
+    m_pLuaPhysicsShapeManager->RemoveAll();
+    m_pLuaPhysicsContraintManager->RemoveAll();
+    m_pLuaPhysicsRigidBodyManager->RemoveAll();
+    m_pLuaPhysicsStaticCollisionManager->RemoveAll();
 }
 
 bool CLuaMain::BeingDeleted()

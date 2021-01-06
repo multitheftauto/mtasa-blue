@@ -19,7 +19,7 @@ class CPhysicsRigidBodyProxy;
 class CLuaPhysicsShape;
 class CBulletPhysics;
 
-
+// Thread safe motion state
 class MotionState : public btMotionState
 {
 public:
@@ -34,8 +34,7 @@ private:
     mutable std::mutex m_lock;
 };
 
-
-class CPhysicsRigidBodyProxy : public CPhysicsProxyElement, public btRigidBody
+class CPhysicsRigidBodyProxy : public btRigidBody, public CPhysicsProxyElement
 {
 public:
     CPhysicsRigidBodyProxy(btScalar mass, MotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0))
@@ -45,13 +44,12 @@ public:
 
     ~CPhysicsRigidBodyProxy()
     {
-        setCollisionShape(nullptr); // prevent from destryoing shape
-        delete getMotionState();
+        setCollisionShape(nullptr);            // prevent from destryoing shape
         SetEnabled(false);
     }
 
-    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
-                                                          CVector vecCenterOfMass);
+    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia, CVector vecCenterOfMass,
+                                                          MotionState* pMotionstate);
 
     void SetEnabled(bool bEnabled);
 };

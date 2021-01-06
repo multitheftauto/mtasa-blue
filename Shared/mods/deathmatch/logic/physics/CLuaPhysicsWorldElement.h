@@ -48,8 +48,5 @@ public:
     void                                         GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement);
 
 protected:
-    CMatrix            m_matrix;
-    mutable std::mutex m_matrixLock;
-
     std::vector<CLuaPhysicsWorldElement*> m_vecCollisionContacts;
 };

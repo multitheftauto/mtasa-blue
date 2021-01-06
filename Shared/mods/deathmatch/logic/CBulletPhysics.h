@@ -228,7 +228,7 @@ public:
 
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
     void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
-    void AddRigidBody(btRigidBody* pBtRigidBody) const;
+    void AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
     void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
     void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
     void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
@@ -379,10 +379,6 @@ private:
     SharedUtil::ConcurrentList<CLuaPhysicsElement*>    m_elementUpdatesList;
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>  m_rigidBodiesActivationList;
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>  m_rigidBodiesUpdateAABBList;
-
-    // Multithreaded
-    std::vector<CLuaPhysicsRigidBody*> m_vecActiveRigidBodies;
-    mutable std::mutex                 m_vecActiveRigidBodiesLock;
 
     std::vector<CLuaPhysicsWorldElement*> m_vecLastContact;
     std::unordered_map<const char*, ProfilerTime>    m_mapProfileTimings;

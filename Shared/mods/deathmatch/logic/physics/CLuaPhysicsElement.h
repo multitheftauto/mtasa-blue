@@ -35,6 +35,7 @@ public:
     enum class eTempDataKey
     {
         Mass,
+        Scale,
         LinearDumping,
         AngularDumping,
         CcdMotionThreshold,

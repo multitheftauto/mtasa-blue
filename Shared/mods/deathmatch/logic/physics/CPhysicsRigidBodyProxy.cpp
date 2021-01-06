@@ -45,12 +45,9 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
 }
 
 std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
-                                                                       CVector vecCenterOfMass)
+                                                                       CVector vecCenterOfMass, MotionState* pMotionstate)
 {
-    btTransform           transform = btTransform::getIdentity();
-    MotionState* motionstate = new MotionState(transform);
-
-    CLuaPhysicsSharedLogic::SetPosition(motionstate->m_centerOfMassOffset, vecCenterOfMass);
+    CLuaPhysicsSharedLogic::SetPosition(pMotionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->GetBtShape();
     if (vecLocalInertia.LengthSquared() == 0)
     {
@@ -59,9 +56,9 @@ std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysi
         vecLocalInertia = localInertia;
     }
 
-    const CPhysicsRigidBodyProxy::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pCollisionShape, vecLocalInertia);
-    std::unique_ptr<CPhysicsRigidBodyProxy>                   pRigidBody = std::make_unique<CPhysicsRigidBodyProxy>(rigidBodyCI);
+    const CPhysicsRigidBodyProxy::btRigidBodyConstructionInfo rigidBodyCI(fMass, pMotionstate, pCollisionShape, vecLocalInertia);
 
+    std::unique_ptr<CPhysicsRigidBodyProxy>                   pRigidBody = std::make_unique<CPhysicsRigidBodyProxy>(rigidBodyCI);
     pRigidBody->m_pPhysics = pShape->GetPhysics();
 
     pRigidBody->SetEnabled(true);

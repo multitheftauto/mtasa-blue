@@ -12,20 +12,32 @@
 template <class T>
 class CLuaPhysicsBaseManager;
 
+template <class T>
+class ILuaPhysicsBaseManager;
+
 #pragma once
 
+
 template <class T>
-class CLuaPhysicsBaseManager
+class ILuaPhysicsBaseManager
+{
+public:
+    virtual void Remove(T pElement) = 0;
+};
+
+template <class T>
+class CLuaPhysicsBaseManager : public ILuaPhysicsBaseManager<T>
 {
 public:
     CLuaPhysicsBaseManager(EIdClassType idClass) : m_IdClass(idClass){};
-    ~CLuaPhysicsBaseManager() { RemoveAll(); }
+    ~CLuaPhysicsBaseManager(){}
+
 
     void RemoveAll()
     {
-        while (m_elementsList.size())
+        for (auto it = m_elementsList.rbegin(); it != m_elementsList.rend(); ++it)
         {
-            Remove(*(m_elementsList.begin()));
+            Remove(*it);
         }
     }
 
@@ -43,7 +55,6 @@ public:
 
     void Add(T pElement) { m_elementsList.push_back(pElement); }
 
-    virtual void  Remove(T pElement) = 0;
     unsigned long Count() const { return m_elementsList.size(); }
     auto          IterBegin() { return m_elementsList.begin(); }
     auto          IterEnd() { return m_elementsList.end(); }

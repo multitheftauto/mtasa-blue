@@ -47,9 +47,6 @@ public:
     int  GetFilterMask() const;
     void SetFilterMask(int mask);
 
-    // Called every time if while simulation position, rotation has changed.
-    void HasMoved();
-
     // Running on worker thread
     void Initialize();
 
@@ -107,4 +104,5 @@ private:
     std::vector<CLuaPhysicsConstraint*>     m_constraintList;
     mutable std::atomic<bool>               m_bActivationRequested;
     mutable std::atomic<bool>               m_bAABBUpdateRequested;
+    std::unique_ptr<MotionState>            m_pMotionState; // Thread safe
 };

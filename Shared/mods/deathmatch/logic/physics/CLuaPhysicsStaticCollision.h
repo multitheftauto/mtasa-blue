@@ -53,4 +53,6 @@ private:
     CLuaPhysicsShape*  m_pShape;
 
     mutable std::mutex m_lock;
+    mutable std::mutex m_matrixLock;
+    mutable CMatrix m_matrix;
 };

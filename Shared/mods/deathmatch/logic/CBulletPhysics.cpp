@@ -53,10 +53,10 @@ void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned l
         m_pDispatcherMt = std::make_unique<btCollisionDispatcherMt>(m_pCollisionConfiguration.get(), iGrainSize);
         m_pDynamicsWorldMt = std::make_unique<btDiscreteDynamicsWorldMt>(m_pDispatcherMt.get(), m_pOverlappingPairCache.get(), m_pMtSolverPool.get(),
                                                                        m_pSolverMt.get(), m_pCollisionConfiguration.get());
-        m_bUseMt = true;
         m_pDynamicsWorldMt->setGravity(BulletPhysics::Defaults::Gravity);
         m_pDynamicsWorldMt->setDebugDrawer(m_pDebugDrawer.get());
         m_pDynamicsWorldMt->getSimulationIslandManager()->setSplitIslands(true);
+        m_bUseMt = true;
     }
     else
     {
@@ -113,14 +113,13 @@ void CBulletPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject
         m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
 }
 
-void CBulletPhysics::AddRigidBody(btRigidBody* pBtRigidBody) const
+void CBulletPhysics::AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const
 {
     std::lock_guard guard(dynamicsWorldLock);
-
     if (m_bUseMt)
-        m_pDynamicsWorldMt->addRigidBody(pBtRigidBody);
+        m_pDynamicsWorldMt->addRigidBody(pRigidBodyProxy);
     else
-        m_pDynamicsWorld->addRigidBody(pBtRigidBody);
+        m_pDynamicsWorld->addRigidBody(pRigidBodyProxy);
 }
 
 void CBulletPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
@@ -835,6 +834,7 @@ void CBulletPhysics::FlushAllChanges()
     if (!m_InitializeStaticCollisionsList.empty())
     {
         BT_PROFILE("initializeStaticCollisions");
+
         while (!m_InitializeStaticCollisionsList.empty())
         {
             CLuaPhysicsStaticCollision* pStaticCollision = m_InitializeStaticCollisionsList.pop();
@@ -957,29 +957,6 @@ void CBulletPhysics::DoPulse()
         }
     }
 #endif
-
-    {
-        BT_PROFILE("cacheActiveRigidBodies");
-        std::lock_guard guardVecActiveRigidBodies(m_vecActiveRigidBodiesLock);
-        std::lock_guard guardDynamicsWorld(dynamicsWorldLock);
-        m_vecActiveRigidBodies.clear();
-
-        btAlignedObjectArray<btRigidBody*> nonStaticRigidBodies;
-        if (m_bUseMt)
-            nonStaticRigidBodies = m_pDynamicsWorldMt->getNonStaticRigidBodies();
-        else
-            nonStaticRigidBodies = m_pDynamicsWorld->getNonStaticRigidBodies();
-
-        for (int i = 0; i < nonStaticRigidBodies.size(); i++)
-        {
-            if (nonStaticRigidBodies[i]->isActive())
-            {
-                CLuaPhysicsRigidBody* pRigidBody = (CLuaPhysicsRigidBody*)nonStaticRigidBodies[i]->getUserPointer();
-                pRigidBody->HasMoved();
-                m_vecActiveRigidBodies.push_back(pRigidBody);
-            }
-        }
-    }
 
     PostProcessCollisions();
 
