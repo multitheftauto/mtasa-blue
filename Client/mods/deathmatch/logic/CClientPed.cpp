@@ -6799,8 +6799,8 @@ void CClientPed::UpdateVehicleInOut()
         else if (m_bIsGettingIntoVehicle)
         {
             // If we aren't working on entering the car (he's either finished or cancelled)
-            // Or we are dead (fix for #908)
-            if (!IsEnteringVehicle() || IsDead())
+            // Or we are dead (fix for #908) or we are in water (fix for #521)
+            if (!IsEnteringVehicle() || IsDead() || IsInWater())
             {
                 // Is he in a vehicle now?
                 CClientVehicle* pVehicle = GetRealOccupiedVehicle();
