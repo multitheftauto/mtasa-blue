@@ -964,18 +964,21 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
     GetClientSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 
     // Remove elements that do not match the criterias
-    result.erase(std::remove_if(result.begin(), result.end(), [&](CClientEntity* pEntity) {
-        if (typeHash && typeHash != pEntity->GetTypeHash())
-            return true;
+    if (interior || dimension || typeHash) {
+        result.erase(std::remove_if(result.begin(), result.end(), [&](CElement* pElement) {
+            if (typeHash && typeHash != pElement->GetTypeHash())
+                return true;
 
-        if (interior.has_value() && interior != pEntity->GetInterior())
-            return true;
+            if (interior.has_value() && interior != pElement->GetInterior())
+                return true;
 
-        if (dimension.has_value() && dimension != pEntity->GetDimension())
-            return true;
+            if (dimension.has_value() && dimension != pElement->GetDimension())
+                return true;
 
-        return pEntity->IsBeingDeleted();
-    }), result.end());
+            return pElement->IsBeingDeleted();
+            }), result.end()
+        );
+    }
 
     return result;
 }
