@@ -356,11 +356,8 @@ void CMapEventManager::ToggleServerRPCFunction(eServerRPCFunctions eServerRPCFun
     // Check no active handle exists under root
     auto iter = g_pGame->GetMapManager()->GetRootElement()->IterBegin();
     for (; iter != g_pGame->GetMapManager()->GetRootElement()->IterEnd(); iter++)
-    {
-        bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunction).empty();
-        if (bFound)
+        if (bFound = !(*iter)->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunction).empty())
             return;
-    }
 
     // Let players know that the function got toggled
     std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
