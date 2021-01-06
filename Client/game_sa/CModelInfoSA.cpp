@@ -25,6 +25,8 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
+static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
+
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
@@ -249,7 +251,13 @@ BYTE CModelInfoSA::GetVehicleType()
 
 bool CModelInfoSA::IsVehicle() const
 {
-    return m_pInterface != nullptr && reinterpret_cast<intptr_t>(m_pInterface->VFTBL) == 0x85C5C8;
+    // NOTE(botder): This is from CModelInfo::IsVehicleModelType
+    if (m_dwModelID >= 20000)
+        return false;
+
+    // NOTE(botder): m_pInterface might be a nullptr here, we can't use it
+    CBaseModelInfoSAInterface* model = ppModelInfo[m_dwModelID];
+    return model != nullptr && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
 }
 
 bool CModelInfoSA::IsPlayerModel()
