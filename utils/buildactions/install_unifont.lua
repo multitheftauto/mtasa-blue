@@ -29,6 +29,14 @@ newaction {
 			return
 		end
 
+		-- Check downloaded file hash
+		if os.sha256_file(archive_path) ~= UNIFONT_HASH then
+			print("Unifont hash mismatch!")
+			-- Delete bad file
+			os.remove(archive_path)
+			return
+		end
+
 		print("Unifont updated.")
 	end
 }
