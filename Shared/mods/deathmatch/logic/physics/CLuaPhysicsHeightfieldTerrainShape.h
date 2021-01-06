@@ -27,6 +27,6 @@ public:
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::HeightfieldTerrainShape; }
 
 private:
-    int                m_iSizeX;
-    int                m_iSizeY;
+    int m_iSizeX;
+    int m_iSizeY;
 };

@@ -304,7 +304,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateGimpactMeshShape(CBulletPhysics*
 
 // Todo: Add support for greyscale texture as input
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(CBulletPhysics* pPhysics, int sizeX, int sizeY,
-                                                                                        std::optional<std::vector<float>> vecHeights)
+                                                                        std::optional<std::vector<float>> vecHeights)
 {
     if (sizeX < BulletPhysics::Limits::MinimumHeightfieldTerrain || sizeY < BulletPhysics::Limits::MinimumHeightfieldTerrain)
         throw std::invalid_argument(SString("Minimum size of hegihtfield terrain shape is %i", BulletPhysics::Limits::MinimumHeightfieldTerrain).c_str());
@@ -362,8 +362,8 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     return pShape->GetPhysics()->CreateRigidBody(pShape);
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape,
-                                                                                          std::optional<CVector> position, std::optional<CVector> rotation)
+CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
+                                                                          std::optional<CVector> rotation)
 {
     CLuaPhysicsStaticCollision* pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(
         pShape, position.value_or(BulletPhysics::Defaults::RigidBodyPosition), rotation.value_or(BulletPhysics::Defaults::RigidBodyRotation));
@@ -371,8 +371,8 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
     return pStaticCollision;
 }
 
-bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysicsShape* pShapeChildShape,
-                                           std::optional<CVector> vecOptionalPosition, std::optional<CVector> vecOptionalRotation)
+bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysicsShape* pShapeChildShape, std::optional<CVector> vecOptionalPosition,
+                                           std::optional<CVector> vecOptionalRotation)
 {
     if (pShape->GetPhysics() != pShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
@@ -750,7 +750,7 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
 
                 VisitElement(pElement,
                              overloaded{[fSweptSphereRadius](CLuaPhysicsRigidBody* pRigidbody) { pRigidbody->SetSweptSphereRadius(fSweptSphereRadius); },
-                                                  [](CLuaPhysicsElement* __) { assert(0); }});
+                                        [](CLuaPhysicsElement* __) { assert(0); }});
                 return true;
             }
             break;
@@ -762,7 +762,7 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
 }
 
 std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant,
-                                                                              ePhysicsProperty                                   eProperty)
+                                                                                                  ePhysicsProperty                                   eProperty)
 {
     if (std::holds_alternative<CBulletPhysics*>(variant))
     {
@@ -805,10 +805,9 @@ std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::Phy
 // rigidbody vector     vector bool         // variant B
 // rigidbody rigidbdoy  vector vector bool  // variant C
 CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraint(CLuaPhysicsRigidBody*                        pRigidBody,
-                                                                                            std::variant<CLuaPhysicsRigidBody*, CVector> variantA,
-                                                                                            std::variant<std::monostate, CVector, bool>  variantB,
-                                                                                            std::variant<std::monostate, CVector, bool>  variantC,
-                                                                                            std::optional<bool>                          bBool)
+                                                                            std::variant<CLuaPhysicsRigidBody*, CVector> variantA,
+                                                                            std::variant<std::monostate, CVector, bool>  variantB,
+                                                                            std::variant<std::monostate, CVector, bool> variantC, std::optional<bool> bBool)
 {
     bool bDisableCollisionsBetweenLinkedBodies = true;
     if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantA))            // variant A or C
@@ -862,7 +861,7 @@ CLuaPhysicsConstraint* CLuaPhysicsDefs::PhysicsCreatePointToPointConstraint(CLua
         {
             throw std::invalid_argument("");
         }
-        CVector                                            vecPosition = std::get<CVector>(variantA);
+        CVector                            vecPosition = std::get<CVector>(variantA);
         CLuaPhysicsPointToPointConstraint* pConstraint =
             pRigidBody->GetPhysics()->CreatePointToPointConstraint(pRigidBody, vecPosition, bDisableCollisionsBetweenLinkedBodies);
         return pConstraint;
@@ -1065,8 +1064,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
     return results;
 }
 
-std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition,
-                                                                CVector vecRotation, std::optional<RayOptions> options)
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition, CVector vecRotation,
+                                                                std::optional<RayOptions> options)
 {
     bool bEnrichResult = false;
     int  iFilterGroup = BulletPhysics::Defaults::FilterGroup;
@@ -1220,7 +1219,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
         collisionContacts = pWorldElement->GetAllContacts();
     else
         throw new std::invalid_argument("Unsupported physics element.");
-    
+
     std::vector<CLuaPhysicsRigidBody*>       vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
 
@@ -1246,7 +1245,7 @@ std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> 
     std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB)
 {
     std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> result;
-    //if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantA))
+    // if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantA))
     //{
     //    CLuaPhysicsRigidBody* pRigidBodyA = std::get<CLuaPhysicsRigidBody*>(variantA);
 
@@ -1363,7 +1362,6 @@ bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
     throw std::invalid_argument("Unsupported physics element type");
 }
 
-
 bool CLuaPhysicsDefs::PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant)
 {
     switch (eDebugMode)
@@ -1432,8 +1430,7 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
 #endif
 
 // from, to, color
-std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition,
-                                                                                                               float fRadius)
+std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius)
 {
     pPhysics->FlushAllChanges();
     std::vector<std::vector<float>> lines = pPhysics->GetDebugLines(vecPosition, fRadius);

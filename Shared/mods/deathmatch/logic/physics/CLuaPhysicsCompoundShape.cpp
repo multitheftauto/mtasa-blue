@@ -11,13 +11,13 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsCompoundShape::CLuaPhysicsCompoundShape(CBulletPhysics* pPhysics, int iInitialChildCapacity) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCompound()))
+CLuaPhysicsCompoundShape::CLuaPhysicsCompoundShape(CBulletPhysics* pPhysics, int iInitialChildCapacity)
+    : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCompound()))
 {
 }
 
 CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
 {
-
 }
 
 void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
@@ -47,7 +47,7 @@ bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)
 const CVector& CLuaPhysicsCompoundShape::GetChildShapePosition(int index)
 {
     btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    btTransform transform = pCompound->getChildTransform(index);
+    btTransform      transform = pCompound->getChildTransform(index);
     return CLuaPhysicsSharedLogic::GetPosition(transform);
 }
 

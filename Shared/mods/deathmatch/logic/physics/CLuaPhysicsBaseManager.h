@@ -17,7 +17,6 @@ class ILuaPhysicsBaseManager;
 
 #pragma once
 
-
 template <class T>
 class ILuaPhysicsBaseManager
 {
@@ -30,8 +29,7 @@ class CLuaPhysicsBaseManager : public ILuaPhysicsBaseManager<T>
 {
 public:
     CLuaPhysicsBaseManager(EIdClassType idClass) : m_IdClass(idClass){};
-    ~CLuaPhysicsBaseManager(){}
-
+    ~CLuaPhysicsBaseManager() {}
 
     void RemoveAll()
     {
@@ -51,7 +49,6 @@ public:
             return nullptr;
         return pElement;
     }
-
 
     void Add(T pElement) { m_elementsList.push_back(pElement); }
 

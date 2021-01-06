@@ -20,8 +20,8 @@ class CLuaPhysicsBoxShape : public CLuaPhysicsConvexShape
 public:
     CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half);
     CVector GetSize();
-    bool SetSize(CVector& vecSize);
-    void Update() {}
+    bool    SetSize(CVector& vecSize);
+    void    Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BoxShape; }
 };

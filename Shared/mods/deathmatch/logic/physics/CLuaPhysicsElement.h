@@ -68,10 +68,10 @@ public:
     // Run changes on worker thread, let you modify element before get created
     void CommitChange(std::function<void()> change);
 
-    void         NeedsUpdate();
+    void NeedsUpdate();
 
-    template<typename T>
-    bool GetTempData(eTempDataKey key, T& out) const // Multithread safe
+    template <typename T>
+    bool GetTempData(eTempDataKey key, T& out) const            // Multithread safe
     {
         std::lock_guard guard(m_tempDataLock);
         auto            iter = m_mapTempData.find(key);
@@ -84,7 +84,7 @@ public:
     }
 
     template <typename T>
-    void SetTempData(eTempDataKey key, const T& value) // Multithread safe
+    void SetTempData(eTempDataKey key, const T& value)            // Multithread safe
     {
         std::lock_guard guard(m_tempDataLock);
         m_mapTempData[key] = value;
@@ -92,20 +92,20 @@ public:
 
 protected:
     std::atomic<bool> m_bNeedsUpdate = false;
-    void Ready() { m_isReady = true; }
-private:
+    void              Ready() { m_isReady = true; }
 
+private:
     void ClearTempData();            // Multithread safe
     void RemoveScriptID();
 
-    std::atomic<bool>                                  m_isReady;
-    std::atomic<bool>                                  m_bHasEnqueuedChanges = false;
-    CBulletPhysics*                                    m_pPhysics;
-    EIdClass::EIdClassType                             m_classType;
-    unsigned int                                       m_uiScriptID;
-    SharedUtil::ConcurrentList<std::function<void()>>  m_listChanges;
+    std::atomic<bool>                                 m_isReady;
+    std::atomic<bool>                                 m_bHasEnqueuedChanges = false;
+    CBulletPhysics*                                   m_pPhysics;
+    EIdClass::EIdClassType                            m_classType;
+    unsigned int                                      m_uiScriptID;
+    SharedUtil::ConcurrentList<std::function<void()>> m_listChanges;
 
-    mutable std::mutex                                         m_tempDataLock;
+    mutable std::mutex m_tempDataLock;
     // Stores information user set for get function while they are being permanently applied into specific element
     std::unordered_map<eTempDataKey, std::variant<int, float, CVector, SColor>> m_mapTempData;
 };

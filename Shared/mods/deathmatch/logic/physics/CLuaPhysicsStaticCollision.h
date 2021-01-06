@@ -22,7 +22,7 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void    Initialize();
+    void Initialize();
 
     void          SetPosition(CVector vecPosition, bool dontCommitChanges = false);
     const CVector GetPosition() const;
@@ -30,11 +30,11 @@ public:
     const CVector GetRotation() const;
     void          SetScale(const CVector& vecScale);
     const CVector GetScale() const;
-    void    SetMatrix(const CMatrix& matrix);
+    void          SetMatrix(const CMatrix& matrix);
     const CMatrix GetMatrix() const;
 
-    void          RemoveDebugColor();
-    void          SetDebugColor(const SColor& color);
+    void         RemoveDebugColor();
+    void         SetDebugColor(const SColor& color);
     const SColor GetDebugColor() const;
 
     int  GetFilterGroup() const;
@@ -53,9 +53,9 @@ public:
 
 private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
-    CLuaPhysicsShape*  m_pShape;
+    CLuaPhysicsShape*                             m_pShape;
 
     mutable std::mutex m_lock;
     mutable std::mutex m_matrixLock;
-    mutable CMatrix m_matrix;
+    mutable CMatrix    m_matrix;
 };

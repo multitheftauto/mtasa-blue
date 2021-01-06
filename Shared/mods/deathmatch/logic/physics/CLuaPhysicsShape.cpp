@@ -96,7 +96,7 @@ const CVector& CLuaPhysicsShape::GetScale()
 bool CLuaPhysicsShape::GetBoundingBox(CVector& vecMin, CVector& vecMax)
 {
     btTransform transform = btTransform::getIdentity();
-    btVector3 min, max;
+    btVector3   min, max;
     m_pBtShape->getAabb(transform, min, max);
     vecMin = min;
     vecMax = max;
@@ -137,7 +137,7 @@ void CLuaPhysicsShape::UpdateRigids()
 // Return true fo shapes that can be used as rigid body.
 bool CLuaPhysicsShape::SupportRigidBody() const
 {
-    switch (GetType())
+    switch (GetBtType())
     {
         case BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE:
         case BroadphaseNativeTypes::TRIANGLE_MESH_SHAPE_PROXYTYPE:

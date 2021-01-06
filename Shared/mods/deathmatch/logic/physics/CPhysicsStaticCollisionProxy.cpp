@@ -23,7 +23,7 @@ std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::Crea
 CPhysicsStaticCollisionProxy::~CPhysicsStaticCollisionProxy()
 {
     SetEnabled(false);
-    setCollisionShape(nullptr); // don't destroy shape, only static collision
+    setCollisionShape(nullptr);            // don't destroy shape, only static collision
 }
 void CPhysicsStaticCollisionProxy::SetEnabled(bool bEnabled)
 {

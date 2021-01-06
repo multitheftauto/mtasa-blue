@@ -18,7 +18,6 @@ CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CBulletPhysics* pPhysics, float
 
 CLuaPhysicsCapsuleShape::~CLuaPhysicsCapsuleShape()
 {
-
 }
 
 bool CLuaPhysicsCapsuleShape::SetRadius(float fRadius)

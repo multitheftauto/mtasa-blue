@@ -16,7 +16,6 @@ class CLuaPhysicsRigidBody;
 
 #pragma once
 
-
 struct SPhysicsCollisionReport;
 class CLuaPhysicsConstraint;
 
@@ -26,7 +25,7 @@ public:
     CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
-    void    SetPosition(CVector vecPosition, bool dontCommitChanges = false);
+    void          SetPosition(CVector vecPosition, bool dontCommitChanges = false);
     const CVector GetPosition() const;
     void          SetRotation(CVector vecRotation, bool dontCommitChanges = false);
     const CVector GetRotation() const;
@@ -35,14 +34,14 @@ public:
     void          SetMatrix(const CMatrix& matrix);
     const CMatrix GetMatrix() const;
 
-    void          RemoveDebugColor();
-    void          SetDebugColor(const SColor& color);
+    void         RemoveDebugColor();
+    void         SetDebugColor(const SColor& color);
     const SColor GetDebugColor() const;
 
-    int  GetFilterGroup() const;
-    void SetFilterGroup(int iGroup);
-    CVector  GetGravity() const;
-    void SetGravity(CVector gravity);
+    int     GetFilterGroup() const;
+    void    SetFilterGroup(int iGroup);
+    CVector GetGravity() const;
+    void    SetGravity(CVector gravity);
 
     int  GetFilterMask() const;
     void SetFilterMask(int mask);
@@ -75,10 +74,10 @@ public:
     void    ApplyTorque(const CVector& vecTraque);
     void    ApplyTorqueImpulse(const CVector& vecTraque);
 
-    void   SetSleepingThresholds(float fLinear, float fAngular);
-    void   GetSleepingThresholds(float& fLinear, float& fAngular) const;
-    void   SetRestitution(float fRestitution);
-    float  GetRestitution() const;
+    void  SetSleepingThresholds(float fLinear, float fAngular);
+    void  GetSleepingThresholds(float& fLinear, float& fAngular) const;
+    void  SetRestitution(float fRestitution);
+    float GetRestitution() const;
 
     bool  IsSleeping() const;
     bool  WantsSleeping() const;
@@ -95,8 +94,8 @@ public:
     void         NeedsActivation() const;
     void         NeedsAABBUpdate() const;
 
-    void                                    AABBUpdated() { m_bAABBUpdateRequested = false; }
-    void                                    Update() {}
+    void AABBUpdated() { m_bAABBUpdateRequested = false; }
+    void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::RigidBody; }
 
@@ -106,5 +105,5 @@ private:
     std::vector<CLuaPhysicsConstraint*>     m_constraintList;
     mutable std::atomic<bool>               m_bActivationRequested;
     mutable std::atomic<bool>               m_bAABBUpdateRequested;
-    std::unique_ptr<MotionState>            m_pMotionState; // Thread safe
+    std::unique_ptr<MotionState>            m_pMotionState;            // Thread safe
 };

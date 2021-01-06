@@ -17,7 +17,6 @@ CLuaPhysicsWorldElement::CLuaPhysicsWorldElement(CBulletPhysics* pPhysics, EIdCl
 
 CLuaPhysicsWorldElement::~CLuaPhysicsWorldElement()
 {
-
 }
 
 void CLuaPhysicsWorldElement::ClearCollisionContacts()
@@ -32,5 +31,4 @@ void CLuaPhysicsWorldElement::ReportCollisionContact(CLuaPhysicsWorldElement* pE
 
 void CLuaPhysicsWorldElement::GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement)
 {
-
 }

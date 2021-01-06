@@ -29,7 +29,7 @@ void CLuaPhysicsRigidBody::Initialize()
 {
     assert(!IsReady());            // in case something goes wrong, or element get initialized twice
 
-    float fMass;
+    float   fMass;
     CVector vecLocalInertia, vecCenterOfMass;
     GetTempData(eTempDataKey::Mass, fMass);
     GetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
@@ -42,7 +42,7 @@ void CLuaPhysicsRigidBody::Initialize()
     SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
 
     Ready();
-    //SetMatrix(m_matrix);
+    // SetMatrix(m_matrix);
 }
 
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChanges)
@@ -59,7 +59,7 @@ void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChang
     std::function<void()> change([&, vecPosition]() {
         btTransform transform = m_pRigidBodyProxy->getWorldTransform();
         CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-        //m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
+        // m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
         m_pRigidBodyProxy->setWorldTransform(transform);
         m_pRigidBodyProxy->proceedToTransform(transform);
         NeedsActivation();
@@ -97,7 +97,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool dontCommitChang
 
 const CVector CLuaPhysicsRigidBody::GetRotation() const
 {
-    btTransform     transform;
+    btTransform transform;
     m_pMotionState->getWorldTransform(transform);
     return CLuaPhysicsSharedLogic::GetRotation(transform);
 }
@@ -132,7 +132,6 @@ void CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
     SetTempData(eTempDataKey::Scale, matrix.GetScale());
     m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
 
-
     std::function<void()> change([&, matrix]() {
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
         CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetRotation());
@@ -147,7 +146,7 @@ void CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
 
 const CMatrix CLuaPhysicsRigidBody::GetMatrix() const
 {
-    CMatrix         matrix;
+    CMatrix matrix;
 
     return matrix;
 }
@@ -194,7 +193,7 @@ void CLuaPhysicsRigidBody::NeedsAABBUpdate() const
 
 bool CLuaPhysicsRigidBody::Activate() const
 {
-    if (!m_pRigidBodyProxy->isActive()) // prevent activation when you eg. set position directly after create
+    if (!m_pRigidBodyProxy->isActive())            // prevent activation when you eg. set position directly after create
     {
         m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
         m_pRigidBodyProxy->setActivationState(ACTIVE_TAG);
@@ -401,7 +400,6 @@ float CLuaPhysicsRigidBody::GetRestitution() const
     if (IsReady())
         return m_pRigidBodyProxy->getRestitution();
     return 0;
-
 }
 
 void CLuaPhysicsRigidBody::SetFilterMask(int iMask)
@@ -495,7 +493,7 @@ const SColor CLuaPhysicsRigidBody::GetDebugColor() const
         color.A = 255;
         return color;
     }
-    return 0; // #TODO, set white
+    return 0;            // #TODO, set white
 }
 
 void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)

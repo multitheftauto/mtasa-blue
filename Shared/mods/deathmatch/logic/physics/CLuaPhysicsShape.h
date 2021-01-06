@@ -26,19 +26,19 @@ protected:
 
 public:
     ~CLuaPhysicsShape();
-    void Unlink(); // removes all related static collisions and rigid bodies
+    void Unlink();            // removes all related static collisions and rigid bodies
 
-    btCollisionShape*              GetBtShape() const { return m_pBtShape.get(); }
-    void                           AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                           RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                           AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    void                           RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    btCollisionShape* GetBtShape() const { return m_pBtShape.get(); }
+    void              AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void              RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void              AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void              RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
-    bool SetScale(CVector scale);
+    bool           SetScale(CVector scale);
     const CVector& GetScale();
-    bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
-    bool GetBoundingSphere(CVector& vecCenter, float& fRadius);
-    void GetMargin(float& fMargin);
+    bool           GetBoundingBox(CVector& vecMin, CVector& vecMax);
+    bool           GetBoundingSphere(CVector& vecCenter, float& fRadius);
+    void           GetMargin(float& fMargin);
 
     void UpdateRigids();
 
@@ -46,18 +46,18 @@ public:
     const char*           GetBtName();
 
     // for CLuaPhysicsHeightfieldTerrainShape shape
-    float*                GetHeightfieldData() { return &m_vecHeightfieldData[0]; }
-    bool                  SupportRigidBody() const;
+    float* GetHeightfieldData() { return &m_vecHeightfieldData[0]; }
+    bool   SupportRigidBody() const;
 
-    const std::vector<CLuaPhysicsRigidBody*>& GetRigidBodies() const { return m_vecRigidBodyList; }
+    const std::vector<CLuaPhysicsRigidBody*>&       GetRigidBodies() const { return m_vecRigidBodyList; }
     const std::vector<CLuaPhysicsStaticCollision*>& GetStaticCollisions() const { return m_vecStaticCollisions; }
-    
+
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Shape; }
 
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;
-    std::vector<float> m_vecHeightfieldData;
+    std::vector<float>                m_vecHeightfieldData;
 
-    std::vector<CLuaPhysicsRigidBody*>        m_vecRigidBodyList;
+    std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
 };

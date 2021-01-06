@@ -23,5 +23,4 @@ public:
 protected:
     CLuaPhysicsConcaveShape(CBulletPhysics* pPhysics, btCollisionShape* pShape);
     CLuaPhysicsConcaveShape(CBulletPhysics* pPhysics, heightfieldTerrainShape* pHeightfieldTerrainShape);
-
 };

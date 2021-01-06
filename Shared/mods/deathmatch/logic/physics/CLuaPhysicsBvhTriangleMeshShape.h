@@ -15,9 +15,9 @@ class CLuaPhysicsBvhTriangleMeshShape;
 
 struct STriangleInfo
 {
-    int vertex1;
-    int vertex2;
-    int vertex3;
+    int     vertex1;
+    int     vertex2;
+    int     vertex3;
     CVector vecVertex1;
     CVector vecVertex2;
     CVector vecVertex3;
@@ -40,7 +40,7 @@ public:
 
     void Update();
 
-    int GetVerticesNum() const { return m_verticesCount; }
+    int           GetVerticesNum() const { return m_verticesCount; }
     STriangleInfo GetTriangleInfo(int iTriangleIndex);
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BvhTriangleMeshShape; }

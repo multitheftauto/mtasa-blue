@@ -30,6 +30,7 @@ public:
     btTransform m_graphicsWorldTrans;
     btTransform m_centerOfMassOffset;
     btTransform m_startWorldTrans;
+
 private:
     mutable std::mutex m_lock;
 };

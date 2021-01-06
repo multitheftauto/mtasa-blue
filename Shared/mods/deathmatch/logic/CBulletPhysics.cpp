@@ -52,7 +52,7 @@ void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned l
         m_pMtSolverPool = std::make_unique<btConstraintSolverPoolMt>(iParallelSolvers);
         m_pDispatcherMt = std::make_unique<btCollisionDispatcherMt>(m_pCollisionConfiguration.get(), iGrainSize);
         m_pDynamicsWorldMt = std::make_unique<btDiscreteDynamicsWorldMt>(m_pDispatcherMt.get(), m_pOverlappingPairCache.get(), m_pMtSolverPool.get(),
-                                                                       m_pSolverMt.get(), m_pCollisionConfiguration.get());
+                                                                         m_pSolverMt.get(), m_pCollisionConfiguration.get());
         m_pDynamicsWorldMt->setGravity(BulletPhysics::Defaults::Gravity);
         m_pDynamicsWorldMt->setDebugDrawer(m_pDebugDrawer.get());
         m_pDynamicsWorldMt->getSimulationIslandManager()->setSplitIslands(true);
@@ -63,7 +63,8 @@ void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned l
         m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
         m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
         m_pSolver->setRandSeed(ulSeed);
-        m_pDynamicsWorld = std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
+        m_pDynamicsWorld =
+            std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
         m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
         m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
         m_pDynamicsWorld->getSimulationIslandManager()->setSplitIslands(true);
@@ -201,8 +202,8 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
                                                                        int iFilterGroup, int iFilterMask) const
 {
     BT_PROFILE("shapeCast");
-    CVector fromPosition = CLuaPhysicsSharedLogic::GetPosition(from);
-    CVector toPosition = CLuaPhysicsSharedLogic::GetPosition(to);
+    CVector                      fromPosition = CLuaPhysicsSharedLogic::GetPosition(from);
+    CVector                      toPosition = CLuaPhysicsSharedLogic::GetPosition(to);
     SClosestConvexResultCallback rayCallback(fromPosition, toPosition);
 
     rayCallback.m_collisionFilterGroup = iFilterGroup;
@@ -354,9 +355,9 @@ void CBulletPhysics::StepSimulation()
     isDuringSimulation = true;
     std::lock_guard guard(dynamicsWorldLock);
 
-    //if (m_bUseMt)
+    // if (m_bUseMt)
     //    m_pDynamicsWorldMt->getSimulationIslandManager()->buildIslands(m_pDispatcherMt.get(), m_pDynamicsWorldMt.get());
-    //else
+    // else
     //    m_pDynamicsWorld->getSimulationIslandManager()->buildIslands(m_pDispatcher.get(), m_pDynamicsWorld.get());
     //
     if (m_bUseMt)
@@ -906,7 +907,6 @@ void CBulletPhysics::FlushAllChanges()
 
         while (!m_rigidBodiesActivationList.empty())
         {
-            
             pRigidBody = m_rigidBodiesActivationList.pop();
             if (pRigidBody->Activate())
             {
@@ -915,7 +915,7 @@ void CBulletPhysics::FlushAllChanges()
                                                                                                         m_pDynamicsWorldMt->getDispatcher());
                 else
                     m_pDynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                                  m_pDynamicsWorld->getDispatcher());
+                                                                                                      m_pDynamicsWorld->getDispatcher());
             }
         }
     }

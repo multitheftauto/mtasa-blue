@@ -44,7 +44,7 @@ public:
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Constraint; }
 
 protected:
-    virtual void InternalInitialize(std::unique_ptr<btTypedConstraint> pConstraint);
+    virtual void                       InternalInitialize(std::unique_ptr<btTypedConstraint> pConstraint);
     bool                               m_bDisableCollisionsBetweenLinkedBodies;
     uint                               m_uiScriptID;
     std::unique_ptr<btTypedConstraint> m_pConstraint;
