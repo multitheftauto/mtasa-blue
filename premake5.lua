@@ -5,7 +5,6 @@ require "install_data"
 require "install_resources"
 require "install_cef"
 require "install_discord"
-require "install_unifont"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
