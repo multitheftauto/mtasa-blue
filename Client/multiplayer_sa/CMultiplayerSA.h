@@ -67,6 +67,7 @@ public:
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
     void                InitHooks_VehicleCollision();
+    void                InitHooks_VehicleDummies();
     void                InitHooks_Vehicles();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();

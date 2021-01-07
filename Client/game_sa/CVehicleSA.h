@@ -326,9 +326,6 @@ class CAutoPilot
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
-/**
- * \todo GAME RELEASE: Update CVehicleSAInterface
- */
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
@@ -424,21 +421,30 @@ public:
     unsigned int m_isUsingHornOrSecondarySiren;
 
     // 1304
-    BYTE Padding220[112];
+    uint8_t Padding220[96];
+
+    // 1400
+    CFxSystemSAInterface* m_overheatParticle;
+    CFxSystemSAInterface* m_fireParticle;
+    CFxSystemSAInterface* m_dustParticle;
+    uint32_t m_renderLights;
 
     // 1416
     RwTexture* m_pCustomPlateTexture;
 
-    // 1420
-    BYTE Padding225[4];
+    float m_steeringLeftRight;
 
     // 1424
-    BYTE m_type;            // 0 = car/plane, 5 = boat, 6 = train, 9 = bike
+    uint8_t  m_vehicleClass;
+    uint32_t m_vehicleSubClass;
 
-    // 1425
-    BYTE Padding226[15];
+    int16_t    m_peviousRemapTxd;
+    int16_t    m_remapTxd;
+    RwTexture* m_pRemapTexture;
 };
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
+
+class CAutomobileSAInterface;
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
@@ -465,6 +471,8 @@ private:
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount;
     bool                             m_doorsUndamageable = false;
+
+    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
 
 public:
     CVehicleSA();
@@ -745,7 +753,15 @@ public:
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
+    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const override;
+    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) override;
+
+    CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
+    const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
+
 private:
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
+
     void           RecalculateSuspensionLines();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
