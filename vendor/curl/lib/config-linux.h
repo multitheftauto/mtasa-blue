@@ -16,6 +16,9 @@
 /* Default SSL backend */
 /* #undef CURL_DEFAULT_SSL_BACKEND */
 
+/* disable alt-svc */
+/* #undef CURL_DISABLE_ALTSVC */
+
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
 
@@ -33,6 +36,9 @@
 
 /* to disable FTP */
 /* #undef CURL_DISABLE_FTP */
+
+/* to disable curl_easy_options */
+/* #undef CURL_DISABLE_GETOPTIONS */
 
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
@@ -57,6 +63,9 @@
 
 /* disable mime API */
 /* #undef CURL_DISABLE_MIME */
+
+/* to disable MQTT */
+/* #undef CURL_DISABLE_MQTT */
 
 /* disable netrc parsing */
 /* #undef CURL_DISABLE_NETRC */
@@ -88,6 +97,9 @@
 /* to disable SMTP */
 /* #undef CURL_DISABLE_SMTP */
 
+/* to disable socketpair support */
+/* #undef CURL_DISABLE_SOCKETPAIR */
+
 /* to disable TELNET */
 /* #undef CURL_DISABLE_TELNET */
 
@@ -96,9 +108,6 @@
 
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
-
-/* to enable MQTT */
-/* #undef CURL_ENABLE_MQTT */
 
 /* Definition to make a library symbol externally visible. */
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
@@ -634,8 +643,8 @@
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
 
-/* Define to 1 if you have the `SSL_get_esni_status' function. */
-/* #undef HAVE_SSL_GET_ESNI_STATUS */
+/* Define to 1 if you have the `SSL_get_ech_status' function. */
+/* #undef HAVE_SSL_GET_ECH_STATUS */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -863,7 +872,7 @@
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "a suitable curl mailing list: https://curl.haxx.se/mail/"
+#define PACKAGE_BUGREPORT "a suitable curl mailing list: https://curl.se/mail/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
@@ -967,9 +976,6 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
 
-/* to enable alt-svc */
-/* #undef USE_ALTSVC */
-
 /* if AmiSSL is in use */
 /* #undef USE_AMISSL */
 
@@ -979,14 +985,17 @@
 /* if BearSSL is enabled */
 /* #undef USE_BEARSSL */
 
-/* if ESNI support is available */
-/* #undef USE_ESNI */
+/* if ECH support is available */
+/* #undef USE_ECH */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
 /* if GnuTLS uses nettle as crypto backend */
 /* #undef USE_GNUTLS_NETTLE */
+
+/* to enable HSTS */
+/* #undef USE_HSTS */
 
 /* PSL support enabled */
 /* #undef USE_LIBPSL */

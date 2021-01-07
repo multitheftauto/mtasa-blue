@@ -3605,6 +3605,17 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition)
+{
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(usModel);
+
+    if (modelInfo == nullptr || !modelInfo->IsVehicle())
+        return false;
+
+    vecPosition = modelInfo->GetVehicleDummyDefaultPosition(eDummy);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
