@@ -6438,8 +6438,8 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // We dead?
-    if (IsDead())
+    // We dead or in water?
+    if (IsDead() || IsInWater())
     {
         return false;
     }
