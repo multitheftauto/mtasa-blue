@@ -20,6 +20,8 @@
 #include <vector>
 #include <cstdio>
 #include <cstring>
+#include <variant>
+#include <optional>
 
 #include <zlib.h>
 

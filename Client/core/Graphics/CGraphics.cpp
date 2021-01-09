@@ -1350,7 +1350,7 @@ bool CGraphics::LoadStandardDXFonts()
         m_FontResourceNames.push_back("sabankgothic.ttf");
         m_FontResourceNames.push_back("saheader.ttf");
         m_FontResourceNames.push_back("sagothic.ttf");
-        m_FontResourceNames.push_back("unifont-5.1.20080907.ttf");
+        m_FontResourceNames.push_back("unifont.ttf");
     }
 
     for (uint i = 0; i < m_FontResourceNames.size(); i++)
