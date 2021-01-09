@@ -60,7 +60,7 @@ public:
                                      std::optional<CVector> vecOptionalRotation);
 
     static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
-                                     std::variant<CVector, SColor, bool, float, int> argument, std::variant<float> argument2);
+                                     std::variant<CVector, SColor, bool, float, int> argument, std::variant<std::monostate, float> argument2);
     static std::variant<CVector, bool, int, float, std::vector<float>> PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> varian,
                                                                                             ePhysicsProperty                                   eProperty);
     static CLuaPhysicsShape*                                           PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
@@ -112,7 +112,7 @@ public:
     static bool                               PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float>          PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
     static std::unordered_map<int, int>       PhysicsGetSimulationIslands(CBulletPhysics* pPhysics);
-    static std::vector<CLuaPhysicsRigidBody*> PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iIsland);
+    static std::vector<CLuaPhysicsRigidBody*> PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iTargetIsland);
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
 #endif
@@ -127,5 +127,39 @@ public:
             return std::get<U>(it->second);
         }
         return default;
+    }
+
+    template <typename R = void, typename F>
+    static R VisitElement(CLuaPhysicsElement* pElement, F func)
+    {
+        ePhysicsElementType e = pElement->GetType();
+        if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pSphere)>>)
+                return func(pSphere);
+        if (auto* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCapsule)>>)
+                return func(pCapsule);
+        if (auto* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCylinder)>>)
+                return func(pCylinder);
+        if (auto* pCone = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCone)>>)
+                return func(pCone);
+        if (auto* pBox = dynamic_cast<CLuaPhysicsBoxShape*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pBox)>>)
+                return func(pBox);
+        if (auto* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pRigidBody)>>)
+                return func(pRigidBody);
+        if (auto* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pStaticCollision)>>)
+                return func(pStaticCollision);
+
+        if (auto* pAnyShape = dynamic_cast<CLuaPhysicsShape*>(pElement))
+            if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pAnyShape)>>)
+                return func(pAnyShape);
+
+        if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(func), decltype(pElement)>>)
+            func(pElement);
     }
 };

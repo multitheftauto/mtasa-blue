@@ -368,7 +368,7 @@ void CBulletPhysics::StepSimulation()
     isDuringSimulation = false;
 }
 
-void CBulletPhysics::UpdateSimulationIslandCache(int iTargetIsland)
+CBulletPhysics::CIslandCallback* CBulletPhysics::GetSimulationIslandCallback(int iTargetIsland)
 {
     m_pIslandCallback->m_islandBodies.clear();
     m_pIslandCallback->m_bodies.clear();
@@ -378,6 +378,8 @@ void CBulletPhysics::UpdateSimulationIslandCache(int iTargetIsland)
         m_pDynamicsWorldMt->getSimulationIslandManager()->processIslands(m_pDispatcherMt.get(), m_pDynamicsWorldMt.get(), m_pIslandCallback.get());
     else
         m_pDynamicsWorld->getSimulationIslandManager()->processIslands(m_pDispatcher.get(), m_pDynamicsWorld.get(), m_pIslandCallback.get());
+
+    return m_pIslandCallback.get();
 }
 
 void CBulletPhysics::ClearOutsideWorldRigidBodies()

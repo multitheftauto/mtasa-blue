@@ -49,8 +49,6 @@ namespace BulletPhysics
     {
         inline constexpr CVector Gravity(0.f, 0.f, -9.81f);
         inline constexpr float   RigidBodyMass = 1.f;
-        inline constexpr CVector RigidBodyPosition(0.f, 0.f, 0.f);
-        inline constexpr CVector RigidBodyRotation(0.f, 0.f, 0.f);
         inline constexpr float   RigidBodyLinearDumping = 0.005f;             // 0.0 - 1.0
         inline constexpr float   RigidBodyAngularDumping = 0.005f;            // 0.0 - 1.0
         inline constexpr float   RigidBodyLinearSleepingThreshold = 0.1f;

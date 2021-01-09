@@ -41,7 +41,7 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
             m_pPhysics->RemoveRigidBody(this);
         }
         m_bEnabled = bEnabled;
-    }
+    } 
 }
 
 std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,

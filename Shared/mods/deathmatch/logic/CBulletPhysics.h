@@ -243,7 +243,7 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
-    void UpdateSimulationIslandCache(int iTargetIsland = -1);
+    CIslandCallback* GetSimulationIslandCallback(int iTargetIsland = -1);
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
                                           CVector vecLocalInertia = CVector(0, 0, 0), CVector vecCenterOfMass = CVector(0, 0, 0));
@@ -298,8 +298,6 @@ public:
     std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const { return m_vecRigidBodies; }
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<CLuaPhysicsConstraint*>      GetConstraints() const { return m_vecConstraints; }
-
-    CIslandCallback* GetSimulationIslandCallback() const { return m_pIslandCallback.get(); }
 
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);

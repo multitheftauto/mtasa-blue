@@ -329,19 +329,41 @@ void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3&
 #pragma warning(pop)
 }
 
-bool CLuaPhysicsSharedLogic::FitsInUpperPrimitiveLimits(const CVector& vector)
+void CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(CVector vector)
 {
     if (abs(vector.fX) > BulletPhysics::Limits::MaximumPrimitiveSize || abs(vector.fY) > BulletPhysics::Limits::MaximumPrimitiveSize ||
         abs(vector.fZ) > BulletPhysics::Limits::MaximumPrimitiveSize)
-        return false;
-    return true;
+        throw std::invalid_argument(SString("Maximum x,y,z must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 }
 
-bool CLuaPhysicsSharedLogic::FitsInLowerPrimitiveLimits(const CVector& vector)
+void CLuaPhysicsSharedLogic::CheckMinimumPrimitiveSize(CVector vector)
 {
     if (abs(vector.fX) < BulletPhysics::Limits::MinimumPrimitiveSize || abs(vector.fY) < BulletPhysics::Limits::MinimumPrimitiveSize ||
         abs(vector.fZ) < BulletPhysics::Limits::MinimumPrimitiveSize)
-        return false;
-    return true;
+        throw std::invalid_argument(SString("Minimum x,y,z must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+}
+
+void CLuaPhysicsSharedLogic::CheckMinimumPrimitiveSize(float value)
+{
+    if (BulletPhysics::Limits::MinimumPrimitiveSize < value)
+        throw std::invalid_argument(SString("Maximum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+}
+
+void CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(float value)
+{
+    if (BulletPhysics::Limits::MaximumPrimitiveSize > value)
+        throw std::invalid_argument(SString("Maximum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+}
+
+void CLuaPhysicsSharedLogic::CheckPrimitiveSize(float value)
+{
+    CheckMinimumPrimitiveSize(value);
+    CheckMaximumPrimitiveSize(value);
+}
+
+void CLuaPhysicsSharedLogic::CheckPrimitiveSize(CVector vector)
+{
+    CheckMinimumPrimitiveSize(vector);
+    CheckMaximumPrimitiveSize(vector);
 }
 

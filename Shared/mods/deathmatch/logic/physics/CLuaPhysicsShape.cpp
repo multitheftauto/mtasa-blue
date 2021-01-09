@@ -134,7 +134,7 @@ void CLuaPhysicsShape::UpdateRigids()
     }
 }
 
-// Return true fo shapes that can be used as rigid body.
+// Return true fo shapes that can be used as rigid body. Checks compatibility of that shape for rigidbody purpose.
 bool CLuaPhysicsShape::SupportRigidBody() const
 {
     switch (GetBtType())

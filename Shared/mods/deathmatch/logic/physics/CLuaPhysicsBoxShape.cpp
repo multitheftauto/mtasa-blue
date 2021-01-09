@@ -15,7 +15,7 @@ CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half)
 {
 }
 
-bool CLuaPhysicsBoxShape::SetSize(CVector& vecSize)
+bool CLuaPhysicsBoxShape::SetSize(CVector vecSize)
 {
     btConvexInternalShape* pInternalShape = (btConvexInternalShape*)GetBtShape();
     vecSize.fX -= pInternalShape->getMargin();

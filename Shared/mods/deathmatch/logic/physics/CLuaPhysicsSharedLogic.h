@@ -48,6 +48,17 @@ public:
     static void EulerToQuaternion(btVector3 rotation, btQuaternion& result);
     static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
 
-    static bool FitsInUpperPrimitiveLimits(const CVector& vector);
-    static bool FitsInLowerPrimitiveLimits(const CVector& vector);
+    // throws proper std::invalid_argument error when something wrong
+    static void CheckPrimitiveSize(CVector vector);
+
+    // throws proper std::invalid_argument error when something wrong
+    static void CheckPrimitiveSize(float value);
+
+    // throws proper std::invalid_argument error when something wrong
+    static void CheckMinimumPrimitiveSize(float value);
+    static void CheckMinimumPrimitiveSize(CVector vector);
+
+    // throws proper std::invalid_argument error when something wrong
+    static void CheckMaximumPrimitiveSize(float value);
+    static void CheckMaximumPrimitiveSize(CVector vector);
 };
