@@ -20,7 +20,7 @@ CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const st
     m_bChanged = false;
     m_pManager = pManager;
     m_AccountType = accountType;
-    m_strName = strName.substr(0, MAX_USERNAME_LENGTH);
+    m_strName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
     m_iUserID = iUserID;
     m_strIP = strIP;
     m_strSerial = strSerial;
@@ -46,7 +46,7 @@ void CAccount::SetName(const std::string& strName)
 {
     if (m_strName != strName)
     {
-        std::string strNewName = strName.substr(0, MAX_USERNAME_LENGTH);
+        std::string strNewName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
         m_pManager->ChangingName(this, m_strName, strNewName);
         m_strName = strNewName;
         m_pManager->MarkAsChanged(this);

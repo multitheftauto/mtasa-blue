@@ -114,6 +114,9 @@ class CAccountManager
     friend class CAccount;
 
 public:
+    static inline constexpr size_t MIN_USERNAME_LENGTH = 1;
+    static inline constexpr size_t MAX_USERNAME_LENGTH = 64;
+
     CAccountManager(const SString& strDbPathFilename);
     ~CAccountManager();
 
