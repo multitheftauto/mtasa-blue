@@ -481,7 +481,7 @@ void CAccountManager::RemoveAll()
     DeletePointersAndClearList(m_List);
 }
 
-bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, std::string strAccountName, const char* szPassword)
+bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const std::string& strAccountName, const char* szPassword)
 {
     // Is he already logged in?
     if (pClient->IsRegistered())
@@ -504,10 +504,8 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, std::string 
     SString  strPlayerIP = pPlayer->GetSourceIP();
     SString  strPlayerSerial = pPlayer->GetSerial();
 
-    if (strAccountName.length() > MAX_USERNAME_LENGTH)
-        strAccountName = strAccountName.substr(0, MAX_USERNAME_LENGTH);
-
-    const char* szAccountName = strAccountName.c_str();
+    std::string strSlicedAccountName = strAccountName.substr(0, MAX_USERNAME_LENGTH);
+    const char* szAccountName = strSlicedAccountName.c_str();
 
     if (!IsValidAccountName(szAccountName))
     {
