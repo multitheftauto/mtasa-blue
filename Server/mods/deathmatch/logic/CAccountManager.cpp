@@ -522,7 +522,7 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, std::string 
     if (m_AccountProtect.IsFlooding(strPlayerIP.c_str()))
     {
         if (pEchoClient)
-            pEchoClient->SendEcho(SString("login: Account locked", szAccountName).c_str());
+            pEchoClient->SendEcho("login: Account locked");
         CLogger::AuthPrintf("LOGIN: Ignoring %s trying to log in as '%s' (IP: %s  Serial: %s)\n", strPlayerName.c_str(), szAccountName, strPlayerIP.c_str(),
                             strPlayerSerial.c_str());
         return false;
