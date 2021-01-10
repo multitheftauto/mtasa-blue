@@ -70,7 +70,6 @@ public:
 
     // Vehicle set functions
     LUA_DECLARE(FixVehicle);
-    LUA_DECLARE(BlowVehicle);
     LUA_DECLARE(SetVehicleRotation);
     LUA_DECLARE(SetVehicleTurnVelocity);
     LUA_DECLARE(SetVehicleColor);

@@ -2627,12 +2627,12 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 if (pVehicle->GetIsBlown() == false)
                                 {
                                     pVehicle->SetIsBlown(true);
+                                    pVehicle->SetEngineOn(false);
 
-                                    // Call the onVehicleExplode event
                                     CLuaArguments Arguments;
                                     pVehicle->CallEvent("onVehicleExplode", Arguments);
-                                    // Update our engine State
-                                    pVehicle->SetEngineOn(false);
+
+                                    bBroadcast = pVehicle->GetIsBlown() && !pVehicle->IsBeingDeleted();
                                 }
                                 else
                                 {

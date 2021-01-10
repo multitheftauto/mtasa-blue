@@ -5270,23 +5270,26 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
+bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 {
-    assert(pElement);
-    RUN_CHILDREN(BlowVehicle(*iter, bExplode))
-
+    RUN_CHILDREN(BlowVehicle(*iter))
+    
     if (!IS_VEHICLE(pElement))
         return false;
 
     CVehicle* vehicle = static_cast<CVehicle*>(pElement);
 
-    if (vehicle->GetIsBlown())
+    if (vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
         return false;
 
     vehicle->SetIsBlown(true);
 
     CLuaArguments Arguments;
     vehicle->CallEvent("onVehicleExplode", Arguments);
+
+    // Abort if vehicle got fixed or destroyed
+    if (!vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+        return true;
 
     vehicle->SetHealth(0.0f);
     vehicle->SetEngineOn(false);
