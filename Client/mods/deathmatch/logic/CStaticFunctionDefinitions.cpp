@@ -2788,11 +2788,6 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity)
 
     return false;
 }
-bool CStaticFunctionDefinitions::IsVehicleBlown(CClientVehicle& Vehicle, bool& bBlown)
-{
-    bBlown = Vehicle.IsVehicleBlown();
-    return true;
-}
 
 bool CStaticFunctionDefinitions::GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2)
 {

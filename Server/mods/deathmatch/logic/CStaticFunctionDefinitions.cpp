@@ -5275,38 +5275,26 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
     assert(pElement);
     RUN_CHILDREN(BlowVehicle(*iter, bExplode))
 
-    if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+    if (!IS_VEHICLE(pElement))
+        return false;
 
-        // Blow it up on our records. Also change the sync time context or this vehicle
-        // is likely to blow up twice, call the events twice and all that if someone's
-        // nearby and syncing it.
-        if (IsVehicleBlown(pVehicle) == false)
-        {
-            // Call the onVehicleExplode event
-            CLuaArguments Arguments;
-            pVehicle->CallEvent("onVehicleExplode", Arguments);
-        }
-        pVehicle->SetHealth(0.0f);
-        if (!bExplode)
-            pVehicle->SetIsBlown(true);
+    CVehicle* vehicle = static_cast<CVehicle*>(pElement);
 
-        // Update our engine State
-        pVehicle->SetEngineOn(false);
+    if (vehicle->GetIsBlown())
+        return false;
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pVehicle->GenerateSyncTimeContext());
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, BLOW_VEHICLE, *BitStream.pBitStream));
-        return true;
-    }
+    vehicle->SetIsBlown(true);
 
-    return false;
-}
-bool CStaticFunctionDefinitions::IsVehicleBlown(CVehicle* pVehicle)
-{
-    assert(pVehicle);
-    return pVehicle->GetIsBlown();
+    CLuaArguments Arguments;
+    vehicle->CallEvent("onVehicleExplode", Arguments);
+
+    vehicle->SetHealth(0.0f);
+    vehicle->SetEngineOn(false);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor)

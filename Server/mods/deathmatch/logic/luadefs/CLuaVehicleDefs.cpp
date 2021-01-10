@@ -59,7 +59,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getTrainSpeed", GetTrainSpeed},
         //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
-        {"isVehicleBlown", IsVehicleBlown},
+        {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
 
@@ -1751,26 +1751,9 @@ int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::IsVehicleBlown(lua_State* luaVM)
+bool CLuaVehicleDefs::IsVehicleBlown(CVehicle* vehicle)
 {
-    CVehicle* pVehicle;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::IsVehicleBlown(pVehicle))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vehicle->GetIsBlown();
 }
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)

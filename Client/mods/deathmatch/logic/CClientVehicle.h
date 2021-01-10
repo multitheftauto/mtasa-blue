@@ -198,7 +198,7 @@ public:
     void  SetHealth(float fHealth);
     void  Fix();
     void  Blow(bool bAllowMovement = false);
-    bool  IsVehicleBlown() { return m_bBlown; };
+    bool  IsVehicleBlown() const noexcept { return m_bBlown; };
 
     CVehicleColor& GetColor();
     void           SetColor(const CVehicleColor& color);
