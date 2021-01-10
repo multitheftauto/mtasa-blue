@@ -48,7 +48,7 @@ void CAccount::SetName(const std::string& strName)
     {
         std::string strNewName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
         m_pManager->ChangingName(this, m_strName, strNewName);
-        m_strName = strNewName;
+        m_strName = std::move(strNewName);
         m_pManager->MarkAsChanged(this);
     }
 }
