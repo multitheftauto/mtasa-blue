@@ -57,6 +57,10 @@ public:
 
 #define MAX_TEAM_NAME_LENGTH 255
 
+// Min and max number of characters in usernames
+#define MIN_USERNAME_LENGTH 1
+#define MAX_USERNAME_LENGTH 64
+
 // Min number of characters in passwords
 #define MIN_PASSWORD_LENGTH 1
 
