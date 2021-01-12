@@ -210,6 +210,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ServerInfoSync(bitStream);
             return true;
 
+        case PACKET_ID_SERVER_CUSTOM_MODELS:
+            Packet_ServerCustomModels(bitStream);
+            return true;
+
         default:
             break;
     }
@@ -3178,14 +3182,23 @@ retry:
 
                     // Read out the vehicle model
                     unsigned short usModel = 400;
-                    bitStream.Read(usModel);
 
-                    // Is invalid model -> need request model
+                    if (bitStream.Can(eBitStreamVersion::CustomVehicleModels))
+                    {
+                        bitStream.Read(usModel);
+                    }
+                    else
+                    {
+                        unsigned char ucModel = 0xFF;
+                        bitStream.Read(ucModel);
+                        usModel = ucModel + 400;
+                    }
+
                     unsigned short usModelOriginal = usModel;
                     if (!CClientVehicleManager::IsStandardModel(usModel))
                     {
-                        bitStream.Read(usModelOriginal);
-                        if (!CClientVehicleManager::IsValidModel(usModel) && !g_pClientGame->m_pManager->GetModelManager()->RequestModel(usModel, usModelOriginal, eClientModelType::VEHICLE, g_pClientGame->m_pManager))
+                        usModelOriginal = g_pClientGame->m_pManager->GetModelManager()->GetModelParentId(usModel);
+                        if (!CClientVehicleManager::IsValidModel(usModel) || !CClientVehicleManager::IsValidModel(usModelOriginal))
                         {
                             RaiseEntityAddError(39);
                             return;
@@ -5309,6 +5322,30 @@ void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
             return;
 
         g_pClientGame->GetServerInfo()->SetMaxPlayers(maxPlayersCount);
+    }
+}
+
+void CPacketHandler::Packet_ServerCustomModels(NetBitStreamInterface& bitStream)
+{
+    uchar modelType;
+    if (!bitStream.Read(modelType))
+        return;
+
+    unsigned short usNumFunctions;
+    if (!bitStream.ReadCompressed(usNumFunctions))
+        return;
+
+    for (unsigned short us = 0; us < usNumFunctions; us++)
+    {
+        ushort modelID;
+        ushort parentID;
+        if (bitStream.Read(modelID) && bitStream.Read(parentID))
+        {
+            if (CClientVehicleManager::IsStandardModel(parentID))
+            {
+                g_pClientGame->m_pManager->GetModelManager()->RequestModel(modelID, parentID, (eClientModelType) modelType, g_pClientGame->m_pManager);
+            }
+        }
     }
 }
 

@@ -435,7 +435,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // --slush
 
                     unsigned short usModel = pVehicle->GetModel();
-                    BitStream.Write(usModel);
+                    if (BitStream.Can(eBitStreamVersion::CustomVehicleModels))
+                        BitStream.Write(usModel);
+                    else
+                        BitStream.Write(static_cast<unsigned char>(usModel - 400));
 
                     unsigned short usModelOriginal = usModel;
                     if (!CVehicleManager::IsValidModel(usModel))
@@ -444,8 +447,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             usModelOriginal = g_pGame->GetModelManager()->GetModelParent(usModel);
                         else
                             usModelOriginal = VT_LANDSTAL;
-
-                        BitStream.Write(usModelOriginal);
                     }
 
                     // Health

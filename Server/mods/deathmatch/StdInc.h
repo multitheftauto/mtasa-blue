@@ -95,6 +95,7 @@ struct SAclRequest;
 #include "packets/CResourceStopPacket.h"
 #include "packets/CResourceClientScriptsPacket.h"
 #include "packets/CReturnSyncPacket.h"
+#include "packets/CServerCustomModelsPacket.h"
 #include "packets/CServerTextItemPacket.h"
 #include "packets/CUpdateInfoPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"

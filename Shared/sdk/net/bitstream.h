@@ -452,6 +452,10 @@ enum class eBitStreamVersion : unsigned short
     // 2020-11-10 0x71
     PedEnterExit,
 
+    // Implement custom vehicle models id by serverside
+    // 2021-01-12 0x72
+    CustomVehicleModels,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

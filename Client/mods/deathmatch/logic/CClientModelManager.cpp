@@ -9,12 +9,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforTXD()))
+CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforTXD())), m_ModelsParent(std::make_unique<ushort[]>(g_pGame->GetBaseIDforTXD()))
 {
     const unsigned int MAX_MODEL_ID = g_pGame->GetBaseIDforTXD();
     for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         m_Models[i] = nullptr;
+        m_ModelsParent[i] = i;
     }
 }
 
@@ -29,18 +30,21 @@ void CClientModelManager::RemoveAll(void)
     for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         m_Models[i] = nullptr;
+        m_ModelsParent[i] = i;
     }
     m_modelCount = 0;
 }
 
-void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
+void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel, ushort iParentID)
 {
     if (m_Models[pModel->GetModelID()] != nullptr)
     {
         dassert(m_Models[pModel->GetModelID()].get() == pModel.get());
         return;
     }
-    m_Models[pModel->GetModelID()] = pModel;
+    int modelId = pModel->GetModelID();
+    m_Models[modelId] = pModel;
+    m_ModelsParent[modelId] = iParentID > 0 ? iParentID : modelId;
     m_modelCount++;
 }
 
@@ -51,6 +55,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     {
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
+        m_ModelsParent[modelId] = modelId;
         m_modelCount--;
         return true;
     }
@@ -93,7 +98,7 @@ bool CClientModelManager::RequestModel(int iModelID, ushort usParentID, eClientM
 
     pModel = std::make_shared<CClientModel>(pManager, iModelID, eModelType);
 
-    Add(pModel);
+    Add(pModel, usParentID);
 
     pModel->Allocate(usParentID);
 
@@ -101,6 +106,11 @@ bool CClientModelManager::RequestModel(int iModelID, ushort usParentID, eClientM
         pModel->SetParentResource(pResource);
 
     return true;
+}
+
+ushort CClientModelManager::GetModelParentId(int iModelID)
+{
+    return m_ModelsParent[iModelID];
 }
 
 std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eClientModelType type, const unsigned int minModelID)

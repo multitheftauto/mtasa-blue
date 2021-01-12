@@ -1248,6 +1248,9 @@ void CGame::JoinPlayer(CPlayer& Player)
     if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
+    if (m_pModelManager->HasModelsByType(eModelType::VEHICLE))
+        Player.Send(CServerCustomModelsPacket(eModelType::VEHICLE, m_pModelManager->GetModels(eModelType::VEHICLE)));
+
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
         CPerfStatDebugInfo::GetSingleton()->AddLine("PlayerInGameNotice", marker.GetString());

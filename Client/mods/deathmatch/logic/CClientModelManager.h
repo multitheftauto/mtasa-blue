@@ -27,13 +27,14 @@ public:
 
     void RemoveAll(void);
 
-    void Add(const std::shared_ptr<CClientModel>& pModel);
+    void Add(const std::shared_ptr<CClientModel>& pModel, ushort iParentID = 0);
     bool Remove(const std::shared_ptr<CClientModel>& pModel);
 
     int GetFirstFreeModelID(void);
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
     bool RequestModel(int iModelID, ushort usParentID, eClientModelType eModelType, CClientManager* pManager, CResource* pResource = NULL);
+    ushort GetModelParentId(int iModelID);
 
     std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
 
@@ -41,5 +42,6 @@ public:
 
 private:
     std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
+    std::unique_ptr<ushort[]> m_ModelsParent;
     unsigned int m_modelCount = 0;
 };
