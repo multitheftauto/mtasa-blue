@@ -162,6 +162,14 @@ void CWebView::SetRenderingPaused(bool bPaused)
         m_pWebView->GetHost()->WasHidden(bPaused);
 }
 
+void CWebView::GetRenderingPaused()
+{
+    if (!m_pWebView)
+        return false;
+
+    return m_pWebView->GetHost()->WasHidden();
+}
+
 void CWebView::Focus(bool state)
 {
     if (m_pWebView)
