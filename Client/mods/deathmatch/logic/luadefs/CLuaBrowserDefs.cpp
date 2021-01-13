@@ -468,7 +468,7 @@ int CLuaBrowserDefs::IsBrowserRenderingPaused(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushnumber(luaVM, pWebBrowser->GetRenderingPaused());
+        lua_pushboolean(luaVM, pWebBrowser->GetRenderingPaused());
         return 1;
     }
     else
