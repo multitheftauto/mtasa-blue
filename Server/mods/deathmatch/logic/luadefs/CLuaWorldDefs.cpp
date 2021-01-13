@@ -89,7 +89,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"resetMoonSize", resetMoonSize},
 
         // Custom models
-        {"requestModel", RequestModel},
+        {"requestModel", ArgumentParser<RequestModel>},
     };
 
     // Add functions
@@ -1437,44 +1437,25 @@ int CLuaWorldDefs::getOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::RequestModel(lua_State* luaVM)
+bool CLuaWorldDefs::RequestModel(ushort usModelID, eModelType modelType, ushort usParentID)
 {
-    ushort usModelID = 0;
-    eModelType modelType;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModelID);
-    argStream.ReadEnumString(modelType);
-
-    if (!argStream.HasErrors())
+    if (usParentID == 0)
     {
-        ushort usParentID = -1;
-        if (argStream.NextIsNumber())
-            argStream.ReadNumber(usParentID);
-        else
+        switch (modelType)
         {
-            switch (modelType)
-            {
-            case eModelType::PED:
-                usParentID = 7; // male01
-                break;
-            case eModelType::OBJECT:
-                usParentID = 1337; // BinNt07_LA (trash can)
-                break;
-            case eModelType::VEHICLE:
-                usParentID = VT_LANDSTAL;
-                break;
-            default:
-                break;
-            }
+        case eModelType::PED:
+            usParentID = 7; // male01
+            break;
+        case eModelType::OBJECT:
+            usParentID = 1337; // BinNt07_LA (trash can)
+            break;
+        case eModelType::VEHICLE:
+            usParentID = VT_LANDSTAL;
+            break;
+        default:
+            break;
         }
-
-        lua_pushboolean(luaVM, g_pGame->GetModelManager()->RequestModel(usModelID, usParentID, modelType));
-        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetModelManager()->RequestModel(usModelID, usParentID, modelType);
 }

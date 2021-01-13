@@ -93,5 +93,5 @@ public:
     LUA_DECLARE(RestoreAllWorldModels);
     LUA_DECLARE(resetMoonSize);
 
-    LUA_DECLARE(RequestModel);
+    static bool RequestModel(ushort usModelID, eModelType modelType, ushort usParentID = 0);
 };
