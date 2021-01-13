@@ -6438,7 +6438,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // We dead?
+    // We dead or in water?
     if (IsDead())
     {
         return false;
@@ -6495,6 +6495,14 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (!pVehicle->IsEnterable())
     {
         // Stop if the vehicle is not enterable
+        return false;
+    }
+
+    // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
+    unsigned short vehicleModel = pVehicle->GetModel();
+
+    if (IsInWater() && !(vehicleModel == VT_SKIMMER || vehicleModel == VT_SEASPAR || vehicleModel == VT_LEVIATHN || vehicleModel == VT_VORTEX))
+    {
         return false;
     }
 
@@ -6799,8 +6807,8 @@ void CClientPed::UpdateVehicleInOut()
         else if (m_bIsGettingIntoVehicle)
         {
             // If we aren't working on entering the car (he's either finished or cancelled)
-            // Or we are dead (fix for #908)
-            if (!IsEnteringVehicle() || IsDead())
+            // Or we are dead (fix for #908) or we are in water (fix for #521)
+            if (!IsEnteringVehicle() || IsDead() || IsInWater())
             {
                 // Is he in a vehicle now?
                 CClientVehicle* pVehicle = GetRealOccupiedVehicle();

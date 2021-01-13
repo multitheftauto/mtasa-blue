@@ -3605,6 +3605,17 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition)
+{
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(usModel);
+
+    if (modelInfo == nullptr || !modelInfo->IsVehicle())
+        return false;
+
+    vecPosition = modelInfo->GetVehicleDummyDefaultPosition(eDummy);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -6999,21 +7010,10 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
 
 bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
 {
-    assert(szKey);
+    if (szKey == nullptr || !g_pCore->IsFocused())
+        return false;
 
-    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
-    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey(szKey);
-    if (pKey)
-    {
-        if (g_pCore->IsFocused())
-        {
-            bState = (::GetKeyState(pKey->ulCode) & 0x8000) ? true : false;
-
-            return true;
-        }
-    }
-
-    return false;
+    return g_pCore->GetKeyBinds()->GetKeyStateByName(szKey, bState);
 }
 
 bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bState)
