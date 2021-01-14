@@ -269,7 +269,6 @@ public:
     static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
-    static bool  IsVehicleBlown(CVehicle* pVehicle);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
     static bool  GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio);
 
@@ -290,7 +289,7 @@ public:
 
     // Vehicle set functions
     static bool FixVehicle(CElement* pElement);
-    static bool BlowVehicle(CElement* pElement, bool bExplode);
+    static bool BlowVehicle(CElement* pElement);
     static bool SetVehicleColor(CElement* pElement, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
