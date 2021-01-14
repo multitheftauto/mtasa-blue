@@ -124,12 +124,12 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
-    template <class T>
-    T* CreateElement()
+    template <class T, typename ...Ty>
+    T* CreateElement(Ty... args)
     {
         if (m_pResource)
         {
-            T*             pElement = new T(m_pResource->GetDynamicElementRoot(), this);
+            T*             pElement = new T(m_pResource->GetDynamicElementRoot(), this, args...);
             CElementGroup* pGroup = m_pResource->GetElementGroup();
             if (pGroup)
             {

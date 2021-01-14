@@ -103,14 +103,21 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        CBulletPhysics* pPhysics = pLuaMain->CreateElement<CBulletPhysics>();
+        CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
+        int                iParallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
+
+        CBulletPhysics* pPhysics;
+        if (iParallelSolvers > 1)
+            pPhysics = pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorldMt);
+        else
+            pPhysics = pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
+
         if (pPhysics)
         {
-            CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
-            CVector            gravity = getOption(mapOptions, "gravity", BulletPhysics::Defaults::Gravity);
-            int                iParallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
-            int                iGrainSize = getOption(mapOptions, "grainSize", BulletPhysics::Defaults::GrainSize);
-            double             ulSeed = getOption(mapOptions, "seed", BulletPhysics::Defaults::Seed);
+            CVector gravity = getOption(mapOptions, "gravity", BulletPhysics::Defaults::Gravity);
+            int     iGrainSize = getOption(mapOptions, "grainSize", BulletPhysics::Defaults::GrainSize);
+            double  ulSeed = getOption(mapOptions, "seed", BulletPhysics::Defaults::Seed);
+
             pPhysics->Initialize(iParallelSolvers, iGrainSize, (unsigned long)ulSeed);
             pPhysics->SetGravity(gravity);
             return pPhysics;
@@ -1127,7 +1134,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
     std::vector<CLuaPhysicsRigidBody*>       vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
 
-    pPhysics->QueryBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter),
+    pPhysics->OverlapBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter),
                        collisionMask.value_or(btBroadphaseProxy::AllFilter));
     std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
     result["rigidbodies"] = vecRigidBodies;

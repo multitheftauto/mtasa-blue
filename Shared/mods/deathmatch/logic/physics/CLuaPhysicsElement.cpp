@@ -58,7 +58,7 @@ void CLuaPhysicsElement::NeedsUpdate()
     if (!m_bNeedsUpdate)
     {
         m_bNeedsUpdate = true;
-        GetPhysics()->AddToUpdateStack(this);
+        GetPhysics()->AddToBatchUpdate(this);
     }
 }
 

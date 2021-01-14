@@ -65,14 +65,14 @@ class CPhysicsDebugDrawer;
 class CBulletPhysics : public CClientEntity
 {
     DECLARE_CLASS(CBulletPhysics, CClientEntity)
-    CBulletPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain);
+    CBulletPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain, ePhysicsWorld physicsWorldType);
     ~CBulletPhysics();
     eClientEntityType GetType() const { return CBULLETPHYSICS; }
 #else
 class CBulletPhysics : public CElement
 {
 public:
-    CBulletPhysics(CDummy* parent, CLuaMain* luaMain);
+    CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld physicsWorldType);
     ~CBulletPhysics();
 #endif
     bool ReadSpecialData(const int iLine) { return true; }
@@ -82,7 +82,8 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    void Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed);
+    // BulletPhysics specific methods
+
     struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
     {
         std::vector<int> m_hitTriangleIndices;
@@ -115,7 +116,7 @@ public:
         int m_hitTriangleIndex;
         int m_hitShapePart;
 
-        SClosestRayResultCallback(const CVector& rayFrom, const CVector& rayTo)
+        SClosestRayResultCallback(CVector rayFrom, CVector rayTo)
             : btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo), m_hitTriangleIndex(0), m_hitShapePart(0)
         {
         }
@@ -146,7 +147,7 @@ public:
         int     m_hitShapePart;
         CVector m_closestPosition;
 
-        SClosestConvexResultCallback(const CVector& rayFrom, const CVector& rayTo)
+        SClosestConvexResultCallback(CVector rayFrom, CVector rayTo)
             : btCollisionWorld::ClosestConvexResultCallback(rayFrom, rayTo), m_hitTriangleIndex(0), m_hitShapePart(0)
         {
         }
@@ -197,10 +198,34 @@ public:
         }
     };
 
-#ifdef MTA_CLIENT
-    void DrawDebug() { m_bDrawDebugNextTime = true; };
-    void DrawDebugLines();
-#endif
+    struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
+    {
+        btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
+        short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
+        BroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
+                               int collisionMask = btBroadphaseProxy::AllFilter)
+            : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
+        {
+            m_collisionObjectArray.resize(0);
+        }
+
+        SIMD_FORCE_INLINE bool needsCollision(const btBroadphaseProxy* proxy) const
+        {
+            bool collides = (proxy->m_collisionFilterGroup & m_collisionFilterMask) != 0;
+            collides = collides && (m_collisionFilterGroup & proxy->m_collisionFilterMask);
+            return collides;
+        }
+
+        virtual bool process(const btBroadphaseProxy* proxy)
+        {
+            if (needsCollision(proxy))
+                m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
+            return true;
+        }
+    };
+
+    void Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed);
+
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
     void DoPulse();            // Running on worker thread
@@ -213,7 +238,7 @@ public:
     CBulletPhysics::SClosestConvexResultCallback ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to, int iFilterGroup,
                                                            int iFilterMask) const;
 
-    CBulletPhysics::SClosestRayResultCallback RayCast(const CVector& from, const CVector& to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
+    CBulletPhysics::SClosestRayResultCallback RayCast(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
     CBulletPhysics::SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
@@ -226,7 +251,7 @@ public:
     void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
     void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
 
-    void    SetGravity(const CVector& vecGravity) const;
+    void    SetGravity(CVector vecGravity) const;
     CVector GetGravity() const;
     bool    GetUseContinous() const;
     void    SetUseContinous(bool bUse) const;
@@ -241,7 +266,7 @@ public:
     void    SetTriggerConstraintEvents(bool bTriggerConstraintEvents) { m_bTriggerConstraintEvents = bTriggerConstraintEvents; }
     bool    GetTriggerConstraintvents() const { return m_bTriggerConstraintEvents; }
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
-    void    GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
+    CVector GetWorldSize() const { return m_vecWorldSize; }
 
     CIslandCallback* GetSimulationIslandCallback(int iTargetIsland = -1);
 
@@ -263,27 +288,26 @@ public:
     CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
     CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights);
 
-    // Links two bodies together
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                    const CVector& vecPivotA, const CVector& vecPivotB,
-                                                                    bool bDisableCollisionsBetweenLinkedBodies);
+    // Links two bodies together using custom pivots offsets
+    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector vecPivotA,
+                                                                    CVector vecPivotB, bool bDisableCollisionsBetweenLinkedBodies);
 
     // Links body to position
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
+    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position,
                                                                     bool bDisableCollisionsBetweenLinkedBodies);
-    // Automatically calculate bodies offsets
+    // Automatically calculate bodies pivot
     CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
                                                                     bool bDisableCollisionsBetweenLinkedBodies);
 
     std::atomic<bool> isDuringSimulation = false;
 
-    void QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
-                  std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask);
+    void OverlapBox(CVector min, CVector max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies, std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions,
+                    short collisionGroup, int collisionMask);
 
     void AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody);
     void AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody);
     void AddToChangesStack(CLuaPhysicsElement* pElement);
-    void AddToUpdateStack(CLuaPhysicsElement* pElement);
+    void AddToBatchUpdate(CLuaPhysicsElement* pElement);
 
     CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
     CLuaPhysicsRigidBody*       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
@@ -303,6 +327,11 @@ public:
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+
+#ifdef MTA_CLIENT
+    void DrawDebug() { m_bDrawDebugNextTime = true; };
+    void DrawDebugLines();
+#endif
 
 private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
@@ -338,11 +367,11 @@ private:
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 
     std::atomic<int> m_iDeltaTimeMs = 0;
-    bool             m_bDrawDebugNextTime = false;
     CLuaMain*        m_pLuaMain;
 
     CBulletPhysicsManager* m_pPhysicsManager;
 
+    const ePhysicsWorld m_ePhysicsWorld;
     bool               m_canDoPulse = false;
     CTickCount         m_LastTimeMs;
     std::atomic<float> m_fSpeed = 1.0f;
@@ -372,30 +401,8 @@ private:
     std::vector<CLuaPhysicsWorldElement*>         m_vecLastContact;
     std::unordered_map<const char*, ProfilerTime> m_mapProfileTimings;
     std::unique_ptr<CIslandCallback>              m_pIslandCallback;
-};
 
-struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
-{
-    btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
-    short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
-    BroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
-                           int collisionMask = btBroadphaseProxy::AllFilter)
-        : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
-    {
-        m_collisionObjectArray.resize(0);
-    }
-
-    SIMD_FORCE_INLINE bool needsCollision(const btBroadphaseProxy* proxy) const
-    {
-        bool collides = (proxy->m_collisionFilterGroup & m_collisionFilterMask) != 0;
-        collides = collides && (m_collisionFilterGroup & proxy->m_collisionFilterMask);
-        return collides;
-    }
-
-    virtual bool process(const btBroadphaseProxy* proxy)
-    {
-        if (needsCollision(proxy))
-            m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
-        return true;
-    }
+#ifdef MTA_CLIENT
+    bool m_bDrawDebugNextTime = false;
+#endif
 };

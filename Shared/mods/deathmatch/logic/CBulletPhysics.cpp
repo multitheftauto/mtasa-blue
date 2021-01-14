@@ -18,12 +18,13 @@
 #include "physics/CPhysicsDebugDrawer.h"
 
 #ifdef MTA_CLIENT
-CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
+CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain, ePhysicsWorld physicsWorldType)
+    : ClassInit(this), CClientEntity(ID), m_ePhysicsWorld(physicsWorldType)
 {
     m_pManager = pManager;
     m_pPhysicsManager = pManager->GetPhysicsManager();
 #else
-CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain) : CElement(parent)
+CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld physicsWorldType) : CElement(parent), m_ePhysicsWorld(physicsWorldType)
 {
     m_pPhysicsManager = g_pGame->GetBulletPhysicsManager();
     m_iType = CElement::CBULLETPHYSICS;
@@ -153,7 +154,7 @@ void CBulletPhysics::RemoveConstraint(btTypedConstraint* pBtTypedConstraint) con
         m_pDynamicsWorld->removeConstraint(pBtTypedConstraint);
 }
 
-void CBulletPhysics::SetGravity(const CVector& vecGravity) const
+void CBulletPhysics::SetGravity(CVector vecGravity) const
 {
     std::lock_guard guard(dynamicsWorldLock);
 
@@ -240,7 +241,7 @@ bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, i
     return rayCallback.hasHit();
 }
 
-CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(const CVector& from, const CVector& to, int iFilterGroup, int iFilterMask,
+CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(CVector from, CVector to, int iFilterGroup, int iFilterMask,
                                                                   bool bFilterBackfaces) const
 {
     BT_PROFILE("rayCast");
@@ -707,7 +708,7 @@ CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(
     return pConstraint;
 }
 
-CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, const CVector& position,
+CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position,
                                                                                 bool bDisableCollisionsBetweenLinkedBodies)
 {
     CLuaPhysicsPointToPointConstraint* pConstraint = new CLuaPhysicsPointToPointConstraint(pRigidBody, position, bDisableCollisionsBetweenLinkedBodies);
@@ -716,7 +717,7 @@ CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(
 }
 
 CLuaPhysicsPointToPointConstraint* CBulletPhysics::CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                                const CVector& vecPivotA, const CVector& vecPivotB,
+                                                                                CVector vecPivotA, CVector vecPivotB,
                                                                                 bool bDisableCollisionsBetweenLinkedBodies)
 {
     assert(pRigidBodyA != pRigidBodyB);
@@ -752,9 +753,8 @@ std::vector<std::vector<float>> CBulletPhysics::GetDebugLines(CVector vecPositio
     std::vector<std::vector<float>> vecLines;
     vecLines.reserve(vecLines.size());
     for (auto const& line : m_pDebugDrawer->m_vecLines)
-    {
         vecLines.push_back({line.from.fX, line.from.fY, line.from.fZ, line.to.fX, line.to.fY, line.to.fZ, (float)line.color.ulARGB});
-    }
+
     return vecLines;
 }
 
@@ -770,7 +770,7 @@ void CBulletPhysics::DrawDebugLines()
 }
 #endif
 
-void CBulletPhysics::QueryBox(const CVector& min, const CVector& max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
+void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
                               std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {
     btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
@@ -816,7 +816,7 @@ void CBulletPhysics::AddToChangesStack(CLuaPhysicsElement* pElement)
     m_bWorldHasChanged = true;
 }
 
-void CBulletPhysics::AddToUpdateStack(CLuaPhysicsElement* pElement)
+void CBulletPhysics::AddToBatchUpdate(CLuaPhysicsElement* pElement)
 {
     m_elementUpdatesList.push(pElement);
     m_bWorldHasChanged = true;
