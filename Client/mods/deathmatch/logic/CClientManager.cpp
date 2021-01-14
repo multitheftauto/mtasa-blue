@@ -54,6 +54,7 @@ CClientManager::CClientManager()
     m_pPointLightsManager = new CClientPointLightsManager(this);
     m_pModelManager = new CClientModelManager();
     m_pPacketRecorder = new CClientPacketRecorder(this);
+    m_pVectorGraphicManager = new CVectorGraphic(this);
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
@@ -177,6 +178,9 @@ CClientManager::~CClientManager()
 
     delete m_pModelManager;
     m_pModelManager = nullptr;
+
+    delete m_pVectorGraphicManager;
+    m_pVectorGraphicManager = nullptr;
 }
 
 //

@@ -104,6 +104,7 @@
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
+#include <CVectorGraphic.h>
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
@@ -138,6 +139,7 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaTimerDefs.h>
+#include <luadefs/CLuaVectorGraphicDefs.h>
 #include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
