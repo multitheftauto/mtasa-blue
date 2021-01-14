@@ -59,7 +59,7 @@ public:
     SString            GetURL();
     const SString&     GetTitle();
     void               SetRenderingPaused(bool bPaused);
-    void               GetRenderingPaused();
+    bool               GetRenderingPaused();
     void               Focus(bool state = true);
     IDirect3DTexture9* GetTexture() { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
     void               ClearTexture();

@@ -71,8 +71,9 @@ void CClientWebBrowser::SetRenderingPaused(bool bPaused)
     m_pWebView->SetRenderingPaused(bPaused);
 }
 
-void CClientWebBrowser::IsRenderingPaused()
+bool CClientWebBrowser::GetRenderingPaused()
 {
+
     return m_pWebView->GetRenderingPaused();
 }
 

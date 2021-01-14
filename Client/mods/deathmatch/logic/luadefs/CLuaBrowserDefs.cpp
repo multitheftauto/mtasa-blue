@@ -92,8 +92,7 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "url", "loadBrowserURL", "getBrowserURL");
     lua_classvariable(luaVM, "loading", nullptr, "isBrowserLoading");
     lua_classvariable(luaVM, "title", nullptr, "getBrowserTitle");
-    lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", nullptr);
-    lua_classvariable(luaVM, "renderingPaused", "isBrowserRenderingPaused");
+    lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", "isBrowserRenderingPaused");
     lua_classvariable(luaVM, "volume", "setBrowserVolume", "getBrowserVolume");
     lua_classvariable(luaVM, "devTools", "toggleBrowserDevTools", nullptr);
 

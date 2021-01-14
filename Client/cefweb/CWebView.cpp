@@ -26,6 +26,7 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
 
     // Initialise properties
     m_Properties["mobile"] = "0";
+    m_Properties["renderingPaused"] = "false";
 }
 
 CWebView::~CWebView()
@@ -160,14 +161,16 @@ void CWebView::SetRenderingPaused(bool bPaused)
 {
     if (m_pWebView)
         m_pWebView->GetHost()->WasHidden(bPaused);
+
+    m_Properties["renderingPaused"] = bPaused ? "true" : "false";
 }
 
-void CWebView::GetRenderingPaused()
+bool CWebView::GetRenderingPaused()
 {
     if (!m_pWebView)
         return false;
 
-    return m_pWebView->GetHost()->WasHidden();
+    return m_Properties["renderingPaused"] == "true" ? true : false;
 }
 
 void CWebView::Focus(bool state)
@@ -458,7 +461,8 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
                 return;
 
             result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
-    }, this);
+        },
+        this);
 
     return result;
 }
@@ -504,7 +508,8 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
                 return;
 
             result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
-    }, this);
+        },
+        this);
 
     return result;
 }
@@ -824,7 +829,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
-                                                              CefRefPtr<CefRequestCallback> callback)
+                                                                      CefRefPtr<CefRequestCallback> callback)
 {
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
