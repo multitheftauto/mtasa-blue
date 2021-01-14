@@ -1,0 +1,48 @@
+add_subdirectory(geometry)
+add_subdirectory(graphics)
+
+target_sources(lunasvg 
+PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/cssproperty.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgcolor.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgenumeration.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svglength.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgnumber.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgpath.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgpoint.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgpreserveaspectratio.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgproperty.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgcontentutils.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgrect.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgstring.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgtransform.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgangle.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/rendercontext.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgdefselement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgdocument.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgdocumentimpl.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgelementimpl.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgelementiter.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgfittoviewbox.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svggeometryelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svggraphicselement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgpaintelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgparser.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svggelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgsvgelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgstopelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgstyledelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgurireference.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svguseelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgsymbolelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgmaskelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgclippathelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgmarkerelement.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/svgtextelement.cpp"
+)
+
+target_include_directories(lunasvg
+PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}"
+)
