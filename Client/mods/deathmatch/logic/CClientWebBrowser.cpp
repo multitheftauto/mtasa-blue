@@ -71,12 +71,6 @@ void CClientWebBrowser::SetRenderingPaused(bool bPaused)
     m_pWebView->SetRenderingPaused(bPaused);
 }
 
-bool CClientWebBrowser::GetRenderingPaused()
-{
-
-    return m_pWebView->GetRenderingPaused();
-}
-
 void CClientWebBrowser::Focus()
 {
     m_pWebView->Focus();

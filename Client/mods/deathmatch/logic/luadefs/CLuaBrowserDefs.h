@@ -30,7 +30,7 @@ public:
     LUA_DECLARE(GetBrowserTitle);
     LUA_DECLARE(GetBrowserURL);
     LUA_DECLARE(SetBrowserRenderingPaused);
-    LUA_DECLARE(IsBrowserRenderingPaused);
+    static bool IsBrowserRenderingPaused(CClientWebBrowser* browser);
     LUA_DECLARE(ExecuteBrowserJavascript);
     LUA_DECLARE(GetBrowserVolume);
     LUA_DECLARE(SetBrowserVolume);
