@@ -24,6 +24,7 @@ public:
     virtual SString            GetURL() = 0;
     virtual const SString&     GetTitle() = 0;
     virtual void               SetRenderingPaused(bool bPaused) = 0;
+    virtual bool               GetRenderingPaused() = 0;
     virtual void               Focus(bool state = true) = 0;
     virtual IDirect3DTexture9* GetTexture() = 0;
 

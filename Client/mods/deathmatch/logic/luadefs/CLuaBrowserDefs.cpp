@@ -26,6 +26,7 @@ void CLuaBrowserDefs::LoadFunctions()
         {"getBrowserTitle", GetBrowserTitle},
         {"getBrowserURL", GetBrowserURL},
         {"setBrowserRenderingPaused", SetBrowserRenderingPaused},
+        {"isBrowserRenderingPaused", IsBrowserRenderingPaused},
         {"executeBrowserJavascript", ExecuteBrowserJavascript},
         {"getBrowserVolume", GetBrowserVolume},
         {"setBrowserVolume", SetBrowserVolume},
@@ -67,6 +68,7 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTitle", "getBrowserTitle");
     lua_classfunction(luaVM, "getURL", "getBrowserURL");
     lua_classfunction(luaVM, "setRenderingPaused", "setBrowserRenderingPaused");
+    lua_classfunction(luaVM, "isRenderingPaused", "isBrowserRenderingPaused");
     lua_classfunction(luaVM, "executeJavascript", "executeBrowserJavascript");
     lua_classfunction(luaVM, "getVolume", "getBrowserVolume");
     lua_classfunction(luaVM, "setVolume", "setBrowserVolume");
@@ -90,7 +92,7 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "url", "loadBrowserURL", "getBrowserURL");
     lua_classvariable(luaVM, "loading", nullptr, "isBrowserLoading");
     lua_classvariable(luaVM, "title", nullptr, "getBrowserTitle");
-    lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", nullptr);
+    lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", "isBrowserRenderingPaused");
     lua_classvariable(luaVM, "volume", "setBrowserVolume", "getBrowserVolume");
     lua_classvariable(luaVM, "devTools", "toggleBrowserDevTools", nullptr);
 
@@ -446,6 +448,26 @@ int CLuaBrowserDefs::SetBrowserRenderingPaused(lua_State* luaVM)
     {
         pWebBrowser->SetRenderingPaused(bPaused);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaBrowserDefs::IsBrowserRenderingPaused(lua_State* luaVM)
+{
+    //  bool isBrowserRenderingPaused ( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pWebBrowser);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, pWebBrowser->GetRenderingPaused());
         return 1;
     }
     else
