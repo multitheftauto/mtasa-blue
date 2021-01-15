@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaBrowserDefs::LoadFunctions()
 {
@@ -26,7 +27,7 @@ void CLuaBrowserDefs::LoadFunctions()
         {"getBrowserTitle", GetBrowserTitle},
         {"getBrowserURL", GetBrowserURL},
         {"setBrowserRenderingPaused", SetBrowserRenderingPaused},
-        {"isBrowserRenderingPaused", IsBrowserRenderingPaused},
+        {"isBrowserRenderingPaused", ArgumentParser<IsBrowserRenderingPaused>},
         {"executeBrowserJavascript", ExecuteBrowserJavascript},
         {"getBrowserVolume", GetBrowserVolume},
         {"setBrowserVolume", SetBrowserVolume},
@@ -457,24 +458,9 @@ int CLuaBrowserDefs::SetBrowserRenderingPaused(lua_State* luaVM)
     return 1;
 }
 
-int CLuaBrowserDefs::IsBrowserRenderingPaused(lua_State* luaVM)
+bool CLuaBrowserDefs::IsBrowserRenderingPaused(CClientWebBrowser* browser)
 {
-    //  bool isBrowserRenderingPaused ( browser webBrowser )
-    CClientWebBrowser* pWebBrowser;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pWebBrowser);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pWebBrowser->GetRenderingPaused());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return browser->GetRenderingPaused();
 }
 
 int CLuaBrowserDefs::ExecuteBrowserJavascript(lua_State* luaVM)
