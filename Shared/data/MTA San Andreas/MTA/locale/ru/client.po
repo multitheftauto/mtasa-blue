@@ -3347,7 +3347,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Права защищены (C) 2003 - 2016 Multi Theft Auto"
+#~ msgstr "Права защищены (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "В данный момент сервис недоступен"
@@ -3380,7 +3380,7 @@ msgstr ""
 #~ msgstr "Отсутствует код подтверждения"
 
 #~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-#~ msgstr "Права защищены © 2003 - 2016 Multi Theft Auto"
+#~ msgstr "Права защищены © 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Сообщество"
