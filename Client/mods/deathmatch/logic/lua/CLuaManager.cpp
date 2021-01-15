@@ -198,6 +198,7 @@ void CLuaManager::LoadCFunctions()
         // Util functions
         {"getValidPedModels", CLuaFunctionDefs::GetValidPedModels},
         {"downloadFile", CLuaFunctionDefs::DownloadFile},
+        {"getThemeColor", CLuaFunctionDefs::GetThemeColor},
 
         // Input functions
         {"bindKey", CLuaFunctionDefs::BindKey},

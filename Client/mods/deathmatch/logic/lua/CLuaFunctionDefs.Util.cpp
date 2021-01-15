@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <winrt/Windows.UI.ViewManagement.h>
+#include <VersionHelpers.h>
+
+using namespace winrt::Windows::UI::ViewManagement;
 
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
@@ -392,6 +396,44 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
             }
         }
     }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::GetThemeColor(lua_State* luaVM)
+{
+    //  int int int int int int getThemeColor ()
+    if (IsWindows10OrGreater())
+    {
+
+        // ui settings (win10)
+        UISettings settings;
+
+        // background
+        Windows.UI.Color background = settings.GetColorValue(UIColorType::Background);
+        lua_pushnumber(luaVM, background.R);
+        lua_pushnumber(luaVM, background.G);
+        lua_pushnumber(luaVM, background.B);
+
+        // foreground
+        Windows.UI.Color foreground = settings.GetColorValue(UIColorType::Foreground);
+        lua_pushnumber(luaVM, foreground.R);
+        lua_pushnumber(luaVM, foreground.G);
+        lua_pushnumber(luaVM, foreground.B);
+    
+    }
+    else
+    {
+        
+        // return default 6x 255
+        for (int r = 0; r < 6; r++)
+        {
+            lua_pushnumber(luaVM, 255);
+        }
+
+    }
+
+    // failed
     lua_pushboolean(luaVM, false);
     return 1;
 }
