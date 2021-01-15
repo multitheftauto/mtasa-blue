@@ -165,7 +165,7 @@ void CWebView::SetRenderingPaused(bool bPaused)
     }
 }
 
-const bool CWebView::GetRenderingPaused()
+const bool CWebView::GetRenderingPaused() const
 {
     return m_pWebView ? m_bIsRenderingPaused : false;
 }
