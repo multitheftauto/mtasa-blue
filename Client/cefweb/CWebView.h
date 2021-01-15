@@ -177,6 +177,7 @@ private:
 
     bool                       m_bBeingDestroyed;
     bool                       m_bIsLocal;
+    bool                       m_bIsRenderingPaused = false;
     bool                       m_bIsTransparent;
     POINT                      m_vecMousePosition;
     bool                       m_mouseButtonStates[3];

@@ -26,7 +26,6 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
 
     // Initialise properties
     m_Properties["mobile"] = "0";
-    m_Properties["renderingPaused"] = "false";
 }
 
 CWebView::~CWebView()
@@ -161,8 +160,7 @@ void CWebView::SetRenderingPaused(bool bPaused)
 {
     if (m_pWebView)
         m_pWebView->GetHost()->WasHidden(bPaused);
-
-    m_Properties["renderingPaused"] = bPaused ? "true" : "false";
+        m_bIsRenderingPaused = bPaused;
 }
 
 bool CWebView::GetRenderingPaused()
@@ -170,7 +168,7 @@ bool CWebView::GetRenderingPaused()
     if (!m_pWebView)
         return false;
 
-    return m_Properties["renderingPaused"] == "true" ? true : false;
+    return m_bIsRenderingPaused;
 }
 
 void CWebView::Focus(bool state)
