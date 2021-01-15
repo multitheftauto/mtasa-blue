@@ -138,6 +138,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
     CLASS_CClientWebBrowser,
+    CLASS_CClientVectorGraphic,
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,

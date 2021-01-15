@@ -37,7 +37,6 @@ static CClientCamera*            m_pCamera;
 static CClientExplosionManager*  m_pExplosionManager;
 static CClientProjectileManager* m_pProjectileManager;
 static CClientSoundManager*      m_pSoundManager;
-static CVectorGraphic*           m_pVectorGraphicManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \
@@ -77,7 +76,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pExplosionManager = pManager->GetExplosionManager();
     m_pProjectileManager = pManager->GetProjectileManager();
     m_pSoundManager = pManager->GetSoundManager();
-    m_pVectorGraphicManager = pManager->GetVectorGraphicManager();
 }
 
 CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
@@ -9954,13 +9952,5 @@ bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
         g_pGame->GetWorld()->ResetSurfaceInfo(sSurfaceID);
         return true;
     }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SvgTest(bool bBool)
-{
-    if (bBool)
-        return m_pVectorGraphicManager->TestFunc();
-        
     return false;
 }

@@ -104,7 +104,7 @@
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
-#include <CVectorGraphic.h>
+#include <CClientVectorGraphic.h>
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>

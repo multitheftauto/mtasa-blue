@@ -14,8 +14,7 @@
 void CLuaVectorGraphicDefs::LoadFunctions()
 {
    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // Audio funcs
-        {"svgTest", TestFunc},
+        {"svgCreate", ArgumentParser<SVGCreate>},
     };
 
     // Add functions
@@ -27,27 +26,32 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    lua_classfunction(luaVM, "test", "svgTest");
+    lua_classfunction(luaVM, "create", "svgCreate");
 
     lua_registerclass(luaVM, "SVG");
 }
 
-int CLuaVectorGraphicDefs::TestFunc(lua_State* luaVM)
+bool CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, uint width, uint height)
 {
-    CScriptArgReader argStream(luaVM);
-
-    bool bBool = false;
-    argStream.ReadBool(bBool);
-
-    if (!argStream.HasErrors())
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
     {
-        bool bTest = CStaticFunctionDefinitions::SvgTest(bBool);
-        lua_pushboolean(luaVM, bTest);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        CResource* pParentResource = pLuaMain->GetResource();
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(width, height);
+        if (pVectorGraphic)
+        {
+            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+            pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
+
+            // Set our owner resource
+            pVectorGraphic->SetResource(pParentResource);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    return false;
 }

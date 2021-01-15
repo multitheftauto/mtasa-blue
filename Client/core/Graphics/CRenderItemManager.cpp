@@ -145,6 +145,29 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::CreateVectorGraphic
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint height)
+{
+    CVectorGraphicItem* pVectorItem = new CVectorGraphicItem();
+    pVectorItem->PostConstruct(this, width, height);
+
+    if (!pVectorItem->IsValid())
+    {
+        SAFE_RELEASE(pVectorItem);
+        return NULL;
+    }
+
+    UpdateMemoryUsage();
+
+    return pVectorItem;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::CreateRenderTarget
 //
 //

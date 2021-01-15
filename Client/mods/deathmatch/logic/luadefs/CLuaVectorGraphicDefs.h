@@ -17,5 +17,5 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(TestFunc);
+    static bool SVGCreate(lua_State* luaVM, uint width, uint height);
 };
