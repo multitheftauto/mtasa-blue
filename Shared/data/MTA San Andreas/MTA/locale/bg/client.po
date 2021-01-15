@@ -3337,5 +3337,5 @@ msgstr ""
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
 #~ msgstr "свържете: Синтаксис е 'connect <host> <port> [<nick> <pass>]'"
 
-#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Копирайт (C) 2003 - 2018 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Копирайт (C) 2003 - 2021 Multi Theft Auto"

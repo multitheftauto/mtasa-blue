@@ -3337,8 +3337,8 @@ msgstr ""
 #~ "bağlan (/connect): Sözdizimi 'connect <sunucu ip> <port> [<kullanıcı adı> "
 #~ "<şifre>]'"
 
-#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2018 Multi Theft Auto' ya aittir"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Tüm Hakları (C) 2003-2021 Multi Theft Auto' ya aittir"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Servis bulunamıyor"
@@ -3371,8 +3371,8 @@ msgstr ""
 #~ msgstr "Onay kodu eksik"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2014 Multi Theft Auto ya aittir"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Tüm Hakları (C) 2003-2021 Multi Theft Auto ya aittir"
 
 #~ msgid "Community"
 #~ msgstr "Topluluk"
@@ -3401,8 +3401,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Çıkış yap"
 
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2014 Multi Theft Auto ya aittir"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Tüm Hakları (C) 2003-2021 Multi Theft Auto ya aittir"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Aero Masaüstünü Devre Dışı Bırak"
@@ -3431,8 +3431,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Genel"
 
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2013 Multi Theft Auto ya aittir"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Tüm Hakları (C) 2003-2021 Multi Theft Auto ya aittir"
 
 #~ msgid "Resolution"
 #~ msgstr "Çözünürlük:"

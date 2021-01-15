@@ -3393,8 +3393,8 @@ msgstr ""
 #~ msgstr "Logga ut"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Inaktivera Aero Desktop"
@@ -3420,8 +3420,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Allmänt  "
 
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Upplösning"

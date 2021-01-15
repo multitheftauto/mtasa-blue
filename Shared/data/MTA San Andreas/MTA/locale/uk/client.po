@@ -3350,8 +3350,8 @@ msgstr ""
 #~ msgstr ""
 #~ "під'єднатися: Використовуйте 'connect <адреса> <порт> [<нік> <пароль>]'"
 
-#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "В даний момент сервіс недоступний"
@@ -3383,7 +3383,7 @@ msgstr ""
 #~ msgid "Validation code missing"
 #~ msgstr "Немає коду підтвердження"
 
-#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
 #~ msgstr "Права захищені © 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Community"
@@ -3417,8 +3417,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Вийти"
 
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Права захищені © 2003 - 2014 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Права захищені © 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Browser"
 #~ msgstr "Браузер"
@@ -3450,8 +3450,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Загальні"
 
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Роздільність "

@@ -3374,8 +3374,8 @@ msgstr ""
 #~ msgid "Validation code missing"
 #~ msgstr "Potvrdni kod nedostaje"
 
-#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-#~ msgstr "Autorska prava (C) 2003 - 2015 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Autorska prava (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Zajednica"
@@ -3409,8 +3409,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Odjava"
 
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Autorska prava (C) 2003 - 2014 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Autorska prava (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Browser"
 #~ msgstr "Preglednik"
@@ -3442,8 +3442,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Općenito"
 
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Autorska Prava (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Autorska Prava (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Rezolucija"

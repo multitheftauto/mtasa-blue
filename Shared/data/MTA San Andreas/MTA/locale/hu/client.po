@@ -3356,8 +3356,8 @@ msgstr ""
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
 #~ msgstr "kapcsolódás: Példa: 'connect <hoszt> <port> [<név> <jelszó>]'"
 
-#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "A Szolgáltatás jelenleg nem elérhető"
@@ -3390,8 +3390,8 @@ msgstr ""
 #~ msgid "Validation code missing"
 #~ msgstr "Hiányzó érvényesítő kód"
 
-#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Közösség"
@@ -3425,8 +3425,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Kijelentkezés"
 
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Browser"
 #~ msgstr "Böngésző"
@@ -3458,8 +3458,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Általános"
 
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Felbontás"

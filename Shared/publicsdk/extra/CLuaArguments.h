@@ -4,7 +4,7 @@
  *
  *  ml_base, External lua add-on module
  *
- *  Copyright � 2003-2018 MTA.  All Rights Reserved.
+ *  Copyright � 2003-2021 MTA.  All Rights Reserved.
  *
  *  Grand Theft Auto is � 2002-2018 Rockstar North
  *

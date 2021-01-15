@@ -3334,8 +3334,8 @@ msgstr ""
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
 #~ msgstr "connect: Správný tvar je 'connect <ip> <port> [<jméno> <heslo>]'"
 
-#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Služba je momentálně nedostupná"
@@ -3368,8 +3368,8 @@ msgstr ""
 #~ msgstr "Chybí validační kód"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Komunita"
@@ -3399,8 +3399,8 @@ msgstr ""
 #~ msgstr "Odhlásit"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Zakazát Aero Desktop"
@@ -3426,8 +3426,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Obecné  "
 
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Rozlišení"
