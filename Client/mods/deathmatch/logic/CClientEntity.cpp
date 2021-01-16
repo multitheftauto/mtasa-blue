@@ -46,7 +46,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_pAttachedToEntity = NULL;
 
     m_strTypeName = "unknown";
-    m_uiTypeHash = HashString(m_strTypeName);
+    m_uiTypeHash = GetTypeHashFromString(m_strTypeName);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 
@@ -173,7 +173,7 @@ void CClientEntity::SetTypeName(const SString& name)
 {
     CClientEntity::RemoveEntityFromRoot(m_uiTypeHash, this);
     m_strTypeName.AssignLeft(name, MAX_TYPENAME_LENGTH);
-    m_uiTypeHash = HashString(name);
+    m_uiTypeHash = GetTypeHashFromString(name);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 }
@@ -605,6 +605,20 @@ void CClientEntity::SetRotationDegrees(const CVector& vecDegrees)
     CVector vecTemp = vecDegrees;
     ConvertDegreesToRadians(vecTemp);
     SetRotationRadians(vecTemp);
+}
+
+void CClientEntity::SetDimension(unsigned short usDimension)
+{
+    if (m_usDimension == usDimension)
+        return;
+
+    unsigned int usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onClientElementDimensionChange", Arguments, true);
 }
 
 bool CClientEntity::IsOutOfBounds()
@@ -1082,6 +1096,27 @@ void CClientEntity::RemoveAllCollisions()
 bool CClientEntity::IsEntityAttached(CClientEntity* pEntity)
 {
     return ListContains(m_AttachedEntities, pEntity);
+}
+
+bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
+{
+    if (bRecursive)
+    {
+        std::set<CClientEntity*> history;
+
+        for (CClientEntity* pCurrent = this; pCurrent; pCurrent = pCurrent->GetAttachedTo())
+        {
+            if (pCurrent == pEntity)
+                return true;
+
+            if (!std::get<bool>(history.insert(pCurrent)))
+                break; // This should not be possible, but you never know
+        }
+
+        return false;
+    }
+
+    return m_pAttachedToEntity == pEntity;
 }
 
 void CClientEntity::ReattachEntities()

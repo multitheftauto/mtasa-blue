@@ -178,6 +178,7 @@ public:
 
     const SString& GetTypeName() { return m_strTypeName; }
     unsigned int   GetTypeHash() { return m_uiTypeHash; }
+    static auto    GetTypeHashFromString(std::string_view type) { return HashString(type.data(), type.length()); }
     void           SetTypeName(const SString& name);
 
     CClientEntity* GetParent() { return m_pParent; };
@@ -222,7 +223,7 @@ public:
     virtual void SetRotationDegrees(const CVector& vecDegrees);
 
     virtual inline unsigned short GetDimension() { return m_usDimension; }
-    virtual void                  SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    virtual void                  SetDimension(unsigned short usDimension);
 
     virtual void ModelRequestCallback(CModelInfo* pModelInfo){};
 
@@ -234,6 +235,7 @@ public:
     virtual void   GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     virtual void   SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     bool           IsEntityAttached(CClientEntity* pEntity);
+    bool           IsAttachedToElement(CClientEntity* pEntity, bool bRecursive = true);
     uint           GetAttachedEntityCount() { return m_AttachedEntities.size(); }
     CClientEntity* GetAttachedEntity(uint uiIndex) { return m_AttachedEntities[uiIndex]; }
     void           ReattachEntities();
@@ -323,6 +325,9 @@ public:
     bool         IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     virtual void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
 
+    bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
+    void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
+
 protected:
     CClientManager*       m_pManager;
     CClientEntity*        m_pParent;
@@ -369,7 +374,8 @@ protected:
     bool                              m_bWorldIgnored;
     bool                              m_bCallPropagationEnabled;
     bool                              m_bDisallowCollisions;
-
+    bool                              m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                                  // have no effect on this element
 public:
     // Optimization for getElementsByType starting at root
     static void StartupEntitiesFromRoot();

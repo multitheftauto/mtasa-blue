@@ -80,7 +80,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteCompressed(m_uiBitrate);
 
     // fakelag command enabled
-    if (BitStream.Version() >= 0x06A)
+    if (BitStream.Can(eBitStreamVersion::FakeLagCommand))
     {
         BitStream.WriteBit(g_pGame->GetConfig()->IsFakeLagCommandEnabled());
     }

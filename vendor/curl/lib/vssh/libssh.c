@@ -12,7 +12,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -158,6 +158,7 @@ const struct Curl_handler Curl_handler_scp = {
   ZERO_NULL,                    /* connection_check */
   PORT_SSH,                     /* defport */
   CURLPROTO_SCP,                /* protocol */
+  CURLPROTO_SCP,                /* family */
   PROTOPT_DIRLOCK | PROTOPT_CLOSEACTION | PROTOPT_NOURLQUERY    /* flags */
 };
 
@@ -183,6 +184,7 @@ const struct Curl_handler Curl_handler_sftp = {
   ZERO_NULL,                            /* connection_check */
   PORT_SSH,                             /* defport */
   CURLPROTO_SFTP,                       /* protocol */
+  CURLPROTO_SFTP,                       /* family */
   PROTOPT_DIRLOCK | PROTOPT_CLOSEACTION
   | PROTOPT_NOURLQUERY                  /* flags */
 };
@@ -403,6 +405,9 @@ static int myssh_is_known(struct connectdata *conn)
           knownkey.keytype = CURLKHTYPE_RSA1;
           break;
         case SSH_KEYTYPE_ECDSA:
+        case SSH_KEYTYPE_ECDSA_P256:
+        case SSH_KEYTYPE_ECDSA_P384:
+        case SSH_KEYTYPE_ECDSA_P521:
           knownkey.keytype = CURLKHTYPE_ECDSA;
           break;
         case SSH_KEYTYPE_ED25519:
@@ -470,6 +475,11 @@ static int myssh_is_known(struct connectdata *conn)
         foundkey.keytype = CURLKHTYPE_RSA1;
         break;
       case SSH_KEYTYPE_ECDSA:
+#if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,9,0)
+      case SSH_KEYTYPE_ECDSA_P256:
+      case SSH_KEYTYPE_ECDSA_P384:
+      case SSH_KEYTYPE_ECDSA_P521:
+#endif
         foundkey.keytype = CURLKHTYPE_ECDSA;
         break;
 #if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,7,0)
@@ -654,7 +664,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SSHPROTO *protop = data->req.protop;
+  struct SSHPROTO *protop = data->req.p.ssh;
   struct ssh_conn *sshc = &conn->proto.sshc;
   curl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc = SSH_NO_ERROR, err;
@@ -1422,11 +1432,8 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
           data->req.bytecount += sshc->readdir_len + 1;
 
           /* output debug output if that is requested */
-          if(data->set.verbose) {
-            Curl_debug(data, CURLINFO_DATA_OUT,
-                       (char *)sshc->readdir_filename,
-                       sshc->readdir_len);
-          }
+          Curl_debug(data, CURLINFO_DATA_OUT, (char *)sshc->readdir_filename,
+                     sshc->readdir_len);
         }
         else {
           sshc->readdir_currLen = strlen(sshc->readdir_longentry);
@@ -1538,12 +1545,9 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
                                  sshc->readdir_currLen);
 
       if(!result) {
-
         /* output debug output if that is requested */
-        if(data->set.verbose) {
-          Curl_debug(data, CURLINFO_DATA_OUT, sshc->readdir_line,
-                     sshc->readdir_currLen);
-        }
+        Curl_debug(data, CURLINFO_DATA_OUT, sshc->readdir_line,
+                   sshc->readdir_currLen);
         data->req.bytecount += sshc->readdir_currLen;
       }
       Curl_safefree(sshc->readdir_line);
@@ -2121,7 +2125,7 @@ static CURLcode myssh_setup_connection(struct connectdata *conn)
 {
   struct SSHPROTO *ssh;
 
-  conn->data->req.protop = ssh = calloc(1, sizeof(struct SSHPROTO));
+  conn->data->req.p.ssh = ssh = calloc(1, sizeof(struct SSHPROTO));
   if(!ssh)
     return CURLE_OUT_OF_MEMORY;
 
@@ -2141,9 +2145,10 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
   CURLcode result;
   curl_socket_t sock = conn->sock[FIRSTSOCKET];
   struct Curl_easy *data = conn->data;
+  int rc;
 
   /* initialize per-handle data if not already */
-  if(!data->req.protop)
+  if(!data->req.p.ssh)
     myssh_setup_connection(conn);
 
   /* We default to persistent connections. We set this already in this connect
@@ -2167,38 +2172,70 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
     return CURLE_FAILED_INIT;
   }
 
-  ssh_options_set(ssh->ssh_session, SSH_OPTIONS_FD, &sock);
+  rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_HOST, conn->host.name);
+  if(rc != SSH_OK) {
+    failf(data, "Could not set remote host");
+    return CURLE_FAILED_INIT;
+  }
 
-  if(conn->user) {
+  rc = ssh_options_parse_config(ssh->ssh_session, NULL);
+  if(rc != SSH_OK) {
+    infof(data, "Could not parse SSH configuration files");
+    /* ignore */
+  }
+
+  rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_FD, &sock);
+  if(rc != SSH_OK) {
+    failf(data, "Could not set socket");
+    return CURLE_FAILED_INIT;
+  }
+
+  if(conn->user && conn->user[0] != '\0') {
     infof(data, "User: %s\n", conn->user);
-    ssh_options_set(ssh->ssh_session, SSH_OPTIONS_USER, conn->user);
+    rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_USER, conn->user);
+    if(rc != SSH_OK) {
+      failf(data, "Could not set user");
+      return CURLE_FAILED_INIT;
+    }
   }
 
   if(data->set.str[STRING_SSH_KNOWNHOSTS]) {
     infof(data, "Known hosts: %s\n", data->set.str[STRING_SSH_KNOWNHOSTS]);
-    ssh_options_set(ssh->ssh_session, SSH_OPTIONS_KNOWNHOSTS,
-                    data->set.str[STRING_SSH_KNOWNHOSTS]);
+    rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_KNOWNHOSTS,
+                         data->set.str[STRING_SSH_KNOWNHOSTS]);
+    if(rc != SSH_OK) {
+      failf(data, "Could not set known hosts file path");
+      return CURLE_FAILED_INIT;
+    }
   }
 
-  ssh_options_set(ssh->ssh_session, SSH_OPTIONS_HOST, conn->host.name);
-  if(conn->remote_port)
-    ssh_options_set(ssh->ssh_session, SSH_OPTIONS_PORT,
-                    &conn->remote_port);
+  if(conn->remote_port) {
+    rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_PORT,
+                         &conn->remote_port);
+    if(rc != SSH_OK) {
+      failf(data, "Could not set remote port");
+      return CURLE_FAILED_INIT;
+    }
+  }
 
   if(data->set.ssh_compression) {
-    ssh_options_set(ssh->ssh_session, SSH_OPTIONS_COMPRESSION,
-                    "zlib,zlib@openssh.com,none");
+    rc = ssh_options_set(ssh->ssh_session, SSH_OPTIONS_COMPRESSION,
+                         "zlib,zlib@openssh.com,none");
+    if(rc != SSH_OK) {
+      failf(data, "Could not set compression");
+      return CURLE_FAILED_INIT;
+    }
   }
 
   ssh->privkey = NULL;
   ssh->pubkey = NULL;
 
   if(data->set.str[STRING_SSH_PUBLIC_KEY]) {
-    int rc = ssh_pki_import_pubkey_file(data->set.str[STRING_SSH_PUBLIC_KEY],
-                                        &ssh->pubkey);
+    rc = ssh_pki_import_pubkey_file(data->set.str[STRING_SSH_PUBLIC_KEY],
+                                    &ssh->pubkey);
     if(rc != SSH_OK) {
       failf(data, "Could not load public key file");
-      /* ignore */
+      return CURLE_FAILED_INIT;
     }
   }
 
@@ -2312,7 +2349,7 @@ static CURLcode scp_disconnect(struct connectdata *conn,
 static CURLcode myssh_done(struct connectdata *conn, CURLcode status)
 {
   CURLcode result = CURLE_OK;
-  struct SSHPROTO *protop = conn->data->req.protop;
+  struct SSHPROTO *protop = conn->data->req.p.ssh;
 
   if(!status) {
     /* run the state-machine */
@@ -2565,7 +2602,7 @@ static void sftp_quote(struct connectdata *conn)
 {
   const char *cp;
   struct Curl_easy *data = conn->data;
-  struct SSHPROTO *protop = data->req.protop;
+  struct SSHPROTO *protop = data->req.p.ssh;
   struct ssh_conn *sshc = &conn->proto.sshc;
   CURLcode result;
 
@@ -2595,10 +2632,9 @@ static void sftp_quote(struct connectdata *conn)
       sshc->nextstate = SSH_NO_STATE;
       return;
     }
-    if(data->set.verbose) {
-      Curl_debug(data, CURLINFO_HEADER_OUT, (char *) "PWD\n", 4);
-      Curl_debug(data, CURLINFO_HEADER_IN, tmp, strlen(tmp));
-    }
+    Curl_debug(data, CURLINFO_HEADER_OUT, (char *) "PWD\n", 4);
+    Curl_debug(data, CURLINFO_HEADER_IN, tmp, strlen(tmp));
+
     /* this sends an FTP-like "header" to the header callback so that the
        current directory can be read very similar to how it is read when
        using ordinary FTP. */
@@ -2651,7 +2687,9 @@ static void sftp_quote(struct connectdata *conn)
    */
   if(strncasecompare(cmd, "chgrp ", 6) ||
      strncasecompare(cmd, "chmod ", 6) ||
-     strncasecompare(cmd, "chown ", 6)) {
+     strncasecompare(cmd, "chown ", 6) ||
+     strncasecompare(cmd, "atime ", 6) ||
+     strncasecompare(cmd, "mtime ", 6)) {
     /* attribute change */
 
     /* sshc->quote_path1 contains the mode to set */
@@ -2661,7 +2699,7 @@ static void sftp_quote(struct connectdata *conn)
       if(result == CURLE_OUT_OF_MEMORY)
         failf(data, "Out of memory");
       else
-        failf(data, "Syntax error in chgrp/chmod/chown: "
+        failf(data, "Syntax error in chgrp/chmod/chown/atime/mtime: "
               "Bad second parameter");
       Curl_safefree(sshc->quote_path1);
       state(conn, SSH_SFTP_CLOSE);
@@ -2821,6 +2859,34 @@ static void sftp_quote_stat(struct connectdata *conn)
       return;
     }
     sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_UIDGID;
+  }
+  else if(strncasecompare(cmd, "atime", 5)) {
+    time_t date = Curl_getdate_capped(sshc->quote_path1);
+    if(date == -1) {
+      Curl_safefree(sshc->quote_path1);
+      Curl_safefree(sshc->quote_path2);
+      failf(data, "Syntax error: incorrect access date format");
+      state(conn, SSH_SFTP_CLOSE);
+      sshc->nextstate = SSH_NO_STATE;
+      sshc->actualcode = CURLE_QUOTE_ERROR;
+      return;
+    }
+    sshc->quote_attrs->atime = (uint32_t)date;
+    sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_ACMODTIME;
+  }
+  else if(strncasecompare(cmd, "mtime", 5)) {
+    time_t date = Curl_getdate_capped(sshc->quote_path1);
+    if(date == -1) {
+      Curl_safefree(sshc->quote_path1);
+      Curl_safefree(sshc->quote_path2);
+      failf(data, "Syntax error: incorrect modification date format");
+      state(conn, SSH_SFTP_CLOSE);
+      sshc->nextstate = SSH_NO_STATE;
+      sshc->actualcode = CURLE_QUOTE_ERROR;
+      return;
+    }
+    sshc->quote_attrs->mtime = (uint32_t)date;
+    sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_ACMODTIME;
   }
 
   /* Now send the completed structure... */

@@ -264,6 +264,7 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     // Restore all the models we replaced.
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
     pModelInfo->ResetVehicleDummies(true);
+    pModelInfo->ResetVehicleWheelSizes();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
 
@@ -351,6 +352,8 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
     pModelInfo->SetCustomModel(pClump);
+
+    pModelInfo->ResetVehicleWheelSizes();
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 

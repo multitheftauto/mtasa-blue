@@ -37,15 +37,16 @@ public:
 
     static CVector2D OOP_DxGetTextSize(
         // font can be called with a std::nullopt to grab the FONT_DEFAULT, see DxGetTextSize
-        std::variant<CClientDxFont*, eFontType> font, const std::string text, const std::optional<float> optWidth, const std::optional<float> optScaleXY,
-        const std::optional<float> optScaleY, const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded);
+        std::variant<CClientDxFont*, eFontType> font, const std::string text, const std::optional<float> optWidth,
+        const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded);
 
-     static inline std::tuple<float, float> DxGetTextSize(std::string text, std::optional<float> optWidth, std::optional<float> optScaleXY,
-                                                         std::optional<float> optScaleY, std::optional<std::variant<CClientDxFont*, eFontType>> optFont,
-                                                         std::optional<bool> optWordBreak, std::optional<bool> optColorCoded)
+    static inline std::tuple<float, float> DxGetTextSize(std::string text, std::optional<float> optWidth,
+                                                         std::optional<std::variant<CVector2D, float>>          optScaleXY,
+                                                         std::optional<std::variant<CClientDxFont*, eFontType>> optFont, std::optional<bool> optWordBreak,
+                                                         std::optional<bool> optColorCoded)
     {
         const auto size = OOP_DxGetTextSize(std::move(optFont.value_or(FONT_DEFAULT)), std::move(text), std::move(optWidth), std::move(optScaleXY),
-                                            std::move(optScaleY), std::move(optWordBreak), std::move(optColorCoded));
+                                            std::move(optWordBreak), std::move(optColorCoded));
 
         return {size.fX, size.fY};
     };

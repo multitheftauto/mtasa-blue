@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -33,9 +33,11 @@ void Curl_expire_done(struct Curl_easy *data, expire_id id);
 void Curl_update_timer(struct Curl_multi *multi);
 void Curl_attach_connnection(struct Curl_easy *data,
                              struct connectdata *conn);
+void Curl_detach_connnection(struct Curl_easy *data);
 bool Curl_multiplex_wanted(const struct Curl_multi *multi);
 void Curl_set_in_callback(struct Curl_easy *data, bool value);
 bool Curl_is_in_callback(struct Curl_easy *easy);
+CURLcode Curl_preconnect(struct Curl_easy *data);
 
 /* Internal version of curl_multi_init() accepts size parameters for the
    socket and connection hashes */

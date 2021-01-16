@@ -46,7 +46,7 @@ public:
 
     float GetAlphaFactor() const { return m_fAlphaFactor; };
 
-    void SetDimension(unsigned short usDimension);
+    void SetDimension(unsigned short usDimension) override;
     void RelateDimension(unsigned short usDimension);
 
 protected:

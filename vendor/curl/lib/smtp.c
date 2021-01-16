@@ -9,7 +9,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -133,6 +133,7 @@ const struct Curl_handler Curl_handler_smtp = {
   ZERO_NULL,                        /* connection_check */
   PORT_SMTP,                        /* defport */
   CURLPROTO_SMTP,                   /* protocol */
+  CURLPROTO_SMTP,                   /* family */
   PROTOPT_CLOSEACTION | PROTOPT_NOURLQUERY | /* flags */
   PROTOPT_URLOPTIONS
 };
@@ -160,6 +161,7 @@ const struct Curl_handler Curl_handler_smtps = {
   ZERO_NULL,                        /* connection_check */
   PORT_SMTPS,                       /* defport */
   CURLPROTO_SMTPS,                  /* protocol */
+  CURLPROTO_SMTP,                   /* family */
   PROTOPT_CLOSEACTION | PROTOPT_SSL
   | PROTOPT_NOURLQUERY | PROTOPT_URLOPTIONS /* flags */
 };
@@ -183,7 +185,7 @@ static void smtp_to_smtps(struct connectdata *conn)
   conn->handler = &Curl_handler_smtps;
 
   /* Set the connection's upgraded to TLS flag */
-  conn->tls_upgraded = TRUE;
+  conn->bits.tls_upgraded = TRUE;
 }
 #else
 #define smtp_to_smtps(x) Curl_nop_stmt
@@ -484,7 +486,7 @@ static CURLcode smtp_perform_command(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
 
   if(smtp->rcpt) {
     /* We notify the server we are sending UTF-8 data if a) it supports the
@@ -625,8 +627,7 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
         utf8 = TRUE;
 
       if(host.name) {
-        free(from);
-        from = aprintf("<%s@%s>", address, host.name);
+        auth = aprintf("<%s@%s>", address, host.name);
 
         Curl_free_idnconverted_hostname(&host);
       }
@@ -636,8 +637,6 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
         auth = aprintf("<%s>", address);
 
       free(address);
-      if(!from)
-        return CURLE_OUT_OF_MEMORY;
     }
     else
       /* Empty AUTH, RFC-2554, sect. 5 */
@@ -700,7 +699,7 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
      any there do, as we need to correctly identify our support for SMTPUTF8
      in the envelope, as per RFC-6531 sect. 3.4 */
   if(conn->proto.smtpc.utf8_supported && !utf8) {
-    struct SMTP *smtp = data->req.protop;
+    struct SMTP *smtp = data->req.p.smtp;
     struct curl_slist *rcpt = smtp->rcpt;
 
     while(rcpt && !utf8) {
@@ -744,7 +743,7 @@ static CURLcode smtp_perform_rcpt_to(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
   char *address = NULL;
   struct hostname host = { NULL, NULL, NULL, NULL };
 
@@ -992,7 +991,7 @@ static CURLcode smtp_state_command_resp(struct connectdata *conn, int smtpcode,
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
   char *line = data->state.buffer;
   size_t len = strlen(line);
 
@@ -1058,7 +1057,7 @@ static CURLcode smtp_state_rcpt_resp(struct connectdata *conn, int smtpcode,
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
   bool is_smtp_err = FALSE;
   bool is_smtp_blocking_err = FALSE;
 
@@ -1281,7 +1280,7 @@ static CURLcode smtp_init(struct connectdata *conn)
   struct Curl_easy *data = conn->data;
   struct SMTP *smtp;
 
-  smtp = data->req.protop = calloc(sizeof(struct SMTP), 1);
+  smtp = data->req.p.smtp = calloc(sizeof(struct SMTP), 1);
   if(!smtp)
     result = CURLE_OUT_OF_MEMORY;
 
@@ -1325,6 +1324,7 @@ static CURLcode smtp_connect(struct connectdata *conn, bool *done)
   Curl_sasl_init(&smtpc->sasl, &saslsmtp);
 
   /* Initialise the pingpong layer */
+  Curl_pp_setup(pp);
   Curl_pp_init(pp);
 
   /* Parse the URL options */
@@ -1359,7 +1359,7 @@ static CURLcode smtp_done(struct connectdata *conn, CURLcode status,
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
   struct pingpong *pp = &conn->proto.smtpc.pp;
   char *eob;
   ssize_t len;
@@ -1445,7 +1445,7 @@ static CURLcode smtp_perform(struct connectdata *conn, bool *connected,
   /* This is SMTP and no proxy */
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
 
   DEBUGF(infof(conn->data, "DO phase starts\n"));
 
@@ -1553,7 +1553,7 @@ static CURLcode smtp_disconnect(struct connectdata *conn, bool dead_connection)
 /* Call this when the DO phase has completed */
 static CURLcode smtp_dophase_done(struct connectdata *conn, bool connected)
 {
-  struct SMTP *smtp = conn->data->req.protop;
+  struct SMTP *smtp = conn->data->req.p.smtp;
 
   (void)connected;
 
@@ -1620,7 +1620,7 @@ static CURLcode smtp_setup_connection(struct connectdata *conn)
   CURLcode result;
 
   /* Clear the TLS upgraded flag */
-  conn->tls_upgraded = FALSE;
+  conn->bits.tls_upgraded = FALSE;
 
   /* Initialise the SMTP layer */
   result = smtp_init(conn);
@@ -1692,7 +1692,8 @@ static CURLcode smtp_parse_url_path(struct connectdata *conn)
   }
 
   /* URL decode the path and use it as the domain in our EHLO */
-  return Curl_urldecode(conn->data, path, 0, &smtpc->domain, NULL, TRUE);
+  return Curl_urldecode(conn->data, path, 0, &smtpc->domain, NULL,
+                        REJECT_CTRL);
 }
 
 /***********************************************************************
@@ -1705,12 +1706,12 @@ static CURLcode smtp_parse_custom_request(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
   const char *custom = data->set.str[STRING_CUSTOMREQUEST];
 
   /* URL decode the custom request */
   if(custom)
-    result = Curl_urldecode(data, custom, 0, &smtp->custom, NULL, TRUE);
+    result = Curl_urldecode(data, custom, 0, &smtp->custom, NULL, REJECT_CTRL);
 
   return result;
 }
@@ -1741,10 +1742,10 @@ static CURLcode smtp_parse_custom_request(struct connectdata *conn)
  * Notes:
  *
  * Should a UTF-8 host name require conversion to IDN ACE and we cannot honor
- * that convertion then we shall return success. This allow the caller to send
+ * that conversion then we shall return success. This allow the caller to send
  * the data to the server as a U-label (as per RFC-6531 sect. 3.2).
  *
- * If an mailbox '@' seperator cannot be located then the mailbox is considered
+ * If an mailbox '@' separator cannot be located then the mailbox is considered
  * to be either a local mailbox or an invalid mailbox (depending on what the
  * calling function deems it to be) then the input will simply be returned in
  * the address part with the host name being NULL.
@@ -1762,10 +1763,12 @@ static CURLcode smtp_parse_address(struct connectdata *conn, const char *fqma,
     return CURLE_OUT_OF_MEMORY;
 
   length = strlen(dup);
-  if(dup[length - 1] == '>')
-    dup[length - 1] = '\0';
+  if(length) {
+    if(dup[length - 1] == '>')
+      dup[length - 1] = '\0';
+  }
 
-  /* Extract the host name from the addresss (if we can) */
+  /* Extract the host name from the address (if we can) */
   host->name = strpbrk(dup, "@");
   if(host->name) {
     *host->name = '\0';
@@ -1796,7 +1799,7 @@ CURLcode Curl_smtp_escape_eob(struct connectdata *conn, const ssize_t nread)
   ssize_t i;
   ssize_t si;
   struct Curl_easy *data = conn->data;
-  struct SMTP *smtp = data->req.protop;
+  struct SMTP *smtp = data->req.p.smtp;
   char *scratch = data->state.scratch;
   char *newscratch = NULL;
   char *oldscratch = NULL;
