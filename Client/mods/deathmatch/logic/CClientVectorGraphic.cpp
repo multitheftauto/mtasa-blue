@@ -19,18 +19,71 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     m_pResource = nullptr;
     m_pManager = pManager;
 
-    m_pDocument = CreateDocument();
+    m_pVectorGraphicItem = pVectorGraphicItem;
+
+    CreateDocument();
+
+    m_pVectorGraphicDisplay = new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this);
 }
 
-SVGDocument* CClientVectorGraphic::CreateDocument()
+void CClientVectorGraphic::CreateDocument()
 {
-    SVGDocument* document = new SVGDocument();
+    SVGElement* rootElement = m_pDocument->rootElement();
 
-    return document;
+    uint uiWidth = m_pVectorGraphicItem->m_uiSurfaceSizeX;
+    uint uiHeight = m_pVectorGraphicItem->m_uiSurfaceSizeY;
+
+    std::string strWidth = std::to_string(uiWidth);
+    std::string strHeight = std::to_string(uiHeight);
+
+    rootElement->setAttribute("width", strWidth);
+    rootElement->setAttribute("height", strHeight);
+
+    SVGElement* pCircle = m_pDocument->appendContent("<circle cx='0' cy='0' r='40'/>");
+    pCircle->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
+}
+
+void CClientVectorGraphic::UpdateTexture()
+{
+    IDirect3DSurface9* surface = m_pVectorGraphicItem->m_pD3DRenderTargetSurface;
+
+    if (!surface)
+        return;
+
+    IDirect3DDevice9* device = m_pVectorGraphicItem->m_pDevice;
+
+    uint width = m_pVectorGraphicItem->m_uiSizeX;
+    uint height = m_pVectorGraphicItem->m_uiSizeY;
+
+    Bitmap bitmap = m_pDocument->renderToBitmap(width, height);
+
+    // Lock surface
+    D3DLOCKED_RECT LockedRect;
+    surface->LockRect(&LockedRect, nullptr, 0);
+
+    auto surfaceData = static_cast<byte*>(LockedRect.pBits);
+    auto sourceData = static_cast<const byte*>(bitmap.data());
+    auto pitch = LockedRect.Pitch;
+
+    memcpy(surfaceData, sourceData, bitmap.width() * bitmap.height() * 4);
+
+    // Unlock surface
+    surface->UnlockRect();
+}
+
+void CClientVectorGraphic::ClearTexture()
+{
+    // Does nothing right now
 }
 
 CClientVectorGraphic::~CClientVectorGraphic()
 {
     delete m_pDocument;
     m_pDocument = nullptr;
+
+    delete m_pVectorGraphicItem;
+    m_pVectorGraphicItem = nullptr;
+
+    delete m_pVectorGraphicDisplay;
+    m_pVectorGraphicDisplay = nullptr;
 }

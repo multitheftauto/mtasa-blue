@@ -480,6 +480,7 @@ class CVectorGraphicItem : public CTextureItem
     virtual void OnResetDevice();
     void         CreateUnderlyingData();
     void         ReleaseUnderlyingData();
+    void         UpdateTexture();
     virtual void Resize(const CVector2D& size);
 
     IDirect3DSurface9* m_pD3DRenderTargetSurface;

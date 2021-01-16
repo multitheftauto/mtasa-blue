@@ -11,6 +11,7 @@
 #pragma once
 
 #include <svgdocument.h>
+#include "CClientVectorGraphicDisplay.h"
 
 using namespace lunasvg;
 
@@ -24,9 +25,15 @@ public:
     CResource* GetResource() { return m_pResource; }
     void       SetResource(CResource* pResource) { m_pResource = pResource; }
 
-    SVGDocument* CreateDocument();
+    void CreateDocument();
+    void UpdateTexture();
+    void ClearTexture();
+
+    const bool IsDisplayCleared() { return m_pVectorGraphicDisplay->IsCleared(); }
 private:
-    CResource*                  m_pResource;
-    CClientManager*             m_pManager;
-    SVGDocument*                m_pDocument;
+    SVGDocument*                     m_pDocument;
+    CResource*                       m_pResource;
+    CClientManager*                  m_pManager;
+    CVectorGraphicItem*              m_pVectorGraphicItem;
+    CClientVectorGraphicDisplay*     m_pVectorGraphicDisplay;
 };
