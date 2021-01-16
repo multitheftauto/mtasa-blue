@@ -33,6 +33,7 @@ void CClientVectorGraphic::CreateDocument()
         return;
 
     m_pDocument = new SVGDocument();
+
     SVGElement* rootElement = m_pDocument->rootElement();
 
     uint uiWidth = m_pVectorGraphicItem->m_uiSurfaceSizeX;
@@ -41,11 +42,12 @@ void CClientVectorGraphic::CreateDocument()
     std::string strWidth = std::to_string(uiWidth);
     std::string strHeight = std::to_string(uiHeight);
 
+    rootElement->setAttribute("viewBox", "0, 0, " + strWidth + ", " + strHeight);
+    rootElement->setAttribute("x", "0");
+    rootElement->setAttribute("y", "0");
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
-
-    SVGElement* pCircle = m_pDocument->appendContent("<circle cx='0' cy='0' r='40'/>");
-    pCircle->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
+    rootElement->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
 }
 
 void CClientVectorGraphic::UpdateTexture()
