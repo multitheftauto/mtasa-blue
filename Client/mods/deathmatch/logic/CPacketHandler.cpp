@@ -3967,9 +3967,8 @@ retry:
                             if (bitStream.Can(eBitStreamVersion::SetPolygonHeight))
                             {
                                 float fFloor, fCeil;
-                                bitStream.Read(fFloor);
-                                bitStream.Read(fCeil);
-                                pPolygon->SetHeight(fFloor, fCeil);
+                                if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
+                                    pPolygon->SetHeight(fFloor, fCeil);
                             }
                             break;
                         }
