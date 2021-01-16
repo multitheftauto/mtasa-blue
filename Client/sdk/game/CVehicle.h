@@ -242,12 +242,16 @@ public:
     virtual CHandlingEntry* GetHandlingData() = 0;
     virtual void            SetHandlingData(CHandlingEntry* pHandling) = 0;
 
+    virtual CFlyingHandlingEntry* GetFlyingHandlingData() = 0;
+    virtual void                  SetFlyingHandlingData(CFlyingHandlingEntry* pHandling) = 0;
+
     virtual void BurstTyre(BYTE bTyre) = 0;
 
     virtual BYTE GetBikeWheelStatus(BYTE bWheel) = 0;
     virtual void SetBikeWheelStatus(BYTE bWheel, BYTE bStatus) = 0;
 
     virtual bool IsWheelCollided(BYTE bWheel) = 0;
+    virtual int  GetWheelFrictionState(BYTE bWheel) = 0;
 
     virtual class CVehicleSAInterface* GetVehicleInterface() = 0;
 
@@ -330,4 +334,9 @@ public:
     virtual float                             GetWheelScale() = 0;
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
+
+    virtual bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const = 0;
+    virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
+
+    virtual const CVector* GetDummyPositions() const = 0;
 };

@@ -30,6 +30,8 @@ void CLuaColShapeDefs::LoadFunctions()
         {"setColPolygonPointPosition", SetColPolygonPointPosition},
         {"addColPolygonPoint", AddColPolygonPoint},
         {"removeColPolygonPoint", RemoveColPolygonPoint},
+        {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
+        {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
 
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
@@ -64,6 +66,8 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setPointPosition", "setColPolygonPointPosition", SetColPolygonPointPosition);
     lua_classfunction(luaVM, "addPoint", "addColPolygonPoint", AddColPolygonPoint);
     lua_classfunction(luaVM, "removePoint", "removeColPolygonPoint", RemoveColPolygonPoint);
+    lua_classfunction(luaVM, "setHeight", "setColPolygonHeight", ArgumentParser<SetColPolygonHeight>);
+    lua_classfunction(luaVM, "getHeight", "getColPolygonHeight", ArgumentParser<GetColPolygonHeight>);
 
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
 
@@ -790,4 +794,32 @@ int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
 
     argStream.SetCustomError("ColShape must be Polygon");
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+std::tuple<float, float> CLuaColShapeDefs::GetColPolygonHeight(CColPolygon* pColPolygon)
+{
+    float fFloor, fCeil;
+    pColPolygon->GetHeight(fFloor, fCeil);
+    return std::make_tuple(fFloor, fCeil);
+}
+
+bool CLuaColShapeDefs::SetColPolygonHeight(CColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil)
+{
+    //  bool SetColPolygonHeight ( colshape theColShape, float floor, float ceil )
+    float fFloor, fCeil;
+
+    if (std::holds_alternative<bool>(floor))
+        fFloor = std::numeric_limits<float>::min();
+    else
+        fFloor = std::get<float>(floor);
+
+    if (std::holds_alternative<bool>(ceil))
+        fCeil = std::numeric_limits<float>::max();
+    else
+        fCeil = std::get<float>(ceil);
+
+    if (fFloor > fCeil)
+        std::swap(fFloor, fCeil);
+
+    return CStaticFunctionDefinitions::SetColPolygonHeight(pColPolygon, fFloor, fCeil);
 }
