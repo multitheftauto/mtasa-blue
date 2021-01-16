@@ -34,9 +34,7 @@ bool CColPolygon::DoHitDetection(const CVector& vecNowPosition)
     if (!IsInBounds(vecNowPosition))
         return false;
 
-    float z = vecNowPosition.fZ;
-
-    if (z > m_fCeil || z < m_fFloor)
+    if (vecNowPosition.fZ > m_fCeil || vecNowPosition.fZ < m_fFloor)
         return false;
 
     bool collides = false;
