@@ -12189,7 +12189,7 @@ bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, f
     {
         RefreshColShapeColliders(pColPolygon);
 
-        CBitStream      BitStream;
+        CBitStream BitStream;
         BitStream.pBitStream->Write(fFloor);
         BitStream.pBitStream->Write(fCeil);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, SET_COLPOLYGON_HEIGHT, *BitStream.pBitStream));
