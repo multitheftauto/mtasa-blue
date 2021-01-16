@@ -2420,7 +2420,6 @@ eMovementState CClientPed::GetMovementState()
 
                 // Is he crouching and moving?
                 return MOVEMENTSTATE_CRAWL;
-
             }
         }
     }
