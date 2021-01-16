@@ -756,8 +756,7 @@ void CElementRPCs::SetCallPropagationEnabled(CClientEntity* pSource, NetBitStrea
 
 void CElementRPCs::SetColPolygonHeight(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    float fFloor;
-    float fCeil;
+    float fFloor, fCeil;
     if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
