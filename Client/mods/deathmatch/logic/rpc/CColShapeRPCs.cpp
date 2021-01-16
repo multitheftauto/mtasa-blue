@@ -88,8 +88,6 @@ void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStrea
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
         if (pColPolygon->SetHeight(fFloor, fCeil))
-        {
             CStaticFunctionDefinitions::RefreshColShapeColliders(pColPolygon);
-        }
     }
 }
