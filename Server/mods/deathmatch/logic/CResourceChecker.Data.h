@@ -246,7 +246,7 @@ namespace
         {"getVehicleModelDummyDefaultPosition", "1.5.8-9.20797"},
         {"setVehicleDummyPosition", "1.5.8-9.20797"},
         {"resetVehicleDummyPositions", "1.5.8-9.20797"},
-        {"setColPolygonHeight", "1.5.8"},
+        {"getColPolygonHeight", "1.5.8"},
         {"setColPolygonHeight", "1.5.8"},
     };
 
