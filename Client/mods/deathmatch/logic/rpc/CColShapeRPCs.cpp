@@ -83,8 +83,7 @@ void CColShapeRPCs::RemoveColPolygonPoint(CClientEntity* pSource, NetBitStreamIn
 
 void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    float fFloor;
-    float fCeil;
+    float fFloor, fCeil;
     if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
