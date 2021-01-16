@@ -24,5 +24,4 @@ public:
     DECLARE_ELEMENT_RPC(AddColPolygonPoint);
     DECLARE_ELEMENT_RPC(RemoveColPolygonPoint);
     DECLARE_ELEMENT_RPC(SetColShapePolygonHeight);
-
 };
