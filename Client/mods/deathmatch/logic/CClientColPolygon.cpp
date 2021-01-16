@@ -232,7 +232,7 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
         CVector vecFloorBegin(vecPointBegin.fX, vecPointBegin.fY, m_fFloor);
         CVector vecFloorEnd(vecPointEnd.fX, vecPointEnd.fY, m_fFloor);
         pGraphics->DrawLine3DQueued(vecFloorBegin, vecFloorEnd, fLineWidth, color, false);
-        
+
         CVector vecCeilBegin(vecPointBegin.fX, vecPointBegin.fY, m_fCeil);
         CVector vecCeilEnd(vecPointEnd.fX, vecPointEnd.fY, m_fCeil);
         pGraphics->DrawLine3DQueued(vecCeilBegin, vecCeilEnd, fLineWidth, color, false);

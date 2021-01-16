@@ -812,7 +812,7 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CColPolygon* pColPolygon, std::varian
         fFloor = std::numeric_limits<float>::min();
     else
         fFloor = std::get<float>(floor);
-    
+
     if (std::holds_alternative<bool>(ceil))
         fCeil = std::numeric_limits<float>::max();
     else

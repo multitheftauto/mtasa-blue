@@ -457,7 +457,7 @@ public:
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
     static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
-    
+
     // Shape set functions
     static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
     static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);

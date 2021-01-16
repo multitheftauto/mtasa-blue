@@ -5273,7 +5273,7 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
 bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 {
     RUN_CHILDREN(BlowVehicle(*iter))
-    
+
     if (!IS_VEHICLE(pElement))
         return false;
 

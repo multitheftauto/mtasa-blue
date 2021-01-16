@@ -439,7 +439,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
     if (!bitStream.Read(usModel))
         return;
-    
+
     switch (pSource->GetType())
     {
         case CCLIENTPED:
@@ -492,7 +492,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         {
             CClientObject* pObject = static_cast<CClientObject*>(pSource);
             const unsigned short usCurrentModel = pObject->GetModel();
-            
+
             if (usCurrentModel != usModel)
             {
                 pObject->SetModel(usModel);
