@@ -177,11 +177,11 @@ CSphere CColPolygon::GetWorldBoundingSphere()
 
 bool CColPolygon::SetHeight(float fFloor, float fCeil)
 {
-    if (m_fFloor != fFloor || m_fCeil != fCeil)
-    {
-        m_fFloor = fFloor;
-        m_fCeil = fCeil;
-        return true;
-    }
-    return false;
+    if (m_fFloor == fFloor && m_fCeil == fCeil)
+        return false;
+
+    m_fFloor = fFloor;
+    m_fCeil = fCeil;
+
+    return true;
 }
