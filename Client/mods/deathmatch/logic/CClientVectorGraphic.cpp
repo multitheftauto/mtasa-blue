@@ -16,6 +16,7 @@ using namespace lunasvg;
 CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
     : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
 {
+    m_pDocument = nullptr;
     m_pResource = nullptr;
     m_pManager = pManager;
 
@@ -28,6 +29,10 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
 
 void CClientVectorGraphic::CreateDocument()
 {
+    if (m_pDocument)
+        return;
+
+    m_pDocument = new SVGDocument();
     SVGElement* rootElement = m_pDocument->rootElement();
 
     uint uiWidth = m_pVectorGraphicItem->m_uiSurfaceSizeX;
