@@ -269,7 +269,6 @@ public:
     static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
-    static bool  IsVehicleBlown(CVehicle* pVehicle);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
     static bool  GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio);
 
@@ -290,7 +289,7 @@ public:
 
     // Vehicle set functions
     static bool FixVehicle(CElement* pElement);
-    static bool BlowVehicle(CElement* pElement, bool bExplode);
+    static bool BlowVehicle(CElement* pElement);
     static bool SetVehicleColor(CElement* pElement, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
@@ -693,6 +692,7 @@ public:
     static bool      CopyAccountData(CAccount* pAccount, CAccount* pFromAccount);
 
     // Log in/out funcs
+    static bool LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword);
     static bool LogOut(CPlayer* pPlayer);
 
     // Admin funcs
@@ -733,6 +733,8 @@ public:
 
     // Misc funcs
     static bool ResetMapInfo(CElement* pElement);
+    static void SendClientTransferBoxVisibility(CPlayer* player = nullptr);
+    static bool SetClientTransferBoxVisible(bool visible);
 
     // Resource funcs
     static CElement* GetResourceMapRootElement(CResource* pResource, const char* szMap);

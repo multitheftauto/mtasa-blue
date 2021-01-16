@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../luadefs/CLuaGenericDefs.h"
 
 extern CGame* g_pGame;
 
@@ -319,6 +320,7 @@ void CLuaManager::LoadCFunctions()
     CLuaWaterDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
+    CLuaGenericDefs::LoadFunctions();
     // Backward compatibility functions at the end, so the new function name is used in ACL
     CLuaCompatibilityDefs::LoadFunctions();
 }

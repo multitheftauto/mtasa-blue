@@ -5270,43 +5270,34 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
+bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 {
-    assert(pElement);
-    RUN_CHILDREN(BlowVehicle(*iter, bExplode))
+    RUN_CHILDREN(BlowVehicle(*iter))
+    
+    if (!IS_VEHICLE(pElement))
+        return false;
 
-    if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+    CVehicle* vehicle = static_cast<CVehicle*>(pElement);
 
-        // Blow it up on our records. Also change the sync time context or this vehicle
-        // is likely to blow up twice, call the events twice and all that if someone's
-        // nearby and syncing it.
-        if (IsVehicleBlown(pVehicle) == false)
-        {
-            // Call the onVehicleExplode event
-            CLuaArguments Arguments;
-            pVehicle->CallEvent("onVehicleExplode", Arguments);
-        }
-        pVehicle->SetHealth(0.0f);
-        if (!bExplode)
-            pVehicle->SetIsBlown(true);
+    if (vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+        return false;
 
-        // Update our engine State
-        pVehicle->SetEngineOn(false);
+    vehicle->SetIsBlown(true);
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pVehicle->GenerateSyncTimeContext());
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, BLOW_VEHICLE, *BitStream.pBitStream));
+    CLuaArguments Arguments;
+    vehicle->CallEvent("onVehicleExplode", Arguments);
+
+    // Abort if vehicle got fixed or destroyed
+    if (!vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
         return true;
-    }
 
-    return false;
-}
-bool CStaticFunctionDefinitions::IsVehicleBlown(CVehicle* pVehicle)
-{
-    assert(pVehicle);
-    return pVehicle->GetIsBlown();
+    vehicle->SetHealth(0.0f);
+    vehicle->SetEngineOn(false);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor)
@@ -10640,6 +10631,27 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
     return true;
 }
 
+void CStaticFunctionDefinitions::SendClientTransferBoxVisibility(CPlayer* player)
+{
+    CBitStream BitStream;
+    BitStream->WriteBit(g_pGame->IsClientTransferBoxVisible());
+
+    if (player)
+        player->Send(CLuaPacket(SET_TRANSFER_BOX_VISIBILITY, *BitStream.pBitStream));
+    else
+        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_TRANSFER_BOX_VISIBILITY, *BitStream.pBitStream));
+}
+
+bool CStaticFunctionDefinitions::SetClientTransferBoxVisible(bool visible)
+{
+    if (g_pGame->IsClientTransferBoxVisible() == visible)
+        return false;
+
+    g_pGame->SetClientTransferBoxVisible(visible);
+    SendClientTransferBoxVisibility();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetWeather(unsigned char ucWeather)
 {
     // Verify it's within the max valid weather id
@@ -11353,6 +11365,11 @@ bool CStaticFunctionDefinitions::CopyAccountData(CAccount* pAccount, CAccount* p
 
     m_pAccountManager->CopyAccountData(pFromAccount, pAccount);
     return true;
+}
+
+bool CStaticFunctionDefinitions::LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword)
+{
+    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), szPassword);
 }
 
 bool CStaticFunctionDefinitions::LogOut(CPlayer* pPlayer)

@@ -234,6 +234,18 @@ namespace
         {"getVehicleModelWheelSize", "1.5.7-9.20642"},
         {"setVehicleWheelScale", "1.5.7-9.20642"},
         {"getVehicleWheelScale", "1.5.7-9.20642"},
+
+        // Features added in 1.5.8
+        {"onClientResourceFileDownload", "1.5.8-9.20788"},
+        {"onClientTransferBoxProgressChange", "1.5.8-9.20788"},
+        {"onClientTransferBoxVisibilityChange", "1.5.8-9.20788"},
+        {"setTransferBoxVisible", "1.5.8-9.20788"},
+        {"isTransferBoxVisible", "1.5.8-9.20788"},
+        {"isTransferBoxAlwaysVisible", "1.5.8-9.20788"},
+        {"getVehicleDummyPosition", "1.5.8-9.20797"},
+        {"getVehicleModelDummyDefaultPosition", "1.5.8-9.20797"},
+        {"setVehicleDummyPosition", "1.5.8-9.20797"},
+        {"resetVehicleDummyPositions", "1.5.8-9.20797"},
         {"setColPolygonHeight", "1.5.8"},
         {"setColPolygonHeight", "1.5.8"},
     };
@@ -338,6 +350,10 @@ namespace
         {"addElementDataSubscriber", "1.5.7-9.20477"},
         {"hasElementDataSubscriber", "1.5.7-9.20477"},
         {"removeElementDataSubscriber", "1.5.7-9.20477"},
+
+        // Features added in 1.5.8
+        {"setTransferBoxVisible", "1.5.8-9.20788"},
+        {"isTransferBoxVisible", "1.5.8-9.20788"},
     };
 
     //
