@@ -40,5 +40,5 @@ public:
     LUA_DECLARE(GetColShapeType);
 
     static std::tuple<float, float> GetColPolygonHeight(CClientColPolygon* pColPolygon);
-    static bool SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
+    static bool                     SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };
