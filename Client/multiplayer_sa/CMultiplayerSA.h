@@ -67,6 +67,7 @@ public:
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
     void                InitHooks_VehicleCollision();
+    void                InitHooks_VehicleDummies();
     void                InitHooks_Vehicles();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();
@@ -149,6 +150,8 @@ public:
                       unsigned char BottomBlue);
     void  SetHeatHaze(const SHeatHazeSettings& settings);
     void  GetHeatHaze(SHeatHazeSettings& settings);
+    void  ResetColorFilter();
+    void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color);
     void  ResetHeatHaze();
     void  SetHeatHazeEnabled(bool bEnabled);
     void  ApplyHeatHazeEnabled();

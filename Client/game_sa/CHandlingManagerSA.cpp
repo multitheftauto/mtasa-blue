@@ -28,8 +28,8 @@ CFlyingHandlingEntrySA* CHandlingManagerSA::m_pOriginalFlyingEntries[24];
 tBoatHandlingDataSA   CHandlingManagerSA::m_OriginalBoatHandlingData[12];
 CBoatHandlingEntrySA* CHandlingManagerSA::m_pOriginalBoatEntries[12];
 
-tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[13];
-CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[13];
+tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[14];
+CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[14];
 
 // TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
 
@@ -133,7 +133,7 @@ CHandlingManagerSA::CHandlingManagerSA()
         m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
     }
 
-    for (int i = 0; i < 13; i++)
+    for (int i = 0; i < 14; i++)
     {
         m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
     }
@@ -190,6 +190,15 @@ CHandlingManagerSA::~CHandlingManagerSA()
         delete m_pOriginalFlyingEntries[i];
     }
 
+    for (int i = 0; i < 12; i++)
+    {
+        delete m_pOriginalBoatEntries[i];
+    }
+
+    for (int i = 0; i < 14; i++)
+    {
+        delete m_pOriginalBikeEntries[i];
+    }
 }
 
 eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
@@ -283,8 +292,10 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehic
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
-        if (eHandling >= HT_BIKE || eHandling <= HT_FREEWAY)
+        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
             return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+        else if (eHandling == HT_FAGGIO)
+            return m_pOriginalBikeEntries[13];
     }
 
     return NULL;
@@ -9140,6 +9151,9 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalBikeHandlingData[12].fWheelieSteer = -0.006f;
     m_OriginalBikeHandlingData[12].fWheelieStabMult = 0.5f;
     m_OriginalBikeHandlingData[12].fStoppieStabMult = 0.3f;
+
+    m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];            // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
 void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)

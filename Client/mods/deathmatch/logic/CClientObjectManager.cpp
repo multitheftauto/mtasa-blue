@@ -92,11 +92,22 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 {
-    if (ulObjectModel >= 20000)
+    if (ulObjectModel >= g_pGame->GetBaseIDforTXD())
+        return false;
+
+    // Clothes and hands cause crash (Github #424)
+    if (384 <= ulObjectModel && ulObjectModel <= 397)
+        return false;
+
+    // These cutscene objects cause crash (Github #424)
+    if (300 <= ulObjectModel && ulObjectModel <= 314)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulObjectModel);
     if (!pModelInfo || !pModelInfo->GetInterface())
+        return false;
+
+    if (!pModelInfo->IsAllocatedInArchive())
         return false;
 
     eModelInfoType eType = pModelInfo->GetModelType();

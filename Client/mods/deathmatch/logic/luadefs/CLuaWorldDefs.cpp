@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
 {
@@ -59,6 +60,7 @@ void CLuaWorldDefs::LoadFunctions()
 
         // World set funcs
         {"setTime", SetTime},
+        {"setColorFilter", ArgumentParser<SetColorFilter>},
         {"setSkyGradient", SetSkyGradient},
         {"setHeatHaze", SetHeatHaze},
         {"setWeather", SetWeather},
@@ -100,6 +102,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"createExplosion", CreateExplosion},
 
         // World reset funcs
+        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
         {"resetSkyGradient", ResetSkyGradient},
         {"resetHeatHaze", ResetHeatHaze},
         {"resetWindVelocity", ResetWindVelocity},
@@ -1969,4 +1972,19 @@ int CLuaWorldDefs::GetFPSLimit(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaWorldDefs::ResetColorFilter()
+{
+    g_pMultiplayer->ResetColorFilter();
+    return true;
+}
+
+bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+    uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha)
+{
+    unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
+    unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
+    g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
+    return true;
 }

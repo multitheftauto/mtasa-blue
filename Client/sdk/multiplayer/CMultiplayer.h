@@ -256,6 +256,8 @@ public:
     virtual void  ResetSky() = 0;
     virtual void  SetHeatHaze(const SHeatHazeSettings& settings) = 0;
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
+    virtual void  ResetColorFilter() = 0;
+    virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
     virtual void  ResetHeatHaze() = 0;
     virtual void  SetHeatHazeEnabled(bool bEnabled) = 0;
     virtual bool  HasWaterColor() = 0;

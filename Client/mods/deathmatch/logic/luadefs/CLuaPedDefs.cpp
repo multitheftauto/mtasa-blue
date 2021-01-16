@@ -99,6 +99,8 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
+        {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
     };
 
     // Add functions
@@ -188,6 +190,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStat", "setPedStat");
     lua_classfunction(luaVM, "giveWeapon", "givePedWeapon");
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
+    lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
+    lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -1013,7 +1017,8 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entit
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>>
+CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -1023,7 +1028,7 @@ std::variant<bool, CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const l
         {
             CMatrix matrix;
             g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, matrix);
-            return matrix;
+            return matrix.To4x4Array();
         }
     }
     return false;
@@ -2335,4 +2340,16 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
+{
+    CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
+    bool bPassenger = bOptPassenger.value_or(false);
+    return pPed->EnterVehicle(pVehicle, bPassenger);
+}
+
+bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
+{
+    return pPed->ExitVehicle();
 }
