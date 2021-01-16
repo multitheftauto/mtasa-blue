@@ -12192,7 +12192,7 @@ bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, f
         CBitStream      BitStream;
         BitStream.pBitStream->Write(fFloor);
         BitStream.pBitStream->Write(fCeil);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, COLSHAPE_POLYGON_SET_HEIGHT, *BitStream.pBitStream));
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, SET_COLPOLYGON_HEIGHT, *BitStream.pBitStream));
         return true;
     }
 
