@@ -48,7 +48,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_WEAPON_OWNER, SetWeaponOwner, "setWeaponOwner");
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
-    AddHandler(COLSHAPE_POLYGON_SET_HEIGHT, SetColPolygonHeight, "setColShapePolygonHeight");
+    AddHandler(SET_COLPOLYGON_HEIGHT, SetColPolygonHeight, "setColShapePolygonHeight");
 }
 
 #define RUN_CHILDREN_SERVER(func) \
