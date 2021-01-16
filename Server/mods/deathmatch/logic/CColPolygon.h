@@ -39,7 +39,7 @@ public:
     std::vector<CVector2D>::const_iterator IterEnd() { return m_Points.end(); };
 
     bool SetHeight(float fFloor, float fCeil);
-    void GetHeight(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
+    void GetHeight(float& fFloor, float& fCeil) const { fFloor = m_fFloor; fCeil = m_fCeil; };
 
 protected:
     std::vector<CVector2D> m_Points;
