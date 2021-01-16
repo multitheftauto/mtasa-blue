@@ -264,9 +264,6 @@ CClientVectorGraphic* CClientRenderElementManager::CreateVectorGraphic(uint widt
     // Add to this manager's list
     MapSet(m_ItemElementMap, pVectorGraphicItem, pVectorGraphicElement);
 
-    // Update stats
-    m_uiStatsWebBrowserCount++;
-
     return pVectorGraphicElement;
 }
 
