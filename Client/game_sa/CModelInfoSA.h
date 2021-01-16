@@ -21,7 +21,9 @@ class CPedModelInfoSAInterface;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
-#define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+// #define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+static void* CStreaming__ms_aInfoForModel = *(void**)(0x5B8B08 + 6);
+static void* ARRAY_ModelLoaded = (char*)CStreaming__ms_aInfoForModel + 0x10;
 
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
 
@@ -33,7 +35,8 @@ class CPedModelInfoSAInterface;
 #define     DWORD_AtomicsReplacerModelID    0xB71840
 #define     FUNC_AtomicsReplacer            0x537150
 
-#define     ARRAY_ModelInfo                 0xA9B0C8
+// #define     ARRAY_ModelInfo                 0xA9B0C8
+static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     CLASS_CText                     0xC1B340
 #define     FUNC_CText_Get                  0x6A0050
 #define     FUNC_GetModelFlags              0x4044E0
@@ -219,10 +222,26 @@ public:
     // +772 = Anim file index
 };
 
+struct CTimeInfoSAInterface
+{
+    CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
+    char  m_nTimeOn;
+    char  m_nTimeOff;
+    short m_wOtherTimeModel;
+};
+
+class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    CTimeInfoSAInterface timeInfo;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
     CVector vecDummies[15];
+    char m_sUpgrade[18];
+
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -248,17 +267,23 @@ public:
     unsigned int                        uiComponentRules;
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
-};
-
-enum eModelInfoType : unsigned char
-{
-    MODEL_INFO_TYPE_ATOMIC = 1,
-    MODEL_INFO_TYPE_TIME = 3,
-    MODEL_INFO_TYPE_WEAPON = 4,
-    MODEL_INFO_TYPE_CLUMP = 5,
-    MODEL_INFO_TYPE_VEHICLE = 6,
-    MODEL_INFO_TYPE_PED = 7,
-    MODEL_INFO_TYPE_LOD_ATOMIC = 8,
+    char                                pad3[464];
+    char                                pDirtMaterial[64]; // *RwMaterial
+    char                                pad4[64];
+    char                                primColors[8];
+    char                                secondColors[8];
+    char                                treeColors[8];
+    char                                fourColors[8];
+    unsigned char                       ucNumOfColorVariations;
+    unsigned char                       ucLastColorVariation;
+    unsigned char                       ucPrimColor;
+    unsigned char                       ucSecColor;
+    unsigned char                       ucTertColor;
+    unsigned char                       ucQuatColor;
+    char                                upgrades[36];
+    char                                anRemapTXDs[8];
+    char                                pad5[2];
+    char                                pAnimBlock[4];
 };
 
 /**
@@ -270,6 +295,7 @@ class CModelInfoSA : public CModelInfo
 protected:
     CBaseModelInfoSAInterface*                                                   m_pInterface;
     DWORD                                                                        m_dwModelID;
+    DWORD                                                                        m_dwParentID;
     DWORD                                                                        m_dwReferences;
     DWORD                                                                        m_dwPendingInterfaceRef;
     CColModel*                                                                   m_pCustomColModel;
@@ -279,6 +305,7 @@ protected:
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     bool                                                                         m_bAddedRefForCollision;
@@ -308,11 +335,12 @@ public:
     BOOL IsQuadBike();
     BOOL IsBmx();
     BOOL IsTrailer();
-    BOOL IsVehicle();
+    bool IsVehicle() const override;
     BOOL IsUpgrade();
 
     char* GetNameIfVehicle();
 
+    BYTE           GetVehicleType();
     VOID           Request(EModelRequestType requestType, const char* szTag);
     VOID           Remove();
     BYTE           GetLevelFromPosition(CVector* vecPosition);
@@ -321,6 +349,7 @@ public:
     BYTE           GetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
+    bool           IsAllocatedInArchive();
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
@@ -331,6 +360,9 @@ public:
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
+    bool           GetTime(char& cHourOn, char& cHourOff);
+    bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
@@ -351,7 +383,9 @@ public:
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
+    CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
+    bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
@@ -379,7 +413,10 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
+    void MakeObjectModel(ushort usBaseModelID);
+    void MakeVehicleAutomobile(ushort usBaseModelID);
     void DeallocateModel(void);
+    unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
@@ -395,5 +432,6 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
+    void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };

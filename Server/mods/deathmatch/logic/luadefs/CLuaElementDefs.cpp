@@ -46,7 +46,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementType", getElementType},
         {"getElementInterior", getElementInterior},
         {"getElementsWithinColShape", getElementsWithinColShape},
-        {"getElementsWithinRange", getElementsWithinRange},
+        {"getElementsWithinRange", ArgumentParserWarn<false, getElementsWithinRange>},
         {"getElementDimension", getElementDimension},
         {"getElementZoneName", getElementZoneName},
         {"getElementColShape", getElementColShape},
@@ -1013,43 +1013,32 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
+CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
+    std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
 {
-    CVector position;
-    float   radius;
-    SString elementType;
+    const auto typeHash = (type.has_value() && !type.value().empty()) ?
+        CElement::GetTypeHashFromString(type.value()) : 0;
+        
+    CElementResult result;
+    GetSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(position);
-    argStream.ReadNumber(radius);
-    argStream.ReadString(elementType, "");
+    if (interior || dimension || typeHash) {
+        result.erase(std::remove_if(result.begin(), result.end(), [&](CElement* pElement) {
+            if (typeHash && typeHash != pElement->GetTypeHash())
+                return true;
 
-    if (!argStream.HasErrors())
-    {
-        // Query the spatial database
-        CElementResult result;
-        GetSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
+            if (interior.has_value() && interior != pElement->GetInterior())
+                return true;
 
-        lua_newtable(luaVM);
-        unsigned int index = 0;
+            if (dimension.has_value() && dimension != pElement->GetDimension())
+                return true;
 
-        for (CElement* entity : result)
-        {
-            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
-            {
-                lua_pushnumber(luaVM, ++index);
-                lua_pushelement(luaVM, entity);
-                lua_settable(luaVM, -3);
-            }
-        }
-
-        return 1;
+            return pElement->IsBeingDeleted();
+            }), result.end()
+        );
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return result;
 }
 
 int CLuaElementDefs::getElementDimension(lua_State* luaVM)

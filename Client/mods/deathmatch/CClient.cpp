@@ -12,6 +12,7 @@
 #include <StdInc.h>
 #define ALLOC_STATS_MODULE_NAME "client"
 #include "SharedUtil.hpp"
+#include <core/CClientCommands.h>
 
 CCoreInterface*         g_pCore = NULL;
 CLocalizationInterface* g_pLocalization = NULL;
@@ -251,8 +252,23 @@ bool CClient::WebsiteRequestResultHandler(const std::unordered_set<SString>& new
     return false;
 }
 
-bool CClient::ProcessCommand(const char* szCommandLine)
+bool CClient::ProcessCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize)
 {
+    if (commandName == nullptr || commandNameLength == 0)
+        return false;
+
+    std::string_view command{commandName, commandNameLength};
+
+    if (command == mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX)
+    {
+        if (userdata == nullptr || sizeof(bool) != userdataSize)
+            return false;
+
+        auto& alwaysShowTransferBox = *reinterpret_cast<const bool*>(userdata);
+        g_pClientGame->GetTransferBox()->SetAlwaysVisible(alwaysShowTransferBox);
+        return true;
+    }
+
     return false;
 }
 
