@@ -452,6 +452,7 @@ enum class eBitStreamVersion : unsigned short
     // 2020-11-10 0x71
     PedEnterExit,
 
+    // 0x72
     SetColPolygonHeight,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
