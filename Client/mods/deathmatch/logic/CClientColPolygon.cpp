@@ -245,5 +245,4 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
         CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, m_fCeil);
         pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
     }
-
 }
