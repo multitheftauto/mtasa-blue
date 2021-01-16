@@ -78,6 +78,7 @@ enum eClientEntityType
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
     CCLIENTUNKNOWN,
+    CCLIENTVECTORGRAPHIC,
 };
 
 class CClientColShape;

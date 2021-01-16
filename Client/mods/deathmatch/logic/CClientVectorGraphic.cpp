@@ -14,7 +14,7 @@
 using namespace lunasvg;
 
 CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
-    : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
+    : ClassInit(this), CClientRenderElement(pManager, ID)
 {
     m_pDocument = nullptr;
     m_pResource = nullptr;
@@ -48,6 +48,9 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
     rootElement->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
+
+    SVGElement* pCircle = m_pDocument->appendContent("<circle cx='150' cy='150' r='100'/>");
+    pCircle->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
 }
 
 void CClientVectorGraphic::UpdateTexture()
@@ -62,7 +65,7 @@ void CClientVectorGraphic::UpdateTexture()
     uint width = m_pVectorGraphicItem->m_uiSizeX;
     uint height = m_pVectorGraphicItem->m_uiSizeY;
 
-    Bitmap bitmap = m_pDocument->renderToBitmap(width, height);
+    Bitmap bitmap = m_pDocument->renderToBitmap(width, height, 96.0, 0x46C2D4FF);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;

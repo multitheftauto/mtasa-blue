@@ -15,15 +15,17 @@
 
 using namespace lunasvg;
 
-class CClientVectorGraphic : public CClientTexture
+class CClientVectorGraphic : public CClientRenderElement
 {
-    DECLARE_CLASS(CClientVectorGraphic, CClientTexture)
+    DECLARE_CLASS(CClientVectorGraphic, CClientRenderElement)
 public:
     CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pWebBrowserItem);
     ~CClientVectorGraphic();
 
     CResource* GetResource() { return m_pResource; }
     void       SetResource(CResource* pResource) { m_pResource = pResource; }
+
+    eClientEntityType GetType() const { return CCLIENTVECTORGRAPHIC; }
 
     void CreateDocument();
     void UpdateTexture();
