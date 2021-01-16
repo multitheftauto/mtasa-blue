@@ -565,7 +565,7 @@ void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisR
     for (CResource* pResource : setNoPermissionResources)
     {
         ssResourceNames << pResource->GetName();
-        
+
         if (remainingElements > 1)
             ssResourceNames << ", ";
 

@@ -1696,7 +1696,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
     {
         test    eax, eax
         jnz     continueLoadingColorLineLocation
-        
+
         pushad
         lea     ecx, [esp + 55Ch - 440h]
         push    ecx
@@ -1730,7 +1730,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
     {
         test    eax, eax
         jnz     continueLoadingColorLineLocation
-        
+
         pushad
         lea     ecx, [esp + 59Ch - 440h]
         push    ecx

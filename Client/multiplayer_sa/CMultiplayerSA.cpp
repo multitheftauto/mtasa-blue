@@ -1493,7 +1493,7 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
 
-    
+
     // Allow crouching with 1HP
     MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
     fDuckingHealthThreshold = 0;
