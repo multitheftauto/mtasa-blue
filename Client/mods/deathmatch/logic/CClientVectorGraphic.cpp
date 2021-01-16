@@ -20,7 +20,8 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     m_pResource = nullptr;
     m_pManager = pManager;
 
-    m_pVectorGraphicItem = pVectorGraphicItem;
+    m_pRenderItem = pVectorGraphicItem; // This is cast to CClientRenderItem
+    m_pVectorGraphicItem = pVectorGraphicItem; // Keep this as CVectorGraphicItem so we don't have to cast everywhere later on...
 
     CreateDocument();
 
@@ -43,13 +44,12 @@ void CClientVectorGraphic::CreateDocument()
     std::string strHeight = std::to_string(uiHeight);
 
     rootElement->setAttribute("viewBox", "0, 0, " + strWidth + ", " + strHeight);
-    rootElement->setAttribute("x", "0");
-    rootElement->setAttribute("y", "0");
+    rootElement->setAttribute("x", "50%");
+    rootElement->setAttribute("y", "50%");
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
-    rootElement->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
 
-    SVGElement* pCircle = m_pDocument->appendContent("<circle cx='150' cy='150' r='100'/>");
+    SVGElement* pCircle = m_pDocument->appendContent("<circle cx='50' cy='50' r='45'/>");
     pCircle->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
 }
 
