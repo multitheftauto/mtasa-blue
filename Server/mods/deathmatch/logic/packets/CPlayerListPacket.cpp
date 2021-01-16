@@ -136,7 +136,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (szNametagText)
             ucNametagTextLength = static_cast<unsigned char>(strlen(szNametagText));
 
-        if (BitStream.Version() < 0x67)
+        if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
         {
             // Old client version has a fixed buffer of 22 characters
             ucNametagTextLength = std::min<uchar>(ucNametagTextLength, 22);

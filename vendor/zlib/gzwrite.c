@@ -3,6 +3,10 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
+#ifdef __APPLE__
+  #include <unistd.h>
+#endif
+
 #include "gzguts.h"
 
 /* Local functions */

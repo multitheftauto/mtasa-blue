@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -30,16 +30,16 @@
 
 /* This is the version number of the libcurl package from which this header
    file origins: */
-#define LIBCURL_VERSION "7.69.1"
+#define LIBCURL_VERSION "7.74.0"
 
 /* The numeric version number is also available "in parts" by using these
    defines: */
 #define LIBCURL_VERSION_MAJOR 7
-#define LIBCURL_VERSION_MINOR 69
-#define LIBCURL_VERSION_PATCH 1
+#define LIBCURL_VERSION_MINOR 74
+#define LIBCURL_VERSION_PATCH 0
 
 /* This is the numeric version of the libcurl version number, meant for easier
-   parsing and comparions by programs. The LIBCURL_VERSION_NUM define will
+   parsing and comparisons by programs. The LIBCURL_VERSION_NUM define will
    always follow this syntax:
 
          0xXXYYZZ
@@ -57,7 +57,7 @@
    CURL_VERSION_BITS() macro since curl's own configure script greps for it
    and needs it to contain the full number.
 */
-#define LIBCURL_VERSION_NUM 0x074501
+#define LIBCURL_VERSION_NUM 0x074a00
 
 /*
  * This is the date and time when the full source package was created. The
@@ -68,7 +68,7 @@
  *
  * "2007-11-23"
  */
-#define LIBCURL_TIMESTAMP "2020-03-11"
+#define LIBCURL_TIMESTAMP "2020-12-09"
 
 #define CURL_VERSION_BITS(x,y,z) ((x)<<16|(y)<<8|(z))
 #define CURL_AT_LEAST_VERSION(x,y,z) \

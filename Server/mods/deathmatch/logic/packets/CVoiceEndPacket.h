@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CVoiceEndPacket : public CPacket
+class CVoiceEndPacket final : public CPacket
 {
 public:
     CVoiceEndPacket(class CPlayer* pPlayer = NULL);

@@ -207,7 +207,7 @@ void CResourceMapItem::LinkupElements()
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
 
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(vehicle))
                 vehicle->AttachTo(pElement);
         }
     }
@@ -221,7 +221,7 @@ void CResourceMapItem::LinkupElements()
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
 
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(pPlayer))
                 pPlayer->AttachTo(pElement);
         }
     }
@@ -235,7 +235,7 @@ void CResourceMapItem::LinkupElements()
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
 
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(pObject))
                 pObject->AttachTo(pElement);
         }
     }
@@ -249,7 +249,7 @@ void CResourceMapItem::LinkupElements()
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
 
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(pBlip))
                 pBlip->AttachTo(pElement);
         }
     }

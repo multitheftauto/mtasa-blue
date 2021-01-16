@@ -15,7 +15,7 @@ project "Client Core"
 			"../sdk",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-9b",
+			"../../vendor/jpeg-9d",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/hwbrk",
