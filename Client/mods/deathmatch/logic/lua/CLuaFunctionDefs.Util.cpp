@@ -403,23 +403,25 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
 int CLuaFunctionDefs::GetThemeColor(lua_State* luaVM)
 {
     //  int int int int int int getThemeColor ()
-    if (IsWindows10OrGreater())
+    if (std::IsWindows10OrGreater())
     {
 
         // ui settings (win10)
         UISettings settings;
 
         // background
-        Windows.UI.Color background = settings.GetColorValue(UIColorType::Background);
+        std::Windows.UI.Color background = settings.GetColorValue(UIColorType::Background);
         lua_pushnumber(luaVM, background.R);
         lua_pushnumber(luaVM, background.G);
         lua_pushnumber(luaVM, background.B);
 
         // foreground
-        Windows.UI.Color foreground = settings.GetColorValue(UIColorType::Foreground);
+        std::Windows.UI.Color foreground = settings.GetColorValue(UIColorType::Foreground);
         lua_pushnumber(luaVM, foreground.R);
         lua_pushnumber(luaVM, foreground.G);
         lua_pushnumber(luaVM, foreground.B);
+
+        return 6;
     
     }
     else
@@ -430,6 +432,8 @@ int CLuaFunctionDefs::GetThemeColor(lua_State* luaVM)
         {
             lua_pushnumber(luaVM, 255);
         }
+
+        return 6;
 
     }
 
