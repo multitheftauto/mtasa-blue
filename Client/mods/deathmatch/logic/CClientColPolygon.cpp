@@ -229,18 +229,12 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
         const CVector2D& vecPointBegin = m_Points[i];
         const CVector2D& vecPointEnd = m_Points[(i + 1) % uiNumPoints];
 
-        CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, m_fFloor);
-        CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, m_fFloor);
-        pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
-    }
-
-    for (uint i = 0; i < uiNumPoints; i++)
-    {
-        const CVector2D& vecPointBegin = m_Points[i];
-        const CVector2D& vecPointEnd = m_Points[(i + 1) % uiNumPoints];
-
-        CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, m_fCeil);
-        CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, m_fCeil);
-        pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+        CVector vecFloorBegin(vecPointBegin.fX, vecPointBegin.fY, m_fFloor);
+        CVector vecFloorEnd(vecPointEnd.fX, vecPointEnd.fY, m_fFloor);
+        pGraphics->DrawLine3DQueued(vecFloorBegin, vecFloorEnd, fLineWidth, color, false);
+        
+        CVector vecCeilBegin(vecPointBegin.fX, vecPointBegin.fY, m_fCeil);
+        CVector vecCeilEnd(vecPointEnd.fX, vecPointEnd.fY, m_fCeil);
+        pGraphics->DrawLine3DQueued(vecCeilBegin, vecCeilEnd, fLineWidth, color, false);
     }
 }
