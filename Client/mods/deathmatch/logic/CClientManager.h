@@ -44,7 +44,6 @@ class CClientManager;
 #include "CClientPointLightsManager.h"
 #include "CClientModelManager.h"
 
-class CClientVectorGraphic;
 class CClientProjectileManager;
 class CClientExplosionManager;
 
