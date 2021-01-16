@@ -19,7 +19,7 @@ void CColShapeRPCs::LoadFunctions(void)
     AddHandler(UPDATE_COLPOLYGON_POINT, UpdateColPolygonPoint, "UpdateColPolygonPoint");
     AddHandler(ADD_COLPOLYGON_POINT, AddColPolygonPoint, "AddColPolygonPoint");
     AddHandler(REMOVE_COLPOLYGON_POINT, RemoveColPolygonPoint, "RemoveColPolygonPoint");
-    AddHandler(COLSHAPE_POLYGON_SET_HEIGHT, SetColShapePolygonHeight, "SetColShapePolygonHeight");
+    AddHandler(SET_COLPOLYGON_HEIGHT, SetColShapePolygonHeight, "SetColShapePolygonHeight");
 }
 
 void CColShapeRPCs::SetColShapeRadius(CClientEntity* pSource, NetBitStreamInterface& bitStream)
