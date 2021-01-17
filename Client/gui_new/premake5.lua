@@ -43,13 +43,16 @@ project "GUI New"
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
-	}
+    }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" }
+        flags { "ExcludeFromBuild" }
+        
+    configuration "windows"
+        buildoptions { "-Zm180" }
 
 	configuration "Debug"
 		links { "dbghelp" }
