@@ -451,6 +451,9 @@ public:
     void SetDevelopmentMode(bool enabled) { m_DevelopmentModeEnabled = enabled; }
     bool GetDevelopmentMode() { return m_DevelopmentModeEnabled; }
 
+    bool IsClientTransferBoxVisible() const { return m_showClientTransferBox; }
+    void SetClientTransferBoxVisible(bool visible) { m_showClientTransferBox = visible; }
+
 private:
     void AddBuiltInEvents();
     void RelayPlayerPuresync(class CPacket& Packet);
@@ -642,4 +645,5 @@ private:
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 
     bool m_DevelopmentModeEnabled;
+    bool m_showClientTransferBox = true;
 };

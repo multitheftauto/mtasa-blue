@@ -39,7 +39,7 @@ public:
 class CBoatSA : public virtual CBoat, public virtual CVehicleSA
 {
 private:
-    CBoatHandlingEntrySA* m_pBoatHandlingData;
+    CBoatHandlingEntrySA* m_pBoatHandlingData = nullptr;
     //  CBoatSAInterface        * internalInterface;
 public:
     CBoatSA(CBoatSAInterface* boat);

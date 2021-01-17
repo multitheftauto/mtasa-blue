@@ -142,7 +142,7 @@ public:
         bool bIntersects = IntesectsLinePlane(vecRay, vecNormal, vecPosition, &fDist);
 
         const float fSegLength = vecSegment.Length();
-        
+
         *outVec = *this + vecRay * fDist;
         return bIntersects && fDist >= 0 && (fDist <= fSegLength);
     }

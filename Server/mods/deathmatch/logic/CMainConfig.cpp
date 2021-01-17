@@ -33,10 +33,9 @@ struct
     {26, "data/timecyc.dat"},
 };
 
-CMainConfig::CMainConfig(CConsole* pConsole, CLuaManager* pLuaMain) : CXMLConfig(NULL)
+CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
 {
     m_pConsole = pConsole;
-    m_pLuaManager = pLuaMain;
     m_pRootNode = NULL;
     m_pCommandLineParser = NULL;
 
@@ -643,7 +642,7 @@ bool CMainConfig::LoadExtended()
 
                 if (IsValidFilePath(strBuffer.c_str()))
                 {
-                    m_pLuaManager->GetLuaModuleManager()->LoadModule(strBuffer.c_str(), strFilename, false);
+                    g_pGame->GetLuaManager()->GetLuaModuleManager()->LoadModule(strBuffer.c_str(), strFilename, false);
                 }
             }
         }

@@ -1389,8 +1389,8 @@ void CMultiplayerSA::InitHooks()
     // Fix melee doesn't work outside the world bounds.
     MemSet((void*)0x5FFAEE, 0x90, 2);
     MemSet((void*)0x5FFB4B, 0x90, 2);
-    MemSet((void*)0x5FFBA5, 0x90, 2);
-    MemSet((void*)0x5FFC03, 0x90, 2);
+    MemSet((void*)0x5FFBA2, 0x90, 5);
+    MemSet((void*)0x5FFC00, 0x90, 5);
 
     // Fix shooting sniper doesn't work outside the world bounds (for local player).
     MemSet((void*)0x7361BF, 0x90, 6);
@@ -1493,7 +1493,7 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
 
-    
+
     // Allow crouching with 1HP
     MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
     fDuckingHealthThreshold = 0;
@@ -6867,11 +6867,32 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
     }
 }
 
-
 void PostCWorld_ProcessPedsAfterPreRender()
 {
     if (m_postWorldProcessPedsAfterPreRenderHandler)
         m_postWorldProcessPedsAfterPreRenderHandler();
+
+    // Scale the object entities
+    CPools* pools = pGameInterface->GetPools();
+    for (std::uint32_t i = 0; i < MAX_OBJECTS; i++)
+    {
+        CObject* objectEntity = pools->GetObjectFromIndex(i);
+        if (!objectEntity)
+            continue;
+        auto objectInterface = objectEntity->GetObjectInterface();
+        if (objectInterface && objectEntity->GetPreRenderRequired())
+        {
+            if (objectInterface->fScale != 1.0f || objectInterface->bUpdateScale)
+            {
+                objectEntity->SetScaleInternal(*objectEntity->GetScale());
+                objectInterface->bUpdateScale = false;
+            }
+            RpClump* clump = objectInterface->m_pRwObject;
+            if (clump && clump->object.type == RP_TYPE_CLUMP)
+                objectEntity->UpdateRpHAnim();
+            objectEntity->SetPreRenderRequired(false);
+        }
+    }
 }
 
 const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;

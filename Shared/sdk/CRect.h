@@ -6,7 +6,7 @@
  *  PURPOSE:     This is an actual GTA SA class. MTA has its own version of
  *               CRect, and it's called CRect2D. CRect behaves similarly to
  *               CRect2D, except it's used by GTA:SA, and the initial values
- *               are NOT zero when constructed. 
+ *               are NOT zero when constructed.
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
