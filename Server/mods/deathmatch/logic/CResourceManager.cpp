@@ -258,7 +258,7 @@ void CResourceManager::CheckResources(CResource* pResource)
     }
 }
 
-void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState)
+void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState) const
 {
     if (!pResource) return;
 
