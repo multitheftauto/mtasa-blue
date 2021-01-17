@@ -4,9 +4,11 @@
 #include <string>
 #include <memory>
 
+#include "export.h"
+
 namespace lunasvg {
 
-class Bitmap
+class LUNASVG_API Bitmap
 {
 public:
     /**
@@ -52,7 +54,7 @@ enum InsertPosition
 
 class SVGDocument;
 
-class SVGElement
+class LUNASVG_API SVGElement
 {
 public:
     /**

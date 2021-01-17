@@ -1,21 +1,13 @@
 project "lunasvg"
-	language "C++"
-	kind "StaticLib"
-	targetname "lunasvg"
+  language "C++"
+  cppdialect "C++17"
+  kind "SharedLib"
+  targetname "lunasvg"
+  targetdir(buildpath("mta"))
+  floatingpoint "Fast"
+  rtti "Off"
 
-	includedirs {
-		"include",
-		"source",
-		"source/graphics",
-		"source/geometry",
-		"3rdparty/plutovg",
-		"3rdparty/software",
-		"3rdparty/stb"
-	}
-
-	defines {
-		"_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING"
-	}
+  defines { "LUNASVG_EXPORTS", "LUNASVG_SHARED", "_CRT_SECURE_NO_WARNINGS" }
 
 	vpaths {
 		["Headers/*"] = "**.h",
@@ -24,18 +16,26 @@ project "lunasvg"
 		["*"] = "premake5.lua"
 	}
 
-	files {
-		"premake5.lua",
-		"**.cpp",
-		"**.c",
-		"**.h",
-	}
+  files { 
+    "premake5.lua",
+    "**.cpp",
+    "**.h",
+    "**.c"
+  }
 
-	filter "architecture:x64"
-		flags { "ExcludeFromBuild" }
-	filter "system:not windows"
-		flags { "ExcludeFromBuild" }
+  includedirs { 
+    "3rdparty/stb", 
+    "3rdparty/plutovg", 
+    "3rdparty/software", 
+    "source/geometry", 
+    "source/graphics", 
+    "source", 
+    "include", 
+    "contrib"
+  }
 
-	filter {"system:windows"}
-		linkoptions { "/ignore:4221" }
-		disablewarnings { "4221" }
+configuration "vs2019"
+  flags { "MultiProcessorCompile" }
+
+configuration "vs2019 and Release"
+  flags { "LinkTimeOptimization" }

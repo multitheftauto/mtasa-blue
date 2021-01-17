@@ -3,12 +3,14 @@
 
 #include <string>
 
+#include "export.h"
+
 namespace lunasvg {
 
 class SVGElement;
 class SVGElementImpl;
 
-class SVGElementIter
+class LUNASVG_API SVGElementIter
 {
 public:
     SVGElementIter(const SVGElement* element, const std::string& id = std::string(), const std::string& tagName = std::string());

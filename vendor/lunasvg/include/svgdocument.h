@@ -3,11 +3,13 @@
 
 #include "svgelement.h"
 
+#include "export.h"
+
 namespace lunasvg {
 
 class SVGDocumentImpl;
 
-class SVGDocument
+class LUNASVG_API SVGDocument
 {
 public:
     SVGDocument();
