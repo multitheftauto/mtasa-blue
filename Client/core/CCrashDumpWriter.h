@@ -9,7 +9,7 @@
  *
  *****************************************************************************/
 
-#pragma once 
+#pragma once
 
 #include <set>
 
@@ -38,7 +38,7 @@ enum EDumpFileNameParts
 //
 class CCrashDumpWriter
 {
-    //static 
+    //static
 public:
     static long WINAPI HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
     static LONG WINAPI HandleExceptionHardWareBreakPoint(PEXCEPTION_POINTERS ExceptionInfo);

@@ -959,7 +959,7 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
 {
     const auto typeHash = (type.has_value() && !type.value().empty()) ?
         CClientEntity::GetTypeHashFromString(type.value()) : 0;
-        
+
     CClientEntityResult result;
     GetClientSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 

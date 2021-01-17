@@ -22,7 +22,7 @@ public:
         if (pstrValue)
             strOutValue = *pstrValue;
         else
-            strOutValue = szDefaultValue; 
+            strOutValue = szDefaultValue;
     }
 
     template <typename T, typename U>
