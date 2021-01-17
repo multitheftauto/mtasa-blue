@@ -155,7 +155,7 @@ bool CBlip::ReadSpecialData(const int iLine)
             return false;
         }
     }
-    
+
     return true;
 }
 

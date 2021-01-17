@@ -28,7 +28,7 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 
     // Gather our custom skin model IDs allocated with engineRequestModel
     // (there might be some < 313 as well, and since we don't want duplicates, we start at 313, others are already included by the loop above)
-    for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED, 313)) 
+    for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED, 313))
     {
         lua_pushnumber(luaVM, ++iIndex);
         lua_pushnumber(luaVM, model->GetModelID());
@@ -257,7 +257,7 @@ int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
     lua_pushstring(luaVM, "readingLayout");
     lua_pushstring(luaVM, readingLayout);
     lua_settable(luaVM, -3);
-    
+
     return 1;
 }
 

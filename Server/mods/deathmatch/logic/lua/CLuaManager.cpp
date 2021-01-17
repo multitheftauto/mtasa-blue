@@ -288,7 +288,7 @@ void CLuaManager::LoadCFunctions()
     // Add all functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
-    
+
     // Restricted functions
     CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
     CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);
