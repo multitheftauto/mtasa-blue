@@ -436,7 +436,7 @@ bool CClientSound::SetLooped(bool bLoop)
 {
     if (m_bLoop == bLoop)
         return false;
-        
+
     m_bLoop = bLoop;
     m_SimulatedPlayPosition.SetLooped(bLoop);
 
