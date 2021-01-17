@@ -18,10 +18,10 @@
         // param_t is the type of the content of the vector
     }
 
-    For each version of is_Nspecialization we have two class templates: 
-        - The first one (inheriting from std::false_type) is used to provide a 
+    For each version of is_Nspecialization we have two class templates:
+        - The first one (inheriting from std::false_type) is used to provide a
           default case, where something isn't a match. It does not impose restrictions
-          on anything apart from the Test parameter (which is required to take N template 
+          on anything apart from the Test parameter (which is required to take N template
           parameters). Thus it matches anything.
 
         - The second one (std::true_type) is used to perform the actual match
@@ -69,7 +69,7 @@ struct is_5specialization<Ref<Arg1, Arg2, Arg3, Arg4, Arg5>, Ref> : std::true_ty
 // is_variant
 //  Returns whether a T is a variant
 //  If T is a variant, it also allows accessing the individual types
-//  of the variant via param1_t (first type) and rest_t (which is a 
+//  of the variant via param1_t (first type) and rest_t (which is a
 //  variant of the remaining types).
 template <typename Test>
 struct is_variant : std::false_type
@@ -87,14 +87,14 @@ struct is_variant<std::variant<Arg1, Args...>> : std::true_type
 /**
     nth_element
 
-    Returns the nth element of a parameter pack by recursively 
+    Returns the nth element of a parameter pack by recursively
     discarding and counting down until the index is zero, at which
     point the type is returned
 **/
 
 // Recursive case, I is larger than 1, therefore
 // we need to look at the I-1 case by discarding the
-// first type. 
+// first type.
 template <std::size_t I, typename T, typename... Ts>
 struct nth_element_impl
 {
@@ -178,7 +178,7 @@ struct common_variant<std::variant<Ts...>, T>
 
 
 // Variant + Variant = Combined Variant
-// This recursively calls itself and deconstructs the first variant, while 
+// This recursively calls itself and deconstructs the first variant, while
 // adding the first type in the first variant to the second variant (via the T + variant overload)
 template <typename T, typename... Ts, typename... Us>
 struct common_variant<std::variant<T, Ts...>, std::variant<Us...>>
@@ -205,7 +205,7 @@ struct n_tuple<N, true, Args...>
     using type = std::tuple<Args...>;
 };
 
-// Second parameter is false -> Add a dummy type and 
+// Second parameter is false -> Add a dummy type and
 // decide if sizeof...(Args) + 1 is enough
 template <std::size_t N, typename... Args>
 struct n_tuple<N, false, Args...>
@@ -214,14 +214,14 @@ struct n_tuple<N, false, Args...>
 };
 
 // pad_func_with_func
-// pads Func with as many dummy_type arguments as needed to 
+// pads Func with as many dummy_type arguments as needed to
 // have the same number of arguments as FuncB has
 template <auto* Func, typename T>
 struct pad_func_with_func_impl
 {
 };
 
-// pad_func_with_func_impl takes a tuple of additional arguments, which are then 
+// pad_func_with_func_impl takes a tuple of additional arguments, which are then
 // taken as parameter. This allows us to discard exactly sizeof...(Ts) function
 // arguments. Effectively this means Call is a function that is identical in behavior
 // to Func, but takes additional sizeof...(Ts) dummy arguments that are discarded.
@@ -238,7 +238,7 @@ struct pad_func_with_func
 
 // pad_func_with_func initially needs to figure out the maximum number of parameters for the two functions
 // It then determines how many parameters need to be added to Func, in order to have parity in argument count
-// By using n_tuple, we build a Tuple of exactly the amout of parameters that need to be added to Func, which 
+// By using n_tuple, we build a Tuple of exactly the amout of parameters that need to be added to Func, which
 // is then applied via the impl function above
 template <typename Ret, typename... Args, auto (*Func)(Args...)->Ret, typename RetB, typename... ArgsB, auto (*FuncB)(ArgsB...)->RetB>
 struct pad_func_with_func<Func, FuncB> : pad_func_with_func_impl<Func, typename n_tuple<std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args),

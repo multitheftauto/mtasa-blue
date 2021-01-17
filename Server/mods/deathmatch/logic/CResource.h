@@ -370,7 +370,7 @@ private:
 
     CResourceManager* m_pResourceManager;
 
-    
+
     SString     m_strResourceName;
     SString     m_strAbsPath;                      // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
     std::string m_strResourceZip;                  // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip

@@ -12,26 +12,29 @@
 #include "CVehicleSA.h"
 #include "CDoorSA.h"
 
-enum eTrainNodes
+namespace eTrainNode
 {
-    TRAIN_NODE_NONE = 0,
-    TRAIN_NODE_DOOR_LF = 1,
-    TRAIN_NODE_DOOR_RF = 2,
-    TRAIN_NODE_WHEEL_RF1 = 3,
-    TRAIN_NODE_WHEEL_RF2 = 4,
-    TRAIN_NODE_WHEEL_RF3 = 5,
-    TRAIN_NODE_WHEEL_RB1 = 6,
-    TRAIN_NODE_WHEEL_RB2 = 7,
-    TRAIN_NODE_WHEEL_RB3 = 8,
-    TRAIN_NODE_WHEEL_LF1 = 9,
-    TRAIN_NODE_WHEEL_LF2 = 10,
-    TRAIN_NODE_WHEEL_LF3 = 11,
-    TRAIN_NODE_WHEEL_LB1 = 12,
-    TRAIN_NODE_WHEEL_LB2 = 13,
-    TRAIN_NODE_WHEEL_LB3 = 14,
-    TRAIN_NODE_BOGIE_FRONT = 15,
-    TRAIN_NODE_BOGIE_REAR = 16,
-    TRAIN_NUM_NODES
+    enum
+    {
+        NONE = 0,
+        DOOR_LF = 1,
+        DOOR_RF = 2,
+        WHEEL_RF1 = 3,
+        WHEEL_RF2 = 4,
+        WHEEL_RF3 = 5,
+        WHEEL_RB1 = 6,
+        WHEEL_RB2 = 7,
+        WHEEL_RB3 = 8,
+        WHEEL_LF1 = 9,
+        WHEEL_LF2 = 10,
+        WHEEL_LF3 = 11,
+        WHEEL_LB1 = 12,
+        WHEEL_LB2 = 13,
+        WHEEL_LB3 = 14,
+        BOGIE_FRONT = 15,
+        BOGIE_REAR = 16,
+        NUM_NODES
+    };
 };
 
 enum class eTrainPassengersGenerationState : unsigned char
@@ -95,7 +98,7 @@ public:
     CPedSAInterface*                m_pTemporaryPassenger;                  // we tell peds to enter train and then delete them
     CTrainSAInterface*              m_prevCarriage;
     CTrainSAInterface*              m_nextCarriage;
-    CDoorSAInterface                m_aDoors[6];
-    RwFrame*                        m_aTrainNodes[TRAIN_NUM_NODES];
+    CDoorSAInterface                m_aDoors[MAX_DOORS];
+    RwFrame*                        m_aTrainNodes[eTrainNode::NUM_NODES];
 };
 static_assert(sizeof(CTrainSAInterface) == 0x6AC, "Invalid size for CTrainSAInterface");

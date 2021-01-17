@@ -762,7 +762,7 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
     ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
     short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
     short sButtonCross = keys.data.bButtonCross ? 255 : 0;
-    if (BitStream.Version() >= 0x06F)
+    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -817,7 +817,7 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
     ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
     short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
     short sButtonCross = keys.data.bButtonCross ? 255 : 0;
-    if (BitStream.Version() >= 0x06F)
+    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present

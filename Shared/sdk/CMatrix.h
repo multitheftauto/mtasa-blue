@@ -12,10 +12,12 @@
 #pragma once
 
 #include "CVector.h"
+#include <array>
 
 /**
  * Contains full positional data for a point
  */
+
 class CMatrix
 {
 public:
@@ -151,7 +153,7 @@ public:
         matResult.vFront = vFront.Clone();
         matResult.vUp = vUp.Clone();
         matResult.vPos = vPos.Clone();
-        
+
         return matResult;
     }
 
@@ -280,7 +282,7 @@ public:
         return CVector(vRight.Length(), vFront.Length(), vUp.Length());
     }
 
-    void SetScale(const CVector& vecScale) 
+    void SetScale(const CVector& vecScale)
     {
         CMatrix matRot = GetRotationMatrix();
         vRight = matRot.vRight * vecScale.fX;
@@ -321,6 +323,16 @@ public:
         array[13] = vPos.fY;
         array[14] = vPos.fZ;
         array[15] = 1.0f;
+    }
+
+    std::array<std::array<float, 4>, 4> To4x4Array() const noexcept
+    {
+        return {
+            vRight.fX, vRight.fY, vRight.fZ, 0.0f,
+            vFront.fX, vFront.fY, vFront.fZ, 0.0f,
+            vUp.fX,    vUp.fY,    vUp.fZ,    0.0f,
+            vPos.fX,   vPos.fY,   vPos.fZ,   1.0f
+        };
     }
 
     enum EMatrixAxes

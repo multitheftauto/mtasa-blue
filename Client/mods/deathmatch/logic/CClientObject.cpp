@@ -53,6 +53,7 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
 
     if (m_bIsLowLod)
         m_pManager->OnLowLODElementCreated();
+    m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 }
 
 CClientObject::~CClientObject()
@@ -71,6 +72,7 @@ CClientObject::~CClientObject()
 
     if (m_bIsLowLod)
         m_pManager->OnLowLODElementDestroyed();
+    m_clientModel = nullptr;
 }
 
 void CClientObject::Unlink()
@@ -261,6 +263,8 @@ void CClientObject::SetModel(unsigned short usModel)
 
         // Set the new model ID and recreate the model
         m_usModel = usModel;
+        if (m_clientModel && m_clientModel->GetModelID() != m_usModel)
+            m_clientModel = nullptr;
         m_pModelInfo = g_pGame->GetModelInfo(usModel);
         UpdateSpatialData();
 
