@@ -3393,8 +3393,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Deconectare"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2014 Multi Theft Auto"
 
 #~ msgid "Browser"
 #~ msgstr "Navigator"
@@ -3426,8 +3426,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "General  "
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Rezoluție"

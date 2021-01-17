@@ -3342,7 +3342,7 @@ msgstr ""
 #~ msgstr ""
 #~ "конекција: Синтаксата е конектирана на <хост> <порта> [<име> <пасворд>]'"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
 #~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
 
 #~ msgid "Chat BG"

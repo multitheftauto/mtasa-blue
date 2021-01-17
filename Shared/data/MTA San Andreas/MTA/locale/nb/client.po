@@ -3374,8 +3374,8 @@ msgstr ""
 #~ msgid "Validation code missing"
 #~ msgstr "Validerings kode mangler"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Opphavsrett (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "Opphavsrett (C) 2003 - 2015 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Samfunn"
@@ -3409,8 +3409,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Logg ut"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Opphavsrett (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Opphavsrett (C) 2003 - 2014 Multi Theft Auto"
 
 #~ msgid "Browser"
 #~ msgstr "Leser"
@@ -3442,8 +3442,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Generelt  "
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Opphavsrett (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Opphavsrett (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Oppløsning"

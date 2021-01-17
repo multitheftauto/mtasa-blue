@@ -3284,8 +3284,8 @@ msgstr ""
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
 #~ msgstr "连接: 指令为 'connect <服务器地址> <端口> [<昵称> <密码>]'"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "版权所有 (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgstr "版权所有 (C) 2003 - 2018 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "当前服务不可用"
@@ -3317,8 +3317,8 @@ msgstr ""
 #~ msgid "Validation code missing"
 #~ msgstr "请填写验证码"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "版权所有 (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "版权所有 (C) 2003 - 2015 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "社区"
@@ -3347,8 +3347,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "登出"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "版权所有 (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "版权所有 (C) 2003 - 2014 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "关闭桌面 Aero 特效"
@@ -3377,8 +3377,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "常规    "
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "版权所有 (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "版权所有 (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "分辨率"

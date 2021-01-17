@@ -3382,7 +3382,7 @@ msgstr ""
 #~ msgstr "connect: Składnia komendy to 'connect <host> <port> [<nick> <hasło>]'"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
 #~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto."
 
 #~ msgid "Services currently unavailable"
@@ -3416,7 +3416,7 @@ msgstr ""
 #~ msgstr "Proszę podać kod weryfikacji"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
 #~ msgstr ""
 #~ "Copyright (C) 2003 - 2021 Multi Theft Auto. Wszelkie prawa zastrzeżone."
 
@@ -3450,7 +3450,7 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "Wyloguj"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
 #~ msgstr ""
 #~ "Copyright (C) 2003 - 2021 Multi Theft Auto. Wszelkie prawa zastrzeżone."
 
@@ -3484,8 +3484,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Ogólne  "
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "(C) 2003 - 2021 Multi Theft Auto. Wszelkie prawa zastrzeżone."
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "(C) 2003 - 2013 Multi Theft Auto. Wszelkie prawa zastrzeżone."
 
 #~ msgid "Resolution"
 #~ msgstr "Rozdzielczość"

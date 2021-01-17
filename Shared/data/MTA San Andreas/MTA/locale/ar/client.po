@@ -3351,8 +3351,8 @@ msgstr ""
 #~ "تصحيح: بناء الجملة هو : [<كلمة المرور> <الأسم>] <المنفذ> <الخادم> connect'"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "حقوق التأليف والنشر © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgstr "حقوق التأليف والنشر © 2003 - 2014 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "الخدمات غير متوفرة حالياً"
@@ -3385,8 +3385,8 @@ msgstr ""
 #~ msgstr "شفرة التحقق غير موجودة"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "حقوق التأليف والنشر © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "حقوق التأليف والنشر © 2003 - 2014 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "المجتمع"
@@ -3415,8 +3415,8 @@ msgstr ""
 #~ msgid "Logout"
 #~ msgstr "تسجيل الخروج"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "حقوق التأليف والنشر © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "حقوق التأليف والنشر © 2003 - 2014 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "تعطيل وضع الشفافية في سطح المكتب"
@@ -3445,8 +3445,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "عام‏"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "حقوق الطبع والنشر © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "حقوق الطبع والنشر © 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "دقة الشاشة"

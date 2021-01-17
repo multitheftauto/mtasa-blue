@@ -3313,8 +3313,8 @@ msgstr ""
 #~ msgstr "povezava: Sintaksa je 'connect <host> <port> [<nick> <pass>]'"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Avtorske pravice © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgstr "Avtorske pravice © 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Storitev trenutno ni na voljo"
@@ -3347,8 +3347,8 @@ msgstr ""
 #~ msgstr "Potrjevalne kode ni bilo mogoče najti"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Avtorske pravice © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "Avtorske pravice © 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Skupnost"
@@ -3378,8 +3378,8 @@ msgstr ""
 #~ msgstr "Odjava"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Avtorske pravice © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Avtorske pravice © 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Onemogoči Aero namizje"
@@ -3405,8 +3405,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Splošno"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Avtorske pravice © 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Avtorske pravice © 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Ločljivost"

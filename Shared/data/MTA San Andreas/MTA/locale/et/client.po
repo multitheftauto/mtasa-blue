@@ -3353,8 +3353,8 @@ msgstr ""
 #~ msgstr "Logi välja"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Õigused on kaitstud (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Õigused on kaitstud (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Keela Aero Desktop"
@@ -3380,8 +3380,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Üldine"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Õigused on kaitstud (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Õigused on kaitstud (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Resolutsioon"

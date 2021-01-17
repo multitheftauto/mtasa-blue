@@ -3359,8 +3359,8 @@ msgstr ""
 #~ msgstr "Odhlásiť"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Vypnúť Aero Desktop"
@@ -3386,8 +3386,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Hlavné"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Rozlíšenie"

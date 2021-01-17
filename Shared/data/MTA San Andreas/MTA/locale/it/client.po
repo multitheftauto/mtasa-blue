@@ -3338,8 +3338,8 @@ msgstr ""
 #~ msgstr "Codice di validazione mancante "
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Community"
 #~ msgstr "Comunità"
@@ -3369,8 +3369,8 @@ msgstr ""
 #~ msgstr "Uscita"
 
 #, fuzzy
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
 #~ msgstr "Disabilità il Desktop Aero"
@@ -3396,8 +3396,8 @@ msgstr ""
 #~ msgid "General  "
 #~ msgstr "Generale"
 
-#~ msgid "Copyright (C) 2003 - 2021 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Resolution"
 #~ msgstr "Risoluzione"
