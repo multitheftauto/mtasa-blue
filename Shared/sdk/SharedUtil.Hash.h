@@ -32,8 +32,7 @@ enum class StringEncryptFunction
 {
     TEA,
     BASE32,
-    BASE64,
-    HMAC
+    BASE64
 };
 
 namespace SharedUtil
