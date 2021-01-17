@@ -7,7 +7,7 @@ project "CEGUISILLYModule"
 	includedirs {
 		"include",
 		"../../../libpng",
-		"../../../jpeg-9b",
+		"../../../jpeg-9d",
 		"../../../zlib"
 	}
     
