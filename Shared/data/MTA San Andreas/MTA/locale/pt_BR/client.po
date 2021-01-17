@@ -3402,7 +3402,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Copyright (C) 2003 - 2021 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2016 Multi Theft Auto"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "O serviço está atualmente indisponível"
