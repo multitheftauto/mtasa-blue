@@ -260,23 +260,22 @@ void CResourceManager::CheckResources(CResource* pResource)
 
 void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState)
 {
-    if (pResource)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushResource(pResource);
+    if (!pResource) return;
 
-        if (szOldState)
-            Arguments.PushString(szOldState);
-        else
-            Arguments.PushNil();
+    CLuaArguments Arguments;
+    Arguments.PushResource(pResource);
 
-        if (szNewState)
-            Arguments.PushString(szNewState);
-        else
-            Arguments.PushNil();
-        
-        g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourceLoadStateChange", Arguments);
-    }
+    if (szOldState)
+        Arguments.PushString(szOldState);
+    else
+        Arguments.PushNil();
+
+    if (szNewState)
+        Arguments.PushString(szNewState);
+    else
+        Arguments.PushNil();
+
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourceLoadStateChange", Arguments);
 }
 
 const char* CResourceManager::GetResourceDirectory()
