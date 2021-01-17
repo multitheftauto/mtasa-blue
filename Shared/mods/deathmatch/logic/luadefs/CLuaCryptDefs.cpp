@@ -318,6 +318,64 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
+            case StringEncryptFunction::BASE32:
+            {
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [data] {
+                            // Execute time-consuming task
+                            SString result = SharedUtil::Base32encode(data);
+                            return result;
+                        },
+                        [luaFunctionRef](const SString& result) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+                                arguments.PushString(result);
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
+                        });
+
+                    lua_pushboolean(luaVM, true);  
+                }
+                else            // Sync
+                {
+                    SString result = SharedUtil::Base32encode(data);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
+            case StringEncryptFunction::BASE64:
+            {
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [data] {
+                            // Execute time-consuming task
+                            SString result = SharedUtil::Base64encode(data);
+                            return result;
+                        },
+                        [luaFunctionRef](const SString& result) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+                                arguments.PushString(result);
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
+                        });
+                }
+                else            // Sync
+                {
+                    SString result = SharedUtil::Base64encode(data);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
             default:
             {
                 m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
@@ -393,6 +451,64 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 {
                     SString result;
                     SharedUtil::TeaDecode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
+            case StringEncryptFunction::BASE32:
+            {
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [data] {
+                            // Execute time-consuming task
+                            SString result = SharedUtil::Base32decode(data);
+                            return result;
+                        },
+                        [luaFunctionRef](const SString& result) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+                                arguments.PushString(result);
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
+                        });
+
+                    lua_pushboolean(luaVM, true);
+                }
+                else            // Sync
+                {
+                    SString result = SharedUtil::Base32decode(data);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
+            case StringEncryptFunction::BASE64:
+            {
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [data] {
+                            // Execute time-consuming task
+                            SString result = SharedUtil::Base64decode(data);
+                            return result;
+                        },
+                        [luaFunctionRef](const SString& result) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+                                arguments.PushString(result);
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
+                        });
+                }
+                else            // Sync
+                {
+                    SString result = SharedUtil::Base64decode(data);
                     lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;

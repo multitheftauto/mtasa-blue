@@ -54,6 +54,8 @@ IMPLEMENT_ENUM_CLASS_END("password-hash-function")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(StringEncryptFunction)
 ADD_ENUM(StringEncryptFunction::TEA, "tea")
+ADD_ENUM(StringEncryptFunction::BASE32, "base32")
+ADD_ENUM(StringEncryptFunction::BASE64, "base64")
 IMPLEMENT_ENUM_CLASS_END("string-encrypt-function")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)

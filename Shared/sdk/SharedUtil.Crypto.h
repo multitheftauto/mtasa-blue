@@ -9,6 +9,7 @@
  *****************************************************************************/
 #pragma once
 #include <cryptopp/base64.h>
+#include <cryptopp/base32.h>
 
 namespace SharedUtil
 {
@@ -24,6 +25,22 @@ namespace SharedUtil
     {
         SString                result;
         CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Decoder(new CryptoPP::StringSink(result)));            // Memory is freed automatically
+
+        return result;
+    }
+
+    inline SString Base32encode(const SString& data)
+    {
+        SString                result;
+        CryptoPP::StringSource ss(data, true, new CryptoPP::Base32Encoder(new CryptoPP::StringSink(result), false));            // Memory is freed automatically
+
+        return result;
+    }
+
+    inline SString Base32decode(const SString& data)
+    {
+        SString                result;
+        CryptoPP::StringSource ss(data, true, new CryptoPP::Base32Decoder(new CryptoPP::StringSink(result)));            // Memory is freed automatically
 
         return result;
     }
