@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "detours/include/detours.h"
+#include <detours.h>
 
 template <>
 CSetCursorPosHook* CSingleton<CSetCursorPosHook>::m_pSingleton = NULL;
@@ -36,8 +36,11 @@ CSetCursorPosHook::~CSetCursorPosHook()
 void CSetCursorPosHook::ApplyHook()
 {
     // Hook SetCursorPos
-    m_pfnSetCursorPos =
-        reinterpret_cast<pSetCursorPos>(DetourFunction(DetourFindFunction("User32.dll", "SetCursorPos"), reinterpret_cast<PBYTE>(API_SetCursorPos)));
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    m_pfnSetCursorPos = reinterpret_cast<decltype(m_pfnSetCursorPos)>(DetourFindFunction("User32.dll", "SetCursorPos"));
+    DetourAttach(&reinterpret_cast<PVOID&>(m_pfnSetCursorPos), API_SetCursorPos);
+    DetourTransactionCommit();
 }
 
 void CSetCursorPosHook::RemoveHook()
@@ -45,11 +48,14 @@ void CSetCursorPosHook::RemoveHook()
     // Remove hook
     if (m_pfnSetCursorPos)
     {
-        DetourRemove(reinterpret_cast<PBYTE>(m_pfnSetCursorPos), reinterpret_cast<PBYTE>(API_SetCursorPos));
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+        DetourDetach(&reinterpret_cast<PVOID&>(m_pfnSetCursorPos), API_SetCursorPos);
+        DetourTransactionCommit();
     }
 
     // Reset variables
-    m_pfnSetCursorPos = NULL;
+    m_pfnSetCursorPos = nullptr;
     m_bCanCall = true;
 }
 
