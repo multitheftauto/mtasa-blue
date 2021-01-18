@@ -521,21 +521,19 @@ void CPickup::Callback_OnLeave(CColShape& Shape, CElement& Element)
         // Matching interior
         if (GetInterior() == Element.GetInterior())
         {
-            // Matching dimension
-            if (GetDimension() == Element.GetDimension())
+            // Is he alive?
+            if (!Player.IsDead())
             {
-                // Is he alive?
-                if (!Player.IsDead())
-                {
-                    // Call the onPickupLeave event
-                    CLuaArguments Arguments;
-                    Arguments.PushElement(&Player);
-                    CallEvent("onPickupLeave", Arguments);
+                // Call the onPickupLeave event
+                CLuaArguments Arguments;
+                Arguments.PushElement(&Player);
+                Arguments.PushBoolean(GetDimension() == Element.GetDimension());
+                CallEvent("onPickupLeave", Arguments);
 
-                    CLuaArguments Arguments2;
-                    Arguments2.PushElement(this);            // pickup
-                    Element.CallEvent("onPlayerPickupLeave", Arguments2);
-                }
+                CLuaArguments Arguments2;
+                Arguments2.PushElement(this);            // pickup
+                Arguments2.PushBoolean(GetDimension() == Element.GetDimension());
+                Element.CallEvent("onPlayerPickupLeave", Arguments2);
             }
         }
     }
