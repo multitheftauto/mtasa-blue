@@ -15,9 +15,9 @@
 
 using namespace lunasvg;
 
-class CClientVectorGraphic : public CClientRenderElement
+class CClientVectorGraphic : public CClientTexture
 {
-    DECLARE_CLASS(CClientVectorGraphic, CClientRenderElement)
+    DECLARE_CLASS(CClientVectorGraphic, CClientTexture)
 public:
     CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pWebBrowserItem);
     ~CClientVectorGraphic();

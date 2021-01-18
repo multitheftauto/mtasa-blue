@@ -11,10 +11,8 @@
 #include "StdInc.h"
 #include <svgdocument.h>
 
-using namespace lunasvg;
-
 CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
-    : ClassInit(this), CClientRenderElement(pManager, ID)
+    : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
 {
     m_pDocument = nullptr;
     m_pResource = nullptr;
@@ -73,9 +71,15 @@ void CClientVectorGraphic::UpdateTexture()
 
     auto surfaceData = static_cast<byte*>(LockedRect.pBits);
     auto sourceData = static_cast<const byte*>(bitmap.data());
-    auto pitch = LockedRect.Pitch;
 
-    memcpy(surfaceData, sourceData, bitmap.width() * bitmap.height() * 4);
+    for (int y = 0; y < bitmap.height(); ++y)
+    {
+        memcpy(surfaceData, sourceData, bitmap.width() * 4);  // 4 bytes per pixel
+
+        // advance row pointers
+        sourceData += bitmap.stride();
+        surfaceData += LockedRect.Pitch;
+    }
 
     // Unlock surface
     surface->UnlockRect();
@@ -91,7 +95,7 @@ CClientVectorGraphic::~CClientVectorGraphic()
     delete m_pDocument;
     m_pDocument = nullptr;
 
-    delete m_pVectorGraphicItem;
+    m_pVectorGraphicItem->Release();
     m_pVectorGraphicItem = nullptr;
 
     delete m_pVectorGraphicDisplay;

@@ -125,6 +125,7 @@ void CVectorGraphicItem::CreateUnderlyingData()
 ////////////////////////////////////////////////////////////////
 void CVectorGraphicItem::ReleaseUnderlyingData()
 {
+    SAFE_RELEASE(m_pD3DRenderTargetSurface);
     SAFE_RELEASE(m_pD3DTexture);
 }
 

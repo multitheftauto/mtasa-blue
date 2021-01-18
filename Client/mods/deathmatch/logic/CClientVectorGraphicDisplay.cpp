@@ -21,6 +21,7 @@ CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* 
     m_fScale = 1;
     m_ulFormat = 0;
     m_bVisible = true;
+    m_bIsCleared = false;
 }
 
 CClientVectorGraphicDisplay::~CClientVectorGraphicDisplay()
