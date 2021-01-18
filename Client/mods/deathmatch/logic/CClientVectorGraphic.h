@@ -31,6 +31,8 @@ public:
     void UpdateTexture();
     void ClearTexture();
 
+    void LoadFromFile(std::string strFilePath);
+
     const bool IsDisplayCleared() { return m_pVectorGraphicDisplay->IsCleared(); }
 private:
     SVGDocument*                     m_pDocument;
@@ -38,4 +40,6 @@ private:
     CClientManager*                  m_pManager;
     CVectorGraphicItem*              m_pVectorGraphicItem;
     CClientVectorGraphicDisplay*     m_pVectorGraphicDisplay;
+
+    bool m_bHasUpdated;
 };

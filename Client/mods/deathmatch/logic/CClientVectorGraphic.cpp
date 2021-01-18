@@ -46,13 +46,13 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("y", "50%");
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
-
-    SVGElement* pCircle = m_pDocument->appendContent("<circle cx='50' cy='50' r='45'/>");
-    pCircle->setAttribute("style", "fill:#FFF;stroke:#000;stroke-width:4");
 }
 
 void CClientVectorGraphic::UpdateTexture()
 {
+    if (m_bHasUpdated)
+        return;
+
     IDirect3DSurface9* surface = m_pVectorGraphicItem->m_pD3DRenderTargetSurface;
 
     if (!surface)
@@ -63,7 +63,7 @@ void CClientVectorGraphic::UpdateTexture()
     uint width = m_pVectorGraphicItem->m_uiSizeX;
     uint height = m_pVectorGraphicItem->m_uiSizeY;
 
-    Bitmap bitmap = m_pDocument->renderToBitmap(width, height, 96.0, 0x46C2D4FF);
+    Bitmap bitmap = m_pDocument->renderToBitmap(width, height, 96.0);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
@@ -83,6 +83,8 @@ void CClientVectorGraphic::UpdateTexture()
 
     // Unlock surface
     surface->UnlockRect();
+
+    m_bHasUpdated = true;
 }
 
 void CClientVectorGraphic::ClearTexture()
@@ -90,12 +92,17 @@ void CClientVectorGraphic::ClearTexture()
     // Does nothing right now
 }
 
+void CClientVectorGraphic::LoadFromFile(std::string strFilePath)
+{
+    m_pDocument->loadFromFile(strFilePath);
+}
+
 CClientVectorGraphic::~CClientVectorGraphic()
 {
     delete m_pDocument;
     m_pDocument = nullptr;
 
-    m_pVectorGraphicItem->Release();
+    delete m_pVectorGraphicItem;
     m_pVectorGraphicItem = nullptr;
 
     delete m_pVectorGraphicDisplay;

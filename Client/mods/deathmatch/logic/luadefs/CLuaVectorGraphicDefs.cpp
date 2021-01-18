@@ -35,9 +35,11 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
 {
     //  texture svgCreate ( int width, int height )
     CVector2D vecSize;
+    SString   path;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecSize);
+    argStream.ReadString(path, "");
 
     if (!argStream.HasErrors())
     {
@@ -64,6 +66,7 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
 
             CClientVectorGraphic* pVectorGraphic =
                 g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic((int)vecSize.fX, (int)vecSize.fY);
+
             if (pVectorGraphic)
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -71,6 +74,14 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
 
                 // Set our owner resource
                 pVectorGraphic->SetResource(pParentResource);
+
+                // Try and load from the filepath or svg data (if provided)
+                std::string strPath;
+                if (CResourceManager::ParseResourcePathInput(path, pParentResource, &strPath))
+                {
+                    if (FileExists(strPath))
+                        pVectorGraphic->LoadFromFile(strPath);
+                }
             }
             lua_pushelement(luaVM, pVectorGraphic);
             return 1;
