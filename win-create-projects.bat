@@ -1,5 +1,8 @@
 @echo off
 
+rem Update v8
+utils\premake5.exe install_v8
+
 rem Update CEF eventually
 utils\premake5.exe install_cef
 

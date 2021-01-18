@@ -16,6 +16,7 @@
 #include "../utils/CFunctionUseLogger.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
+#include "../../../launcher/CDynamicLibrary.h"
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -491,6 +492,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pASE = NULL;
     IsMainThread();
 
+    CDynamicLibrary v8Dll;
+    v8Dll.Load("v8_d.dll");
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot();
 

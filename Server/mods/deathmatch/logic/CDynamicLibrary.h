@@ -2,8 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CDynamicLibrary.h
- *  PURPOSE:     Header for dynamic library class
+ *  FILE:        launcher/CDynamicLibrary.h
+ *  PURPOSE:     Dynamic library handling class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *

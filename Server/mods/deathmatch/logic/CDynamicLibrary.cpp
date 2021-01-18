@@ -2,14 +2,17 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CDynamicLibrary.cpp
- *  PURPOSE:     Dynamic libraries loader
+ *  FILE:        launcher/CDynamicLibrary.cpp
+ *  PURPOSE:     Dynamic library handling class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-#include <StdInc.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include "CDynamicLibrary.h"
 
 CDynamicLibrary::CDynamicLibrary()
@@ -31,24 +34,14 @@ bool CDynamicLibrary::Load(const char* szFilename)
 
     // Load the new library
     #ifdef WIN32
-    // Search at the same path for dependencies (path must be abslolute)
-    m_hModule = LoadLibraryEx(szFilename, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-
-    if (!m_hModule)
-    {
-        DWORD dwError = GetLastError();
-        char  szError[2048] = {0};
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwError, LANG_NEUTRAL, szError, sizeof(szError), NULL);
-        CLogger::ErrorPrintf("Could not load %s - %s", szFilename, szError);
-    }
-
+    m_hModule = LoadLibrary(szFilename);
     #else
     m_hModule = dlopen(szFilename, RTLD_NOW);
 
     // Output error if needed
     if (!m_hModule)
     {
-        CLogger::ErrorPrintf("Could not load %s - %s", szFilename, dlerror());
+        printf("%s\n", dlerror());
     }
     #endif
 
