@@ -2,16 +2,20 @@
 
 using namespace v8;
 
-CV8Isolate::CV8Isolate()
+CV8Isolate::CV8Isolate(std::string& originResource)
 {
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     m_pIsolate = Isolate::New(m_createParams);
+    m_strOriginResource = originResource;
 }
 
-void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch)
+void CV8Isolate::ReportException(v8::Isolate* isolate, v8::TryCatch* tryCatch)
 {
-    String::Utf8Value utf8(isolate, try_catch->Exception());
-    printf("%s\n", *utf8);
+    String::Utf8Value      utf8(isolate, tryCatch->Exception());
+    v8::Local<v8::Message> message = tryCatch->Message();
+    int line = message->GetLineNumber(isolate->GetCurrentContext()).FromJust();
+    int column = message->GetEndColumn(isolate->GetCurrentContext()).FromJust();
+    printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
 }
 
 void CV8Isolate::RunCode(std::string& code)
@@ -31,7 +35,7 @@ void CV8Isolate::RunCode(std::string& code)
 
     // Create a string containing the JavaScript source code.
     Local<String> source = String::NewFromUtf8(m_pIsolate, code.c_str(), NewStringType::kNormal).ToLocalChecked();
-    Local<String> resourceName = String::NewFromUtf8(m_pIsolate, "Foo resource", NewStringType::kNormal).ToLocalChecked();
+    Local<String> resourceName = String::NewFromUtf8(m_pIsolate, m_strOriginResource.c_str(), NewStringType::kNormal).ToLocalChecked();
     // Compile the source code.
     ScriptOrigin  origin(resourceName);
     v8::TryCatch          tryCatch(m_pIsolate);

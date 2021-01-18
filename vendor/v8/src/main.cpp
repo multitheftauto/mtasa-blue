@@ -19,6 +19,7 @@ MTAEXPORT CV8Base* Run()
 {
     CV8* v8 = new CV8();
     std::string code("typeof NaN = number");
-    v8->CreateIsolate(code);
+    std::string origin("patrikCode.js");
+    v8->CreateIsolate(code, origin);
     return v8;
 }
