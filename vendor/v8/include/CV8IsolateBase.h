@@ -1,0 +1,4 @@
+class CV8IsolateBase
+{
+
+};

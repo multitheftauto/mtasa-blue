@@ -109,6 +109,44 @@ bool CModManagerImpl::Load(const char* szModName, int iArgumentCount, char* szAr
     return true;
 }
 
+bool CModManagerImpl::LoadV8(const char* szModName)
+{
+    // Fail if no server path is specified
+    if (m_strServerPath == "")
+        return false;
+
+    // Make the string path to the mod library
+    m_strModPath = SString("%s/mods/%s", m_strServerPath.c_str(), szModName);
+
+    SString strLibFilename("%s%s", szModName, MTA_LIB_SUFFIX MTA_LIB_EXTENSION);
+    SString strFilename = PathJoin(m_strServerPath, SERVER_BIN_PATH_MOD, strLibFilename);
+
+    // Attempt to load it
+    if (!m_Library.Load(strFilename))
+    {
+        // Failed
+        Print("\nERROR: Loading mod (%s) failed!\n", strFilename.c_str());
+        return false;
+    }
+
+    // Grab the initialization procedure
+    // CV8Base* Run()
+    InitV8* pV8Base = (InitV8*)(m_Library.GetProcedureAddress("Run"));
+    if (!pV8Base)
+    {
+        // Unload the library
+        m_Library.Unload();
+
+        // Report the error
+        Print("\nERROR: Bad file: %s!\n", strFilename.c_str());
+        return false;
+    }
+    pV8Base();
+
+    // Success
+    return true;
+}
+
 void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
 {
     // Got a mod loaded?

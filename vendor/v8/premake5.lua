@@ -4,6 +4,9 @@ project "v8"
 	kind "SharedLib"
 	--kind "StaticLib"
 	targetdir(buildpath("server/mods/deathmatch"))
+	
+	pchheader "StdInc.h"
+	pchsource "StdInc.cpp"
 
 	vpaths { 
 		["Headers"] = "**.h",
@@ -16,8 +19,9 @@ project "v8"
 		"src/**.cpp",
 		"include/**.h",
 		"v8/**.h",
-		--"v8/v8/buildtools/third_party/libc++/trunk/include/**"
-		--"v8/src/**.cc",
+		
+		"StdInc.h",
+		"StdInc.cpp",
 	}
 	
 	--linkoptions {
@@ -26,6 +30,7 @@ project "v8"
 	
 	includedirs {
 		".",
+		"./include",
 		"./sources",
 		"./sources/include",
 		--"./v8/v8/buildtools/third_party/libc++/trunk",

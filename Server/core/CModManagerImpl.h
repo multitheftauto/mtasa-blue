@@ -20,6 +20,7 @@ class CModManagerImpl;
 #include "CServerImpl.h"
 
 typedef CServerBase*(InitServer)();
+typedef void*(InitV8)();
 
 class CModManagerImpl : public CModManager
 {
@@ -39,6 +40,7 @@ public:
     CServerBase* GetCurrentMod();
 
     bool Load(const char* szModName, int iArgumentCount, char* szArguments[]);
+    bool LoadV8(const char* szModName);
     void Unload(bool bKeyPressBeforeTerm = false);
 
     void HandleInput(const char* szCommand);
