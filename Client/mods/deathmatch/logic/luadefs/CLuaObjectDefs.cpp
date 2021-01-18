@@ -23,6 +23,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"isObjectBreakable", IsObjectBreakable},
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
+        {"isObjectMoving", IsObjectMoving},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -58,12 +59,14 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
+    lua_classfunction(luaVM, "isMoving", "isObjectMoving");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "setMass", "setObjectMass");
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
+    lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "mass", "setObjectMass", "getObjectMass");
@@ -206,6 +209,27 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaObjectDefs::IsObjectMoving(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CClientEntity*   pEntity;
+
+    argStream.ReadUserData(pEntity);
+    if (!argStream.HasErrors())
+    {
+        bool bIsMoving;
+        if (CStaticFunctionDefinitions::IsObjectMoving(*pEntity, bIsMoving))
+        {
+            lua_pushboolean(luaVM, bIsMoving);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     return 1;
 }
 

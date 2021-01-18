@@ -86,6 +86,8 @@ void CDeathmatchObject::_StopMovement(bool a_bUnregister)
         }
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
+        CLuaArguments Arguments;
+        this->CallEvent("onClientObjectMoveFinish", Arguments, true);
     }
 }
 
@@ -95,6 +97,14 @@ void CDeathmatchObject::UpdateMovement()
     bool              bStillRunning = m_pMoveAnimation->GetValue(positionRotation);
 
     SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
+
+    CLuaArguments Arguments;
+    CVector       currentPosition;
+    this->GetPosition(currentPosition);
+    Arguments.PushNumber(currentPosition.fX);
+    Arguments.PushNumber(currentPosition.fY);
+    Arguments.PushNumber(currentPosition.fZ);
+    this->CallEvent("onClientObjectMove", Arguments, true);
 
     if (!bStillRunning)
     {

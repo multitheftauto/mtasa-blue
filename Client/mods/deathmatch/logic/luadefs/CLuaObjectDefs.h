@@ -23,6 +23,7 @@ public:
 
     // Object get funcs
     LUA_DECLARE(IsObjectStatic);
+    LUA_DECLARE(IsObjectMoving);
     LUA_DECLARE(GetObjectScale);
     LUA_DECLARE(IsObjectBreakable);
     LUA_DECLARE(GetObjectMass);

@@ -2598,6 +2598,8 @@ void CClientGame::AddBuiltInEvents()
     // Object events
     m_Events.AddEvent("onClientObjectDamage", "loss, attacker", NULL, false);
     m_Events.AddEvent("onClientObjectBreak", "attacker", NULL, false);
+    m_Events.AddEvent("onClientObjectMove", "x, y, z", NULL, false);
+    m_Events.AddEvent("onClientObjectMoveFinish", "", NULL, false);
 
     // Web events
     m_Events.AddEvent("onClientBrowserWhitelistChange", "newPages", NULL, false);
