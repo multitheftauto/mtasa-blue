@@ -69,4 +69,7 @@ public:
     LUA_DECLARE(SetRadioChannel);
     LUA_DECLARE(GetRadioChannel);
     LUA_DECLARE(GetRadioChannelName);
+
+    LUA_DECLARE(ShowSound);
+    LUA_DECLARE(IsShowSoundEnabled);
 };
