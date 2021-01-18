@@ -26,7 +26,7 @@ CONDITIONAL COMPILATION :
 
 #include "StdInc.h"
 #include "CrashHandler.h"
-#include <detours.h>
+#include <SharedUtil.Detours.h>
 
 /*//////////////////////////////////////////////////////////////////////
                       File Scope Global Variables
@@ -110,11 +110,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
             static_assert(std::is_same_v<decltype(RedirectedSetUnhandledExceptionFilter), decltype(&SetUnhandledExceptionFilter)>,
                           "invalid type of RedirectedSetUnhandledExceptionFilter");
 
-            PVOID Win32SetUnhandledExceptionFilter = DetourFindFunction("Kernel32.dll", "SetUnhandledExceptionFilter");
-            DetourTransactionBegin();
-            DetourUpdateThread(GetCurrentThread());
-            DetourAttach(&(PVOID&)Win32SetUnhandledExceptionFilter, RedirectedSetUnhandledExceptionFilter);
-            DetourTransactionCommit();
+            DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
         }
     }
     return (TRUE);

@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <detours.h>
+#include <SharedUtil.Detours.h>
 
 template <>
 CDirectInputHook8* CSingleton<CDirectInputHook8>::m_pSingleton = NULL;
@@ -74,12 +74,7 @@ HRESULT CDirectInputHook8::API_DirectInput8Create(HINSTANCE hinst, DWORD dwVersi
 
 bool CDirectInputHook8::ApplyHook()
 {
-    // Hook DirectInput8Create.
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    m_pfnDirectInputCreate = reinterpret_cast<decltype(m_pfnDirectInputCreate)>(DetourFindFunction("DINPUT8.DLL", "DirectInput8Create"));
-    DetourAttach(&reinterpret_cast<PVOID&>(m_pfnDirectInputCreate), API_DirectInput8Create);
-    return DetourTransactionCommit() == NO_ERROR;
+    return DetourLibraryFunction("dinput8.dll", "DirectInput8Create", m_pfnDirectInputCreate, API_DirectInput8Create);
 }
 
 bool CDirectInputHook8::RemoveHook()
@@ -87,11 +82,7 @@ bool CDirectInputHook8::RemoveHook()
     // Make sure we should be doing this.
     if (m_pfnDirectInputCreate != NULL)
     {
-        // Unhook Direct3DCreate9.
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-        DetourDetach(&reinterpret_cast<PVOID&>(m_pfnDirectInputCreate), API_DirectInput8Create);
-        DetourTransactionCommit();
+        UndoFunctionDetour(m_pfnDirectInputCreate, API_DirectInput8Create);
 
         // Unset our hook variable.
         m_pfnDirectInputCreate = NULL;

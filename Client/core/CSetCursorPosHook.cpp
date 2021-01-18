@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <detours.h>
+#include <SharedUtil.Detours.h>
 
 template <>
 CSetCursorPosHook* CSingleton<CSetCursorPosHook>::m_pSingleton = NULL;
@@ -35,12 +35,7 @@ CSetCursorPosHook::~CSetCursorPosHook()
 
 void CSetCursorPosHook::ApplyHook()
 {
-    // Hook SetCursorPos
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    m_pfnSetCursorPos = reinterpret_cast<decltype(m_pfnSetCursorPos)>(DetourFindFunction("User32.dll", "SetCursorPos"));
-    DetourAttach(&reinterpret_cast<PVOID&>(m_pfnSetCursorPos), API_SetCursorPos);
-    DetourTransactionCommit();
+    DetourLibraryFunction("user32.dll", "SetCursorPos", m_pfnSetCursorPos, API_SetCursorPos);
 }
 
 void CSetCursorPosHook::RemoveHook()
@@ -48,10 +43,7 @@ void CSetCursorPosHook::RemoveHook()
     // Remove hook
     if (m_pfnSetCursorPos)
     {
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-        DetourDetach(&reinterpret_cast<PVOID&>(m_pfnSetCursorPos), API_SetCursorPos);
-        DetourTransactionCommit();
+        UndoFunctionDetour(m_pfnSetCursorPos, API_SetCursorPos);
     }
 
     // Reset variables

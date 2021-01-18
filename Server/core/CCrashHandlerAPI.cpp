@@ -28,7 +28,7 @@ CONDITIONAL COMPILATION :
 #ifdef WIN32
 
 #ifndef _WIN64
-    #include <detours.h>
+    #include <SharedUtil.Detours.h>
 #endif
 
 /*//////////////////////////////////////////////////////////////////////
@@ -114,11 +114,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
             static_assert(std::is_same_v<decltype(RedirectedSetUnhandledExceptionFilter), decltype(&SetUnhandledExceptionFilter)>,
                           "invalid type of RedirectedSetUnhandledExceptionFilter");
 
-            PVOID Win32SetUnhandledExceptionFilter = DetourFindFunction("Kernel32.dll", "SetUnhandledExceptionFilter");
-            DetourTransactionBegin();
-            DetourUpdateThread(GetCurrentThread());
-            DetourAttach(&(PVOID&)Win32SetUnhandledExceptionFilter, RedirectedSetUnhandledExceptionFilter);
-            DetourTransactionCommit();
+            DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
 #endif
         }
     }
