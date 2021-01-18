@@ -35,8 +35,7 @@ SString       g_strJingleBells;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-static HMODULE(WINAPI* Win32LoadLibraryA)(LPCSTR) = nullptr;
-static_assert(std::is_same_v<decltype(Win32LoadLibraryA), decltype(&LoadLibraryA)>, "invalid type of Win32LoadLibraryA");
+static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
