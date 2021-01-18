@@ -70,6 +70,6 @@ public:
     LUA_DECLARE(GetRadioChannel);
     LUA_DECLARE(GetRadioChannelName);
 
-    LUA_DECLARE(ShowSound);
-    LUA_DECLARE(IsShowSoundEnabled);
+    static bool ShowSound(bool state);
+    static bool IsShowSoundEnabled();
 };

@@ -682,11 +682,11 @@ public:
     static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex);
 
     // Shape dev functions
-    static bool SetShowCollision(const bool fShowState);
+    static bool SetShowCollision(bool show);
     static bool IsShowCollisionsEnabled();
 
     // Sound dev functions
-    static bool SetShowSound(const bool fShowState);
+    static bool SetShowSound(bool show);
     static bool IsShowSoundEnabled();
 
     // Weapon funcs

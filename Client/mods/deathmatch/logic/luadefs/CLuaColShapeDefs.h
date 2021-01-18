@@ -39,8 +39,8 @@ public:
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
 
-    LUA_DECLARE(SetShowCollision);
-    LUA_DECLARE(IsShowCollisionsEnabled);
+    static bool SetShowCollision(bool state);
+    static bool IsShowCollisionsEnabled();
 
     static std::tuple<float, float> GetColPolygonHeight(CClientColPolygon* pColPolygon);
     static bool                     SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);

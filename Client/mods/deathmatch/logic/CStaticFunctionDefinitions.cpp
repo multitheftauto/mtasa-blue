@@ -7404,12 +7404,12 @@ bool CStaticFunctionDefinitions::IsInsideColShape(CClientColShape* pColShape, co
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetShowCollision(const bool fShowState)
+bool CStaticFunctionDefinitions::SetShowCollision(bool show)
 {
     if (!g_pClientGame->GetDevelopmentMode())
         return false;
 
-    g_pClientGame->SetShowCollision(fShowState);
+    g_pClientGame->SetShowCollision(show);
     return true;
 }
 
@@ -7418,12 +7418,12 @@ bool CStaticFunctionDefinitions::IsShowCollisionsEnabled()
     return g_pClientGame->GetShowCollision();
 }
 
-bool CStaticFunctionDefinitions::SetShowSound(const bool fShowState)
+bool CStaticFunctionDefinitions::SetShowSound(bool show)
 {
     if (!g_pClientGame->GetDevelopmentMode())
         return false;
 
-    g_pClientGame->SetShowSound(fShowState);
+    g_pClientGame->SetShowSound(show);
     return true;
 }
 

@@ -67,8 +67,8 @@ void CLuaAudioDefs::LoadFunctions()
         {"getRadioChannelName", GetRadioChannelName},
 
         // Dev funcs
-        {"showSound", ShowSound},
-        {"isShowSoundEnabled", IsShowSoundEnabled}
+        {"showSound", ArgumentParser<ShowSound>},
+        {"isShowSoundEnabled", ArgumentParser<IsShowSoundEnabled>}
     };
 
     // Add functions
@@ -1809,20 +1809,12 @@ int CLuaAudioDefs::GetRadioChannelName(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAudioDefs::ShowSound(lua_State* luaVM)
+bool CLuaAudioDefs::ShowSound(bool state)
 {
-    bool             fShowState;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(fShowState);
-
-    CStaticFunctionDefinitions::SetShowSound(fShowState);
-    lua_pushboolean(luaVM, true);
-    return 1;
+    return CStaticFunctionDefinitions::SetShowSound(state);
 }
 
-int CLuaAudioDefs::IsShowSoundEnabled(lua_State* luaVM)
+bool CLuaAudioDefs::IsShowSoundEnabled()
 {
-    bool fShowSound = CStaticFunctionDefinitions::IsShowSoundEnabled();
-    lua_pushboolean(luaVM, fShowSound);
-    return 1;
+    return CStaticFunctionDefinitions::IsShowSoundEnabled();
 }

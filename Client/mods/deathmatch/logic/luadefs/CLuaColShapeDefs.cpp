@@ -37,8 +37,8 @@ void CLuaColShapeDefs::LoadFunctions()
         {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
         {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
 
-        {"showCol", SetShowCollision},
-        {"isShowCollisionsEnabled", IsShowCollisionsEnabled}
+        {"showCol", ArgumentParser<SetShowCollision>},
+        {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}
     };
 
     // Add functions
@@ -853,20 +853,12 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
     return false;
 }
 
-int CLuaColShapeDefs::SetShowCollision(lua_State* luaVM)
+bool CLuaColShapeDefs::SetShowCollision(bool state)
 {
-    bool             fShowState;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(fShowState);
-
-    CStaticFunctionDefinitions::SetShowCollision(fShowState);
-    lua_pushboolean(luaVM, true);
-    return 1;
+    return CStaticFunctionDefinitions::SetShowCollision(state);
 }
 
-int CLuaColShapeDefs::IsShowCollisionsEnabled(lua_State* luaVM)
+bool CLuaColShapeDefs::IsShowCollisionsEnabled()
 {
-    bool fColShapeShow = CStaticFunctionDefinitions::IsShowCollisionsEnabled();
-    lua_pushboolean(luaVM, fColShapeShow);
-    return 1;
+    return CStaticFunctionDefinitions::IsShowCollisionsEnabled();
 }
