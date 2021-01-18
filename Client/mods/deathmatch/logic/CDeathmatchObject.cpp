@@ -98,19 +98,22 @@ void CDeathmatchObject::UpdateMovement()
 
     SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
 
-    CLuaArguments Arguments;
-    CVector       currentPosition;
-    this->GetPosition(currentPosition);
-    Arguments.PushNumber(currentPosition.fX);
-    Arguments.PushNumber(currentPosition.fY);
-    Arguments.PushNumber(currentPosition.fZ);
-    this->CallEvent("onClientObjectMove", Arguments, true);
 
     if (!bStillRunning)
     {
         _StopMovement(false);            // We don't unregister ourselves here since CDeathmatchObject::UpdateMovement is called from an iteration in
                                          // CMovingObjectsManager::DoPulse
         // and we are automatically removed from the list after CDeathmatchObject::UpdateMovement if we are finished
+    }
+    else
+    {
+        CLuaArguments Arguments;
+        CVector       currentPosition;
+        this->GetPosition(currentPosition);
+        Arguments.PushNumber(currentPosition.fX);
+        Arguments.PushNumber(currentPosition.fY);
+        Arguments.PushNumber(currentPosition.fZ);
+        this->CallEvent("onClientObjectMove", Arguments, true);
     }
 }
 
