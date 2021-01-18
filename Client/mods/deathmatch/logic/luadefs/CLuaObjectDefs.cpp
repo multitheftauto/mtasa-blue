@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaObjectDefs::LoadFunctions()
 {
@@ -23,7 +24,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"isObjectBreakable", IsObjectBreakable},
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
-        {"isObjectMoving", IsObjectMoving},
+        {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -212,25 +213,9 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
     return 1;
 }
 
-int CLuaObjectDefs::IsObjectMoving(lua_State* luaVM)
+bool CLuaObjectDefs::IsObjectMoving(CClientEntity* pEntity)
 {
-    CScriptArgReader argStream(luaVM);
-    CClientEntity*   pEntity;
-
-    argStream.ReadUserData(pEntity);
-    if (!argStream.HasErrors())
-    {
-        bool bIsMoving;
-        if (CStaticFunctionDefinitions::IsObjectMoving(*pEntity, bIsMoving))
-        {
-            lua_pushboolean(luaVM, bIsMoving);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    return 1;
+    return CStaticFunctionDefinitions::IsObjectMoving(*pEntity);
 }
 
 int CLuaObjectDefs::GetObjectMass(lua_State* luaVM)

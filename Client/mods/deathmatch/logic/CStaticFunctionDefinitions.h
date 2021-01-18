@@ -273,7 +273,7 @@ public:
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
-    static bool           IsObjectMoving(CClientEntity& Entity, bool& bIsMoving);
+    static bool           IsObjectMoving(CClientEntity& Entity);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
     static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
     static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);

@@ -23,7 +23,7 @@ public:
 
     // Object get funcs
     LUA_DECLARE(IsObjectStatic);
-    LUA_DECLARE(IsObjectMoving);
+    static bool IsObjectMoving(CClientEntity* pEntity);
     LUA_DECLARE(GetObjectScale);
     LUA_DECLARE(IsObjectBreakable);
     LUA_DECLARE(GetObjectMass);

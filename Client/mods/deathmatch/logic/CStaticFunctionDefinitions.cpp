@@ -3865,14 +3865,17 @@ bool CStaticFunctionDefinitions::IsObjectBreakable(CClientObject& Object, bool& 
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsObjectMoving(CClientEntity& Entity, bool& bIsMoving)
+bool CStaticFunctionDefinitions::IsObjectMoving(CClientEntity& Entity)
 {
     CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+    bool               bIsMoving;
+
     if (IS_OBJECT(&Entity))
-    {
         bIsMoving = Object.IsMoving();
-    }
-    return true;
+    else
+        bIsMoving = false;
+
+    return bIsMoving;
 }
 
 bool CStaticFunctionDefinitions::GetObjectMass(CClientObject& Object, float& fMass)
