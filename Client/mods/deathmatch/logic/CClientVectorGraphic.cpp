@@ -48,11 +48,12 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("height", strHeight);
 }
 
-std::variant<bool, int, std::string> CClientVectorGraphic::AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width,                         std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill)
+std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width,                         std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill)
 {
     SVGElement* rootElement = m_pDocument->rootElement();
 
-    SString rectSVGNode = SString("<rect x='%s' y='%s' width='%s' height='%s' rx='%s' ry='%s' pathLength='%s' fill='%s' color='%s' data-id='%s' />",
+    // There has to be a better way to do this (:
+    SString rectSVGNode = SString("<rect x='%s' y='%s' width='%s' height='%s' rx='%s' ry='%s' pathLength='%s' fill='%s' data-id='%s' />",
         (x.index() == 0) ? std::to_string(std::get<float>(x)).c_str() : std::get<string>(x).c_str(),
         (y.index() == 0) ? std::to_string(std::get<float>(y)).c_str() : std::get<string>(y).c_str(),
         (width.index() == 0) ? std::to_string(std::get<float>(width)).c_str() : std::get<string>(width).c_str(),
@@ -61,15 +62,35 @@ std::variant<bool, int, std::string> CClientVectorGraphic::AddRect(std::variant<
         (ry.index() == 0) ? std::to_string(std::get<float>(ry)).c_str() : std::get<string>(ry).c_str(),
         std::to_string(pathLength).c_str(),
         fill.c_str(),
-        color.c_str(),
         std::to_string(++m_iShapeCount).c_str());
 
     m_pDocument->appendContent(rectSVGNode.c_str());
 
     m_bHasUpdated = false;
                             
-    return rectSVGNode;
+    return m_iShapeCount;
 }
+
+std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std::string> cx, std::variant<float, std::string> cy, float radius, float pathLength, std::string fill)
+{
+    SVGElement* rootElement = m_pDocument->rootElement();
+
+    // There has to be a better way to do this (:
+    SString rectSVGNode = SString("<circle cx='%s' cy='%s' r='%s' pathLength='%s' fill='%s' data-id='%s' />",
+        (cx.index() == 0) ? std::to_string(std::get<float>(cx)).c_str() : std::get<string>(cx).c_str(),
+        (cy.index() == 0) ? std::to_string(std::get<float>(cy)).c_str() : std::get<string>(cy).c_str(),
+        std::to_string(radius).c_str(),
+        std::to_string(pathLength).c_str(),
+        fill.c_str(),
+        std::to_string(++m_iShapeCount).c_str());
+
+    m_pDocument->appendContent(rectSVGNode.c_str());
+
+    m_bHasUpdated = false;
+                            
+    return m_iShapeCount;
+}
+
 
 void CClientVectorGraphic::UpdateTexture()
 {
