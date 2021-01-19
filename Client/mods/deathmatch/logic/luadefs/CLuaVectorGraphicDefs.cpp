@@ -2,7 +2,6 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/mods/deathmatch/logic/luadefs/CLuaVectorGraphicDefs.cpp
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
