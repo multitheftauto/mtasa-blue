@@ -41,10 +41,15 @@ public:
 
     void Render();
 
+    void UpdateTexture();
+    void ClearTexture();
+
     static void SetGlobalScale(float fScale) { m_fGlobalScale = fScale; }
 
     const bool IsCleared() { return m_bIsCleared; }
+    const bool HasUpdated() { return m_bHasUpdated; }
 
+    void Update();
 private:
     CClientVectorGraphic* m_pVectorGraphic;
     SString m_strCaption;
@@ -56,4 +61,5 @@ private:
     static float m_fGlobalScale;
 
     bool m_bIsCleared;
+    bool m_bHasUpdated;
 };

@@ -28,8 +28,6 @@ public:
     eClientEntityType GetType() const { return CCLIENTVECTORGRAPHIC; }
 
     void CreateDocument();
-    void UpdateTexture();
-    void ClearTexture();
 
     std::variant<bool, int> AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width, std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill);
 
@@ -39,6 +37,9 @@ public:
 
     void       Destroy();
     const bool IsDestroyed();
+
+    SVGDocument*        GetSVGDocument() { return m_pDocument; }
+    CVectorGraphicItem* GetRenderItem() { return m_pVectorGraphicItem; }
 
     const bool IsDisplayCleared() { return m_pVectorGraphicDisplay->IsCleared(); }
 private:
@@ -50,6 +51,5 @@ private:
 
     int m_iShapeCount;
     
-    bool m_bHasUpdated;
     bool m_bIsDestroyed;
 };

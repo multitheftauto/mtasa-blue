@@ -21,11 +21,9 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     m_pRenderItem = pVectorGraphicItem; // This is cast to CClientRenderItem
     m_pVectorGraphicItem = pVectorGraphicItem; // Keep this as CVectorGraphicItem so we don't have to cast everywhere later on...
 
-    CreateDocument();
-
     m_pVectorGraphicDisplay = new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this);
 
-    UpdateTexture();
+    CreateDocument();
 }
 
 void CClientVectorGraphic::CreateDocument()
@@ -49,7 +47,7 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
 
-    m_bHasUpdated = true;
+    m_pVectorGraphicDisplay->Update();
 }
 
 std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width,                         std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill)
@@ -60,7 +58,7 @@ std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::s
     SVGElement* rootElement = m_pDocument->rootElement();
 
     // There has to be a better way to do this (:
-    SString rectSVGNode = SString("<rect x='%s' y='%s' width='%s' height='%s' rx='%s' ry='%s' pathLength='%s' fill='%s' data-id='%s' />",
+    SString rectSVGNode = SString("<rect x='%s' y='%s' width='%s' height='%s' rx='%s' ry='%s' pathLength='%s' fill='%s' id='rect%s' />",
         (x.index() == 0) ? std::to_string(std::get<float>(x)).c_str() : std::get<string>(x).c_str(),
         (y.index() == 0) ? std::to_string(std::get<float>(y)).c_str() : std::get<string>(y).c_str(),
         (width.index() == 0) ? std::to_string(std::get<float>(width)).c_str() : std::get<string>(width).c_str(),
@@ -73,7 +71,7 @@ std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::s
 
     m_pDocument->appendContent(rectSVGNode.c_str());
 
-    m_bHasUpdated = true;
+    m_pVectorGraphicDisplay->Update();
                             
     return m_iShapeCount;
 }
@@ -86,7 +84,7 @@ std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std:
     SVGElement* rootElement = m_pDocument->rootElement();
 
     // There has to be a better way to do this (:
-    SString rectSVGNode = SString("<circle cx='%s' cy='%s' r='%s' pathLength='%s' fill='%s' data-id='%s' />",
+    SString circleSVGNode = SString("<circle cx='%s' cy='%s' r='%s' pathLength='%s' fill='%s' id='circle%s' />",
         (cx.index() == 0) ? std::to_string(std::get<float>(cx)).c_str() : std::get<string>(cx).c_str(),
         (cy.index() == 0) ? std::to_string(std::get<float>(cy)).c_str() : std::get<string>(cy).c_str(),
         std::to_string(radius).c_str(),
@@ -94,76 +92,11 @@ std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std:
         fill.c_str(),
         std::to_string(++m_iShapeCount).c_str());
 
-    m_pDocument->appendContent(rectSVGNode.c_str());
+    m_pDocument->appendContent(circleSVGNode.c_str());
 
-    m_bHasUpdated = true;
+    m_pVectorGraphicDisplay->Update();
                             
     return m_iShapeCount;
-}
-
-
-void CClientVectorGraphic::UpdateTexture()
-{
-    if (IsDestroyed())
-        return;
-
-    if (!m_bHasUpdated)
-        return;
-
-    if(!m_pDocument)
-        return;
-
-    IDirect3DSurface9* surface = m_pVectorGraphicItem->m_pD3DRenderTargetSurface;
-
-    if (!surface)
-        return;
-
-    IDirect3DDevice9* device = m_pVectorGraphicItem->m_pDevice;
-
-    uint width = m_pVectorGraphicItem->m_uiSizeX;
-    uint height = m_pVectorGraphicItem->m_uiSizeY;
-
-    Bitmap bitmap = m_pDocument->renderToBitmap(width, height, 96.0);
-
-    // Lock surface
-    D3DLOCKED_RECT LockedRect;
-    surface->LockRect(&LockedRect, nullptr, 0);
-
-    auto surfaceData = static_cast<byte*>(LockedRect.pBits);
-    auto sourceData = static_cast<const byte*>(bitmap.data());
-
-    for (int y = 0; y < bitmap.height(); ++y)
-    {
-        memcpy(surfaceData, sourceData, bitmap.width() * 4);  // 4 bytes per pixel
-
-        // advance row pointers
-        sourceData += bitmap.stride();
-        surfaceData += LockedRect.Pitch;
-    }
-
-    // Unlock surface
-    surface->UnlockRect();
-
-    m_bHasUpdated = false;
-}
-
-void CClientVectorGraphic::ClearTexture()
-{
-   IDirect3DSurface9* surface = m_pVectorGraphicItem->m_pD3DRenderTargetSurface;
-
-    if (!surface)
-        return;
-
-    IDirect3DDevice9* device = m_pVectorGraphicItem->m_pDevice;
-
-    // Lock surface
-    D3DLOCKED_RECT LockedRect;
-    surface->LockRect(&LockedRect, nullptr, 0);
-
-    device->ColorFill(surface, NULL, D3DCOLOR_ARGB(0, 0, 0, 0));
-
-    // Unlock surface
-    surface->UnlockRect();
 }
 
 bool CClientVectorGraphic::LoadFromFile(std::string strFilePath)
@@ -173,7 +106,7 @@ bool CClientVectorGraphic::LoadFromFile(std::string strFilePath)
 
     if (m_pDocument->loadFromFile(strFilePath))
     {
-        m_bHasUpdated = true;
+        m_pVectorGraphicDisplay->Update();
         return true;
     }
 
