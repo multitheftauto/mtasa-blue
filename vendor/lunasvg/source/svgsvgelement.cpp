@@ -85,7 +85,8 @@ void SVGRootElement::renderToBitmap(Bitmap& bitmap, const Rect& viewBox, double 
     newState.viewPort = viewBox;
 
     context.render(next, tail);
-    state.canvas.convertToRGBA();
+    if (bitmap.colorFormat() == ColorFormat::RGBA)
+        state.canvas.convertToRGBA();
 }
 
 } // namespace lunasvg
