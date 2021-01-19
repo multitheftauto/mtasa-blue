@@ -31,6 +31,8 @@ public:
     void UpdateTexture();
     void ClearTexture();
 
+    std::variant<bool, int, std::string> AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width, std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill);
+
     void LoadFromFile(std::string strFilePath);
 
     const bool IsDisplayCleared() { return m_pVectorGraphicDisplay->IsCleared(); }
@@ -41,5 +43,7 @@ private:
     CVectorGraphicItem*              m_pVectorGraphicItem;
     CClientVectorGraphicDisplay*     m_pVectorGraphicDisplay;
 
+    int m_iShapeCount;
+    
     bool m_bHasUpdated;
 };

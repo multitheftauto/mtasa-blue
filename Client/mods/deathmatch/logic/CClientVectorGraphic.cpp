@@ -48,6 +48,29 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("height", strHeight);
 }
 
+std::variant<bool, int, std::string> CClientVectorGraphic::AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width,                         std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill)
+{
+    SVGElement* rootElement = m_pDocument->rootElement();
+
+    SString rectSVGNode = SString("<rect x='%s' y='%s' width='%s' height='%s' rx='%s' ry='%s' pathLength='%s' fill='%s' color='%s' data-id='%s' />",
+        (x.index() == 0) ? std::to_string(std::get<float>(x)).c_str() : std::get<string>(x).c_str(),
+        (y.index() == 0) ? std::to_string(std::get<float>(y)).c_str() : std::get<string>(y).c_str(),
+        (width.index() == 0) ? std::to_string(std::get<float>(width)).c_str() : std::get<string>(width).c_str(),
+        (height.index() == 0) ? std::to_string(std::get<float>(height)).c_str() : std::get<string>(height).c_str(),
+        (rx.index() == 0) ? std::to_string(std::get<float>(rx)).c_str() : std::get<string>(rx).c_str(),
+        (ry.index() == 0) ? std::to_string(std::get<float>(ry)).c_str() : std::get<string>(ry).c_str(),
+        std::to_string(pathLength).c_str(),
+        fill.c_str(),
+        color.c_str(),
+        std::to_string(++m_iShapeCount).c_str());
+
+    m_pDocument->appendContent(rectSVGNode.c_str());
+
+    m_bHasUpdated = false;
+                            
+    return rectSVGNode;
+}
+
 void CClientVectorGraphic::UpdateTexture()
 {
     if (m_bHasUpdated)

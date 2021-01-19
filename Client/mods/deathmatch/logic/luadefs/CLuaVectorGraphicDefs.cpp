@@ -15,6 +15,7 @@ void CLuaVectorGraphicDefs::LoadFunctions()
 {
    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"svgCreate", SVGCreate},
+        {"svgAddRect", ArgumentParser<SVGAddRect>},
     };
 
     // Add functions
@@ -92,4 +93,11 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, int, std::string> CLuaVectorGraphicDefs::SVGAddRect(CClientVectorGraphic* pVectorGraphic, std::variant<float, std::string> x, std::variant<float, std::string> y,
+                                                        std::variant<float, std::string> width, std::variant<float, std::string> height, std::variant<float, std::string> rx,
+                                                        std::variant<float, std::string> ry, float pathLength, std::string fill)
+{
+       return pVectorGraphic->AddRect(x, y, width, height, rx, ry, pathLength, fill);
 }
