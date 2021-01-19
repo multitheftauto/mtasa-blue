@@ -37,8 +37,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 {
     if (size.fX < 0 || size.fY < 0 || size.fX == 0 || size.fY == 0)
     {
-        m_pScriptDebugging->LogError(luaVM, "A vector graphic must be at least 1x1 in size.");
-        return nullptr;
+        throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
     }
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -64,20 +63,15 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 if (!pVectorGraphic->LoadFromFile(strPath))
                 {
                     pVectorGraphic->Destroy();
-
-                    m_pScriptDebugging->LogError(luaVM, SString("Unable to load SVG file [%s]", pathOrRawData.value().c_str()).c_str());
-                    return nullptr;
+                    throw std::invalid_argument(SString("Unable to load SVG file [%s]", pathOrRawData.value().c_str()).c_str());
                 }
-
             }
             else
             {
                 if (!pVectorGraphic->LoadFromData(pathOrRawData.value()))
                 {
                     pVectorGraphic->Destroy();
-
-                    m_pScriptDebugging->LogError(luaVM, "Unable to load SVG data");
-                    return nullptr;
+                    throw std::invalid_argument("Unable to load SVG data");
                 }
             }
         }
@@ -85,7 +79,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         return pVectorGraphic;
     }
 
-    return nullptr;
+    throw std::invalid_argument("Error occurred creating SVG element");
 }
 
 std::variant<bool, int> CLuaVectorGraphicDefs::SVGAddRect(CClientVectorGraphic* pVectorGraphic, std::variant<float, std::string> x, std::variant<float, std::string> y,
