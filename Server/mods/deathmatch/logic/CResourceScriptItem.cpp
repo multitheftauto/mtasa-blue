@@ -34,19 +34,20 @@ bool CResourceScriptItem::Start()
     FileLoad(m_strResourceFileName, buffer);
     unsigned int iSize = buffer.size();
 
-
     m_pVM = m_resource->GetVirtualMachine();
     if (iSize > 0)
     {
+        CV8Base*    v8 = g_pServerInterface->GetV8();
         switch (m_language)
         {
             case eScriptLanguage::LUA:
                 m_pVM->LoadScriptFromBuffer(&buffer.at(0), iSize, m_strResourceFileName.c_str());
                 break;
             case eScriptLanguage::JAVASCRIPT:
-                CV8Base* v8 = g_pServerInterface->GetV8();
-                std::string code(buffer.begin(), buffer.end());
-                v8->CreateIsolate(code, m_strResourceFileName);
+                v8->CreateIsolate(std::string(buffer.begin(), buffer.end()), m_strResourceFileName);
+                break;
+            case eScriptLanguage::JAVASCRIPT_MODULE:
+                v8->CreateIsolate(std::string(buffer.begin(), buffer.end()), m_strResourceFileName, true);
                 break;
         }
     }

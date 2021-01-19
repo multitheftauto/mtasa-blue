@@ -7,13 +7,6 @@ const char* ToCString(const String::Utf8Value& value)
     return *value ? *value : "<string conversion failed>";
 }
 
-void Foo(const FunctionCallbackInfo<Value>& args)
-{
-    Local<String> returnStr = String::NewFromUtf8(args.GetIsolate(), "FOOO", NewStringType::kNormal).ToLocalChecked();
-
-    args.GetReturnValue().Set(returnStr);
-}
-
 CV8::CV8()
 {
     V8::InitializeICUDefaultLocation("");
@@ -32,9 +25,9 @@ CV8::~CV8()
     V8::ShutdownPlatform();
 }
 
-CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originResource)
+CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originResource, bool bModule)
 {
     CV8Isolate* pIsolate = new CV8Isolate(originResource);
-    pIsolate->RunCode(strCode);
+    pIsolate->RunCode(strCode, bModule);
     return pIsolate;
 }

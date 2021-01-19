@@ -6,10 +6,9 @@ public:
     CV8Isolate(std::string& originResource);
     ~CV8Isolate();
 
-    void RunCode(std::string& code);
-
+    void RunCode(std::string& code, bool bAsModule = false);
 private:
-    void                  ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch);
+    void                  ReportException(TryCatch* pTryCatch);
     std::string           m_strOriginResource;
     Isolate::CreateParams m_createParams;
     Isolate* m_pIsolate;
