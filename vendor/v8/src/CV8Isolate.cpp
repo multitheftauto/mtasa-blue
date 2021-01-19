@@ -46,10 +46,12 @@ void CV8Isolate::RunCode(std::string& code)
         return;
     }
     // Run the script to get the result.
-    Local<Value> result = script->Run(context).ToLocalChecked();
-    // Convert the result to an UTF8 string and print it.
-    String::Utf8Value utf8(m_pIsolate, result);
-    printf("%s\n", *utf8);
+    MaybeLocal<Value> result = script->Run(context);
+    //if (result.IsEmpty())
+    //Local<Value> result = script->Run(context).ToLocalChecked();
+    //// Convert the result to an UTF8 string and print it.
+    //String::Utf8Value utf8(m_pIsolate, result);
+    //printf("%s\n", *utf8);
 }
 
 CV8Isolate::~CV8Isolate()

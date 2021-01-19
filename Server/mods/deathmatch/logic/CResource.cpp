@@ -1670,6 +1670,17 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
         // Grab the type attribute (server / client)
         bool           bServer = true;
         bool           bClient = false;
+        CResourceScriptItem::eScriptLanguage eLanguage = CResourceScriptItem::eScriptLanguage::LUA;
+        CXMLAttribute* pLang = Attributes.Find("lang");
+        if (pLang)
+        {
+            const char* szLang = pLang->GetValue().c_str();
+            if (!stricmp(szLang, "js"))
+            {
+                eLanguage = CResourceScriptItem::eScriptLanguage::JAVASCRIPT;
+            }
+        }
+
         CXMLAttribute* pType = Attributes.Find("type");
 
         if (pType)
@@ -1717,7 +1728,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                 {
                     // Create it depending on the type (client or server or shared) and add it to the list of resource files
                     if (bServer)
-                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, eLanguage));
                     if (bClient)
                         m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
                 }
