@@ -28,6 +28,7 @@
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 char szXMLLibName[] = "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
+char szV8LibName[] = "v8" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 
 using namespace std;
 
@@ -69,6 +70,7 @@ CServerImpl::CServerImpl()
     m_uiInputCount = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
+    m_pV8 = nullptr;
 
     // Create our stuff
     m_pModManager = new CModManagerImpl(this);
@@ -93,6 +95,11 @@ CModManager* CServerImpl::GetModManager()
 CXML* CServerImpl::GetXML()
 {
     return m_pXML;
+}
+
+CV8Base* CServerImpl::GetV8()
+{
+    return m_pV8;
 }
 
 SString CServerImpl::GetAbsolutePath(const char* szRelative)
@@ -348,57 +355,75 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (m_XMLLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szXMLLibName)))
         {
-            // Grab the network interface
-            InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
-            InitXMLInterface       pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
-            if (pfnInitNetServerInterface && pfnInitXMLInterface)
+            if (m_V8Library.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szV8LibName)))
             {
-                // Call it to grab the network interface class
-                m_pNetwork = pfnInitNetServerInterface();
-                m_pXML = pfnInitXMLInterface(*m_strServerModPath);
-                if (m_pNetwork && m_pXML)
+                // Grab the network interface
+                InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
+                InitXMLInterface       pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
+                InitV8                 pfnInitV8Base = (InitV8)(m_V8Library.GetProcedureAddress("InitV8"));
+
+                if (pfnInitNetServerInterface && pfnInitXMLInterface && pfnInitV8Base)
                 {
-                    // Make the modmanager load our mod
-                    if (m_pModManager->Load("deathmatch", iArgumentCount, szArguments))            // Hardcoded for now
+                    // Call it to grab the network interface class
+                    m_pNetwork = pfnInitNetServerInterface();
+                    m_pXML = pfnInitXMLInterface(*m_strServerModPath);
+                    m_pV8 = pfnInitV8Base();
+                    if (m_pNetwork && m_pXML && m_pV8)
                     {
-                        m_pModManager->LoadV8("v8");
-                        // Enter our mainloop
-                        MainLoop();
+                        // Make the modmanager load our mod
+                        if (m_pModManager->Load("deathmatch", iArgumentCount, szArguments))            // Hardcoded for now
+                        {
+                            /*std::string code("typeof NaN = number");
+                            std::string origin("patrikCode.js");
+                            v8->CreateIsolate(code, origin);*/
+                            // Enter our mainloop
+                            MainLoop();
+                        }
+                        else
+                        {
+                            // Quit during startup?
+                            if (m_bRequestedQuit)
+                            {
+                                DestroyWindow();
+                                return ERROR_NO_ERROR;
+                            }
+
+                            // Couldn't load our mod
+                            Print("Press Q to shut down the server!\n");
+                            WaitForKey('q');
+                            DestroyWindow();
+                            return ERROR_LOADING_MOD;
+                        }
                     }
                     else
                     {
-                        // Quit during startup?
-                        if (m_bRequestedQuit)
-                        {
-                            DestroyWindow();
-                            return ERROR_NO_ERROR;
-                        }
-
-                        // Couldn't load our mod
+                        // Couldn't find the InitNetServerInterface func
+                        Print("ERROR: Initialization functions failed!\n");
                         Print("Press Q to shut down the server!\n");
                         WaitForKey('q');
                         DestroyWindow();
-                        return ERROR_LOADING_MOD;
+                        return ERROR_NETWORK_LIBRARY_FAILED;
                     }
                 }
                 else
                 {
                     // Couldn't find the InitNetServerInterface func
-                    Print("ERROR: Initialization functions failed!\n");
+                    Print("ERROR: No suitable initialization functions found!\n");
                     Print("Press Q to shut down the server!\n");
                     WaitForKey('q');
                     DestroyWindow();
                     return ERROR_NETWORK_LIBRARY_FAILED;
                 }
+
             }
             else
             {
-                // Couldn't find the InitNetServerInterface func
-                Print("ERROR: No suitable initialization functions found!\n");
+                // Couldn't load it
+                Print("ERROR: Loading V8 library (%s) failed!\n", szV8LibName);
                 Print("Press Q to shut down the server!\n");
                 WaitForKey('q');
                 DestroyWindow();
-                return ERROR_NETWORK_LIBRARY_FAILED;
+                return ERROR_OTHER;
             }
         }
         else

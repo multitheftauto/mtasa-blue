@@ -2,7 +2,17 @@
 
 using namespace v8;
 
-class CV8Isolate;
+const char* ToCString(const String::Utf8Value& value)
+{
+    return *value ? *value : "<string conversion failed>";
+}
+
+void Foo(const FunctionCallbackInfo<Value>& args)
+{
+    Local<String> returnStr = String::NewFromUtf8(args.GetIsolate(), "FOOO", NewStringType::kNormal).ToLocalChecked();
+
+    args.GetReturnValue().Set(returnStr);
+}
 
 CV8::CV8()
 {

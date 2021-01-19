@@ -28,6 +28,7 @@ class CServerImpl;
 
 typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
 typedef CNetServer* (*InitNetServerInterface)();
+typedef CV8Base*(*InitV8)();
 
 #ifdef WIN32
 typedef void(FClientFeedback)(const char* szText);
@@ -48,6 +49,7 @@ public:
     CNetServer*  GetNetwork();
     CModManager* GetModManager();
     CXML*        GetXML();
+    CV8Base*     GetV8();
 
     const char* GetServerModPath() { return m_strServerModPath; };
     SString     GetAbsolutePath(const char* szRelative);
@@ -82,9 +84,11 @@ private:
 
     CDynamicLibrary  m_NetworkLibrary;
     CDynamicLibrary  m_XMLLibrary;
+    CDynamicLibrary  m_V8Library;
     CNetServer*      m_pNetwork;
     CModManagerImpl* m_pModManager;
     CXML*            m_pXML;
+    CV8Base*         m_pV8;
 
 #ifdef WIN32
     FClientFeedback* m_fClientFeedback;

@@ -9,6 +9,8 @@
  *
  *****************************************************************************/
 
+#include "StdInc.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>

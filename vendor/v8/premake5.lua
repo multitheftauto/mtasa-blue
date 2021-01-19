@@ -3,7 +3,7 @@ project "v8"
 	targetname "v8"
 	kind "SharedLib"
 	--kind "StaticLib"
-	targetdir(buildpath("server/mods/deathmatch"))
+	targetdir(buildpath("server"))
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

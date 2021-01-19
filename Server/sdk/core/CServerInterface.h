@@ -14,6 +14,7 @@
 #include "net/CNetServer.h"
 #include "CModManager.h"
 #include <xml/CXML.h>
+#include <v8/CV8Base.h>
 
 class CServerInterface
 {
@@ -21,6 +22,7 @@ public:
     virtual CNetServer*  GetNetwork() = 0;
     virtual CModManager* GetModManager() = 0;
     virtual CXML*        GetXML() = 0;
+    virtual CV8Base*     GetV8() = 0;
 
     virtual const char* GetServerModPath() = 0;
     virtual SString     GetAbsolutePath(const char* szRelative) = 0;

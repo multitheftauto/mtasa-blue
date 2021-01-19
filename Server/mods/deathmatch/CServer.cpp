@@ -39,6 +39,12 @@ void CServer::ServerInitialize(CServerInterface* pServerInterface)
     m_pServerInterface = pServerInterface;
     g_pServerInterface = pServerInterface;
     g_pNetServer = pServerInterface->GetNetwork();
+    CV8Base* v8 = pServerInterface->GetV8();
+
+    std::string code("typeof NaN = number");
+    std::string origin("patrikCode.js");
+    v8->CreateIsolate(code, origin);
+
     g_pRealNetServer = g_pNetServer;
     #if defined(MTA_DEBUG)
     SharedUtil_Tests();
