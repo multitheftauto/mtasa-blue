@@ -1,3 +1,5 @@
+#include "CV8IsolateBase.h"
+
 class CV8Base
 {
 public:

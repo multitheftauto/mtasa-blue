@@ -141,8 +141,11 @@ bool CModManagerImpl::LoadV8(const char* szModName)
         Print("\nERROR: Bad file: %s!\n", strFilename.c_str());
         return false;
     }
-    pV8Base();
+    CV8Base* v8 = pV8Base();
 
+    std::string code("typeof NaN = number");
+    std::string origin("patrikCode.js");
+    v8->CreateIsolate(code, origin);
     // Success
     return true;
 }

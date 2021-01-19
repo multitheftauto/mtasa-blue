@@ -15,12 +15,13 @@ class CModManagerImpl;
 
 #include <core/CModManager.h>
 #include <core/CServerBase.h>
+#include <v8/CV8Base.h>
 
 #include "CDynamicLibrary.h"
 #include "CServerImpl.h"
 
 typedef CServerBase*(InitServer)();
-typedef void*(InitV8)();
+typedef CV8Base*(InitV8)();
 
 class CModManagerImpl : public CModManager
 {

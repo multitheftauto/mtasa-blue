@@ -18,8 +18,5 @@ void Foo(const FunctionCallbackInfo<Value>& args)
 MTAEXPORT CV8Base* Run()
 {
     CV8* v8 = new CV8();
-    std::string code("typeof NaN = number");
-    std::string origin("patrikCode.js");
-    v8->CreateIsolate(code, origin);
     return v8;
 }

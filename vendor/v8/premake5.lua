@@ -33,6 +33,7 @@ project "v8"
 		"./include",
 		"./sources",
 		"./sources/include",
+        "./../../Shared/sdk",
 		--"./v8/v8/buildtools/third_party/libc++/trunk",
 		--"./v8/v8/out/ia32.release/gen",
 		--"./v8/v8/buildtools/third_party/libc++/trunk/utils/google-benchmark/include"
