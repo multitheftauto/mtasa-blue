@@ -77,13 +77,34 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
                 // Set our owner resource
                 pVectorGraphic->SetResource(pParentResource);
 
-                // Try and load from the filepath or svg data (if provided)
-                std::string strPath;
-                if (CResourceManager::ParseResourcePathInput(path, pParentResource, &strPath))
+                if (!path.empty())
                 {
-                    if (FileExists(strPath))
-                        pVectorGraphic->LoadFromFile(strPath);
+                    // Try and load from the filepath or svg data (if provided)
+                    std::string strPath;
+                    if (CResourceManager::ParseResourcePathInput(path, pParentResource, &strPath) && FileExists(strPath))
+                    {
+                        if (!pVectorGraphic->LoadFromFile(strPath))
+                            pVectorGraphic->Destroy();
+                            delete pVectorGraphic;
+                            pVectorGraphic = nullptr;
+
+                            m_pScriptDebugging->LogError(luaVM, "Unable to load SVG data");
+                            lua_pushboolean(luaVM, false);
+                            return 1;
+                    }
+                    else
+                    {
+                        pVectorGraphic->Destroy();
+                        delete pVectorGraphic;
+                        pVectorGraphic = nullptr;
+
+                        m_pScriptDebugging->LogError(luaVM, SString("Unable to load SVG file [%s]", path.c_str()).c_str());
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                        
                 }
+
             }
             lua_pushelement(luaVM, pVectorGraphic);
             return 1;

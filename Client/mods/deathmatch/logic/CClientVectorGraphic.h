@@ -35,7 +35,10 @@ public:
 
     std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std::string> cx, std::variant<float, std::string> cy, float radius, float pathLength, std::string fill);
 
-    void LoadFromFile(std::string strFilePath);
+    bool LoadFromFile(std::string strFilePath);
+
+    void       Destroy();
+    const bool IsDestroyed();
 
     const bool IsDisplayCleared() { return m_pVectorGraphicDisplay->IsCleared(); }
 private:
@@ -48,4 +51,5 @@ private:
     int m_iShapeCount;
     
     bool m_bHasUpdated;
+    bool m_bIsDestroyed;
 };

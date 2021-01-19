@@ -24,6 +24,8 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     CreateDocument();
 
     m_pVectorGraphicDisplay = new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this);
+
+    UpdateTexture();
 }
 
 void CClientVectorGraphic::CreateDocument()
@@ -46,10 +48,15 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("y", "50%");
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
+
+    m_bHasUpdated = true;
 }
 
 std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width,                         std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill)
 {
+    if(!m_pDocument)
+        return false;
+
     SVGElement* rootElement = m_pDocument->rootElement();
 
     // There has to be a better way to do this (:
@@ -66,13 +73,16 @@ std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::s
 
     m_pDocument->appendContent(rectSVGNode.c_str());
 
-    m_bHasUpdated = false;
+    m_bHasUpdated = true;
                             
     return m_iShapeCount;
 }
 
 std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std::string> cx, std::variant<float, std::string> cy, float radius, float pathLength, std::string fill)
 {
+    if(!m_pDocument)
+        return false;
+
     SVGElement* rootElement = m_pDocument->rootElement();
 
     // There has to be a better way to do this (:
@@ -86,7 +96,7 @@ std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std:
 
     m_pDocument->appendContent(rectSVGNode.c_str());
 
-    m_bHasUpdated = false;
+    m_bHasUpdated = true;
                             
     return m_iShapeCount;
 }
@@ -94,7 +104,13 @@ std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std:
 
 void CClientVectorGraphic::UpdateTexture()
 {
-    if (m_bHasUpdated)
+    if (IsDestroyed())
+        return;
+
+    if (!m_bHasUpdated)
+        return;
+
+    if(!m_pDocument)
         return;
 
     IDirect3DSurface9* surface = m_pVectorGraphicItem->m_pD3DRenderTargetSurface;
@@ -128,27 +144,54 @@ void CClientVectorGraphic::UpdateTexture()
     // Unlock surface
     surface->UnlockRect();
 
-    m_bHasUpdated = true;
+    m_bHasUpdated = false;
 }
 
 void CClientVectorGraphic::ClearTexture()
 {
-    // Does nothing right now
+   IDirect3DSurface9* surface = m_pVectorGraphicItem->m_pD3DRenderTargetSurface;
+
+    if (!surface)
+        return;
+
+    IDirect3DDevice9* device = m_pVectorGraphicItem->m_pDevice;
+
+    // Lock surface
+    D3DLOCKED_RECT LockedRect;
+    surface->LockRect(&LockedRect, nullptr, 0);
+
+    device->ColorFill(surface, NULL, D3DCOLOR_ARGB(0, 0, 0, 0));
+
+    // Unlock surface
+    surface->UnlockRect();
 }
 
-void CClientVectorGraphic::LoadFromFile(std::string strFilePath)
+bool CClientVectorGraphic::LoadFromFile(std::string strFilePath)
 {
-    m_pDocument->loadFromFile(strFilePath);
+    if(!m_pDocument)
+        return false;
+
+    if (m_pDocument->loadFromFile(strFilePath))
+    {
+        m_bHasUpdated = true;
+        return true;
+    }
+
+    return false;
+}
+
+const bool CClientVectorGraphic::IsDestroyed()
+{
+    return m_bIsDestroyed;
+}
+
+void CClientVectorGraphic::Destroy()
+{
+    m_bIsDestroyed = true;
 }
 
 CClientVectorGraphic::~CClientVectorGraphic()
 {
     delete m_pDocument;
     m_pDocument = nullptr;
-
-    delete m_pVectorGraphicItem;
-    m_pVectorGraphicItem = nullptr;
-
-    delete m_pVectorGraphicDisplay;
-    m_pVectorGraphicDisplay = nullptr;
 }

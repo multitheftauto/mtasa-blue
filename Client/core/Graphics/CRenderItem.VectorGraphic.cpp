@@ -37,8 +37,8 @@ void CVectorGraphicItem::PostConstruct(CRenderItemManager* pManager, uint width,
 ////////////////////////////////////////////////////////////////
 void CVectorGraphicItem::PreDestruct()
 {
-    ReleaseUnderlyingData();
     Super::PreDestruct();
+    ReleaseUnderlyingData();
 }
 
 ////////////////////////////////////////////////////////////////

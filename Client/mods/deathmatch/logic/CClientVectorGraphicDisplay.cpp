@@ -35,6 +35,9 @@ void CClientVectorGraphicDisplay::SetPosition(const CVector& vecPosition)
 
 void CClientVectorGraphicDisplay::Render()
 {
+    if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
+        return;
+
     if (!m_bVisible)
     {
         if (!IsCleared())
