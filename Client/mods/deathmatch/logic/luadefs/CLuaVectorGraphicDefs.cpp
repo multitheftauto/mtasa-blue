@@ -84,6 +84,7 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
                     if (CResourceManager::ParseResourcePathInput(path, pParentResource, &strPath) && FileExists(strPath))
                     {
                         if (!pVectorGraphic->LoadFromFile(strPath))
+                        {
                             pVectorGraphic->Destroy();
                             delete pVectorGraphic;
                             pVectorGraphic = nullptr;
@@ -91,6 +92,8 @@ int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
                             m_pScriptDebugging->LogError(luaVM, "Unable to load SVG data");
                             lua_pushboolean(luaVM, false);
                             return 1;
+                        }
+
                     }
                     else
                     {
