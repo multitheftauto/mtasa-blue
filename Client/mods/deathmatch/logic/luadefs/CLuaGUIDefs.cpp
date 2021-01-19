@@ -2367,7 +2367,7 @@ int CLuaGUIDefs::GUIGridListAddRow(lua_State* luaVM)
                 {
                     // Grab the lua string and its size
                     const char* szLuaString = lua_tostring(luaVM, pArgument->GetIndex());
-                    size_t      sizeLuaString = lua_strlen(luaVM, pArgument->GetIndex());
+                    size_t      sizeLuaString = lua_rawlen(luaVM, pArgument->GetIndex());
 
                     // Set our string
                     strItemText.assign(szLuaString, sizeLuaString);
@@ -2433,7 +2433,7 @@ int CLuaGUIDefs::GUIGridListInsertRowAfter(lua_State* luaVM)
                 {
                     // Grab the lua string and its size
                     const char* szLuaString = lua_tostring(luaVM, pArgument->GetIndex());
-                    size_t      sizeLuaString = lua_strlen(luaVM, pArgument->GetIndex());
+                    size_t      sizeLuaString = lua_rawlen(luaVM, pArgument->GetIndex());
 
                     // Set our string
                     strItemText.assign(szLuaString, sizeLuaString);

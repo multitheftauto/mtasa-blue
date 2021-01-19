@@ -75,7 +75,7 @@ void CLuaMain::ResetInstructionCount()
 void CLuaMain::InitSecurity()
 {
     // Disable dangerous Lua Os library functions
-    static const luaL_reg osfuncs[] =
+    static const luaL_Reg osfuncs[] =
     {
         { "execute", CLuaUtilDefs::DisabledFunction },
         { "rename", CLuaUtilDefs::DisabledFunction },
@@ -86,7 +86,7 @@ void CLuaMain::InitSecurity()
         { "setlocale", CLuaUtilDefs::DisabledFunction },
         { NULL, NULL }
     };
-    luaL_register(m_luaVM, "os", osfuncs);
+    //lua_register(m_luaVM, "os", osfuncs); Disabled for now
 
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
@@ -143,20 +143,14 @@ void CLuaMain::InitVM()
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open();
+    m_luaVM = luaL_newstate();
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
     lua_sethook(m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT);
 
     // Load LUA libraries
-    luaopen_base(m_luaVM);
-    luaopen_math(m_luaVM);
-    luaopen_string(m_luaVM);
-    luaopen_table(m_luaVM);
-    luaopen_debug(m_luaVM);
-    luaopen_utf8(m_luaVM);
-    luaopen_os(m_luaVM);
+    luaL_openlibs(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();

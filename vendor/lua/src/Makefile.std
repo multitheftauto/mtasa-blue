@@ -18,7 +18,7 @@ MYCFLAGS=
 MYLDFLAGS=
 MYLIBS=
 
-SFX= 5.1
+SFX= 5.4
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
@@ -106,10 +106,10 @@ macosx:
 #	$(MAKE) all MYCFLAGS="-DLUA_USE_MACOSX -DLUA_USE_READLINE" MYLIBS="-lreadline"
 
 mingw:
-	$(MAKE) "LUA_A=lua5.1.dll" "LUA_T=lua5.1.exe" \
+	$(MAKE) "LUA_A=lua5.4.dll" "LUA_T=lua5.4.exe" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
 	"MYCFLAGS=-DLUA_BUILD_AS_DLL" "MYLIBS=" "MYLDFLAGS=-s" lua$(SFX).exe
-	$(MAKE) "LUAC_T=luac5.1.exe" luac$(SFX).exe
+	$(MAKE) "LUAC_T=luac5.4.exe" luac$(SFX).exe
 
 posix:
 	$(MAKE) all MYCFLAGS=-DLUA_USE_POSIX

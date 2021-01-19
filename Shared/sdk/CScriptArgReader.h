@@ -549,7 +549,7 @@ public:
 
         if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
-            size_t length = lua_strlen(m_luaVM, m_iIndex);
+            size_t length = lua_rawlen(m_luaVM, m_iIndex);
 
             try
             {
@@ -995,7 +995,7 @@ public:
                 int iArgument = lua_type(m_luaVM, -1);
                 if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
                 {
-                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    uint uiLength = lua_rawlen(m_luaVM, -1);
                     outList.push_back(SStringX(lua_tostring(m_luaVM, -1), uiLength));
                 }
             }
@@ -1087,7 +1087,7 @@ protected:
             SString value;
             if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
             {
-                uint uiLength = lua_strlen(m_luaVM, -1);
+                uint uiLength = lua_rawlen(m_luaVM, -1);
                 value.assign(lua_tostring(m_luaVM, -1), uiLength);
             }
             else if (valueType == LUA_TBOOLEAN)
@@ -1101,9 +1101,9 @@ protected:
                 // Dumb number -> string convertion to avoid stack perturbations
                 if (keyType == LUA_TNUMBER)
                 {
-                    char s[LUAI_MAXNUMBER2STR];
+                    char s[32];
                     lua_Number n = lua_tonumber(m_luaVM, -2);
-                    lua_number2str(s, n);
+                    lua_number2str(s, 32, n);
 
                     keyValue = std::make_pair(SStringX(s), value);
                 }
@@ -1124,12 +1124,12 @@ protected:
 
         // lua_next has a bug after it calling findindex internally
         // But we have to iterate sequentially right now. So luaL_getn is the solution.
-        for (int i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
+        for (int i = 1; i <= lua_rawlen(m_luaVM, iIndex); ++i)
         {
             lua_pushnumber(m_luaVM, i);
             lua_gettable(m_luaVM, iIndex);
 
-            if (lua_type(m_luaVM, -1) == LUA_TTABLE && luaL_getn(m_luaVM, -1) >= 2)
+            if (lua_type(m_luaVM, -1) == LUA_TTABLE && lua_rawlen(m_luaVM, -1) >= 2)
             {
                 lua_pushnumber(m_luaVM, 1);
                 lua_gettable(m_luaVM, -2);
@@ -1174,7 +1174,7 @@ protected:
                 SStringMapValue value;
                 if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
                 {
-                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    uint uiLength = lua_rawlen(m_luaVM, -1);
                     value.assign(lua_tostring(m_luaVM, -1), uiLength);
                 }
                 else if (valueType == LUA_TBOOLEAN)

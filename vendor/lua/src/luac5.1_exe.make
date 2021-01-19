@@ -8,28 +8,28 @@ endif
 ifeq ($(CONFIG),Debug)
   BINDIR := ../bin
   LIBDIR := ../lib
-  OBJDIR := ../obj/luac5.1_exe/Debug
+  OBJDIR := ../obj/luac5.4_exe/Debug
   OUTDIR := ../bin
   CPPFLAGS := -MD -DLUA_USE_POSIX -DLUA_USE_DLOPEN -DLUA_USE_READLINE -I "../include" -I "../src"
   CFLAGS += $(CPPFLAGS) -g
   CXXFLAGS := $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -Wl,-E -L"../lib" -llua5.1 -lm -ldl
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -Wl,-E -L"../lib" -llua5.4 -lm -ldl
   LDDEPS :=
-  TARGET := luac5.1
+  TARGET := luac5.4
   BLDCMD = $(CC) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES)
 endif
 
 ifeq ($(CONFIG),Release)
   BINDIR := ../bin
   LIBDIR := ../lib
-  OBJDIR := ../obj/luac5.1_exe/Release
+  OBJDIR := ../obj/luac5.4_exe/Release
   OUTDIR := ../bin
   CPPFLAGS := -MD -DLUA_USE_POSIX -DLUA_USE_DLOPEN -DLUA_USE_READLINE -I "../include" -I "../src"
   CFLAGS += $(CPPFLAGS) -O2
   CXXFLAGS := $(CFLAGS)
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -Wl,-E -L"../lib" -llua5.1 -lm -ldl
+  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -Wl,-E -L"../lib" -llua5.4 -lm -ldl
   LDDEPS :=
-  TARGET := luac5.1
+  TARGET := luac5.4
   BLDCMD = $(CC) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES)
 endif
 
@@ -53,14 +53,14 @@ endif
 .PHONY: clean
 
 $(OUTDIR)/$(TARGET): $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking luac5.1_exe
+	@echo Linking luac5.4_exe
 	-@$(CMD_MKBINDIR)
 	-@$(CMD_MKLIBDIR)
 	-@$(CMD_MKOUTDIR)
 	@$(BLDCMD)
 
 clean:
-	@echo Cleaning luac5.1_exe
+	@echo Cleaning luac5.4_exe
 	-@rm -rf $(OUTDIR)/$(TARGET) $(OBJDIR)
 
 $(OBJDIR)/luac.o: luac.c

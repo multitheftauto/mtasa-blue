@@ -202,7 +202,7 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
             {
                 // Grab the lua string and its size
                 const char* szLuaString = lua_tostring(luaVM, iArgument);
-                size_t      sizeLuaString = lua_strlen(luaVM, iArgument);
+                size_t      sizeLuaString = lua_rawlen(luaVM, iArgument);
 
                 // Set our string
                 m_strString.assign(szLuaString, sizeLuaString);
