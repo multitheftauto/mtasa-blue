@@ -145,7 +145,9 @@ void SVGDocumentImpl::render(Bitmap& bitmap, double dpi, std::uint32_t bgColor) 
     state.viewPort = Rect(0, 0, bitmap.width(), bitmap.height());
     state.dpi = dpi;
     context.render(m_rootElement, m_rootElement->tail);
-    state.canvas.convertToRGBA();
+	if(bitmap.colorFormat() == ColorFormat::RGBA) {
+		state.canvas.convertToRGBA();
+    }
 }
 
 void SVGDocumentImpl::updateIdCache(const std::string& oldValue, const std::string& newValue, SVGElementImpl* element)
