@@ -14,7 +14,7 @@
 void CLuaVectorGraphicDefs::LoadFunctions()
 {
    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"svgCreate", SVGCreate},
+        {"svgCreate", ArgumentParser<SVGCreate>},
         {"svgAddRect", ArgumentParser<SVGAddRect>},
         {"svgAddCircle", ArgumentParser<SVGAddCircle>},
     };
@@ -33,91 +33,59 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "SVG");
 }
 
-int CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM)
+CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData)
 {
-    //  texture svgCreate ( int width, int height )
-    CVector2D vecSize;
-    SString   path;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(vecSize);
-    argStream.ReadString(path, "");
-
-    if (!argStream.HasErrors())
+    if (size.fX < 0 || size.fY < 0 || size.fX == 0 || size.fY == 0)
     {
-        if (vecSize.fX < 0)
-        {
-            argStream.SetCustomError("Width is smaller than 0", "Invalid parameter");
-        }
-        else if (vecSize.fY < 0)
-        {
-            argStream.SetCustomError("Height is smaller than 0", "Invalid parameter");
-        }
-        else if (vecSize.fX == 0 || vecSize.fY == 0)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "A vector graphic must be at least 1x1 in size. This warning may be an error in future versions.");
-        }
+        m_pScriptDebugging->LogError(luaVM, "A vector graphic must be at least 1x1 in size.");
+        return nullptr;
     }
 
-    if (!argStream.HasErrors())
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CResource* pParentResource = pLuaMain->GetResource();
+
+    CClientVectorGraphic* pVectorGraphic =
+        g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic((int)size.fX, (int)size.fY);
+
+    if (pVectorGraphic)
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+        pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
+
+        // Set our owner resource
+        pVectorGraphic->SetResource(pParentResource);
+
+        if (pathOrRawData.has_value())
         {
-            CResource* pParentResource = pLuaMain->GetResource();
-
-            CClientVectorGraphic* pVectorGraphic =
-                g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic((int)vecSize.fX, (int)vecSize.fY);
-
-            if (pVectorGraphic)
+            // Try and load from the filepath or svg data (if provided)
+            std::string strPath;
+            if (CResourceManager::ParseResourcePathInput(pathOrRawData.value(), pParentResource, &strPath) && FileExists(strPath))
             {
-                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
-
-                // Set our owner resource
-                pVectorGraphic->SetResource(pParentResource);
-
-                if (!path.empty())
+                if (!pVectorGraphic->LoadFromFile(strPath))
                 {
-                    // Try and load from the filepath or svg data (if provided)
-                    std::string strPath;
-                    if (CResourceManager::ParseResourcePathInput(path, pParentResource, &strPath) && FileExists(strPath))
-                    {
-                        if (!pVectorGraphic->LoadFromFile(strPath))
-                        {
-                            pVectorGraphic->Destroy();
-                            delete pVectorGraphic;
-                            pVectorGraphic = nullptr;
+                    pVectorGraphic->Destroy();
 
-                            m_pScriptDebugging->LogError(luaVM, "Unable to load SVG data");
-                            lua_pushboolean(luaVM, false);
-                            return 1;
-                        }
-
-                    }
-                    else
-                    {
-                        pVectorGraphic->Destroy();
-                        delete pVectorGraphic;
-                        pVectorGraphic = nullptr;
-
-                        m_pScriptDebugging->LogError(luaVM, SString("Unable to load SVG file [%s]", path.c_str()).c_str());
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                        
+                    m_pScriptDebugging->LogError(luaVM, SString("Unable to load SVG file [%s]", pathOrRawData.value().c_str()).c_str());
+                    return nullptr;
                 }
 
             }
-            lua_pushelement(luaVM, pVectorGraphic);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            else
+            {
+                if (!pVectorGraphic->LoadFromData(pathOrRawData.value()))
+                {
+                    pVectorGraphic->Destroy();
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+                    m_pScriptDebugging->LogError(luaVM, "Unable to load SVG data");
+                    return nullptr;
+                }
+            }
+        }
+
+        return pVectorGraphic;
+    }
+
+    return nullptr;
 }
 
 std::variant<bool, int> CLuaVectorGraphicDefs::SVGAddRect(CClientVectorGraphic* pVectorGraphic, std::variant<float, std::string> x, std::variant<float, std::string> y,

@@ -113,6 +113,20 @@ bool CClientVectorGraphic::LoadFromFile(std::string strFilePath)
     return false;
 }
 
+bool CClientVectorGraphic::LoadFromData(std::string strData)
+{
+    if(!m_pDocument)
+        return false;
+
+    if (m_pDocument->loadFromData(strData))
+    {
+        m_pVectorGraphicDisplay->Update();
+        return true;
+    }
+
+    return false;
+}
+
 const bool CClientVectorGraphic::IsDestroyed()
 {
     return m_bIsDestroyed;

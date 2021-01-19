@@ -34,6 +34,7 @@ public:
     std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std::string> cx, std::variant<float, std::string> cy, float radius, float pathLength, std::string fill);
 
     bool LoadFromFile(std::string strFilePath);
+    bool LoadFromData(std::string strData);
 
     void       Destroy();
     const bool IsDestroyed();
