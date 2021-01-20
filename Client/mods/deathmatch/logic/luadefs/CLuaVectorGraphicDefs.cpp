@@ -15,6 +15,8 @@ void CLuaVectorGraphicDefs::LoadFunctions()
 {
    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"svgCreate", ArgumentParser<SVGCreate>},
+        {"svgGetDocumentXML", SVGGetDocumentXML},
+        {"svgSetDocumentXML", SVGSetDocumentXML},
     };
 
     // Add functions
@@ -27,6 +29,8 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "svgCreate");
+    lua_classfunction(luaVM, "getDocumentXML", "svgGetDocumentXML");
+    lua_classfunction(luaVM, "SetDocumentXML", "svgSetDocumentXML");
 
     lua_registerclass(luaVM, "SVG");
 }
@@ -77,4 +81,64 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     }
 
     throw std::invalid_argument("Error occurred creating SVG element");
+}
+
+int CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM)
+{
+    CClientVectorGraphic* pVectorGraphic = nullptr;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVectorGraphic);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    CLuaMain*   pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (pLuaMain)
+    {
+        std::string strXmlContent = pVectorGraphic->GetSVGDocumentXML();
+
+        CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent.c_str());
+
+        if (rootNode && rootNode->IsValid())
+        {
+            lua_pushxmlnode(luaVM, rootNode);
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, "Unable to get SVG XML document");
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM)
+{
+    CClientVectorGraphic* pVectorGraphic = nullptr;
+    CXMLNode* pXMLNode = nullptr;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVectorGraphic);
+    argStream.ReadUserData(pXMLNode);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    CLuaMain*   pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (pLuaMain)
+    {
+        std::string strXML = pXMLNode->ToString();
+        if (pVectorGraphic->LoadFromData(strXML.c_str()))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+            
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
