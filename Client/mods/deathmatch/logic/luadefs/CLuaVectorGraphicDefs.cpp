@@ -15,8 +15,6 @@ void CLuaVectorGraphicDefs::LoadFunctions()
 {
    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"svgCreate", ArgumentParser<SVGCreate>},
-        {"svgAddRect", ArgumentParser<SVGAddRect>},
-        {"svgAddCircle", ArgumentParser<SVGAddCircle>},
     };
 
     // Add functions
@@ -79,16 +77,4 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     }
 
     throw std::invalid_argument("Error occurred creating SVG element");
-}
-
-std::variant<bool, int> CLuaVectorGraphicDefs::SVGAddRect(CClientVectorGraphic* pVectorGraphic, std::variant<float, std::string> x, std::variant<float, std::string> y,
-                                                        std::variant<float, std::string> width, std::variant<float, std::string> height, std::variant<float, std::string> rx,
-                                                        std::variant<float, std::string> ry, float pathLength, std::string fill)
-{
-       return pVectorGraphic->AddRect(x, y, width, height, rx, ry, pathLength, fill);
-}
-
-std::variant<bool, int> CLuaVectorGraphicDefs::SVGAddCircle(CClientVectorGraphic* pVectorGraphic, std::variant<float, std::string> cx, std::variant<float, std::string> cy, float radius, float pathLength, std::string fill)
-{
-       return pVectorGraphic->AddCircle(cx, cy, radius, pathLength, fill);
 }

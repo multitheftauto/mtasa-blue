@@ -30,10 +30,6 @@ public:
 
     void CreateDocument();
 
-    std::variant<bool, int> AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width, std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill);
-
-    std::variant<bool, int> AddCircle(std::variant<float, std::string> cx, std::variant<float, std::string> cy, float radius, float pathLength, std::string fill);
-
     bool LoadFromFile(std::string strFilePath);
     bool LoadFromData(std::string strData);
 
