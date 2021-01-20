@@ -561,11 +561,11 @@ std::string CXMLNodeImpl::ToString()
     if (pDocument == nullptr)
         return std::string("");
 
-    std::unique_ptr<TiXmlPrinter> pPrinter(new TiXmlPrinter());
-    pPrinter->SetIndent("\t");
+    TiXmlPrinter printer;
+    printer.SetIndent("\t");
 
-    if (pDocument->Accept(pPrinter.get()))
-        return std::string(pPrinter->CStr());
+    if (pDocument->Accept(&printer))
+        return std::string(printer.CStr());
 
     return std::string("");
 }
