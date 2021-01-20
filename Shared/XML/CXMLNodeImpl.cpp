@@ -564,5 +564,8 @@ std::string CXMLNodeImpl::ToString()
     std::unique_ptr<TiXmlPrinter> pPrinter(new TiXmlPrinter());
     pPrinter->SetIndent("\t");
 
-    return pDocument->Accept(pPrinter.get()) ? std::string(pPrinter->CStr()) : nullptr;
+    if (pDocument->Accept(pPrinter.get()))
+        return std::string(pPrinter->CStr());
+
+    return nullptr;
 }
