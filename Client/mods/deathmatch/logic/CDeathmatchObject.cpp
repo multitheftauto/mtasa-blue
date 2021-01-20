@@ -100,7 +100,6 @@ void CDeathmatchObject::UpdateMovement()
 
     SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
 
-
     if (!bStillRunning)
     {
         _StopMovement(false);            // We don't unregister ourselves here since CDeathmatchObject::UpdateMovement is called from an iteration in
