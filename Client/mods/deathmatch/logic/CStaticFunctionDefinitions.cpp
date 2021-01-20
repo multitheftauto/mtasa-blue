@@ -6243,20 +6243,19 @@ bool CStaticFunctionDefinitions::SetTime(unsigned char ucHour, unsigned char ucM
 }
 
 bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint,
-                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity,
+                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, std::vector<CEntity*> vecIgnoredEntities,
                                                     SLineOfSightBuildingResult* pBuildingResult)
 {
     assert(pColPoint);
     assert(pColEntity);
 
-    if (pIgnoredEntity)
+    for (CEntity* pIgnoredEntity : vecIgnoredEntities)
         g_pGame->GetWorld()->IgnoreEntity(pIgnoredEntity);
 
     CEntity* pColGameEntity = 0;
     bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);
 
-    if (pIgnoredEntity)
-        g_pGame->GetWorld()->IgnoreEntity(NULL);
+    g_pGame->GetWorld()->IgnoreEntity(NULL);
 
     CPools* pPools = g_pGame->GetPools();
     *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
