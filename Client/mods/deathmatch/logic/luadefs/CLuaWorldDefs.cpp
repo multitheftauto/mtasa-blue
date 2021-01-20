@@ -243,7 +243,11 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     argStream.ReadBool(flags.bIgnoreSomeObjectsForCamera, false);
     argStream.ReadBool(flags.bShootThroughStuff, false);
 
-    if (!argStream.NextIsNil() && !argStream.NextIsNone())
+    if (argStream.NextIsTable())
+    {
+        argStream.ReadUserDataTable(vecIgnoredElements);
+    }
+    else if (!argStream.NextIsNil() && !argStream.NextIsNone())
     {
         while(argStream.NextIsUserData())
         {
