@@ -19,8 +19,8 @@ class CClientVectorGraphicDisplay : public CClientDisplay
     friend class CClientDisplayManager;
 
 public:
-    CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID = 0xFFFFFFFF);
-    ~CClientVectorGraphicDisplay();
+    CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID = DISPLAY_VECTORGRAPHIC);
+    ~CClientVectorGraphicDisplay() = default;
 
     eDisplayType GetType() { return DISPLAY_VECTORGRAPHIC; }
 
