@@ -245,7 +245,7 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
 
     if (!argStream.NextIsNil())
     {
-        while(!argStream.NextIsBool())
+        while(!argStream.NextIsBool() || argStream.NextIsNone())
         {
             CClientEntity* pElement;
             argStream.ReadUserData(pElement);
