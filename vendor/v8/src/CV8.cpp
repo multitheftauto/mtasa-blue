@@ -25,9 +25,9 @@ CV8::~CV8()
     V8::ShutdownPlatform();
 }
 
-CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originResource, bool bModule)
+CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originResource)
 {
     CV8Isolate* pIsolate = new CV8Isolate(originResource);
-    pIsolate->RunCode(strCode, bModule);
+    pIsolate->RunCode(strCode, true);
     return pIsolate;
 }

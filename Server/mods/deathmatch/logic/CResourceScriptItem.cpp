@@ -46,9 +46,6 @@ bool CResourceScriptItem::Start()
             case eScriptLanguage::JAVASCRIPT:
                 v8->CreateIsolate(std::string(buffer.begin(), buffer.end()), m_strResourceFileName);
                 break;
-            case eScriptLanguage::JAVASCRIPT_MODULE:
-                v8->CreateIsolate(std::string(buffer.begin(), buffer.end()), m_strResourceFileName, true);
-                break;
         }
     }
 

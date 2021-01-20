@@ -7,9 +7,11 @@ public:
     ~CV8Isolate();
 
     void RunCode(std::string& code, bool bAsModule = false);
+
 private:
     void                  ReportException(TryCatch* pTryCatch);
     std::string           m_strOriginResource;
     Isolate::CreateParams m_createParams;
-    Isolate* m_pIsolate;
+    Isolate*              m_pIsolate;
+    Local<Module>         m_mtaModule;
 };

@@ -2,11 +2,52 @@
 
 using namespace v8;
 
+void MtaPrint(const FunctionCallbackInfo<Value>& args)
+{
+    String::Utf8Value text(args.GetIsolate(), args[0].As<String>());
+    printf("%s\n", *text);
+
+    args.GetReturnValue().Set(True(args.GetIsolate()));
+}
+
+MaybeLocal<Value> TestModule(Local<Context> context, Local<Module> module)
+{
+    module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "print").ToLocalChecked(),
+                                     v8::Function::New(context, MtaPrint).ToLocalChecked());
+    module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked(), v8::Number::New(context->GetIsolate(), 3.14159));
+
+    return True(context->GetIsolate());
+}
+
+MaybeLocal<Module> Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer)
+{
+    String::Utf8Value importName(context->GetIsolate(), specifier);
+
+    if (!strcmp(*importName, "@mta"))
+    {
+        printf("Importing: %s\n", *importName);
+        Local<String> mtaModuleName = String::NewFromUtf8(context->GetIsolate(), "@mta").ToLocalChecked();
+        return Module::CreateSyntheticModule(
+            context->GetIsolate(), mtaModuleName,
+            {String::NewFromUtf8(context->GetIsolate(), "print").ToLocalChecked(), String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked()},
+                                             TestModule);
+    }
+
+    MaybeLocal<Module> empty;
+    return empty;
+}
+
 CV8Isolate::CV8Isolate(std::string& originResource)
 {
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     m_pIsolate = Isolate::New(m_createParams);
     m_strOriginResource = originResource;
+
+    Isolate::Scope isolate_scope(m_pIsolate);
+    HandleScope handle_scope(m_pIsolate);
+    
+    Local<String> mtaModuleName = String::NewFromUtf8(m_pIsolate, "@mta").ToLocalChecked();
+    m_mtaModule = Module::CreateSyntheticModule(m_pIsolate, mtaModuleName, {String::NewFromUtf8(m_pIsolate, "foo").ToLocalChecked()}, TestModule);
 }
 
 void CV8Isolate::ReportException(v8::TryCatch* pTryCatch)
@@ -18,38 +59,15 @@ void CV8Isolate::ReportException(v8::TryCatch* pTryCatch)
     printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
 }
 
-void Foo(const FunctionCallbackInfo<Value>& args)
-{
-    Local<String> returnStr = String::NewFromUtf8(args.GetIsolate(), "FOOO", NewStringType::kNormal).ToLocalChecked();
-
-    args.GetReturnValue().Set(returnStr);
-}
-
-MaybeLocal<Value> TestModule(Local<Context> context, Local<Module> module)
-{
-    module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "foo").ToLocalChecked(), v8::Function::New(context, Foo).ToLocalChecked());
-
-    return True(context->GetIsolate());
-}
-
 void CV8Isolate::RunCode(std::string& code, bool bAsModule)
 {
     Isolate::Scope isolate_scope(m_pIsolate);
     // Create a stack-allocated handle scope.
     HandleScope handle_scope(m_pIsolate);
 
-    // Create a new context.
-    // Local<Context> context = Context::New(isolate);
-    // Enter the context for compiling and running the hello world script.
-
-    Local<String> mtaModuleName = String::NewFromUtf8(m_pIsolate, "mta").ToLocalChecked();
-    // Local<Module> module = Module::CreateSyntheticModule(m_pIsolate, mtaModuleName, {String::NewFromUtf8(m_pIsolate, "foo").ToLocalChecked()}, AddMtaModule);
-
     Local<ObjectTemplate> global = ObjectTemplate::New(m_pIsolate);
 
     Local<Context> context = Context::New(m_pIsolate, nullptr, global);
-    // std::vector<Local<String>> names = {String::NewFromUtf8(m_pIsolate, "foo").ToLocalChecked()};
-    // Local<Module>              module = Module::CreateSyntheticModule(m_pIsolate, mtaModuleName, names, TestModule);
 
     Context::Scope context_scope(context);
 
@@ -71,18 +89,24 @@ void CV8Isolate::RunCode(std::string& code, bool bAsModule)
                 ReportException(&compileTryCatch);
                 return;
             }
-            Local<FixedArray> requests = module->GetModuleRequests();
-            for (int i = 0; i < requests->Length(); i++)
+            for (int i = 0; i < module->GetModuleRequestsLength(); i++)
             {
-                Local<ModuleRequest> request = requests->Get(context, i).As<ModuleRequest>();
-                String::Utf8Value    utf8(m_pIsolate, request->GetSpecifier());
-                printf("Attempt to import: %s\n", *utf8);
+                Local<ModuleRequest>  request = module->GetModuleRequests()->Get(context, i).As<ModuleRequest>();
+                v8::String::Utf8Value str(context->GetIsolate(), request->GetSpecifier());
+                v8::Maybe<bool>       result = module->InstantiateModule(context, Resolve);
+                if (result.IsNothing())
+                {
+                    printf("Fail to import module\n");
+                }
+
+
             }
+            module->Evaluate(context);
         }
         else
         {
             ScriptOrigin          origin(resourceName);
-            v8::Local<v8::Script> script;
+            Local<Script> script;
 
             if (!Script::Compile(context, source, &origin).ToLocal(&script))
             {

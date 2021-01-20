@@ -27,7 +27,6 @@ public:
     {
         LUA,
         JAVASCRIPT,
-        JAVASCRIPT_MODULE,
     };
 
     enum eResourceType

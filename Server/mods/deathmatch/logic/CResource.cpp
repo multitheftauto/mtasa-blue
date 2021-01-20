@@ -1679,10 +1679,6 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
             {
                 eLanguage = CResourceScriptItem::eScriptLanguage::JAVASCRIPT;
             }
-            if (!stricmp(szLang, "js-module"))
-            {
-                eLanguage = CResourceScriptItem::eScriptLanguage::JAVASCRIPT_MODULE;
-            }
         }
 
         CXMLAttribute* pType = Attributes.Find("type");
