@@ -20,8 +20,8 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     m_pResource = nullptr;
     m_pManager = pManager;
 
-    m_pVectorGraphicItem = std::unique_ptr<CVectorGraphicItem>(std::move(pVectorGraphicItem));
-    m_pVectorGraphicDisplay = std::unique_ptr<CClientVectorGraphicDisplay>(new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this));
+    m_pVectorGraphicItem = std::move(pVectorGraphicItem);
+    m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
 
     CreateDocument();
 }
@@ -31,7 +31,7 @@ void CClientVectorGraphic::CreateDocument()
     if (m_pDocument)
         return;
 
-    m_pDocument = std::unique_ptr<SVGDocument>(new SVGDocument());
+    m_pDocument = std::make_unique<SVGDocument>();
 
     SVGElement* rootElement = m_pDocument->rootElement();
 
@@ -74,6 +74,11 @@ bool CClientVectorGraphic::LoadFromData(std::string strData)
     }
 
     return false;
+}
+
+bool CClientVectorGraphic::SetSVGDocumentXML(CXMLNode* xmlDocument)
+{
+    return LoadFromData(xmlDocument->ToString());
 }
 
 void CClientVectorGraphic::Destroy()

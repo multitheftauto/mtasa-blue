@@ -14,7 +14,7 @@
 
 using namespace lunasvg;
 
-constexpr float DPI() { return 96.0; }
+constexpr float DPI = 96.0;
 
 class CClientVectorGraphic : public CClientTexture
 {
@@ -23,7 +23,7 @@ public:
     CClientVectorGraphic(CClientManager* pManager, ElementID ID, std::unique_ptr<CVectorGraphicItem> pVectorGraphicItem);
     ~CClientVectorGraphic() = default;
 
-    CResource* GetResource() { return m_pResource; }
+    CResource* GetResource() const { return m_pResource; }
     void       SetResource(CResource* pResource) { m_pResource = pResource; }
 
     eClientEntityType GetType() const { return CCLIENTVECTORGRAPHIC; }
@@ -39,6 +39,9 @@ public:
     SVGDocument*        GetSVGDocument() const { return m_pDocument.get(); }
     CVectorGraphicItem* GetRenderItem() const { return m_pVectorGraphicItem.get(); }
 
+    std::string GetSVGDocumentXML() const { return m_pDocument->toString(); };
+    bool        SetSVGDocumentXML(CXMLNode* xmlNode);
+
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
 private:
     CResource*                                        m_pResource;
@@ -47,7 +50,5 @@ private:
     std::unique_ptr<CVectorGraphicItem>               m_pVectorGraphicItem;
     std::unique_ptr<CClientVectorGraphicDisplay>      m_pVectorGraphicDisplay;
 
-    int m_iShapeCount;
-    
-    bool m_bIsDestroyed;
+    bool m_bIsDestroyed = false;
 };

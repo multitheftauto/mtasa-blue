@@ -82,7 +82,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     uint width = pVectorGraphicItem->m_uiSizeX;
     uint height = pVectorGraphicItem->m_uiSizeY;
 
-    Bitmap bitmap = svgDocument->renderToBitmap(width, height, DPI());
+    Bitmap bitmap = svgDocument->renderToBitmap(width, height, DPI);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
@@ -120,7 +120,7 @@ void CClientVectorGraphicDisplay::ClearTexture()
     D3DLOCKED_RECT LockedRect;
     surface->LockRect(&LockedRect, nullptr, 0);
 
-    device->ColorFill(surface, NULL, D3DCOLOR_ARGB(0, 0, 0, 0));
+    device->ColorFill(surface, nullptr, D3DCOLOR_ARGB(0, 0, 0, 0));
 
     // Unlock surface
     surface->UnlockRect();
