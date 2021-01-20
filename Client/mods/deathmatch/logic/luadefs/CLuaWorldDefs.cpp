@@ -247,7 +247,6 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     {
         CClientEntity* pElement;
         argStream.ReadUserData(pElement);
-
         vecIgnoredElements.push_back(pElement);
     }  
 
@@ -256,16 +255,11 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        std::vector<CEntity*> vecIgnoredEntities;
-
-        for (CClientEntity* pElement : vecIgnoredElements)
-            vecIgnoredEntities.push_back(pElement->GetGameEntity());
-
         CColPoint*                 pColPoint = NULL;
         CClientEntity*             pColEntity = NULL;
         bool                       bCollision;
         SLineOfSightBuildingResult buildingResult;
-        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, vecIgnoredEntities,
+        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, vecIgnoredElements,
                                                            bIncludeBuildingInfo ? &buildingResult : NULL))
         {
             // Got a collision?

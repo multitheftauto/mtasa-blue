@@ -6243,19 +6243,28 @@ bool CStaticFunctionDefinitions::SetTime(unsigned char ucHour, unsigned char ucM
 }
 
 bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint,
-                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, std::vector<CEntity*> vecIgnoredEntities,
+                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, std::vector<CClientEntity*> vecIgnoredElements,
                                                     SLineOfSightBuildingResult* pBuildingResult)
 {
     assert(pColPoint);
     assert(pColEntity);
 
-    for (CEntity* pIgnoredEntity : vecIgnoredEntities)
-        g_pGame->GetWorld()->IgnoreEntity(pIgnoredEntity);
+    std::vector<CClientEntity*> vecDidIgnoreElements;
+
+    for (CClientEntity* pIgnoredElement : vecIgnoredElements)
+    {
+        if (CStaticFunctionDefinitions::GetElementCollisionsEnabled(*pIgnoredElement))
+        {
+            CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, false);
+            vecDidIgnoreElements.push_back(pIgnoredElement);
+        }
+    }
 
     CEntity* pColGameEntity = 0;
     bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);
 
-    g_pGame->GetWorld()->IgnoreEntity(NULL);
+    for (CClientEntity* pIgnoredElement : vecDidIgnoreElements)
+        CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, true);
 
     CPools* pPools = g_pGame->GetPools();
     *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
