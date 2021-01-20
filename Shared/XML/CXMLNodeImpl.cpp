@@ -559,7 +559,7 @@ std::string CXMLNodeImpl::ToString()
     TiXmlDocument* pDocument = m_pDocument ? m_pDocument : static_cast<TiXmlDocument*>(m_pNode->ToDocument());
 
     if (pDocument == nullptr)
-        return nullptr;
+        return std::string("");
 
     std::unique_ptr<TiXmlPrinter> pPrinter(new TiXmlPrinter());
     pPrinter->SetIndent("\t");
@@ -567,5 +567,5 @@ std::string CXMLNodeImpl::ToString()
     if (pDocument->Accept(pPrinter.get()))
         return std::string(pPrinter->CStr());
 
-    return nullptr;
+    return std::string("");
 }
