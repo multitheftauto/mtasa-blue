@@ -46,6 +46,7 @@ public:
     uint GetRenderTargetCount() { return m_uiStatsRenderTargetCount; }
     uint GetScreenSourceCount() { return m_uiStatsScreenSourceCount; }
     uint GetWebBrowserCount() { return m_uiStatsWebBrowserCount; }
+    uint GetVectorGraphicCount() { return m_uiStatsVectorGraphicCount; }
 
 protected:
     CClientManager*                               m_pClientManager;
@@ -59,4 +60,5 @@ protected:
     uint                                          m_uiStatsRenderTargetCount;
     uint                                          m_uiStatsScreenSourceCount;
     uint                                          m_uiStatsWebBrowserCount;
+    uint                                          m_uiStatsVectorGraphicCount;
 };
