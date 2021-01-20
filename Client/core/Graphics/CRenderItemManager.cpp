@@ -135,7 +135,7 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
     if (!pTextureItem->IsValid())
     {
         SAFE_RELEASE(pTextureItem);
-        return NULL;
+        return nullptr;
     }
 
     UpdateMemoryUsage();
@@ -150,15 +150,15 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
 //
 //
 ////////////////////////////////////////////////////////////////
-CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint height)
+std::unique_ptr<CVectorGraphicItem> CRenderItemManager::CreateVectorGraphic(uint width, uint height)
 {
-    CVectorGraphicItem* pVectorItem = new CVectorGraphicItem();
+    std::unique_ptr<CVectorGraphicItem> pVectorItem(new CVectorGraphicItem());
     pVectorItem->PostConstruct(this, width, height);
 
     if (!pVectorItem->IsValid())
     {
         SAFE_RELEASE(pVectorItem);
-        return NULL;
+        return nullptr;
     }
 
     UpdateMemoryUsage();

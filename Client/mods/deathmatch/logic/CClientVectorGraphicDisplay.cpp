@@ -8,6 +8,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientVectorGraphicDisplay.h"
+#include "CClientVectorGraphic.h"
 
 using std::list;
 
@@ -23,10 +25,6 @@ CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* 
     m_bIsCleared = false;
 
     UpdateTexture();
-}
-
-CClientVectorGraphicDisplay::~CClientVectorGraphicDisplay()
-{
 }
 
 void CClientVectorGraphicDisplay::SetPosition(const CVector& vecPosition)
@@ -69,7 +67,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 
     SVGDocument* svgDocument = m_pVectorGraphic->GetSVGDocument();
 
-    if(!m_pVectorGraphic->GetSVGDocument())
+    if(svgDocument == nullptr)
         return;
 
     CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
@@ -84,7 +82,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     uint width = pVectorGraphicItem->m_uiSizeX;
     uint height = pVectorGraphicItem->m_uiSizeY;
 
-    Bitmap bitmap = svgDocument->renderToBitmap(width, height, 96.0);
+    Bitmap bitmap = svgDocument->renderToBitmap(width, height, DPI());
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
@@ -111,7 +109,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 void CClientVectorGraphicDisplay::ClearTexture()
 {
    CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
-   IDirect3DSurface9* surface =  pVectorGraphicItem->m_pD3DRenderTargetSurface;
+   IDirect3DSurface9*  surface = pVectorGraphicItem->m_pD3DRenderTargetSurface;
 
     if (!surface)
         return;

@@ -10,6 +10,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "CClientVectorGraphic.h"
 
 class CLuaVectorGraphicDefs : public CLuaDefs
 {

@@ -8,19 +8,20 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientVectorGraphic.h"
 #include <svgdocument.h>
 
-CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
-    : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
+CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, std::unique_ptr<CVectorGraphicItem> pVectorGraphicItem)
+    : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem.get())
 {
+    SetTypeName("svg");
+
     m_pDocument = nullptr;
     m_pResource = nullptr;
     m_pManager = pManager;
 
-    m_pRenderItem = pVectorGraphicItem; // This is cast to CClientRenderItem
-    m_pVectorGraphicItem = pVectorGraphicItem; // Keep this as CVectorGraphicItem so we don't have to cast everywhere later on...
-
-    m_pVectorGraphicDisplay = new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this);
+    m_pVectorGraphicItem = std::unique_ptr<CVectorGraphicItem>(std::move(pVectorGraphicItem));
+    m_pVectorGraphicDisplay = std::unique_ptr<CClientVectorGraphicDisplay>(new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this));
 
     CreateDocument();
 }
@@ -30,7 +31,7 @@ void CClientVectorGraphic::CreateDocument()
     if (m_pDocument)
         return;
 
-    m_pDocument = new SVGDocument();
+    m_pDocument = std::unique_ptr<SVGDocument>(new SVGDocument());
 
     SVGElement* rootElement = m_pDocument->rootElement();
 
@@ -45,8 +46,6 @@ void CClientVectorGraphic::CreateDocument()
     rootElement->setAttribute("y", "50%");
     rootElement->setAttribute("width", strWidth);
     rootElement->setAttribute("height", strHeight);
-
-    m_pVectorGraphicDisplay->Update();
 }
 
 std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::string> x, std::variant<float, std::string> y, std::variant<float, std::string> width,                         std::variant<float, std::string> height, std::variant<float, std::string> rx, std::variant<float, std::string> ry, float pathLength, std::string fill)
@@ -66,7 +65,8 @@ std::variant<bool, int> CClientVectorGraphic::AddRect(std::variant<float, std::s
         (ry.index() == 0) ? std::to_string(std::get<float>(ry)).c_str() : std::get<string>(ry).c_str(),
         std::to_string(pathLength).c_str(),
         fill.c_str(),
-        std::to_string(++m_iShapeCount).c_str());
+        std::to_string(
+            ++m_iShapeCount).c_str());
 
     m_pDocument->appendContent(rectSVGNode.c_str());
 
@@ -89,7 +89,8 @@ std::variant<bool, int> CClientVectorGraphic::AddCircle(std::variant<float, std:
         std::to_string(radius).c_str(),
         std::to_string(pathLength).c_str(),
         fill.c_str(),
-        std::to_string(++m_iShapeCount).c_str());
+        std::to_string(
+            ++m_iShapeCount).c_str());
 
     m_pDocument->appendContent(circleSVGNode.c_str());
 
@@ -126,18 +127,7 @@ bool CClientVectorGraphic::LoadFromData(std::string strData)
     return false;
 }
 
-const bool CClientVectorGraphic::IsDestroyed()
-{
-    return m_bIsDestroyed;
-}
-
 void CClientVectorGraphic::Destroy()
 {
     m_bIsDestroyed = true;
-}
-
-CClientVectorGraphic::~CClientVectorGraphic()
-{
-    delete m_pDocument;
-    m_pDocument = nullptr;
 }

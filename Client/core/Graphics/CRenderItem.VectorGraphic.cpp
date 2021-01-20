@@ -37,8 +37,8 @@ void CVectorGraphicItem::PostConstruct(CRenderItemManager* pManager, uint width,
 ////////////////////////////////////////////////////////////////
 void CVectorGraphicItem::PreDestruct()
 {
-    Super::PreDestruct();
     ReleaseUnderlyingData();
+    Super::PreDestruct();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ void CVectorGraphicItem::PreDestruct()
 ////////////////////////////////////////////////////////////////
 bool CVectorGraphicItem::IsValid()
 {
-    return m_pD3DTexture != NULL;
+    return m_pD3DTexture != nullptr;
 }
 
 ////////////////////////////////////////////////////////////////

@@ -152,12 +152,15 @@ public:
     virtual CTextureItem* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                         uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                         ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1) = 0;
+
     virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                        bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros) = 0;
-    virtual CRenderTargetItem*      CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
-    virtual CScreenSourceItem*      CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
-    virtual CWebBrowserItem*        CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
-    virtual CVectorGraphicItem*     CreateVectorGraphic(uint uiSizeX, uint uiSizeY) = 0;
+
+    virtual CRenderTargetItem*                      CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
+    virtual CScreenSourceItem*                      CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
+    virtual CWebBrowserItem*                        CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
+    virtual std::unique_ptr<CVectorGraphicItem>     CreateVectorGraphic(uint uiSizeX, uint uiSizeY) = 0;
+
     virtual bool                    SetRenderTarget(CRenderTargetItem* pItem, bool bClear) = 0;
     virtual void                    EnableSetRenderTargetOldVer(bool bEnable) = 0;
     virtual bool                    IsSetRenderTargetEnabledOldVer() = 0;

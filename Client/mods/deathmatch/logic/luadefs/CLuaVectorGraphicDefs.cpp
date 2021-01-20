@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
+#include "CLuaVectorGraphicDefs.h"
 
 void CLuaVectorGraphicDefs::LoadFunctions()
 {
@@ -42,8 +43,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     CResource* pParentResource = pLuaMain->GetResource();
 
-    CClientVectorGraphic* pVectorGraphic =
-        g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic((int)size.fX, (int)size.fY);
+    CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic((int)size.fX, (int)size.fY);
 
     if (pVectorGraphic)
     {
