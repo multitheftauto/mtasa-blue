@@ -556,16 +556,11 @@ void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankL
 
 std::string CXMLNodeImpl::ToString()
 {
-    TiXmlDocument* pDocument = m_pDocument ? m_pDocument : static_cast<TiXmlDocument*>(m_pNode->ToDocument());
+    TiXmlPrinter printer;
+    printer.SetIndent("\t");
 
-    if (pDocument == nullptr)
-        return std::string("");
-
-    std::unique_ptr<TiXmlPrinter> pPrinter(new TiXmlPrinter());
-    pPrinter->SetIndent("\t");
-
-    if (pDocument->Accept(pPrinter.get()))
-        return std::string(pPrinter->CStr());
+    if (m_pNode->Accept(&printer))
+        return std::string(printer.CStr());
 
     return std::string("");
 }
