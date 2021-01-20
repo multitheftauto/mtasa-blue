@@ -59,6 +59,7 @@ public:
     SString            GetURL();
     const SString&     GetTitle();
     void               SetRenderingPaused(bool bPaused);
+    const bool         GetRenderingPaused() const;
     void               Focus(bool state = true);
     IDirect3DTexture9* GetTexture() { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
     void               ClearTexture();
@@ -176,6 +177,7 @@ private:
 
     bool                       m_bBeingDestroyed;
     bool                       m_bIsLocal;
+    bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
     POINT                      m_vecMousePosition;
     bool                       m_mouseButtonStates[3];

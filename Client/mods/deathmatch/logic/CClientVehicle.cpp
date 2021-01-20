@@ -3072,7 +3072,7 @@ void CClientVehicle::Destroy()
                 break;
             default:
                 break;
-        }            
+        }
 
         if (m_eVehicleType == CLIENTVEHICLE_CAR || m_eVehicleType == CLIENTVEHICLE_PLANE || m_eVehicleType == CLIENTVEHICLE_QUADBIKE)
         {
@@ -3141,7 +3141,7 @@ void CClientVehicle::Destroy()
             // Force the trailer to stream out
             GetTowedVehicle()->StreamOut();
         }
-        
+
         if (m_pTowedByVehicle)
         {
             m_pVehicle->BreakTowLink();

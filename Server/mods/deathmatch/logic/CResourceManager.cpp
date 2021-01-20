@@ -258,6 +258,26 @@ void CResourceManager::CheckResources(CResource* pResource)
     }
 }
 
+void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState) const
+{
+    if (!pResource) return;
+
+    CLuaArguments Arguments;
+    Arguments.PushResource(pResource);
+
+    if (szOldState)
+        Arguments.PushString(szOldState);
+    else
+        Arguments.PushNil();
+
+    if (szNewState)
+        Arguments.PushString(szNewState);
+    else
+        Arguments.PushNil();
+
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourceLoadStateChange", Arguments);
+}
+
 const char* CResourceManager::GetResourceDirectory()
 {
     return m_strResourceDirectory;
@@ -343,7 +363,10 @@ void CResourceManager::UnloadRemovedResources()
     }
 
     for (CResource* pResource : resourcesToDelete)
+    {
+        OnResourceLoadStateChange(pResource, "loaded", nullptr);
         UnloadAndDelete(pResource);
+    }
 }
 
 void CResourceManager::UnloadAndDelete(CResource* pResource)
@@ -363,6 +386,7 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
 {
     bool bStartAfterLoading = false;
     bool bProtected = false;
+    bool bPreviouslyLoaded = false;
 
     // check to see if we've already loaded this resource - we can only
     // load each resource once
@@ -387,6 +411,7 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
         }
 
         UnloadAndDelete(pResource);
+        bPreviouslyLoaded = true;
         pResource = nullptr;
     }
 
@@ -407,7 +432,14 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     {
         // Don't log new resources during server startup
         if (g_pGame->IsServerFullyUp())
+        {
+            if (!bPreviouslyLoaded)
+                OnResourceLoadStateChange(pLoadedResource, nullptr, "loaded");
+            else
+                OnResourceLoadStateChange(pLoadedResource, "loaded", "loaded");
+
             CLogger::LogPrintf("New resource '%s' loaded\n", pLoadedResource->GetName().c_str());
+        }
     }
 
     return pLoadedResource;
@@ -660,6 +692,9 @@ bool CResourceManager::Reload(CResource* pResource)
         CLogger::LogPrintf("Loading of resource '%s' failed\n", strResourceName.c_str());
         return false;
     }
+
+    // Call the onResourceStateChange event
+    OnResourceLoadStateChange(pResource, "loaded", "loaded");
 
     // Success
     return true;

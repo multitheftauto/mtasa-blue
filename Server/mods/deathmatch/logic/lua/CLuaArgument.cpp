@@ -514,7 +514,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
                 {
                     if(!bitStream.CanReadNumberOfBytes(uiLength))
                         return false;
-                        
+
                     bitStream.AlignReadToByteBoundary();
 
                     // Allocate a buffer and read the string into it

@@ -5273,7 +5273,7 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
 bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 {
     RUN_CHILDREN(BlowVehicle(*iter))
-    
+
     if (!IS_VEHICLE(pElement))
         return false;
 
@@ -12181,4 +12181,20 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag()
 CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 {
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, float fFloor, float fCeil)
+{
+    if (pColPolygon->SetHeight(fFloor, fCeil))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(fFloor);
+        BitStream.pBitStream->Write(fCeil);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, SET_COLPOLYGON_HEIGHT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }

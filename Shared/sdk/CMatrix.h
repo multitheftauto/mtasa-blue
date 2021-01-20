@@ -153,7 +153,7 @@ public:
         matResult.vFront = vFront.Clone();
         matResult.vUp = vUp.Clone();
         matResult.vPos = vPos.Clone();
-        
+
         return matResult;
     }
 
@@ -282,7 +282,7 @@ public:
         return CVector(vRight.Length(), vFront.Length(), vUp.Length());
     }
 
-    void SetScale(const CVector& vecScale) 
+    void SetScale(const CVector& vecScale)
     {
         CMatrix matRot = GetRotationMatrix();
         vRight = matRot.vRight * vecScale.fX;

@@ -1248,7 +1248,7 @@ DWORD SharedUtil::GetMainThreadId()
         // Get the module information for the currently running process
         DWORD      processEntryPointAddress = 0;
         MODULEINFO moduleInfo = {};
-        
+
         if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
         {
             processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);

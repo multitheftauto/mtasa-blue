@@ -780,12 +780,12 @@ float CBassAudio::GetSoundBPM()
 
         // open the same file as played but for bpm decoding detection
         DWORD bpmChan = BASS_StreamCreateFile(false, FromUTF8(m_strPath), 0, 0, BASS_STREAM_DECODE | BASS_UNICODE);
-        
+
         if (!bpmChan)
         {
             bpmChan = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_DECODE | BASS_MUSIC_PRESCAN | BASS_UNICODE, 0);
         }
-        
+
         if (bpmChan)
         {
             fData = BASS_FX_BPM_DecodeGet(bpmChan, 0, GetLength(), 0, BASS_FX_FREESOURCE, NULL, NULL);

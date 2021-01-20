@@ -457,7 +457,7 @@ public:
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
     static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
-    
+
     // Shape set functions
     static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
     static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
@@ -466,6 +466,7 @@ public:
     static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);
     static bool AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
     static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex);
+    static bool SetColPolygonHeight(CColPolygon* pColPolygon, float fFloor, float fCeil);
 
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);

@@ -44,7 +44,7 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
-    const unsigned int modelInfoMax = GetCountOfAllFileIDs(); 
+    const unsigned int modelInfoMax = GetCountOfAllFileIDs();
     ModelInfo = new CModelInfoSA[modelInfoMax];
     ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
