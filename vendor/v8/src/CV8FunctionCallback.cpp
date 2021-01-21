@@ -6,6 +6,13 @@ CV8FunctionCallback::CV8FunctionCallback(const FunctionCallbackInfo<Value>& call
 {
 }
 
+const char* CV8FunctionCallback::GetType()
+{
+    Local<String>     typeName = m_callback[m_iIndex]->TypeOf(m_callback.GetIsolate());
+    String::Utf8Value str(m_callback.GetIsolate(), typeName);
+    return *str;
+}
+
 std::string CV8FunctionCallback::ReadString()
 {
     if (m_callback.Length() > m_iIndex)

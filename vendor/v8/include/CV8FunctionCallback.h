@@ -5,6 +5,8 @@ public:
     int         CountArguments() const { return m_callback.Length(); };
     std::string ReadString();
 
+    const char* GetType();
+
     void Return(std::string arg);
     void Return(bool arg);
 
