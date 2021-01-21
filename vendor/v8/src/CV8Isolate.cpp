@@ -1,6 +1,8 @@
 #include "StdInc.h"
-
+#include <functional>
 using namespace v8;
+
+static std::string g_currentModuleName;
 
 void MtaPrint(const FunctionCallbackInfo<Value>& args)
 {
@@ -10,16 +12,31 @@ void MtaPrint(const FunctionCallbackInfo<Value>& args)
     args.GetReturnValue().Set(True(args.GetIsolate()));
 }
 
+MaybeLocal<Value> InitializeModuleExports(Local<Context> context, Local<Module> module)
+{
+    CV8Module* pModule = CV8::GetModuleByName(g_currentModuleName.c_str());
+    for (auto const& pair : pModule->GetFunctions())
+    {
+        static void (*g_currentFunction)(CV8FunctionCallbackBase*) = pair.second;
+        module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), pair.first).ToLocalChecked(),
+                                         v8::Function::New(context, [](const FunctionCallbackInfo<Value>& args) {
+                                             CV8FunctionCallback callback(args);
+                                             g_currentFunction(&callback);
+                                         }).ToLocalChecked());
+    }
+    return True(context->GetIsolate());
+}
+
 MaybeLocal<Value> TestModule(Local<Context> context, Local<Module> module)
 {
     module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "print").ToLocalChecked(),
                                      v8::Function::New(context, MtaPrint).ToLocalChecked());
-    module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked(), v8::Number::New(context->GetIsolate(), 3.14159));
+    // module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked(), v8::Number::New(context->GetIsolate(), 3.14159));
 
     return True(context->GetIsolate());
 }
 
-MaybeLocal<Module> Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer)
+MaybeLocal<Module> CV8Isolate::Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer)
 {
     String::Utf8Value importName(context->GetIsolate(), specifier);
 
@@ -30,24 +47,18 @@ MaybeLocal<Module> Resolve(Local<Context> context, Local<String> specifier, Loca
         return Module::CreateSyntheticModule(
             context->GetIsolate(), mtaModuleName,
             {String::NewFromUtf8(context->GetIsolate(), "print").ToLocalChecked(), String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked()},
-                                             TestModule);
+            TestModule);
     }
 
     MaybeLocal<Module> empty;
     return empty;
 }
 
-CV8Isolate::CV8Isolate(std::string& originResource)
+CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     m_pIsolate = Isolate::New(m_createParams);
     m_strOriginResource = originResource;
-
-    Isolate::Scope isolate_scope(m_pIsolate);
-    HandleScope handle_scope(m_pIsolate);
-    
-    Local<String> mtaModuleName = String::NewFromUtf8(m_pIsolate, "@mta").ToLocalChecked();
-    m_mtaModule = Module::CreateSyntheticModule(m_pIsolate, mtaModuleName, {String::NewFromUtf8(m_pIsolate, "foo").ToLocalChecked()}, TestModule);
 }
 
 void CV8Isolate::ReportException(v8::TryCatch* pTryCatch)
@@ -93,19 +104,36 @@ void CV8Isolate::RunCode(std::string& code, bool bAsModule)
             {
                 Local<ModuleRequest>  request = module->GetModuleRequests()->Get(context, i).As<ModuleRequest>();
                 v8::String::Utf8Value str(context->GetIsolate(), request->GetSpecifier());
-                v8::Maybe<bool>       result = module->InstantiateModule(context, Resolve);
+
+                v8::Maybe<bool> result = module->InstantiateModule(
+                    context, [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
+                        String::Utf8Value  importName(context->GetIsolate(), specifier);
+                        CV8Module*         pModule = CV8::GetModuleByName(*importName);
+                        MaybeLocal<Module> module;
+                        if (!pModule)
+                            return module;
+
+                        g_currentModuleName = *importName;
+                        Local<String> moduleName = String::NewFromUtf8(context->GetIsolate(), *importName).ToLocalChecked();
+                        auto          exports = pModule->GetExports(context->GetIsolate());
+                        module = Module::CreateSyntheticModule(context->GetIsolate(), moduleName, exports,
+                                                               InitializeModuleExports);
+
+                        return module;
+                    });
                 if (result.IsNothing())
                 {
-                    printf("Fail to import module\n");
+                    printf("Failed to import module %s\n", *str);
                 }
-
-
             }
-            module->Evaluate(context);
+            if (Module::Status::kInstantiated == module->GetStatus())
+            {
+                module->Evaluate(context);
+            }
         }
         else
         {
-            ScriptOrigin          origin(resourceName);
+            ScriptOrigin  origin(resourceName);
             Local<Script> script;
 
             if (!Script::Compile(context, source, &origin).ToLocal(&script))
