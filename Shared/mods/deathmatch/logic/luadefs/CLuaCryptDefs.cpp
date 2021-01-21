@@ -318,13 +318,13 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
-            case StringEncodeFunction::BASE32:
+            case StringEncryptFunction::BASE32:
             {
                 SString result = SharedUtil::Base32encode(data);
                 lua_pushlstring(luaVM, result, result.length());
                 return 1;
             }
-            case StringEncodeFunction::BASE64:
+            case StringEncryptFunction::BASE64:
             {
                 SString result = SharedUtil::Base64encode(data);
                 lua_pushlstring(luaVM, result, result.length());

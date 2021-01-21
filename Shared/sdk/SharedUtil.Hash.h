@@ -31,13 +31,9 @@ enum class PasswordHashFunction
 enum class StringEncryptFunction
 {
     TEA,
-};
-
-enum class StringEncodeFunction
-{
     BASE32,
     BASE64
-}
+};
 
 namespace SharedUtil
 {
