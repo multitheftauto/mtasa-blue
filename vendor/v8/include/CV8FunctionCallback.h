@@ -8,6 +8,7 @@ public:
     const char* GetType();
 
     void Return(std::string arg);
+    void Return(double arg);
     void Return(bool arg);
 
 private:

@@ -79,6 +79,8 @@ void CLuaUtilDefs::LoadFunctions()
         printf("[%s] %s\n", *GetLocalTimeString(false), stream.str().c_str());
         callback->Return(true);
     });
+
+    pHashModule->AddFunction("getTickCount", [](CV8FunctionCallbackBase* callback) { callback->Return(static_cast<double>(GetTickCount64_())); });
 #endif
     //     m_pScriptDebugging->LogInformation(L, "%s", output.c_str());
 

@@ -4,56 +4,6 @@ using namespace v8;
 
 static std::string g_currentModuleName;
 
-void MtaPrint(const FunctionCallbackInfo<Value>& args)
-{
-    String::Utf8Value text(args.GetIsolate(), args[0].As<String>());
-    printf("%s\n", *text);
-
-    args.GetReturnValue().Set(True(args.GetIsolate()));
-}
-
-MaybeLocal<Value> InitializeModuleExports(Local<Context> context, Local<Module> module)
-{
-    CV8Module* pModule = CV8::GetModuleByName(g_currentModuleName.c_str());
-    for (auto const& pair : pModule->GetFunctions())
-    {
-        static void (*g_currentFunction)(CV8FunctionCallbackBase*) = pair.second;
-        module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), pair.first).ToLocalChecked(),
-                                         v8::Function::New(context, [](const FunctionCallbackInfo<Value>& args) {
-                                             CV8FunctionCallback callback(args);
-                                             g_currentFunction(&callback);
-                                         }).ToLocalChecked());
-    }
-    return True(context->GetIsolate());
-}
-
-MaybeLocal<Value> TestModule(Local<Context> context, Local<Module> module)
-{
-    module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "print").ToLocalChecked(),
-                                     v8::Function::New(context, MtaPrint).ToLocalChecked());
-    // module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked(), v8::Number::New(context->GetIsolate(), 3.14159));
-
-    return True(context->GetIsolate());
-}
-
-MaybeLocal<Module> CV8Isolate::Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer)
-{
-    String::Utf8Value importName(context->GetIsolate(), specifier);
-
-    if (!strcmp(*importName, "@mta"))
-    {
-        printf("Importing: %s\n", *importName);
-        Local<String> mtaModuleName = String::NewFromUtf8(context->GetIsolate(), "@mta").ToLocalChecked();
-        return Module::CreateSyntheticModule(
-            context->GetIsolate(), mtaModuleName,
-            {String::NewFromUtf8(context->GetIsolate(), "print").ToLocalChecked(), String::NewFromUtf8(context->GetIsolate(), "PI").ToLocalChecked()},
-            TestModule);
-    }
-
-    MaybeLocal<Module> empty;
-    return empty;
-}
-
 CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
@@ -68,6 +18,26 @@ void CV8Isolate::ReportException(v8::TryCatch* pTryCatch)
     int                    line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
     int                    column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
     printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
+}
+
+MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Local<Module> module)
+{
+    CV8Module* pModule = CV8::GetModuleByName(g_currentModuleName.c_str());
+    for (auto const& pair : pModule->GetFunctions())
+    {
+        Local<Value> value = External::New(context->GetIsolate(), pair.second);
+
+        FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
+            v8::Local<v8::External> ext = args.Data().As<v8::External>();
+            void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
+            CV8FunctionCallback callback(args);
+            func(&callback);
+        };
+
+        module->SetSyntheticModuleExport(String::NewFromUtf8(context->GetIsolate(), pair.first).ToLocalChecked(),
+                                         v8::Function::New(context, callback, value).ToLocalChecked());
+    }
+    return True(context->GetIsolate());
 }
 
 void CV8Isolate::RunCode(std::string& code, bool bAsModule)

@@ -7,6 +7,7 @@ public:
     ~CV8Isolate();
 
     void RunCode(std::string& code, bool bAsModule = false);
+    static MaybeLocal<Value> InitializeModuleExports(Local<Context> context, Local<Module> module);
 
 private:
     static MaybeLocal<Module> Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer);

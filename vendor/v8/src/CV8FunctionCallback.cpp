@@ -31,6 +31,12 @@ void CV8FunctionCallback::Return(std::string arg)
     m_callback.GetReturnValue().Set(result);
 }
 
+void CV8FunctionCallback::Return(double arg)
+{
+    Local<Number> result = Number::New(m_callback.GetIsolate(), arg);
+    m_callback.GetReturnValue().Set(result);
+}
+
 void CV8FunctionCallback::Return(bool arg)
 {
     m_callback.GetReturnValue().Set(Boolean::New(m_callback.GetIsolate(), arg));
