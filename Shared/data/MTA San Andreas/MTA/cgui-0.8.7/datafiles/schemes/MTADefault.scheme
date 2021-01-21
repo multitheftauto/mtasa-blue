@@ -11,6 +11,7 @@
 	<FalagardMapping windowType="CGUI/VerticalScrollbar" targetType="CEGUI/Scrollbar" renderer="Core/Scrollbar" lookNFeel="CGUI/VerticalScrollbar" />
 	<FalagardMapping windowType="CGUI/HorizontalScrollbarThumb" targetType="CEGUI/Thumb" renderer="Core/Button" lookNFeel="CGUI/HorizontalScrollbarThumb" />
 	<FalagardMapping windowType="CGUI/HorizontalScrollbar" targetType="CEGUI/Scrollbar" renderer="Core/Scrollbar" lookNFeel="CGUI/HorizontalScrollbar" />
+	<FalagardMapping windowType="CGUI/Static"      targetType="DefaultWindow" renderer="Core/Static"      lookNFeel="CGUI/Static" />	
 	<FalagardMapping windowType="CGUI/StaticImage" targetType="DefaultWindow" renderer="Core/StaticImage" lookNFeel="CGUI/StaticImage" />
 	<FalagardMapping windowType="CGUI/StaticText" targetType="DefaultWindow" renderer="Core/StaticText" lookNFeel="CGUI/StaticText" />
 	<FalagardMapping windowType="CGUI/MultiLineEditbox" targetType="CEGUI/MultiLineEditbox" renderer="Core/MultiLineEditbox" lookNFeel="CGUI/MultiLineEditbox" />
@@ -20,6 +21,8 @@
  	<FalagardMapping windowType="CGUI/TabButton" targetType="CEGUI/TabButton" renderer="Core/TabButton" lookNFeel="CGUI/TabButton" />
 	<FalagardMapping windowType="CGUI/TabControl" targetType="CEGUI/TabControl" renderer="Core/TabControl" lookNFeel="CGUI/TabControl" />
 	<FalagardMapping windowType="CGUI/TabPane" targetType="DefaultWindow" renderer="Core/Default" lookNFeel="CGUI/TabPane" />
+	<FalagardMapping windowType="CGUI/TabContentPane"    targetType="DefaultWindow"    renderer="Core/Default"    lookNFeel="CGUI/TabContentPane" />
+	<FalagardMapping windowType="CGUI/TabButtonPane"    targetType="DefaultWindow"    renderer="Core/Default"    lookNFeel="CGUI/TabButtonPane" />
 	<FalagardMapping windowType="CGUI/ProgressBar" targetType="CEGUI/ProgressBar" renderer="Core/ProgressBar" lookNFeel="CGUI/ProgressBar" />
 	<FalagardMapping windowType="CGUI/Checkbox" targetType="CEGUI/ToggleButton" renderer="Core/ToggleButton" lookNFeel="CGUI/Checkbox" />
 	<FalagardMapping windowType="CGUI/RadioButton" targetType="CEGUI/RadioButton" renderer="Core/ToggleButton" lookNFeel="CGUI/RadioButton" />

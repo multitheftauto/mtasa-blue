@@ -718,10 +718,10 @@
     ***************************************************
     -->
     <WidgetLook name="WindowsLook/Combobox">
-        <PropertyLinkDefinition targetProperty="NormalTextColour" widget="__auto_editbox__" initialValue="FF000000" type="ColourRect" name="NormalEditTextColour"/>
-        <PropertyLinkDefinition targetProperty="SelectedTextColour" widget="__auto_editbox__" initialValue="FFFFFFFF" type="ColourRect" name="SelectedEditTextColour"/>
-        <PropertyLinkDefinition targetProperty="ActiveSelectionColour" widget="__auto_editbox__" initialValue="FF607FFF" type="ColourRect" name="ActiveEditSelectionColour"/>
-        <PropertyLinkDefinition targetProperty="InactiveSelectionColour" widget="__auto_editbox__" initialValue="FF808080" type="ColourRect" name="InactiveEditSelectionColour"/>
+        <PropertyLinkDefinition targetProperty="NormalTextColour" widget="__auto_editbox__" initialValue="FF000000" type="ColourRect" name="NormalTextColour"/>
+        <PropertyLinkDefinition targetProperty="SelectedTextColour" widget="__auto_editbox__" initialValue="FFFFFFFF" type="ColourRect" name="SelectedTextColour"/>
+        <PropertyLinkDefinition targetProperty="ActiveSelectionColour" widget="__auto_editbox__" initialValue="FF607FFF" type="ColourRect" name="ActiveSelectionColour"/>
+        <PropertyLinkDefinition targetProperty="InactiveSelectionColour" widget="__auto_editbox__" initialValue="FF808080" type="ColourRect" name="InactiveSelectionColour"/>
         <Property name="Size" value="{{0, 256}, {0, 256}}" />
         <Child nameSuffix="__auto_editbox__" type="WindowsLook/Editbox">
             <Area>
