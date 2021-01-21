@@ -18,8 +18,13 @@ std::string CV8FunctionCallback::ReadString()
     return "";
 }
 
-void CV8FunctionCallback::Return(std::string str)
+void CV8FunctionCallback::Return(std::string arg)
 {
-    Local<String> result = String::NewFromUtf8(m_callback.GetIsolate(), str.c_str()).ToLocalChecked();
+    Local<String> result = String::NewFromUtf8(m_callback.GetIsolate(), arg.c_str()).ToLocalChecked();
     m_callback.GetReturnValue().Set(result);
+}
+
+void CV8FunctionCallback::Return(bool arg)
+{
+    m_callback.GetReturnValue().Set(Boolean::New(m_callback.GetIsolate(), arg));
 }

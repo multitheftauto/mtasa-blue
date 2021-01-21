@@ -10,6 +10,13 @@
 
 #include "StdInc.h"
 
+#ifndef MTA_CLIENT
+    #include <v8/CV8Base.h>
+    #include <core/CServerInterface.h>
+
+extern CServerInterface* g_pServerInterface;
+#endif
+
 void CLuaUtilDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -47,6 +54,26 @@ void CLuaUtilDefs::LoadFunctions()
         {"gettok", GetTok},
         {"tocolor", tocolor},
     };
+
+#ifndef MTA_CLIENT
+    CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("utils");
+
+    pHashModule->AddFunction("print", [](CV8FunctionCallbackBase* callback) {
+        std::stringstream stream;
+        int              count = callback->CountArguments();
+        for (int i = 0; i < count; i++)
+        {
+            stream << callback->ReadString();
+            if (i + 1 != count)
+            {
+                stream << " ";
+            }
+        }
+        printf("[%s] %s\n", *GetLocalTimeString(false), stream.str().c_str());
+        callback->Return(true);
+    });
+#endif
+    //     m_pScriptDebugging->LogInformation(L, "%s", output.c_str());
 
     // Add functions
     for (const auto& [name, func] : functions)
