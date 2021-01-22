@@ -243,21 +243,26 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     argStream.ReadBool(flags.bIgnoreSomeObjectsForCamera, false);
     argStream.ReadBool(flags.bShootThroughStuff, false);
 
-    if (argStream.NextIsTable())
+    if (argStream.NextIsTable()) // Is the next value a table? Read it as a user data table (will error if table contains invalid type)
     {
         argStream.ReadUserDataTable(vecIgnoredElements);
     }
-    else if (!argStream.NextIsNil() && !argStream.NextIsNone())
+    else if (argStream.NextIsNil()) // Is the next value nil? We can just skip to reading bIncludeBuildingInfo
     {
-        while(argStream.NextIsUserData())
+        argStream.Skip(1);
+    }
+    else if (!argStream.NextIsNone()) // Has the next value been supplied AT ALL (regardless of type)? Then we'll try to read that argument as a userdata (which will ensure errors are returned upon incorrect type), and keep trying to read each successive argument as userdata until the next argument has not been supplied, or it is a bool (bIncludeBuildingInfo).
+    {
+        CClientEntity* pElement;
+        argStream.ReadUserData(pElement);
+        vecIgnoredElements.push_back(pElement);
+        while(!argStream.NextIsNone() && !argStream.NextIsBool())
         {
             CClientEntity* pElement;
             argStream.ReadUserData(pElement);
             vecIgnoredElements.push_back(pElement);
         }
     }
-    else if (!argStream.NextIsNone())
-        argStream.Skip(1);
 
     argStream.ReadBool(bIncludeBuildingInfo, false);
     argStream.ReadBool(flags.bCheckCarTires, false);
