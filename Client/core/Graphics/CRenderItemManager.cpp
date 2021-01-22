@@ -150,9 +150,12 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
 //
 //
 ////////////////////////////////////////////////////////////////
-std::unique_ptr<CVectorGraphicItem> CRenderItemManager::CreateVectorGraphic(uint width, uint height)
+CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint height)
 {
-    std::unique_ptr<CVectorGraphicItem> pVectorItem(new CVectorGraphicItem());
+    if (!CanCreateRenderItem(CVectorGraphicItem::GetClassId()))
+        return NULL;
+
+    CVectorGraphicItem* pVectorItem = new CVectorGraphicItem;
     pVectorItem->PostConstruct(this, width, height);
 
     if (!pVectorItem->IsValid())

@@ -20,7 +20,7 @@ class CClientVectorGraphic : public CClientTexture
 {
     DECLARE_CLASS(CClientVectorGraphic, CClientTexture)
 public:
-    CClientVectorGraphic(CClientManager* pManager, ElementID ID, std::unique_ptr<CVectorGraphicItem> pVectorGraphicItem);
+    CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem);
     ~CClientVectorGraphic() = default;
 
     CResource* GetResource() const { return m_pResource; }
@@ -37,7 +37,7 @@ public:
     bool IsDestroyed() const { return m_bIsDestroyed; }
 
     SVGDocument*        GetSVGDocument() const { return m_pDocument.get(); }
-    CVectorGraphicItem* GetRenderItem() const { return m_pVectorGraphicItem.get(); }
+    CVectorGraphicItem* GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
 
     std::string GetSVGDocumentXML() const { return m_pDocument->toString(); };
     bool        SetSVGDocumentXML(CXMLNode* xmlNode);
@@ -47,7 +47,6 @@ private:
     CResource*                                        m_pResource;
     CClientManager*                                   m_pManager;
     std::unique_ptr<SVGDocument>                      m_pDocument;
-    std::unique_ptr<CVectorGraphicItem>               m_pVectorGraphicItem;
     std::unique_ptr<CClientVectorGraphicDisplay>      m_pVectorGraphicDisplay;
 
     bool m_bIsDestroyed = false;

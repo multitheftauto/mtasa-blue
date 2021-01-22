@@ -254,14 +254,14 @@ CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser(uint uiSizeX, u
 CClientVectorGraphic* CClientRenderElementManager::CreateVectorGraphic(uint width, uint height)
 {
     // Create the item
-    std::unique_ptr<CVectorGraphicItem> pVectorGraphicItem = m_pRenderItemManager->CreateVectorGraphic(width, height);
+    CVectorGraphicItem* pVectorGraphicItem = m_pRenderItemManager->CreateVectorGraphic(width, height);
 
     // Check create worked
     if (!pVectorGraphicItem)
         return nullptr;
 
     // Create the element
-    CClientVectorGraphic* pVectorGraphicElement = new CClientVectorGraphic(m_pClientManager, INVALID_ELEMENT_ID, std::move(pVectorGraphicItem));
+    CClientVectorGraphic* pVectorGraphicElement = new CClientVectorGraphic(m_pClientManager, INVALID_ELEMENT_ID, pVectorGraphicItem);
 
     // Add to this manager's list
     MapSet(m_ItemElementMap, pVectorGraphicElement->GetRenderItem(), pVectorGraphicElement);

@@ -11,16 +11,15 @@
 #include "CClientVectorGraphic.h"
 #include <svgdocument.h>
 
-CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, std::unique_ptr<CVectorGraphicItem> pVectorGraphicItem)
-    : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem.get())
+CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
+    : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
 {
     SetTypeName("svg");
 
     m_pDocument = nullptr;
     m_pResource = nullptr;
     m_pManager = pManager;
-
-    m_pVectorGraphicItem = std::move(pVectorGraphicItem);
+    
     m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
 
     CreateDocument();
@@ -35,8 +34,8 @@ void CClientVectorGraphic::CreateDocument()
 
     SVGElement* rootElement = m_pDocument->rootElement();
 
-    uint uiWidth = m_pVectorGraphicItem->m_uiSurfaceSizeX;
-    uint uiHeight = m_pVectorGraphicItem->m_uiSurfaceSizeY;
+    uint uiWidth = GetRenderItem()->m_uiSurfaceSizeX;
+    uint uiHeight = GetRenderItem()->m_uiSurfaceSizeY;
 
     std::string strWidth = std::to_string(uiWidth);
     std::string strHeight = std::to_string(uiHeight);
