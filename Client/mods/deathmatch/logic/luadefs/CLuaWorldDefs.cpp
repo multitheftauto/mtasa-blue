@@ -223,8 +223,18 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
     //  float endZ,
     //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool
-    //        returnBuildingInfo = false, bCheckCarTires = false ] )
+    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil [,
+    //        element ignoredElement2,
+    //        element ignoredElement3,
+    //        ... etc
+    //        ], bool returnBuildingInfo = false, bCheckCarTires = false ] )
+
+    //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
+    //  float endZ,
+    //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
+    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, table ignoredElements = nil,
+    //        bool returnBuildingInfo = false, bCheckCarTires = false ] )
+
     CVector                     vecStart;
     CVector                     vecEnd;
     SLineOfSightFlags           flags;
