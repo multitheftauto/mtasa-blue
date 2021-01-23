@@ -112,7 +112,7 @@ namespace lua
     template <typename T>
     std::enable_if_t<std::is_class_v<T>> Push(lua_State* L, T* val)
     {
-        lua_pushelement(L, val);
+        lua_pushuserdata(L, val);
     }
 
     template <typename T>
