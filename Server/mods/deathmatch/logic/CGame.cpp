@@ -447,7 +447,16 @@ void CGame::DoPulse()
     {
         CLOCK_CALL1(m_pRemoteDebugger->DoPulse(););
     }
-
+    CV8Base* v8 = g_pServerInterface->GetV8();
+    //v8->DoTaskPulse();
+    
+    //SharedUtil::async([v8]() { v8->DoTaskPulse(); });
+    m_pAsyncTaskScheduler->PushTask<bool>(
+        [v8]() {
+            v8->DoTaskPulse();
+            return true;
+        },
+        [v8](bool _) { v8->DoPulse(); });
     // Pulse ASE
     if (m_pASE)
     {

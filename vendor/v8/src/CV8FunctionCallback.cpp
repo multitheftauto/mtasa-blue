@@ -20,7 +20,6 @@ std::string CV8FunctionCallback::ReadString()
         String::Utf8Value str(m_callback.GetIsolate(), m_callback[m_iIndex].As<String>());
         m_iIndex++;
         return std::string(*str);
-
     }
     return "";
 }
@@ -40,4 +39,14 @@ void CV8FunctionCallback::Return(double arg)
 void CV8FunctionCallback::Return(bool arg)
 {
     m_callback.GetReturnValue().Set(Boolean::New(m_callback.GetIsolate(), arg));
+}
+
+void CV8FunctionCallback::ReturnPromise(std::function<void(CV8PromiseBase*)> callback)
+{
+    CV8Promise* pPromise = new CV8Promise(m_callback.GetIsolate());
+    CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
+
+    pPromise->m_callback = callback;
+    pThisIsolate->AddPromise(pPromise);
+    m_callback.GetReturnValue().Set(pPromise->GetPromise());
 }

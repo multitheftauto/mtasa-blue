@@ -46,10 +46,38 @@ CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pC
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     m_pIsolate = Isolate::New(m_createParams);
     m_strOriginResource = originResource;
+    m_pIsolate->SetMicrotasksPolicy(v8::MicrotasksPolicy::kExplicit);
+
+    m_pIsolate->SetData(0, this);
+}
+
+void CV8Isolate::DoTaskPulse()
+{
+    for (auto const& promise : m_vecPromises)
+    {
+        if (promise)
+            promise->Execute();
+    }
+}
+
+void CV8Isolate::DoPulse()
+{   
+    bool anyPromiseHasResolved = false;
+    for (int i = m_vecPromises.size() - 1; i >= 0; --i)
+    {
+        const auto& promise = m_vecPromises[i];
+        if (promise->FulFill())
+        {
+            m_vecPromises.erase(m_vecPromises.begin() + i);
+            anyPromiseHasResolved = true;
+        }
+    }
+    if (anyPromiseHasResolved)
+        m_pIsolate->PerformMicrotaskCheckpoint();
 }
 
 void CV8Isolate::ReportException(v8::TryCatch* pTryCatch)
-{
+    {
     String::Utf8Value      utf8(m_pIsolate, pTryCatch->Exception());
     v8::Local<v8::Message> message = pTryCatch->Message();
     int                    line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
@@ -69,7 +97,10 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
 
     Local<String> moduleName = String::NewFromUtf8(context->GetIsolate(), *importName).ToLocalChecked();
     auto          exports = pModule->GetExports(context->GetIsolate());
-    module = Module::CreateSyntheticModule(context->GetIsolate(), moduleName, exports, InitializeModuleExports);
+    module = Module::CreateSyntheticModule(context->GetIsolate(), moduleName, exports, [](Local<Context> context, Local<Module> module) {
+        CV8Isolate* pThisIsolate = (CV8Isolate*)context->GetIsolate()->GetData(0);
+        return pThisIsolate->InitializeModuleExports(context, module);
+    });
     Local<Module> checkedModule;
     if (!module.ToLocal(&checkedModule))
     {
@@ -89,7 +120,9 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
         Local<Value> value = External::New(context->GetIsolate(), pair.second);
 
         FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
+            v8::HandleScope         handle_scope(args.GetIsolate());
             v8::Local<v8::External> ext = args.Data().As<v8::External>();
+            CV8Isolate*             pThisIsolate = (CV8Isolate*)args.GetIsolate()->GetData(0);
             void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
             CV8FunctionCallback callback(args);
             func(&callback);
@@ -115,7 +148,6 @@ void CV8Isolate::RunCode(std::string& code, bool bAsModule)
     HandleScope handle_scope(m_pIsolate);
 
     Local<ObjectTemplate> global = ObjectTemplate::New(m_pIsolate);
-
     Local<Context> context = Context::New(m_pIsolate, nullptr, global);
 
     Context::Scope context_scope(context);

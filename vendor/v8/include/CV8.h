@@ -8,6 +8,8 @@ public:
     ~CV8();
     CV8IsolateBase* CreateIsolate(std::string& strCode, std::string& originResource);
     CV8ModuleBase*  CreateModule(const char* name);
+    void            DoPulse();
+    void            DoTaskPulse();
 
     static CV8Module*  GetModuleByName(const char* name);
     static std::unordered_map<std::string, std::unique_ptr<CV8Module>> m_mapModules;

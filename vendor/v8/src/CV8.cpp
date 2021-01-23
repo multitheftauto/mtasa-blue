@@ -28,6 +28,22 @@ CV8::~CV8()
     V8::ShutdownPlatform();
 }
 
+void CV8::DoTaskPulse()
+{
+    for (auto const& isolate : m_vecIsolates)
+    {
+        isolate->DoTaskPulse();
+    }
+}
+
+void CV8::DoPulse()
+{
+    for (auto const& isolate : m_vecIsolates)
+    {
+        isolate->DoPulse();
+    }
+}
+
 std::vector<CV8IsolateBase*> CV8::GetIsolates()
 {
     std::vector<CV8IsolateBase*> isolates = std::vector<CV8IsolateBase*>();

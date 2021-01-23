@@ -11,6 +11,8 @@ public:
     void Return(double arg);
     void Return(bool arg);
 
+    void ReturnPromise(std::function<void(CV8PromiseBase*)> callback);
+
 private:
     const FunctionCallbackInfo<Value>& m_callback;
     int                                m_iIndex = 0;

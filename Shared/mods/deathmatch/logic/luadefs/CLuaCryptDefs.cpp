@@ -43,6 +43,19 @@ void CLuaCryptDefs::LoadFunctions()
         std::string md5 = Md5(str);
         callback->Return(md5);
     });
+
+    pHashModule->AddFunction("md5Async", [](CV8FunctionCallbackBase* callback) {
+        std::string     str = callback->ReadString();
+        callback->ReturnPromise([str](CV8PromiseBase* promise) {
+            promise->Resolve(Md5(str));
+        });
+    });
+
+    pHashModule->AddFunction("passwordHash", [](CV8FunctionCallbackBase* callback) {
+        std::string password = callback->ReadString();
+        callback->ReturnPromise([password](CV8PromiseBase* promise) { promise->Resolve(SharedUtil::BcryptHash(password, "", 13));
+        });
+    });
 #endif
 
     // Add functions
