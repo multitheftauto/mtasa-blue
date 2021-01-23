@@ -46,6 +46,7 @@ void CServer::ServerInitialize(CServerInterface* pServerInterface)
     //v8->CreateIsolate(code, origin);
 
     g_pRealNetServer = g_pNetServer;
+
     #if defined(MTA_DEBUG)
     SharedUtil_Tests();
     #endif

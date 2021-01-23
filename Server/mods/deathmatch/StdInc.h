@@ -178,6 +178,7 @@ struct SAclRequest;
 // Logic includes
 #include "ASE.h"
 #include "ASEQuerySDK.h"
+#include "CRemoteDebugger.h"
 #include "CAccessControlList.h"
 #include "CAccessControlListGroup.h"
 #include "CAccessControlListManager.h"

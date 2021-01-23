@@ -28,11 +28,24 @@ CV8::~CV8()
     V8::ShutdownPlatform();
 }
 
+std::vector<CV8IsolateBase*> CV8::GetIsolates()
+{
+    std::vector<CV8IsolateBase*> isolates = std::vector<CV8IsolateBase*>();
+    isolates.reserve(m_vecIsolates.size());
+    for (auto const& isolate : m_vecIsolates)
+    {
+        isolates.push_back(isolate.get());
+    }
+    return isolates;
+}
+
 CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originResource)
 {
-    CV8Isolate* pIsolate = new CV8Isolate(this, originResource);
+    std::unique_ptr<CV8Isolate> pIsolate = std::make_unique<CV8Isolate>(this, originResource);
     pIsolate->RunCode(strCode, true);
-    return pIsolate;
+    CV8Isolate* isolate = pIsolate.get();
+    m_vecIsolates.push_back(std::move(pIsolate));
+    return isolate;
 }
 
 CV8Module* CV8::GetModuleByName(const char* name)

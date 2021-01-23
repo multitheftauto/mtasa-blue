@@ -327,7 +327,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pFunctionUseLogger);
     SAFE_DELETE(m_pOpenPortsTester);
     SAFE_DELETE(m_pMasterServerAnnouncer);
-    SAFE_DELETE(m_pASE);
+    SAFE_DELETE(m_pRemoteDebugger);
     SAFE_RELEASE(m_pHqComms);
     CSimControl::Shutdown();
 
@@ -442,6 +442,12 @@ void CGame::DoPulse()
         CLOCK_CALL1(ProcessTrafficLights(llCurrentTime););
     }
 
+    // Pulse Remote debugger
+    if (m_pRemoteDebugger)
+    {
+        CLOCK_CALL1(m_pRemoteDebugger->DoPulse(););
+    }
+
     // Pulse ASE
     if (m_pASE)
     {
@@ -491,9 +497,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Init
     m_pASE = NULL;
     IsMainThread();
-
-    CDynamicLibrary v8Dll;
-    v8Dll.Load("v8_d.dll");
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot();
 
@@ -878,6 +881,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         }
     }
 
+    m_pRemoteDebugger = new CRemoteDebugger(m_pMainConfig, m_pPlayerManager, 1234, strServerIPList);
+    m_pRemoteDebugger->SetPortEnabled(true, true);
     // If ASE is enabled
     m_pASE = new ASE(m_pMainConfig, m_pPlayerManager, static_cast<int>(usServerPort), strServerIPList);
     if (m_pMainConfig->GetSerialVerificationEnabled())

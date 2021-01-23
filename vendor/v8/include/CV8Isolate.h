@@ -1,15 +1,17 @@
 using namespace v8;
 
 class CV8Isolate : public CV8IsolateBase
-{
+    {
 public:
     CV8Isolate(const CV8* pCV8, std::string& originResource);
     ~CV8Isolate();
 
     void RunCode(std::string& code, bool bAsModule = false);
+    void                      TestMess(std::string mess);
     static MaybeLocal<Value> InitializeModuleExports(Local<Context> context, Local<Module> module);
     static MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions,
                                                             Local<Module> referrer);
+
 
 private:
     static MaybeLocal<Module> Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer);
@@ -19,4 +21,9 @@ private:
     Isolate::CreateParams m_createParams;
     Isolate*              m_pIsolate;
     const CV8*            m_pCV8;
+
+    std::unique_ptr<class InspectorClientImpl> m_pClient;
+    std::unique_ptr<class ChannelImpl>         m_pChannel;
+    std::unique_ptr<class v8_inspector::V8InspectorSession> m_pSession;
+    std::unique_ptr<class v8_inspector::V8Inspector>        m_pInspector;
 };

@@ -3,7 +3,43 @@
 
 using namespace v8;
 
-static std::queue<std::string> modulesListName; // Todo, get rid of this list
+static std::queue<std::string> modulesListName;            // Todo, get rid of this list
+
+class InspectorClientImpl : public v8_inspector::V8InspectorClient
+{
+public:
+    InspectorClientImpl() {}
+};
+
+class ChannelImpl : public v8_inspector::V8Inspector::Channel
+{
+public:
+    ChannelImpl(Isolate* pIsolate) : m_pIsolate(pIsolate) {}
+    void sendResponse(int callId, std::unique_ptr<v8_inspector::StringBuffer> message) { int a = 5; }
+    void sendNotification(std::unique_ptr<v8_inspector::StringBuffer> message)
+    {
+        v8::HandleScope handle_scope(m_pIsolate);
+        auto stringView = message->string();
+        int  length = static_cast<int>(stringView.length());
+        Local<String> mess =
+            (stringView.is8Bit()
+                 ? v8::String::NewFromOneByte(m_pIsolate, reinterpret_cast<const uint8_t*>(stringView.characters8()), v8::NewStringType::kNormal, length)
+                 : v8::String::NewFromTwoByte(m_pIsolate, reinterpret_cast<const uint16_t*>(stringView.characters16()), v8::NewStringType::kNormal, length))
+                .ToLocalChecked();
+
+        String::Utf8Value utf8(m_pIsolate, mess);
+        std::string       str(*utf8);
+
+        printf("[SEND NOTIFICATION] %s\n", str.c_str());
+    }
+    void                                flushProtocolNotifications() { int b = 5; }
+    std::unique_ptr<v8_inspector::V8InspectorSession> connect(int contextGroupId, Channel*, v8_inspector::StringView state) { int b = 5; };
+    std::unique_ptr<v8_inspector::V8StackTrace>         createStackTrace(v8::Local<v8::StackTrace>) { int b = 5; }
+    std::unique_ptr<v8_inspector::V8StackTrace>         captureStackTrace(bool fullStack) { int c = 5; }
+
+private:
+    Isolate* m_pIsolate;
+};
 
 CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
@@ -64,6 +100,12 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
     }
     modulesListName.pop();
     return True(context->GetIsolate());
+}
+
+void CV8Isolate::TestMess(std::string mess)
+{
+    v8_inspector::StringView view((uint8_t*)mess.c_str(), mess.length() + 1);
+    m_pSession->dispatchProtocolMessage(view);
 }
 
 void CV8Isolate::RunCode(std::string& code, bool bAsModule)
@@ -131,11 +173,31 @@ void CV8Isolate::RunCode(std::string& code, bool bAsModule)
         }
     }
 
+    // v8_inspector::V8InspectorClient* client = new v8_inspector::V8InspectorClient();
+    // std::unique_ptr<v8_inspector::V8Inspector> inspector = v8_inspector::V8Inspector::create(m_pIsolate, client);
+
     // if (result.IsEmpty())
     // Local<Value> result = script->Run(context).ToLocalChecked();
     //// Convert the result to an UTF8 string and print it.
     // String::Utf8Value utf8(m_pIsolate, result);
     // printf("%s\n", *utf8);
+
+    if (true)
+    {
+        m_pClient = std::make_unique<InspectorClientImpl>();
+
+        m_pInspector = std::move(v8_inspector::V8Inspector::create(m_pIsolate, m_pClient.get()));
+
+        std::string                         test("TEST MTA 123123");
+        m_pChannel = std::make_unique<ChannelImpl>(m_pIsolate);
+        v8_inspector::StringView              view((uint8_t*)test.c_str(), test.length() + 1);
+        v8_inspector::StringView              ctx_name((uint8_t*)test.c_str(), test.length() + 1);
+
+        m_pSession = m_pInspector->connect(1, m_pChannel.get(), view);
+
+        m_pInspector->contextCreated(v8_inspector::V8ContextInfo(context, 1, ctx_name));
+
+    }
 }
 
 CV8Isolate::~CV8Isolate()
