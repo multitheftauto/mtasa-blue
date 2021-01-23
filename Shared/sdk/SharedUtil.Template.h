@@ -1,88 +1,5 @@
 #pragma once
 
-/**
-    is_Nspecialization
-
-    These structs allow testing whether a type is a specialization of a
-    class template
-
-    Note: Take care of optional parameters. For example std::unordered_map
-    has 5 template arguments, thus is_5specialization needs to be used, rather
-    than is_2specialization (Key, Value).
-
-    Usage can be the following:
-    if constexpr(is_2specialization<std::vector, T>::value)
-    {
-        // T is a vector!
-        using param_t = typename is_2specialization<std::vector, T>::param_t
-        // param_t is the type of the content of the vector
-    }
-
-    For each version of is_Nspecialization we have two class templates:
-        - The first one (inheriting from std::false_type) is used to provide a
-          default case, where something isn't a match. It does not impose restrictions
-          on anything apart from the Test parameter (which is required to take N template
-          parameters). Thus it matches anything.
-
-        - The second one (std::true_type) is used to perform the actual match
-          by specializting the template for Test<Arg, Arg2>
-**/
-
-template <typename Test, template <typename> class Ref>
-struct is_specialization : std::false_type
-{
-};
-
-template <template <typename> class Ref, typename Args>
-struct is_specialization<Ref<Args>, Ref> : std::true_type
-{
-    using param_t = Args;
-};
-
-template <typename Test, template <typename, typename> class Ref>
-struct is_2specialization : std::false_type
-{
-};
-
-template <template <typename, typename> class Ref, typename Arg1, typename Arg2>
-struct is_2specialization<Ref<Arg1, Arg2>, Ref> : std::true_type
-{
-    using param1_t = Arg1;
-    using param2_t = Arg2;
-};
-
-template <typename Test, template <typename, typename, typename, typename, typename> class Ref>
-struct is_5specialization : std::false_type
-{
-};
-
-template <template <typename, typename, typename, typename, typename> class Ref, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-struct is_5specialization<Ref<Arg1, Arg2, Arg3, Arg4, Arg5>, Ref> : std::true_type
-{
-    using param1_t = Arg1;
-    using param2_t = Arg2;
-    using param3_t = Arg3;
-    using param4_t = Arg4;
-    using param5_t = Arg5;
-};
-
-// is_variant
-//  Returns whether a T is a variant
-//  If T is a variant, it also allows accessing the individual types
-//  of the variant via param1_t (first type) and rest_t (which is a
-//  variant of the remaining types).
-template <typename Test>
-struct is_variant : std::false_type
-{
-};
-
-template <typename Arg1, typename... Args>
-struct is_variant<std::variant<Arg1, Args...>> : std::true_type
-{
-    using param1_t = Arg1;
-    using rest_t = std::variant<Args...>;
-    static constexpr auto count = sizeof...(Args) + 1;
-};
 
 /**
     nth_element
@@ -112,6 +29,31 @@ struct nth_element_impl<0, T, Ts...>
 template <std::size_t I, typename... Ts>
 using nth_element_t = typename nth_element_impl<I, Ts...>::type;
 
+/**
+    is_specialization
+
+    This struct allows testing whether a type is a specialization of a class template
+
+    Usage can be the following:
+    if constexpr(is_specialization<T, std::vector>::value)
+    {
+        // T is a vector!
+        using param_t = typename is_specialization<T, std::vector>::param_t<0>
+        // param_t is the type of the content of the vector
+    }
+**/
+template <typename Test, template <typename...> class Ref>
+struct is_specialization : std::false_type
+{
+};
+
+template <template <typename...> class Ref, typename... Args>
+struct is_specialization<Ref<Args...>, Ref> : std::true_type
+{
+    template <std::size_t N>
+    using param_t = nth_element_t<N, Args...>;
+    static constexpr auto size = sizeof...(Args);
+};
 
 // common_variant
 // common_variant builds a single variant from types or variants

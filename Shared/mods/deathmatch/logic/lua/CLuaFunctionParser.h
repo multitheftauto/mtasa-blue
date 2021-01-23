@@ -28,17 +28,17 @@ struct CLuaFunctionParserBase
 
     // Translates a variant type to a list of names separated by slashes
     // std::variant<bool, int, float> => bool/int/float
-    template <typename T>
+    template <typename T, std::size_t typeIndex = 0>
     inline void TypeToNameVariant(SString& accumulator)
     {
-        using param = typename is_variant<T>::param1_t;
+        using param = typename is_specialization<T, std::variant>::param_t<typeIndex>;
         if (accumulator.length() == 0)
             accumulator = TypeToName<param>();
         else
             accumulator += "/" + TypeToName<param>();
 
-        if constexpr (is_variant<T>::count != 1)
-            return TypeToNameVariant<typename is_variant<T>::rest_t>(accumulator);
+        if constexpr (typeIndex < is_specialization<T, std::variant>::size - 1)
+            return TypeToNameVariant<T, typeIndex + 1>(accumulator);
     }
 
     template <typename T>
@@ -54,14 +54,14 @@ struct CLuaFunctionParserBase
             return "enum";
         else if constexpr (is_specialization<T, std::optional>::value)
         {
-            using param_t = typename is_specialization<T, std::optional>::param_t;
+            using param_t = typename is_specialization<T, std::optional>::param_t<0>;
             return TypeToName<param_t>();
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
             return "value";
-        else if constexpr (is_2specialization<T, std::vector>::value)
+        else if constexpr (is_specialization<T, std::vector>::value)
             return "table";
-        else if constexpr (is_5specialization<T, std::unordered_map>::value)
+        else if constexpr (is_specialization<T, std::unordered_map>::value)
             return "table";
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
             return "function";
@@ -77,7 +77,7 @@ struct CLuaFunctionParserBase
             return "colour";
         else if constexpr (std::is_same_v<T, lua_State*>)
             return "";            // not reachable
-        else if constexpr (is_variant<T>::value)
+        else if constexpr (is_specialization<T, std::variant>::value)
         {
             SString strTypes;
             TypeToNameVariant<T>(strTypes);
@@ -154,24 +154,23 @@ struct CLuaFunctionParserBase
 
     // Special type matcher for variants. Returns -1 if the type does not match
     // returns n if the nth type of the variant matches
-    template <typename T>
+    template <typename T, std::size_t typeIndex = 0>
     inline int TypeMatchVariant(lua_State* L, std::size_t index)
     {
         // If the variant is empty, we have exhausted all options
         // The type therefore doesn't match the variant
-        if constexpr (std::is_same_v<T, std::variant<>>)
+        if constexpr (is_specialization<T, std::variant>::size == typeIndex)
             return -1;
         else
         {
             // Try to match the first type of the variant
             // If it matches, we've found our index
-            using first_t = typename is_variant<T>::param1_t;
-            using next_t = typename is_variant<T>::rest_t;
+            using first_t = typename is_specialization<T, std::variant>::param_t<typeIndex>;
             if (TypeMatch<first_t>(L, index))
                 return 0;
 
             // Else try the remaining types of the variant
-            int iResult = TypeMatchVariant<next_t>(L, index);
+            int iResult = TypeMatchVariant<T, typeIndex+1>(L, index);
             if (iResult == -1)
                 return -1;
             return 1 + iResult;
@@ -217,11 +216,11 @@ struct CLuaFunctionParserBase
             return true;
 
         // std::vector is used for arrays built from tables
-        if constexpr (is_2specialization<T, std::vector>::value)
+        if constexpr (is_specialization<T, std::vector>::value)
             return iArgument == LUA_TTABLE;
 
         // std::unordered_map<k,v> is used for maps built from tables
-        if constexpr (is_5specialization<T, std::unordered_map>::value)
+        if constexpr (is_specialization<T, std::unordered_map>::value)
             return iArgument == LUA_TTABLE;
 
         // CLuaFunctionRef is used for functions
@@ -234,7 +233,7 @@ struct CLuaFunctionParserBase
 
         // variants can be used by any of the underlying types
         // thus recursively use this function
-        if constexpr (is_variant<T>::value)
+        if constexpr (is_specialization<T, std::variant>::value)
             return TypeMatchVariant<T>(L, index) != -1;
 
         // Vector2 may either be represented by CLuaVector or by two numbers
@@ -270,10 +269,19 @@ struct CLuaFunctionParserBase
             }
             return true;
         }
-        // Catch all for class pointer types, assume all classes are valid script entities
-        // and can be fetched from a userdata
-        if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
-            return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+
+        // Handle class pointer types
+        if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>> && !std::is_same_v<T, lua_State*>)
+        {
+            if (iArgument != LUA_TUSERDATA && iArgument != LUA_TLIGHTUSERDATA)
+                return false;
+            bool  isLightUserData = iArgument == LUA_TLIGHTUSERDATA;
+            void* pValue = lua::PopPrimitive<void*>(L, index);
+            using class_t = std::remove_pointer_t<T>;
+            auto result =
+                isLightUserData ? UserDataCast<class_t>((class_t*)0, pValue, L) : UserDataCast<class_t>((class_t*)0, *reinterpret_cast<void**>(pValue), L);
+            return result != nullptr;
+        }            
 
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
@@ -287,10 +295,10 @@ struct CLuaFunctionParserBase
     {
         // As std::variant<> cannot be constructed, we simply return the first value
         // in the error case. This is actually unreachable in the regular path,
-        // due to TypeMatch making sure that vindex < is_variant<T>::count
-        if constexpr (is_variant<T>::count == currIndex)
+        // due to TypeMatch making sure that vindex refers to a valid variant index
+        if constexpr (is_specialization<T, std::variant>::size== currIndex)
         {
-            using type_t = typename is_variant<T>::param1_t;
+            using type_t = typename is_specialization<T, std::variant>::param_t<0>;
             return type_t{};
         }
         else
@@ -380,7 +388,7 @@ struct CLuaFunctionParserBase
         else if constexpr (is_specialization<T, std::optional>::value)
         {
             // optionals may either type match the desired value, or be nullopt
-            using param = typename is_specialization<T, std::optional>::param_t;
+            using param = typename is_specialization<T, std::optional>::param_t<0>;
             if (TypeMatch<param>(L, index))
                 return PopUnsafe<param>(L, index);
 
@@ -397,9 +405,9 @@ struct CLuaFunctionParserBase
             return std::nullopt;
         }
 
-        else if constexpr (is_2specialization<T, std::vector>::value)            // 2 specialization due to allocator
+        else if constexpr (is_specialization<T, std::vector>::value)
         {
-            using param = typename is_2specialization<T, std::vector>::param1_t;
+            using param = typename is_specialization<T, std::vector>::param_t<0>;
             T vecData;
             lua_pushnil(L); /* first key */
             while (lua_next(L, index) != 0)
@@ -418,10 +426,10 @@ struct CLuaFunctionParserBase
             ++index;
             return vecData;
         }
-        else if constexpr (is_5specialization<T, std::unordered_map>::value)
+        else if constexpr (is_specialization<T, std::unordered_map>::value)
         {
-            using key_t = typename is_5specialization<T, std::unordered_map>::param1_t;
-            using value_t = typename is_5specialization<T, std::unordered_map>::param2_t;
+            using key_t = typename is_specialization<T, std::unordered_map>::param_t<0>;
+            using value_t = typename is_specialization<T, std::unordered_map>::param_t<1>;
             T map;
             lua_pushnil(L); /* first key */
             while (lua_next(L, index) != 0)
@@ -450,7 +458,7 @@ struct CLuaFunctionParserBase
             return L;
         // variants can be used by any of the underlying types
         // thus recursively use this function
-        else if constexpr (is_variant<T>::value)
+        else if constexpr (is_specialization<T, std::variant>::value)
         {
             int iMatch = TypeMatchVariant<T>(L, index);
             return PopUnsafeVariant<T>(L, index, iMatch);
