@@ -93,8 +93,6 @@ void CGUIElement_Impl::SetPosition(const CVector2D& Position, bool bRelative)
         position = CEGUI::Vector2(CEGUI::UDim(0, Position.fX), CEGUI::UDim(0, Position.fY));
 
     m_pWindow->setPosition(position);
-
-    CorrectEdges();
 }
 
 CVector2D CGUIElement_Impl::GetPosition(bool bRelative)
@@ -138,8 +136,6 @@ void CGUIElement_Impl::SetSize(const CVector2D& vecSize, bool bRelative)
         size = CEGUI::USize(CEGUI::UDim(0, vecSize.fX), CEGUI::UDim(0, vecSize.fY));
 
     m_pWindow->setSize(size);
-
-    CorrectEdges();
 }
 
 CVector2D CGUIElement_Impl::GetSize(bool bRelative)
@@ -355,13 +351,14 @@ void CGUIElement_Impl::CorrectEdges()
     CEGUI::UVector2 currentPosition = m_pWindow->getPosition();
     CEGUI::USize    currentSize = m_pWindow->getSize();
 
-    SString defaultSkinName = "";
+    std::string strType = m_pWindow->getType().c_str();
+    std::string strParentType = m_pWindow->getParent()->getType().c_str();
 
     // Label turns out to be buggy
-    if (typeid(m_pWindow).name() == "StaticText")
+    if (strType == m_pManager->GetElementPrefix() + "/StaticText")
         return;
 
-    if (typeid(m_pWindow->getParent()).name() == "FrameWindow")
+    if (strParentType == m_pManager->GetElementPrefix() + "/FrameWindow")
     {
         CEGUI::USize parentSize = m_pWindow->getParent()->getSize();
         if (currentPosition.d_x.d_offset < CGUI_NODRAW_LEFT)

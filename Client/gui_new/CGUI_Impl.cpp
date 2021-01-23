@@ -350,17 +350,17 @@ bool CGUI_Impl::GetGUIInputEnabled()
             {
                 return false;
             }
-            if (typeid(pActiveWindow).name() == "Editbox")
+            if (pActiveWindow->getType() == GetElementPrefix() + "/Editbox")
             {
                 CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
                 return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
             }
-            else if (typeid(pActiveWindow).name() == "MultiLineEditbox")
+            else if (pActiveWindow->getType() == GetElementPrefix() + "/MultiLineEditbox")
             {
                 CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
                 return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
             }
-            else if (typeid(pActiveWindow).name() == CGUIWEBBROWSER_NAME)
+            else if (pActiveWindow->getType() == GetElementPrefix() + "/" + CGUIWEBBROWSER_NAME)
             {
                 auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
                 if (pElement->GetType() == CGUI_WEBBROWSER)
@@ -769,7 +769,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
 
                 // Edit boxes
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (typeid(Wnd).name() == "Editbox")
+                if (Wnd->getType() == GetElementPrefix() + "/Editbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
@@ -798,7 +798,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                 }
 
                 // Multiline editboxes
-                if (typeid(Wnd).name() == "MultiLineEditbox")
+                if (Wnd->getType() == GetElementPrefix() + "/MultiLineEditbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast<CEGUI::MultiLineEditbox*>(Wnd);
@@ -855,7 +855,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
             if (KeyboardArgs.sysKeys & CEGUI::Control)
             {
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (typeid(Wnd).name() == "Editbox" || typeid(Wnd).name() == "MultiLineEditbox")
+                if (Wnd->getType() == GetElementPrefix() +  "/Editbox" || Wnd->getType() == GetElementPrefix() + "/MultiLineEditbox")
                 {
                     // Open the clipboard
                     OpenClipboard(NULL);
@@ -871,7 +871,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         bool          bReplaceNewLines = true;
                         bool          bIsBoxFull = false;
 
-                        if (typeid(Wnd).name() == "Editbox")
+                        if (Wnd->getType() == GetElementPrefix() + "/Editbox")
                         {
                             // Turn our event window into an editbox
                             CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
@@ -967,7 +967,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         if (bIsBoxFull)
                         {
                             // Fire an event if the editbox is full
-                            if (typeid(Wnd).name() == "Editbox")
+                            if (Wnd->getType() == GetElementPrefix() + "/Editbox")
                             {
                                 CEGUI::Editbox*        WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                                 CEGUI::WindowEventArgs args(WndEdit);
@@ -982,7 +982,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         }
                         else
                         {
-                            if (typeid(Wnd).name() == "Editbox")
+                            if (Wnd->getType() == GetElementPrefix() + "/Editbox")
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                                 WndEdit->setText(strEditText);
@@ -1012,13 +1012,13 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
             {
                 // Edit boxes
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
-                if (typeid(Wnd).name() == "Editbox")
+                if (Wnd->getType() == GetElementPrefix() + "/Editbox")
                 {
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast<CEGUI::Editbox*>(Wnd);
                     WndEdit->setSelection(0, WndEdit->getText().size());
                 }
-                else if (typeid(Wnd).name() == "MultiLineEditbox")
+                else if (Wnd->getType() == GetElementPrefix() + "/MultiLineEditbox")
                 {
                     // Turn our event window into a multiline editbox
                     CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast<CEGUI::MultiLineEditbox*>(Wnd);
@@ -1734,7 +1734,7 @@ void CGUI_Impl::ClearSystemKeys()
 CEGUI::Window* CGUI_Impl::GetMasterWindow(CEGUI::Window* wnd)
 {
     // A titlebar should always return the parent (i.e. the frame window)
-    if (typeid(wnd).name() == CEGUI::Titlebar::EventNamespace)
+    if (wnd->getType() == GetElementPrefix() + "/" + CEGUI::Titlebar::EventNamespace)
     {
         if (wnd->getParent())
             return wnd->getParent();
