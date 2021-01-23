@@ -444,7 +444,33 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
         {
-            return luaM_toref(L, index++);
+        #ifdef MTA_CLIENT
+            CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(L);
+        #else
+            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(L);
+        #endif
+            const void* pFuncPtr = lua_topointer(L, index);
+
+            if (CRefInfo* pInfo = MapFind(pLuaMain->m_CallbackTable, pFuncPtr))
+            {
+                // Re-use the lua ref we already have to this function
+                pInfo->ulUseCount++;
+                ++index;
+                return CLuaFunctionRef(L, pInfo->iFunction, pFuncPtr);
+            }
+            else
+            {
+                // Get a lua ref to this function
+                lua_pushvalue(L, index);
+                int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+
+                // Save ref info
+                CRefInfo info{1, ref};
+                MapSet(pLuaMain->m_CallbackTable, pFuncPtr, info);
+
+                ++index;
+                return CLuaFunctionRef(L, ref, pFuncPtr);
+            }
         }
         else if constexpr (std::is_same_v<T, lua_State*>)
             return L;
