@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - feature/ci-actions
     paths: 
     - '.github/**'
     - 'Dockerfile'
