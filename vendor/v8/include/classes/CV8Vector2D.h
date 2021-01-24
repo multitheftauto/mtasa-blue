@@ -1,17 +1,24 @@
 class CVector2D;
 
-class CV8Vector2D : public CMtaReference<CVector2D>
+using namespace v8;
+
+class CV8Vector2D : public CV8BaseClass
 {
 public:
-    static void CreateTemplate(v8::Local<v8::Context> context);
+    inline static const char* m_szName = "Vector2";
+    // Adds new class definition to the context
 
-    //static v8::Handle<v8::Object> New(CVector2D vector2d, v8::Isolate* isolate);
+    static void CreateTemplate(Local<Context> context);
+
+    //static Handle<Object> New(CVector2D vector2d, Isolate* isolate);
 
 private:
-    static void ConstructorCall(const v8::FunctionCallbackInfo<v8::Value>& info);
+    static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
 
-    static void GetX(v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value>& info);
-    static void SetX(v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-    static void GetY(v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value>& info);
-    static void SetY(v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+    static void GetX(Local<Name> property, const PropertyCallbackInfo<Value>& info);
+    static void SetX(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
+    static void GetY(Local<Name> property, const PropertyCallbackInfo<Value>& info);
+    static void SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
+
+    static void MethodGetLength(const FunctionCallbackInfo<Value>& info);
 };

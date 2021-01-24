@@ -14,7 +14,7 @@
 
 #include "v8/CV8Base.h"
 
-#include "classes/CMtaReference.h"
+#include "classes/CV8BaseClass.h"
 #include "classes/CV8Vector2D.h"
 
 #include "include/CV8.h"
