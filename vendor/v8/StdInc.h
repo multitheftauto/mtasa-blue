@@ -16,6 +16,7 @@
 
 #include "classes/CV8BaseClass.h"
 #include "classes/CV8Vector2D.h"
+#include "classes/CV8Vector3D.h"
 
 #include "include/CV8.h"
 #include "include/CV8Isolate.h"

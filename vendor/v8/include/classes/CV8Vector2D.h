@@ -8,7 +8,7 @@ public:
     inline static const char* m_szName = "Vector2";
     // Adds new class definition to the context
 
-    static void CreateTemplate(Local<Context> context);
+    static Handle<FunctionTemplate> CreateTemplate(Local<Context> context);
 
     //static Handle<Object> New(CVector2D vector2d, Isolate* isolate);
 

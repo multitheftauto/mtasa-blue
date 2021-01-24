@@ -72,11 +72,10 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     info.GetReturnValue().Set(wrapper);
 }
 
-void CV8Vector2D::CreateTemplate(Local<Context> context)
+Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
 {
-    Isolate*       isolate = context->GetIsolate();
-    Isolate::Scope isolate_scope(isolate);
-    HandleScope    handle_scope(isolate);
+    Isolate*                 isolate = context->GetIsolate();
+    v8::EscapableHandleScope handleScope{isolate};
 
     Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
     vector2dTemplate->SetCallHandler(ConstructorCall);
@@ -90,4 +89,5 @@ void CV8Vector2D::CreateTemplate(Local<Context> context)
     objectTemplate->Set(String::NewFromUtf8(isolate, "getLength").ToLocalChecked(), FunctionTemplate::New(isolate, MethodGetLength));
     objectTemplate->Set(Symbol::GetToStringTag(isolate), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
     context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), vector2dTemplate->GetFunction(context).ToLocalChecked());
+    return handleScope.Escape(vector2dTemplate);
 }
