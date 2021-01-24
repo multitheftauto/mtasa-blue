@@ -27,6 +27,8 @@ newaction {
 	description = "Downloads and installs v8",
 
 	execute = function()
+		os.mkdir(V8_PATH) -- make sure path exists, otherwise download fails
+
 		-- Check file hash
 		local archive_path = V8_PATH.."/"..V8_DOWNLOAD_FILENAME..".zip"
 		if os.isfile(archive_path) and os.sha256_file(archive_path) == V8_HASH then
