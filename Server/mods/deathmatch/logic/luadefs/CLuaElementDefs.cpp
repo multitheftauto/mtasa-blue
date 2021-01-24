@@ -1018,7 +1018,7 @@ CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius
 {
     const auto typeHash = (type.has_value() && !type.value().empty()) ?
         CElement::GetTypeHashFromString(type.value()) : 0;
-        
+
     CElementResult result;
     GetSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 
@@ -1671,7 +1671,7 @@ int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-  
+
         if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, strKey, pPlayer))
         {
             lua_pushboolean(luaVM, true);

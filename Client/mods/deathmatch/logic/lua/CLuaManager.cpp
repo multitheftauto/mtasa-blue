@@ -48,8 +48,8 @@ CLuaManager::~CLuaManager()
         delete (*iter);
     }
 
-	// Close and remove LVM from memory
-	ProcessPendingDeleteList();
+    // Close and remove LVM from memory
+    ProcessPendingDeleteList();
 
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();

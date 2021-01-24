@@ -377,7 +377,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     if (m_pCore->IsCursorForcedVisible())
     {
         if (!bIsCursorForced)
-        {   
+        {
             if (m_pCore->IsCursorControlsToggled())
             {
                 SetAllControls(false);
@@ -1954,7 +1954,7 @@ bool CKeyBinds::GetKeyStateByName(const char* keyName, bool& state) const
         state = GetBindableKeyState(key);
         return true;
     }
-    
+
     return false;
 }
 
@@ -2351,7 +2351,7 @@ void CKeyBinds::DoPostFramePulse()
 
         bindableKeyStates[BK_MOUSE_WHEEL_UP] = false;
         bindableKeyStates[BK_MOUSE_WHEEL_DOWN] = false;
-        
+
         m_bMouseWheel = false;
     }
 }
