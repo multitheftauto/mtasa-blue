@@ -560,7 +560,7 @@ std::string CXMLNodeImpl::ToString()
     printer.SetIndent("\t");
 
     if (m_pNode->Accept(&printer))
-        return std::string(printer.CStr());
+        return {printer.CStr()};
 
-    return std::string("");
+    return {};
 }
