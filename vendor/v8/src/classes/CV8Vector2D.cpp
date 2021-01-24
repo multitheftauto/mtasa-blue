@@ -48,22 +48,27 @@ void CV8Vector2D::MethodGetLength(const FunctionCallbackInfo<Value>& info)
 
 void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
 {
-    if (!info.IsConstructCall())
+    HandleScope handleScope(info.GetIsolate());
+    if (!ConstructorCallCheck(info))
+        return;
+
+    double              x, y;
+    CV8FunctionCallback args(info);
+    if (!args.ReadNumber(x))
     {
-        int a = 5;
-        // Isolate::ThrowException(String::NewFromUtf8(info.GetIsolate(), "Cannot call constructor as function").ToLocalChecked());
+        info.GetIsolate()->ThrowException(String::NewFromUtf8(info.GetIsolate(), "Expected number at argument 1").ToLocalChecked());
+        return;
     }
-
-    v8::HandleScope handle_scope(info.GetIsolate());
-    Local<Context>  context = info.GetIsolate()->GetCurrentContext();
-
-    double x = info[0]->ToNumber(context).ToLocalChecked()->Value();
-    double y = info[1]->ToNumber(context).ToLocalChecked()->Value();
-
-    v8::Local<v8::Object> wrapper = info.Holder();
+    if (!args.ReadNumber(y))
+    {
+        info.GetIsolate()->ThrowException(String::NewFromUtf8(info.GetIsolate(), "Expected number at argument 2").ToLocalChecked());
+        return;
+    }
+    Local<Context> context = info.GetIsolate()->GetCurrentContext();
+    Local<Object>  wrapper = info.Holder();
 
     CVector2D* point = new CVector2D(x, y);
-    wrapper->SetInternalField(0, v8::External::New(info.GetIsolate(), point));
+    wrapper->SetInternalField(0, External::New(info.GetIsolate(), point));
     info.GetReturnValue().Set(wrapper);
 }
 
@@ -73,17 +78,16 @@ void CV8Vector2D::CreateTemplate(Local<Context> context)
     Isolate::Scope isolate_scope(isolate);
     HandleScope    handle_scope(isolate);
 
-    Handle<FunctionTemplate> point_template = FunctionTemplate::New(isolate);
-    point_template->SetCallHandler(ConstructorCall);
-    point_template->SetLength(1);
-    point_template->SetClassName(String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
-    Local<ObjectTemplate> objectTemplate = point_template->InstanceTemplate();
-    objectTemplate->SetCallAsFunctionHandler(ConstructorCall);
+    Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
+    vector2dTemplate->SetCallHandler(ConstructorCall);
+    vector2dTemplate->SetLength(2);
+    vector2dTemplate->SetClassName(String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+    Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(1);
 
     objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "x").ToLocalChecked(), GetX, SetX);
     objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "y").ToLocalChecked(), GetY, SetY);
-    objectTemplate->Set(String::NewFromUtf8(isolate, "getLength").ToLocalChecked(), v8::FunctionTemplate::New(isolate, MethodGetLength));
+    objectTemplate->Set(String::NewFromUtf8(isolate, "getLength").ToLocalChecked(), FunctionTemplate::New(isolate, MethodGetLength));
     objectTemplate->Set(Symbol::GetToStringTag(isolate), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
-    context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), point_template->GetFunction(context).ToLocalChecked());
+    context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), vector2dTemplate->GetFunction(context).ToLocalChecked());
 }

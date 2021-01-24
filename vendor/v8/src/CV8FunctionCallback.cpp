@@ -24,6 +24,21 @@ std::string CV8FunctionCallback::ReadString()
     return "";
 }
 
+bool CV8FunctionCallback::ReadNumber(double& value)
+{
+    if (m_callback.Length() > m_iIndex)
+    {
+        if (m_callback[m_iIndex]->IsNumber())
+        {
+            value = m_callback[m_iIndex].As<Number>()->Value();
+            m_iIndex++;
+            return true;
+        }
+    }
+    bHasError = true;
+    return false;
+}
+
 void CV8FunctionCallback::Return(std::string arg)
 {
     Local<String> result = String::NewFromUtf8(m_callback.GetIsolate(), arg.c_str()).ToLocalChecked();
