@@ -17,6 +17,12 @@
 CPlayerManager::~CPlayerManager()
 {
     // Deallocate all players
+    // The code design is retarded, so the player is erased from
+    // m_Players, and others thru the destructor, which means that
+    // the set changes while iterating, which isn't a problem, since
+    // in the case of CFastHashSet iterators aren't invalidated when
+    // erase() is called.
+    // TODO: Reverse manager - object relationship
     for (CPlayer* pPlayer : m_Players)
         delete pPlayer;
 }
@@ -74,12 +80,12 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     }
 
     // Create the new player
-    return new CPlayer(this, m_pScriptDebugging, PlayerSocket); // Seems very safe
+    return new CPlayer(this, m_pScriptDebugging, PlayerSocket); // TODO: Use unique_ptr in m_Players, and return the pointer here
 }
 
 size_t CPlayerManager::CountJoined() const
 {
-    return m_JoinedByBitStreamVer.CountJoined(); // O(n), where n = m_JoinedByBitStreamVer.CountUniqueVersions()
+    return m_JoinedByBitStreamVer.CountJoined();
 }
 
 // Find player by fully matching nick. Todo: Partial nick
