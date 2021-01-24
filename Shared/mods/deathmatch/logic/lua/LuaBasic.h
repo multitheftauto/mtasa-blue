@@ -102,24 +102,24 @@ namespace lua
 
     // Script entities
     #ifdef MTA_CLIENT
-    void Push(lua_State* L, const CClientEntity* value) { lua_pushelement(L, value); }
+    inline void Push(lua_State* L, const CClientEntity* value) {lua_pushelement(L, const_cast<CClientEntity*>(value)); }
     #else
-    void Push(lua_State* L, const CElement* value) { lua_pushelement(L, value); }
+    inline void Push(lua_State* L, const CElement* value) { lua_pushelement(L, const_cast<CElement*>(value)); }
+    inline void Push(lua_State* L, const CAccount* value) { lua_pushaccount(L, const_cast<CAccount*>(value)); }
+    inline void Push(lua_State* L, const CAccessControlList* value) { lua_pushacl(L, const_cast<CAccessControlList*>(value)); }
+    inline void Push(lua_State* L, const CAccessControlListGroup* value) { lua_pushaclgroup(L, const_cast<CAccessControlListGroup*>(value)); }
+    inline void Push(lua_State* L, const CBan* value) {lua_pushban(L, const_cast<CBan*>(value)); }
+    inline void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, const_cast<CTextDisplay*>(value)); }
+    inline void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, const_cast<CTextItem*>(value)); }
+    inline void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, const_cast<CDbJobData*>(value)); }
     #endif
-    void Push(lua_State* L, const CResource* value) { lua_pushresource(L, value); }
-    void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, value); }
-    void Push(lua_State* L, const CLuaTimer* value) { lua_pushtimer(L, value); }
-    void Push(lua_State* L, const CLuaVector2D* value) { lua_pushvector(L, *value); }
-    void Push(lua_State* L, const CLuaVector3D* value) { lua_pushvector(L, *value); }
-    void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
-    void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
-    void Push(lua_State* L, const CAccount* value) { lua_pushaccount(L, value); }
-    void Push(lua_State* L, const CAccessControlList* value) { lua_pushacl(L, value); }
-    void Push(lua_State* L, const CAccessControlListGroup* value) { lua_pushaclgroup(L, value); }
-    void Push(lua_State* L, const CBan* value) { lua_pushban(L, value); }
-    void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, value); }
-    void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, value); }
-    void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, value); }
+    inline void Push(lua_State* L, const CResource* value) { lua_pushresource(L, const_cast<CResource*>(value)); }
+    inline void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, const_cast<CXMLNode*>(value)); }
+    inline void Push(lua_State* L, const CLuaTimer* value) {lua_pushtimer(L, const_cast<CLuaTimer*>(value)); }
+    inline void Push(lua_State* L, const CLuaVector2D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaVector3D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
 
 
     // Overload for enum types only
@@ -140,7 +140,6 @@ namespace lua
     void Push(lua_State* L, const std::unique_ptr<T>& ptr)
     {
         Push(L, ptr.get());
-        return 1;
     }
 
     /*****************************************************************\
@@ -188,7 +187,7 @@ namespace lua
     void Push(lua_State* L, const std::array<T, N>& val)
     {
         lua_createtable(L, N, 0);
-        lua_Number i = 1;
+        int i = 1;
         for (const auto& v : val)
         {
             Push(L, v);
