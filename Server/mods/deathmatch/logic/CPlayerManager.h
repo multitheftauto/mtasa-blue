@@ -169,9 +169,9 @@ private:
 
     class CScriptDebugging* m_pScriptDebugging = nullptr;
 
-    CFastHashSet<CPlayer*>                    m_Players; // All joined players
-    CFastHashMap<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;
-    CSendList                                 m_JoinedByBitStreamVer; // Players joined into groups by bit stream version for easy packet sending
+    CFastHashSet<CPlayer*>                    m_Players; // All players connected to the server
+    CFastHashMap<NetServerPlayerID, CPlayer*> m_SocketPlayerMap; // All players connected to the server socket -> player map
+    CSendList                                 m_JoinedByBitStreamVer; // JOINED players only (connected != joined)
     CMtaVersion                               m_LowestJoinedPlayerVersion;
     CElapsedTime                              m_ZombieCheckTimer;
 };
