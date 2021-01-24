@@ -855,10 +855,14 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
 
 bool CLuaColShapeDefs::SetShowCollision(bool state)
 {
-    return CStaticFunctionDefinitions::SetShowCollision(state);
+    if (!g_pClientGame->GetDevelopmentMode())
+        return false;
+
+    g_pClientGame->SetShowCollision(state);
+    return true;
 }
 
 bool CLuaColShapeDefs::IsShowCollisionsEnabled()
 {
-    return CStaticFunctionDefinitions::IsShowCollisionsEnabled();
+    return g_pClientGame->GetShowCollision();
 }

@@ -7404,34 +7404,6 @@ bool CStaticFunctionDefinitions::IsInsideColShape(CClientColShape* pColShape, co
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetShowCollision(bool show)
-{
-    if (!g_pClientGame->GetDevelopmentMode())
-        return false;
-
-    g_pClientGame->SetShowCollision(show);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsShowCollisionsEnabled()
-{
-    return g_pClientGame->GetShowCollision();
-}
-
-bool CStaticFunctionDefinitions::SetShowSound(bool show)
-{
-    if (!g_pClientGame->GetDevelopmentMode())
-        return false;
-
-    g_pClientGame->SetShowSound(show);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsShowSoundEnabled()
-{
-    return g_pClientGame->GetShowSound();
-}
-
 bool CStaticFunctionDefinitions::GetWeaponNameFromID(unsigned char ucID, SString& strOutName)
 {
     if (ucID <= 59)

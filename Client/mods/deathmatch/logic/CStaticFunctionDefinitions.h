@@ -681,14 +681,6 @@ public:
     static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
     static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex);
 
-    // Shape dev functions
-    static bool SetShowCollision(bool show);
-    static bool IsShowCollisionsEnabled();
-
-    // Sound dev functions
-    static bool SetShowSound(bool show);
-    static bool IsShowSoundEnabled();
-
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);
     static bool           GetWeaponIDFromName(const char* szName, unsigned char& ucID);

@@ -1811,10 +1811,14 @@ int CLuaAudioDefs::GetRadioChannelName(lua_State* luaVM)
 
 bool CLuaAudioDefs::ShowSound(bool state)
 {
-    return CStaticFunctionDefinitions::SetShowSound(state);
+    if (!g_pClientGame->GetDevelopmentMode())
+        return false;
+
+    g_pClientGame->SetShowSound(state);
+    return true;
 }
 
 bool CLuaAudioDefs::IsShowSoundEnabled()
 {
-    return CStaticFunctionDefinitions::IsShowSoundEnabled();
+    return g_pClientGame->GetShowSound();
 }
