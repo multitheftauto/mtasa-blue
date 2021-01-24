@@ -150,7 +150,9 @@ void CV8Isolate::RunCode(std::string& code, bool bAsModule)
     Local<ObjectTemplate> global = ObjectTemplate::New(m_pIsolate);
     Local<Context> context = Context::New(m_pIsolate, nullptr, global);
 
+
     Context::Scope context_scope(context);
+    CV8Vector2D::CreateTemplate(context);
 
     // Create a string containing the JavaScript source code.
     Local<String> source = String::NewFromUtf8(m_pIsolate, code.c_str(), NewStringType::kNormal).ToLocalChecked();
