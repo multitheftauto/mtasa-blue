@@ -28,7 +28,7 @@
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 char szXMLLibName[] = "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
-char szV8LibName[] = "v8" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
+char szV8LibName[] = "Mtav8" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 
 using namespace std;
 

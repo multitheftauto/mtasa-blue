@@ -1,6 +1,6 @@
 project "v8"
 	language "C++"
-	targetname "v8"
+	targetname "Mtav8"
 	kind "SharedLib"
 	--kind "StaticLib"
 	targetdir(buildpath("server"))
@@ -9,9 +9,11 @@ project "v8"
 	pchsource "StdInc.cpp"
 
 	vpaths { 
-		["Headers"] = "**.h",
-		["Sources"] = "**.c",
-		["*"] = "premake5.lua"
+		["Headers"] = "include/*.h",
+		["Headers/Classes"] = "include/classes/*.h",
+		["Sources"] = "src/*.c",
+		["Sources/Classes"] = "src/classes/*.c",
+		["*"] = {"premake5.lua", "StdInc.h", "StdInc.cpp"}
 	}
 	
 	files {
