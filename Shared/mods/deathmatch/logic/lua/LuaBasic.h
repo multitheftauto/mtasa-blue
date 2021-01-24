@@ -100,6 +100,28 @@ namespace lua
         lua_pushmatrix(L, value);
     }
 
+    // Script entities
+    #ifdef MTA_CLIENT
+    void Push(lua_State* L, const CClientEntity* value) { lua_pushelement(L, value); }
+    #else
+    void Push(lua_State* L, const CElement* value) { lua_pushelement(L, value); }
+    #endif
+    void Push(lua_State* L, const CResource* value) { lua_pushresource(L, value); }
+    void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, value); }
+    void Push(lua_State* L, const CLuaTimer* value) { lua_pushtimer(L, value); }
+    void Push(lua_State* L, const CLuaVector2D* value) { lua_pushvector(L, *value); }
+    void Push(lua_State* L, const CLuaVector3D* value) { lua_pushvector(L, *value); }
+    void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
+    void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
+    void Push(lua_State* L, const CAccount* value) { lua_pushaccount(L, value); }
+    void Push(lua_State* L, const CAccessControlList* value) { lua_pushacl(L, value); }
+    void Push(lua_State* L, const CAccessControlListGroup* value) { lua_pushaclgroup(L, value); }
+    void Push(lua_State* L, const CBan* value) { lua_pushban(L, value); }
+    void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, value); }
+    void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, value); }
+    void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, value); }
+
+
     // Overload for enum types only
     template <typename T>
     typename std::enable_if_t<std::is_enum_v<T>> Push(lua_State* L, const T& val)
@@ -108,23 +130,17 @@ namespace lua
         Push(L, EnumToString(val));
     }
 
-    // Overload for pointers to classes. We boldly assume that these are script entities
-    template <typename T>
-    std::enable_if_t<std::is_class_v<T>> Push(lua_State* L, T* val)
-    {
-        lua_pushuserdata(L, val);
-    }
-
     template <typename T>
     void Push(lua_State* L, const std::shared_ptr<T>& ptr)
     {
-        lua_pushelement(L, ptr.get());
+        Push(L, ptr.get());
     }
 
     template <typename T>
     void Push(lua_State* L, const std::unique_ptr<T>& ptr)
     {
-        lua_pushelement(L, ptr.get());
+        Push(L, ptr.get());
+        return 1;
     }
 
     /*****************************************************************\

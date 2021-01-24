@@ -22,23 +22,23 @@ CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
 #define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
 
-// Lua pop macros for our datatypes
+// Lua pop macros for our data types
 class CElement* lua_toelement(lua_State* luaVM, int iArgument);
 
-// Lua push macros for our datatypes
-void lua_pushelement(lua_State* luaVM, class CElement* pElement);
-void lua_pushacl(lua_State* luaVM, class CAccessControlList* pACL);
-void lua_pushaclgroup(lua_State* luaVM, class CAccessControlListGroup* pACL);
-void lua_pushaccount(lua_State* luaVM, class CAccount* pAccount);
-void lua_pushresource(lua_State* luaVM, class CResource* pResource);
-void lua_pushtextdisplay(lua_State* luaVM, class CTextDisplay* pDisplay);
-void lua_pushtextitem(lua_State* luaVM, class CTextItem* pItem);
-void lua_pushtimer(lua_State* luaVM, class CLuaTimer* pTimer);
-void lua_pushxmlnode(lua_State* luaVM, class CXMLNode* pNode);
-void lua_pushban(lua_State* luaVM, class CBan* pBan);
-void lua_pushquery(lua_State* luaVM, class CDbJobData* pJobData);
-void lua_pushuserdata(lua_State* luaVM, void* value);
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
+// Lua push macros for our data types
+void lua_pushelement(lua_State* luaVM, const class CElement* pElement);
+void lua_pushacl(lua_State* luaVM, const class CAccessControlList* pACL);
+void lua_pushaclgroup(lua_State* luaVM, const class CAccessControlListGroup* pACL);
+void lua_pushaccount(lua_State* luaVM, const class CAccount* pAccount);
+void lua_pushresource(lua_State* luaVM, const class CResource* pResource);
+void lua_pushtextdisplay(lua_State* luaVM, const class CTextDisplay* pDisplay);
+void lua_pushtextitem(lua_State* luaVM, const class CTextItem* pItem);
+void lua_pushtimer(lua_State* luaVM, const class CLuaTimer* pTimer);
+void lua_pushxmlnode(lua_State* luaVM, const class CXMLNode* pNode);
+void lua_pushban(lua_State* luaVM, const class CBan* pBan);
+void lua_pushquery(lua_State* luaVM, const class CDbJobData* pJobData);
+void lua_pushuserdata(lua_State* luaVM, const void* value);
+void lua_pushobject(lua_State* luaVM, const char* szClass, const void* pObject, bool bSkipCache = false);
 
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector);
 void lua_pushvector(lua_State* luaVM, const CVector& vector);
