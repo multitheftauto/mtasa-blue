@@ -170,8 +170,8 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
         itPlayer->AddPlayerToDistLists(pPlayer);
     }
 
-    dassert(m_Players.find(pPlayer) == m_Players.end()); // Make sure he's not in the set already
-    m_Players.insert(pPlayer); // Before putting this into dassert, look at its definiton :-)
+    dassert(m_Players.find(pPlayer) == m_Players.end());
+    m_Players.insert(pPlayer);
 
     dassert(!MapFind(m_SocketPlayerMap, pPlayer->GetSocket()));
     m_SocketPlayerMap[pPlayer->GetSocket()] = pPlayer;
@@ -182,10 +182,10 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
 {
-    dassert(m_Players.find(pPlayer) != m_Players.end()); // Make sure he's not in the set already
+    dassert(m_Players.find(pPlayer) != m_Players.end());
     m_Players.erase(pPlayer);
 
-    dassert(MapFind(m_SocketPlayerMap, pPlayer->GetSocket())); // Make sure he was in the socket map as well
+    dassert(MapFind(m_SocketPlayerMap, pPlayer->GetSocket()));
     m_SocketPlayerMap.erase(pPlayer->GetSocket());
 
     dassert(m_Players.size() == m_SocketPlayerMap.size());
