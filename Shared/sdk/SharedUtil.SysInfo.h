@@ -13,7 +13,7 @@
 #ifdef WIN32
 #include <vector>
 #include "SString.h"
-#include <Windows.h>
+#include <windows.h>
 #include "WinVer.h"
 
 namespace SharedUtil
