@@ -11,12 +11,10 @@
 
 #pragma once
 
-//
-// class SString
-//
-// Adds some functionality to the std::string class
-//
-#include <stdarg.h>
+#include <string>
+#include <vector>
+#include <cstdarg>
+#include "SharedUtil.IntTypes.h"
 
 #ifdef WIN32
 #ifndef va_copy
