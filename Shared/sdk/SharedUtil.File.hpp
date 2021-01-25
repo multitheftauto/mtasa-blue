@@ -14,12 +14,11 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Buffer.h"
 #include <algorithm>
-#define WIN32 1
 
 #ifdef WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+    #ifndef NOMINMAX
+    #define NOMINMAX
+    #endif
     #include "Windows.h"
     #include "shellapi.h"
     #include "shlobj.h"
