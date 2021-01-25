@@ -18,6 +18,21 @@ class CLuaArgument;
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 
+// Wrapper around std::tuple to indicate that multiple values should be pushed to
+// the Lua stack
+template<typename... Ts>
+struct LuaMultiReturn
+{
+    // Note: We use a separate template for the constructor arguments
+    // to allow type conversions. For example: return { "hello", 42 };
+    // is a valid statement to construct a LuaMuliReturn<std::string, int>
+    template <typename... Args>
+    LuaMultiReturn(Args... args) : values{args...} {}
+
+    std::tuple<Ts...> values;
+};
+
+
 struct CLuaFunctionParserBase
 {
     // iIndex is passed around by reference
@@ -86,6 +101,8 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return GetClassTypeName((T)0);
         else if constexpr (std::is_same_v<T, dummy_type>)
+            return "";
+        else if constexpr (std::is_same_v<T, std::monostate>)
             return "";
     }
 
@@ -278,6 +295,10 @@ struct CLuaFunctionParserBase
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
         if constexpr (std::is_same_v<T, dummy_type>)
+            return iArgument == LUA_TNONE;
+
+        // no value
+        if constexpr (std::is_same_v<T, std::monostate>)
             return iArgument == LUA_TNONE;
     }
 
@@ -615,6 +636,10 @@ struct CLuaFunctionParserBase
             argument.Read(L, index++);
             return argument;
         }
+        else if constexpr (std::is_same_v<T, std::monostate>)
+        {
+            return T{};
+        }
     }
 };
 
@@ -642,13 +667,30 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
             }
             else
             {
-                return lua::Push(L, Func(std::forward<Params>(ps)...));
+                return PushResult(L, Func(std::forward<Params>(ps)...));
             }
         }
         else
         {
             return Call(L, ps..., Pop<typename nth_element_impl<sizeof...(Params), Args...>::type>(L, iIndex));
         }
+    }
+
+    // Tuples can be used to return multiple results
+    template <typename... Ts>
+    inline int PushResult(lua_State* L, const LuaMultiReturn<Ts...>& result)
+    {
+        // Call Push on each element of the tuple
+        std::apply([L](const auto&... value) { (lua::Push(L, value), ...); }, result.values);
+        return sizeof...(Ts);
+    }
+
+    // If `T` is not a tuple, defer to Push to push the value onto the stack
+    template <typename T>
+    inline int PushResult(lua_State* L, const T& value)
+    {
+        lua::Push(L, value);
+        return 1;
     }
 
     inline int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
