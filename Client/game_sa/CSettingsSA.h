@@ -89,7 +89,6 @@ private:
     eAspectRatio          m_AspectRatio;
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
-    float                 m_fShadowsOffset;
 
 public:
     CSettingsSA();
