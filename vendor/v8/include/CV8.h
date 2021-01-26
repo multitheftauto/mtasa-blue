@@ -7,6 +7,8 @@ public:
     CV8();
     ~CV8();
     CV8IsolateBase* CreateIsolate(std::string& strCode, std::string& originResource);
+    void            RemoveIsolate(CV8IsolateBase* pIsolate);
+
     CV8ModuleBase*  CreateModule(const char* name);
     void            DoPulse();
     void            DoTaskPulse();

@@ -19,7 +19,6 @@ public:
     void              AddPromise(CV8Promise* pPromise) { m_vecPromises.push_back(pPromise); }
 
 private:
-    static MaybeLocal<Module> Resolve(Local<Context> context, Local<String> specifier, Local<Module> referrer);
 
     void                  ReportException(TryCatch* pTryCatch);
     std::string           m_strOriginResource;
