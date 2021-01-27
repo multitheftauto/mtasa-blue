@@ -47,7 +47,6 @@ CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pC
     m_pIsolate = Isolate::New(m_createParams);
     m_strOriginResource = originResource;
     m_pIsolate->SetMicrotasksPolicy(v8::MicrotasksPolicy::kExplicit);
-
     m_pIsolate->SetData(0, this);
 }
 
@@ -135,12 +134,6 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
     return True(context->GetIsolate());
 }
 
-void CV8Isolate::TestMess(std::string mess)
-{
-    v8_inspector::StringView view((uint8_t*)mess.c_str(), mess.length() + 1);
-    m_pSession->dispatchProtocolMessage(view);
-}
-
 void CV8Isolate::RunCode(std::string& code, bool bAsModule)
 {
     Isolate::Scope isolate_scope(m_pIsolate);
@@ -217,27 +210,26 @@ void CV8Isolate::RunCode(std::string& code, bool bAsModule)
     // String::Utf8Value utf8(m_pIsolate, result);
     // printf("%s\n", *utf8);
 
-    if (true)
-    {
-        m_pClient = std::make_unique<InspectorClientImpl>();
+    //if (false)
+    //{
+    //    m_pClient = std::make_unique<InspectorClientImpl>();
 
-        m_pInspector = std::move(v8_inspector::V8Inspector::create(m_pIsolate, m_pClient.get()));
+    //    m_pInspector = std::move(v8_inspector::V8Inspector::create(m_pIsolate, m_pClient.get()));
 
-        std::string                         test("TEST MTA 123123");
-        m_pChannel = std::make_unique<ChannelImpl>(m_pIsolate);
-        v8_inspector::StringView              view((uint8_t*)test.c_str(), test.length() + 1);
-        v8_inspector::StringView              ctx_name((uint8_t*)test.c_str(), test.length() + 1);
+    //    std::string                         test("TEST MTA 123123");
+    //    m_pChannel = std::make_unique<ChannelImpl>(m_pIsolate);
+    //    v8_inspector::StringView              view((uint8_t*)test.c_str(), test.length() + 1);
+    //    v8_inspector::StringView              ctx_name((uint8_t*)test.c_str(), test.length() + 1);
 
-        m_pSession = m_pInspector->connect(1, m_pChannel.get(), view);
+    //    m_pSession = m_pInspector->connect(1, m_pChannel.get(), view);
 
-        m_pInspector->contextCreated(v8_inspector::V8ContextInfo(context, 1, ctx_name));
+    //    m_pInspector->contextCreated(v8_inspector::V8ContextInfo(context, 1, ctx_name));
 
-    }
+    //}
 }
 
 CV8Isolate::~CV8Isolate()
 {
-    m_pIsolate->Dispose();
-
     delete m_createParams.array_buffer_allocator;
+    m_pIsolate->Dispose();
 }
