@@ -327,6 +327,25 @@ bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
 float       fDuckingHealthThreshold;
 
+static const std::array<uint32_t, 16> shadowAddr{
+    0x6FAD5D,            // CRegisteredCorona::Update
+    0x7041DB,            // CPostEffects::Fog
+    0x7085A9,            // CShadows::RenderStaticShadows
+    0x709B2F,            // CShadows::CastShadowEntityXY
+    0x709B8E,            // CShadows::CastShadowEntityXY
+    0x709BC7,            // CShadows::CastShadowEntityXY
+    0x709BF6,            // CShadows::CastShadowEntityXY
+    0x709C93,            // CShadows::CastShadowEntityXY
+    0x709E9E,            // IntersectEntityRenderTriangleCB
+    0x709EBC,            // IntersectEntityRenderTriangleCB
+    0x709ED7,            // IntersectEntityRenderTriangleCB
+    0x70B221,            // CShadows::RenderStoredShadows
+    0x70B373,            // CShadows::RenderStoredShadows
+    0x70B4D1,            // CShadows::RenderStoredShadows
+    0x70B635,            // CShadows::RenderStoredShadows
+    0x73A48F             // CWeapon::AddGunshell
+};
+
 PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
 PreWeaponFireHandler*       m_pPreWeaponFireHandler = NULL;
@@ -1500,26 +1519,8 @@ void CMultiplayerSA::InitHooks()
 
     // Lower the GTA shadows offset closer to ground/floor level
     m_fShadowsOffset = 0.013f;            // GTA default = 0.06f
-    std::array<DWORD, 16> shadowAddr{
-        0x6FAD5D,            // CRegisteredCorona::Update
-        0x7041DB,            // CPostEffects::Fog
-        0x7085A9,            // CShadows::RenderStaticShadows
-        0x709B2F,            // CShadows::CastShadowEntityXY
-        0x709B8E,            // CShadows::CastShadowEntityXY
-        0x709BC7,            // CShadows::CastShadowEntityXY
-        0x709BF6,            // CShadows::CastShadowEntityXY
-        0x709C93,            // CShadows::CastShadowEntityXY
-        0x709E9E,            // IntersectEntityRenderTriangleCB
-        0x709EBC,            // IntersectEntityRenderTriangleCB
-        0x709ED7,            // IntersectEntityRenderTriangleCB
-        0x70B221,            // CShadows::RenderStoredShadows
-        0x70B373,            // CShadows::RenderStoredShadows
-        0x70B4D1,            // CShadows::RenderStoredShadows
-        0x70B635,            // CShadows::RenderStoredShadows
-        0x73A48F             // CWeapon::AddGunshell
-    };
-    for (auto dwAddr : shadowAddr)
-        MemPut(dwAddr, &m_fShadowsOffset);
+    for (auto uiAddr : shadowAddr)
+        MemPut(uiAddr, &m_fShadowsOffset);
 
     InitHooks_CrashFixHacks();
 
