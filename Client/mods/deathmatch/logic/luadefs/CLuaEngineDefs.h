@@ -11,7 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
-#include "CLuaMultiReturn.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaEngineDefs : public CLuaDefs
 {
