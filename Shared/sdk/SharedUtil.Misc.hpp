@@ -17,7 +17,7 @@
 #include "CDuplicateLineFilter.h"
 #ifdef WIN32
     #include <ctime>
-    #include "Windows.h"
+    #include <windows.h>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
