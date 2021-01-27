@@ -16,7 +16,7 @@
 #include "SharedUtil.Time.h"
 
 #ifdef _WIN32
-    #include <Windows.h>
+    #include <windows.h>
 #endif
 
 #ifdef MTA_DEBUG
