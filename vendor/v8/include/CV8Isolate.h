@@ -11,7 +11,6 @@ public:
     void DoPulse();
 
     void                      RunCode(std::string& code, bool bAsModule = false);
-    void                      TestMess(std::string mess);
     static MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions,
                                                             Local<Module> referrer);
 
@@ -26,9 +25,9 @@ private:
     Isolate*              m_pIsolate;
     const CV8*            m_pCV8;
 
-    std::unique_ptr<class InspectorClientImpl>              m_pClient;
-    std::unique_ptr<class ChannelImpl>                      m_pChannel;
-    std::unique_ptr<class v8_inspector::V8InspectorSession> m_pSession;
-    std::unique_ptr<class v8_inspector::V8Inspector>        m_pInspector;
+    //std::unique_ptr<class InspectorClientImpl>              m_pClient;
+    //std::unique_ptr<class ChannelImpl>                      m_pChannel;
+    //std::unique_ptr<class v8_inspector::V8InspectorSession> m_pSession;
+    //std::unique_ptr<class v8_inspector::V8Inspector>        m_pInspector;
     std::vector<CV8Promise*>                                m_vecPromises;
 };

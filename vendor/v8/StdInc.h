@@ -7,6 +7,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <functional>
+#include "SharedUtil.h"
 
 #include "include/v8.h"
 #include "include/libplatform/libplatform.h"
@@ -17,6 +18,7 @@
 #include "classes/CV8BaseClass.h"
 #include "classes/CV8Vector2D.h"
 #include "classes/CV8Vector3D.h"
+#include "classes/CV8Matrix.h"
 
 #include "include/CV8.h"
 #include "include/CV8Isolate.h"

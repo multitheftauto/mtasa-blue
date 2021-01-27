@@ -64,6 +64,18 @@ CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originReso
     return isolate;
 }
 
+void CV8::RemoveIsolate(CV8IsolateBase* pIsolate)
+{
+    for (auto it = m_vecIsolates.begin(); it != m_vecIsolates.end(); ++it)
+    {
+        if ((*it).get() == pIsolate)
+        {
+            m_vecIsolates.erase(it);
+            return;
+        }
+    }
+}
+
 CV8Module* CV8::GetModuleByName(const char* name)
 {
     if (CV8::m_mapModules.find(name) != CV8::m_mapModules.end())

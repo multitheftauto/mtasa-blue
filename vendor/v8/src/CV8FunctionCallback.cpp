@@ -2,6 +2,8 @@
 
 using namespace v8;
 
+#include "CVector.h";
+
 CV8FunctionCallback::CV8FunctionCallback(const FunctionCallbackInfo<Value>& callback) : m_callback(callback)
 {
 }
@@ -33,6 +35,19 @@ bool CV8FunctionCallback::ReadNumber(double& value)
             value = m_callback[m_iIndex].As<Number>()->Value();
             m_iIndex++;
             return true;
+        }
+    }
+    bHasError = true;
+    return false;
+}
+
+bool CV8FunctionCallback::ReadVector(CVector& value)
+{
+    if (m_callback.Length() > m_iIndex)
+    {
+        if (m_callback[m_iIndex]->IsObject())
+        {
+            return ReadClass(CV8Vector3D::m_eClass, value);
         }
     }
     bHasError = true;

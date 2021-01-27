@@ -5,6 +5,7 @@ using namespace v8;
 class CV8Vector2D : public CV8BaseClass
 {
 public:
+    inline static EClass      m_eClass = EClass::Vector2;
     inline static const char* m_szName = "Vector2";
     // Adds new class definition to the context
 

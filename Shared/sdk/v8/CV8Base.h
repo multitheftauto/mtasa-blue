@@ -9,7 +9,9 @@ class CV8Base
 {
 public:
     virtual CV8IsolateBase* CreateIsolate(std::string& strCode, std::string& originResource) = 0;
-    virtual CV8ModuleBase*  CreateModule(const char* name) = 0;
+    virtual void            RemoveIsolate(CV8IsolateBase* pIsolate) = 0;
+
+    virtual CV8ModuleBase* CreateModule(const char* name) = 0;
 
     virtual void DoPulse() = 0;
     virtual void DoTaskPulse() = 0;

@@ -1,14 +1,18 @@
 class CVector2D;
+class CVector;
 
 using namespace v8;
 
 class CV8Vector3D : public CV8BaseClass
 {
 public:
+    inline static EClass      m_eClass = EClass::Vector3;
     inline static const char* m_szName = "Vector3";
 
     // Adds new class definition to the context
-    static Handle<FunctionTemplate> CV8Vector3D::CreateTemplate(Local<Context> context, Handle<FunctionTemplate> parent);
+    static Handle<FunctionTemplate> CreateTemplate(Local<Context> context, Handle<FunctionTemplate> parent);
+    static Local<Object>            New(CVector vector);
+    static bool                     Convert(Local<Object> object, CVector& vector);
 
 private:
     static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
