@@ -75,6 +75,47 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
             headers.PushString((*iter).second.c_str());
         }
 
+        std::string sMethod;
+        switch (ipoHttpRequest->nRequestMethod)
+        {
+            case REQUESTMETHOD_GET:
+                sMethod = "GET";
+                break;
+            case REQUESTMETHOD_OPTIONS:
+                sMethod = "OPTIONS";
+                break;
+            case REQUESTMETHOD_HEAD:
+                sMethod = "HEAD";
+                break;
+            case REQUESTMETHOD_POST:
+                sMethod = "POST";
+                break;
+            case REQUESTMETHOD_PUT:
+                sMethod = "PUT";
+                break;
+            case REQUESTMETHOD_DELETE:
+                sMethod = "DELETE";
+                break;
+            case REQUESTMETHOD_TRACE:
+                sMethod = "TRACE";
+                break;
+            case REQUESTMETHOD_CONNECT:
+                sMethod = "CONNECT";
+                break;
+            case REQUESTMETHOD_LAST:
+                sMethod = "LAST";
+                break;
+            case REQUESTMETHOD_UNKNOWN:
+                sMethod = "UNKNOWN";
+                break;
+            case REQUESTMETHOD_INVALID:
+                sMethod = "INVALID";
+                break;
+            default:
+                sMethod = "INVALID";
+                break;
+        }
+
         m_currentResponse = ipoHttpResponse;
         CLuaArguments querystring(formData);
         CLuaArguments args;
@@ -86,6 +127,7 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
         args.PushTable(&querystring);                                     // querystring
         args.PushAccount(account);
         args.PushString(ipoHttpRequest->sBody);                           // raw
+        args.PushString(sMethod);                                         // method
 
         // g_pGame->Lock(); // get the mutex (blocking)
         args.CallGlobal(m_pVM, "renderPage");
@@ -163,7 +205,7 @@ bool CResourceHTMLItem::Start()
         bool        bJustStartedCodeBlock = false;
         bool        bIsShorthandCodeBlock = false;
         std::string strScript;
-        strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, raw )\n";
+        strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, raw, method )\n";
         strScript += "\nhttpWrite ( \"";            // bit hacky, possibly can be terminated straight away
         unsigned char c;
         int           i = 0;
