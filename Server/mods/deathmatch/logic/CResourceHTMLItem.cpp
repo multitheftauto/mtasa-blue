@@ -85,6 +85,7 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
         args.PushString(ipoHttpRequest->sOriginalUri.c_str());            // url
         args.PushTable(&querystring);                                     // querystring
         args.PushAccount(account);
+        args.PushString(ipoHttpRequest->sBody);                           // raw
 
         // g_pGame->Lock(); // get the mutex (blocking)
         args.CallGlobal(m_pVM, "renderPage");
@@ -162,7 +163,7 @@ bool CResourceHTMLItem::Start()
         bool        bJustStartedCodeBlock = false;
         bool        bIsShorthandCodeBlock = false;
         std::string strScript;
-        strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user )\n";
+        strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, raw )\n";
         strScript += "\nhttpWrite ( \"";            // bit hacky, possibly can be terminated straight away
         unsigned char c;
         int           i = 0;
