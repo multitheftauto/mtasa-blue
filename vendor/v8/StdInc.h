@@ -23,5 +23,6 @@
 #include "include/CV8.h"
 #include "include/CV8Isolate.h"
 #include "include/CV8Module.h"
+#include "include/CV8Task.h"
 #include "include/CV8Promise.h"
 #include "include/CV8FunctionCallback.h"

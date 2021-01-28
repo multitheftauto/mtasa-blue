@@ -76,7 +76,6 @@ void CV8FunctionCallback::ReturnPromise(std::function<void(CV8PromiseBase*)> cal
     CV8Promise* pPromise = new CV8Promise(m_callback.GetIsolate());
     CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
 
-    pPromise->m_callback = callback;
     pThisIsolate->AddPromise(pPromise);
     m_callback.GetReturnValue().Set(pPromise->GetPromise());
 }

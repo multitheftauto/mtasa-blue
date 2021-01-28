@@ -17,7 +17,7 @@ CV8::CV8()
     // V8::InitializeICUDefaultLocation(argv[0]);
     // V8::InitializeExternalStartupData(argv[0]);
 
-    m_pPlatform = platform::NewSingleThreadedDefaultPlatform();
+    m_pPlatform = platform::NewDefaultPlatform(4);
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
 }
@@ -70,6 +70,7 @@ void CV8::RemoveIsolate(CV8IsolateBase* pIsolate)
     {
         if ((*it).get() == pIsolate)
         {
+            platform::NotifyIsolateShutdown(m_pPlatform.get(), it->get()->GetIsolate());
             m_vecIsolates.erase(it);
             return;
         }
@@ -88,7 +89,7 @@ CV8ModuleBase* CV8::CreateModule(const char* name)
     std::string buf("@mta/");
     buf.append(name);
 
-    std::unique_ptr<CV8Module> module = std::make_unique<CV8Module>(buf.c_str()); 
+    std::unique_ptr<CV8Module> module = std::make_unique<CV8Module>(buf.c_str());
     CV8Module*                 pModule = module.get();
     CV8::m_mapModules.insert({buf, std::move(module)});
     return pModule;

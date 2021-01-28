@@ -418,3 +418,4 @@ utils/DXFiles/
 utils/vswhere.exe
 
 vendor/v8/sources/
+vendor/v8/library/win32bit/
