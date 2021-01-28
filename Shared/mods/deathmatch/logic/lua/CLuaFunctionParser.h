@@ -102,6 +102,8 @@ struct CLuaFunctionParserBase
             return GetClassTypeName((T)0);
         else if constexpr (std::is_same_v<T, dummy_type>)
             return "";
+        else if constexpr (std::is_same_v<T, std::monostate>)
+            return "";
     }
 
     // Reads the parameter type (& value in some cases) at a given index
@@ -293,6 +295,10 @@ struct CLuaFunctionParserBase
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
         if constexpr (std::is_same_v<T, dummy_type>)
+            return iArgument == LUA_TNONE;
+
+        // no value
+        if constexpr (std::is_same_v<T, std::monostate>)
             return iArgument == LUA_TNONE;
     }
 
@@ -629,6 +635,10 @@ struct CLuaFunctionParserBase
             CLuaArgument argument;
             argument.Read(L, index++);
             return argument;
+        }
+        else if constexpr (std::is_same_v<T, std::monostate>)
+        {
+            return T{};
         }
     }
 };

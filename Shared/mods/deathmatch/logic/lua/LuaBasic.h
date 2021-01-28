@@ -100,6 +100,28 @@ namespace lua
         lua_pushmatrix(L, value);
     }
 
+    // Script entities
+    #ifdef MTA_CLIENT
+    inline void Push(lua_State* L, const CClientEntity* value) {lua_pushelement(L, const_cast<CClientEntity*>(value)); }
+    #else
+    inline void Push(lua_State* L, const CElement* value) { lua_pushelement(L, const_cast<CElement*>(value)); }
+    inline void Push(lua_State* L, const CAccount* value) { lua_pushaccount(L, const_cast<CAccount*>(value)); }
+    inline void Push(lua_State* L, const CAccessControlList* value) { lua_pushacl(L, const_cast<CAccessControlList*>(value)); }
+    inline void Push(lua_State* L, const CAccessControlListGroup* value) { lua_pushaclgroup(L, const_cast<CAccessControlListGroup*>(value)); }
+    inline void Push(lua_State* L, const CBan* value) {lua_pushban(L, const_cast<CBan*>(value)); }
+    inline void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, const_cast<CTextDisplay*>(value)); }
+    inline void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, const_cast<CTextItem*>(value)); }
+    inline void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, const_cast<CDbJobData*>(value)); }
+    #endif
+    inline void Push(lua_State* L, const CResource* value) { lua_pushresource(L, const_cast<CResource*>(value)); }
+    inline void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, const_cast<CXMLNode*>(value)); }
+    inline void Push(lua_State* L, const CLuaTimer* value) {lua_pushtimer(L, const_cast<CLuaTimer*>(value)); }
+    inline void Push(lua_State* L, const CLuaVector2D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaVector3D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
+
+
     // Overload for enum types only
     template <typename T>
     typename std::enable_if_t<std::is_enum_v<T>> Push(lua_State* L, const T& val)
@@ -108,23 +130,16 @@ namespace lua
         Push(L, EnumToString(val));
     }
 
-    // Overload for pointers to classes. We boldly assume that these are script entities
-    template <typename T>
-    std::enable_if_t<std::is_class_v<T>> Push(lua_State* L, T* val)
-    {
-        lua_pushelement(L, val);
-    }
-
     template <typename T>
     void Push(lua_State* L, const std::shared_ptr<T>& ptr)
     {
-        lua_pushelement(L, ptr.get());
+        Push(L, ptr.get());
     }
 
     template <typename T>
     void Push(lua_State* L, const std::unique_ptr<T>& ptr)
     {
-        lua_pushelement(L, ptr.get());
+        Push(L, ptr.get());
     }
 
     /*****************************************************************\
@@ -172,7 +187,7 @@ namespace lua
     void Push(lua_State* L, const std::array<T, N>& val)
     {
         lua_createtable(L, N, 0);
-        lua_Number i = 1;
+        int i = 1;
         for (const auto& v : val)
         {
             Push(L, v);
