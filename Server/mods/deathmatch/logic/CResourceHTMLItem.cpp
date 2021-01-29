@@ -75,7 +75,7 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
             headers.PushString((*iter).second.c_str());
         }
 
-        std::string sMethod;
+        const char* sMethod = "INVALID";
         switch (ipoHttpRequest->nRequestMethod)
         {
             case REQUESTMETHOD_GET:
@@ -110,7 +110,6 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
                 break;
             case REQUESTMETHOD_INVALID:
             default:
-                sMethod = "INVALID";
                 break;
         }
 
@@ -124,7 +123,7 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
         args.PushString(ipoHttpRequest->sOriginalUri.c_str());            // url
         args.PushTable(&querystring);                                     // querystring
         args.PushAccount(account);
-        args.PushString(ipoHttpRequest->sBody);                           // raw
+        args.PushString(ipoHttpRequest->sBody);                           // requestBody
         args.PushString(sMethod);                                         // method
 
         // g_pGame->Lock(); // get the mutex (blocking)
@@ -203,7 +202,7 @@ bool CResourceHTMLItem::Start()
         bool        bJustStartedCodeBlock = false;
         bool        bIsShorthandCodeBlock = false;
         std::string strScript;
-        strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, raw, method )\n";
+        strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, requestBody, method )\n";
         strScript += "\nhttpWrite ( \"";            // bit hacky, possibly can be terminated straight away
         unsigned char c;
         int           i = 0;
