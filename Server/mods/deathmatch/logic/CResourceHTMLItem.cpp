@@ -108,9 +108,6 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
             case REQUESTMETHOD_UNKNOWN:
                 sMethod = "UNKNOWN";
                 break;
-            case REQUESTMETHOD_INVALID:
-            default:
-                break;
         }
 
         m_currentResponse = ipoHttpResponse;
