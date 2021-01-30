@@ -2737,17 +2737,14 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 if (pJacked && !pJacked->IsPlayer())
                                 {
                                     // Check that all clients have a compatible bitstream
-                                    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
-                                    {
-                                        CPlayer* pSendPlayer = *iter;
+                                    m_pPlayerManager->IterateJoined([&](CPlayer* pSendPlayer) {
                                         if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
-                                        {
-                                            if (pSendPlayer->IsJoined())
-                                                // Store this player as incompatible for later
-                                                // This happens because the player joined during a player jacking a ped
-                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
+                                        {    
+                                            // Store this player as incompatible for later
+                                            // This happens because the player joined during a player jacking a ped
+                                            sendListIncompatiblePlayers.Insert(pSendPlayer);
                                         }
-                                    }
+                                    });
                                 }
                             }
                         }
@@ -2760,9 +2757,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             bValidPed = true;
 
                             // Check that all clients have a compatible bitstream when we have a ped enter/exit
-                            for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+                            for (CPlayer* pSendPlayer : m_pPlayerManager->GetAllPlayers())
                             {
-                                CPlayer* pSendPlayer = *iter;
                                 if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
                                 {
                                     switch (ucAction)
@@ -2781,7 +2777,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                             if (pSendPlayer->IsJoined())
                                                 // Store this player as incompatible for later
                                                 // This happens because the player joined during a ped enter/exit
-                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
+                                                sendListIncompatiblePlayers.Insert(pSendPlayer);
                                         }
                                     }
                                 }
@@ -2931,9 +2927,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                         if (!IS_PLAYER(pOccupant))
                                                         {
                                                             // Check that all clients have a compatible bitstream
-                                                            for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+                                                            for (CPlayer* pSendPlayer : m_pPlayerManager->GetAllPlayers())
                                                             {
-                                                                CPlayer* pSendPlayer = *iter;
                                                                 if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
                                                                 {
                                                                     bValidOccupant = false;
@@ -3164,7 +3159,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
                                     Reply.SetDoorAngle(fDoorAngle);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
-                                    if (!sendListIncompatiblePlayers.empty())
+                                    if (!sendListIncompatiblePlayers.Empty())
                                     {
                                         CBitStream BitStream;
                                         BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
@@ -3247,7 +3242,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     // Tell everyone he can start exiting the vehicle
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
-                                    if (!sendListIncompatiblePlayers.empty())
+                                    if (!sendListIncompatiblePlayers.Empty())
                                     {
                                         // Warp the ped out of the vehicle manually for incompatible players
                                         CBitStream BitStream;
@@ -3437,7 +3432,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
                                 }
 
-                                if (!sendListIncompatiblePlayers.empty())
+                                if (!sendListIncompatiblePlayers.Empty())
                                     {
                                         // Warp the ped into the vehicle manually for incompatible players
                                         CBitStream BitStream;
@@ -3490,7 +3485,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         CVehicleInOutPacket JackedReply(pJacked->GetID(), VehicleID, 0, VEHICLE_NOTIFY_OUT_RETURN);
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
 
-                                        if (!sendListIncompatiblePlayers.empty())
+                                        if (!sendListIncompatiblePlayers.Empty())
                                         {
                                             // Warp the ped out of the vehicle manually for incompatible players
                                             CBitStream BitStream;
