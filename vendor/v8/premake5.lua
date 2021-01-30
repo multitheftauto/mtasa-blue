@@ -2,7 +2,6 @@ project "v8"
 	language "C++"
 	targetname "Mtav8"
 	kind "SharedLib"
-	--kind "StaticLib"
 	targetdir(buildpath("server"))
 	
 	pchheader "StdInc.h"
@@ -42,14 +41,7 @@ project "v8"
 		"./sources",
 		"./sources/include",
         "./../../Shared/sdk",
-		--"./v8/v8/buildtools/third_party/libc++/trunk",
-		--"./v8/v8/out/ia32.release/gen",
-		--"./v8/v8/buildtools/third_party/libc++/trunk/utils/google-benchmark/include"
 		}
-
-	--defines { "BUILDING_V8_SHARED" }
-	--defines { "BUILDING_V8_PLATFORM_SHARED", "BUILDING_V8_SHARED" }
--- 	defines { "USING_V8_PLATFORM_SHARED", "USING_V8_SHARED", "USING_V8_BASE_SHARED" }
 
 	defines { "SDK_WITH_BCRYPT" }
 
@@ -61,12 +53,4 @@ project "v8"
 		"library/win32bit/v8.dll.lib",
 		"library/win32bit/v8_libbase.dll.lib",
 		"library/win32bit/v8_libplatform.dll.lib",
-
-		--[["library/win32bit/bytecode_builtins_list_generator.lib",
-		"library/win32bit/icui18n.dll.lib",
-		"library/win32bit/icuuc.dll.lib",
-		"library/win32bit/libc++.dll.lib",
-		"library/win32bit/mksnapshot.lib",
-		"library/win32bit/torque.lib",
-		"library/win32bit/zlib.dll.lib",]]
 	}
