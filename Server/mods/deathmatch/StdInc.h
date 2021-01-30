@@ -41,7 +41,7 @@ struct SAclRequest;
 #include "CMatrix.h"
 #include "net/Packets.h"
 #include "Enums.h"
-#include <bochs_internal/crc32.h>
+#include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
 #include "CIdArray.h"
 #include "pcrecpp.h"

@@ -14,6 +14,7 @@
 #include "CXMLCommon.h"
 #include "CXMLAttributes.h"
 #include <string>
+#include "SString.h"
 
 class CXMLNode : public CXMLCommon
 {

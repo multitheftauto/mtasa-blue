@@ -17,20 +17,7 @@ class CLuaArgument;
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
-
-// Wrapper around std::tuple to indicate that multiple values should be pushed to
-// the Lua stack
-template<typename... Ts>
-struct LuaMultiReturn
-{
-    // Note: We use a separate template for the constructor arguments
-    // to allow type conversions. For example: return { "hello", 42 };
-    // is a valid statement to construct a LuaMuliReturn<std::string, int>
-    template <typename... Args>
-    LuaMultiReturn(Args... args) : values{args...} {}
-
-    std::tuple<Ts...> values;
-};
+#include <lua/CLuaMultiReturn.h>
 
 
 struct CLuaFunctionParserBase
@@ -678,11 +665,19 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
 
     // Tuples can be used to return multiple results
     template <typename... Ts>
-    inline int PushResult(lua_State* L, const LuaMultiReturn<Ts...>& result)
+    inline int PushResult(lua_State* L, const CLuaMultiReturn<Ts...>& result)
     {
         // Call Push on each element of the tuple
         std::apply([L](const auto&... value) { (lua::Push(L, value), ...); }, result.values);
         return sizeof...(Ts);
+    }
+
+    
+    // Variant
+    template <typename... Ts>
+    inline int PushResult(lua_State* L, const std::variant<Ts...>& result)
+    {
+        return std::visit([this, L](const auto& value) { return PushResult(L, value); }, result);
     }
 
     // If `T` is not a tuple, defer to Push to push the value onto the stack
