@@ -4,7 +4,7 @@
  */
 
 #include "StdInc.h"
-#include "crc32.h"
+#include "bochs_crc32.h"
 #include <stdio.h>
 #include <cstring>
 #include "zlib.h"

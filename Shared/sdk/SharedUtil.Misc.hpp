@@ -9,10 +9,15 @@
  *
  *****************************************************************************/
 
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Time.h"
+#include <map>
 #include "UTF8.h"
 #include "UTF8Detect.hpp"
+#include "CDuplicateLineFilter.h"
 #ifdef WIN32
     #include <ctime>
+    #include <windows.h>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
