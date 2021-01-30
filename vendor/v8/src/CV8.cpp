@@ -28,14 +28,6 @@ CV8::~CV8()
     V8::ShutdownPlatform();
 }
 
-void CV8::DoTaskPulse()
-{
-    for (auto const& isolate : m_vecIsolates)
-    {
-        isolate->DoTaskPulse();
-    }
-}
-
 void CV8::DoPulse()
 {
     for (auto const& isolate : m_vecIsolates)

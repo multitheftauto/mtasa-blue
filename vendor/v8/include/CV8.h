@@ -12,7 +12,6 @@ public:
 
     CV8ModuleBase* CreateModule(const char* name);
     void           DoPulse();
-    void           DoTaskPulse();
 
     static CV8Module*                                                  GetModuleByName(const char* name);
     static std::unordered_map<std::string, std::unique_ptr<CV8Module>> m_mapModules;

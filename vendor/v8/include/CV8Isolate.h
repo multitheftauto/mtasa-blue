@@ -27,10 +27,5 @@ private:
     Isolate*              m_pIsolate;
     const CV8*            m_pCV8;
 
-    //std::unique_ptr<class InspectorClientImpl>              m_pClient;
-    //std::unique_ptr<class ChannelImpl>                      m_pChannel;
-    //std::unique_ptr<class v8_inspector::V8InspectorSession> m_pSession;
-    //std::unique_ptr<class v8_inspector::V8Inspector>        m_pInspector;
-    std::vector<std::unique_ptr<JobHandle>>                 m_vecJobHandles;
     std::vector<std::unique_ptr<CV8Promise>>                m_vecPromises;
 };
