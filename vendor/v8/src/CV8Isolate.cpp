@@ -195,6 +195,10 @@ bool CV8Isolate::GetErrorMessage(std::string& error)
 
 void CV8Isolate::Evaluate()
 {
+    Locker         lock(m_pIsolate);
+    Isolate::Scope isolateScope(m_pIsolate);
+    HandleScope    handleScope(m_pIsolate);
+    Context::Scope contextScope(m_context.Get(m_pIsolate));
     for (auto const& module : m_vecModules)
     {
         TryCatch     evaluateTryCatch(m_pIsolate);
