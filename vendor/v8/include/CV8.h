@@ -7,7 +7,7 @@ class CV8 : public CV8Base
 public:
     CV8();
     ~CV8();
-    CV8IsolateBase* CreateIsolate(std::string& strCode, std::string& originResource);
+    CV8IsolateBase* CreateIsolate(std::string& originResource);
     void            RemoveIsolate(CV8IsolateBase* pIsolate);
 
     CV8ModuleBase* CreateModule(const char* name);

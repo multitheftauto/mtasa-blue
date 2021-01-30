@@ -951,6 +951,19 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             AddDependent(pDependent);
     }
 
+    if (m_pJsVm)
+    {
+        std::string error;
+        if (m_pJsVm->GetErrorMessage(error))
+        {
+            CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
+        }
+        else
+        {
+            m_pJsVm->Evaluate();
+        }
+    }
+
     m_eState = EResourceState::Running;
 
     // Call the onResourceStart event. If it returns false, cancel this script again
@@ -1109,6 +1122,16 @@ bool CResource::CreateVM(bool bEnableOOP)
     return true;
 }
 
+bool CResource::CreateJsVM()
+{
+    if (m_pJsVm)
+        return false;
+
+    CV8Base* v8 = g_pServerInterface->GetV8();
+    m_pJsVm = v8->CreateIsolate(m_strResourceName);
+    return true;
+}
+
 bool CResource::DestroyVM()
 {
     // Remove all player keybinds on this VM
@@ -1130,6 +1153,13 @@ bool CResource::DestroyVM()
     m_pResourceManager->NotifyResourceVMClose(this, m_pVM);
     g_pGame->GetLuaManager()->RemoveVirtualMachine(m_pVM);
     m_pVM = nullptr;
+
+    if (m_pJsVm)
+    {
+        CV8Base* v8 = g_pServerInterface->GetV8();
+        v8->RemoveIsolate(m_pJsVm);
+        m_pJsVm = nullptr;
+    }
     return true;
 }
 
@@ -1662,6 +1692,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 {
     int i = 0;
 
+    bool hasAnyJsScript = false;
     // Loop through all script nodes under the root
     for (CXMLNode* pScript = pRoot->FindSubNode("script", i); pScript != nullptr; pScript = pRoot->FindSubNode("script", ++i))
     {
@@ -1678,6 +1709,11 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
             if (!stricmp(szLang, "js"))
             {
                 eLanguage = CResourceScriptItem::eScriptLanguage::JAVASCRIPT;
+                if (!hasAnyJsScript)
+                {
+                    CreateJsVM();
+                }
+                hasAnyJsScript = true;
             }
         }
 

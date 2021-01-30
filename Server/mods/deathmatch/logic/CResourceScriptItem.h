@@ -22,7 +22,4 @@ public:
 
     bool Start();
     bool Stop();
-
-private:
-    CV8IsolateBase* m_pIsolate = nullptr;
 };

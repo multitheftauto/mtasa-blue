@@ -35,16 +35,16 @@ bool CResourceScriptItem::Start()
     unsigned int iSize = buffer.size();
 
     m_pVM = m_resource->GetVirtualMachine();
+    CV8IsolateBase* isolateBase = m_resource->GetJsVm();
     if (iSize > 0)
     {
-        CV8Base*    v8 = g_pServerInterface->GetV8();
         switch (m_language)
         {
             case eScriptLanguage::LUA:
                 m_pVM->LoadScriptFromBuffer(&buffer.at(0), iSize, m_strResourceFileName.c_str());
                 break;
             case eScriptLanguage::JAVASCRIPT:
-                m_pIsolate = v8->CreateIsolate(std::string(buffer.begin(), buffer.end()), m_strResourceFileName);
+                isolateBase->RunCode(std::string(buffer.begin(), buffer.end()), (std::string)ConformResourcePath(m_strResourceFileName.c_str()));
                 break;
         }
     }
@@ -54,10 +54,5 @@ bool CResourceScriptItem::Start()
 
 bool CResourceScriptItem::Stop()
 {
-    if (m_pIsolate)
-    {
-        CV8Base* v8 = g_pServerInterface->GetV8();
-        v8->RemoveIsolate(m_pIsolate);
-    }
     return true;
 }

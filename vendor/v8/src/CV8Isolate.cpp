@@ -1,5 +1,6 @@
 #include "StdInc.h"
 #include <queue>
+#include <sstream>
 
 using namespace v8;
 
@@ -7,15 +8,28 @@ static std::queue<std::string> modulesListName;            // Todo, get rid of t
 
 CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
+    m_strOriginResource = originResource;
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     m_pIsolate = Isolate::New(m_createParams);
-    m_strOriginResource = originResource;
-    m_pIsolate->SetMicrotasksPolicy(v8::MicrotasksPolicy::kExplicit);
+    Locker lock(m_pIsolate);
+
+    Isolate::Scope isolateScope(m_pIsolate);
+    HandleScope    handleScope(m_pIsolate);
+
+    m_pIsolate->SetMicrotasksPolicy(MicrotasksPolicy::kExplicit);
     m_pIsolate->SetData(0, this);
+    m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
+    m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
+
+    Context::Scope contextScope(m_context.Get(m_pIsolate));
+
+    Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(m_pIsolate->GetCurrentContext());
+    Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(m_context.Get(m_pIsolate), vector2dTemplate);
+    Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(m_context.Get(m_pIsolate));
 }
 
 void CV8Isolate::DoPulse()
-{   
+{
     m_pIsolate->PerformMicrotaskCheckpoint();
 }
 
@@ -32,19 +46,20 @@ void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
     Locker lock(m_pIsolate);
     m_pIsolate->EnqueueMicrotask(
         [](void* data) {
-            CMicrotask* microtask = (CMicrotask*)data;
+            CMicrotask*     microtask = (CMicrotask*)data;
+            MicrotasksScope scope(microtask->m_isolate->GetIsolate(), MicrotasksScope::Type::kRunMicrotasks);
             microtask->m_microtask(microtask->m_isolate);
             delete microtask;
-    },
+        },
         new CMicrotask(microtask, this));
 }
 
-void CV8Isolate::ReportException(v8::TryCatch* pTryCatch)
+void CV8Isolate::ReportException(TryCatch* pTryCatch)
 {
-    String::Utf8Value      utf8(m_pIsolate, pTryCatch->Exception());
-    v8::Local<v8::Message> message = pTryCatch->Message();
-    int                    line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
-    int                    column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
+    String::Utf8Value utf8(m_pIsolate, pTryCatch->Exception());
+    Local<Message>    message = pTryCatch->Message();
+    int               line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
+    int               column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
     printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
 }
 
@@ -91,93 +106,123 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
         Local<Value> value = External::New(context->GetIsolate(), pair.second);
 
         FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
-            Locker                  lock(args.GetIsolate());
-            v8::HandleScope         handle_scope(args.GetIsolate());
-            v8::Local<v8::External> ext = args.Data().As<v8::External>();
-            CV8Isolate*             pThisIsolate = (CV8Isolate*)args.GetIsolate()->GetData(0);
+            Locker          lock(args.GetIsolate());
+            HandleScope     handleScope(args.GetIsolate());
+            Local<External> ext = args.Data().As<External>();
+            CV8Isolate*     pThisIsolate = (CV8Isolate*)args.GetIsolate()->GetData(0);
             void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
             CV8FunctionCallback callback(args);
             func(&callback);
         };
 
         module->SetSyntheticModuleExport(context->GetIsolate(), String::NewFromUtf8(context->GetIsolate(), pair.first).ToLocalChecked(),
-                                         v8::Function::New(context, callback, value).ToLocalChecked());
+                                         Function::New(context, callback, value).ToLocalChecked());
     }
     modulesListName.pop();
     return True(context->GetIsolate());
 }
 
-void CV8Isolate::RunCode(std::string& code, bool bAsModule)
+void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
 {
-    Locker lock(m_pIsolate);
-    Isolate::Scope isolate_scope(m_pIsolate);
-    // Create a stack-allocated handle scope.
-    HandleScope handle_scope(m_pIsolate);
+    m_iRunCodeCount++;
+    Locker         lock(m_pIsolate);
+    Isolate::Scope isolateScope(m_pIsolate);
+    HandleScope    handleScope(m_pIsolate);
+    Context::Scope contextScope(m_context.Get(m_pIsolate));
 
-    Local<ObjectTemplate> global = ObjectTemplate::New(m_pIsolate);
-    Local<Context> context = Context::New(m_pIsolate, nullptr, global);
-
-    Context::Scope context_scope(context);
-    Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(context);
-    Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(context, vector2dTemplate);
-    Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(context);
-
-    // Create a string containing the JavaScript source code.
     Local<String> source = String::NewFromUtf8(m_pIsolate, code.c_str(), NewStringType::kNormal).ToLocalChecked();
-    Local<String> resourceName = String::NewFromUtf8(m_pIsolate, m_strOriginResource.c_str(), NewStringType::kNormal).ToLocalChecked();
-    // Compile the source code.
+    Local<String> fileName = String::NewFromUtf8(m_pIsolate, originFileName.c_str(), NewStringType::kNormal).ToLocalChecked();
 
+    ScriptOrigin origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
+
+    ScriptCompiler::Source compilerSource(source, origin);
+    Local<Module>          module;
+    TryCatch               compileTryCatch(m_pIsolate);
+    if (!ScriptCompiler::CompileModule(m_pIsolate, &compilerSource).ToLocal(&module))
     {
-        v8::TryCatch compileTryCatch(m_pIsolate);
-        if (bAsModule)
+        String::Utf8Value exception(m_pIsolate, compileTryCatch.Exception());
+        Local<Message>    message = compileTryCatch.Message();
+        int               line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
+        int               column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
+        std::unique_ptr<STryCatch> sTryCatch = std::make_unique<STryCatch>(originFileName, *exception, line, column);
+        m_vecCompilationErrors.emplace_back(std::move(sTryCatch));
+        return;
+    }
+    for (int i = 0; i < module->GetModuleRequestsLength(); i++)
+    {
+        Local<ModuleRequest> request = module->GetModuleRequests()->Get(m_context.Get(m_pIsolate), i).As<ModuleRequest>();
+
+        Maybe<bool> result = module->InstantiateModule(m_context.Get(m_pIsolate), InstantiateModule);
+        if (result.IsNothing())
         {
-            ScriptOrigin origin(resourceName, 0, 0, false, -1, Local<Value>(), false, false, true);
-
-            ScriptCompiler::Source compilerSource(source, origin);
-            Local<Module>          module;
-            if (!ScriptCompiler::CompileModule(m_pIsolate, &compilerSource).ToLocal(&module))
-            {
-                ReportException(&compileTryCatch);
-                return;
-            }
-            for (int i = 0; i < module->GetModuleRequestsLength(); i++)
-            {
-                Local<ModuleRequest> request = module->GetModuleRequests()->Get(context, i).As<ModuleRequest>();
-
-                v8::Maybe<bool> result = module->InstantiateModule(context, InstantiateModule);
-                if (result.IsNothing())
-                {
-                    v8::String::Utf8Value str(context->GetIsolate(), request->GetSpecifier());
-                    printf("Failed to import module %s\n", *str);
-                }
-            }
-            if (Module::Status::kInstantiated == module->GetStatus())
-            {
-                v8::TryCatch evaluateTryCatch(m_pIsolate);
-                Local<Value> returnValue;
-                if (!module->Evaluate(context).ToLocal(&returnValue))
-                {
-                    ReportException(&evaluateTryCatch);
-                    return;
-                }
-            }
+            String::Utf8Value str(m_pIsolate, request->GetSpecifier());
+            printf("Failed to import module %s\n", *str);
         }
-        else
+    }
+    if (Module::Status::kInstantiated == module->GetStatus())
+    {
+        std::unique_ptr<SModule> smodule = std::make_unique<SModule>();
+        smodule->m_module.Reset(m_pIsolate, module);
+        m_vecModules.push_back(std::move(smodule));
+        /*TryCatch evaluateTryCatch(m_pIsolate);
+        Local<Value> returnValue;
+        if (!module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&returnValue))
         {
-            ScriptOrigin  origin(resourceName);
-            Local<Script> script;
+            ReportException(&evaluateTryCatch);
+            return;
+        }*/
+    }
+}
 
-            if (!Script::Compile(context, source, &origin).ToLocal(&script))
-            {
-                ReportException(&compileTryCatch);
-                return;
-            }
+bool CV8Isolate::GetErrorMessage(std::string& error)
+{
+    if (m_vecCompilationErrors.empty())
+    {
+        return false;
+    }
+    std::stringstream stream;
+
+    stream << "[JS Error] Failed to compile " << m_vecCompilationErrors.size() << " of " << m_iRunCodeCount << " scripts in resource \"" << m_strOriginResource << "\"\n";
+    for (auto const& tryCatch : m_vecCompilationErrors)
+    {
+        stream << "\t" << tryCatch->location << ": " << tryCatch->exception << " at " << tryCatch->line << ":" << tryCatch->column << "\n";
+    }
+    
+    stream << '\n';
+    error = stream.str();
+    return true;
+}
+
+void CV8Isolate::Evaluate()
+{
+    for (auto const& module : m_vecModules)
+    {
+        TryCatch     evaluateTryCatch(m_pIsolate);
+        Local<Value> returnValue;
+        if (!module->m_module.Get(m_pIsolate)->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&returnValue))
+        {
+            ReportException(&evaluateTryCatch);
         }
     }
 }
 
 CV8Isolate::~CV8Isolate()
 {
+    {
+        Locker         lock(m_pIsolate);
+        Isolate::Scope isolateScope(m_pIsolate);
+        HandleScope    handleScope(m_pIsolate);
+        Context::Scope contextScope(m_context.Get(m_pIsolate));
+
+        m_global.Reset();
+        m_context.Reset();
+
+        for (auto const& module : m_vecModules)
+        {
+            module->m_module.Reset();
+        }
+    }
+
     delete m_createParams.array_buffer_allocator;
     m_pIsolate->Dispose();
 }

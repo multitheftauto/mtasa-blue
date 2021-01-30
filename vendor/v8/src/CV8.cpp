@@ -47,10 +47,9 @@ std::vector<CV8IsolateBase*> CV8::GetIsolates()
     return isolates;
 }
 
-CV8IsolateBase* CV8::CreateIsolate(std::string& strCode, std::string& originResource)
+CV8IsolateBase* CV8::CreateIsolate(std::string& originResource)
 {
     std::unique_ptr<CV8Isolate> pIsolate = std::make_unique<CV8Isolate>(this, originResource);
-    pIsolate->RunCode(strCode, true);
     CV8Isolate* isolate = pIsolate.get();
     m_vecIsolates.push_back(std::move(pIsolate));
     return isolate;
