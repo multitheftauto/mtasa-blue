@@ -12,4 +12,6 @@ public:
     virtual void Return(double arg) = 0;
     virtual void Return(bool arg) = 0;
     virtual void ReturnPromise(std::function<void(CV8PromiseBase*)> callback) = 0;
+
+    virtual void ReturnPromiseNew(std::unique_ptr<class CV8AsyncFunction> pAsyncFunction) = 0;
 };

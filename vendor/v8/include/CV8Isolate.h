@@ -11,11 +11,12 @@ public:
     void DoPulse();
 
     void                      RunCode(std::string& code, bool bAsModule = false);
-    static MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions,
+    static MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions,
                                                             Local<Module> referrer);
 
+    void              EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask);
     MaybeLocal<Value> InitializeModuleExports(Local<Context> context, Local<Module> module);
-    void              AddPromise(CV8Promise* pPromise) { m_vecPromises.push_back(pPromise); }
+    void              AddPromise(std::unique_ptr<CV8Promise> pPromise);
     Isolate*          GetIsolate() const { return m_pIsolate; }
 
 private:
@@ -30,6 +31,6 @@ private:
     //std::unique_ptr<class ChannelImpl>                      m_pChannel;
     //std::unique_ptr<class v8_inspector::V8InspectorSession> m_pSession;
     //std::unique_ptr<class v8_inspector::V8Inspector>        m_pInspector;
-    std::vector<CV8Promise*>                                m_vecPromises;
     std::vector<std::unique_ptr<JobHandle>>                 m_vecJobHandles;
+    std::vector<std::unique_ptr<CV8Promise>>                m_vecPromises;
 };

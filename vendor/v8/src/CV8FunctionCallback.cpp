@@ -73,9 +73,18 @@ void CV8FunctionCallback::Return(bool arg)
 
 void CV8FunctionCallback::ReturnPromise(std::function<void(CV8PromiseBase*)> callback)
 {
-    CV8Promise* pPromise = new CV8Promise(m_callback.GetIsolate());
-    CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
+    //CV8Promise* pPromise = new CV8Promise(m_callback.GetIsolate());
+    //CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
 
-    pThisIsolate->AddPromise(pPromise);
-    m_callback.GetReturnValue().Set(pPromise->GetPromise());
+    //pThisIsolate->AddPromise(pPromise);
+    //m_callback.GetReturnValue().Set(pPromise->GetPromise());
+}
+
+void CV8FunctionCallback::ReturnPromiseNew(std::unique_ptr<CV8AsyncFunction> pAsyncFunction)
+{
+    CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
+    std::unique_ptr<CV8Promise> pPromise = std::make_unique<CV8Promise>(pThisIsolate, std::move(pAsyncFunction));
+    Local<Promise>              promise = pPromise->GetPromise();
+    pThisIsolate->AddPromise(std::move(pPromise));
+    m_callback.GetReturnValue().Set(promise);
 }

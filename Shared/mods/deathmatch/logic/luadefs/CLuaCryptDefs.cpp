@@ -13,6 +13,7 @@
 
 #ifndef MTA_CLIENT
     #include <v8/CV8Base.h>
+    #include <v8/include/async/functions/CV8PasswordHash.h>
     #include <core/CServerInterface.h>
 
     extern CServerInterface* g_pServerInterface;
@@ -53,8 +54,11 @@ void CLuaCryptDefs::LoadFunctions()
 
     pHashModule->AddFunction("passwordHash", [](CV8FunctionCallbackBase* callback) {
         std::string password = callback->ReadString();
-        callback->ReturnPromise([password](CV8PromiseBase* promise) { promise->Resolve(SharedUtil::BcryptHash(password, "", 13));
-        });
+        double         value;
+        if(callback->ReadNumber(value))
+        {
+            callback->ReturnPromiseNew(std::make_unique<CV8PasswordHash>(password, (int)value));
+        }
     });
 #endif
 

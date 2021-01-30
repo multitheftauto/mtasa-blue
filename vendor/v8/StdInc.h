@@ -1,5 +1,7 @@
 #define PI (3.14159265358979323846f)
 
+class CV8Delegate;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,10 +17,12 @@
 
 #include "v8/CV8Base.h"
 
+
 #include "classes/CV8BaseClass.h"
 #include "classes/CV8Vector2D.h"
 #include "classes/CV8Vector3D.h"
 #include "classes/CV8Matrix.h"
+
 
 #include "include/CV8.h"
 #include "include/CV8Isolate.h"
@@ -26,3 +30,6 @@
 #include "include/CV8Task.h"
 #include "include/CV8Promise.h"
 #include "include/CV8FunctionCallback.h"
+
+#include "async/CV8Delegate.h"
+#include "async/CV8AsyncFunction.h"

@@ -26,6 +26,7 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
+			"../../../vendor/v8/include",
 			"logic",
 			"utils",
 			"."
@@ -54,6 +55,8 @@ project "Deathmatch"
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
+		"../../../vendor/v8/include/async/functions/**.h",
+		"../../../vendor/v8/src/async/functions/**.cpp",
 	}
 
 	filter "system:windows"

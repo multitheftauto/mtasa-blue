@@ -21,6 +21,8 @@ public:
 
     void ReturnPromise(std::function<void(CV8PromiseBase*)> callback);
 
+    void ReturnPromiseNew(std::unique_ptr<class CV8AsyncFunction> pAsyncFunction);
+
 private:
     template<typename T>
     bool ReadClass(CV8BaseClass::EClass eClass, T& value)

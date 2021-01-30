@@ -11,15 +11,21 @@ project "v8"
 	vpaths { 
 		["Headers"] = "include/*.h",
 		["Headers/Classes"] = "include/classes/*.h",
-		["Sources"] = "src/*.c",
-		["Sources/Classes"] = "src/classes/*.c",
+		["Headers/Async"] = "include/async/*.h",
+		["Sources"] = "src/*.cpp",
+		["Sources/Classes"] = "src/classes/*.cpp",
+		["Sources/Async"] = "src/async/*.cpp",
 		["*"] = {"premake5.lua", "StdInc.h", "StdInc.cpp"}
 	}
 	
 	files {
 		"premake5.lua",
-		"src/**.cpp",
-		"include/**.h",
+		"src/*.cpp",
+		"src/async/*.cpp",
+		"src/classes/*.cpp",
+		"include/*.h",
+		"include/async/*.h",
+		"include/classes/*.h",
 		"v8/**.h",
 		
 		"StdInc.h",
@@ -44,6 +50,12 @@ project "v8"
 	--defines { "BUILDING_V8_SHARED" }
 	--defines { "BUILDING_V8_PLATFORM_SHARED", "BUILDING_V8_SHARED" }
 -- 	defines { "USING_V8_PLATFORM_SHARED", "USING_V8_SHARED", "USING_V8_BASE_SHARED" }
+
+	defines { "SDK_WITH_BCRYPT" }
+
+	links {
+		"cryptopp", "blowfish_bcrypt"
+	}
 
 	links {
 		"library/win32bit/v8.dll.lib",
