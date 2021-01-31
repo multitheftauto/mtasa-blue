@@ -1242,16 +1242,16 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
 {
     unsigned char ucOldInterior = Entity.GetInterior();
 
-    CLuaArguments Arguments;
-    Arguments.PushNumber(ucOldInterior);
-    Arguments.PushNumber(ucInterior);
-
-    if (Entity.CallEvent("onClientElementInteriorChange", Arguments, false))
+    if (ucInterior != ucOldInterior)
     {
-        RUN_CHILDREN(SetElementInterior(**iter, ucInterior, bSetPosition, vecPosition))
+        CLuaArguments Arguments;
+        Arguments.PushNumber(ucOldInterior);
+        Arguments.PushNumber(ucInterior);
 
-        if (ucInterior != ucOldInterior)
+        if (Entity.CallEvent("onClientElementInteriorChange", Arguments, false))
         {
+            RUN_CHILDREN(SetElementInterior(**iter, ucInterior, bSetPosition, vecPosition))
+
             Entity.SetInterior(ucInterior);
 
             if (bSetPosition)
