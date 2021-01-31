@@ -188,6 +188,10 @@ void CPlayerManager::AddToList(CPlayer* pPlayer)
 
 void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
 {
+    // This is called from CPlayer::~CPlayer(), which might be called from our destructor.
+    // Which means that modifying m_Players might be dangerous (in the case of google_sparse_set[AKA CFastHashSet])
+    // erase operations do not invalidate iterators.
+
     dassert(m_Players.find(pPlayer) != m_Players.end());
     m_Players.erase(pPlayer);
 
