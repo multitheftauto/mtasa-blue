@@ -700,7 +700,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
             if (pPlayer->ShouldIgnoreMinClientVersionChecks())
                 return false;
 
-            return m_strMinClientRequirement >= pPlayer->GetPlayerVersion();
+            return m_strMinClientRequirement > pPlayer->GetPlayerVersion();
         });
 
         if (numIncompatiblePlayers > 0)
