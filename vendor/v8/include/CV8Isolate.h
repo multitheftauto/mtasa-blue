@@ -7,11 +7,10 @@ class CV8Isolate : public CV8IsolateBase
 public:
     CV8Isolate(const CV8* pCV8, std::string& originResource);
     ~CV8Isolate();
-    void DoTaskPulse();
     void DoPulse();
 
-    void                      RunCode(std::string& code, std::string& originFileName);
-    static MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer);
+    void               RunCode(std::string& code, std::string& originFileName);
+    MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer);
 
     void               EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask);
     MaybeLocal<Value>  InitializeModuleExports(Local<Context> context, Local<Module> module);
@@ -35,7 +34,10 @@ private:
         std::string exception;
         int         line;
         int         column;
-        STryCatch(std::string location, std::string&& exception, int line, int column) : location(location), exception(std::move(exception)), line(line), column(column) {}
+        STryCatch(std::string location, std::string&& exception, int line, int column)
+            : location(location), exception(std::move(exception)), line(line), column(column)
+        {
+        }
     };
 
     void                   ReportException(TryCatch* pTryCatch);

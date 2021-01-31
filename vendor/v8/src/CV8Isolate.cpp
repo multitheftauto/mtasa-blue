@@ -73,7 +73,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
     if (!pModule)
     {
         Local<Module> scriptModule;
-        if(!self->GetScriptModule(*importName).ToLocal(&scriptModule))
+        if (!self->GetScriptModule(*importName).ToLocal(&scriptModule))
         {
             return module;
         }
@@ -101,7 +101,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
 MaybeLocal<Module> CV8Isolate::GetScriptModule(const char* name)
 {
     MaybeLocal<Module> module;
-    auto const& result = m_mapScriptModules.find(name);
+    auto const&        result = m_mapScriptModules.find(name);
 
     if (result != m_mapScriptModules.end())
     {
@@ -130,7 +130,6 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
             Locker          lock(args.GetIsolate());
             HandleScope     handleScope(args.GetIsolate());
             Local<External> ext = args.Data().As<External>();
-            CV8Isolate*     pThisIsolate = (CV8Isolate*)args.GetIsolate()->GetData(0);
             void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
             CV8FunctionCallback callback(args);
             func(&callback);
@@ -154,7 +153,7 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
     Local<String> source = String::NewFromUtf8(m_pIsolate, code.c_str(), NewStringType::kNormal).ToLocalChecked();
     Local<String> fileName = String::NewFromUtf8(m_pIsolate, originFileName.c_str(), NewStringType::kNormal).ToLocalChecked();
 
-    ScriptOrigin origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
+    ScriptOrigin           origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
     ScriptCompiler::Source compilerSource(source, origin);
     Local<Module>          module;
     TryCatch               compileTryCatch(m_pIsolate);
@@ -169,7 +168,6 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
         return;
     }
 
-    auto status = module->GetStatus();
     if (Module::Status::kUninstantiated == module->GetStatus())
     {
         const char* szName = originFileName.c_str();
@@ -179,7 +177,11 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
         {
             Local<ModuleRequest> request = module->GetModuleRequests()->Get(m_context.Get(m_pIsolate), i).As<ModuleRequest>();
 
-            Maybe<bool> result = module->InstantiateModule(m_context.Get(m_pIsolate), InstantiateModule);
+            Maybe<bool> result = module->InstantiateModule(
+                m_context.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
+                    CV8Isolate* self = (CV8Isolate*)context->GetIsolate()->GetData(0);
+                    return self->InstantiateModule(context, specifier, import_assertions, referrer);
+                });
             if (result.IsNothing())
             {
                 String::Utf8Value str(m_pIsolate, request->GetSpecifier());
@@ -223,11 +225,18 @@ void CV8Isolate::Evaluate()
     {
         TryCatch      evaluateTryCatch(m_pIsolate);
         Local<Module> v8Module = module->m_module.Get(m_pIsolate);
-        Local<Value>  val;
-        if (!v8Module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&val))
+        if (Module::Status::kInstantiated == v8Module->GetStatus())
         {
-            ReportException(&evaluateTryCatch);
-            continue;
+            Local<Value>  val;
+            if (!v8Module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&val))
+            {
+                ReportException(&evaluateTryCatch);
+                continue;
+            }
+        }
+        else
+        {
+            printf("error\n");
         }
     }
 }

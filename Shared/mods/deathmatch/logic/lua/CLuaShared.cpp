@@ -71,6 +71,7 @@ void CLuaShared::LoadFunctions()
     CLuaBitDefs::LoadFunctions();
     CLuaCryptDefs::LoadFunctions();
     CJsCryptDefs::LoadFunctions();
+    CJsUtilDefs::LoadFunctions();
     CLuaFileDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
     CLuaTrainTrackDefs::LoadFunctions();

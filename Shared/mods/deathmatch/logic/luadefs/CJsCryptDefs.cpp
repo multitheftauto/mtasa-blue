@@ -9,6 +9,7 @@
  *****************************************************************************/
 #include "StdInc.h"
 #include <SharedUtil.Crypto.h>
+#include <functional>
 
 #ifndef MTA_CLIENT
     #include <v8/CV8Base.h>
@@ -24,25 +25,38 @@ void CJsCryptDefs::LoadFunctions()
 #ifndef MTA_CLIENT
     CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("crypt");
 
-    pHashModule->AddFunction("md5", [](CV8FunctionCallbackBase* callback) {
-        std::string str;
-        if (callback->ReadString(str))
-        {
-            callback->ReturnPromise(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
-            return;
-        }
-        callback->Return(false);
-    });
+    constexpr static const std::pair<const char*, void(*)(CV8FunctionCallbackBase*)> functions[]{
+        {"md5", Md5}, {"BCrypt", BCrypt}
+    };
 
-    pHashModule->AddFunction("passwordHash", [](CV8FunctionCallbackBase* callback) {
-        std::string password;
-        double      value;
-        if (callback->ReadString(password) && callback->ReadNumber(value))
-        {
-            callback->ReturnPromise(std::make_unique<CV8PasswordHash>(password, (int)value));
-            return;
-        }
-        callback->Return(false);
-    });
+    // Add functions
+    for (const auto& [name, func] : functions)
+        pHashModule->AddFunction(name, func);
 #endif
 }
+
+#ifndef MTA_CLIENT
+void CJsCryptDefs::Md5(CV8FunctionCallbackBase* callback)
+{
+    std::string str;
+    if (callback->ReadString(str))
+    {
+        callback->ReturnPromise(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
+        return;
+    }
+    callback->Return(false);
+}
+
+void CJsCryptDefs::BCrypt(CV8FunctionCallbackBase* callback)
+{
+    std::string password;
+    double      value;
+    if (callback->ReadString(password) && callback->ReadNumber(value))
+    {
+        callback->ReturnPromise(std::make_unique<CV8PasswordHash>(password, (int)value));
+        return;
+    }
+    callback->Return(false);
+}
+
+#endif
