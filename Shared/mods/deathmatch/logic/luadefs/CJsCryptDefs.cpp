@@ -1,0 +1,42 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/mods/logic/luadefs/CJsCryptDefs.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+#include "StdInc.h"
+#include <SharedUtil.Crypto.h>
+
+#ifndef MTA_CLIENT
+#include <v8/CV8Base.h>
+#include <v8/include/async/functions/CV8InlineAsyncFunction.h>
+#include <v8/include/async/functions/CV8PasswordHash.h>
+#include <core/CServerInterface.h>
+
+extern CServerInterface* g_pServerInterface;
+#endif
+
+
+void CJsCryptDefs::LoadFunctions()
+{
+#ifndef MTA_CLIENT
+    CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("crypt");
+
+    pHashModule->AddFunction("md5", [](CV8FunctionCallbackBase* callback) {
+        std::string str = callback->ReadString();
+        callback->ReturnPromiseNew(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
+    });
+
+    pHashModule->AddFunction("passwordHash", [](CV8FunctionCallbackBase* callback) {
+        std::string password = callback->ReadString();
+        double         value;
+        if(callback->ReadNumber(value))
+        {
+            callback->ReturnPromiseNew(std::make_unique<CV8PasswordHash>(password, (int)value));
+        }
+    });
+#endif
+}

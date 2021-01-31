@@ -11,15 +11,6 @@
 #include <SharedUtil.Crypto.h>
 #include <lua/CLuaFunctionParser.h>
 
-#ifndef MTA_CLIENT
-    #include <v8/CV8Base.h>
-    #include <v8/include/async/functions/CV8PasswordHash.h>
-    #include <core/CServerInterface.h>
-
-    extern CServerInterface* g_pServerInterface;
-#endif
-
-
 void CLuaCryptDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -35,32 +26,6 @@ void CLuaCryptDefs::LoadFunctions()
         {"encodeString", EncodeString},
         {"decodeString", DecodeString},
     };
-
-#ifndef MTA_CLIENT
-    CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("hash");
-
-    pHashModule->AddFunction("md5", [](CV8FunctionCallbackBase* callback) {
-        std::string str = callback->ReadString();
-        std::string md5 = Md5(str);
-        callback->Return(md5);
-    });
-
-    pHashModule->AddFunction("md5Async", [](CV8FunctionCallbackBase* callback) {
-        std::string     str = callback->ReadString();
-        callback->ReturnPromise([str](CV8PromiseBase* promise) {
-            promise->Resolve(Md5(str));
-        });
-    });
-
-    pHashModule->AddFunction("passwordHash", [](CV8FunctionCallbackBase* callback) {
-        std::string password = callback->ReadString();
-        double         value;
-        if(callback->ReadNumber(value))
-        {
-            callback->ReturnPromiseNew(std::make_unique<CV8PasswordHash>(password, (int)value));
-        }
-    });
-#endif
 
     // Add functions
     for (const auto& [name, func] : functions)
