@@ -22,14 +22,14 @@ class CPlayer;
 class CSendList : protected std::unordered_map<unsigned short, std::vector<CPlayer*>>
 {
 public:
-    using BaseCont_t = std::unordered_map<unsigned short, std::vector<CPlayer*>>;
+    using BaseContainer = std::unordered_map<unsigned short, std::vector<CPlayer*>>;
 
 public:
     CSendList() = default;
 
     // From sequencial container
-    template<class Cont_t>
-    CSendList(Cont_t&& players) { Insert(std::forward<Cont_t>(players)); }
+    template<class Container>
+    CSendList(Container&& players) { Insert(std::forward<Container>(players)); }
 
     CSendList(CSendList&&) = default;
     CSendList(const CSendList&) = default;
@@ -37,9 +37,9 @@ public:
     void Insert(CPlayer* pPlayer);
 
     // Insert from a sequencial container(including a set)
-    template<typename Cont_t,
-        typename = std::enable_if_t<std::is_same_v<std::remove_cv_t<typename Cont_t::value_type>, CPlayer*>>>
-    void Insert(const Cont_t& players)
+    template<typename Container,
+        typename = std::enable_if_t<std::is_same_v<std::remove_cv_t<typename Container::value_type>, CPlayer*>>>
+    void Insert(const Container& players)
     {
         for (auto pPlayer : players)
             Insert(pPlayer);
@@ -58,7 +58,7 @@ public:
 
     bool Erase(CPlayer* pPlayer) noexcept
     {
-        if (BaseCont_t::mapped_type* group = GetAPlayersGroup(pPlayer))
+        if (BaseContainer::mapped_type* group = GetAPlayersGroup(pPlayer))
         {
             if (const auto it = std::find(group->begin(), group->end(), pPlayer); it != group->end())
             {
@@ -69,26 +69,26 @@ public:
         return false;
     }
 
-    const BaseCont_t::mapped_type* GetPlayerGroupByBitStream(unsigned short bsver) const
+    const BaseContainer::mapped_type* GetPlayerGroupByBitStream(unsigned short bsver) const
     {
         if (const auto it = find(bsver); it != end())
             return &it->second;
         return nullptr;
     }
 
-    BaseCont_t::mapped_type* GetPlayerGroupByBitStream(unsigned short bsver)
+    BaseContainer::mapped_type* GetPlayerGroupByBitStream(unsigned short bsver)
     { 
         // As seen in Scott Mayers book.. Thanks stackoverflow!
-        return const_cast<BaseCont_t::mapped_type*>(const_cast<const CSendList*>(this)->GetPlayerGroupByBitStream(bsver));
+        return const_cast<BaseContainer::mapped_type*>(const_cast<const CSendList*>(this)->GetPlayerGroupByBitStream(bsver));
     }
 
     // Return a list where players thave the same bitstream version as the player
-    BaseCont_t::mapped_type* GetAPlayersGroup(CPlayer* pPlayer);
-    const BaseCont_t::mapped_type* GetAPlayersGroup(CPlayer* pPlayer) const;
+    BaseContainer::mapped_type* GetAPlayersGroup(CPlayer* pPlayer);
+    const BaseContainer::mapped_type* GetAPlayersGroup(CPlayer* pPlayer) const;
 
     // Wrappers (we dont want to expose non-const iterators)
     bool Empty() const noexcept { return empty(); }
 
-    BaseCont_t::const_iterator begin() const noexcept { return BaseCont_t::begin(); }
-    BaseCont_t::const_iterator end() const noexcept { return BaseCont_t::end(); }
+    BaseContainer::const_iterator begin() const noexcept { return BaseContainer::begin(); }
+    BaseContainer::const_iterator end() const noexcept { return BaseContainer::end(); }
 };
