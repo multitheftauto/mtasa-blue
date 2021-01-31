@@ -380,6 +380,7 @@ void CGame::DoPulse()
 
     UpdateModuleTickCount64();
 
+    CV8Base* v8 = g_pServerInterface->GetV8();
     // Calculate FPS
     long long llCurrentTime = SharedUtil::GetModuleTickCount64();
     long long ulDiff = llCurrentTime - m_llLastFPSTime;
@@ -403,6 +404,8 @@ void CGame::DoPulse()
         ucProgress = (ucProgress + 1) & 3;
         ucProgressSkip = (uchar)llCurrentTime;
     }
+
+    v8->DoPulse();
 
     // Handle critical things
     CSimControl::DoPulse();
@@ -447,9 +450,6 @@ void CGame::DoPulse()
     {
         CLOCK_CALL1(m_pRemoteDebugger->DoPulse(););
     }
-    CV8Base* v8 = g_pServerInterface->GetV8();
-
-    v8->DoPulse();
 
     // Pulse ASE
     if (m_pASE)
@@ -487,6 +487,8 @@ void CGame::DoPulse()
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
+
+    v8->DoPulse();
 
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
