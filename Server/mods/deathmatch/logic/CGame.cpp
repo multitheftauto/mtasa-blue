@@ -4498,8 +4498,8 @@ CMtaVersion CGame::CalculateMinClientRequirement()
             m_strPrevMinClientKickRequirement = strKickMin;
 
             // Do kicking
-            const auto& players = g_pGame->GetPlayerManager()->GetAllPlayers();
-            const auto  playersRedirectedCount = std::count_if(players.begin(), players.end(), [&strKickMin](CPlayer* pPlayer) {
+            const auto&  players = g_pGame->GetPlayerManager()->GetAllPlayers();
+            const size_t playersRedirectedCount = std::count_if(players.begin(), players.end(), [&strKickMin](CPlayer* pPlayer) {
                 if (strKickMin <= pPlayer->GetPlayerVersion())
                     return false;
 
@@ -4508,7 +4508,7 @@ CMtaVersion CGame::CalculateMinClientRequirement()
             });
 
             if (playersRedirectedCount > 0)
-                CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", playersRedirectedCount, *strKickMin));
+                CLogger::LogPrintf(SString("Forced %u player(s) to reconnect so they can update to %s\n", (unsigned)playersRedirectedCount, *strKickMin));
         }
     }
 
