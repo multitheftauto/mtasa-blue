@@ -1119,8 +1119,10 @@ bool CResource::DestroyVM()
 {
     // Remove all player keybinds on this VM
     for (CPlayer* pPlayer : g_pGame->GetPlayerManager()->GetAllPlayers())
+    {
         if (auto pBinds = pPlayer->GetKeyBinds())
             pBinds->RemoveAllKeys(m_pVM);
+    }
 
     // Delete the events on this VM
     m_pRootElement->DeleteEvents(m_pVM, true);
