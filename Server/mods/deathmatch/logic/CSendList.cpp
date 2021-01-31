@@ -27,12 +27,12 @@ size_t CSendList::CountJoined() const noexcept
     );
 }
 
-auto CSendList::GetAPlayersGroup(CPlayer* pPlayer) -> BaseCont_t::mapped_type*
+auto CSendList::GetAPlayersGroup(CPlayer* pPlayer) -> BaseContainer::mapped_type*
 {
     return GetPlayerGroupByBitStream(pPlayer->GetBitStreamVersion()); 
 }
 
-auto CSendList::GetAPlayersGroup(CPlayer* pPlayer) const -> const BaseCont_t::mapped_type*
+auto CSendList::GetAPlayersGroup(CPlayer* pPlayer) const -> const BaseContainer::mapped_type*
 {
     return GetPlayerGroupByBitStream(pPlayer->GetBitStreamVersion()); 
 }
