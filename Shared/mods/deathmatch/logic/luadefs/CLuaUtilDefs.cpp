@@ -60,16 +60,23 @@ void CLuaUtilDefs::LoadFunctions()
 
     pHashModule->AddFunction("print", [](CV8FunctionCallbackBase* callback) {
         std::stringstream stream;
+        std::string       str;
         int               count = callback->CountArguments();
         for (int i = 0; i < count; i++)
         {
             if (!strcmp(callback->GetType(), "string"))
             {
-                stream << "\"" << callback->ReadString() << "\"";
+                if (callback->ReadString(str, false))
+                {
+                    stream << "\"" << str << "\"";
+                }
             }
             else
             {
-                stream << callback->ReadString();
+                if (callback->ReadString(str, false))
+                {
+                    stream << str;
+                }
             }
             if (i + 1 != count)
             {

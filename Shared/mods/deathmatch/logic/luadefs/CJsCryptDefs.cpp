@@ -11,14 +11,13 @@
 #include <SharedUtil.Crypto.h>
 
 #ifndef MTA_CLIENT
-#include <v8/CV8Base.h>
-#include <v8/include/async/functions/CV8InlineAsyncFunction.h>
-#include <v8/include/async/functions/CV8PasswordHash.h>
-#include <core/CServerInterface.h>
+    #include <v8/CV8Base.h>
+    #include <v8/include/async/functions/CV8InlineAsyncFunction.h>
+    #include <v8/include/async/functions/CV8PasswordHash.h>
+    #include <core/CServerInterface.h>
 
 extern CServerInterface* g_pServerInterface;
 #endif
-
 
 void CJsCryptDefs::LoadFunctions()
 {
@@ -26,17 +25,24 @@ void CJsCryptDefs::LoadFunctions()
     CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("crypt");
 
     pHashModule->AddFunction("md5", [](CV8FunctionCallbackBase* callback) {
-        std::string str = callback->ReadString();
-        callback->ReturnPromiseNew(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
+        std::string str;
+        if (callback->ReadString(str))
+        {
+            callback->ReturnPromise(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
+            return;
+        }
+        callback->Return(false);
     });
 
     pHashModule->AddFunction("passwordHash", [](CV8FunctionCallbackBase* callback) {
-        std::string password = callback->ReadString();
-        double         value;
-        if(callback->ReadNumber(value))
+        std::string password;
+        double      value;
+        if (callback->ReadString(password) && callback->ReadNumber(value))
         {
-            callback->ReturnPromiseNew(std::make_unique<CV8PasswordHash>(password, (int)value));
+            callback->ReturnPromise(std::make_unique<CV8PasswordHash>(password, (int)value));
+            return;
         }
+        callback->Return(false);
     });
 #endif
 }

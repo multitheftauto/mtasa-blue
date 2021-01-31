@@ -15,15 +15,23 @@ const char* CV8FunctionCallback::GetType()
     return *str;
 }
 
-std::string CV8FunctionCallback::ReadString()
+bool CV8FunctionCallback::ReadString(std::string& value, bool strict)
 {
     if (m_callback.Length() > m_iIndex)
     {
+        if (strict)
+        {
+            if (!m_callback[m_iIndex]->IsNumber() && !m_callback[m_iIndex]->IsString())
+            {
+                return false;
+            }
+        }
         String::Utf8Value str(m_callback.GetIsolate(), m_callback[m_iIndex].As<String>());
         m_iIndex++;
-        return std::string(*str);
+        value = std::string(*str);
+        return true;
     }
-    return "";
+    return false;
 }
 
 bool CV8FunctionCallback::ReadNumber(double& value)
@@ -71,16 +79,7 @@ void CV8FunctionCallback::Return(bool arg)
     m_callback.GetReturnValue().Set(Boolean::New(m_callback.GetIsolate(), arg));
 }
 
-void CV8FunctionCallback::ReturnPromise(std::function<void(CV8PromiseBase*)> callback)
-{
-    //CV8Promise* pPromise = new CV8Promise(m_callback.GetIsolate());
-    //CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
-
-    //pThisIsolate->AddPromise(pPromise);
-    //m_callback.GetReturnValue().Set(pPromise->GetPromise());
-}
-
-void CV8FunctionCallback::ReturnPromiseNew(std::unique_ptr<CV8AsyncFunction> pAsyncFunction)
+void CV8FunctionCallback::ReturnPromise(std::unique_ptr<CV8AsyncFunction> pAsyncFunction)
 {
     CV8Isolate* pThisIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
     std::unique_ptr<CV8Promise> pPromise = std::make_unique<CV8Promise>(pThisIsolate, std::move(pAsyncFunction));

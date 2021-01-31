@@ -8,10 +8,10 @@ public:
     // Returns current argument index for error purpose
     int GetArgumentIndex() const { return m_iIndex; };
     // Return true when one of "read" method failed while reading argument.
-    bool        HasError() const { return bHasError; };
-    std::string ReadString();
-    bool        ReadNumber(double& value);
-    bool        ReadVector(CVector& value);
+    bool HasError() const { return bHasError; };
+    bool ReadString(std::string& value, bool strict = true);
+    bool ReadNumber(double& value);
+    bool ReadVector(CVector& value);
 
     const char* GetType();
 
@@ -19,12 +19,10 @@ public:
     void Return(double arg);
     void Return(bool arg);
 
-    void ReturnPromise(std::function<void(CV8PromiseBase*)> callback);
-
-    void ReturnPromiseNew(std::unique_ptr<class CV8AsyncFunction> pAsyncFunction);
+    void ReturnPromise(std::unique_ptr<class CV8AsyncFunction> pAsyncFunction);
 
 private:
-    template<typename T>
+    template <typename T>
     bool ReadClass(CV8BaseClass::EClass eClass, T& value)
     {
         Local<Object> obj = m_callback[m_iIndex]->ToObject(m_callback.GetIsolate()->GetCurrentContext()).ToLocalChecked();
