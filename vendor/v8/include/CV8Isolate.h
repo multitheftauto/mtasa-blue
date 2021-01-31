@@ -13,10 +13,11 @@ public:
     void                      RunCode(std::string& code, std::string& originFileName);
     static MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer);
 
-    void              EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask);
-    MaybeLocal<Value> InitializeModuleExports(Local<Context> context, Local<Module> module);
-    void              AddPromise(std::unique_ptr<CV8Promise> pPromise);
-    Isolate*          GetIsolate() const { return m_pIsolate; }
+    void               EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask);
+    MaybeLocal<Value>  InitializeModuleExports(Local<Context> context, Local<Module> module);
+    MaybeLocal<Module> GetScriptModule(const char* name);
+    void               AddPromise(std::unique_ptr<CV8Promise> pPromise);
+    Isolate*           GetIsolate() const { return m_pIsolate; }
 
     bool GetErrorMessage(std::string& error);
     void Evaluate();
@@ -45,8 +46,9 @@ private:
     Global<ObjectTemplate> m_global;
     Global<Context>        m_context;
 
-    std::vector<std::unique_ptr<CV8Promise>> m_vecPromises;
-    std::vector<std::unique_ptr<SModule>>    m_vecModules;
-    std::vector<std::unique_ptr<STryCatch>>  m_vecCompilationErrors;
-    int                                      m_iRunCodeCount = 0;
+    std::unordered_map<std::string, Global<Module>> m_mapScriptModules;
+    std::vector<std::unique_ptr<CV8Promise>>        m_vecPromises;
+    std::vector<std::unique_ptr<SModule>>           m_vecModules;
+    std::vector<std::unique_ptr<STryCatch>>         m_vecCompilationErrors;
+    int                                             m_iRunCodeCount = 0;
 };

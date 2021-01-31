@@ -44,7 +44,7 @@ bool CResourceScriptItem::Start()
                 m_pVM->LoadScriptFromBuffer(&buffer.at(0), iSize, m_strResourceFileName.c_str());
                 break;
             case eScriptLanguage::JAVASCRIPT:
-                isolateBase->RunCode(std::string(buffer.begin(), buffer.end()), (std::string)ConformResourcePath(m_strResourceFileName.c_str()));
+                isolateBase->RunCode(std::string(buffer.begin(), buffer.end()), m_strShortName);
                 break;
         }
     }

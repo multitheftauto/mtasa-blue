@@ -18,6 +18,7 @@ CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pC
 
     m_pIsolate->SetMicrotasksPolicy(MicrotasksPolicy::kExplicit);
     m_pIsolate->SetData(0, this);
+
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
 
@@ -65,19 +66,27 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
 
 MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer)
 {
+    CV8Isolate*        self = (CV8Isolate*)context->GetIsolate()->GetData(0);
     String::Utf8Value  importName(context->GetIsolate(), specifier);
     CV8Module*         pModule = CV8::GetModuleByName(*importName);
     MaybeLocal<Module> module;
     if (!pModule)
-        return module;
+    {
+        Local<Module> scriptModule;
+        if(!self->GetScriptModule(*importName).ToLocal(&scriptModule))
+        {
+            return module;
+        }
+        return scriptModule;
+    }
 
     modulesListName.push(*importName);
 
     Local<String> moduleName = String::NewFromUtf8(context->GetIsolate(), *importName).ToLocalChecked();
     auto          exports = pModule->GetExports(context->GetIsolate());
     module = Module::CreateSyntheticModule(context->GetIsolate(), moduleName, exports, [](Local<Context> context, Local<Module> module) {
-        CV8Isolate* pThisIsolate = (CV8Isolate*)context->GetIsolate()->GetData(0);
-        return pThisIsolate->InitializeModuleExports(context, module);
+        CV8Isolate* self = (CV8Isolate*)context->GetIsolate()->GetData(0);
+        return self->InitializeModuleExports(context, module);
     });
     Local<Module> checkedModule;
     if (!module.ToLocal(&checkedModule))
@@ -87,6 +96,18 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
     }
 
     return checkedModule;
+}
+
+MaybeLocal<Module> CV8Isolate::GetScriptModule(const char* name)
+{
+    MaybeLocal<Module> module;
+    auto const& result = m_mapScriptModules.find(name);
+
+    if (result != m_mapScriptModules.end())
+    {
+        module = result->second.Get(m_pIsolate);
+    }
+    return module;
 }
 
 void CV8Isolate::AddPromise(std::unique_ptr<CV8Promise> pPromise)
@@ -134,43 +155,41 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
     Local<String> fileName = String::NewFromUtf8(m_pIsolate, originFileName.c_str(), NewStringType::kNormal).ToLocalChecked();
 
     ScriptOrigin origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
-
     ScriptCompiler::Source compilerSource(source, origin);
     Local<Module>          module;
     TryCatch               compileTryCatch(m_pIsolate);
     if (!ScriptCompiler::CompileModule(m_pIsolate, &compilerSource).ToLocal(&module))
     {
-        String::Utf8Value exception(m_pIsolate, compileTryCatch.Exception());
-        Local<Message>    message = compileTryCatch.Message();
-        int               line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
-        int               column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
+        String::Utf8Value          exception(m_pIsolate, compileTryCatch.Exception());
+        Local<Message>             message = compileTryCatch.Message();
+        int                        line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
+        int                        column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
         std::unique_ptr<STryCatch> sTryCatch = std::make_unique<STryCatch>(originFileName, *exception, line, column);
         m_vecCompilationErrors.emplace_back(std::move(sTryCatch));
         return;
     }
-    for (int i = 0; i < module->GetModuleRequestsLength(); i++)
-    {
-        Local<ModuleRequest> request = module->GetModuleRequests()->Get(m_context.Get(m_pIsolate), i).As<ModuleRequest>();
 
-        Maybe<bool> result = module->InstantiateModule(m_context.Get(m_pIsolate), InstantiateModule);
-        if (result.IsNothing())
-        {
-            String::Utf8Value str(m_pIsolate, request->GetSpecifier());
-            printf("Failed to import module %s\n", *str);
-        }
-    }
-    if (Module::Status::kInstantiated == module->GetStatus())
+    auto status = module->GetStatus();
+    if (Module::Status::kUninstantiated == module->GetStatus())
     {
+        const char* szName = originFileName.c_str();
+        m_mapScriptModules[szName] = Global<Module>(m_pIsolate, module);
+
+        for (int i = 0; i < module->GetModuleRequestsLength(); i++)
+        {
+            Local<ModuleRequest> request = module->GetModuleRequests()->Get(m_context.Get(m_pIsolate), i).As<ModuleRequest>();
+
+            Maybe<bool> result = module->InstantiateModule(m_context.Get(m_pIsolate), InstantiateModule);
+            if (result.IsNothing())
+            {
+                String::Utf8Value str(m_pIsolate, request->GetSpecifier());
+                printf("Failed to import module %s\n", *str);
+            }
+        }
+
         std::unique_ptr<SModule> smodule = std::make_unique<SModule>();
         smodule->m_module.Reset(m_pIsolate, module);
         m_vecModules.push_back(std::move(smodule));
-        /*TryCatch evaluateTryCatch(m_pIsolate);
-        Local<Value> returnValue;
-        if (!module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&returnValue))
-        {
-            ReportException(&evaluateTryCatch);
-            return;
-        }*/
     }
 }
 
@@ -182,12 +201,13 @@ bool CV8Isolate::GetErrorMessage(std::string& error)
     }
     std::stringstream stream;
 
-    stream << "[JS Error] Failed to compile " << m_vecCompilationErrors.size() << " of " << m_iRunCodeCount << " scripts in resource \"" << m_strOriginResource << "\"\n";
+    stream << "[JS Error] Failed to compile " << m_vecCompilationErrors.size() << " of " << m_iRunCodeCount << " scripts in resource \"" << m_strOriginResource
+           << "\"\n";
     for (auto const& tryCatch : m_vecCompilationErrors)
     {
         stream << "\t" << tryCatch->location << ": " << tryCatch->exception << " at " << tryCatch->line << ":" << tryCatch->column << "\n";
     }
-    
+
     stream << '\n';
     error = stream.str();
     return true;
@@ -201,11 +221,13 @@ void CV8Isolate::Evaluate()
     Context::Scope contextScope(m_context.Get(m_pIsolate));
     for (auto const& module : m_vecModules)
     {
-        TryCatch     evaluateTryCatch(m_pIsolate);
-        Local<Value> returnValue;
-        if (!module->m_module.Get(m_pIsolate)->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&returnValue))
+        TryCatch      evaluateTryCatch(m_pIsolate);
+        Local<Module> v8Module = module->m_module.Get(m_pIsolate);
+        Local<Value>  val;
+        if (!v8Module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&val))
         {
             ReportException(&evaluateTryCatch);
+            continue;
         }
     }
 }
@@ -221,7 +243,11 @@ CV8Isolate::~CV8Isolate()
         m_global.Reset();
         m_context.Reset();
 
-        for (auto const& module : m_vecModules)
+        for (auto& pair : m_mapScriptModules)
+        {
+            pair.second.Reset();
+        }
+        for (auto& module : m_vecModules)
         {
             module->m_module.Reset();
         }
