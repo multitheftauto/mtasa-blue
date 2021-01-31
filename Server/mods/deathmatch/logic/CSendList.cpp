@@ -17,7 +17,13 @@
 
 void CSendList::Insert(CPlayer* pPlayer)
 {
-    (*this)[pPlayer->GetBitStreamVersion()].push_back(pPlayer);
+    BaseContainer::mapped_type& group = (*this)[pPlayer->GetBitStreamVersion()];
+
+    // Check if the player is already in the group. If he is, something went wrong.
+    dassert(std::find(group.begin(), group.end(), pPlayer) == group.end());
+
+    // Insert him after the check
+    group.push_back(pPlayer);
 }
 
 size_t CSendList::CountJoined() const noexcept
