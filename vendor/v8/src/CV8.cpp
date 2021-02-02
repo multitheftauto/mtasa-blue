@@ -50,7 +50,7 @@ std::vector<CV8IsolateBase*> CV8::GetIsolates()
 CV8IsolateBase* CV8::CreateIsolate(std::string& originResource)
 {
     std::unique_ptr<CV8Isolate> pIsolate = std::make_unique<CV8Isolate>(this, originResource);
-    CV8Isolate* isolate = pIsolate.get();
+    CV8Isolate*                 isolate = pIsolate.get();
     m_vecIsolates.push_back(std::move(pIsolate));
     return isolate;
 }
@@ -66,6 +66,18 @@ void CV8::RemoveIsolate(CV8IsolateBase* pIsolate)
             return;
         }
     }
+}
+
+Local<Module> CV8::GetDummyModule(Isolate* pIsolate)
+{
+    Local<String> source = String::NewFromUtf8(pIsolate, "", NewStringType::kNormal).ToLocalChecked();
+    Local<String> fileName = String::NewFromUtf8(pIsolate, "", NewStringType::kNormal).ToLocalChecked();
+
+    ScriptOrigin           origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
+    ScriptCompiler::Source compilerSource(source, origin);
+    Local<Module>          module;
+    ScriptCompiler::CompileModule(pIsolate, &compilerSource).ToLocal(&module);
+    return module;
 }
 
 CV8Module* CV8::GetModuleByName(const char* name)

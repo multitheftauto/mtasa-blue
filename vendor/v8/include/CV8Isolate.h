@@ -19,7 +19,11 @@ public:
     Isolate*           GetIsolate() const { return m_pIsolate; }
 
     bool GetErrorMessage(std::string& error);
+    bool GetMissingModulesErrorMessage(std::string& error);
+
     void Evaluate();
+
+    void ReportMissingModule(std::string name);
 
 private:
     struct SModule
@@ -42,15 +46,17 @@ private:
 
     void                   ReportException(TryCatch* pTryCatch);
     std::string            m_strOriginResource;
+    std::string            m_strCurrentOriginFileName;
     Isolate::CreateParams  m_createParams;
     Isolate*               m_pIsolate;
     const CV8*             m_pCV8;
     Global<ObjectTemplate> m_global;
     Global<Context>        m_context;
 
-    std::unordered_map<std::string, Global<Module>> m_mapScriptModules;
-    std::vector<std::unique_ptr<CV8Promise>>        m_vecPromises;
-    std::vector<std::unique_ptr<SModule>>           m_vecModules;
-    std::vector<std::unique_ptr<STryCatch>>         m_vecCompilationErrors;
-    int                                             m_iRunCodeCount = 0;
+    std::unordered_map<std::string, Global<Module>>           m_mapScriptModules;
+    std::vector<std::unique_ptr<CV8Promise>>                  m_vecPromises;
+    std::vector<std::unique_ptr<SModule>>                     m_vecModules;
+    std::vector<std::unique_ptr<STryCatch>>                   m_vecCompilationErrors;
+    std::unordered_map<std::string, std::vector<std::string>> m_mapMissingModules;
+    int                                                       m_iRunCodeCount = 0;
 };

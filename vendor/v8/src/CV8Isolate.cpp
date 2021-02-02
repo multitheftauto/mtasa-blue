@@ -75,12 +75,11 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
         Local<Module> scriptModule;
         if (!self->GetScriptModule(*importName).ToLocal(&scriptModule))
         {
+            modulesListName.push(*importName);
             return module;
         }
         return scriptModule;
     }
-
-    modulesListName.push(*importName);
 
     Local<String> moduleName = String::NewFromUtf8(context->GetIsolate(), *importName).ToLocalChecked();
     auto          exports = pModule->GetExports(context->GetIsolate());
@@ -94,6 +93,8 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
         printf("error?");
         return module;
     }
+
+    modulesListName.push(*importName);
 
     return checkedModule;
 }
@@ -145,6 +146,7 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
 void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
 {
     m_iRunCodeCount++;
+    m_strCurrentOriginFileName = originFileName;
     Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
@@ -173,26 +175,32 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
         const char* szName = originFileName.c_str();
         m_mapScriptModules[szName] = Global<Module>(m_pIsolate, module);
 
-        for (int i = 0; i < module->GetModuleRequestsLength(); i++)
-        {
-            Local<ModuleRequest> request = module->GetModuleRequests()->Get(m_context.Get(m_pIsolate), i).As<ModuleRequest>();
-
-            Maybe<bool> result = module->InstantiateModule(
-                m_context.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
-                    CV8Isolate* self = (CV8Isolate*)context->GetIsolate()->GetData(0);
-                    return self->InstantiateModule(context, specifier, import_assertions, referrer);
-                });
-            if (result.IsNothing())
-            {
-                String::Utf8Value str(m_pIsolate, request->GetSpecifier());
-                printf("Failed to import module %s\n", *str);
-            }
-        }
-
+        // Result always will true due i'm faking every module is always availiable
+        Maybe<bool> result = module->InstantiateModule(
+            m_context.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
+                String::Utf8Value  importName(context->GetIsolate(), specifier);
+                CV8Isolate*        self = (CV8Isolate*)context->GetIsolate()->GetData(0);
+                MaybeLocal<Module> module = self->InstantiateModule(context, specifier, import_assertions, referrer);
+                if (module.IsEmpty())
+                {
+                    self->ReportMissingModule(*importName);
+                    module = CV8::GetDummyModule(context->GetIsolate());            // make error message display all missing modules instead of first only.
+                }
+                return module;
+            });
         std::unique_ptr<SModule> smodule = std::make_unique<SModule>();
         smodule->m_module.Reset(m_pIsolate, module);
         m_vecModules.push_back(std::move(smodule));
     }
+}
+
+void CV8Isolate::ReportMissingModule(std::string name)
+{
+    if (m_mapMissingModules.find(m_strCurrentOriginFileName) == m_mapMissingModules.end())
+    {
+        m_mapMissingModules[m_strCurrentOriginFileName] = std::vector<std::string>();
+    }
+    m_mapMissingModules[m_strCurrentOriginFileName].push_back(name);
 }
 
 bool CV8Isolate::GetErrorMessage(std::string& error)
@@ -215,12 +223,59 @@ bool CV8Isolate::GetErrorMessage(std::string& error)
     return true;
 }
 
+bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
+{
+    if (m_mapMissingModules.empty())
+    {
+        return false;
+    }
+
+    int iMissingModules = 0;
+    for (auto const& missingModules : m_mapMissingModules)
+    {
+        iMissingModules += missingModules.second.size();
+    }
+
+    std::stringstream stream;
+    if (iMissingModules == 1)
+    {
+        stream << "[JS Error] Failed to resolve " << iMissingModules << " module in resource \"" << m_strOriginResource << "\.\n";
+    }
+    else
+    {
+        stream << "[JS Error] Failed to resolve " << iMissingModules << " modules in resource \"" << m_strOriginResource << "\".\n";
+    }
+
+    int limit = 4; // Display only first 4 modules
+    for (auto const& missingModules : m_mapMissingModules)
+    {
+        stream << "\t in " << missingModules.first << ": ";
+        for (auto const& importName : missingModules.second)
+        {
+            stream << "\"" << importName << "\", ";
+        }
+        stream << "\n";
+    }
+
+    error = stream.str();
+    return true;
+}
+
 void CV8Isolate::Evaluate()
 {
     Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
     Context::Scope contextScope(m_context.Get(m_pIsolate));
+    for (auto const& module : m_vecModules)
+    {
+        Local<Module> v8Module = module->m_module.Get(m_pIsolate);
+        if (Module::Status::kInstantiated != v8Module->GetStatus())
+        {
+            int a = 5;
+            return;
+        }
+    }
     for (auto const& module : m_vecModules)
     {
         TryCatch      evaluateTryCatch(m_pIsolate);
@@ -233,10 +288,6 @@ void CV8Isolate::Evaluate()
                 ReportException(&evaluateTryCatch);
                 continue;
             }
-        }
-        else
-        {
-            printf("error\n");
         }
     }
 }

@@ -33,14 +33,13 @@ private:
                 m_iIndex++;
                 return true;
             }
-            else
-            {
-                bHasError = true;
-            }
-            m_iIndex++;
-            return false;
         }
-        static_assert("Not implemented class");
+        else
+            static_assert("Not implemented class");
+
+        bHasError = true;
+        m_iIndex++;
+        return false;
     }
     const FunctionCallbackInfo<Value>& m_callback;
     int                                m_iIndex = 0;

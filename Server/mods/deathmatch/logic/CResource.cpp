@@ -954,13 +954,20 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (m_pJsVm)
     {
         std::string error;
-        if (m_pJsVm->GetErrorMessage(error))
+        if (!m_pJsVm->GetErrorMessage(error))
         {
-            CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
+            if (!m_pJsVm->GetMissingModulesErrorMessage(error))
+            {
+                m_pJsVm->Evaluate();
+            }
+            else
+            {
+                CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
+            }
         }
         else
         {
-            m_pJsVm->Evaluate();
+            CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
         }
     }
 
