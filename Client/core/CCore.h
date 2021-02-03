@@ -276,7 +276,6 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
-    HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
     bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
 
 private:
