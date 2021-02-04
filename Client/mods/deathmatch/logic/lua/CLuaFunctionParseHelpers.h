@@ -461,6 +461,11 @@ inline SString GetClassByTypeName(eClientModelType)
     return "client-model-type";
 }
 
+inline SString GetClassByTypeName(CClientVectorGraphic*)
+{
+    return "svg";
+}
+
 //
 // CResource from userdata
 //
