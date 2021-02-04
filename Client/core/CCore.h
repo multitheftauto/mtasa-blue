@@ -13,7 +13,7 @@ class CCore;
 
 #pragma once
 
-#include "../version.h"
+#include "version.h"
 
 #include "CClientVariables.h"
 #include "CCommands.h"

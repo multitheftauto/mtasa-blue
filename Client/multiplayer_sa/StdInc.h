@@ -22,7 +22,7 @@
 #include <net/CNet.h>
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
-#include <../version.h>
+#include <version.h>
 #include <hwbrk.h>
 
 // Multiplayer includes
