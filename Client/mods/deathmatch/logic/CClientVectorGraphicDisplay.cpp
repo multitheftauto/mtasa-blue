@@ -11,8 +11,6 @@
 #include "CClientVectorGraphicDisplay.h"
 #include "CClientVectorGraphic.h"
 
-using std::list;
-
 float CClientVectorGraphicDisplay::m_fGlobalScale = 1.0f;
 
 CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(pDisplayManager, ID)

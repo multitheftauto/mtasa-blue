@@ -153,7 +153,7 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
 CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint height)
 {
     if (!CanCreateRenderItem(CVectorGraphicItem::GetClassId()))
-        return NULL;
+        return nullptr;
 
     CVectorGraphicItem* pVectorItem = new CVectorGraphicItem;
     pVectorItem->PostConstruct(this, width, height);
