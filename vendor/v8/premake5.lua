@@ -26,6 +26,7 @@ project "v8"
 		"include/async/*.h",
 		"include/classes/*.h",
 		"v8/**.h",
+		"**.hpp",
 		
 		"StdInc.h",
 		"StdInc.cpp",
@@ -40,7 +41,7 @@ project "v8"
 		"./include",
 		"./sources",
 		"./sources/include",
-        "./../../Shared/sdk",
+		"../sdk"
 		}
 
 	defines { "SDK_WITH_BCRYPT" }

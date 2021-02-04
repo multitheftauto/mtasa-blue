@@ -254,6 +254,8 @@ CGame::~CGame()
     if (m_pHTTPD)
         m_pHTTPD->StopHTTPD();
 
+    g_pServerInterface->GetV8()->Shutdown();
+
     // Stop the performance stats modules
     if (CPerfStatManager::GetSingleton() != NULL)
         CPerfStatManager::GetSingleton()->Stop();

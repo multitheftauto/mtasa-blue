@@ -5,7 +5,7 @@ class CV8Promise;
 class CV8Isolate : public CV8IsolateBase
 {
 public:
-    CV8Isolate(const CV8* pCV8, std::string& originResource);
+    CV8Isolate(CV8* pCV8, std::string& originResource);
     ~CV8Isolate();
     void DoPulse();
 
@@ -25,7 +25,21 @@ public:
 
     void ReportMissingModule(std::string name);
 
+    void TerminateExecution();
+
 private:
+    // Perform common execution checks, long execution protection.
+    // Use before each time js starts to execute
+    class Execution
+    {
+    public:
+        Execution(CV8Isolate* pIsolate) : m_pIsolate(pIsolate) { pIsolate->m_pCV8->EnterExecution(pIsolate); }
+        ~Execution() { m_pIsolate->m_pCV8->ExitExecution(m_pIsolate); }
+
+    private:
+        CV8Isolate* m_pIsolate;
+    };
+
     struct SModule
     {
         Global<Module> m_module;
@@ -49,7 +63,7 @@ private:
     std::string            m_strCurrentOriginFileName;
     Isolate::CreateParams  m_createParams;
     Isolate*               m_pIsolate;
-    const CV8*             m_pCV8;
+    CV8*                   m_pCV8;
     Global<ObjectTemplate> m_global;
     Global<Context>        m_context;
 

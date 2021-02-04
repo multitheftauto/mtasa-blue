@@ -20,12 +20,61 @@ CV8::CV8()
     m_pPlatform = platform::NewDefaultPlatform(4);
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
+    m_longExecutionGuardThread = std::thread([this]() {
+        while (true)
+        {
+            {
+                std::lock_guard guard(m_lock);
+                if (m_bDisposing)
+                    return;
+            }
+
+            {
+                std::lock_guard lock(m_executionGuard);
+                if (m_pCurrentExecutionIsolate)
+                {
+                    double time = static_cast<double>(GetTickCount64_()) - m_pIsolateExecutionStart;
+                    //printf("Time %lf\n", time);
+                    if (time > 2000)
+                    {
+                        m_pCurrentExecutionIsolate->TerminateExecution();
+                    }
+                }
+            }
+
+            std::chrono::milliseconds timespan(20);
+
+            std::this_thread::sleep_for(timespan);
+        }
+    });
 }
 
 CV8::~CV8()
 {
+}
+
+void CV8::Shutdown()
+{
+    {
+        std::lock_guard guard(m_lock);
+        m_bDisposing = true;
+    }
+    m_longExecutionGuardThread.join();
     V8::Dispose();
     V8::ShutdownPlatform();
+}
+
+void CV8::EnterExecution(CV8Isolate* pIsolate)
+{
+    std::lock_guard lock(m_executionGuard);
+    m_pIsolateExecutionStart = static_cast<double>(GetTickCount64_());
+    m_pCurrentExecutionIsolate = pIsolate;
+}
+
+void CV8::ExitExecution(CV8Isolate* pIsolate)
+{
+    std::lock_guard lock(m_executionGuard);
+    m_pCurrentExecutionIsolate = nullptr;
 }
 
 void CV8::DoPulse()

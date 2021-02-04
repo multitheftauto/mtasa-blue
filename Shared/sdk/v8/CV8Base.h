@@ -14,6 +14,7 @@ public:
     virtual CV8ModuleBase* CreateModule(const char* name) = 0;
 
     virtual void DoPulse() = 0;
+    virtual void Shutdown() = 0;
 
     virtual std::vector<CV8IsolateBase*> GetIsolates() = 0;
 };

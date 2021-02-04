@@ -8,6 +8,11 @@ class CV8 : public CV8Base
 public:
     CV8();
     ~CV8();
+    void Shutdown();
+
+    void EnterExecution(CV8Isolate* pIsolate);
+    void ExitExecution(CV8Isolate* pIsolate);
+
     CV8IsolateBase* CreateIsolate(std::string& originResource);
     void            RemoveIsolate(CV8IsolateBase* pIsolate);
 
@@ -24,4 +29,12 @@ public:
 private:
     std::unique_ptr<Platform>                m_pPlatform;
     std::vector<std::unique_ptr<CV8Isolate>> m_vecIsolates;
+
+    std::thread                              m_longExecutionGuardThread;
+    std::mutex                               m_lock;
+    bool                                     m_bDisposing = false;
+
+    std::mutex                               m_executionGuard;
+    CV8Isolate*                              m_pCurrentExecutionIsolate = nullptr;
+    double                                   m_pIsolateExecutionStart = 0;
 };

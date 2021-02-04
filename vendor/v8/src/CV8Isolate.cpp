@@ -1,12 +1,15 @@
 #include "StdInc.h"
 #include <queue>
 #include <sstream>
+#include "SharedUtil.hpp"
 
 using namespace v8;
 
 static std::queue<std::string> modulesListName;            // Todo, get rid of this list
 
 CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
+{
+CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
     m_strOriginResource = originResource;
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
@@ -57,11 +60,36 @@ void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
 
 void CV8Isolate::ReportException(TryCatch* pTryCatch)
 {
+    v8::HandleScope handle_scope(m_pIsolate);
+
+    if (pTryCatch->HasTerminated())
+    {
+        printf("%s: Long execution has been termianted.\n", m_strOriginResource.c_str());
+        return;
+    }
     String::Utf8Value utf8(m_pIsolate, pTryCatch->Exception());
     Local<Message>    message = pTryCatch->Message();
-    int               line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
-    int               column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
-    printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
+    if (!message.IsEmpty())
+    {
+        int line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
+        int column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
+        printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
+    }
+    else
+    {
+        printf("%s: '%s'\n", m_strOriginResource.c_str(), *utf8);
+    }
+    v8::Local<v8::Value> stackTraceStringV8;
+    if (pTryCatch->StackTrace(m_pIsolate->GetCurrentContext()).ToLocal(&stackTraceStringV8))
+    {
+        if (stackTraceStringV8->IsString() && v8::Local<v8::String>::Cast(stackTraceStringV8)->Length() > 0)
+        {
+            v8::String::Utf8Value stackTrace(m_pIsolate, stackTraceStringV8);
+            std::string           strStackTrace = std::string(*stackTrace);
+            strStackTrace.erase(0, strStackTrace.find("\n") + 1);
+            printf("%s\n", strStackTrace.c_str());
+        }
+    }
 }
 
 MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer)
@@ -159,6 +187,7 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
     ScriptCompiler::Source compilerSource(source, origin);
     Local<Module>          module;
     TryCatch               compileTryCatch(m_pIsolate);
+
     if (!ScriptCompiler::CompileModule(m_pIsolate, &compilerSource).ToLocal(&module))
     {
         String::Utf8Value          exception(m_pIsolate, compileTryCatch.Exception());
@@ -261,12 +290,18 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
     return true;
 }
 
+void CV8Isolate::TerminateExecution()
+{
+    m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
+}
+
 void CV8Isolate::Evaluate()
 {
     Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
     Context::Scope contextScope(m_context.Get(m_pIsolate));
+    
     for (auto const& module : m_vecModules)
     {
         Local<Module> v8Module = module->m_module.Get(m_pIsolate);
@@ -276,8 +311,10 @@ void CV8Isolate::Evaluate()
             return;
         }
     }
+
     for (auto const& module : m_vecModules)
     {
+        Execution     execution(this);
         TryCatch      evaluateTryCatch(m_pIsolate);
         Local<Module> v8Module = module->m_module.Get(m_pIsolate);
         if (Module::Status::kInstantiated == v8Module->GetStatus())
