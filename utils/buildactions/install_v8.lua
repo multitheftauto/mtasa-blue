@@ -21,7 +21,7 @@ local V8_PATH = "vendor/v8/sources"
 local V8_PATH_LIBRARY = "vendor/v8/library"
 
 local librariesVersions = {
-	["win32bit"] = {"https://content-na.drive.amazonaws.com/v2/download/presigned/unFmgb7VSItjZa4JU3rOmhmbB-4MzsUSAV2meiI6t9QeJxFPc?download=true&ownerId=A3QQ2Y77MB2XV9", "3ba3bd640597376451eaa6c5f524adc937baab3d14767c642b7c8e1c31f28bde" }
+	["win32bit"] = {"https://download1512.mediafire.com/blbwbsm7xygg/e755ws5hl52j8m0/library_win32bit.zip", "3ba3bd640597376451eaa6c5f524adc937baab3d14767c642b7c8e1c31f28bde" }
 }
 -- Change these to update the version
 local V8_HASH = "0a090f8689f97152685a6101c49250fa99c1e47a582801c3f1d285554fd14ff5"
