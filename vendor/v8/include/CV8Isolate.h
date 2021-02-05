@@ -58,6 +58,13 @@ private:
         }
     };
 
+    class CMicrotask
+    {
+    public:
+        CMicrotask(std::function<void(CV8Isolate*)> microtask, CV8Isolate* isolate) : m_microtask(microtask), m_isolate(isolate) {}
+        std::function<void(CV8Isolate*)> m_microtask;
+        CV8Isolate*                      m_isolate;
+    };
     void                   ReportException(TryCatch* pTryCatch);
     std::string            m_strOriginResource;
     std::string            m_strCurrentOriginFileName;

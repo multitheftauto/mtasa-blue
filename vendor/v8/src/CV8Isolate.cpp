@@ -7,8 +7,6 @@ using namespace v8;
 
 static std::queue<std::string> modulesListName;            // Todo, get rid of this list
 
-CV8Isolate::CV8Isolate(const CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
-{
 CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
     m_strOriginResource = originResource;
@@ -29,6 +27,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 
     Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(m_pIsolate->GetCurrentContext());
     Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(m_context.Get(m_pIsolate), vector2dTemplate);
+    Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(m_context.Get(m_pIsolate), vector3dTemplate);
     Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(m_context.Get(m_pIsolate));
 }
 
@@ -36,14 +35,6 @@ void CV8Isolate::DoPulse()
 {
     m_pIsolate->PerformMicrotaskCheckpoint();
 }
-
-class CMicrotask
-{
-public:
-    CMicrotask(std::function<void(CV8Isolate*)> microtask, CV8Isolate* isolate) : m_microtask(microtask), m_isolate(isolate) {}
-    std::function<void(CV8Isolate*)> m_microtask;
-    CV8Isolate*                      m_isolate;
-};
 
 void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
 {

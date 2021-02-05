@@ -22,6 +22,7 @@ class CV8Delegate;
 #include "classes/CV8BaseClass.h"
 #include "classes/CV8Vector2D.h"
 #include "classes/CV8Vector3D.h"
+#include "classes/CV8Vector4D.h"
 #include "classes/CV8Matrix.h"
 
 

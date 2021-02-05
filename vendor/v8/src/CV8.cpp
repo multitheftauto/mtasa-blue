@@ -136,7 +136,7 @@ CV8Module* CV8::GetModuleByName(const char* name)
 
 CV8ModuleBase* CV8::CreateModule(const char* name)
 {
-    std::string buf("@mta/");
+    std::string buf(V8Config::szMtaModulePrefix);
     buf.append(name);
 
     std::unique_ptr<CV8Module> module = std::make_unique<CV8Module>(buf.c_str());

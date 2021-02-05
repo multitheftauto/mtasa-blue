@@ -10,6 +10,7 @@ public:
         Invalid, // To distinguish between nullptr and actual class.
         Vector2,
         Vector3,
+        Vector4,
         Matrix,
     };
 
