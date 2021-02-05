@@ -12,10 +12,8 @@ const char* ToCString(const String::Utf8Value& value)
 
 CV8::CV8()
 {
-    V8::InitializeICUDefaultLocation("");
-    V8::InitializeExternalStartupData("");
-    // V8::InitializeICUDefaultLocation(argv[0]);
-    // V8::InitializeExternalStartupData(argv[0]);
+    V8::InitializeICUDefaultLocation(V8Config::szExecPath);
+    V8::InitializeExternalStartupData(V8Config::szExternalStartupData);
 
     m_pPlatform = platform::NewDefaultPlatform(4);
     V8::InitializePlatform(m_pPlatform.get());
@@ -42,7 +40,7 @@ CV8::CV8()
                 }
             }
 
-            std::chrono::milliseconds timespan(20);
+            std::chrono::milliseconds timespan(V8Config::iGuardThreadSleep);
 
             std::this_thread::sleep_for(timespan);
         }
