@@ -75,6 +75,9 @@ jobs:
 
       - name: Install CEF
         run: utils\premake5 install_cef
+        
+      - name: Install V8
+        run: utils\premake5 install_v8
 
       - name: Install data files
         run: utils\premake5 install_data
