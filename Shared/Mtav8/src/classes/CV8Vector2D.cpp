@@ -67,11 +67,13 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     }
     Local<Context> context = isolate->GetCurrentContext();
     Local<Object>  wrapper = info.Holder();
+    
+    CVector2D* vector = CreateGarbageCollected<CVector2D>(isolate, wrapper);
+    vector->fX = x;
+    vector->fY = y;
 
-    CVector2D* vector = Allocate<CVector2D>(isolate);
     wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
     wrapper->SetInternalField(1, External::New(isolate, vector));
-    AttachGC(wrapper, sizeof(CVector2D));
     info.GetReturnValue().Set(wrapper);
 }
 

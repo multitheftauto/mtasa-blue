@@ -17,6 +17,14 @@ public:
     static bool ConstructorCallCheck(const FunctionCallbackInfo<Value>& info);
 
     template<typename T>
+    static T* CreateGarbageCollected(Isolate* isolate, Local<Object> object)
+    {
+        T* value = Allocate<T>(isolate);
+        AttachGC(object, sizeof(T));
+        return value;
+    }
+
+    template <typename T>
     static T* Allocate(Isolate* isolate) {
         ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
 

@@ -93,11 +93,9 @@ void CV8Matrix::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     Local<Object>      wrapper = info.Holder();
     Persistent<Object> matrixObject = Persistent<Object>(isolate, wrapper);
 
-    CMatrix* matrix = Allocate<CMatrix>(isolate);
-    matrix = new(matrix) CMatrix(position, rotation, scale);
+    CMatrix* matrix = CreateGarbageCollected<CMatrix>(isolate, wrapper);
     wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
     wrapper->SetInternalField(1, External::New(isolate, matrix));
-    AttachGC(wrapper, sizeof(CMatrix));
 
     info.GetReturnValue().Set(matrixObject.Get(isolate));
 }

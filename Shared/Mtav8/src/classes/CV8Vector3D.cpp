@@ -58,7 +58,8 @@ void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     Local<Object>           wrapper = info.Holder();
     ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
 
-    CVector* vector = Allocate<CVector>(isolate);
+
+    CVector* vector = CreateGarbageCollected<CVector>(isolate, wrapper);
     vector->fX = x;
     vector->fY = y;
     vector->fZ = z;
@@ -66,7 +67,6 @@ void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
     wrapper->SetInternalField(1, External::New(isolate, vector));
 
-    AttachGC(wrapper, sizeof(CVector));
     info.GetReturnValue().Set(wrapper);
 }
 
