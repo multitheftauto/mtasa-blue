@@ -26,6 +26,7 @@ public:
     void ReportMissingModule(std::string name);
 
     void TerminateExecution();
+    void SetJsEvalSetting(eJsEval value);
 
 private:
     // Perform common execution checks, long execution protection.
@@ -80,4 +81,8 @@ private:
     std::vector<std::unique_ptr<STryCatch>>                   m_vecCompilationErrors;
     std::unordered_map<std::string, std::vector<std::string>> m_mapMissingModules;
     int                                                       m_iRunCodeCount = 0;
+
+    eJsEval m_eJsEval;
+
+    static ModifyCodeGenerationFromStringsResult Eval(Local<Context> context, Local<Value> source, bool is_code_like);
 };

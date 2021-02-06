@@ -19,7 +19,6 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 
     m_pIsolate->SetMicrotasksPolicy(MicrotasksPolicy::kExplicit);
     m_pIsolate->SetData(0, this);
-
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
 
@@ -288,6 +287,25 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
     return true;
 }
 
+void CV8Isolate::SetJsEvalSetting(eJsEval value)
+{
+    Locker         lock(m_pIsolate);
+    Isolate::Scope isolateScope(m_pIsolate);
+    HandleScope    handleScope(m_pIsolate);
+
+    m_eJsEval = value;
+    switch (m_eJsEval)
+    {
+        case eJsEval::DISABLED:
+            m_context.Get(m_pIsolate)->AllowCodeGenerationFromStrings(false);
+            break;
+        case eJsEval::ACL_ALLOWED:
+            assert(false && "unimplemented eval setting");
+        default:
+            assert(false && "unimplemented eval setting");
+
+    }
+}
 void CV8Isolate::TerminateExecution()
 {
     m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);

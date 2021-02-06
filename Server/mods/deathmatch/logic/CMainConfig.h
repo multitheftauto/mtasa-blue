@@ -123,6 +123,7 @@ public:
     const std::vector<SString>& GetOwnerEmailAddressList() const { return m_OwnerEmailAddressList; }
     bool                        IsDatabaseCredentialsProtectionEnabled() const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
+    eJsEval                     GetJsEvalSetting() const { return m_eJsEval; }
 
     SString GetSetting(const SString& configSetting);
     bool    GetSetting(const SString& configSetting, SString& strValue);
@@ -218,4 +219,6 @@ private:
     int                        m_bFilterDuplicateLogLinesEnabled;
     int                        m_bDatabaseCredentialsProtectionEnabled;
     int                        m_bFakeLagCommandEnabled;
+
+    eJsEval m_eJsEval;
 };

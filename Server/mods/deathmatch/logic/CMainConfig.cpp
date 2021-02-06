@@ -510,6 +510,23 @@ bool CMainConfig::Load()
         GetInteger(m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync);
         g_TickRateSettings.iLightSync = Clamp(200, g_TickRateSettings.iLightSync, 4000);
     }
+    
+    pNode = m_pRootNode->FindSubNode("javascript");
+    if (pNode)
+    {
+        CXMLNode* pChildNode = nullptr;
+        pChildNode = pNode->FindSubNode("eval");
+        std::string eval = pChildNode->GetTagContent();
+
+        int iEvalValue;
+        GetInteger(pNode, "eval", iEvalValue);
+        if (iEvalValue >= (int)eJsEval::COUNT)
+        {
+            iEvalValue = (int)eJsEval::DISABLED;
+            CLogger::ErrorPrintf("Invalid 'eval' value in mtaserver.conf, set to default ( Disabled ).!\n");
+        }
+        m_eJsEval = (eJsEval)iEvalValue;
+    }
 
     ApplyNetOptions();
 

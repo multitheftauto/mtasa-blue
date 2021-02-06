@@ -1136,6 +1136,8 @@ bool CResource::CreateJsVM()
 
     CV8Base* v8 = g_pServerInterface->GetV8();
     m_pJsVm = v8->CreateIsolate(m_strResourceName);
+    m_pJsVm->SetJsEvalSetting(g_pGame->GetConfig()->GetJsEvalSetting());
+
     return true;
 }
 
