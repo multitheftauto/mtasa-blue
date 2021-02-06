@@ -127,6 +127,14 @@ Local<Module> CV8::GetDummyModule(Isolate* pIsolate)
     return module;
 }
 
+void CV8::RegisterAllModules(Isolate* pIsolate)
+{
+    for (auto const& [name, module] : m_mapModules)
+    {
+        module->
+    }
+}
+
 CV8Module* CV8::GetModuleByName(const char* name)
 {
     if (CV8::m_mapModules.find(name) != CV8::m_mapModules.end())
@@ -137,6 +145,7 @@ CV8Module* CV8::GetModuleByName(const char* name)
 CV8ModuleBase* CV8::CreateModule(const char* name)
 {
     std::string buf(V8Config::szMtaModulePrefix);
+    buf.append("/");
     buf.append(name);
 
     std::unique_ptr<CV8Module> module = std::make_unique<CV8Module>(buf.c_str());

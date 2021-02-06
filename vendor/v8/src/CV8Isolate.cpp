@@ -85,10 +85,18 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
 
 MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer)
 {
-    CV8Isolate*        self = (CV8Isolate*)context->GetIsolate()->GetData(0);
-    String::Utf8Value  importName(context->GetIsolate(), specifier);
+    Isolate*           pIsolate = context->GetIsolate();
+    CV8Isolate*        self = (CV8Isolate*)pIsolate->GetData(0);
+    String::Utf8Value  importName(pIsolate, specifier);
     CV8Module*         pModule = CV8::GetModuleByName(*importName);
     MaybeLocal<Module> module;
+    if (!strcmp(*importName, V8Config::szMtaModulePrefix))
+    {
+        printf("name %s\n", *importName);
+        CV8::RegisterAllModules(pIsolate);
+        return CV8::GetDummyModule(pIsolate);
+    }
+
     if (!pModule)
     {
         Local<Module> scriptModule;
@@ -99,11 +107,10 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
         }
         return scriptModule;
     }
-
-    Local<String> moduleName = String::NewFromUtf8(context->GetIsolate(), *importName).ToLocalChecked();
-    auto          exports = pModule->GetExports(context->GetIsolate());
-    module = Module::CreateSyntheticModule(context->GetIsolate(), moduleName, exports, [](Local<Context> context, Local<Module> module) {
-        CV8Isolate* self = (CV8Isolate*)context->GetIsolate()->GetData(0);
+    Local<String> moduleName = String::NewFromUtf8(pIsolate, *importName).ToLocalChecked();
+    auto          exports = pModule->GetExports(pIsolate);
+    module = Module::CreateSyntheticModule(pIsolate, moduleName, exports, [](Local<Context> context, Local<Module> module) {
+        CV8Isolate* self = (CV8Isolate*)pIsolate->GetData(0);
         return self->InitializeModuleExports(context, module);
     });
     Local<Module> checkedModule;
