@@ -151,6 +151,7 @@ workspace "MTASA"
 		group "Shared"
 		include "Shared"
 		include "Shared/XML"
+		include "Shared/Mtav8"
 
 		group "Vendor"
 		include "vendor/bcrypt"

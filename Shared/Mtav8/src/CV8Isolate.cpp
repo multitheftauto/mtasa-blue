@@ -110,7 +110,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
     Local<String> moduleName = String::NewFromUtf8(pIsolate, *importName).ToLocalChecked();
     auto          exports = pModule->GetExports(pIsolate);
     module = Module::CreateSyntheticModule(pIsolate, moduleName, exports, [](Local<Context> context, Local<Module> module) {
-        CV8Isolate* self = (CV8Isolate*)pIsolate->GetData(0);
+        CV8Isolate* self = (CV8Isolate*)context->GetIsolate()->GetData(0);
         return self->InitializeModuleExports(context, module);
     });
     Local<Module> checkedModule;

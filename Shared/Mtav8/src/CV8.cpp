@@ -131,7 +131,7 @@ void CV8::RegisterAllModules(Isolate* pIsolate)
 {
     for (auto const& [name, module] : m_mapModules)
     {
-        module->
+
     }
 }
 

@@ -1,6 +1,6 @@
 project "v8"
 	language "C++"
-	targetname "Mtav8"
+	targetname "v8"
 	kind "SharedLib"
 	targetdir(buildpath("server"))
 	
@@ -8,28 +8,15 @@ project "v8"
 	pchsource "StdInc.cpp"
 
 	vpaths { 
-		["Headers"] = "include/*.h",
-		["Headers/Classes"] = "include/classes/*.h",
-		["Headers/Async"] = "include/async/*.h",
-		["Sources"] = "src/*.cpp",
-		["Sources/Classes"] = "src/classes/*.cpp",
-		["Sources/Async"] = "src/async/*.cpp",
 		["*"] = {"premake5.lua", "StdInc.h", "StdInc.cpp"}
 	}
 	
 	files {
 		"premake5.lua",
-		"src/*.cpp",
-		"src/async/*.cpp",
-		"src/classes/*.cpp",
-		"include/*.h",
-		"include/async/*.h",
-		"include/classes/*.h",
-		"v8/**.h",
-		"**.hpp",
 		
 		"StdInc.h",
 		"StdInc.cpp",
+		"v8/**.h",
 	}
 	
 	--linkoptions {
@@ -41,17 +28,5 @@ project "v8"
 		"./include",
 		"./sources",
 		"./sources/include",
-		"../sdk"
-		}
-
-	defines { "SDK_WITH_BCRYPT" }
-
-	links {
-		"cryptopp", "blowfish_bcrypt"
 	}
 
-	links {
-		"library/win32bit/v8.dll.lib",
-		"library/win32bit/v8_libbase.dll.lib",
-		"library/win32bit/v8_libplatform.dll.lib",
-	}
