@@ -23,7 +23,7 @@ void CV8Matrix::SetPosition(Local<Name> property, Local<Value> value, const Prop
         static_cast<CMatrix*>(ptr)->SetPosition(vector);
         return;
     }
-    info.GetIsolate()->ThrowException(String::NewFromUtf8(info.GetIsolate(), "Value is not Vector3 type").ToLocalChecked());
+    info.GetIsolate()->ThrowException(CV8Utils::ToV8String("Value is not Vector3 type"));
 }
 
 void CV8Matrix::GetRotation(Local<Name> property, const PropertyCallbackInfo<Value>& info)
@@ -46,7 +46,7 @@ void CV8Matrix::SetRotation(Local<Name> property, Local<Value> value, const Prop
         static_cast<CMatrix*>(ptr)->SetRotation(vector * (180.0f / PI));
         return;
     }
-    info.GetIsolate()->ThrowException(String::NewFromUtf8(info.GetIsolate(), "Value is not Vector3 type").ToLocalChecked());
+    info.GetIsolate()->ThrowException(CV8Utils::ToV8String("Value is not Vector3 type"));
 }
 
 void CV8Matrix::GetScale(Local<Name> property, const PropertyCallbackInfo<Value>& info)
@@ -69,7 +69,7 @@ void CV8Matrix::SetScale(Local<Name> property, Local<Value> value, const Propert
         static_cast<CMatrix*>(ptr)->SetScale(vector);
         return;
     }
-    info.GetIsolate()->ThrowException(String::NewFromUtf8(info.GetIsolate(), "Value is not Vector3 type").ToLocalChecked());
+    info.GetIsolate()->ThrowException(CV8Utils::ToV8String("Value is not Vector3 type"));
 }
 
 void CV8Matrix::ConstructorCall(const FunctionCallbackInfo<Value>& info)
@@ -108,14 +108,14 @@ Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context)
     Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
     vector2dTemplate->SetCallHandler(ConstructorCall);
     vector2dTemplate->SetLength(16);
-    vector2dTemplate->SetClassName(String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+    vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);
 
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "position").ToLocalChecked(), GetPosition, SetPosition);
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "rotation").ToLocalChecked(), GetRotation, SetRotation);
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "scale").ToLocalChecked(), GetScale, SetScale);
-    objectTemplate->Set(Symbol::GetToStringTag(isolate), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
-    context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), vector2dTemplate->GetFunction(context).ToLocalChecked());
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("position"), GetPosition, SetPosition);
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("rotation"), GetRotation, SetRotation);
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("scale"), GetScale, SetScale);
+    objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
+    context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector2dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector2dTemplate);
 }

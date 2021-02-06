@@ -64,7 +64,7 @@ bool CV8FunctionCallback::ReadVector(CVector& value)
 
 void CV8FunctionCallback::Return(std::string arg)
 {
-    Local<String> result = String::NewFromUtf8(m_callback.GetIsolate(), arg.c_str()).ToLocalChecked();
+    Local<String> result = CV8Utils::ToV8String(arg);
     m_callback.GetReturnValue().Set(result);
 }
 

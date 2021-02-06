@@ -41,22 +41,22 @@ void CV8Vector4D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     CV8FunctionCallback args(info);
     if (!args.ReadNumber(x))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 1").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 1"));
         return;
     }
     if (!args.ReadNumber(y))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 2").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 2"));
         return;
     }
     if (!args.ReadNumber(z))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 3").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 3"));
         return;
     }
     if (!args.ReadNumber(w))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 4").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 4"));
         return;
     }
     Local<Context>          context = isolate->GetCurrentContext();
@@ -92,11 +92,11 @@ Local<Object> CV8Vector4D::New(CVector4D vector)
     Isolate*             isolate = Isolate::GetCurrent();
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Value>    maybeValue =
-        isolate->GetCurrentContext()->Global()->Get(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+        isolate->GetCurrentContext()->Global()->Get(isolate->GetCurrentContext(), CV8Utils::ToV8String(m_szName));
     Local<Value> value;
     if (!maybeValue.ToLocal(&value))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Vector3 class not found.").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Vector3 class not found."));
         return Object::New(isolate);
     }
     if (value->IsFunction())
@@ -113,7 +113,7 @@ Local<Object> CV8Vector4D::New(CVector4D vector)
             return handleScope.Escape(object);
         }
     }
-    isolate->ThrowException(String::NewFromUtf8(isolate, "Constructor for class Vector3 not found.").ToLocalChecked());
+    isolate->ThrowException(CV8Utils::ToV8String("Constructor for class Vector3 not found."));
     return Object::New(isolate);
 }
 
@@ -126,12 +126,12 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     vector4dTemplate->Inherit(parent);
     vector4dTemplate->SetCallHandler(ConstructorCall);
     vector4dTemplate->SetLength(4);
-    vector4dTemplate->SetClassName(String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+    vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector4dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "w").ToLocalChecked(), GetW, SetW);
-    objectTemplate->Set(String::NewFromUtf8(isolate, "getLength").ToLocalChecked(), FunctionTemplate::New(isolate, MethodGetLength));
-    objectTemplate->Set(Symbol::GetToStringTag(isolate), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
-    context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), vector4dTemplate->GetFunction(context).ToLocalChecked());
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("w"), GetW, SetW);
+    objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
+    objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
+    context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector4dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector4dTemplate);
 }

@@ -8,7 +8,7 @@ bool CV8BaseClass::ConstructorCallCheck(const FunctionCallbackInfo<Value>& info)
 {
     if (!info.IsConstructCall())
     {
-        info.GetIsolate()->ThrowException(String::NewFromUtf8(info.GetIsolate(), "Cannot call constructor as function").ToLocalChecked());
+        info.GetIsolate()->ThrowException(CV8Utils::ToV8String("Cannot call constructor as function"));
         return false;
     }
     return true;

@@ -117,8 +117,8 @@ void CV8::RemoveIsolate(CV8IsolateBase* pIsolate)
 
 Local<Module> CV8::GetDummyModule(Isolate* pIsolate)
 {
-    Local<String> source = String::NewFromUtf8(pIsolate, "", NewStringType::kNormal).ToLocalChecked();
-    Local<String> fileName = String::NewFromUtf8(pIsolate, "", NewStringType::kNormal).ToLocalChecked();
+    Local<String> source = CV8Utils::ToV8String("");
+    Local<String> fileName = CV8Utils::ToV8String("");
 
     ScriptOrigin           origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
     ScriptCompiler::Source compilerSource(source, origin);

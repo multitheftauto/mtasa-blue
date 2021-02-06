@@ -106,7 +106,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
         }
         return scriptModule;
     }
-    Local<String> moduleName = String::NewFromUtf8(pIsolate, *importName).ToLocalChecked();
+    Local<String> moduleName = CV8Utils::ToV8String(*importName);
     auto          exports = pModule->GetExports(pIsolate);
     module = Module::CreateSyntheticModule(pIsolate, moduleName, exports, [](Local<Context> context, Local<Module> module) {
         CV8Isolate* self = (CV8Isolate*)context->GetIsolate()->GetData(0);
@@ -161,7 +161,7 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
             func(&callback);
         };
 
-        module->SetSyntheticModuleExport(context->GetIsolate(), String::NewFromUtf8(context->GetIsolate(), pair.first).ToLocalChecked(),
+        module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(pair.first),
                                          Function::New(context, callback, value).ToLocalChecked());
     }
     modulesListName.pop();
@@ -177,8 +177,8 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
     HandleScope    handleScope(m_pIsolate);
     Context::Scope contextScope(m_context.Get(m_pIsolate));
 
-    Local<String> source = String::NewFromUtf8(m_pIsolate, code.c_str(), NewStringType::kNormal).ToLocalChecked();
-    Local<String> fileName = String::NewFromUtf8(m_pIsolate, originFileName.c_str(), NewStringType::kNormal).ToLocalChecked();
+    Local<String> source = CV8Utils::ToV8String(code);
+    Local<String> fileName = CV8Utils::ToV8String(originFileName);
 
     ScriptOrigin           origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
     ScriptCompiler::Source compilerSource(source, origin);

@@ -16,7 +16,7 @@ std::vector<Local<String>> CV8Module::GetExports(Isolate* pIsolate)
     std::vector<Local<String>> exports;
     for (auto const& pair : m_mapFunctions)
     {
-        exports.push_back(String::NewFromUtf8(pIsolate, pair.first).ToLocalChecked());
+        exports.push_back(CV8Utils::ToV8String(pair.first));
     }
     return exports;
 }

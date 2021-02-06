@@ -57,12 +57,12 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     CV8FunctionCallback args(info);
     if (!args.ReadNumber(x))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 1").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 1"));
         return;
     }
     if (!args.ReadNumber(y))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 2").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 2"));
         return;
     }
     Local<Context> context = isolate->GetCurrentContext();
@@ -85,14 +85,14 @@ Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
     Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
     vector2dTemplate->SetCallHandler(ConstructorCall);
     vector2dTemplate->SetLength(2);
-    vector2dTemplate->SetClassName(String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+    vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);
 
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "x").ToLocalChecked(), GetX, SetX);
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "y").ToLocalChecked(), GetY, SetY);
-    objectTemplate->Set(String::NewFromUtf8(isolate, "getLength").ToLocalChecked(), FunctionTemplate::New(isolate, MethodGetLength));
-    objectTemplate->Set(Symbol::GetToStringTag(isolate), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
-    context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), vector2dTemplate->GetFunction(context).ToLocalChecked());
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("x"), GetX, SetX);
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("y"), GetY, SetY);
+    objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
+    objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
+    context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector2dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector2dTemplate);
 }

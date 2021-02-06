@@ -47,7 +47,6 @@ void CV8Promise::Resolve(std::string arg)
         Isolate*      isolate = pIsolate->GetIsolate();
         Locker        lock(isolate);
         HandleScope   scope(isolate);
-        Local<String> result = String::NewFromUtf8(isolate, arg.c_str()).ToLocalChecked();
-        Resolve(result);
+        Resolve(CV8Utils::ToV8String(arg));
     });
 }

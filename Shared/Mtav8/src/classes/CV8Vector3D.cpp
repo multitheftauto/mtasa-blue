@@ -41,23 +41,22 @@ void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     CV8FunctionCallback args(info);
     if (!args.ReadNumber(x))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 1").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 1"));
         return;
     }
     if (!args.ReadNumber(y))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 2").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 2"));
         return;
     }
     if (!args.ReadNumber(z))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Expected number at argument 3").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 3"));
         return;
     }
     Local<Context>          context = isolate->GetCurrentContext();
     Local<Object>           wrapper = info.Holder();
     ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
-
 
     CVector* vector = CreateGarbageCollected<CVector>(isolate, wrapper);
     vector->fX = x;
@@ -87,11 +86,11 @@ Local<Object> CV8Vector3D::New(CVector vector)
     Isolate*             isolate = Isolate::GetCurrent();
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Value>    maybeValue =
-        isolate->GetCurrentContext()->Global()->Get(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+        isolate->GetCurrentContext()->Global()->Get(isolate->GetCurrentContext(), CV8Utils::ToV8String(m_szName));
     Local<Value> value;
     if (!maybeValue.ToLocal(&value))
     {
-        isolate->ThrowException(String::NewFromUtf8(isolate, "Vector3 class not found.").ToLocalChecked());
+        isolate->ThrowException(CV8Utils::ToV8String("Vector3 class not found."));
         return Object::New(isolate);
     }
     if (value->IsFunction())
@@ -107,7 +106,7 @@ Local<Object> CV8Vector3D::New(CVector vector)
             return handleScope.Escape(object);
         }
     }
-    isolate->ThrowException(String::NewFromUtf8(isolate, "Constructor for class Vector3 not found.").ToLocalChecked());
+    isolate->ThrowException(CV8Utils::ToV8String("Constructor for class Vector3 not found."));
     return Object::New(isolate);
 }
 
@@ -120,12 +119,12 @@ Handle<FunctionTemplate> CV8Vector3D::CreateTemplate(Local<Context> context, Han
     vector3dTemplate->Inherit(parent);
     vector3dTemplate->SetCallHandler(ConstructorCall);
     vector3dTemplate->SetLength(3);
-    vector3dTemplate->SetClassName(String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
+    vector3dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector3dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);
-    objectTemplate->SetAccessor(String::NewFromUtf8(isolate, "z").ToLocalChecked(), GetZ, SetZ);
-    objectTemplate->Set(String::NewFromUtf8(isolate, "getLength").ToLocalChecked(), FunctionTemplate::New(isolate, MethodGetLength));
-    objectTemplate->Set(Symbol::GetToStringTag(isolate), String::NewFromUtf8(isolate, m_szName).ToLocalChecked());
-    context->Global()->Set(context, String::NewFromUtf8(isolate, m_szName).ToLocalChecked(), vector3dTemplate->GetFunction(context).ToLocalChecked());
+    objectTemplate->SetAccessor(CV8Utils::ToV8String("z"), GetZ, SetZ);
+    objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
+    objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
+    context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector3dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector3dTemplate);
 }
