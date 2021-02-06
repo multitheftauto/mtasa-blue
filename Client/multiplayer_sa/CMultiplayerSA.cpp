@@ -379,7 +379,6 @@ DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
-HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 void   HOOK_FindPlayerCoors();
 void   HOOK_FindPlayerCentreOfWorld();
 void   HOOK_FindPlayerHeading();

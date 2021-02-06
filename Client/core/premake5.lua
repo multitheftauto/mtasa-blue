@@ -18,7 +18,6 @@ project "Client Core"
 			"../../vendor/jpeg-9d",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk",
 		}
 
 	libdirs {
@@ -35,8 +34,6 @@ project "Client Core"
 		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
 	}
-
-	links { "hwbrk" }
 
 	files {
 		"premake5.lua",
