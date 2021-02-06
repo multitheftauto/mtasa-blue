@@ -60,4 +60,6 @@ public:
     virtual SString GetAttributeValue(const SString& strAttributeName) = 0;
     virtual SString GetCommentText() = 0;
     virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false) = 0;
+
+    virtual std::string ToString() = 0;
 };
