@@ -126,6 +126,7 @@ protected:
     // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIElement*  m_pWindow;
     CGUITabPanel* m_pTabs;
+    CGUITab*      m_pTabAudio;
     CGUITab*      m_pTabInterface;
     CGUITab*      m_pTabBrowser;
     CGUIButton*   m_pButtonOK;
@@ -390,6 +391,7 @@ protected:
     void ReloadBrowserLists();
 
 private:
+    void CreateAudioTabGUI();
     void CreateInterfaceTabGUI();
     void UpdateChatColorPreview(eChatColorType eType);
 
