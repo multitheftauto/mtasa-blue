@@ -35,7 +35,9 @@ public:
     // Equivalent of js "let key = value"
     void SetKeyValue(const char* key, Local<Value> value);
 
-private:
+    Local<Function> CreateFunction(void (*callback)(CV8FunctionCallbackBase*));
+
+        private:
     // Perform common execution checks, long execution protection.
     // Use before each time js starts to execute
     class Execution

@@ -141,18 +141,8 @@ void CV8::RegisterAllModules(CV8Isolate* pIsolate)
         Local<Object> object = pIsolate->CreateGlobalObject(moduleName.c_str());
         for (auto const& [import, callback] : module->GetFunctions())
         {
-            Local<Value> value = External::New(isolate, callback);
-
-            FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
-                Locker          lock(args.GetIsolate());
-                HandleScope     handleScope(args.GetIsolate());
-                Local<External> ext = args.Data().As<External>();
-                void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
-                CV8FunctionCallback callback(args);
-                func(&callback);
-            };
-
-            pIsolate->SetObjectKeyValue(object, import, Function::New(isolate->GetCurrentContext(), callback, value).ToLocalChecked());
+            Local<Function> function = pIsolate->CreateFunction(callback);
+            pIsolate->SetObjectKeyValue(object, import, function);
         }
     }
 }
@@ -165,18 +155,8 @@ void CV8::RegisterAllModulesInGlobalNamespace(CV8Isolate* pIsolate)
     {
         for (auto const& [import, callback] : module->GetFunctions())
         {
-            Local<Value> value = External::New(isolate, callback);
-
-            FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
-                Locker          lock(args.GetIsolate());
-                HandleScope     handleScope(args.GetIsolate());
-                Local<External> ext = args.Data().As<External>();
-                void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
-                CV8FunctionCallback callback(args);
-                func(&callback);
-            };
-
-            pIsolate->SetKeyValue(import, Function::New(isolate->GetCurrentContext(), callback, value).ToLocalChecked());
+            Local<Function> function = pIsolate->CreateFunction(callback);
+            pIsolate->SetKeyValue(import, function);
         }
     }
 }

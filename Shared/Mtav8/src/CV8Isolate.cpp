@@ -152,21 +152,10 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
     Locker      lock(m_pIsolate);
     const char* name = modulesListName.front().c_str();
     CV8Module*  pModule = CV8::GetModuleByName(name);
-    for (auto const& pair : pModule->GetFunctions())
+    for (auto const& [import, callback] : pModule->GetFunctions())
     {
-        Local<Value> value = External::New(context->GetIsolate(), pair.second);
-
-        FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
-            Locker          lock(args.GetIsolate());
-            HandleScope     handleScope(args.GetIsolate());
-            Local<External> ext = args.Data().As<External>();
-            void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
-            CV8FunctionCallback callback(args);
-            func(&callback);
-        };
-
-        module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(pair.first),
-                                         Function::New(context, callback, value).ToLocalChecked());
+        Local<Function> function = CreateFunction(callback);
+        module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(import), function);
     }
     modulesListName.pop();
     return True(context->GetIsolate());
@@ -330,6 +319,23 @@ void CV8Isolate::SetObjectKeyValue(Local<Object> object, const char* key, Local<
 void CV8Isolate::SetKeyValue(const char* key, Local<Value> value)
 {
     m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
+}
+
+Local<Function> CV8Isolate::CreateFunction(void (*callback)(CV8FunctionCallbackBase*))
+{
+    Local<Value> value = External::New(m_pIsolate, callback);
+
+    FunctionCallback functionCallback = [](const FunctionCallbackInfo<Value>& args) {
+        Locker          lock(args.GetIsolate());
+        HandleScope     handleScope(args.GetIsolate());
+        Local<External> ext = args.Data().As<External>();
+        void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
+        CV8FunctionCallback callback(args);
+        func(&callback);
+    };
+
+    Local<Function> function = Function::New(m_pIsolate->GetCurrentContext(), functionCallback, value).ToLocalChecked();
+    return function;
 }
 
 void CV8Isolate::Evaluate()
