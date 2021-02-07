@@ -31,11 +31,14 @@ CV8::CV8()
                 std::lock_guard lock(m_executionGuard);
                 if (m_pCurrentExecutionIsolate)
                 {
-                    double time = static_cast<double>(GetTickCount64_()) - m_pIsolateExecutionStart;
-                    //printf("Time %lf\n", time);
-                    if (time > 2000)
+                    if (m_pIsolateExecutionTicks <= 0)
                     {
                         m_pCurrentExecutionIsolate->TerminateExecution();
+                        m_pCurrentExecutionIsolate = nullptr;
+                    }
+                    else
+                    {
+                        m_pIsolateExecutionTicks--; // use decrement counter over getTickCount comperasion to prevent terminating scripts while debugger is in use.
                     }
                 }
             }
@@ -65,7 +68,7 @@ void CV8::Shutdown()
 void CV8::EnterExecution(CV8Isolate* pIsolate)
 {
     std::lock_guard lock(m_executionGuard);
-    m_pIsolateExecutionStart = static_cast<double>(GetTickCount64_());
+    m_pIsolateExecutionTicks = 2000 / V8Config::iGuardThreadSleep;
     m_pCurrentExecutionIsolate = pIsolate;
 }
 
