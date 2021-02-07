@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaVehicleDefs : public CLuaDefs
 {
@@ -140,11 +141,11 @@ public:
     LUA_DECLARE(SetVehicleModelDummyPosition);
     LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
 
-    static std::variant<bool, std::tuple<float, float, float>> GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
     static std::variant<bool, CVector>                         OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
 
     static bool                                                SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position);
-    static std::variant<bool, std::tuple<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
     static std::variant<bool, CVector>                         OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
     static bool                                                ResetVehicleDummyPositions(CClientVehicle* vehicle);
 

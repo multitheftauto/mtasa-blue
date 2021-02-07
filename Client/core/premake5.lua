@@ -18,7 +18,6 @@ project "Client Core"
 			"../../vendor/jpeg-9d",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk",
 			"../../vendor/detours/4.0.1/src",
 		}
 
@@ -32,7 +31,7 @@ project "Client Core"
 		["*"] = "premake5.lua"
 	}
 
-	links { "hwbrk", "detours" }
+	links { "detours" }
 
 	files {
 		"premake5.lua",

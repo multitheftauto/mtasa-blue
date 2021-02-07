@@ -961,7 +961,7 @@ void CCore::CreateNetwork()
         ulong ulNetModuleVersion = 0;
         pfnCheckCompatibility(1, &ulNetModuleVersion);
         SString strMessage("Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
-#if !defined(MTA_DM_CONNECT_TO_PUBLIC)
+#if !defined(MTA_DM_PUBLIC_CONNECTIONS)
         strMessage += "\n\n(Devs: Update source and run win-install-data.bat)";
 #endif
         BrowseToSolution("netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
@@ -2263,9 +2263,4 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
-}
-
-HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
-{
-    return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }

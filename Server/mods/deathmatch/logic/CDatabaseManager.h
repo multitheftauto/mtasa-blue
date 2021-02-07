@@ -88,7 +88,7 @@ public:
 
     CDbJobData();
     ~CDbJobData();
-    SDbJobId           GetId() { return id; }
+    SDbJobId           GetId() const { return id; }
     bool               SetCallback(PFN_DBRESULT pfnDbResult, void* pContext);
     bool               HasCallback();
     void               ProcessCallback();
