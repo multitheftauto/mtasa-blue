@@ -32,6 +32,8 @@ public:
     Local<Object> CreateGlobalObject(const char* mapName);
     // Equivalent of js "object[key] = value"
     void SetObjectKeyValue(Local<Object> object, const char* key, Local<Value> value);
+    // Equivalent of js "let key = value"
+    void SetKeyValue(const char* key, Local<Value> value);
 
 private:
     // Perform common execution checks, long execution protection.

@@ -21,6 +21,7 @@ public:
 
     static Local<Module>         GetDummyModule(Isolate* pIsolate);
     static void                  RegisterAllModules(CV8Isolate* pIsolate);
+    static void                  RegisterAllModulesInGlobalNamespace(CV8Isolate* pIsolate);
     static CV8Module*            GetModuleByName(const char* name);
     std::vector<CV8IsolateBase*> GetIsolates();
     Platform*                    GetPlatform() const { return m_pPlatform.get(); }

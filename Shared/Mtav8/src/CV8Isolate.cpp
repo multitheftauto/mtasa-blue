@@ -93,6 +93,12 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
         CV8::RegisterAllModules(this);
         return CV8::GetDummyModule(pIsolate);
     }
+    
+    if (!strcmp(*importName, V8Config::szMtaImportAllFunctions))
+    {
+        CV8::RegisterAllModulesInGlobalNamespace(this);
+        return CV8::GetDummyModule(pIsolate);
+    }
 
     if (!pModule)
     {
@@ -319,6 +325,11 @@ Local<Object> CV8Isolate::CreateGlobalObject(const char* mapName)
 void CV8Isolate::SetObjectKeyValue(Local<Object> object, const char* key, Local<Value> value)
 {
     object->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
+}
+
+void CV8Isolate::SetKeyValue(const char* key, Local<Value> value)
+{
+    m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
 }
 
 void CV8Isolate::Evaluate()
