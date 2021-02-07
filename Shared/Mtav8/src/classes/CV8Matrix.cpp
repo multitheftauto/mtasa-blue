@@ -119,7 +119,7 @@ Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context)
 
     Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
     vector2dTemplate->SetCallHandler(ConstructorCall);
-    vector2dTemplate->SetLength(16);
+    vector2dTemplate->SetLength(sizeof(CMatrix) / sizeof(CVector));
     vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);

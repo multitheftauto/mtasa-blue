@@ -104,7 +104,7 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     Handle<FunctionTemplate> vector4dTemplate = FunctionTemplate::New(isolate);
     vector4dTemplate->Inherit(parent);
     vector4dTemplate->SetCallHandler(ConstructorCall);
-    vector4dTemplate->SetLength(4);
+    vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
     vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector4dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);

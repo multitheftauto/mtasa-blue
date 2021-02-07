@@ -21,7 +21,6 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     m_pIsolate->SetData(0, this);
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
-
     Context::Scope contextScope(m_context.Get(m_pIsolate));
 
     Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(m_pIsolate->GetCurrentContext());
@@ -91,8 +90,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
     MaybeLocal<Module> module;
     if (!strcmp(*importName, V8Config::szMtaModulePrefix))
     {
-        printf("name %s\n", *importName);
-        CV8::RegisterAllModules(pIsolate);
+        CV8::RegisterAllModules(this);
         return CV8::GetDummyModule(pIsolate);
     }
 
@@ -309,6 +307,18 @@ void CV8Isolate::SetJsEvalSetting(eJsEval value)
 void CV8Isolate::TerminateExecution()
 {
     m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
+}
+
+Local<Object> CV8Isolate::CreateGlobalObject(const char* mapName)
+{
+    Local<Object> object = Object::New(m_pIsolate);
+    m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(mapName), object);
+    return object;
+}
+
+void CV8Isolate::SetObjectKeyValue(Local<Object> object, const char* key, Local<Value> value)
+{
+    object->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
 }
 
 void CV8Isolate::Evaluate()

@@ -38,7 +38,8 @@ CV8::CV8()
                     }
                     else
                     {
-                        m_pIsolateExecutionTicks--; // use decrement counter over getTickCount comperasion to prevent terminating scripts while debugger is in use.
+                        m_pIsolateExecutionTicks--;            // use decrement counter over getTickCount comperasion to prevent terminating scripts while
+                                                               // debugger is in use.
                     }
                 }
             }
@@ -130,11 +131,29 @@ Local<Module> CV8::GetDummyModule(Isolate* pIsolate)
     return module;
 }
 
-void CV8::RegisterAllModules(Isolate* pIsolate)
+void CV8::RegisterAllModules(CV8Isolate* pIsolate)
 {
+    Isolate* isolate = pIsolate->GetIsolate();
+
     for (auto const& [name, module] : m_mapModules)
     {
+        std::string   moduleName = name.substr(strlen(V8Config::szMtaModulePrefix) + 1);
+        Local<Object> object = pIsolate->CreateGlobalObject(moduleName.c_str());
+        for (auto const& [import, callback] : module->GetFunctions())
+        {
+            Local<Value> value = External::New(isolate, callback);
 
+            FunctionCallback callback = [](const FunctionCallbackInfo<Value>& args) {
+                Locker          lock(args.GetIsolate());
+                HandleScope     handleScope(args.GetIsolate());
+                Local<External> ext = args.Data().As<External>();
+                void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
+                CV8FunctionCallback callback(args);
+                func(&callback);
+            };
+
+            pIsolate->SetObjectKeyValue(object, import, Function::New(isolate->GetCurrentContext(), callback, value).ToLocalChecked());
+        }
     }
 }
 

@@ -28,6 +28,11 @@ public:
     void TerminateExecution();
     void SetJsEvalSetting(eJsEval value);
 
+    // May be used as a namespace for module imports. Equivalent of js "let object = {}"
+    Local<Object> CreateGlobalObject(const char* mapName);
+    // Equivalent of js "object[key] = value"
+    void SetObjectKeyValue(Local<Object> object, const char* key, Local<Value> value);
+
 private:
     // Perform common execution checks, long execution protection.
     // Use before each time js starts to execute

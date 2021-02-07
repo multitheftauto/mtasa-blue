@@ -98,7 +98,7 @@ Handle<FunctionTemplate> CV8Vector3D::CreateTemplate(Local<Context> context, Han
     Handle<FunctionTemplate> vector3dTemplate = FunctionTemplate::New(isolate);
     vector3dTemplate->Inherit(parent);
     vector3dTemplate->SetCallHandler(ConstructorCall);
-    vector3dTemplate->SetLength(3);
+    vector3dTemplate->SetLength(sizeof(CVector) / sizeof(float));
     vector3dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector3dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(2);
