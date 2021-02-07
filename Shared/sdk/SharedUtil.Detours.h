@@ -27,7 +27,7 @@ namespace SharedUtil
     inline bool DetourLibraryFunction(const char* libraryName, const char* functionName, TargetType& target, void* replacement)
     {
         target = reinterpret_cast<TargetType>(DetourFindFunction(libraryName, functionName));
-        return DetourFunction(target, replacement);
+        return (target != nullptr) ? DetourFunction(target, replacement) : false;
     }
 
     inline bool DetourLibraryFunction(const char* libraryName, const char* functionName, void* replacement)
