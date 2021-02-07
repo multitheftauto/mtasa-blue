@@ -11,7 +11,7 @@ public:
 
     // Adds new class definition to the context
     static Handle<FunctionTemplate> CreateTemplate(Local<Context> context, Handle<FunctionTemplate> parent);
-    static Local<Object>            New(CVector vector);
+    static MaybeLocal<Object>       New(CVector vector);
     static bool                     Convert(Local<Object> object, CVector& vector);
 
 private:

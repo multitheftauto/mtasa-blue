@@ -11,7 +11,7 @@ public:
 
     static Handle<FunctionTemplate> CreateTemplate(Local<Context> context);
 
-    //static Handle<Object> New(CVector2D vector2d, Isolate* isolate);
+    MaybeLocal<Object> New(CVector2D vector);
 
 private:
     static void ConstructorCall(const FunctionCallbackInfo<Value>& info);

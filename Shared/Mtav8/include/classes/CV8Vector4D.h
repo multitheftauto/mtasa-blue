@@ -12,7 +12,9 @@ public:
 
     // Adds new class definition to the context
     static Handle<FunctionTemplate> CreateTemplate(Local<Context> context, Handle<FunctionTemplate> parent);
-    static Local<Object>            New(CVector4D vector);
+
+    // Equivalent to "new Vector4(x,y,z,w)" in js
+    static MaybeLocal<Object>       New(CVector4D vector);
     static bool                     Convert(Local<Object> object, CVector4D& vector);
 
 private:

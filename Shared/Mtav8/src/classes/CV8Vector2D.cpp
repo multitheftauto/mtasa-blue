@@ -68,13 +68,22 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     Local<Context> context = isolate->GetCurrentContext();
     Local<Object>  wrapper = info.Holder();
     
-    CVector2D* vector = CreateGarbageCollected<CVector2D>(isolate, wrapper);
+    CVector2D* vector = CreateGarbageCollected<CVector2D>(wrapper);
     vector->fX = x;
     vector->fY = y;
 
     wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
     wrapper->SetInternalField(1, External::New(isolate, vector));
     info.GetReturnValue().Set(wrapper);
+}
+
+MaybeLocal<Object> CV8Vector2D::New(CVector2D vector)
+{
+    Isolate* isolate = Isolate::GetCurrent();
+    assert(isolate);
+    EscapableHandleScope handleScope(isolate);
+    MaybeLocal<Object>   object = CV8Utils::NewObject(m_szName, vector.fX, vector.fY);
+    return handleScope.EscapeMaybe(object);
 }
 
 Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)

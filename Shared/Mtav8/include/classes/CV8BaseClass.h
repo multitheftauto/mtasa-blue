@@ -17,8 +17,10 @@ public:
     static bool ConstructorCallCheck(const FunctionCallbackInfo<Value>& info);
 
     template<typename T>
-    static T* CreateGarbageCollected(Isolate* isolate, Local<Object> object)
+    static T* CreateGarbageCollected(Local<Object> object)
     {
+        Isolate* isolate = Isolate::GetCurrent();
+        assert(isolate);
         T* value = Allocate<T>(isolate);
         AttachGC(object, sizeof(T));
         return value;

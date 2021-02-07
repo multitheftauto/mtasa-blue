@@ -8,6 +8,8 @@ public:
     inline static EClass      m_eClass = EClass::Matrix;
     inline static const char* m_szName = "Matrix";
 
+    static MaybeLocal<Object> New(CVector position, CVector rotation, CVector scale);
+
     // Adds new class definition to the context
     static Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context);
 
