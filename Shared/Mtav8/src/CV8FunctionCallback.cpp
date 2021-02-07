@@ -62,6 +62,32 @@ bool CV8FunctionCallback::ReadVector(CVector& value)
     return false;
 }
 
+bool CV8FunctionCallback::ReadVector(CVector2D& value)
+{
+    if (m_callback.Length() > m_iIndex)
+    {
+        if (m_callback[m_iIndex]->IsObject())
+        {
+            return ReadClass(CV8Vector2D::m_eClass, value);
+        }
+    }
+    bHasError = true;
+    return false;
+}
+
+bool CV8FunctionCallback::ReadVector(CVector4D& value)
+{
+    if (m_callback.Length() > m_iIndex)
+    {
+        if (m_callback[m_iIndex]->IsObject())
+        {
+            return ReadClass(CV8Vector4D::m_eClass, value);
+        }
+    }
+    bHasError = true;
+    return false;
+}
+
 void CV8FunctionCallback::Return(std::string arg)
 {
     Local<String> result = CV8Utils::ToV8String(arg);

@@ -46,6 +46,23 @@ void CV8Vector2D::MethodGetLength(const FunctionCallbackInfo<Value>& info)
     info.GetReturnValue().Set(value->Length());
 }
 
+void CV8Vector2D::MethodDotProduct(const FunctionCallbackInfo<Value>& info)
+{
+    HandleScope         handleScope(info.GetIsolate());
+    CV8FunctionCallback args(info);
+    CVector2D           other;
+    if (!args.ReadVector(other))
+    {
+        info.GetIsolate()->ThrowException(CV8Utils::ToV8String("Expected vector at argument 1"));
+        return;
+    }
+    Local<Object>   self = info.Holder();
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    void*           ptr = wrap->Value();
+    CVector2D*      value = static_cast<CVector2D*>(ptr);
+    info.GetReturnValue().Set(value->DotProduct(other));
+}
+
 void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
 {
     Isolate*    isolate = info.GetIsolate();
@@ -67,7 +84,7 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     }
     Local<Context> context = isolate->GetCurrentContext();
     Local<Object>  wrapper = info.Holder();
-    
+
     CVector2D* vector = CreateGarbageCollected<CVector2D>(wrapper);
     vector->fX = x;
     vector->fY = y;
@@ -75,6 +92,19 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
     wrapper->SetInternalField(1, External::New(isolate, vector));
     info.GetReturnValue().Set(wrapper);
+}
+
+
+bool CV8Vector2D::Convert(Local<Object> object, CVector2D& vector)
+{
+    Local<Number> type = Local<Number>::Cast(object->GetInternalField(0));
+    if (!type.IsEmpty() && type->Value() == (double)m_eClass)
+    {
+        Local<External> wrap = Local<External>::Cast(object->GetInternalField(1));
+        vector = *(CVector2D*)wrap->Value();
+        return true;
+    }
+    return false;
 }
 
 MaybeLocal<Object> CV8Vector2D::New(CVector2D vector)
@@ -101,6 +131,7 @@ Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
     objectTemplate->SetAccessor(CV8Utils::ToV8String("x"), GetX, SetX);
     objectTemplate->SetAccessor(CV8Utils::ToV8String("y"), GetY, SetY);
     objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
+    objectTemplate->Set(CV8Utils::ToV8String("dotProduct"), FunctionTemplate::New(isolate, MethodDotProduct));
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
     context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector2dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector2dTemplate);

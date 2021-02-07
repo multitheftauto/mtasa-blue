@@ -11,7 +11,9 @@ public:
     bool HasError() const { return bHasError; };
     bool ReadString(std::string& value, bool strict = true);
     bool ReadNumber(double& value);
+    bool ReadVector(CVector2D& value);
     bool ReadVector(CVector& value);
+    bool ReadVector(CVector4D& value);
 
     const char* GetType();
 
@@ -29,6 +31,22 @@ private:
         if constexpr (std::is_same<T, CVector>())
         {
             if (CV8Vector3D::Convert(obj, value))
+            {
+                m_iIndex++;
+                return true;
+            }
+        }
+        else if constexpr (std::is_same<T, CVector2D>())
+        {
+            if (CV8Vector2D::Convert(obj, value))
+            {
+                m_iIndex++;
+                return true;
+            }
+        }
+        else if constexpr (std::is_same<T, CVector4D>())
+        {
+            if (CV8Vector4D::Convert(obj, value))
             {
                 m_iIndex++;
                 return true;

@@ -11,7 +11,9 @@ public:
 
     static Handle<FunctionTemplate> CreateTemplate(Local<Context> context);
 
-    MaybeLocal<Object> New(CVector2D vector);
+
+    static MaybeLocal<Object> New(CVector2D vector);
+    static bool Convert(Local<Object> object, CVector2D& vector);
 
 private:
     static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
@@ -22,4 +24,5 @@ private:
     static void SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
 
     static void MethodGetLength(const FunctionCallbackInfo<Value>& info);
+    static void MethodDotProduct(const FunctionCallbackInfo<Value>& info);
 };
