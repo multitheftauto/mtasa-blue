@@ -20,7 +20,7 @@ class CV8Utils
 
         any(float v)
         {
-            m_data.dValue = v;
+            m_data.fValue = v;
             m_type = eType::Float;
         }
 

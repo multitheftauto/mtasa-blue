@@ -42,6 +42,17 @@ float CV8Vector2D::MethodGetLength(CV8FunctionCallback& info, Local<Object> self
     return value->Length();
 }
 
+float CV8Vector2D::MethodGetLengthSquared(CV8FunctionCallback& info, Local<Object> self, CVector2D* value)
+{
+    return value->LengthSquared();
+}
+
+bool CV8Vector2D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector2D* value)
+{
+    value->Normalize();
+    return true;
+}
+
 float CV8Vector2D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector2D* value)
 {
     CVector2D           other;
@@ -121,6 +132,8 @@ Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
     objectTemplate->SetAccessor(CV8Utils::ToV8String("y"), GetY, SetY);
 
     AddMethod<float, CVector2D>(objectTemplate, "getLenght", MethodGetLength);
+    AddMethod<float, CVector2D>(objectTemplate, "getLengthSquared", MethodGetLengthSquared);
+    AddMethod<bool, CVector2D>(objectTemplate, "normalize", MethodNormalize);
     AddMethod<float, CVector2D>(objectTemplate, "dotProduct", MethodDotProduct);
 
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));

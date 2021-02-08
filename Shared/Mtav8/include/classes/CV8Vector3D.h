@@ -21,5 +21,9 @@ private:
 
     static void SetZ(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
 
-    static void MethodGetLength(const FunctionCallbackInfo<Value>& info);
+    static float MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static float MethodGetLengthSquared(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static void MethodCrossProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static void MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static void MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector* value);
 };

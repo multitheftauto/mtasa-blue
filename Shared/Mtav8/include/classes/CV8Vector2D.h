@@ -25,5 +25,7 @@ private:
     static void SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
 
     static float MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
+    static float MethodGetLengthSquared(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
+    static bool  MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
     static float MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
 };

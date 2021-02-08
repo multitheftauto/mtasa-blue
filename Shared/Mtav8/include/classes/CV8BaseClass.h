@@ -9,7 +9,7 @@ class CV8BaseClass
 public:
     enum class EClass
     {
-        Invalid, // To distinguish between nullptr and actual class.
+        Invalid,            // To distinguish between nullptr and actual class.
         Vector2,
         Vector3,
         Vector4,
@@ -17,7 +17,7 @@ public:
     };
 
     template <typename R, typename T>
-    using MethodCallbackFunc = R(*)(CV8FunctionCallback& info, Local<Object> self, T* value);
+    using MethodCallbackFunc = R (*)(CV8FunctionCallback& info, Local<Object> self, T* value);
 
     template <typename R, typename T>
     static Local<FunctionTemplate> MethodCallback(MethodCallbackFunc<R, T> callbackFunc)
@@ -32,12 +32,35 @@ public:
                 Local<External>          wrap = Local<External>::Cast(self->GetInternalField(1));
                 void*                    ptr = wrap->Value();
                 assert(ptr);
-                T*                       value = static_cast<T*>(ptr);
-                CV8FunctionCallback      args(info);
-                R                        result;
+                T*                  value = static_cast<T*>(ptr);
+                CV8FunctionCallback args(info);
+
                 try
                 {
-                    result = cb(args, self, value);
+                    if constexpr (std::is_same<R, void>())
+                    {
+                        cb(args, self, value);
+                        info.GetReturnValue().SetUndefined();
+                    }
+                    else
+                    {
+                        R result = cb(args, self, value);
+
+                        if constexpr (std::is_same<R, bool>())
+                        {
+                            info.GetReturnValue().Set(result);
+                        }
+                        else if constexpr (std::is_same<R, float>())
+                        {
+                            info.GetReturnValue().Set(result);
+                        }
+                        else if constexpr (std::is_same<R, CVector>())
+                        {
+                            info.GetReturnValue().Set(CV8Vector3D::New(result).ToLocalChecked());
+                        }
+                        else
+                            info.GetReturnValue().SetUndefined();
+                    }
                 }
                 catch (const std::invalid_argument& ex)
                 {
@@ -45,16 +68,6 @@ public:
                     info.GetReturnValue().SetUndefined();
                     return;
                 }
-
-                if constexpr (std::is_same<R, bool>())
-                {
-                    info.GetReturnValue().Set(result);
-                }else if constexpr (std::is_same<R, float>())
-                {
-                    info.GetReturnValue().Set(result);
-                }
-                else
-                    info.GetReturnValue().SetUndefined();
             },
             External::New(isolate, callbackFunc));
         return functionTemplate;
@@ -62,7 +75,7 @@ public:
 
     static bool ConstructorCallCheck(const FunctionCallbackInfo<Value>& info);
 
-    template<typename T>
+    template <typename T>
     static T* CreateGarbageCollected(Local<Object> object)
     {
         Isolate* isolate = Isolate::GetCurrent();
@@ -73,7 +86,8 @@ public:
     }
 
     template <typename T>
-    static T* Allocate(Isolate* isolate) {
+    static T* Allocate(Isolate* isolate)
+    {
         ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
 
         T* data = (T*)allocator->Allocate(sizeof(T));
