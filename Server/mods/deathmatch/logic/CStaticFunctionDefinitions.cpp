@@ -1359,16 +1359,16 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
 
     unsigned char ucOldInterior = pElement->GetInterior();
 
-    if (ucInterior != ucOldInterior)
+    CLuaArguments Arguments;
+    Arguments.PushNumber(ucOldInterior);
+    Arguments.PushNumber(ucInterior);
+
+    if (pElement->CallEvent("onElementInteriorChange", Arguments))
     {
-        CLuaArguments Arguments;
-        Arguments.PushNumber(ucOldInterior);
-        Arguments.PushNumber(ucInterior);
+        RUN_CHILDREN(SetElementInterior(*iter, ucInterior, bSetPosition, vecPosition))
 
-        if (pElement->CallEvent("onElementInteriorChange", Arguments))
+        if (ucInterior != ucOldInterior)
         {
-            RUN_CHILDREN(SetElementInterior(*iter, ucInterior, bSetPosition, vecPosition))
-
             pElement->SetInterior(ucInterior);
 
             // Tell everyone
