@@ -19,6 +19,7 @@ void CColShapeRPCs::LoadFunctions(void)
     AddHandler(UPDATE_COLPOLYGON_POINT, UpdateColPolygonPoint, "UpdateColPolygonPoint");
     AddHandler(ADD_COLPOLYGON_POINT, AddColPolygonPoint, "AddColPolygonPoint");
     AddHandler(REMOVE_COLPOLYGON_POINT, RemoveColPolygonPoint, "RemoveColPolygonPoint");
+    AddHandler(SET_COLPOLYGON_HEIGHT, SetColShapePolygonHeight, "SetColShapePolygonHeight");
 }
 
 void CColShapeRPCs::SetColShapeRadius(CClientEntity* pSource, NetBitStreamInterface& bitStream)
@@ -77,5 +78,16 @@ void CColShapeRPCs::RemoveColPolygonPoint(CClientEntity* pSource, NetBitStreamIn
     {
         CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
         CStaticFunctionDefinitions::RemoveColPolygonPoint(pColShape, uiPointIndex);
+    }
+}
+
+void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    float fFloor, fCeil;
+    if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
+    {
+        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
+        if (pColPolygon->SetHeight(fFloor, fCeil))
+            CStaticFunctionDefinitions::RefreshColShapeColliders(pColPolygon);
     }
 }

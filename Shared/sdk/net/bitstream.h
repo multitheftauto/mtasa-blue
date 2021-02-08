@@ -14,6 +14,11 @@
 #include "Common.h"
 #include "../Common.h"
 #include <string>
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Math.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Logging.h"
+#include <vector>
 #ifndef WIN32
     #include <alloca.h>
 #endif
@@ -451,6 +456,10 @@ enum class eBitStreamVersion : unsigned short
     // Implement entering/exiting/jacking for peds #1748
     // 2020-11-10 0x71
     PedEnterExit,
+
+    // Add height for colpolygon (#1908)
+    // 2021-01-16 0x72
+    SetColPolygonHeight,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

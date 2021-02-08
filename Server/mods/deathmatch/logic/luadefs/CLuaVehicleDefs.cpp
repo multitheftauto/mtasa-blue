@@ -59,13 +59,13 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getTrainSpeed", GetTrainSpeed},
         //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
-        {"isVehicleBlown", IsVehicleBlown},
+        {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
 
         // Vehicle set funcs
         {"fixVehicle", FixVehicle},
-        {"blowVehicle", BlowVehicle},
+        {"blowVehicle", ArgumentParserWarn<false, CStaticFunctionDefinitions::BlowVehicle>},
         {"setVehicleRotation", SetVehicleRotation},
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
         {"setVehicleColor", SetVehicleColor},
@@ -1727,50 +1727,9 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
+bool CLuaVehicleDefs::IsVehicleBlown(CVehicle* vehicle)
 {
-    CElement* pElement;
-    bool      bExplode;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadBool(bExplode, true);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::BlowVehicle(pElement, bExplode))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaVehicleDefs::IsVehicleBlown(lua_State* luaVM)
-{
-    CVehicle* pVehicle;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::IsVehicleBlown(pVehicle))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vehicle->GetIsBlown();
 }
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)

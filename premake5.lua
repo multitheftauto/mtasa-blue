@@ -137,6 +137,7 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
+		include "vendor/detours"
 	end
 
 	filter {}
@@ -157,7 +158,6 @@ workspace "MTASA"
 		include "vendor/curl"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
-		include "vendor/hwbrk"
 		include "vendor/json-c"
 		include "vendor/lua"
 		include "vendor/mbedtls"
