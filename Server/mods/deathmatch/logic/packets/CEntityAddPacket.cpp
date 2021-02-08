@@ -1038,6 +1038,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 vertex.data.vecPosition = *iter;
                                 BitStream.Write(&vertex);
                             }
+
+                            if (BitStream.Can(eBitStreamVersion::SetColPolygonHeight))
+                            {
+                                float fFloor, fCeil;
+                                pPolygon->GetHeight(fFloor, fCeil);
+
+                                BitStream.Write(fFloor);
+                                BitStream.Write(fCeil);
+                            }
                             break;
                         }
                         default:

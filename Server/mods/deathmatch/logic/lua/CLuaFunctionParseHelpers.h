@@ -424,7 +424,7 @@ CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
 
     if (pRemoteCall && g_pGame->GetRemoteCalls()->CallExists(pRemoteCall))
         return pRemoteCall;
-    
+
     return nullptr;
 }
 

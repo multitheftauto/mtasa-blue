@@ -211,7 +211,6 @@ public:
     static bool            GetTrainSpeed(CClientVehicle& Vehicle, float& fSpeed);
     static bool            GetTrainPosition(CClientVehicle& Vehicle, float& fPosition);
     static bool            IsTrainChainEngine(CClientVehicle& Vehicle, bool& bChainEngine);
-    static bool            IsVehicleBlown(CClientVehicle& Vehicle, bool& bBlown);
     static bool            GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor);
     static bool            GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear);
     static bool            GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
@@ -225,6 +224,7 @@ public:
     static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
     static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
     static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -273,6 +273,7 @@ public:
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
+    static bool           IsObjectMoving(CClientEntity& Entity);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
     static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
     static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);

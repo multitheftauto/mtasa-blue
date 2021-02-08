@@ -20,6 +20,8 @@
 #include <vector>
 #include <cstdio>
 #include <cstring>
+#include <variant>
+#include <optional>
 
 #include <zlib.h>
 
@@ -161,4 +163,4 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
-#include "../../version.h"
+#include "version.h"

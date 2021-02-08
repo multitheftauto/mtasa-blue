@@ -30,12 +30,9 @@ project "Core"
 		"*.cpp"
 	}
 
-	filter "system:windows"
-		libdirs {
-			"../../vendor/detours/lib"
-		}
+	filter { "system:windows", "platforms:x86" }
 		includedirs {
-			"../../vendor/detours/include"
+			"../../vendor/detours/4.0.1/src"
 		}
 		links { "detours", "Imagehlp" }
 

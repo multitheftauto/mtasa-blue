@@ -184,7 +184,7 @@ public:
     char                      field_963;
     float                     field_964;
     int                       m_wheelFrictionState[4];
-    void*                     pNitroParticle[2];
+    CFxSystemSAInterface*     pNitroParticle[2];
     char                      field_980;
     char                      field_981;
     short                     field_982;

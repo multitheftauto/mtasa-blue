@@ -25,6 +25,8 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
+static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
+
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
@@ -247,9 +249,15 @@ BYTE CModelInfoSA::GetVehicleType()
     return bReturn;
 }
 
-BOOL CModelInfoSA::IsVehicle()
+bool CModelInfoSA::IsVehicle() const
 {
-    return GetVehicleType() != 0xFF;
+    // NOTE(botder): This is from CModelInfo::IsVehicleModelType
+    if (m_dwModelID >= 20000)
+        return false;
+
+    // NOTE(botder): m_pInterface might be a nullptr here, we can't use it
+    CBaseModelInfoSAInterface* model = ppModelInfo[m_dwModelID];
+    return model != nullptr && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
 }
 
 bool CModelInfoSA::IsPlayerModel()
@@ -583,7 +591,7 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)
         return false;
-    
+
     if (GetModelType() != eModelInfoType::TIME)
         return false;
 
@@ -776,7 +784,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(*it);
-        MemPut<BYTE>((char*)CStreaming__ms_aInfoForModel + 20 * (*it), 0);
+        pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
     }
 }
 
@@ -1014,6 +1022,40 @@ CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
 void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
 {
     return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
+}
+
+bool CModelInfoSA::GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const
+{
+    if (!IsVehicle())
+        return false;
+
+    CVector* dummyPositions = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface)->pVisualInfo->vecDummies;
+    std::copy(dummyPositions, dummyPositions + positions.size(), positions.begin());
+    return true;
+}
+
+CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
+{
+    if (!IsVehicle())
+        return CVector();
+
+    auto dummyIter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
+
+    if (dummyIter != ms_ModelDefaultDummiesPosition.end())
+    {
+        auto positionIter = dummyIter->second.find(eDummy);
+
+        if (positionIter != dummyIter->second.end())
+        {
+            return positionIter->second;
+        }
+    }
+
+    if (!IsLoaded())
+        Request(BLOCKING, "GetVehicleDummyDefaultPosition");
+
+    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return modelInfo->pVisualInfo->vecDummies[eDummy];
 }
 
 CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
@@ -1273,6 +1315,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
         // FUNC_SetColModel resets bDoWeOwnTheColModel
         m_pInterface->bDoWeOwnTheColModel = false;
+        m_pInterface->bCollisionWasStreamedWithModel = false;
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
@@ -1327,8 +1370,6 @@ void CModelInfoSA::RestoreColModel()
                 push    dwOriginalColModelInterface
                 call    dwFunc
             }
-
-            m_pInterface->bDoWeOwnTheColModel = false;
 
             // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
             DWORD func = 0x5B2C20;

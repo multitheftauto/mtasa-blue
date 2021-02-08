@@ -15,16 +15,11 @@ project "Client Core"
 			"../sdk",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-9b",
+			"../../vendor/jpeg-9d",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk",
+			"../../vendor/detours/4.0.1/src",
 		}
-
-	libdirs {
-		"../../vendor/detours/lib",
-	}
-
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -36,7 +31,7 @@ project "Client Core"
 		["*"] = "premake5.lua"
 	}
 
-	links { "hwbrk" }
+	links { "detours" }
 
 	files {
 		"premake5.lua",
@@ -50,7 +45,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours",
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext",
 	}
 
 	defines {

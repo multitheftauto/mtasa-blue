@@ -51,7 +51,7 @@ public:
     CEffectCloner(CRenderItemManager* pManager);
     void         DoPulse();
     CEffectWrap* CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug, const EffectMacroList& macros);
-    void         ReleaseD3DEffect(CEffectWrap* pD3DEffect);    
+    void         ReleaseD3DEffect(CEffectWrap* pD3DEffect);
 private:
     void         MaybeTidyUp(bool bForceDrasticMeasures = false);
 
