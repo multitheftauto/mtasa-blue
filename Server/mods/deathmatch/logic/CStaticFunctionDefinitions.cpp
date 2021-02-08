@@ -1356,35 +1356,25 @@ bool CStaticFunctionDefinitions::SetElementVisibleTo(CElement* pElement, CElemen
 bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition)
 {
     assert(pElement);
+    RUN_CHILDREN(SetElementInterior(*iter, ucInterior, bSetPosition, vecPosition))
 
-    unsigned char ucOldInterior = pElement->GetInterior();
-
-    CLuaArguments Arguments;
-    Arguments.PushNumber(ucOldInterior);
-    Arguments.PushNumber(ucInterior);
-
-    if (pElement->CallEvent("onElementInteriorChange", Arguments))
+    if (ucInterior != pElement->GetInterior())
     {
-        RUN_CHILDREN(SetElementInterior(*iter, ucInterior, bSetPosition, vecPosition))
+        pElement->SetInterior(ucInterior);
 
-        if (ucInterior != ucOldInterior)
+        // Tell everyone
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(ucInterior);
+        BitStream.pBitStream->Write(static_cast<unsigned char>((bSetPosition) ? 1 : 0));
+        if (bSetPosition)
         {
-            pElement->SetInterior(ucInterior);
-
-            // Tell everyone
-            CBitStream BitStream;
-            BitStream.pBitStream->Write(ucInterior);
-            BitStream.pBitStream->Write(static_cast<unsigned char>((bSetPosition) ? 1 : 0));
-            if (bSetPosition)
-            {
-                BitStream.pBitStream->Write(vecPosition.fX);
-                BitStream.pBitStream->Write(vecPosition.fY);
-                BitStream.pBitStream->Write(vecPosition.fZ);
-            }
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_INTERIOR, *BitStream.pBitStream));
-
-            return true;
+            BitStream.pBitStream->Write(vecPosition.fX);
+            BitStream.pBitStream->Write(vecPosition.fY);
+            BitStream.pBitStream->Write(vecPosition.fZ);
         }
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_INTERIOR, *BitStream.pBitStream));
+
+        return true;
     }
 
     return false;

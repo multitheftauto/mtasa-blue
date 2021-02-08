@@ -1240,38 +1240,23 @@ bool CStaticFunctionDefinitions::SetElementParent(CClientEntity& Entity, CClient
 
 bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition)
 {
-    unsigned char ucOldInterior = Entity.GetInterior();
+    RUN_CHILDREN(SetElementInterior(**iter, ucInterior, bSetPosition, vecPosition))
 
-    CLuaArguments Arguments;
-    Arguments.PushNumber(ucOldInterior);
-    Arguments.PushNumber(ucInterior);
+    Entity.SetInterior(ucInterior);
+    if (bSetPosition)
+        Entity.SetPosition(vecPosition);
 
-    if (Entity.CallEvent("onClientElementInteriorChange", Arguments, false))
+    if (Entity.GetType() == CCLIENTPLAYER)
     {
-        RUN_CHILDREN(SetElementInterior(**iter, ucInterior, bSetPosition, vecPosition))
-
-        if (ucInterior != ucOldInterior)
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (Ped.IsLocalPlayer())
         {
-            Entity.SetInterior(ucInterior);
-
-            if (bSetPosition)
-                Entity.SetPosition(vecPosition);
-
-            if (Entity.GetType() == CCLIENTPLAYER)
-            {
-                CClientPed& Ped = static_cast<CClientPed&>(Entity);
-                if (Ped.IsLocalPlayer())
-                {
-                    // Update all of our streamers/managers to the local player's interior
-                    m_pClientGame->SetAllInteriors(ucInterior);
-                }
-            }
-
-            return true;
+            // Update all of our streamers/managers to the local player's interior
+            m_pClientGame->SetAllInteriors(ucInterior);
         }
     }
 
-    return false;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsigned short usDimension)
