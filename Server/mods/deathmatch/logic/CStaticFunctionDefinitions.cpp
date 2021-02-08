@@ -1363,7 +1363,7 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
     Arguments.PushNumber(ucOldInterior);
     Arguments.PushNumber(ucInterior);
 
-    if (pElement->CallEvent("onElementInteriorChange", Arguments, false))
+    if (pElement->CallEvent("onElementInteriorChange", Arguments))
     {
         RUN_CHILDREN(SetElementInterior(*iter, ucInterior, bSetPosition, vecPosition))
 
