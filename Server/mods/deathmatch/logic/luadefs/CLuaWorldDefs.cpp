@@ -88,7 +88,7 @@ void CLuaWorldDefs::LoadFunctions()
         // Check
         {"isGarageOpen", isGarageOpen},
         {"isGlitchEnabled", isGlitchEnabled},        
-        {"areTrafficLightsLocked", areTrafficLightsLocked}        
+        {"areTrafficLightsLocked", areTrafficLightsLocked},
 
         // Custom models
         {"requestModel", ArgumentParser<RequestModel>},
