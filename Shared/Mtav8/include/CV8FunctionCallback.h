@@ -9,6 +9,7 @@ public:
     int GetArgumentIndex() const { return m_iIndex; };
     // Return true when one of "read" method failed while reading argument.
     bool HasError() const { return bHasError; };
+    Isolate* GetIsolate() const { return m_callback.GetIsolate(); };
     bool ReadString(std::string& value, bool strict = true);
     bool ReadNumber(double& value);
     bool ReadVector(CVector2D& value);

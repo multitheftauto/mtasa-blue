@@ -1,4 +1,5 @@
 class CVector2D;
+class CV8FunctionCallback;
 
 using namespace v8;
 
@@ -23,6 +24,6 @@ private:
     static void GetY(Local<Name> property, const PropertyCallbackInfo<Value>& info);
     static void SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
 
-    static void MethodGetLength(const FunctionCallbackInfo<Value>& info);
-    static void MethodDotProduct(const FunctionCallbackInfo<Value>& info);
+    static float MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
+    static float MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
 };
