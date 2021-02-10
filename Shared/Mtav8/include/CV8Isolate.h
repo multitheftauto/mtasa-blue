@@ -83,6 +83,7 @@ public:
     CV8*                   m_pCV8;
     Global<ObjectTemplate> m_global;
     Global<Context>        m_context;
+    ResourceConstraints    m_constraints;
 
     std::unordered_map<std::string, Global<Module>>           m_mapScriptModules;
     std::vector<std::unique_ptr<CV8Promise>>                  m_vecPromises;

@@ -6,7 +6,7 @@ using namespace v8;
 void CV8Vector3D::GetZ(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     float           value = static_cast<CVector*>(ptr)->fZ;
     info.GetReturnValue().Set(value);
@@ -15,7 +15,7 @@ void CV8Vector3D::GetZ(Local<Name> property, const PropertyCallbackInfo<Value>& 
 void CV8Vector3D::SetZ(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     static_cast<CVector*>(ptr)->fZ = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
 }
@@ -101,18 +101,18 @@ void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     vector->fY = y;
     vector->fZ = z;
 
-    wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(1, External::New(isolate, vector));
-
+    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
+    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
+    AttachGC(isolate, wrapper);
     info.GetReturnValue().Set(wrapper);
 }
 
 bool CV8Vector3D::Convert(Local<Object> object, CVector& vector)
 {
-    Local<Number> type = Local<Number>::Cast(object->GetInternalField(0));
+    Local<Number> type = Local<Number>::Cast(object->GetInternalField(EInternalFieldPurpose::TypeOfClass));
     if (!type.IsEmpty() && type->Value() == (double)m_eClass)
     {
-        Local<External> wrap = Local<External>::Cast(object->GetInternalField(1));
+        Local<External> wrap = Local<External>::Cast(object->GetInternalField(EInternalFieldPurpose::PointerToValue));
         vector = *(CVector*)wrap->Value();
         return true;
     }
@@ -139,7 +139,7 @@ Handle<FunctionTemplate> CV8Vector3D::CreateTemplate(Local<Context> context, Han
     vector3dTemplate->SetLength(sizeof(CVector) / sizeof(float));
     vector3dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector3dTemplate->InstanceTemplate();
-    objectTemplate->SetInternalFieldCount(2);
+    objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
     objectTemplate->SetAccessor(CV8Utils::ToV8String("z"), GetZ, SetZ);
     AddMethod<float, CVector>(objectTemplate, "getLenght", MethodGetLength);
     AddMethod<float, CVector>(objectTemplate, "getLenghtSquared", MethodGetLengthSquared);

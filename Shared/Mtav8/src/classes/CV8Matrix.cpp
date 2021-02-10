@@ -6,7 +6,7 @@ using namespace v8;
 void CV8Matrix::GetPosition(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     CVector         value = static_cast<CMatrix*>(ptr)->GetPosition();
     info.GetReturnValue().Set(CV8Vector3D::New(value).ToLocalChecked());
@@ -15,7 +15,7 @@ void CV8Matrix::GetPosition(Local<Name> property, const PropertyCallbackInfo<Val
 void CV8Matrix::SetPosition(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     CVector         vector;
     if (value->IsObject() && CV8Vector3D::Convert(Local<Object>::Cast(value), vector))
@@ -29,7 +29,7 @@ void CV8Matrix::SetPosition(Local<Name> property, Local<Value> value, const Prop
 void CV8Matrix::GetRotation(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     CVector         value = static_cast<CMatrix*>(ptr)->GetRotation();
     info.GetReturnValue().Set(CV8Vector3D::New(value * (180.0f / PI)).ToLocalChecked());
@@ -38,7 +38,7 @@ void CV8Matrix::GetRotation(Local<Name> property, const PropertyCallbackInfo<Val
 void CV8Matrix::SetRotation(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     CVector         vector;
     if (value->IsObject() && CV8Vector3D::Convert(Local<Object>::Cast(value), vector))
@@ -52,7 +52,7 @@ void CV8Matrix::SetRotation(Local<Name> property, Local<Value> value, const Prop
 void CV8Matrix::GetScale(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     CVector         value = static_cast<CMatrix*>(ptr)->GetScale();
     info.GetReturnValue().Set(CV8Vector3D::New(value).ToLocalChecked());
@@ -61,7 +61,7 @@ void CV8Matrix::GetScale(Local<Name> property, const PropertyCallbackInfo<Value>
 void CV8Matrix::SetScale(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     CVector         vector;
     if (value->IsObject() && CV8Vector3D::Convert(Local<Object>::Cast(value), vector))
@@ -94,8 +94,8 @@ void CV8Matrix::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     Persistent<Object> matrixObject = Persistent<Object>(isolate, wrapper);
 
     CMatrix* matrix = CreateGarbageCollected<CMatrix>(wrapper);
-    wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(1, External::New(isolate, matrix));
+    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
+    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, matrix));
 
     info.GetReturnValue().Set(matrixObject.Get(isolate));
 }
@@ -122,7 +122,7 @@ Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context)
     vector2dTemplate->SetLength(sizeof(CMatrix) / sizeof(CVector));
     vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
-    objectTemplate->SetInternalFieldCount(2);
+    objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
 
     objectTemplate->SetAccessor(CV8Utils::ToV8String("position"), GetPosition, SetPosition);
     objectTemplate->SetAccessor(CV8Utils::ToV8String("rotation"), GetRotation, SetRotation);

@@ -7,10 +7,35 @@ using namespace v8;
 
 static std::queue<std::string> modulesListName;            // Todo, get rid of this list
 
+class PHV : public v8::PersistentHandleVisitor
+{
+public:
+    v8::Isolate* isolate_;
+
+    PHV(v8::Isolate* isolate) : isolate_(isolate) {}
+    virtual ~PHV() {}
+
+    virtual void VisitPersistentHandle(v8::Persistent<v8::Value>* value, uint16_t class_id)
+    {
+        printf("VISIT\n");
+        // delete persistent handles on isolate disposal.
+        //if (class_id == HC_GARBAGE_COLLECTED_CLASS_ID)
+        //{
+        //    v8::HandleScope hs(isolate_);
+        //    Wrapper*        w =            // extract your wrapped object from
+        //                                   // the passed-in value object.
+        //        delete w;
+        //}
+    }
+};
+
 CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
+    //m_constraints.ConfigureDefaults(1024 * 1024 * 200, 0);
+    m_constraints.ConfigureDefaultsFromHeapSize(1024 * 1024 * 64, 1024 * 1024 * 66);
     m_strOriginResource = originResource;
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
+    m_createParams.constraints = m_constraints;
     m_pIsolate = Isolate::New(m_createParams);
     Locker lock(m_pIsolate);
 
@@ -19,6 +44,20 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 
     m_pIsolate->SetMicrotasksPolicy(MicrotasksPolicy::kExplicit);
     m_pIsolate->SetData(0, this);
+    m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
+    /*using NearHeapLimitCallback = size_t (*)(void* data, size_t current_heap_limit, size_t initial_heap_limit);*/
+    m_pIsolate->AddNearHeapLimitCallback(
+        [](void* data, size_t current_heap_limit, size_t initial_heap_limit) {
+            CV8Isolate* pIsolate = (CV8Isolate*)data;
+            int         increaseMB = 1024 * 1024 * 64;
+            printf("[V8 Debug] Heap limit reached. New limit: %iMB, Initial limit: %iMB Globals count: %i\n", (current_heap_limit + increaseMB) / 1024 / 1024,
+                   initial_heap_limit / 1024 / 1024, JavascriptWrapper::GetGlobalsCount());
+            //((Isolate*)data)->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
+            return (size_t)current_heap_limit + increaseMB;
+        },
+        this);
+    
+    m_pIsolate->EnableMemorySavingsMode();
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
     Context::Scope contextScope(m_context.Get(m_pIsolate));
@@ -301,7 +340,7 @@ void CV8Isolate::SetJsEvalSetting(eJsEval value)
 }
 void CV8Isolate::TerminateExecution()
 {
-    m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
+    //m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
 }
 
 Local<Object> CV8Isolate::CreateGlobalObject(const char* mapName)
@@ -344,7 +383,9 @@ void CV8Isolate::Evaluate()
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
     Context::Scope contextScope(m_context.Get(m_pIsolate));
-    
+
+    m_context.Get(m_pIsolate)->Enter();
+
     for (auto const& module : m_vecModules)
     {
         Local<Module> v8Module = module->m_module.Get(m_pIsolate);
@@ -370,6 +411,8 @@ void CV8Isolate::Evaluate()
             }
         }
     }
+
+    m_context.Get(m_pIsolate)->Exit();
 }
 
 CV8Isolate::~CV8Isolate()
@@ -378,7 +421,24 @@ CV8Isolate::~CV8Isolate()
         Locker         lock(m_pIsolate);
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
-        Context::Scope contextScope(m_context.Get(m_pIsolate));
+        Local<Context> thisContext = m_context.Get(m_pIsolate);
+        Context::Scope contextScope(thisContext);
+        
+        /*for (auto const& [index, persistent] : CV8BaseClass::m_mapPersistents)
+        {
+            auto objectContext = persistent->Get(m_pIsolate)->CreationContext();
+            if (objectContext == thisContext)
+            {
+                persistent->Empty();
+            }
+        }*/
+        // check failed i::FLAG_expose_gc
+        m_pIsolate->LowMemoryNotification();
+#if DEBUG
+        int before = JavascriptWrapper::GetGlobalsCount();
+        m_pIsolate->RequestGarbageCollectionForTesting(Isolate::GarbageCollectionType::kFullGarbageCollection);
+        printf("[V8 DEBUG] Garbage colledted: %i objects.\n", before - JavascriptWrapper::GetGlobalsCount());
+#endif
 
         m_global.Reset();
         m_context.Reset();

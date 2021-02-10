@@ -18,6 +18,11 @@ CV8::CV8()
     m_pPlatform = platform::NewDefaultPlatform(4);
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
+
+    #if DEBUG
+        V8::SetFlagsFromString("--expose-gc", 11);
+    #endif
+
     m_longExecutionGuardThread = std::thread([this]() {
         while (true)
         {

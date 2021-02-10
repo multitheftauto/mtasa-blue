@@ -6,7 +6,7 @@ using namespace v8;
 void CV8Vector4D::GetW(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     float           value = static_cast<CVector4D*>(ptr)->fW;
     info.GetReturnValue().Set(value);
@@ -69,8 +69,8 @@ void CV8Vector4D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     vector->fZ = z;
     vector->fW = w;
 
-    wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(1, External::New(isolate, vector));
+    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
+    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
 
     info.GetReturnValue().Set(wrapper);
 }
@@ -107,7 +107,7 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
     vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector4dTemplate->InstanceTemplate();
-    objectTemplate->SetInternalFieldCount(2);
+    objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
     objectTemplate->SetAccessor(CV8Utils::ToV8String("w"), GetW, SetW);
     objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));

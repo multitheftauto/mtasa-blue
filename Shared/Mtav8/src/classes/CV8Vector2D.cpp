@@ -6,7 +6,7 @@ using namespace v8;
 void CV8Vector2D::GetX(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     float           value = static_cast<CVector2D*>(ptr)->fX;
     info.GetReturnValue().Set(value);
@@ -15,7 +15,7 @@ void CV8Vector2D::GetX(Local<Name> property, const PropertyCallbackInfo<Value>& 
 void CV8Vector2D::SetX(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     static_cast<CVector2D*>(ptr)->fX = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
 }
@@ -23,7 +23,7 @@ void CV8Vector2D::SetX(Local<Name> property, Local<Value> value, const PropertyC
 void CV8Vector2D::GetY(Local<Name> property, const PropertyCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     float           value = static_cast<CVector2D*>(ptr)->fY;
     info.GetReturnValue().Set(value);
@@ -32,7 +32,7 @@ void CV8Vector2D::GetY(Local<Name> property, const PropertyCallbackInfo<Value>& 
 void CV8Vector2D::SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     static_cast<CVector2D*>(ptr)->fY = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
 }
@@ -89,18 +89,18 @@ void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     vector->fX = x;
     vector->fY = y;
 
-    wrapper->SetInternalField(0, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(1, External::New(isolate, vector));
+    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
+    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
     info.GetReturnValue().Set(wrapper);
 }
 
 
 bool CV8Vector2D::Convert(Local<Object> object, CVector2D& vector)
 {
-    Local<Number> type = Local<Number>::Cast(object->GetInternalField(0));
+    Local<Number> type = Local<Number>::Cast(object->GetInternalField(EInternalFieldPurpose::TypeOfClass));
     if (!type.IsEmpty() && type->Value() == (double)m_eClass)
     {
-        Local<External> wrap = Local<External>::Cast(object->GetInternalField(1));
+        Local<External> wrap = Local<External>::Cast(object->GetInternalField(EInternalFieldPurpose::PointerToValue));
         vector = *(CVector2D*)wrap->Value();
         return true;
     }
@@ -126,7 +126,7 @@ Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
     vector2dTemplate->SetLength(sizeof(CVector2D) / sizeof(float));
     vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
-    objectTemplate->SetInternalFieldCount(2);
+    objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
 
     objectTemplate->SetAccessor(CV8Utils::ToV8String("x"), GetX, SetX);
     objectTemplate->SetAccessor(CV8Utils::ToV8String("y"), GetY, SetY);
