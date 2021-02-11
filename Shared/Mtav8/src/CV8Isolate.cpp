@@ -59,15 +59,29 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     
     m_pIsolate->EnableMemorySavingsMode();
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
+
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
     Context::Scope contextScope(m_context.Get(m_pIsolate));
 
-    Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(m_pIsolate->GetCurrentContext());
-    Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(m_context.Get(m_pIsolate), vector2dTemplate);
-    Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(m_context.Get(m_pIsolate), vector3dTemplate);
-    Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(m_context.Get(m_pIsolate));
+    Local<Context> context = m_context.Get(m_pIsolate);
+    Local<Object>  global = context->Global();
+
+    InitSecurity();
+
+    Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(context);
+    Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(context, vector2dTemplate);
+    Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(context, vector3dTemplate);
+    Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(context);
+
 }
 
+void CV8Isolate::InitSecurity()
+{
+    Local<Context> context = m_context.Get(m_pIsolate);
+    Local<Object>  global = context->Global();
+    global->Set(context, CV8Utils::ToV8String("WebAssembly"), Undefined(m_pIsolate));
+
+}
 void CV8Isolate::DoPulse()
 {
     m_pIsolate->PerformMicrotaskCheckpoint();

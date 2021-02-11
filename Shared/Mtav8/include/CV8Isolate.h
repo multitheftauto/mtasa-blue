@@ -7,6 +7,9 @@ class CV8Isolate : public CV8IsolateBase
 public:
     CV8Isolate(CV8* pCV8, std::string& originResource);
     ~CV8Isolate();
+
+    void InitSecurity();
+
     void DoPulse();
 
     void               RunCode(std::string& code, std::string& originFileName);
