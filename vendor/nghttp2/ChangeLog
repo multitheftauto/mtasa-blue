@@ -1,0 +1,239 @@
+commit fb0bd22979711c89d92d98ac5db57ebc6f4fd148 (HEAD, tag: v1.43.0, origin/master, origin/HEAD, master)
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-02-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-02-02
+
+    Update manual pages
+
+commit 3dc6c0afa2ed8b80b1f219813539db28f70886a3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-02-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-02-02
+
+    Bump version number to 1.43.0
+
+commit e8762781a72bf9220ec4de4e1c540d046051bb0a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-02-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-02-02
+
+    Update AUTHORS
+
+commit 2bf841e22ae1fc27b9f4881cdc63020511ec047a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-01-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-01-17
+
+    workflow: Build with UBSAN enabled
+
+commit 7ebab98e91df1678da74b47d690a1b1c5f2ba2e2
+Merge: 43ba3125 23fc6cc9
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-12-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-29
+
+    Merge pull request #1548 from nghttp2/py3-bindings
+    
+    Py3 bindings
+
+commit 23fc6cc9002e34f9b771ee54286e559fa4eecaef
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Bump Linux runner OS to ubuntu 20.04
+
+commit 2e35cdea6ca3cdad3c111d1ca927d70dc29f9771
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Update doc
+
+commit 22af8e782bed98e4b4f71617c9b905dd37e7c3f3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Require python3 for python bindings
+
+commit c88e9100096330c5d4445bc8d7482d6ad2c75fce
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Update ax_python_devel.m4
+
+commit 43ba3125932c1d56addaeded2b7f62637af255cd
+Merge: 79a4f789 3c17299a
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-12-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-29
+
+    Merge pull request #1547 from nghttp2/sphinx-v3.3
+    
+    Sphinx v3.3
+
+commit 3c17299a925dc150fd7aa7e1534d4b1679fb397d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Update enum references
+
+commit a7ecff657cfbcc442bfc70d51efbad1b57a9be46
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Make doc generation work with sphinx v3.3
+
+commit 79a4f789a1453d8b916fbcfa43804184462bd11f
+Merge: 46536729 28ba0b37
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-12-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-29
+
+    Merge pull request #1546 from nghttp2/py3-scripts
+    
+    Python3 development scripts
+
+commit 28ba0b37e17e4daa901b622b0865dae61ee709a3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Update document reference
+
+commit 6b7ade9f3fb9ebb68bcb0c0911b2a831d4f10333
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-29
+
+    Require python3 for python scripts
+
+commit 465367294fbcd2029b09844c4859b5acaa3fbe87
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-28
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-28
+
+    Bump clang-format to 10
+
+commit 563c1173038a418165eebc27e61e4845eee3ca81
+Merge: 1c04ca80 d32e20bc
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-12-16
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-16
+
+    Merge pull request #1544 from nghttp2/nghttpx-clear-mcpool
+    
+    nghttpx: Make sure that Pool gets cleared when all buffers are returned
+
+commit 1c04ca80328434e8972726c9b26f524b4ee25a90
+Merge: 8b8ba6b0 d8c71d5f
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-12-16
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-16
+
+    Merge pull request #1540 from tavrez/patch-1
+    
+    Added new nghttp2_ksl.c to Windows makefile
+
+commit d32e20bcaa8c9f4f24b9d5c3885204b6414fc923
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-16
+
+    nghttpx: Make sure that Pool gets cleared when all buffers are returned
+
+commit 8b8ba6b0a61b58b2e40cb0325dbf49aca6fe62e2
+Merge: fb5b5aef 81fb0153
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-12-14
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-14
+
+    Merge pull request #1542 from nghttp2/nghttpx-check-sigalg
+    
+    nghttpx: Choose ECDSA cert if compatible signature algorithm available
+
+commit 81fb015391c7ba9218b87caa148f46c888a49368
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-12-13
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-12-13
+
+    nghttpx: Choose ECDSA cert if compatible signature algorithm available
+
+commit d8c71d5fdb6cd1579f2a569ccd7bdbdf9f776ea1
+Author:     Reza Tavakoli <9096461+tavrez@users.noreply.github.com>
+AuthorDate: 2020-12-02
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-12-02
+
+    Added new nghttp2_ksl.c to Windows makefile
+
+commit fb5b5aef0aca21142d867b45f8b425a1da32bc4d
+Merge: ffcdf5df 6787423e
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-11-27
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-11-27
+
+    Merge pull request #1537 from nghttp2/nghttpx-allow-colon-in-pattern
+    
+    nghttpx: Add workaround to include ':' in backend pattern
+
+commit 6787423edc7928ea778260e9c0c54b72f0a39770
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-11-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-11-27
+
+    nghttpx: Add workaround to include ':' in backend pattern
+
+commit ffcdf5dfbcfa9fa35a5501e0ea679bdf6181a88c
+Merge: c9d5472f 0cdb1738
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2020-11-24
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-11-24
+
+    Merge pull request #1533 from LorenzNickel/patch-1
+    
+    Fix typo in security.rst
+
+commit 0cdb173846f84ffff8035b83c1d9ddd4fe732fda
+Author:     Lorenz Nickel <lorenz.nickel@gmx.net>
+AuthorDate: 2020-11-23
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2020-11-23
+
+    Fix typo in security.rst
+
+commit c9d5472ffb5e7ec1214dd08d0afb4781c83725b2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2020-11-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2020-11-23
+
+    Bump version number to 1.43.0-DEV

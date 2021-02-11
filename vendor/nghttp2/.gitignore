@@ -1,0 +1,12 @@
+*
+!lib/
+!lib/includes/
+!lib/includes/nghttp2/
+!lib/includes/nghttp2/**.h
+!lib/**.h
+!lib/**.c
+!.gitignore
+!ChangeLog
+!config*.h
+!COPYING
+!premake5.lua

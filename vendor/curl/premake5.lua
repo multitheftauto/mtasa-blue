@@ -4,9 +4,11 @@ project "curl"
 	kind "StaticLib"
 	targetname "curl"
 
-	includedirs { "include", "lib", "../mbedtls/include", "../zlib" }
-	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H" }
+	includedirs { "include", "lib", "../nghttp2/lib/includes", "../mbedtls/include", "../zlib" }
+	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H", "USE_NGHTTP2" }
 	warnings "off"
+
+	links { "nghttp2" }
 
 	files {
 		"premake5.lua",
