@@ -13,9 +13,9 @@ public:
     v8::Isolate* isolate_;
 
     PHV(v8::Isolate* isolate) : isolate_(isolate) {}
-    virtual ~PHV() {}
+    ~PHV() {}
 
-    virtual void VisitPersistentHandle(v8::Persistent<v8::Value>* value, uint16_t class_id)
+    void VisitPersistentHandle(v8::Persistent<v8::Value>* value, uint16_t class_id)
     {
         printf("VISIT\n");
         // delete persistent handles on isolate disposal.
@@ -44,7 +44,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 
     m_pIsolate->SetMicrotasksPolicy(MicrotasksPolicy::kExplicit);
     m_pIsolate->SetData(0, this);
-    m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
+
     /*using NearHeapLimitCallback = size_t (*)(void* data, size_t current_heap_limit, size_t initial_heap_limit);*/
     m_pIsolate->AddNearHeapLimitCallback(
         [](void* data, size_t current_heap_limit, size_t initial_heap_limit) {
@@ -58,6 +58,8 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
         this);
     
     m_pIsolate->EnableMemorySavingsMode();
+    m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
+    m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
 
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
@@ -437,7 +439,7 @@ CV8Isolate::~CV8Isolate()
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_context.Get(m_pIsolate);
         Context::Scope contextScope(thisContext);
-        
+        thisContext->Enter();
         /*for (auto const& [index, persistent] : CV8BaseClass::m_mapPersistents)
         {
             auto objectContext = persistent->Get(m_pIsolate)->CreationContext();
@@ -447,6 +449,8 @@ CV8Isolate::~CV8Isolate()
             }
         }*/
         // check failed i::FLAG_expose_gc
+        m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
+        m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
         m_pIsolate->LowMemoryNotification();
 #if DEBUG
         int before = JavascriptWrapper::GetGlobalsCount();
@@ -465,6 +469,7 @@ CV8Isolate::~CV8Isolate()
         {
             module->m_module.Reset();
         }
+        thisContext->Exit();
     }
 
     delete m_createParams.array_buffer_allocator;

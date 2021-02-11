@@ -18,7 +18,7 @@ public:
     static bool                     Convert(Local<Object> object, CVector4D& vector);
 
 private:
-    static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
+    static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector4D* value);
 
     static void GetW(Local<Name> property, const PropertyCallbackInfo<Value>& info);
 

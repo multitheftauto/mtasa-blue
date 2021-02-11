@@ -71,30 +71,18 @@ void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
 {
     auto        isolate = Isolate::GetCurrent();
     HandleScope scope(isolate);
+    isolate->Enter();
 
     if (!ConstructorCallCheck(info))
         return;
 
     double              x, y, z;
     CV8FunctionCallback args(info);
-    if (!args.ReadNumber(x))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 1"));
-        return;
-    }
-    if (!args.ReadNumber(y))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 2"));
-        return;
-    }
-    if (!args.ReadNumber(z))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 3"));
-        return;
-    }
-    Local<Context>          context = isolate->GetCurrentContext();
+    args.ReadNumber(x);
+    args.ReadNumber(y);
+    args.ReadNumber(z);
+
     Local<Object>           wrapper = info.Holder();
-    ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
 
     CVector* vector = CreateGarbageCollected<CVector>(wrapper);
     vector->fX = x;
@@ -105,6 +93,7 @@ void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
     wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
     AttachGC(isolate, wrapper);
     info.GetReturnValue().Set(wrapper);
+    isolate->Exit();
 }
 
 bool CV8Vector3D::Convert(Local<Object> object, CVector& vector)

@@ -10,8 +10,8 @@ class CV8BaseClass
 public:
     enum EInternalFieldPurpose
     {
-        TypeOfClass, // Value is one of value from EClass
-        PointerToValue, // Values is a pointer to external value.
+        TypeOfClass,               // Value is one of value from EClass
+        PointerToValue,            // Values is a pointer to external value.
         Count,
     };
 
@@ -26,6 +26,9 @@ public:
 
     template <typename R, typename T>
     using MethodCallbackFunc = R (*)(CV8FunctionCallback& info, Local<Object> self, T* value);
+
+    template <typename T>
+    using ConstructorCallbackFunc = bool (*)(CV8FunctionCallback& info, Local<Object> self, T* value);
 
     template <typename R, typename T>
     static Local<FunctionTemplate> MethodCallback(MethodCallbackFunc<R, T> callbackFunc)
@@ -92,7 +95,8 @@ public:
         assert(isolate);
         T* value = Allocate<T>(isolate);
 
-        //AttachGC(object, sizeof(T));
+        // AttachGC(object, sizeof(T));
+        object->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, value));
         return value;
     }
 
@@ -114,23 +118,50 @@ public:
     {
         objectTemplate->Set(CV8Utils::ToV8String(name), MethodCallback<R, T>(callback));
     }
+
+    template <typename T>
+    static void SetConstructor(Handle<FunctionTemplate> objectTemplate, ConstructorCallbackFunc<T> callback)
+    {
+        objectTemplate->SetCallHandler(
+            [](const FunctionCallbackInfo<Value>& info) {
+                auto                       isolate = Isolate::GetCurrent();
+                HandleScope                scope(isolate);
+                Local<External>            data = info.Data().As<External>();
+                ConstructorCallbackFunc<T> cb = (ConstructorCallbackFunc<T>)data->Value();
+                isolate->Enter();
+
+                if (!ConstructorCallCheck(info))
+                    return;
+
+                CV8FunctionCallback args(info);
+
+                Local<Object> wrapper = info.Holder();
+                T*            value = CreateGarbageCollected<T>(wrapper);
+                if (cb(args, wrapper, value))
+                {
+                    info.GetReturnValue().Set(wrapper);
+                    isolate->Exit();
+                    return;
+                }
+
+                // Here we are expecting exception to be thrown
+                isolate->Exit();
+            },
+            External::New(Isolate::GetCurrent(), callback));
+    }
 };
 
 class JavascriptWrapper
 {
-
 private:
     static std::map<int, JavascriptWrapper*> m_pGlobals;
     static int                               i;
 
     Global<Object> wrapper;
 
-    static void weakCallbackForObjectHolder(const WeakCallbackInfo<JavascriptWrapper>& data)
-    {
-        delete data.GetParameter();
-    }
+    static void weakCallbackForObjectHolder(const WeakCallbackInfo<JavascriptWrapper>& data) { delete data.GetParameter(); }
 
-    int m_pId;
+    int   m_pId;
     void* m_pExternalData;
 
 public:

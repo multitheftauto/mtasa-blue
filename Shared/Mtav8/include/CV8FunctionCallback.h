@@ -8,8 +8,46 @@ public:
     // Returns current argument index for error purpose
     int GetArgumentIndex() const { return m_iIndex; };
     // Return true when one of "read" method failed while reading argument.
-    bool HasError() const { return bHasError; };
+    bool     HasError() const { return bHasError; };
     Isolate* GetIsolate() const { return m_callback.GetIsolate(); };
+
+    template <typename T>
+    constexpr bool Read(T& arg)
+    {
+        if (CountArguments() == 0)
+        {
+            GetIsolate()->ThrowException(CV8Utils::ToV8String("Expected 1 argument, got 0 arguments."));
+
+            return false; 
+        }
+        using rawT = std::remove_reference_t<T>;
+        if constexpr (std::is_same<rawT, double>::value)
+        {
+            return ReadNumber(arg);
+        }
+        else
+            static_assert(false && "Unimplemented read type");
+    }
+
+    template <typename T, typename... Ty>
+    constexpr bool Read(T& arg, Ty&... args)
+    {
+        if (1 + sizeof...(args) > CountArguments())
+        {
+            auto exception = std::string("Expected ") + std::to_string(CountArguments()) + std::string(" argument, got ") + std::to_string(1 + sizeof...(args));
+            GetIsolate()->ThrowException(CV8Utils::ToV8String(exception));
+            return false;
+        }
+        if (Read(arg))
+        {
+            if (sizeof...(args) > 0)
+            {
+                return Read(args...);
+            }
+        }
+        return true;
+    }
+
     bool ReadString(std::string& value, bool strict = true);
     bool ReadNumber(double& value);
     bool ReadVector(CVector2D& value);
@@ -61,6 +99,6 @@ private:
         return false;
     }
     const FunctionCallbackInfo<Value>& m_callback;
-    int                                m_iIndex = 0;
+    mutable int                        m_iIndex = 0;
     bool                               bHasError = false;
 };

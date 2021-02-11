@@ -15,7 +15,7 @@ void CV8Vector4D::GetW(Local<Name> property, const PropertyCallbackInfo<Value>& 
 void CV8Vector4D::SetW(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
     static_cast<CVector4D*>(ptr)->fW = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
 }
@@ -23,64 +23,31 @@ void CV8Vector4D::SetW(Local<Name> property, Local<Value> value, const PropertyC
 void CV8Vector4D::MethodGetLength(const FunctionCallbackInfo<Value>& info)
 {
     Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
     void*           ptr = wrap->Value();
-    CVector4D*        value = static_cast<CVector4D*>(ptr);
+    CVector4D*      value = static_cast<CVector4D*>(ptr);
     info.GetReturnValue().Set(value->Length());
 }
 
-void CV8Vector4D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
+bool CV8Vector4D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector4D* value)
 {
-    auto        isolate = Isolate::GetCurrent();
-    HandleScope scope(isolate);
-
-    if (!ConstructorCallCheck(info))
-        return;
-
-    double              x, y, z, w;
-    CV8FunctionCallback args(info);
-    if (!args.ReadNumber(x))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 1"));
-        return;
-    }
-    if (!args.ReadNumber(y))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 2"));
-        return;
-    }
-    if (!args.ReadNumber(z))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 3"));
-        return;
-    }
-    if (!args.ReadNumber(w))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 4"));
-        return;
-    }
-    Local<Context>          context = isolate->GetCurrentContext();
-    Local<Object>           wrapper = info.Holder();
-    ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
-
-    CVector4D* vector = CreateGarbageCollected<CVector4D>(wrapper);
-    vector->fX = x;
-    vector->fY = y;
-    vector->fZ = z;
-    vector->fW = w;
-
-    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
-
-    info.GetReturnValue().Set(wrapper);
+    double x, y, z, w;
+    if (!info.Read(x, y, z, w))
+        return false;
+    value->fX = x;
+    value->fY = y;
+    value->fZ = z;
+    value->fW = w;
+    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    return true;
 }
 
 bool CV8Vector4D::Convert(Local<Object> object, CVector4D& vector)
 {
-    Local<Number> type = Local<Number>::Cast(object->GetInternalField(0));
+    Local<Number> type = Local<Number>::Cast(object->GetInternalField(EInternalFieldPurpose::TypeOfClass));
     if (!type.IsEmpty() && type->Value() == (double)m_eClass)
     {
-        Local<External> wrap = Local<External>::Cast(object->GetInternalField(1));
+        Local<External> wrap = Local<External>::Cast(object->GetInternalField(EInternalFieldPurpose::PointerToValue));
         vector = *(CVector4D*)wrap->Value();
         return true;
     }
@@ -89,7 +56,7 @@ bool CV8Vector4D::Convert(Local<Object> object, CVector4D& vector)
 
 MaybeLocal<Object> CV8Vector4D::New(CVector4D vector)
 {
-    Isolate*             isolate = Isolate::GetCurrent();
+    Isolate* isolate = Isolate::GetCurrent();
     assert(isolate);
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Object>   object = CV8Utils::NewObject(m_szName, vector.fX, vector.fY, vector.fZ, vector.fW);
@@ -103,7 +70,8 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
 
     Handle<FunctionTemplate> vector4dTemplate = FunctionTemplate::New(isolate);
     vector4dTemplate->Inherit(parent);
-    vector4dTemplate->SetCallHandler(ConstructorCall);
+    SetConstructor(vector4dTemplate, ConstructorCall);
+
     vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
     vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector4dTemplate->InstanceTemplate();

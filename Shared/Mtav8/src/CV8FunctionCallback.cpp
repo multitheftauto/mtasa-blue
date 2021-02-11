@@ -31,6 +31,8 @@ bool CV8FunctionCallback::ReadString(std::string& value, bool strict)
         value = std::string(*str);
         return true;
     }
+    m_iIndex++;
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(std::string("Expected String at argument ") + std::to_string(m_iIndex)));
     return false;
 }
 
@@ -45,7 +47,8 @@ bool CV8FunctionCallback::ReadNumber(double& value)
             return true;
         }
     }
-    bHasError = true;
+    m_iIndex++;
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(std::string("Expected number at argument ") + std::to_string(m_iIndex)));
     return false;
 }
 
@@ -58,7 +61,8 @@ bool CV8FunctionCallback::ReadVector(CVector& value)
             return ReadClass(CV8Vector3D::m_eClass, value);
         }
     }
-    bHasError = true;
+    m_iIndex++;
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(std::string("Expected Vector3 at argument ") + std::to_string(m_iIndex)));
     return false;
 }
 
@@ -71,7 +75,8 @@ bool CV8FunctionCallback::ReadVector(CVector2D& value)
             return ReadClass(CV8Vector2D::m_eClass, value);
         }
     }
-    bHasError = true;
+    m_iIndex++;
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(std::string("Expected Vector3 at argument ") + std::to_string(m_iIndex)));
     return false;
 }
 
@@ -84,7 +89,8 @@ bool CV8FunctionCallback::ReadVector(CVector4D& value)
             return ReadClass(CV8Vector4D::m_eClass, value);
         }
     }
-    bHasError = true;
+    m_iIndex++;
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(std::string("Expected Vector4 at argument ") + std::to_string(m_iIndex)));
     return false;
 }
 
