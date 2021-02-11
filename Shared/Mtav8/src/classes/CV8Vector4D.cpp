@@ -3,21 +3,14 @@
 
 using namespace v8;
 
-void CV8Vector4D::GetW(Local<Name> property, const PropertyCallbackInfo<Value>& info)
+float CV8Vector4D::GetW(CVector4D* internalValue)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    float           value = static_cast<CVector4D*>(ptr)->fW;
-    info.GetReturnValue().Set(value);
+    return internalValue->fW;
 }
 
-void CV8Vector4D::SetW(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
+void CV8Vector4D::SetW(CVector4D* internalValue, float value)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    static_cast<CVector4D*>(ptr)->fW = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+    internalValue->fW = value;
 }
 
 void CV8Vector4D::MethodGetLength(const FunctionCallbackInfo<Value>& info)
@@ -71,12 +64,12 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     Handle<FunctionTemplate> vector4dTemplate = FunctionTemplate::New(isolate);
     vector4dTemplate->Inherit(parent);
     SetConstructor(vector4dTemplate, ConstructorCall);
-
+    //SetAccessor(vector4dTemplate , "w", GetW, SetW);
     vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
     vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector4dTemplate->InstanceTemplate();
+    SetAccessor(objectTemplate, "w", GetW, SetW);
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
-    objectTemplate->SetAccessor(CV8Utils::ToV8String("w"), GetW, SetW);
     objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
     context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector4dTemplate->GetFunction(context).ToLocalChecked());

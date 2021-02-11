@@ -20,9 +20,8 @@ public:
 private:
     static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector4D* value);
 
-    static void GetW(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-
-    static void SetW(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
+    static float GetW(CVector4D* internalValue);
+    static void  SetW(CVector4D* internalValue, float value);
 
     static void MethodGetLength(const FunctionCallbackInfo<Value>& info);
 };

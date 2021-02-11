@@ -30,6 +30,12 @@ public:
     template <typename T>
     using ConstructorCallbackFunc = bool (*)(CV8FunctionCallback& info, Local<Object> self, T* value);
 
+    template <typename T, typename V>
+    using SetterCallbackFunc = void (*)(T* internalValue, V value);
+
+    template <typename T, typename V>
+    using GetterCallbackFunc = V (*)(T* internalValue);
+
     template <typename R, typename T>
     static Local<FunctionTemplate> MethodCallback(MethodCallbackFunc<R, T> callbackFunc)
     {
@@ -117,6 +123,54 @@ public:
     static void AddMethod(Local<ObjectTemplate> objectTemplate, const char* name, MethodCallbackFunc<R, T> callback)
     {
         objectTemplate->Set(CV8Utils::ToV8String(name), MethodCallback<R, T>(callback));
+    }
+
+    template <typename T, typename V>            // Type of internal value, type of modified field
+    static void SetAccessor(Local<ObjectTemplate> objectTemplate, const char* name, GetterCallbackFunc<T, V> getterCallback,
+                            SetterCallbackFunc<T, V> setterCallback)
+    {
+        auto         externalGetter = External::New(Isolate::GetCurrent(), getterCallback);
+        auto         externalSetter = External::New(Isolate::GetCurrent(), setterCallback);
+        Local<Array> getterSetter = Array::New(Isolate::GetCurrent(), 2);
+        getterSetter->Set(Isolate::GetCurrent()->GetCurrentContext(), 0, externalGetter);
+        getterSetter->Set(Isolate::GetCurrent()->GetCurrentContext(), 1, externalSetter);
+        objectTemplate->SetAccessor(
+            CV8Utils::ToV8String(name),
+            [](Local<Name> property, const PropertyCallbackInfo<Value>& info) {
+                Local<Object>   self = info.Holder();
+                Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
+                void*           ptr = wrap->Value();
+                T*              internalValue = static_cast<T*>(ptr);
+
+                Local<Array>             data = info.Data().As<Array>();
+                Local<External>          externalData = data->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
+                GetterCallbackFunc<T, V> cb = (GetterCallbackFunc<T, V>)(externalData->Value());
+                V                        result = cb(internalValue);
+                info.GetReturnValue().Set(result);
+            },
+            [](Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info) {
+                Local<Object>   self = info.Holder();
+                Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
+                void*           ptr = wrap->Value();
+                T*              internalValue = static_cast<T*>(ptr);
+
+                Local<Array>             data = info.Data().As<Array>();
+                Local<External>          externalData = data->Get(info.GetIsolate()->GetCurrentContext(), 1).ToLocalChecked().As<External>();
+                SetterCallbackFunc<T, V> cb = (SetterCallbackFunc<T, V>)(externalData->Value());
+
+                V argument;
+                if constexpr (std::is_same_v<V, double>)
+                {
+                    argument = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+                }
+                else if constexpr (std::is_same_v<V, float>)
+                {
+                    argument = (float)value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+                }
+
+                cb(internalValue, argument);
+            },
+            getterSetter);
     }
 
     template <typename T>
