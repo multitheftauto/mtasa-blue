@@ -12,17 +12,16 @@ public:
 
     static Handle<FunctionTemplate> CreateTemplate(Local<Context> context);
 
-
     static MaybeLocal<Object> New(CVector2D vector);
-    static bool Convert(Local<Object> object, CVector2D& vector);
+    static bool               Convert(Local<Object> object, CVector2D& vector);
 
 private:
-    static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
+    static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector2D* value);
 
-    static void GetX(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-    static void SetX(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
-    static void GetY(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-    static void SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
+    static float GetX(CVector2D* internalValue);
+    static void  SetX(CVector2D* internalValue, float value);
+    static float GetY(CVector2D* internalValue);
+    static void  SetY(CVector2D* internalValue, float value);
 
     static float MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);
     static float MethodGetLengthSquared(CV8FunctionCallback& info, Local<Object> self, CVector2D* value);

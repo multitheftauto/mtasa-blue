@@ -3,38 +3,24 @@
 
 using namespace v8;
 
-void CV8Vector2D::GetX(Local<Name> property, const PropertyCallbackInfo<Value>& info)
+float CV8Vector2D::GetX(CVector2D* internalValue)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    float           value = static_cast<CVector2D*>(ptr)->fX;
-    info.GetReturnValue().Set(value);
+    return internalValue->fX;
 }
 
-void CV8Vector2D::SetX(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
+void CV8Vector2D::SetX(CVector2D* internalValue, float value)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    static_cast<CVector2D*>(ptr)->fX = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+    internalValue->fX = value;
 }
 
-void CV8Vector2D::GetY(Local<Name> property, const PropertyCallbackInfo<Value>& info)
+float CV8Vector2D::GetY(CVector2D* internalValue)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    float           value = static_cast<CVector2D*>(ptr)->fY;
-    info.GetReturnValue().Set(value);
+    return internalValue->fY;
 }
 
-void CV8Vector2D::SetY(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
+void CV8Vector2D::SetY(CVector2D* internalValue, float value)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    static_cast<CVector2D*>(ptr)->fY = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+    internalValue->fY = value;
 }
 
 float CV8Vector2D::MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector2D* value)
@@ -55,7 +41,7 @@ bool CV8Vector2D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self,
 
 float CV8Vector2D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector2D* value)
 {
-    CVector2D           other;
+    CVector2D other;
     if (!info.ReadVector(other))
     {
         throw std::invalid_argument("Expected vector at argument 1");
@@ -63,37 +49,16 @@ float CV8Vector2D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> sel
     return value->DotProduct(other);
 }
 
-void CV8Vector2D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
+bool CV8Vector2D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector2D* value)
 {
-    Isolate*    isolate = info.GetIsolate();
-    HandleScope handleScope(isolate);
-    if (!ConstructorCallCheck(info))
-        return;
-
-    double              x, y;
-    CV8FunctionCallback args(info);
-    if (!args.ReadNumber(x))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 1"));
-        return;
-    }
-    if (!args.ReadNumber(y))
-    {
-        isolate->ThrowException(CV8Utils::ToV8String("Expected number at argument 2"));
-        return;
-    }
-    Local<Context> context = isolate->GetCurrentContext();
-    Local<Object>  wrapper = info.Holder();
-
-    CVector2D* vector = CreateGarbageCollected<CVector2D>(wrapper);
-    vector->fX = x;
-    vector->fY = y;
-
-    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
-    info.GetReturnValue().Set(wrapper);
+    double x, y;
+    if (!info.Read(x, y))
+        return false;
+    value->fX = x;
+    value->fY = y;
+    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    return true;
 }
-
 
 bool CV8Vector2D::Convert(Local<Object> object, CVector2D& vector)
 {
@@ -118,23 +83,23 @@ MaybeLocal<Object> CV8Vector2D::New(CVector2D vector)
 
 Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
 {
-    Isolate*                 isolate = context->GetIsolate();
-    v8::EscapableHandleScope handleScope{isolate};
+    Isolate*             isolate = context->GetIsolate();
+    EscapableHandleScope handleScope{isolate};
 
     Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
-    vector2dTemplate->SetCallHandler(ConstructorCall);
+    SetConstructor(vector2dTemplate, ConstructorCall);
     vector2dTemplate->SetLength(sizeof(CVector2D) / sizeof(float));
     vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
 
-    objectTemplate->SetAccessor(CV8Utils::ToV8String("x"), GetX, SetX);
-    objectTemplate->SetAccessor(CV8Utils::ToV8String("y"), GetY, SetY);
+    SetAccessor(objectTemplate, "x", GetX, SetX);
+    SetAccessor(objectTemplate, "y", GetY, SetY);
 
-    AddMethod<float, CVector2D>(objectTemplate, "getLenght", MethodGetLength);
-    AddMethod<float, CVector2D>(objectTemplate, "getLengthSquared", MethodGetLengthSquared);
-    AddMethod<bool, CVector2D>(objectTemplate, "normalize", MethodNormalize);
-    AddMethod<float, CVector2D>(objectTemplate, "dotProduct", MethodDotProduct);
+    AddMethod(objectTemplate, "getLenght", MethodGetLength);
+    AddMethod(objectTemplate, "getLengthSquared", MethodGetLengthSquared);
+    AddMethod(objectTemplate, "normalize", MethodNormalize);
+    AddMethod(objectTemplate, "dotProduct", MethodDotProduct);
 
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
     context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector2dTemplate->GetFunction(context).ToLocalChecked());

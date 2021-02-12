@@ -1,6 +1,6 @@
 #include "StdInc.h"
 
-    // Common checks
+// Common checks
 bool CV8BaseClass::ConstructorCallCheck(const FunctionCallbackInfo<Value>& info)
 {
     if (!info.IsConstructCall())
@@ -17,7 +17,7 @@ void CV8BaseClass::AttachGC(Isolate* isolate, Local<Object> object)
 }
 
 std::map<int, JavascriptWrapper*> JavascriptWrapper::m_pGlobals;
-int JavascriptWrapper::i;
+int                               JavascriptWrapper::i;
 
 int JavascriptWrapper::GetGlobalsCount()
 {

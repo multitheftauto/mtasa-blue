@@ -14,7 +14,7 @@ public:
     void                                 Run();
 
 private:
-    void Resolve(v8::Local<v8::Value> value);
+    void Resolve(Local<Value> value);
 
     CV8Isolate*           m_pIsolate;
     Local<Promise>        m_promise;

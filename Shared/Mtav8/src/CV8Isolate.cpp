@@ -7,21 +7,21 @@ using namespace v8;
 
 static std::queue<std::string> modulesListName;            // Todo, get rid of this list
 
-class PHV : public v8::PersistentHandleVisitor
+class PHV : public PersistentHandleVisitor
 {
 public:
-    v8::Isolate* isolate_;
+    Isolate* isolate_;
 
-    PHV(v8::Isolate* isolate) : isolate_(isolate) {}
+    PHV(Isolate* isolate) : isolate_(isolate) {}
     ~PHV() {}
 
-    void VisitPersistentHandle(v8::Persistent<v8::Value>* value, uint16_t class_id)
+    void VisitPersistentHandle(Persistent<Value>* value, uint16_t class_id)
     {
         printf("VISIT\n");
         // delete persistent handles on isolate disposal.
-        //if (class_id == HC_GARBAGE_COLLECTED_CLASS_ID)
+        // if (class_id == HC_GARBAGE_COLLECTED_CLASS_ID)
         //{
-        //    v8::HandleScope hs(isolate_);
+        //    HandleScope hs(isolate_);
         //    Wrapper*        w =            // extract your wrapped object from
         //                                   // the passed-in value object.
         //        delete w;
@@ -31,7 +31,7 @@ public:
 
 CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
-    //m_constraints.ConfigureDefaults(1024 * 1024 * 200, 0);
+    // m_constraints.ConfigureDefaults(1024 * 1024 * 200, 0);
     m_constraints.ConfigureDefaultsFromHeapSize(1024 * 1024 * 64, 1024 * 1024 * 66);
     m_strOriginResource = originResource;
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
@@ -56,7 +56,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
             return (size_t)current_heap_limit + increaseMB;
         },
         this);
-    
+
     m_pIsolate->EnableMemorySavingsMode();
     m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
     m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
@@ -74,7 +74,6 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(context, vector2dTemplate);
     Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(context, vector3dTemplate);
     Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(context);
-
 }
 
 void CV8Isolate::InitSecurity()
@@ -82,7 +81,6 @@ void CV8Isolate::InitSecurity()
     Local<Context> context = m_context.Get(m_pIsolate);
     Local<Object>  global = context->Global();
     global->Set(context, CV8Utils::ToV8String("WebAssembly"), Undefined(m_pIsolate));
-
 }
 void CV8Isolate::DoPulse()
 {
@@ -104,7 +102,7 @@ void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
 
 void CV8Isolate::ReportException(TryCatch* pTryCatch)
 {
-    v8::HandleScope handle_scope(m_pIsolate);
+    HandleScope handle_scope(m_pIsolate);
 
     if (pTryCatch->HasTerminated())
     {
@@ -123,13 +121,13 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
     {
         printf("%s: '%s'\n", m_strOriginResource.c_str(), *utf8);
     }
-    v8::Local<v8::Value> stackTraceStringV8;
+    Local<Value> stackTraceStringV8;
     if (pTryCatch->StackTrace(m_pIsolate->GetCurrentContext()).ToLocal(&stackTraceStringV8))
     {
-        if (stackTraceStringV8->IsString() && v8::Local<v8::String>::Cast(stackTraceStringV8)->Length() > 0)
+        if (stackTraceStringV8->IsString() && Local<String>::Cast(stackTraceStringV8)->Length() > 0)
         {
-            v8::String::Utf8Value stackTrace(m_pIsolate, stackTraceStringV8);
-            std::string           strStackTrace = std::string(*stackTrace);
+            String::Utf8Value stackTrace(m_pIsolate, stackTraceStringV8);
+            std::string       strStackTrace = std::string(*stackTrace);
             strStackTrace.erase(0, strStackTrace.find("\n") + 1);
             printf("%s\n", strStackTrace.c_str());
         }
@@ -148,7 +146,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
         CV8::RegisterAllModules(this);
         return CV8::GetDummyModule(pIsolate);
     }
-    
+
     if (!strcmp(*importName, V8Config::szMtaImportAllFunctions))
     {
         CV8::RegisterAllModulesInGlobalNamespace(this);
@@ -249,7 +247,7 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
         const char* szName = originFileName.c_str();
         m_mapScriptModules[szName] = Global<Module>(m_pIsolate, module);
 
-        // Result always will true due i'm faking every module is always availiable
+        // Result always true even module does not exists.
         Maybe<bool> result = module->InstantiateModule(
             m_context.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
                 String::Utf8Value  importName(context->GetIsolate(), specifier);
@@ -320,7 +318,7 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
         stream << "[JS Error] Failed to resolve " << iMissingModules << " modules in resource \"" << m_strOriginResource << "\".\n";
     }
 
-    int limit = 4; // Display only first 4 modules
+    int limit = 4;            // Display only first 4 modules
     for (auto const& missingModules : m_mapMissingModules)
     {
         stream << "\t in " << missingModules.first << ": ";
@@ -351,12 +349,11 @@ void CV8Isolate::SetJsEvalSetting(eJsEval value)
             assert(false && "unimplemented eval setting");
         default:
             assert(false && "unimplemented eval setting");
-
     }
 }
 void CV8Isolate::TerminateExecution()
 {
-    //m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
+    // m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
 }
 
 Local<Object> CV8Isolate::CreateGlobalObject(const char* mapName)
@@ -419,7 +416,7 @@ void CV8Isolate::Evaluate()
         Local<Module> v8Module = module->m_module.Get(m_pIsolate);
         if (Module::Status::kInstantiated == v8Module->GetStatus())
         {
-            Local<Value>  val;
+            Local<Value> val;
             if (!v8Module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&val))
             {
                 ReportException(&evaluateTryCatch);

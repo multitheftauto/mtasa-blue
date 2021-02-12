@@ -13,13 +13,27 @@ void CV8Vector4D::SetW(CVector4D* internalValue, float value)
     internalValue->fW = value;
 }
 
-void CV8Vector4D::MethodGetLength(const FunctionCallbackInfo<Value>& info)
+float CV8Vector4D::MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector4D* value)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    CVector4D*      value = static_cast<CVector4D*>(ptr);
-    info.GetReturnValue().Set(value->Length());
+    return value->Length();
+}
+
+float CV8Vector4D::MethodGetLengthSquared(CV8FunctionCallback& info, Local<Object> self, CVector4D* value)
+{
+    return value->LengthSquared();
+}
+
+void CV8Vector4D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector4D* value)
+{
+    value->Normalize();
+}
+
+void CV8Vector4D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector4D* value)
+{
+    CVector4D other;
+    if (!info.Read(other))
+        return;
+    value->DotProduct(other);
 }
 
 bool CV8Vector4D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector4D* value)
@@ -64,13 +78,18 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     Handle<FunctionTemplate> vector4dTemplate = FunctionTemplate::New(isolate);
     vector4dTemplate->Inherit(parent);
     SetConstructor(vector4dTemplate, ConstructorCall);
-    //SetAccessor(vector4dTemplate , "w", GetW, SetW);
+
     vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
     vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector4dTemplate->InstanceTemplate();
-    SetAccessor(objectTemplate, "w", GetW, SetW);
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
-    objectTemplate->Set(CV8Utils::ToV8String("getLength"), FunctionTemplate::New(isolate, MethodGetLength));
+
+    SetAccessor(objectTemplate, "w", GetW, SetW);
+    AddMethod(objectTemplate, "getLength", MethodGetLength);
+    AddMethod(objectTemplate, "getLengthSquared", MethodGetLengthSquared);
+    AddMethod(objectTemplate, "normalize", MethodNormalize);
+    AddMethod(objectTemplate, "dotProduct", MethodDotProduct);
+
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
     context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector4dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector4dTemplate);

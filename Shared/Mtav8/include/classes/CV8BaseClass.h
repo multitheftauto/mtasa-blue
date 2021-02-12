@@ -129,14 +129,16 @@ public:
     static void SetAccessor(Local<ObjectTemplate> objectTemplate, const char* name, GetterCallbackFunc<T, V> getterCallback,
                             SetterCallbackFunc<T, V> setterCallback)
     {
-        auto         externalGetter = External::New(Isolate::GetCurrent(), getterCallback);
-        auto         externalSetter = External::New(Isolate::GetCurrent(), setterCallback);
-        Local<Array> getterSetter = Array::New(Isolate::GetCurrent(), 2);
-        getterSetter->Set(Isolate::GetCurrent()->GetCurrentContext(), 0, externalGetter);
-        getterSetter->Set(Isolate::GetCurrent()->GetCurrentContext(), 1, externalSetter);
+        Isolate*     isolate = Isolate::GetCurrent();
+        auto         externalGetter = External::New(isolate, getterCallback);
+        auto         externalSetter = External::New(isolate, setterCallback);
+        Local<Array> getterSetter = Array::New(isolate, 2);
+        getterSetter->Set(isolate->GetCurrentContext(), 0, externalGetter);
+        getterSetter->Set(isolate->GetCurrentContext(), 1, externalSetter);
         objectTemplate->SetAccessor(
             CV8Utils::ToV8String(name),
             [](Local<Name> property, const PropertyCallbackInfo<Value>& info) {
+                Isolate*        isolate = info.GetIsolate();
                 Local<Object>   self = info.Holder();
                 Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
                 void*           ptr = wrap->Value();
@@ -146,26 +148,44 @@ public:
                 Local<External>          externalData = data->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
                 GetterCallbackFunc<T, V> cb = (GetterCallbackFunc<T, V>)(externalData->Value());
                 V                        result = cb(internalValue);
-                info.GetReturnValue().Set(result);
+                if constexpr (std::is_same_v<V, bool>)
+                {
+                    info.GetReturnValue().Set(Boolean::New(isolate, result));
+                }
+                else if constexpr (std::is_same_v<V, CVector2D>)
+                {
+                    info.GetReturnValue().Set(CV8Vector2D::New(result).ToLocalChecked());
+                }
+                else if constexpr (std::is_same_v<V, CVector>)
+                {
+                    info.GetReturnValue().Set(CV8Vector3D::New(result).ToLocalChecked());
+                }
+                else if constexpr (std::is_same_v<V, CVector4D>)
+                {
+                    info.GetReturnValue().Set(CV8Vector4D::New(result).ToLocalChecked());
+                }
+                else
+                    info.GetReturnValue().Set(result);
             },
             [](Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info) {
+                Isolate*        isolate = info.GetIsolate();
                 Local<Object>   self = info.Holder();
                 Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
                 void*           ptr = wrap->Value();
                 T*              internalValue = static_cast<T*>(ptr);
 
                 Local<Array>             data = info.Data().As<Array>();
-                Local<External>          externalData = data->Get(info.GetIsolate()->GetCurrentContext(), 1).ToLocalChecked().As<External>();
+                Local<External>          externalData = data->Get(isolate->GetCurrentContext(), 1).ToLocalChecked().As<External>();
                 SetterCallbackFunc<T, V> cb = (SetterCallbackFunc<T, V>)(externalData->Value());
 
                 V argument;
                 if constexpr (std::is_same_v<V, double>)
                 {
-                    argument = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+                    argument = value->NumberValue(isolate->GetCurrentContext()).ToChecked();
                 }
                 else if constexpr (std::is_same_v<V, float>)
                 {
-                    argument = (float)value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+                    argument = (float)value->NumberValue(isolate->GetCurrentContext()).ToChecked();
                 }
 
                 cb(internalValue, argument);

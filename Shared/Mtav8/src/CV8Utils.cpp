@@ -47,6 +47,6 @@ MaybeLocal<Value> CV8Utils::GetClassByName(const char* className)
             }
         }
     }
-    
+
     return handleScope.EscapeMaybe(MaybeLocal<Value>());
 }

@@ -3,21 +3,14 @@
 
 using namespace v8;
 
-void CV8Vector3D::GetZ(Local<Name> property, const PropertyCallbackInfo<Value>& info)
+float CV8Vector3D::GetZ(CVector* internalValue)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    float           value = static_cast<CVector*>(ptr)->fZ;
-    info.GetReturnValue().Set(value);
+    return internalValue->fZ;
 }
 
-void CV8Vector3D::SetZ(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info)
+void CV8Vector3D::SetZ(CVector* internalValue, float value)
 {
-    Local<Object>   self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-    void*           ptr = wrap->Value();
-    static_cast<CVector*>(ptr)->fZ = value->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked();
+    internalValue->fZ = value;
 }
 
 float CV8Vector3D::MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector* value)
@@ -30,35 +23,19 @@ float CV8Vector3D::MethodGetLengthSquared(CV8FunctionCallback& info, Local<Objec
     return value->LengthSquared();
 }
 
-//CVector CV8Vector3D::MethodCrossProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value)
-//{
-//    CVector other;
-//    if (!info.ReadVector(other))
-//    {
-//        throw std::invalid_argument("Expected vector at argument 1");
-//    }
-//    CVector thisValue = CVector(value->fX, value->fY, value->fZ);
-//    other.CrossProduct(&thisValue);
-//    return other;
-//}
-
 void CV8Vector3D::MethodCrossProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value)
 {
     CVector other;
-    if (!info.ReadVector(other))
-    {
-        throw std::invalid_argument("Expected vector at argument 1");
-    }
+    if (!info.Read(other))
+        return;
     value->CrossProduct(&other);
 }
 
 void CV8Vector3D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value)
 {
     CVector other;
-    if (!info.ReadVector(other))
-    {
-        throw std::invalid_argument("Expected vector at argument 1");
-    }
+    if (!info.Read(other))
+        return;
     value->DotProduct(&other);
 }
 
@@ -67,33 +44,16 @@ void CV8Vector3D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self,
     value->Normalize();
 }
 
-void CV8Vector3D::ConstructorCall(const FunctionCallbackInfo<Value>& info)
+bool CV8Vector3D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector* value)
 {
-    auto        isolate = Isolate::GetCurrent();
-    HandleScope scope(isolate);
-    isolate->Enter();
-
-    if (!ConstructorCallCheck(info))
-        return;
-
-    double              x, y, z;
-    CV8FunctionCallback args(info);
-    args.ReadNumber(x);
-    args.ReadNumber(y);
-    args.ReadNumber(z);
-
-    Local<Object>           wrapper = info.Holder();
-
-    CVector* vector = CreateGarbageCollected<CVector>(wrapper);
-    vector->fX = x;
-    vector->fY = y;
-    vector->fZ = z;
-
-    wrapper->SetInternalField(EInternalFieldPurpose::TypeOfClass, Number::New(isolate, (double)m_eClass));
-    wrapper->SetInternalField(EInternalFieldPurpose::PointerToValue, External::New(isolate, vector));
-    AttachGC(isolate, wrapper);
-    info.GetReturnValue().Set(wrapper);
-    isolate->Exit();
+    double x, y, z;
+    if (!info.Read(x, y, z))
+        return false;
+    value->fX = x;
+    value->fY = y;
+    value->fZ = z;
+    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    return true;
 }
 
 bool CV8Vector3D::Convert(Local<Object> object, CVector& vector)
@@ -124,17 +84,20 @@ Handle<FunctionTemplate> CV8Vector3D::CreateTemplate(Local<Context> context, Han
 
     Handle<FunctionTemplate> vector3dTemplate = FunctionTemplate::New(isolate);
     vector3dTemplate->Inherit(parent);
-    vector3dTemplate->SetCallHandler(ConstructorCall);
+
+    SetConstructor(vector3dTemplate, ConstructorCall);
     vector3dTemplate->SetLength(sizeof(CVector) / sizeof(float));
     vector3dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector3dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
-    objectTemplate->SetAccessor(CV8Utils::ToV8String("z"), GetZ, SetZ);
-    AddMethod<float, CVector>(objectTemplate, "getLenght", MethodGetLength);
-    AddMethod<float, CVector>(objectTemplate, "getLenghtSquared", MethodGetLengthSquared);
-    AddMethod<void, CVector>(objectTemplate, "crossProduct", MethodCrossProduct);
-    AddMethod<void, CVector>(objectTemplate, "dotProduct", MethodDotProduct);
-    AddMethod<void, CVector>(objectTemplate, "normalize", MethodNormalize);
+
+    SetAccessor(objectTemplate, "w", GetZ, SetZ);
+    AddMethod(objectTemplate, "getLenght", MethodGetLength);
+    AddMethod(objectTemplate, "getLenghtSquared", MethodGetLengthSquared);
+    AddMethod(objectTemplate, "crossProduct", MethodCrossProduct);
+    AddMethod(objectTemplate, "dotProduct", MethodDotProduct);
+    AddMethod(objectTemplate, "normalize", MethodNormalize);
+
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
     context->Global()->Set(context, CV8Utils::ToV8String(m_szName), vector3dTemplate->GetFunction(context).ToLocalChecked());
     return handleScope.Escape(vector3dTemplate);

@@ -15,15 +15,14 @@ public:
     static bool                     Convert(Local<Object> object, CVector& vector);
 
 private:
-    static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
+    static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector* value);
 
-    static void GetZ(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-
-    static void SetZ(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
+    static float CV8Vector3D::GetZ(CVector* internalValue);
+    static void  SetZ(CVector* internalValue, float value);
 
     static float MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector* value);
     static float MethodGetLengthSquared(CV8FunctionCallback& info, Local<Object> self, CVector* value);
-    static void MethodCrossProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value);
-    static void MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value);
-    static void MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static void  MethodCrossProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static void  MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value);
+    static void  MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector* value);
 };

@@ -1,4 +1,5 @@
-class CVector2D;
+class CVector;
+class CMatrix;
 
 using namespace v8;
 
@@ -14,12 +15,12 @@ public:
     static Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context);
 
 private:
-    static void ConstructorCall(const FunctionCallbackInfo<Value>& info);
+    static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CMatrix* value);
 
-    static void GetPosition(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-    static void SetPosition(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
-    static void GetRotation(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-    static void SetRotation(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
-    static void GetScale(Local<Name> property, const PropertyCallbackInfo<Value>& info);
-    static void SetScale(Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info);
+    static CVector GetPosition(CMatrix* internalValue);
+    static void    SetPosition(CMatrix* internalValue, CVector value);
+    static CVector GetRotation(CMatrix* internalValue);
+    static void    SetRotation(CMatrix* internalValue, CVector value);
+    static CVector GetScale(CMatrix* internalValue);
+    static void    SetScale(CMatrix* internalValue, CVector value);
 };

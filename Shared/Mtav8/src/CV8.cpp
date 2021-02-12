@@ -1,14 +1,8 @@
 #include "StdInc.h"
 
-#include "v8-inspector.h"
 using namespace v8;
 
 std::unordered_map<std::string, std::unique_ptr<CV8Module>> CV8::m_mapModules;
-
-const char* ToCString(const String::Utf8Value& value)
-{
-    return *value ? *value : "<string conversion failed>";
-}
 
 CV8::CV8()
 {
@@ -19,9 +13,9 @@ CV8::CV8()
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
 
-    #if DEBUG
-        V8::SetFlagsFromString("--expose-gc", 11);
-    #endif
+#if DEBUG
+    V8::SetFlagsFromString("--expose-gc", 11);
+#endif
 
     m_longExecutionGuardThread = std::thread([this]() {
         while (true)

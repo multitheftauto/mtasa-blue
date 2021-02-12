@@ -8,7 +8,6 @@ CV8Module::CV8Module(const char* name) : m_strName(name)
 
 CV8Module::~CV8Module()
 {
-
 }
 
 std::vector<Local<String>> CV8Module::GetExports(Isolate* pIsolate)

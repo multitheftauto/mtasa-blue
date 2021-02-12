@@ -1,4 +1,5 @@
 class CVector;
+class CV8AsyncFunction;
 
 class CV8FunctionCallback : public CV8FunctionCallbackBase
 {
@@ -18,12 +19,24 @@ public:
         {
             GetIsolate()->ThrowException(CV8Utils::ToV8String("Expected 1 argument, got 0 arguments."));
 
-            return false; 
+            return false;
         }
         using rawT = std::remove_reference_t<T>;
         if constexpr (std::is_same<rawT, double>::value)
         {
             return ReadNumber(arg);
+        }
+        else if constexpr (std::is_same<rawT, CVector2D>::value)
+        {
+            return ReadVector(arg);
+        }
+        else if constexpr (std::is_same<rawT, CVector>::value)
+        {
+            return ReadVector(arg);
+        }
+        else if constexpr (std::is_same<rawT, CVector4D>::value)
+        {
+            return ReadVector(arg);
         }
         else
             static_assert(false && "Unimplemented read type");
@@ -60,7 +73,7 @@ public:
     void Return(double arg);
     void Return(bool arg);
 
-    void ReturnPromise(std::unique_ptr<class CV8AsyncFunction> pAsyncFunction);
+    void ReturnPromise(std::unique_ptr<CV8AsyncFunction> pAsyncFunction);
 
 private:
     template <typename T>

@@ -58,7 +58,7 @@ public:
         Global<Module> m_module;
     };
 
-    // v8::TryCatch can't be copied
+    // TryCatch can't be copied
     struct STryCatch
     {
         std::string location;
