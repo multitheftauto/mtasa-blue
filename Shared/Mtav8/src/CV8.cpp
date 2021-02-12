@@ -14,7 +14,7 @@ CV8::CV8()
     V8::Initialize();
 
 #if DEBUG
-    V8::SetFlagsFromString("--expose-gc", 11);
+    V8::SetFlagsFromString("--expose-gc --trace-opt --trace-deopt", 38);
 #endif
 
     m_longExecutionGuardThread = std::thread([this]() {

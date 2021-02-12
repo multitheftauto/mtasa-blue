@@ -67,7 +67,11 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 
     Local<Context> context = m_context.Get(m_pIsolate);
     Local<Object>  global = context->Global();
-
+    m_pIsolate->SetCounterFunction([](const char* name) {
+        printf("%s\n", name);
+        return new int(0);
+    });
+    
     InitSecurity();
 
     Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(context);
@@ -435,16 +439,8 @@ CV8Isolate::~CV8Isolate()
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_context.Get(m_pIsolate);
-        Context::Scope contextScope(thisContext);
         thisContext->Enter();
-        /*for (auto const& [index, persistent] : CV8BaseClass::m_mapPersistents)
-        {
-            auto objectContext = persistent->Get(m_pIsolate)->CreationContext();
-            if (objectContext == thisContext)
-            {
-                persistent->Empty();
-            }
-        }*/
+
         // check failed i::FLAG_expose_gc
         m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
         m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));

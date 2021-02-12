@@ -140,17 +140,22 @@ public:
             [](Local<Name> property, const PropertyCallbackInfo<Value>& info) {
                 Isolate*        isolate = info.GetIsolate();
                 Local<Object>   self = info.Holder();
-                Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-                void*           ptr = wrap->Value();
-                T*              internalValue = static_cast<T*>(ptr);
+                Local<External> external = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
+                void*           pointerToValue = external->Value();
+                T*              internalValue = static_cast<T*>(pointerToValue);
+                assert(internalValue);
 
-                Local<Array>             data = info.Data().As<Array>();
-                Local<External>          externalData = data->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
-                GetterCallbackFunc<T, V> cb = (GetterCallbackFunc<T, V>)(externalData->Value());
-                V                        result = cb(internalValue);
+                Local<Array>             array = info.Data().As<Array>();
+                Local<External>          externalData = array->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
+                GetterCallbackFunc<T, V> callback = (GetterCallbackFunc<T, V>)(externalData->Value());
+                V                        result = callback(internalValue);
                 if constexpr (std::is_same_v<V, bool>)
                 {
                     info.GetReturnValue().Set(Boolean::New(isolate, result));
+                }
+                else if constexpr (std::is_same_v<V, void>)
+                {
+                    info.GetReturnValue().SetUndefined();
                 }
                 else if constexpr (std::is_same_v<V, CVector2D>)
                 {
@@ -170,13 +175,13 @@ public:
             [](Local<Name> property, Local<Value> value, const PropertyCallbackInfo<void>& info) {
                 Isolate*        isolate = info.GetIsolate();
                 Local<Object>   self = info.Holder();
-                Local<External> wrap = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
-                void*           ptr = wrap->Value();
-                T*              internalValue = static_cast<T*>(ptr);
+                Local<External> external = Local<External>::Cast(self->GetInternalField(EInternalFieldPurpose::PointerToValue));
+                void*           pointerToValue = external->Value();
+                T*              internalValue = static_cast<T*>(pointerToValue);
 
                 Local<Array>             data = info.Data().As<Array>();
                 Local<External>          externalData = data->Get(isolate->GetCurrentContext(), 1).ToLocalChecked().As<External>();
-                SetterCallbackFunc<T, V> cb = (SetterCallbackFunc<T, V>)(externalData->Value());
+                SetterCallbackFunc<T, V> callback = (SetterCallbackFunc<T, V>)(externalData->Value());
 
                 V argument;
                 if constexpr (std::is_same_v<V, double>)
@@ -188,7 +193,7 @@ public:
                     argument = (float)value->NumberValue(isolate->GetCurrentContext()).ToChecked();
                 }
 
-                cb(internalValue, argument);
+                callback(internalValue, argument);
             },
             getterSetter);
     }
