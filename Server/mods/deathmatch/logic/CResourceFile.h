@@ -63,10 +63,11 @@ public:
     virtual bool Stop() = 0;
     virtual bool IsNoClientCache() const { return false; }
 
-    eResourceType GetType() { return m_type; }
-    const char*   GetName() { return m_strShortName.c_str(); }
-    const char*   GetFullName() { return m_strResourceFileName.c_str(); }
-    const char*   GetWindowsName() { return m_strWindowsName.c_str(); }
+    eResourceType   GetType() { return m_type; }
+    eScriptLanguage GetLanguageType() const { return m_language; }
+    const char*     GetName() { return m_strShortName.c_str(); }
+    const char*     GetFullName() { return m_strResourceFileName.c_str(); }
+    const char*     GetWindowsName() { return m_strWindowsName.c_str(); }
 
     CChecksum GetLastChecksum() { return m_checksum; }
     void      SetLastChecksum(CChecksum checksum) { m_checksum = checksum; }
