@@ -831,6 +831,21 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (m_bSyncMapElementDataDefined)
         m_pResourceManager->ApplySyncMapElementDataOption(this, m_bSyncMapElementData);
 
+    bool hasJsFile = false;
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        if (pResourceFile->GetLanguageType() == CResourceFile::eScriptLanguage::JAVASCRIPT)
+        {
+            hasJsFile = true;
+            break;
+        }
+    }
+
+    if (hasJsFile)
+    {
+        CreateJsVM();
+    }
+
     // Start all our sub resourcefiles
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
