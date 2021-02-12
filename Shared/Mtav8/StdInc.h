@@ -10,7 +10,6 @@ class CV8Delegate;
 #include <unordered_map>
 #include <functional>
 #include "SharedUtil.h"
-
 #include "Common.h"
 
 #include "include/config.h"

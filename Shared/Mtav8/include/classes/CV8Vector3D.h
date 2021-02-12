@@ -17,7 +17,7 @@ public:
 private:
     static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector* value);
 
-    static float CV8Vector3D::GetZ(CVector* internalValue);
+    static float GetZ(CVector* internalValue);
     static void  SetZ(CVector* internalValue, float value);
 
     static float MethodGetLength(CV8FunctionCallback& info, Local<Object> self, CVector* value);

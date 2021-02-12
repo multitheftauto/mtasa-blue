@@ -12,7 +12,7 @@ public:
     static MaybeLocal<Object> New(CVector position, CVector rotation, CVector scale);
 
     // Adds new class definition to the context
-    static Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context);
+    static Handle<FunctionTemplate> CreateTemplate(Local<Context> context);
 
 private:
     static bool ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CMatrix* value);

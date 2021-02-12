@@ -28,7 +28,7 @@
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 char szXMLLibName[] = "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
-char szV8LibName[] = "Mtav8" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
+char szV8LibName[] = "v8\\Mtav8" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 
 using namespace std;
 
@@ -420,6 +420,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
             {
                 // Couldn't load it
                 Print("ERROR: Loading V8 library (%s) failed!\n", szV8LibName);
+                Print("Check if in folder 'server\v8' are files: icudtl.dat, icui18n.dll, 1217536 icuuc.dll, Mtav8_d.dll, snapshot_blob.bin, ( v8.dll or v8_d.dll ), v8_libbase.dll, v8_libplatform.dll, zlib.dll!\n", szV8LibName);
                 Print("Press Q to shut down the server!\n");
                 WaitForKey('q');
                 DestroyWindow();
