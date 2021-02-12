@@ -361,6 +361,8 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     ConvertMatrixToEulerAngles(*targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
                     vecRotation = -vecRotation;
                 }
+                else
+                    pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
             }
         }
     }
