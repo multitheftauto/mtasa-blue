@@ -2,7 +2,7 @@ project "Mtav8"
 	language "C++"
 	targetname "Mtav8"
 	kind "SharedLib"
-	targetdir(buildpath("server"))
+	targetdir(buildpath("server/v8"))
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
