@@ -56,7 +56,6 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
             return (size_t)current_heap_limit + increaseMB;
         },
         this);
-
     m_pIsolate->EnableMemorySavingsMode();
     m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
     m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));

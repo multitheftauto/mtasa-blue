@@ -7,13 +7,9 @@ CV8Promise::CV8Promise(CV8Isolate* pIsolate, std::unique_ptr<CV8AsyncFunction> p
     : m_pIsolate(pIsolate), m_pAsyncFunction(std::move(pAsyncFunction))
 {
     Isolate* isolate = pIsolate->GetIsolate();
-    auto     a = isolate->GetCurrentContext();
-    auto     b = Isolate::GetCurrent();
-    auto&    promiseResolver = Promise::Resolver::New(isolate->GetCurrentContext()).ToLocalChecked();
+    Local<Promise::Resolver>    promiseResolver = Promise::Resolver::New(isolate->GetCurrentContext()).ToLocalChecked();
     m_promiseResolver.Reset(isolate, promiseResolver);
-
     m_pContext.Reset(isolate, isolate->GetCurrentContext());
-    m_promise = promiseResolver->GetPromise();
 }
 
 CV8Promise::~CV8Promise()
@@ -28,14 +24,13 @@ void CV8Promise::Run()
 
 void CV8Promise::Resolve(Local<Value> value)
 {
-    Isolate*                 isolate = m_pIsolate->GetIsolate();
-    Local<Promise::Resolver> resolver = m_promiseResolver.Get(isolate);
+    Local<Promise::Resolver> resolver = m_promiseResolver.Get(m_pIsolate->GetIsolate());
 
     // Local<Promise::Resolver> resolver = m_promiseResolver.Get(m_pIsolate).As<Promise::Resolver>();
     if (resolver->GetPromise()->State() == Promise::PromiseState::kPending)
     {
-        Local<Promise::Resolver> local = Local<Promise::Resolver>::New(isolate, m_promiseResolver);
-        local->Resolve(m_pContext.Get(isolate), value).ToChecked();
+        Local<Promise::Resolver> local = Local<Promise::Resolver>::New(m_pIsolate->GetIsolate(), m_promiseResolver);
+        local->Resolve(m_pContext.Get(m_pIsolate->GetIsolate()), value).ToChecked();
         m_promiseResolver.Reset();
         m_pContext.Reset();
     }
