@@ -11,6 +11,7 @@ project "Client Core"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			".",
 			"../sdk",
 			"../../vendor/tinygettext",

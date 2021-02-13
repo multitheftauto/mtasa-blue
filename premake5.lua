@@ -37,7 +37,6 @@ workspace "MTASA"
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
 		"vendor",
-		"Shared/sdk",
 	}
 
 	defines {
