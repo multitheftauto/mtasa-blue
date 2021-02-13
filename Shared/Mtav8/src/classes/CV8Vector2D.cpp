@@ -76,6 +76,7 @@ MaybeLocal<Object> CV8Vector2D::New(CVector2D vector)
 {
     Isolate* isolate = Isolate::GetCurrent();
     assert(isolate);
+    Locker               lock(isolate);
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Object>   object = CV8Utils::NewObject(m_szName, vector.fX, vector.fY);
     return handleScope.EscapeMaybe(object);
@@ -93,8 +94,8 @@ Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
 
-    SetAccessor(objectTemplate, "x", GetX, SetX);
     SetAccessor(objectTemplate, "y", GetY, SetY);
+    SetAccessor(objectTemplate, "x", GetX, SetX);
 
     AddMethod(objectTemplate, "getLenght", MethodGetLength);
     AddMethod(objectTemplate, "getLengthSquared", MethodGetLengthSquared);

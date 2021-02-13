@@ -3,6 +3,36 @@
 
 using namespace v8;
 
+
+inline float WrapAround(float fValue, float fHigh)
+{
+    return fValue - (fHigh * floor(static_cast<float>(fValue / fHigh)));
+}
+
+inline float ConvertDegreesToRadians(float fRotation)
+{
+    return WrapAround(static_cast<float>(fRotation * PI / 180.0f + 2 * PI), static_cast<float>(2 * PI));
+}
+
+inline float ConvertRadiansToDegrees(float fRotation)
+{
+    return WrapAround(static_cast<float>(fRotation * 180.0f / PI + 360.0f), 360.0f);
+}
+
+inline void ConvertRadiansToDegrees(CVector& vecRotation)
+{
+    vecRotation.fX = ConvertRadiansToDegrees(vecRotation.fX);
+    vecRotation.fY = ConvertRadiansToDegrees(vecRotation.fY);
+    vecRotation.fZ = ConvertRadiansToDegrees(vecRotation.fZ);
+}
+
+inline void ConvertDegreesToRadians(CVector& vecRotation)
+{
+    vecRotation.fX = ConvertDegreesToRadians(vecRotation.fX);
+    vecRotation.fY = ConvertDegreesToRadians(vecRotation.fY);
+    vecRotation.fZ = ConvertDegreesToRadians(vecRotation.fZ);
+}
+
 CVector CV8Matrix::GetPosition(CMatrix* internalValue)
 {
     return internalValue->GetPosition();
@@ -15,11 +45,16 @@ void CV8Matrix::SetPosition(CMatrix* internalValue, CVector value)
 
 CVector CV8Matrix::GetRotation(CMatrix* internalValue)
 {
-    return internalValue->GetRotation();
+    CVector v = internalValue->GetRotation();
+    v.fX *= 180 / PI;
+    v.fY *= 180 / PI;
+    v.fZ *= 180 / PI;
+    return v;
 }
 
 void CV8Matrix::SetRotation(CMatrix* internalValue, CVector value)
 {
+    value *= PI / 180;
     internalValue->SetRotation(value);
 }
 
@@ -33,19 +68,38 @@ void CV8Matrix::SetScale(CMatrix* internalValue, CVector value)
     internalValue->SetScale(value);
 }
 
-bool CV8Matrix::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CMatrix* value)
+void CV8Matrix::MethodInverse(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue)
 {
-    CVector position, rotation;
-    CVector scale(1, 1, 1);
+    internalValue->Inverse();
+}
+
+void CV8Matrix::MethodInvert(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue)
+{
+    internalValue->Invert();
+}
+
+CVector CV8Matrix::MethodTransformVector(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue)
+{
+    CVector vector;
+    if (!info.Read(vector))
+        return {};
+    return internalValue->TransformVector(vector);
+}
+
+bool CV8Matrix::ConstructorCall(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue)
+{
+    CVector position, rotation, scale;
     if (!info.Read(position, rotation, scale))
         return false;
 
-    rotation = rotation / (180.0f / PI);
-
-    value->SetPosition(position);
-    value->SetRotation(rotation);
-    value->SetScale(scale);
-    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    rotation.fX *= PI / 180;
+    rotation.fY *= PI / 180;
+    rotation.fZ *= PI / 180;
+    //ConvertDegreesToRadians(rotation);
+    internalValue->SetPosition(position);
+    internalValue->SetRotation(rotation);
+    internalValue->SetScale(scale);
+    self->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
     return true;
 }
 
@@ -53,6 +107,7 @@ MaybeLocal<Object> CV8Matrix::New(CVector position, CVector rotation, CVector sc
 {
     Isolate* isolate = Isolate::GetCurrent();
     assert(isolate);
+    Locker               lock(isolate);
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Object>   vecPosition = CV8Utils::NewObject(CV8Vector3D::m_szName, position.fX, position.fY, position.fZ);
     MaybeLocal<Object>   vecRotation = CV8Utils::NewObject(CV8Vector3D::m_szName, rotation.fX, rotation.fY, rotation.fZ);
@@ -76,6 +131,8 @@ Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context)
     SetAccessor(objectTemplate, "position", GetPosition, SetPosition);
     SetAccessor(objectTemplate, "rotation", GetRotation, SetRotation);
     SetAccessor(objectTemplate, "scale", GetScale, SetScale);
+
+    AddMethod(objectTemplate, "inverse", MethodInverse);
 
     objectTemplate->Set(Symbol::GetToStringTag(isolate), CV8Utils::ToV8String(m_szName));
     context->Global()->Set(context, CV8Utils::ToV8String(m_szName), matrixTemplate->GetFunction(context).ToLocalChecked());

@@ -66,10 +66,10 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 
     Local<Context> context = m_context.Get(m_pIsolate);
     Local<Object>  global = context->Global();
-    m_pIsolate->SetCounterFunction([](const char* name) {
-        printf("%s\n", name);
-        return new int(0);
-    });
+    //m_pIsolate->SetCounterFunction([](const char* name) {
+    //    printf("%s\n", name);
+    //    return new int(0);
+    //});
     
     InitSecurity();
 

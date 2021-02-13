@@ -111,7 +111,8 @@ public:
     {
         ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
 
-        T* data = (T*)allocator->Allocate(sizeof(T));
+        T* data = (T*)allocator->AllocateUninitialized(sizeof(T));
+        data = new (data) T;
         isolate->AdjustAmountOfExternalAllocatedMemory(sizeof(T));
         return data;
     }
@@ -149,13 +150,13 @@ public:
                 Local<External>          externalData = array->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
                 GetterCallbackFunc<T, V> callback = (GetterCallbackFunc<T, V>)(externalData->Value());
                 V                        result = callback(internalValue);
-                if constexpr (std::is_same_v<V, bool>)
-                {
-                    info.GetReturnValue().Set(Boolean::New(isolate, result));
-                }
-                else if constexpr (std::is_same_v<V, void>)
+                if constexpr (std::is_same_v<V, void>)
                 {
                     info.GetReturnValue().SetUndefined();
+                }
+                else if constexpr (std::is_same_v<V, bool>)
+                {
+                    info.GetReturnValue().Set(Boolean::New(isolate, result));
                 }
                 else if constexpr (std::is_same_v<V, CVector2D>)
                 {

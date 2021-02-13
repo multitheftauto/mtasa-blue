@@ -23,4 +23,8 @@ private:
     static void    SetRotation(CMatrix* internalValue, CVector value);
     static CVector GetScale(CMatrix* internalValue);
     static void    SetScale(CMatrix* internalValue, CVector value);
+
+    static void MethodInverse(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue);
+    static void MethodInvert(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue);
+    static CVector MethodTransformVector(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue);
 };

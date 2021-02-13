@@ -72,6 +72,7 @@ MaybeLocal<Object> CV8Vector3D::New(CVector vector)
 {
     Isolate* isolate = Isolate::GetCurrent();
     assert(isolate);
+    Locker               lock(isolate);
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Object>   object = CV8Utils::NewObject(m_szName, vector.fX, vector.fY, vector.fZ);
     return handleScope.EscapeMaybe(object);
@@ -91,7 +92,7 @@ Handle<FunctionTemplate> CV8Vector3D::CreateTemplate(Local<Context> context, Han
     Local<ObjectTemplate> objectTemplate = vector3dTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
 
-    SetAccessor(objectTemplate, "w", GetZ, SetZ);
+    SetAccessor(objectTemplate, "z", GetZ, SetZ);
     AddMethod(objectTemplate, "getLenght", MethodGetLength);
     AddMethod(objectTemplate, "getLenghtSquared", MethodGetLengthSquared);
     AddMethod(objectTemplate, "crossProduct", MethodCrossProduct);

@@ -65,6 +65,7 @@ MaybeLocal<Object> CV8Vector4D::New(CVector4D vector)
 {
     Isolate* isolate = Isolate::GetCurrent();
     assert(isolate);
+    Locker               lock(isolate);
     EscapableHandleScope handleScope(isolate);
     MaybeLocal<Object>   object = CV8Utils::NewObject(m_szName, vector.fX, vector.fY, vector.fZ, vector.fW);
     return handleScope.EscapeMaybe(object);
@@ -76,7 +77,6 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     EscapableHandleScope handleScope(isolate);
 
     Handle<FunctionTemplate> vector4dTemplate = FunctionTemplate::New(isolate);
-    vector4dTemplate->Inherit(parent);
     SetConstructor(vector4dTemplate, ConstructorCall);
 
     vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
@@ -85,6 +85,7 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     objectTemplate->SetInternalFieldCount(EInternalFieldPurpose::Count);
 
     SetAccessor(objectTemplate, "w", GetW, SetW);
+    vector4dTemplate->Inherit(parent);
     AddMethod(objectTemplate, "getLength", MethodGetLength);
     AddMethod(objectTemplate, "getLengthSquared", MethodGetLengthSquared);
     AddMethod(objectTemplate, "normalize", MethodNormalize);
