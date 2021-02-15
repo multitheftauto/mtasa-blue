@@ -24,12 +24,14 @@ public:
     bool GetErrorMessage(std::string& error);
     bool GetMissingModulesErrorMessage(std::string& error);
 
+    void InitializeModules();
     void Evaluate();
 
     void ReportMissingModule(std::string name);
 
     void TerminateExecution();
     void SetJsEvalSetting(eJsEval value);
+    std::string GetModuleName(Local<Module> module);
 
     // May be used as a namespace for module imports. Equivalent of js "let object = {}"
     Local<Object> CreateGlobalObject(const char* mapName);
@@ -38,9 +40,19 @@ public:
     // Equivalent of js "let key = value"
     void SetKeyValue(const char* key, Local<Value> value);
 
+    // Stopping initialization, prevents scripts from starting.
+    template <typename... Args>
+    void RaiseInitializationError(const std::string& format, Args&&... args)
+    {
+        printf(format.c_str(), std::forward<Args>(args)...);
+        m_bHasInitializationError = true;
+    }
+
+    bool HasInitializationError() const { return m_bHasInitializationError; }
+
     Local<Function> CreateFunction(void (*callback)(CV8FunctionCallbackBase*));
 
-        private:
+private:
     // Perform common execution checks, long execution protection.
     // Use before each time js starts to execute
     class Execution
@@ -88,6 +100,11 @@ public:
     Global<Context>        m_context;
     ResourceConstraints    m_constraints;
 
+    std::unordered_set<std::string> m_loadedModules;
+
+    // Module from index X can only import modules at index < X. eg index 3 can import index 0,1 or 2 only.
+    // It prevents from error: ReferenceError: Cannot access 'ImportName' before initialization
+    std::vector<std::string>                                  m_loadingOrder;
     std::unordered_map<std::string, Global<Module>>           m_mapScriptModules;
     std::vector<std::unique_ptr<CV8Promise>>                  m_vecPromises;
     std::vector<std::unique_ptr<SModule>>                     m_vecModules;
@@ -95,7 +112,9 @@ public:
     std::unordered_map<std::string, std::vector<std::string>> m_mapMissingModules;
     int                                                       m_iRunCodeCount = 0;
 
-    eJsEval m_eJsEval;
+    std::queue<std::string> modulesListName;
+    eJsEval                 m_eJsEval;
+    bool                    m_bHasInitializationError = false;
 
     static ModifyCodeGenerationFromStringsResult Eval(Local<Context> context, Local<Value> source, bool is_code_like);
 };
