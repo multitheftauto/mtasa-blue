@@ -5,27 +5,33 @@
 
 using namespace v8;
 
-class PHV : public PersistentHandleVisitor
+void CV8GC::VisitPersistentHandle(Persistent<Value>* persistent, uint16_t usClassId)
 {
-public:
-    Isolate* isolate_;
+    HandleScope          handleScope(m_pIsolate);
+    CV8BaseClass::EClass classId = (CV8BaseClass::EClass)usClassId;
+    Local<Value>         value = persistent->Get(m_pIsolate);
 
-    PHV(Isolate* isolate) : isolate_(isolate) {}
-    ~PHV() {}
+    assert(value->IsObject());            // may be removed in future
 
-    void VisitPersistentHandle(Persistent<Value>* value, uint16_t class_id)
+    Local<Object>   object = value->ToObject(m_pIsolate->GetCurrentContext()).ToLocalChecked();
+    Local<External> external = Local<External>::Cast(object->GetInternalField(CV8BaseClass::EInternalFieldPurpose::PointerToValue));
+    void*           pointerToValue = external->Value();
+
+    switch (classId) // Cast to 
     {
-        printf("VISIT\n");
-        // delete persistent handles on isolate disposal.
-        // if (class_id == HC_GARBAGE_COLLECTED_CLASS_ID)
-        //{
-        //    HandleScope hs(isolate_);
-        //    Wrapper*        w =            // extract your wrapped object from
-        //                                   // the passed-in value object.
-        //        delete w;
-        //}
+        case CV8BaseClass::EClass::Invalid:
+            assert(false && "Invalid class id");
+            break;
+        case CV8BaseClass::EClass::Vector2:
+        case CV8BaseClass::EClass::Vector3:
+        case CV8BaseClass::EClass::Vector4:
+        case CV8BaseClass::EClass::Matrix:
+            delete pointerToValue;
+            break;
+        default:
+            assert(false && "Not implemented class");
     }
-};
+}
 
 CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
 {
@@ -48,15 +54,13 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
         [](void* data, size_t current_heap_limit, size_t initial_heap_limit) {
             CV8Isolate* pIsolate = (CV8Isolate*)data;
             int         increaseMB = 1024 * 1024 * 64;
-            printf("[V8 Debug] Heap limit reached. New limit: %iMB, Initial limit: %iMB Globals count: %i\n", (current_heap_limit + increaseMB) / 1024 / 1024,
-                   initial_heap_limit / 1024 / 1024, JavascriptWrapper::GetGlobalsCount());
+            printf("[V8 Debug] Heap limit reached. New limit: %iMB, Initial limit: %iMB\n", (current_heap_limit + increaseMB) / 1024 / 1024,
+                   initial_heap_limit / 1024 / 1024);
             //((Isolate*)data)->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
             return (size_t)current_heap_limit + increaseMB;
         },
         this);
     m_pIsolate->EnableMemorySavingsMode();
-    m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
-    m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
 
     m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
@@ -68,6 +72,8 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     //    printf("%s\n", name);
     //    return new int(0);
     //});
+
+    m_pGC = std::make_unique<CV8GC>(m_pIsolate);
 
     InitSecurity();
 
@@ -475,7 +481,10 @@ void CV8Isolate::Evaluate()
     InitializeModules();
 
     if (HasInitializationError())
+    {
+        m_context.Get(m_pIsolate)->Exit();
         return;
+    }
 
     std::reverse(m_loadingOrder.begin(), m_loadingOrder.end());
     for (std::string moduleName : m_loadingOrder)
@@ -507,14 +516,11 @@ CV8Isolate::~CV8Isolate()
         Local<Context> thisContext = m_context.Get(m_pIsolate);
         thisContext->Enter();
 
-        // check failed i::FLAG_expose_gc
-        m_pIsolate->VisitWeakHandles(new PHV(m_pIsolate));
-        m_pIsolate->VisitHandlesWithClassIds(new PHV(m_pIsolate));
+        m_pIsolate->VisitWeakHandles(m_pGC.get());
+
         m_pIsolate->LowMemoryNotification();
 #if DEBUG
-        int before = JavascriptWrapper::GetGlobalsCount();
         m_pIsolate->RequestGarbageCollectionForTesting(Isolate::GarbageCollectionType::kFullGarbageCollection);
-        printf("[V8 DEBUG] Garbage colledted: %i objects.\n", before - JavascriptWrapper::GetGlobalsCount());
 #endif
 
         m_global.Reset();

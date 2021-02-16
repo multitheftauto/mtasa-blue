@@ -2,6 +2,20 @@ using namespace v8;
 
 class CV8Promise;
 
+class CV8GC : public PersistentHandleVisitor
+{
+public:
+    Isolate* m_pIsolate;
+
+    CV8GC(Isolate* isolate) : m_pIsolate(isolate) {}
+    ~CV8GC() {}
+
+    void VisitPersistentHandle(Persistent<Value>* persistent, uint16_t usClassId);
+};
+
+// Remember to implement all classes in VisitPersistentHandle and bump number.
+static_assert((int)CV8BaseClass::EClass::Count == 5 && "Missing implementation for GC");
+
 class CV8Isolate : public CV8IsolateBase
 {
 public:
@@ -115,6 +129,8 @@ private:
     std::queue<std::string> modulesListName;
     eJsEval                 m_eJsEval;
     bool                    m_bHasInitializationError = false;
+
+    std::unique_ptr<CV8GC> m_pGC;
 
     static ModifyCodeGenerationFromStringsResult Eval(Local<Context> context, Local<Value> source, bool is_code_like);
 };

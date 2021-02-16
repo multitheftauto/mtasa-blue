@@ -15,13 +15,14 @@ public:
         Count,
     };
 
-    enum class EClass
+    enum class EClass : uint16_t
     {
         Invalid,            // To distinguish between nullptr and actual class.
         Vector2,
         Vector3,
         Vector4,
         Matrix,
+        Count,
     };
 
     template <typename R, typename T>
@@ -113,12 +114,13 @@ public:
 
         T* data = (T*)allocator->AllocateUninitialized(sizeof(T));
         data = new (data) T;
+
         isolate->AdjustAmountOfExternalAllocatedMemory(sizeof(T));
         return data;
     }
 
     // Freeing memory used by internal data at index 1 for this object
-    static void AttachGC(Isolate* isolate, Local<Object> object);
+    static void AttachGC(Isolate* isolate, Local<Object> object, uint16_t classId);
 
     template <typename R, typename T>
     static void AddMethod(Local<ObjectTemplate> objectTemplate, const char* name, MethodCallbackFunc<R, T> callback)
@@ -199,7 +201,7 @@ public:
             getterSetter);
     }
 
-    template <typename T>
+    template <EClass classId, typename T>
     static void SetConstructor(Handle<FunctionTemplate> objectTemplate, ConstructorCallbackFunc<T> callback)
     {
         objectTemplate->SetCallHandler(
@@ -219,7 +221,10 @@ public:
                 T*            value = CreateGarbageCollected<T>(wrapper);
                 if (cb(args, wrapper, value))
                 {
+                    AttachGC(isolate, wrapper, (uint16_t)classId);
+
                     info.GetReturnValue().Set(wrapper);
+
                     isolate->Exit();
                     return;
                 }
@@ -234,33 +239,33 @@ public:
 class JavascriptWrapper
 {
 private:
-    static std::map<int, JavascriptWrapper*> m_pGlobals;
-    static int                               i;
+    //static std::map<int, JavascriptWrapper*> m_pGlobals;
+    //static int                               i;
 
     Global<Object> wrapper;
 
-    static void weakCallbackForObjectHolder(const WeakCallbackInfo<JavascriptWrapper>& data) { delete data.GetParameter(); }
+    static void WeakCallbackForObjectHolder(const WeakCallbackInfo<JavascriptWrapper>& data) { delete data.GetParameter(); }
 
-    int   m_pId;
+    //int   m_pId;
     void* m_pExternalData;
 
 public:
-    static int GetGlobalsCount();
+    //static int GetGlobalsCount();
 
     ~JavascriptWrapper()
     {
         delete m_pExternalData;
-        m_pGlobals.erase(m_pId);
+        //m_pGlobals.erase(m_pId);
     }
 
-    JavascriptWrapper(Isolate* pIsolate, Local<Object> object) : m_pId(i)
+    JavascriptWrapper(Isolate* pIsolate, Local<Object> object, uint16_t classId) /*: m_pId(i)*/
     {
         wrapper.Reset(pIsolate, object);
         Local<External> wrap = Local<External>::Cast(object->GetInternalField(CV8BaseClass::EInternalFieldPurpose::PointerToValue));
         m_pExternalData = wrap->Value();
-        wrapper.SetWeak(this, weakCallbackForObjectHolder, WeakCallbackType::kParameter);
-
-        m_pGlobals[i] = this;
-        i++;
+        wrapper.SetWeak(this, WeakCallbackForObjectHolder, WeakCallbackType::kParameter);
+        wrapper.SetWrapperClassId(classId);
+        //m_pGlobals[i] = this;
+        //i++;
     }
 };

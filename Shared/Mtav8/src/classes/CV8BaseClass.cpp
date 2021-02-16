@@ -11,15 +11,15 @@ bool CV8BaseClass::ConstructorCallCheck(const FunctionCallbackInfo<Value>& info)
     return true;
 }
 
-void CV8BaseClass::AttachGC(Isolate* isolate, Local<Object> object)
+void CV8BaseClass::AttachGC(Isolate* isolate, Local<Object> object, uint16_t classId)
 {
-    new JavascriptWrapper(isolate, object);
+    new JavascriptWrapper(isolate, object, classId);
 }
 
-std::map<int, JavascriptWrapper*> JavascriptWrapper::m_pGlobals;
-int                               JavascriptWrapper::i;
-
-int JavascriptWrapper::GetGlobalsCount()
-{
-    return m_pGlobals.size();
-}
+//std::map<int, JavascriptWrapper*> JavascriptWrapper::m_pGlobals;
+//int                               JavascriptWrapper::i;
+//
+//int JavascriptWrapper::GetGlobalsCount()
+//{
+//    return m_pGlobals.size();
+//}

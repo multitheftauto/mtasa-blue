@@ -88,7 +88,8 @@ Handle<FunctionTemplate> CV8Vector2D::CreateTemplate(Local<Context> context)
     EscapableHandleScope handleScope{isolate};
 
     Handle<FunctionTemplate> vector2dTemplate = FunctionTemplate::New(isolate);
-    SetConstructor(vector2dTemplate, ConstructorCall);
+    SetConstructor<EClass::Vector2>(vector2dTemplate, ConstructorCall);
+
     vector2dTemplate->SetLength(sizeof(CVector2D) / sizeof(float));
     vector2dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = vector2dTemplate->InstanceTemplate();

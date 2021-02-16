@@ -122,7 +122,7 @@ Handle<FunctionTemplate> CV8Matrix::CreateTemplate(Local<Context> context)
     EscapableHandleScope handleScope{isolate};
 
     Handle<FunctionTemplate> matrixTemplate = FunctionTemplate::New(isolate);
-    SetConstructor(matrixTemplate, ConstructorCall);
+    SetConstructor<EClass::Matrix>(matrixTemplate, ConstructorCall);
     matrixTemplate->SetLength(sizeof(CMatrix) / sizeof(CVector));
     matrixTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
     Local<ObjectTemplate> objectTemplate = matrixTemplate->InstanceTemplate();

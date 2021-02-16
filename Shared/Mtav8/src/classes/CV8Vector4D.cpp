@@ -77,7 +77,7 @@ Handle<FunctionTemplate> CV8Vector4D::CreateTemplate(Local<Context> context, Han
     EscapableHandleScope handleScope(isolate);
 
     Handle<FunctionTemplate> vector4dTemplate = FunctionTemplate::New(isolate);
-    SetConstructor(vector4dTemplate, ConstructorCall);
+    SetConstructor<EClass::Vector4>(vector4dTemplate, ConstructorCall);
 
     vector4dTemplate->SetLength(sizeof(CVector4D) / sizeof(float));
     vector4dTemplate->SetClassName(CV8Utils::ToV8String(m_szName));
