@@ -57,7 +57,7 @@ project "Client Deathmatch"
 		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
+		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp",
 		"../../../vendor/bulletphysics3d/LinearMath/TaskScheduler/btThreadSupportWin32.cpp",
 		"../../../vendor/bulletphysics3d/LinearMath/TaskScheduler/btThreadSupportPosix.cpp"
 	}
