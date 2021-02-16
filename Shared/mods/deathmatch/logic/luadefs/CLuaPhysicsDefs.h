@@ -133,33 +133,51 @@ public:
     static R VisitElement(CLuaPhysicsElement* pElement, F func)
     {
         ePhysicsElementType e = pElement->GetType();
-        if (auto* pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
+        if (auto pSphere = dynamic_cast<CLuaPhysicsSphereShape*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pSphere)>>)
                 return func(pSphere);
-        if (auto* pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
+        }
+        else if (auto pCapsule = dynamic_cast<CLuaPhysicsCapsuleShape*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCapsule)>>)
                 return func(pCapsule);
-        if (auto* pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        }
+        else if (auto pCylinder = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCylinder)>>)
                 return func(pCylinder);
-        if (auto* pCone = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        }
+        else if (auto pCone = dynamic_cast<CLuaPhysicsCylinderShape*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pCone)>>)
                 return func(pCone);
-        if (auto* pBox = dynamic_cast<CLuaPhysicsBoxShape*>(pElement))
+        }
+        else if (auto pBox = dynamic_cast<CLuaPhysicsBoxShape*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pBox)>>)
                 return func(pBox);
-        if (auto* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+        }
+        else if (auto pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pRigidBody)>>)
                 return func(pRigidBody);
-        if (auto* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+        }
+        else if (auto pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pStaticCollision)>>)
                 return func(pStaticCollision);
-
-        if (auto* pAnyShape = dynamic_cast<CLuaPhysicsShape*>(pElement))
+        }
+        else if (auto pAnyShape = dynamic_cast<CLuaPhysicsShape*>(pElement))
+        {
             if constexpr (std::is_same_v<R, std::invoke_result_t<decltype(func), decltype(pAnyShape)>>)
                 return func(pAnyShape);
-
-        if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(func), decltype(pElement)>>)
+        }
+        else if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(func), decltype(pElement)>>)
+        {
             func(pElement);
+        }
+        else
+            static_assert(false && "Unimplemented");
     }
 };
