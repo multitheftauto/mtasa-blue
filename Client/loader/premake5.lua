@@ -8,6 +8,7 @@ project "Loader"
 		linkoptions { "/SAFESEH:NO" }
 
 	includedirs {
+		"../../Shared/sdk",
 		"../sdk",
 		"../../vendor",
 		"../../vendor/detours/4.0.1/src",

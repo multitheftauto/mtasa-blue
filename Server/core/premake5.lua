@@ -10,6 +10,7 @@ project "Core"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/google-breakpad/src",
 			"../../vendor/sparsehash/current/src/",

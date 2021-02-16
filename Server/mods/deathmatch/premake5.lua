@@ -12,6 +12,7 @@ project "Deathmatch"
 
 	filter {}
 		includedirs {
+			"../../../Shared/sdk",
 			"../../sdk",
 			"../../../vendor/bochs",
 			"../../../vendor/pme",
