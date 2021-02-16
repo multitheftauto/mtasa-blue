@@ -679,8 +679,9 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
             RwV3d   angles = {yaw, roll, pitch};
             BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
             CEntitySAInterface* theInterface = GetInterface();
-            if (theInterface)
+            if (theInterface) {
                 theInterface->bDontUpdateHierarchy = false;
+            }
             return true;
         }
     }

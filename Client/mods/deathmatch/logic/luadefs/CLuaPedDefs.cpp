@@ -1042,8 +1042,9 @@ bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* en
         theEntity->UpdateRpHAnim();
         if (theEntity->GetModelIndex() == 0) { // CJ skin
             RpClump* clump = theEntity->GetRpClump();
-            if (clump)
+            if (clump) {
                 ((void(__cdecl*)(RpClump*))0x5DF560)(clump); // CPed::ShoulderBoneRotation
+            }
         }
         return true;
     }
