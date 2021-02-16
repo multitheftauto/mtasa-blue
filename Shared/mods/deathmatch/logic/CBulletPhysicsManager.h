@@ -14,6 +14,7 @@
 
 class btDiscreteDynamicsWorld;
 class CBulletPhysics;
+class CClientManager;
 
 class CBulletPhysicsManager
 {
