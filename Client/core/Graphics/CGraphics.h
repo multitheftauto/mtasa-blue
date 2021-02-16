@@ -152,7 +152,7 @@ public:
 
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
-    
+
     void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI);
     void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI);
 

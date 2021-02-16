@@ -12,7 +12,6 @@
 #pragma once
 
 #include <cmath>
-#include "CVector.h"
 
 /**
  * CVector4D Structure used to store a 2D vertex.

@@ -6640,12 +6640,6 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Dead vehicle?
-    if (pOccupiedVehicle->GetHealth() <= 0.0f)
-    {
-        return false;
-    }
-
     // Check the server is compatible if we are a ped
     if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {

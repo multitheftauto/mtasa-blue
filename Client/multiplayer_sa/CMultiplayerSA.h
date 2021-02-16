@@ -316,6 +316,7 @@ private:
     eAnimGroup          m_dwLastStaticAnimGroupID;
     eAnimID          m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
+    float               m_fShadowsOffset;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
