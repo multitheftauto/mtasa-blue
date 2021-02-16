@@ -368,14 +368,15 @@ Function .onInstSuccess
         CreateDirectory "$SMPROGRAMS\MTA San Andreas ${0.0}"
 
         IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
+        IfFileExists "$SMPROGRAMS\\MTA San Andreas ${0.0}\Play MTA San Andreas.lnk" 0 skip1
         SetOutPath "$INSTDIR"
-        Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Play MTA San Andreas.lnk"
         CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
             "" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
             "" "Play Multi Theft Auto: San Andreas ${0.0}"
         skip1:
 
         IfFileExists "$INSTDIR\Server\MTA Server.exe" 0 skip2
+        IfFileExists "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk" 0 skip2
         SetOutPath "$INSTDIR\Server"
         CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
             "" "$INSTDIR\Server\MTA Server.exe" 2 SW_SHOWNORMAL \
@@ -383,6 +384,7 @@ Function .onInstSuccess
         skip2:
 
         IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
+        IfFileExists "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" 0 skip3
         SetOutPath "$INSTDIR"
         CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
             "" "$INSTDIR\Uninstall.exe" 0 SW_SHOWNORMAL \
@@ -392,8 +394,8 @@ Function .onInstSuccess
 
     ${If} $CreateDesktopIcon == 1
         IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
+        IfFileExists "$DESKTOP\Play MTA San Andreas ${0.0}.lnk" 0 skip4
         SetOutPath "$INSTDIR"
-        Delete "$DESKTOP\Play MTA San Andreas ${0.0}.lnk"
         CreateShortCut "$DESKTOP\MTA San Andreas ${0.0}.lnk" "$INSTDIR\Multi Theft Auto.exe" \
             "" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
             "" "Play Multi Theft Auto: San Andreas ${0.0}"
