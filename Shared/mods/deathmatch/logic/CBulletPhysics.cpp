@@ -203,8 +203,8 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
                                                                        int iFilterGroup, int iFilterMask) const
 {
     BT_PROFILE("shapeCast");
-    CVector                      fromPosition = CLuaPhysicsSharedLogic::GetPosition(from);
-    CVector                      toPosition = CLuaPhysicsSharedLogic::GetPosition(to);
+    CVector                      fromPosition = CPhysicsSharedLogic::GetPosition(from);
+    CVector                      toPosition = CPhysicsSharedLogic::GetPosition(to);
     SClosestConvexResultCallback rayCallback(fromPosition, toPosition);
 
     rayCallback.m_collisionFilterGroup = iFilterGroup;

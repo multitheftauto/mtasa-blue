@@ -49,7 +49,7 @@ void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChang
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    CPhysicsSharedLogic::SetPosition(transform, vecPosition);
     if (m_pRigidBodyProxy)
         m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
 
@@ -58,7 +58,7 @@ void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChang
 
     std::function<void()> change([&, vecPosition]() {
         btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        CPhysicsSharedLogic::SetPosition(transform, vecPosition);
         // m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
         m_pRigidBodyProxy->setWorldTransform(transform);
         m_pRigidBodyProxy->proceedToTransform(transform);
@@ -72,14 +72,14 @@ const CVector CLuaPhysicsRigidBody::GetPosition() const
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
-    return CLuaPhysicsSharedLogic::GetPosition(transform);
+    return CPhysicsSharedLogic::GetPosition(transform);
 }
 
 void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool dontCommitChanges)
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
-    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
 
     if (dontCommitChanges)
@@ -87,7 +87,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool dontCommitChang
 
     std::function<void()> change([&, vecRotation]() {
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+        CPhysicsSharedLogic::SetRotation(transform, vecRotation);
         m_pRigidBodyProxy->proceedToTransform(transform);
         NeedsActivation();
     });
@@ -99,7 +99,7 @@ const CVector CLuaPhysicsRigidBody::GetRotation() const
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
-    return CLuaPhysicsSharedLogic::GetRotation(transform);
+    return CPhysicsSharedLogic::GetRotation(transform);
 }
 
 void CLuaPhysicsRigidBody::SetScale(const CVector& vecScale)
@@ -127,15 +127,15 @@ void CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
-    CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
-    CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
+    CPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
+    CPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
     SetTempData(eTempDataKey::Scale, matrix.GetScale());
     m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
 
     std::function<void()> change([&, matrix]() {
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetRotation());
-        CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
+        CPhysicsSharedLogic::SetPosition(transform, matrix.GetRotation());
+        CPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
         m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(matrix.GetScale());
         m_pRigidBodyProxy->proceedToTransform(transform);
         NeedsActivation();

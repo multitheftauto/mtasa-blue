@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsConvexHullShape::CLuaPhysicsConvexHullShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecPoints) : CLuaPhysicsShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints)))
+CLuaPhysicsConvexHullShape::CLuaPhysicsConvexHullShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecPoints) : CLuaPhysicsShape(pPhysics, std::move(CPhysicsSharedLogic::CreateConvexHull(vecPoints)))
 {
 }
 

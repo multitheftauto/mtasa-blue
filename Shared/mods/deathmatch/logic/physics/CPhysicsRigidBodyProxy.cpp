@@ -47,7 +47,7 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
 std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
                                                                        CVector vecCenterOfMass, MotionState* pMotionstate)
 {
-    CLuaPhysicsSharedLogic::SetPosition(pMotionstate->m_centerOfMassOffset, vecCenterOfMass);
+    CPhysicsSharedLogic::SetPosition(pMotionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->GetBtShape();
     if (vecLocalInertia.LengthSquared() == 0)
     {

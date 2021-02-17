@@ -5,7 +5,7 @@
 
 class btGImpactMeshShape;
 class heightfieldTerrainShape;
-class CLuaPhysicsSharedLogic;
+class CPhysicsSharedLogic;
 
 #pragma once
 
@@ -15,7 +15,7 @@ struct heightfieldTerrainShape
     std::vector<float>         data;
 };
 
-class CLuaPhysicsSharedLogic
+class CPhysicsSharedLogic
 {
 public:
     static const char* GetShapeName(btCollisionShape* pShape);

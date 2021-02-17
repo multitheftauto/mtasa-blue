@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsGimpactTriangleMeshShape::CLuaPhysicsGimpactTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecVertices)
-    : CLuaPhysicsConcaveShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateGimpactMeshShape(vecVertices)))
+    : CLuaPhysicsConcaveShape(pPhysics, std::move(CPhysicsSharedLogic::CreateGimpactMeshShape(vecVertices)))
 {
 }
 

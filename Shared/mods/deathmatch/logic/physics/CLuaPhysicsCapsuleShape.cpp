@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsCapsuleShape::CLuaPhysicsCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
-    : CLuaPhysicsConvexShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight)))
+    : CLuaPhysicsConvexShape(pPhysics, std::move(CPhysicsSharedLogic::CreateCapsule(fRadius, fHeight)))
 {
 }
 

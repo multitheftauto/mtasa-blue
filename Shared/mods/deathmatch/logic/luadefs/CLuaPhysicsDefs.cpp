@@ -139,37 +139,37 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(CBulletPhysics* pPhysic
         vecSize = CVector{fSize, fSize, fSize};
     }
 
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
+    CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
     return pPhysics->CreateBoxShape(vecSize / 2);
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fRadius)
 {
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
     return pPhysics->CreateSphereShape(fRadius);
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
 {
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
 
     return pPhysics->CreateCapsuleShape(fRadius, fHeight);
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
 {
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
 
     return pPhysics->CreateConeShape(fRadius, fHeight);
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCylinderShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
 {
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
-    CLuaPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
+    CPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
 
     return pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
 }
@@ -200,7 +200,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateTriangleMeshShape(CBulletPhysics
         throw std::invalid_argument("Triangle mesh needs vertices count divisible by 3");
 
     for (auto const& vertex : vecVertices)
-        CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(vertex);
+        CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vertex);
 
     return pPhysics->CreateBhvTriangleMeshShape(vecVertices);
 }
@@ -214,7 +214,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateGimpactMeshShape(CBulletPhysics*
         throw std::invalid_argument("Gimpact mesh needs vertices count divisible by 3");
 
     for (auto const& vertex : vecVertices)
-        CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(vertex);
+        CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vertex);
 
     return pPhysics->CreateGimpactTriangleMeshShape(vecVertices);
 }
@@ -302,7 +302,7 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysics
 
     const CVector vecPosition = vecOptionalPosition.value_or(CVector{0, 0, 0});
     const CVector vecRotation = vecOptionalRotation.value_or(CVector{0, 0, 0});
-    CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
+    CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
 
     if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
     {
@@ -538,7 +538,7 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
                 else
                     vecSize = std::get<CVector>(argument);
 
-                CLuaPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
+                CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
                 VisitElement(pElement, overloaded{[vecSize](CLuaPhysicsBoxShape* pBox) { pBox->SetSize(vecSize); }, unsupported});
                 return true;
@@ -1016,10 +1016,10 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape
     btTransform     startTransform = btTransform::getIdentity();
     btTransform     endTransform = btTransform::getIdentity();
 
-    CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
-    CLuaPhysicsSharedLogic::SetRotation(startTransform, vecRotation);
-    CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
-    CLuaPhysicsSharedLogic::SetRotation(endTransform, vecRotation);
+    CPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
+    CPhysicsSharedLogic::SetRotation(startTransform, vecRotation);
+    CPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
+    CPhysicsSharedLogic::SetRotation(endTransform, vecRotation);
 
     CBulletPhysics::SClosestConvexResultCallback rayCallback = pPhysics->ShapeCast(pShape, startTransform, endTransform, iFilterGroup, iFilterMask);
     if (!rayCallback.hasHit())
@@ -1118,8 +1118,8 @@ std::tuple<CVector, CVector> CLuaPhysicsDefs::PhysicsPredictTransform(CLuaPhysic
 {
     btTransform& transform = pRigidBody->PredictTransform(time);
 
-    CVector position = CLuaPhysicsSharedLogic::GetPosition(transform);
-    CVector rotation = CLuaPhysicsSharedLogic::GetRotation(transform);
+    CVector position = CPhysicsSharedLogic::GetPosition(transform);
+    CVector rotation = CPhysicsSharedLogic::GetRotation(transform);
     if (!ignoreGravity.value_or(false))
     {
         CVector gravityFactor = pRigidBody->GetPhysics()->GetGravity() * time * time * 0.5;
@@ -1225,7 +1225,7 @@ bool CLuaPhysicsDefs::PhysicsSetVertexPosition(CLuaPhysicsShape* pShape, int iVe
     {
         if (iVertexId > 0 && pTriangleMesh->GetVerticesNum() > iVertexId)
         {
-            CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
+            CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
 
             pTriangleMesh->SetVertexPosition(--iVertexId, vecPosition);
             return true;
@@ -1241,7 +1241,7 @@ bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsShape* pShape, int iVertexId, 
     {
         if (iVertexId > 0 && pHeightfieldTerrain->GetVerticesNum() > iVertexId)
         {
-            CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(fHeight);
+            CPhysicsSharedLogic::CheckMaximumPrimitiveSize(fHeight);
 
             pHeightfieldTerrain->SetHeight(--iVertexId, fHeight);
             return true;

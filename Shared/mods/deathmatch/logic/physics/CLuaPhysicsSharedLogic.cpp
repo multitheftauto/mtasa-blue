@@ -5,7 +5,7 @@
     CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 #endif
 
-const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
+const char* CPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
 {
     BroadphaseNativeTypes eType = (BroadphaseNativeTypes)pShape->getShapeType();
 
@@ -91,100 +91,100 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
     return "unknown";
 }
 
-void CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, CVector vecRotation)
+void CPhysicsSharedLogic::SetRotation(btTransform& transform, CVector vecRotation)
 {
     btQuaternion quaternion = transform.getRotation();
     EulerToQuaternion(vecRotation, quaternion);
     transform.setRotation(quaternion);
 }
 
-CVector CLuaPhysicsSharedLogic::GetRotation(const btTransform& transform)
+CVector CPhysicsSharedLogic::GetRotation(const btTransform& transform)
 {
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
-    CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
+    CPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
     return rotation;
 }
 
-CVector CLuaPhysicsSharedLogic::GetPosition(const btTransform& transform)
+CVector CPhysicsSharedLogic::GetPosition(const btTransform& transform)
 {
     const btVector3& vecPosition = transform.getOrigin();
     return vecPosition;
 }
 
-void CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, CVector vecPosition)
+void CPhysicsSharedLogic::SetPosition(btTransform& transform, CVector vecPosition)
 {
     transform.setOrigin(vecPosition);
 }
 
-void CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation)
+void CPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetRotation(transform, vecRotation);
     pCollisionObject->setWorldTransform(transform);
 }
 
-void CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition)
+void CPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetPosition(transform, vecPosition);
     pCollisionObject->setWorldTransform(transform);
 }
 
-CVector CLuaPhysicsSharedLogic::GetRotation(btCollisionObject* pCollisionObject)
+CVector CPhysicsSharedLogic::GetRotation(btCollisionObject* pCollisionObject)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     return GetRotation(transform);
 }
 
-CVector CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject)
+CVector CPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     return GetPosition(transform);
 }
 
-btBoxShape* CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector vecPosition, CVector vecRotation)
+btBoxShape* CPhysicsSharedLogic::CreateBox(CVector& half, CVector vecPosition, CVector vecRotation)
 {
     btBoxShape* pBoxShape = new btBoxShape(half);
     btTransform transform = btTransform::getIdentity();
 
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    CPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    CPhysicsSharedLogic::SetRotation(transform, vecRotation);
 
     return pBoxShape;
 }
 
-btSphereShape* CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector vecPosition, CVector vecRotation)
+btSphereShape* CPhysicsSharedLogic::CreateSphere(float fRadius, CVector vecPosition, CVector vecRotation)
 {
     btSphereShape* pSphereShape = new btSphereShape(fRadius);
     btTransform                    transform = btTransform::getIdentity();
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    CPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    CPhysicsSharedLogic::SetRotation(transform, vecRotation);
 
     return pSphereShape;
 }
 
-btCapsuleShape* CLuaPhysicsSharedLogic::CreateCapsule(float fRadius, float fHeight)
+btCapsuleShape* CPhysicsSharedLogic::CreateCapsule(float fRadius, float fHeight)
 {
     return new btCapsuleShape(fRadius, fHeight);
 }
 
-btConeShape* CLuaPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
+btConeShape* CPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
 {
     return new btConeShape(fRadius, fHeight);
 }
 
-btCylinderShape* CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
+btCylinderShape* CPhysicsSharedLogic::CreateCylinder(CVector& half)
 {
     return new btCylinderShape(half);
 }
 
-btCompoundShape* CLuaPhysicsSharedLogic::CreateCompound()
+btCompoundShape* CPhysicsSharedLogic::CreateCompound()
 {
     return new btCompoundShape();
 }
 
-btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(std::vector<CVector>& vecVertices)
+btBvhTriangleMeshShape* CPhysicsSharedLogic::CreateBvhTriangleMesh(std::vector<CVector>& vecVertices)
 {
     if (vecVertices.size() % 3 != 0 || vecVertices.size() == 0)
         return nullptr;
@@ -201,7 +201,7 @@ btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(std::vecto
     return triangleMeshShape;
 }
 
-btGImpactMeshShape* CLuaPhysicsSharedLogic::CreateGimpactMeshShape(std::vector<CVector>& vecVertices)
+btGImpactMeshShape* CPhysicsSharedLogic::CreateGimpactMeshShape(std::vector<CVector>& vecVertices)
 {
     if (vecVertices.size() % 3 != 0 || vecVertices.size() == 0)
         return nullptr;
@@ -218,7 +218,7 @@ btGImpactMeshShape* CLuaPhysicsSharedLogic::CreateGimpactMeshShape(std::vector<C
     return pGimpactMesh;
 }
 
-heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
+heightfieldTerrainShape* CPhysicsSharedLogic::CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
 {
     if (iSizeX * iSizeY != vecHeightData.size())
         return nullptr;
@@ -243,7 +243,7 @@ heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iS
     return heightfieldTerrain;
 }
 
-btConvexHullShape* CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>& vecPoints)
+btConvexHullShape* CPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>& vecPoints)
 {
     if (vecPoints.size() < 3)
         return nullptr;
@@ -251,7 +251,7 @@ btConvexHullShape* CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>
     return new btConvexHullShape(&vecPoints[0].fX, vecPoints.size(), sizeof(CVector));
 }
 
-std::unique_ptr<btRigidBody> CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+std::unique_ptr<btRigidBody> CPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
     btTransform           transform = btTransform::getIdentity();
     btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
@@ -265,7 +265,7 @@ std::unique_ptr<btRigidBody> CLuaPhysicsSharedLogic::CreateRigidBody(btCollision
     return std::move(pRigidBody);
 }
 
-void CLuaPhysicsSharedLogic::EulerToQuaternion(btVector3 rotation, btQuaternion& result)
+void CPhysicsSharedLogic::EulerToQuaternion(btVector3 rotation, btQuaternion& result)
 {
     float c1 = cos(rotation.getX() / 2 * PI / 180);
     float c2 = cos(rotation.getY() / 2 * PI / 180);
@@ -284,7 +284,7 @@ void CLuaPhysicsSharedLogic::EulerToQuaternion(btVector3 rotation, btQuaternion&
     result.setZ(z);
 }
 
-void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3& result)
+void CPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3& result)
 {
     rotation.setX(-rotation.getX());
     rotation.setY(-rotation.getY());
@@ -329,39 +329,39 @@ void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3&
 #pragma warning(pop)
 }
 
-void CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(CVector vector)
+void CPhysicsSharedLogic::CheckMaximumPrimitiveSize(CVector vector)
 {
     if (abs(vector.fX) > BulletPhysics::Limits::MaximumPrimitiveSize || abs(vector.fY) > BulletPhysics::Limits::MaximumPrimitiveSize ||
         abs(vector.fZ) > BulletPhysics::Limits::MaximumPrimitiveSize)
         throw std::invalid_argument(SString("Maximum x,y,z must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 }
 
-void CLuaPhysicsSharedLogic::CheckMinimumPrimitiveSize(CVector vector)
+void CPhysicsSharedLogic::CheckMinimumPrimitiveSize(CVector vector)
 {
     if (abs(vector.fX) < BulletPhysics::Limits::MinimumPrimitiveSize || abs(vector.fY) < BulletPhysics::Limits::MinimumPrimitiveSize ||
         abs(vector.fZ) < BulletPhysics::Limits::MinimumPrimitiveSize)
         throw std::invalid_argument(SString("Minimum x,y,z must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 }
 
-void CLuaPhysicsSharedLogic::CheckMinimumPrimitiveSize(float value)
+void CPhysicsSharedLogic::CheckMinimumPrimitiveSize(float value)
 {
     if (BulletPhysics::Limits::MinimumPrimitiveSize < value)
         throw std::invalid_argument(SString("Maximum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 }
 
-void CLuaPhysicsSharedLogic::CheckMaximumPrimitiveSize(float value)
+void CPhysicsSharedLogic::CheckMaximumPrimitiveSize(float value)
 {
     if (BulletPhysics::Limits::MaximumPrimitiveSize > value)
         throw std::invalid_argument(SString("Maximum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 }
 
-void CLuaPhysicsSharedLogic::CheckPrimitiveSize(float value)
+void CPhysicsSharedLogic::CheckPrimitiveSize(float value)
 {
     CheckMinimumPrimitiveSize(value);
     CheckMaximumPrimitiveSize(value);
 }
 
-void CLuaPhysicsSharedLogic::CheckPrimitiveSize(CVector vector)
+void CPhysicsSharedLogic::CheckPrimitiveSize(CVector vector)
 {
     CheckMinimumPrimitiveSize(vector);
     CheckMaximumPrimitiveSize(vector);

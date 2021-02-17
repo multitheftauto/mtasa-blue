@@ -45,7 +45,7 @@ void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition, bool dontCommi
 
     std::function<void()> change([&, vecPosition]() {
         btTransform& transform = GetCollisionObject()->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        CPhysicsSharedLogic::SetPosition(transform, vecPosition);
         GetCollisionObject()->setWorldTransform(transform);
     });
 
@@ -66,7 +66,7 @@ void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation, bool dontCommi
 
     std::function<void()> change([&, vecRotation]() {
         btTransform& transform = GetCollisionObject()->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+        CPhysicsSharedLogic::SetRotation(transform, vecRotation);
         GetCollisionObject()->setWorldTransform(transform);
     });
 
@@ -112,8 +112,8 @@ void CLuaPhysicsStaticCollision::SetMatrix(const CMatrix& matrix)
 
     std::function<void()> change([&, matrix]() {
         btTransform& transform = GetCollisionObject()->getWorldTransform();
-        CLuaPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
-        CLuaPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
+        CPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
+        CPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
         m_btCollisionObject->getCollisionShape()->setLocalScaling(matrix.GetScale());
         GetCollisionObject()->setWorldTransform(transform);
     });

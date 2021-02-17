@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsConeShape::CLuaPhysicsConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight)
-    : CLuaPhysicsConvexShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight)))
+    : CLuaPhysicsConvexShape(pPhysics, std::move(CPhysicsSharedLogic::CreateCone(fRadius, fHeight)))
 {
 }
 

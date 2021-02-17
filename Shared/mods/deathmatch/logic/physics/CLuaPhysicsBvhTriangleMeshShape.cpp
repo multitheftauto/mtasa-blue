@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsBvhTriangleMeshShape::CLuaPhysicsBvhTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecVertices)
-    : CLuaPhysicsConcaveShape(pPhysics, std::move(CLuaPhysicsSharedLogic::CreateBvhTriangleMesh(vecVertices)))
+    : CLuaPhysicsConcaveShape(pPhysics, std::move(CPhysicsSharedLogic::CreateBvhTriangleMesh(vecVertices)))
 {
     m_verticesCount = vecVertices.size();
 }

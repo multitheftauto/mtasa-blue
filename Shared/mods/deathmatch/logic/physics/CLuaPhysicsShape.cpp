@@ -120,7 +120,7 @@ BroadphaseNativeTypes CLuaPhysicsShape::GetBtType() const
 
 const char* CLuaPhysicsShape::GetBtName()
 {
-    return CLuaPhysicsSharedLogic::GetShapeName(GetBtShape());
+    return CPhysicsSharedLogic::GetShapeName(GetBtShape());
 }
 
 // Call after shape change, makes all rigid bodies update their position
