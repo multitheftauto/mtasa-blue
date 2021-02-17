@@ -287,17 +287,18 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
     {
         case EIdClassType::RIGID_BODY:
             m_pLuaMain->GetPhysicsRigidBodyManager()->Remove((CLuaPhysicsRigidBody*)pPhysicsElement);
-            break;
+            return;
         case EIdClassType::SHAPE:
             m_pLuaMain->GetPhysicsShapeManager()->Remove((CLuaPhysicsShape*)pPhysicsElement);
-            break;
+            return;
         case EIdClassType::STATIC_COLLISION:
             m_pLuaMain->GetPhysicsStaticCollisionManager()->Remove((CLuaPhysicsStaticCollision*)pPhysicsElement);
-            break;
+            return;
         case EIdClassType::CONSTRAINT:
             m_pLuaMain->GetPhysicsConstraintManager()->Remove((CLuaPhysicsConstraint*)pPhysicsElement);
-            break;
+            return;
     }
+    assert(false && "Unimplemented class type");
 }
 
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
