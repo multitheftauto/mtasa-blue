@@ -22,7 +22,7 @@ class CResourceHTMLItem : public CResourceFile
 {
 public:
     CResourceHTMLItem(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes, bool bIsDefault,
-                      bool bIsRaw, bool bRestricted, bool bOOPEnabled);
+                      bool bIsRaw, bool bRestricted, bool bOOPEnabled, std::string bLuaVersion);
     ~CResourceHTMLItem();
 
     bool         Start();
@@ -51,7 +51,8 @@ private:
     std::string m_strMime;
     bool        m_bRestricted;
 
-    bool m_bOOPEnabled;
+    bool        m_bOOPEnabled;
+    std::string m_bLuaVersion;
 
     ResponseCode  m_responseCode;
     HttpResponse* m_currentResponse;

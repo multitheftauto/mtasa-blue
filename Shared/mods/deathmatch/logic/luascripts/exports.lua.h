@@ -12,6 +12,15 @@ namespace EmbeddedLuaCode
 --]]
 
 -- Protect some functions from modifications by resources
+if (_VERSION == "Lua 5.4") then
+local type <const> = type
+local setmetatable <const> = setmetatable
+local getResourceRootElement <const> = getResourceRootElement
+local call <const> = call
+local getResourceFromName <const> = getResourceFromName
+local tostring <const> = tostring
+local outputDebugString <const> = outputDebugString
+else
 local type = type
 local setmetatable = setmetatable
 local getResourceRootElement = getResourceRootElement
@@ -19,6 +28,7 @@ local call = call
 local getResourceFromName = getResourceFromName
 local tostring = tostring
 local outputDebugString = outputDebugString
+end
 
 local rescallMT = {}
 function rescallMT:__index(k)

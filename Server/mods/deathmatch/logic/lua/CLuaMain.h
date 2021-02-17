@@ -42,7 +42,7 @@ class CLuaMain            //: public CClient
 public:
     ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
-             CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP);
+             CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP, std::string bLuaVersion);
 
     ~CLuaMain();
 
@@ -138,7 +138,8 @@ private:
     list<CTextDisplay*>                             m_Displays;
     list<CTextItem*>                                m_TextItems;
 
-    bool m_bEnableOOP;
+    bool        m_bEnableOOP;
+    std::string m_bLuaVersion;
 
     bool m_bBeingDeleted;            // prevent it being deleted twice
 

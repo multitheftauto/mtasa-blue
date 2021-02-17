@@ -82,6 +82,7 @@ bool CResource::Load()
     m_bClientFiles = true;
 
     m_bOOPEnabledInMetaXml = false;
+    m_bLuaVersionInMetaXml = "5.1";
 
     m_pVM = nullptr;
     // @@@@@ Set some type of HTTP access here
@@ -182,6 +183,28 @@ bool CResource::Load()
             if (pNodeClientOOP)
             {
                 m_bOOPEnabledInMetaXml = StringToBool(pNodeClientOOP->GetTagContent().c_str());
+            }
+
+            m_bLuaVersionInMetaXml = "5.1";
+            CXMLNode* pNodeLuaVersion = pRoot->FindSubNode("luaversion", 0);
+
+            if (pNodeLuaVersion)
+            {
+                CXMLAttributes& Attributes = pNodeLuaVersion->GetAttributes();
+
+                m_Info.clear();
+
+                for (unsigned int i = 0; i < Attributes.Count(); i++)
+                {
+                    CXMLAttribute* pAttribute = Attributes.Get(i);
+                    MapSet(m_Info, pAttribute->GetName(), pAttribute->GetValue());
+                }
+
+                CXMLAttribute* pVersion = Attributes.Find("server");
+                if (pVersion)
+                {
+                    m_bLuaVersionInMetaXml = pVersion->GetValue().c_str();
+                }
             }
 
             m_iDownloadPriorityGroup = 0;
@@ -820,7 +843,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     m_pResourceElement->SetName(m_strResourceName.c_str());
 
     // Create the virtual machine for this resource
-    CreateVM(m_bOOPEnabledInMetaXml);
+    CreateVM(m_bOOPEnabledInMetaXml, m_bLuaVersionInMetaXml);
 
     // We're now active
     CLogger::LogPrintf(LOGLEVEL_LOW, "Starting %s\n", m_strResourceName.c_str());
@@ -1094,11 +1117,11 @@ bool CResource::Stop(bool bManualStop)
     return true;
 }
 
-bool CResource::CreateVM(bool bEnableOOP)
+bool CResource::CreateVM(bool bEnableOOP, std::string bLuaVersion)
 {
     if (!m_pVM)
     {
-        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP);
+        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP, bLuaVersion);
         m_pResourceManager->NotifyResourceVMOpen(this, m_pVM);
     }
 
@@ -1383,7 +1406,7 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
 
                     // Create a new resource HTML file and add it to the list
                     auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw,
-                                                               bIsRestricted, m_bOOPEnabledInMetaXml);
+                                                               bIsRestricted, m_bOOPEnabledInMetaXml, m_bLuaVersionInMetaXml);
                     m_ResourceFiles.push_back(pResourceFile);
 
                     // This is the first HTML file? Remember it

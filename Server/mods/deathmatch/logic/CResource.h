@@ -353,7 +353,7 @@ private:
     bool ReadIncludedHTML(CXMLNode* pRoot);
     bool ReadIncludedExports(CXMLNode* pRoot);
     bool ReadIncludedFiles(CXMLNode* pRoot);
-    bool CreateVM(bool bEnableOOP);
+    bool CreateVM(bool bEnableOOP, std::string bLuaVersion);
     bool DestroyVM();
     void TidyUp();
 
@@ -421,6 +421,7 @@ private:
     bool m_bUsingDbConnectMysql = false;
 
     bool m_bOOPEnabledInMetaXml = false;
+    std::string m_bLuaVersionInMetaXml = "5.1";
     bool m_bLinked = false;                  // if true, the included resources are already linked to this resource
     bool m_bIsPersistent = false;            // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool m_bDestroyed = false;

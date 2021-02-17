@@ -28,7 +28,7 @@ extern CNetServer* g_pRealNetServer;
 #include "luascripts/inspect.lua.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
-                   CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
+                   CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP, std::string bLuaVersion)
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
@@ -50,6 +50,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_pMapManager = pMapManager;
 
     m_bEnableOOP = bEnableOOP;
+    m_bLuaVersion = bLuaVersion;
 
     CPerfStatLuaMemory::GetSingleton()->OnLuaMainCreate(this);
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
@@ -173,6 +174,7 @@ void CLuaMain::InitVM()
 
     // Create a new VM
     m_luaVM = luaL_newstate();
+        
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook

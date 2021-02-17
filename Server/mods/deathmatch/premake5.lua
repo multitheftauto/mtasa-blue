@@ -20,7 +20,8 @@ project "Deathmatch"
 			"../../../vendor/pcre",
 			"../../../vendor/json-c",
 			"../../../vendor/bob_withers",
-			"../../../vendor/lua/src",
+			"../../../vendor/lua5.4/src",
+			"../../../vendor/lua5.1/src",
 			"../../../Shared/gta",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
@@ -33,7 +34,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
+		"Lua_Server5.4", "Lua_Server5.1", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
