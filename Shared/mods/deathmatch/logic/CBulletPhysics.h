@@ -343,8 +343,6 @@ private:
     void ClearOutsideWorldRigidBodies();
     void PostProcessCollisions();
 
-    void Clear();
-
     void AddShape(CLuaPhysicsShape* pShape);
     void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void AddConstraint(CLuaPhysicsConstraint* pConstraint);

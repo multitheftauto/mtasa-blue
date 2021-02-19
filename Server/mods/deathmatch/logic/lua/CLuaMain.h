@@ -127,6 +127,7 @@ public:
     template <class T, typename ...Ty>
     T* CreateElement(Ty... args)
     {
+        static_assert(std::is_base_of<CElement, T>::value);
         if (m_pResource)
         {
             T*             pElement = new T(m_pResource->GetDynamicElementRoot(), this, args...);

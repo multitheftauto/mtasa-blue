@@ -94,6 +94,7 @@ public:
     template <class T, typename... Ty>
     T* CreateElement(Ty... args)
     {
+        static_assert(std::is_base_of<CClientEntity, T>::value);
         if (m_pResource)
         {
             T*             pElement = new T(CLuaDefs::m_pManager, INVALID_ELEMENT_ID, this, args...);
