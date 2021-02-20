@@ -18,47 +18,48 @@ struct heightfieldTerrainShape
 class CPhysicsSharedLogic
 {
 public:
-    static const char* GetShapeName(btCollisionShape* pShape);
+    static const char* GetShapeName(const btCollisionShape* pShape);
 
-    static void      SetPosition(btTransform& transform, CVector vecPosition);
-    static void      SetRotation(btTransform& transform, CVector vecRotation);
-    static void      SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition);
-    static void      SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation);
-    static CVector   GetRotation(const btTransform& transform);
-    static CVector   GetPosition(const btTransform& transform);
+    static void    SetPosition(btTransform& transform, const CVector vecPosition);
+    static void    SetRotation(btTransform& transform, const CVector vecRotation);
+    static void    SetPosition(btCollisionObject* pCollisionObject, const CVector vecPosition);
+    static void    SetRotation(btCollisionObject* pCollisionObject, const CVector vecRotation);
+    static CVector GetRotation(const btTransform& transform);
+    static CVector GetPosition(const btTransform& transform);
 
     static CVector GetPosition(btCollisionObject* pCollisionObject);
     static CVector GetRotation(btCollisionObject* pCollisionObject);
 
-    static btBoxShape*      CreateBox(CVector& half, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
-    static btSphereShape*   CreateSphere(float fRadius, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
-    static btCapsuleShape*  CreateCapsule(float fRadius, float fHeight);
-    static btConeShape*     CreateCone(float fRadius, float fHeight);
-    static btCylinderShape* CreateCylinder(CVector& half);
+    static btBoxShape*      CreateBox(const CVector half, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector(0, 0, 0));
+    static btSphereShape*   CreateSphere(const float fRadius, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector(0, 0, 0));
+    static btCapsuleShape*  CreateCapsule(const float fRadius, const float fHeight);
+    static btConeShape*     CreateCone(const float fRadius, const float fHeight);
+    static btCylinderShape* CreateCylinder(const CVector half);
     static btCompoundShape* CreateCompound();
 
-    static btBvhTriangleMeshShape*  CreateBvhTriangleMesh(std::vector<CVector>& vecVertices);
-    static btGImpactMeshShape*      CreateGimpactMeshShape(std::vector<CVector>& vecVertices);
+    static btBvhTriangleMeshShape* CreateBvhTriangleMesh(const std::vector<CVector>& vecVertices);
+    static btGImpactMeshShape*     CreateGimpactMeshShape(const std::vector<CVector>& vecVertices);
 
-    static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
-    static btConvexHullShape*       CreateConvexHull(std::vector<CVector>& vecPoints);
+    static heightfieldTerrainShape* CreateHeightfieldTerrain(const int iSizeX, const int iSizeY, const std::vector<float>& vecHeightData);
+    static btConvexHullShape*       CreateConvexHull(const std::vector<CVector>& vecPoints);
 
-    static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, const float fMass, const CVector vecLocalInertia,
+                                                        const CVector vecCenterOfMass);
 
-    static void EulerToQuaternion(btVector3 rotation, btQuaternion& result);
-    static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
-
-    // throws proper std::invalid_argument error when something wrong
-    static void CheckPrimitiveSize(CVector vector);
+    static void EulerToQuaternion(const btVector3 rotation, btQuaternion& result);
+    static void QuaternionToEuler(const btQuaternion rotation, btVector3& result);
 
     // throws proper std::invalid_argument error when something wrong
-    static void CheckPrimitiveSize(float value);
+    static void CheckPrimitiveSize(const CVector vector);
 
     // throws proper std::invalid_argument error when something wrong
-    static void CheckMinimumPrimitiveSize(float value);
-    static void CheckMinimumPrimitiveSize(CVector vector);
+    static void CheckPrimitiveSize(const float value);
 
     // throws proper std::invalid_argument error when something wrong
-    static void CheckMaximumPrimitiveSize(float value);
-    static void CheckMaximumPrimitiveSize(CVector vector);
+    static void CheckMinimumPrimitiveSize(const float value);
+    static void CheckMinimumPrimitiveSize(const CVector vector);
+
+    // throws proper std::invalid_argument error when something wrong
+    static void CheckMaximumPrimitiveSize(const float value);
+    static void CheckMaximumPrimitiveSize(const CVector vector);
 };

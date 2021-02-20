@@ -180,6 +180,7 @@ enum class ePhysicsWorld
 {
     DiscreteDynamicsWorld,
     DiscreteDynamicsWorldMt,
+    Count,
 };
 
 

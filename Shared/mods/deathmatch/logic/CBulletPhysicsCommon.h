@@ -43,6 +43,7 @@ namespace BulletPhysics
         inline constexpr int     MaximumHeightfieldTerrain = 1024;
         inline constexpr int     RaycastAllUpperResultsLimit = 8196;
         inline constexpr float   RigidBodyMassLimit = 1000000.0f;
+        inline constexpr int     ParallelSolversLimit = 128;
     }            // namespace Limits
     namespace Defaults
     {

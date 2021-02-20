@@ -16,7 +16,7 @@ class CLuaPhysicsHeightfieldTerrainShape;
 class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsConcaveShape
 {
 public:
-    CLuaPhysicsHeightfieldTerrainShape(CBulletPhysics* pPhysics, int iSizeX, int iSizeY, std::vector<float> vecHeightData);
+    CLuaPhysicsHeightfieldTerrainShape(CBulletPhysics* pPhysics, int iSizeX, int iSizeY, const std::vector<float>& vecHeightData);
     ~CLuaPhysicsHeightfieldTerrainShape();
 
     void Update() {}

@@ -126,7 +126,7 @@ public:
                 throw std::invalid_argument(SString("'%s' value must be ...", szProperty.c_str()).c_str());
             return std::get<U>(it->second);
         }
-        return U{};
+        return default;
     }
 
     template <typename R = void, typename F>

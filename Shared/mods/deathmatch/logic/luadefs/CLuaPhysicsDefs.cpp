@@ -106,11 +106,16 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
         CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
         int                iParallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
 
-        CBulletPhysics* pPhysics;
-        if (iParallelSolvers > 1)
-            pPhysics = pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorldMt);
-        else
-            pPhysics = pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
+        if (iParallelSolvers < 1 || iParallelSolvers > BulletPhysics::Limits::ParallelSolversLimit)
+        {
+            throw std::invalid_argument(SString("Parallel solvers should be between 1 and %i", BulletPhysics::Limits::ParallelSolversLimit).c_str());
+        }
+
+        CBulletPhysics* pPhysics = [&](){
+            if (iParallelSolvers == 1)
+                return pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
+            return pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorldMt);
+        }();
 
         if (pPhysics)
         {

@@ -84,6 +84,43 @@ public:
 
     // BulletPhysics specific methods
 
+    // Thread-safe access to bullet physics world
+    class WorldContext
+    {
+        friend CBulletPhysics;
+
+        std::unique_lock<std::mutex> m_lock;
+    public:
+        // static void* operator new(size_t) = delete;
+
+        WorldContext(const CBulletPhysics* pPhysics) : m_pPhysics(pPhysics), m_lock(pPhysics->lock, std::try_to_lock)
+        {
+            assert(m_lock.owns_lock() && "Physics world is already locked");
+            m_btWorld = [&]() {
+                switch (m_pPhysics->m_ePhysicsWorldType)
+                {
+                    case ePhysicsWorld::DiscreteDynamicsWorld:
+                        return m_pPhysics->m_pDynamicsWorld.get();
+                    case ePhysicsWorld::DiscreteDynamicsWorldMt:
+                        return (btDiscreteDynamicsWorld*)m_pPhysics->m_pDynamicsWorldMt.get();
+                }
+            }();
+
+            // Implement your world, and bump number.
+            static_assert((int)ePhysicsWorld::Count == 2, "Unimplemented world type");
+        }
+
+        ~WorldContext()
+        {
+        }
+        bool                     IsLocked() { return m_pPhysics->m_lockBtWorld.owns_lock(); }
+        btDiscreteDynamicsWorld* operator->() { return m_btWorld; }
+
+    private:
+        const CBulletPhysics*    m_pPhysics;
+        btDiscreteDynamicsWorld* m_btWorld;
+    };
+
     struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
     {
         std::vector<int> m_hitTriangleIndices;
@@ -286,7 +323,7 @@ public:
     CLuaPhysicsGimpactTriangleMeshShape* CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats);
     CLuaPhysicsGimpactTriangleMeshShape* CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices);
     CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
-    CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, std::vector<float>& vecHeights);
+    CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, const std::vector<float>& vecHeights);
 
     // Links two bodies together using custom pivots offsets
     CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector vecPivotA,
@@ -333,6 +370,8 @@ public:
     void DrawDebugLines();
 #endif
 
+    btDiscreteDynamicsWorld* GetWorld() const;
+
 private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
@@ -348,8 +387,8 @@ private:
     void AddConstraint(CLuaPhysicsConstraint* pConstraint);
     void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
-    std::mutex         lock;
-    mutable std::mutex dynamicsWorldLock;
+    mutable std::mutex         lock;
+    mutable std::mutex         doPulseLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
     std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;
@@ -358,7 +397,10 @@ private:
     std::unique_ptr<btCollisionDispatcher>                 m_pDispatcher;
     std::unique_ptr<btCollisionDispatcherMt>               m_pDispatcherMt;
     std::unique_ptr<btDefaultCollisionConfiguration>       m_pCollisionConfiguration;
+
+    // Don't use directly, use "WorldContext world(this)" instead
     std::unique_ptr<btDiscreteDynamicsWorldMt>             m_pDynamicsWorldMt;
+    // Don't use directly, use "WorldContext world(this)" instead
     std::unique_ptr<btDiscreteDynamicsWorld>               m_pDynamicsWorld;
     bool                                                   m_bUseMt = false;            // true when multithreaded world is in use
 
@@ -369,13 +411,14 @@ private:
 
     CBulletPhysicsManager* m_pPhysicsManager;
 
-    const ePhysicsWorld m_ePhysicsWorld;
+    const ePhysicsWorld m_ePhysicsWorldType;
     bool               m_canDoPulse = false;
     CTickCount         m_LastTimeMs;
     std::atomic<float> m_fSpeed = 1.0f;
     bool               m_bDuringSimulation = false;
     std::atomic<int>   m_iSubSteps = 10;
     bool               m_bWorldHasChanged = false;
+    mutable std::unique_lock<std::mutex>         m_lockBtWorld;
     std::mutex         m_lockWorldHasChanged;
     float              m_fImpulseThreshold = 0.01f;
     std::atomic<bool>  m_bSimulationEnabled = false;
