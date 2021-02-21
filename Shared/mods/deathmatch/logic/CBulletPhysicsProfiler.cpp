@@ -9,20 +9,42 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
 #include "bulletphysics3d/LinearMath/btQuickprof.h";
 #include "CBulletPhysicsProfiler.h"
+#include <numeric>
 
-std::unordered_map<DWORD, std::unordered_map<const char*, ProfilerTime>> CBulletPhysicsProfiler::m_mapProfileTimings;
-std::unordered_map<DWORD, const char*>                                   CBulletPhysicsProfiler::m_mapCurrentProfile;
-std::unordered_map<DWORD, ProfilerTime>                                  CBulletPhysicsProfiler::m_mapTiming;
-std::mutex                                                               CBulletPhysicsProfiler::m_lock;
+std::vector<ProfileSample>                                                CBulletPhysicsProfiler::m_vecProfileSamples;
+std::stack<std::string>                                                  CBulletPhysicsProfiler::m_stackCurrentProfile;
+std::stack<ProfilerTime>                                                 CBulletPhysicsProfiler::m_stackTiming;
+std::mutex                                                               CBulletPhysicsProfiler::lock;
+std::vector<std::string>                                                  CBulletPhysicsProfiler::m_vecScope;
 #ifdef USE_NANOSECOND_TIMING
 std::unique_ptr<btClock> CBulletPhysicsProfiler::m_clock;
 #endif
 
-void CBulletPhysicsProfiler::Start()
+template <typename InputIt>
+std::string join(InputIt begin, InputIt end,
+                 const std::string& separator = ", ")
 {
+    std::ostringstream ss;
+
+    if (begin != end)
+    {
+        ss << *begin++;            // see 3.
+    }
+
+    while (begin != end)            // see 3.
+    {
+        ss << separator;
+        ss << *begin++;
+    }
+
+    return ss.str();
+}
+
+void CBulletPhysicsProfiler::Enable()
+{
+    std::lock_guard guard(CBulletPhysicsProfiler::lock);
 #ifdef USE_NANOSECOND_TIMING
     CBulletPhysicsProfiler::m_clock = std::make_unique<btClock>();
 #endif
@@ -30,58 +52,50 @@ void CBulletPhysicsProfiler::Start()
     btSetCustomLeaveProfileZoneFunc(OnProfileLeave);
 };
 
-void CBulletPhysicsProfiler::Stop()
+void CBulletPhysicsProfiler::Disable()
 {
+    std::lock_guard guard(CBulletPhysicsProfiler::lock);
 #ifdef USE_NANOSECOND_TIMING
     CBulletPhysicsProfiler::m_clock.reset();
 #endif
+    btSetCustomEnterProfileZoneFunc(OnProfileEnterDisabled);
+    btSetCustomLeaveProfileZoneFunc(OnProfileLeaveDisabled);
 }
 
-std::unordered_map<const char*, ProfilerTime> CBulletPhysicsProfiler::GetProfileTimings()
+std::vector<ProfileSample> CBulletPhysicsProfiler::GetProfileTimings()
 {
-    std::lock_guard guard(CBulletPhysicsProfiler::m_lock);
-    if (CBulletPhysicsProfiler::m_mapProfileTimings.find(GetCurrentThreadId()) != CBulletPhysicsProfiler::m_mapProfileTimings.end())
-    {
-        return CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()];
-    }
-    return {};
+    std::lock_guard guard(CBulletPhysicsProfiler::lock);
+    return CBulletPhysicsProfiler::m_vecProfileSamples;
 }
 
 void CBulletPhysicsProfiler::Clear()
 {
-    std::lock_guard guard(m_lock);
-    if (CBulletPhysicsProfiler::m_mapProfileTimings.find(GetCurrentThreadId()) == CBulletPhysicsProfiler::m_mapProfileTimings.end())
-    {
-        CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()] = {};
-    }
-    else
-    {
-        CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()].clear();
-    }
+    std::lock_guard guard(CBulletPhysicsProfiler::lock);
+    if (!CBulletPhysicsProfiler::m_vecProfileSamples.empty())
+        CBulletPhysicsProfiler::m_vecProfileSamples.clear();
 }
 
 void CBulletPhysicsProfiler::OnProfileEnter(const char* name)
 {
-    std::lock_guard guard(CBulletPhysicsProfiler::m_lock);
+    m_vecScope.push_back(name);
+    std::lock_guard guard(CBulletPhysicsProfiler::lock);
 #ifdef USE_NANOSECOND_TIMING
-    CBulletPhysicsProfiler::m_mapTiming[GetCurrentThreadId()] = CBulletPhysicsProfiler::m_clock->getTimeNanoseconds();
+    CBulletPhysicsProfiler::m_stackTiming.push(CBulletPhysicsProfiler::m_clock->getTimeNanoseconds());
 #elif
-    CBulletPhysicsProfiler::m_mapTiming[GetCurrentThreadId()] = GetTickCount32();
+    CBulletPhysicsProfiler::m_vecTiming.push(GetTickCount32());
 #endif
-    CBulletPhysicsProfiler::m_mapCurrentProfile[GetCurrentThreadId()] = name;
+
+    std::string s = join(m_vecScope.begin(), m_vecScope.end(), std::string("/"));
+    CBulletPhysicsProfiler::m_stackCurrentProfile.push(s);
 }
 
 void CBulletPhysicsProfiler::OnProfileLeave()
 {
-    std::lock_guard guard(CBulletPhysicsProfiler::m_lock);
-    ProfilerTime    time = CBulletPhysicsProfiler::m_clock->getTimeNanoseconds() - CBulletPhysicsProfiler::m_mapTiming[GetCurrentThreadId()];
-    const char*     name = CBulletPhysicsProfiler::m_mapCurrentProfile[GetCurrentThreadId()];
-    if (CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()].find(name) == CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()].end())
-    {
-        CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()][name] = time;
-    }
-    else
-    {
-        CBulletPhysicsProfiler::m_mapProfileTimings[GetCurrentThreadId()][name] += time;
-    }
+    std::lock_guard guard(CBulletPhysicsProfiler::lock);
+    ProfilerTime    time = CBulletPhysicsProfiler::m_clock->getTimeNanoseconds() - CBulletPhysicsProfiler::m_stackTiming.top();
+    CBulletPhysicsProfiler::m_stackTiming.pop();
+    std::string     name = CBulletPhysicsProfiler::m_stackCurrentProfile.top();
+    CBulletPhysicsProfiler::m_vecProfileSamples.push_back(ProfileSample(name, time));
+    CBulletPhysicsProfiler::m_stackCurrentProfile.pop();
+    m_vecScope.pop_back();
 }

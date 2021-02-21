@@ -27,7 +27,7 @@ CBulletPhysicsManager::CBulletPhysicsManager(CClientManager* pManager)
 
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2, 1);
 
-    CBulletPhysicsProfiler::Start();
+    CBulletPhysicsProfiler::Enable();
 }
 
 #else
@@ -38,7 +38,7 @@ CBulletPhysicsManager::CBulletPhysicsManager()
     btSetTaskScheduler(m_pBtTaskScheduler.get()); 
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2, 1);
 
-    CBulletPhysicsProfiler::Start();
+    CBulletPhysicsProfiler::Enable();
 }
 
 #endif
@@ -48,7 +48,7 @@ CBulletPhysicsManager::~CBulletPhysicsManager()
     WaitForSimulationsToFinish(true);
     // Make sure all the physics worlds are deleted
 
-    CBulletPhysicsProfiler::Stop();
+    CBulletPhysicsProfiler::Disable();
     DeleteAll();
 }
 
@@ -127,6 +127,7 @@ void CBulletPhysicsManager::DoPulse()
     if (m_numPhysicsLeft > 0)
     {
         isLocked = true;
+        CBulletPhysicsProfiler::Clear();
         for (auto const& pPhysics : vecPhysics)
         {
             m_pAsyncTaskScheduler->CollectResults(); // flush previous call

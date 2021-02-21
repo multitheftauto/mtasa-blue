@@ -94,7 +94,7 @@ public:
     static std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> PhysicsGetContactDetails(
         std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB);
 
-    static std::unordered_map<std::string, long long int> PhysicsGetPerformanceStats(CBulletPhysics* pPhysics);
+    static std::vector<std::tuple<std::string, double>> PhysicsGetPerformanceStats();
 
     static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, std::variant<CLuaPhysicsRigidBody*, CVector> variantA,
                                                                       std::variant<std::monostate, CVector, bool> variantB,

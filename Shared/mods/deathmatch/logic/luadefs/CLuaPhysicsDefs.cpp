@@ -1210,17 +1210,16 @@ std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> 
     return result;
 }
 
-std::unordered_map<std::string, long long int> CLuaPhysicsDefs::PhysicsGetPerformanceStats(CBulletPhysics* pPhysics)
+std::vector<std::tuple<std::string, double>> CLuaPhysicsDefs::PhysicsGetPerformanceStats()
 {
-    std::unordered_map<std::string, long long int> result;
+    std::vector<std::tuple<std::string, double>> result;
 
     long long int total = 0;
-    for (auto const& timing : pPhysics->GetProfileTimings())
+    for (auto const& sample : CBulletPhysicsProfiler::GetProfileTimings())
     {
-        result[timing.first] = timing.second;
-        total += timing.second;
+        result.push_back(std::make_tuple(sample.name, sample.time));
     }
-    result["total"] = total;
+    //result["total"] = total;
     return result;
 }
 

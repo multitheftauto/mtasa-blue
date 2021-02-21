@@ -39,6 +39,7 @@ CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld 
     m_pPhysicsManager->AddToList(this);
 }
 
+// Requires ~3789,34KB of ram
 void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed)
 {
     m_pOverlappingPairCache = std::make_unique<btDbvtBroadphase>();
@@ -70,7 +71,6 @@ void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned l
     world->setGravity(BulletPhysics::Defaults::Gravity);
     world->setDebugDrawer(m_pDebugDrawer.get());
     world->getSimulationIslandManager()->setSplitIslands(true);
-    printf("world created\n");
     m_bSimulationEnabled = true;
 }
 
@@ -95,18 +95,6 @@ void CBulletPhysics::Unlink()
     {
         DestroyElement(*shape);
     } 
-}
-
-btDiscreteDynamicsWorld* CBulletPhysics::GetWorld() const
-{
-    static_assert((int)ePhysicsWorld::Count == 2, "Unimplemented world type");
-    switch (m_ePhysicsWorldType)
-    {
-        case ePhysicsWorld::DiscreteDynamicsWorld:
-            return m_pDynamicsWorld.get();
-        case ePhysicsWorld::DiscreteDynamicsWorldMt:
-            return m_pDynamicsWorldMt.get();
-    }
 }
 
 void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
@@ -330,11 +318,11 @@ void CBulletPhysics::StepSimulation()
 
 CBulletPhysics::CIslandCallback* CBulletPhysics::GetSimulationIslandCallback(int iTargetIsland)
 {
+    WorldContext world(this);
     m_pIslandCallback->m_islandBodies.clear();
     m_pIslandCallback->m_bodies.clear();
     m_pIslandCallback->iTargetIsland = iTargetIsland;
 
-    WorldContext world(this);
     world->getSimulationIslandManager()->processIslands(m_pDispatcher.get(), m_pDynamicsWorld.get(), m_pIslandCallback.get());
 
     return m_pIslandCallback.get();
@@ -724,10 +712,8 @@ void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysic
     btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
     BroadphaseAabbCallback                   callback(collisionObjectArray, collisionGroup, collisionMask);
 
-    {
-        WorldContext world(this);
-        world->getBroadphase()->aabbTest(min, max, callback);
-    }
+    WorldContext world(this);
+    world->getBroadphase()->aabbTest(min, max, callback);
 
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
@@ -814,10 +800,10 @@ void CBulletPhysics::FlushAllChanges()
     if (!m_rigidBodiesUpdateAABBList.empty())
     {
         BT_PROFILE("updateRigidBodiesAABB");
+        WorldContext world(this);
         while (!m_rigidBodiesUpdateAABBList.empty())
         {
             CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesUpdateAABBList.pop();
-            WorldContext          world(this);
             world->updateSingleAabb(pRigidBody->GetBtRigidBody());
             pRigidBody->AABBUpdated();
         }
@@ -848,12 +834,12 @@ void CBulletPhysics::FlushAllChanges()
         BT_PROFILE("activateRigidBodies");
         CLuaPhysicsRigidBody* pRigidBody;
 
+        WorldContext world(this);
         while (!m_rigidBodiesActivationList.empty())
         {
             pRigidBody = m_rigidBodiesActivationList.pop();
             if (pRigidBody->Activate())
             {
-                WorldContext world(this);
                 world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
                                                                                                       m_pDynamicsWorld->getDispatcher());
             }
@@ -868,9 +854,10 @@ void CBulletPhysics::DoPulse()
     std::lock_guard<std::mutex> guard(doPulseLock);
     assert(!isDuringSimulation);
 
-    CBulletPhysicsProfiler::Clear();
-
-    FlushAllChanges();
+    {
+        BT_PROFILE("flushAllChanges");
+        FlushAllChanges();
+    }
 
     CTickCount tickCountNow = CTickCount::Now();
 
@@ -882,6 +869,7 @@ void CBulletPhysics::DoPulse()
 #ifdef MTA_CLIENT
     if (m_bDrawDebugNextTime)
     {
+        BT_PROFILE("drawDebug");
         m_pDebugDrawer->Clear();
 
         CVector vecPosition, vecLookAt;
@@ -894,9 +882,11 @@ void CBulletPhysics::DoPulse()
         }
     }
 #endif
+    {
+        BT_PROFILE("mta");
+        PostProcessCollisions();
+    }
 
-    PostProcessCollisions();
-
-    m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
+    //m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
     // ClearOutsideWorldRigidBodies();
 }

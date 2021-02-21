@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <stack>
+
 #define USE_NANOSECOND_TIMING 1            // use nanoseconds for profiling?
 
 #ifdef USE_NANOSECOND_TIMING
@@ -20,23 +22,33 @@ typdef uint ProfilerTime;
 
 class btClock;
 
+struct ProfileSample
+{
+    std::string  name;
+    ProfilerTime time;
+    ProfileSample(std::string name, ProfilerTime time) : name(name), time(time) {}
+};
+
 class CBulletPhysicsProfiler
 {
 public:
-    static void                                          Start();
-    static void                                          Stop();
-    static void                                          OnProfileEnter(const char* name);
-    static void                                          OnProfileLeave();
-    static std::unordered_map<const char*, ProfilerTime> GetProfileTimings();
-    static void                                          Clear();
+    static void                       Enable();
+    static void                       Disable();
+    static void                       OnProfileEnter(const char* name);
+    static void                       OnProfileLeave();
+    static void                       OnProfileEnterDisabled(const char* name){};
+    static void                       OnProfileLeaveDisabled(){};
+    static std::vector<ProfileSample> GetProfileTimings();
+    static void                       Clear();
 
 private:
-    static std::unordered_map<DWORD, std::unordered_map<const char*, ProfilerTime>> m_mapProfileTimings;
-    static std::unordered_map<DWORD, const char*>                                   m_mapCurrentProfile;
-    static std::unordered_map<DWORD, ProfilerTime>                                  m_mapTiming;
+    static std::vector<ProfileSample> m_vecProfileSamples;
+    static std::stack<std::string>    m_stackCurrentProfile;
+    static std::stack<ProfilerTime>   m_stackTiming;
     // static long        tickCount = GetTickCount32();
-    static std::mutex m_lock;
+    static std::mutex lock;
 #ifdef USE_NANOSECOND_TIMING
     static std::unique_ptr<btClock> m_clock;
+    static std::vector<std::string> m_vecScope;
 #endif
 };

@@ -349,8 +349,6 @@ public:
     CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
     CLuaPhysicsRigidBody*       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
 
-    const std::unordered_map<const char*, ProfilerTime>& GetProfileTimings() const { return m_mapProfileTimings; }
-
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
     void                 FlushAllChanges();
     bool                 WorldHasChanged();
@@ -369,8 +367,6 @@ public:
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DrawDebugLines();
 #endif
-
-    btDiscreteDynamicsWorld* GetWorld() const;
 
 private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
@@ -440,7 +436,6 @@ private:
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*> m_rigidBodiesUpdateAABBList;
 
     std::vector<CLuaPhysicsWorldElement*>         m_vecLastContact;
-    std::unordered_map<const char*, ProfilerTime> m_mapProfileTimings;
     std::unique_ptr<CIslandCallback>              m_pIslandCallback;
 
 #ifdef MTA_CLIENT
