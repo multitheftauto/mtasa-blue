@@ -92,14 +92,14 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
         }
 
         // On Fire
-        if (ucFlags & 0x20)
+        if (ucFlags & 0x20 && BitStream.Version() >= 0x04E)
         {
             if (!BitStream.ReadBit(pData->bOnFire))
                 return false;
         }
 
         // In Water
-        if (ucFlags & 0x40)
+        if (ucFlags & 0x40 && BitStream.Version() >= 0x55)
         {
             if (!BitStream.ReadBit(pData->bIsInWater))
                 return false;
@@ -154,9 +154,9 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(pData->fHealth);
     if (pData->ucFlags & 0x10)
         BitStream.Write(pData->fArmor);
-    if (pData->ucFlags & 0x20)
+    if (pData->ucFlags & 0x20 && BitStream.Version() >= 0x04E)
         BitStream.WriteBit(pData->bOnFire);
-    if (pData->ucFlags & 0x40)
+    if (pData->ucFlags & 0x40 && BitStream.Version() >= 0x55)
         BitStream.Write(pData->bIsInWater);
 
     return true;
