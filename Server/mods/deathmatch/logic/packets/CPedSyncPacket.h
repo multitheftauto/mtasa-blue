@@ -20,7 +20,6 @@ class CPedSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        bool          bSend;
         ElementID     Model;
         unsigned char ucFlags;
         unsigned char ucSyncTimeContext;
@@ -34,7 +33,10 @@ public:
     };
 
 public:
+    // Used when receiving ped sync from clients, can contain multiple SyncData
     CPedSyncPacket(){};
+    // Used when sending ped sync to clients, only contains one SyncData
+    CPedSyncPacket(SyncData* pData);
     ~CPedSyncPacket();
 
     ePacketID     GetPacketID() const { return PACKET_ID_PED_SYNC; };

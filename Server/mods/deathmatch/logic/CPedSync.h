@@ -26,8 +26,9 @@ public:
     void OverrideSyncer(CPed* pPed, CPlayer* pPlayer);
 
 private:
-    void     Update();
-    void     UpdatePed(CPed* pPed);
+    void     UpdateAllSyncer();
+    void     UpdateSyncer(CPed* pPed);
+    void     UpdateNearPlayersList();
     void     FindSyncer(CPed* pPed);
     CPlayer* FindPlayerCloseToPed(CPed* pPed, float fMaxDistance);
 
@@ -35,9 +36,11 @@ private:
     void StopSync(CPed* pPed);
 
     void Packet_PedSync(CPedSyncPacket& Packet);
+    
 
     CPlayerManager* m_pPlayerManager;
     CPedManager*    m_pPedManager;
 
-    CElapsedTime m_UpdateTimer;
+    CElapsedTime m_UpdateSyncerTimer;
+    CElapsedTime m_UpdateNearListTimer;
 };

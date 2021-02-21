@@ -13,12 +13,29 @@
 
 CPedSyncPacket::~CPedSyncPacket()
 {
-    vector<SyncData*>::const_iterator iter = m_Syncs.begin();
-    for (; iter != m_Syncs.end(); ++iter)
+    for (auto iter = m_Syncs.begin(); iter != m_Syncs.end(); ++iter)
     {
         delete *iter;
     }
     m_Syncs.clear();
+}
+
+CPedSyncPacket::CPedSyncPacket(SyncData* pReadData)
+{
+    // Create a new struct and copy the data
+    SyncData* pWriteData = new SyncData;
+    pWriteData->Model = pReadData->Model;
+    pWriteData->ucFlags = pReadData->ucFlags;
+    pWriteData->ucSyncTimeContext = pReadData->ucSyncTimeContext;
+    pWriteData->vecPosition = pReadData->vecPosition;
+    pWriteData->fRotation = pReadData->fRotation;
+    pWriteData->vecVelocity = pReadData->vecVelocity;
+    pWriteData->fHealth = pReadData->fHealth;
+    pWriteData->fArmor = pReadData->fArmor;
+    pWriteData->bOnFire = pReadData->bOnFire;
+    pWriteData->bIsInWater = pReadData->bIsInWater;
+
+    m_Syncs.push_back(pWriteData);
 }
 
 bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
@@ -28,7 +45,6 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
     {
         // Read out the sync data
         SyncData* pData = new SyncData;
-        pData->bSend = false;
 
         if (!BitStream.Read(pData->Model))
             return false;
@@ -100,58 +116,48 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
 
 bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    // While we're not out of syncs to write
-    bool                              bSent = false;
-    vector<SyncData*>::const_iterator iter = m_Syncs.begin();
-    for (; iter != m_Syncs.end(); ++iter)
+    SyncData* pData = m_Syncs.front();
+    if (!pData)
+        return false;
+
+    // Write vehicle ID
+    BitStream.Write(pData->Model);
+
+    // Write the sync time context
+    BitStream.Write(pData->ucSyncTimeContext);
+
+    BitStream.Write(pData->ucFlags);
+
+    // Position and rotation
+    if (pData->ucFlags & 0x01)
     {
-        // If we're not supposed to ignore the packet
-        SyncData* pData = *iter;
-        if (pData->bSend)
-        {
-            // Write vehicle ID
-            BitStream.Write(pData->Model);
-
-            // Write the sync time context
-            BitStream.Write(pData->ucSyncTimeContext);
-
-            BitStream.Write(pData->ucFlags);
-
-            // Position and rotation
-            if (pData->ucFlags & 0x01)
-            {
-                BitStream.Write(pData->vecPosition.fX);
-                BitStream.Write(pData->vecPosition.fY);
-                BitStream.Write(pData->vecPosition.fZ);
-            }
-
-            if (pData->ucFlags & 0x02)
-            {
-                BitStream.Write(pData->fRotation);
-            }
-
-            // Velocity
-            if (pData->ucFlags & 0x04)
-            {
-                BitStream.Write(pData->vecVelocity.fX);
-                BitStream.Write(pData->vecVelocity.fY);
-                BitStream.Write(pData->vecVelocity.fZ);
-            }
-
-            // Health, armour, on fire and is in water
-            if (pData->ucFlags & 0x08)
-                BitStream.Write(pData->fHealth);
-            if (pData->ucFlags & 0x10)
-                BitStream.Write(pData->fArmor);
-            if (pData->ucFlags & 0x20 && BitStream.Version() >= 0x04E)
-                BitStream.WriteBit(pData->bOnFire);
-            if (pData->ucFlags & 0x40 && BitStream.Version() >= 0x55)
-                BitStream.Write(pData->bIsInWater);
-
-            // We've sent atleast one sync
-            bSent = true;
-        }
+        BitStream.Write(pData->vecPosition.fX);
+        BitStream.Write(pData->vecPosition.fY);
+        BitStream.Write(pData->vecPosition.fZ);
     }
 
-    return bSent;
+    if (pData->ucFlags & 0x02)
+    {
+        BitStream.Write(pData->fRotation);
+    }
+
+    // Velocity
+    if (pData->ucFlags & 0x04)
+    {
+        BitStream.Write(pData->vecVelocity.fX);
+        BitStream.Write(pData->vecVelocity.fY);
+        BitStream.Write(pData->vecVelocity.fZ);
+    }
+
+    // Health, armour, on fire and is in water
+    if (pData->ucFlags & 0x08)
+        BitStream.Write(pData->fHealth);
+    if (pData->ucFlags & 0x10)
+        BitStream.Write(pData->fArmor);
+    if (pData->ucFlags & 0x20 && BitStream.Version() >= 0x04E)
+        BitStream.WriteBit(pData->bOnFire);
+    if (pData->ucFlags & 0x40 && BitStream.Version() >= 0x55)
+        BitStream.Write(pData->bIsInWater);
+
+    return true;
 }

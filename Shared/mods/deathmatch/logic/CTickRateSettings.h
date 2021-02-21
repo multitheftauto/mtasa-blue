@@ -17,6 +17,7 @@ public:
         iLightSync = 1500;
         iCamSync = 500;
         iPedSync = 400;
+        iPedFarSync = 2000;
         iUnoccupiedVehicle = 400;
         iObjectSync = 500;
         iKeySyncRotation = 100;
@@ -30,6 +31,7 @@ public:
     int iLightSync;
     int iCamSync;
     int iPedSync;
+    int iPedFarSync;
     int iUnoccupiedVehicle;
     int iObjectSync;
     int iKeySyncRotation;
