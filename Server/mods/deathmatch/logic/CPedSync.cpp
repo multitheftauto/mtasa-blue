@@ -277,7 +277,7 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         for (auto iter = pPed->NearPlayersIterBegin(); iter != pPed->NearPlayersIterEnd(); iter++)
         {
             CPlayer* pRemotePlayer = *iter;
-            // If the syncer changes between UpdateNearLists() he can be in the list, make sure we don't send to him
+            // If the syncer changes between UpdateNearPlayersList() he can be in the list, make sure we don't send to him
             if (pRemotePlayer && pRemotePlayer != pPlayer)
                 sendList.push_back(pRemotePlayer);
         }
