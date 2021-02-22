@@ -157,6 +157,18 @@ void CBulletPhysics::SetUseContinous(bool bUse) const
     world->getDispatchInfo().m_useContinuous = bUse;
 }
 
+void CBulletPhysics::SetSubSteps(int iSubSteps)
+{
+    std::lock_guard<std::mutex> guard(cycleLock);
+    m_iSubSteps = iSubSteps;
+}
+
+int CBulletPhysics::GetSubSteps() const
+{
+    std::lock_guard<std::mutex> guard(cycleLock);
+    return m_iSubSteps;
+}
+
 CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
 {
     CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
@@ -212,8 +224,10 @@ CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(CVector from, 
     if (bFilterBackfaces)
         rayCallback.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
 
-    WorldContext world(this);
-    world->rayTest(from, to, rayCallback);
+    {
+        WorldContext world(this);
+        world->rayTest(from, to, rayCallback);
+    }
 
     return rayCallback;
 }
@@ -237,6 +251,7 @@ CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, C
 
 void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
 {
+    std::lock_guard<std::mutex> guard(cycleLock);
     switch (pPhysicsElement->GetClassType())
     {
         case EIdClassType::RIGID_BODY:
@@ -253,26 +268,6 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
             return;
     }
     assert(false && "Unimplemented class type");
-}
-
-void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
-{
-    ListRemove(m_vecRigidBodies, pLuaRigidBody);
-}
-
-void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
-{
-    ListRemove(m_vecShapes, pLuaShape);
-}
-
-void CBulletPhysics::DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint)
-{
-    ListRemove(m_vecConstraints, pLuaConstraint);
-}
-
-void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
-{
-    ListRemove(m_vecStaticCollisions, pStaticCollision);
 }
 
 void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
@@ -305,6 +300,26 @@ void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
     m_bWorldHasChanged = true;
 }
 
+void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
+{
+    ListRemove(m_vecRigidBodies, pLuaRigidBody);
+}
+
+void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
+{
+    ListRemove(m_vecShapes, pLuaShape);
+}
+
+void CBulletPhysics::DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint)
+{
+    ListRemove(m_vecConstraints, pLuaConstraint);
+}
+
+void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    ListRemove(m_vecStaticCollisions, pStaticCollision);
+}
+
 void CBulletPhysics::StepSimulation()
 {
     BT_PROFILE("stepSimulation");
@@ -316,16 +331,11 @@ void CBulletPhysics::StepSimulation()
     isDuringSimulation = false;
 }
 
-CBulletPhysics::CIslandCallback* CBulletPhysics::GetSimulationIslandCallback(int iTargetIsland)
+void CBulletPhysics::GetSimulationIslandCallback(CBulletPhysics::CIslandCallback& callback)
 {
     WorldContext world(this);
-    m_pIslandCallback->m_islandBodies.clear();
-    m_pIslandCallback->m_bodies.clear();
-    m_pIslandCallback->iTargetIsland = iTargetIsland;
 
     world->getSimulationIslandManager()->processIslands(m_pDispatcher.get(), m_pDynamicsWorld.get(), m_pIslandCallback.get());
-
-    return m_pIslandCallback.get();
 }
 
 void CBulletPhysics::ClearOutsideWorldRigidBodies()
@@ -851,7 +861,7 @@ void CBulletPhysics::FlushAllChanges()
 
 void CBulletPhysics::DoPulse()
 {
-    std::lock_guard<std::mutex> guard(doPulseLock);
+    std::lock_guard<std::mutex> guard(cycleLock);
     assert(!isDuringSimulation);
 
     {

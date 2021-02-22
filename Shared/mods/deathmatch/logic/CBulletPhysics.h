@@ -75,6 +75,11 @@ public:
     CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld physicsWorldType);
     ~CBulletPhysics();
 #endif
+    friend CLuaPhysicsConstraintManager;
+    friend CLuaPhysicsRigidBodyManager;
+    friend CLuaPhysicsShapeManager;
+    friend CLuaPhysicsStaticCollisionManager;
+
     bool ReadSpecialData(const int iLine) { return true; }
 
     // Sorta a hack that these are required by CClientEntity...
@@ -265,13 +270,11 @@ public:
 
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
-    void DoPulse();            // Running on worker thread
-    bool CanDoPulse();
-    void WaitForSimulationToFinish();
-
+    // Thread safe
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
     bool                                         LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const;
+    // Thread safe
     CBulletPhysics::SClosestConvexResultCallback ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to, int iFilterGroup,
                                                            int iFilterMask) const;
 
@@ -281,19 +284,31 @@ public:
 
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
 
+    // Thread safe
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    // Thread safe
     void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    // Thread safe
     void AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
+    // Thread safe
     void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
+    // Thread safe
     void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
+    // Thread safe
     void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
 
-    void    SetGravity(CVector vecGravity) const;
+    // Thread safe
+    void SetGravity(CVector vecGravity) const;
+    // Thread safe
     CVector GetGravity() const;
-    bool    GetUseContinous() const;
-    void    SetUseContinous(bool bUse) const;
-    void    SetSubSteps(int iSubSteps) { m_iSubSteps = iSubSteps; }
-    int     GetSubSteps() const { return m_iSubSteps; }
+    // Thread safe
+    bool GetUseContinous() const;
+    // Thread safe
+    void SetUseContinous(bool bUse) const;
+    // Thread safe
+    void SetSubSteps(int iSubSteps);
+    // Thread safe
+    int     GetSubSteps() const;
     void    SetSimulationEnabled(bool bSimulationEnabled) { m_bSimulationEnabled = bSimulationEnabled; }
     bool    GetSimulationEnabled() const { return m_bSimulationEnabled; }
     void    SetTriggerEvents(bool bTriggerEvents) { m_bTriggerEvents = bTriggerEvents; }
@@ -305,7 +320,7 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     CVector GetWorldSize() const { return m_vecWorldSize; }
 
-    CIslandCallback* GetSimulationIslandCallback(int iTargetIsland = -1);
+    void GetSimulationIslandCallback(CBulletPhysics::CIslandCallback& callback);
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
                                           CVector vecLocalInertia = CVector(0, 0, 0), CVector vecCenterOfMass = CVector(0, 0, 0));
@@ -358,21 +373,30 @@ public:
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
     std::vector<CLuaPhysicsConstraint*>      GetConstraints() const { return m_vecConstraints; }
 
-    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void DestroyShape(CLuaPhysicsShape* pLuaShape);
-    void DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint);
-    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-
 #ifdef MTA_CLIENT
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DrawDebugLines();
 #endif
+
+    // Running on worker thread
+    void DoPulse();
+    bool CanDoPulse();
+    void WaitForSimulationToFinish();
 
 private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
     std::vector<CLuaPhysicsConstraint*>      m_vecConstraints;
+
+    // Use DestroyElement instead
+    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
+    // Use DestroyElement instead
+    void DestroyShape(CLuaPhysicsShape* pLuaShape);
+    // Use DestroyElement instead
+    void DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint);
+    // Use DestroyElement instead
+    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     void StepSimulation();
     void ClearOutsideWorldRigidBodies();
@@ -384,7 +408,8 @@ private:
     void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     mutable std::mutex         lock;
-    mutable std::mutex         doPulseLock;
+    // stepSimulation, doPulse thread safety lock
+    mutable std::mutex         cycleLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
     std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;
@@ -413,7 +438,7 @@ private:
     std::atomic<float> m_fSpeed = 1.0f;
     bool               m_bDuringSimulation = false;
     std::atomic<int>   m_iSubSteps = 10;
-    bool               m_bWorldHasChanged = false;
+    std::atomic<bool>  m_bWorldHasChanged = false;
     mutable std::unique_lock<std::mutex>         m_lockBtWorld;
     std::mutex         m_lockWorldHasChanged;
     float              m_fImpulseThreshold = 0.01f;

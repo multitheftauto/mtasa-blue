@@ -1338,16 +1338,19 @@ std::vector<CLuaPhysicsRigidBody*> CLuaPhysicsDefs::PhysicsGetIslandRigidBodies(
 {
     if (iTargetIsland >= 0)
     {
-        CBulletPhysics::CIslandCallback* callback = pPhysics->GetSimulationIslandCallback(iTargetIsland);
-        return callback->m_bodies;
+        CBulletPhysics::CIslandCallback  callback;
+        callback.iTargetIsland = iTargetIsland;
+        pPhysics->GetSimulationIslandCallback(callback);
+        return callback.m_bodies;
     }
     return std::vector<CLuaPhysicsRigidBody*>();
 }
 
 std::unordered_map<int, int> CLuaPhysicsDefs::PhysicsGetSimulationIslands(CBulletPhysics* pPhysics)
 {
-    CBulletPhysics::CIslandCallback* callback = pPhysics->GetSimulationIslandCallback();
-    return callback->m_islandBodies;
+    CBulletPhysics::CIslandCallback  callback;
+    pPhysics->GetSimulationIslandCallback(callback);
+    return callback.m_islandBodies;
 }
 
 #ifdef MTA_CLIENT
