@@ -37,7 +37,7 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
 
 CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData)
 {
-    if (size.fX < 0 || size.fY < 0 || size.fX == 0 || size.fY == 0)
+    if (size.fX <= 0 || size.fY <= 0)
     {
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
     }
