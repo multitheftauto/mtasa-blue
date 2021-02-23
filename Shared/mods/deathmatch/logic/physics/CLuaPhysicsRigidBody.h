@@ -98,6 +98,8 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::RigidBody; }
+    
+    CLuaPhysicsShape* GetShape() const { return m_pShape; }
 
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;

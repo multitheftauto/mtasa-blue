@@ -43,6 +43,9 @@ public:
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Constraint; }
 
+    CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
+    CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
+
 protected:
     virtual void                       InternalInitialize(std::unique_ptr<btTypedConstraint> pConstraint);
     bool                               m_bDisableCollisionsBetweenLinkedBodies;
@@ -50,6 +53,6 @@ protected:
     std::unique_ptr<btTypedConstraint> m_pConstraint;
     std::unique_ptr<btJointFeedback>   m_pJointFeedback;
     bool                               m_bLastBreakingStatus;
-    CLuaPhysicsRigidBody*              m_pRigidBodyA;
-    CLuaPhysicsRigidBody*              m_pRigidBodyB;
+    CLuaPhysicsRigidBody*              m_pRigidBodyA = nullptr;
+    CLuaPhysicsRigidBody*              m_pRigidBodyB = nullptr;
 };

@@ -15,6 +15,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, btCollisionShape* p
 {
     m_pBtShape.reset(pShape);
     m_pBtShape->setUserPointer((void*)this);
+    m_pBtShape->setUserIndex(EIdClass::SHAPE);
 }
 
 CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, heightfieldTerrainShape* pHeightfieldTerrainShape) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
@@ -22,6 +23,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, heightfieldTerrainS
     m_vecHeightfieldData = std::move(pHeightfieldTerrainShape->data);
     m_pBtShape.reset(pHeightfieldTerrainShape->pHeightfieldTerrainShape);
     m_pBtShape->setUserPointer((void*)this);
+    m_pBtShape->setUserIndex(EIdClass::SHAPE);
 }
 
 void CLuaPhysicsShape::Unlink()

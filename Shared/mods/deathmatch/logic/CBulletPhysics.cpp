@@ -34,7 +34,6 @@ CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld 
 
     SetTypeName("physics");
 
-    m_pIslandCallback = std::make_unique<CIslandCallback>();
     // Add us to Physics manager's list
     m_pPhysicsManager->AddToList(this);
 }
@@ -303,6 +302,7 @@ void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
     ListRemove(m_vecRigidBodies, pLuaRigidBody);
+    m_InitializeRigidBodiesList.remove(pLuaRigidBody);
 }
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
@@ -323,11 +323,10 @@ void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticC
 void CBulletPhysics::StepSimulation()
 {
     BT_PROFILE("stepSimulation");
-    isDuringSimulation = true;
 
     WorldContext world(this);
+    isDuringSimulation = true;
     world->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
-    bool b =  world.IsLocked();
     isDuringSimulation = false;
 }
 
@@ -335,7 +334,7 @@ void CBulletPhysics::GetSimulationIslandCallback(CBulletPhysics::CIslandCallback
 {
     WorldContext world(this);
 
-    world->getSimulationIslandManager()->processIslands(m_pDispatcher.get(), m_pDynamicsWorld.get(), m_pIslandCallback.get());
+    world->getSimulationIslandManager()->processIslands(m_pDispatcher.get(), m_pDynamicsWorld.get(), &callback);
 }
 
 void CBulletPhysics::ClearOutsideWorldRigidBodies()
@@ -425,8 +424,6 @@ void CBulletPhysics::PostProcessCollisions()
 
     for (int i = 0; i < numManifolds; i++)
     {
-        WorldContext                 world(this);
-        
         btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
 
         if (contactManifold == nullptr)
@@ -554,7 +551,7 @@ CLuaPhysicsCylinderShape* CBulletPhysics::CreateCylinderShape(CVector half)
 
 CLuaPhysicsCompoundShape* CBulletPhysics::CreateCompoundShape(int iInitialChildCapacity)
 {
-    assert(iInitialChildCapacity > 0);
+    assert(iInitialChildCapacity >= 0);
 
     CLuaPhysicsCompoundShape* pShape = new CLuaPhysicsCompoundShape(this, iInitialChildCapacity);
     AddShape(pShape);
@@ -728,13 +725,15 @@ void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysic
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
         auto const& btObject = callback.m_collisionObjectArray[i];
-        if (CPhysicsRigidBodyProxy* pRigidBody = dynamic_cast<CPhysicsRigidBodyProxy*>(btObject))
+        static EIdClassType classType = (EIdClass::EIdClassType)btObject->getUserIndex();
+        switch (classType)
         {
-            vecRigidBodies.push_back((CLuaPhysicsRigidBody*)pRigidBody->getUserPointer());
-        }
-        else if (CPhysicsStaticCollisionProxy* pStaticCollision = dynamic_cast<CPhysicsStaticCollisionProxy*>(btObject))
-        {
-            vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)pStaticCollision->getUserPointer());
+            case EIdClassType::RIGID_BODY:
+                vecRigidBodies.push_back((CLuaPhysicsRigidBody*)btObject->getUserPointer());
+                break;
+            case EIdClassType::STATIC_COLLISION:
+                vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)btObject->getUserPointer());
+                break;
         }
     }
 }
@@ -773,6 +772,8 @@ void CBulletPhysics::FlushAllChanges()
     if (!m_bWorldHasChanged)
         return;
 
+    auto shapeManager = m_pLuaMain->GetPhysicsShapeManager();
+    auto rigidBodiesManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     if (!m_InitializeStaticCollisionsList.empty())
     {
         BT_PROFILE("initializeStaticCollisions");
@@ -780,7 +781,7 @@ void CBulletPhysics::FlushAllChanges()
         while (!m_InitializeStaticCollisionsList.empty())
         {
             CLuaPhysicsStaticCollision* pStaticCollision = m_InitializeStaticCollisionsList.pop();
-            if (m_pLuaMain->GetPhysicsShapeManager()->IsShapeValid(pStaticCollision->GetShape()))
+            if (shapeManager->IsShapeValid(pStaticCollision->GetShape()))
             {
                 pStaticCollision->Initialize();
             }
@@ -793,7 +794,10 @@ void CBulletPhysics::FlushAllChanges()
         while (!m_InitializeRigidBodiesList.empty())
         {
             CLuaPhysicsRigidBody* pRigidBody = m_InitializeRigidBodiesList.pop();
-            pRigidBody->Initialize();
+            if (shapeManager->IsShapeValid(pRigidBody->GetShape()))
+            {
+                pRigidBody->Initialize();
+            }
         }
     }
 
@@ -803,7 +807,10 @@ void CBulletPhysics::FlushAllChanges()
         while (!m_InitializeConstraintsList.empty())
         {
             CLuaPhysicsConstraint* pConstraint = m_InitializeConstraintsList.pop();
-            pConstraint->Initialize();
+            if (rigidBodiesManager->IsRigidBodyValid(pConstraint->GetRigidBodyA()) && rigidBodiesManager->IsRigidBodyValid(pConstraint->GetRigidBodyB()))
+            {
+                pConstraint->Initialize();
+            }
         }
     }
 
@@ -862,7 +869,6 @@ void CBulletPhysics::FlushAllChanges()
 void CBulletPhysics::DoPulse()
 {
     std::lock_guard<std::mutex> guard(cycleLock);
-    assert(!isDuringSimulation);
 
     {
         BT_PROFILE("flushAllChanges");
@@ -892,10 +898,10 @@ void CBulletPhysics::DoPulse()
         }
     }
 #endif
-    {
+    /*{
         BT_PROFILE("mta");
         PostProcessCollisions();
-    }
+    }*/
 
     //m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
     // ClearOutsideWorldRigidBodies();

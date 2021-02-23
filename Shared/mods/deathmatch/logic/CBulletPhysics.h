@@ -461,7 +461,6 @@ private:
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*> m_rigidBodiesUpdateAABBList;
 
     std::vector<CLuaPhysicsWorldElement*>         m_vecLastContact;
-    std::unique_ptr<CIslandCallback>              m_pIslandCallback;
 
 #ifdef MTA_CLIENT
     bool m_bDrawDebugNextTime = false;

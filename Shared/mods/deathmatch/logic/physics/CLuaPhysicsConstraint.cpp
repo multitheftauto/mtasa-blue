@@ -40,7 +40,10 @@ void CLuaPhysicsConstraint::InternalInitialize(std::unique_ptr<btTypedConstraint
     //    m_pConstraint->getRigidBodyA().addConstraintRef(m_pConstraint.get());
     //    m_pConstraint->getRigidBodyB().addConstraintRef(m_pConstraint.get());
     //}
+    m_pConstraint->setUserConstraintPtr(this);
+    m_pConstraint->setUserConstraintId(EIdClass::CONSTRAINT);
     m_pRigidBodyA->GetPhysics()->AddConstraint(m_pConstraint.get(), m_bDisableCollisionsBetweenLinkedBodies);
+
 }
 
 CLuaPhysicsConstraint::~CLuaPhysicsConstraint()

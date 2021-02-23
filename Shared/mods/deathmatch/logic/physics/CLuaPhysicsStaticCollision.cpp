@@ -27,6 +27,7 @@ void CLuaPhysicsStaticCollision::Initialize()
 {
     m_btCollisionObject = CPhysicsStaticCollisionProxy::Create(m_pShape);
     m_btCollisionObject->setUserPointer((void*)this);
+    m_btCollisionObject->setUserIndex(EIdClass::CONSTRAINT);
 
     Ready();
 

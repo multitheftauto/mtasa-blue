@@ -1034,8 +1034,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape
     const btCollisionShape*  pBtCollisionShape = pBtCollisionObject->getCollisionShape();
     const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
 
-    if (pBtCollisionObject == nullptr)
-        assert(0);            // should never happen
+    assert(pBtCollisionObject == nullptr); // should never happen
 
     CLuaPhysicsShape*     pHitShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
     CLuaPhysicsRigidBody* pRigidBody = nullptr;

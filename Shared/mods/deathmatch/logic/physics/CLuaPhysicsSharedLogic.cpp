@@ -345,13 +345,13 @@ void CPhysicsSharedLogic::CheckMinimumPrimitiveSize(const CVector vector)
 
 void CPhysicsSharedLogic::CheckMinimumPrimitiveSize(const float value)
 {
-    if (BulletPhysics::Limits::MinimumPrimitiveSize < value)
-        throw std::invalid_argument(SString("Maximum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
+    if (BulletPhysics::Limits::MinimumPrimitiveSize > value)
+        throw std::invalid_argument(SString("Minumum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 }
 
 void CPhysicsSharedLogic::CheckMaximumPrimitiveSize(const float value)
 {
-    if (BulletPhysics::Limits::MaximumPrimitiveSize > value)
+    if (BulletPhysics::Limits::MaximumPrimitiveSize < value)
         throw std::invalid_argument(SString("Maximum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MaximumPrimitiveSize).c_str());
 }
 

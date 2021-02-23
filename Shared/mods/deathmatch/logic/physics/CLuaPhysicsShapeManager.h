@@ -17,6 +17,10 @@ class CLuaPhysicsShapeManager : public CLuaPhysicsBaseManager<CLuaPhysicsShape*>
 {
 public:
     CLuaPhysicsShapeManager() : CLuaPhysicsBaseManager<CLuaPhysicsShape*>(EIdClassType::SHAPE) {}
+    ~CLuaPhysicsShapeManager();
     void Remove(CLuaPhysicsShape* pShape);
     bool IsShapeValid(CLuaPhysicsShape* pShape);
+
+private:
+    std::mutex lock;
 };

@@ -20,4 +20,7 @@ class CLuaPhysicsConstraintManager : public CLuaPhysicsBaseManager<CLuaPhysicsCo
 public:
     CLuaPhysicsConstraintManager() : CLuaPhysicsBaseManager<CLuaPhysicsConstraint*>(EIdClassType::CONSTRAINT) {}
     void Remove(CLuaPhysicsConstraint* pConstraint);
+
+private:
+    std::mutex lock;
 };

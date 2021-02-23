@@ -16,12 +16,19 @@ void CLuaPhysicsConstraintManager::Remove(CLuaPhysicsConstraint* pConstraint)
 {
     assert(pConstraint);
 
-    // Check if already removed
-    if (!ListContains(m_elementsList, pConstraint))
-        return;
+    {
+        std::lock_guard guard(lock);
+        // Check if already removed
+        if (!ListContains(m_elementsList, pConstraint))
+            return;
+    }
 
     // Remove all references
     pConstraint->Unlink();
     pConstraint->GetPhysics()->DestroyConstraint(pConstraint);
-    ListRemove(m_elementsList, pConstraint);
+
+    {
+        std::lock_guard guard(lock);
+        ListRemove(m_elementsList, pConstraint);
+    }
 }
