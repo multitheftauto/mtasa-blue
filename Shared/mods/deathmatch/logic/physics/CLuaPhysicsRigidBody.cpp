@@ -18,6 +18,7 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
     SetTempData(eTempDataKey::Mass, fMass);
     SetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
     SetTempData(eTempDataKey::CenterOfMass, vecCenterOfMass);
+    pShape->AddRigidBody(this);
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()

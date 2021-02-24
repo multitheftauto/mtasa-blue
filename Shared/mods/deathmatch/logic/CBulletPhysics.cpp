@@ -93,7 +93,7 @@ void CBulletPhysics::Unlink()
     for (auto shape = m_vecShapes.rbegin(); shape != m_vecShapes.rend(); ++shape)
     {
         DestroyElement(*shape);
-    } 
+    }
 }
 
 void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
@@ -212,8 +212,7 @@ bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, i
     return rayCallback.hasHit();
 }
 
-CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(CVector from, CVector to, int iFilterGroup, int iFilterMask,
-                                                                  bool bFilterBackfaces) const
+CBulletPhysics::SClosestRayResultCallback CBulletPhysics::RayCast(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const
 {
     BT_PROFILE("rayCast");
     SClosestRayResultCallback rayCallback(from, to);
@@ -250,14 +249,26 @@ CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, C
 
 void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
 {
-    std::lock_guard<std::mutex> guard(cycleLock);
+    std::lock_guard<std::recursive_mutex> lk(elementsLock);
+
     switch (pPhysicsElement->GetClassType())
     {
         case EIdClassType::RIGID_BODY:
             m_pLuaMain->GetPhysicsRigidBodyManager()->Remove((CLuaPhysicsRigidBody*)pPhysicsElement);
             return;
         case EIdClassType::SHAPE:
+        {
+            CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)pPhysicsElement;
+            for (CLuaPhysicsRigidBody* body : pShape->GetRigidBodies())
+            {
+                body->Destroy();
+            }
+            for (CLuaPhysicsStaticCollision* staticCollision : pShape->GetStaticCollisions())
+            {
+                staticCollision->Destroy();
+            }
             m_pLuaMain->GetPhysicsShapeManager()->Remove((CLuaPhysicsShape*)pPhysicsElement);
+        }
             return;
         case EIdClassType::STATIC_COLLISION:
             m_pLuaMain->GetPhysicsStaticCollisionManager()->Remove((CLuaPhysicsStaticCollision*)pPhysicsElement);
@@ -714,7 +725,7 @@ void CBulletPhysics::DrawDebugLines()
 #endif
 
 void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
-                              std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
+                                std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {
     btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
     BroadphaseAabbCallback                   callback(collisionObjectArray, collisionGroup, collisionMask);
@@ -724,7 +735,7 @@ void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysic
 
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
-        auto const& btObject = callback.m_collisionObjectArray[i];
+        auto const&         btObject = callback.m_collisionObjectArray[i];
         static EIdClassType classType = (EIdClass::EIdClassType)btObject->getUserIndex();
         switch (classType)
         {
@@ -858,7 +869,7 @@ void CBulletPhysics::FlushAllChanges()
             if (pRigidBody->Activate())
             {
                 world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                                      m_pDynamicsWorld->getDispatcher());
+                                                                                       m_pDynamicsWorld->getDispatcher());
             }
         }
     }
@@ -868,7 +879,8 @@ void CBulletPhysics::FlushAllChanges()
 
 void CBulletPhysics::DoPulse()
 {
-    std::lock_guard<std::mutex> guard(cycleLock);
+    std::lock_guard<std::mutex>            guard(cycleLock);
+    std::lock_guard<std::recursive_mutex> lk(elementsLock);
 
     {
         BT_PROFILE("flushAllChanges");
@@ -903,6 +915,6 @@ void CBulletPhysics::DoPulse()
         PostProcessCollisions();
     }*/
 
-    //m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
+    // m_mapProfileTimings = CBulletPhysicsProfiler::GetProfileTimings();
     // ClearOutsideWorldRigidBodies();
 }

@@ -16,6 +16,7 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
 {
     // pShape->AddStaticCollision(this);
     m_pShape = pShape;
+    pShape->AddStaticCollision(this);
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()

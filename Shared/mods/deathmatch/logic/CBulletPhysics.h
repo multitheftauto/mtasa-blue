@@ -410,6 +410,8 @@ private:
     mutable std::mutex         lock;
     // stepSimulation, doPulse thread safety lock
     mutable std::mutex         cycleLock;
+    // For elements managment 
+    mutable std::recursive_mutex         elementsLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
     std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;
