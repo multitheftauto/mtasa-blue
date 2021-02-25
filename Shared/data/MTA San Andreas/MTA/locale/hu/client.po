@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Translators: Bence Szlobodics; György Péter; NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza\n"
+"Translators: Bence Szlobodics; György Péter; NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza; tarcsi\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1562879773.0\n"
 
@@ -895,12 +895,12 @@ msgstr "Automatikus média fájl felismerés"
 #: ..\Client\core\CSettings.cpp:561
 #, fuzzy
 msgid "Mute options"
-msgstr "Egér beállítások"
+msgstr "További hangbeállítások"
 
 #: ..\Client\core\CSettings.cpp:567
 #, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Némítsa az SFX hangokat amikor minimalizálva van"
+msgstr "Némítsa az összes hangot amikor minimalizálva van"
 
 #: ..\Client\core\CSettings.cpp:572
 msgid "Mute Radio sounds when minimized"
@@ -977,7 +977,7 @@ msgstr "Keret nélküli ablak"
 
 #: ..\Client\core\CSettings.cpp:647 ..\Client\core\CSettings.cpp:1558
 msgid "Borderless keep res"
-msgstr "Ablak keret nélkül"
+msgstr "Keret nélküli ablak a felbontás megtartásával"
 
 #: ..\Client\core\CSettings.cpp:651
 msgid "Mip Mapping"
@@ -1055,20 +1055,20 @@ msgstr "Hőség effekt"
 
 #: ..\Client\core\CSettings.cpp:800
 msgid "Tyre Smoke etc"
-msgstr "Gumi füstölés stb."
+msgstr "Gumi füstölés stb"
 
 #: ..\Client\core\CSettings.cpp:804
 msgid "Render vehicles always in high detail"
-msgstr "Jármű renderelés magas felbontáson"
+msgstr "Járművek renderelése magas felbontáson"
 
 #: ..\Client\core\CSettings.cpp:808
 #, fuzzy
 msgid "Render peds always in high detail"
-msgstr "Jármű renderelés magas felbontáson"
+msgstr "Karakterek renderelése magas felbontáson"
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
-msgstr "Gumi füstölés stb."
+msgstr "Minimalizálás teljes képernyős módban"
 
 #: ..\Client\core\CSettings.cpp:825
 msgid "Enable Device Selection Dialog"
@@ -2821,7 +2821,7 @@ msgstr "GTA:SA hibákat talált a '%s' fájlban"
 
 #: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Újrainduljon a számítógép miközben játszik az MTA:SA-val?"
+msgstr "Újraindult a számítógéped miközben játszottál az MTA-val?"
 
 #: ..\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"
