@@ -91,8 +91,8 @@ void CPedSync::UpdateSyncer(CPed* pPed)
     if (pSyncer)
     {
         // Is he close enough, and in the right dimension?
-        if (IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance))
-            if (pPed->GetDimension() == pSyncer->GetDimension())
+        if (IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance)
+            && pPed->GetDimension() == pSyncer->GetDimension())
                 return;
 
         // Stop him from syncing it
