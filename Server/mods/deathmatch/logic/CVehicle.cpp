@@ -741,7 +741,7 @@ bool CVehicle::SetTowedByVehicle(CVehicle* pVehicle)
 void CVehicle::SpawnAt(const CVector& vecPosition, const CVector& vecRotation)
 {
     SetHealth(GetRespawnHealth());
-    SetIsBlown(false);
+    SetBlowState(VehicleBlowState::INTACT);
     StopIdleTimer();
     ResetDoorsWheelsPanelsLights();
     SetLandingGearDown(true);
@@ -889,18 +889,23 @@ void CVehicle::ResetDoorsWheelsPanelsLights()
     memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
 }
 
-// For blow respawn timer
-void CVehicle::SetIsBlown(bool bBlown)
+bool CVehicle::IsBlowTimerFinished()
 {
-    if (!bBlown)
-        m_llBlowTime = CTickCount(0LL);
-    else
+    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+}
+
+void CVehicle::ResetExplosionTimer()
+{
+    if (m_blowState == VehicleBlowState::BLOWN)
         m_llBlowTime = CTickCount::Now();
 }
 
-bool CVehicle::IsBlowTimerFinished()
+void CVehicle::SetBlowState(VehicleBlowState state)
 {
-    return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+    m_blowState = state;
+
+    if (state == VehicleBlowState::BLOWN)
+        m_llBlowTime = CTickCount::Now();
 }
 
 void CVehicle::StopIdleTimer()

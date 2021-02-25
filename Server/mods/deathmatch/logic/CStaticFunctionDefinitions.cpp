@@ -5257,7 +5257,7 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
         // Repair it
         pVehicle->SetHealth(DEFAULT_VEHICLE_HEALTH);
         pVehicle->ResetDoorsWheelsPanelsLights();
-        pVehicle->SetIsBlown(false);
+        pVehicle->SetBlowState(VehicleBlowState::INTACT);
 
         // Tell everyone
         CBitStream BitStream;
@@ -5270,25 +5270,27 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
+bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<bool> withExplosion)
 {
-    RUN_CHILDREN(BlowVehicle(*iter))
+    RUN_CHILDREN(BlowVehicle(*iter, withExplosion))
 
     if (!IS_VEHICLE(pElement))
         return false;
 
     CVehicle* vehicle = static_cast<CVehicle*>(pElement);
 
-    if (vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+    if (vehicle->IsBlown() || vehicle->IsBeingDeleted())
         return false;
 
-    vehicle->SetIsBlown(true);
+    bool createExplosion = withExplosion.value_or(true);
+    vehicle->SetBlowState(createExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
 
-    CLuaArguments Arguments;
-    vehicle->CallEvent("onVehicleExplode", Arguments);
+    CLuaArguments arguments;
+    arguments.PushBoolean(createExplosion);            // withExplosion
+    vehicle->CallEvent("onVehicleExplode", arguments);
 
     // Abort if vehicle got fixed or destroyed
-    if (!vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+    if (!vehicle->IsBlown() || vehicle->IsBeingDeleted())
         return true;
 
     vehicle->SetHealth(0.0f);
@@ -6761,9 +6763,8 @@ bool CStaticFunctionDefinitions::ResetVehicleExplosionTime(CElement* pElement)
 
     if (IS_VEHICLE(pElement))
     {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-        pVehicle->SetIsBlown(false);
-
+        CVehicle* vehicle = static_cast<CVehicle*>(pElement);
+        vehicle->ResetExplosionTimer();
         return true;
     }
 
