@@ -80,6 +80,10 @@ public:
     friend CLuaPhysicsShapeManager;
     friend CLuaPhysicsStaticCollisionManager;
 
+    friend CPhysicsRigidBodyProxy;
+    friend CPhysicsStaticCollisionProxy;
+    friend CLuaPhysicsConstraint;
+
     bool ReadSpecialData(const int iLine) { return true; }
 
     // Sorta a hack that these are required by CClientEntity...
@@ -282,20 +286,7 @@ public:
 
     CBulletPhysics::SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
 
-    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
-
-    // Thread safe
-    void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
-    // Thread safe
-    void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
-    // Thread safe
-    void AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
-    // Thread safe
-    void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
-    // Thread safe
-    void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
-    // Thread safe
-    void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
+    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
 
     // Thread safe
     void SetGravity(CVector vecGravity) const;
@@ -323,7 +314,7 @@ public:
     void GetSimulationIslandCallback(CBulletPhysics::CIslandCallback& callback);
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
-                                          CVector vecLocalInertia = CVector(0, 0, 0), CVector vecCenterOfMass = CVector(0, 0, 0));
+                                          CVector vecLocalInertia = CVector{0, 0, 0}, CVector vecCenterOfMass = CVector{0, 0, 0});
 
     CLuaPhysicsBoxShape*                 CreateBoxShape(CVector vector);
     CLuaPhysicsSphereShape*              CreateSphereShape(float radius);
@@ -388,6 +379,19 @@ private:
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
     std::vector<CLuaPhysicsConstraint*>      m_vecConstraints;
+
+    // Thread safe
+    void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    // Thread safe
+    void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    // Thread safe
+    void AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
+    // Thread safe
+    void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
+    // Thread safe
+    void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
+    // Thread safe
+    void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
 
     // Use DestroyElement instead
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);

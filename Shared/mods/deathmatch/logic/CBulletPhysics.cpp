@@ -168,7 +168,7 @@ int CBulletPhysics::GetSubSteps() const
     return m_iSubSteps;
 }
 
-CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
+CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
 {
     CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
     AddStaticCollision(pStaticCollision);
@@ -199,7 +199,7 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
 bool CBulletPhysics::LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const
 {
     BT_PROFILE("lineCast");
-    btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
+    SClosestRayResultCallback rayCallback(from, to);
     rayCallback.m_collisionFilterGroup = iFilterGroup;
     rayCallback.m_collisionFilterMask = iFilterMask;
     if (bFilterBackfaces)

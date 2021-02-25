@@ -132,7 +132,7 @@ void CLuaPhysicsShape::UpdateRigids()
     {
         rigidBody->NeedsAABBUpdate();
         rigidBody->NeedsActivation();
-        // rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
+        // rigidBody->ApplyForce(CVector{0, 0, 0}, CVector(0, 0, 0.01));
     }
 }
 

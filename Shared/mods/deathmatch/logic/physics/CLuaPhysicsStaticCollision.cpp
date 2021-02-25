@@ -30,9 +30,15 @@ void CLuaPhysicsStaticCollision::Initialize()
     m_btCollisionObject->setUserPointer((void*)this);
     m_btCollisionObject->setUserIndex(EIdClass::CONSTRAINT);
 
-    Ready();
+    btTransform& transform = m_btCollisionObject->getWorldTransform();
+    CPhysicsSharedLogic::SetPosition(transform, m_matrix.GetPosition());
+    CPhysicsSharedLogic::SetRotation(transform, m_matrix.GetRotation());
+    m_btCollisionObject->getCollisionShape()->setLocalScaling(m_matrix.GetScale());
 
-    //SetMatrix(m_matrix);
+    m_btCollisionObject->setWorldTransform(transform);
+    m_btCollisionObject->SetEnabled(true);
+
+    Ready();
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition, bool dontCommitChanges)

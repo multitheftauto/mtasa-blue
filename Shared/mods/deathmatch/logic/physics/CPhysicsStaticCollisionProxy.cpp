@@ -16,7 +16,6 @@ std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::Crea
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject = std::make_unique<CPhysicsStaticCollisionProxy>();
     m_btCollisionObject->m_pPhysics = pShape->GetPhysics();
     m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
-    m_btCollisionObject->SetEnabled(true);
     return std::move(m_btCollisionObject);
 }
 
@@ -25,6 +24,7 @@ CPhysicsStaticCollisionProxy::~CPhysicsStaticCollisionProxy()
     SetEnabled(false);
     setCollisionShape(nullptr);            // don't destroy shape, only static collision
 }
+
 void CPhysicsStaticCollisionProxy::SetEnabled(bool bEnabled)
 {
     if (bEnabled != m_bEnabled)

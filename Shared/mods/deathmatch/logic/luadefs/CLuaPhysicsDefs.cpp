@@ -289,8 +289,15 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
                                                                           std::optional<CVector> rotation)
 {
     CLuaPhysicsStaticCollision* pStaticCollision =
-        pShape->GetPhysics()->CreateStaticCollision(pShape, position.value_or(CVector(0, 0, 0)), rotation.value_or(CVector(0, 0, 0)));
+        pShape->GetPhysics()->CreateStaticCollision(pShape);
 
+    CVector vecPosition = position.value_or(CVector{0, 0, 0});
+    CVector vecRotation = rotation.value_or(CVector{0, 0, 0});
+
+    if (vecPosition.LengthSquared() != 0)
+        pStaticCollision->SetPosition(vecPosition, true);
+    if (vecRotation.LengthSquared() != 0)
+        pStaticCollision->SetRotation(vecRotation, true);
     return pStaticCollision;
 }
 
@@ -820,8 +827,9 @@ bool CLuaPhysicsDefs::PhysicsLineCast(CBulletPhysics* pPhysics, CVector from, CV
         iFilterMask = getOption(options.value(), "filterMask", BulletPhysics::Defaults::FilterMask);
     }
 
-    const CBulletPhysics::SClosestRayResultCallback& rayCallback = pPhysics->RayCast(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
-    return rayCallback.hasHit();
+    pPhysics->FlushAllChanges();
+    bool result = pPhysics->LineCast(from, to, iFilterGroup, iFilterMask, bFilterBackfaces);
+    return result;
 }
 
 std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options)

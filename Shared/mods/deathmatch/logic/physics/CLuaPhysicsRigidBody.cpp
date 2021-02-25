@@ -42,6 +42,7 @@ void CLuaPhysicsRigidBody::Initialize()
 
     SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);
     SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
+    m_pRigidBodyProxy->SetEnabled(true);
 
     Ready();
     // SetMatrix(m_matrix);

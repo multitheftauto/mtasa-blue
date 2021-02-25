@@ -30,8 +30,8 @@ public:
     static CVector GetPosition(btCollisionObject* pCollisionObject);
     static CVector GetRotation(btCollisionObject* pCollisionObject);
 
-    static btBoxShape*      CreateBox(const CVector half, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector(0, 0, 0));
-    static btSphereShape*   CreateSphere(const float fRadius, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector(0, 0, 0));
+    static btBoxShape*      CreateBox(const CVector half, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector{0, 0, 0});
+    static btSphereShape*   CreateSphere(const float fRadius, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector{0, 0, 0});
     static btCapsuleShape*  CreateCapsule(const float fRadius, const float fHeight);
     static btConeShape*     CreateCone(const float fRadius, const float fHeight);
     static btCylinderShape* CreateCylinder(const CVector half);
