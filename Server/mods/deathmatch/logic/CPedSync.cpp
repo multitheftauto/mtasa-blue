@@ -91,8 +91,8 @@ void CPedSync::UpdateSyncer(CPed* pPed)
     if (pSyncer)
     {
         // Is he close enough, and in the right dimension?
-        if (IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance)
-            && pPed->GetDimension() == pSyncer->GetDimension())
+        if (pPed->GetDimension() == pSyncer->GetDimension()
+            && IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance))
                 return;
 
         // Stop him from syncing it
@@ -166,12 +166,12 @@ CPlayer* CPedSync::FindPlayerCloseToPed(CPed* pPed, float fMaxDistance)
         if (!pPlayer->IsJoined())
             continue;
 
-        // He's near enough?
-        if (!IsPointNearPoint3D(vecPedPosition, pPlayer->GetPosition(), fMaxDistance))
-            continue;
-
         // Same dimension?
         if (pPlayer->GetDimension() != pPed->GetDimension())
+            continue;
+
+        // He's near enough?
+        if (!IsPointNearPoint3D(vecPedPosition, pPlayer->GetPosition(), fMaxDistance))
             continue;
 
         // He syncs less peds than the previous player close enough?
