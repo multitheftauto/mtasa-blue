@@ -36,8 +36,7 @@ public:
     // Used when receiving ped sync from clients, can contain multiple SyncData
     CPedSyncPacket(){};
     // Used when sending ped sync to clients, only contains one SyncData
-    CPedSyncPacket(SyncData* pData);
-    ~CPedSyncPacket();
+    CPedSyncPacket(SyncData& pReadData);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PED_SYNC; };
     unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
@@ -45,8 +44,5 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    std::vector<SyncData*>::const_iterator IterBegin() { return m_Syncs.begin(); };
-    std::vector<SyncData*>::const_iterator IterEnd() { return m_Syncs.end(); };
-
-    std::vector<SyncData*> m_Syncs;
+    std::vector<SyncData> m_Syncs;
 };

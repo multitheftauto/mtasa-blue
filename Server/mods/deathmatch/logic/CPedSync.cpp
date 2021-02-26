@@ -194,12 +194,10 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
     long long llTickCountNow = GetModuleTickCount64();
 
     // Apply the data for each ped in the packet
-    for (auto iter = Packet.IterBegin(); iter != Packet.IterEnd(); iter++)
+    for (auto& Data : Packet.m_Syncs)
     {
-        CPedSyncPacket::SyncData* pData = *iter;
-
         // Grab the ped this packet is for
-        CElement* pPedElement = CElementIDs::GetElement(pData->ID);
+        CElement* pPedElement = CElementIDs::GetElement(Data.ID);
         if (!pPedElement || !IS_PED(pPedElement))
             continue;
 
@@ -208,30 +206,30 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
 
         // Is the player syncing this ped?
         // Check if the time context matches.
-        if (pPed->GetSyncer() != pPlayer || !pPed->CanUpdateSync(pData->ucSyncTimeContext))
+        if (pPed->GetSyncer() != pPlayer || !pPed->CanUpdateSync(Data.ucSyncTimeContext))
             continue;
 
         // Apply the data to the ped
-        if (pData->ucFlags & 0x01)
+        if (Data.ucFlags & 0x01)
         {
-            pPed->SetPosition(pData->vecPosition);
+            pPed->SetPosition(Data.vecPosition);
             g_pGame->GetColManager()->DoHitDetection(pPed->GetPosition(), pPed);
         }
-        if (pData->ucFlags & 0x02)
-            pPed->SetRotation(pData->fRotation);
-        if (pData->ucFlags & 0x04)
-            pPed->SetVelocity(pData->vecVelocity);
+        if (Data.ucFlags & 0x02)
+            pPed->SetRotation(Data.fRotation);
+        if (Data.ucFlags & 0x04)
+            pPed->SetVelocity(Data.vecVelocity);
 
-        if (pData->ucFlags & 0x08)
+        if (Data.ucFlags & 0x08)
         {
             // Less health than last time?
             float fPreviousHealth = pPed->GetHealth();
-            pPed->SetHealth(pData->fHealth);
+            pPed->SetHealth(Data.fHealth);
 
-            if (pData->fHealth < fPreviousHealth)
+            if (Data.fHealth < fPreviousHealth)
             {
                 // Grab the delta health
-                float fDeltaHealth = fPreviousHealth - pData->fHealth;
+                float fDeltaHealth = fPreviousHealth - Data.fHealth;
 
                 if (fDeltaHealth > 0.0f)
                 {
@@ -243,14 +241,14 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
             }
         }
 
-        if (pData->ucFlags & 0x10)
-            pPed->SetArmor(pData->fArmor);
+        if (Data.ucFlags & 0x10)
+            pPed->SetArmor(Data.fArmor);
 
-        if (pData->ucFlags & 0x20)
-            pPed->SetOnFire(pData->bOnFire);
+        if (Data.ucFlags & 0x20)
+            pPed->SetOnFire(Data.bOnFire);
 
-        if (pData->ucFlags & 0x40)
-            pPed->SetInWater(pData->bIsInWater);
+        if (Data.ucFlags & 0x40)
+            pPed->SetInWater(Data.bIsInWater);
 
         // Is it time to sync to everyone
         bool bDoFarSync = llTickCountNow - pPed->GetLastFarSyncTick() >= g_TickRateSettings.iPedFarSync;
@@ -259,7 +257,7 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
             continue;
 
         // Create a new packet, containing only the struct for this ped
-        CPedSyncPacket PedPacket(pData);
+        CPedSyncPacket PedPacket(Data);
         if (!&PedPacket)
             continue;
 
