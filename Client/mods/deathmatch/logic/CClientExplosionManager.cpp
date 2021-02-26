@@ -124,14 +124,14 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     CClientEntity* pOriginSource = nullptr;
 
     // Is this an exploding vehicle?
-    if (pGameExplodingEntity && pGameExplodingEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
+    if (pGameExplodingEntity != nullptr && pResponsible->GetType() == CCLIENTVEHICLE)
     {
-        // Set our origin-source to the vehicle
-        SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle(reinterpret_cast<DWORD*>(pGameExplodingEntity->GetInterface()));
+        auto vehicle = reinterpret_cast<CClientVehicle*>(pResponsible);
+        pOriginSource = vehicle;
 
-        if (pVehicleClientEntity)
+        if (vehicle->GetBlowState() == VehicleBlowState::INTACT)
         {
-            pOriginSource = pVehicleClientEntity->pClientEntity;
+            vehicle->SetBlowState(VehicleBlowState::AWAITING_EXPLOSION_SYNC);
         }
     }
     // If theres other players, sync it relative to the closest (lag compensation)

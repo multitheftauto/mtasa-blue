@@ -834,19 +834,19 @@ void CClientVehicle::SetHealth(float health)
 
 void CClientVehicle::Fix()
 {
+    if (m_pVehicle)
+    {
+        m_pVehicle->Fix();
+        // Make sure its visible, if its supposed to be
+        m_pVehicle->SetVisible(m_bVisible);
+    }
+
     m_blowAfterStreamIn = false;
 
     if (m_blowState != VehicleBlowState::INTACT)
     {
         m_blowState = VehicleBlowState::INTACT;
         ReCreate();
-    }
-
-    if (m_pVehicle)
-    {
-        m_pVehicle->Fix();
-        // Make sure its visible, if its supposed to be
-        m_pVehicle->SetVisible(m_bVisible);
     }
 
     SetHealth(DEFAULT_VEHICLE_HEALTH);
