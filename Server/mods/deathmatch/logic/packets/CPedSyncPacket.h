@@ -20,7 +20,7 @@ class CPedSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        ElementID     Model;
+        ElementID     ID;
         unsigned char ucFlags;
         unsigned char ucSyncTimeContext;
         CVector       vecPosition;

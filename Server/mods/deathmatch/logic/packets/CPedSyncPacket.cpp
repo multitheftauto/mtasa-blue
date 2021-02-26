@@ -24,7 +24,7 @@ CPedSyncPacket::CPedSyncPacket(SyncData* pReadData)
 {
     // Create a new struct and copy the data
     SyncData* pWriteData = new SyncData;
-    pWriteData->Model = pReadData->Model;
+    pWriteData->ID = pReadData->ID;
     pWriteData->ucFlags = pReadData->ucFlags;
     pWriteData->ucSyncTimeContext = pReadData->ucSyncTimeContext;
     pWriteData->vecPosition = pReadData->vecPosition;
@@ -46,7 +46,7 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
         // Read out the sync data
         SyncData* pData = new SyncData;
 
-        if (!BitStream.Read(pData->Model))
+        if (!BitStream.Read(pData->ID))
             return false;
 
         // Read the sync time context
@@ -121,7 +121,7 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
         return false;
 
     // Write vehicle ID
-    BitStream.Write(pData->Model);
+    BitStream.Write(pData->ID);
 
     // Write the sync time context
     BitStream.Write(pData->ucSyncTimeContext);

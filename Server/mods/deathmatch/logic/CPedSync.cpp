@@ -199,7 +199,7 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         CPedSyncPacket::SyncData* pData = *iter;
 
         // Grab the ped this packet is for
-        CElement* pPedElement = CElementIDs::GetElement(pData->Model);
+        CElement* pPedElement = CElementIDs::GetElement(pData->ID);
         if (!pPedElement || !IS_PED(pPedElement))
             continue;
 
