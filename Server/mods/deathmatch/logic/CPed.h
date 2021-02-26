@@ -323,7 +323,7 @@ protected:
     bool m_bSyncable;
     bool m_bCollisionsEnabled;
 
-    long long             m_llLastFarSyncTick;
+    long long             m_llLastFarSyncTick = 0;
     std::vector<CPlayer*> m_nearPlayersList;
 
 private:
