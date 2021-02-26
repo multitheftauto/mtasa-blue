@@ -5255,9 +5255,9 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
         pVehicle->GenerateSyncTimeContext();
 
         // Repair it
+        pVehicle->SetBlowState(VehicleBlowState::INTACT);
         pVehicle->SetHealth(DEFAULT_VEHICLE_HEALTH);
         pVehicle->ResetDoorsWheelsPanelsLights();
-        pVehicle->SetBlowState(VehicleBlowState::INTACT);
 
         // Tell everyone
         CBitStream BitStream;
@@ -5298,6 +5298,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<b
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
+    BitStream.pBitStream->WriteBit(createExplosion);            // only consumed by clients with at least eBitStreamVersion::VehicleBlowStateSupport
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
     return true;
 }

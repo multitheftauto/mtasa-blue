@@ -92,7 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
         {"fixVehicle", FixVehicle},
-        {"blowVehicle", BlowVehicle},
+        {"blowVehicle", ArgumentParserWarn<false, BlowVehicle>},
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
         {"setVehicleColor", SetVehicleColor},
         {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
@@ -1548,30 +1548,9 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
-{
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::BlowVehicle(*pEntity))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 bool CLuaVehicleDefs::IsVehicleBlown(CClientVehicle* vehicle)
 {
-    return vehicle->IsVehicleBlown();
+    return vehicle->IsBlown();
 }
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
@@ -4162,4 +4141,9 @@ std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClient
 bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
 {
     return vehicle->ResetDummyPositions();
+}
+
+bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
+{
+    return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }

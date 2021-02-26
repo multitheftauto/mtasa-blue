@@ -34,6 +34,15 @@ bool CExplosionSyncPacket::Read(NetBitStreamInterface& BitStream)
     if (bHasOrigin && !BitStream.Read(m_OriginID))
         return false;
 
+    if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+    {
+        if (!BitStream.ReadBit(m_isVehicleResponsible))
+            return false;
+
+        if (m_isVehicleResponsible && !BitStream.ReadBit(m_blowVehicleWithoutExplosion))
+            return false;
+    }
+
     SPositionSync position(false);
     if (BitStream.Read(&position))
     {
@@ -73,6 +82,14 @@ bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const
     }
     else
         BitStream.WriteBit(false);
+
+    if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+    {
+        BitStream.WriteBit(m_isVehicleResponsible);
+
+        if (m_isVehicleResponsible)
+            BitStream.WriteBit(m_blowVehicleWithoutExplosion);
+    }
 
     // Write position and type
     SPositionSync position(false);

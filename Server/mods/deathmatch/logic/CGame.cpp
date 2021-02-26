@@ -2635,7 +2635,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                     if (previousBlowState == VehicleBlowState::INTACT)
                                     {
                                         CLuaArguments arguments;
-                                        arguments.PushBoolean(true);            // withExplosion
+                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
                                         vehicle->CallEvent("onVehicleExplode", arguments);
                                     }
 

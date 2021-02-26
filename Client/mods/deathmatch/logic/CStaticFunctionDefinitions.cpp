@@ -2774,15 +2774,17 @@ bool CStaticFunctionDefinitions::FixVehicle(CClientEntity& Entity)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity)
+bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optional<bool> withExplosion)
 {
-    RUN_CHILDREN(BlowVehicle(**iter))
-
+    RUN_CHILDREN(BlowVehicle(**iter, withExplosion))
+    
     if (IS_VEHICLE(&Entity))
     {
-        CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+        CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
 
-        Vehicle.Blow(true);
+        VehicleBlowFlags blow;
+        blow.withExplosion = withExplosion.value_or(true);
+        vehicle.Blow(blow);
         return true;
     }
 

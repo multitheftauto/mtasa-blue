@@ -180,6 +180,7 @@ CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
         CVector vecRotationDegrees;
         GetRotationDegrees(vecRotationDegrees);
         pTemp->SetRotationDegrees(vecRotationDegrees);
+        pTemp->SetBlowState(m_blowState);
         pTemp->SetHealth(GetHealth());
         pTemp->SetColor(GetColor());
         pTemp->SetUpgrades(GetUpgrades());
@@ -515,6 +516,14 @@ void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
 {
     m_ucVariant = ucVariant;
     m_ucVariant2 = ucVariant2;
+}
+
+void CVehicle::SetHealth(float fHealth)
+{
+    if (fHealth < 0.0f || IsBlown())
+        fHealth = 0.0f;
+
+    m_fHealth = fHealth;
 }
 
 CVehicleColor& CVehicle::RandomizeColor()

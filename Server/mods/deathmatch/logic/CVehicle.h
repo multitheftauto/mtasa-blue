@@ -194,7 +194,7 @@ public:
     void           SetTurnSpeed(const CVector& vecTurnSpeed) { m_vecTurnSpeed = vecTurnSpeed; };
 
     float GetHealth() { return m_fHealth; };
-    void  SetHealth(float fHealth) { m_fHealth = fHealth; };
+    void  SetHealth(float fHealth);
     float GetLastSyncedHealth() { return m_fLastSyncedHealthHealth; };
     void  SetLastSyncedHealth(float fHealth) { m_fLastSyncedHealthHealth = fHealth; };
 
