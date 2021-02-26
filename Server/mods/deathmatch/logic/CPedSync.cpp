@@ -308,13 +308,13 @@ void CPedSync::UpdateNearPlayersList()
         CElementResult resultNearCamera;
         GetSpatialDatabase()->SphereQuery(resultNearCamera, CSphere(vecCameraPosition, DISTANCE_FOR_NEAR_VIEWER));
 
-        for (auto iter = resultNearCamera.begin(); iter != resultNearCamera.end(); ++iter)
+        for (CElement* pElement : resultNearCamera)
         {
             // Make sure it's a ped
-            if ((*iter)->GetType() != CElement::PED)
+            if (pElement->GetType() != CElement::PED)
                 continue;
 
-            CPed* pPed = static_cast<CPed*>(*iter);
+            CPed* pPed = static_cast<CPed*>(pElement);
 
             // Check dimension matches
             if (pPlayer->GetDimension() != pPed->GetDimension())
