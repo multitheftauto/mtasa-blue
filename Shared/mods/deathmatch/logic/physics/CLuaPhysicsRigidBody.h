@@ -18,6 +18,8 @@ class CLuaPhysicsRigidBody;
 
 struct SPhysicsCollisionReport;
 class CLuaPhysicsConstraint;
+struct SBoundingBox;
+struct SBoundingSphere;
 
 class CLuaPhysicsRigidBody : public CLuaPhysicsWorldElement
 {
@@ -74,8 +76,12 @@ public:
     void    ApplyTorque(const CVector& vecTraque);
     void    ApplyTorqueImpulse(const CVector& vecTraque);
 
-    void  SetSleepingThresholds(float fLinear, float fAngular);
-    void  GetSleepingThresholds(float& fLinear, float& fAngular) const;
+    void SetLinearSleepingThreshold(float fLinear);
+    void SetAngularSleepingThreshold(float fAngular);
+    
+    float GetLinearSleepingThreshold() const;
+    float GetAngularSleepingThreshold() const;
+
     void  SetRestitution(float fRestitution);
     float GetRestitution() const;
 
@@ -101,9 +107,14 @@ public:
     
     CLuaPhysicsShape* GetShape() const { return m_pShape; }
 
+    void SetEnabled(bool bEnabled) { m_pRigidBodyProxy->SetEnabled(bEnabled); }
+    bool IsEnabled() const { return m_pRigidBodyProxy->IsEnabled(); }
+
+    SBoundingBox    GetBoundingBox() { return m_pShape->GetBoundingBox(); }
+    SBoundingSphere GetBoundingSphere() { return m_pShape->GetBoundingSphere(); }
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;
-    CLuaPhysicsShape*                       m_pShape;
+    CLuaPhysicsShape*     m_pShape;
     std::vector<CLuaPhysicsConstraint*>     m_constraintList;
     mutable std::atomic<bool>               m_bActivationRequested;
     mutable std::atomic<bool>               m_bAABBUpdateRequested;

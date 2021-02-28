@@ -36,8 +36,8 @@ public:
 
     bool           SetScale(CVector scale);
     const CVector& GetScale();
-    bool           GetBoundingBox(CVector& vecMin, CVector& vecMax);
-    bool           GetBoundingSphere(CVector& vecCenter, float& fRadius);
+    SBoundingBox           GetBoundingBox();
+    SBoundingSphere           GetBoundingSphere();
     void           GetMargin(float& fMargin);
 
     void UpdateRigids();

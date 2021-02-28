@@ -32,9 +32,10 @@ void CLuaPhysicsElement::RemoveScriptID()
     }
 }
 
-void CLuaPhysicsElement::Destroy()
+bool CLuaPhysicsElement::Destroy()
 {
     m_pPhysics->DestroyElement(this);
+    return true;
 }
 
 bool CLuaPhysicsElement::IsSafeToAccess() const

@@ -187,3 +187,13 @@ void CLuaPhysicsStaticCollision::Unlink()
         m_btCollisionObject = nullptr;
     }
 }
+
+SBoundingBox CLuaPhysicsStaticCollision::GetBoundingBox()
+{
+    return m_pShape->GetBoundingBox();
+}
+
+SBoundingSphere CLuaPhysicsStaticCollision::GetBoundingSphere()
+{
+    return m_pShape->GetBoundingSphere();
+}

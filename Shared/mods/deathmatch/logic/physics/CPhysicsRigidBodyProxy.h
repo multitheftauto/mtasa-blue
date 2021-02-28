@@ -53,4 +53,5 @@ public:
                                                           MotionState* pMotionstate);
 
     void SetEnabled(bool bEnabled);
+    bool IsEnabled() const { return m_bEnabled; }
 };

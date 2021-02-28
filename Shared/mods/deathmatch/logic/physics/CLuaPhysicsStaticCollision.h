@@ -50,6 +50,12 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::StaticCollision; }
+    
+    void SetEnabled(bool bEnabled) { m_btCollisionObject->SetEnabled(bEnabled); }
+    bool IsEnabled() const { return m_btCollisionObject->IsEnabled(); }
+
+    SBoundingBox    GetBoundingBox();
+    SBoundingSphere GetBoundingSphere();
 
 private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;

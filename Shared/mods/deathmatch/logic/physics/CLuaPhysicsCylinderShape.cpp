@@ -23,34 +23,29 @@ CLuaPhysicsCylinderShape::~CLuaPhysicsCylinderShape()
 
 bool CLuaPhysicsCylinderShape::SetRadius(float fRadius)
 {
-    float fHeight;
-    GetHeight(fHeight);
-    ((btCylinderShape*)GetBtShape())->setImplicitShapeDimensions(btVector3(fRadius, fHeight / 2, fRadius));
+    ((btCylinderShape*)GetBtShape())->setImplicitShapeDimensions(btVector3(fRadius, GetHeight() / 2, fRadius));
     UpdateRigids();
     return true;
 }
 
-bool CLuaPhysicsCylinderShape::GetRadius(float& fRadius)
+float CLuaPhysicsCylinderShape::GetRadius()
 {
-    fRadius = ((btCylinderShape*)GetBtShape())->getRadius();
-    return true;
+    return ((btCylinderShape*)GetBtShape())->getRadius();
 }
 
 bool CLuaPhysicsCylinderShape::SetHeight(float fHeight)
 {
     btCylinderShape* pCylinder = (btCylinderShape*)GetBtShape();
-    float            fRadius;
-    GetRadius(fRadius);
+    float            fRadius = GetRadius();
     fRadius += pCylinder->getMargin();
     fHeight -= pCylinder->getMargin();
     pCylinder->setImplicitShapeDimensions(btVector3(fRadius, fHeight, fRadius));
     return true;
 }
 
-bool CLuaPhysicsCylinderShape::GetHeight(float& fHeight)
+float CLuaPhysicsCylinderShape::GetHeight()
 {
     btCylinderShape* pCylinder = (btCylinderShape*)GetBtShape();
-    fHeight = pCylinder->getImplicitShapeDimensions().getY();
-    fHeight += pCylinder->getMargin();
-    return true;
+    float fHeight = pCylinder->getImplicitShapeDimensions().getY();
+    return fHeight + pCylinder->getMargin();
 }

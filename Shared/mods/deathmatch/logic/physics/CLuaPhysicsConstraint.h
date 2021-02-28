@@ -46,6 +46,9 @@ public:
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
 
+    SBoundingBox    GetBoundingBox() { return SBoundingBox(); }
+    SBoundingSphere GetBoundingSphere() { return SBoundingSphere(); }
+
 protected:
     virtual void                       InternalInitialize(std::unique_ptr<btTypedConstraint> pConstraint);
     bool                               m_bDisableCollisionsBetweenLinkedBodies;

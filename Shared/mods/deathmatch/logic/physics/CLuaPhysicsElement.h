@@ -19,10 +19,24 @@ class CLuaPhysicsElement;
 
 class CBulletPhysics;
 
+struct SBoundingBox
+{
+    CVector vecMin;
+    CVector vecMax;
+};
+
+struct SBoundingSphere
+{
+    CVector vecCenter;
+    float   fRadius;
+};
+
 class ILuaPhysicsElement
 {
 public:
     virtual void Update() = 0;
+    virtual SBoundingBox GetBoundingBox() = 0;
+    virtual SBoundingSphere GetBoundingSphere() = 0;
 };
 
 class CLuaPhysicsElement : public ILuaPhysicsElement
@@ -56,7 +70,7 @@ public:
     CBulletPhysics*        GetPhysics() const { return m_pPhysics; }
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
-    void                   Destroy();
+    bool                   Destroy();
     bool                   IsReady() const { return m_isReady; }
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();

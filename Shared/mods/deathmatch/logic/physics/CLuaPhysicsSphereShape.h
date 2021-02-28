@@ -20,7 +20,7 @@ public:
     ~CLuaPhysicsSphereShape();
 
     void SetRadius(float fRadius);
-    bool GetRadius(float& fRadius);
+    float GetRadius();
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::SphereShape; }

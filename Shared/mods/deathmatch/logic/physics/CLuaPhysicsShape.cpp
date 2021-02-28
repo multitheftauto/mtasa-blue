@@ -95,24 +95,26 @@ const CVector& CLuaPhysicsShape::GetScale()
     return btScale;
 }
 
-bool CLuaPhysicsShape::GetBoundingBox(CVector& vecMin, CVector& vecMax)
+SBoundingBox CLuaPhysicsShape::GetBoundingBox()
 {
     btTransform transform = btTransform::getIdentity();
     btVector3   min, max;
     m_pBtShape->getAabb(transform, min, max);
-    vecMin = min;
-    vecMax = max;
-    return true;
+    SBoundingBox sBox = SBoundingBox();
+    sBox.vecMin = min;
+    sBox.vecMax = max;
+    return sBox;
 }
 
-bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
+SBoundingSphere CLuaPhysicsShape::GetBoundingSphere()
 {
     btVector3 center;
     btScalar  radius;
     m_pBtShape->getBoundingSphere(center, radius);
-    fRadius = radius;
-    vecCenter = center;
-    return true;
+    SBoundingSphere sSphere = SBoundingSphere();
+    sSphere.fRadius = radius;
+    sSphere.vecCenter = center;
+    return sSphere;
 }
 
 BroadphaseNativeTypes CLuaPhysicsShape::GetBtType() const

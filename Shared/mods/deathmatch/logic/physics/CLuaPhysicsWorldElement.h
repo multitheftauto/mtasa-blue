@@ -49,6 +49,10 @@ public:
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::WorldElement; }
 
+    
+    virtual void SetEnabled(bool bEnabled) = 0;
+    virtual bool IsEnabled() const = 0;
+
 protected:
     std::vector<CLuaPhysicsWorldElement*> m_vecCollisionContacts;
 };

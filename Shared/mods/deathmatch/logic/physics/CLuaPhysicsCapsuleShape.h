@@ -20,9 +20,9 @@ public:
     ~CLuaPhysicsCapsuleShape();
 
     bool SetRadius(float fRadius);
-    bool GetRadius(float& fRadius);
+    float GetRadius();
     bool SetHeight(float fHeight);
-    bool GetHeight(float& fHeight);
+    float GetHeight();
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BvhTriangleMeshShape; }

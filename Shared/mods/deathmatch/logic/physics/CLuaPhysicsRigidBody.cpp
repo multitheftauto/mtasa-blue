@@ -41,7 +41,8 @@ void CLuaPhysicsRigidBody::Initialize()
     m_pRigidBodyProxy->setUserIndex(EIdClass::RIGID_BODY);
 
     SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);
-    SetSleepingThresholds(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold, BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
+    SetLinearSleepingThreshold(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold);
+    SetAngularSleepingThreshold(BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
     m_pRigidBodyProxy->SetEnabled(true);
 
     Ready();
@@ -499,33 +500,49 @@ const SColor CLuaPhysicsRigidBody::GetDebugColor() const
     return 0;            // #TODO, set white
 }
 
-void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)
+void CLuaPhysicsRigidBody::SetLinearSleepingThreshold(float fLinear)
 {
     assert(fLinear >= 0);
-    assert(fAngular >= 0);
 
     SetTempData(eTempDataKey::SleepingThresholdLinear, fLinear);
-    SetTempData(eTempDataKey::SleepingThresholdAngular, fAngular);
 
-    std::function<void()> change([&, fLinear, fAngular]() { m_pRigidBodyProxy->setSleepingThresholds(fLinear, fAngular); });
+    std::function<void()> change(
+        [&, fLinear]() { m_pRigidBodyProxy->setSleepingThresholds(fLinear, m_pRigidBodyProxy->getAngularSleepingThreshold()); });
 
     CommitChange(change);
 }
 
-void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular) const
+void CLuaPhysicsRigidBody::SetAngularSleepingThreshold(float fAngular)
 {
-    if (GetTempData(eTempDataKey::SleepingThresholdLinear, fLinear))
-        if (GetTempData(eTempDataKey::SleepingThresholdAngular, fAngular))
-            return;
+    assert(fAngular >= 0);
 
-    if (IsReady())
-    {
+    SetTempData(eTempDataKey::SleepingThresholdAngular, fAngular);
+
+    std::function<void()> change([&, fAngular]() { m_pRigidBodyProxy->setSleepingThresholds(m_pRigidBodyProxy->getLinearSleepingThreshold(), fAngular); });
+
+    CommitChange(change);
+}
+
+float CLuaPhysicsRigidBody::GetLinearSleepingThreshold() const
+{
+    float fLinear = 0;
+    if (GetTempData(eTempDataKey::SleepingThresholdLinear, fLinear))
+        return fLinear;
+    else if (IsReady())
         fLinear = m_pRigidBodyProxy->getLinearSleepingThreshold();
+
+    return fLinear;
+}
+
+float CLuaPhysicsRigidBody::GetAngularSleepingThreshold() const
+{
+    float fAngular = 0;
+    if (GetTempData(eTempDataKey::SleepingThresholdAngular, fAngular))
+        return fAngular;
+    else if (IsReady())
         fAngular = m_pRigidBodyProxy->getAngularSleepingThreshold();
-        return;
-    }
-    fLinear = 0;
-    fAngular = 0;
+
+    return fAngular;
 }
 
 btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const

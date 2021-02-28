@@ -91,14 +91,15 @@ enum class ePhysicsDebugMode
     // Custom
     LINE_WIDTH,
     DRAW_DISTANCE,
-    MAX_DEBUG_DRAW_MODE
+    COUNT,
 };
 DECLARE_ENUM_CLASS(ePhysicsDebugMode);
 
 enum class ePhysicsProperty
 {
     MASS,
-    SLEEPING_THRESHOLDS,
+    SLEEPING_LINEAR_THRESHOLDS,
+    SLEEPING_ANGULAR_THRESHOLDS,
     RESTITUTION,
     SCALE,
     DEBUG_COLOR,
@@ -109,19 +110,11 @@ enum class ePhysicsProperty
     HEIGHT,
     BOUNDING_BOX,
     BOUNDING_SPHERE,
-    GRAVITY,
-    USE_CONTINOUS,
     MOTION_CCD_THRESHOLD,
+    GRAVITY,
     SWEPT_SPHERE_RADIUS,
     SLEEP,
     WANTS_SLEEPING,
-    SIMULATION_ENABLED,
-    SUBSTEPS,
-    WORLDSIZE,
-    TRIGGEREVENTS,
-    TRIGGERCOLLISIONEVENTS,
-    TRIGGERCONSTRAINTEVENTS,
-
     // constraints properties
     STIFFNESS,
     PIVOT_A,
@@ -136,17 +129,23 @@ enum class ePhysicsProperty
     RIGID_BODY_B,
     JOINTS_FEEDBACK,
     ENABLED,
-
-    IS_COMPOUND,
-    IS_CONCAVE,
-    IS_CONVEX,
-    IS_CONVEX2D,
-    IS_INFINITE,
-    IS_NON_MOVING,
-    IS_POLYHEDRAL,
-    IS_SOFT_BODY,
+    COUNT,
 };
 DECLARE_ENUM_CLASS(ePhysicsProperty);
+
+enum class ePhysicsWorldProperty
+{
+    GRAVITY,
+    USE_CONTINOUS,
+    SIMULATION_ENABLED,
+    SUBSTEPS,
+    WORLDSIZE,
+    TRIGGEREVENTS,
+    TRIGGERCOLLISIONEVENTS,
+    TRIGGERCONSTRAINTEVENTS,
+    COUNT,
+};
+DECLARE_ENUM_CLASS(ePhysicsWorldProperty);
 
 enum class ePhysicsElementType
 {

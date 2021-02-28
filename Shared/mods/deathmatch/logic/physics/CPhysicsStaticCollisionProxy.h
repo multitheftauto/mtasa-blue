@@ -28,4 +28,5 @@ public:
 
     static std::unique_ptr<CPhysicsStaticCollisionProxy> Create(CLuaPhysicsShape* pShape);
     void SetEnabled(bool bEnabled);
+    bool IsEnabled() const { return m_bEnabled; }
 };

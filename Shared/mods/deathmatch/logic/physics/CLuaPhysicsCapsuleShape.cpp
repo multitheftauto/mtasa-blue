@@ -22,36 +22,30 @@ CLuaPhysicsCapsuleShape::~CLuaPhysicsCapsuleShape()
 
 bool CLuaPhysicsCapsuleShape::SetRadius(float fRadius)
 {
-    float fHeight;
-    GetHeight(fHeight);
-    ((btCapsuleShape*)GetBtShape())->setImplicitShapeDimensions(btVector3(fRadius, fHeight / 2, fRadius));
+    ((btCapsuleShape*)GetBtShape())->setImplicitShapeDimensions(btVector3(fRadius, GetHeight() / 2, fRadius));
     UpdateRigids();
     return true;
 }
 
-bool CLuaPhysicsCapsuleShape::GetRadius(float& fRadius)
+float CLuaPhysicsCapsuleShape::GetRadius()
 {
     btVector3 implicityShapeDimension;
     implicityShapeDimension = ((btSphereShape*)GetBtShape())->getImplicitShapeDimensions();
-    fRadius = implicityShapeDimension.getX();
-    return true;
+    return implicityShapeDimension.getX();
 }
 
 bool CLuaPhysicsCapsuleShape::SetHeight(float fHeight)
 {
     btCapsuleShape* pCapsule = (btCapsuleShape*)GetBtShape();
-    float           fRadius;
-    GetRadius(fRadius);
+    float           fRadius = GetRadius();
     fHeight /= 2;
     pCapsule->setImplicitShapeDimensions(btVector3(fRadius, fHeight, fRadius));
     UpdateRigids();
     return true;
 }
 
-bool CLuaPhysicsCapsuleShape::GetHeight(float& fHeight)
+float CLuaPhysicsCapsuleShape::GetHeight()
 {
     btCapsuleShape* pCapsule = (btCapsuleShape*)GetBtShape();
-    fHeight = pCapsule->getHalfHeight();
-    fHeight *= 2;
-    return true;
+    return pCapsule->getHalfHeight() * 2;
 }

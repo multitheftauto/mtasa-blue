@@ -70,8 +70,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
         {"physicsSetVertexPosition", ArgumentParser<PhysicsSetVertexPosition>},
         {"physicsSetHeight", ArgumentParser<PhysicsSetHeight>},
-        {"physicsSetEnabled", ArgumentParser<PhysicsSetEnabled>},
-        {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
+        {"physicsSetEnabled", ArgumentParser<PhysicsSetRigidBodyEnabled, PhysicsSetStaticCollisionEnabled>},
+        {"physicsIsEnabled", ArgumentParser<PhysicsIsRigidBodyEnabled, PhysicsIsStaticCollisionEnabled>},
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
         {"physicsWorldHasChanged", ArgumentParser<PhysicsWorldHasChanged>},
         {"physicsIsDuringSimulation", ArgumentParser<PhysicsIsDuringSimulation>},
@@ -111,7 +111,7 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
             throw std::invalid_argument(SString("Parallel solvers should be between 1 and %i", BulletPhysics::Limits::ParallelSolversLimit).c_str());
         }
 
-        CBulletPhysics* pPhysics = [&](){
+        CBulletPhysics* pPhysics = [&]() {
             if (iParallelSolvers == 1)
                 return pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
             return pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorldMt);
@@ -133,16 +133,17 @@ CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optio
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant)
 {
-    CVector vecSize;
-    if (std::holds_alternative<CVector>(variant))
-    {
-        vecSize = std::get<CVector>(variant);
-    }
-    else if (std::holds_alternative<float>(variant))
-    {
-        float fSize = std::get<float>(variant);
-        vecSize = CVector{fSize, fSize, fSize};
-    }
+    CVector vecSize = [&]() {
+        if (std::holds_alternative<CVector>(variant))
+        {
+            return std::get<CVector>(variant);
+        }
+        else if (std::holds_alternative<float>(variant))
+        {
+            float fSize = std::get<float>(variant);
+            return CVector{fSize, fSize, fSize};
+        }
+    }();
 
     CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
@@ -250,8 +251,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateHeightfieldTerrainShape(CBulletP
 
 bool CLuaPhysicsDefs::PhysicsDestroy(CLuaPhysicsElement* physicsElement)
 {
-    physicsElement->Destroy();
-    return true;
+    return physicsElement->Destroy();
 }
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
@@ -259,37 +259,35 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     if (!pShape->SupportRigidBody())
         throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
 
-    if (options.has_value() && !options.value().empty())
-    {
-        float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
+    if (!options.has_value() || options.value().empty())
+        return pShape->GetPhysics()->CreateRigidBody(pShape);
 
-        if (fMass < 0)
-            throw std::invalid_argument("Mass can not be negative");
-        if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
-            throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
+    float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
 
-        CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
-        CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
-        CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
-        CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
+    if (fMass < 0)
+        throw std::invalid_argument("Mass can not be negative");
+    if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
+        throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
 
-        CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
+    CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
+    CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
+    CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
 
-        if (vecPosition.LengthSquared() != 0)
-            pRigidBody->SetPosition(vecPosition, true);
-        if (vecRotation.LengthSquared() != 0)
-            pRigidBody->SetRotation(vecRotation, true);
+    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
-        return pRigidBody;
-    }
-    return pShape->GetPhysics()->CreateRigidBody(pShape);
+    if (vecPosition.LengthSquared() != 0)
+        pRigidBody->SetPosition(vecPosition, true);
+    if (vecRotation.LengthSquared() != 0)
+        pRigidBody->SetRotation(vecRotation, true);
+
+    return pRigidBody;
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision =
-        pShape->GetPhysics()->CreateStaticCollision(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(pShape);
 
     CVector vecPosition = position.value_or(CVector{0, 0, 0});
     CVector vecRotation = rotation.value_or(CVector{0, 0, 0});
@@ -301,10 +299,10 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
     return pStaticCollision;
 }
 
-bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysicsShape* pShapeChildShape, std::optional<CVector> vecOptionalPosition,
-                                           std::optional<CVector> vecOptionalRotation)
+bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShapeChildShape,
+                                           std::optional<CVector> vecOptionalPosition, std::optional<CVector> vecOptionalRotation)
 {
-    if (pShape->GetPhysics() != pShape->GetPhysics())
+    if (pCompoundShape->GetPhysics() != pShapeChildShape->GetPhysics())
         throw std::invalid_argument("Shapes need to belong to the same physics world");
 
     if (CLuaPhysicsCompoundShape* pCompoundChildShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShapeChildShape))
@@ -316,92 +314,56 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsShape* pShape, CLuaPhysics
     const CVector vecRotation = vecOptionalRotation.value_or(CVector{0, 0, 0});
     CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
 
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
-    {
-        pCompoundShape->AddShape(pShapeChildShape, vecPosition, vecRotation);
-        return true;
-    }
-
-    throw std::invalid_argument("Shape is not be compound");
+    pCompoundShape->AddShape(pShapeChildShape, vecPosition, vecRotation);
+    return true;
 }
 
-std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsShape* pShape)
+std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape)
 {
-    if (pShape->GetType() == ePhysicsElementType::CompoundShape)
-        if (CLuaPhysicsCompoundShape* pCompoundShape = static_cast<CLuaPhysicsCompoundShape*>(pShape))
-        {
-            return pCompoundShape->GetChildShapes();
-        }
-
-    throw std::invalid_argument("Shape is not be compound");
+    return pCompoundShape->GetChildShapes();
 }
 
-bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsShape* pShape, int iIndex)
+bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
-    {
-        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
-            throw std::invalid_argument("Invalid child index");
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-        pCompoundShape->RemoveChildShape(iIndex);
-        return true;
-    }
-
-    throw std::invalid_argument("Shape is not be compound");
+    pCompoundShape->RemoveChildShape(iIndex);
+    return true;
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsShape* pShape, int iIndex)
+CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
-    {
-        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
-            throw std::invalid_argument("Invalid child index");
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-        return pCompoundShape->GetChildShapePosition(iIndex);
-    }
-
-    throw std::invalid_argument("Shape is not be compound");
+    return pCompoundShape->GetChildShapePosition(iIndex);
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsShape* pShape, int iIndex)
+CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
-    {
-        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
-            throw std::invalid_argument("Invalid child index");
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-        return pCompoundShape->GetChildShapeRotation(iIndex);
-    }
-
-    throw std::invalid_argument("Shape is not be compound");
+    return pCompoundShape->GetChildShapeRotation(iIndex);
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsShape* pShape, int iIndex, CVector vecPosition)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecPosition)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
-    {
-        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
-            throw std::invalid_argument("Invalid child index");
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-        pCompoundShape->SetChildShapePosition(iIndex, vecPosition);
-        return true;
-    }
-
-    throw std::invalid_argument("Shape is not be compound");
+    pCompoundShape->SetChildShapePosition(iIndex, vecPosition);
+    return true;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(CLuaPhysicsShape* pShape, int iIndex, CVector vecRotation)
+bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecRotation)
 {
-    if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
-    {
-        if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
-            throw std::invalid_argument("Invalid child index");
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+        throw std::invalid_argument("Invalid child index");
 
-        pCompoundShape->SetChildShapeRotation(iIndex, vecRotation);
-        return true;
-    }
-
-    throw std::invalid_argument("Shape is not be compound");
+    pCompoundShape->SetChildShapeRotation(iIndex, vecRotation);
+    return true;
 }
 
 bool CLuaPhysicsDefs::PhysicsApplyVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative)
@@ -440,96 +402,96 @@ bool CLuaPhysicsDefs::PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBo
     return true;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
-                                           std::variant<CVector, SColor, bool, float, int> argument, std::variant<std::monostate, float> argument2)
+bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CBulletPhysics* pPhysics, ePhysicsWorldProperty eProperty,
+                                                std::variant<CVector, SColor, bool, float, int> argument)
 {
-    if (std::holds_alternative<CBulletPhysics*>(variant))
+    switch (eProperty)
     {
-        CBulletPhysics* pPhysics = std::get<CBulletPhysics*>(variant);
-        switch (eProperty)
-        {
-            case ePhysicsProperty::GRAVITY:
-                if (std::holds_alternative<CVector>(argument))
+        case ePhysicsWorldProperty::GRAVITY:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                pPhysics->SetGravity(std::get<CVector>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::USE_CONTINOUS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetUseContinous(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::SIMULATION_ENABLED:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetSimulationEnabled(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::SUBSTEPS:
+            if (std::holds_alternative<int>(argument))
+            {
+                int subSteps = std::get<int>(argument);
+                if (subSteps >= 1 && subSteps <= BulletPhysics::Limits::MaximumSubSteps)
                 {
-                    pPhysics->SetGravity(std::get<CVector>(argument));
+                    pPhysics->SetSubSteps(subSteps);
                     return true;
                 }
-                throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::USE_CONTINOUS:
-                if (std::holds_alternative<bool>(argument))
+                else
                 {
-                    pPhysics->SetUseContinous(std::get<bool>(argument));
-                    return true;
+                    throw std::invalid_argument(SString("Substeps must be between 1 and %i", BulletPhysics::Limits::MaximumSubSteps).c_str());
                 }
-                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::SIMULATION_ENABLED:
-                if (std::holds_alternative<bool>(argument))
-                {
-                    pPhysics->SetSimulationEnabled(std::get<bool>(argument));
-                    return true;
-                }
-                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::SUBSTEPS:
-                if (std::holds_alternative<int>(argument))
-                {
-                    int subSteps = std::get<int>(argument);
-                    if (subSteps >= 1 && subSteps <= BulletPhysics::Limits::MaximumSubSteps)
-                    {
-                        pPhysics->SetSubSteps(subSteps);
-                        return true;
-                    }
-                    else
-                    {
-                        throw std::invalid_argument(SString("Substeps must be between 1 and %i", BulletPhysics::Limits::MaximumSubSteps).c_str());
-                    }
-                }
-                throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::TRIGGEREVENTS:
-                if (std::holds_alternative<bool>(argument))
-                {
-                    pPhysics->SetTriggerEvents(std::get<bool>(argument));
-                    return true;
-                }
-                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::TRIGGERCOLLISIONEVENTS:
-                if (std::holds_alternative<bool>(argument))
-                {
-                    pPhysics->SetTriggerCollisionEvents(std::get<bool>(argument));
-                    return true;
-                }
-                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::TRIGGERCONSTRAINTEVENTS:
-                if (std::holds_alternative<bool>(argument))
-                {
-                    pPhysics->SetTriggerConstraintEvents(std::get<bool>(argument));
-                    return true;
-                }
-                throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
-            case ePhysicsProperty::WORLDSIZE:
-                if (std::holds_alternative<CVector>(argument))
-                {
-                    CVector size = std::get<CVector>(argument);
+            }
+            throw std::invalid_argument(SString("Property '%s' requires integer argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::TRIGGEREVENTS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetTriggerEvents(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::TRIGGERCOLLISIONEVENTS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetTriggerCollisionEvents(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::TRIGGERCONSTRAINTEVENTS:
+            if (std::holds_alternative<bool>(argument))
+            {
+                pPhysics->SetTriggerConstraintEvents(std::get<bool>(argument));
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires boolean argument.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::WORLDSIZE:
+            if (std::holds_alternative<CVector>(argument))
+            {
+                CVector size = std::get<CVector>(argument);
 
-                    CVector min = BulletPhysics::Limits::WorldMinimumSize;
-                    CVector max = BulletPhysics::Limits::WorldMaximumSize;
+                CVector min = BulletPhysics::Limits::WorldMinimumSize;
+                CVector max = BulletPhysics::Limits::WorldMaximumSize;
 
-                    if (size.fX < min.fX || size.fY < min.fY || size.fZ < min.fZ)
-                    {
-                        throw std::invalid_argument(SString("World size can not be smaller than %.2fx, %.2fy, %.2fy", min.fX, min.fY, min.fZ));
-                    }
-                    if (size.fX > max.fX || size.fY > max.fY || size.fZ > max.fZ)
-                    {
-                        throw std::invalid_argument(SString("World size can not be greater than %.2fx, %.2fy, %.2fy", max.fX, max.fY, max.fZ));
-                    }
-
-                    pPhysics->SetWorldSize(size);
-                    return true;
+                if (size.fX < min.fX || size.fY < min.fY || size.fZ < min.fZ)
+                {
+                    throw std::invalid_argument(SString("World size can not be smaller than %.2fx, %.2fy, %.2fy", min.fX, min.fY, min.fZ));
                 }
-                throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
-        }
-        return false;
+                if (size.fX > max.fX || size.fY > max.fY || size.fZ > max.fZ)
+                {
+                    throw std::invalid_argument(SString("World size can not be greater than %.2fx, %.2fy, %.2fy", max.fX, max.fY, max.fZ));
+                }
+
+                pPhysics->SetWorldSize(size);
+                return true;
+            }
+            throw std::invalid_argument(SString("Property '%s' requires x,y,z or vector as argument.", EnumToString(eProperty)).c_str());
     }
+    return false;
+}
 
+bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
+                                           std::variant<CVector, SColor, bool, float, int> argument)
+{
     auto unsupported = [eProperty](CLuaPhysicsElement* pElement) {
         throw std::invalid_argument(
             SString("Physics element '%s' does not support '%s' property.", pElement->GetName(), EnumToString(eProperty).c_str()).c_str());
@@ -551,7 +513,7 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
                     vecSize = std::get<CVector>(argument);
 
                 CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
-
+                 
                 VisitElement(pElement, overloaded{[vecSize](CLuaPhysicsBoxShape* pBox) { pBox->SetSize(vecSize); }, unsupported});
                 return true;
             }
@@ -569,24 +531,27 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
                 return true;
             }
             break;
-        case ePhysicsProperty::SLEEPING_THRESHOLDS:
-            if (std::holds_alternative<float>(argument) && std::holds_alternative<float>(argument2))
+        case ePhysicsProperty::SLEEPING_LINEAR_THRESHOLDS:
+            if (std::holds_alternative<float>(argument))
             {
                 float fLinear = std::get<float>(argument);
-                float fAngular = std::get<float>(argument2);
-                if (fLinear < 0)
-                    throw std::invalid_argument("Linear threshold can not be negative");
-                if (fAngular < 0)
-                    throw std::invalid_argument("Angular threshold can not be negative");
-
                 VisitElement(
                     pElement,
-                    overloaded{[fLinear, fAngular](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetSleepingThresholds(fLinear, fAngular); }, unsupported});
+                    overloaded{[fLinear](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetLinearSleepingThreshold(fLinear); }, unsupported});
+                return true;
+            }
+            break;
+        case ePhysicsProperty::SLEEPING_ANGULAR_THRESHOLDS:
+            if (std::holds_alternative<float>(argument))
+            {
+                float fAngular = std::get<float>(argument);
+                VisitElement(pElement,
+                             overloaded{[fAngular](CLuaPhysicsRigidBody* pRigidBody) { pRigidBody->SetAngularSleepingThreshold(fAngular); }, unsupported});
                 return true;
             }
             break;
         case ePhysicsProperty::RESTITUTION:
-            if (std::holds_alternative<float>(argument) && std::holds_alternative<float>(argument2))
+            if (std::holds_alternative<float>(argument))
             {
                 float fRestitution = std::get<float>(argument);
 
@@ -704,32 +669,29 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
     throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
 }
 
-std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::PhysicsGetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant,
-                                                                                                  ePhysicsProperty                                   eProperty)
+std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::PhysicsGetWorldProperties(CBulletPhysics*       pPhysics,
+                                                                                                       ePhysicsWorldProperty eProperty)
 {
-    if (std::holds_alternative<CBulletPhysics*>(variant))
+    switch (eProperty)
     {
-        CBulletPhysics* pPhysics = std::get<CBulletPhysics*>(variant);
-        switch (eProperty)
-        {
-            case ePhysicsProperty::GRAVITY:
-                return pPhysics->GetGravity();
-            case ePhysicsProperty::TRIGGERCOLLISIONEVENTS:
-                return pPhysics->GetTriggerCollisionEvents();
-            case ePhysicsProperty::TRIGGERCONSTRAINTEVENTS:
-                return pPhysics->GetTriggerConstraintvents();
-            case ePhysicsProperty::SIMULATION_ENABLED:
-                return pPhysics->GetSimulationEnabled();
-            case ePhysicsProperty::USE_CONTINOUS:
-                return pPhysics->GetUseContinous();
-            case ePhysicsProperty::SUBSTEPS:
-                return pPhysics->GetSubSteps();
-        }
-        throw std::invalid_argument(SString("Physics world does not support %s property.", EnumToString(eProperty)).c_str());
+        case ePhysicsWorldProperty::GRAVITY:
+            return pPhysics->GetGravity();
+        case ePhysicsWorldProperty::TRIGGERCOLLISIONEVENTS:
+            return pPhysics->GetTriggerCollisionEvents();
+        case ePhysicsWorldProperty::TRIGGERCONSTRAINTEVENTS:
+            return pPhysics->GetTriggerConstraintvents();
+        case ePhysicsWorldProperty::SIMULATION_ENABLED:
+            return pPhysics->GetSimulationEnabled();
+        case ePhysicsWorldProperty::USE_CONTINOUS:
+            return pPhysics->GetUseContinous();
+        case ePhysicsWorldProperty::SUBSTEPS:
+            return pPhysics->GetSubSteps();
     }
+    static_assert((int)ePhysicsWorldProperty::COUNT == 8, "Check if all properties are implemented and bump number.");
+}
 
-    CLuaPhysicsElement* pElement = std::get<CLuaPhysicsElement*>(variant);
-
+std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty)
+{
     auto unsupported = [eProperty](CLuaPhysicsElement* pElement) {
         throw std::invalid_argument(
             SString("Physics element '%s' does not support '%s' property.", pElement->GetName(), EnumToString(eProperty).c_str()).c_str());
@@ -737,10 +699,67 @@ std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::Phy
 
     switch (eProperty)
     {
+        case ePhysicsProperty::MASS:
+            return VisitElement<float>(
+                pElement,
+                overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetMass(); }, unsupported});
+        case ePhysicsProperty::SLEEPING_LINEAR_THRESHOLDS:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetLinearSleepingThreshold(); }, unsupported});
+        case ePhysicsProperty::SLEEPING_ANGULAR_THRESHOLDS:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetAngularSleepingThreshold(); }, unsupported});
+        case ePhysicsProperty::RESTITUTION:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetRestitution(); }, unsupported});
+        case ePhysicsProperty::SCALE:
+            return VisitElement<CVector>(pElement, overloaded{[](CLuaPhysicsShape* pShape) { return pShape->GetScale(); }, unsupported});
+        case ePhysicsProperty::DEBUG_COLOR:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsWorldElement* pWorldElement) { return (float)pWorldElement->GetDebugColor().ulARGB; }, unsupported});
+        case ePhysicsProperty::FILTER_MASK:
+            return VisitElement<int>(pElement, overloaded{[](CLuaPhysicsWorldElement* pWorldElement) { return pWorldElement->GetFilterMask(); }, unsupported});
+        case ePhysicsProperty::FILTER_GROUP:
+            return VisitElement<int>(pElement, overloaded{[](CLuaPhysicsWorldElement* pWorldElement) { return pWorldElement->GetFilterGroup(); }, unsupported});
         case ePhysicsProperty::SIZE:
-            return VisitElement<std::vector<float>>(pElement, overloaded{[](CLuaPhysicsBoxShape* pBox) { return pBox->GetSize().AsVector(); }, unsupported});
-            break;
+            return VisitElement<CVector>(pElement, overloaded{[](CLuaPhysicsBoxShape* pBox) { return pBox->GetSize(); }, unsupported});
+        case ePhysicsProperty::RADIUS:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsSphereShape* pSphere) { return pSphere->GetRadius(); },
+                                                            [](CLuaPhysicsCapsuleShape* pCapsule) { return pCapsule->GetRadius(); },
+                                                            [](CLuaPhysicsConeShape* pCone) { return pCone->GetRadius(); },
+                                                            [](CLuaPhysicsCylinderShape* pCylinder) { return pCylinder->GetRadius(); }, unsupported});         
+        case ePhysicsProperty::HEIGHT:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsCapsuleShape* pCapsule) { return pCapsule->GetHeight(); },
+                                                            [](CLuaPhysicsCylinderShape* pCylinder) { return pCylinder->GetHeight(); },
+                                                            [](CLuaPhysicsConeShape* pCone) { return pCone->GetHeight(); }, unsupported});         
+        //case ePhysicsProperty::BOUNDING_BOX:
+        //    return pElement->GetBoundingBox();
+        //case ePhysicsProperty::BOUNDING_SPHERE:
+        //    return pElement->GetBoundingSphere();
+        case ePhysicsProperty::MOTION_CCD_THRESHOLD:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetCcdMotionThreshold(); }, unsupported});
+        case ePhysicsProperty::GRAVITY:
+            return VisitElement<CVector>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetGravity(); }, unsupported});
+        case ePhysicsProperty::SWEPT_SPHERE_RADIUS:
+            return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetSweptSphereRadius(); }, unsupported});
+        case ePhysicsProperty::SLEEP:
+            return VisitElement<bool>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->IsSleeping(); }, unsupported});
+        case ePhysicsProperty::WANTS_SLEEPING:
+            return VisitElement<bool>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->WantsSleeping(); }, unsupported});
+        case ePhysicsProperty::STIFFNESS:
+        case ePhysicsProperty::PIVOT_A:
+        case ePhysicsProperty::PIVOT_B:
+        case ePhysicsProperty::LOWER_LIN_LIMIT:
+        case ePhysicsProperty::UPPER_LIN_LIMIT:
+        case ePhysicsProperty::LOWER_ANG_LIMIT:
+        case ePhysicsProperty::UPPER_ANG_LIMIT:
+        case ePhysicsProperty::BREAKING_IMPULSE_THRESHOLD:
+        case ePhysicsProperty::APPLIED_IMPULSE:
+        case ePhysicsProperty::RIGID_BODY_A:
+        case ePhysicsProperty::RIGID_BODY_B:
+        case ePhysicsProperty::JOINTS_FEEDBACK:
+        case ePhysicsProperty::ENABLED:
+            return VisitElement<bool>(pElement, overloaded{[](CLuaPhysicsWorldElement* pWorldElement) { return pWorldElement->IsEnabled(); }, unsupported});
+
     }
+    static_assert((int)ePhysicsProperty::COUNT == 31, "Check if all properties are implemented and adjust number.");
+    return false;
 }
 
 // --------- AAAAAAAAA  BBBB   CCCC
@@ -860,7 +879,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
     if (!pBtCollisionObject)
         return false;            // should never happen
 
-    CLuaPhysicsShape*     pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
+    CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
     if (pBtRigidBody)
@@ -945,7 +964,7 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
         if (!pBtCollisionObject)
             continue;            // should never happen
 
-        CLuaPhysicsShape*     pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
+        CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
         CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
         if (pBtRigidBody)
@@ -1008,7 +1027,8 @@ std::vector<RayResult> CLuaPhysicsDefs::PhysicsRayCastAll(CBulletPhysics* pPhysi
     return results;
 }
 
-std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition, CVector vecRotation,
+std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition,
+                                                                CVector vecRotation,
                                                                 std::optional<RayOptions> options)
 {
     bool bEnrichResult = false;
@@ -1042,9 +1062,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape
     const btCollisionShape*  pBtCollisionShape = pBtCollisionObject->getCollisionShape();
     const btRigidBody*       pBtRigidBody = btRigidBody::upcast(pBtCollisionObject);
 
-    assert(pBtCollisionObject == nullptr); // should never happen
-
-    CLuaPhysicsShape*     pHitShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
+    CLuaPhysicsShape* pHitShape = (CLuaPhysicsShape*)(pBtCollisionShape->getUserPointer());
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
     if (pBtRigidBody)
@@ -1147,7 +1165,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
     std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
 
     pPhysics->OverlapBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter),
-                       collisionMask.value_or(btBroadphaseProxy::AllFilter));
+                         collisionMask.value_or(btBroadphaseProxy::AllFilter));
     std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
     result["rigidbodies"] = vecRigidBodies;
     result["staticCollisions"] = vecStaticCollisions;
@@ -1168,13 +1186,14 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
 
     for (auto const& pContactElement : collisionContacts)
     {
-        if (pContactElement->GetClassType() == EIdClass::EIdClassType::RIGID_BODY)
+        switch (pContactElement->GetClassType())
         {
-            vecRigidBodies.push_back((CLuaPhysicsRigidBody*)pContactElement);
-        }
-        if (pContactElement->GetClassType() == EIdClass::EIdClassType::STATIC_COLLISION)
-        {
-            vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)pContactElement);
+            case EIdClass::EIdClassType::RIGID_BODY:
+                vecRigidBodies.push_back((CLuaPhysicsRigidBody*)pContactElement);
+                break;
+            case EIdClass::EIdClassType::STATIC_COLLISION:
+                vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)pContactElement);
+                break;
         }
     }
 
@@ -1226,7 +1245,7 @@ std::vector<std::tuple<std::string, double>> CLuaPhysicsDefs::PhysicsGetPerforma
     {
         result.push_back(std::make_tuple(sample.name, sample.time));
     }
-    //result["total"] = total;
+    // result["total"] = total;
     return result;
 }
 
@@ -1243,7 +1262,7 @@ bool CLuaPhysicsDefs::PhysicsSetVertexPosition(CLuaPhysicsShape* pShape, int iVe
         }
         throw std::invalid_argument("Vertex index out of range");
     }
-    throw std::invalid_argument(SString("Shape %s unsupported", pShape->GetName()).c_str());
+    throw std::invalid_argument(SString("Shape %s is not unsupport", pShape->GetName()).c_str());
 }
 
 bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsShape* pShape, int iVertexId, float fHeight)
@@ -1259,45 +1278,29 @@ bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsShape* pShape, int iVertexId, 
         }
         throw std::invalid_argument("Vertex index out of range");
     }
-    throw std::invalid_argument(SString("Shape %s unsupported", pShape->GetName()).c_str());
+    throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
 }
 
-bool CLuaPhysicsDefs::PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable)
+bool CLuaPhysicsDefs::PhysicsSetRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody, bool bEnable)
 {
-    if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
-    {
-        if (pRigidBody->IsReady())
-        {
-            pRigidBody->GetBtRigidBody()->SetEnabled(bEnable);
-        }
-        return true;
-    }
-    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
-    {
-        if (pStaticCollision->IsReady())
-        {
-            pStaticCollision->GetCollisionObject()->SetEnabled(bEnable);
-        }
-        return true;
-    }
-    throw std::invalid_argument("Unsupported physics element type");
+    pRigidBody->GetBtRigidBody()->SetEnabled(bEnable);
+    return true;
 }
 
-bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
+bool CLuaPhysicsDefs::PhysicsSetStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision, bool bEnable)
 {
-    if (CLuaPhysicsRigidBody* pRigidBody = dynamic_cast<CLuaPhysicsRigidBody*>(pElement))
-    {
-        if (pRigidBody->IsReady() && pRigidBody->GetBtRigidBody())
-            return pRigidBody->GetBtRigidBody()->IsEnabled();
-        return false;            // not created yet
-    }
-    else if (CLuaPhysicsStaticCollision* pStaticCollision = dynamic_cast<CLuaPhysicsStaticCollision*>(pElement))
-    {
-        if (pStaticCollision->IsReady() && pStaticCollision->GetCollisionObject())
-            return pStaticCollision->GetCollisionObject()->IsEnabled();
-        return false;
-    }
-    throw std::invalid_argument("Unsupported physics element type");
+    pStaticCollision->GetCollisionObject()->SetEnabled(bEnable);
+    return true;
+}
+
+bool CLuaPhysicsDefs::PhysicsIsRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody)
+{
+    return pRigidBody->GetBtRigidBody()->IsEnabled();
+}
+
+bool CLuaPhysicsDefs::PhysicsIsStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    return pStaticCollision->GetCollisionObject()->IsEnabled();
 }
 
 bool CLuaPhysicsDefs::PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant)
@@ -1345,17 +1348,17 @@ std::vector<CLuaPhysicsRigidBody*> CLuaPhysicsDefs::PhysicsGetIslandRigidBodies(
 {
     if (iTargetIsland >= 0)
     {
-        CBulletPhysics::CIslandCallback  callback;
+        CBulletPhysics::CIslandCallback callback;
         callback.iTargetIsland = iTargetIsland;
         pPhysics->GetSimulationIslandCallback(callback);
         return callback.m_bodies;
     }
-    return std::vector<CLuaPhysicsRigidBody*>();
+    return {};
 }
 
 std::unordered_map<int, int> CLuaPhysicsDefs::PhysicsGetSimulationIslands(CBulletPhysics* pPhysics)
 {
-    CBulletPhysics::CIslandCallback  callback;
+    CBulletPhysics::CIslandCallback callback;
     pPhysics->GetSimulationIslandCallback(callback);
     return callback.m_islandBodies;
 }
@@ -1372,8 +1375,7 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
 std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius)
 {
     pPhysics->FlushAllChanges();
-    std::vector<std::vector<float>> lines = pPhysics->GetDebugLines(vecPosition, fRadius);
-    return lines;
+    return pPhysics->GetDebugLines(vecPosition, fRadius);
 }
 
 bool CLuaPhysicsDefs::PhysicsWorldHasChanged(CBulletPhysics* pPhysics)
