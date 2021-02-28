@@ -15,30 +15,33 @@ class CLuaPhysicsShape;
 
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsStaticCollision.h"
+#include "CShapeHolder.h"
 
 class heightfieldTerrainShape;
 
-class CLuaPhysicsShape : public CLuaPhysicsElement
+class CLuaPhysicsShape : public CLuaPhysicsElement, CShapeHolder<btCollisionShape>
 {
 protected:
     CLuaPhysicsShape(CBulletPhysics* pPhysics, btCollisionShape* pShape);
     CLuaPhysicsShape(CBulletPhysics* pPhysics, heightfieldTerrainShape* pHeightfieldTerrainShape);
 
+
 public:
     ~CLuaPhysicsShape();
     void Unlink();            // removes all related static collisions and rigid bodies
 
-    btCollisionShape* GetBtShape() const { return m_pBtShape.get(); }
-    void              AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void              RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void              AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    void              RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    btCollisionShape* InternalGetBtShape() const { return m_pBtShape.get(); }
 
-    bool           SetScale(CVector scale);
-    const CVector& GetScale();
-    SBoundingBox           GetBoundingBox();
-    SBoundingSphere           GetBoundingSphere();
-    void           GetMargin(float& fMargin);
+    void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+
+    bool            SetScale(CVector scale);
+    const CVector&  GetScale();
+    SBoundingBox    GetBoundingBox();
+    SBoundingSphere GetBoundingSphere();
+    void            GetMargin(float& fMargin);
 
     void UpdateRigids();
 

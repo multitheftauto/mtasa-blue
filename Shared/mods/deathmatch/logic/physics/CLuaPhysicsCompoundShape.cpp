@@ -22,21 +22,19 @@ CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
 
 void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
 {
-    btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
     btTransform      transform = btTransform::getIdentity();
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    pCompound->addChildShape(transform, pShape->GetBtShape());
-    pCompound->recalculateLocalAabb();
+    GetBtShape()->addChildShape(transform, pShape->InternalGetBtShape());
+    GetBtShape()->recalculateLocalAabb();
     m_vecChildShapes.push_back(pShape);
 }
 
 bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)
 {
-    btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    if (index >= 0 && index < pCompound->getNumChildShapes())
+    if (index >= 0 && index < GetBtShape()->getNumChildShapes())
     {
-        pCompound->removeChildShapeByIndex(index);
+        GetBtShape()->removeChildShapeByIndex(index);
         m_vecChildShapes.erase(m_vecChildShapes.begin() + index);
         UpdateRigids();
         return true;
@@ -46,32 +44,28 @@ bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)
 
 const CVector& CLuaPhysicsCompoundShape::GetChildShapePosition(int index)
 {
-    btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    btTransform      transform = pCompound->getChildTransform(index);
+    btTransform transform = GetBtShape()->getChildTransform(index);
     return CPhysicsSharedLogic::GetPosition(transform);
 }
 
 const CVector& CLuaPhysicsCompoundShape::GetChildShapeRotation(int index)
 {
-    btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    btTransform      transform = pCompound->getChildTransform(index);
+    btTransform transform = GetBtShape()->getChildTransform(index);
     return CPhysicsSharedLogic::GetRotation(transform);
 }
 
 void CLuaPhysicsCompoundShape::SetChildShapePosition(int index, const CVector& vecPosition)
 {
-    btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    btTransform      childOffset = pCompound->getChildTransform(index);
+    btTransform childOffset = GetBtShape()->getChildTransform(index);
     CPhysicsSharedLogic::SetPosition(childOffset, vecPosition);
-    pCompound->updateChildTransform(index, childOffset);
+    GetBtShape()->updateChildTransform(index, childOffset);
     UpdateRigids();
 }
 
 void CLuaPhysicsCompoundShape::SetChildShapeRotation(int index, const CVector& vecRotation)
 {
-    btCompoundShape* pCompound = (btCompoundShape*)GetBtShape();
-    btTransform      childOffset = pCompound->getChildTransform(index);
+    btTransform childOffset = GetBtShape()->getChildTransform(index);
     CPhysicsSharedLogic::SetRotation(childOffset, vecRotation);
-    pCompound->updateChildTransform(index, childOffset);
+    GetBtShape()->updateChildTransform(index, childOffset);
     UpdateRigids();
 }

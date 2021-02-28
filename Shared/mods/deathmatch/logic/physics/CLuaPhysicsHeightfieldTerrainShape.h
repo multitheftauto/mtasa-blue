@@ -13,7 +13,7 @@ class CLuaPhysicsHeightfieldTerrainShape;
 
 #pragma once
 
-class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsConcaveShape
+class CLuaPhysicsHeightfieldTerrainShape : public CLuaPhysicsConcaveShape, CShapeHolder<btHeightfieldTerrainShape>
 {
 public:
     CLuaPhysicsHeightfieldTerrainShape(CBulletPhysics* pPhysics, int iSizeX, int iSizeY, const std::vector<float>& vecHeightData);
@@ -25,6 +25,7 @@ public:
     void SetHeight(int index, float fHeight);
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::HeightfieldTerrainShape; }
+    btHeightfieldTerrainShape*  GetBtShape() const { return (btHeightfieldTerrainShape*)InternalGetBtShape(); }
 
 private:
     int m_iSizeX;

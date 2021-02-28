@@ -1042,7 +1042,7 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsShapeCast(CLuaPhysicsShape
         iFilterMask = getOption(options.value(), "filterMask", BulletPhysics::Defaults::FilterMask);
     }
 
-    if (!pShape->GetBtShape()->isConvex())
+    if (!pShape->InternalGetBtShape()->isConvex())
         throw std::invalid_argument(SString("Shape casting does not support %s shape type.", pShape->GetName()).c_str());
 
     CBulletPhysics* pPhysics = pShape->GetPhysics();

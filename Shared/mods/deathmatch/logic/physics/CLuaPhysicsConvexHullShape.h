@@ -11,7 +11,7 @@
 
 #pragma once
 
-class CLuaPhysicsConvexHullShape : public CLuaPhysicsShape
+class CLuaPhysicsConvexHullShape : public CLuaPhysicsShape, CShapeHolder<btConvexHullShape>
 {
 public:
     CLuaPhysicsConvexHullShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecPoints);
@@ -19,4 +19,5 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConvexHullShape; }
+    btConvexHullShape*          GetBtShape() const { return (btConvexHullShape*)InternalGetBtShape(); }
 };

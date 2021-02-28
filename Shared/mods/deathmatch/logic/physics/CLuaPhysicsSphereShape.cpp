@@ -23,10 +23,10 @@ CLuaPhysicsSphereShape::~CLuaPhysicsSphereShape()
 
 void CLuaPhysicsSphereShape::SetRadius(float fRadius)
 {
-    ((btSphereShape*)GetBtShape())->setUnscaledRadius(fRadius);
+    GetBtShape()->setUnscaledRadius(fRadius);
 }
 
 float CLuaPhysicsSphereShape::GetRadius()
 {
-    return ((btSphereShape*)GetBtShape())->getRadius();
+    return GetBtShape()->getRadius();
 }

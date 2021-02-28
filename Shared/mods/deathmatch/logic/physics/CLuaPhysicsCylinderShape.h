@@ -13,7 +13,7 @@ class CLuaPhysicsCylinderShape;
 
 #pragma once
 
-class CLuaPhysicsCylinderShape : public CLuaPhysicsConvexShape
+class CLuaPhysicsCylinderShape : public CLuaPhysicsConvexShape, CShapeHolder<btCylinderShape>
 {
 public:
     CLuaPhysicsCylinderShape(CBulletPhysics* pPhysics, CVector half);
@@ -26,4 +26,5 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::CylinderShape; }
+    btCylinderShape*            GetBtShape() const { return (btCylinderShape*)InternalGetBtShape(); }
 };

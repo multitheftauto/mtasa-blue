@@ -13,7 +13,7 @@ class CLuaPhysicsGimpactTriangleMeshShape;
 
 #pragma once
 
-class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsConcaveShape
+class CLuaPhysicsGimpactTriangleMeshShape : public CLuaPhysicsConcaveShape, CShapeHolder<btGImpactMeshShape>
 {
 public:
     CLuaPhysicsGimpactTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecVertices);
@@ -21,4 +21,5 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::GimpactTriangleMeshShape; }
+    btGImpactMeshShape*         GetBtShape() const { return (btGImpactMeshShape*)InternalGetBtShape(); }
 };

@@ -13,7 +13,7 @@ class CLuaPhysicsCompoundShape;
 
 #pragma once
 
-class CLuaPhysicsCompoundShape : public CLuaPhysicsShape
+class CLuaPhysicsCompoundShape : public CLuaPhysicsShape, CShapeHolder<btCompoundShape>
 {
 public:
     CLuaPhysicsCompoundShape(CBulletPhysics* pPhysics, int iInitialChildCapacity);
@@ -37,6 +37,7 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::CompoundShape; }
+    btCompoundShape*            GetBtShape() const { return (btCompoundShape*)InternalGetBtShape(); }
 
 private:
     std::vector<CLuaPhysicsShape*> m_vecChildShapes;

@@ -34,8 +34,7 @@ void CLuaPhysicsBvhTriangleMeshShape::InternalUpdateVerticesPositions()
     if (m_vecVerticesUpdate.size() == 0)
         return;
 
-    btBvhTriangleMeshShape*  pShape = (btBvhTriangleMeshShape*)GetBtShape();
-    btStridingMeshInterface* pMeshInterface = pShape->getMeshInterface();
+    btStridingMeshInterface* pMeshInterface = GetBtShape()->getMeshInterface();
 
     CVector*       vertexbase = 0;
     int*           indexbase = 0;
@@ -57,7 +56,7 @@ void CLuaPhysicsBvhTriangleMeshShape::InternalUpdateVerticesPositions()
         }
     }
 
-    pShape->recalcLocalAabb();
+    GetBtShape()->recalcLocalAabb();
     m_vecVerticesUpdate.clear();
 }
 
@@ -71,8 +70,7 @@ void CLuaPhysicsBvhTriangleMeshShape::SetVertexPosition(int iVertex, CVector vec
 
 STriangleInfo CLuaPhysicsBvhTriangleMeshShape::GetTriangleInfo(int iTriangleIndex)
 {
-    btBvhTriangleMeshShape*  pShape = (btBvhTriangleMeshShape*)GetBtShape();
-    btStridingMeshInterface* pMeshInterface = pShape->getMeshInterface();
+    btStridingMeshInterface* pMeshInterface = GetBtShape()->getMeshInterface();
 
     const CVector4D* vertexbase = 0;
     const int*     indexbase = 0;

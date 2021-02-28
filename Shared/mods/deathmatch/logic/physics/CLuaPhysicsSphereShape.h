@@ -13,15 +13,16 @@ class CLuaPhysicsSphereShape;
 
 #pragma once
 
-class CLuaPhysicsSphereShape : public CLuaPhysicsConvexShape
+class CLuaPhysicsSphereShape : public CLuaPhysicsConvexShape, CShapeHolder<btSphereShape>
 {
 public:
     CLuaPhysicsSphereShape(CBulletPhysics* pPhysics, float radius);
     ~CLuaPhysicsSphereShape();
 
-    void SetRadius(float fRadius);
+    void  SetRadius(float fRadius);
     float GetRadius();
-    void Update() {}
+    void  Update() {}
 
+    btSphereShape*              GetBtShape() const { return (btSphereShape*)InternalGetBtShape(); }
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::SphereShape; }
 };

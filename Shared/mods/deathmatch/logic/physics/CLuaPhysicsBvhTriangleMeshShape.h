@@ -23,7 +23,7 @@ struct STriangleInfo
     CVector vecVertex3;
 };
 
-class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsConcaveShape
+class CLuaPhysicsBvhTriangleMeshShape : public CLuaPhysicsConcaveShape, CShapeHolder<btBvhTriangleMeshShape>
 {
     struct SVertexUpdate
     {
@@ -44,6 +44,7 @@ public:
     STriangleInfo GetTriangleInfo(int iTriangleIndex);
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BvhTriangleMeshShape; }
+    btBvhTriangleMeshShape*     GetBtShape() const { return (btBvhTriangleMeshShape*)InternalGetBtShape(); }
 
 private:
     void InternalUpdateVerticesPositions();

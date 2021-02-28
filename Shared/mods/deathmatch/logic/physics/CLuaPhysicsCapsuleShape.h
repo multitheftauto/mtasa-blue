@@ -13,7 +13,7 @@ class CLuaPhysicsCapsuleShape;
 
 #pragma once
 
-class CLuaPhysicsCapsuleShape : public CLuaPhysicsConvexShape
+class CLuaPhysicsCapsuleShape : public CLuaPhysicsConvexShape, CShapeHolder<btCapsuleShape>
 {
 public:
     CLuaPhysicsCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
@@ -26,4 +26,5 @@ public:
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BvhTriangleMeshShape; }
+    btCapsuleShape*             GetBtShape() const { return (btCapsuleShape*)InternalGetBtShape(); }
 };

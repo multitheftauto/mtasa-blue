@@ -188,7 +188,7 @@ CBulletPhysics::SClosestConvexResultCallback CBulletPhysics::ShapeCast(CLuaPhysi
     rayCallback.m_collisionFilterMask = iFilterMask;
     {
         WorldContext world(this);
-        world->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, rayCallback, 0.0f);
+        world->convexSweepTest((btConvexShape*)(pShape->InternalGetBtShape()), from, to, rayCallback, 0.0f);
     }
 
     rayCallback.m_closestPosition = rayCallback.m_convexFromWorld.lerp(rayCallback.m_convexToWorld, rayCallback.m_closestHitFraction);

@@ -23,22 +23,22 @@ CLuaPhysicsConeShape::~CLuaPhysicsConeShape()
 
 void CLuaPhysicsConeShape::SetRadius(float fRadius)
 {
-    ((btConeShape*)GetBtShape())->setRadius(fRadius);
+    GetBtShape()->setRadius(fRadius);
     UpdateRigids();
 }
 
 float CLuaPhysicsConeShape::GetRadius()
 {
-    return ((btConeShape*)GetBtShape())->getRadius();
+    return GetBtShape()->getRadius();
 }
 
 bool CLuaPhysicsConeShape::SetHeight(float fHeight)
 {
-    ((btConeShape*)GetBtShape())->setHeight(fHeight);
+    GetBtShape()->setHeight(fHeight);
     return true;
 }
 
 float CLuaPhysicsConeShape::GetHeight()
 {
-    return ((btConeShape*)GetBtShape())->getHeight();
+    return GetBtShape()->getHeight();
 }
