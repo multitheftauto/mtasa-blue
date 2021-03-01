@@ -103,16 +103,40 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive) const
 
 CPlayer* CPlayerManager::GetRandom() const noexcept
 {
-    // Optimized random player selection
-     std::mt19937 rndgen{ std::random_device{}() };
+    if (!m_JoinedByBitStreamVer.Empty()) {
+        // Optimized random player selection
+        std::mt19937 rndgen{ std::random_device{}() };
 
-    // Select a random player group
-    std::uniform_int_distribution<size_t> joinedDistribution(0, m_JoinedByBitStreamVer.CountUniqueVersions() - 1);
-    const auto it = std::next(m_JoinedByBitStreamVer.begin(), joinedDistribution(rndgen));
+        const auto GetRandomInRange = [](size_t max) { // Like Python's random.randrange()
+            std::default_random_engine engine{ std::random_device() };
+            return std::uniform_int_distribution<size_t>{0, max - 1}(engine);
+        };
 
-    // Select a random player within it
-    std::uniform_int_distribution<size_t> playerGroupDistribution(0, it->second.size() - 1);
-    return it->second[playerGroupDistribution(rndgen)];
+        const auto GetRandomInGroup = [&rndgen, GetRandomInRange](const auto& group) -> CPlayer* {
+            for (size_t i = GetRandomInRange(group.size()); i < group.size(); i++) {
+                if (CPlayer* player = group[i]; !player->IsBeingDeleted())
+                    return player;
+            }
+            return nullptr;
+        };
+
+        const auto groupIt = std::next(m_JoinedByBitStreamVer.begin(),
+            GetRandomInRange(m_JoinedByBitStreamVer.CountUniqueVersions()));
+
+        // Try to find and return a player that isn't being deleted.
+        // Normally this loop wont run more than an iteration or 2
+        for (auto it = groupIt; it != m_JoinedByBitStreamVer.end(); it++) {
+            if (CPlayer* p = GetRandomInGroup(it->second))
+                return p;
+        }
+
+        // If the above failed try groups before the selected one
+        for (auto it = m_JoinedByBitStreamVer.begin(); it != groupIt; it++) {
+            if (CPlayer* p = GetRandomInGroup(it->second))
+                return p;
+        }
+    }
+    return nullptr; // No available players for selection
 }
 
 void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip) const
