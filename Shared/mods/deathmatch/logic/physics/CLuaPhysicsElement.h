@@ -46,32 +46,11 @@ protected:
     ~CLuaPhysicsElement();
 
 public:
-    enum class eTempDataKey
-    {
-        Mass,
-        Scale,
-        LinearDumping,
-        AngularDumping,
-        CcdMotionThreshold,
-        SweptSphereRadius,
-        LinearVelocity,
-        AngularVelocity,
-        Restitution,
-        Mask,
-        Group,
-        SleepingThresholdLinear,
-        SleepingThresholdAngular,
-        LocalInertia,
-        CenterOfMass,
-        DebugColor,
-        Gravity,
-    };
 
     CBulletPhysics*        GetPhysics() const { return m_pPhysics; }
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
     bool                   Destroy();
-    bool                   IsReady() const { return m_isReady; }
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
 
@@ -79,47 +58,43 @@ public:
 
     const char* GetName() { return EnumToString(GetType()); }
 
-    // Run changes on worker thread, let you modify element before get created
-    void CommitChange(std::function<void()> change);
-
     void NeedsUpdate();
 
+    // Thread-safe access to bullet physics element
     template <typename T>
-    bool GetTempData(eTempDataKey key, T& out) const            // Multithread safe
+    class ElementLock
     {
-        std::lock_guard guard(m_tempDataLock);
-        auto            iter = m_mapTempData.find(key);
-        if (iter != m_mapTempData.end())
-        {
-            out = std::get<T>((*iter).second);
-            return true;
-        }
-        return false;
-    }
+        friend CBulletPhysics;
 
-    template <typename T>
-    void SetTempData(eTempDataKey key, const T& value)            // Multithread safe
-    {
-        std::lock_guard guard(m_tempDataLock);
-        m_mapTempData[key] = value;
-    }
+        std::unique_lock<std::mutex> m_lock;
+
+    public:
+        // static void* operator new(size_t) = delete;
+
+        ElementLock(T pElement) : m_pElement(pElement), m_pPhysics(pElement->GetPhysics()), m_lock(pElement->m_lockElement, std::try_to_lock)
+        {
+            assert(m_lock.owns_lock() && "Element is already locked");
+        }
+
+        ~ElementLock() {}
+        bool IsLocked() { return m_lock.owns_lock(); }
+
+    private:
+        const CBulletPhysics*     m_pPhysics;
+        const T m_pElement;
+    };
+
+    mutable std::mutex m_lockElement;
 
 protected:
     std::atomic<bool> m_bNeedsUpdate = false;
-    void              Ready() { m_isReady = true; }
 
 private:
-    void ClearTempData();            // Multithread safe
     void RemoveScriptID();
 
-    std::atomic<bool>                                 m_isReady;
     std::atomic<bool>                                 m_bHasEnqueuedChanges = false;
     CBulletPhysics*                                   m_pPhysics;
     EIdClass::EIdClassType                            m_classType;
     unsigned int                                      m_uiScriptID;
     SharedUtil::ConcurrentList<std::function<void()>> m_listChanges;
-
-    mutable std::mutex m_tempDataLock;
-    // Stores information user set for get function while they are being permanently applied into specific element
-    std::unordered_map<eTempDataKey, std::variant<int, float, CVector, SColor>> m_mapTempData;
 };

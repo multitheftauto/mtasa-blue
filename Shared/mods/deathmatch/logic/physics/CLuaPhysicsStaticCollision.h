@@ -22,8 +22,6 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    void Initialize();
-
     void          SetPosition(CVector vecPosition, bool dontCommitChanges = false);
     const CVector GetPosition() const;
     void          SetRotation(CVector vecRotation, bool dontCommitChanges = false);
@@ -62,6 +60,4 @@ private:
     CLuaPhysicsShape*                             m_pShape;
 
     mutable std::mutex m_lock;
-    mutable std::mutex m_matrixLock;
-    mutable CMatrix    m_matrix;
 };

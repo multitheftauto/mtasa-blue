@@ -50,7 +50,6 @@ void CLuaPhysicsElement::ApplyChanges()
         m_listChanges.pop()();
     }
     Update();
-    ClearTempData();
     m_bHasEnqueuedChanges = false;
 }
 
@@ -61,20 +60,4 @@ void CLuaPhysicsElement::NeedsUpdate()
         m_bNeedsUpdate = true;
         GetPhysics()->AddToBatchUpdate(this);
     }
-}
-
-void CLuaPhysicsElement::CommitChange(std::function<void()> change)
-{
-    if (!m_bHasEnqueuedChanges)
-    {
-        m_bHasEnqueuedChanges = true;
-        GetPhysics()->AddToChangesStack(this);
-    }
-    m_listChanges.push(change);
-}
-
-void CLuaPhysicsElement::ClearTempData()
-{
-    std::lock_guard guard(m_tempDataLock);
-    m_mapTempData.clear();
 }

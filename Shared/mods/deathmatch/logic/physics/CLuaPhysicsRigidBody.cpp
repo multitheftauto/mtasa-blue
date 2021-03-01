@@ -15,9 +15,17 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
     : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(pShape)
 {
     m_pMotionState = std::make_unique<MotionState>();
-    SetTempData(eTempDataKey::Mass, fMass);
-    SetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
-    SetTempData(eTempDataKey::CenterOfMass, vecCenterOfMass);
+
+    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
+    m_pRigidBodyProxy->setUserPointer((void*)this);
+    m_pRigidBodyProxy->setUserIndex(EIdClass::RIGID_BODY);
+
+    SetLinearDumping(BulletPhysics::Defaults::RigidBodyLinearDumping);
+    SetAngularDumping(BulletPhysics::Defaults::RigidBodyAngularDumping);
+    SetLinearSleepingThreshold(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold);
+    SetAngularSleepingThreshold(BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
+    m_pRigidBodyProxy->SetEnabled(true);
+
     pShape->AddRigidBody(this);
 }
 
@@ -26,77 +34,39 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
     Unlink();
 }
 
-void CLuaPhysicsRigidBody::Initialize()
-{
-    assert(!IsReady());            // in case something goes wrong, or element get initialized twice
-
-    float   fMass;
-    CVector vecLocalInertia, vecCenterOfMass;
-    GetTempData(eTempDataKey::Mass, fMass);
-    GetTempData(eTempDataKey::LocalInertia, vecLocalInertia);
-    GetTempData(eTempDataKey::CenterOfMass, vecCenterOfMass);
-
-    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
-    m_pRigidBodyProxy->setUserPointer((void*)this);
-    m_pRigidBodyProxy->setUserIndex(EIdClass::RIGID_BODY);
-
-    SetDumping(BulletPhysics::Defaults::RigidBodyLinearDumping, BulletPhysics::Defaults::RigidBodyAngularDumping);
-    SetLinearSleepingThreshold(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold);
-    SetAngularSleepingThreshold(BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
-    m_pRigidBodyProxy->SetEnabled(true);
-
-    Ready();
-    // SetMatrix(m_matrix);
-}
-
-void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool dontCommitChanges)
+void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool a)
 {
     btTransform transform;
-    m_pMotionState->getWorldTransform(transform);
-    CPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    if (m_pRigidBodyProxy)
-        m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
-
-    if (dontCommitChanges)
-        return;
-
-    std::function<void()> change([&, vecPosition]() {
+    {
+        ElementLock lk(this);
         btTransform transform = m_pRigidBodyProxy->getWorldTransform();
         CPhysicsSharedLogic::SetPosition(transform, vecPosition);
         // m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
         m_pRigidBodyProxy->setWorldTransform(transform);
         m_pRigidBodyProxy->proceedToTransform(transform);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 const CVector CLuaPhysicsRigidBody::GetPosition() const
 {
-    btTransform transform;
+    btTransform    transform;
     m_pMotionState->getWorldTransform(transform);
     return CPhysicsSharedLogic::GetPosition(transform);
 }
 
-void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool dontCommitChanges)
+void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool a)
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
-
-    if (dontCommitChanges)
-        return;
-
-    std::function<void()> change([&, vecRotation]() {
+    {
+        ElementLock lk(this);
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
         CPhysicsSharedLogic::SetRotation(transform, vecRotation);
         m_pRigidBodyProxy->proceedToTransform(transform);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 const CVector CLuaPhysicsRigidBody::GetRotation() const
@@ -108,44 +78,28 @@ const CVector CLuaPhysicsRigidBody::GetRotation() const
 
 void CLuaPhysicsRigidBody::SetScale(const CVector& vecScale)
 {
-    SetTempData(eTempDataKey::Scale, vecScale);
-
-    std::function<void()> change([&, vecScale]() {
-        m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(vecScale);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(vecScale);
+    NeedsActivation();
 }
 
 const CVector CLuaPhysicsRigidBody::GetScale() const
 {
-    CVector vecScale;
-    if (GetTempData(eTempDataKey::Scale, vecScale))
-        return vecScale;
-
+    ElementLock lk(this);
     return m_pRigidBodyProxy->getCollisionShape()->getLocalScaling();
 }
 
 void CLuaPhysicsRigidBody::SetMatrix(const CMatrix& matrix)
 {
-    btTransform transform;
-    m_pMotionState->getWorldTransform(transform);
-    CPhysicsSharedLogic::SetPosition(transform, matrix.GetPosition());
-    CPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
-    SetTempData(eTempDataKey::Scale, matrix.GetScale());
-    m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
-
-    std::function<void()> change([&, matrix]() {
+    {
+        ElementLock lk(this);
         btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
         CPhysicsSharedLogic::SetPosition(transform, matrix.GetRotation());
         CPhysicsSharedLogic::SetRotation(transform, matrix.GetRotation());
         m_pRigidBodyProxy->getCollisionShape()->setLocalScaling(matrix.GetScale());
         m_pRigidBodyProxy->proceedToTransform(transform);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 const CMatrix CLuaPhysicsRigidBody::GetMatrix() const
@@ -157,24 +111,21 @@ const CMatrix CLuaPhysicsRigidBody::GetMatrix() const
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
-    SetTempData(eTempDataKey::Mass, fMass);
-
-    std::function<void()> change([&, fMass]() {
-        const btVector3 localInertia = m_pRigidBodyProxy->getLocalInertia();
-        m_pRigidBodyProxy->setMassProps(fMass, localInertia);
-    });
-
-    CommitChange(change);
+    ElementLock  lk(this);
+    const btVector3 localInertia = m_pRigidBodyProxy->getLocalInertia();
+    m_pRigidBodyProxy->setMassProps(fMass, localInertia);
 }
 
-void CLuaPhysicsRigidBody::SetDumping(float fLinearDamping, float fAngularDamping)
+void CLuaPhysicsRigidBody::SetLinearDumping(float fLinearDamping)
 {
-    SetTempData(eTempDataKey::LinearDumping, fLinearDamping);
-    SetTempData(eTempDataKey::AngularDumping, fAngularDamping);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setDamping(fLinearDamping, m_pRigidBodyProxy->getAngularDamping());
+}
 
-    std::function<void()> change([&, fLinearDamping, fAngularDamping]() { m_pRigidBodyProxy->setDamping(fLinearDamping, fAngularDamping); });
-
-    CommitChange(change);
+void CLuaPhysicsRigidBody::SetAngularDumping(float fAngularDamping)
+{
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setDamping(m_pRigidBodyProxy->getLinearDamping(), fAngularDamping);
 }
 
 void CLuaPhysicsRigidBody::NeedsActivation() const
@@ -197,6 +148,7 @@ void CLuaPhysicsRigidBody::NeedsAABBUpdate() const
 
 bool CLuaPhysicsRigidBody::Activate() const
 {
+    ElementLock lk(this);
     if (!m_pRigidBodyProxy->isActive())            // prevent activation when you eg. set position directly after create
     {
         m_pRigidBodyProxy->setCollisionFlags(m_pRigidBodyProxy->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
@@ -211,345 +163,245 @@ bool CLuaPhysicsRigidBody::Activate() const
 
 void CLuaPhysicsRigidBody::SetCcdMotionThreshold(float fThreshold)
 {
-    SetTempData(eTempDataKey::CcdMotionThreshold, fThreshold);
-
-    std::function<void()> change([&, fThreshold]() { m_pRigidBodyProxy->setCcdMotionThreshold(fThreshold); });
-
-    CommitChange(change);
+    ElementLock        lk(this);
+    m_pRigidBodyProxy->setCcdMotionThreshold(fThreshold);
 }
 
 float CLuaPhysicsRigidBody::GetCcdMotionThreshold() const
 {
-    float fCcdMotionThreshold;
-    if (GetTempData<float>(eTempDataKey::CcdMotionThreshold, fCcdMotionThreshold))
-        return fCcdMotionThreshold;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getCcdMotionThreshold();
-    return 0;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getCcdMotionThreshold();
 }
 
 void CLuaPhysicsRigidBody::SetSweptSphereRadius(float fSphereRadius)
 {
     assert(fSphereRadius >= 0);
 
-    SetTempData(eTempDataKey::SweptSphereRadius, fSphereRadius);
-
-    std::function<void()> change([&, fSphereRadius]() { m_pRigidBodyProxy->setCcdSweptSphereRadius(fSphereRadius); });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setCcdSweptSphereRadius(fSphereRadius);
 }
 
 float CLuaPhysicsRigidBody::GetSweptSphereRadius() const
 {
-    float fCcdMotionThreshold;
-    if (GetTempData(eTempDataKey::SweptSphereRadius, fCcdMotionThreshold))
-        return fCcdMotionThreshold;
-
+    ElementLock lk(this);
     return m_pRigidBodyProxy->getCcdSweptSphereRadius();
 }
 
 bool CLuaPhysicsRigidBody::IsSleeping() const
 {
-    if (IsReady())
-        return !m_pRigidBodyProxy->isActive();
-    return true;
+    ElementLock lk(this);
+    return !m_pRigidBodyProxy->isActive();
 }
 
 bool CLuaPhysicsRigidBody::WantsSleeping() const
 {
-    if (IsReady())
-        m_pRigidBodyProxy->wantsSleeping();
-    return false;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->wantsSleeping();
 }
 
 float CLuaPhysicsRigidBody::GetMass() const
 {
-    float fMass;
-    if (GetTempData(eTempDataKey::Mass, fMass))
-        return fMass;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getMass();
-    return BulletPhysics::Defaults::RigidBodyMass;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getMass();
 }
 
 void CLuaPhysicsRigidBody::SetLinearVelocity(const CVector& vecVelocity)
 {
-    SetTempData(eTempDataKey::LinearVelocity, vecVelocity);
-
-    std::function<void()> change([&, vecVelocity]() { m_pRigidBodyProxy->setLinearVelocity(vecVelocity); });
-
-    CommitChange(change);
+    {
+        ElementLock lk(this);
+        m_pRigidBodyProxy->setLinearVelocity(vecVelocity);
+    }
+    NeedsActivation();
 }
 
 CVector CLuaPhysicsRigidBody::GetLinearVelocity() const
 {
-    CVector fLinearVelocity;
-    if (GetTempData(eTempDataKey::LinearVelocity, fLinearVelocity))
-        return fLinearVelocity;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getLinearVelocity();
-    return {0, 0, 0};
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getLinearVelocity();
 }
 
 void CLuaPhysicsRigidBody::SetAngularVelocity(const CVector& vecVelocity)
 {
-    SetTempData(eTempDataKey::AngularVelocity, vecVelocity);
-
-    std::function<void()> change([&, vecVelocity]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->setAngularVelocity(vecVelocity);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 CVector CLuaPhysicsRigidBody::GetAngularVelocity() const
 {
-    CVector fLinearVelocity;
-    if (GetTempData(eTempDataKey::LinearVelocity, fLinearVelocity))
-        return fLinearVelocity;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getAngularVelocity();
-    return {0, 0, 0};
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getAngularVelocity();
 }
 
 void CLuaPhysicsRigidBody::ApplyCentralForce(const CVector& vecForce)
 {
-    std::function<void()> change([&, vecForce]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->applyCentralForce(vecForce);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 void CLuaPhysicsRigidBody::ApplyDamping(float fDamping)
 {
     assert(fDamping >= 0);
-
-    std::function<void()> change([&, fDamping]() { m_pRigidBodyProxy->applyDamping(fDamping); });
-
-    CommitChange(change);
+    
+    ElementLock lk(this);
+    m_pRigidBodyProxy->applyDamping(fDamping);
 }
 
 void CLuaPhysicsRigidBody::ApplyForce(const CVector& vecFrom, const CVector& vecTo)
 {
-    std::function<void()> change([&, vecFrom, vecTo]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->applyForce(vecFrom, vecTo);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 void CLuaPhysicsRigidBody::ApplyImpulse(const CVector& vecFrom, const CVector& vecTo)
 {
-    std::function<void()> change([&, vecFrom, vecTo]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->applyImpulse(vecFrom, vecTo);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 void CLuaPhysicsRigidBody::ApplyCentralImpulse(const CVector& vecForce)
 {
-    std::function<void()> change([&, vecForce]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->applyCentralImpulse(vecForce);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 void CLuaPhysicsRigidBody::ApplyTorque(const CVector& vecTraque)
 {
-    std::function<void()> change([&, vecTraque]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->applyTorque(vecTraque);
-        NeedsActivation();
-    });
+    }
+    NeedsActivation();
 
-    CommitChange(change);
 }
 
 void CLuaPhysicsRigidBody::ApplyTorqueImpulse(const CVector& vecTraque)
 {
-    std::function<void()> change([&, vecTraque]() {
+    {
+        ElementLock lk(this);
         m_pRigidBodyProxy->applyTorqueImpulse(vecTraque);
-        NeedsActivation();
-    });
-
-    CommitChange(change);
+    }
+    NeedsActivation();
 }
 
 void CLuaPhysicsRigidBody::SetRestitution(float fRestitution)
 {
-    SetTempData(eTempDataKey::Restitution, fRestitution);
-
-    std::function<void()> change([&, fRestitution]() { m_pRigidBodyProxy->setRestitution(fRestitution); });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setRestitution(fRestitution);
 }
 
 float CLuaPhysicsRigidBody::GetRestitution() const
 {
-    float fRestitution;
-    if (GetTempData(eTempDataKey::Restitution, fRestitution))
-        return fRestitution;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getRestitution();
-    return 0;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getRestitution();
 }
 
 void CLuaPhysicsRigidBody::SetFilterMask(int iMask)
 {
-    SetTempData(eTempDataKey::Mask, iMask);
-
-    std::function<void()> change([&, iMask]() { m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterMask = iMask; });
-
-    CommitChange(change);
+    ElementLock        lk(this);
+    m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterMask = iMask;
 }
 
 int CLuaPhysicsRigidBody::GetFilterMask() const
 {
-    int iMask;
-    if (GetTempData(eTempDataKey::Mask, iMask))
-        return iMask;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterMask;
-    return -1;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterMask;
 }
 
 void CLuaPhysicsRigidBody::SetDebugColor(const SColor& color)
 {
-    SetTempData(eTempDataKey::DebugColor, color);
-
-    std::function<void()> change(
-        [&, color]() { m_pRigidBodyProxy->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255)); });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
 }
 
 void CLuaPhysicsRigidBody::SetFilterGroup(int iGroup)
 {
-    SetTempData(eTempDataKey::Group, iGroup);
-
-    std::function<void()> change([&, iGroup]() { m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup = iGroup; });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup = iGroup;
 }
 
 void CLuaPhysicsRigidBody::SetGravity(CVector vecGravity)
 {
-    SetTempData(eTempDataKey::Gravity, vecGravity);
-
-    std::function<void()> change([&, vecGravity]() { m_pRigidBodyProxy->setGravity(vecGravity); });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setGravity(vecGravity);
 }
 
 CVector CLuaPhysicsRigidBody::GetGravity() const
 {
-    CVector vecGravity;
-    if (GetTempData(eTempDataKey::Gravity, vecGravity))
-        return vecGravity;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getGravity();
-    return {1, 1, 1};
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getGravity();
 }
 
 int CLuaPhysicsRigidBody::GetFilterGroup() const
 {
-    SColor iGroup;
-    if (GetTempData(eTempDataKey::Group, iGroup))
-        return iGroup;
-
-    if (IsReady())
-        return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup;
-    return BulletPhysics::Defaults::FilterGroup;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getBroadphaseHandle()->m_collisionFilterGroup;
 }
 
 void CLuaPhysicsRigidBody::RemoveDebugColor()
 {
-    std::function<void()> change([&]() { m_pRigidBodyProxy->removeCustomDebugColor(); });
+    ElementLock lk(this);
+    m_pRigidBodyProxy->removeCustomDebugColor();
 }
 
 const SColor CLuaPhysicsRigidBody::GetDebugColor() const
 {
-    SColor color;
-    if (GetTempData(eTempDataKey::DebugColor, color))
-        return color;
-
-    if (IsReady())
+    SColor    color;
+    btVector3 btColor;
     {
-        btVector3 btColor;
+        ElementLock lk(this);
         m_pRigidBodyProxy->getCustomDebugColor(btColor);
-        color.R = btColor.getX() * 255;
-        color.G = btColor.getY() * 255;
-        color.B = btColor.getZ() * 255;
-        color.A = 255;
-        return color;
     }
-    return 0;            // #TODO, set white
+    color.R = btColor.getX() * 255;
+    color.G = btColor.getY() * 255;
+    color.B = btColor.getZ() * 255;
+    color.A = 255;
+    return color;
 }
 
 void CLuaPhysicsRigidBody::SetLinearSleepingThreshold(float fLinear)
 {
-    assert(fLinear >= 0);
-
-    SetTempData(eTempDataKey::SleepingThresholdLinear, fLinear);
-
-    std::function<void()> change(
-        [&, fLinear]() { m_pRigidBodyProxy->setSleepingThresholds(fLinear, m_pRigidBodyProxy->getAngularSleepingThreshold()); });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setSleepingThresholds(fLinear, m_pRigidBodyProxy->getAngularSleepingThreshold());
 }
 
 void CLuaPhysicsRigidBody::SetAngularSleepingThreshold(float fAngular)
 {
-    assert(fAngular >= 0);
-
-    SetTempData(eTempDataKey::SleepingThresholdAngular, fAngular);
-
-    std::function<void()> change([&, fAngular]() { m_pRigidBodyProxy->setSleepingThresholds(m_pRigidBodyProxy->getLinearSleepingThreshold(), fAngular); });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setSleepingThresholds(m_pRigidBodyProxy->getLinearSleepingThreshold(), fAngular);
 }
 
 float CLuaPhysicsRigidBody::GetLinearSleepingThreshold() const
 {
-    float fLinear = 0;
-    if (GetTempData(eTempDataKey::SleepingThresholdLinear, fLinear))
-        return fLinear;
-    else if (IsReady())
-        fLinear = m_pRigidBodyProxy->getLinearSleepingThreshold();
-
-    return fLinear;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getLinearSleepingThreshold();
 }
 
 float CLuaPhysicsRigidBody::GetAngularSleepingThreshold() const
 {
-    float fAngular = 0;
-    if (GetTempData(eTempDataKey::SleepingThresholdAngular, fAngular))
-        return fAngular;
-    else if (IsReady())
-        fAngular = m_pRigidBodyProxy->getAngularSleepingThreshold();
-
-    return fAngular;
+    ElementLock lk(this);
+    return m_pRigidBodyProxy->getAngularSleepingThreshold();
 }
 
 btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const
 {
     btTransform predictedTransform = btTransform::getIdentity();
-    if (IsReady())
     {
+        ElementLock lk(this);
         m_pRigidBodyProxy->predictIntegratedTransform(time, predictedTransform);
     }
     return predictedTransform;
@@ -557,37 +409,33 @@ btTransform& CLuaPhysicsRigidBody::PredictTransform(float time) const
 
 void CLuaPhysicsRigidBody::ClearForces()
 {
-    std::function<void()> change([&]() {
-        m_pRigidBodyProxy->setLinearVelocity(btVector3(0, 0, 0));
-        m_pRigidBodyProxy->setAngularVelocity(btVector3(0, 0, 0));
-        m_pRigidBodyProxy->setInterpolationAngularVelocity(btVector3(0, 0, 0));
-        m_pRigidBodyProxy->setInterpolationLinearVelocity(btVector3(0, 0, 0));
-        m_pRigidBodyProxy->clearForces();
-    });
-
-    CommitChange(change);
+    ElementLock lk(this);
+    m_pRigidBodyProxy->setLinearVelocity(btVector3(0, 0, 0));
+    m_pRigidBodyProxy->setAngularVelocity(btVector3(0, 0, 0));
+    m_pRigidBodyProxy->setInterpolationAngularVelocity(btVector3(0, 0, 0));
+    m_pRigidBodyProxy->setInterpolationLinearVelocity(btVector3(0, 0, 0));
+    m_pRigidBodyProxy->clearForces();
 }
 
 void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstraint)
 {
+    ElementLock lk(this);
     m_pRigidBodyProxy->removeConstraintRef(pConstraint->GetConstraint());
     ListRemove(m_constraintList, pConstraint);
 }
 
 void CLuaPhysicsRigidBody::Unlink()
 {
-    if (IsReady())
+    ElementLock lk(this);
+    while (!m_constraintList.empty())
     {
-        while (!m_constraintList.empty())
-        {
-            auto const& constraint = m_constraintList.back();
-            RemoveConstraintRef(constraint);
-            GetPhysics()->DestroyElement(constraint);
-        }
-        m_constraintList.clear();
-
-        m_pRigidBodyProxy.reset();
-        // m_pShape->RemoveRigidBody(this);
-        m_pShape = nullptr;
+        auto const& constraint = m_constraintList.back();
+        RemoveConstraintRef(constraint);
+        GetPhysics()->DestroyElement(constraint);
     }
+    m_constraintList.clear();
+
+    m_pRigidBodyProxy.reset();
+    // m_pShape->RemoveRigidBody(this);
+    m_pShape = nullptr;
 }

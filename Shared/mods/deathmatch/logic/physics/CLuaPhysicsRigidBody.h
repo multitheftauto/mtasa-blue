@@ -48,13 +48,12 @@ public:
     int  GetFilterMask() const;
     void SetFilterMask(int mask);
 
-    // Running on worker thread
-    void Initialize();
-
     bool Activate() const;
 
-    // both from 0.0f to 1.0f
-    void SetDumping(float fLinearDamping, float fAngularDamping);
+    // from 0.0f to 1.0f
+    void SetLinearDumping(float fLinearDamping);
+    // from 0.0f to 1.0f
+    void SetAngularDumping(float fAngularDamping);
     void SetMass(float fMass);
 
     // Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold

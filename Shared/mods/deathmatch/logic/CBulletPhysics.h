@@ -458,7 +458,6 @@ private:
     bool                                                                m_bObjectsCached = false;
 
     SharedUtil::ConcurrentList<CLuaPhysicsStaticCollision*> m_InitializeStaticCollisionsList;
-    SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*>       m_InitializeRigidBodiesList;
     SharedUtil::ConcurrentList<CLuaPhysicsConstraint*>      m_InitializeConstraintsList;
 
     SharedUtil::ConcurrentList<CLuaPhysicsElement*>   m_elementChangesList;

@@ -296,6 +296,7 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
         pStaticCollision->SetPosition(vecPosition, true);
     if (vecRotation.LengthSquared() != 0)
         pStaticCollision->SetRotation(vecRotation, true);
+    pStaticCollision->SetEnabled(true);
     return pStaticCollision;
 }
 

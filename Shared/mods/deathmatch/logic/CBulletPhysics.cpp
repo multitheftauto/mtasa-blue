@@ -298,7 +298,6 @@ void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
     m_pLuaMain->GetPhysicsRigidBodyManager()->Add(pRigidBody);
     m_vecRigidBodies.push_back(pRigidBody);
-    m_InitializeRigidBodiesList.push(pRigidBody);
     m_bWorldHasChanged = true;
 }
 
@@ -313,7 +312,6 @@ void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
     ListRemove(m_vecRigidBodies, pLuaRigidBody);
-    m_InitializeRigidBodiesList.remove(pLuaRigidBody);
 }
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
@@ -783,34 +781,8 @@ void CBulletPhysics::FlushAllChanges()
     if (!m_bWorldHasChanged)
         return;
 
-    auto shapeManager = m_pLuaMain->GetPhysicsShapeManager();
+    //auto shapeManager = m_pLuaMain->GetPhysicsShapeManager();
     auto rigidBodiesManager = m_pLuaMain->GetPhysicsRigidBodyManager();
-    if (!m_InitializeStaticCollisionsList.empty())
-    {
-        BT_PROFILE("initializeStaticCollisions");
-
-        while (!m_InitializeStaticCollisionsList.empty())
-        {
-            CLuaPhysicsStaticCollision* pStaticCollision = m_InitializeStaticCollisionsList.pop();
-            if (shapeManager->IsShapeValid(pStaticCollision->GetShape()))
-            {
-                pStaticCollision->Initialize();
-            }
-        }
-    }
-
-    if (!m_InitializeRigidBodiesList.empty())
-    {
-        BT_PROFILE("initializeRigidBodies");
-        while (!m_InitializeRigidBodiesList.empty())
-        {
-            CLuaPhysicsRigidBody* pRigidBody = m_InitializeRigidBodiesList.pop();
-            if (shapeManager->IsShapeValid(pRigidBody->GetShape()))
-            {
-                pRigidBody->Initialize();
-            }
-        }
-    }
 
     if (!m_InitializeConstraintsList.empty())
     {
