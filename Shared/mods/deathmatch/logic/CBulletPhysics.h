@@ -246,9 +246,10 @@ public:
 
     struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
     {
-        btAlignedObjectArray<btCollisionObject*>& m_collisionObjectArray;
+
+        btAlignedObjectArray<CLuaPhysicsElement*>& m_collisionObjectArray;
         short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
-        BroadphaseAabbCallback(btAlignedObjectArray<btCollisionObject*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
+        BroadphaseAabbCallback(btAlignedObjectArray<CLuaPhysicsElement*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
                                int collisionMask = btBroadphaseProxy::AllFilter)
             : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
         {
@@ -265,7 +266,9 @@ public:
         virtual bool process(const btBroadphaseProxy* proxy)
         {
             if (needsCollision(proxy))
-                m_collisionObjectArray.push_back((btCollisionObject*)proxy->m_clientObject);
+            {
+                m_collisionObjectArray.push_back((CLuaPhysicsElement*)((btCollisionObject*)proxy->m_clientObject)->getUserPointer());
+            }
             return true;
         }
     };

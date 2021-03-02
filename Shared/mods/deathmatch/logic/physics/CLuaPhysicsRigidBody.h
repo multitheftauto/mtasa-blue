@@ -56,6 +56,8 @@ public:
     void SetAngularDumping(float fAngularDamping);
     void SetMass(float fMass);
 
+    void UpdateAABB();
+
     // Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold
     void SetCcdMotionThreshold(float fThreshold);
     // Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold

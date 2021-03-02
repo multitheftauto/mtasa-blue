@@ -127,6 +127,14 @@ void CLuaPhysicsRigidBody::SetAngularDumping(float fAngularDamping)
     m_pRigidBodyProxy->setDamping(m_pRigidBodyProxy->getLinearDamping(), fAngularDamping);
 }
 
+void CLuaPhysicsRigidBody::UpdateAABB()
+{
+    ElementLock lk(this);
+
+    CBulletPhysics::WorldContext world(GetPhysics());
+    world->updateSingleAabb(m_pRigidBodyProxy.get());
+}
+
 void CLuaPhysicsRigidBody::NeedsActivation() const
 {
     if (!m_bActivationRequested)

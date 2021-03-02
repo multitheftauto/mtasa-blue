@@ -263,6 +263,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     if (!options.has_value() || options.value().empty())
     {
         pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape);
+        pRigidBody->SetPosition(CVector{0, 0, 0});
         pRigidBody->SetEnabled(true);
         return pRigidBody;
     }

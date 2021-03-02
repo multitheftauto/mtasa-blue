@@ -725,23 +725,25 @@ void CBulletPhysics::DrawDebugLines()
 void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
                                 std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {
-    btAlignedObjectArray<btCollisionObject*> collisionObjectArray;
+    btAlignedObjectArray<CLuaPhysicsElement*> collisionObjectArray;
     BroadphaseAabbCallback                   callback(collisionObjectArray, collisionGroup, collisionMask);
 
-    WorldContext world(this);
-    world->getBroadphase()->aabbTest(min, max, callback);
+    {
+        WorldContext world(this);
+        world->getBroadphase()->aabbTest(min, max, callback);
+    }
 
+    CLuaPhysicsElement* pPhysicsElement;
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
-        auto const&         btObject = callback.m_collisionObjectArray[i];
-        static EIdClassType classType = (EIdClass::EIdClassType)btObject->getUserIndex();
-        switch (classType)
+        pPhysicsElement = callback.m_collisionObjectArray[i];
+        switch (pPhysicsElement->GetClassType())
         {
             case EIdClassType::RIGID_BODY:
-                vecRigidBodies.push_back((CLuaPhysicsRigidBody*)btObject->getUserPointer());
+                vecRigidBodies.push_back((CLuaPhysicsRigidBody*)pPhysicsElement);
                 break;
             case EIdClassType::STATIC_COLLISION:
-                vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)btObject->getUserPointer());
+                vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)pPhysicsElement);
                 break;
         }
     }

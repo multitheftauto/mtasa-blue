@@ -61,6 +61,5 @@ std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysi
     std::unique_ptr<CPhysicsRigidBodyProxy> pRigidBody = std::make_unique<CPhysicsRigidBodyProxy>(rigidBodyCI);
     pRigidBody->m_pPhysics = pShape->GetPhysics();
 
-    pRigidBody->SetEnabled(true);
     return pRigidBody;
 }
