@@ -550,8 +550,8 @@ int CLuaElementDefs::getElementParent(lua_State* luaVM)
 int CLuaElementDefs::getElementPosition(lua_State* luaVM)
 {
     //  float, float, float getElementPosition ( element theElement )
-    CElement*             pElement;
-    CLuaPhysicsRigidBody* pPhysicsWorldElement = nullptr;
+    CElement*                pElement;
+    CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
@@ -1799,10 +1799,10 @@ int CLuaElementDefs::setElementParent(lua_State* luaVM)
 int CLuaElementDefs::setElementPosition(lua_State* luaVM)
 {
     //  bool setElementPosition ( element theElement, float x, float y, float z [, bool warp = true ] )
-    CElement*             pElement;
-    CLuaPhysicsRigidBody* pPhysicsWorldElement = nullptr;
-    CVector   vecPosition;
-    bool      bWarp;
+    CElement*                pElement;
+    CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
+    CVector                  vecPosition;
+    bool                     bWarp;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())

@@ -19,8 +19,7 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
 
     m_btCollisionObject = CPhysicsStaticCollisionProxy::Create(m_pShape);
     m_btCollisionObject->setUserPointer((void*)this);
-    m_btCollisionObject->setUserIndex(EIdClass::CONSTRAINT);
-
+    m_btCollisionObject->setUserIndex(EIdClass::STATIC_COLLISION);
     pShape->AddStaticCollision(this);
 }
 
@@ -29,20 +28,24 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
     Unlink();
 }
 
-void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition, bool dontCommitChanges)
+void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
 {
     ElementLock lk(this);
     btTransform& transform = GetCollisionObject()->getWorldTransform();
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
     GetCollisionObject()->setWorldTransform(transform);
+    CBulletPhysics::WorldContext world(GetPhysics());
+    world->updateAabbs();
 }
 
-void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation, bool dontCommitChanges)
+void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation)
 {
     ElementLock  lk(this);
     btTransform& transform = GetCollisionObject()->getWorldTransform();
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     GetCollisionObject()->setWorldTransform(transform);
+    CBulletPhysics::WorldContext world(GetPhysics());
+    world->updateAabbs();
 }
 
 const CVector CLuaPhysicsStaticCollision::GetPosition() const

@@ -88,12 +88,12 @@ void CBulletPhysics::Unlink()
 {
     m_pPhysicsManager->RemoveFromList(this);
 
-    // Only shapes need to be removed, everything linking to some shape, rigid bodies
-    // It causes chains of DestroyElement on rigid bodies, static collisions and constraints
-    for (auto shape = m_vecShapes.rbegin(); shape != m_vecShapes.rend(); ++shape)
-    {
-        DestroyElement(*shape);
-    }
+    //// Only shapes need to be removed, everything linking to some shape, rigid bodies
+    //// It causes chains of DestroyElement on rigid bodies, static collisions and constraints
+    //for (auto shape = m_vecShapes.rbegin(); shape != m_vecShapes.rend(); ++shape)
+    //{
+    //    DestroyElement(*shape);
+    //}
 }
 
 void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const

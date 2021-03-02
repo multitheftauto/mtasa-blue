@@ -27,9 +27,9 @@ public:
     CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
-    void          SetPosition(CVector vecPosition, bool dontCommitChanges = false);
+    void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;
-    void          SetRotation(CVector vecRotation, bool dontCommitChanges = false);
+    void          SetRotation(CVector vecRotation);
     const CVector GetRotation() const;
     void          SetScale(const CVector& vecScale);
     const CVector GetScale() const;

@@ -259,8 +259,13 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     if (!pShape->SupportRigidBody())
         throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
 
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
     if (!options.has_value() || options.value().empty())
-        return pShape->GetPhysics()->CreateRigidBody(pShape);
+    {
+        pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape);
+        pRigidBody->SetEnabled(true);
+        return pRigidBody;
+    }
 
     float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
 
@@ -274,13 +279,11 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
     CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
 
-    CLuaPhysicsRigidBody* pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
-    if (vecPosition.LengthSquared() != 0)
-        pRigidBody->SetPosition(vecPosition, true);
-    if (vecRotation.LengthSquared() != 0)
-        pRigidBody->SetRotation(vecRotation, true);
-
+    pRigidBody->SetPosition(vecPosition);
+    pRigidBody->SetRotation(vecRotation);
+    pRigidBody->SetEnabled(true);
     return pRigidBody;
 }
 
@@ -292,10 +295,8 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
     CVector vecPosition = position.value_or(CVector{0, 0, 0});
     CVector vecRotation = rotation.value_or(CVector{0, 0, 0});
 
-    if (vecPosition.LengthSquared() != 0)
-        pStaticCollision->SetPosition(vecPosition, true);
-    if (vecRotation.LengthSquared() != 0)
-        pStaticCollision->SetRotation(vecRotation, true);
+    pStaticCollision->SetPosition(vecPosition);
+    pStaticCollision->SetRotation(vecRotation);
     pStaticCollision->SetEnabled(true);
     return pStaticCollision;
 }

@@ -71,17 +71,14 @@ public:
     public:
         // static void* operator new(size_t) = delete;
 
-        ElementLock(T pElement) : m_pElement(pElement), m_pPhysics(pElement->GetPhysics()), m_lock(pElement->m_lockElement, std::try_to_lock)
+        ElementLock(T pElement) : m_pElement(pElement), m_lock(pElement->m_lockElement, std::try_to_lock)
         {
             assert(m_lock.owns_lock() && "Element is already locked");
         }
 
-        ~ElementLock() {}
-        bool IsLocked() { return m_lock.owns_lock(); }
-
     private:
-        const CBulletPhysics*     m_pPhysics;
-        const T m_pElement;
+        const CBulletPhysics* m_pPhysics;
+        const T               m_pElement;
     };
 
     mutable std::mutex m_lockElement;

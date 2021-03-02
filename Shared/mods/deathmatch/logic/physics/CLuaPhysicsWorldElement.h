@@ -24,9 +24,9 @@ protected:
     ~CLuaPhysicsWorldElement();
 
 public:
-    virtual void          SetPosition(CVector vecPosition, bool dontCommitChanges = false) = 0;
+    virtual void          SetPosition(CVector vecPosition) = 0;
     virtual const CVector GetPosition() const = 0;
-    virtual void          SetRotation(CVector vecRotation, bool dontCommitChanges = false) = 0;
+    virtual void          SetRotation(CVector vecRotation) = 0;
     virtual const CVector GetRotation() const = 0;
     virtual void          SetScale(const CVector& vecScale) = 0;
     virtual const CVector GetScale() const = 0;

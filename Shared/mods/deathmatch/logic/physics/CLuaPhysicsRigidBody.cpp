@@ -24,7 +24,6 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
     SetAngularDumping(BulletPhysics::Defaults::RigidBodyAngularDumping);
     SetLinearSleepingThreshold(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold);
     SetAngularSleepingThreshold(BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
-    m_pRigidBodyProxy->SetEnabled(true);
 
     pShape->AddRigidBody(this);
 }
@@ -34,7 +33,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
     Unlink();
 }
 
-void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition, bool a)
+void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
 {
     btTransform transform;
     {
@@ -55,7 +54,7 @@ const CVector CLuaPhysicsRigidBody::GetPosition() const
     return CPhysicsSharedLogic::GetPosition(transform);
 }
 
-void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation, bool a)
+void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation)
 {
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
