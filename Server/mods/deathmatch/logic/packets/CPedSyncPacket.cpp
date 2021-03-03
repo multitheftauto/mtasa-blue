@@ -14,8 +14,7 @@
 CPedSyncPacket::CPedSyncPacket(SyncData& ReadData)
 {
     // Copy the struct
-    SyncData WriteData = ReadData;
-    m_Syncs.push_back(WriteData);
+    m_Syncs.push_back(ReadData);
 }
 
 bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
