@@ -20,15 +20,7 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
         std::lock_guard guard(lock);
         // Check if already removed
         if (!ListContains(m_elementsList, pRigidBody))
-        {
-            auto it = m_elementsList.begin();
-            for (; it != m_elementsList.end(); ++it)
-                if ((CLuaPhysicsElement*)pRigidBody == (CLuaPhysicsElement*)*it)
-                {
-                    int a = 123;
-                }
             return;
-        }
     }
 
     // Remove all references

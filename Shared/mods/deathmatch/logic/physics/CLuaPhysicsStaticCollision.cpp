@@ -31,6 +31,7 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 bool CLuaPhysicsStaticCollision::Destroy()
 {
     GetPhysics()->DestroyElement(this);
+    m_pShape->RemoveStaticCollision(this);
     return true;
 }
 
