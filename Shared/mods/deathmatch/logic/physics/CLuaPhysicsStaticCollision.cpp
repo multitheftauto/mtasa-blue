@@ -12,12 +12,11 @@
 #include <StdInc.h>
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
-    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
+    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::Create(pShape))
 {
     // pShape->AddStaticCollision(this);
     m_pShape = pShape;
 
-    m_btCollisionObject = CPhysicsStaticCollisionProxy::Create(m_pShape);
     m_btCollisionObject->setUserPointer((void*)this);
     m_btCollisionObject->setUserIndex(EIdClass::STATIC_COLLISION);
     pShape->AddStaticCollision(this);
@@ -25,7 +24,6 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 {
-    Unlink();
 }
 
 bool CLuaPhysicsStaticCollision::Destroy()
@@ -163,8 +161,6 @@ void CLuaPhysicsStaticCollision::Unlink()
 {
     ElementLock lk(this);
     m_btCollisionObject->setCollisionShape(nullptr);
-    m_btCollisionObject->SetEnabled(false);
-    m_btCollisionObject = nullptr;
 }
 
 SBoundingBox CLuaPhysicsStaticCollision::GetBoundingBox()

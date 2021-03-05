@@ -36,8 +36,6 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
         GetPhysics()->DestroyElement(constraint);
     }
     m_constraintList.clear();
-
-    m_pRigidBodyProxy->SetEnabled(false);
 }
 
 bool CLuaPhysicsRigidBody::Destroy()

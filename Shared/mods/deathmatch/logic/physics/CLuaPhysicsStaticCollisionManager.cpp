@@ -24,4 +24,6 @@ void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaS
     pLuaStaticCollision->Unlink();
     pLuaStaticCollision->GetPhysics()->DestroyStaticCollision(pLuaStaticCollision);
     ListRemove(m_elementsList, pLuaStaticCollision);
+
+    delete pLuaStaticCollision;
 }
