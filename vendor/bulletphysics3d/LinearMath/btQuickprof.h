@@ -61,7 +61,6 @@ btLeaveProfileZoneFunc* btGetCurrentLeaveProfileZoneFunc();
 void btSetCustomEnterProfileZoneFunc(btEnterProfileZoneFunc* enterFunc);
 void btSetCustomLeaveProfileZoneFunc(btLeaveProfileZoneFunc* leaveFunc);
 
-#define BT_ENABLE_PROFILE
 #ifndef BT_ENABLE_PROFILE
 #define BT_NO_PROFILE 1
 #endif  //BT_NO_PROFILE

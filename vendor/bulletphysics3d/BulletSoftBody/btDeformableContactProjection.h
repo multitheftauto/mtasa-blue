@@ -19,35 +19,81 @@
 #include "btSoftBody.h"
 #include "BulletDynamics/Featherstone/btMultiBodyLinkCollider.h"
 #include "BulletDynamics/Featherstone/btMultiBodyConstraint.h"
+#include "btDeformableContactConstraint.h"
 #include "LinearMath/btHashMap.h"
-class btDeformableContactProjection : public btCGProjection
+#include "LinearMath/btReducedVector.h"
+#include "LinearMath/btModifiedGramSchmidt.h"
+#include <vector>
+
+struct LagrangeMultiplier
+{
+	int m_num_constraints;  // Number of constraints
+	int m_num_nodes;        // Number of nodes in these constraints
+	btScalar m_weights[3];  // weights of the nodes involved, same size as m_num_nodes
+	btVector3 m_dirs[3];    // Constraint directions, same size of m_num_constraints;
+	int m_indices[3];       // indices of the nodes involved, same size as m_num_nodes;
+};
+
+class btDeformableContactProjection
 {
 public:
-    // map from node index to constraints
-    btHashMap<btHashInt, DeformableContactConstraint> m_constraints;
-    
-    btDeformableContactProjection(btAlignedObjectArray<btSoftBody *>& softBodies, const btScalar& dt)
-    : btCGProjection(softBodies, dt)
-    {
-    }
-    
-    virtual ~btDeformableContactProjection()
-    {
-    }
-    
-    // apply the constraints to the rhs
-    virtual void project(TVStack& x);
-    // add to friction
-    virtual void applyDynamicFriction(TVStack& f);
-    
-    // apply constraints to x in Ax=b
-    virtual void enforceConstraint(TVStack& x);
-    
-    // update the constraints
-    virtual btScalar update();
-    
-    virtual void setConstraints();
-    
-    virtual void reinitialize(bool nodeUpdated);
+	typedef btAlignedObjectArray<btVector3> TVStack;
+	btAlignedObjectArray<btSoftBody*>& m_softBodies;
+
+	// all constraints involving face
+	btAlignedObjectArray<btDeformableContactConstraint*> m_allFaceConstraints;
+#ifndef USE_MGS
+	// map from node index to projection directions
+	btHashMap<btHashInt, btAlignedObjectArray<btVector3> > m_projectionsDict;
+#else
+	btAlignedObjectArray<btReducedVector> m_projections;
+#endif
+
+	btAlignedObjectArray<LagrangeMultiplier> m_lagrangeMultipliers;
+
+	// map from node index to static constraint
+	btAlignedObjectArray<btAlignedObjectArray<btDeformableStaticConstraint> > m_staticConstraints;
+	// map from node index to node rigid constraint
+	btAlignedObjectArray<btAlignedObjectArray<btDeformableNodeRigidContactConstraint> > m_nodeRigidConstraints;
+	// map from node index to face rigid constraint
+	btAlignedObjectArray<btAlignedObjectArray<btDeformableFaceRigidContactConstraint> > m_faceRigidConstraints;
+	// map from node index to deformable constraint
+	btAlignedObjectArray<btAlignedObjectArray<btDeformableFaceNodeContactConstraint> > m_deformableConstraints;
+	// map from node index to node anchor constraint
+	btAlignedObjectArray<btAlignedObjectArray<btDeformableNodeAnchorConstraint> > m_nodeAnchorConstraints;
+
+	bool m_useStrainLimiting;
+
+	btDeformableContactProjection(btAlignedObjectArray<btSoftBody*>& softBodies)
+		: m_softBodies(softBodies)
+	{
+	}
+
+	virtual ~btDeformableContactProjection()
+	{
+	}
+
+	// apply the constraints to the rhs of the linear solve
+	virtual void project(TVStack& x);
+
+	// add friction force to the rhs of the linear solve
+	virtual void applyDynamicFriction(TVStack& f);
+
+	// update and solve the constraints
+	virtual btScalar update(btCollisionObject** deformableBodies, int numDeformableBodies, const btContactSolverInfo& infoGlobal);
+
+	// Add constraints to m_constraints. In addition, the constraints that each vertex own are recorded in m_constraintsDict.
+	virtual void setConstraints(const btContactSolverInfo& infoGlobal);
+
+	// Set up projections for each vertex by adding the projection direction to
+	virtual void setProjection();
+
+	virtual void reinitialize(bool nodeUpdated);
+
+	btScalar solveSplitImpulse(btCollisionObject** deformableBodies, int numDeformableBodies, const btContactSolverInfo& infoGlobal);
+
+	virtual void setLagrangeMultiplier();
+
+	void checkConstraints(const TVStack& x);
 };
 #endif /* btDeformableContactProjection_h */

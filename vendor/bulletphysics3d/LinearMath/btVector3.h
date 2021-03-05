@@ -302,7 +302,7 @@ public:
    * x^2 + y^2 + z^2 = 1 */
 	SIMD_FORCE_INLINE btVector3& normalize()
 	{
-		//btAssert(!fuzzyZero()); // looks like bug
+		btAssert(!fuzzyZero());
 
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		// dot product first

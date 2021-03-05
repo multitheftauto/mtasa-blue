@@ -76,6 +76,7 @@ struct MultiBodyInplaceSolverIslandCallback : public btSimulationIslandManager::
     btDispatcher* m_dispatcher;
     
     btAlignedObjectArray<btCollisionObject*> m_bodies;
+	btAlignedObjectArray<btCollisionObject*> m_softBodies;
     btAlignedObjectArray<btPersistentManifold*> m_manifolds;
     btAlignedObjectArray<btTypedConstraint*> m_constraints;
     btAlignedObjectArray<btMultiBodyConstraint*> m_multiBodyConstraints;
@@ -188,7 +189,17 @@ struct MultiBodyInplaceSolverIslandCallback : public btSimulationIslandManager::
             //} else
             {
                 for (i = 0; i < numBodies; i++)
-                    m_bodies.push_back(bodies[i]);
+				{
+					bool isSoftBodyType = (bodies[i]->getInternalType() & btCollisionObject::CO_SOFT_BODY);
+					if (!isSoftBodyType)
+					{
+						m_bodies.push_back(bodies[i]);
+					}
+					else
+					{
+						m_softBodies.push_back(bodies[i]);
+					}
+				}
                 for (i = 0; i < numManifolds; i++)
                     m_manifolds.push_back(manifolds[i]);
                 for (i = 0; i < numCurConstraints; i++)
@@ -225,6 +236,7 @@ struct MultiBodyInplaceSolverIslandCallback : public btSimulationIslandManager::
             m_islandAnalyticsData.push_back(m_solver->m_analyticsData);
         }
         m_bodies.resize(0);
+		m_softBodies.resize(0);
         m_manifolds.resize(0);
         m_constraints.resize(0);
         m_multiBodyConstraints.resize(0);

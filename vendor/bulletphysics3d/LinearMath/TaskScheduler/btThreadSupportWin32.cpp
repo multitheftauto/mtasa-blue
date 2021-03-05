@@ -13,8 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "StdInc.h"
-
 #if defined(_WIN32) && BT_THREADSAFE
 
 #include "LinearMath/btScalar.h"

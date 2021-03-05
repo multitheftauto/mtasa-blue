@@ -8,7 +8,7 @@
 		".."
 	}		
 	
-    if os.istarget("Linux") then
+    if os.is("Linux") then
         buildoptions{"-fPIC"}
     end
 

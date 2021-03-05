@@ -14,7 +14,6 @@ subject to the following restrictions:
 
 #ifndef BT_THREADS_H
 #define BT_THREADS_H
-#define BT_THREADSAFE 1
 
 #include "btScalar.h"  // has definitions like SIMD_FORCE_INLINE
 

@@ -16,8 +16,8 @@ subject to the following restrictions:
 #ifndef BT_HEIGHTFIELD_TERRAIN_SHAPE_H
 #define BT_HEIGHTFIELD_TERRAIN_SHAPE_H
 
-#include "bulletphysics3d/BulletCollision/CollisionShapes/btConcaveShape.h"
-#include "bulletphysics3d/LinearMath/btAlignedObjectArray.h"
+#include "btConcaveShape.h"
+#include "LinearMath/btAlignedObjectArray.h"
 
 ///btHeightfieldTerrainShape simulates a 2D heightfield terrain
 /**
@@ -114,7 +114,7 @@ protected:
 	int m_vboundsGridLength;
 	int m_vboundsChunkSize;
 
-	int m_userIndex2;
+	
 	btScalar m_userValue3;
 
 	struct btTriangleInfoMap* m_triangleInfoMap;
@@ -192,14 +192,6 @@ public:
 	virtual const char* getName() const { return "HEIGHTFIELD"; }
 
 	
-	void setUserIndex2(int index)
-	{
-		m_userIndex2 = index;
-	}
-	int getUserIndex2() const
-	{
-		return m_userIndex2;
-	}
 	void setUserValue3(btScalar value)
 	{
 		m_userValue3 = value;
