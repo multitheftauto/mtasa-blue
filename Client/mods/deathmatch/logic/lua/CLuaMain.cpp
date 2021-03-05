@@ -96,7 +96,7 @@ CLuaPhysicsConstraint* CLuaMain::GetContraintFromScriptID(unsigned int uiScriptI
 
 CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
 {
-    return m_pLuaPhysicsRigidBodyManager->GetFromScriptID(uiScriptID);
+    return (CLuaPhysicsRigidBody*)m_pLuaPhysicsRigidBodyManager->GetFromScriptID(uiScriptID);
 }
 
 CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned int uiScriptID)

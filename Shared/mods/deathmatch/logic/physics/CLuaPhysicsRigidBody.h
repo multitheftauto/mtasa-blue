@@ -27,6 +27,8 @@ public:
     CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
+    bool Destroy();
+
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;
     void          SetRotation(CVector vecRotation);
@@ -95,7 +97,6 @@ public:
     void AddConstraintRef(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraintRef(CLuaPhysicsConstraint* pConstraint);
 
-    void         Unlink();
     btTransform& PredictTransform(float time) const;
     void         ClearForces();
     void         NeedsActivation() const;

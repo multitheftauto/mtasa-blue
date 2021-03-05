@@ -28,6 +28,12 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
     Unlink();
 }
 
+bool CLuaPhysicsStaticCollision::Destroy()
+{
+    GetPhysics()->DestroyElement(this);
+    return true;
+}
+
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
 {
     ElementLock lk(this);

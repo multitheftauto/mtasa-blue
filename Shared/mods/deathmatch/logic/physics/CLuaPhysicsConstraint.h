@@ -28,6 +28,7 @@ public:
                           bool bDisableCollisionsBetweenLinkedBodies = true);
     ~CLuaPhysicsConstraint();
 
+    bool Destroy();
     void  SetBreakingImpulseThreshold(float fThreshold);
     float GetBreakingImpulseThreshold();
     float GetAppliedImpulse();

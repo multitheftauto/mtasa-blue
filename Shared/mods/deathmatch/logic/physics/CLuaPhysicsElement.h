@@ -50,7 +50,7 @@ public:
     CBulletPhysics*        GetPhysics() const { return m_pPhysics; }
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
-    bool                   Destroy();
+    virtual bool           Destroy() = 0;
     bool                   IsSafeToAccess() const;
     void                   ApplyChanges();
 
@@ -67,17 +67,17 @@ public:
         friend CBulletPhysics;
 
         std::unique_lock<std::mutex> m_lock;
+        std::unique_lock<std::recursive_mutex> m_elementsLock;
 
     public:
         // static void* operator new(size_t) = delete;
 
-        ElementLock(T pElement) : m_pElement(pElement), m_lock(pElement->m_lockElement, std::try_to_lock)
+        ElementLock(T pElement) : m_pElement(pElement), m_lock(pElement->m_lockElement, std::try_to_lock), m_elementsLock(pElement->GetPhysics()->m_elementsLock)
         {
             assert(m_lock.owns_lock() && "Element is already locked");
         }
 
     private:
-        const CBulletPhysics* m_pPhysics;
         const T               m_pElement;
     };
 

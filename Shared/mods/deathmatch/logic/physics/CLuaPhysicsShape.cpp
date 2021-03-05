@@ -26,27 +26,37 @@ CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, heightfieldTerrainS
     m_pBtShape->setUserIndex(EIdClass::SHAPE);
 }
 
+bool CLuaPhysicsShape::Destroy()
+{
+    GetPhysics()->DestroyElement(this);
+    return true;
+}
+
 void CLuaPhysicsShape::Unlink()
 {
     if (GetBtType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
     {
     }
 
-    for (auto const& pRigidBody : GetRigidBodies())
-        pRigidBody->Destroy();
-    for (auto const& pStaticCollision : GetStaticCollisions())
-        pStaticCollision->Destroy();
+    // copy vector, "Destroy" method below modyfing original, may be made better in the future
+    std::vector<CLuaPhysicsRigidBody*> bodies = m_vecRigidBodyList;
+    std::vector<CLuaPhysicsStaticCollision*> staticCollisions = m_vecStaticCollisions;
 
-    m_vecRigidBodyList.clear();
-    m_vecStaticCollisions.clear();
+    for (auto const& pRigidBody : bodies)
+        pRigidBody->Destroy();
+    for (auto const& pStaticCollision : staticCollisions)
+        pStaticCollision->Destroy();
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
+    assert(m_vecRigidBodyList.empty());
+    assert(m_vecStaticCollisions.empty());
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
+    ElementLock lk(this);
     if (ListContains(m_vecRigidBodyList, pRigidBody))
         return;
 
@@ -55,6 +65,7 @@ void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 
 void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
+    ElementLock lk(this);
     if (!ListContains(m_vecRigidBodyList, pRigidBody))
         return;
 
@@ -63,6 +74,7 @@ void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 
 void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
+    ElementLock lk(this);
     if (ListContains(m_vecStaticCollisions, pStaticCollision))
         return;
 
@@ -71,6 +83,7 @@ void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCol
 
 void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
+    ElementLock lk(this);
     if (!ListContains(m_vecStaticCollisions, pStaticCollision))
         return;
 
@@ -79,11 +92,13 @@ void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStatic
 
 void CLuaPhysicsShape::GetMargin(float& fMargin)
 {
+    ElementLock lk(this);
     fMargin = m_pBtShape->getMargin();
 }
 
 bool CLuaPhysicsShape::SetScale(CVector scale)
 {
+    ElementLock lk(this);
     m_pBtShape->setLocalScaling(scale);
     UpdateRigids();
     return true;
@@ -91,12 +106,14 @@ bool CLuaPhysicsShape::SetScale(CVector scale)
 
 const CVector& CLuaPhysicsShape::GetScale()
 {
+    ElementLock lk(this);
     btVector3 btScale = m_pBtShape->getLocalScaling();
     return btScale;
 }
 
 SBoundingBox CLuaPhysicsShape::GetBoundingBox()
 {
+    ElementLock lk(this);
     btTransform transform = btTransform::getIdentity();
     btVector3   min, max;
     m_pBtShape->getAabb(transform, min, max);
@@ -108,6 +125,7 @@ SBoundingBox CLuaPhysicsShape::GetBoundingBox()
 
 SBoundingSphere CLuaPhysicsShape::GetBoundingSphere()
 {
+    ElementLock lk(this);
     btVector3 center;
     btScalar  radius;
     m_pBtShape->getBoundingSphere(center, radius);
@@ -119,17 +137,20 @@ SBoundingSphere CLuaPhysicsShape::GetBoundingSphere()
 
 BroadphaseNativeTypes CLuaPhysicsShape::GetBtType() const
 {
+    ElementLock lk(this);
     return (BroadphaseNativeTypes)m_pBtShape->getShapeType();
 }
 
 const char* CLuaPhysicsShape::GetBtName()
 {
+    ElementLock lk(this);
     return CPhysicsSharedLogic::GetShapeName(GetBtShape());
 }
 
 // Call after shape change, makes all rigid bodies update their position
 void CLuaPhysicsShape::UpdateRigids()
 {
+    ElementLock lk(this);
     for (auto const& rigidBody : m_vecRigidBodyList)
     {
         rigidBody->NeedsAABBUpdate();

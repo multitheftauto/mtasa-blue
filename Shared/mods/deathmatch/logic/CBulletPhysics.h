@@ -247,9 +247,9 @@ public:
     struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
     {
 
-        btAlignedObjectArray<CLuaPhysicsElement*>& m_collisionObjectArray;
+        btAlignedObjectArray<CLuaPhysicsWorldElement*>& m_collisionObjectArray;
         short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
-        BroadphaseAabbCallback(btAlignedObjectArray<CLuaPhysicsElement*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
+        BroadphaseAabbCallback(btAlignedObjectArray<CLuaPhysicsWorldElement*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
                                int collisionMask = btBroadphaseProxy::AllFilter)
             : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
         {
@@ -267,7 +267,7 @@ public:
         {
             if (needsCollision(proxy))
             {
-                m_collisionObjectArray.push_back((CLuaPhysicsElement*)((btCollisionObject*)proxy->m_clientObject)->getUserPointer());
+                m_collisionObjectArray.push_back((CLuaPhysicsWorldElement*)((btCollisionObject*)proxy->m_clientObject)->getUserPointer());
             }
             return true;
         }
@@ -377,6 +377,10 @@ public:
     bool CanDoPulse();
     void WaitForSimulationToFinish();
 
+    
+    // For elements managment
+    mutable std::recursive_mutex m_elementsLock;
+
 private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
@@ -417,8 +421,6 @@ private:
     mutable std::mutex         lock;
     // stepSimulation, doPulse thread safety lock
     mutable std::mutex         cycleLock;
-    // For elements managment 
-    mutable std::recursive_mutex         elementsLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
     std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;

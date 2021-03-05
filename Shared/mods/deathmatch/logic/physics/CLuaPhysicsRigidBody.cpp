@@ -24,13 +24,27 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
     SetAngularDumping(BulletPhysics::Defaults::RigidBodyAngularDumping);
     SetLinearSleepingThreshold(BulletPhysics::Defaults::RigidBodyLinearSleepingThreshold);
     SetAngularSleepingThreshold(BulletPhysics::Defaults::RigidBodyAngularSleepingThreshold);
-
     pShape->AddRigidBody(this);
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
-    Unlink();
+    while (!m_constraintList.empty())
+    {
+        auto const& constraint = m_constraintList.back();
+        RemoveConstraintRef(constraint);
+        GetPhysics()->DestroyElement(constraint);
+    }
+    m_constraintList.clear();
+
+    m_pRigidBodyProxy->SetEnabled(false);
+}
+
+bool CLuaPhysicsRigidBody::Destroy()
+{
+    GetPhysics()->DestroyElement(this);
+    m_pShape->RemoveRigidBody(this);
+    return true;
 }
 
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
@@ -429,20 +443,4 @@ void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstrain
     ElementLock lk(this);
     m_pRigidBodyProxy->removeConstraintRef(pConstraint->GetConstraint());
     ListRemove(m_constraintList, pConstraint);
-}
-
-void CLuaPhysicsRigidBody::Unlink()
-{
-    ElementLock lk(this);
-    while (!m_constraintList.empty())
-    {
-        auto const& constraint = m_constraintList.back();
-        RemoveConstraintRef(constraint);
-        GetPhysics()->DestroyElement(constraint);
-    }
-    m_constraintList.clear();
-
-    m_pRigidBodyProxy.reset();
-    // m_pShape->RemoveRigidBody(this);
-    m_pShape = nullptr;
 }

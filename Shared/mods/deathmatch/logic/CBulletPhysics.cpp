@@ -249,7 +249,7 @@ CBulletPhysics::SAllRayResultCallback CBulletPhysics::RayCastAll(CVector from, C
 
 void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
 {
-    std::lock_guard<std::recursive_mutex> lk(elementsLock);
+    std::lock_guard<std::recursive_mutex> lk(m_elementsLock);
 
     switch (pPhysicsElement->GetClassType())
     {
@@ -257,18 +257,7 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
             m_pLuaMain->GetPhysicsRigidBodyManager()->Remove((CLuaPhysicsRigidBody*)pPhysicsElement);
             return;
         case EIdClassType::SHAPE:
-        {
-            CLuaPhysicsShape* pShape = (CLuaPhysicsShape*)pPhysicsElement;
-            for (CLuaPhysicsRigidBody* body : pShape->GetRigidBodies())
-            {
-                body->Destroy();
-            }
-            for (CLuaPhysicsStaticCollision* staticCollision : pShape->GetStaticCollisions())
-            {
-                staticCollision->Destroy();
-            }
             m_pLuaMain->GetPhysicsShapeManager()->Remove((CLuaPhysicsShape*)pPhysicsElement);
-        }
             return;
         case EIdClassType::STATIC_COLLISION:
             m_pLuaMain->GetPhysicsStaticCollisionManager()->Remove((CLuaPhysicsStaticCollision*)pPhysicsElement);
@@ -311,6 +300,7 @@ void CBulletPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
+    m_rigidBodiesActivationList.remove(pLuaRigidBody);
     ListRemove(m_vecRigidBodies, pLuaRigidBody);
 }
 
@@ -725,7 +715,7 @@ void CBulletPhysics::DrawDebugLines()
 void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies,
                                 std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions, short collisionGroup, int collisionMask)
 {
-    btAlignedObjectArray<CLuaPhysicsElement*> collisionObjectArray;
+    btAlignedObjectArray<CLuaPhysicsWorldElement*> collisionObjectArray;
     BroadphaseAabbCallback                   callback(collisionObjectArray, collisionGroup, collisionMask);
 
     {
@@ -733,7 +723,7 @@ void CBulletPhysics::OverlapBox(CVector min, CVector max, std::vector<CLuaPhysic
         world->getBroadphase()->aabbTest(min, max, callback);
     }
 
-    CLuaPhysicsElement* pPhysicsElement;
+    CLuaPhysicsWorldElement* pPhysicsElement;
     for (int i = 0; i < callback.m_collisionObjectArray.size(); ++i)
     {
         pPhysicsElement = callback.m_collisionObjectArray[i];
@@ -854,7 +844,7 @@ void CBulletPhysics::FlushAllChanges()
 void CBulletPhysics::DoPulse()
 {
     std::lock_guard<std::mutex>            guard(cycleLock);
-    std::lock_guard<std::recursive_mutex> lk(elementsLock);
+    std::lock_guard<std::recursive_mutex>  lk(m_elementsLock);
 
     {
         BT_PROFILE("flushAllChanges");

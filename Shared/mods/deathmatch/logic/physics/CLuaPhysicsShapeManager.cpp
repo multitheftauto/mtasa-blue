@@ -17,7 +17,7 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
     assert(pShape);
 
     {
-        std::lock_guard guard(lock);
+        std::lock_guard lk(lock);
         // Check if already removed
         if (!ListContains(m_elementsList, pShape))
             return;
@@ -27,7 +27,7 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
     pShape->GetPhysics()->DestroyShape(pShape);
 
     {
-        std::lock_guard guard(lock);
+        std::lock_guard lk(lock);
         ListRemove(m_elementsList, pShape);
     }
 
@@ -44,6 +44,6 @@ bool CLuaPhysicsShapeManager::IsShapeValid(CLuaPhysicsShape* pShape)
 {
     assert(pShape);
 
-    std::lock_guard guard(lock);
+    std::lock_guard lk(lock);
     return ListContains(m_elementsList, pShape);
 }

@@ -28,6 +28,7 @@ protected:
 
 public:
     ~CLuaPhysicsShape();
+    bool Destroy();
     void Unlink();            // removes all related static collisions and rigid bodies
 
     btCollisionShape* InternalGetBtShape() const { return m_pBtShape.get(); }

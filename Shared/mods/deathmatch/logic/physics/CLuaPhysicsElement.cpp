@@ -32,12 +32,6 @@ void CLuaPhysicsElement::RemoveScriptID()
     }
 }
 
-bool CLuaPhysicsElement::Destroy()
-{
-    m_pPhysics->DestroyElement(this);
-    return true;
-}
-
 bool CLuaPhysicsElement::IsSafeToAccess() const
 {
     return m_pPhysics->isDuringSimulation;

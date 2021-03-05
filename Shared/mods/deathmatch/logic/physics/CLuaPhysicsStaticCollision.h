@@ -22,6 +22,8 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
+    bool          Destroy();
+
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;
     void          SetRotation(CVector vecRotation);

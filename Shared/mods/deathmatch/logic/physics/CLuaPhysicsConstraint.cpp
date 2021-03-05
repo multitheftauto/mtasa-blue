@@ -54,6 +54,12 @@ CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
     }
 }
 
+bool CLuaPhysicsConstraint::Destroy()
+{
+    GetPhysics()->DestroyElement(this);
+    return true;
+}
+
 void CLuaPhysicsConstraint::SetBreakingImpulseThreshold(float fThreshold)
 {
     m_pConstraint->setBreakingImpulseThreshold(fThreshold);
