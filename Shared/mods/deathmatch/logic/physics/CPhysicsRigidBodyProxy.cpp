@@ -28,24 +28,8 @@ void MotionState::setWorldTransform(const btTransform& centerOfMassWorldTrans)
     m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset;
 }
 
-void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
-{
-    if (bEnabled != m_bEnabled)
-    {
-        if (bEnabled)
-        {
-            m_pPhysics->AddRigidBody(this);
-        }
-        else
-        {
-            m_pPhysics->RemoveRigidBody(this);
-        }
-        m_bEnabled = bEnabled;
-    } 
-}
-
-std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
-                                                                       CVector vecCenterOfMass, MotionState* pMotionstate)
+std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::New(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia,
+                                                                    CVector vecCenterOfMass, MotionState* pMotionstate)
 {
     CPhysicsSharedLogic::SetPosition(pMotionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pShape->InternalGetBtShape();
@@ -62,4 +46,20 @@ std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::Create(CLuaPhysi
     pRigidBody->m_pPhysics = pShape->GetPhysics();
 
     return pRigidBody;
+}
+
+void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
+{
+    if (bEnabled != m_bEnabled)
+    {
+        if (bEnabled)
+        {
+            m_pPhysics->AddRigidBody(this);
+        }
+        else
+        {
+            m_pPhysics->RemoveRigidBody(this);
+        }
+        m_bEnabled = bEnabled;
+    } 
 }

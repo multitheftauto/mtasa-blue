@@ -16,7 +16,7 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
 {
     m_pMotionState = std::make_unique<MotionState>();
 
-    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::Create(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
+    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::New(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
     m_pRigidBodyProxy->setUserPointer((void*)this);
     m_pRigidBodyProxy->setUserIndex(EIdClass::RIGID_BODY);
 

@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
-    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::Create(pShape))
+    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pShape))
 {
     // pShape->AddStaticCollision(this);
     m_pShape = pShape;

@@ -38,9 +38,11 @@ private:
 class CPhysicsRigidBodyProxy : public btRigidBody, public CPhysicsProxyElement
 {
 public:
+    // Use 'CPhysicsRigidBodyProxy::New' instead.
     CPhysicsRigidBodyProxy(btScalar mass, MotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0))
         : btRigidBody(mass, motionState, collisionShape, localInertia){};
 
+    // Use 'CPhysicsRigidBodyProxy::New' instead.
     CPhysicsRigidBodyProxy(const btRigidBodyConstructionInfo& constructionInfo) : btRigidBody(constructionInfo){};
 
     ~CPhysicsRigidBodyProxy()
@@ -49,7 +51,7 @@ public:
         SetEnabled(false);
     }
 
-    static std::unique_ptr<CPhysicsRigidBodyProxy> Create(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia, CVector vecCenterOfMass,
+    static std::unique_ptr<CPhysicsRigidBodyProxy> New(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia, CVector vecCenterOfMass,
                                                           MotionState* pMotionstate);
 
     void SetEnabled(bool bEnabled);
