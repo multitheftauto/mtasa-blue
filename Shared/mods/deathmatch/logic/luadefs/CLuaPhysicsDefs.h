@@ -11,6 +11,8 @@
 #pragma once
 
 class CLuaPhysicsCompoundShape;
+class CLuaPhysicsBvhTriangleMeshShape;
+class CLuaPhysicsHeightfieldTerrainShape;
 
 #include "lua/CLuaFunctionParser.h"
 #include "Enums.h"
@@ -107,8 +109,8 @@ public:
                                                                       std::variant<std::monostate, CVector, bool> variantB,
                                                                       std::variant<std::monostate, CVector, bool> variantC, std::optional<bool> bBool);
 
-    static bool PhysicsSetVertexPosition(CLuaPhysicsShape* pShape, int iVertexId, CVector vecPosition);
-    static bool PhysicsSetHeight(CLuaPhysicsShape* pShape, int iVertexId, float fHeight);
+    static bool PhysicsSetVertexPosition(CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape, int iVertexId, CVector vecPosition);
+    static bool PhysicsSetHeight(CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrainShape, int iVertexId, float fHeight);
 
     static bool PhysicsSetRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody, bool bEnable);
     static bool PhysicsSetStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision, bool bEnable);
@@ -117,12 +119,12 @@ public:
     static bool PhysicsIsStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision);
 
     static std::vector<std::vector<float>>    PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius);
-    static bool                               PhysicsWorldHasChanged(CBulletPhysics* pPhysics);
-    static bool                               PhysicsIsDuringSimulation(CBulletPhysics* pPhysics);
     static bool                               PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float>          PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
     static std::unordered_map<int, int>       PhysicsGetSimulationIslands(CBulletPhysics* pPhysics);
     static std::vector<CLuaPhysicsRigidBody*> PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iTargetIsland);
+    static std::string                               PhysicsGetShapeType(CLuaPhysicsShape* pShape);
+
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
 #endif

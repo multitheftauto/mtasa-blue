@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 class CLuaPhysicsShape;
+class CLuaPhysicsCompoundShape;
 
 #pragma once
 
@@ -37,6 +38,8 @@ public:
     void RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void AddCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape);
+    void RemoveCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape);
 
     bool            SetScale(CVector scale);
     const CVector&  GetScale();
@@ -64,4 +67,5 @@ private:
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
+    std::vector<CLuaPhysicsCompoundShape*>   m_vecCompoundShapes;
 };

@@ -23,7 +23,9 @@ public:
 
     std::vector<CLuaPhysicsShape*> GetChildShapes() const { return m_vecChildShapes; }
 
-    bool   RemoveChildShape(int index);
+    bool RemoveChildShape(int index);
+    bool RemoveChildShape(CLuaPhysicsShape* pShape);
+
     size_t GetChildShapesNum() const noexcept { return m_vecChildShapes.size(); }
     // Be sure index is valid using 'GetChildShapesCounts' method
     const CVector& GetChildShapePosition(int iIndex);

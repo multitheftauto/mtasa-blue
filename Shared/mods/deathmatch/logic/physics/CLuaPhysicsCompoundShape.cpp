@@ -27,7 +27,22 @@ void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPos
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     GetBtShape()->addChildShape(transform, pShape->InternalGetBtShape());
     GetBtShape()->recalculateLocalAabb();
+    pShape->AddCompoundShape(this);
     m_vecChildShapes.push_back(pShape);
+}
+
+bool CLuaPhysicsCompoundShape::RemoveChildShape(CLuaPhysicsShape* pShape)
+{
+    for (;;)
+    {
+        auto result = std::find(std::begin(m_vecChildShapes), std::end(m_vecChildShapes), pShape);
+        if (result == m_vecChildShapes.end())
+            break;
+        (*result)->RemoveCompoundShape(this);
+        m_vecChildShapes.erase(result);
+    }
+    UpdateRigids();
+    return true;
 }
 
 bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)
@@ -35,6 +50,7 @@ bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)
     if (index >= 0 && index < GetBtShape()->getNumChildShapes())
     {
         GetBtShape()->removeChildShapeByIndex(index);
+        m_vecChildShapes[index]->RemoveCompoundShape(this);
         m_vecChildShapes.erase(m_vecChildShapes.begin() + index);
         UpdateRigids();
         return true;

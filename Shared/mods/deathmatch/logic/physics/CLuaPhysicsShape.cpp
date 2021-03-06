@@ -34,12 +34,15 @@ bool CLuaPhysicsShape::Destroy()
 
 void CLuaPhysicsShape::Unlink()
 {
-    if (GetBtType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
+    if (GetBtType() != BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
     {
-    }
+        // copy vector, "Destroy" method below modyfing original, may be made better in the future
+        std::vector<CLuaPhysicsCompoundShape*>   shapes = m_vecCompoundShapes;
 
-    // copy vector, "Destroy" method below modyfing original, may be made better in the future
-    std::vector<CLuaPhysicsRigidBody*> bodies = m_vecRigidBodyList;
+        for (auto const& pShape : shapes)
+            pShape->RemoveChildShape(this);
+    }
+    std::vector<CLuaPhysicsRigidBody*>       bodies = m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> staticCollisions = m_vecStaticCollisions;
 
     for (auto const& pRigidBody : bodies)
@@ -52,6 +55,7 @@ CLuaPhysicsShape::~CLuaPhysicsShape()
 {
     assert(m_vecRigidBodyList.empty());
     assert(m_vecStaticCollisions.empty());
+    assert(m_vecCompoundShapes.empty());
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
@@ -88,6 +92,25 @@ void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStatic
         return;
 
     ListRemove(m_vecStaticCollisions, pStaticCollision);
+}
+
+
+void CLuaPhysicsShape::AddCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape)
+{
+    ElementLock lk(this);
+    if (ListContains(m_vecCompoundShapes, pCompoundShape))
+        return;
+
+    m_vecCompoundShapes.push_back(pCompoundShape);
+}
+
+void CLuaPhysicsShape::RemoveCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape)
+{
+    ElementLock lk(this);
+    if (!ListContains(m_vecCompoundShapes, pCompoundShape))
+        return;
+
+    ListRemove(m_vecCompoundShapes, pCompoundShape);
 }
 
 void CLuaPhysicsShape::GetMargin(float& fMargin)

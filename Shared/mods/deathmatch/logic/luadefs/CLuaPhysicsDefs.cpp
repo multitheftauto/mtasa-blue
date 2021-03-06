@@ -73,12 +73,11 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetEnabled", ArgumentParser<PhysicsSetRigidBodyEnabled, PhysicsSetStaticCollisionEnabled>},
         {"physicsIsEnabled", ArgumentParser<PhysicsIsRigidBodyEnabled, PhysicsIsStaticCollisionEnabled>},
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
-        {"physicsWorldHasChanged", ArgumentParser<PhysicsWorldHasChanged>},
-        {"physicsIsDuringSimulation", ArgumentParser<PhysicsIsDuringSimulation>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
         {"physicsGetSimulationIslands", ArgumentParser<PhysicsGetSimulationIslands>},
         {"physicsGetIslandRigidBodies", ArgumentParser<PhysicsGetIslandRigidBodies>},
+        {"physicsGetShapeType", ArgumentParser<PhysicsGetShapeType>},
 #ifdef MTA_CLIENT
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
 #endif
@@ -177,7 +176,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCylinderShape(CBulletPhysics* pP
     CPhysicsSharedLogic::CheckPrimitiveSize(fRadius);
     CPhysicsSharedLogic::CheckPrimitiveSize(fHeight);
 
-    return pPhysics->CreateCylinderShape(CVector(fRadius, fHeight, fRadius));
+    return pPhysics->CreateCylinderShape({fRadius, fHeight, fRadius});
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCompoundShape(CBulletPhysics* pPhysics, std::optional<int> optionalInitialCapacity)
@@ -191,8 +190,8 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateCompoundShape(CBulletPhysics* pP
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateConvexHullShape(CBulletPhysics* pPhysics, std::vector<float> vecPoints)
 {
-    if (vecPoints.size() < 3)
-        throw std::invalid_argument("Convex hull shape require at least 3 vertices");
+    if (vecPoints.size() < 9)
+        throw std::invalid_argument("Convex hull shape require at least 9 vertices");
 
     return pPhysics->CreateConvexHullShape(vecPoints);
 }
@@ -665,9 +664,6 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
                 return true;
             }
             break;
-        case ePhysicsProperty::SLEEP:
-        case ePhysicsProperty::WANTS_SLEEPING:
-            break;
     }
     throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
 }
@@ -903,29 +899,33 @@ std::variant<bool, RayResult> CLuaPhysicsDefs::PhysicsRayCast(CBulletPhysics* pP
 
     if (bEnrichResult)
     {
-        CMatrix matrix;
-        if (pRigidBody)
-            matrix = pRigidBody->GetMatrix();
-        else if (pStaticCollision)
-            matrix = pStaticCollision->GetMatrix();
-
-        if (CLuaPhysicsCompoundShape* pCompoundShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShape))
+        switch (pShape->GetType())
         {
-            if (rayCallback.m_hitShapePart >= 0)
-                result["childShapeIndex"] = rayCallback.m_hitShapePart + 1;
-        }
-        else if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
-        {
-            if (rayCallback.m_hitTriangleIndex >= 0)
-                result["triangleIndex"] = rayCallback.m_hitTriangleIndex + 1;
+            case ePhysicsElementType::CompoundShape:
+                if (rayCallback.m_hitShapePart >= 0)
+                    result["childShapeIndex"] = rayCallback.m_hitShapePart + 1;
+                break;
+            case ePhysicsElementType::BvhTriangleMeshShape:
+            {
+                CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape = (CLuaPhysicsBvhTriangleMeshShape*)pShape;
+                CMatrix matrix;
+                if (pRigidBody)
+                    matrix = pRigidBody->GetMatrix();
+                else if (pStaticCollision)
+                    matrix = pStaticCollision->GetMatrix();
 
-            STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(rayCallback.m_hitTriangleIndex);
-            result["vertex1"] = triangleInfo.vertex1 + 1;
-            result["vertex2"] = triangleInfo.vertex2 + 1;
-            result["vertex3"] = triangleInfo.vertex3 + 1;
-            result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsVector();
-            result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsVector();
-            result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsVector();
+                if (rayCallback.m_hitTriangleIndex >= 0)
+                    result["triangleIndex"] = rayCallback.m_hitTriangleIndex + 1;
+
+                STriangleInfo triangleInfo = pTriangleMeshShape->GetTriangleInfo(rayCallback.m_hitTriangleIndex);
+                result["vertex1"] = triangleInfo.vertex1 + 1;
+                result["vertex2"] = triangleInfo.vertex2 + 1;
+                result["vertex3"] = triangleInfo.vertex3 + 1;
+                result["vertexPosition1"] = matrix.TransformVector(triangleInfo.vecVertex1).AsVector();
+                result["vertexPosition2"] = matrix.TransformVector(triangleInfo.vecVertex2).AsVector();
+                result["vertexPosition3"] = matrix.TransformVector(triangleInfo.vecVertex3).AsVector();
+            }
+            break;
         }
     }
 
@@ -1252,36 +1252,28 @@ std::vector<std::tuple<std::string, double>> CLuaPhysicsDefs::PhysicsGetPerforma
     return result;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetVertexPosition(CLuaPhysicsShape* pShape, int iVertexId, CVector vecPosition)
+bool CLuaPhysicsDefs::PhysicsSetVertexPosition(CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape, int iVertexId, CVector vecPosition)
 {
-    if (CLuaPhysicsBvhTriangleMeshShape* pTriangleMesh = dynamic_cast<CLuaPhysicsBvhTriangleMeshShape*>(pShape))
+    if (iVertexId > 0 && pTriangleMeshShape->GetVerticesNum() > iVertexId)
     {
-        if (iVertexId > 0 && pTriangleMesh->GetVerticesNum() > iVertexId)
-        {
-            CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
+        CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
 
-            pTriangleMesh->SetVertexPosition(--iVertexId, vecPosition);
-            return true;
-        }
-        throw std::invalid_argument("Vertex index out of range");
+        pTriangleMeshShape->SetVertexPosition(--iVertexId, vecPosition);
+        return true;
     }
-    throw std::invalid_argument(SString("Shape %s is not unsupport", pShape->GetName()).c_str());
+    throw std::invalid_argument("Vertex index out of range");
 }
 
-bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsShape* pShape, int iVertexId, float fHeight)
+bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrainShape, int iVertexId, float fHeight)
 {
-    if (CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrain = dynamic_cast<CLuaPhysicsHeightfieldTerrainShape*>(pShape))
+    if (iVertexId > 0 && pHeightfieldTerrainShape->GetVerticesNum() > iVertexId)
     {
-        if (iVertexId > 0 && pHeightfieldTerrain->GetVerticesNum() > iVertexId)
-        {
-            CPhysicsSharedLogic::CheckMaximumPrimitiveSize(fHeight);
+        CPhysicsSharedLogic::CheckMaximumPrimitiveSize(fHeight);
 
-            pHeightfieldTerrain->SetHeight(--iVertexId, fHeight);
-            return true;
-        }
-        throw std::invalid_argument("Vertex index out of range");
+        pHeightfieldTerrainShape->SetHeight(--iVertexId, fHeight);
+        return true;
     }
-    throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
+    throw std::invalid_argument("Vertex index out of range");
 }
 
 bool CLuaPhysicsDefs::PhysicsSetRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody, bool bEnable)
@@ -1381,12 +1373,7 @@ std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhy
     return pPhysics->GetDebugLines(vecPosition, fRadius);
 }
 
-bool CLuaPhysicsDefs::PhysicsWorldHasChanged(CBulletPhysics* pPhysics)
+std::string CLuaPhysicsDefs::PhysicsGetShapeType(CLuaPhysicsShape* pShape)
 {
-    return pPhysics->WorldHasChanged();
-}
-
-bool CLuaPhysicsDefs::PhysicsIsDuringSimulation(CBulletPhysics* pPhysics)
-{
-    return pPhysics->isDuringSimulation;
+    return pShape->GetBtName();
 }

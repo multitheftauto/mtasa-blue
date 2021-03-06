@@ -420,7 +420,7 @@ private:
 
     mutable std::mutex         lock;
     // stepSimulation, doPulse thread safety lock
-    mutable std::mutex         cycleLock;
+    mutable std::mutex         pulseLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
     std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;

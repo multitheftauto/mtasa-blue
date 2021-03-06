@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CShapeHolder.h
- *  PURPOSE:     
+ *  PURPOSE:     Tells the lua shape what BP underlying shape type is
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *

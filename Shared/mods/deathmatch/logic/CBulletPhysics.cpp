@@ -158,13 +158,13 @@ void CBulletPhysics::SetUseContinous(bool bUse) const
 
 void CBulletPhysics::SetSubSteps(int iSubSteps)
 {
-    std::lock_guard<std::mutex> guard(cycleLock);
+    std::lock_guard<std::mutex> guard(pulseLock);
     m_iSubSteps = iSubSteps;
 }
 
 int CBulletPhysics::GetSubSteps() const
 {
-    std::lock_guard<std::mutex> guard(cycleLock);
+    std::lock_guard<std::mutex> guard(pulseLock);
     return m_iSubSteps;
 }
 
@@ -843,7 +843,7 @@ void CBulletPhysics::FlushAllChanges()
 
 void CBulletPhysics::DoPulse()
 {
-    std::lock_guard<std::mutex>            guard(cycleLock);
+    std::lock_guard<std::mutex>           guard(pulseLock);
     std::lock_guard<std::recursive_mutex>  lk(m_elementsLock);
 
     {
