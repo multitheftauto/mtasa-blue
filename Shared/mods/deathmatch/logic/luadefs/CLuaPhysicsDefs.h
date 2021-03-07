@@ -111,11 +111,8 @@ public:
     static bool PhysicsSetVertexPosition(CLuaPhysicsBvhTriangleMeshShape* pTriangleMeshShape, int iVertexId, CVector vecPosition);
     static bool PhysicsSetHeight(CLuaPhysicsHeightfieldTerrainShape* pHeightfieldTerrainShape, int iVertexId, float fHeight);
 
-    static bool PhysicsSetRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody, bool bEnable);
-    static bool PhysicsSetStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision, bool bEnable);
-
-    static bool PhysicsIsRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody);
-    static bool PhysicsIsStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision);
+    static bool PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable);
+    static bool PhysicsIsEnabled(CLuaPhysicsElement* pElement);
 
     static std::vector<std::vector<float>>    PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius);
     static bool                               PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);

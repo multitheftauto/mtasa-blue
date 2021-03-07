@@ -72,8 +72,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
         {"physicsSetVertexPosition", ArgumentParser<PhysicsSetVertexPosition>},
         {"physicsSetHeight", ArgumentParser<PhysicsSetHeight>},
-        {"physicsSetEnabled", ArgumentParser<PhysicsSetRigidBodyEnabled, PhysicsSetStaticCollisionEnabled>},
-        {"physicsIsEnabled", ArgumentParser<PhysicsIsRigidBodyEnabled, PhysicsIsStaticCollisionEnabled>},
+        {"physicsSetEnabled", ArgumentParser<PhysicsSetEnabled>},
+        {"physicsIsEnabled", ArgumentParser<PhysicsIsEnabled>},
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
@@ -1306,26 +1306,35 @@ bool CLuaPhysicsDefs::PhysicsSetHeight(CLuaPhysicsHeightfieldTerrainShape* pHeig
     throw std::invalid_argument("Vertex index out of range");
 }
 
-bool CLuaPhysicsDefs::PhysicsSetRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody, bool bEnable)
+bool CLuaPhysicsDefs::PhysicsSetEnabled(CLuaPhysicsElement* pElement, bool bEnable)
 {
-    pRigidBody->GetBtRigidBody()->SetEnabled(bEnable);
-    return true;
+    switch (pElement->GetClassType())
+    {
+        case EIdClass::EIdClassType::RIGID_BODY:
+            ((CLuaPhysicsRigidBody*)pElement)->SetEnabled(bEnable);
+            return true;
+        case EIdClass::EIdClassType::STATIC_COLLISION:
+            ((CLuaPhysicsStaticCollision*)pElement)->SetEnabled(bEnable);
+            return true;
+    }
+
+    throw std::invalid_argument(SString("Function is not supported for %s element.", pElement->GetName()).c_str());
+    return false;
 }
 
-bool CLuaPhysicsDefs::PhysicsSetStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision, bool bEnable)
-{
-    pStaticCollision->GetCollisionObject()->SetEnabled(bEnable);
-    return true;
-}
 
-bool CLuaPhysicsDefs::PhysicsIsRigidBodyEnabled(CLuaPhysicsRigidBody* pRigidBody)
+bool CLuaPhysicsDefs::PhysicsIsEnabled(CLuaPhysicsElement* pElement)
 {
-    return pRigidBody->GetBtRigidBody()->IsEnabled();
-}
+    switch (pElement->GetClassType())
+    {
+        case EIdClass::EIdClassType::RIGID_BODY:
+            return ((CLuaPhysicsRigidBody*)pElement)->IsEnabled();
+        case EIdClass::EIdClassType::STATIC_COLLISION:
+            return ((CLuaPhysicsStaticCollision*)pElement)->IsEnabled();
+    }
 
-bool CLuaPhysicsDefs::PhysicsIsStaticCollisionEnabled(CLuaPhysicsStaticCollision* pStaticCollision)
-{
-    return pStaticCollision->GetCollisionObject()->IsEnabled();
+    throw std::invalid_argument(SString("Function is not supported for %s element.", pElement->GetName()).c_str());
+    return false;
 }
 
 bool CLuaPhysicsDefs::PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant)
