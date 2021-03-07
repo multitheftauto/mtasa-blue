@@ -24,7 +24,7 @@ public:
     bool         SetHeight(float fHeight);
     float        GetHeight();
     void         Update() {}
-    SBoundingBox GetBoundingBox();
+    SBoundingBox GetBoundingBox(btTransform transform);
 
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConeShape; }

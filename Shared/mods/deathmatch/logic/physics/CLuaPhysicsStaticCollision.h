@@ -54,7 +54,7 @@ public:
     void SetEnabled(bool bEnabled) { m_btCollisionObject->SetEnabled(bEnabled); }
     bool IsEnabled() const { return m_btCollisionObject->IsEnabled(); }
 
-    SBoundingBox    GetBoundingBox();
+    SBoundingBox    GetBoundingBox(btTransform transform);
     SBoundingSphere GetBoundingSphere();
 
 private:

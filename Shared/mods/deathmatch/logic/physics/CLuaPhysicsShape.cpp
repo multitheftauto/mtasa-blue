@@ -129,10 +129,9 @@ const CVector& CLuaPhysicsShape::GetScale()
     return btScale;
 }
 
-SBoundingBox CLuaPhysicsShape::GetBoundingBox()
+SBoundingBox CLuaPhysicsShape::GetBoundingBox(btTransform transform)
 {
     ElementLock lk(this);
-    btTransform transform = btTransform::getIdentity();
     btVector3   min, max;
     m_pBtShape->getAabb(transform, min, max);
     SBoundingBox sBox = SBoundingBox();

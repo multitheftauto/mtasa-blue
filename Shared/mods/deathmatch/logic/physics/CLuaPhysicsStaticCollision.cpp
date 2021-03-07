@@ -163,9 +163,9 @@ void CLuaPhysicsStaticCollision::Unlink()
     m_btCollisionObject->setCollisionShape(nullptr);
 }
 
-SBoundingBox CLuaPhysicsStaticCollision::GetBoundingBox()
+SBoundingBox CLuaPhysicsStaticCollision::GetBoundingBox(btTransform transform)
 {
-    return m_pShape->GetBoundingBox();
+    return m_pShape->GetBoundingBox(transform);
 }
 
 SBoundingSphere CLuaPhysicsStaticCollision::GetBoundingSphere()

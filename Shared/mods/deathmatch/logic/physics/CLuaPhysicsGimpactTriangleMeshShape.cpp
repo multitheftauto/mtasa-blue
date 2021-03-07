@@ -21,10 +21,9 @@ CLuaPhysicsGimpactTriangleMeshShape::~CLuaPhysicsGimpactTriangleMeshShape()
     delete GetBtShape()->getMeshInterface();
 }
 
-SBoundingBox CLuaPhysicsGimpactTriangleMeshShape::GetBoundingBox()
+SBoundingBox CLuaPhysicsGimpactTriangleMeshShape::GetBoundingBox(btTransform transform)
 {
     ElementLock lk(this);
-    btTransform transform = btTransform::getIdentity();
     btVector3   min, max;
     GetBtShape()->getAabb(transform, min, max);
     SBoundingBox sBox = SBoundingBox();

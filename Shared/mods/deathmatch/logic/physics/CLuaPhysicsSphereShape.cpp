@@ -30,3 +30,15 @@ float CLuaPhysicsSphereShape::GetRadius()
 {
     return GetBtShape()->getRadius();
 }
+
+SBoundingSphere CLuaPhysicsSphereShape::GetBoundingSphere()
+{
+    ElementLock lk(this);
+    btVector3   center;
+    btScalar    radius;
+    GetBtShape()->getBoundingSphere(center, radius); // ~sqrt(3)/2 for sphere of radius 0.5, invalid
+    SBoundingSphere sSphere = SBoundingSphere();
+    sSphere.fRadius = GetRadius();
+    sSphere.vecCenter = center;
+    return sSphere;
+}

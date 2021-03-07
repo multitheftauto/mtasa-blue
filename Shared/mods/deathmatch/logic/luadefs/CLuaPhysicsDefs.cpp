@@ -65,6 +65,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsOverlapBox", ArgumentParser<PhysicsOverlapBox>},
         {"physicsPredictTransform", ArgumentParser<PhysicsPredictTransform>},
         {"physicsClearForces", ArgumentParser<PhysicsClearForces>},
+        {"physicsGetBoundingBox", ArgumentParser<PhysicsGetBoundingBox>},
+        {"physicsGetBoundingSphere", ArgumentParser<PhysicsGetBoundingSphere>},
         {"physicsGetContacts", ArgumentParser<PhysicsGetContacts>},
         {"physicsGetContactDetails", ArgumentParser<PhysicsGetContactDetails>},
         {"physicsGetPerformanceStats", ArgumentParser<PhysicsGetPerformanceStats>},
@@ -665,6 +667,7 @@ bool CLuaPhysicsDefs::PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBu
             break;
     }
     throw std::invalid_argument(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
+    static_assert((int)ePhysicsProperty::COUNT == 29, "Check if all properties are implemented and adjust number.");
 }
 
 std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::PhysicsGetWorldProperties(CBulletPhysics*       pPhysics,
@@ -688,7 +691,7 @@ std::variant<CVector, bool, int, float, std::vector<float>> CLuaPhysicsDefs::Phy
     static_assert((int)ePhysicsWorldProperty::COUNT == 8, "Check if all properties are implemented and bump number.");
 }
 
-std::variant<CVector, bool, int, float, std::vector<float>, std::tuple<float, float, float, float>, std::tuple<float, float, float, float, float, float>>
+std::variant<CVector, bool, int, float, std::vector<float>>
 CLuaPhysicsDefs::PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty)
 {
     auto unsupported = [eProperty](CLuaPhysicsElement* pElement) {
@@ -728,16 +731,6 @@ CLuaPhysicsDefs::PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProp
             return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsCapsuleShape* pCapsule) { return pCapsule->GetHeight(); },
                                                             [](CLuaPhysicsCylinderShape* pCylinder) { return pCylinder->GetHeight(); },
                                                             [](CLuaPhysicsConeShape* pCone) { return pCone->GetHeight(); }, unsupported});
-        case ePhysicsProperty::BOUNDING_BOX:
-        {
-            SBoundingBox bBox = pElement->GetBoundingBox();
-            return std::make_tuple(bBox.vecMin.fX, bBox.vecMin.fY, bBox.vecMin.fZ, bBox.vecMax.fX, bBox.vecMax.fY, bBox.vecMax.fZ);
-        }
-        case ePhysicsProperty::BOUNDING_SPHERE:
-        {
-            SBoundingSphere bSphere = pElement->GetBoundingSphere();
-            return std::make_tuple(bSphere.vecCenter.fX, bSphere.vecCenter.fY, bSphere.vecCenter.fZ, bSphere.fRadius);
-        }
         case ePhysicsProperty::MOTION_CCD_THRESHOLD:
             return VisitElement<float>(pElement, overloaded{[](CLuaPhysicsRigidBody* pRigidbody) { return pRigidbody->GetCcdMotionThreshold(); }, unsupported});
         case ePhysicsProperty::GRAVITY:
@@ -763,7 +756,7 @@ CLuaPhysicsDefs::PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProp
         case ePhysicsProperty::ENABLED:
             return VisitElement<bool>(pElement, overloaded{[](CLuaPhysicsWorldElement* pWorldElement) { return pWorldElement->IsEnabled(); }, unsupported});
     }
-    static_assert((int)ePhysicsProperty::COUNT == 31, "Check if all properties are implemented and adjust number.");
+    static_assert((int)ePhysicsProperty::COUNT == 29, "Check if all properties are implemented and adjust number.");
     return false;
 }
 
@@ -1180,7 +1173,39 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
     return result;
 }
 
-std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsGetContacts(
+std::tuple<float, float, float, float, float, float> CLuaPhysicsDefs::PhysicsGetBoundingBox(CLuaPhysicsElement* pElement, std::optional<bool> bAxisAligned)
+{
+    SBoundingBox bBox = [&]() {
+        if (bAxisAligned.value_or(false))
+        {
+            btTransform transform = btTransform::getIdentity();
+            switch (pElement->GetType())
+            {
+                case ePhysicsElementType::RigidBody:
+                case ePhysicsElementType::StaticCollision:
+                    auto rot = ((CLuaPhysicsWorldElement*)pElement)->GetRotation();
+                    CPhysicsSharedLogic::SetRotation(transform, ((CLuaPhysicsWorldElement*)pElement)->GetRotation());
+                    break;
+            }
+
+            return pElement->GetBoundingBox(transform);
+        }
+        else
+        {
+            return pElement->GetBoundingBox(btTransform::getIdentity());
+        }
+    }();
+    return std::make_tuple(bBox.vecMin.fX, bBox.vecMin.fY, bBox.vecMin.fZ, bBox.vecMax.fX, bBox.vecMax.fY, bBox.vecMax.fZ);
+}
+
+std::tuple<float, float, float, float> CLuaPhysicsDefs::PhysicsGetBoundingSphere(CLuaPhysicsElement* pElement)
+{
+    SBoundingSphere bSphere = pElement->GetBoundingSphere();
+    return std::make_tuple(bSphere.vecCenter.fX, bSphere.vecCenter.fY, bSphere.vecCenter.fZ, bSphere.fRadius);
+}
+
+std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
+        CLuaPhysicsDefs::PhysicsGetContacts(
     CLuaPhysicsElement* pElement)
 {
     std::vector<CLuaPhysicsWorldElement*> collisionContacts;

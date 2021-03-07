@@ -108,8 +108,6 @@ enum class ePhysicsProperty
     SIZE,
     RADIUS,
     HEIGHT,
-    BOUNDING_BOX,
-    BOUNDING_SPHERE,
     MOTION_CCD_THRESHOLD,
     GRAVITY,
     SWEPT_SPHERE_RADIUS,

@@ -35,7 +35,7 @@ class ILuaPhysicsElement
 {
 public:
     virtual void Update() = 0;
-    virtual SBoundingBox GetBoundingBox() = 0;
+    virtual SBoundingBox    GetBoundingBox(btTransform transform) = 0;
     virtual SBoundingSphere GetBoundingSphere() = 0;
 };
 

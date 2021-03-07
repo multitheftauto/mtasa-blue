@@ -112,7 +112,7 @@ public:
     void SetEnabled(bool bEnabled) { m_pRigidBodyProxy->SetEnabled(bEnabled); }
     bool IsEnabled() const { return m_pRigidBodyProxy->IsEnabled(); }
 
-    SBoundingBox    GetBoundingBox() { return m_pShape->GetBoundingBox(); }
+    SBoundingBox    GetBoundingBox(btTransform transform) { return m_pShape->GetBoundingBox(transform); }
     SBoundingSphere GetBoundingSphere() { return m_pShape->GetBoundingSphere(); }
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;

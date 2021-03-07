@@ -47,7 +47,7 @@ public:
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
 
-    SBoundingBox    GetBoundingBox() { return SBoundingBox(); }
+    SBoundingBox    GetBoundingBox(btTransform transform) { return SBoundingBox(); }
     SBoundingSphere GetBoundingSphere() { return SBoundingSphere(); }
 
 protected:

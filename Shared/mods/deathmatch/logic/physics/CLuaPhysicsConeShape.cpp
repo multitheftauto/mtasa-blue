@@ -43,10 +43,9 @@ float CLuaPhysicsConeShape::GetHeight()
     return GetBtShape()->getHeight();
 }
 
-SBoundingBox CLuaPhysicsConeShape::GetBoundingBox()
+SBoundingBox CLuaPhysicsConeShape::GetBoundingBox(btTransform transform)
 {
     ElementLock lk(this);
-    btTransform transform = btTransform::getIdentity();
     btVector3   min, max;
     GetBtShape()->getAabb(transform, min, max);
     SBoundingBox sBox = SBoundingBox();

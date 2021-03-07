@@ -67,9 +67,7 @@ public:
     static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
                                      std::variant<CVector, SColor, bool, float, int> argument);
     static std::variant<CVector, bool, int, float, std::vector<float>> PhysicsGetWorldProperties(CBulletPhysics* pPhysics, ePhysicsWorldProperty eProperty);
-    static std::variant<CVector, bool, int, float, std::vector<float>, std::tuple<float, float, float, float>,
-                        std::tuple<float, float, float, float, float, float>>
-    PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty);
+    static std::variant<CVector, bool, int, float, std::vector<float>> PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty);
 
     static CLuaPhysicsShape* PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
     static CLuaPhysicsShape* PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fDiameter);
@@ -95,6 +93,8 @@ public:
 
     static std::tuple<CVector, CVector> PhysicsPredictTransform(CLuaPhysicsRigidBody* pRigidBody, float time, std::optional<bool> ignoreGravity);
     static bool                         PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody);
+    static std::tuple<float, float, float, float, float, float> PhysicsGetBoundingBox(CLuaPhysicsElement* pElement, std::optional<bool> bAxisAligned);
+    static std::tuple<float, float, float, float>               PhysicsGetBoundingSphere(CLuaPhysicsElement* pElement);
 
     static std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> PhysicsGetContacts(
         CLuaPhysicsElement* pElement);

@@ -22,6 +22,7 @@ public:
     void  SetRadius(float fRadius);
     float GetRadius();
     void  Update() {}
+    SBoundingSphere GetBoundingSphere();
 
     btSphereShape*              GetBtShape() const { return (btSphereShape*)InternalGetBtShape(); }
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::SphereShape; }
