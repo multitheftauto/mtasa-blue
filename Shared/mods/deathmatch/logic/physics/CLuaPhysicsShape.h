@@ -45,7 +45,7 @@ public:
     const CVector&          GetScale();
     virtual SBoundingBox    GetBoundingBox(btTransform transform);
     virtual SBoundingSphere GetBoundingSphere();
-    void                    GetMargin(float& fMargin);
+    float                   GetMargin();
 
     void UpdateRigids();
 

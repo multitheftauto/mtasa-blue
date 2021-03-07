@@ -108,10 +108,10 @@ void CLuaPhysicsShape::RemoveCompoundShape(CLuaPhysicsCompoundShape* pCompoundSh
     ListRemove(m_vecCompoundShapes, pCompoundShape);
 }
 
-void CLuaPhysicsShape::GetMargin(float& fMargin)
+float CLuaPhysicsShape::GetMargin()
 {
     ElementLock lk(this);
-    fMargin = m_pBtShape->getMargin();
+    return m_pBtShape->getMargin();
 }
 
 bool CLuaPhysicsShape::SetScale(CVector scale)
@@ -131,9 +131,11 @@ const CVector& CLuaPhysicsShape::GetScale()
 
 SBoundingBox CLuaPhysicsShape::GetBoundingBox(btTransform transform)
 {
-    ElementLock lk(this);
     btVector3   min, max;
-    m_pBtShape->getAabb(transform, min, max);
+    {
+        ElementLock lk(this);
+        m_pBtShape->getAabb(transform, min, max);
+    }
     SBoundingBox sBox = SBoundingBox();
     sBox.vecMin = min;
     sBox.vecMax = max;
@@ -142,10 +144,12 @@ SBoundingBox CLuaPhysicsShape::GetBoundingBox(btTransform transform)
 
 SBoundingSphere CLuaPhysicsShape::GetBoundingSphere()
 {
-    ElementLock lk(this);
     btVector3 center;
     btScalar  radius;
-    m_pBtShape->getBoundingSphere(center, radius);
+    {
+        ElementLock lk(this);
+        m_pBtShape->getBoundingSphere(center, radius);
+    }
     SBoundingSphere sSphere = SBoundingSphere();
     sSphere.fRadius = radius;
     sSphere.vecCenter = center;

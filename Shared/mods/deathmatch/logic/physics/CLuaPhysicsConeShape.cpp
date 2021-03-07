@@ -45,13 +45,14 @@ float CLuaPhysicsConeShape::GetHeight()
 
 SBoundingBox CLuaPhysicsConeShape::GetBoundingBox(btTransform transform)
 {
-    ElementLock lk(this);
     btVector3   min, max;
-    GetBtShape()->getAabb(transform, min, max);
+    {
+        ElementLock lk(this);
+        GetBtShape()->getAabb(transform, min, max);
+    }
     SBoundingBox sBox = SBoundingBox();
     sBox.vecMin = min;
     sBox.vecMax = max;
-    sBox.vecMin += GetBtShape()->getMargin() * 2;
-    sBox.vecMax -= GetBtShape()->getMargin() * 2;
+    sBox.vecMax -= GetMargin() * 2;
     return sBox;
 }
