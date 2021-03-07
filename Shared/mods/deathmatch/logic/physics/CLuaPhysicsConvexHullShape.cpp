@@ -19,3 +19,16 @@ CLuaPhysicsConvexHullShape::~CLuaPhysicsConvexHullShape()
 {
 }
 
+SBoundingBox CLuaPhysicsConvexHullShape::GetBoundingBox()
+{
+    ElementLock lk(this);
+    btTransform transform = btTransform::getIdentity();
+    btVector3   min, max;
+    GetBtShape()->getAabb(transform, min, max);
+    SBoundingBox sBox = SBoundingBox();
+    sBox.vecMin = min;
+    sBox.vecMax = max;
+    sBox.vecMin += GetBtShape()->getMargin() * 2;
+    sBox.vecMax -= GetBtShape()->getMargin() * 2;
+    return sBox;
+}

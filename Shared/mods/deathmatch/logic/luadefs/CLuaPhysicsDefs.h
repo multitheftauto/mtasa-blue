@@ -52,9 +52,8 @@ public:
     static bool                        PhysicsApplyDamping(CLuaPhysicsRigidBody* pRigidBody, float fDamping);
     static bool                        PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
     static bool                        PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
-    static CLuaPhysicsStaticCollision*    PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
-                                                                       std::optional<CVector> rotation);
-    static std::vector<CLuaPhysicsShape*> PhysicsGetShapes(CBulletPhysics* pPhysics);
+    static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position, std::optional<CVector> rotation);
+    static std::vector<CLuaPhysicsShape*>           PhysicsGetShapes(CBulletPhysics* pPhysics);
     static std::vector<CLuaPhysicsRigidBody*>       PhysicsGetRigidBodies(CBulletPhysics* pPhysics);
     static std::vector<CLuaPhysicsStaticCollision*> PhysicsGetStaticCollisions(CBulletPhysics* pPhysics);
     static std::vector<CLuaPhysicsConstraint*>      PhysicsGetConstraints(CBulletPhysics* pPhysics);
@@ -68,27 +67,27 @@ public:
     static bool PhysicsSetProperties(std::variant<CLuaPhysicsElement*, CBulletPhysics*> variant, ePhysicsProperty eProperty,
                                      std::variant<CVector, SColor, bool, float, int> argument);
     static std::variant<CVector, bool, int, float, std::vector<float>> PhysicsGetWorldProperties(CBulletPhysics* pPhysics, ePhysicsWorldProperty eProperty);
-    static std::variant<CVector, bool, int, float, std::vector<float>> PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty);
+    static std::variant<CVector, bool, int, float, std::vector<float>, std::tuple<float, float, float, float>,
+                        std::tuple<float, float, float, float, float, float>>
+    PhysicsGetProperties(CLuaPhysicsElement* pElement, ePhysicsProperty eProperty);
 
-    static CLuaPhysicsShape*                          PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
-    static CLuaPhysicsShape*                    PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fRadius);
-    static CLuaPhysicsShape*                          PhysicsCreateCapsuleShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
-    static CLuaPhysicsShape*                          PhysicsCreateConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
-    static CLuaPhysicsShape*                          PhysicsCreateCylinderShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
-    static CLuaPhysicsShape*                          PhysicsCreateCompoundShape(CBulletPhysics* pPhysics, std::optional<int> initialCapacity);
-    static CLuaPhysicsShape*                          PhysicsCreateConvexHullShape(CBulletPhysics* pPhysics, std::vector<float> vecPoints);
-    static CLuaPhysicsShape*                          PhysicsCreateTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
-    static CLuaPhysicsShape*                          PhysicsCreateGimpactMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
-    static CLuaPhysicsShape* PhysicsCreateHeightfieldTerrainShape(CBulletPhysics* pPhysics, int sizeX, int sizeY,
-                                                                                    std::optional<std::vector<float>> vecHeights);
+    static CLuaPhysicsShape* PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
+    static CLuaPhysicsShape* PhysicsCreateSphereShape(CBulletPhysics* pPhysics, float fDiameter);
+    static CLuaPhysicsShape* PhysicsCreateCapsuleShape(CBulletPhysics* pPhysics, float fDiameter, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateCylinderShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
+    static CLuaPhysicsShape* PhysicsCreateCompoundShape(CBulletPhysics* pPhysics, std::optional<int> initialCapacity);
+    static CLuaPhysicsShape* PhysicsCreateConvexHullShape(CBulletPhysics* pPhysics, std::vector<float> vecPoints);
+    static CLuaPhysicsShape* PhysicsCreateTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
+    static CLuaPhysicsShape* PhysicsCreateGimpactMeshShape(CBulletPhysics* pPhysics, std::vector<float> vecVertices);
+    static CLuaPhysicsShape* PhysicsCreateHeightfieldTerrainShape(CBulletPhysics* pPhysics, int sizeX, int sizeY, std::optional<std::vector<float>> vecHeights);
 
     static std::variant<bool, RayResult> PhysicsRayCast(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
     static bool                          PhysicsLineCast(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
 
     static std::vector<RayResult> PhysicsRayCastAll(CBulletPhysics* pPhysics, CVector from, CVector to, std::optional<RayOptions> options);
 
-    static std::variant<bool, RayResult> PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition,
-                                                          CVector vecRotation,
+    static std::variant<bool, RayResult> PhysicsShapeCast(CLuaPhysicsShape* pShape, CVector vecStartPosition, CVector vecEndPosition, CVector vecRotation,
                                                           std::optional<RayOptions> options);
 
     static std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> PhysicsOverlapBox(
@@ -123,7 +122,7 @@ public:
     static std::variant<bool, float>          PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
     static std::unordered_map<int, int>       PhysicsGetSimulationIslands(CBulletPhysics* pPhysics);
     static std::vector<CLuaPhysicsRigidBody*> PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iTargetIsland);
-    static std::string                               PhysicsGetShapeType(CLuaPhysicsShape* pShape);
+    static std::string                        PhysicsGetShapeType(CLuaPhysicsShape* pShape);
 
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
@@ -193,6 +192,5 @@ public:
         {
             func(pElement);
         }
-
     }
 };

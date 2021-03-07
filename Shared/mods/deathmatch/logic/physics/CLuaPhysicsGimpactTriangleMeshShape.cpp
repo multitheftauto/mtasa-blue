@@ -18,4 +18,20 @@ CLuaPhysicsGimpactTriangleMeshShape::CLuaPhysicsGimpactTriangleMeshShape(CBullet
 
 CLuaPhysicsGimpactTriangleMeshShape::~CLuaPhysicsGimpactTriangleMeshShape()
 {
+    delete GetBtShape()->getMeshInterface();
+}
+
+SBoundingBox CLuaPhysicsGimpactTriangleMeshShape::GetBoundingBox()
+{
+    ElementLock lk(this);
+    btTransform transform = btTransform::getIdentity();
+    btVector3   min, max;
+    GetBtShape()->getAabb(transform, min, max);
+    SBoundingBox sBox = SBoundingBox();
+    sBox.vecMin = min;
+    sBox.vecMax = max;
+    float fMargin = GetBtShape()->getMeshPart(0)->getMargin();
+    sBox.vecMin += fMargin;
+    sBox.vecMax -= fMargin;
+    return sBox;
 }

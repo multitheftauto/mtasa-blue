@@ -19,11 +19,11 @@ CLuaPhysicsBvhTriangleMeshShape::CLuaPhysicsBvhTriangleMeshShape(CBulletPhysics*
 
 CLuaPhysicsBvhTriangleMeshShape::~CLuaPhysicsBvhTriangleMeshShape()
 {
+    delete GetBtShape()->getMeshInterface();
 }
 
 void CLuaPhysicsBvhTriangleMeshShape::Update()
 {
-    std::lock_guard guard(m_lock);
     m_bNeedsUpdate = false;
 
     InternalUpdateVerticesPositions();
@@ -62,7 +62,6 @@ void CLuaPhysicsBvhTriangleMeshShape::InternalUpdateVerticesPositions()
 
 void CLuaPhysicsBvhTriangleMeshShape::SetVertexPosition(int iVertex, CVector vecPosition)
 {
-    std::lock_guard guard(m_lock);
     m_vecVerticesUpdate.emplace_back(iVertex, vecPosition);
 
     NeedsUpdate();

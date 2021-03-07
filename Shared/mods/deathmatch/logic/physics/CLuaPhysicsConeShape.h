@@ -19,11 +19,13 @@ public:
     CLuaPhysicsConeShape(CBulletPhysics* pPhysics, float fRadius, float fHeight);
     ~CLuaPhysicsConeShape();
 
-    void    SetRadius(float fRadius);
-    float   GetRadius();
-    bool    SetHeight(float fHeight);
-    float   GetHeight();
-    void    Update() {}
+    void         SetRadius(float fRadius);
+    float        GetRadius();
+    bool         SetHeight(float fHeight);
+    float        GetHeight();
+    void         Update() {}
+    SBoundingBox GetBoundingBox();
+
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConeShape; }
     btConeShape*                GetBtShape() const { return (btConeShape*)InternalGetBtShape(); }

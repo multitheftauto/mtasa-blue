@@ -16,7 +16,8 @@ class CLuaPhysicsConvexHullShape : public CLuaPhysicsShape, CShapeHolder<btConve
 public:
     CLuaPhysicsConvexHullShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecPoints);
     ~CLuaPhysicsConvexHullShape();
-    void Update() {}
+    void         Update() {}
+    SBoundingBox GetBoundingBox();
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConvexHullShape; }
     btConvexHullShape*          GetBtShape() const { return (btConvexHullShape*)InternalGetBtShape(); }

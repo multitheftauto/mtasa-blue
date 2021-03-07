@@ -51,5 +51,5 @@ private:
 
     int                        m_verticesCount = 0;
     std::vector<SVertexUpdate> m_vecVerticesUpdate;
-    mutable std::mutex         m_lock;
+    btTriangleMesh*            m_triangleMesh;
 };

@@ -18,6 +18,8 @@ CLuaPhysicsCompoundShape::CLuaPhysicsCompoundShape(CBulletPhysics* pPhysics, int
 
 CLuaPhysicsCompoundShape::~CLuaPhysicsCompoundShape()
 {
+    for (const auto& pShape : m_vecChildShapes)
+        pShape->RemoveCompoundShape(this);
 }
 
 void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
@@ -33,16 +35,24 @@ void CLuaPhysicsCompoundShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPos
 
 bool CLuaPhysicsCompoundShape::RemoveChildShape(CLuaPhysicsShape* pShape)
 {
+    bool bUpdate = false;
     for (;;)
     {
+        if (m_vecChildShapes.empty())
+            break;
+
         auto result = std::find(std::begin(m_vecChildShapes), std::end(m_vecChildShapes), pShape);
         if (result == m_vecChildShapes.end())
             break;
+
         (*result)->RemoveCompoundShape(this);
         m_vecChildShapes.erase(result);
+        bUpdate = true;
     }
-    UpdateRigids();
-    return true;
+
+    if (bUpdate)
+        UpdateRigids();
+    return bUpdate;
 }
 
 bool CLuaPhysicsCompoundShape::RemoveChildShape(int index)

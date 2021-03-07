@@ -28,7 +28,7 @@ protected:
 
 
 public:
-    ~CLuaPhysicsShape();
+    virtual ~CLuaPhysicsShape();
     bool Destroy();
     void Unlink();            // removes all related static collisions and rigid bodies
 
@@ -41,11 +41,11 @@ public:
     void AddCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape);
     void RemoveCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape);
 
-    bool            SetScale(CVector scale);
-    const CVector&  GetScale();
-    SBoundingBox    GetBoundingBox();
-    SBoundingSphere GetBoundingSphere();
-    void            GetMargin(float& fMargin);
+    bool                    SetScale(CVector scale);
+    const CVector&          GetScale();
+    virtual SBoundingBox    GetBoundingBox();
+    virtual SBoundingSphere GetBoundingSphere();
+    void                    GetMargin(float& fMargin);
 
     void UpdateRigids();
 

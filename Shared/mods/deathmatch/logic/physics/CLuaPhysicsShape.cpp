@@ -34,21 +34,16 @@ bool CLuaPhysicsShape::Destroy()
 
 void CLuaPhysicsShape::Unlink()
 {
-    if (GetBtType() != BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
-    {
-        // copy vector, "Destroy" method below modyfing original, may be made better in the future
-        std::vector<CLuaPhysicsCompoundShape*>   shapes = m_vecCompoundShapes;
-
-        for (auto const& pShape : shapes)
-            pShape->RemoveChildShape(this);
-    }
     std::vector<CLuaPhysicsRigidBody*>       bodies = m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> staticCollisions = m_vecStaticCollisions;
+    std::vector<CLuaPhysicsCompoundShape*>   shapes = m_vecCompoundShapes;
 
     for (auto const& pRigidBody : bodies)
         pRigidBody->Destroy();
     for (auto const& pStaticCollision : staticCollisions)
         pStaticCollision->Destroy();
+    for (auto const& pShape : shapes)
+        pShape->RemoveChildShape(this);
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()

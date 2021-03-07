@@ -30,7 +30,7 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
         std::lock_guard lk(lock);
         ListRemove(m_elementsList, pShape);
     }
-
+    
     delete pShape;
 }
 

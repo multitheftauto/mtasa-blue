@@ -19,6 +19,7 @@ public:
     CLuaPhysicsGimpactTriangleMeshShape(CBulletPhysics* pPhysics, std::vector<CVector>& vecVertices);
     ~CLuaPhysicsGimpactTriangleMeshShape();
     void Update() {}
+    SBoundingBox GetBoundingBox();
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::GimpactTriangleMeshShape; }
     btGImpactMeshShape*         GetBtShape() const { return (btGImpactMeshShape*)InternalGetBtShape(); }
