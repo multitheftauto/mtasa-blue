@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git submodule init vendor/lua
+git submodule update vendor/lua
 
 # Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
