@@ -1,6 +1,6 @@
 @echo off
 
-git submodule update vendor/lua
+git submodule update vendor/lua --init
 
 rem Update CEF eventually
 utils\premake5.exe install_cef
