@@ -39,7 +39,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     static CBulletPhysics*                PhysicsCreateWorld(lua_State* luaVM, std::optional<CreateWorldOptions> vecGravity);
-    static bool                           IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement);
+    static bool                           IsPhysicsElement(lua_State* luaVM);
     static std::vector<CLuaPhysicsShape*> PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape);
     static bool                           PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
     static CVector                        PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);

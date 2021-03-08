@@ -1134,10 +1134,22 @@ std::vector<CLuaPhysicsConstraint*> CLuaPhysicsDefs::PhysicsGetConstraints(CBull
     return pPhysics->GetConstraints();
 }
 
-bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
+bool CLuaPhysicsDefs::IsPhysicsElement(lua_State* luaVM)
 {
-    return true;
+    CScriptArgReader argStream(luaVM);
+    int              iArgument = lua_type(luaVM, 1);
+
+    if (argStream.NextIsUserData())
+    {
+        SString strType;
+        if (iArgument == LUA_TLIGHTUSERDATA)
+            strType = GetUserDataClassName(lua_touserdata(luaVM, 1), luaVM, false);
+
+        return strType.Contains("physics");
+    }
+    return false;
 }
+
 
 bool CLuaPhysicsDefs::PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody)
 {
