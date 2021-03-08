@@ -93,7 +93,7 @@ const char* CPhysicsSharedLogic::GetShapeName(const btCollisionShape* pShape)
 
 void CPhysicsSharedLogic::SetRotation(btTransform& transform, CVector vecRotation)
 {
-    btQuaternion quaternion = transform.getRotation();
+    btQuaternion quaternion = btQuaternion::getIdentity();
     EulerToQuaternion(vecRotation, quaternion);
     transform.setRotation(quaternion);
 }
@@ -179,9 +179,9 @@ btCylinderShape* CPhysicsSharedLogic::CreateCylinder(const CVector half)
     return new btCylinderShape(half);
 }
 
-btCompoundShape* CPhysicsSharedLogic::CreateCompound()
+btCompoundShape* CPhysicsSharedLogic::CreateCompound(int iInitialChildCapacity)
 {
-    return new btCompoundShape();
+    return new btCompoundShape(false, iInitialChildCapacity);
 }
 
 btBvhTriangleMeshShape* CPhysicsSharedLogic::CreateBvhTriangleMesh(const std::vector<CVector>& vecVertices)

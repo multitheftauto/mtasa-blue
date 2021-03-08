@@ -42,6 +42,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsAddChildShape", ArgumentParser<PhysicsAddChildShape>},
         {"physicsRemoveChildShape", ArgumentParser<PhysicsRemoveChildShape>},
         {"physicsGetChildShapes", ArgumentParser<PhysicsGetChildShapes>},
+        {"physicsGetChildShapesCount", ArgumentParser<PhysicsGetChildShapesCount>},
         {"physicsGetChildShapeOffsetPosition", ArgumentParser<PhysicsGetChildShapeOffsetPosition>},
         {"physicsGetChildShapeOffsetRotation", ArgumentParser<PhysicsGetChildShapeOffsetRotation>},
         {"physicsSetChildShapeOffsetPosition", ArgumentParser<PhysicsSetChildShapeOffsetPosition>},
@@ -314,11 +315,15 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundSh
         throw std::invalid_argument("Child shape can not be compound");
     }
 
-    const CVector vecPosition = vecOptionalPosition.value_or(CVector{0, 0, 0});
-    const CVector vecRotation = vecOptionalRotation.value_or(CVector{0, 0, 0});
+    CVector vecPosition = vecOptionalPosition.value_or(CVector{0, 0, 0});
+    CVector vecRotation = vecOptionalRotation.value_or(CVector{0, 0, 0});
     CPhysicsSharedLogic::CheckMaximumPrimitiveSize(vecPosition);
 
-    pCompoundShape->AddShape(pShapeChildShape, vecPosition, vecRotation);
+    //ConvertRadiansToDegrees(vecRotation);
+    pCompoundShape->AddShape(pShapeChildShape);
+
+    pCompoundShape->SetChildShapePosition(pCompoundShape->GetChildShapesNum() - 1, vecPosition);
+    pCompoundShape->SetChildShapeRotation(pCompoundShape->GetChildShapesNum() - 1, vecRotation);
     return true;
 }
 
@@ -327,46 +332,53 @@ std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysic
     return pCompoundShape->GetChildShapes();
 }
 
+int CLuaPhysicsDefs::PhysicsGetChildShapesCount(CLuaPhysicsCompoundShape* pCompoundShape)
+{
+    return pCompoundShape->GetChildShapesNum();
+}
+
 bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() < iIndex)
         throw std::invalid_argument("Invalid child index");
 
-    pCompoundShape->RemoveChildShape(iIndex);
+    pCompoundShape->RemoveChildShape(--iIndex);
     return true;
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
+std::array<float, 3> CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() < iIndex)
         throw std::invalid_argument("Invalid child index");
 
-    return pCompoundShape->GetChildShapePosition(iIndex);
+    CVector vecPosition = pCompoundShape->GetChildShapePosition(--iIndex);
+    return {vecPosition.fX, vecPosition.fY, vecPosition.fZ};
 }
 
-CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
+std::array<float, 3> CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
-    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() < iIndex)
         throw std::invalid_argument("Invalid child index");
 
-    return pCompoundShape->GetChildShapeRotation(iIndex);
+    CVector vecRotation = pCompoundShape->GetChildShapeRotation(--iIndex);
+    return {vecRotation.fX, vecRotation.fY, vecRotation.fZ};
 }
 
 bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecPosition)
 {
-    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() < iIndex)
         throw std::invalid_argument("Invalid child index");
 
-    pCompoundShape->SetChildShapePosition(iIndex, vecPosition);
+    pCompoundShape->SetChildShapePosition(--iIndex, vecPosition);
     return true;
 }
 
 bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecRotation)
 {
-    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() > iIndex)
+    if (iIndex < 0 || pCompoundShape->GetChildShapesNum() < iIndex)
         throw std::invalid_argument("Invalid child index");
 
-    pCompoundShape->SetChildShapeRotation(iIndex, vecRotation);
+    pCompoundShape->SetChildShapeRotation(--iIndex, vecRotation);
     return true;
 }
 
@@ -1149,7 +1161,6 @@ bool CLuaPhysicsDefs::IsPhysicsElement(lua_State* luaVM)
     }
     return false;
 }
-
 
 bool CLuaPhysicsDefs::PhysicsClearForces(CLuaPhysicsRigidBody* pRigidBody)
 {

@@ -41,9 +41,10 @@ public:
     static CBulletPhysics*                PhysicsCreateWorld(lua_State* luaVM, std::optional<CreateWorldOptions> vecGravity);
     static bool                           IsPhysicsElement(lua_State* luaVM);
     static std::vector<CLuaPhysicsShape*> PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape);
+    static int                            PhysicsGetChildShapesCount(CLuaPhysicsCompoundShape* pCompoundShape);
     static bool                           PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
-    static CVector                        PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
-    static CVector                        PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
+    static std::array<float, 3>           PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
+    static std::array<float, 3>           PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
     static bool                           PhysicsSetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecPosition);
     static bool                           PhysicsSetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector vecPosition);
 

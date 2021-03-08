@@ -35,7 +35,7 @@ public:
     static btCapsuleShape*  CreateCapsule(const float fRadius, const float fHeight);
     static btConeShape*     CreateCone(const float fRadius, const float fHeight);
     static btCylinderShape* CreateCylinder(const CVector half);
-    static btCompoundShape* CreateCompound();
+    static btCompoundShape* CreateCompound(int iInitialChildCapacity = 0);
 
     static btBvhTriangleMeshShape* CreateBvhTriangleMesh(const std::vector<CVector>& vecVertices);
     static btGImpactMeshShape*     CreateGimpactMeshShape(const std::vector<CVector>& vecVertices);

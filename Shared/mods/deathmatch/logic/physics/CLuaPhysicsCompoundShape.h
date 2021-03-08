@@ -19,7 +19,7 @@ public:
     CLuaPhysicsCompoundShape(CBulletPhysics* pPhysics, int iInitialChildCapacity);
     ~CLuaPhysicsCompoundShape();
 
-    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
+    void AddShape(CLuaPhysicsShape* pShape);
 
     std::vector<CLuaPhysicsShape*> GetChildShapes() const { return m_vecChildShapes; }
 
@@ -27,14 +27,11 @@ public:
     bool RemoveChildShape(CLuaPhysicsShape* pShape);
 
     size_t GetChildShapesNum() const noexcept { return m_vecChildShapes.size(); }
-    // Be sure index is valid using 'GetChildShapesCounts' method
-    const CVector& GetChildShapePosition(int iIndex);
-    // Be sure index is valid using 'GetChildShapesCounts' method
-    const CVector& GetChildShapeRotation(int iIndex);
-    // Be sure index is valid using 'GetChildShapesCounts' method
-    void SetChildShapePosition(int iIndex, const CVector& vecPosition);
-    // Be sure index is valid using 'GetChildShapesCounts' method
-    void SetChildShapeRotation(int iIndex, const CVector& vecRotation);
+
+    void    SetChildShapePosition(int iIndex, const CVector vecPosition);
+    void    SetChildShapeRotation(int iIndex, const CVector vecRotation);
+    CVector GetChildShapePosition(int iIndex);
+    CVector GetChildShapeRotation(int iIndex);
 
     void Update() {}
 
