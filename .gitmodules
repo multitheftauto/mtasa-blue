@@ -1,0 +1,3 @@
+[submodule "vendor/lua"]
+	path = vendor/lua
+	url = https://github.com/multitheftauto/lua.git
