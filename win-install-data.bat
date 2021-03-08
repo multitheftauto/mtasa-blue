@@ -1,6 +1,6 @@
 @echo off
 
-git submodule update vendor/lua --init
+git submodule update --init vendor/lua
 
 rem Install data files
 utils\premake5 install_data
