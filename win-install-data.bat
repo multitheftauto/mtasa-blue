@@ -1,11 +1,5 @@
 @echo off
 
-rem Update Lua submodule
-git submodule update --init vendor/lua
-
-rem Install data files
-utils\premake5 install_data
-
 rem Optionally install resources
 echo.
 set ANSWER=n
