@@ -1,5 +1,6 @@
 @echo off
 
+rem Update Lua submodule
 git submodule update --init vendor/lua
 
 rem Install data files
