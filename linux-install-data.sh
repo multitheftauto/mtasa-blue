@@ -1,7 +1,5 @@
 #!/bin/bash
 
-git submodule update --init vendor/lua
-
 # Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
     PREMAKE5=utils/premake5-macos
