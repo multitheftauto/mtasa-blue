@@ -22,7 +22,7 @@ newaction {
 	execute = function()
 		-- Make Bin directory if not exists
 		os.mkdir(BIN_DIR)
-
+		
 		-- Init and update submodules
 		include "update_submodules.lua"
 
