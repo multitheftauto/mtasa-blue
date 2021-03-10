@@ -495,10 +495,7 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector2D vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -527,11 +524,7 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                vec.fZ = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -558,12 +551,8 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector4D vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                vec.fZ = lua::PopPrimitive<float>(L, index);
-                vec.fW = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index),
+                         PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -595,18 +584,12 @@ struct CLuaFunctionParserBase
                 };
                 
                 CMatrix matrix;
-                matrix.vRight.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vRight.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vRight.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fZ = lua::PopPrimitive<float>(L, index);
+
+                matrix.vRight = ReadVector();
+                matrix.vFront = ReadVector();
+                matrix.vUp = ReadVector();
+                matrix.vPos = ReadVector();
+
                 return matrix;
             }
             else
@@ -647,7 +630,7 @@ struct CLuaFunctionParserBase
             return static_cast<T>(result);
         }
         else if constexpr (std::is_same_v<T, SColor>)
-            return static_cast<unsigned long>(lua::PopPrimitive<int64_t>(L, index));
+            return static_cast<unsigned long>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
             CLuaArgument argument;
