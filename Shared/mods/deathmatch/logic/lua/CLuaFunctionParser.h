@@ -354,19 +354,46 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // primitive types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_integral_v<T>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return lua::PopPrimitive<T>(L, index);
-        // floats/doubles may not be NaN
-        else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
+        else if constexpr (std::is_same_v<T, bool>)
+            return lua::PopPrimitive<T>(L, index);
+        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) // bool is an integral type, so must pop it before ^^
         {
-            T value = lua::PopPrimitive<T>(L, index);
-            if (std::isnan(value))
+            const auto number = lua::PopPrimitive<lua_Number>(L, index);
+
+            if (std::isnan(number))
             {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
                 SetBadArgumentError(L, "number", index - 1, "NaN");
+                return static_cast<T>(number);
             }
-            return value;
+
+            if constexpr (std::is_integral_v<T>)
+            {
+                if constexpr (std::is_unsigned_v<T>)
+                {
+                    if (number < 0.0)
+                    {
+                        // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+                        // underlying element is of a wrong type
+                        SetBadArgumentError(L, "positive value", index - 1, "negative");
+
+                        return static_cast<T>(static_cast<int64_t>(number));
+                    }
+                }
+
+                #ifdef MTA_DEBUG
+                {
+                    using Tlimits = std::numeric_limits<T>;
+                    dassert(static_cast<int64_t>(Tlimits::max()) >= number); // Check overflow
+                    dassert(static_cast<int64_t>(Tlimits::min()) <= number); // Check underflow
+                }
+                #endif   
+            }
+
+            return static_cast<T>(number);
         }
         else if constexpr (std::is_enum_v<T>)
         {
@@ -563,6 +590,10 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
+                const auto ReadVector = [&] {
+                    return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index));
+                };
+                
                 CMatrix matrix;
                 matrix.vRight.fX = lua::PopPrimitive<float>(L, index);
                 matrix.vRight.fY = lua::PopPrimitive<float>(L, index);
