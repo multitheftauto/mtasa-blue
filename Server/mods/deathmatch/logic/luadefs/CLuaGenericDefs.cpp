@@ -89,7 +89,7 @@ unsigned int CLuaGenericDefs::GetServerHttpPort()
 
 std::string_view CLuaGenericDefs::GetServerName()
 {
-    return std::string_view{g_pGame->GetConfig()->GetServerName()};
+    return g_pGame->GetConfig()->GetServerName();
 }
 
 bool CLuaGenericDefs::OutputServerLog(std::string_view message)
@@ -161,8 +161,8 @@ bool CLuaGenericDefs::OutputChatBox(lua_State* luaVM, std::string message, std::
         if (IS_TEAM(element))
         {
             auto team = static_cast<CTeam*>(element);
-            sendList.resize(team->CountPlayers());
-            sendList.assign(team->PlayersBegin(), team->PlayersEnd());
+            sendList.reserve(team->CountPlayers());
+            sendList.insert(sendList.begin(), team->PlayersBegin(), team->PlayersEnd());
         }
         else
         {
