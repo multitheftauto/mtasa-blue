@@ -28,7 +28,7 @@ private:
 
     LUA_DECLARE(fileClose);
     LUA_DECLARE(fileFlush);
-    LUA_DECLARE(fileRead);
+    static std::string fileRead(lua_State* L, CScriptFile* pFile, size_t count);
     LUA_DECLARE(fileWrite);
 
     LUA_DECLARE(fileGetPos);

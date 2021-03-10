@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
@@ -24,7 +25,7 @@ void CLuaFileDefs::LoadFunctions()
 
         {"fileClose", fileClose},
         {"fileFlush", fileFlush},
-        {"fileRead", fileRead},
+        {"fileRead", ArgumentParser<fileRead>}, // Must use new parser here, because negative numbers underflow and cause crash
         {"fileWrite", fileWrite},
 
         {"fileGetPos", fileGetPos},
@@ -682,51 +683,19 @@ int CLuaFileDefs::fileFlush(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFileDefs::fileRead(lua_State* luaVM)
+std::string CLuaFileDefs::fileRead(lua_State* L, CScriptFile* pFile, size_t count)
 {
-    //  string fileRead ( file theFile, int count )
-    CScriptFile*  pFile;
-    unsigned long ulCount = 0;
+    // Reading zero bytes from a file results in an empty string
+    if (!count)
+        return "";
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pFile);
-    argStream.ReadNumber(ulCount);
-
-    if (!argStream.HasErrors())
-    {
-        // Reading zero bytes from a file results in an empty string
-        if (ulCount == 0)
-        {
-            lua_pushstring(luaVM, "");
-            return 1;
-        }
-
-        // Allocate a buffer to read the stuff into and read some :~ into it
-        SString buffer;
-        long lBytesRead = pFile->Read(ulCount, buffer);
-
-        if (lBytesRead >= 0)
-        {
-            // Push the string onto the Lua stack. Use pushlstring so we are binary
-            // compatible. Normal push string takes zero terminated strings.
-            lua_pushlstring(luaVM, buffer.data(), lBytesRead);
-            return 1;
-        }
-        else if (lBytesRead == -2)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "out of memory");
-        }
-        else
-        {
-            m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
-        }
-    }
+    SString buffer;
+    if (auto bytesRead = pFile->Read(count, buffer); bytesRead >= 0)
+        return buffer;
+    else if (bytesRead == -2)
+        throw std::exception("Out of memory");
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Error
-    lua_pushnil(luaVM);
-    return 1;
+        m_pScriptDebugging->LogBadPointer(L, "file", 1);
 }
 
 int CLuaFileDefs::fileWrite(lua_State* luaVM)
