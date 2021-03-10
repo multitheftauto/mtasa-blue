@@ -329,7 +329,7 @@ void CBulletPhysics::StepSimulation()
     isDuringSimulation = false;
 }
 
-void CBulletPhysics::GetSimulationIslandCallback(CBulletPhysics::CIslandCallback& callback)
+void CBulletPhysics::GetSimulationIslandCallback(CBulletPhysics::SIslandCallback& callback)
 {
     WorldContext world(this);
 

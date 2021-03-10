@@ -172,3 +172,8 @@ SBoundingSphere CLuaPhysicsStaticCollision::GetBoundingSphere()
 {
     return m_pShape->GetBoundingSphere();
 }
+
+int CLuaPhysicsStaticCollision::GetIslandTag()
+{
+    return m_btCollisionObject->getIslandTag();
+}

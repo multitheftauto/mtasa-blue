@@ -42,14 +42,15 @@ public:
     virtual int  GetFilterMask() const = 0;
     virtual void SetFilterMask(int mask) = 0;
 
-    void                                         ClearCollisionContacts();
-    void                                         ReportCollisionContact(CLuaPhysicsWorldElement* pElement);
-    const std::vector<CLuaPhysicsWorldElement*>& GetAllContacts() const { return m_vecCollisionContacts; }
-    void                                         GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement);
+    virtual int GetIslandTag() = 0;
+
+    void ClearCollisionContacts();
+    void ReportCollisionContact(CLuaPhysicsWorldElement* pElement);
+    void GetAllContacts(std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies, std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions);
+    void GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement);
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::WorldElement; }
 
-    
     virtual void SetEnabled(bool bEnabled) = 0;
     virtual bool IsEnabled() const = 0;
 

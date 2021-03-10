@@ -56,8 +56,10 @@ public:
 
     SBoundingBox    GetBoundingBox(btTransform transform);
     SBoundingSphere GetBoundingSphere();
+    int             GetIslandTag();
+    const std::vector<CLuaPhysicsWorldElement*>& GetAllContacts() const;
 
-private:
+        private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
     CLuaPhysicsShape*                             m_pShape;
 

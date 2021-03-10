@@ -440,3 +440,8 @@ void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstrain
     m_pRigidBodyProxy->removeConstraintRef(pConstraint->GetConstraint());
     ListRemove(m_constraintList, pConstraint);
 }
+
+int CLuaPhysicsRigidBody::GetIslandTag()
+{
+    return m_pRigidBodyProxy->getIslandTag();
+}

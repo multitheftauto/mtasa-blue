@@ -218,30 +218,18 @@ public:
         }
     };
 
-    struct CIslandCallback : public btSimulationIslandManager::IslandCallback
+    struct SIslandCallback : public btSimulationIslandManager::IslandCallback
     {
     public:
-        int                                iTargetIsland = -1;
-        std::unordered_map<int, int>       m_islandBodies;
-        std::vector<CLuaPhysicsRigidBody*> m_bodies;
-        ~CIslandCallback() {}
-        void processIsland(btCollisionObject** bodies, int numBodies, class btPersistentManifold** manifolds, int numManifolds, int islandId)
+        ~SIslandCallback() {}
+        void processIsland(btCollisionObject** bodies, int numBodies, btPersistentManifold** manifolds, int numManifolds, int islandId)
         {
-            if (iTargetIsland != -1)
-            {
-                if (iTargetIsland == islandId)
-                {
-                    m_bodies.reserve(numBodies);
-                    for (int i = 0; i < numBodies; i++)
-                        m_bodies.push_back((CLuaPhysicsRigidBody*)(bodies[i]->getUserPointer()));
-                }
-            }
-            else
-            {
-                if (numBodies > 0)
-                    m_islandBodies[islandId] = numBodies;
-            }
+            m_mapIslandsBodies[islandId] = std::vector<CLuaPhysicsRigidBody*>(numBodies);
+            for (int i = 0; i < numBodies; i++)
+                m_mapIslandsBodies[islandId].push_back((CLuaPhysicsRigidBody*)(bodies[i]->getUserPointer()));
         }
+
+        std::unordered_map<int, std::vector<CLuaPhysicsRigidBody*>> m_mapIslandsBodies;
     };
 
     struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
@@ -314,7 +302,7 @@ public:
     void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     CVector GetWorldSize() const { return m_vecWorldSize; }
 
-    void GetSimulationIslandCallback(CBulletPhysics::CIslandCallback& callback);
+    void GetSimulationIslandCallback(CBulletPhysics::SIslandCallback& callback);
 
     CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
                                           CVector vecLocalInertia = CVector{0, 0, 0}, CVector vecCenterOfMass = CVector{0, 0, 0});

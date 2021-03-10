@@ -114,6 +114,9 @@ public:
 
     SBoundingBox    GetBoundingBox(btTransform transform) { return m_pShape->GetBoundingBox(transform); }
     SBoundingSphere GetBoundingSphere() { return m_pShape->GetBoundingSphere(); }
+
+    int                                          GetIslandTag();
+
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*     m_pShape;

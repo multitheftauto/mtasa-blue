@@ -42,7 +42,7 @@ bool CLuaPhysicsCompoundShape::RemoveChildShape(CLuaPhysicsShape* pShape)
         auto result = std::find(std::begin(m_vecChildShapes), std::end(m_vecChildShapes), pShape);
         if (result == m_vecChildShapes.end())
             break;
-
+        GetBtShape()->removeChildShape(pShape->InternalGetBtShape());
         (*result)->RemoveCompoundShape(this);
         m_vecChildShapes.erase(result);
         bUpdate = true;

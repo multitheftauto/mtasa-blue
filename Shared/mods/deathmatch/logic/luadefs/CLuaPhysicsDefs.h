@@ -13,6 +13,7 @@
 class CLuaPhysicsCompoundShape;
 class CLuaPhysicsBvhTriangleMeshShape;
 class CLuaPhysicsHeightfieldTerrainShape;
+class CLuaPhysicsWorldElement;
 
 #include "lua/CLuaFunctionParser.h"
 #include "Enums.h"
@@ -118,8 +119,7 @@ public:
     static std::vector<std::vector<float>>    PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius);
     static bool                               PhysicsSetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode, std::variant<float, bool> variant);
     static std::variant<bool, float>          PhysicsGetDebugMode(CBulletPhysics* pPhysics, ePhysicsDebugMode eDebugMode);
-    static std::unordered_map<int, int>       PhysicsGetSimulationIslands(CBulletPhysics* pPhysics);
-    static std::vector<CLuaPhysicsRigidBody*> PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iTargetIsland);
+    static std::unordered_map<int, std::vector<CLuaPhysicsRigidBody*>> PhysicsGetRigidBodiesBySimulationIsland(CBulletPhysics* pPhysics);
     static std::string                        PhysicsGetShapeType(CLuaPhysicsShape* pShape);
 
 #ifdef MTA_CLIENT

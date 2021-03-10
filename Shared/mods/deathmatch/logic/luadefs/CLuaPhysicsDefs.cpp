@@ -78,8 +78,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
         {"physicsSetDebugMode", ArgumentParser<PhysicsSetDebugMode>},
         {"physicsGetDebugMode", ArgumentParser<PhysicsGetDebugMode>},
-        {"physicsGetSimulationIslands", ArgumentParser<PhysicsGetSimulationIslands>},
-        {"physicsGetIslandRigidBodies", ArgumentParser<PhysicsGetIslandRigidBodies>},
+        {"physicsGetRigidBodiesBySimulationIsland", ArgumentParser<PhysicsGetRigidBodiesBySimulationIsland>},
         {"physicsGetShapeType", ArgumentParser<PhysicsGetShapeType>},
 #ifdef MTA_CLIENT
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
@@ -295,11 +294,8 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
 {
     CLuaPhysicsStaticCollision* pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(pShape);
 
-    CVector vecPosition = position.value_or(CVector{0, 0, 0});
-    CVector vecRotation = rotation.value_or(CVector{0, 0, 0});
-
-    pStaticCollision->SetPosition(vecPosition);
-    pStaticCollision->SetRotation(vecRotation);
+    pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
+    pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
     pStaticCollision->SetEnabled(true);
     return pStaticCollision;
 }
@@ -311,9 +307,7 @@ bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundSh
         throw std::invalid_argument("Shapes need to belong to the same physics world");
 
     if (CLuaPhysicsCompoundShape* pCompoundChildShape = dynamic_cast<CLuaPhysicsCompoundShape*>(pShapeChildShape))
-    {
         throw std::invalid_argument("Child shape can not be compound");
-    }
 
     CVector vecPosition = vecOptionalPosition.value_or(CVector{0, 0, 0});
     CVector vecRotation = vecOptionalRotation.value_or(CVector{0, 0, 0});
@@ -489,13 +483,9 @@ bool CLuaPhysicsDefs::PhysicsSetWorldProperties(CBulletPhysics* pPhysics, ePhysi
                 CVector max = BulletPhysics::Limits::WorldMaximumSize;
 
                 if (size.fX < min.fX || size.fY < min.fY || size.fZ < min.fZ)
-                {
                     throw std::invalid_argument(SString("World size can not be smaller than %.2fx, %.2fy, %.2fy", min.fX, min.fY, min.fZ));
-                }
                 if (size.fX > max.fX || size.fY > max.fY || size.fZ > max.fZ)
-                {
                     throw std::invalid_argument(SString("World size can not be greater than %.2fx, %.2fy, %.2fy", max.fX, max.fY, max.fZ));
-                }
 
                 pPhysics->SetWorldSize(size);
                 return true;
@@ -1191,7 +1181,7 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
     pPhysics->OverlapBox(min, max, vecRigidBodies, vecStaticCollisions, collisionGroup.value_or(btBroadphaseProxy::DefaultFilter),
                          collisionMask.value_or(btBroadphaseProxy::AllFilter));
     std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
-    result["rigidbodies"] = vecRigidBodies;
+    result["rigidBodies"] = vecRigidBodies;
     result["staticCollisions"] = vecStaticCollisions;
     return result;
 }
@@ -1227,36 +1217,23 @@ std::tuple<float, float, float, float> CLuaPhysicsDefs::PhysicsGetBoundingSphere
     return std::make_tuple(bSphere.vecCenter.fX, bSphere.vecCenter.fY, bSphere.vecCenter.fZ, bSphere.fRadius);
 }
 
-std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>>
-        CLuaPhysicsDefs::PhysicsGetContacts(
+std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> CLuaPhysicsDefs::PhysicsGetContacts(
     CLuaPhysicsElement* pElement)
 {
     std::vector<CLuaPhysicsWorldElement*> collisionContacts;
     if (CLuaPhysicsWorldElement* pWorldElement = dynamic_cast<CLuaPhysicsWorldElement*>(pElement))
-        collisionContacts = pWorldElement->GetAllContacts();
+    {
+        std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
+
+        std::vector<CLuaPhysicsRigidBody*>       vecRigidBodies;
+        std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
+        pWorldElement->GetAllContacts(vecRigidBodies, vecStaticCollisions);
+        result["rigidBodies"] = vecRigidBodies;
+        result["staticCollisions"] = vecStaticCollisions;
+        return result;
+    }
     else
         throw new std::invalid_argument("Unsupported physics element.");
-
-    std::vector<CLuaPhysicsRigidBody*>       vecRigidBodies;
-    std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
-
-    for (auto const& pContactElement : collisionContacts)
-    {
-        switch (pContactElement->GetClassType())
-        {
-            case EIdClass::EIdClassType::RIGID_BODY:
-                vecRigidBodies.push_back((CLuaPhysicsRigidBody*)pContactElement);
-                break;
-            case EIdClass::EIdClassType::STATIC_COLLISION:
-                vecStaticCollisions.push_back((CLuaPhysicsStaticCollision*)pContactElement);
-                break;
-        }
-    }
-
-    std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>, std::vector<CLuaPhysicsStaticCollision*>>> result;
-    result["rigidbodies"] = vecRigidBodies;
-    result["staticCollisions"] = vecStaticCollisions;
-    return result;
 }
 
 std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> CLuaPhysicsDefs::PhysicsGetContactDetails(
@@ -1401,23 +1378,11 @@ std::variant<bool, float> CLuaPhysicsDefs::PhysicsGetDebugMode(CBulletPhysics* p
     return pPhysics->GetDebug()->getDebugMode(eDebugMode);
 }
 
-std::vector<CLuaPhysicsRigidBody*> CLuaPhysicsDefs::PhysicsGetIslandRigidBodies(CBulletPhysics* pPhysics, int iTargetIsland)
+std::unordered_map<int, std::vector<CLuaPhysicsRigidBody*>> CLuaPhysicsDefs::PhysicsGetRigidBodiesBySimulationIsland(CBulletPhysics* pPhysics)
 {
-    if (iTargetIsland >= 0)
-    {
-        CBulletPhysics::CIslandCallback callback;
-        callback.iTargetIsland = iTargetIsland;
-        pPhysics->GetSimulationIslandCallback(callback);
-        return callback.m_bodies;
-    }
-    return {};
-}
-
-std::unordered_map<int, int> CLuaPhysicsDefs::PhysicsGetSimulationIslands(CBulletPhysics* pPhysics)
-{
-    CBulletPhysics::CIslandCallback callback;
+    CBulletPhysics::SIslandCallback callback;
     pPhysics->GetSimulationIslandCallback(callback);
-    return callback.m_islandBodies;
+    return callback.m_mapIslandsBodies;
 }
 
 #ifdef MTA_CLIENT
