@@ -108,6 +108,7 @@ public:
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::RigidBody; }
     
     CLuaPhysicsShape* GetShape() const { return m_pShape; }
+    btCollisionObject* GetBtCollisionObject() const { return m_pRigidBodyProxy.get(); }
 
     void SetEnabled(bool bEnabled) { m_pRigidBodyProxy->SetEnabled(bEnabled); }
     bool IsEnabled() const { return m_pRigidBodyProxy->IsEnabled(); }

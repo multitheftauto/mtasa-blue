@@ -32,6 +32,10 @@ void CLuaPhysicsWorldElement::ReportCollisionContact(CLuaPhysicsWorldElement* pE
 
 void CLuaPhysicsWorldElement::GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement)
 {
+    CBulletPhysics::WorldContext world(GetPhysics());
+    int c1 = world->getDispatcher()->getNumManifolds();
+    auto manifold = world->getDispatcher()->getNewManifold(GetBtCollisionObject(), pElement->GetBtCollisionObject());
+    int c2 = world->getDispatcher()->getNumManifolds();
 }
 
 void CLuaPhysicsWorldElement::GetAllContacts(std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies, std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions)

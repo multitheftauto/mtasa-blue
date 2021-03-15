@@ -43,6 +43,7 @@ public:
     virtual void SetFilterMask(int mask) = 0;
 
     virtual int GetIslandTag() = 0;
+    virtual btCollisionObject* GetBtCollisionObject() const = 0;
 
     void ClearCollisionContacts();
     void ReportCollisionContact(CLuaPhysicsWorldElement* pElement);

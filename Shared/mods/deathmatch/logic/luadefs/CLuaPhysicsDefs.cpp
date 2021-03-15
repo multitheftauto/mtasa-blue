@@ -1236,9 +1236,12 @@ std::unordered_map<std::string, std::variant<std::vector<CLuaPhysicsRigidBody*>,
         throw new std::invalid_argument("Unsupported physics element.");
 }
 
-std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> CLuaPhysicsDefs::PhysicsGetContactDetails(
-    std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB)
+std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> CLuaPhysicsDefs::PhysicsGetContactDetails(CLuaPhysicsElement* pElementA, CLuaPhysicsElement* pElementB)
 {
+    if (pElementA->GetPhysics() != pElementB->GetPhysics())
+        throw std::invalid_argument("Elements need to belong to the same physics world");
+
+    ((CLuaPhysicsWorldElement*)pElementA)->GetContactManifoldsWithElement((CLuaPhysicsWorldElement*)pElementB);
     std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> result;
     // if (std::holds_alternative<CLuaPhysicsRigidBody*>(variantA))
     //{

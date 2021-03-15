@@ -102,8 +102,8 @@ public:
         CLuaPhysicsElement* pElement);
 
     static std::vector<std::unordered_map<std::string, std::variant<CVector, float, int>>> PhysicsGetContactDetails(
-        std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantA, std::variant<CLuaPhysicsRigidBody*, CLuaPhysicsStaticCollision*> variantB);
-
+        CLuaPhysicsElement* pElementA, CLuaPhysicsElement* pElementB);
+    
     static std::vector<std::tuple<std::string, double>> PhysicsGetPerformanceStats();
 
     static CLuaPhysicsConstraint* PhysicsCreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, std::variant<CLuaPhysicsRigidBody*, CVector> variantA,

@@ -44,6 +44,7 @@ public:
 
     void Unlink();
 
+    btCollisionObject* GetBtCollisionObject() const { return m_btCollisionObject.get(); }
     CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
     CLuaPhysicsShape*             GetShape() const { return m_pShape; }
 
