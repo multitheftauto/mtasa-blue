@@ -36,7 +36,7 @@ public:
 
     void Insert(CPlayer* pPlayer);
 
-    // Insert from a sequencial container(including a set)
+    // Insert from a sequential container(including a set)
     template<typename Container,
         typename = std::enable_if_t<std::is_same_v<std::remove_cv_t<typename Container::value_type>, CPlayer*>>>
     void Insert(const Container& players)
@@ -63,6 +63,8 @@ public:
             if (const auto it = std::find(group->begin(), group->end(), pPlayer); it != group->end())
             {
                 group->erase(it);
+                if (group->empty())
+                    erase(pPlayer->GetBitStreamVersion()); // Delete this group as it contains no players
                 return true;
             }
         }

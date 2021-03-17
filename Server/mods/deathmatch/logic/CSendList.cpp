@@ -18,6 +18,7 @@
 void CSendList::Insert(CPlayer* pPlayer)
 {
     BaseContainer::mapped_type& group = (*this)[pPlayer->GetBitStreamVersion()];
+    group.reserve(128); // We dont want a lot of reallocations. 128 * 4 bytes is a good trade-off here.
 
     // Check if the player is already in the group. If he is, something went wrong.
     dassert(std::find(group.begin(), group.end(), pPlayer) == group.end());
