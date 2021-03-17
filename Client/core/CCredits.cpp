@@ -182,6 +182,7 @@ CCredits::CCredits()
         "rafalh\n"
         "samt2497\n"
         "SDraw\n"
+        "se16n\n"
         "Sergeanur\n"
         "-ffs-Sniper\n"
         "TAPL-93\n"
