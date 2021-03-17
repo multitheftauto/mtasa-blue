@@ -9,6 +9,8 @@ jobs:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
       - uses: actions/cache@v1
         id: cache-dxfiles
@@ -53,6 +55,8 @@ jobs:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
       - uses: actions/cache@v1
         id: cache-dxfiles
@@ -101,6 +105,8 @@ jobs:
       - name: Link MySQL
         run: brew link --overwrite mysql
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Run Build
         run: ./linux-build.sh
 
@@ -114,6 +120,8 @@ jobs:
       - name: Link MySQL
         run: brew link --overwrite mysql
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Run Build
         run: ./linux-build.sh "" debug
 
@@ -124,6 +132,8 @@ jobs:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Run Build
         run: ./linux-build.sh
 
@@ -134,5 +144,8 @@ jobs:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
       - name: Run Build
         run: ./linux-build.sh "" debug
