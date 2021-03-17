@@ -73,6 +73,7 @@ CCredits::CCredits()
         "MX_Master\n"
         "Pirulax\n"
         "Remp\n"
+        "SugarD-x\n"
         "\n"
         "\n";
 
