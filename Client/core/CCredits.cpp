@@ -140,6 +140,7 @@ CCredits::CCredits()
         "asturel\n"
         "Audifire\n"
         "Bonus1702\n"
+        "cleopatra\n"
         "colistro123\n"
         "correaAlex\n"
         "CrosRoad95\n"
