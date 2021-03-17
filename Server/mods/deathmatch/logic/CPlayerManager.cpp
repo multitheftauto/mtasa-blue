@@ -227,17 +227,20 @@ void CPlayerManager::RemoveFromList(CPlayer* pPlayer)
     m_JoinedByBitStreamVer.Erase(pPlayer);
     dassert(m_JoinedByBitStreamVer.CountJoined() <= m_Players.size());
 
-    for (CPlayer* itPlayer : m_Players)
+    m_LowestJoinedPlayerVersion.clear();
+    for (CPlayer* player : m_Players)
     {
         // Remove from other players near/far lists
-        itPlayer->RemovePlayerFromDistLists(pPlayer);
+        player->RemovePlayerFromDistLists(pPlayer);
+    }
 
-        // Find lowest player version
-        if (itPlayer->IsJoined())
-        {
-            if (pPlayer->GetPlayerVersion() < m_LowestJoinedPlayerVersion || m_LowestJoinedPlayerVersion.empty())
-                m_LowestJoinedPlayerVersion = pPlayer->GetPlayerVersion();
-        }
+    if (!m_Players.empty()) {
+        const auto it = std::min_element(m_Players.begin(), m_Players.end(),
+            [](CPlayer* a, CPlayer* b) {
+                return a->GetPlayerVersion() < b->GetPlayerVersion();
+            }
+        );
+        m_LowestJoinedPlayerVersion = (*it)->GetPlayerVersion();
     }
 
     g_pGame->CalculateMinClientRequirement();
