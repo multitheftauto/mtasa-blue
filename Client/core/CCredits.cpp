@@ -71,6 +71,7 @@ CCredits::CCredits()
         "lopezloo\n"
         "LopSided\n"
         "MX_Master\n"
+        "Pirulax\n"
         "Remp\n"
         "\n"
         "\n";
@@ -150,6 +151,7 @@ CCredits::CCredits()
         "Dragon\n"
         "dvarnai\n"
         "Einheit-101\n"
+        "emre1702\n"
         "Fabio(GNR)\n"
         "FileEX\n"
         "FrankZZ\n"
@@ -176,7 +178,6 @@ CCredits::CCredits()
         "pentaflops\n"
         "PerikiyoXD\n"
         "PhrozenByte\n"
-        "Pirulax\n"
         "rafalh\n"
         "samt2497\n"
         "SDraw\n"
