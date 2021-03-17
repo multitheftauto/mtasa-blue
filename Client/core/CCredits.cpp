@@ -69,7 +69,7 @@ CCredits::CCredits()
         "Iztas\n"
         "JoeBullet\n"
         "lopezloo\n"
-        "LopSided\n"
+        "Lpsd\n"
         "MX_Master\n"
         "Pirulax\n"
         "Remp\n"
