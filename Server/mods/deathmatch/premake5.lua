@@ -12,6 +12,7 @@ project "Deathmatch"
 
 	filter {}
 		includedirs {
+			"../../../Shared/sdk",
 			"../../sdk",
 			"../../../vendor/bochs",
 			"../../../vendor/pme",
@@ -50,9 +51,8 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bochs/bochs_internal/crc32.cpp",
+		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp",
 	}
 
 	filter "system:windows"
