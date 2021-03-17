@@ -153,6 +153,7 @@ CCredits::CCredits()
         "Einheit-101\n"
         "emre1702\n"
         "Fabio(GNR)\n"
+        "fastman92\n"
         "FileEX\n"
         "FrankZZ\n"
         "Gothem\n"
