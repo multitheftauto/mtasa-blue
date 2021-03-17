@@ -104,15 +104,15 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive) const
 CPlayer* CPlayerManager::GetRandom() const noexcept
 {
     if (!m_JoinedByBitStreamVer.Empty()) {
-        // Optimized random player selection
-        std::mt19937 rndgen{ std::random_device{}() };
-
         const auto GetRandomInRange = [](size_t max) { // Like Python's random.randrange()
-            std::default_random_engine engine{ std::random_device() };
-            return std::uniform_int_distribution<size_t>{0, max - 1}(engine);
+            // having it as static is faster, but might cause issues
+            // if called from another thread, but at that point you have
+            // way bigger problems to worry about
+            static std::mt19937 re{ std::random_device{}() };
+            return std::uniform_int_distribution<size_t>{ 0, max - 1 }(re);
         };
 
-        const auto GetRandomInGroup = [&rndgen, GetRandomInRange](const auto& group) -> CPlayer* {
+        const auto GetRandomInGroup = [GetRandomInRange](const auto& group) -> CPlayer* {
             for (size_t i = GetRandomInRange(group.size()); i < group.size(); i++) {
                 if (CPlayer* player = group[i]; !player->IsBeingDeleted())
                     return player;
