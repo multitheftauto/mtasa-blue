@@ -1,5 +1,8 @@
 @echo off
 
+rem Install data files
+utils\premake5 install_data
+
 rem Optionally install resources
 echo.
 set ANSWER=n
