@@ -218,6 +218,7 @@ CCredits::CCredits()
         "Adamix\n"
         "Aibo\n"
         "diegofkda\n"
+        "leetIbrahim\n"
         "Phatlooser\n"
         "Pugwipe\n"
         "Ren712\n"
