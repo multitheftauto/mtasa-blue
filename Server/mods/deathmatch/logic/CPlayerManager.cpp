@@ -91,13 +91,13 @@ size_t CPlayerManager::CountJoined() const
 // Find player by fully matching nick. Todo: Partial nick
 CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive) const
 {
-    const auto iter = std::find_if(m_Players.begin(), m_Players.end(), [bCaseSensitive, szNick](CPlayer* pPlayer) {
-        const char* szPlayerNick = pPlayer->GetNick();
-        if (bCaseSensitive) 
-            return strcmp(szNick, szPlayerNick) == 0; // Do a case sensitive compare
-        else
-            return stricmp(szNick, szPlayerNick) == 0; // Insensitive otherwise
-    });
+    const auto iter = std::find_if(m_Players.begin(), m_Players.end(),
+        [=, len = strlen(szNick), cmp = bCaseSensitive ? strcmp : stricmp](CPlayer* pPlayer) {
+            if (strlen(pPlayer->GetNick()) != len)
+                return false;
+            return cmp(szNick, pPlayer->GetNick()) == 0;
+        }
+    );
     return (iter == m_Players.end()) ? nullptr : *iter;
 }
 
