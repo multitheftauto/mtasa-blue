@@ -922,6 +922,10 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
 {
     NullEmptyStrings(szKey, szArguments, szResource, szOriginalScriptKey);
 
+    char* szCompArguments = strdup(szArguments);
+    if (szArguments)
+        szCompArguments = SharedUtil::Trim(szCompArguments);
+
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
     {
@@ -934,7 +938,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
                 {
                     if (!bCheckState || (pBind->bHitState == bState))
                     {
-                        if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
+                        if (!szCompArguments || (pBind->szArguments && strcmp(pBind->szArguments, szCompArguments) == 0))
                         {
                             if (!szResource || (pBind->szResource && strcmp(pBind->szResource, szResource) == 0))
                             {
@@ -2692,7 +2696,12 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
 
                 if (szCommand)
                 {
-                    char*   szArguments = strtok(NULL, "\0");
+                    char* szArguments = strtok(NULL, "\0");
+                    if (szArguments)
+                        szArguments = SharedUtil::Trim(szArguments);
+                    if (szArguments != nullptr && szArguments[0] == '\0')
+                        szArguments = nullptr;
+
                     SString strKeyState("%s", bState ? "down" : "up");
                     SString strCommandAndArguments("%s%s%s", szCommand, szArguments ? " " : "", szArguments ? szArguments : "");
 
