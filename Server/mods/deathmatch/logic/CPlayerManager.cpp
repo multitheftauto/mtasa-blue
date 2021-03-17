@@ -142,20 +142,20 @@ CPlayer* CPlayerManager::GetRandom() const noexcept
 void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip) const
 {
     BroadcastJoinedIf(Packet,
-        [=](CPlayer* pPlayer) { return pPlayer != pSkip; });
+        [=](CPlayer* pPlayer) { return !pSkip || pPlayer != pSkip; });
 }
 
 void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip) const
 {
     BroadcastJoinedIf(Packet,
-        [=](CPlayer* pPlayer) { return pPlayer != pSkip && pPlayer->GetDimension() == usDimension; });
+        [=](CPlayer* pPlayer) { return (!pSkip || pPlayer != pSkip) && pPlayer->GetDimension() == usDimension; });
 }
 
 // Used for subscriber based setElementData
 void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const std::string& name, CPlayer* pSkip) const
 {
     BroadcastJoinedIf(Packet,
-        [=, &name](CPlayer* pPlayer) { return pPlayer != pSkip && pPlayer->IsSubscribed(pElement, name); });
+        [=, &name](CPlayer* pPlayer) { return (!pSkip || pPlayer != pSkip) && pPlayer->IsSubscribed(pElement, name); });
 }
 
 void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)

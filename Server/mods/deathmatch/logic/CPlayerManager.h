@@ -92,6 +92,7 @@ public:
     template <class Predicate_t>
     void BroadcastJoinedIf(const CPacket& Packet, Predicate_t&& Predicate) const
     {
+        // Important consideration: If predicate modifies `m_JoinedByBitStreamVer` we're fucked in a way..
         DoBroadcastIf(Packet, m_JoinedByBitStreamVer, std::forward<Predicate_t>(Predicate));
     }
 
@@ -102,10 +103,10 @@ public:
     void BroadcastAll(const CPacket& Packet, CPlayer* pSkip = nullptr) const
     {
         DoBroadcastIf(Packet, m_Players,
-            [=](CPlayer* pPlayer) {return pSkip != pPlayer; });
+            [=](CPlayer* pPlayer) {return !pSkip || pSkip != pPlayer; });
     }
 
-    // Subscriber based elementdata things
+    // Subscriber based elementdata things.. Todo: Move this stuff out of here..
     void ClearElementData(CElement* pElement, const std::string& name);
     void ClearElementData(CElement* pElement);
 
