@@ -47,7 +47,7 @@ public:
     {
         return (usPlayerModel == 0 || usPlayerModel == 1 || usPlayerModel == 2 || usPlayerModel == 7 ||
             (usPlayerModel >= 9 && usPlayerModel != 208 && usPlayerModel != 149 && usPlayerModel != 119 && usPlayerModel != 86 && usPlayerModel != 74 &&
-            usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
+                usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
             (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
     }
 
@@ -120,47 +120,43 @@ private:
     // Eg.: It takes in a `CPlayer*` as its first (and only) argument
     // And only if it (the predicate) returns true, the packet is sent to the player.
     template<class Predicate_t>
-    static void DoBroadcastIf(const CPacket& Packet, const CSendList& playersByBitStreamVer, Predicate_t predicate)
+    static void DoBroadcastIf(const CPacket& Packet, const CSendList& sendList, Predicate_t predicate)
     {
         if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
             return;
 
-        // Use the flags to determine how to send it
         const auto reliability = Packet.GetNetServerReliability();
         const auto priority = Packet.GetNetServerPriority();
 
-        // For each bitstream version, make and send a packet
-        for (auto&& [bsver, players] : playersByBitStreamVer)
+        for (const auto& [bsver, players] : sendList)
         {
-            // Allocate a bitstream
-            NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream(bsver);
+            auto iter = std::find_if(players.begin(), players.end(), predicate);
+            if (iter == players.end())
+                continue; // No player in the group for which pred returns true
 
+            NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream(bsver);
             if (Packet.Write(*pBitStream))
             {
                 extern CGame* g_pGame;
+
                 g_pGame->SendPacketBatchBegin(Packet.GetPacketID(), pBitStream);
 
-                for (CPlayer* pPlayer : players)
-                {
-                    if (!predicate(pPlayer))
-                        continue;
-
-                    dassert(bsver == pPlayer->GetBitStreamVersion());
-                    g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, priority, reliability, Packet.GetPacketOrdering());
+                // Now, iterate thru all players for which predicate is true
+                for (; iter != players.end(); iter = std::find_if(iter, players.end(), predicate)) {
+                    dassert(bsver == (*iter)->GetBitStreamVersion());
+                    g_pGame->SendPacket(Packet.GetPacketID(), (*iter)->GetSocket(), pBitStream, FALSE, priority, reliability, Packet.GetPacketOrdering());
                 }
 
                 g_pGame->SendPacketBatchEnd();
             }
-
-            // Destroy the bitstream
             g_pNetServer->DeallocateNetServerBitStream(pBitStream);
         }
-    } 
+    }
 
     // Wrapper around the above function so it can be called without a predicate
-    static void DoBroadcast(const CPacket& Packet, const CSendList& playersByBitStreamVer)
+    static void DoBroadcast(const CPacket& Packet, const CSendList& sendList)
     {
-        DoBroadcastIf(Packet, playersByBitStreamVer,
+        DoBroadcastIf(Packet, sendList,
             [](CPlayer*) { return true; }); // Placeholder lambda
     }
 
