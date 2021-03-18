@@ -266,7 +266,7 @@ public:
     bool AreLightsOn();
 
     void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent);
-    void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
+    void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true, bool spawnFlyingComponent = false);
     void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
     void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);
     bool GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");

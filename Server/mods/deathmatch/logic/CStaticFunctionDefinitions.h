@@ -302,7 +302,7 @@ public:
     static bool AddAllVehicleUpgrades(CElement* pElement);
     static bool RemoveVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
-    static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
+    static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1, bool spawnFlyingComponent = false);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);

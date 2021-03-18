@@ -865,7 +865,7 @@ void CClientVehicle::Fix()
     for (int i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
     for (int i = 0; i < MAX_WHEELS; i++)
-        SetWheelStatus(i, 0);
+        SetWheelStatus(i, 0, false);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
     struct
@@ -1563,7 +1563,7 @@ void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus,
     }
 }
 
-void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent)
+void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent, bool spawnFlyingComponent)
 {
     if (ucWheel < MAX_WHEELS)
     {
@@ -1581,7 +1581,28 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
             // Do we have a damage model?
             if (HasDamageModel())
             {
-                m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
+                m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus, spawnFlyingComponent);
+
+                if (spawnFlyingComponent && ucStatus == DT_WHEEL_MISSING)
+                {
+                    switch (ucWheel)
+                    {
+                        case FRONT_LEFT_WHEEL:
+                            m_pVehicle->SpawnFlyingComponent(5, 1);
+                            break;
+                        case REAR_LEFT_WHEEL:
+                            m_pVehicle->SpawnFlyingComponent(7, 1);
+                            break;
+                        case FRONT_RIGHT_WHEEL:
+                            m_pVehicle->SpawnFlyingComponent(2, 1);
+                            break;
+                        case REAR_RIGHT_WHEEL:
+                            m_pVehicle->SpawnFlyingComponent(4, 1);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 // Update the wheel's visibility
                 m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));

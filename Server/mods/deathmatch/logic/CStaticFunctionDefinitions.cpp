@@ -6545,10 +6545,10 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight)
+bool CStaticFunctionDefinitions::SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight, bool spawnFlyingComponent)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleWheelStates(*iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight))
+    RUN_CHILDREN(SetVehicleWheelStates(*iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight, spawnFlyingComponent))
 
     unsigned char a = -1;
     if (a == (unsigned char)-1)
@@ -6577,6 +6577,7 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates(CElement* pElement, int i
 
                 CBitStream BitStream;
                 BitStream.pBitStream->Write((const char*)&pVehicle->m_ucWheelStates[0], MAX_WHEELS);
+                BitStream.pBitStream->WriteBit(spawnFlyingComponent);
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream));
 
                 return true;

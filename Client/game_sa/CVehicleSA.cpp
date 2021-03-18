@@ -2642,10 +2642,10 @@ void CVehicleSA::UpdateLandingGearPosition()
             fGearPosition = 0.0f;
 
             // Remove Wheels
-            m_pDamageManager->SetWheelStatus(FRONT_LEFT_WHEEL, 0);
-            m_pDamageManager->SetWheelStatus(FRONT_RIGHT_WHEEL, 0);
-            m_pDamageManager->SetWheelStatus(REAR_LEFT_WHEEL, 0);
-            m_pDamageManager->SetWheelStatus(REAR_RIGHT_WHEEL, 0);
+            m_pDamageManager->SetWheelStatus(FRONT_LEFT_WHEEL, 0, false);
+            m_pDamageManager->SetWheelStatus(FRONT_RIGHT_WHEEL, 0, false);
+            m_pDamageManager->SetWheelStatus(REAR_LEFT_WHEEL, 0, false);
+            m_pDamageManager->SetWheelStatus(REAR_RIGHT_WHEEL, 0, false);
 
             // Update Air Resistance
             float fDragCoeff = GetHandlingData()->GetDragCoeff();
@@ -2664,10 +2664,10 @@ void CVehicleSA::UpdateLandingGearPosition()
             // C++ Representaion of CPlane::SetLandingGearDown (006CAC20)
 
             // Recreate Wheels
-            m_pDamageManager->SetWheelStatus(FRONT_LEFT_WHEEL, 2);
-            m_pDamageManager->SetWheelStatus(FRONT_RIGHT_WHEEL, 2);
-            m_pDamageManager->SetWheelStatus(REAR_LEFT_WHEEL, 2);
-            m_pDamageManager->SetWheelStatus(REAR_RIGHT_WHEEL, 2);
+            m_pDamageManager->SetWheelStatus(FRONT_LEFT_WHEEL, 2, false);
+            m_pDamageManager->SetWheelStatus(FRONT_RIGHT_WHEEL, 2, false);
+            m_pDamageManager->SetWheelStatus(REAR_LEFT_WHEEL, 2, false);
+            m_pDamageManager->SetWheelStatus(REAR_RIGHT_WHEEL, 2, false);
 
             // Update Air Resistance
             float fDragCoeff = GetHandlingData()->GetDragCoeff();

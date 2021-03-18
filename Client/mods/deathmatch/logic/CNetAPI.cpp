@@ -2218,7 +2218,7 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 
     if (damage.data.bSyncWheels)
         for (unsigned int i = 0; i < MAX_WHEELS; ++i)
-            pVehicle->SetWheelStatus(i, damage.data.wheels.data.ucStates[i]);
+            pVehicle->SetWheelStatus(i, damage.data.wheels.data.ucStates[i], false);
 
     if (damage.data.bSyncPanels)
         for (unsigned int i = 0; i < MAX_PANELS; ++i)

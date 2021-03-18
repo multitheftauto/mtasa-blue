@@ -91,7 +91,7 @@ BYTE CDamageManagerSA::GetWheelStatus(eWheelPosition bWheel)
     return NULL;
 }
 
-VOID CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
+VOID CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus, bool spawnFlyingComponent)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetWheelStatus ( eWheelPosition bWheel, BYTE bTireStatus )");
     if (bWheel < MAX_WHEELS)

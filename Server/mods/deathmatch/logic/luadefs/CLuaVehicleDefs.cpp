@@ -2051,6 +2051,7 @@ int CLuaVehicleDefs::SetVehicleWheelStates(lua_State* luaVM)
     int       iRearLeft;
     int       iFrontRight;
     int       iRearRight;
+    bool      spawnFlyingComponent;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -2061,7 +2062,7 @@ int CLuaVehicleDefs::SetVehicleWheelStates(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleWheelStates(pElement, iFrontLeft, iRearLeft, iFrontRight, iRearRight))
+        if (CStaticFunctionDefinitions::SetVehicleWheelStates(pElement, iFrontLeft, iRearLeft, iFrontRight, iRearRight, spawnFlyingComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2105,6 +2106,7 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
     CElement*     pElement;
     unsigned char ucPanel;
     unsigned char ucState;
+    bool          spawnFlyingComponent;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

@@ -3042,9 +3042,9 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight)
+bool CStaticFunctionDefinitions::SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight, bool spawnFlyingComponent)
 {
-    RUN_CHILDREN(SetVehicleWheelStates(**iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight))
+    RUN_CHILDREN(SetVehicleWheelStates(**iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight, spawnFlyingComponent))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -3069,10 +3069,10 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates(CClientEntity& Entity, in
         // If atleast 1 wheel state is different
         if (ucNewFrontLeft != ucFrontLeft || ucNewRearLeft != ucRearLeft || ucNewFrontRight != ucFrontRight || ucNewRearRight != ucRearRight)
         {
-            Vehicle.SetWheelStatus(FRONT_LEFT_WHEEL, ucNewFrontLeft, false);
-            Vehicle.SetWheelStatus(REAR_LEFT_WHEEL, ucNewRearLeft, false);
-            Vehicle.SetWheelStatus(FRONT_RIGHT_WHEEL, ucNewFrontRight, false);
-            Vehicle.SetWheelStatus(REAR_RIGHT_WHEEL, ucNewRearRight, false);
+            Vehicle.SetWheelStatus(FRONT_LEFT_WHEEL, ucNewFrontLeft, false, spawnFlyingComponent);
+            Vehicle.SetWheelStatus(REAR_LEFT_WHEEL, ucNewRearLeft, false, spawnFlyingComponent);
+            Vehicle.SetWheelStatus(FRONT_RIGHT_WHEEL, ucNewFrontRight, false, spawnFlyingComponent);
+            Vehicle.SetWheelStatus(REAR_RIGHT_WHEEL, ucNewRearRight, false, spawnFlyingComponent);
 
             return true;
         }

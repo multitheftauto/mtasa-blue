@@ -57,7 +57,7 @@ public:
     BYTE          GetDoorStatus(eDoors bDoor);
     VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
     BYTE          GetWheelStatus(eWheelPosition bWheel);
-    VOID          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
+    VOID          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus, bool spawnFlyingComponent);
     BYTE          GetPanelStatus(BYTE bPanel);
     unsigned long GetPanelStatus();
     VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);

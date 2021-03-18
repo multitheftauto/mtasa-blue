@@ -1894,16 +1894,18 @@ int CLuaVehicleDefs::SetVehicleWheelStates(lua_State* luaVM)
     CClientEntity*   pEntity = NULL;
     int              iFrontLeft = -1;
     int              iRearLeft = -1, iFrontRight = -1, iRearRight = -1;
+    bool             spawnFlyingComponent = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(iFrontLeft);
     argStream.ReadNumber(iRearLeft, -1);
     argStream.ReadNumber(iFrontRight, -1);
     argStream.ReadNumber(iRearRight, -1);
+    argStream.ReadBool(spawnFlyingComponent, false);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleWheelStates(*pEntity, iFrontLeft, iRearLeft, iFrontRight, iRearRight))
+        if (CStaticFunctionDefinitions::SetVehicleWheelStates(*pEntity, iFrontLeft, iRearLeft, iFrontRight, iRearRight, spawnFlyingComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;
