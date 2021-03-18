@@ -138,7 +138,7 @@ public:
     static bool SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel);
     static bool SetPlayerWantedLevel(CElement* pElement, unsigned int iLevel);
     static bool ForcePlayerMap(CElement* pElement, bool bVisible);
-    static bool SetPlayerNametagText(CElement* pElement, const char* szText);
+    static bool SetPlayerNametagText(CElement* pElement, const std::string& szText);
     static bool SetPlayerNametagColor(CElement* pElement, bool bRemoveOverride, unsigned char ucR, unsigned char ucG, unsigned char ucB);
     static bool SetPlayerNametagShowing(CElement* pElement, bool bShowing);
     static bool SpawnPlayer(CPlayer* pPlayer, const CVector& vecPosition, float fRotation, unsigned long ulModel, unsigned char ucInterior,

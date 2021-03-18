@@ -275,7 +275,7 @@ void ReadCameraOrientation(const CVector& vecBasePosition, NetBitStreamInterface
 
 // Validation funcs
 bool IsNickValid(const char* szNick);
-bool IsNametagValid(const char* szNick);
+bool IsNametagValid(const std::string& szNick);
 
 // Network funcs
 SString LongToDottedIP(unsigned long ulIP);

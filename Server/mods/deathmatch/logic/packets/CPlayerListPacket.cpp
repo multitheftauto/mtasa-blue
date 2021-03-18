@@ -131,20 +131,20 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(pPlayer->IsFrozen());
 
         // Nametag stuff
-        unsigned char ucNametagTextLength = 0;
-        char*         szNametagText = pPlayer->GetNametagText();
-        if (szNametagText)
-            ucNametagTextLength = static_cast<unsigned char>(strlen(szNametagText));
+        unsigned char    ucNametagTextLength = 0u;
+        std::string_view nametagText = pPlayer->GetNametagText();
+
+        ucNametagTextLength = (unsigned char)nametagText.length();
 
         if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
         {
             // Old client version has a fixed buffer of 22 characters
-            ucNametagTextLength = std::min<uchar>(ucNametagTextLength, 22);
+            ucNametagTextLength = std::min<unsigned char>(ucNametagTextLength, 22u);
         }
 
         BitStream.Write(ucNametagTextLength);
-        if (ucNametagTextLength > 0)
-            BitStream.Write(szNametagText, ucNametagTextLength);
+        if (ucNametagTextLength)
+            BitStream.Write(nametagText.data(), ucNametagTextLength);
 
         // Write nametag color if it's overridden
         if (pPlayer->IsNametagColorOverridden())

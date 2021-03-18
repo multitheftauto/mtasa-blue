@@ -178,7 +178,7 @@ void CPlayer::DoPulse()
 
 void CPlayer::SetNick(const char* szNick)
 {
-    m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
+    m_nick = szNick;
 }
 
 // Ignore min client version checks if is a custom build and both player and server have build number of 0
@@ -530,13 +530,6 @@ void CPlayer::Reset()
 
     m_bNametagShowing = true;
     m_usModel = 0;
-}
-
-void CPlayer::SetNametagText(const char* szText)
-{
-    m_nametagText.Clear();
-    if (szText)
-        m_nametagText = szText;
 }
 
 void CPlayer::GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB)

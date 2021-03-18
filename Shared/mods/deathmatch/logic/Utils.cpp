@@ -924,28 +924,17 @@ void ReadCameraOrientation(const CVector& vecBasePosition, NetBitStreamInterface
         vecOutCamPosition = vecBasePosition - vecUsePosition;
 }
 
-bool IsNametagValid(const char* szNick)
+bool IsNametagValid(const std::string& nick)
 {
     // Grab the size of the nick. Check that it's not to long or short
-    size_t sizeNick = MbUTF8ToUTF16(szNick).size();
+    size_t sizeNick = MbUTF8ToUTF16(nick).size();
     if (sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH)
     {
         return false;
     }
 
     // Check that each character is valid (visible characters exluding space)
-    unsigned char ucTemp;
-    for (size_t i = 0; i < sizeNick; i++)
-    {
-        ucTemp = szNick[i];
-        if (ucTemp < 32)
-        {
-            return false;
-        }
-    }
-
-    // nametag is valid, return true
-    return true;
+    return std::find_if(nick.begin(), nick.end(), [](char c) { return c < 32; }) == nick.end();
 }
 
 bool IsNickValid(const char* szNick)

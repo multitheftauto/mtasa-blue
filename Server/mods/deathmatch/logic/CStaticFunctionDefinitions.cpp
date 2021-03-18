@@ -2875,13 +2875,15 @@ bool CStaticFunctionDefinitions::GetPlayerNametagText(CPlayer* pPlayer, SString&
 {
     assert(pPlayer);
 
-    const char* szNametagText = pPlayer->GetNametagText();
-    if (szNametagText == NULL)
-        szNametagText = pPlayer->GetNick();
+    // Try actual nametag first..
+    if (std::string_view text = pPlayer->GetNametagText(); !text.empty()) {
+        strOutText.assign(text);
+        return true;
+    }
 
-    if (szNametagText)
-    {
-        strOutText = szNametagText;
+    // Nametag empty, use nickname
+    if (std::string_view text = pPlayer->GetNick(); !text.empty()) {
+        strOutText.assign(text);
         return true;
     }
 
@@ -3187,34 +3189,30 @@ bool CStaticFunctionDefinitions::ForcePlayerMap(CElement* pElement, bool bVisibl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPlayerNametagText(CElement* pElement, const char* szText)
+bool CStaticFunctionDefinitions::SetPlayerNametagText(CElement* pElement, const std::string& text)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPlayerNametagText(*iter, szText))
+    RUN_CHILDREN(SetPlayerNametagText(*iter, text))
 
     if (IS_PLAYER(pElement))
     {
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        char*    szNametagText = pPlayer->GetNametagText();
-        if ((szText && (szNametagText == NULL || strcmp(szNametagText, szText))) || (szText == NULL && szNametagText))
-        {
-            if (szText == NULL || IsNametagValid(szText))
-            {
-                pPlayer->SetNametagText(szText);
+        auto pPlayer = static_cast<CPlayer*>(pElement);
+        auto nametagText = pPlayer->GetNametagText();
 
-                unsigned short usTextLength = 0;
-                if (szText)
-                    usTextLength = static_cast<unsigned short>(strlen(szText));
+        if (text == nametagText)
+            return false;
 
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(usTextLength);
-                if (usTextLength > 0)
-                    BitStream.pBitStream->Write(szText, usTextLength);
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPlayer, SET_PLAYER_NAMETAG_TEXT, *BitStream.pBitStream));
+        if (!text.empty() && !IsNametagValid(text))
+            return false;
 
-                return true;
-            }
-        }
+        pPlayer->SetNametagText(text);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write((unsigned short)text.length());
+        BitStream.pBitStream->WriteStringCharacters(text, text.length());
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPlayer, SET_PLAYER_NAMETAG_TEXT, *BitStream.pBitStream));
+
+        return true;
     }
 
     return false;

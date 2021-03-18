@@ -85,7 +85,7 @@ public:
     int                GetClientType() { return CClient::CLIENT_PLAYER; };
     unsigned long long GetTimeSinceConnected() { return m_ConnectedTimer.Get(); }
 
-    const char* GetNick() { return m_strNick; };
+    const char* GetNick() { return m_nick; };
     void        SetNick(const char* szNick);
 
     int                GetGameVersion() { return m_iGameVersion; };
@@ -203,8 +203,8 @@ public:
     bool IsCursorShowing() { return m_bCursorShowing; }
     void SetCursorShowing(bool bCursorShowing) { m_bCursorShowing = bCursorShowing; }
 
-    char* GetNametagText() { return m_nametagText; }
-    void  SetNametagText(const char* szText);
+    std::string_view GetNametagText() { return m_nametagText; }
+    void  SetNametagText(std::string_view text) { m_nametagText = text; }
     void  GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     void  SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB);
     void  RemoveNametagOverrideColor();
@@ -353,7 +353,7 @@ private:
 
     CPlayerTextManager* m_pPlayerTextManager;
 
-    SString        m_strNick;
+    SFixedString<MAX_PLAYER_NICK_LENGTH> m_nick;
     bool           m_bDoNotSendEntities;
     int            m_iGameVersion;
     unsigned short m_usMTAVersion;
