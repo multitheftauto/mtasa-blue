@@ -73,7 +73,14 @@ bool CGUIStaticImage_Impl::LoadFromFile(const char* szFilename, const char* szRe
     else
     {
         // Define a new image in the ImageManager
-        m_pImagesetManager->addFromImageFile(szFilename, szFilename, szResourceGroup);
+        try
+        {
+            m_pImagesetManager->addFromImageFile(szFilename, szFilename, szResourceGroup);
+        }
+        catch (CEGUI::Exception e)
+        {
+            printf("why?");
+        }
 
         // Failed to create image
         if (!m_pImagesetManager->isDefined(szFilename))
