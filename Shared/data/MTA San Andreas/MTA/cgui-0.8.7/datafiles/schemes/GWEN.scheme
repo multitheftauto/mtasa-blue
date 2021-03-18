@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GUIScheme Name="GWEN">
+  <Imageset Filename="GWEN.imageset" />
+  <Font Filename="OpenSans-8.font" />
+  <LookNFeel Filename="GWEN.looknfeel" />
+  <WindowRendererSet Filename="CEGUIFalagardWRBase" />
+  <FalagardMapping WindowType="GWEN/Button" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="GWEN/Button" />
+  <FalagardMapping WindowType="GWEN/RadioButton" TargetType="CEGUI/RadioButton" Renderer="Falagard/ToggleButton" LookNFeel="GWEN/RadioButton" />
+  <FalagardMapping WindowType="GWEN/Checkbox" TargetType="CEGUI/Checkbox" Renderer="Falagard/ToggleButton" LookNFeel="GWEN/Checkbox" />
+  <FalagardMapping WindowType="GWEN/Editbox" TargetType="CEGUI/Editbox" Renderer="Falagard/Editbox" LookNFeel="GWEN/Editbox" />
+  <FalagardMapping WindowType="GWEN/Titlebar" TargetType="CEGUI/Titlebar" Renderer="Falagard/Titlebar" LookNFeel="GWEN/Titlebar" />
+  <FalagardMapping WindowType="GWEN/ImageButton" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="GWEN/ImageButton" />
+  <FalagardMapping WindowType="GWEN/FrameWindow" TargetType="CEGUI/FrameWindow" Renderer="Falagard/FrameWindow" LookNFeel="GWEN/FrameWindow" />
+  <FalagardMapping WindowType="GWEN/GroupBox" TargetType="CEGUI/GroupBox" Renderer="Falagard/Default" LookNFeel="GWEN/GroupBox" />
+  <FalagardMapping WindowType="GWEN/ProgressBar" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="GWEN/ProgressBar" />
+  <FalagardMapping WindowType="GWEN/VUMeter" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="GWEN/VUMeter" />
+  <FalagardMapping WindowType="GWEN/SliderThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="GWEN/SliderThumb" />
+  <FalagardMapping WindowType="GWEN/HorizontalSliderThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="GWEN/HorizontalSliderThumb" />
+  <FalagardMapping WindowType="GWEN/Slider" TargetType="CEGUI/Slider" Renderer="Falagard/Slider" LookNFeel="GWEN/Slider" />
+  <FalagardMapping WindowType="GWEN/HorizontalSlider" TargetType="CEGUI/Slider" Renderer="Falagard/Slider" LookNFeel="GWEN/HorizontalSlider" />
+  <FalagardMapping WindowType="GWEN/HorizontalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="GWEN/HorizontalScrollbarThumb" />
+  <FalagardMapping WindowType="GWEN/HorizontalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="GWEN/HorizontalScrollbar" />
+  <FalagardMapping WindowType="GWEN/VerticalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="GWEN/VerticalScrollbarThumb" />
+  <FalagardMapping WindowType="GWEN/VerticalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="GWEN/VerticalScrollbar" />
+  <FalagardMapping WindowType="GWEN/Listbox" TargetType="CEGUI/Listbox" Renderer="Falagard/Listbox" LookNFeel="GWEN/Listbox" />
+  <FalagardMapping WindowType="GWEN/ListboxItem" TargetType="CEGUI/ItemEntry" Renderer="Falagard/ItemEntry" LookNFeel="GWEN/ListboxItem" />
+  <FalagardMapping WindowType="GWEN/ComboDropList" TargetType="CEGUI/ComboDropList" Renderer="Falagard/Listbox" LookNFeel="GWEN/ComboDropList" />
+  <FalagardMapping WindowType="GWEN/ComboEditbox" TargetType="CEGUI/Editbox" Renderer="Falagard/Editbox" LookNFeel="GWEN/ComboEditbox" />
+  <FalagardMapping WindowType="GWEN/Combobox" TargetType="CEGUI/Combobox" Renderer="Falagard/Default" LookNFeel="GWEN/Combobox" />
+  <FalagardMapping WindowType="GWEN/Spinner" TargetType="CEGUI/Spinner" Renderer="Falagard/Default" LookNFeel="GWEN/Spinner" />
+  <FalagardMapping WindowType="GWEN/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="GWEN/StaticImage" />
+  <FalagardMapping WindowType="GWEN/StaticText" TargetType="DefaultWindow" Renderer="Falagard/StaticText" LookNFeel="GWEN/StaticText" />
+  <FalagardMapping WindowType="GWEN/ListHeaderSegment" TargetType="CEGUI/ListHeaderSegment" Renderer="Falagard/ListHeaderSegment" LookNFeel="GWEN/ListHeaderSegment" />
+  <FalagardMapping WindowType="GWEN/ListHeader" TargetType="CEGUI/ListHeader" Renderer="Falagard/ListHeader" LookNFeel="GWEN/ListHeader" />
+  <FalagardMapping WindowType="GWEN/MultiColumnList" TargetType="CEGUI/MultiColumnList" Renderer="Falagard/MultiColumnList" LookNFeel="GWEN/MultiColumnList" />
+  <FalagardMapping WindowType="GWEN/MultiLineEditbox" TargetType="CEGUI/MultiLineEditbox" Renderer="Falagard/MultiLineEditbox" LookNFeel="GWEN/MultiLineEditbox" />
+  <FalagardMapping WindowType="GWEN/SystemButton" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="GWEN/Button" />
+  <FalagardMapping WindowType="GWEN/Tooltip" TargetType="CEGUI/Tooltip" Renderer="Falagard/Tooltip" LookNFeel="GWEN/Tooltip" />
+  <FalagardMapping WindowType="GWEN/ScrollablePane" TargetType="CEGUI/ScrollablePane" Renderer="Falagard/ScrollablePane" LookNFeel="GWEN/ScrollablePane" />
+  <FalagardMapping WindowType="GWEN/TabButton" TargetType="CEGUI/TabButton" Renderer="Falagard/TabButton" LookNFeel="GWEN/TabButton" />
+  <FalagardMapping WindowType="GWEN/TabContentPane" TargetType="DefaultWindow" Renderer="Falagard/Default" LookNFeel="GWEN/TabContentPane" />
+  <FalagardMapping WindowType="GWEN/TabButtonPane" TargetType="DefaultWindow" Renderer="Falagard/Default" LookNFeel="GWEN/TabButtonPane" />
+  <FalagardMapping WindowType="GWEN/TabControl" TargetType="CEGUI/TabControl" Renderer="Falagard/TabControl" LookNFeel="GWEN/TabControl" />
+  <FalagardMapping WindowType="GWEN/MenuItem" TargetType="CEGUI/MenuItem" Renderer="Falagard/MenuItem" LookNFeel="GWEN/MenuItem" />
+  <FalagardMapping WindowType="GWEN/Menubar" TargetType="CEGUI/Menubar" Renderer="Falagard/Menubar" LookNFeel="GWEN/Menubar" />
+  <FalagardMapping WindowType="GWEN/PopupMenu" TargetType="CEGUI/PopupMenu" Renderer="Falagard/PopupMenu" LookNFeel="GWEN/PopupMenu" />
+  <FalagardMapping WindowType="GWEN/ItemListbox" TargetType="CEGUI/ItemListbox" Renderer="Falagard/ItemListbox" LookNFeel="GWEN/ItemListbox" />
+  <FalagardMapping WindowType="GWEN/Tree" TargetType="CEGUI/Tree" Renderer="Falagard/Tree" LookNFeel="GWEN/Tree" />
+</GUIScheme>
