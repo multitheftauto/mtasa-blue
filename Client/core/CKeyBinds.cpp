@@ -928,7 +928,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
     if (szCompArguments)
         szCompArguments = SharedUtil::Trim(szCompArguments);
 
-    CKeyBind* pResult = nullptr;
+    CCommandBind*                   pResult = nullptr;
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
     {
