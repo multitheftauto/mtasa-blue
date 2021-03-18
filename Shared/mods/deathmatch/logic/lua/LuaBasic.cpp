@@ -30,6 +30,18 @@ namespace lua
     }
 
     template <>
+    long PopPrimitive<long>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<long>(lua_tonumber(L, index++));
+    }
+
+    template <>
+    unsigned long PopPrimitive<unsigned long>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<unsigned long>(lua_tonumber(L, index++));
+    }
+
+    template <>
     int PopPrimitive<int>(lua_State* L, std::size_t& index)
     {
         return static_cast<int>(lua_tonumber(L, index++));
@@ -66,15 +78,15 @@ namespace lua
     }
 
     template <>
-    int64_t PopPrimitive<int64_t>(lua_State* L, std::size_t& index)
+    long long PopPrimitive<long long>(lua_State* L, std::size_t& index)
     {
-        return static_cast<int64_t>(lua_tonumber(L, index++));
+        return static_cast<long long>(lua_tonumber(L, index++));
     }
 
     template <>
-    uint64_t PopPrimitive<uint64_t>(lua_State* L, std::size_t& index)
+    unsigned long long PopPrimitive<unsigned long long>(lua_State* L, std::size_t& index)
     {
-        return static_cast<uint64_t>(lua_tonumber(L, index++));
+        return static_cast<unsigned long long>(lua_tonumber(L, index++));
     }
 
     template <>

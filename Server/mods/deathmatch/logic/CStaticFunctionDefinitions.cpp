@@ -1405,7 +1405,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         // Loop all seats of the vehicle
         for (unsigned int i = 0; i < MAX_VEHICLE_SEATS; i++)
         {
-            pOccupant = GetVehicleOccupant(pVehicle, i);
+            pOccupant = pVehicle->GetOccupant(i);
             if (pOccupant)
                 // If the seat is occupied, set the occupants dimension
                 SetElementDimension(pOccupant, usDimension);
@@ -4898,228 +4898,6 @@ bool CStaticFunctionDefinitions::SetVehicleSirens(CVehicle* pVehicle, unsigned c
     return false;
 }
 
-bool CStaticFunctionDefinitions::RemoveVehicleSirens(CVehicle* pVehicle)
-{
-    assert(pVehicle);
-
-    pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
-    pVehicle->RemoveVehicleSirens();
-
-    CBitStream BitStream;
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, REMOVE_VEHICLE_SIRENS, *BitStream.pBitStream));
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleVariant(CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2)
-{
-    assert(pVehicle);
-    ucVariant = pVehicle->GetVariant();
-    ucVariant2 = pVehicle->GetVariant2();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleColor(CVehicle* pVehicle, CVehicleColor& color)
-{
-    assert(pVehicle);
-    color = pVehicle->GetColor();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, unsigned short& usID)
-{
-    assert(szName);
-
-    unsigned long ulID = CVehicleNames::GetVehicleModel(szName);
-    if (ulID != 0)
-    {
-        usID = static_cast<unsigned short>(ulID);
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleMaxPassengers(CVehicle* pVehicle, unsigned char& ucMaxPassengers)
-{
-    assert(pVehicle);
-
-    ucMaxPassengers = pVehicle->GetMaxPassengers();
-    return ucMaxPassengers != 255;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleName(CVehicle* pVehicle, SString& strOutName)
-{
-    assert(pVehicle);
-
-    strOutName = CVehicleNames::GetVehicleName(pVehicle->GetModel());
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
-{
-    strOutName = CVehicleNames::GetVehicleName(usModel);
-    return !strOutName.empty();
-}
-
-CPed* CStaticFunctionDefinitions::GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat)
-{
-    assert(pVehicle);
-    return pVehicle->GetOccupant(uiSeat);
-}
-
-CPed* CStaticFunctionDefinitions::GetVehicleController(CVehicle* pVehicle)
-{
-    assert(pVehicle);
-    return pVehicle->GetController();
-}
-
-bool CStaticFunctionDefinitions::GetVehicleRotation(CVehicle* pVehicle, CVector& vecRotation)
-{
-    assert(pVehicle);
-
-    pVehicle->GetRotationDegrees(vecRotation);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleTurnVelocity(CVehicle* pVehicle, CVector& vecTurnVelocity)
-{
-    assert(pVehicle);
-
-    vecTurnVelocity = pVehicle->GetTurnSpeed();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleTurretPosition(CVehicle* pVehicle, CVector2D& vecPosition)
-{
-    assert(pVehicle);
-
-    vecPosition.fX = pVehicle->GetTurretPositionX();
-    vecPosition.fY = pVehicle->GetTurretPositionY();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsVehicleLocked(CVehicle* pVehicle, bool& bLocked)
-{
-    assert(pVehicle);
-
-    bLocked = pVehicle->IsLocked();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleUpgradeOnSlot(CVehicle* pVehicle, unsigned char ucSlot, unsigned short& usUpgrade)
-{
-    assert(pVehicle);
-
-    CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
-    if (pUpgrades)
-    {
-        usUpgrade = pUpgrades->GetSlotState(ucSlot);
-
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned char ucSlot, SString& strOutName)
-{
-    strOutName = CVehicleUpgrades::GetSlotName(ucSlot);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned short usUpgrade, SString& strOutName)
-{
-    unsigned char ucSlot;
-    if (CVehicleUpgrades::GetSlotFromUpgrade(usUpgrade, ucSlot))
-    {
-        strOutName = CVehicleUpgrades::GetSlotName(ucSlot);
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleDoorState(CVehicle* pVehicle, unsigned char ucDoor, unsigned char& ucState)
-{
-    assert(pVehicle);
-
-    if (ucDoor < MAX_DOORS)
-    {
-        ucState = pVehicle->m_ucDoorStates[ucDoor];
-
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleWheelStates(CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucRearLeft, unsigned char& ucFrontRight,
-                                                       unsigned char& ucRearRight)
-{
-    assert(pVehicle);
-
-    ucFrontLeft = pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL];
-    ucRearLeft = pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL];
-    ucFrontRight = pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL];
-    ucRearRight = pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL];
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleLightState(CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState)
-{
-    assert(pVehicle);
-
-    if (ucLight < 4)
-    {
-        ucState = pVehicle->m_ucLightStates[ucLight];
-
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehiclePanelState(CVehicle* pVehicle, unsigned char ucPanel, unsigned char& ucState)
-{
-    assert(pVehicle);
-
-    if (ucPanel < 7)
-    {
-        ucState = pVehicle->m_ucPanelStates[ucPanel];
-
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleOverrideLights(CVehicle* pVehicle, unsigned char& ucLights)
-{
-    assert(pVehicle);
-
-    ucLights = pVehicle->GetOverrideLights();
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehiclePaintjob(CVehicle* pVehicle, unsigned char& ucPaintjob)
-{
-    assert(pVehicle);
-
-    ucPaintjob = pVehicle->GetPaintjob();
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehiclePlateText(CVehicle* pVehicle, char* szPlateText)
-{
-    assert(pVehicle);
-
-    const char* szRegPlate = pVehicle->GetRegPlate();
-    STRNCPY(szPlateText, szRegPlate, 9);
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetVehiclePlateText(CElement* pElement, const SString& strPlateText)
 {
     assert(pElement);
@@ -5138,107 +4916,6 @@ bool CStaticFunctionDefinitions::SetVehiclePlateText(CElement* pElement, const S
     }
 
     return false;
-}
-
-bool CStaticFunctionDefinitions::IsVehicleDamageProof(CVehicle* pVehicle, bool& bDamageProof)
-{
-    assert(pVehicle);
-
-    bDamageProof = pVehicle->IsDamageProof();
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsVehicleFuelTankExplodable(CVehicle* pVehicle, bool& bExplodable)
-{
-    assert(pVehicle);
-
-    bExplodable = pVehicle->IsFuelTankExplodable();
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsVehicleFrozen(CVehicle* pVehicle, bool& bFrozen)
-{
-    assert(pVehicle);
-
-    bFrozen = pVehicle->IsFrozen();
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsVehicleOnGround(CVehicle* pVehicle, bool& bOnGround)
-{
-    assert(pVehicle);
-
-    bOnGround = pVehicle->IsOnGround();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleEngineState(CVehicle* pVehicle, bool& bState)
-{
-    assert(pVehicle);
-
-    bState = pVehicle->IsEngineOn();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsTrainDerailed(CVehicle* pVehicle, bool& bDerailed)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-
-    bDerailed = pVehicle->IsDerailed();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-
-    bDerailable = pVehicle->IsDerailable();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainDirection(CVehicle* pVehicle, bool& bDirection)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-
-    bDirection = pVehicle->GetTrainDirection();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainSpeed(CVehicle* pVehicle, float& fSpeed)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-
-    const CVector& vecVelocity = pVehicle->GetVelocity();
-    fSpeed = vecVelocity.Length();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainPosition(CVehicle* pVehicle, float& fPosition)
-{
-    assert(pVehicle);
-
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
-        return false;
-    else if (pVehicle->IsDerailed())
-        return false;
-
-    fPosition = pVehicle->GetTrainPosition();
-    return true;
 }
 
 bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
@@ -5298,24 +4975,6 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
     BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
     return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor)
-{
-    assert(pVehicle);
-
-    outColor = pVehicle->GetHeadLightColor();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio)
-{
-    if (ucDoor <= 5 && pVehicle != NULL)
-    {
-        fRatio = pVehicle->GetDoorOpenRatio(ucDoor);
-        return true;
-    }
-    return false;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue)
@@ -6309,7 +5968,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorsUndamageable(CElement* pElement,
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRotation(CElement* pElement, const CVector& vecRotation)
+bool CStaticFunctionDefinitions::SetVehicleRotation(CElement* pElement, CVector vecRotation)
 {
     assert(pElement);
     RUN_CHILDREN(SetVehicleRotation(*iter, vecRotation))
@@ -6386,7 +6045,7 @@ bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn(CElement* pElement, bool 
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
+bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CElement* pElement, CVector vecTurnVelocity)
 {
     assert(pElement);
     RUN_CHILDREN(SetVehicleTurnVelocity(*iter, vecTurnVelocity))
@@ -6545,46 +6204,50 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight)
+bool CStaticFunctionDefinitions::SetVehicleWheelStates(CElement* pElement, std::optional<uchar> fl, std::optional<uchar> rl, std::optional<uchar> fr, std::optional<uchar> rr)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleWheelStates(*iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight))
+    RUN_CHILDREN(SetVehicleWheelStates(*iter, fl, rl, fr, rr))
 
-    unsigned char a = -1;
-    if (a == (unsigned char)-1)
-        a = 2;
-    if (IS_VEHICLE(pElement))
+    if (!IS_VEHICLE(pElement))
+        return false;
+
+    CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
+    auto& states = pVehicle->m_ucWheelStates;
+
+    // Create a table of kv pairs
+    const std::pair<eWheelPosition, std::optional<uchar>> values[]{
+        {FRONT_LEFT_WHEEL, fl},
+        {REAR_LEFT_WHEEL, rl},
+        {FRONT_RIGHT_WHEEL, fr},
+        {REAR_RIGHT_WHEEL, rr}
+    };
+
+    size_t changing = 0;
+    for (const auto& [pos, val] : values)
     {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        if (val.value_or(-1) == (uchar)-1) // Is there a value? (-1 means no change)
+            continue;
 
-        if ((iFrontLeft >= -1 && iFrontLeft <= DT_WHEEL_INTACT_COLLISIONLESS) && (iRearLeft >= -1 && iRearLeft <= DT_WHEEL_INTACT_COLLISIONLESS) &&
-            (iFrontRight >= -1 && iFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS) && (iRearRight >= -1 && iRearRight <= DT_WHEEL_INTACT_COLLISIONLESS))
-        {
-            // If atleast 1 wheel state is different
-            if ((iFrontLeft != -1 && iFrontLeft != pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL]) ||
-                (iRearLeft != -1 && iRearLeft != pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL]) ||
-                (iFrontRight != -1 && iFrontRight != pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL]) ||
-                (iRearRight != -1 && iRearRight != pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL]))
-            {
-                if (iFrontLeft != -1)
-                    pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL] = iFrontLeft;
-                if (iRearLeft != -1)
-                    pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL] = iRearLeft;
-                if (iFrontRight != -1)
-                    pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL] = iFrontRight;
-                if (iRearRight != -1)
-                    pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL] = iRearRight;
+        if (val > DT_WHEEL_INTACT_COLLISIONLESS) // Valid?
+            return false;
 
-                CBitStream BitStream;
-                BitStream.pBitStream->Write((const char*)&pVehicle->m_ucWheelStates[0], MAX_WHEELS);
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream));
+        if (states[pos] == *val) // Changing?
+            continue;
 
-                return true;
-            }
-        }
+        changing++;
+        states[pos] = *val;
     }
 
-    return false;
+    if (!changing)
+        return false;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write((const char*)&pVehicle->m_ucWheelStates[0], MAX_WHEELS);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState)
@@ -6694,35 +6357,7 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, 
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation)
-{
-    assert(pElement);
-
-    if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-        vecRotation = pVehicle->GetRespawnRotationDegrees();
-
-        return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition)
-{
-    assert(pElement);
-
-    if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-        vecPosition = pVehicle->GetRespawnPosition();
-
-        return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation)
+bool CStaticFunctionDefinitions::SetVehicleRespawnRotation(CElement* pElement, CVector vecRotation)
 {
     assert(pElement);
     RUN_CHILDREN(SetVehicleRespawnRotation(*iter, vecRotation))
@@ -6738,7 +6373,7 @@ bool CStaticFunctionDefinitions::SetVehicleRespawnRotation(CElement* pElement, c
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, CVector vecPosition)
 {
     assert(pElement);
     RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition))
@@ -6835,6 +6470,9 @@ bool CStaticFunctionDefinitions::RespawnVehicle(CElement* pElement)
 
 bool CStaticFunctionDefinitions::SetVehicleOverrideLights(CElement* pElement, unsigned char ucLights)
 {
+    if (ucLights > 2)
+        return false;
+
     assert(pElement);
     RUN_CHILDREN(SetVehicleOverrideLights(*iter, ucLights))
 

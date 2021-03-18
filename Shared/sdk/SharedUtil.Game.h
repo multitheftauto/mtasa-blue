@@ -38,6 +38,16 @@ namespace SharedUtil
     public:
         CVehicleColor();
 
+        explicit CVehicleColor(SColor c1, SColor c2 = {}, SColor c3 = {}, SColor c4 = {}) : m_RGBColors{ c1, c2, c3, c4 }
+        {
+            InvalidatePaletteColors();
+        }
+
+        CVehicleColor(uchar c1, uchar c2, uchar c3, uchar c4) : m_ucPaletteColors{ c1, c2, c3, c4 }
+        {
+            InvalidateRGBColors();
+        }
+
         void SetRGBColors(SColor color1, SColor color2, SColor color3, SColor color4);
         void SetPaletteColors(uchar ucColor1, uchar ucColor2, uchar ucColor3, uchar ucColor4);
 

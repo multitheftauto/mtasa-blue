@@ -55,8 +55,6 @@ public:
     CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
     CVehicleColor         GetRandomColor(unsigned short usModel);
 
-    void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
-
     Container::size_type GetVehicleCount() { return m_List.size(); }
 
     Container&       GetVehicles() noexcept { return m_List; }

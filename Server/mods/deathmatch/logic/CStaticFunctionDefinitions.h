@@ -236,42 +236,6 @@ public:
                                    unsigned char ucVariant, unsigned char ucVariant2);
 
     // Vehicle get functions
-    static bool  GetVehicleVariant(CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
-    static bool  GetVehicleColor(CVehicle* pVehicle, CVehicleColor& color);
-    static bool  GetVehicleModelFromName(const char* szName, unsigned short& usID);
-    static bool  GetVehicleMaxPassengers(CVehicle* pVehicle, unsigned char& ucMaxPassengers);
-    static bool  GetVehicleName(CVehicle* pVehicle, SString& strOutName);
-    static bool  GetVehicleNameFromModel(unsigned short usModel, SString& strOutName);
-    static CPed* GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat);
-    static CPed* GetVehicleController(CVehicle* pVehicle);
-    static bool  GetVehicleRotation(CVehicle* pVehicle, CVector& vecRotation);
-    static bool  GetVehicleTurnVelocity(CVehicle* pVehicle, CVector& vecTurnVelocity);
-    static bool  GetVehicleTurretPosition(CVehicle* pVehicle, CVector2D& vecPosition);
-    static bool  IsVehicleLocked(CVehicle* pVehicle, bool& bLocked);
-    static bool  GetVehicleUpgradeOnSlot(CVehicle* pVehicle, unsigned char ucSlot, unsigned short& usUpgrade);
-    static bool  GetVehicleUpgradeSlotName(unsigned char ucSlot, SString& strOutName);
-    static bool  GetVehicleUpgradeSlotName(unsigned short usUpgrade, SString& strOutName);
-    static bool  GetVehicleDoorState(CVehicle* pVehicle, unsigned char ucDoor, unsigned char& ucState);
-    static bool  GetVehicleWheelStates(CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucRearLeft, unsigned char& ucFrontRight,
-                                       unsigned char& ucRearRight);
-    static bool  GetVehicleLightState(CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState);
-    static bool  GetVehiclePanelState(CVehicle* pVehicle, unsigned char ucPanel, unsigned char& ucState);
-    static bool  GetVehicleOverrideLights(CVehicle* pVehicle, unsigned char& ucLights);
-    static bool  GetVehiclePaintjob(CVehicle* pVehicle, unsigned char& ucPaintjob);
-    static bool  GetVehiclePlateText(CVehicle* pVehicle, char* szPlateText);
-    static bool  IsVehicleDamageProof(CVehicle* pVehicle, bool& bDamageProof);
-    static bool  IsVehicleFuelTankExplodable(CVehicle* pVehicle, bool& bExplodable);
-    static bool  IsVehicleFrozen(CVehicle* pVehicle, bool& bFrozen);
-    static bool  IsVehicleOnGround(CVehicle* pVehicle, bool& bOnGround);
-    static bool  GetVehicleEngineState(CVehicle* pVehicle, bool& bState);
-    static bool  IsTrainDerailed(CVehicle* pVehicle, bool& bDerailed);
-    static bool  IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable);
-    static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
-    static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
-    static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
-    static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
-    static bool  GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio);
-
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, float& fValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue);
@@ -294,23 +258,21 @@ public:
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
     static bool SetVehicleDoorsUndamageable(CElement* pElement, bool bDoorsUndamageable);
-    static bool SetVehicleRotation(CElement* pElement, const CVector& vecRotation);
+    static bool SetVehicleRotation(CElement* pElement, CVector vecRotation);
     static bool SetVehicleSirensOn(CElement* pElement, bool bSirensOn);
     static bool SetVehicleTaxiLightOn(CElement* pElement, bool bTaxiLightState);
-    static bool SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity);
+    static bool SetVehicleTurnVelocity(CElement* pElement, CVector vecTurnVelocity);
     static bool AddVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CElement* pElement);
     static bool RemoveVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
-    static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
+    static bool SetVehicleWheelStates(CElement* pElement, std::optional<uchar> fl, std::optional<uchar> rl, std::optional<uchar> fr, std::optional<uchar> rr);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
-    static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
-    static bool GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation);
-    static bool SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation);
-    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition);
+    static bool SetVehicleRespawnRotation(CElement* pElement, CVector vecRotation);
+    static bool SetVehicleRespawnPosition(CElement* pElement, CVector vecPosition);
     static bool ToggleVehicleRespawn(CElement* pElement, bool bRespawn);
     static bool ResetVehicleExplosionTime(CElement* pElement);
     static bool ResetVehicleIdleTime(CElement* pElement);
@@ -358,7 +320,6 @@ public:
     static bool SetVehicleVariant(CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2);
     static bool SetVehicleSirens(CVehicle* pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo);
     static bool GiveVehicleSirens(CVehicle* pVehicle, unsigned char ucSirenType, unsigned char ucSirenCount, SSirenInfo tSirenInfo);
-    static bool RemoveVehicleSirens(CVehicle* pVehicle);
 
     // Marker create/destroy functions
     static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo);

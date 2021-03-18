@@ -828,6 +828,34 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
     }
 }
 
+std::optional<eDoorStatus> CVehicle::GetDoorState(size_t door)
+{
+    if (door < MAX_DOORS)
+        return (eDoorStatus)m_ucDoorStates[door];
+    return std::nullopt;
+}
+
+std::optional<eWheelStatus> CVehicle::GetWheelState(size_t wheel)
+{
+    if (wheel < MAX_WHEELS)
+        return (eWheelStatus)m_ucWheelStates[wheel];
+    return std::nullopt;
+}
+
+std::optional<eLightStatus> CVehicle::GetLightState(size_t light)
+{
+    if (light < MAX_LIGHTS)
+        return (eLightStatus)m_ucLightStates[light];
+    return std::nullopt;
+}
+
+std::optional<eComponentStatus> CVehicle::GetPanelState(size_t panel)
+{
+    if (panel < MAX_PANELS)
+        return (eComponentStatus)m_ucPanelStates[panel];
+    return std::nullopt;
+}
+
 void CVehicle::GenerateHandlingData()
 {
     // Make a new CHandlingEntry

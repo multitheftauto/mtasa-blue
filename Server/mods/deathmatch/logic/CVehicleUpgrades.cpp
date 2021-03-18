@@ -469,3 +469,8 @@ bool CVehicleUpgrades::IsValidUpgrade(unsigned short usUpgrade)
 {
     return (usUpgrade >= 1000 && usUpgrade <= 1193);
 }
+
+bool CVehicleUpgrades::IsValidSlot(unsigned char ucSlot)
+{
+    return ucSlot < VEHICLE_UPGRADE_SLOTS;
+}

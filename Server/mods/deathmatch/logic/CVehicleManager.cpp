@@ -585,22 +585,3 @@ CVehicleColor CVehicleManager::GetRandomColor(unsigned short usModel)
 {
     return m_ColorManager.GetRandomColor(usModel);
 }
-
-void CVehicleManager::GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM)
-{
-    assert(luaVM);
-
-    // Add all the matching vehicles to the table
-    unsigned int              uiIndex = 0;
-    list<CVehicle*>::iterator iter = m_List.begin();
-    for (; iter != m_List.end(); ++iter)
-    {
-        if ((*iter)->GetModel() == uiModel)
-        {
-            // Add it to the table
-            lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, *iter);
-            lua_settable(luaVM, -3);
-        }
-    }
-}

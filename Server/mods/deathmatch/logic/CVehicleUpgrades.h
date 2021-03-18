@@ -44,6 +44,7 @@ public:
     unsigned char      Count();
 
     static const char* GetSlotName(unsigned char ucSlot);
+    static bool        IsValidSlot(unsigned char ucSlot);
     static bool        IsValidUpgrade(unsigned short usUpgrade);
 
 protected:

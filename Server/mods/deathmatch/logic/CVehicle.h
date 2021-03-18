@@ -19,6 +19,7 @@ class CVehicle;
 #include "CEvents.h"
 #include "CVehicleUpgrades.h"
 #include "CHandlingEntry.h"
+#include <optional>
 
 #define MAX_VEHICLE_SEATS 9
 #define DEFAULT_VEHICLE_HEALTH 1000
@@ -122,6 +123,7 @@ struct SSirenBeaconInfo
     SColor  m_RGBBeaconColour;
     DWORD   m_dwMinSirenAlpha;
 };
+
 struct SSirenInfo
 {
     // Flags
@@ -269,6 +271,13 @@ public:
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
     void GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates);
+    std::optional<eDoorStatus> GetDoorState(size_t door);
+
+    std::optional<eWheelStatus> GetWheelState(size_t wheel);
+
+    std::optional<eLightStatus> GetLightState(size_t light);
+
+    std::optional<eComponentStatus> GetPanelState(size_t panel);
 
     CPed* GetJackingPed() { return m_pJackingPed; }
     void  SetJackingPed(CPed* pPed);

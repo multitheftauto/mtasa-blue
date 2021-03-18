@@ -1610,6 +1610,9 @@ namespace SharedUtil
             return data[uiIndex];
         }
 
+        auto begin() const noexcept { return std::begin(data); }
+        auto end() const noexcept { return std::end(data); }
+
         T data[SIZE];
     };
 
