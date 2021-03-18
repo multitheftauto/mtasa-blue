@@ -928,6 +928,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
     if (szCompArguments)
         szCompArguments = SharedUtil::Trim(szCompArguments);
 
+    CKeyBind* pResult = nullptr;
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
     {
@@ -948,8 +949,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
                                 {
                                     if (!szOriginalScriptKey || (pBind->strOriginalScriptKey == szOriginalScriptKey))
                                     {
-                                        free(szCompArguments);
-                                        return pBind;
+                                        pResult = pBind;
+                                        break;
                                     }
                                 }
                             }
@@ -960,7 +961,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
         }
     }
     free(szCompArguments);
-    return NULL;
+    return pResult;
 }
 
 //
