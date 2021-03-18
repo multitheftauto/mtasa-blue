@@ -102,6 +102,7 @@ class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
+class CPerformanceRecorder;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
@@ -245,6 +246,7 @@ public:
     CZoneNames*                      GetZoneNames() { return m_pZoneNames; }
     CClock*                          GetClock() { return m_pClock; }
     CWaterManager*                   GetWaterManager() { return m_pWaterManager; }
+    CPerformanceRecorder*            GetPerformanceRecorder() { return m_pPerformanceRecorder; }
     CLightsyncManager*               GetLightSyncManager() { return &m_lightsyncManager; }
     CWeaponStatManager*              GetWeaponStatManager() { return m_pWeaponStatsManager; }
     CBuildingRemovalManager*         GetBuildingRemovalManager() { return m_pBuildingRemovalManager; }
@@ -555,6 +557,7 @@ private:
     CRPCFunctions*             m_pRPCFunctions;
     CLanBroadcast*             m_pLanBroadcast;
     CWaterManager*             m_pWaterManager;
+    CPerformanceRecorder*      m_pPerformanceRecorder;
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;

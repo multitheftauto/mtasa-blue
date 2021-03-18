@@ -52,4 +52,8 @@ public:
     // Utility functions
     LUA_DECLARE(GetTok);
     LUA_DECLARE(tocolor);
+
+    static bool        StartRecordPerformance(std::optional<bool> bClear);
+    static bool        StopRecordPerformance();
+    static std::string GetRecordedPerformance();
 };

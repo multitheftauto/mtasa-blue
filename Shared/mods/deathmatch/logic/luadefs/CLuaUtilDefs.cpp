@@ -46,6 +46,9 @@ void CLuaUtilDefs::LoadFunctions()
         // Utility functions
         {"gettok", GetTok},
         {"tocolor", tocolor},
+        {"startRecordPerformance", ArgumentParser<StartRecordPerformance>},
+        {"stopRecordPerformance", ArgumentParser<StopRecordPerformance>},
+        {"getRecordedPerformance", ArgumentParser<GetRecordedPerformance>},
     };
 
     // Add functions
@@ -710,4 +713,31 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     unsigned long ulColor = COLOR_RGBA(0, 0, 0, 255);
     lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
+}
+
+bool CLuaUtilDefs::StartRecordPerformance(std::optional<bool> bClear)
+{
+    if (g_pGame->GetPerformanceRecorder()->IsDuringPerformanceRecording())
+        return false;
+
+    g_pGame->GetPerformanceRecorder()->Start();
+
+    if (bClear.value_or(false))
+        g_pGame->GetPerformanceRecorder()->Clear();
+
+    return true;
+}
+
+bool CLuaUtilDefs::StopRecordPerformance()
+{
+    if (!g_pGame->GetPerformanceRecorder()->IsDuringPerformanceRecording())
+        return false;
+
+    g_pGame->GetPerformanceRecorder()->Stop();
+    return true;
+}
+
+std::string CLuaUtilDefs::GetRecordedPerformance()
+{
+    return g_pGame->GetPerformanceRecorder()->GetResult();
 }

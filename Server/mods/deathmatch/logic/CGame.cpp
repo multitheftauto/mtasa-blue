@@ -141,6 +141,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pBuildingRemovalManager = NULL;
     m_pCustomWeaponManager = NULL;
     m_pFunctionUseLogger = NULL;
+    m_pPerformanceRecorder = nullptr;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -320,6 +321,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pSettings);
     SAFE_DELETE(m_pRPCFunctions);
     SAFE_DELETE(m_pWaterManager);
+    SAFE_DELETE(m_pPerformanceRecorder);
     SAFE_DELETE(m_pWeaponStatsManager);
     SAFE_DELETE(m_pBuildingRemovalManager);
     SAFE_DELETE(m_pCustomWeaponManager);
@@ -374,6 +376,13 @@ void CGame::HandleInput(char* szCommand)
 
 void CGame::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("DoPulse");
+    {
+        CPerformanceRecorder::Sample sample("Foo test");
+        for (int i = 0; i < 10000000; i++)
+        {
+        }
+    }
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock();
 
@@ -511,6 +520,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pWaterManager = new CWaterManager;
+    m_pPerformanceRecorder = new CPerformanceRecorder;
     m_pScriptDebugging = new CScriptDebugging();
     m_pMapManager = new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager,
                                     m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups,
