@@ -237,14 +237,14 @@ bool CPlayer::IsSubscribed(CElement* pElement, const std::string& strName) const
 
 const char* CPlayer::GetSourceIP()
 {
-    if (m_strIP.empty())
+    if (m_IP.Empty())
     {
-        char           szIP[22];
+        dassert(m_IP.GetMaxLength() >= 22);
+
         unsigned short usPort;
-        g_pNetServer->GetPlayerIP(m_PlayerSocket, szIP, &usPort);
-        m_strIP = szIP;
+        g_pNetServer->GetPlayerIP(m_PlayerSocket, m_IP.Data(), &usPort);
     }
-    return m_strIP;
+    return m_IP;
 }
 
 uint CPlayer::Send(const CPacket& Packet)

@@ -450,7 +450,7 @@ private:
     int     m_iLastPuresyncZoneDebug;
 
     long long m_llLastPositionHasChanged;
-    SString   m_strIP;
+    SFixedString<32> m_IP;
 
     SScreenShotInfo m_ScreenShotInfo;
 
