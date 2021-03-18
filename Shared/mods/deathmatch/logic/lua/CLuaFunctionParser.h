@@ -656,7 +656,7 @@ struct CLuaFunctionParserBase
     }
 };
 
-template <bool, auto, auto*>
+template <bool, auto, auto>
 struct CLuaFunctionParser
 {
 };
