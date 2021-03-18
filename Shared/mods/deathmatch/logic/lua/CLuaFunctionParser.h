@@ -46,7 +46,7 @@ struct CLuaFunctionParserBase
     template <typename T>
     inline SString TypeToName()
     {
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, const char*>)
             return "string";
         else if constexpr (std::is_same_v<T, bool>)
             return "boolean";
@@ -191,7 +191,7 @@ struct CLuaFunctionParserBase
     {
         int iArgument = lua_type(L, index);
         // primitive types
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, const char*>)
             return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
         if constexpr (std::is_same_v<T, bool>)
             return (iArgument == LUA_TBOOLEAN);
@@ -354,7 +354,7 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // primitive types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_integral_v<T>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, const char*> || std::is_integral_v<T>)
             return lua::PopPrimitive<T>(L, index);
         // floats/doubles may not be NaN
         else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
