@@ -948,6 +948,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
                                 {
                                     if (!szOriginalScriptKey || (pBind->strOriginalScriptKey == szOriginalScriptKey))
                                     {
+                                        free(szCompArguments);
                                         return pBind;
                                     }
                                 }
@@ -958,6 +959,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
             }
         }
     }
+    free(szCompArguments);
     return NULL;
 }
 
