@@ -203,7 +203,7 @@ public:
     bool IsCursorShowing() { return m_bCursorShowing; }
     void SetCursorShowing(bool bCursorShowing) { m_bCursorShowing = bCursorShowing; }
 
-    char* GetNametagText() { return m_szNametagText; }
+    char* GetNametagText() { return m_nametagText; }
     void  SetNametagText(const char* szText);
     void  GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     void  SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB);
@@ -409,7 +409,7 @@ private:
 
     bool m_bCursorShowing;
 
-    char*         m_szNametagText;
+    SFixedString<MAX_PLAYER_NAMETAG_LENGTH> m_nametagText;
     unsigned char m_ucNametagR;
     unsigned char m_ucNametagG;
     unsigned char m_ucNametagB;

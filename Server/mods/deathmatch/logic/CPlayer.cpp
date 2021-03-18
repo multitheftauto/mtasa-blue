@@ -73,7 +73,6 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
 
     m_bCursorShowing = false;
 
-    m_szNametagText = NULL;
     m_ucNametagR = 0xFF;
     m_ucNametagG = 0xFF;
     m_ucNametagB = 0xFF;
@@ -125,13 +124,6 @@ CPlayer::~CPlayer()
 
     // Delete the player text manager
     delete m_pPlayerTextManager;
-
-    // Destroy our nick
-    if (m_szNametagText)
-    {
-        delete[] m_szNametagText;
-        m_szNametagText = NULL;
-    }
 
     SetTeam(NULL, true);
 
@@ -542,16 +534,9 @@ void CPlayer::Reset()
 
 void CPlayer::SetNametagText(const char* szText)
 {
-    if (m_szNametagText)
-    {
-        delete[] m_szNametagText;
-        m_szNametagText = NULL;
-    }
+    m_nametagText.Clear();
     if (szText)
-    {
-        m_szNametagText = new char[strlen(szText) + 1];
-        strcpy(m_szNametagText, szText);
-    }
+        m_nametagText = szText;
 }
 
 void CPlayer::GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB)
