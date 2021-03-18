@@ -32,6 +32,7 @@ CFunctionUseLogger::~CFunctionUseLogger()
 //
 void CFunctionUseLogger::Pulse()
 {
+    CPerformanceRecorder::Sample sample("CFunctionUseLogger::Pulse");
     if (!m_FuncCallRecordMap.empty())
         MaybeFlush();
 }

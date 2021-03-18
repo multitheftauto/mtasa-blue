@@ -39,6 +39,7 @@ CBanManager::~CBanManager()
 
 void CBanManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CBanManager::DoPulse");
     time_t tTime = time(NULL);
 
     if (tTime > m_tUpdate)

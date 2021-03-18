@@ -42,6 +42,7 @@ CLatentTransferManager::~CLatentTransferManager()
 ///////////////////////////////////////////////////////////////
 void CLatentTransferManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CLatentTransferManager::DoPulse");
     // Update timing info
     CTickCount tickCountNow = CTickCount::Now();
 

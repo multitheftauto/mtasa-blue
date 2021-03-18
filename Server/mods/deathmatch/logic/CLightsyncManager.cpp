@@ -76,6 +76,8 @@ void CLightsyncManager::DoPulse()
     // are also storing the delta context in what it happened, so we only consider the health unchanged
     // when we find the marker with the same context value.
 
+    CPerformanceRecorder::Sample sample("CLightsyncManager::DoPulse");
+
     if (g_pBandwidthSettings->bLightSyncEnabled == false)
         return;
 

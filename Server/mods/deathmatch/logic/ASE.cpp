@@ -134,6 +134,7 @@ bool ASE::SetPortEnabled(bool bInternetEnabled, bool bLanEnabled)
 
 void ASE::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("ASE::DoPulse");
     if (m_SocketList.empty())
         return;
 

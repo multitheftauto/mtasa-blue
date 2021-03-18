@@ -135,6 +135,7 @@ void CAccountManager::DoPulse()
     // Save it only once in a while whenever something has changed
     if (m_bChangedSinceSaved && GetTickCount64_() > m_llLastTimeSaved + 15000)
     {
+        CPerformanceRecorder::Sample sample("CAccountManager::DoPulse");
         // Save it
         Save();
     }

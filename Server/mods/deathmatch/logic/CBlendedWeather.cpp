@@ -27,6 +27,7 @@ CBlendedWeather::CBlendedWeather(CClock* pClock)
 
 void CBlendedWeather::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CBlendedWeather::DoPulse");
     Update();
 }
 

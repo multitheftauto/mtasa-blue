@@ -19,6 +19,7 @@ CUnoccupiedVehicleSync::CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, C
 
 void CUnoccupiedVehicleSync::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CUnoccupiedVehicleSync::DoPulse");
     // Time to check for players that should no longer be syncing a vehicle or vehicles that should be synced?
     if (m_UpdateTimer.Get() > 500)
     {

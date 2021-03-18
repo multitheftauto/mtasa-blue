@@ -24,6 +24,8 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
     for (CFastList<CLuaTimer*>::const_iterator iter = m_TimerList.begin(); iter != m_TimerList.end(); ++iter)
         m_ProcessQueue.push_back(*iter);
 
+    CPerformanceRecorder::Sample sample("CLuaTimerManager::DoPulse");
+    int                          executed = 0;
     while (!m_ProcessQueue.empty())
     {
         m_pProcessingTimer = m_ProcessQueue.front();
@@ -36,7 +38,12 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
         // Is the time up and is not being deleted
         if (llCurrentTime >= (llStartTime + llDelay))
         {
+            executed++;
+            CPerformanceRecorder::Sample timerSample("Timer executed");
             // Set our debug info
+            const SLuaDebugInfo& debugInfo = m_pProcessingTimer->GetLuaDebugInfo();
+            timerSample.SetArg("File",debugInfo.strFile);
+            timerSample.SetArg("Line",debugInfo.iLine);
             g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(m_pProcessingTimer->GetLuaDebugInfo());
 
             m_pProcessingTimer->ExecuteTimer(pLuaMain);
@@ -69,6 +76,7 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
         else
             m_pProcessingTimer = NULL;
     }
+    sample.SetArg("Executed timers", executed);
 }
 
 void CLuaTimerManager::RemoveTimer(CLuaTimer* pLuaTimer)

@@ -44,6 +44,8 @@ void CElementDeleter::Delete(class CElement* pElement, bool bUnlink, bool bUpdat
 
 void CElementDeleter::DoDeleteAll()
 {
+    CPerformanceRecorder::Sample sample("CElementDeleter::DoDeleteAll");
+    sample.SetArg("Deleted elements", m_List.size());
     // This depends on CElementDeleter::Unreference() being called in ~CElement()
     while (!m_List.empty())
         delete *m_List.begin();

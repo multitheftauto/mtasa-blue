@@ -26,6 +26,7 @@ CPlayerManager::~CPlayerManager()
 
 void CPlayerManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CPlayerManager::DoPulse");
     PulseZombieCheck();
 
     list<CPlayer*>::const_iterator iter = m_Players.begin();
@@ -33,6 +34,7 @@ void CPlayerManager::DoPulse()
     {
         (*iter)->DoPulse();
     }
+    sample.SetArg("Players", m_Players.size());
 }
 
 void CPlayerManager::PulseZombieCheck()

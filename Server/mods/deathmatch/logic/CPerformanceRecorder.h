@@ -13,20 +13,35 @@ public:
     bool IsDuringPerformanceRecording() const { return m_bRecordPerformance; }
     std::string GetResult();
 
-    
     class Sample
     {
     public:
         Sample(const char* name);
         ~Sample();
 
-        void Set(const char* szKey, const char* value);
+        void SetArg(const char* szKey, const char* value);
+        void SetArg(const char* szKey, int value);
+
+    protected:
+        std::string  m_szName;
+        const char*  m_szCategory = "default";
     private:
-        const char*  m_szName;
-        TIMEUS       m_start;
+        TIMEUS       m_start = 0;
         json_object* m_pObject = nullptr;
+        json_object* m_pObjectArgs = nullptr;
     };
 
+    class FunctionSample : public Sample
+    {
+    public:
+        FunctionSample(const char* name);
+    };
+    
+    class EventSample : public Sample
+    {
+    public:
+        EventSample(const char* name);
+    };
 
 private:
     bool m_bRecordPerformance = false;

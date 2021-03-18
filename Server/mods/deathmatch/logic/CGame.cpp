@@ -376,13 +376,6 @@ void CGame::HandleInput(char* szCommand)
 
 void CGame::DoPulse()
 {
-    CPerformanceRecorder::Sample sample("DoPulse");
-    {
-        CPerformanceRecorder::Sample sample("Foo test");
-        for (int i = 0; i < 10000000; i++)
-        {
-        }
-    }
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock();
 
@@ -416,11 +409,16 @@ void CGame::DoPulse()
     CSimControl::DoPulse();
     CNetBufferWatchDog::DoPulse();
 
+    CPerformanceRecorder::Sample sample("DoPulse");
     CLOCK_SET_SECTION("CGame::DoPulse");
-    CLOCK1("HTTPDownloadManager");
-    GetRemoteCalls()->ProcessQueuedFiles();
-    g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE)->ProcessQueuedFiles();
-    UNCLOCK1("HTTPDownloadManager");
+    {
+        CPerformanceRecorder::Sample sample("HTTPDownloadManager");
+
+        CLOCK1("HTTPDownloadManager");
+        GetRemoteCalls()->ProcessQueuedFiles();
+        g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE)->ProcessQueuedFiles();
+        UNCLOCK1("HTTPDownloadManager");
+    }
 
     CLOCK_CALL1(m_pPlayerManager->DoPulse(););
 
@@ -429,6 +427,7 @@ void CGame::DoPulse()
 
     if (m_pLanBroadcast)
     {
+        CPerformanceRecorder::Sample sample("Lan broadcast");
         CLOCK_CALL1(m_pLanBroadcast->DoPulse(););
     }
 
@@ -447,6 +446,7 @@ void CGame::DoPulse()
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
     {
+        CPerformanceRecorder::Sample sample("ProcessTrafficLights");
         CLOCK_CALL1(ProcessTrafficLights(llCurrentTime););
     }
 
@@ -483,7 +483,10 @@ void CGame::DoPulse()
 
     CLOCK_CALL1(m_pLatentTransferManager->DoPulse(););
 
-    CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
+    {
+        CPerformanceRecorder::Sample sample("CAsyncTaskScheduler::CollectResults");
+        CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
+    }
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
 

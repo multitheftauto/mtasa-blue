@@ -55,6 +55,7 @@ CMapManager::~CMapManager()
 
 void CMapManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CMapManager::DoPulse");
     // Do the respawning checks
     DoRespawning();
 }

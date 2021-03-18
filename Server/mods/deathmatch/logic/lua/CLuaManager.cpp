@@ -104,12 +104,14 @@ void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
 
 void CLuaManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CLuaManager::DoPulse");
     list<CLuaMain*>::iterator iter;
     for (iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter)
     {
         (*iter)->DoPulse();
     }
     m_pLuaModuleManager->DoPulse();
+    sample.SetArg("Virtual machines count", m_virtualMachines.size());
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)

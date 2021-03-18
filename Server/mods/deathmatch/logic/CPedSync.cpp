@@ -19,6 +19,7 @@ CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 
 void CPedSync::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CPedSync::DoPulse");
     // Time to check for players that should no longer be syncing a ped or peds that should be synced?
     if (m_UpdateTimer.Get() > 500)
     {

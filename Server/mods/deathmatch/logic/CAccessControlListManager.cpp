@@ -304,6 +304,7 @@ CAccessControlList* CAccessControlListManager::GetACL(const char* szACLName)
 
 void CAccessControlListManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CAccessControlListManager::DoPulse");
     // Clear cache every 12 hours or if dirty
     if (m_bReadCacheDirty || GetTickCount64_() - m_llLastTimeReadCacheCleared > 1000 * 60 * 60 * 12)
         ClearReadCache();

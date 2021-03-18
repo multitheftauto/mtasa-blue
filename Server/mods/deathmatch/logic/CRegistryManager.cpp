@@ -21,6 +21,7 @@ CRegistryManager::~CRegistryManager()
 
 void CRegistryManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CRegistryManager::DoPulse");
     // End automatic transactions started in the previous pulse
     for (unsigned int i = 0; i < m_RegistryList.size(); i++)
         m_RegistryList[i]->EndAutomaticTransaction();

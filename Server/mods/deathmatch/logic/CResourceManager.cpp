@@ -747,6 +747,8 @@ void CResourceManager::QueueResource(CResource* pResource, eResourceQueue eQueue
 
 void CResourceManager::ProcessQueue()
 {
+    CPerformanceRecorder::Sample sample("CResourceManager::ProcessQueue");
+    sample.SetArg("Queue size", m_resourceQueue.size());
     // While we have queuestuff to process
     while (m_resourceQueue.size() > 0)
     {

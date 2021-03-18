@@ -119,6 +119,7 @@ CDatabaseManagerImpl::~CDatabaseManagerImpl()
 ///////////////////////////////////////////////////////////////
 void CDatabaseManagerImpl::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CDatabaseManager::DoPulse");
     m_JobQueue->DoPulse();
 }
 

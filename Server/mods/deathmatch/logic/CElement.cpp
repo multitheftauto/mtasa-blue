@@ -422,6 +422,7 @@ bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFuncti
 
 bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller)
 {
+    CPerformanceRecorder::EventSample sample(szName);
     if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
         return false;
 
