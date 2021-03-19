@@ -1,3 +1,5 @@
+#pragma once
+
 class CPerformanceRecorder
 {
     friend class Sample;
