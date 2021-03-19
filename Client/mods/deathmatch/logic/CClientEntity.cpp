@@ -1303,7 +1303,14 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     {
         pEntity->SetAreaCode(ucInterior);
     }
+
+    unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(ucOldInterior);
+    Arguments.PushNumber(ucInterior);
+    CallEvent("onClientElementInteriorChange", Arguments, true);
 }
 
 bool CClientEntity::IsOnScreen()
