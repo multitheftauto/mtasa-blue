@@ -442,14 +442,19 @@ void CVehicleRPCs::SetVehicleWheelStates(CClientEntity* pSource, NetBitStreamInt
 {
     unsigned char ucWheelStates[MAX_WHEELS];
     bool          spawnFlyingComponent = false;
-    if (bitStream.Read((char*)ucWheelStates, MAX_WHEELS) && (!bitStream.Can(eBitStreamVersion::setVehicleWheelStates_SpawnFlyingComponent) || bitStream.ReadBit(spawnFlyingComponent)))
+
+    if (!bitStream.Read((char*)ucWheelStates, MAX_WHEELS))
+        return;
+
+    if (bitStream.Can(eBitStreamVersion::setVehicleWheelStates_SpawnFlyingComponent))
+        if (!bitStream.ReadBit(spawnFlyingComponent))
+            return;
+
+    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
+    if (pVehicle)
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
-        if (pVehicle)
-        {
-            for (int i = 0; i < MAX_WHEELS; i++)
-                pVehicle->SetWheelStatus(i, ucWheelStates[i], false, spawnFlyingComponent);
-        }
+        for (int i = 0; i < MAX_WHEELS; i++)
+            pVehicle->SetWheelStatus(i, ucWheelStates[i], false, spawnFlyingComponent);
     }
 }
 
