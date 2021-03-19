@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaUtilDefs::LoadFunctions()
 {
@@ -46,9 +47,13 @@ void CLuaUtilDefs::LoadFunctions()
         // Utility functions
         {"gettok", GetTok},
         {"tocolor", tocolor},
+
+        // Performance recorder
         {"startRecordPerformance", ArgumentParser<StartRecordPerformance>},
         {"stopRecordPerformance", ArgumentParser<StopRecordPerformance>},
-        {"getRecordedPerformance", ArgumentParser<GetRecordedPerformance>},
+        {"clearPerformanceRecorder", ArgumentParser<ClearPerformanceRecorder>},
+        {"isPerformanceRecording", ArgumentParser<IsPerformanceRecording>},
+        {"getRecordedSamples", ArgumentParser<GetRecordedSamples>},
     };
 
     // Add functions
@@ -715,29 +720,63 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaUtilDefs::StartRecordPerformance(std::optional<bool> bClear)
+bool CLuaUtilDefs::StartRecordPerformance()
 {
+#ifdef MTA_CLIENT
+    if (g_pClientGame->GetPerformanceRecorder()->IsDuringPerformanceRecording())
+        return false;
+
+    g_pClientGame->GetPerformanceRecorder()->Start();
+#else
     if (g_pGame->GetPerformanceRecorder()->IsDuringPerformanceRecording())
         return false;
 
     g_pGame->GetPerformanceRecorder()->Start();
-
-    if (bClear.value_or(false))
-        g_pGame->GetPerformanceRecorder()->Clear();
+#endif
 
     return true;
 }
 
 bool CLuaUtilDefs::StopRecordPerformance()
 {
+#ifdef MTA_CLIENT
+    if (!g_pClientGame->GetPerformanceRecorder()->IsDuringPerformanceRecording())
+        return false;
+
+    g_pClientGame->GetPerformanceRecorder()->Stop();
+#else
     if (!g_pGame->GetPerformanceRecorder()->IsDuringPerformanceRecording())
         return false;
 
     g_pGame->GetPerformanceRecorder()->Stop();
+#endif
     return true;
 }
 
-std::string CLuaUtilDefs::GetRecordedPerformance()
+bool CLuaUtilDefs::ClearPerformanceRecorder()
 {
+#ifdef MTA_CLIENT
+    g_pClientGame->GetPerformanceRecorder()->Clear();
+#else
+    g_pGame->GetPerformanceRecorder()->Clear();
+#endif
+    return true;
+}
+
+bool CLuaUtilDefs::IsPerformanceRecording()
+{
+#ifdef MTA_CLIENT
+    return g_pClientGame->GetPerformanceRecorder()->IsDuringPerformanceRecording();
+#else
+    return g_pGame->GetPerformanceRecorder()->IsDuringPerformanceRecording();
+#endif
+}
+
+std::string CLuaUtilDefs::GetRecordedSamples()
+{
+#ifdef MTA_CLIENT
+    return g_pClientGame->GetPerformanceRecorder()->GetResult();
+#else
     return g_pGame->GetPerformanceRecorder()->GetResult();
+#endif
 }

@@ -23,10 +23,10 @@ public:
         void SetArg(const char* szKey, int value);
 
     protected:
-        std::string  m_szName;
-        const char*  m_szCategory = "default";
+        std::string m_name;
+        std::string m_category = "default";
     private:
-        TIMEUS       m_start = 0;
+        TIMEUS       m_startTime = 0;
         json_object* m_pObject = nullptr;
         json_object* m_pObjectArgs = nullptr;
     };

@@ -883,12 +883,13 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
     ESyncType     lastSyncType = ESyncType::BROADCAST;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
 
+    sample.SetArg("Sync type", EnumToString(syncType));
+    sample.SetArg("Key", szName);
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
-        sample.SetArg("Sync type", EnumToString(syncType));
-        sample.SetArg("Key", szName);
         if (syncType != ESyncType::LOCAL)
         {
+            CPerformanceRecorder::Sample sample("Broadcast");
             // Tell our clients to update their data
             unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
             CBitStream     BitStream;
@@ -896,7 +897,6 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             BitStream.pBitStream->Write(szName, usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
 
-            CPerformanceRecorder::Sample sample("Broadcast");
             if (syncType == ESyncType::BROADCAST)
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
             else

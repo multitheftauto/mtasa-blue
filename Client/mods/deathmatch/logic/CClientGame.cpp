@@ -184,6 +184,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pScriptKeyBinds = new CScriptKeyBinds;
     m_pRemoteCalls = new CRemoteCalls();
     m_pResourceFileDownloadManager = new CResourceFileDownloadManager();
+    m_pPerformanceRecorder = new CPerformanceRecorder();
 
     // Create our net API
     m_pNetAPI = new CNetAPI(m_pManager);
@@ -479,6 +480,7 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
     SAFE_DELETE(m_pResourceFileDownloadManager);
+    SAFE_DELETE(m_pPerformanceRecorder);
 
     SAFE_DELETE(m_pRootEntity);
 

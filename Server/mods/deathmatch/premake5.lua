@@ -26,6 +26,7 @@ project "Deathmatch"
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
+			"../../../Shared/sdk/profiler",
 			"../../../vendor/sparsehash/src/",
 			"logic",
 			"utils",
@@ -51,6 +52,7 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
+		"../../../Shared/sdk/profiler/CPerformanceRecorder.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp",
 	}

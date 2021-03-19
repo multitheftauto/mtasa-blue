@@ -16,16 +16,18 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
     assert(m_ProcessQueue.empty());
     assert(!m_pPendingDelete);
     assert(!m_pProcessingTimer);
-
     CTickCount llCurrentTime = CTickCount::Now();
+    CPerformanceRecorder::Sample sample("CLuaTimerManager::DoPulse");
+    sample.SetArg("Resource name", pLuaMain->GetResource()->GetName());
 
     // Use a separate queue to avoid trouble
     // What kind of problems are we trying to avoid? Doing a copy each frame isn't quite efficient
     for (CFastList<CLuaTimer*>::const_iterator iter = m_TimerList.begin(); iter != m_TimerList.end(); ++iter)
         m_ProcessQueue.push_back(*iter);
 
-    CPerformanceRecorder::Sample sample("CLuaTimerManager::DoPulse");
-    int                          executed = 0;
+    int executed = 0;
+    int timersCount = m_ProcessQueue.size();
+
     while (!m_ProcessQueue.empty())
     {
         m_pProcessingTimer = m_ProcessQueue.front();
@@ -44,7 +46,7 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
             const SLuaDebugInfo& debugInfo = m_pProcessingTimer->GetLuaDebugInfo();
             timerSample.SetArg("File",debugInfo.strFile);
             timerSample.SetArg("Line",debugInfo.iLine);
-            g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(m_pProcessingTimer->GetLuaDebugInfo());
+            g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(debugInfo);
 
             m_pProcessingTimer->ExecuteTimer(pLuaMain);
             // Reset
@@ -76,6 +78,7 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
         else
             m_pProcessingTimer = NULL;
     }
+    sample.SetArg("Timers count", timersCount);
     sample.SetArg("Executed timers", executed);
 }
 

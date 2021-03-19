@@ -10,6 +10,7 @@ project "Shared"
 
 	vpaths {
 		["Headers/*"] = { "**.h", "**.hpp" },
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua",
 	}
 

@@ -299,6 +299,7 @@ public:
     CLatentTransferManager*   GetLatentTransferManager() { return m_pLatentTransferManager; }
     CClientModelCacheManager* GetModelCacheManager() { return m_pModelCacheManager; }
     CDebugHookManager*        GetDebugHookManager() { return m_pDebugHookManager; }
+    CPerformanceRecorder*     GetPerformanceRecorder() const { return m_pPerformanceRecorder; }
 
     CElementDeleter*              GetElementDeleter() { return &m_ElementDeleter; }
     CObjectRespawner*             GetObjectRespawner() { return &m_ObjectRespawner; }
@@ -688,6 +689,7 @@ private:
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;
     CResourceFileDownloadManager* m_pResourceFileDownloadManager;
+    CPerformanceRecorder*         m_pPerformanceRecorder;
 
     // Revised facilities
     CServer m_Server;

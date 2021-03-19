@@ -150,6 +150,7 @@
 #include "CLatentTransferManager.h"
 #include "CDebugHookManager.h"
 #include "lua/CLuaShared.h"
+#include "profiler/CPerformanceRecorder.h"
 
 // Deathmatch includes
 #include "ClientCommands.h"

@@ -177,7 +177,7 @@ struct SAclRequest;
 
 // Logic includes
 #include "ASE.h"
-#include "CPerformanceRecorder.h"
+#include "profiler/CPerformanceRecorder.h"
 #include "ASEQuerySDK.h"
 #include "CAccessControlList.h"
 #include "CAccessControlListGroup.h"
