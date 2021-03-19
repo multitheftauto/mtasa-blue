@@ -701,8 +701,8 @@ namespace SharedUtil
 
         // Shake it all about
         void Encrypt();
-        constexpr bool Empty() { return szData[0] == 0; }
-        constexpr void Clear() const { szData[0] = 0; }
+        constexpr bool Empty() const { return !szData[0]; }
+        constexpr void Clear() { szData[0] = 0; }
     };
 
     ///////////////////////////////////////////////////////////////
