@@ -82,13 +82,13 @@ CPerformanceRecorder::Sample::~Sample()
         json_object_object_add(m_pObjectStart, "cat", json_object_new_string(m_category.c_str()));
         json_object_object_add(m_pObjectStart, "ph", json_object_new_string("B"));
         json_object_object_add(m_pObjectStart, "ts", json_object_new_int(m_startTime));
-        json_object_object_add(m_pObjectStart, "pid", json_object_new_int(GetCurrentThreadId()));
+        json_object_object_add(m_pObjectStart, "pid", json_object_new_int(0));
 
         json_object_object_add(m_pObject, "name", json_object_new_string(m_name.c_str()));
         json_object_object_add(m_pObject, "cat", json_object_new_string(m_category.c_str()));
         json_object_object_add(m_pObject, "ph", json_object_new_string("E"));
         json_object_object_add(m_pObject, "ts", json_object_new_int(GetTimeUs()));
-        json_object_object_add(m_pObject, "pid", json_object_new_int(GetCurrentThreadId()));
+        json_object_object_add(m_pObject, "pid", json_object_new_int(0));
 
         if (m_pObjectArgs)
         {
