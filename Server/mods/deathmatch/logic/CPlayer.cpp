@@ -176,11 +176,6 @@ void CPlayer::DoPulse()
     }
 }
 
-void CPlayer::SetNick(const char* szNick)
-{
-    m_nick = szNick;
-}
-
 // Ignore min client version checks if is a custom build and both player and server have build number of 0
 bool CPlayer::ShouldIgnoreMinClientVersionChecks()
 {

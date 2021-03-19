@@ -667,32 +667,80 @@ namespace SharedUtil
 
     public:
         constexpr SFixedString() { szData[0] = 0; }
-
-
-        // In
-        constexpr SFixedString& Assign(const char* szOther, size_t len)
-        {
-            STRNCPY(szData, szOther, len + 1);
-            return *this;
-        }
-
-        constexpr SFixedString& operator=(const char* szOther)
-        {
-            Assign(szOther, MAX_LENGTH + 1);
-            return *this;
-        }
+        constexpr SFixedString(const char* other) { Assign(other); }
 #ifdef __cpp_lib_string_view
+        constexpr SFixedString(std::string_view view) { Assign(view); }
+#endif
+
+        // Copies the first `n` characters from the array of characters pointed by `other`.
+        // Throws if `n > MAX_LENGTH`.
+        constexpr SFixedString& Assign(const char* other, size_t n = MAX_LENGTH)
+        {
+            if (n > MAX_LENGTH)
+                throw std::length_error{"n > MAX_LENGTH"};
+
+            const auto end = std::copy(other, other + n, szData);
+            *end = 0; // Remember: There are MAX_LENGTH + 1 characters! So this is always safe.
+
+            return *this;
+        }
+
+        // Copies at most `m` characters from the array of characters pointed by `other`.
+        // Use this to assign strings of size possibly larger than MAX_LENGTH.
+        // Throws if `m > MAX_LENGTH`.
+        constexpr SFixedString& AssignAtMost(const char* other, size_t m = MAX_LENGTH)
+        {
+            if (m > MAX_LENGTH)
+                throw std::length_error{"m > MAX_LENGTH"};
+            Assign(other, strlen(other)); // Might be slow with if other is very long.
+            return *this;
+        }
+
+        // Throws if `strlen(other) > MAX_LENGTH`.
+        constexpr SFixedString& operator=(const char* other)
+        {
+            Assign(other, strlen(other));
+            return *this;
+        }
+
+#ifdef __cpp_lib_string_view
+        // Copy at most `m` characters from `other`
+        constexpr SFixedString& AssignAtMost(std::string_view other, size_t m = MAX_LENGTH)
+        {
+            if (m > MAX_LENGTH)
+                throw std::length_error{ "m > MAX_LENGTH" };
+            Assign(other.data(), std::min<size_t>(other.length(), m));
+            return *this;
+        }
+
+        // Throws if `other.length() > MAX_LENGTH`.
         constexpr SFixedString& operator=(std::string_view other)
         {
-            Assign(other.data(), other.length() + 1);
+            Assign(other.data(), other.length());
             return *this;
         }
+
+        constexpr operator std::string_view() const { return { szData }; }
+#else
+        // Copy at most `m` characters from `other`
+        constexpr SFixedString& AssignAtMost(const std::string& other, size_t m = MAX_LENGTH)
+        {
+            if (m > MAX_LENGTH)
+                throw std::length_error{ "m > MAX_LENGTH" };
+            Assign(other.data(), std::min<size_t>(other.length(), m));
+            return *this;
+        }
+
+        // Throws if `other.length() > MAX_LENGTH`.
+        constexpr SFixedString& operator=(const std::string& other)
+        {
+            Assign(other.data(), other.length());
+            return *this;
+        }
+
+        constexpr operator std::string() const { return { szData }; }
 #endif
 
-#ifdef __cpp_lib_string_view
-        // Out
-        constexpr operator std::string_view() const { return { szData }; }
-#endif
         constexpr operator const char*() const { return szData; }
         constexpr char*           Data() { return &szData[0]; }
 

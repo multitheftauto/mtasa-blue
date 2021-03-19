@@ -86,7 +86,7 @@ public:
     unsigned long long GetTimeSinceConnected() { return m_ConnectedTimer.Get(); }
 
     const char* GetNick() { return m_nick; };
-    void        SetNick(const char* szNick);
+    void        SetNick(std::string_view nick) { m_nick.AssignAtMost(nick); }
 
     int                GetGameVersion() { return m_iGameVersion; };
     void               SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
@@ -204,7 +204,7 @@ public:
     void SetCursorShowing(bool bCursorShowing) { m_bCursorShowing = bCursorShowing; }
 
     std::string_view GetNametagText() { return m_nametagText; }
-    void  SetNametagText(std::string_view text) { m_nametagText = text; }
+    void  SetNametagText(std::string_view text) { m_nametagText.AssignAtMost(text); }
     void  GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     void  SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB);
     void  RemoveNametagOverrideColor();
