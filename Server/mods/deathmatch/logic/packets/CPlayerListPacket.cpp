@@ -131,10 +131,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(pPlayer->IsFrozen());
 
         // Nametag stuff
-        unsigned char    ucNametagTextLength = 0u;
         std::string_view nametagText = pPlayer->GetNametagText();
-
-        ucNametagTextLength = (unsigned char)nametagText.length();
+        unsigned char    ucNametagTextLength = static_cast<unsigned char>(nametagText.length());
 
         if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
         {
