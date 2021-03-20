@@ -1,12 +1,12 @@
 #include "StdInc.h"
 
-CPerformanceRecorder::CPerformanceRecorder()
+CPerformanceRecorder::CPerformanceRecorder() : m_start(GetTimeUs()), m_samples(json_object_new_array())
 {
-    m_samples = json_object_new_array();
 }
 
 CPerformanceRecorder::~CPerformanceRecorder()
 {
+    json_object_put(m_samples);
 }
 
 void CPerformanceRecorder::Start()
@@ -21,8 +21,9 @@ void CPerformanceRecorder::Stop()
 
 void CPerformanceRecorder::Clear()
 {
-    // m_strStream.clear();
     m_start = GetTimeUs();
+    json_object_put(m_samples);
+    m_samples = json_object_new_array();
 }
 
 void CPerformanceRecorder::EnterScope()
@@ -33,7 +34,6 @@ void CPerformanceRecorder::EnterScope()
 void CPerformanceRecorder::ExitScope()
 {
     assert(m_stackSamples.size() > 0);
-    json_object* top = m_stackSamples.top();
     json_object_array_add(m_samples, m_stackSamples.top());
     m_stackSamples.pop();
 }
@@ -56,6 +56,9 @@ CPerformanceRecorder::FunctionSample::FunctionSample(const char* name) : Sample(
 
 CPerformanceRecorder::FunctionSample::~FunctionSample()
 {
+    if (!m_enabled)
+        return;
+
 #ifdef MTA_CLIENT
     json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
 #else
@@ -71,6 +74,9 @@ CPerformanceRecorder::EventSample::EventSample(const char* name) : Sample(name)
 
 CPerformanceRecorder::EventSample::~EventSample()
 {
+    if (!m_enabled)
+        return;
+
 #ifdef MTA_CLIENT
     json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
 #else
@@ -84,10 +90,12 @@ CPerformanceRecorder::Sample::Sample(const char* name) : m_name(name), m_startTi
 {
 #ifdef MTA_CLIENT
     m_enabled = g_pClientGame->GetPerformanceRecorder()->m_bRecordPerformance;
-    g_pClientGame->GetPerformanceRecorder()->EnterScope();
+    if (m_enabled)
+        g_pClientGame->GetPerformanceRecorder()->EnterScope();
 #else
     m_enabled = g_pGame->GetPerformanceRecorder()->m_bRecordPerformance;
-    g_pGame->GetPerformanceRecorder()->EnterScope();
+    if (m_enabled)
+        g_pGame->GetPerformanceRecorder()->EnterScope();
 #endif
 }
 
