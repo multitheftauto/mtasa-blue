@@ -473,10 +473,16 @@ void CGame::DoPulse()
     CLOCK_CALL1(CPerfStatManager::GetSingleton()->DoPulse(););
 
     if (m_pMasterServerAnnouncer)
+    {
+        CPerformanceRecorder::Sample sample("CMasterServerAnnouncer::Pulse");
         m_pMasterServerAnnouncer->Pulse();
+    }
 
     if (m_pHqComms)
+    {
+        CPerformanceRecorder::Sample sample("CHqComms::Pulse");
         m_pHqComms->Pulse();
+    }
 
     CLOCK_CALL1(m_pFunctionUseLogger->Pulse(););
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););

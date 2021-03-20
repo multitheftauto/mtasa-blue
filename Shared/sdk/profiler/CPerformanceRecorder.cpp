@@ -2,6 +2,7 @@
 
 CPerformanceRecorder::CPerformanceRecorder()
 {
+    m_samples = json_object_new_array();
 }
 
 CPerformanceRecorder::~CPerformanceRecorder()
@@ -11,12 +12,6 @@ CPerformanceRecorder::~CPerformanceRecorder()
 void CPerformanceRecorder::Start()
 {
     m_bRecordPerformance = true;
-#ifdef MTA_CLIENT
-    g_pClientGame->GetPerformanceRecorder()->m_strStream
-#else
-    g_pGame->GetPerformanceRecorder()->m_strStream
-#endif
-    << '[';
 }
 
 void CPerformanceRecorder::Stop()
@@ -26,86 +21,140 @@ void CPerformanceRecorder::Stop()
 
 void CPerformanceRecorder::Clear()
 {
-    m_strStream.clear();
+    // m_strStream.clear();
     m_start = GetTimeUs();
+}
+
+void CPerformanceRecorder::EnterScope()
+{
+    m_stackSamples.push(json_object_new_object());
+}
+
+void CPerformanceRecorder::ExitScope()
+{
+    assert(m_stackSamples.size() > 0);
+    json_object* top = m_stackSamples.top();
+    json_object_array_add(m_samples, m_stackSamples.top());
+    m_stackSamples.pop();
+}
+
+json_object* CPerformanceRecorder::GetSampleObject()
+{
+    assert(m_stackSamples.size() > 0);
+    return m_stackSamples.top();
 }
 
 std::string CPerformanceRecorder::GetResult()
 {
-    return m_strStream.str() + "]";
+    int flags = JSON_C_TO_STRING_PLAIN;
+    return json_object_to_json_string_ext(m_samples, flags);
 }
 
-CPerformanceRecorder::FunctionSample::FunctionSample(const char* name) : Sample("")
+CPerformanceRecorder::FunctionSample::FunctionSample(const char* name) : Sample(name)
 {
-    m_name = std::string("Native function: ") + name;
-    m_category = "function";
 }
 
-CPerformanceRecorder::EventSample::EventSample(const char* name) : Sample("")
+CPerformanceRecorder::FunctionSample::~FunctionSample()
 {
-    m_name = std::string("Event: ") + name;
-    m_category = "event";
+#ifdef MTA_CLIENT
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
+#else
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
+#endif
+    json_object_object_add(object, "name", json_object_new_string(("Native function: " + m_name).c_str()));
+    json_object_object_add(object, "cat", json_object_new_string("function"));
+}
+
+CPerformanceRecorder::EventSample::EventSample(const char* name) : Sample(name)
+{
+}
+
+CPerformanceRecorder::EventSample::~EventSample()
+{
+#ifdef MTA_CLIENT
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
+#else
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
+#endif
+    json_object_object_add(object, "name", json_object_new_string(("Event: " + m_name).c_str()));
+    json_object_object_add(object, "cat", json_object_new_string("event"));
 }
 
 CPerformanceRecorder::Sample::Sample(const char* name) : m_name(name), m_startTime(GetTimeUs())
 {
 #ifdef MTA_CLIENT
-    if (g_pClientGame->GetPerformanceRecorder()->m_bRecordPerformance)
+    m_enabled = g_pClientGame->GetPerformanceRecorder()->m_bRecordPerformance;
+    g_pClientGame->GetPerformanceRecorder()->EnterScope();
 #else
-    if (g_pGame->GetPerformanceRecorder()->m_bRecordPerformance)
+    m_enabled = g_pGame->GetPerformanceRecorder()->m_bRecordPerformance;
+    g_pGame->GetPerformanceRecorder()->EnterScope();
 #endif
-        m_pObject = json_object_new_object();
 }
 
 void CPerformanceRecorder::Sample::SetArg(const char* szKey, const char* value)
 {
-    if (!m_pObjectArgs)
-        m_pObjectArgs = json_object_new_object();
+    if (!m_enabled)
+        return;
 
-    json_object_object_add(m_pObjectArgs, szKey, json_object_new_string(value));
+#ifdef MTA_CLIENT
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
+#else
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
+#endif
+    json_object* args = json_object_object_get(object, "args");
+    if (!args)
+    {
+        args = json_object_new_object();
+        json_object_object_add(object, "args", args);
+    }
+
+    json_object_object_add(args, szKey, json_object_new_string(value));
 }
 
 void CPerformanceRecorder::Sample::SetArg(const char* szKey, int value)
 {
-    if (!m_pObjectArgs)
-        m_pObjectArgs = json_object_new_object();
+    if (!m_enabled)
+        return;
 
-    json_object_object_add(m_pObjectArgs, szKey, json_object_new_int(value));
+#ifdef MTA_CLIENT
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
+#else
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
+#endif
+    json_object* args = json_object_object_get(object, "args");
+    if (!args)
+    {
+        args = json_object_new_object();
+        json_object_object_add(object, "args", args);
+    }
+
+    json_object_object_add(args, szKey, json_object_new_int(value));
 }
 
 CPerformanceRecorder::Sample::~Sample()
 {
-    if (m_pObject)
-    {
-        json_object* m_pObjectStart = json_object_new_object();
-        json_object_object_add(m_pObjectStart, "name", json_object_new_string(m_name.c_str()));
-        json_object_object_add(m_pObjectStart, "cat", json_object_new_string(m_category.c_str()));
-        json_object_object_add(m_pObjectStart, "ph", json_object_new_string("B"));
-        json_object_object_add(m_pObjectStart, "ts", json_object_new_int(m_startTime));
-        json_object_object_add(m_pObjectStart, "pid", json_object_new_int(0));
-
-        json_object_object_add(m_pObject, "name", json_object_new_string(m_name.c_str()));
-        json_object_object_add(m_pObject, "cat", json_object_new_string(m_category.c_str()));
-        json_object_object_add(m_pObject, "ph", json_object_new_string("E"));
-        json_object_object_add(m_pObject, "ts", json_object_new_int(GetTimeUs()));
-        json_object_object_add(m_pObject, "pid", json_object_new_int(0));
-
-        if (m_pObjectArgs)
-        {
-            json_object_object_add(m_pObjectStart, "args", m_pObjectArgs);
-        }
-
-        int flags = JSON_C_TO_STRING_PLAIN;
+    if (!m_enabled)
+        return;
 
 #ifdef MTA_CLIENT
-        g_pClientGame->GetPerformanceRecorder()->m_strStream
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
 #else
-        g_pGame->GetPerformanceRecorder()->m_strStream
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
 #endif
-                                                       << json_object_to_json_string_ext(m_pObjectStart, flags) << ','
-                                                       << json_object_to_json_string_ext(m_pObject, flags) << ',';
 
-        json_object_put(m_pObject);
-        json_object_put(m_pObjectStart);
-    }
+    if (!json_object_object_get(object, "name"))
+        json_object_object_add(object, "name", json_object_new_string(m_name.c_str()));
+    if (!json_object_object_get(object, "cat"))
+        json_object_object_add(object, "cat", json_object_new_string("default"));
+
+    json_object_object_add(object, "ph", json_object_new_string("X"));
+    json_object_object_add(object, "ts", json_object_new_int(m_startTime));
+    json_object_object_add(object, "dur", json_object_new_int(GetTimeUs() - m_startTime));
+    json_object_object_add(object, "tid", json_object_new_int(getpid()));
+
+#ifdef MTA_CLIENT
+    g_pClientGame->GetPerformanceRecorder()->ExitScope();
+#else
+    g_pGame->GetPerformanceRecorder()->ExitScope();
+#endif
 }

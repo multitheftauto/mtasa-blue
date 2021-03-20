@@ -220,6 +220,7 @@ void CNetServerBuffer::StopNetwork()
 ///////////////////////////////////////////////////////////////////////////
 void CNetServerBuffer::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CNetServerBuffer::DoPulse");
     // Schedule a net pulse
     SDoPulseArgs* pArgs = new SDoPulseArgs();
     AddCommandAndFree(pArgs);
