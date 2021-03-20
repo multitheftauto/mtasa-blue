@@ -156,7 +156,7 @@ CPerformanceRecorder::Sample::~Sample()
         json_object_object_add(object, "cat", json_object_new_string("default"));
 
     json_object_object_add(object, "ph", json_object_new_string("X"));
-    json_object_object_add(object, "ts", json_object_new_int(m_startTime));
+    json_object_object_add(object, "ts", json_object_new_int64(m_startTime)); // int64 prevents int32 overflowing in this case.
     json_object_object_add(object, "dur", json_object_new_int(GetTimeUs() - m_startTime));
     json_object_object_add(object, "tid", json_object_new_int(getpid()));
 
