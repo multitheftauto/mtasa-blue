@@ -574,7 +574,7 @@ void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, 
                 {
                     // Remove query portion of URL
                     SString strUrlCleaned = SString(pArgument->GetString()).ReplaceI("%3F","?").Replace("#","?").SplitLeft("?");
-                    pArgument->ReadString(strUrlCleaned);   
+                    pArgument->ReadString(strUrlCleaned);
                 }
             }
             else if (maskArgument.argType == EArgType::MaxArgs)

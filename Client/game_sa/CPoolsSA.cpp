@@ -98,9 +98,9 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
         auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
-        
+
         switch (vehicleClass)
-	    {
+        {
             case VehicleClass::BOAT:
                 pVehicle = new CBoatSA(eVehicleType, ucVariation, ucVariation2);
                 break;
@@ -111,7 +111,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
             default:
                 pVehicle = new CVehicleSA(eVehicleType, ucVariation, ucVariation2);
                 break;
-	    }
+        }
 
         if (!AddVehicleToPool(pClientVehicle, pVehicle))
         {
@@ -159,7 +159,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInter
                     default:
                         pVehicle = new CVehicleSA(pInterface);
                         break;
-	            }
+                }
 
                 if (!AddVehicleToPool(pClientVehicle, pVehicle))
                 {

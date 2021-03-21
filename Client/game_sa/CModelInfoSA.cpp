@@ -591,7 +591,7 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)
         return false;
-    
+
     if (GetModelType() != eModelInfoType::TIME)
         return false;
 

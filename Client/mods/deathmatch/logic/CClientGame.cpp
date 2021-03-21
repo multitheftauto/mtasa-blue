@@ -2465,6 +2465,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2598,6 +2599,8 @@ void CClientGame::AddBuiltInEvents()
     // Object events
     m_Events.AddEvent("onClientObjectDamage", "loss, attacker", NULL, false);
     m_Events.AddEvent("onClientObjectBreak", "attacker", NULL, false);
+    m_Events.AddEvent("onClientObjectMoveStart", "", NULL, false);
+    m_Events.AddEvent("onClientObjectMoveStop", "", NULL, false);
 
     // Web events
     m_Events.AddEvent("onClientBrowserWhitelistChange", "newPages", NULL, false);

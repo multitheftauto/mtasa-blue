@@ -1471,6 +1471,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
+    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
     // Blip events
 
@@ -1540,6 +1541,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
