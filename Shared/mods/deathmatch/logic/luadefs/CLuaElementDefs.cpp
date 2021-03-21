@@ -82,7 +82,6 @@ int CLuaElementDefs::GetAllElementData(lua_State* luaVM)
     return 1;
 }
 
-
 int CLuaElementDefs::HasElementData(lua_State* luaVM)
 {
     //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )
