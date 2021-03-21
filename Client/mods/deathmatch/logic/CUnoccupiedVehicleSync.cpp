@@ -56,6 +56,7 @@ bool CUnoccupiedVehicleSync::ProcessPacket(unsigned char ucPacketID, NetBitStrea
 
 void CUnoccupiedVehicleSync::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CUnoccupiedVehicleSync::DoPulse");
     // Check all our vehicles for damage
     UpdateDamageModels();
 

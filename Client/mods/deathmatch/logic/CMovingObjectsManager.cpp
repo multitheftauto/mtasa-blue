@@ -14,6 +14,7 @@
 
 void CMovingObjectsManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CMovingObjectsManager::DoPulse");
     using Iterator = std::list<CDeathmatchObject*>::iterator;
 
     for (Iterator iter = m_List.begin(); iter != m_List.end(); /* manual increment */)

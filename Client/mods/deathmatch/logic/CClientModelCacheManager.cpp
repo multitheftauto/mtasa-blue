@@ -101,6 +101,7 @@ CClientModelCacheManagerImpl::~CClientModelCacheManagerImpl()
 ///////////////////////////////////////////////////////////////
 void CClientModelCacheManagerImpl::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CClientModelCacheManager::DoPulse");
     m_TickCountNow = CTickCount::Now();
     ClearStats();
 

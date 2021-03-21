@@ -110,6 +110,8 @@ void CLuaManager::ProcessPendingDeleteList()
 
 void CLuaManager::DoPulse()
 {
+    CPerformanceRecorder::Sample sample("CLuaManager::DoPulse");
+    sample.SetArg("Virtual machines count", m_virtualMachines.size());
     list<CLuaMain*>::iterator iter = m_virtualMachines.begin();
     for (; iter != m_virtualMachines.end(); ++iter)
     {

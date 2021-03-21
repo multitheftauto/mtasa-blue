@@ -1711,6 +1711,7 @@ int CLuaElementDefs::SetElementID(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementData(lua_State* luaVM)
 {
+    CPerformanceRecorder::FunctionSample sample("SetElementData");
     //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
     CClientEntity* pEntity;
     SString        strKey;
@@ -1735,7 +1736,8 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
                                                              *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
-
+            sample.SetArg("Key", strKey);
+            sample.SetArg("Synchronized", bSynchronize);
             if (CStaticFunctionDefinitions::SetElementData(*pEntity, strKey, value, bSynchronize))
             {
                 lua_pushboolean(luaVM, true);

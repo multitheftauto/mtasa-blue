@@ -28,6 +28,10 @@ public:
 
         void SetArg(const char* szKey, const char* value);
         void SetArg(const char* szKey, int value);
+        void SetArg(const char* szKey, size_t value);
+        void SetArg(const char* szKey, bool value);
+
+        void Exit();
 
     protected:
         std::string m_name;

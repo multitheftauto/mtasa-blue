@@ -88,6 +88,7 @@ void CElementDeleter::DeleteRecursive(class CClientEntity* pElement)
 
 void CElementDeleter::DoDeleteAll()
 {
+    CPerformanceRecorder::Sample sample("CElementDeleter::DoDeleteAll");
     // Make sure elements won't call us back and screw with our list (would crash)
     m_bAllowUnreference = false;
 

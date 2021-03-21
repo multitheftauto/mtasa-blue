@@ -119,6 +119,26 @@ void CPerformanceRecorder::Sample::SetArg(const char* szKey, const char* value)
     json_object_object_add(args, szKey, json_object_new_string(value));
 }
 
+void CPerformanceRecorder::Sample::SetArg(const char* szKey, bool value)
+{
+    if (!m_enabled)
+        return;
+
+#ifdef MTA_CLIENT
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
+#else
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
+#endif
+    json_object* args = json_object_object_get(object, "args");
+    if (!args)
+    {
+        args = json_object_new_object();
+        json_object_object_add(object, "args", args);
+    }
+
+    json_object_object_add(args, szKey, json_object_new_boolean(value));
+}
+
 void CPerformanceRecorder::Sample::SetArg(const char* szKey, int value)
 {
     if (!m_enabled)
@@ -139,7 +159,27 @@ void CPerformanceRecorder::Sample::SetArg(const char* szKey, int value)
     json_object_object_add(args, szKey, json_object_new_int(value));
 }
 
-CPerformanceRecorder::Sample::~Sample()
+void CPerformanceRecorder::Sample::SetArg(const char* szKey, size_t value)
+{
+    if (!m_enabled)
+        return;
+
+#ifdef MTA_CLIENT
+    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
+#else
+    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
+#endif
+    json_object* args = json_object_object_get(object, "args");
+    if (!args)
+    {
+        args = json_object_new_object();
+        json_object_object_add(object, "args", args);
+    }
+
+    json_object_object_add(args, szKey, json_object_new_int64(value));
+}
+
+void CPerformanceRecorder::Sample::Exit()
 {
     if (!m_enabled)
         return;
@@ -156,7 +196,7 @@ CPerformanceRecorder::Sample::~Sample()
         json_object_object_add(object, "cat", json_object_new_string("default"));
 
     json_object_object_add(object, "ph", json_object_new_string("X"));
-    json_object_object_add(object, "ts", json_object_new_int64(m_startTime)); // int64 prevents int32 overflowing in this case.
+    json_object_object_add(object, "ts", json_object_new_int64(m_startTime));            // int64 prevents int32 overflowing in this case.
     json_object_object_add(object, "dur", json_object_new_int(GetTimeUs() - m_startTime));
     json_object_object_add(object, "tid", json_object_new_int(getpid()));
 
@@ -165,4 +205,10 @@ CPerformanceRecorder::Sample::~Sample()
 #else
     g_pGame->GetPerformanceRecorder()->ExitScope();
 #endif
+    m_enabled = false;
+}
+
+CPerformanceRecorder::Sample::~Sample()
+{
+    Exit();
 }

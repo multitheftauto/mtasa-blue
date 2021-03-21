@@ -733,6 +733,7 @@ void CClientGame::DoPulsePreFrame()
 
 void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
 {
+    CPerformanceRecorder::Sample sample("CClientGame::DoPulsePreHUDRender");
     // Allow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
 
@@ -765,6 +766,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 
 void CClientGame::DoPulsePostFrame()
 {
+    CPerformanceRecorder::Sample sample("CClientGame::DoPulsePostFrame");
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
     #ifdef DEBUG_KEYSTATES
     // Get the controller state
@@ -942,6 +944,7 @@ void CClientGame::DoPulses()
 
     g_pCore->ApplyFrameRateLimit();
 
+    CPerformanceRecorder::Sample sample("CClientGame::DoPulses");
     TIMING_CHECKPOINT("+CClientGame::DoPulses");
 
     m_BuiltCollisionMapThisFrame = false;
@@ -1315,6 +1318,7 @@ void CClientGame::DoPulses()
 // Extrapolation test
 void CClientGame::DoPulses2(bool bCalledFromIdle)
 {
+    CPerformanceRecorder::Sample sample("CClientGame::DoPulses2");
     bool bIsUsingAlternatePulseOrder = IsUsingAlternatePulseOrder(!bCalledFromIdle);
 
     // Figure out which pulses to do
@@ -1345,11 +1349,12 @@ void CClientGame::DoPulses2(bool bCalledFromIdle)
         // be rounded to look more like what is expected
         ChangeFloatPrecision(true);
 
-        // Pulse the network interface
-        TIMING_CHECKPOINT("+NetPulse");
-        g_pNet->DoPulse();
-        TIMING_CHECKPOINT("-NetPulse");
-
+        {
+            // Pulse the network interface
+            TIMING_CHECKPOINT("+NetPulse");
+            g_pNet->DoPulse();
+            TIMING_CHECKPOINT("-NetPulse");
+        }
         // Change precision back, and check we are in low precision mode 4 sure
         ChangeFloatPrecision(false);
         assert(!IsHighFloatPrecision());

@@ -1546,6 +1546,7 @@ int CLuaElementDefs::setElementID(lua_State* luaVM)
 
 int CLuaElementDefs::setElementData(lua_State* luaVM)
 {
+    CPerformanceRecorder::FunctionSample sample("setElementData");
     //  bool setElementData ( element theElement, string key, var value, [var syncMode = true] )
     CElement*    pElement;
     SString      strKey;
@@ -1579,6 +1580,8 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
+        sample.SetArg("Sync type", EnumToString(syncType));
+        sample.SetArg("Key", strKey);
         if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
         {
             lua_pushboolean(luaVM, true);

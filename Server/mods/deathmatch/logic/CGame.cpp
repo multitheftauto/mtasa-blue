@@ -420,10 +420,17 @@ void CGame::DoPulse()
         UNCLOCK1("HTTPDownloadManager");
     }
 
-    CLOCK_CALL1(m_pPlayerManager->DoPulse(););
+    {
+        CPerformanceRecorder::Sample sample("CPlayerManager::DoPulse");
+        CLOCK_CALL1(m_pPlayerManager->DoPulse(););
 
-    // Pulse the net interface
-    CLOCK_CALL1(g_pNetServer->DoPulse(););
+    }
+
+    {
+        CPerformanceRecorder::Sample sample("CNetServerBuffer::DoPulse");
+        // Pulse the net interface
+        CLOCK_CALL1(g_pNetServer->DoPulse(););
+    }
 
     if (m_pLanBroadcast)
     {

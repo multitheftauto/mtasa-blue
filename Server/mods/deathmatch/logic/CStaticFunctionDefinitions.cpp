@@ -878,13 +878,10 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
     assert(pElement);
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
-    CPerformanceRecorder::FunctionSample sample("setElementData");
 
     ESyncType     lastSyncType = ESyncType::BROADCAST;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
 
-    sample.SetArg("Sync type", EnumToString(syncType));
-    sample.SetArg("Key", szName);
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
         if (syncType != ESyncType::LOCAL)

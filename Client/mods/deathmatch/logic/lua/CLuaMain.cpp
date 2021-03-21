@@ -508,6 +508,7 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
 ///////////////////////////////////////////////////////////////
 int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 {
+    CPerformanceRecorder::Sample sample("CLuaMain::PCall");
     TIMING_CHECKPOINT("+pcall");
     g_pClientGame->ChangeFloatPrecision(true);
     g_pClientGame->GetScriptDebugging()->PushLuaMain(this);
