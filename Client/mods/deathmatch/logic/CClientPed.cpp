@@ -565,7 +565,7 @@ void CClientPed::SetInterior(unsigned char ucInterior)
         }
     }
 
-    m_ucInterior = ucInterior;
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientPed::Teleport(const CVector& vecPosition)

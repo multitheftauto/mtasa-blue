@@ -219,7 +219,7 @@ public:
     void RemoveOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.remove(pPed); }
 
     unsigned char GetInterior() { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
+    void          SetInterior(unsigned char ucInterior);
 
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
