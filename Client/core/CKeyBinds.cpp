@@ -480,10 +480,14 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                                                     }
                                                 }
 
-                                                // don't fire if its already fired
+                                                // don't add if its already added to queue
                                                 if (!bAlreadyProcessed)
                                                 {
-                                                    Call(pCommandBind);
+                                                    if (processedList.empty())
+                                                        Call(pCommandBind);
+                                                    else
+                                                        m_vecBindQueue.push_back(pCommandBind);
+
                                                     processedList.push_back(pCommandBind);
                                                 }
                                             }
@@ -2088,6 +2092,13 @@ void CKeyBinds::DoPreFramePulse()
     {
         Call(m_pChatBoxBind);
         m_pChatBoxBind = NULL;
+    }
+
+    if (!m_vecBindQueue.empty())
+    {
+        auto it = m_vecBindQueue.begin();
+        Call(*it);
+        m_vecBindQueue.erase(it);
     }
 
     // HACK: shift keys
