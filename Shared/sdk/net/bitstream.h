@@ -228,6 +228,13 @@ public:
         // Write the characters
         return WriteStringCharacters(value);
     }
+
+    // Write a string (incl. variable size header)
+    void WriteStr(std::string_view value)
+    {
+        WriteLength(value.length());
+        return WriteStringCharacters(value, value.length());
+    }
 #endif
 
     // Read characters into a std::string
@@ -307,13 +314,6 @@ public:
                 return false;
         }
         return true;
-    }
-
-    // Write a string (incl. variable size header)
-    void WriteStr(std::string_view value)
-    {
-        WriteLength(value.length());
-        return WriteStringCharacters(value, value.length());
     }
 
     // Read a string (incl. variable size header)
