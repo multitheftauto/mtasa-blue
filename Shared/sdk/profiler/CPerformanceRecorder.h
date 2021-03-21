@@ -27,15 +27,14 @@ public:
         virtual ~Sample();
 
         void SetArg(const char* szKey, const char* value);
-        void SetArg(const char* szKey, int value);
-        void SetArg(const char* szKey, size_t value);
-        void SetArg(const char* szKey, bool value);
+        void SetArg(const char* szKey, int64_t value);
+        void SetBool(const char* szKey, bool value);
 
         void Exit();
 
     protected:
         std::string m_name;
-        bool        m_enabled;
+        bool        m_enabled = false;
 
     private:
         TIMEUS m_startTime = 0;

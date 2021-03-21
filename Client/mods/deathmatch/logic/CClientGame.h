@@ -299,7 +299,7 @@ public:
     CLatentTransferManager*   GetLatentTransferManager() { return m_pLatentTransferManager; }
     CClientModelCacheManager* GetModelCacheManager() { return m_pModelCacheManager; }
     CDebugHookManager*        GetDebugHookManager() { return m_pDebugHookManager; }
-    CPerformanceRecorder*     GetPerformanceRecorder() const { return m_pPerformanceRecorder; }
+    CPerformanceRecorder*     GetPerformanceRecorder() const { return m_pPerformanceRecorder.get(); }
 
     CElementDeleter*              GetElementDeleter() { return &m_ElementDeleter; }
     CObjectRespawner*             GetObjectRespawner() { return &m_ObjectRespawner; }
@@ -689,7 +689,6 @@ private:
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;
     CResourceFileDownloadManager* m_pResourceFileDownloadManager;
-    CPerformanceRecorder*         m_pPerformanceRecorder;
 
     // Revised facilities
     CServer m_Server;
@@ -705,7 +704,8 @@ private:
     CScriptDebugging*   m_pScriptDebugging;
     CRegisteredCommands m_RegisteredCommands;
 
-    std::unique_ptr<CServerInfo> m_ServerInfo;
+    std::unique_ptr<CServerInfo>          m_ServerInfo;
+    std::unique_ptr<CPerformanceRecorder> m_pPerformanceRecorder;
 
     // Map statuses
     SString m_strCurrentMapName;

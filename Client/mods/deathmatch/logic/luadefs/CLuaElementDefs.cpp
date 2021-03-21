@@ -1737,7 +1737,7 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
             sample.SetArg("Key", strKey);
-            sample.SetArg("Synchronized", bSynchronize);
+            sample.SetBool("Synchronized", bSynchronize);
             if (CStaticFunctionDefinitions::SetElementData(*pEntity, strKey, value, bSynchronize))
             {
                 lua_pushboolean(luaVM, true);

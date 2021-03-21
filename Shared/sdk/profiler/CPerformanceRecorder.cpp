@@ -6,7 +6,11 @@ CPerformanceRecorder::CPerformanceRecorder() : m_start(GetTimeUs()), m_samples(j
 
 CPerformanceRecorder::~CPerformanceRecorder()
 {
-    json_object_put(m_samples);
+    if (m_samples)
+    {
+        json_object_put(m_samples);
+        m_samples = nullptr;
+    }
 }
 
 void CPerformanceRecorder::Start()
@@ -88,11 +92,18 @@ CPerformanceRecorder::EventSample::~EventSample()
 
 CPerformanceRecorder::Sample::Sample(const char* name) : m_name(name), m_startTime(GetTimeUs())
 {
+
 #ifdef MTA_CLIENT
+    if (!g_pClientGame)
+        return;
+
     m_enabled = g_pClientGame->GetPerformanceRecorder()->m_bRecordPerformance;
     if (m_enabled)
         g_pClientGame->GetPerformanceRecorder()->EnterScope();
 #else
+    if (!g_pGame)
+        return;
+
     m_enabled = g_pGame->GetPerformanceRecorder()->m_bRecordPerformance;
     if (m_enabled)
         g_pGame->GetPerformanceRecorder()->EnterScope();
@@ -119,7 +130,7 @@ void CPerformanceRecorder::Sample::SetArg(const char* szKey, const char* value)
     json_object_object_add(args, szKey, json_object_new_string(value));
 }
 
-void CPerformanceRecorder::Sample::SetArg(const char* szKey, bool value)
+void CPerformanceRecorder::Sample::SetBool(const char* szKey, bool value)
 {
     if (!m_enabled)
         return;
@@ -139,27 +150,7 @@ void CPerformanceRecorder::Sample::SetArg(const char* szKey, bool value)
     json_object_object_add(args, szKey, json_object_new_boolean(value));
 }
 
-void CPerformanceRecorder::Sample::SetArg(const char* szKey, int value)
-{
-    if (!m_enabled)
-        return;
-
-#ifdef MTA_CLIENT
-    json_object* object = g_pClientGame->GetPerformanceRecorder()->GetSampleObject();
-#else
-    json_object* object = g_pGame->GetPerformanceRecorder()->GetSampleObject();
-#endif
-    json_object* args = json_object_object_get(object, "args");
-    if (!args)
-    {
-        args = json_object_new_object();
-        json_object_object_add(object, "args", args);
-    }
-
-    json_object_object_add(args, szKey, json_object_new_int(value));
-}
-
-void CPerformanceRecorder::Sample::SetArg(const char* szKey, size_t value)
+void CPerformanceRecorder::Sample::SetArg(const char* szKey, int64_t value)
 {
     if (!m_enabled)
         return;
