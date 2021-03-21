@@ -30,7 +30,7 @@ void CEntryHistory::Add(SString line)
 {
     if (line.empty())
         return;
-    
+
     // Remove any matching entry
     m_entries.remove(line);
 

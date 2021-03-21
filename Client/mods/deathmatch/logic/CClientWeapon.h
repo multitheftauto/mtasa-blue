@@ -40,7 +40,7 @@ enum eWeaponFlags
     WEAPONFLAGS_DISABLE_MODEL,
     WEAPONFLAGS_INSTANT_RELOAD,
 };
-class CClientWeapon : public CClientObject
+class CClientWeapon final : public CClientObject
 {
     DECLARE_CLASS(CClientWeapon, CClientObject)
 public:

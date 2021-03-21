@@ -703,11 +703,11 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
         unsigned int uiIndex = 0;
 
         ProcessControl(cs.LeftStickX, uiIndex); // Left
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.LeftStickX, uiIndex); // Right
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.LeftStickY, uiIndex); // Up
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.LeftStickY, uiIndex); // Down
     }
     else
@@ -715,23 +715,23 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
         unsigned int uiIndex = 4;
 
         ProcessControl(cs.LeftStickX, uiIndex); // Left
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.LeftStickX, uiIndex); // Right
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.LeftStickY, uiIndex); // Up
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.LeftStickY, uiIndex); // Down
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.ButtonCross, uiIndex); // Accel
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.ButtonSquare, uiIndex); // Brake
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.RightStickX, uiIndex); // Special Left
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.RightStickX, uiIndex); // Special Right
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.RightStickY, uiIndex); // Special Up
-        uiIndex++;            
+        uiIndex++;
         ProcessControl(cs.RightStickY, uiIndex); // Special Down
     }
 }

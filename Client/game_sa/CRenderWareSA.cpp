@@ -474,7 +474,7 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
-    // The above function adds a reference to the model's TXD by either 
+    // The above function adds a reference to the model's TXD by either
     // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
     return true;

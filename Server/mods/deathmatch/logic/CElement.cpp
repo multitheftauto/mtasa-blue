@@ -1072,6 +1072,20 @@ void CElement::SetDimension(unsigned short usDimension)
     CallEvent("onElementDimensionChange", Arguments);
 }
 
+void CElement::SetInterior(unsigned char ucInterior)
+{
+    if (m_ucInterior == ucInterior)
+        return;
+
+    unsigned char ucOldInterior = m_ucInterior;
+    m_ucInterior = ucInterior;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(ucOldInterior);
+    Arguments.PushNumber(ucInterior);
+    CallEvent("onElementInteriorChange", Arguments);
+}
+
 CClient* CElement::GetClient()
 {
     CClient* pClient = NULL;

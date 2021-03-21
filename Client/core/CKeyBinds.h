@@ -161,18 +161,19 @@ public:
 private:
     CCore* m_pCore;
 
-    std::list<CKeyBind*>* m_pList;
-    bool                  m_bMouseWheel;
-    bool                  m_bInVehicle;
-    CCommandBind*         m_pChatBoxBind;
-    bool                  m_bProcessingKeyStroke;
-    KeyStrokeHandler      m_KeyStrokeHandler;
-    CharacterKeyHandler   m_CharacterKeyHandler;
-    bool                  m_bWaitingToLoadDefaults;
-    bool                  m_bLastStateForwards;
-    bool                  m_bLastStateBackwards;
-    bool                  m_bMoveForwards;
-    bool                  m_bLastStateLeft;
-    bool                  m_bLastStateRight;
-    bool                  m_bMoveLeft;
+    std::list<CKeyBind*>*  m_pList;
+    bool                   m_bMouseWheel;
+    bool                   m_bInVehicle;
+    CCommandBind*          m_pChatBoxBind;
+    std::vector<CKeyBind*> m_vecBindQueue;
+    bool                   m_bProcessingKeyStroke;
+    KeyStrokeHandler       m_KeyStrokeHandler;
+    CharacterKeyHandler    m_CharacterKeyHandler;
+    bool                   m_bWaitingToLoadDefaults;
+    bool                   m_bLastStateForwards;
+    bool                   m_bLastStateBackwards;
+    bool                   m_bMoveForwards;
+    bool                   m_bLastStateLeft;
+    bool                   m_bLastStateRight;
+    bool                   m_bMoveLeft;
 };

@@ -10,6 +10,7 @@
 #pragma once
 #include <cryptopp/base64.h>
 #include <cryptopp/base32.h>
+#include "SString.h"
 
 namespace SharedUtil
 {

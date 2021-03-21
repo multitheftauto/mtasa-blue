@@ -20,7 +20,7 @@ namespace lua
         return outValue;
     }
 
-    
+
     template <>
     std::string_view PopPrimitive<std::string_view>(lua_State* L, std::size_t& index)
     {
@@ -88,7 +88,7 @@ namespace lua
     {
         return static_cast<double>(lua_tonumber(L, index++));
     }
-    
+
     template <>
     bool PopPrimitive<bool>(lua_State* L, std::size_t& index)
     {

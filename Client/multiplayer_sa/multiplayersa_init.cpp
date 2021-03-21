@@ -65,11 +65,6 @@ void OnCrashAverted(uint uiId)
     g_pCore->OnCrashAverted(uiId);
 }
 
-HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
-{
-    return g_pCore->SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
-}
-
 void OnEnterCrashZone(uint uiId)
 {
     g_pCore->OnEnterCrashZone(uiId);

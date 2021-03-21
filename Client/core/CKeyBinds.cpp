@@ -377,7 +377,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     if (m_pCore->IsCursorForcedVisible())
     {
         if (!bIsCursorForced)
-        {   
+        {
             if (m_pCore->IsCursorControlsToggled())
             {
                 SetAllControls(false);
@@ -480,10 +480,14 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                                                     }
                                                 }
 
-                                                // don't fire if its already fired
+                                                // don't add if its already added to queue
                                                 if (!bAlreadyProcessed)
                                                 {
-                                                    Call(pCommandBind);
+                                                    if (processedList.empty())
+                                                        Call(pCommandBind);
+                                                    else
+                                                        m_vecBindQueue.push_back(pCommandBind);
+
                                                     processedList.push_back(pCommandBind);
                                                 }
                                             }
@@ -1954,7 +1958,7 @@ bool CKeyBinds::GetKeyStateByName(const char* keyName, bool& state) const
         state = GetBindableKeyState(key);
         return true;
     }
-    
+
     return false;
 }
 
@@ -2088,6 +2092,13 @@ void CKeyBinds::DoPreFramePulse()
     {
         Call(m_pChatBoxBind);
         m_pChatBoxBind = NULL;
+    }
+
+    if (!m_vecBindQueue.empty())
+    {
+        auto it = m_vecBindQueue.begin();
+        Call(*it);
+        m_vecBindQueue.erase(it);
     }
 
     // HACK: shift keys
@@ -2351,7 +2362,7 @@ void CKeyBinds::DoPostFramePulse()
 
         bindableKeyStates[BK_MOUSE_WHEEL_UP] = false;
         bindableKeyStates[BK_MOUSE_WHEEL_DOWN] = false;
-        
+
         m_bMouseWheel = false;
     }
 }
