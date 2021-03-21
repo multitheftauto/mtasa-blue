@@ -501,7 +501,6 @@ ePedCamMode CClientCamera::GetCameraPedViewMode()
     return (ePedCamMode)m_pCamera->GetCameraPedViewMode();
 }
 
-
 void CClientCamera::SetCameraClip(bool bObjects, bool bVehicles)
 {
     m_pCamera->SetCameraClip(bObjects, bVehicles);
