@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 #include "CSpatialDatabase.h"
+#include <variant>
+#include <utility>
 
 class CLuaElementDefs : public CLuaDefs
 {
@@ -69,14 +71,15 @@ public:
     LUA_DECLARE(setElementVisibleTo);
 
     // Element data
-    static bool removeElementData(lua_State* luaVM, CElement* const element, std::string key);
-    static bool addElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
-    static bool removeElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
-    static bool hasElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
+    static bool removeElementData(lua_State* luaVM, CElement* element, std::string key);
+    static bool addElementDataSubscriber(lua_State* luaVM, CElement* dataOwner, std::string key, CPlayer* subber);
+    static bool removeElementDataSubscriber(lua_State* luaVM, CElement* dataOwner, std::string key, CPlayer* subber);
+    static bool hasElementDataSubscriber(lua_State* luaVM, CElement* dataOwner, std::string key, CPlayer* subber);
+
     // shared with the client(can be found in CLuaElementSharedDefs.cpp)
-    static std::variant<bool, std::reference_wrapper<CLuaArgument>> getElementData(lua_State* const luaVM, CElement* const element, std::string key, std::optional<bool> inherit);
-    static bool hasElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit);
-    static bool setElementData(lua_State* const luaVM, CElement* const element, std::string key, CLuaArgument newValue, const std::optional<std::variant<bool, ESyncType>> optionalNewSyncType);
+    static std::variant<bool, std::reference_wrapper<CLuaArgument>> GetElementData(lua_State* L, CElement* element, std::string key, std::optional<bool> inherit);
+    static bool HasElementData(lua_State* luaVM, CElement* element, std::string key, std::optional<bool> inherit);
+    static bool SetElementData(lua_State* luaVM, CElement* element, std::string key, CLuaArgument newValue, std::optional<std::variant<bool, ESyncType>> optionalNewSyncType);
 
     // Attachement
     LUA_DECLARE(attachElements);

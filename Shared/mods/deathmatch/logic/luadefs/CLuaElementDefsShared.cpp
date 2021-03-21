@@ -1,45 +1,52 @@
 #include "StdInc.h"
 
+#ifdef CElement
+#undef CElement
+#endif
+#ifdef MTA_CLIENT
+using CElement = CClientEntity;
+#endif
+
 // Warn and truncate if key is too long
-static void TruncateStringAndWarn(std::string& key, lua_State* const luaVM, CScriptDebugging* const scriptDebugging)
+void TruncateStringAndWarn(lua_State* L, std::string& key)
 {
     if (key.length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
-        static const char* formatString = "Truncated argument @ '%s' [string length reduced to " QUOTE_DEFINE(MAX_CUSTOMDATA_NAME_LENGTH) " characters at argument 2. Key: %s]";
-        key = key.substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
-        scriptDebugging->LogCustom(luaVM, SString(formatString, lua_tostring(luaVM, lua_upvalueindex(1)), key.c_str()).c_str());
+#ifdef MTA_CLIENT
+        const auto scriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+        const auto scriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+        scriptDebugging->LogCustom(L, SString(
+            "Truncated argument @ '%s' [string length reduced to " QUOTE_DEFINE(MAX_CUSTOMDATA_NAME_LENGTH) " characters at argument 2]",
+            lua_tostring(L, lua_upvalueindex(1))
+        ));
+        key.resize(MAX_CUSTOMDATA_NAME_LENGTH);
     }
 }
 
-#ifdef MTA_CLIENT
-std::variant<bool, std::reference_wrapper<CLuaArgument>> CLuaElementDefs::GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit)
-#else
-std::variant<bool, std::reference_wrapper<CLuaArgument>> CLuaElementDefs::getElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit)
-#endif
+std::variant<bool, std::reference_wrapper<CLuaArgument>>
+CLuaElementDefs::GetElementData(lua_State* L, CElement* element, std::string key, std::optional<bool> inherit)
 {
-    TruncateStringAndWarn(key, luaVM, m_pScriptDebugging);
-
-#ifdef MTA_CLIENT
-    CLuaArgument* const pVariable = element->GetCustomData(key.c_str(), inherit.value_or(true));
-#else
-    CLuaArgument* const pVariable = CStaticFunctionDefinitions::GetElementData(element, key.c_str(), inherit.value_or(true));
-#endif
-
-    if (pVariable)
-        return *pVariable;
-
+    TruncateStringAndWarn(L, key);
+    if (auto value = element->GetCustomData(key.c_str(), inherit.value_or(true)))
+        return *value;
     return false;
 }
 
 #ifdef MTA_CLIENT
 //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
-bool CLuaElementDefs::SetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, CLuaArgument newValue, const std::optional<bool> optionalIsSynced)
+bool CLuaElementDefs::SetElementData(lua_State* L, CClientEntity* element, std::string key, CLuaArgument newValue, std::optional<bool> optionalIsSynced)
 #else
 //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true / string syncType = "broadcast"] )
-bool CLuaElementDefs::setElementData(lua_State* const luaVM, CElement* const element, std::string key, CLuaArgument newValue, const std::optional<std::variant<bool, ESyncType>> optionalNewSyncType)
+bool CLuaElementDefs::SetElementData(lua_State* L, CElement* element, std::string key, CLuaArgument newValue, std::optional<std::variant<bool, ESyncType>> optionalNewSyncType)
 #endif
 {
-#ifndef MTA_CLIENT
+    TruncateStringAndWarn(L, key);
+
+#ifdef MTA_CLIENT
+    return CStaticFunctionDefinitions::SetElementData(*element, key.c_str(), newValue, optionalIsSynced.value_or(true));
+#else
     ESyncType newSyncType = ESyncType::BROADCAST;
     if (optionalNewSyncType)
     {
@@ -51,31 +58,13 @@ bool CLuaElementDefs::setElementData(lua_State* const luaVM, CElement* const ele
             newSyncType = ESyncType::LOCAL;
     }
 
-    LogWarningIfPlayerHasNotJoinedYet(luaVM, element);
-#endif
-
-    TruncateStringAndWarn(key, luaVM, m_pScriptDebugging);
-
-#ifdef MTA_CLIENT
-    return CStaticFunctionDefinitions::SetElementData(*element, key.c_str(), newValue, optionalIsSynced.value_or(true));
-#else
+    LogWarningIfPlayerHasNotJoinedYet(L, element);
     return CStaticFunctionDefinitions::SetElementData(element, key.c_str(), newValue, newSyncType);
 #endif
 }
 
-
-#ifdef MTA_CLIENT
-bool CLuaElementDefs::HasElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit)
-#else
-bool CLuaElementDefs::hasElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit)
-#endif
+bool CLuaElementDefs::HasElementData(lua_State* L, CElement* element, std::string key, std::optional<bool> inherit)
 {
-    TruncateStringAndWarn(key, luaVM, m_pScriptDebugging);
-
-#ifdef MTA_CLIENT
-    return element->GetCustomData(key.c_str(), inherit.value_or(true)) != nullptr;
-#else
-    return CStaticFunctionDefinitions::GetElementData(element, key.c_str(), inherit.value_or(true)) != nullptr;
-#endif
-
+    TruncateStringAndWarn(L, key);
+    return element->GetCustomData(key.c_str(), inherit.value_or(true));
 }

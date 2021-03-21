@@ -28,8 +28,8 @@ public:
     LUA_DECLARE(GetElementID);
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
-    static std::variant<bool, std::reference_wrapper<CLuaArgument>> GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
-    static bool HasElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
+    static std::variant<bool, std::reference_wrapper<CLuaArgument>> GetElementData(lua_State* luaVM, CClientEntity* element, std::string key, std::optional<bool> inherit);
+    static bool HasElementData(lua_State* luaVM, CClientEntity* element, std::string key, std::optional<bool> inherit);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
     LUA_DECLARE_OOP(GetElementPosition);
@@ -76,7 +76,7 @@ public:
     LUA_DECLARE(CreateElement);
     LUA_DECLARE(DestroyElement);
     LUA_DECLARE(SetElementID);
-    static bool SetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, CLuaArgument newValue, const std::optional<bool> optionalIsSynced);
+    static bool SetElementData(lua_State* luaVM, CClientEntity* element, std::string key, CLuaArgument newValue, std::optional<bool> optionalIsSynced);
     LUA_DECLARE(SetElementMatrix);
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);
