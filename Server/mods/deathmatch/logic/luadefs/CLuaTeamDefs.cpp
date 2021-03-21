@@ -57,9 +57,8 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "playerCount", NULL, "countPlayersInTeam");
     lua_classvariable(luaVM, "friendlyFire", "setTeamFriendlyFire", "getTeamFriendlyFire");
-    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");            // todo: perhaps table.insert/nilvaluing?
+    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
     lua_classvariable(luaVM, "name", "setTeamName", "getTeamName");
-    // lua_classvariable ( luaVM, "color", "setTeamColor", "getTeamColor" );
 
     lua_registerclass(luaVM, "Team", "Element");
 }

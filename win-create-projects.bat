@@ -3,6 +3,9 @@
 rem Update CEF eventually
 utils\premake5.exe install_cef
 
+rem Update Unifont
+utils\premake5.exe install_unifont
+
 rem Generate solutions
 utils\premake5.exe vs2019
 
@@ -18,4 +21,4 @@ set SCRIPTFILE="%TEMP%\CreateMyShortcut.vbs"
 cscript //nologo %SCRIPTFILE%
 del /f /q %SCRIPTFILE%
 
-pause
+if %0 == "%~0" pause

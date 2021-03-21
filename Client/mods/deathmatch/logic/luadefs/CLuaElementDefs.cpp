@@ -14,7 +14,6 @@
 #include "lua/CLuaFunctionParser.h"
 
 using std::list;
-#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -41,7 +40,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementWithinColShape", IsElementWithinColShape},
         {"isElementWithinMarker", IsElementWithinMarker},
         {"getElementsWithinColShape", GetElementsWithinColShape},
-        {"getElementsWithinRange", GetElementsWithinRange},
+        {"getElementsWithinRange", ArgumentParserWarn<false, GetElementsWithinRange>},
         {"getElementDimension", GetElementDimension},
         {"getElementBoundingBox", GetElementBoundingBox},
         {"getElementRadius", GetElementRadius},
@@ -956,43 +955,33 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
+CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
+    std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
 {
-    CVector position;
-    float   radius;
-    SString elementType;
+    const auto typeHash = (type.has_value() && !type.value().empty()) ?
+        CClientEntity::GetTypeHashFromString(type.value()) : 0;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(position);
-    argStream.ReadNumber(radius);
-    argStream.ReadString(elementType, "");
+    CClientEntityResult result;
+    GetClientSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 
-    if (!argStream.HasErrors())
-    {
-        // Query the spatial database
-        CClientEntityResult result;
-        GetClientSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
+    // Remove elements that do not match the criterias
+    if (interior || dimension || typeHash) {
+        result.erase(std::remove_if(result.begin(), result.end(), [&](CElement* pElement) {
+            if (typeHash && typeHash != pElement->GetTypeHash())
+                return true;
 
-        lua_newtable(luaVM);
-        unsigned int index = 0;
+            if (interior.has_value() && interior != pElement->GetInterior())
+                return true;
 
-        for (CClientEntity* entity : result)
-        {
-            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
-            {
-                lua_pushnumber(luaVM, ++index);
-                lua_pushelement(luaVM, entity);
-                lua_settable(luaVM, -3);
-            }
-        }
+            if (dimension.has_value() && dimension != pElement->GetDimension())
+                return true;
 
-        return 1;
+            return pElement->IsBeingDeleted();
+            }), result.end()
+        );
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return result;
 }
 
 int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
@@ -1038,7 +1027,9 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
         CVector vecMin, vecMax;
         if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
         {
-            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
+            // If the caller expects six results, return six floats, otherwise two vectors
+            int iExpected = lua_ncallresult(luaVM);
+            if (iExpected == 6)
             {
                 lua_pushnumber(luaVM, vecMin.fX);
                 lua_pushnumber(luaVM, vecMin.fY);

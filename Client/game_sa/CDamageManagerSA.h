@@ -43,6 +43,7 @@ public:
     DWORD Lights;            // 2 bits per light
     DWORD Panels;            // 4 bits per panel
 };
+static_assert(sizeof(CDamageManagerSAInterface) == 0x18, "Invalid size for CDamageManagerSAInterface");
 
 class CDamageManagerSA : public CDamageManager
 {

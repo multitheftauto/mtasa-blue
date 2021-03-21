@@ -10,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,6 +27,7 @@
 
 #include "warnless.h"
 #include "curl_sha256.h"
+#include "curl_hmac.h"
 
 #if defined(USE_OPENSSL)
 
@@ -196,10 +197,11 @@ static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
 
 #include <wincrypt.h>
 
-typedef struct {
+struct sha256_ctx {
   HCRYPTPROV hCryptProv;
   HCRYPTHASH hHash;
-} SHA256_CTX;
+};
+typedef struct sha256_ctx SHA256_CTX;
 
 #if !defined(CALG_SHA_256)
 #define CALG_SHA_256 0x0000800c
@@ -207,8 +209,8 @@ typedef struct {
 
 static void SHA256_Init(SHA256_CTX *ctx)
 {
-  if(CryptAcquireContext(&ctx->hCryptProv, NULL, NULL,
-                         PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+  if(CryptAcquireContext(&ctx->hCryptProv, NULL, NULL, PROV_RSA_AES,
+                         CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
     CryptCreateHash(ctx->hCryptProv, CALG_SHA_256, 0, 0, &ctx->hHash);
   }
 }
@@ -222,7 +224,7 @@ static void SHA256_Update(SHA256_CTX *ctx,
 
 static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
 {
-  unsigned long length;
+  unsigned long length = 0;
 
   CryptGetHashParam(ctx->hHash, HP_HASHVAL, NULL, &length, 0);
   if(length == SHA256_DIGEST_LENGTH)
@@ -280,7 +282,7 @@ do {                                                          \
 } while(0)
 #endif
 
-typedef struct sha256_state {
+struct sha256_state {
 #ifdef HAVE_LONGLONG
   unsigned long long length;
 #else
@@ -288,7 +290,8 @@ typedef struct sha256_state {
 #endif
   unsigned long state[8], curlen;
   unsigned char buf[64];
-} SHA256_CTX;
+};
+typedef struct sha256_state SHA256_CTX;
 
 /* The K array */
 static const unsigned long K[64] = {
@@ -341,11 +344,14 @@ static int sha256_compress(struct sha256_state *md,
   }
 
   /* Compress */
-#define RND(a,b,c,d,e,f,g,h,i)                                  \
-  unsigned long t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i]; \
-  unsigned long t1 = Sigma0(a) + Maj(a, b, c);                  \
-  d += t0;                                                      \
-  h = t0 + t1;
+#define RND(a,b,c,d,e,f,g,h,i)                                          \
+  do {                                                                  \
+    unsigned long t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i];       \
+    unsigned long t1 = Sigma0(a) + Maj(a, b, c);                        \
+    d += t0;                                                            \
+    h = t0 + t1;                                                        \
+  } while(0)
+
   for(i = 0; i < 64; ++i) {
     unsigned long t;
     RND(S[0], S[1], S[2], S[3], S[4], S[5], S[6], S[7], i);
@@ -488,5 +494,24 @@ void Curl_sha256it(unsigned char *output, const unsigned char *input,
   SHA256_Update(&ctx, input, curlx_uztoui(length));
   SHA256_Final(output, &ctx);
 }
+
+
+const struct HMAC_params Curl_HMAC_SHA256[] = {
+  {
+    /* Hash initialization function. */
+    CURLX_FUNCTION_CAST(HMAC_hinit_func, SHA256_Init),
+    /* Hash update function. */
+    CURLX_FUNCTION_CAST(HMAC_hupdate_func, SHA256_Update),
+    /* Hash computation end function. */
+    CURLX_FUNCTION_CAST(HMAC_hfinal_func, SHA256_Final),
+    /* Size of hash context structure. */
+    sizeof(SHA256_CTX),
+    /* Maximum key length. */
+    64,
+    /* Result size. */
+    32
+  }
+};
+
 
 #endif /* CURL_DISABLE_CRYPTO_AUTH */

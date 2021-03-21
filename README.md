@@ -1,6 +1,8 @@
-## Multi Theft Auto: San Andreas [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush)
+## Multi Theft Auto: San Andreas
 
-[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game. 
+[![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Fservers-shields.io.json%3Fv%3D7)](https://community.multitheftauto.com/index.php?p=servers) [![Players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Fplayers-shields.io.json%3Fv%3D7)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://multitheftauto.com/discord) [![Translate](https://img.shields.io/website?down_message=offline&up_message=translate&url=https%3A%2F%2Ftranslate.multitheftauto.com)](https://translate.multitheftauto.com/)
+
+[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
 ## Introduction
 
@@ -26,13 +28,19 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
 * [Nightly Builds](https://nightly.mtasa.com/)
-* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
+* [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
 ### IDE Setup
 If not using Visual Studio 2017, download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) plugin to automatically set up your IDE for the correct formatting.
 
 ### Build Instructions
 #### Windows
+
+Prerequisites
+- [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
+- [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
+- [Git for Windows](https://git-scm.com/download/win) (Optional)
+
 1. Execute `win-create-projects.bat`
 2. Open `MTASA.sln` in the `Build` directory
 3. Compile
@@ -58,7 +66,7 @@ docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue
 docker run --rm -v `pwd`:/build -e BUILD_BITS=32 multitheftauto/mtasa-blue
 ```
 If the current directory is a valid git repository clone, it will use this as the build source. If not, it will create a (shallow) clone. After compiling, you will find the resulting binaries in `./Bin`.
-
+To build the unoptimised debug build, add `-e BUILD_TARGET=debug` to the docker run arguments.
 ### Premake FAQ
 #### How to add new C++ source files?
 Execute `win-create-projects.bat`.
@@ -67,4 +75,4 @@ Execute `win-create-projects.bat`.
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2020.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997–2021.

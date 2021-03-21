@@ -88,7 +88,7 @@ public:
 
     CDbJobData();
     ~CDbJobData();
-    SDbJobId           GetId() { return id; }
+    SDbJobId           GetId() const { return id; }
     bool               SetCallback(PFN_DBRESULT pfnDbResult, void* pContext);
     bool               HasCallback();
     void               ProcessCallback();
@@ -165,7 +165,6 @@ public:
                                                 CLuaArguments* pArgs = nullptr) = 0;
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...) = 0;
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename) = 0;
-    virtual int               GetQueueSizeFromConnection(SConnectionHandle connectionHandle) = 0;
 };
 
 CDatabaseManager* NewDatabaseManager();
@@ -178,7 +177,7 @@ CDatabaseManager* NewDatabaseManager();
 // TODO - Check it does not get synced to the client
 //
 ///////////////////////////////////////////////////////////////
-class CDatabaseConnectionElement : public CElement
+class CDatabaseConnectionElement final : public CElement
 {
 public:
     CDatabaseConnectionElement(CElement* pParent, SConnectionHandle connection) : CElement(pParent), m_Connection(connection)

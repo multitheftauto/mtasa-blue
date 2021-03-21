@@ -93,15 +93,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
 
-    // Static class variables or local only variable
-    /*
-    lua_classvariable ( luaVM, "blurLevel", "setPlayerBlurLevel", "getPlayerBlurLevel" );
-    lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
-    lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
-    lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
-    lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
-    lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );*/
-
     lua_registerclass(luaVM, "Player", "Ped");
 }
 

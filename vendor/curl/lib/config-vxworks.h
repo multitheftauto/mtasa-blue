@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -136,9 +136,6 @@
 
 /* Define to 1 if you have the <crypto.h> header file. */
 /* #undef HAVE_CRYPTO_H */
-
-/* Define to 1 if you have the <des.h> header file. */
-/* #undef HAVE_DES_H */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1

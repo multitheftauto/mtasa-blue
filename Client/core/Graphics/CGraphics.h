@@ -152,14 +152,14 @@ public:
 
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
-    
+
     void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI);
     void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI);
 
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
 
-    void DrawWiredSphere(CVector vecPosition, float radius, SColorARGB color, float fLineWidth, int iterations);
+    void DrawWiredSphere(CVector vecPosition, float radius, SColor color, float fLineWidth, int iterations);
 
 
     bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);

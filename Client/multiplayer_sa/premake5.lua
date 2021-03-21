@@ -4,16 +4,22 @@ project "Multiplayer SA"
 	targetname "multiplayer_sa"
 	targetdir(buildpath("mta"))
 
-	cppdialect "C++14" -- HACK(Jusonex): Temp fix for ebp not being set in naked functions
+	-- HACK(Jusonex): Temp fix for ebp not being set in naked functions
+	-- VS2019 changed the evaluation order as required by the C++17 standard
+	-- which broke all functions marked with _declspec(naked) that call C++ code
+	-- Falling back to the old, C++14 implementing fixes this
+	-- See https://developercommunity.visualstudio.com/content/problem/549628/stack-access-broken-in-naked-function.html
+	-- We're not aware of any workaround to avoid rewriting multiplayer_sa
+	cppdialect "C++14" 
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk"
 		}
 
 	pchheader "StdInc.h"
@@ -24,8 +30,6 @@ project "Multiplayer SA"
 		["Sources"] = "*.c",
 		["*"] = "premake5.lua"
 	}
-
-	links { "hwbrk" }
 
 	files {
 		"premake5.lua",

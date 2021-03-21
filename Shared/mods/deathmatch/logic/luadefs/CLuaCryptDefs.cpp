@@ -49,7 +49,7 @@ std::string CLuaCryptDefs::Sha256(std::string strSourceData)
 
 std::string CLuaCryptDefs::Hash(EHashFunctionType hashFunction, std::string strSourceData)
 {
-    return GenerateHashHexString(hashFunction, strSourceData);
+    return GenerateHashHexString(hashFunction, strSourceData).ToLower();
 }
 
 std::string CLuaCryptDefs::TeaEncode(std::string str, std::string key)
