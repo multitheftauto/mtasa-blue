@@ -28,7 +28,7 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
 * [Nightly Builds](https://nightly.mtasa.com/)
-* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
+* [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
 ### IDE Setup
 If not using Visual Studio 2017, download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) plugin to automatically set up your IDE for the correct formatting.
@@ -38,7 +38,7 @@ If not using Visual Studio 2017, download and install the [EditorConfig](https:/
 
 Prerequisites
 - [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-- [Microsoft DirectX SDK](https://www.microsoft.com/en-us/download/details.aspx?id=23549)
+- [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
 1. Execute `win-create-projects.bat`
