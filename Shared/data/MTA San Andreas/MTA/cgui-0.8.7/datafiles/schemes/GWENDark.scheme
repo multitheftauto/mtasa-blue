@@ -1,7 +1,7 @@
-<GUIScheme name="GWEN" version="5">
-  <Imageset filename="GWEN.imageset" />
+<GUIScheme name="GWENDark" version="5">
+  <Imageset name="GWEN" filename="GWENDark.imageset" />
   <Font filename="OpenSans-8.font" />
-  <LookNFeel filename="GWEN.looknfeel" />
+  <LookNFeel filename="GWENDark.looknfeel" />
   <WindowRendererSet filename="CEGUICoreWindowRendererSet" />
   <FalagardMapping lookNFeel="GWEN/Button" renderer="Core/Button" targetType="CEGUI/PushButton" windowType="GWEN/Button" />
   <FalagardMapping lookNFeel="GWEN/RadioButton" renderer="Core/ToggleButton" targetType="CEGUI/RadioButton" windowType="GWEN/RadioButton" />

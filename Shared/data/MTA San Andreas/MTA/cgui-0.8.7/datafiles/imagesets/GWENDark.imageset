@@ -1,4 +1,4 @@
-<Imageset autoScaled="false" imagefile="GWENDefaultSkin.png" name="GWEN" nativeHorzRes="800" nativeVertRes="600" version="2">
+<Imageset autoScaled="false" imagefile="GWENDarkSkin.png" name="GWEN" nativeHorzRes="800" nativeVertRes="600" version="2">
   <Image height="31" name="Shadow" width="31" xPos="448" yPos="0" />
   <Image height="5" name="Tooltip.Top.Left" width="5" xPos="128" yPos="320" />
   <Image height="31" name="StatusBar" width="127" xPos="128" yPos="288" />
