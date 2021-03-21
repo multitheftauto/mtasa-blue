@@ -8,11 +8,14 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+// Note: Cannot use #pragma once here, due to a duplicate existing in publicsdk
 #ifndef __CChecksum_H
 #define __CChecksum_H
 
 #include <variant>
+#include "SharedUtil.Hash.h"
+#include "SString.h"
+#include <bochs_internal/bochs_crc32.h>
 
 // Depends on CMD5Hasher and CRCGenerator
 class CChecksum

@@ -8,7 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+#pragma once
 //
 // System wide defines
 //
@@ -191,3 +191,4 @@
                 : __DATE__ [2] == 't' ? 9 \
                 : __DATE__ [2] == 'v' ? 10 : 11)
 #define BUILD_DAY ((__DATE__ [4]==' ' ? 0 : __DATE__[4]-'0')*10+(__DATE__[5]-'0'))
+static constexpr float FLOAT_EPSILON = 0.0001f;

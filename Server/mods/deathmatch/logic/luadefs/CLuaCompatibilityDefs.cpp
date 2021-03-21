@@ -70,7 +70,7 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild},
         {"attachElementToElement", CLuaElementDefs::attachElements},
         {"detachElementFromElement", CLuaElementDefs::detachElements},
-        
+
         // Deprecated since 1.5.5-9.13846
         {"doesPedHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
         {"givePedJetPack", CLuaPedDefs::GivePedJetPack},

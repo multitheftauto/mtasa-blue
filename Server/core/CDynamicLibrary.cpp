@@ -145,7 +145,7 @@ FuncPtr_t CDynamicLibrary::GetProcedureAddress(const char* szProcName)
 bool CDynamicLibrary::CheckMtaVersion(const char* szLibName)
 {
 #if MTASA_VERSION_TYPE >= VERSION_TYPE_UNSTABLE
-// define MTASA_SKIP_VERSION_CHECKS in "build_overrides_s.h" to skip version checks
+// define MTASA_SKIP_VERSION_CHECKS in "Shared/build_overrides.h" to skip version checks
 #ifndef MTASA_SKIP_VERSION_CHECKS
 
     if (m_hModule == 0)

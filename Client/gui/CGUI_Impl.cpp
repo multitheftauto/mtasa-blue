@@ -22,7 +22,7 @@ using std::list;
 #define CGUI_MTA_DEFAULT_REG_BOLD   "Tahoma Bold (TrueType)"
 #define CGUI_MTA_CLEAR_REG          "Verdana (TrueType)"
 
-#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont-13.0.04.ttf"  // GTA/MTA/<...>
+#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont.ttf"  // GTA/MTA/<...>
 #define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
 #define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
 #define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
