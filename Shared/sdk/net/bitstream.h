@@ -22,7 +22,10 @@
 #ifndef WIN32
     #include <alloca.h>
 #endif
+
+#ifdef __cpp_lib_string_view
 #include <string_view>
+#endif
 
 struct ISyncStructure;
 class NetBitStreamInterface;
@@ -197,13 +200,16 @@ public:
     // Return true if enough bytes left in the bitstream
     bool CanReadNumberOfBytes(int iLength) const { return iLength >= 0 && iLength <= (GetNumberOfUnreadBits() + 7) / 8; }
 
+    // For whatever stupid reason sdk/net gets included in Multiplayer SA and Game SA
+    // And since those projects are c++14 we need this stuff.
+    // TODO: Rip sdk/net out of these projects...
+#ifdef __cpp_lib_string_view
     // Write characters in `value`
     void WriteStringCharacters(std::string_view value)
     {
         if (!value.empty())
             Write(value.data(), (int)value.length());
     }
-
     // Write `n` characters from `value`
     void WriteStringCharacters(std::string_view value, size_t n)
     {
@@ -222,6 +228,7 @@ public:
         // Write the characters
         return WriteStringCharacters(value);
     }
+#endif
 
     // Read characters into a std::string
     bool ReadStringCharacters(std::string& result, uint uiLength)
