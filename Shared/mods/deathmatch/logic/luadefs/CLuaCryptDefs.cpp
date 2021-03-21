@@ -330,7 +330,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             }
             default:
             {
-                m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
+                m_pScriptDebugging->LogCustom(luaVM, "Unknown algorithm");
                 lua_pushboolean(luaVM, false);
                 return 1;
             }
@@ -419,7 +419,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
             }
             default:
             {
-                m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
+                m_pScriptDebugging->LogCustom(luaVM, "Unknown algorithm");
                 lua_pushboolean(luaVM, false);
                 return 1;
             }
