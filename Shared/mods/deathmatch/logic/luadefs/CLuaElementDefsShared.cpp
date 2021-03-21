@@ -14,13 +14,9 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
     //  var getElementData ( element theElement, string key [, inherit = true] )
 
-#ifdef MTA_CLIENT
-    CClientEntity* pElement;
-#else
     CElement* pElement;
-#endif
-    SString strKey;
-    bool    bInherit;
+    SString   strKey;
+    bool      bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -64,11 +60,7 @@ int CLuaElementDefs::GetAllElementData(lua_State* luaVM)
 {
     //  table getAllElementData ( element theElement )
 
-#ifdef MTA_CLIENT
-    CClientEntity* pElement;
-#else
     CElement* pElement;
-#endif
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -95,11 +87,7 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
 {
     //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )
 
-#ifdef MTA_CLIENT
-    CClientEntity* pElement;
-#else
     CElement* pElement;
-#endif
     SString   strKey;
     bool      bInherit;
 
