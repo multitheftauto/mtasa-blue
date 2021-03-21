@@ -327,6 +327,25 @@ bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
 float       fDuckingHealthThreshold;
 
+static const std::array<uint32_t, 16> shadowAddr{
+    0x6FAD5D,            // CRegisteredCorona::Update
+    0x7041DB,            // CPostEffects::Fog
+    0x7085A9,            // CShadows::RenderStaticShadows
+    0x709B2F,            // CShadows::CastShadowEntityXY
+    0x709B8E,            // CShadows::CastShadowEntityXY
+    0x709BC7,            // CShadows::CastShadowEntityXY
+    0x709BF6,            // CShadows::CastShadowEntityXY
+    0x709C93,            // CShadows::CastShadowEntityXY
+    0x709E9E,            // IntersectEntityRenderTriangleCB
+    0x709EBC,            // IntersectEntityRenderTriangleCB
+    0x709ED7,            // IntersectEntityRenderTriangleCB
+    0x70B221,            // CShadows::RenderStoredShadows
+    0x70B373,            // CShadows::RenderStoredShadows
+    0x70B4D1,            // CShadows::RenderStoredShadows
+    0x70B635,            // CShadows::RenderStoredShadows
+    0x73A48F             // CWeapon::AddGunshell
+};
+
 PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
 PreWeaponFireHandler*       m_pPreWeaponFireHandler = NULL;
@@ -360,7 +379,6 @@ DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
-HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 void   HOOK_FindPlayerCoors();
 void   HOOK_FindPlayerCentreOfWorld();
 void   HOOK_FindPlayerHeading();
@@ -1493,10 +1511,15 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
 
-    
+
     // Allow crouching with 1HP
     MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
     fDuckingHealthThreshold = 0;
+
+    // Lower the GTA shadows offset closer to ground/floor level
+    m_fShadowsOffset = 0.013f;            // GTA default = 0.06f
+    for (auto uiAddr : shadowAddr)
+        MemPut(uiAddr, &m_fShadowsOffset);
 
     InitHooks_CrashFixHacks();
 

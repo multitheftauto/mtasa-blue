@@ -14,7 +14,7 @@
 
 class CClientPointLightsManager;
 
-class CClientPointLights : public CClientEntity
+class CClientPointLights final : public CClientEntity
 {
     DECLARE_CLASS(CClientPointLights, CClientEntity)
     friend class CClientPointLightsManager;
