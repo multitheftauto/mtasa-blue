@@ -692,7 +692,7 @@ namespace SharedUtil
         {
             if (m > MAX_LENGTH)
                 throw std::length_error{"m > MAX_LENGTH"};
-            Assign(other, strlen(other)); // Might be slow with if other is very long.
+            Assign(other, std::min<size_t>(strlen(other), m)); // Might be slow with if `other` is very long
             return *this;
         }
 
