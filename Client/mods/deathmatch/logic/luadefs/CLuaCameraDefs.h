@@ -10,6 +10,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 #include <optional>
 
 class CLuaCameraDefs : public CLuaDefs
@@ -18,8 +19,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    static bool SetCameraViewMode(unsigned char usVehicleViewMode, std::optional<unsigned char> usPedViewMode);
-    static std::tuple<unsigned char, unsigned char> GetCameraViewMode();
+    static bool                                          SetCameraViewMode(unsigned char usVehicleViewMode, std::optional<unsigned char> usPedViewMode);
+    static CLuaMultiReturn<unsigned char, unsigned char> GetCameraViewMode();
 
     // Cam get funcs
     LUA_DECLARE(GetCamera);

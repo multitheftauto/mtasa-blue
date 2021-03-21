@@ -103,7 +103,7 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     return 1;
 }
 
-std::tuple<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
+CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
 {
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
