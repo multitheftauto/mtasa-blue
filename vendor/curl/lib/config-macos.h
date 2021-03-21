@@ -335,6 +335,9 @@
 /* if you have MIT Kerberos */
 /* #undef HAVE_GSSMIT */
 
+/* Define to 1 if you have the <hyper.h> header file. */
+/* #undef HAVE_HYPER_H */
+
 /* Define to 1 if you have the <idn2.h> header file. */
 #define HAVE_IDN2_H 1
 
@@ -866,7 +869,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin20.2.0"
+#define OS "x86_64-apple-darwin20.3.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -996,6 +999,9 @@
 
 /* to enable HSTS */
 /* #undef USE_HSTS */
+
+/* if hyper is in use */
+/* #undef USE_HYPER */
 
 /* PSL support enabled */
 /* #undef USE_LIBPSL */
