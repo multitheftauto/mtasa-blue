@@ -22,6 +22,7 @@
 #ifndef WIN32
     #include <alloca.h>
 #endif
+#include <string_view>
 
 struct ISyncStructure;
 class NetBitStreamInterface;
@@ -196,13 +197,30 @@ public:
     // Return true if enough bytes left in the bitstream
     bool CanReadNumberOfBytes(int iLength) const { return iLength >= 0 && iLength <= (GetNumberOfUnreadBits() + 7) / 8; }
 
-    // Write characters from a std::string
-    void WriteStringCharacters(const std::string& value, uint uiLength)
+    // Write characters in `value`
+    void WriteStringCharacters(std::string_view value)
     {
-        dassert(uiLength <= value.length());
-        // Send the data
-        if (uiLength)
-            Write(&value.at(0), uiLength);
+        if (!value.empty())
+            Write(value.data(), (int)value.length());
+    }
+
+    // Write `n` characters from `value`
+    void WriteStringCharacters(std::string_view value, size_t n)
+    {
+        dassert(n <= value.length());
+        if (!value.empty())
+            Write(value.data(), (int)n);
+    }
+
+    // Write all characters in `value` (incl. length with with type `SizeType`)
+    template<typename SizeType = unsigned short>
+    void WriteString(std::string_view value)
+    {
+        // Write the length
+        Write(static_cast<SizeType>(value.length()));
+
+        // Write the characters
+        return WriteStringCharacters(value);
     }
 
     // Read characters into a std::string
@@ -222,18 +240,6 @@ public:
             result = std::string(buffer, uiLength);
         }
         return true;
-    }
-
-    // Write a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
-    void WriteString(const std::string& value)
-    {
-        // Write the length
-        auto length = static_cast<SizeType>(value.length());
-        Write(length);
-
-        // Write the characters
-        return WriteStringCharacters(value, length);
     }
 
     // Read a string (incl. ushort size header)
@@ -297,7 +303,7 @@ public:
     }
 
     // Write a string (incl. variable size header)
-    void WriteStr(const std::string& value)
+    void WriteStr(std::string_view value)
     {
         WriteLength(value.length());
         return WriteStringCharacters(value, value.length());
