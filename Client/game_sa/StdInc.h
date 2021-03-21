@@ -19,13 +19,10 @@
 #include <vector>
 
 // SDK includes
-#include <core/CCoreInterface.h>
 #include <CRect.h>
-#include <net/CNet.h>
 #include <game/CGame.h>
 #include <game/CWanted.h>
 #include <version.h>
-#include <ijsify.h>
 
 // Game includes
 #include "CEntitySA.h"
