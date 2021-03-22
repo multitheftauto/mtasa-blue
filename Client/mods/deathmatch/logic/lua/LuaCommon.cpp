@@ -23,83 +23,27 @@ CClientEntity* lua_toelement(lua_State* luaVM, int iArgument)
     if (lua_type(luaVM, iArgument) == LUA_TLIGHTUSERDATA)
     {
         ElementID      ID = TO_ELEMENTID(lua_touserdata(luaVM, iArgument));
-        CClientEntity* pEntity = CElementIDs::GetElement(ID);
-        if (!pEntity || pEntity->IsBeingDeleted())
+        CClientEntity* pElement = CElementIDs::GetElement(ID);
+        if (!pElement || pElement->IsBeingDeleted())
             return NULL;
-        return pEntity;
+        return pElement;
     }
     else if (lua_type(luaVM, iArgument) == LUA_TUSERDATA)
     {
         ElementID      ID = TO_ELEMENTID(*((void**)lua_touserdata(luaVM, iArgument)));
-        CClientEntity* pEntity = CElementIDs::GetElement(ID);
-        if (!pEntity || pEntity->IsBeingDeleted())
+        CClientEntity* pElement = CElementIDs::GetElement(ID);
+        if (!pElement || pElement->IsBeingDeleted())
             return NULL;
-        return pEntity;
+        return pElement;
     }
 
     return NULL;
 }
 
-void lua_pushelement(lua_State* luaVM, CClientEntity* pElement)
-{
-    if (pElement)
-    {
-        if (pElement->IsBeingDeleted())
-        {
-            lua_pushboolean(luaVM, false);
-            return;
-        }
-
-        ElementID ID = pElement->GetID();
-        if (ID != INVALID_ELEMENT_ID)
-        {
-            const char* szClass = NULL;
-            CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-            if (pLuaMain->IsOOPEnabled())
-                szClass = CLuaClassDefs::GetEntityClass(pElement);
-
-            lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(ID.Value()));
-            return;
-        }
-    }
-
-    lua_pushnil(luaVM);
-}
-
-void lua_pushresource(lua_State* luaVM, CResource* pResource)
-{
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetResourceClass(pResource);
-
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pResource->GetScriptID()));
-}
-
-void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
-{
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetTimerClass(pTimer);
-
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pTimer->GetScriptID()));
-}
-
-void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
-{
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain->IsOOPEnabled())
-        szClass = CLuaClassDefs::GetXmlNodeClass(pElement);
-
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetID()));
-}
-
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
-    if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pData, luaVM))
-        return lua_pushelement(luaVM, pEntity);
+    if (CClientEntity* pElement = UserDataCast<CClientEntity>((CClientEntity*)NULL, pData, luaVM))
+        return lua_pushelement(luaVM, pElement);
     else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, luaVM))
         return lua_pushresource(luaVM, pResource);
     else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, luaVM))
@@ -115,81 +59,7 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
 
-    lua_pushobject(luaVM, NULL, pData);
-}
-
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache)
-{
-    if (szClass == nullptr)
-    {
-        lua_pushlightuserdata(luaVM, pObject);
-        return;
-    }
-
-    if (bSkipCache)
-    {
-        *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
-    }
-    else
-    {
-        // Lookup the userdata in the cache table
-        lua_pushstring(luaVM, "ud");
-        lua_rawget(luaVM, LUA_REGISTRYINDEX);
-
-        assert(lua_istable(luaVM, -1));
-
-        // First we want to check if we have a userdata for this already
-        lua_pushlightuserdata(luaVM, pObject);
-        lua_rawget(luaVM, -2);
-
-        if (lua_isnil(luaVM, -1))
-        {
-            lua_pop(luaVM, 1);
-
-            // we don't have it, create it
-            *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
-
-            // save in ud table
-            lua_pushlightuserdata(luaVM, pObject);
-            lua_pushvalue(luaVM, -2);
-            lua_rawset(luaVM, -4);
-        }
-
-        // userdata is already on the stack, just remove the table
-        lua_remove(luaVM, -2);
-    }
-
-    // Assign the class metatable
-    lua_getclass(luaVM, szClass);
-    lua_setmetatable(luaVM, -2);            // element
-}
-
-void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
-{
-    CLuaVector4D* pVector = new CLuaVector4D(vector);
-    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-void lua_pushvector(lua_State* luaVM, const CVector& vector)
-{
-    CLuaVector3D* pVector = new CLuaVector3D(vector);
-    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
-{
-    CLuaVector2D* pVector = new CLuaVector2D(vector);
-    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
-}
-
-void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
-{
-    CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
-    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
+    lua_pushlightuserdata(luaVM, pData);
 }
 
 // Just do a type check vs LUA_TNONE before calling this, or bant

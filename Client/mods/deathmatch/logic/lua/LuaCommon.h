@@ -18,6 +18,8 @@ extern "C"
     #include "lauxlib.h"
 }
 
+#include <lua/LuaBasic.h>
+
 CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
 #define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
@@ -46,22 +48,26 @@ class CLuaTimer;
 class CResource;
 class CXMLNode;
 
-// Lua push/pop macros for our datatypes
+class CMatrix;
+class CVector4D;
+class CVector;
+class CVector2D;
 
 class CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
 
-void lua_pushelement(lua_State* luaVM, CClientEntity* pElement);
-void lua_pushresource(lua_State* luaVM, CResource* pElement);
-void lua_pushtimer(lua_State* luaVM, CLuaTimer* pElement);
-void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement);
+// Lua push/pop macros for our datatypes
+// For new code uew lua::Push instead
+// TODO: Maybe replace these functions with a direct call to lua::Push
+void lua_pushelement(lua_State* luaVM, CClientEntity* pEntity) { lua::Push(luaVM, pEntity); }
+void lua_pushresource(lua_State* luaVM, CResource* pResource) { lua::Push(luaVM, pResource); }
+void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer) { lua::Push(luaVM, pTimer); }
+void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pNode) { lua::Push(luaVM, pNode); }
+void lua_pushvector(lua_State* luaVM, const CVector4D& vector) { lua::Push(luaVM, vector); }
+void lua_pushvector(lua_State* luaVM, const CVector& vector) { lua::Push(luaVM, vector); }
+void lua_pushvector(lua_State* luaVM, const CVector2D& vector) { lua::Push(luaVM, vector); }
+void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix) { lua::Push(luaVM, matrix); }
+
 void lua_pushuserdata(lua_State* luaVM, void* pData);
-
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
-
-void lua_pushvector(lua_State* luaVM, const CVector4D& vector);
-void lua_pushvector(lua_State* luaVM, const CVector& vector);
-void lua_pushvector(lua_State* luaVM, const CVector2D& vector);
-void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
 
 // Internal use
 void lua_initclasses(lua_State* luaVM);

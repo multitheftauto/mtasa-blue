@@ -186,7 +186,7 @@ public:
     CClientEntity* AddChild(CClientEntity* pChild);
     bool           IsMyChild(CClientEntity* pEntity, bool bRecursive);
     bool           IsMyParent(CClientEntity* pEntity, bool bRecursive);
-    bool           IsBeingDeleted() { return m_bBeingDeleted; }
+    bool           IsBeingDeleted() const { return m_bBeingDeleted; }
     void           SetBeingDeleted(bool bBeingDeleted) { m_bBeingDeleted = bBeingDeleted; }
     void           ClearChildren();
 
@@ -194,7 +194,7 @@ public:
     CChildListType ::const_iterator IterEnd() { return m_Children.end(); }
     CElementListSnapshot*           GetChildrenListSnapshot();
 
-    ElementID GetID() { return m_ID; };
+    ElementID GetID() const { return m_ID; };
     void      SetID(ElementID ID);
 
     CCustomData*  GetCustomDataPointer() { return m_pCustomData; }

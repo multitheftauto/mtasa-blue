@@ -90,11 +90,11 @@ public:
     virtual CElement* Clone(bool* bAddEntity, CResource* pResource) { return nullptr; }
     bool              IsCloneable();
 
-    bool         IsBeingDeleted() { return m_bIsBeingDeleted; };
+    bool         IsBeingDeleted() const { return m_bIsBeingDeleted; };
     void         SetIsBeingDeleted(bool bBeingDeleted) { m_bIsBeingDeleted = bBeingDeleted; };
     virtual void Unlink() = 0;
 
-    ElementID GetID() { return m_ID; };
+    ElementID GetID() const { return m_ID; };
 
     virtual const CVector& GetPosition();
     virtual void           SetPosition(const CVector& vecPosition);
