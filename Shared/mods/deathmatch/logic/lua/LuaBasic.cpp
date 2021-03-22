@@ -297,9 +297,4 @@ namespace lua
     {
         args.PushAsTable(L);
     }
-
-    void Push(lua_State* L, const std::string& value)
-    {
-        lua_pushlstring(L, value.data(), value.length());
-    }
 }            // namespace mta::impl

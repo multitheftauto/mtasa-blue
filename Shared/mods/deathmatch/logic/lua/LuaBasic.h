@@ -73,7 +73,10 @@ namespace lua
         lua_pushnil(L);
     }
 
-    void Push(lua_State* L, const std::string& value);
+    inline void Push(lua_State* L, const std::string& value)
+    {
+        lua_pushlstring(L, value.data(), value.length());
+    }
 
     void Push(lua_State* L, const CVector2D& value);
     void Push(lua_State* L, const CVector& value);
