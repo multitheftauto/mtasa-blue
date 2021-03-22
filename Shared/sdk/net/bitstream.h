@@ -214,11 +214,11 @@ public:
     void WriteStringCharacters(std::string_view value, size_t n)
     {
         dassert(n <= value.length());
-        if (!value.empty())
+        if (n)
             Write(value.data(), (int)n);
     }
 
-    // Write all characters in `value` (incl. length with with type `SizeType`)
+    // Write all characters in `value` (incl. length as `SizeType`)
     template<typename SizeType = unsigned short>
     void WriteString(std::string_view value)
     {
