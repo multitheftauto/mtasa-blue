@@ -16,6 +16,7 @@
 enum eLuaType
 {
 };
+
 DECLARE_ENUM(eLuaType);
 DECLARE_ENUM(CGUIVerticalAlign);
 DECLARE_ENUM(CGUIHorizontalAlign);
@@ -64,6 +65,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM_CLASS(eClientModelType);
 
 class CRemoteCall;
 
@@ -454,6 +456,11 @@ inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
     return "objectgroup-breakmode";
 }
 
+inline SString GetClassByTypeName(eClientModelType)
+{
+    return "client-model-type";
+}
+
 //
 // CResource from userdata
 //
@@ -542,7 +549,7 @@ template <class T>
 CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
 {
     CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
-    
+
     if (pRemoteCall && g_pClientGame->GetRemoteCalls()->CallExists(pRemoteCall))
         return pRemoteCall;
 

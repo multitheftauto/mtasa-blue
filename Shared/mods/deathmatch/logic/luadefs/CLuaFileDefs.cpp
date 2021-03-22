@@ -951,7 +951,7 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
         // This file wasn't closed, so we should warn
         // the scripter that they forgot to close it.
         m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
-       
+
         // Close the file and delete it from elements
         pFile->Unload();
         m_pElementDeleter->Delete(pFile);

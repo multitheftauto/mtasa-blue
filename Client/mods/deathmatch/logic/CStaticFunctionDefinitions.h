@@ -209,10 +209,8 @@ public:
     static bool            IsTrainDerailable(CClientVehicle& Vehicle, bool& bIsDerailable);
     static bool            GetTrainDirection(CClientVehicle& Vehicle, bool& bDirection);
     static bool            GetTrainSpeed(CClientVehicle& Vehicle, float& fSpeed);
-    static bool            GetTrainTrack(CClientVehicle& Vehicle, uchar& ucTrack);
     static bool            GetTrainPosition(CClientVehicle& Vehicle, float& fPosition);
     static bool            IsTrainChainEngine(CClientVehicle& Vehicle, bool& bChainEngine);
-    static bool            IsVehicleBlown(CClientVehicle& Vehicle, bool& bBlown);
     static bool            GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor);
     static bool            GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear);
     static bool            GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
@@ -226,6 +224,7 @@ public:
     static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
     static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
     static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -259,7 +258,6 @@ public:
     static bool SetTrainDerailable(CClientVehicle& Vehicle, bool bDerailable);
     static bool SetTrainDirection(CClientVehicle& Vehicle, bool bDirection);
     static bool SetTrainSpeed(CClientVehicle& Vehicle, float fSpeed);
-    static bool SetTrainTrack(CClientVehicle& Vehicle, uchar ucTrack);
     static bool SetTrainPosition(CClientVehicle& Vehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CClientEntity& Vehicle, const SColor color);
     static bool SetVehicleDoorOpenRatio(CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0);
@@ -275,6 +273,7 @@ public:
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
+    static bool           IsObjectMoving(CClientEntity& Entity);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
     static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
     static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);
@@ -573,7 +572,7 @@ public:
     static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);
     static bool          GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
-    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
+    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     static bool          SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     static bool          SetAllElementWaterLevel(float fLevel, void* pChangeSource);
     static bool          ResetWorldWaterLevel();

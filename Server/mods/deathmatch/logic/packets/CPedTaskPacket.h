@@ -9,7 +9,7 @@
  *****************************************************************************/
 #pragma once
 
-class CPedTaskPacket : public CPacket
+class CPedTaskPacket final : public CPacket
 {
 public:
     CPedTaskPacket();

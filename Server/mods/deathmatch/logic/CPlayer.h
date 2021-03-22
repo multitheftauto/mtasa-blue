@@ -65,7 +65,7 @@ struct SScreenShotInfo
     CBuffer   buffer;
 };
 
-class CPlayer : public CPed, public CClient
+class CPlayer final : public CPed, public CClient
 {
     friend class CElement;
     friend class CScriptDebugging;
@@ -94,6 +94,7 @@ public:
     void               SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
     unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
     void               SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
+    bool               CanBitStream(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(m_usBitStreamVersion) >= query; }
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
     bool               ShouldIgnoreMinClientVersionChecks();
@@ -259,9 +260,6 @@ public:
     CPlayerStatsPacket* GetPlayerStatsPacket() { return m_pPlayerStatsPacket; }
     void                SetPlayerStat(unsigned short usID, float fValue);
     float               GetWeaponRangeFromSlot(uint uiSlot = 0xFF);
-
-    CVehicle* GetJackingVehicle() { return m_pJackingVehicle; }
-    void      SetJackingVehicle(CVehicle* pVehicle);
 
     void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
     bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
@@ -457,7 +455,6 @@ private:
     SScreenShotInfo m_ScreenShotInfo;
 
     CPlayerStatsPacket* m_pPlayerStatsPacket;
-    CVehicle*           m_pJackingVehicle;
 
     // Used to reduce calls when calculating weapon range
     float       m_fWeaponRangeLast;

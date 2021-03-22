@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <list>
 
-class CPlayerListPacket : public CPacket
+class CPlayerListPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_LIST; };
