@@ -115,9 +115,7 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     }
 
     // Get associated resource
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState(luaVM);
-    if (!pResource)
-        return true;
+    auto pResource{static_cast<CResource*>(lua_getowner(luaVM))};
 
     // Update execution time check
     pResource->GetVirtualMachine()->CheckExecutionTime();
