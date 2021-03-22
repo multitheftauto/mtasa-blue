@@ -117,7 +117,7 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
                     {
                         pGroup->Add(pBlip);
                     }
-                    lua_pushelement(luaVM, pBlip);
+                    lua::Push(luaVM, pBlip);
                     return 1;
                 }
             }
@@ -179,7 +179,7 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
                 {
                     group->Add(pBlip);
                 }
-                lua_pushelement(luaVM, pBlip);
+                lua::Push(luaVM, pBlip);
                 return 1;
             }
         }

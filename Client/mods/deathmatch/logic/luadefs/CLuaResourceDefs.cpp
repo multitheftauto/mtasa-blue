@@ -99,10 +99,10 @@ int CLuaResourceDefs::Call(lua_State* luaVM)
                 lua_pop(targetLuaVM, 1);
 
                 // Set the new values for the current sourceResource, and sourceResourceRoot
-                lua_pushresource(targetLuaVM, pThisResource);
+                lua::Push(targetLuaVM, pThisResource);
                 lua_setglobal(targetLuaVM, "sourceResource");
 
-                lua_pushelement(targetLuaVM, pThisResource->GetResourceEntity());
+                lua::Push(targetLuaVM, pThisResource->GetResourceEntity());
                 lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
                 // Call the exported function with the given name and the args
@@ -150,7 +150,7 @@ int CLuaResourceDefs::GetThisResource(lua_State* luaVM)
         CResource* pThisResource = pLuaMain->GetResource();
         if (pThisResource)
         {
-            lua_pushresource(luaVM, pThisResource);
+            lua::Push(luaVM, pThisResource);
             return 1;
         }
     }
@@ -201,7 +201,7 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
                             CXMLNode*            pNode = pConfig->GetRoot();
                             if (pNode)
                             {
-                                lua_pushxmlnode(luaVM, pNode);
+                                lua::Push(luaVM, pNode);
                                 return 1;
                             }
                         }
@@ -263,7 +263,7 @@ int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
         CResource* pResource = m_pResourceManager->GetResource(strResourceName);
         if (pResource)
         {
-            lua_pushresource(luaVM, pResource);
+            lua::Push(luaVM, pResource);
             return 1;
         }
     }
@@ -302,7 +302,7 @@ int CLuaResourceDefs::GetResourceRootElement(lua_State* luaVM)
             CClientEntity* pEntity = pResource->GetResourceEntity();
             if (pEntity)
             {
-                lua_pushelement(luaVM, pEntity);
+                lua::Push(luaVM, pEntity);
                 return 1;
             }
         }
@@ -340,7 +340,7 @@ int CLuaResourceDefs::GetResourceGUIElement(lua_State* luaVM)
         CClientEntity* pEntity = pResource->GetResourceGUIEntity();
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua::Push(luaVM, pEntity);
             return 1;
         }
     }
@@ -363,7 +363,7 @@ int CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM)
         CClientEntity* pEntity = pResource->GetResourceDynamicEntity();
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua::Push(luaVM, pEntity);
             return 1;
         }
         else

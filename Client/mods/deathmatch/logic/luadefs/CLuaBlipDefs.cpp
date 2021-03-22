@@ -112,7 +112,7 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
                         pGroup->Add(pMarker);
                     }
 
-                    lua_pushelement(luaVM, pMarker);
+                    lua::Push(luaVM, pMarker);
                     return 1;
                 }
             }
@@ -175,7 +175,7 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
                     {
                         pGroup->Add(pMarker);
                     }
-                    lua_pushelement(luaVM, pMarker);
+                    lua::Push(luaVM, pMarker);
                     return 1;
                 }
             }

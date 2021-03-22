@@ -229,7 +229,7 @@ int CLuaElementDefs::GetRootElement(lua_State* luaVM)
     CClientEntity* pRoot = CStaticFunctionDefinitions::GetRootElement();
 
     // Return the root element
-    lua_pushelement(luaVM, pRoot);
+    lua::Push(luaVM, pRoot);
     return 1;
 }
 
@@ -288,7 +288,7 @@ int CLuaElementDefs::GetElementByID(lua_State* luaVM)
         CClientEntity* pEntity = CStaticFunctionDefinitions::GetElementByID(strID.c_str(), uiIndex);
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua::Push(luaVM, pEntity);
             return 1;
         }
     }
@@ -314,7 +314,7 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
         CClientEntity* pEntity = CStaticFunctionDefinitions::GetElementByIndex(strType.c_str(), uiIndex);
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua::Push(luaVM, pEntity);
             return 1;
         }
     }
@@ -419,7 +419,7 @@ int CLuaElementDefs::OOP_GetElementMatrix(lua_State* luaVM)
         CMatrix matrix;
         pEntity->GetMatrix(matrix);
 
-        lua_pushmatrix(luaVM, matrix);
+        lua::Push(luaVM, matrix);
         return 1;
     }
     else
@@ -469,7 +469,7 @@ int CLuaElementDefs::OOP_GetElementPosition(lua_State* luaVM)
         CVector vecPosition;
         pEntity->GetPosition(vecPosition);
 
-        lua_pushvector(luaVM, vecPosition);
+        lua::Push(luaVM, vecPosition);
         return 1;
     }
     else
@@ -526,7 +526,7 @@ int CLuaElementDefs::OOP_GetElementRotation(lua_State* luaVM)
         vecRotation = matrix.GetRotation();
         ConvertRadiansToDegrees(vecRotation);
 
-        lua_pushvector(luaVM, vecRotation);
+        lua::Push(luaVM, vecRotation);
         return 1;
     }
     else
@@ -576,7 +576,7 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
         CVector vecVelocity;
         CStaticFunctionDefinitions::GetElementVelocity(*pEntity, vecVelocity);
 
-        lua_pushvector(luaVM, vecVelocity);
+        lua::Push(luaVM, vecVelocity);
         return 1;
     }
     else
@@ -626,7 +626,7 @@ int CLuaElementDefs::OOP_GetElementTurnVelocity(lua_State* luaVM)
         CVector vecTurnVelocity;
         CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity);
 
-        lua_pushvector(luaVM, vecTurnVelocity);
+        lua::Push(luaVM, vecTurnVelocity);
         return 1;
     }
     else
@@ -721,7 +721,7 @@ int CLuaElementDefs::GetElementChild(lua_State* luaVM)
         CClientEntity* pChild = CStaticFunctionDefinitions::GetElementChild(*pEntity, uiIndex);
         if (pChild)
         {
-            lua_pushelement(luaVM, pChild);
+            lua::Push(luaVM, pChild);
             return 1;
         }
     }
@@ -768,7 +768,7 @@ int CLuaElementDefs::GetElementParent(lua_State* luaVM)
         CClientEntity* pParent = pEntity->GetParent();
         if (pParent)
         {
-            lua_pushelement(luaVM, pParent);
+            lua::Push(luaVM, pParent);
             return 1;
         }
     }
@@ -936,7 +936,7 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
                     if (!(*iter)->IsBeingDeleted())
                     {
                         lua_pushnumber(luaVM, ++uiIndex);
-                        lua_pushelement(luaVM, *iter);
+                        lua::Push(luaVM, *iter);
                         lua_settable(luaVM, -3);
                     }
                 }
@@ -1040,8 +1040,8 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
             }
             else
             {
-                lua_pushvector(luaVM, vecMin);
-                lua_pushvector(luaVM, vecMax);
+                lua::Push(luaVM, vecMin);
+                lua::Push(luaVM, vecMax);
                 return 2;
             }
         }
@@ -1148,7 +1148,7 @@ int CLuaElementDefs::GetElementAttachedTo(lua_State* luaVM)
         CClientEntity* pEntityAttachedTo = CStaticFunctionDefinitions::GetElementAttachedTo(*pEntity);
         if (pEntityAttachedTo)
         {
-            lua_pushelement(luaVM, pEntityAttachedTo);
+            lua::Push(luaVM, pEntityAttachedTo);
             return 1;
         }
         else
@@ -1190,7 +1190,7 @@ int CLuaElementDefs::GetAttachedElements(lua_State* luaVM)
                 if (!pAttached->IsBeingDeleted())
                 {
                     lua_pushnumber(luaVM, i + 1);
-                    lua_pushelement(luaVM, pAttached);
+                    lua::Push(luaVM, pAttached);
                     lua_settable(luaVM, -3);
                 }
             }
@@ -1368,7 +1368,7 @@ int CLuaElementDefs::GetElementColShape(lua_State* luaVM)
         CClientEntity* pColShape = static_cast<CClientEntity*>(CStaticFunctionDefinitions::GetElementColShape(pEntity));
         if (pColShape)
         {
-            lua_pushelement(luaVM, pColShape);
+            lua::Push(luaVM, pColShape);
             return 1;
         }
     }
@@ -1645,7 +1645,7 @@ int CLuaElementDefs::CreateElement(lua_State* luaVM)
                     }
 
                     // Return it
-                    lua_pushelement(luaVM, pDummy);
+                    lua::Push(luaVM, pDummy);
                     return 1;
                 }
                 else
@@ -2443,7 +2443,7 @@ int CLuaElementDefs::GetLowLodElement(lua_State* luaVM)
         CClientEntity* pLowLodEntity;
         if (CStaticFunctionDefinitions::GetLowLodElement(*pEntity, pLowLodEntity))
         {
-            lua_pushelement(luaVM, pLowLodEntity);
+            lua::Push(luaVM, pLowLodEntity);
             return 1;
         }
     }

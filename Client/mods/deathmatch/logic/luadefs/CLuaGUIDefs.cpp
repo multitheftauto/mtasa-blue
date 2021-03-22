@@ -713,7 +713,7 @@ int CLuaGUIDefs::GUICreateWindow(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateWindow(*pLuaMain, position, size, titleBarText, relative);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -748,7 +748,7 @@ int CLuaGUIDefs::GUICreateLabel(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateLabel(*pLuaMain, position, size, text, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -791,7 +791,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
                     CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
                     if (pGUIElement != nullptr)
                     {
-                        lua_pushelement(luaVM, pGUIElement);
+                        lua::Push(luaVM, pGUIElement);
                         return 1;
                     }
                     else
@@ -835,7 +835,7 @@ int CLuaGUIDefs::GUICreateButton(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateButton(*pLuaMain, position, size, text, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -868,7 +868,7 @@ int CLuaGUIDefs::GUICreateProgressBar(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateProgressBar(*pLuaMain, position, size, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -905,7 +905,7 @@ int CLuaGUIDefs::GUICreateCheckBox(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateCheckBox(*pLuaMain, position, size, text, selected, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -940,7 +940,7 @@ int CLuaGUIDefs::GUICreateRadioButton(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateRadioButton(*pLuaMain, position, size, text, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -975,7 +975,7 @@ int CLuaGUIDefs::GUICreateEdit(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateEdit(*pLuaMain, position, size, text, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1010,7 +1010,7 @@ int CLuaGUIDefs::GUICreateMemo(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateMemo(*pLuaMain, position, size, text, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1043,7 +1043,7 @@ int CLuaGUIDefs::GUICreateGridList(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateGridList(*pLuaMain, position, size, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1076,7 +1076,7 @@ int CLuaGUIDefs::GUICreateScrollPane(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateScrollPane(*pLuaMain, position, size, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1111,7 +1111,7 @@ int CLuaGUIDefs::GUICreateScrollBar(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateScrollBar(*pLuaMain, position, size, horizontal, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1144,7 +1144,7 @@ int CLuaGUIDefs::GUICreateTabPanel(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateTabPanel(*pLuaMain, position, size, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1237,7 +1237,7 @@ int CLuaGUIDefs::GUICreateTab(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateTab(*pLuaMain, text, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -1260,7 +1260,7 @@ int CLuaGUIDefs::GUIGetSelectedTab(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CClientGUIElement* pTab = CStaticFunctionDefinitions::GUIGetSelectedTab(*tabPanel);
-        lua_pushelement(luaVM, pTab);
+        lua::Push(luaVM, pTab);
         return 1;
     }
     else
@@ -1737,7 +1737,7 @@ int CLuaGUIDefs::GUIGetFont(lua_State* luaVM)
             lua_pushstring(luaVM, strFontName);
         else
             lua_pushnil(luaVM);
-        lua_pushelement(luaVM, pGuiFontElement);
+        lua::Push(luaVM, pGuiFontElement);
         return 2;
     }
     else
@@ -3769,7 +3769,7 @@ int CLuaGUIDefs::GUICreateComboBox(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateComboBox(*pLuaMain, position, size, caption, relative, parent);
-            lua_pushelement(luaVM, pGUIElement);
+            lua::Push(luaVM, pGUIElement);
             return 1;
         }
     }
@@ -4034,7 +4034,7 @@ int CLuaGUIDefs::GUICreateFont(lua_State* luaVM)
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
                         // ElementGroup? **
                         pGuiFont->SetParent(pParentResource->GetResourceDynamicEntity());
-                        lua_pushelement(luaVM, pGuiFont);
+                        lua::Push(luaVM, pGuiFont);
                         return 1;
                     }
                     argStream.SetCustomError(strFilePath, "Error creating font");

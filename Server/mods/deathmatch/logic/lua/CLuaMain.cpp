@@ -199,13 +199,13 @@ void CLuaMain::InitVM()
     // Oli: Don't forget to add new ones to CLuaManager::LoadCFunctions. Thanks!
 
     // create global vars
-    lua_pushelement(m_luaVM, g_pGame->GetMapManager()->GetRootElement());
+    lua::Push(m_luaVM, g_pGame->GetMapManager()->GetRootElement());
     lua_setglobal(m_luaVM, "root");
 
-    lua_pushresource(m_luaVM, m_pResource);
+    lua::Push(m_luaVM, m_pResource);
     lua_setglobal(m_luaVM, "resource");
 
-    lua_pushelement(m_luaVM, m_pResource->GetResourceRootElement());
+    lua::Push(m_luaVM, m_pResource->GetResourceRootElement());
     lua_setglobal(m_luaVM, "resourceRoot");
 
     // Load pre-loaded lua scripts

@@ -228,7 +228,7 @@ void CRegisteredCommands::GetCommands(lua_State* luaVM)
             lua_pushstring(luaVM, pCommand->strKey.c_str());
             lua_rawseti(luaVM, -2, 1);
 
-            lua_pushresource(luaVM, pCommand->pLuaMain->GetResource());
+            lua::Push(luaVM, pCommand->pLuaMain->GetResource());
             lua_rawseti(luaVM, -2, 2);
         }
         lua_settable(luaVM, -3);

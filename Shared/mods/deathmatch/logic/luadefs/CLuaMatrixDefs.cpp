@@ -111,7 +111,7 @@ int CLuaMatrixDefs::Create(lua_State* luaVM)
         return 1;
     }
 
-    lua_pushmatrix(luaVM, matrix);
+    lua::Push(luaVM, matrix);
     return 1;
 }
 
@@ -174,7 +174,7 @@ int CLuaMatrixDefs::TransformPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix1->TransformVector(vector));
+        lua::Push(luaVM, pMatrix1->TransformVector(vector));
         return 1;
     }
     else
@@ -198,7 +198,7 @@ int CLuaMatrixDefs::TransformDirection(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, *pMatrix1 * vector);
+        lua::Push(luaVM, *pMatrix1 * vector);
         return 1;
     }
     else
@@ -219,7 +219,7 @@ int CLuaMatrixDefs::Inverse(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, pMatrix1->Inverse());
+        lua::Push(luaVM, pMatrix1->Inverse());
         return 1;
     }
     else
@@ -240,7 +240,7 @@ int CLuaMatrixDefs::GetPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vPos);
+        lua::Push(luaVM, pMatrix->vPos);
         return 1;
     }
     else
@@ -265,7 +265,7 @@ int CLuaMatrixDefs::GetRotation(lua_State* luaVM)
         vecRotation = pMatrix->GetRotation();
         ConvertRadiansToDegrees(vecRotation);
 
-        lua_pushvector(luaVM, vecRotation);
+        lua::Push(luaVM, vecRotation);
         return 1;
     }
     else
@@ -286,7 +286,7 @@ int CLuaMatrixDefs::GetForward(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vFront);
+        lua::Push(luaVM, pMatrix->vFront);
         return 1;
     }
     else
@@ -307,7 +307,7 @@ int CLuaMatrixDefs::GetRight(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vRight);
+        lua::Push(luaVM, pMatrix->vRight);
         return 1;
     }
     else
@@ -328,7 +328,7 @@ int CLuaMatrixDefs::GetUp(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pMatrix->vUp);
+        lua::Push(luaVM, pMatrix->vUp);
         return 1;
     }
     else
@@ -473,7 +473,7 @@ int CLuaMatrixDefs::Add(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 + *pMatrix2);
+        lua::Push(luaVM, *pMatrix1 + *pMatrix2);
         return 1;
     }
     else
@@ -496,7 +496,7 @@ int CLuaMatrixDefs::Sub(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 - *pMatrix2);
+        lua::Push(luaVM, *pMatrix1 - *pMatrix2);
         return 1;
     }
     else
@@ -519,7 +519,7 @@ int CLuaMatrixDefs::Mul(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 * *pMatrix2);
+        lua::Push(luaVM, *pMatrix1 * *pMatrix2);
         return 1;
     }
     else
@@ -542,7 +542,7 @@ int CLuaMatrixDefs::Div(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushmatrix(luaVM, *pMatrix1 / *pMatrix2);
+        lua::Push(luaVM, *pMatrix1 / *pMatrix2);
         return 1;
     }
     else

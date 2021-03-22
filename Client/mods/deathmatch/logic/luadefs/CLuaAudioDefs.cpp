@@ -185,7 +185,7 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
                         Arguments.PushString("play");            // Reason
                         pSound->CallEvent("onClientSoundStarted", Arguments, false);
 
-                        lua_pushelement(luaVM, pSound);
+                        lua::Push(luaVM, pSound);
                         return 1;
                     }
                 }
@@ -245,7 +245,7 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
                         Arguments.PushString("play");            // Reason
                         pSound->CallEvent("onClientSoundStarted", Arguments, false);
 
-                        lua_pushelement(luaVM, pSound);
+                        lua::Push(luaVM, pSound);
                         return 1;
                     }
                 }
@@ -1578,7 +1578,7 @@ int CLuaAudioDefs::PlaySFX(lua_State* luaVM)
                 CClientSound* pSound;
                 if (CStaticFunctionDefinitions::PlaySFX(pResource, containerIndex, iBankIndex, iAudioIndex, bLoop, pSound))
                 {
-                    lua_pushelement(luaVM, pSound);
+                    lua::Push(luaVM, pSound);
                     return 1;
                 }
             }
@@ -1623,7 +1623,7 @@ int CLuaAudioDefs::PlaySFX3D(lua_State* luaVM)
                 CClientSound* pSound;
                 if (CStaticFunctionDefinitions::PlaySFX3D(pResource, containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop, pSound))
                 {
-                    lua_pushelement(luaVM, pSound);
+                    lua::Push(luaVM, pSound);
                     return 1;
                 }
             }

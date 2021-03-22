@@ -43,21 +43,21 @@ CClientEntity* lua_toelement(lua_State* luaVM, int iArgument)
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
     if (CClientEntity* pElement = UserDataCast<CClientEntity>((CClientEntity*)NULL, pData, luaVM))
-        return lua_pushelement(luaVM, pElement);
+        return lua::Push(luaVM, pElement);
     else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, luaVM))
-        return lua_pushresource(luaVM, pResource);
+        return lua::Push(luaVM, pResource);
     else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, luaVM))
-        return lua_pushxmlnode(luaVM, pNode);
+        return lua::Push(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
-        return lua_pushtimer(luaVM, pTimer);
+        return lua::Push(luaVM, pTimer);
     else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua::Push(luaVM, *pVector);
     else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua::Push(luaVM, *pVector);
     else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua::Push(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
-        return lua_pushmatrix(luaVM, *pMatrix);
+        return lua::Push(luaVM, *pMatrix);
 
     lua_pushlightuserdata(luaVM, pData);
 }

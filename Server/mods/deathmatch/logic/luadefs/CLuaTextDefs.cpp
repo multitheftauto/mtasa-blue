@@ -96,7 +96,7 @@ int CLuaTextDefs::textCreateDisplay(lua_State* luaVM)
     {
         // Create a text display and return it
         CTextDisplay* textDisplay = luaMain->CreateDisplay();
-        lua_pushtextdisplay(luaVM, textDisplay);
+        lua::Push(luaVM, textDisplay);
         return 1;
     }
 
@@ -186,7 +186,7 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
         if (luaMain)
         {
             CTextItem* pTextItem = luaMain->CreateTextItem(strText, fX, fY, (eTextPriority)iPriority, color, fScale, ucFormat, ucShadowAlpha);
-            lua_pushtextitem(luaVM, pTextItem);
+            lua::Push(luaVM, pTextItem);
             return 1;
         }
     }

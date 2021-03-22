@@ -68,7 +68,7 @@ void CTextDisplay::GetObservers(lua_State* pLua)
     for (; iter != m_observers.end(); iter++)
     {
         lua_pushnumber(pLua, ++uiIndex);
-        lua_pushelement(pLua, (*iter)->GetPlayer());
+        lua::Push(pLua, (*iter)->GetPlayer());
         lua_settable(pLua, -3);
     }
 }

@@ -126,7 +126,7 @@ int CLuaAccountDefs::GetAccountPlayer(lua_State* luaVM)
         CClient* pClient = CStaticFunctionDefinitions::GetAccountPlayer(pAccount);
         if (pClient)
         {
-            lua_pushelement(luaVM, pClient->GetElement());
+            lua::Push(luaVM, pClient->GetElement());
             return 1;
         }
     }
@@ -232,7 +232,7 @@ int CLuaAccountDefs::GetAccount(lua_State* luaVM)
         CAccount* pAccount = CStaticFunctionDefinitions::GetAccount(strName, bUsePassword ? strPassword.c_str() : NULL, bCaseSensitive);
         if (pAccount)
         {
-            lua_pushaccount(luaVM, pAccount);
+            lua::Push(luaVM, pAccount);
             return 1;
         }
     }
@@ -269,7 +269,7 @@ int CLuaAccountDefs::GetAccountsByData(lua_State* luaVM)
         for (unsigned int i = 0; i < accounts.size(); ++i)
         {
             lua_pushnumber(luaVM, i + 1);
-            lua_pushaccount(luaVM, accounts[i]);
+            lua::Push(luaVM, accounts[i]);
             lua_settable(luaVM, -3);
         }
         return 1;
@@ -322,7 +322,7 @@ int CLuaAccountDefs::GetAccountsBySerial(lua_State* luaVM)
         for (unsigned int i = 0; i < accounts.size(); ++i)
         {
             lua_pushnumber(luaVM, i + 1);
-            lua_pushaccount(luaVM, accounts[i]);
+            lua::Push(luaVM, accounts[i]);
             lua_settable(luaVM, -3);
         }
         return 1;
@@ -375,7 +375,7 @@ int CLuaAccountDefs::GetAccountsByIP(lua_State* luaVM)
         for (unsigned int i = 0; i < accounts.size(); ++i)
         {
             lua_pushnumber(luaVM, i + 1);
-            lua_pushaccount(luaVM, accounts[i]);
+            lua::Push(luaVM, accounts[i]);
             lua_settable(luaVM, -3);
         }
         return 1;
@@ -424,7 +424,7 @@ int CLuaAccountDefs::GetAccountByID(lua_State* luaVM)
         CAccount* account;
         if (CStaticFunctionDefinitions::GetAccountByID(ID, account) && account)
         {
-            lua_pushaccount(luaVM, account);
+            lua::Push(luaVM, account);
             return 1;
         }
     }
@@ -453,7 +453,7 @@ int CLuaAccountDefs::AddAccount(lua_State* luaVM)
         CAccount* pAccount;
         if ((pAccount = CStaticFunctionDefinitions::AddAccount(strName, strPassword, bAllowCaseVariations, strError)))
         {
-            lua_pushaccount(luaVM, pAccount);
+            lua::Push(luaVM, pAccount);
             return 1;
         }
     }

@@ -99,7 +99,7 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
             else
                 pWaterElement = CStaticFunctionDefinitions::CreateWater(*pResource, &v1, &v2, &v3, NULL, bShallow);
 
-            lua_pushelement(luaVM, pWaterElement);
+            lua::Push(luaVM, pWaterElement);
             return 1;
         }
     }

@@ -2581,7 +2581,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         lua_pushstring(m_pVM->GetVM(), ipoHttpRequest->sOriginalUri.c_str());
         lua_setglobal(m_pVM->GetVM(), "url");
 
-        lua_pushaccount(m_pVM->GetVM(), pAccount);
+        lua::Push(m_pVM->GetVM(), pAccount);
         lua_setglobal(m_pVM->GetVM(), "user");
 
         CLuaArguments Returns;

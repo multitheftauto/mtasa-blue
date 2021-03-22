@@ -93,7 +93,7 @@ int CLuaRadarAreaDefs::CreateRadarArea(lua_State* luaVM)
                 {
                     pGroup->Add(pRadarArea);
                 }
-                lua_pushelement(luaVM, pRadarArea);
+                lua::Push(luaVM, pRadarArea);
                 return 1;
             }
         }
@@ -143,7 +143,7 @@ int CLuaRadarAreaDefs::OOP_GetRadarAreaSize(lua_State* luaVM)
         CVector2D vecSize;
         if (CStaticFunctionDefinitions::GetRadarAreaSize(pRadarArea, vecSize))
         {
-            lua_pushvector(luaVM, vecSize);
+            lua::Push(luaVM, vecSize);
             return 1;
         }
     }

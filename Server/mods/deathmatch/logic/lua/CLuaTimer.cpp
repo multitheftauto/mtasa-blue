@@ -47,7 +47,7 @@ void CLuaTimer::ExecuteTimer(CLuaMain* pLuaMain)
         lua_pop(pState, 1);
 
         // Set the "sourceTimer" global
-        lua_pushtimer(pState, this);
+        lua::Push(pState, this);
         lua_setglobal(pState, "sourceTimer");
 
         m_Arguments.Call(pLuaMain, m_iLuaFunction);

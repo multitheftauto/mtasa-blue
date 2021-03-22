@@ -83,7 +83,7 @@ int CLuaSearchLightDefs::CreateSearchLight(lua_State* luaVM)
                 if (pGroup)
                     pGroup->Add(pLight);
 
-                lua_pushelement(luaVM, pLight);
+                lua::Push(luaVM, pLight);
                 return 1;
             }
         }
@@ -283,7 +283,7 @@ int CLuaSearchLightDefs::OOP_GetSearchLightStartPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pSearchLight->GetStartPosition());
+        lua::Push(luaVM, pSearchLight->GetStartPosition());
         return 1;
     }
     else
@@ -303,7 +303,7 @@ int CLuaSearchLightDefs::OOP_GetSearchLightEndPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, pSearchLight->GetEndPosition());
+        lua::Push(luaVM, pSearchLight->GetEndPosition());
         return 1;
     }
     else

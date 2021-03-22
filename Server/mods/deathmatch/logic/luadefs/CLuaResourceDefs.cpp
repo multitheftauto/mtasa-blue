@@ -157,7 +157,7 @@ int CLuaResourceDefs::createResource(lua_State* luaVM)
             argStream.SetCustomError(strStatus);
         else if (pNewResource)
         {
-            lua_pushresource(luaVM, pNewResource);
+            lua::Push(luaVM, pNewResource);
             return 1;
         }
     }
@@ -189,7 +189,7 @@ int CLuaResourceDefs::copyResource(lua_State* luaVM)
             argStream.SetCustomError(strStatus);
         else if (pNewResource)
         {
-            lua_pushresource(luaVM, pNewResource);
+            lua::Push(luaVM, pNewResource);
             return 1;
         }
     }
@@ -221,7 +221,7 @@ int CLuaResourceDefs::renameResource(lua_State* luaVM)
             argStream.SetCustomError(strStatus);
         else if (pNewResource)
         {
-            lua_pushresource(luaVM, pNewResource);
+            lua::Push(luaVM, pNewResource);
             return 1;
         }
     }
@@ -296,7 +296,7 @@ int CLuaResourceDefs::addResourceMap(lua_State* luaVM)
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap(pResource, strPath, strMetaName, usDimension, pLUA);
                         if (pXMLNode)
                         {
-                            lua_pushxmlnode(luaVM, pXMLNode);
+                            lua::Push(luaVM, pXMLNode);
                             return 1;
                         }
                     }
@@ -359,7 +359,7 @@ int CLuaResourceDefs::addResourceConfig(lua_State* luaVM)
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig(pResource, strPath, strConfigName, iType, pLUA);
                         if (pXMLNode)
                         {
-                            lua_pushxmlnode(luaVM, pXMLNode);
+                            lua::Push(luaVM, pXMLNode);
                             return 1;
                         }
                     }
@@ -628,7 +628,7 @@ int CLuaResourceDefs::getThisResource(lua_State* luaVM)
     if (amain)
     {
         CResource* thisResource = amain->GetResource();
-        lua_pushresource(luaVM, thisResource);
+        lua::Push(luaVM, thisResource);
         return 1;
     }
     lua_pushboolean(luaVM, false);
@@ -647,7 +647,7 @@ int CLuaResourceDefs::getResourceFromName(lua_State* luaVM)
         CResource* pResource = m_pResourceManager->GetResource(strName);
         if (pResource)
         {
-            lua_pushresource(luaVM, pResource);
+            lua::Push(luaVM, pResource);
             return 1;
         }
     }
@@ -666,7 +666,7 @@ int CLuaResourceDefs::getResources(lua_State* luaVM)
     for (; iter != m_pResourceManager->IterEnd(); ++iter)
     {
         lua_pushnumber(luaVM, ++uiIndex);
-        lua_pushresource(luaVM, *iter);
+        lua::Push(luaVM, *iter);
         lua_settable(luaVM, -3);
     }
     return 1;
@@ -810,7 +810,7 @@ int CLuaResourceDefs::getResourceConfig(lua_State* luaVM)
                     if (!pRootNode)
                         continue;
 
-                    lua_pushxmlnode(luaVM, pRootNode);
+                    lua::Push(luaVM, pRootNode);
                     return 1;
                 }
             }
@@ -940,7 +940,7 @@ int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
             CElement* pElement = pResource->GetResourceRootElement();
             if (pElement)
             {
-                lua_pushelement(luaVM, pElement);
+                lua::Push(luaVM, pElement);
                 return 1;
             }
         }
@@ -982,7 +982,7 @@ int CLuaResourceDefs::getResourceDynamicElementRoot(lua_State* luaVM)
             CElement* pElement = pResource->GetDynamicElementRoot();
             if (pElement)
             {
-                lua_pushelement(luaVM, pElement);
+                lua::Push(luaVM, pElement);
                 return 1;
             }
         }
@@ -1013,7 +1013,7 @@ int CLuaResourceDefs::getResourceMapRootElement(lua_State* luaVM)
             CElement* pMapRoot = CStaticFunctionDefinitions::GetResourceMapRootElement(pResource, strMapName);
             if (pMapRoot)
             {
-                lua_pushelement(luaVM, pMapRoot);
+                lua::Push(luaVM, pMapRoot);
                 return 1;
             }
         }
@@ -1155,10 +1155,10 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                 lua_pop(targetLuaVM, 1);
 
                 // Set the new values for the current sourceResource, and sourceResourceRoot
-                lua_pushresource(targetLuaVM, resourceThis);
+                lua::Push(targetLuaVM, resourceThis);
                 lua_setglobal(targetLuaVM, "sourceResource");
 
-                lua_pushelement(targetLuaVM, resourceThis->GetResourceRootElement());
+                lua::Push(targetLuaVM, resourceThis->GetResourceRootElement());
                 lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
                 if (pResource->CallExportedFunction(strFunctionName, args, returns, *resourceThis))

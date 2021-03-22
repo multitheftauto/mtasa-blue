@@ -89,7 +89,7 @@ int CLuaProjectileDefs::CreateProjectile(lua_State* luaVM)
                         pGroup->Add((CClientEntity*)pProjectile);
                     }
 
-                    lua_pushelement(luaVM, pProjectile);
+                    lua::Push(luaVM, pProjectile);
                     return 1;
                 }
             }
@@ -132,12 +132,12 @@ int CLuaProjectileDefs::GetProjectileTarget(lua_State* luaVM)
         unsigned char ucWeapon = pProjectile->GetWeaponType();
         if (ucWeapon == WEAPONTYPE_ROCKET_HS)
         {
-            lua_pushelement(luaVM, pProjectile->GetTargetEntity());
+            lua::Push(luaVM, pProjectile->GetTargetEntity());
             return 1;
         }
         else if (ucWeapon == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
         {
-            lua_pushelement(luaVM, pProjectile->GetSatchelAttachedTo());
+            lua::Push(luaVM, pProjectile->GetSatchelAttachedTo());
             return 1;
         }
     }
@@ -157,7 +157,7 @@ int CLuaProjectileDefs::GetProjectileCreator(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushelement(luaVM, pProjectile->GetCreator());
+        lua::Push(luaVM, pProjectile->GetCreator());
         return 1;
     }
     else

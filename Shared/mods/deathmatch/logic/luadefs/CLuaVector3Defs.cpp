@@ -154,7 +154,7 @@ int CLuaVector3Defs::Create(lua_State* luaVM)
         argStream.ReadVector3D(vector);
     }
 
-    lua_pushvector(luaVM, vector);
+    lua::Push(luaVM, vector);
     return 1;
 }
 
@@ -235,7 +235,7 @@ int CLuaVector3Defs::GetNormalized(lua_State* luaVM)
         CVector vector(*pVector);
         vector.Normalize();
 
-        lua_pushvector(luaVM, vector);
+        lua::Push(luaVM, vector);
         return 1;
     }
     else
@@ -283,7 +283,7 @@ int CLuaVector3Defs::Cross(lua_State* luaVM)
         CVector vector(*pVector1);
         vector.CrossProduct(pVector2);
 
-        lua_pushvector(luaVM, vector);
+        lua::Push(luaVM, vector);
         return 1;
     }
     else
@@ -492,7 +492,7 @@ int CLuaVector3Defs::Add(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, *pVector1 + *pVector2);
+        lua::Push(luaVM, *pVector1 + *pVector2);
         return 1;
     }
     else
@@ -515,7 +515,7 @@ int CLuaVector3Defs::Sub(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, *pVector1 - *pVector2);
+        lua::Push(luaVM, *pVector1 - *pVector2);
         return 1;
     }
     else
@@ -541,7 +541,7 @@ int CLuaVector3Defs::Mul(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            lua_pushvector(luaVM, *pVector1 * fValue);
+            lua::Push(luaVM, *pVector1 * fValue);
             return 1;
         }
         else
@@ -557,7 +557,7 @@ int CLuaVector3Defs::Mul(lua_State* luaVM)
             argStream.ReadNumber(fValue);
             if (!argStream.HasErrors())
             {
-                lua_pushvector(luaVM, *pVector1 * fValue);
+                lua::Push(luaVM, *pVector1 * fValue);
                 return 1;
             }
             else
@@ -570,7 +570,7 @@ int CLuaVector3Defs::Mul(lua_State* luaVM)
 
             if (!argStream.HasErrors())
             {
-                lua_pushvector(luaVM, *pVector1 * *pVector2);
+                lua::Push(luaVM, *pVector1 * *pVector2);
                 return 1;
             }
             else
@@ -595,7 +595,7 @@ int CLuaVector3Defs::Div(lua_State* luaVM)
         float fValue = 0.0f;
         argStream.ReadNumber(fValue);
 
-        lua_pushvector(luaVM, *pVector1 / fValue);
+        lua::Push(luaVM, *pVector1 / fValue);
         return 1;
     }
     else
@@ -604,7 +604,7 @@ int CLuaVector3Defs::Div(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            lua_pushvector(luaVM, *pVector1 / *pVector2);
+            lua::Push(luaVM, *pVector1 / *pVector2);
             return 1;
         }
         else
@@ -635,7 +635,7 @@ int CLuaVector3Defs::Pow(lua_State* luaVM)
         vector.fY = pow(vector.fY, fValue);
         vector.fZ = pow(vector.fZ, fValue);
 
-        lua_pushvector(luaVM, vector);
+        lua::Push(luaVM, vector);
         return 1;
     }
     else
@@ -649,7 +649,7 @@ int CLuaVector3Defs::Pow(lua_State* luaVM)
             vector.fY = pow(vector.fY, pVector2->fY);
             vector.fZ = pow(vector.fZ, pVector2->fZ);
 
-            lua_pushvector(luaVM, vector);
+            lua::Push(luaVM, vector);
             return 1;
         }
         else
@@ -671,7 +671,7 @@ int CLuaVector3Defs::Unm(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushvector(luaVM, CVector() - *pVector);
+        lua::Push(luaVM, CVector() - *pVector);
         return 1;
     }
     else

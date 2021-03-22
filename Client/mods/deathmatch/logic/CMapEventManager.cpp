@@ -209,20 +209,20 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     lua_pop(pState, 1);
 
                     // Set the "source", "this", "sourceResource" and the "sourceResourceRoot" globals on that VM
-                    lua_pushelement(pState, pSource);
+                    lua::Push(pState, pSource);
                     lua_setglobal(pState, "source");
 
-                    lua_pushelement(pState, pThis);
+                    lua::Push(pState, pThis);
                     lua_setglobal(pState, "this");
 
                     CLuaMain*  pLuaMain = g_pClientGame->GetScriptDebugging()->GetTopLuaMain();
                     CResource* pSourceResource = pLuaMain ? pLuaMain->GetResource() : NULL;
                     if (pSourceResource)
                     {
-                        lua_pushresource(pState, pSourceResource);
+                        lua::Push(pState, pSourceResource);
                         lua_setglobal(pState, "sourceResource");
 
-                        lua_pushelement(pState, pSourceResource->GetResourceDynamicEntity());
+                        lua::Push(pState, pSourceResource->GetResourceDynamicEntity());
                         lua_setglobal(pState, "sourceResourceRoot");
                     }
                     else

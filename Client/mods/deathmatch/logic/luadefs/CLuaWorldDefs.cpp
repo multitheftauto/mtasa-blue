@@ -289,7 +289,7 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
                 lua_pushnumber(luaVM, vecColPosition.fZ);
 
                 if (pColEntity)
-                    lua_pushelement(luaVM, pColEntity);
+                    lua::Push(luaVM, pColEntity);
                 else
                     lua_pushnil(luaVM);
 

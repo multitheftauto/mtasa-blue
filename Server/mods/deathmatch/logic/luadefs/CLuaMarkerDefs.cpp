@@ -107,7 +107,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
                     {
                         pGroup->Add(pMarker);
                     }
-                    lua_pushelement(luaVM, pMarker);
+                    lua::Push(luaVM, pMarker);
                     return 1;
                 }
             }
@@ -242,7 +242,7 @@ int CLuaMarkerDefs::OOP_GetMarkerTarget(lua_State* luaVM)
         CVector vecPosition;
         if (CStaticFunctionDefinitions::GetMarkerTarget(pMarker, vecPosition))
         {
-            lua_pushvector(luaVM, vecPosition);
+            lua::Push(luaVM, vecPosition);
         }
         else
             lua_pushboolean(luaVM, false);

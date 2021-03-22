@@ -40,37 +40,37 @@ CElement* lua_toelement(lua_State* luaVM, int iArgument)
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
     if (CElement* pEntity = UserDataCast<CElement>((CElement*)NULL, pData, NULL))
-        return lua_pushelement(luaVM, pEntity);
+        return lua::Push(luaVM, pEntity);
     if (CPlayer* pEntity = UserDataCast<CPlayer>((CPlayer*)NULL, pData, NULL))
-        return lua_pushelement(luaVM, pEntity);
+        return lua::Push(luaVM, pEntity);
     else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, NULL))
-        return lua_pushresource(luaVM, pResource);
+        return lua::Push(luaVM, pResource);
     else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, NULL))
-        return lua_pushxmlnode(luaVM, pNode);
+        return lua::Push(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
-        return lua_pushtimer(luaVM, pTimer);
+        return lua::Push(luaVM, pTimer);
     else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua::Push(luaVM, *pVector);
     else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua::Push(luaVM, *pVector);
     else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
+        return lua::Push(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
-        return lua_pushmatrix(luaVM, *pMatrix);
+        return lua::Push(luaVM, *pMatrix);
     else if (CAccount* pAccount = UserDataCast<CAccount>((CAccount*)NULL, pData, luaVM))
-        return lua_pushaccount(luaVM, pAccount);
+        return lua::Push(luaVM, pAccount);
     else if (CAccessControlList* pACL = UserDataCast<CAccessControlList>((CAccessControlList*)NULL, pData, luaVM))
-        return lua_pushacl(luaVM, pACL);
+        return lua::Push(luaVM, pACL);
     else if (CAccessControlListGroup* pACLGroup = UserDataCast<CAccessControlListGroup>((CAccessControlListGroup*)NULL, pData, luaVM))
-        return lua_pushaclgroup(luaVM, pACLGroup);
+        return lua::Push(luaVM, pACLGroup);
     else if (CBan* pBan = UserDataCast<CBan>((CBan*)NULL, pData, luaVM))
-        return lua_pushban(luaVM, pBan);
+        return lua::Push(luaVM, pBan);
     else if (CTextDisplay* pTextDisplay = UserDataCast<CTextDisplay>((CTextDisplay*)NULL, pData, luaVM))
-        return lua_pushtextdisplay(luaVM, pTextDisplay);
+        return lua::Push(luaVM, pTextDisplay);
     else if (CTextItem* pTextItem = UserDataCast<CTextItem>((CTextItem*)NULL, pData, luaVM))
-        return lua_pushtextitem(luaVM, pTextItem);
+        return lua::Push(luaVM, pTextItem);
     else if (CDbJobData* pQuery = UserDataCast<CDbJobData>((CDbJobData*)NULL, pData, luaVM))
-        return lua_pushquery(luaVM, pQuery);
+        return lua::Push(luaVM, pQuery);
     lua_pushlightuserdata(luaVM, pData);
 }
 

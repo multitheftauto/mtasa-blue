@@ -59,7 +59,7 @@ int CLuaTeamDefs::GetTeamFromName(lua_State* luaVM)
         CClientTeam* pTeam = m_pTeamManager->GetTeam(strName);
         if (pTeam)
         {
-            lua_pushelement(luaVM, pTeam);
+            lua::Push(luaVM, pTeam);
             return 1;
         }
     }
@@ -153,7 +153,7 @@ int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)
             if (!pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, pPlayer);
+                lua::Push(luaVM, pPlayer);
                 lua_settable(luaVM, -3);
             }
         }

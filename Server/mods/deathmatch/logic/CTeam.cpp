@@ -123,7 +123,7 @@ void CTeam::GetPlayers(lua_State* luaVM)
         if (!(*iter)->IsBeingDeleted())
         {
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, *iter);
+            lua::Push(luaVM, *iter);
             lua_settable(luaVM, -3);
         }
     }

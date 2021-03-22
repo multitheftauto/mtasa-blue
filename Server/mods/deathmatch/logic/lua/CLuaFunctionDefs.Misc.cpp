@@ -68,7 +68,7 @@ int CLuaFunctionDefs::GetRootElement(lua_State* luaVM)
     CElement* pRoot = CStaticFunctionDefinitions::GetRootElement();
     if (pRoot)
     {
-        lua_pushelement(luaVM, pRoot);
+        lua::Push(luaVM, pRoot);
         return 1;
     }
 
@@ -93,7 +93,7 @@ int CLuaFunctionDefs::LoadMapData(lua_State* luaVM)
             CElement* pLoadedRoot = CStaticFunctionDefinitions::LoadMapData(pLuaMain, pParent, pXML);
             if (pLoadedRoot)
             {
-                lua_pushelement(luaVM, pLoadedRoot);
+                lua::Push(luaVM, pLoadedRoot);
                 return 1;
             }
         }

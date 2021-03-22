@@ -43,25 +43,6 @@ CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 // Lua pop macros for our datatypes
 class CElement* lua_toelement(lua_State* luaVM, int iArgument);
 
-// Lua push macros for our datatypes
-// For new code uew lua::Push instead
-// TODO: Maybe replace these functions with a direct call to lua::Push
-void lua_pushacl(lua_State* luaVM, CAccessControlList* pACL) { lua::Push(luaVM, pACL); }
-void lua_pushaclgroup(lua_State* luaVM, CAccessControlListGroup* pGroup) { lua::Push(luaVM, pGroup); }
-void lua_pushaccount(lua_State* luaVM, CAccount* pAccount) { lua::Push(luaVM, pAccount); }
-void lua_pushtextdisplay(lua_State* luaVM, CTextDisplay* pDisplay) { lua::Push(luaVM, pDisplay); }
-void lua_pushtextitem(lua_State* luaVM, CTextItem* pItem) { lua::Push(luaVM, pItem); }
-void lua_pushban(lua_State* luaVM, CBan* pBan) { lua::Push(luaVM, pBan); }
-void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData) { lua::Push(luaVM, pJobData); }
-void lua_pushelement(lua_State* luaVM, CElement* pElement) { lua::Push(luaVM, pElement); }
-void lua_pushresource(lua_State* luaVM, CResource* pResource) { lua::Push(luaVM, pResource); }
-void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer) { lua::Push(luaVM, pTimer); }
-void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pNode) { lua::Push(luaVM, pNode); }
-void lua_pushvector(lua_State* luaVM, const CVector4D& vector) { lua::Push(luaVM, vector); }
-void lua_pushvector(lua_State* luaVM, const CVector& vector) { lua::Push(luaVM, vector); }
-void lua_pushvector(lua_State* luaVM, const CVector2D& vector) { lua::Push(luaVM, vector); }
-void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix) { lua::Push(luaVM, matrix); }
-
 void lua_pushuserdata(lua_State* luaVM, void* value);
 
 // Converts any type to string

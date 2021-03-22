@@ -138,7 +138,7 @@ int CLuaFunctionDefs::CreateWeapon(lua_State* luaVM)
                         pGroup->Add((CElement*)pWeapon);
                     }
 
-                    lua_pushelement(luaVM, pWeapon);
+                    lua::Push(luaVM, pWeapon);
                     return 1;
                 }
             }
@@ -289,7 +289,7 @@ int CLuaFunctionDefs::GetWeaponTarget(lua_State* luaVM)
                 return 3;
             case TARGET_TYPE_ENTITY:
                 pTarget = pWeapon->GetElementTarget();
-                lua_pushelement(luaVM, pTarget);
+                lua::Push(luaVM, pTarget);
                 return 1;
             case TARGET_TYPE_FIXED:
                 lua_pushnil(luaVM);
@@ -313,7 +313,7 @@ int CLuaFunctionDefs::GetWeaponOwner(lua_State* luaVM)
         CPlayer* pOwner = pWeapon->GetOwner();
         if (pOwner)
         {
-            lua_pushelement(luaVM, pOwner);
+            lua::Push(luaVM, pOwner);
             return 1;
         }
     }

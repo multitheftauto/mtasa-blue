@@ -82,7 +82,7 @@ int CLuaObjectDefs::CreateObject(lua_State* luaVM)
                             pGroup->Add(pObject);
                         }
 
-                        lua_pushelement(luaVM, pObject);
+                        lua::Push(luaVM, pObject);
                         return 1;
                     }
                 }

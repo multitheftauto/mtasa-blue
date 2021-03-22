@@ -148,7 +148,7 @@ int CLuaACLDefs::aclCreate(lua_State* luaVM)
             pACL = m_pACLManager->AddACL(strACLName);
             CLogger::LogPrintf("ACL: %s: ACL '%s' created\n", GetResourceName(luaVM), pACL->GetName());
             // Return the created ACL
-            lua_pushacl(luaVM, pACL);
+            lua::Push(luaVM, pACL);
             return 1;
         }
     }
@@ -198,7 +198,7 @@ int CLuaACLDefs::aclGet(lua_State* luaVM)
         if (pACL)
         {
             // Return the created ACL
-            lua_pushacl(luaVM, pACL);
+            lua::Push(luaVM, pACL);
             return 1;
         }
     }
@@ -223,7 +223,7 @@ int CLuaACLDefs::aclList(lua_State* luaVM)
     {
         // Push onto the table
         lua_pushnumber(luaVM, ++uiIndex);
-        lua_pushacl(luaVM, *iter);
+        lua::Push(luaVM, *iter);
         lua_settable(luaVM, -3);
     }
 
@@ -542,7 +542,7 @@ int CLuaACLDefs::aclCreateGroup(lua_State* luaVM)
             pGroup = m_pACLManager->AddGroup(strGroup);
             CLogger::LogPrintf("ACL: %s: Group '%s' created\n", GetResourceName(luaVM), pGroup->GetGroupName());
             // And return it
-            lua_pushaclgroup(luaVM, pGroup);
+            lua::Push(luaVM, pGroup);
             return 1;
         }
     }
@@ -592,7 +592,7 @@ int CLuaACLDefs::aclGetGroup(lua_State* luaVM)
         if (pGroup)
         {
             // Return the group
-            lua_pushaclgroup(luaVM, pGroup);
+            lua::Push(luaVM, pGroup);
             return 1;
         }
     }
@@ -617,7 +617,7 @@ int CLuaACLDefs::aclGroupList(lua_State* luaVM)
     {
         // Push onto the table
         lua_pushnumber(luaVM, ++uiIndex);
-        lua_pushaclgroup(luaVM, *iter);
+        lua::Push(luaVM, *iter);
         lua_settable(luaVM, -3);
     }
 
@@ -692,7 +692,7 @@ int CLuaACLDefs::aclGroupListACL(lua_State* luaVM)
         {
             // Push onto the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushacl(luaVM, *iter);
+            lua::Push(luaVM, *iter);
             lua_settable(luaVM, -3);
         }
         // Return the table

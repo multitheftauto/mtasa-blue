@@ -464,7 +464,7 @@ int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)
         CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
-            lua_pushelement(luaVM, pVehicle);
+            lua::Push(luaVM, pVehicle);
             return 1;
         }
     }
@@ -603,7 +603,7 @@ int CLuaPedDefs::GetPedTarget(lua_State* luaVM)
         CClientEntity* pEntity = CStaticFunctionDefinitions::GetPedTarget(*pPed);
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua::Push(luaVM, pEntity);
             return 1;
         }
     }
@@ -654,7 +654,7 @@ int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
 
     if (pPed->GetShotData(&vecStart))
     {
-        lua_pushvector(luaVM, vecStart);
+        lua::Push(luaVM, vecStart);
         return 1;
     }
 
@@ -701,7 +701,7 @@ int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
 
     if (pPed->GetShotData(nullptr, &vecEnd))
     {
-        lua_pushvector(luaVM, vecEnd);
+        lua::Push(luaVM, vecEnd);
         return 1;
     }
 
@@ -748,7 +748,7 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     CVector vecCollision;
     if (CStaticFunctionDefinitions::GetPedTargetCollision(*pPed, vecCollision))
     {
-        lua_pushvector(luaVM, vecCollision);
+        lua::Push(luaVM, vecCollision);
         return 1;
     }
 
@@ -930,7 +930,7 @@ int CLuaPedDefs::GetPedContactElement(lua_State* luaVM)
         CClientEntity* pEntity = pPed->GetContactEntity();
         if (pEntity)
         {
-            lua_pushelement(luaVM, pEntity);
+            lua::Push(luaVM, pEntity);
             return 1;
         }
     }
@@ -1093,7 +1093,7 @@ int CLuaPedDefs::OOP_GetPedBonePosition(lua_State* luaVM)
             CVector vecPosition;
             if (CStaticFunctionDefinitions::GetPedBonePosition(*pPed, bone, vecPosition))
             {
-                lua_pushvector(luaVM, vecPosition);
+                lua::Push(luaVM, vecPosition);
                 return 1;
             }
         }
@@ -2317,7 +2317,7 @@ int CLuaPedDefs::CreatePed(lua_State* luaVM)
                 if (pPed)
                 {
                     // Return it
-                    lua_pushelement(luaVM, pPed);
+                    lua::Push(luaVM, pPed);
                     return 1;
                 }
             }

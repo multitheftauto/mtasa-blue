@@ -151,7 +151,7 @@ int CLuaFileDefs::File(lua_State* luaVM)
                         }
 
                         // Success. Return the file.
-                        lua_pushelement(luaVM, pFile);
+                        lua::Push(luaVM, pFile);
                         return 1;
                     }
                     else
@@ -233,7 +233,7 @@ int CLuaFileDefs::fileOpen(lua_State* luaVM)
                         }
 
                         // Success. Return the file.
-                        lua_pushelement(luaVM, pFile);
+                        lua::Push(luaVM, pFile);
                         return 1;
                     }
                     else
@@ -336,7 +336,7 @@ int CLuaFileDefs::fileCreate(lua_State* luaVM)
                     }
 
                     // Success. Return the file.
-                    lua_pushelement(luaVM, pFile);
+                    lua::Push(luaVM, pFile);
                     return 1;
                 }
                 else

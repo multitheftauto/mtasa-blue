@@ -55,18 +55,6 @@ class CVector2D;
 
 class CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
 
-// Lua push/pop macros for our datatypes
-// For new code uew lua::Push instead
-// TODO: Maybe replace these functions with a direct call to lua::Push
-void lua_pushelement(lua_State* luaVM, CClientEntity* pEntity) { lua::Push(luaVM, pEntity); }
-void lua_pushresource(lua_State* luaVM, CResource* pResource) { lua::Push(luaVM, pResource); }
-void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer) { lua::Push(luaVM, pTimer); }
-void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pNode) { lua::Push(luaVM, pNode); }
-void lua_pushvector(lua_State* luaVM, const CVector4D& vector) { lua::Push(luaVM, vector); }
-void lua_pushvector(lua_State* luaVM, const CVector& vector) { lua::Push(luaVM, vector); }
-void lua_pushvector(lua_State* luaVM, const CVector2D& vector) { lua::Push(luaVM, vector); }
-void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix) { lua::Push(luaVM, matrix); }
-
 void lua_pushuserdata(lua_State* luaVM, void* pData);
 
 // Internal use

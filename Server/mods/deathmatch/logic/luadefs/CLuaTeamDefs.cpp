@@ -116,7 +116,7 @@ int CLuaTeamDefs::CreateTeam(lua_State* luaVM)
                     {
                         pGroup->Add(pTeam);
                     }
-                    lua_pushelement(luaVM, pTeam);
+                    lua::Push(luaVM, pTeam);
                     return 1;
                 }
             }
@@ -162,7 +162,7 @@ int CLuaTeamDefs::GetTeamFromName(lua_State* luaVM)
         CTeam* pTeam = CStaticFunctionDefinitions::GetTeamFromName(strName);
         if (pTeam)
         {
-            lua_pushelement(luaVM, pTeam);
+            lua::Push(luaVM, pTeam);
             return 1;
         }
     }

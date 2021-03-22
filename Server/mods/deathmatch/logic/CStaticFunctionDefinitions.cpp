@@ -11263,7 +11263,7 @@ void CStaticFunctionDefinitions::GetAccounts(lua_State* pLua)
         if (pAccount->IsRegistered() && !pAccount->IsConsoleAccount())
         {
             lua_pushnumber(pLua, ++uiIndex);
-            lua_pushaccount(pLua, pAccount);
+            lua::Push(pLua, pAccount);
             lua_settable(pLua, -3);
         }
     }
@@ -11738,7 +11738,7 @@ bool CStaticFunctionDefinitions::GetBans(lua_State* pLua)
     for (; iter != m_pBanManager->IterEnd(); iter++)
     {
         lua_pushnumber(pLua, ++uiIndex);
-        lua_pushban(pLua, *iter);
+        lua::Push(pLua, *iter);
         lua_settable(pLua, -3);
     }
     return true;

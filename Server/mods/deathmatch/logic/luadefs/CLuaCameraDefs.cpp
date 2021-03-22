@@ -77,7 +77,7 @@ int CLuaCameraDefs::OOP_getCameraMatrix(lua_State* luaVM)
         CMatrix matrix;
         // pPlayer->GetCamera ()->GetMatrix ( matrix );
 
-        lua_pushmatrix(luaVM, matrix);
+        lua::Push(luaVM, matrix);
         return 1;
     }
     else
@@ -100,7 +100,7 @@ int CLuaCameraDefs::getCameraTarget(lua_State* luaVM)
         CElement* pTarget = CStaticFunctionDefinitions::GetCameraTarget(pPlayer);
         if (pTarget)
         {
-            lua_pushelement(luaVM, pTarget);
+            lua::Push(luaVM, pTarget);
             return 1;
         }
     }

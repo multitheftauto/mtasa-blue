@@ -94,7 +94,7 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
     if (pCamera)
     {
-        lua_pushelement(luaVM, pCamera);
+        lua::Push(luaVM, pCamera);
         return 1;
     }
 
@@ -141,7 +141,7 @@ int CLuaCameraDefs::OOP_GetCameraMatrix(lua_State* luaVM)
     CMatrix matrix;
     m_pManager->GetCamera()->GetMatrix(matrix);
 
-    lua_pushmatrix(luaVM, matrix);
+    lua::Push(luaVM, matrix);
     return 1;
 }
 
@@ -150,7 +150,7 @@ int CLuaCameraDefs::GetCameraTarget(lua_State* luaVM)
     CClientEntity* pTarget = CStaticFunctionDefinitions::GetCameraTarget();
     if (pTarget)
     {
-        lua_pushelement(luaVM, pTarget);
+        lua::Push(luaVM, pTarget);
         return 1;
     }
 
@@ -541,7 +541,7 @@ int CLuaCameraDefs::OOP_GetCameraPosition(lua_State* luaVM)
     CVector vecPosition;
     m_pManager->GetCamera()->GetPosition(vecPosition);
 
-    lua_pushvector(luaVM, vecPosition);
+    lua::Push(luaVM, vecPosition);
     return 1;
 }
 
@@ -573,7 +573,7 @@ int CLuaCameraDefs::OOP_GetCameraRotation(lua_State* luaVM)
     CVector vecPosition;
     m_pManager->GetCamera()->GetRotationDegrees(vecPosition);
 
-    lua_pushvector(luaVM, vecPosition);
+    lua::Push(luaVM, vecPosition);
     return 1;
 }
 

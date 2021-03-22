@@ -599,7 +599,7 @@ void CVehicleManager::GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM)
         {
             // Add it to the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, *iter);
+            lua::Push(luaVM, *iter);
             lua_settable(luaVM, -3);
         }
     }

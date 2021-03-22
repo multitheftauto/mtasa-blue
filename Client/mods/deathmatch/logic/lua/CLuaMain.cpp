@@ -168,19 +168,19 @@ void CLuaMain::InitVM()
     InitClasses(m_luaVM);
 
     // Update global variables
-    lua_pushelement(m_luaVM, g_pClientGame->GetRootEntity());
+    lua::Push(m_luaVM, g_pClientGame->GetRootEntity());
     lua_setglobal(m_luaVM, "root");
 
-    lua_pushresource(m_luaVM, m_pResource);
+    lua::Push(m_luaVM, m_pResource);
     lua_setglobal(m_luaVM, "resource");
 
-    lua_pushelement(m_luaVM, m_pResource->GetResourceEntity());
+    lua::Push(m_luaVM, m_pResource->GetResourceEntity());
     lua_setglobal(m_luaVM, "resourceRoot");
 
-    lua_pushelement(m_luaVM, m_pResource->GetResourceGUIEntity());
+    lua::Push(m_luaVM, m_pResource->GetResourceGUIEntity());
     lua_setglobal(m_luaVM, "guiRoot");
 
-    lua_pushelement(m_luaVM, g_pClientGame->GetLocalPlayer());
+    lua::Push(m_luaVM, g_pClientGame->GetLocalPlayer());
     lua_setglobal(m_luaVM, "localPlayer");
 
     // Load pre-loaded lua scripts

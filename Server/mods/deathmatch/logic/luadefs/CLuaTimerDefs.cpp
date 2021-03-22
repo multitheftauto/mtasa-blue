@@ -77,7 +77,7 @@ int CLuaTimerDefs::SetTimer(lua_State* luaVM)
                     // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
                     pLuaTimer->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
 
-                    lua_pushtimer(luaVM, pLuaTimer);
+                    lua::Push(luaVM, pLuaTimer);
                     return 1;
                 }
             }
@@ -192,7 +192,7 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
                 {
                     // Add it to the table
                     lua_pushnumber(luaVM, ++uiIndex);
-                    lua_pushtimer(luaVM, pLuaTimer);
+                    lua::Push(luaVM, pLuaTimer);
                     lua_settable(luaVM, -3);
                 }
             }

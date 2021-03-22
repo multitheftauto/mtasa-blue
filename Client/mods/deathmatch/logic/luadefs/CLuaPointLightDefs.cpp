@@ -87,7 +87,7 @@ int CLuaPointLightDefs::CreateLight(lua_State* luaVM)
                 {
                     pGroup->Add((CClientEntity*)pLight);
                 }
-                lua_pushelement(luaVM, pLight);
+                lua::Push(luaVM, pLight);
                 return 1;
             }
         }

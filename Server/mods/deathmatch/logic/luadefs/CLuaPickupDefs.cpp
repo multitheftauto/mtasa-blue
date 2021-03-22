@@ -94,7 +94,7 @@ int CLuaPickupDefs::createPickup(lua_State* luaVM)
                         pGroup->Add(pPickup);
                     }
                     // Return the handle
-                    lua_pushelement(luaVM, pPickup);
+                    lua::Push(luaVM, pPickup);
                     return 1;
                 }
             }
