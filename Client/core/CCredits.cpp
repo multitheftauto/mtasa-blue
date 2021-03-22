@@ -162,6 +162,7 @@ CCredits::CCredits()
         "GRascm\n"
         "GTX / Timic3\n"
         "guix\n"
+        "JeViCo\n"
         "John_Michael\n"
         "JR10\n"
         "Kayl\n"
