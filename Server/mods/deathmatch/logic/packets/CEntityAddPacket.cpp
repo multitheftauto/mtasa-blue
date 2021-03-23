@@ -226,7 +226,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteBit(bIsDoubleSided);
 
                     // Visible in all dimensions
-                    if (BitStream.Version() >= 0x068)
+                    if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                     {
                         bool bIsVisibleInAllDimensions = pObject->IsVisibleInAllDimensions();
                         BitStream.WriteBit(bIsVisibleInAllDimensions);
@@ -1025,6 +1025,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 vertex.data.vecPosition = *iter;
                                 BitStream.Write(&vertex);
                             }
+
+                            if (BitStream.Can(eBitStreamVersion::SetColPolygonHeight))
+                            {
+                                float fFloor, fCeil;
+                                pPolygon->GetHeight(fFloor, fCeil);
+
+                                BitStream.Write(fFloor);
+                                BitStream.Write(fCeil);
+                            }
                             break;
                         }
                         default:
@@ -1046,7 +1055,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write((short)vecVertex.fY);
                         BitStream.Write(vecVertex.fZ);
                     }
-                    if (BitStream.Version() >= 0x06C)
+                    if (BitStream.Can(eBitStreamVersion::Water_bShallow_ServerSide))
                         BitStream.WriteBit(pWater->IsWaterShallow());
                     break;
                 }

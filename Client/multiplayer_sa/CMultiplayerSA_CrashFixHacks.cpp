@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CTrainSA.h"
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
@@ -144,14 +145,15 @@ DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
 DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
 void _declspec(naked) HOOK_CrashFix_Misc5()
 {
-    _asm
-    {
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+    _asm {
+        mov edi, dword ptr[ARRAY_ModelInfo]
+        mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont        // Skip much code if edi is zero (ped has no model)
+        je      cont            // Skip much code if edi is zero (ped has no model)
 
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+        mov edi, dword ptr[ARRAY_ModelInfo]
+        mov     edi, dword ptr [ecx*4+edi]
         jmp     RETURN_CrashFix_Misc5
     cont:
         push    5
@@ -998,20 +1000,9 @@ inner:
     }
 }
 
-struct CStreamingInfo
-{
-    DWORD gta_hash;
-    WORD  chain_next;
-    uchar flg;
-    uchar archiveId;
-    DWORD offsetInBlocks;
-    DWORD sizeInBlocks;
-    DWORD reqload;
-};
-
 CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 {
-    CStreamingInfo* pItemInfo = (CStreamingInfo*)(0x8E4CC0);
+    CStreamingInfo* pItemInfo = (CStreamingInfo*)(CStreaming__ms_aInfoForModel);
     return pItemInfo + id;
 }
 
@@ -1024,7 +1015,7 @@ CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 {
-    ushort                     usModelId = pEntity->m_nModelIndex;
+    uint32                     usModelId = pEntity->m_nModelIndex;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelId];
     if (!pModelInfo)
     {
@@ -1041,11 +1032,11 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         if (!pColModel)
         {
             // Crash will occur at offset 00134134
-            CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId(usModelId);
-            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d reqload:%d", pModelInfo->usNumberOfRefs,
+            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfoFromModelId(usModelId);
+            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
                                pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
                                pModelInfo->bCollisionWasStreamedWithModel, pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,
-                               pStreamingInfo->reqload);
+                               pStreamingInfo->loadState);
             LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
             CArgMap argMap;
             argMap.Set("id", usModelId);
@@ -1056,10 +1047,10 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_GetBoundRect                      0x53412A
-#define HOOKSIZE_CEntity_GetBoundRect                     7
+#define HOOKPOS_CEntity_GetBoundRect                      0x534131
+#define HOOKSIZE_CEntity_GetBoundRect                     5
 #define HOOKCHECK_CEntity_GetBoundRect                    0x8B
-DWORD RETURN_CEntity_GetBoundRect = 0x534131;
+DWORD RETURN_CEntity_GetBoundRect = 0x534136;
 void _declspec(naked) HOOK_CEntity_GetBoundRect()
 {
     _asm
@@ -1071,7 +1062,8 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
         popad
 
         // Continue replaced code
-        mov     ecx,dword ptr [eax*4+0A9B0C8h]
+        mov     eax, [ecx+14h]
+        mov     edx, [eax]
         jmp     RETURN_CEntity_GetBoundRect
     }
 }
@@ -1315,7 +1307,11 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         popad
 
         // Replaced code
-        mov     eax, 0x0A9B0C8[eax*4]
+        push    ecx
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
     }
 }
@@ -1581,7 +1577,7 @@ static DWORD CONTINUE_CTrain__ProcessControl = 0x6F8FE5;
 // 0xC37FEC; float RailTrackLength[NUM_TRACKS]
 static float* RailTrackLength = reinterpret_cast<float*>(0xC37FEC);
 
-static void _cdecl WrapTrainRailDistance(CVehicleSAInterface* train)
+static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
 {
     // Check if the train is driving on a valid rail track (id < NUM_TRACKS)
     if (train->m_ucRailTrackID >= 4)
@@ -1700,7 +1696,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
     {
         test    eax, eax
         jnz     continueLoadingColorLineLocation
-        
+
         pushad
         lea     ecx, [esp + 55Ch - 440h]
         push    ecx
@@ -1734,7 +1730,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
     {
         test    eax, eax
         jnz     continueLoadingColorLineLocation
-        
+
         pushad
         lea     ecx, [esp + 59Ch - 440h]
         push    ecx

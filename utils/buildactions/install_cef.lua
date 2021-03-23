@@ -4,12 +4,12 @@ premake.modules.install_cef = {}
 
 -- Config variables
 local CEF_PATH = "vendor/cef3/"
-local CEF_URL_PREFIX = "http://opensource.spotify.com/cefbuilds/cef_binary_"
+local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "85.3.12+g3e94ebf+chromium-85.0.4183.121"
-local CEF_HASH = "530daaf9a76768029ab3676679dd666b4c65194c6a7da236d55d211042a202dd"
+local CEF_VERSION = "89.0.12+g2b76680+chromium-89.0.4389.90"
+local CEF_HASH = "56284ed5113686f3cb86deb33c8d2a02450f373e141dd918c3bb3b91d42b1232"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
@@ -44,6 +44,13 @@ function update_install_cef(version, hash)
 	f:close()
 end
 
+local function cef_version_comparator(a, b)
+	local a_major, a_minor, a_patch = a.cef_version:match("^(%d+).(%d+).(%d+)%+*")
+	local b_major, b_minor, c_patch = b.cef_version:match("^(%d+).(%d+).(%d+)%+*")
+
+	return a_major > b_major and a_minor > b_minor and a_patch > c_patch
+end
+
 newaction {
 	trigger = "install_cef",
 	description = "Downloads and installs CEF",
@@ -62,36 +69,35 @@ newaction {
 			CEF_HASH = ""
 		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
-			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.html")
+			resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
 			if result_str ~= "OK" or result_code ~= 200 then
 				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
 				return
 			end
 
-			local _, index = resource:find('Windows 32%-bit Builds.-data%-version="')
-			if not index then
-				errormsg("Could not find version string index.")
+			local meta, err = json.decode(resource)
+			if err then
+				errormsg("Could not parse json meta data:", err)
 				return
 			end
 
-			local version = resource:match("(.-)\">", index+1)
-			if not version then
-				errormsg("Could not get version string from index.")
-			end
+			local builds_by_version = table.filter(meta["windows32"]["versions"], function(build) return build.channel == "stable" end)
+			table.sort(builds_by_version, cef_version_comparator)
+			local latest_build = builds_by_version[1]
 
-			if version == CEF_VERSION then
-				print(("CEF is already up to date (%s)"):format(version))
+			if latest_build.cef_version == CEF_VERSION then
+				print(("CEF is already up to date (%s)"):format(latest_build.cef_version))
 				return
 			end
 
-			io.write(("Does version '%s' look OK to you? (Y/n) "):format(version))
+			io.write(("Does version '%s' look OK to you? (Y/n) "):format(latest_build.cef_version))
 			local input = io.read():lower()
 			if not (input == "y" or input == "yes") then
 				errormsg("Aborting due to user request.")
 				return
 			end
 
-			CEF_VERSION = version
+			CEF_VERSION = latest_build.cef_version
 			CEF_HASH = ""
 		end
 

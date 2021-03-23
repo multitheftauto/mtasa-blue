@@ -14,6 +14,7 @@
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
+
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
@@ -473,7 +474,7 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
-    // The above function adds a reference to the model's TXD by either 
+    // The above function adds a reference to the model's TXD by either
     // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
     return true;
@@ -686,17 +687,17 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
 ////////////////////////////////////////////////////////////////
 ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
 {
-    if (usModelID >= 20000 && usModelID < 25000)
+    if (usModelID >= pGame->GetBaseIDforTXD() && usModelID < pGame->GetBaseIDforCOL())
     {
         // Get global TXD ID instead
-        return usModelID - 20000;
+        return usModelID - pGame->GetBaseIDforTXD();
     }
     else
     {
         // Get the CModelInfo's TXD ID
 
         // Ensure valid
-        if (usModelID >= 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
+        if (usModelID >= pGame->GetBaseIDforTXD() || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
             return 0;
 
         return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
@@ -904,4 +905,64 @@ CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
 RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
+}
+
+void CRenderWareSA::CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)
+{
+    rwOutMatrix.right = (RwV3d&)mat.vRight;
+    rwOutMatrix.up = (RwV3d&)mat.vFront;
+    rwOutMatrix.at = (RwV3d&)mat.vUp;
+    rwOutMatrix.pos = (RwV3d&)mat.vPos;
+}
+
+void CRenderWareSA::RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut)
+{
+    matOut.vRight = (CVector&)rwMatrix.right;
+    matOut.vFront = (CVector&)rwMatrix.up;
+    matOut.vUp = (CVector&)rwMatrix.at;
+    matOut.vPos = (CVector&)rwMatrix.pos;
+}
+
+void CRenderWareSA::RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwMatrix, matTemp);
+    vecOutRotation = matTemp.GetRotation();
+}
+
+void CRenderWareSA::RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwInOutMatrix, matTemp);
+    matTemp.SetRotation(vecRotation);
+    rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+    rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+    rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
+}
+
+void CRenderWareSA::RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition)
+{
+    vecOutPosition = (CVector&)rwMatrix.pos;
+}
+
+void CRenderWareSA::RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition)
+{
+    rwInOutMatrix.pos = (RwV3d&)vecPosition;
+}
+
+void CRenderWareSA::RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwMatrix, matTemp);
+    vecOutScale = matTemp.GetScale();
+}
+
+void CRenderWareSA::RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwInOutMatrix, matTemp);
+    matTemp.SetScale(vecScale);
+    rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+    rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+    rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
 }

@@ -447,6 +447,7 @@ ADD_ENUM(FONT_PRICEDOWN, "pricedown")
 ADD_ENUM(FONT_BANKGOTHIC, "bankgothic")
 ADD_ENUM(FONT_DIPLOMA, "diploma")
 ADD_ENUM(FONT_BECKETT, "beckett")
+ADD_ENUM(FONT_UNIFONT, "unifont")
 IMPLEMENT_ENUM_END_DEFAULTS("font-type", FONT_DEFAULT, "")
 
 IMPLEMENT_ENUM_BEGIN(eFontQuality)
@@ -659,6 +660,12 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_LOOSE, "loose")
 ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
+ADD_ENUM(eClientModelType::PED, "ped")
+ADD_ENUM(eClientModelType::OBJECT, "object")
+ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 //
 // Get best guess at name of userdata type

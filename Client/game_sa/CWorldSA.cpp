@@ -354,6 +354,15 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     pBuildingResult->usLODModelID = 0;
 
                 pBuildingResult->pInterface = targetEntity;
+                if (targetEntity->Placeable.matrix)
+                {
+                    pBuildingResult->vecPosition = targetEntity->Placeable.matrix->vPos;
+                    CVector& vecRotation = pBuildingResult->vecRotation;
+                    ConvertMatrixToEulerAngles(*targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+                    vecRotation = -vecRotation;
+                }
+                else
+                    pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
             }
         }
     }
@@ -441,6 +450,14 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
         add     esp, 0x14
     }
     return fReturn;
+}
+
+float CWorldSA::FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult)
+{
+    DEBUG_TRACE("FLOAT CWorldSA::FindRoofZFor3DCoord(float x, float y, float z, bool * pbOutResult)");
+
+    auto CWorld_FindRoofZFor3DCoord = (float(__cdecl*)(float, float, float, bool*))0x569750;
+    return CWorld_FindRoofZFor3DCoord(pvecPosition->fX, pvecPosition->fY, pvecPosition->fZ, pbOutResult);
 }
 
 void CWorldSA::LoadMapAroundPoint(CVector* vecPosition, FLOAT fRadius)

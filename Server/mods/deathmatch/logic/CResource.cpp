@@ -509,7 +509,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                     return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                 }
 
-                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
                 if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
@@ -559,7 +559,7 @@ bool CResource::GenerateChecksums()
     SString strPath;
 
     if (GetFilePath("meta.xml", strPath))
-        m_metaChecksum = CChecksum::GenerateChecksumFromFile(strPath);
+        m_metaChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
     else
         m_metaChecksum = CChecksum();
 
@@ -572,7 +572,7 @@ bool CResource::HasResourceChanged()
     if (IsResourceZip())
     {
         // Zip file might have changed
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
         if (checksum != m_zipHash)
             return true;
     }
@@ -581,7 +581,7 @@ bool CResource::HasResourceChanged()
     {
         if (GetFilePath(pResourceFile->GetName(), strPath))
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFile(strPath);
+            CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
 
             if (pResourceFile->GetLastChecksum() != checksum)
                 return true;
@@ -594,7 +594,7 @@ bool CResource::HasResourceChanged()
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
                     if (cachedChecksum != checksum)
                         return true;
@@ -609,7 +609,7 @@ bool CResource::HasResourceChanged()
 
     if (GetFilePath("meta.xml", strPath))
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(strPath);
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
         if (checksum != m_metaChecksum)
             return true;
     }
@@ -1259,7 +1259,7 @@ bool CResource::HasGoneAway()
 // gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    // Always prefer the local resource directory, as scripts may 
+    // Always prefer the local resource directory, as scripts may
     // have added new files to the regular folder, rather than the zip
     strPath = m_strResourceDirectoryPath + szFilename;
     if (FileExists(strPath))
@@ -1268,7 +1268,7 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     // If this is a zipped resource, try to use the unzipped file
     if (!IsResourceZip())
         return false;
-    
+
     strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
 }
@@ -2956,7 +2956,7 @@ bool CResource::UnzipResource()
     m_zipfile = nullptr;
 
     // Store the hash so we can figure out whether it has changed later
-    m_zipHash = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+    m_zipHash = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
     return true;
 }
 
