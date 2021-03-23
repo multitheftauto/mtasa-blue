@@ -93,7 +93,7 @@ typedef struct global_State {
   TString *tmname[TM_N];  /* array with tag-method names */
 
   /* MTA Specific stuff */
-  void *owner;  /* pointer to owner CResource */
+  void *owner;  /* pointer to this VM's CLuaMain */
 } global_State;
 
 

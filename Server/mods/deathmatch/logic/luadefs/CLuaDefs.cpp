@@ -113,9 +113,10 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     {
         return true;
     }
-
+    
     // Get associated resource
-    auto pResource{static_cast<CResource*>(lua_getowner(luaVM))};
+    auto pLuaMain{ static_cast<CLuaMain*>(lua_getowner(luaVM)) };
+    auto pResource{ pLuaMain->GetResource() };
 
     // Update execution time check
     pResource->GetVirtualMachine()->CheckExecutionTime();
