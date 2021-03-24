@@ -12,10 +12,6 @@
 #include <svgdocument.h>
 #include "CClientVectorGraphicDisplay.h"
 
-using namespace lunasvg;
-
-constexpr float DPI = 96.0;
-
 class CClientVectorGraphic : public CClientTexture
 {
     DECLARE_CLASS(CClientVectorGraphic, CClientTexture)
@@ -36,18 +32,22 @@ public:
     void Destroy();
     bool IsDestroyed() const { return m_bIsDestroyed; }
 
-    SVGDocument*        GetSVGDocument() const { return m_pDocument.get(); }
-    CVectorGraphicItem* GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
+    lunasvg::SVGDocument*   GetSVGDocument() const { return m_pDocument.get(); }
+    CVectorGraphicItem*     GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
 
     std::string GetSVGDocumentXML() const { return m_pDocument->toString(); };
     bool        SetSVGDocumentXML(CXMLNode* xmlNode);
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
+
+    float GetDPI() const { return m_fDPI; }
+    void  SetDPI(const float dpi) { m_fDPI = dpi; }
 private:
     CResource*                                        m_pResource;
     CClientManager*                                   m_pManager;
-    std::unique_ptr<SVGDocument>                      m_pDocument;
+    std::unique_ptr<lunasvg::SVGDocument>             m_pDocument;
     std::unique_ptr<CClientVectorGraphicDisplay>      m_pVectorGraphicDisplay;
 
-    bool m_bIsDestroyed = false;
+    float m_fDPI = 96.0;
+    bool  m_bIsDestroyed = false;
 };
