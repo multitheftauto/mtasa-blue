@@ -11,23 +11,16 @@
 #include "CClientVectorGraphicDisplay.h"
 #include "CClientVectorGraphic.h"
 
-float CClientVectorGraphicDisplay::m_fGlobalScale = 1.0f;
+using namespace lunasvg;
 
 CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(pDisplayManager, ID)
 {
     // Init
     m_pVectorGraphic = pVectorGraphic;
-    m_fScale = 1;
-    m_ulFormat = 0;
     m_bVisible = true;
     m_bIsCleared = false;
 
     UpdateTexture();
-}
-
-void CClientVectorGraphicDisplay::SetPosition(const CVector& vecPosition)
-{
-    m_vecPosition = vecPosition;
 }
 
 void CClientVectorGraphicDisplay::Render()
@@ -80,7 +73,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     uint width = pVectorGraphicItem->m_uiSizeX;
     uint height = pVectorGraphicItem->m_uiSizeY;
 
-    Bitmap bitmap = svgDocument->renderToBitmap(width, height, DPI);
+    Bitmap bitmap = svgDocument->renderToBitmap(width, height, m_pVectorGraphic->GetDPI());
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
@@ -129,34 +122,4 @@ void CClientVectorGraphicDisplay::ClearTexture()
 void CClientVectorGraphicDisplay::Update()
 {
     m_bHasUpdated = true;
-}
-
-void CClientVectorGraphicDisplay::SetColor(const SColor color)
-{
-    m_Color = color;
-}
-
-void CClientVectorGraphicDisplay::SetColorAlpha(unsigned char ucAlpha)
-{
-    m_Color.A = ucAlpha;
-}
-
-void CClientVectorGraphicDisplay::SetShadowAlpha(unsigned char ucShadowAlpha)
-{
-    m_ucShadowAlpha = ucShadowAlpha;
-}
-
-void CClientVectorGraphicDisplay::SetScale(float fScale)
-{
-    m_fScale = fScale;
-}
-
-void CClientVectorGraphicDisplay::SetFormat(unsigned long ulFormat)
-{
-    m_ulFormat = ulFormat;
-}
-
-void CClientVectorGraphicDisplay::SetVisible(bool bVisible)
-{
-    CClientDisplay::SetVisible(bVisible);
 }

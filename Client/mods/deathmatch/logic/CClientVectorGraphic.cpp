@@ -11,6 +11,8 @@
 #include "CClientVectorGraphic.h"
 #include <svgdocument.h>
 
+using namespace lunasvg;
+
 CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
     : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
 {
