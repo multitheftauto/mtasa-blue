@@ -88,7 +88,7 @@ void CClientDisplayManager::DoPulse()
     while (iter != m_List.end())
     {
         CClientDisplay* pObject = *iter;
-        if (pObject->GetType() == DISPLAY_TEXT && pObject->IsExpired())
+        if (pObject->IsExpired())
         {
             // Delete it and remove it from the list
             delete pObject;
