@@ -45,7 +45,7 @@ protected:
     void CalculateRadius();
     void CalculateRadius(const CVector2D& vecPoint);
 
-    float m_fRadius;
-    float m_fFloor = std::numeric_limits<float>::min();
+    float m_fRadius = 0.0f;
+    float m_fFloor = std::numeric_limits<float>::lowest();
     float m_fCeil = std::numeric_limits<float>::max();
 };

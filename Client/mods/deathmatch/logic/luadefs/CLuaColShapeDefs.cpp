@@ -36,6 +36,9 @@ void CLuaColShapeDefs::LoadFunctions()
         {"getColShapeType", GetColShapeType},
         {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
         {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
+
+        {"showCol", ArgumentParser<SetShowCollision>},
+        {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}
     };
 
     // Add functions
@@ -829,7 +832,7 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
     float fFloor, fCeil;
 
     if (std::holds_alternative<bool>(floor))
-        fFloor = std::numeric_limits<float>::min();
+        fFloor = std::numeric_limits<float>::lowest();
     else
         fFloor = std::get<float>(floor);
 
@@ -848,4 +851,18 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
     }
 
     return false;
+}
+
+bool CLuaColShapeDefs::SetShowCollision(bool state)
+{
+    if (!g_pClientGame->GetDevelopmentMode())
+        return false;
+
+    g_pClientGame->SetShowCollision(state);
+    return true;
+}
+
+bool CLuaColShapeDefs::IsShowCollisionsEnabled()
+{
+    return g_pClientGame->GetShowCollision();
 }
