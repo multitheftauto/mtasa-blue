@@ -2,6 +2,7 @@ project "Mtav8"
 	language "C++"
 	targetname "Mtav8"
 	kind "SharedLib"
+	--toolset("clang")
 	targetdir(buildpath("server/v8"))
 	
 	pchheader "StdInc.h"
@@ -46,11 +47,13 @@ project "Mtav8"
 
 	defines { "SDK_WITH_BCRYPT" }
 
-	links {
-		"cryptopp", "blowfish_bcrypt",
+    
+		links {
+			"cryptopp", "blowfish_bcrypt",
 		
-		"./../../vendor/v8/library/win32bit/v8.dll.lib",
-		"./../../vendor/v8/library/win32bit/v8_libbase.dll.lib",
-		"./../../vendor/v8/library/win32bit/v8_libplatform.dll.lib",
-	}
+			"./../../vendor/v8/library/win32bit/v8.dll.lib",
+			"./../../vendor/v8/library/win32bit/v8_libbase.dll.lib",
+			"./../../vendor/v8/library/win32bit/v8_libplatform.dll.lib",
+		}
 	
+

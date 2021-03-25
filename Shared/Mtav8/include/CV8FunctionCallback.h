@@ -38,8 +38,8 @@ public:
         {
             return ReadVector(arg);
         }
-        else
-            static_assert(false && "Unimplemented read type");
+        //else
+        //    static_assert(false && "Unimplemented read type");
     }
 
     template <typename T, typename... Ty>
