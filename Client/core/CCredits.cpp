@@ -109,6 +109,7 @@ CCredits::CCredits()
         "\n\n"
 
         "Enes \"cleopatra\" Akıllıok\n"
+        "Nawaf \"xLive\" Alqarni\n"
         "Nicolás \"PlatinMTA\" Barrios\n"
         "Amine \"UndR\" Bidah\n"
         "Lukasz \"W\" Biegaj\n"
@@ -198,7 +199,6 @@ CCredits::CCredits()
         "x0rh4x\n"
         "xerox8521\n"
         "[GP_A]XetaQuake\n"
-        "xLive\n"
         "xLuxy\n"
         "Zango\n"
         "zneext\n"
