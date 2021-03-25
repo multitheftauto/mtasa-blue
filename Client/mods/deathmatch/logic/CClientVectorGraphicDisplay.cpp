@@ -10,12 +10,12 @@
 #include "StdInc.h"
 #include "CClientVectorGraphicDisplay.h"
 #include "CClientVectorGraphic.h"
+#include "svgdocument.h"
 
 using namespace lunasvg;
 
 CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(pDisplayManager, ID)
 {
-    // Init
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
     m_bIsCleared = false;
