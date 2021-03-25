@@ -62,6 +62,7 @@ CCredits::CCredits()
     m_strCredits +=
         "\n\n"
 
+        "Patrik \"Pirulax\" Jankovics-Szmolenicki\n"
         "Patrik \"myonlake\" Juvonen\n"
         "Nikita \"StrixG\" Obrecht\n"
         "Arran\n"
@@ -72,7 +73,6 @@ CCredits::CCredits()
         "lopezloo\n"
         "Lpsd\n"
         "MX_Master\n"
-        "Pirulax\n"
         "Remp\n"
         "SugarD-x\n"
         "\n"
