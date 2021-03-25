@@ -110,6 +110,7 @@ CCredits::CCredits()
 
         "Enes \"cleopatra\" Akıllıok\n"
         "Nicolás \"PlatinMTA\" Barrios\n"
+        "Amine \"UndR\" Bidah\n"
         "Lukasz \"W\" Biegaj\n"
         "Pacal \"buepas\" Buerklin\n"
         "Florian \"Flobu\" Busse\n"
@@ -194,7 +195,6 @@ CCredits::CCredits()
         "theSarrum\n"
         "Totto8492\n"
         "tvc\n"
-        "Unde-R\n"
         "x0rh4x\n"
         "xerox8521\n"
         "[GP_A]XetaQuake\n"
