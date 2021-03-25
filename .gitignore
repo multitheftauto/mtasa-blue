@@ -417,6 +417,6 @@ utils/DXFiles/
 !*.exe
 utils/vswhere.exe
 
-vendor/v8/sources/
 vendor/v8/library/win64bit/
 !vendor/v8/library/win32bit/
+!vendor/v8/library/win32bit/*.lib
