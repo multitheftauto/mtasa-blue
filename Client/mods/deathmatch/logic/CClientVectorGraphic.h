@@ -9,8 +9,11 @@
 
 #pragma once
 
-#include <svgdocument.h>
 #include "CClientVectorGraphicDisplay.h"
+
+namespace lunasvg {
+    class SVGDocument;
+}
 
 class CClientVectorGraphic : public CClientTexture
 {
@@ -35,7 +38,7 @@ public:
     lunasvg::SVGDocument*   GetSVGDocument() const { return m_pDocument.get(); }
     CVectorGraphicItem*     GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
 
-    std::string GetSVGDocumentXML() const { return m_pDocument->toString(); };
+    std::string GetSVGDocumentXML() const;
     bool        SetSVGDocumentXML(CXMLNode* xmlNode);
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }

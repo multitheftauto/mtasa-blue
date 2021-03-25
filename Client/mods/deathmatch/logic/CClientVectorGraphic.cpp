@@ -77,6 +77,11 @@ bool CClientVectorGraphic::LoadFromData(std::string strData)
     return false;
 }
 
+std::string CClientVectorGraphic::GetSVGDocumentXML() const
+{
+    return m_pDocument->toString();
+}
+
 bool CClientVectorGraphic::SetSVGDocumentXML(CXMLNode* xmlDocument)
 {
     return LoadFromData(xmlDocument->ToString());
