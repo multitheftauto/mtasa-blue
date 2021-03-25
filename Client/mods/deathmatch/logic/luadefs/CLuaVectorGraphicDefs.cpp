@@ -30,7 +30,7 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "svgCreate");
     lua_classfunction(luaVM, "getDocumentXML", "svgGetDocumentXML");
-    lua_classfunction(luaVM, "SetDocumentXML", "svgSetDocumentXML");
+    lua_classfunction(luaVM, "setDocumentXML", "svgSetDocumentXML");
 
     lua_registerclass(luaVM, "SVG");
 }
@@ -38,60 +38,56 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
 CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData)
 {
     if (size.fX <= 0 || size.fY <= 0)
-    {
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
-    }
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     CResource* pParentResource = pLuaMain->GetResource();
 
-    CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic((int)size.fX, (int)size.fY);
+    CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
-    if (pVectorGraphic)
+    if (!pVectorGraphic)
+        throw std::invalid_argument("Unknown error occurred creating SVG element");
+        
+    // Make it a child of the resource's file root
+    pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
+
+    // Set our owner resource
+    pVectorGraphic->SetResource(pParentResource);
+
+    if (pathOrRawData.has_value())
     {
-        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-        pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
+        std::string strRawData = pathOrRawData.value();
+        std::size_t szCharPos = strRawData.find_first_not_of(" \t\n\r\f\v", 0);
 
-        // Set our owner resource
-        pVectorGraphic->SetResource(pParentResource);
+        const char charAuto = strRawData.at(szCharPos);
 
-        if (pathOrRawData.has_value())
+        if (charAuto == '<')
         {
-            std::string strRawData = pathOrRawData.value().c_str();
-            std::size_t szCharPos = strRawData.find_first_not_of(" \t", 0);
-
-            const char charAuto = strRawData.at(szCharPos);
-
-            if (charAuto == '<')
+            if (!pVectorGraphic->LoadFromData(pathOrRawData.value()))
             {
-                if (!pVectorGraphic->LoadFromData(pathOrRawData.value()))
+                pVectorGraphic->Destroy();
+                throw std::invalid_argument("Unable to load raw SVG data (check for syntax errors)");
+            }
+        }
+        else
+        {
+            std::string strPath;
+            if (CResourceManager::ParseResourcePathInput(pathOrRawData.value(), pParentResource, &strPath) && FileExists(strPath))
+            {
+                if (!pVectorGraphic->LoadFromFile(strPath))
                 {
                     pVectorGraphic->Destroy();
-                    throw std::invalid_argument("Unable to load raw SVG data (check for syntax errors)");
+                    throw std::invalid_argument(SString("Unable to load SVG (check for syntax errors) [%s]", pathOrRawData.value().c_str()));
                 }
             }
             else
             {
-                std::string strPath;
-                if (CResourceManager::ParseResourcePathInput(pathOrRawData.value(), pParentResource, &strPath) && FileExists(strPath))
-                {
-                    if (!pVectorGraphic->LoadFromFile(strPath))
-                    {
-                        pVectorGraphic->Destroy();
-                        throw std::invalid_argument(SString("Unable to load SVG (check for syntax errors) [%s]", pathOrRawData.value().c_str()));
-                    }
-                }
-                else
-                {
-                    throw std::invalid_argument(SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
-                }
+                throw std::invalid_argument(SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
             }
         }
-
-        return pVectorGraphic;
     }
 
-    throw std::invalid_argument("Unknown error occurred creating SVG element");
+    return pVectorGraphic;
 }
 
 CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic)
@@ -105,9 +101,7 @@ CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVect
         CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent.c_str());
 
         if (rootNode && rootNode->IsValid())
-        {
             return rootNode;
-        }
         else
             throw std::invalid_argument("Unable to get SVG XML document");
     }
@@ -115,12 +109,12 @@ CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVect
     throw std::invalid_argument("Unable to get SVG XML document");
 }
 
-bool CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
+void CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
 {
     std::string strXML = pXMLNode->ToString();
 
     if (pVectorGraphic->LoadFromData(strXML.c_str()))
-        return true;
+        return;
 
     throw std::invalid_argument("Unable to set SVG XML document");
 }
