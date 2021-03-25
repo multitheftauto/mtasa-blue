@@ -108,6 +108,7 @@ CCredits::CCredits()
     m_strCredits +=
         "\n\n"
 
+        "Enes \"cleopatra\" Akıllıok\n"
         "Nicolás \"PlatinMTA\" Barrios\n"
         "Lukasz \"W\" Biegaj\n"
         "Pacal \"buepas\" Buerklin\n"
@@ -143,7 +144,6 @@ CCredits::CCredits()
         "asturel\n"
         "Audifire\n"
         "Bonus1702\n"
-        "cleopatra\n"
         "correaAlex\n"
         "CrosRoad95\n"
         "CubedDeath\n"
