@@ -324,6 +324,20 @@ void CResource::Load()
         CLuaArguments Arguments;
         Arguments.PushResource(this);
         m_pResourceEntity->CallEvent("onClientResourceStart", Arguments, true);
+
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        if (pBitStream)
+        {
+            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
+            {
+                // Write resource net ID
+                pBitStream->Write(this->GetNetID());
+
+                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+            }
+
+            g_pNet->DeallocateNetBitStream(pBitStream);
+        }
     }
     else
         assert(0);

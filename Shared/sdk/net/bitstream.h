@@ -461,6 +461,10 @@ enum class eBitStreamVersion : unsigned short
     // 2021-01-16 0x72
     SetColPolygonHeight,
 
+    // Add serverside event "onPlayerResourceStart" #0000
+    // 2021-03-25 0x73
+    OnPlayerResourceStart,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
