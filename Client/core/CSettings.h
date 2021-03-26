@@ -245,6 +245,11 @@ protected:
     CGUILabel*     m_pLabelUserTrackMode;
     CGUIComboBox*  m_pComboUsertrackMode;
     CGUIButton*    m_pAudioDefButton;
+    CGUICheckBox*  m_pAutoOpenServerBrowser;
+    CGUICheckBox*  m_pHideNews;
+    CGUICheckBox*  m_pHideQuickConnect;
+    CGUICheckBox*  m_pHideHostGame;
+    CGUICheckBox*  m_pHideMapEditor;
 
     CGUIGridList* m_pBindsList;
     CGUIButton*   m_pBindsDefButton;

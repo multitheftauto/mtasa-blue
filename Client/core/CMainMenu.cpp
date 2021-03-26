@@ -178,13 +178,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     // Create the menu items
     // Filepath, Relative position, absolute native size
     // And the font for the graphics is ?
-    m_menuItems.push_back(CreateItem(MENU_ITEM_QUICK_CONNECT, "menu_quick_connect.png", CVector2D(0.168f, fBase + fGap * 0)));
-    m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * 1)));
-    m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * 2)));
-    m_menuItems.push_back(CreateItem(MENU_ITEM_MAP_EDITOR, "menu_map_editor.png", CVector2D(0.168f, fBase + fGap * 3)));
-    m_menuItems.push_back(CreateItem(MENU_ITEM_SETTINGS, "menu_settings.png", CVector2D(0.168f, fBase + fGap * 4)));
-    m_menuItems.push_back(CreateItem(MENU_ITEM_ABOUT, "menu_about.png", CVector2D(0.168f, fBase + fGap * 5)));
-    m_menuItems.push_back(CreateItem(MENU_ITEM_QUIT, "menu_quit.png", CVector2D(0.168f, fBase + fGap * 6)));
+    LoadMenuItems(fBase, fGap);
 
     // We store the position of the top item, and the second item.  These will be useful later
     float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
@@ -356,6 +350,15 @@ CMainMenu::~CMainMenu()
     // don't delete it when we iterate the list and delete it separately - the
     // menu item itself still exists even when it's no in the list of menu
     // items. Perhaps there should be a separate list of loaded items really.
+    DeleteMenuItems();
+
+    delete m_pDisconnect->image;
+    delete m_pDisconnect;
+    delete m_pLanguageSelector;
+}
+
+void CMainMenu::DeleteMenuItems()
+{
     for (std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); ++it)
     {
         if ((*it) != m_pDisconnect)
@@ -364,10 +367,53 @@ CMainMenu::~CMainMenu()
             delete (*it);
         }
     }
+}
 
-    delete m_pDisconnect->image;
-    delete m_pDisconnect;
-    delete m_pLanguageSelector;
+void CMainMenu::ReloadMenuItems()
+{
+    DeleteMenuItems();
+
+    float fBase = 0.613f;
+    float fGap = 0.043f;
+    LoadMenuItems(fBase, fGap);
+}
+
+void CMainMenu::LoadMenuItems(float fBase, float fGap)
+{
+    int fGapIndex = 0;
+    bool m_pMenuSetting;
+    CVARS_GET("mainmenu_hide_quickconnect", m_pMenuSetting);
+
+    if (!m_pMenuSetting)
+    {
+        m_menuItems.push_back(CreateItem(MENU_ITEM_QUICK_CONNECT, "menu_quick_connect.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
+        fGapIndex++;
+    }
+
+    m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
+    fGapIndex++;
+
+    CVARS_GET("mainmenu_hide_hostgame", m_pMenuSetting);
+    if (!m_pMenuSetting)
+    {
+        m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
+        fGapIndex++;
+    }
+
+    CVARS_GET("mainmenu_hide_mapeditor", m_pMenuSetting);
+    if (!m_pMenuSetting)
+    {
+        m_menuItems.push_back(CreateItem(MENU_ITEM_MAP_EDITOR, "menu_map_editor.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
+        fGapIndex++;
+    }
+
+    m_menuItems.push_back(CreateItem(MENU_ITEM_SETTINGS, "menu_settings.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
+    fGapIndex++;
+
+    m_menuItems.push_back(CreateItem(MENU_ITEM_ABOUT, "menu_about.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
+    fGapIndex++;
+
+    m_menuItems.push_back(CreateItem(MENU_ITEM_QUIT, "menu_quit.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
@@ -636,6 +682,14 @@ void CMainMenu::Update()
         // Fade up
         if (WaitForMenu >= 250)
         {
+            if (!m_bStarted) {
+                bool m_bMenuSetting;
+                CVARS_GET("mainmenu_auto_open_browser", m_bMenuSetting);
+                m_ServerBrowser.SetVisible(m_bMenuSetting);
+
+                CVARS_GET("mainmenu_hide_news", m_bMenuSetting);
+                m_pLatestNews->SetVisible(m_bMenuSetting);
+            }
             m_bIsVisible = true;
             m_bStarted = true;
         }

@@ -2013,9 +2013,47 @@ void CSettings::CreateInterfaceTabGUI()
     pTabPanel->SetSize(CVector2D(vecSize.fX, vecSize.fY - (vecTemp.fY + 55.0f)));
     pTabPanel->GetSize(vecSize);
 
+    auto pTabMainMenu = pTabPanel->CreateTab(_("Main Menu"));
     auto pTabColors = pTabPanel->CreateTab(_("Colors"));
     auto pTabLayout = pTabPanel->CreateTab(_("Layout"));
     auto pTabOptions = pTabPanel->CreateTab(_("Options"));
+
+    //
+    // Main Menu
+    //
+    {
+
+        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMainMenu, _("Preferences")));
+        pLabel->SetPosition(CVector2D(vecTemp.fX, 10.0f));
+        pLabel->GetPosition(vecTemp);
+        pLabel->AutoSize(NULL, 10.0f);
+        pLabel->SetFont("default-bold-small");
+
+        m_pAutoOpenServerBrowser = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMainMenu, _("Automatically open the server browser when join into the game"), false));
+        m_pAutoOpenServerBrowser->SetPosition(CVector2D(vecTemp.fX, 40.0f));
+        m_pAutoOpenServerBrowser->GetPosition(vecTemp, false);
+        m_pAutoOpenServerBrowser->AutoSize(NULL, 20.0f);
+
+        m_pHideNews = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMainMenu, _("Hide News"), false));
+        m_pHideNews->SetPosition(CVector2D(vecTemp.fX, 60.0f));
+        m_pHideNews->GetPosition(vecTemp, false);
+        m_pHideNews->AutoSize(NULL, 20.0f);
+
+        m_pHideQuickConnect = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMainMenu, _("Hide 'Quick Connect'"), false));
+        m_pHideQuickConnect->SetPosition(CVector2D(vecTemp.fX, 80.0f));
+        m_pHideQuickConnect->GetPosition(vecTemp, false);
+        m_pHideQuickConnect->AutoSize(NULL, 20.0f);
+
+        m_pHideHostGame = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMainMenu, _("Hide 'Host Game'"), false));
+        m_pHideHostGame->SetPosition(CVector2D(vecTemp.fX, 100.0f));
+        m_pHideHostGame->GetPosition(vecTemp, false);
+        m_pHideHostGame->AutoSize(NULL, 20.0f);
+
+        m_pHideMapEditor = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMainMenu, _("Hide 'Map Editor'"), false));
+        m_pHideMapEditor->SetPosition(CVector2D(vecTemp.fX, 120.0f));
+        m_pHideMapEditor->GetPosition(vecTemp, false);
+        m_pHideMapEditor->AutoSize(NULL, 20.0f);
+    }
 
     //
     // Colors
@@ -3187,6 +3225,18 @@ void CSettings::LoadData()
     CVARS_GET("browser_remote_javascript", bVar);
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
 
+    // Main Menu
+    CVARS_GET("mainmenu_hide_news", bVar);
+    m_pHideNews->SetSelected(bVar);
+    CVARS_GET("mainmenu_hide_quickconnect", bVar);
+    m_pHideQuickConnect->SetSelected(bVar);
+    CVARS_GET("mainmenu_hide_hostgame", bVar);
+    m_pHideHostGame->SetSelected(bVar);
+    CVARS_GET("mainmenu_hide_mapeditor", bVar);
+    m_pHideMapEditor->SetSelected(bVar);
+    CVARS_GET("mainmenu_auto_open_browser", bVar);
+    m_pAutoOpenServerBrowser->SetSelected(bVar);
+
     ReloadBrowserLists();
 }
 
@@ -3540,6 +3590,16 @@ void CSettings::SaveData()
     bool bOldRemoteWebsites, bOldRemoteJavascript;
     CVARS_GET("browser_remote_websites", bOldRemoteWebsites);
     CVARS_GET("browser_remote_javascript", bOldRemoteJavascript);
+
+    // Main Menu settings
+    CVARS_SET("mainmenu_hide_news", m_pHideNews->GetSelected());
+    CVARS_SET("mainmenu_hide_quickconnect", m_pHideQuickConnect->GetSelected());
+    CVARS_SET("mainmenu_hide_hostgame", m_pHideHostGame->GetSelected());
+    CVARS_SET("mainmenu_hide_mapeditor", m_pHideMapEditor->GetSelected());
+    CVARS_SET("mainmenu_auto_open_browser", m_pAutoOpenServerBrowser->GetSelected());
+
+    CMainMenu* pMainMenu = CLocalGUI::GetSingleton().GetMainMenu();
+    pMainMenu->ReloadMenuItems();
 
     bool bBrowserSettingChanged = false;
     if (bOldRemoteWebsites != m_pCheckBoxRemoteBrowser->GetSelected() || bOldRemoteJavascript != m_pCheckBoxRemoteJavascript->GetSelected())

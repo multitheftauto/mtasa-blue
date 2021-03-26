@@ -57,6 +57,8 @@ public:
     void SetIsIngame(bool bIsIngame);
     bool GetIsIngame();
 
+    void ReloadMenuItems();
+
     CServerBrowser* GetServerBrowser() { return &m_ServerBrowser; };
     CSettings*      GetSettingsWindow() { return &m_Settings; };
     CQuestionBox*   GetQuestionWindow() { return &m_QuestionBox; };
@@ -94,6 +96,8 @@ private:
     bool OnNewsButtonClick(CGUIElement* pElement);
 
     void HideServerInfo();
+    void  LoadMenuItems(float fBase, float fGap);
+    void  DeleteMenuItems();
 
     CGUI* m_pManager;
 

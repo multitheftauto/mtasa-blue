@@ -353,6 +353,11 @@ void CClientVariables::LoadDefaults()
     DEFAULT("discord_rich_presence", true);                                           // Enable Discord Game SDK
     DEFAULT("always_show_transferbox", false);                                        // Should the transfer box always be visible for downloads? (and ignore scripted control)
     DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));                          // Command to run when right clicking quick connect (beta - can be removed at any time)
+    DEFAULT("mainmenu_hide_news", false);                                             // Hide news from main menu
+    DEFAULT("mainmenu_hide_quickconnect", false);                                     // Hide quick connect from main menu
+    DEFAULT("mainmenu_hide_hostgame", false);                                         // Hide host game from main menu
+    DEFAULT("mainmenu_hide_mapeditor", false);                                        // Hide map editor from main menu
+    DEFAULT("mainmenu_auto_open_browser", false);                                     // Auto open server browser
 
     if (!Exists("locale"))
     {
