@@ -9,6 +9,7 @@ project "GUI"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/sparsehash/src/"

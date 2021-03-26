@@ -23,14 +23,10 @@ void CLuaWorldDefs::LoadFunctions()
         {"getWaveHeight", getWaveHeight},
         {"getFPSLimit", getFPSLimit},
         {"getMinuteDuration", getMinuteDuration},
-        {"isGarageOpen", isGarageOpen},
         {"getTrafficLightState", getTrafficLightState},
-        {"areTrafficLightsLocked", areTrafficLightsLocked},
         {"getJetpackMaxHeight", getJetpackMaxHeight},
         {"getSkyGradient", getSkyGradient},
         {"getHeatHaze", getHeatHaze},
-        {"isGlitchEnabled", isGlitchEnabled},
-        {"setJetpackWeaponEnabled", setJetpackWeaponEnabled},
         {"getJetpackWeaponEnabled", getJetpackWeaponEnabled},
         {"getCloudsEnabled", getCloudsEnabled},
         {"getInteriorSoundsEnabled", getInteriorSoundsEnabled},
@@ -73,6 +69,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"setAircraftMaxVelocity", setAircraftMaxVelocity},
         {"setOcclusionsEnabled", setOcclusionsEnabled},
         {"setMoonSize", setMoonSize},
+        {"setJetpackWeaponEnabled", setJetpackWeaponEnabled},
 
         // Reset
         {"resetSkyGradient", resetSkyGradient},
@@ -87,6 +84,11 @@ void CLuaWorldDefs::LoadFunctions()
         {"restoreWorldModel", RestoreWorldModel},
         {"restoreAllWorldModels", RestoreAllWorldModels},
         {"resetMoonSize", resetMoonSize},
+        
+        // Check
+        {"isGarageOpen", isGarageOpen},
+        {"isGlitchEnabled", isGlitchEnabled},        
+        {"areTrafficLightsLocked", areTrafficLightsLocked}        
     };
 
     // Add functions

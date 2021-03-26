@@ -31,7 +31,6 @@ void CLuaWorldDefs::LoadFunctions()
         {"getGarageBoundingBox", GetGarageBoundingBox},
         {"getBlurLevel", GetBlurLevel},
         {"getTrafficLightState", GetTrafficLightState},
-        {"areTrafficLightsLocked", AreTrafficLightsLocked},
         {"getSkyGradient", GetSkyGradient},
         {"getHeatHaze", GetHeatHaze},
         {"getJetpackMaxHeight", GetJetpackMaxHeight},
@@ -53,11 +52,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"getMoonSize", GetMoonSize},
         {"getFPSLimit", GetFPSLimit},
         {"getBirdsEnabled", GetBirdsEnabled},
-        {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
-        {"isLineOfSightClear", IsLineOfSightClear},
-        {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
-        {"isGarageOpen", IsGarageOpen},
-
+        
         // World set funcs
         {"setTime", SetTime},
         {"setColorFilter", ArgumentParser<SetColorFilter>},
@@ -72,7 +67,6 @@ void CLuaWorldDefs::LoadFunctions()
         {"setGarageOpen", SetGarageOpen},
         {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
         {"setBlurLevel", SetBlurLevel},
-        {"resetBlurLevel", ResetBlurLevel},
         {"setJetpackMaxHeight", SetJetpackMaxHeight},
         {"setCloudsEnabled", SetCloudsEnabled},
         {"setTrafficLightState", SetTrafficLightState},
@@ -98,6 +92,8 @@ void CLuaWorldDefs::LoadFunctions()
         {"removeWorldModel", RemoveWorldBuilding},
         {"restoreAllWorldModels", RestoreWorldBuildings},
         {"restoreWorldModel", RestoreWorldBuilding},
+        
+        // World create funcs
         {"createSWATRope", CreateSWATRope},
         {"createExplosion", CreateExplosion},
 
@@ -115,6 +111,14 @@ void CLuaWorldDefs::LoadFunctions()
         {"resetSunColor", ResetSunColor},
         {"resetSunSize", ResetSunSize},
         {"resetMoonSize", ResetMoonSize},
+        {"resetBlurLevel", ResetBlurLevel},        
+        
+        // World check funcs
+        {"areTrafficLightsLocked", AreTrafficLightsLocked},
+        {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
+        {"isLineOfSightClear", IsLineOfSightClear},
+        {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
+        {"isGarageOpen", IsGarageOpen}        
     };
 
     // Add functions
