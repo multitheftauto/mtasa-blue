@@ -96,8 +96,8 @@ private:
     bool OnNewsButtonClick(CGUIElement* pElement);
 
     void HideServerInfo();
-    void  LoadMenuItems(float fBase, float fGap);
-    void  DeleteMenuItems();
+    void LoadMenuItems(float fBase, float fGap);
+    void DeleteMenuItems();
 
     CGUI* m_pManager;
 

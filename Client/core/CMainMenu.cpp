@@ -359,14 +359,16 @@ CMainMenu::~CMainMenu()
 
 void CMainMenu::DeleteMenuItems()
 {
-    for (std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); ++it)
+    for (auto it = m_menuItems.begin(); it != m_menuItems.end(); it++)
     {
-        if ((*it) != m_pDisconnect)
-        {
-            delete (*it)->image;
-            delete (*it);
-        }
+        sMenuItem* pItem = *it;
+        if (m_pDisconnect == pItem)
+            continue;
+        delete pItem->image;
+        delete pItem;
     }
+    m_menuItems.clear();
+    m_menuItems.push_back(m_pDisconnect);
 }
 
 void CMainMenu::ReloadMenuItems()
@@ -381,10 +383,10 @@ void CMainMenu::ReloadMenuItems()
 void CMainMenu::LoadMenuItems(float fBase, float fGap)
 {
     int fGapIndex = 0;
-    bool m_pMenuSetting;
-    CVARS_GET("mainmenu_hide_quickconnect", m_pMenuSetting);
+    bool bMenuSetting;
+    CVARS_GET("mainmenu_hide_quickconnect", bMenuSetting);
 
-    if (!m_pMenuSetting)
+    if (!bMenuSetting)
     {
         m_menuItems.push_back(CreateItem(MENU_ITEM_QUICK_CONNECT, "menu_quick_connect.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
         fGapIndex++;
@@ -393,15 +395,15 @@ void CMainMenu::LoadMenuItems(float fBase, float fGap)
     m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
     fGapIndex++;
 
-    CVARS_GET("mainmenu_hide_hostgame", m_pMenuSetting);
-    if (!m_pMenuSetting)
+    CVARS_GET("mainmenu_hide_hostgame", bMenuSetting);
+    if (!bMenuSetting)
     {
         m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
         fGapIndex++;
     }
 
-    CVARS_GET("mainmenu_hide_mapeditor", m_pMenuSetting);
-    if (!m_pMenuSetting)
+    CVARS_GET("mainmenu_hide_mapeditor", bMenuSetting);
+    if (!bMenuSetting)
     {
         m_menuItems.push_back(CreateItem(MENU_ITEM_MAP_EDITOR, "menu_map_editor.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
         fGapIndex++;
@@ -683,12 +685,9 @@ void CMainMenu::Update()
         if (WaitForMenu >= 250)
         {
             if (!m_bStarted) {
-                bool m_bMenuSetting;
-                CVARS_GET("mainmenu_auto_open_browser", m_bMenuSetting);
-                m_ServerBrowser.SetVisible(m_bMenuSetting);
-
-                CVARS_GET("mainmenu_hide_news", m_bMenuSetting);
-                m_pLatestNews->SetVisible(m_bMenuSetting);
+                bool bMenuSetting;
+                CVARS_GET("mainmenu_auto_open_browser", bMenuSetting);
+                m_ServerBrowser.SetVisible(bMenuSetting);
             }
             m_bIsVisible = true;
             m_bStarted = true;
