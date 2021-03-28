@@ -2,10 +2,18 @@ using namespace v8;
 
 class CV8Module;
 class CV8Isolate;
+class CV8Class;
 
 class CV8 : public CV8Base
 {
 public:
+    enum EInternalFieldPurpose
+    {
+        TypeOfClass,               // Value is one of value from EClass
+        PointerToValue,            // Values is a pointer to external value.
+        Count,
+    };
+
     CV8();
     ~CV8();
     void Shutdown();
@@ -17,6 +25,9 @@ public:
     void            RemoveIsolate(CV8IsolateBase* pIsolate);
 
     CV8ModuleBase* CreateModule(const char* name);
+
+    CV8ClassBase* CreateClass(std::string name, size_t classId);
+
     void           DoPulse();
 
     static Local<Module>         GetDummyModule(Isolate* pIsolate);
@@ -24,6 +35,7 @@ public:
     static void                  RegisterAllModulesInGlobalNamespace(CV8Isolate* pIsolate);
     static CV8Module*            GetModuleByName(const char* name);
     std::vector<CV8IsolateBase*> GetIsolates();
+    std::vector<CV8Class*>       GetClasses();
     Platform*                    GetPlatform() const { return m_pPlatform.get(); }
 
     static std::unordered_map<std::string, std::unique_ptr<CV8Module>> m_mapModules;
@@ -31,6 +43,7 @@ public:
 private:
     std::unique_ptr<Platform>                m_pPlatform;
     std::vector<std::unique_ptr<CV8Isolate>> m_vecIsolates;
+    std::vector<std::unique_ptr<CV8Class>>   m_vecClasses;
 
     std::thread                              m_longExecutionGuardThread;
     std::mutex                               m_lock;

@@ -4,6 +4,7 @@
 #include "CV8FunctionCallbackBase.h"
 #include "CV8IsolateBase.h"
 #include "CV8ModuleBase.h"
+#include "CV8ClassBase.h"
 
 class CV8Base
 {
@@ -12,6 +13,8 @@ public:
     virtual void            RemoveIsolate(CV8IsolateBase* pIsolate) = 0;
 
     virtual CV8ModuleBase* CreateModule(const char* name) = 0;
+
+    virtual CV8ClassBase* CreateClass(std::string name, size_t classId) = 0;
 
     virtual void DoPulse() = 0;
     virtual void Shutdown() = 0;

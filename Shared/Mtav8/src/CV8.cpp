@@ -97,6 +97,17 @@ std::vector<CV8IsolateBase*> CV8::GetIsolates()
     return isolates;
 }
 
+std::vector<CV8Class*> CV8::GetClasses()
+{
+    std::vector<CV8Class*> isolates = std::vector<CV8Class*>();
+    isolates.reserve(m_vecClasses.size());
+    for (auto const& isolate : m_vecClasses)
+    {
+        isolates.push_back(isolate.get());
+    }
+    return isolates;
+}
+
 CV8IsolateBase* CV8::CreateIsolate(std::string& originResource)
 {
     std::unique_ptr<CV8Isolate> pIsolate = std::make_unique<CV8Isolate>(this, originResource);
@@ -177,4 +188,12 @@ CV8ModuleBase* CV8::CreateModule(const char* name)
     CV8Module*                 pModule = module.get();
     CV8::m_mapModules.insert({buf, std::move(module)});
     return pModule;
+}
+
+CV8ClassBase* CV8::CreateClass(std::string name, size_t classId)
+{
+    std::unique_ptr<CV8Class> v8Class = std::make_unique<CV8Class>(name, classId);
+    CV8Class*                 pClass = v8Class.get();
+    m_vecClasses.push_back(std::move(v8Class));
+    return pClass;
 }

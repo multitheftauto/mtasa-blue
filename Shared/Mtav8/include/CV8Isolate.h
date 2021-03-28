@@ -23,6 +23,7 @@ public:
     ~CV8Isolate();
 
     void InitSecurity();
+    void InitClasses();
 
     void DoPulse();
 

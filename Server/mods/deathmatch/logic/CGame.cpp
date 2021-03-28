@@ -547,6 +547,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 
+    CJsVector2Defs::AddClass();
+
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
     {

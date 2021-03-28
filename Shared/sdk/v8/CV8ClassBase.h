@@ -1,0 +1,17 @@
+#pragma once
+
+enum class EParameterType
+{
+    INVALID,
+    NUMBER,
+    COUNT,
+};
+
+// Don't use directly, use `CJsClassConstructionInfo` in scope variant.
+class CV8ClassBase
+{
+public:
+    virtual void SetParametersCount(size_t count) = 0;
+    virtual void SetSizeOf(size_t count) = 0;
+    virtual void SetConstructorFunction(std::function<void*(CV8FunctionCallbackBase&, void*)> func) = 0;
+};

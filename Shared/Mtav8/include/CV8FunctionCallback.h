@@ -62,6 +62,7 @@ public:
     }
 
     bool ReadString(std::string& value, bool strict = true);
+    bool ReadNumber(float&value);
     bool ReadNumber(double& value);
     bool ReadVector(CVector2D& value);
     bool ReadVector(CVector& value);

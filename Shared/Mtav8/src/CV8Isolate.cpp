@@ -76,11 +76,12 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     m_pGC = std::make_unique<CV8GC>(m_pIsolate);
 
     InitSecurity();
+    InitClasses();
 
-    Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(context);
-    Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(context, vector2dTemplate);
-    Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(context, vector3dTemplate);
-    Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(context);
+    //Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(context);
+    //Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(context, vector2dTemplate);
+    //Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(context, vector3dTemplate);
+    //Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(context);
 }
 
 void CV8Isolate::InitSecurity()
@@ -89,6 +90,15 @@ void CV8Isolate::InitSecurity()
     Local<Object>  global = context->Global();
     global->Set(context, CV8Utils::ToV8String("WebAssembly"), Undefined(m_pIsolate));
 }
+
+void CV8Isolate::InitClasses()
+{
+    for (auto const& pClass : m_pCV8->GetClasses())
+    {
+        pClass->Initialize(this);
+    }
+}
+
 void CV8Isolate::DoPulse()
 {
     m_pIsolate->PerformMicrotaskCheckpoint();

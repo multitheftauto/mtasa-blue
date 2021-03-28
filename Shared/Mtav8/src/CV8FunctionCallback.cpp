@@ -36,6 +36,22 @@ bool CV8FunctionCallback::ReadString(std::string& value, bool strict)
     return false;
 }
 
+bool CV8FunctionCallback::ReadNumber(float& value)
+{
+    if (m_callback.Length() > m_iIndex)
+    {
+        if (m_callback[m_iIndex]->IsNumber())
+        {
+            value = m_callback[m_iIndex].As<Number>()->Value();
+            m_iIndex++;
+            return true;
+        }
+    }
+    m_iIndex++;
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(std::string("Expected number at argument ") + std::to_string(m_iIndex)));
+    return false;
+}
+
 bool CV8FunctionCallback::ReadNumber(double& value)
 {
     if (m_callback.Length() > m_iIndex)
