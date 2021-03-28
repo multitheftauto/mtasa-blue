@@ -380,40 +380,36 @@ LoadMenuItems(0.613f, 0.043f)
 
 void CMainMenu::LoadMenuItems(float fBase, float fGap)
 {
-    int fGapIndex = 0;
-    bool bMenuSetting;
-    CVARS_GET("mainmenu_hide_quickconnect", bMenuSetting);
-
-    if (!bMenuSetting)
+    constexpr struct
     {
-        m_menuItems.push_back(CreateItem(MENU_ITEM_QUICK_CONNECT, "menu_quick_connect.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
-        fGapIndex++;
+        const char* image;
+        eMenuItems item;
+        std::optional<const char*> setting;
+    } items[] = {
+        {"menu_quick_connect.png", MENU_ITEM_QUICK_CONNECT, {"mainmenu_hide_quickconnect"}},
+        {"menu_browse_servers.png", MENU_ITEM_BROWSE_SERVERS, std::nullopt},
+        {"menu_host_game.png", MENU_ITEM_HOST_GAME, {"mainmenu_hide_hostgame"}},
+        {"menu_map_editor.png", MENU_ITEM_MAP_EDITOR, {"mainmenu_hide_mapeditor"}},
+        {"menu_settings.png", MENU_ITEM_SETTINGS, std::nullopt},
+        {"menu_about.png", MENU_ITEM_ABOUT, std::nullopt},
+        {"menu_quit.png", MENU_ITEM_QUIT, std::nullopt}
+    };
+
+    float fOffset = 0;
+    for (const auto& item : items)
+    {
+        if (item.setting)
+        {
+            // Check if its hidden
+            bool value;
+            CVARS_GET(*item.setting, value);
+            if (!value)
+                continue;
+        }
+        m_menuItems.push_back(CreateItem(item.item, item.image, CVector2D(0.168f, fBase + fOffset)));
+        fOffset += fGap;
     }
 
-    m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
-    fGapIndex++;
-
-    CVARS_GET("mainmenu_hide_hostgame", bMenuSetting);
-    if (!bMenuSetting)
-    {
-        m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
-        fGapIndex++;
-    }
-
-    CVARS_GET("mainmenu_hide_mapeditor", bMenuSetting);
-    if (!bMenuSetting)
-    {
-        m_menuItems.push_back(CreateItem(MENU_ITEM_MAP_EDITOR, "menu_map_editor.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
-        fGapIndex++;
-    }
-
-    m_menuItems.push_back(CreateItem(MENU_ITEM_SETTINGS, "menu_settings.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
-    fGapIndex++;
-
-    m_menuItems.push_back(CreateItem(MENU_ITEM_ABOUT, "menu_about.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
-    fGapIndex++;
-
-    m_menuItems.push_back(CreateItem(MENU_ITEM_QUIT, "menu_quit.png", CVector2D(0.168f, fBase + fGap * fGapIndex)));
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
