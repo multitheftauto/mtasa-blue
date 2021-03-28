@@ -1,12 +1,5 @@
 #pragma once
 
-enum class EParameterType
-{
-    INVALID,
-    NUMBER,
-    COUNT,
-};
-
 // Don't use directly, use `CJsClassConstructionInfo` in scope variant.
 class CV8ClassBase
 {

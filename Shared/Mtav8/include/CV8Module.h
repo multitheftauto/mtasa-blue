@@ -3,8 +3,8 @@ class CV8Module : public CV8ModuleBase
 public:
     CV8Module(const char* name);
     ~CV8Module();
-    void AddFunction(const char* name, void (*callback)(CV8FunctionCallbackBase*)) { m_mapFunctions[name] = callback; }
-    std::unordered_map<const char*, void (*)(CV8FunctionCallbackBase*)> GetFunctions() const { return m_mapFunctions; }
+    void                                                                AddFunction(const char* name, void (*callback)(CV8FunctionCallbackBase*));
+    std::unordered_map<const char*, void (*)(CV8FunctionCallbackBase*)> GetFunctions() const;
 
     std::vector<Local<String>> GetExports(Isolate* pIsolate);
 private:

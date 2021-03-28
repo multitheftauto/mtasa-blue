@@ -39,6 +39,7 @@ class CCore;
 #include <ijsify.h>
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
+#include "v8/CV8Base.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -102,6 +103,7 @@ public:
     CWebCoreInterface*        GetWebCore();
     CTrayIconInterface*       GetTrayIcon() { return m_pTrayIcon; };
     CDiscordManagerInterface* GetDiscordManager() { return reinterpret_cast<CDiscordManagerInterface*>(m_DiscordManager.get()); }
+    CV8Base*                  GetV8() const { return m_pV8; }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -296,6 +298,7 @@ private:
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
+    CV8Base*           m_pV8;
 
     std::unique_ptr<class CDiscordManager> m_DiscordManager;
 

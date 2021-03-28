@@ -9,9 +9,9 @@
  *****************************************************************************/
 
 #pragma once
-#include "luadefs/CLuaDefs.h"
+#include "jsdefs/CJsDefs.h"
 
-class CJsCryptDefs : public CLuaDefs
+class CJsCryptDefs : public CJsDefs
 {
 public:
     static void LoadFunctions();

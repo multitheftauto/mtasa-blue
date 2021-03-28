@@ -34,6 +34,7 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
+class CV8Base;
 
 enum eCoreVersion
 {
@@ -176,6 +177,7 @@ public:
     virtual void        OnGameTimerUpdate() = 0;
 
     virtual CDiscordManagerInterface* GetDiscordManager() = 0;
+    virtual CV8Base* GetV8() const = 0;
 };
 
 class CClientTime

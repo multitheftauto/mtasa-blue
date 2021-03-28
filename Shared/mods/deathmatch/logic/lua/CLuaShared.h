@@ -12,9 +12,6 @@
 // Lua function definitions (shared)
 #include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaCryptDefs.h"
-#include "luadefs/CJsCryptDefs.h"
-#include "luadefs/CJsUtilDefs.h"
-#include "luadefs/CJsVector2Defs.h"
 #include <luadefs/CLuaFileDefs.h>
 #include "luadefs/CLuaMatrixDefs.h"
 #include "luadefs/CLuaTrainTrackDefs.h"

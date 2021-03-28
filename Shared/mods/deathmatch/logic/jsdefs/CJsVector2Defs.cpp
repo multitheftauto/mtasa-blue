@@ -3,14 +3,13 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/mods/deathmatch/logic/luadefs/CJsVector2Defs.cpp
- *  PURPOSE:     Lua general class functions
+ *  PURPOSE:     Js Vector2 class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "luadefs/CJsClassConstructionInfo.h"
 
 CV8ClassBase* CJsVector2Defs::m_jsClass;
 CJsClassConstructionInfo<CVector2D>* CJsVector2Defs::m_constructionInfo;

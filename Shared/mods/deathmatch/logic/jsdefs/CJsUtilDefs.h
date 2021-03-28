@@ -9,9 +9,8 @@
  *****************************************************************************/
 
 #pragma once
-#include "luadefs/CLuaDefs.h"
 
-class CJsUtilDefs : public CLuaDefs
+class CJsUtilDefs : public CJsDefs
 {
 public:
     static void LoadFunctions();

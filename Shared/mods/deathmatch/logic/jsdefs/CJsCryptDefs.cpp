@@ -11,13 +11,12 @@
 #include <SharedUtil.Crypto.h>
 #include <functional>
 
-#ifndef MTA_CLIENT
-    #include <v8/CV8Base.h>
-    #include "./../Shared/Mtav8/include/async/functions/CV8InlineAsyncFunction.h"
-    #include "./../Shared/Mtav8/include/async/functions/CV8PasswordHash.h"
-    #include <core/CServerInterface.h>
+#include "./../Shared/Mtav8/include/async/functions/CV8InlineAsyncFunction.h"
+#include "./../Shared/Mtav8/include/async/functions/CV8PasswordHash.h"
 
-extern CServerInterface* g_pServerInterface;
+#ifndef MTA_CLIENT
+    #include <core/CServerInterface.h>
+    extern CServerInterface* g_pServerInterface;
 #endif
 
 void CJsCryptDefs::LoadFunctions()

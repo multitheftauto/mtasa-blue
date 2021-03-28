@@ -10,6 +10,16 @@ CV8Module::~CV8Module()
 {
 }
 
+void CV8Module::AddFunction(const char* name, void (*callback)(CV8FunctionCallbackBase*))
+{
+    m_mapFunctions[name] = callback;
+}
+
+std::unordered_map<const char*, void (*)(CV8FunctionCallbackBase*)> CV8Module::GetFunctions() const
+{
+    return m_mapFunctions;
+}
+
 std::vector<Local<String>> CV8Module::GetExports(Isolate* pIsolate)
 {
     std::vector<Local<String>> exports;

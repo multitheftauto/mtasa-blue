@@ -10,7 +10,8 @@
  *****************************************************************************/
 
 #pragma once
-#include "luadefs/CJsDefs.h"
+#include "jsdefs/CJsDefs.h"
+
 template<typename T>
 class CJsClassConstructionInfo;
 

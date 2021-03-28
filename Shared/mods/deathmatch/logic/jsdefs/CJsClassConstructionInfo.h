@@ -11,22 +11,19 @@
 
 #pragma once
 
-#include "v8/CV8ClassBase.h"
-
 template <typename T>
 class CJsClassConstructionInfo
 {
 public:
-    template <typename... Ts>
-    struct Func : std::monostate
-    {
-        std::function<T*(Ts...)> func;
-    };
     CJsClassConstructionInfo(std::string name, CJsDefs::EClass classId) : classId(classId)
     {
         assert(classId != CJsDefs::EClass::Invalid);
         assert(classId < CJsDefs::EClass::Count);
-        v8Class = g_pServerInterface->GetV8()->CreateClass(name, (size_t)classId);
+        #ifdef MTA_CLIENT
+            v8Class = g_pCore->GetV8()->CreateClass(name, (size_t)classId);
+        #else
+            v8Class = g_pServerInterface->GetV8()->CreateClass(name, (size_t)classId);
+        #endif
         v8Class->SetSizeOf(sizeof(T));
     }
 

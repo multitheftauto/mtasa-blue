@@ -147,6 +147,9 @@ struct SAclRequest;
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 
+// Js function definitions
+#include "js/CJsShared.h"
+
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
