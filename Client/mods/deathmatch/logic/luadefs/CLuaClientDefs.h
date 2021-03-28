@@ -23,4 +23,5 @@ private:
     static bool IsTransferBoxVisible();
     static bool IsTransferBoxAlwaysVisible();
     static bool ClearDebug();
+    static bool ClearConsoleHistory();
 };
