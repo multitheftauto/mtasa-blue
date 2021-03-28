@@ -19,6 +19,9 @@ void CLuaClientDefs::LoadFunctions()
         {"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
         {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
         {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
+
+        // Dev funcs
+        {"clearDebug", ArgumentParser<ClearDebug>}
     };
 
     for (const auto& [name, func] : functions)
@@ -38,4 +41,10 @@ bool CLuaClientDefs::IsTransferBoxVisible()
 bool CLuaClientDefs::IsTransferBoxAlwaysVisible()
 {
     return g_pClientGame->GetTransferBox()->IsAlwaysVisible();
+}
+
+bool CLuaClientDefs::ClearDebug()
+{
+    g_pCore->DebugClear();
+    return true;
 }
