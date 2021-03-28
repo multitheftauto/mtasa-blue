@@ -13,14 +13,14 @@
 #include "luadefs/CJsClassConstructionInfo.h"
 
 CV8ClassBase* CJsVector2Defs::m_jsClass;
-CJsClassConstructionInfo<CVector2D>* CJsVector2Defs::m_jsClassConstructionInfo;
+CJsClassConstructionInfo<CVector2D>* CJsVector2Defs::m_constructionInfo;
 
 void CJsVector2Defs::AddClass()
 {
-    m_jsClassConstructionInfo = new CJsClassConstructionInfo<CVector2D>("Vector2", EClass::Vector2);
+    m_constructionInfo = new CJsClassConstructionInfo<CVector2D>("Vector2", EClass::Vector2);
 
-    m_jsClassConstructionInfo->SetConstructor<float, float>();
+    m_constructionInfo->SetConstructor<float, float>();
 
-    m_jsClass = m_jsClassConstructionInfo->Finilize();
-
+    m_constructionInfo->SetAccessor<&CVector2D::fX, float>("x");
+    m_constructionInfo->SetAccessor<&CVector2D::fY, float>("y");
 }

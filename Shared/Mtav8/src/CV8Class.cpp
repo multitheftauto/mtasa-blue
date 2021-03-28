@@ -11,6 +11,7 @@ Handle<FunctionTemplate> CV8Class::Initialize(CV8Isolate* pIsolate)
     // vector2dTemplate->SetLength(sizeof(CVector2D) / sizeof(float));
     Local<ObjectTemplate> objectTemplate = classTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(CV8::EInternalFieldPurpose::Count);
+    SetAccessors(objectTemplate);
 
     classTemplate->SetClassName(CV8Utils::ToV8String(m_name));
     objectTemplate->Set(Symbol::GetToStringTag(pV8Isolate), CV8Utils::ToV8String(m_name));
@@ -29,4 +30,12 @@ void* CV8Class::Allocate(Isolate* isolate)
 
     isolate->AdjustAmountOfExternalAllocatedMemory(m_sizeOf);
     return allocator->AllocateUninitialized(m_sizeOf);
+}
+
+void CV8Class::SetAccessors(Local<ObjectTemplate> objectTemplate)
+{
+    for (auto const& accessors : m_floatAccessors)
+    {
+        SetAccessor<float>(objectTemplate, accessors.first, accessors.second.first, accessors.second.second);
+    }
 }

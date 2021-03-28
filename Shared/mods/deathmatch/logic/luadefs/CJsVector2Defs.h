@@ -20,5 +20,5 @@ public:
     static void AddClass();
 
     static CV8ClassBase* m_jsClass;
-    static CJsClassConstructionInfo<CVector2D>* m_jsClassConstructionInfo;
+    static CJsClassConstructionInfo<CVector2D>* m_constructionInfo;
 };

@@ -30,16 +30,6 @@ public:
         v8Class->SetSizeOf(sizeof(T));
     }
 
-    //~CJsClassConstructionInfo() = delete;
-
-    // Call when all native functionality get added, save classBase in defs static class.
-    CV8ClassBase* Finilize()
-    {
-        assert(!finilized);
-        finilized = true;
-        return v8Class;
-    }
-
 private:
     template <typename Arg>
     static constexpr Arg ReadArgument(CV8FunctionCallbackBase& args)
@@ -85,8 +75,23 @@ public:
         v8Class->SetConstructorFunction(constructor);
     }
 
-    int              parameters = 0;
+
+    template <auto P, typename U>
+    constexpr void SetAccessor(std::string name)
+    {
+        //static_assert(std::is_same_v<P, float>::value);
+
+        if constexpr (std::is_same_v<U, float>)
+        {
+            v8Class->AddAccessor(name, [](void* ptr) { return (T*)ptr->*P; }, [](void* ptr, float value) { (T*)ptr->*P = value; });
+        }
+        
+        /*T* asd = new T(2.0f,3.0f);
+        set(asd, 5.0f);
+        auto b = get(asd);
+        int       c = 5;*/
+    }
+
     CV8ClassBase*    v8Class;
     CJsDefs::EClass  classId;
-    bool             finilized = false;
 };
