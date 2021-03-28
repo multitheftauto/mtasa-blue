@@ -375,9 +375,7 @@ void CMainMenu::ReloadMenuItems()
 {
     DeleteMenuItems();
 
-    float fBase = 0.613f;
-    float fGap = 0.043f;
-    LoadMenuItems(fBase, fGap);
+LoadMenuItems(0.613f, 0.043f)
 }
 
 void CMainMenu::LoadMenuItems(float fBase, float fGap)
