@@ -10,7 +10,6 @@
 
 void CJsShared::AddFunctions()
 {
-    CJsCryptDefs::LoadFunctions();
     CJsUtilDefs::LoadFunctions();
 }
 

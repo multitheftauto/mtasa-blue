@@ -11,7 +11,10 @@
 
 #pragma once
 
-class CJsDefs
+class CV8FunctionCallbackBase;
+class CV8FunctionBase;
+
+class CJsDefs : CDefs
 {
 public:
     enum class EClass : uint16_t
@@ -23,4 +26,11 @@ public:
         Matrix,
         Count,
     };
+    
+    // hard error on usage mistakes
+    template <auto T>
+    static inline void JsArgumentParser(CV8FunctionCallbackBase* Js)
+    {
+        CLuaFunctionParser<eRuntime::JS, true, nullptr, T > ()(Js, m_pScriptDebugging);
+    }
 };

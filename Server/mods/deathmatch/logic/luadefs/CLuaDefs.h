@@ -53,7 +53,7 @@
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 #define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
 
-class CLuaDefs
+class CLuaDefs : public CDefs
 {
 public:
     static void Initialize(class CGame* pGame);
@@ -77,7 +77,6 @@ protected:
     static CRadarAreaManager*         m_pRadarAreaManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
     static CElement*                  m_pRootElement;
-    static CScriptDebugging*          m_pScriptDebugging;
     static CVehicleManager*           m_pVehicleManager;
     static CTeamManager*              m_pTeamManager;
     static CAccountManager*           m_pAccountManager;
@@ -93,7 +92,7 @@ protected:
     template <auto ReturnOnError, auto T>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<false, ReturnOnError, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<eRuntime::LUA, false, ReturnOnError, T>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads
@@ -115,7 +114,7 @@ protected:
     template <auto T>
     static inline int ArgumentParser(lua_State* L)
     {
-        return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<eRuntime::LUA, true, nullptr, T>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads

@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/logic/luadefs/CLuaCryptDefs.cpp
+ *  FILE:        Shared/mods/logic/defs/CCryptDefs.cpp
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -11,7 +11,15 @@
 #include <SharedUtil.Crypto.h>
 #include <lua/CLuaFunctionParser.h>
 
-void CLuaCryptDefs::LoadFunctions()
+#include "./../Shared/Mtav8/include/async/functions/CV8InlineAsyncFunction.h"
+#include "./../Shared/Mtav8/include/async/functions/CV8PasswordHash.h"
+
+#ifndef MTA_CLIENT
+    #include <core/CServerInterface.h>
+extern CServerInterface* g_pServerInterface;
+#endif
+
+void CCryptDefs::LoadLuaFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"md5", ArgumentParserWarn<false, Md5>},
@@ -32,8 +40,50 @@ void CLuaCryptDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-std::string CLuaCryptDefs::Md5(std::string strMd5)
+void CCryptDefs::LoadJsFunctions()
 {
+#ifndef MTA_CLIENT
+    CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("crypt");
+
+    constexpr static const std::pair<const char*, void(*)(CV8FunctionCallbackBase*)> functions[]{
+        {"md5", JsArgumentParser<Md5>},
+        //{"BCrypt", BCrypt}
+    };
+
+    // Add functions
+    //for (const auto& [name, func] : functions)
+    //    pHashModule->AddFunction(name, func);
+#endif
+}
+
+//#ifndef MTA_CLIENT
+//void CJsCryptDefs::Md5(CV8FunctionCallbackBase* callback)
+//{
+//    std::string str;
+//    if (callback->ReadString(str))
+//    {
+//        callback->ReturnPromise(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
+//        return;
+//    }
+//    callback->Return(false);
+//}
+//
+//void CJsCryptDefs::BCrypt(CV8FunctionCallbackBase* callback)
+//{
+//    std::string password;
+//    double      value;
+//    if (callback->ReadString(password) && callback->ReadNumber(value))
+//    {
+//        callback->ReturnPromise(std::make_unique<CV8PasswordHash>(password, (int)value));
+//        return;
+//    }
+//    callback->Return(false);
+//}
+//
+//#endif
+
+std::string CCryptDefs::Md5(std::string strMd5)
+    {
     MD5        md5bytes;
     char       szResult[33];
     CMD5Hasher hasher;
@@ -42,24 +92,24 @@ std::string CLuaCryptDefs::Md5(std::string strMd5)
     return szResult;
 }
 
-std::string CLuaCryptDefs::Sha256(std::string strSourceData)
+std::string CCryptDefs::Sha256(std::string strSourceData)
 {
     return GenerateSha256HexString(strSourceData);
 }
 
-std::string CLuaCryptDefs::Hash(EHashFunctionType hashFunction, std::string strSourceData)
+std::string CCryptDefs::Hash(EHashFunctionType hashFunction, std::string strSourceData)
 {
     return GenerateHashHexString(hashFunction, strSourceData).ToLower();
 }
 
-std::string CLuaCryptDefs::TeaEncode(std::string str, std::string key)
+std::string CCryptDefs::TeaEncode(std::string str, std::string key)
 {
     SString result;
     SharedUtil::TeaEncode(str, key, &result);
     return SharedUtil::Base64encode(result);
 }
 
-std::string CLuaCryptDefs::TeaDecode(std::string str, std::string key)
+std::string CCryptDefs::TeaDecode(std::string str, std::string key)
 {
     SString result = SharedUtil::Base64decode(str);
     SString strOutResult;
@@ -67,17 +117,17 @@ std::string CLuaCryptDefs::TeaDecode(std::string str, std::string key)
     return strOutResult;
 }
 
-std::string CLuaCryptDefs::Base64encode(std::string str)
+std::string CCryptDefs::Base64encode(std::string str)
 {
     return SharedUtil::Base64encode(str);
 }
 
-std::string CLuaCryptDefs::Base64decode(std::string str)
+std::string CCryptDefs::Base64decode(std::string str)
 {
     return SharedUtil::Base64decode(str);
 }
 
-int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
+int CCryptDefs::PasswordHash(lua_State* luaVM)
 {
     //  string password_hash(string password, string algorithm, table options = {} [, function callback])
     SString              password;
@@ -174,7 +224,7 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 }
 
 
-int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
+int CCryptDefs::PasswordVerify(lua_State* luaVM)
 {
     //  bool passwordVerify(string password, string hash [, table options, function callback])
     SString         password;
@@ -254,7 +304,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCryptDefs::EncodeString(lua_State* luaVM)
+int CCryptDefs::EncodeString(lua_State* luaVM)
 {
     StringEncryptFunction algorithm;
     SString               data;
@@ -333,7 +383,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCryptDefs::DecodeString(lua_State* luaVM)
+int CCryptDefs::DecodeString(lua_State* luaVM)
 {
     StringEncryptFunction algorithm;
     SString               data;

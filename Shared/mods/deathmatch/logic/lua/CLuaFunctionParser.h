@@ -9,6 +9,7 @@
 #pragma once
 
 class CLuaArgument;
+class CV8FunctionBase;
 
 #include <optional>
 #include <variant>
@@ -656,13 +657,13 @@ struct CLuaFunctionParserBase
     }
 };
 
-template <bool, auto, auto*>
+template <eRuntime, bool, auto, auto*>
 struct CLuaFunctionParser
 {
 };
 
-template <bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
+template <eRuntime Runtime, bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
+struct CLuaFunctionParser<Runtime, ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
 {
     template <typename... Params>
     inline auto Call(lua_State* L, Params&&... ps)
@@ -741,5 +742,8 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
             return 1;
         }
         return iResult;
+    }
+
+    inline CV8FunctionBase* operator()(CV8FunctionCallbackBase* JS, CScriptDebugging* pScriptDebugging) { return nullptr;
     }
 };

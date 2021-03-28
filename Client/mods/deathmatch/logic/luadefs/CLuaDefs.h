@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #pragma once
+#include "defs/CDefs.h"
+
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 #define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
 
@@ -33,7 +35,7 @@ class CRenderWare;
 class CResourceManager;
 class CScriptDebugging;
 
-class CLuaDefs
+class CLuaDefs : public CDefs
 {
 public:
     static void Initialize(class CClientGame* pClientGame, CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging);
@@ -46,7 +48,6 @@ public:
 public:
     static CElementDeleter*           m_pElementDeleter;
     static CLuaManager*               m_pLuaManager;
-    static CScriptDebugging*          m_pScriptDebugging;
     static class CClientGame*         m_pClientGame;
     static CClientManager*            m_pManager;
     static CClientEntity*             m_pRootEntity;
@@ -72,7 +73,7 @@ protected:
     template <auto ReturnOnError, auto T>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<false, ReturnOnError, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<eRuntime::LUA, false, ReturnOnError, T>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads
@@ -94,7 +95,7 @@ protected:
     template <auto T>
     static inline int ArgumentParser(lua_State* L)
     {
-        return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<eRuntime::LUA, true, nullptr, T>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads

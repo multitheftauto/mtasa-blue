@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/logic/luadefs/CLuaCryptDefs.h
+ *  FILE:        Shared/mods/logic/luadefs/CCryptDefs.h
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -10,13 +10,15 @@
 
 #pragma once
 #include "luadefs/CLuaDefs.h"
+#include "jsdefs/CJsDefs.h"
 #include <optional>
 #include <variant>
 
-class CLuaCryptDefs : public CLuaDefs
+class CCryptDefs : public CLuaDefs, public CJsDefs
 {
 public:
-    static void LoadFunctions();
+    static void LoadLuaFunctions();
+    static void LoadJsFunctions();
 
     static std::string Md5(std::string strMd5);
 
