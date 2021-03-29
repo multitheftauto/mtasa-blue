@@ -532,7 +532,6 @@ CV8Isolate::~CV8Isolate()
 #if DEBUG
         m_pIsolate->RequestGarbageCollectionForTesting(Isolate::GarbageCollectionType::kFullGarbageCollection);
 #endif
-
         m_global.Reset();
         m_context.Reset();
 

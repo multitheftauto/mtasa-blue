@@ -47,6 +47,10 @@ void CCryptDefs::LoadJsFunctions()
 
     constexpr static const std::pair<const char*, void(*)(CV8FunctionCallbackBase*)> functions[]{
         {"md5", JsArgumentParser<Md5>},
+        {"sha256", JsArgumentParser<Sha256>},
+        {"teaEncode", JsArgumentParser<TeaEncode>},
+        {"base64encode", JsArgumentParser<Base64encode>},
+        {"base64decode", JsArgumentParser<Base64decode>},
     };
 
     for (const auto& [name, func] : functions)
@@ -55,16 +59,7 @@ void CCryptDefs::LoadJsFunctions()
 }
 
 //#ifndef MTA_CLIENT
-//void CJsCryptDefs::Md5(CV8FunctionCallbackBase* callback)
-//{
-//    std::string str;
-//    if (callback->ReadString(str))
-//    {
-//        callback->ReturnPromise(std::make_unique<CV8InlineAsyncFunction>([str](CV8DelegateBase* delegate) { delegate->Resolve(CLuaCryptDefs::Md5(str)); }));
-//        return;
-//    }
-//    callback->Return(false);
-//}
+
 //
 //void CJsCryptDefs::BCrypt(CV8FunctionCallbackBase* callback)
 //{

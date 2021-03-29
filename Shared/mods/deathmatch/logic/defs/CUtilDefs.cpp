@@ -14,6 +14,8 @@
     #include <core/CServerInterface.h>
     extern CServerInterface* g_pServerInterface;
 #endif
+    
+#include <lua/CLuaFunctionParser.h>
 
 void CUtilDefs::LoadLuaFunctions()
 {
@@ -22,7 +24,7 @@ void CUtilDefs::LoadLuaFunctions()
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
         {"deref", Dereference},
         {"ref", Reference},
-        {"getTickCount", GetTickCount_},
+        {"getTickCount", ArgumentParser<GetTickCount_>},
         {"getRealTime", GetCTime},
         {"split", Split},
         {"isOOPEnabled", IsOOPEnabled},
@@ -65,6 +67,7 @@ void CUtilDefs::LoadJsFunctions()
 
     constexpr static const std::pair<const char*, void (*)(CV8FunctionCallbackBase*)> functions[]{
         {"print", JsArgumentParser<JsPrint>},
+        {"getTickCount", JsArgumentParser<GetTickCount_>},
     };
 
     for (const auto& [name, func] : functions)
@@ -142,11 +145,9 @@ int CUtilDefs::Reference(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::GetTickCount_(lua_State* luaVM)
+double CUtilDefs::GetTickCount_()
 {
-    double dTime = static_cast<double>(GetTickCount64_());
-    lua_pushnumber(luaVM, dTime);
-    return 1;
+    return static_cast<double>(GetTickCount64_());
 }
 
 int CUtilDefs::GetCTime(lua_State* luaVM)
