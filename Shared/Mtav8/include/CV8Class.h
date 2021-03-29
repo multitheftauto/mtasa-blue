@@ -1,3 +1,30 @@
+
+class JavascriptWrapper
+{
+public:
+
+    ~JavascriptWrapper()
+    {
+        delete m_pExternalData;
+    }
+
+    JavascriptWrapper(Isolate* pIsolate, Local<Object> object, uint16_t classId)
+    {
+        wrapper.Reset(pIsolate, object);
+        Local<External> wrap = Local<External>::Cast(object->GetInternalField(CV8::EInternalFieldPurpose::PointerToValue));
+        m_pExternalData = wrap->Value();
+        wrapper.SetWeak(this, WeakCallbackForObjectHolder, WeakCallbackType::kParameter);
+        wrapper.SetWrapperClassId(classId);
+    }
+
+private:
+    static void WeakCallbackForObjectHolder(const WeakCallbackInfo<JavascriptWrapper>& data) { delete data.GetParameter(); }
+
+    Global<Object> wrapper;
+    void* m_pExternalData;
+};
+
+
 class CV8Class : public CV8ClassBase
 {
 public:
@@ -10,7 +37,7 @@ public:
     void SetParametersCount(size_t count) { m_parametersCount = count; }
     void SetSizeOf(size_t size) { m_sizeOf = size; }
 
-    void AttachGC(Isolate* isolate, Local<Object> object, uint16_t classId);
+    void AttachGC(Isolate* isolate, Local<Object> object);
 
     // Allocates memory of size of underlying class
     void* Allocate(Isolate* isolate);
@@ -27,53 +54,8 @@ public:
     //    return value;
     //}
 
-    void SetConstructor(Handle<FunctionTemplate> objectTemplate)
-    {
-        objectTemplate->SetCallHandler(
-            [](const FunctionCallbackInfo<Value>& info) {
-                Isolate*        pV8Isolate = Isolate::GetCurrent();
-                HandleScope     scope(pV8Isolate);
-                Local<External> data = info.Data().As<External>();
-                CV8Class*       thisClass = (CV8Class*)data->Value();
-
-                /*std::function<CVector2D*(float, float)> asdf = *(std::function<CVector2D*(float, float)>*)asd;
-                CVector2D*                              aa = asdf(2.0f, 3.40f);*/
-                if (info.Length() != thisClass->GetParametersCount())
-                {
-                    pV8Isolate->ThrowException(CV8Utils::ToV8String("Error"));
-                    return;
-                }
-
-                pV8Isolate->Enter();
-
-                std::function<void*(CV8FunctionCallbackBase&, void*)> constructionFunction = thisClass->GetConstrutorFunction();
-                CV8FunctionCallback                                   funcCallback(info);
-                void*                                                 wrappedClass = constructionFunction(funcCallback, thisClass->Allocate(pV8Isolate));
-                CVector2D*                                            test = (CVector2D*)wrappedClass;
-
-                Local<Object> wrapper = info.Holder();
-
-                wrapper->SetInternalField(CV8::EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)thisClass->GetClassId()));
-                wrapper->SetInternalField(CV8::EInternalFieldPurpose::PointerToValue, External::New(pV8Isolate, wrappedClass));
-
-                thisClass->AttachGC(pV8Isolate, wrapper, thisClass->GetClassId());
-
-                info.GetReturnValue().Set(wrapper);
-
-                pV8Isolate->Exit();
-                return;
-                //}
-
-                //// Here we are expecting exception to be thrown
-                // pV8Isolate->Exit();
-            },
-            External::New(Isolate::GetCurrent(), this));
-    }
-
-    void AddAccessor(std::string name, float (*getter)(void*), void(*setter)(void*, float))
-    {
-        m_floatAccessors[name] = {getter, setter};
-    }
+    void SetConstructor(Handle<FunctionTemplate> objectTemplate);
+    void AddAccessor(std::string name, float (*getter)(void*), void (*setter)(void*, float));
 
     void SetAccessors(Local<ObjectTemplate> objectTemplate);
 
@@ -97,7 +79,7 @@ public:
 
                 Local<Array>            array = info.Data().As<Array>();
                 Local<External>         externalData = array->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
-                CVector2D*              asd = (CVector2D*)(pointerToValue);
+
                 auto getter = (T(*)(void*))externalData->Value();
                 T    result = getter(pointerToValue);
                 auto                    n = typeid(T).name();

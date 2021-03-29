@@ -17,15 +17,6 @@ class CV8FunctionBase;
 class CJsDefs : CDefs
 {
 public:
-    enum class EClass : uint16_t
-    {
-        Invalid,            // To distinguish between nullptr and actual class.
-        Vector2,
-        Vector3,
-        Vector4,
-        Matrix,
-        Count,
-    };
     
     // hard error on usage mistakes
     template <auto T>

@@ -2,24 +2,10 @@ using namespace v8;
 
 class CV8Promise;
 
-class CV8GC : public PersistentHandleVisitor
-{
-public:
-    Isolate* m_pIsolate;
-
-    CV8GC(Isolate* isolate) : m_pIsolate(isolate) {}
-    ~CV8GC() {}
-
-    void VisitPersistentHandle(Persistent<Value>* persistent, uint16_t usClassId);
-};
-
-// Remember to implement all classes in VisitPersistentHandle and bump number.
-static_assert((int)CV8BaseClass::EClass::Count == 5 && "Missing implementation for GC");
-
 class CV8Isolate : public CV8IsolateBase
 {
 public:
-    CV8Isolate(CV8* pCV8, std::string& originResource);
+    CV8Isolate(CV8* pCV8, std::string originResource);
     ~CV8Isolate();
 
     void InitSecurity();
@@ -27,12 +13,12 @@ public:
 
     void DoPulse();
 
-    void               RunCode(std::string& code, std::string& originFileName);
+    void               RunCode(std::string& code, std::string originFileName);
     MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer);
 
     void               EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask);
     MaybeLocal<Value>  InitializeModuleExports(Local<Context> context, Local<Module> module);
-    MaybeLocal<Module> GetScriptModule(const char* name);
+    MaybeLocal<Module> GetScriptModule(std::string name);
     void               AddPromise(std::unique_ptr<CV8Promise> pPromise);
     Isolate*           GetIsolate() const { return m_pIsolate; }
 
@@ -49,11 +35,11 @@ public:
     std::string GetModuleName(Local<Module> module);
 
     // May be used as a namespace for module imports. Equivalent of js "let object = {}"
-    Local<Object> CreateGlobalObject(const char* mapName);
+    Local<Object> CreateGlobalObject(std::string mapName);
     // Equivalent of js "object[key] = value"
-    void SetObjectKeyValue(Local<Object> object, const char* key, Local<Value> value);
+    void SetObjectKeyValue(Local<Object> object, std::string key, Local<Value> value);
     // Equivalent of js "let key = value"
-    void SetKeyValue(const char* key, Local<Value> value);
+    void SetKeyValue(std::string key, Local<Value> value);
 
     // Stopping initialization, prevents scripts from starting.
     template <typename... Args>
@@ -130,8 +116,4 @@ private:
     std::queue<std::string> modulesListName;
     eJsEval                 m_eJsEval;
     bool                    m_bHasInitializationError = false;
-
-    std::unique_ptr<CV8GC> m_pGC;
-
-    static ModifyCodeGenerationFromStringsResult Eval(Local<Context> context, Local<Value> source, bool is_code_like);
 };

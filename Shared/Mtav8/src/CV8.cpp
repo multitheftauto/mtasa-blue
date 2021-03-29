@@ -108,7 +108,7 @@ std::vector<CV8Class*> CV8::GetClasses()
     return isolates;
 }
 
-CV8IsolateBase* CV8::CreateIsolate(std::string& originResource)
+CV8IsolateBase* CV8::CreateIsolate(std::string originResource)
 {
     std::unique_ptr<CV8Isolate> pIsolate = std::make_unique<CV8Isolate>(this, originResource);
     CV8Isolate*                 isolate = pIsolate.get();
@@ -171,22 +171,24 @@ void CV8::RegisterAllModulesInGlobalNamespace(CV8Isolate* pIsolate)
     }
 }
 
-CV8Module* CV8::GetModuleByName(const char* name)
+CV8Module* CV8::GetModuleByName(std::string name)
 {
     if (CV8::m_mapModules.find(name) != CV8::m_mapModules.end())
         return CV8::m_mapModules[name].get();
     return nullptr;
 }
 
-CV8ModuleBase* CV8::CreateModule(const char* name)
+CV8ModuleBase* CV8::CreateModule(std::string name)
 {
-    std::string buf(V8Config::szMtaModulePrefix);
-    buf.append("/");
-    buf.append(name);
+    std::string moduleName(V8Config::szMtaModulePrefix);
+    moduleName.append("/");
+    moduleName.append(name);
 
-    std::unique_ptr<CV8Module> module = std::make_unique<CV8Module>(buf.c_str());
+    assert(CV8::m_mapModules.find(moduleName) == CV8::m_mapModules.end());
+
+    std::unique_ptr<CV8Module> module = std::make_unique<CV8Module>(moduleName);
     CV8Module*                 pModule = module.get();
-    CV8::m_mapModules.insert({buf, std::move(module)});
+    CV8::m_mapModules.insert({moduleName, std::move(module)});
     return pModule;
 }
 

@@ -15,10 +15,10 @@ template <typename T>
 class CJsClassConstructionInfo
 {
 public:
-    CJsClassConstructionInfo(std::string name, CJsDefs::EClass classId) : classId(classId)
+    CJsClassConstructionInfo(std::string name, EClass classId) : classId(classId)
     {
-        assert(classId != CJsDefs::EClass::Invalid);
-        assert(classId < CJsDefs::EClass::Count);
+        assert(classId != EClass::Invalid);
+        assert(classId < EClass::Count);
         #ifdef MTA_CLIENT
             v8Class = g_pCore->GetV8()->CreateClass(name, (size_t)classId);
         #else
@@ -92,5 +92,5 @@ public:
     }
 
     CV8ClassBase*    v8Class;
-    CJsDefs::EClass  classId;
+    EClass  classId;
 };

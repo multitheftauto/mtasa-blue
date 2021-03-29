@@ -10,7 +10,7 @@ public:
     enum EInternalFieldPurpose
     {
         TypeOfClass,               // Value is one of value from EClass
-        PointerToValue,            // Values is a pointer to external value.
+        PointerToValue,            // A pointer to external pointer.
         Count,
     };
 
@@ -21,10 +21,10 @@ public:
     void EnterExecution(CV8Isolate* pIsolate);
     void ExitExecution(CV8Isolate* pIsolate);
 
-    CV8IsolateBase* CreateIsolate(std::string& originResource);
+    CV8IsolateBase* CreateIsolate(std::string originResource);
     void            RemoveIsolate(CV8IsolateBase* pIsolate);
 
-    CV8ModuleBase* CreateModule(const char* name);
+    CV8ModuleBase* CreateModule(std::string name);
 
     CV8ClassBase* CreateClass(std::string name, size_t classId);
 
@@ -33,7 +33,7 @@ public:
     static Local<Module>         GetDummyModule(Isolate* pIsolate);
     static void                  RegisterAllModules(CV8Isolate* pIsolate);
     static void                  RegisterAllModulesInGlobalNamespace(CV8Isolate* pIsolate);
-    static CV8Module*            GetModuleByName(const char* name);
+    CV8Module*                   GetModuleByName(std::string name);
     std::vector<CV8IsolateBase*> GetIsolates();
     std::vector<CV8Class*>       GetClasses();
     Platform*                    GetPlatform() const { return m_pPlatform.get(); }

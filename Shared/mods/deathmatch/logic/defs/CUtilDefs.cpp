@@ -66,8 +66,37 @@ void CUtilDefs::LoadJsFunctions()
     CV8ModuleBase* pUtilsModule = g_pServerInterface->GetV8()->CreateModule("utils");
 
     constexpr static const std::pair<const char*, void (*)(CV8FunctionCallbackBase*)> functions[]{
+        //{"deref", Dereference}, // Unsupported, useless in case of js
+        //{"ref", Reference}, // Unsupported, useless in case of js
         {"print", JsArgumentParser<JsPrint>},
         {"getTickCount", JsArgumentParser<GetTickCount_>},
+        //{"getRealTime", GetCTime}, // Use `Date` class instead.
+        //{"split", Split}, // Use `split` method in `String` class
+        //{"isOOPEnabled", IsOOPEnabled}, // OOP in V8 is always enabled, may be implemented anyway to check if lua has oop enabled.
+        //{"getUserdataType", GetUserdataType}, // use `typeof` operator
+        //{"getColorFromString", GetColorFromString},
+
+        //// Utility vector math functions
+        //{"getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D},
+        //{"getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D},
+        //{"getEasingValue", GetEasingValue},
+        //{"interpolateBetween", InterpolateBetween},
+
+        //// JSON funcs
+        //{"toJSON", toJSON}, // use JSON.stringify
+        //{"fromJSON", fromJSON}, // use JSON.parse
+
+        //// PCRE functions // Use v8 build in `RegExp` class.
+        //{"pregFind", PregFind},
+        //{"pregReplace", PregReplace},
+        //{"pregMatch", PregMatch},
+
+        //// Debug functions
+        //{"debugSleep", DebugSleep},
+
+        //// Utility functions
+        //{"gettok", GetTok}, // Useless, duplicate of `split`
+        //{"tocolor", tocolor},
     };
 
     for (const auto& [name, func] : functions)
@@ -101,6 +130,7 @@ bool CUtilDefs::JsPrint(CV8FunctionCallbackBase* arguments)
             stream << " ";
         }
     }
+    //m_pScriptDebugging->LogInformation(L, "%s", stream.str().c_str());
     printf("[%s] %s\n", *GetLocalTimeString(false), stream.str().c_str());
     return true;
 }

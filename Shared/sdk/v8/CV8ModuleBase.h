@@ -1,5 +1,5 @@
 class CV8ModuleBase
 {
 public:
-    virtual void AddFunction(const char* name, void (*args)(CV8FunctionCallbackBase*)) = 0;
+    virtual void AddFunction(std::string name, void (*args)(CV8FunctionCallbackBase*)) = 0;
 };

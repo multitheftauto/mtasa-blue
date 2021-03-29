@@ -5,35 +5,7 @@
 
 using namespace v8;
 
-void CV8GC::VisitPersistentHandle(Persistent<Value>* persistent, uint16_t usClassId)
-{
-    HandleScope          handleScope(m_pIsolate);
-    CV8BaseClass::EClass classId = (CV8BaseClass::EClass)usClassId;
-    Local<Value>         value = persistent->Get(m_pIsolate);
-
-    assert(value->IsObject());            // may be removed in future
-
-    Local<Object>   object = value->ToObject(m_pIsolate->GetCurrentContext()).ToLocalChecked();
-    Local<External> external = Local<External>::Cast(object->GetInternalField(CV8BaseClass::EInternalFieldPurpose::PointerToValue));
-    void*           pointerToValue = external->Value();
-
-    switch (classId) // Cast to 
-    {
-        case CV8BaseClass::EClass::Invalid:
-            assert(false && "Invalid class id");
-            break;
-        case CV8BaseClass::EClass::Vector2:
-        case CV8BaseClass::EClass::Vector3:
-        case CV8BaseClass::EClass::Vector4:
-        case CV8BaseClass::EClass::Matrix:
-            delete pointerToValue;
-            break;
-        default:
-            assert(false && "Not implemented class");
-    }
-}
-
-CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
+CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
 {
     // m_constraints.ConfigureDefaults(1024 * 1024 * 200, 0);
     m_constraints.ConfigureDefaultsFromHeapSize(1024 * 1024 * 64, 1024 * 1024 * 66);
@@ -41,7 +13,6 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     m_createParams.constraints = m_constraints;
     m_pIsolate = Isolate::New(m_createParams);
-    Locker lock(m_pIsolate);
 
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
@@ -73,15 +44,8 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string& originResource) : m_pCV8(pCV8)
     //    return new int(0);
     //});
 
-    m_pGC = std::make_unique<CV8GC>(m_pIsolate);
-
     InitSecurity();
     InitClasses();
-
-    //Handle<FunctionTemplate> vector2dTemplate = CV8Vector2D::CreateTemplate(context);
-    //Handle<FunctionTemplate> vector3dTemplate = CV8Vector3D::CreateTemplate(context, vector2dTemplate);
-    //Handle<FunctionTemplate> vector4dTemplate = CV8Vector4D::CreateTemplate(context, vector3dTemplate);
-    //Handle<FunctionTemplate> matrixTemplate = CV8Matrix::CreateTemplate(context);
 }
 
 void CV8Isolate::InitSecurity()
@@ -101,12 +65,12 @@ void CV8Isolate::InitClasses()
 
 void CV8Isolate::DoPulse()
 {
+    HandleScope handleScope(m_pIsolate);
     m_pIsolate->PerformMicrotaskCheckpoint();
 }
 
 void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
 {
-    Locker lock(m_pIsolate);
     m_pIsolate->EnqueueMicrotask(
         [](void* data) {
             CMicrotask*     microtask = (CMicrotask*)data;
@@ -173,7 +137,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
     Isolate*          pIsolate = context->GetIsolate();
     CV8Isolate*       self = (CV8Isolate*)pIsolate->GetData(0);
     String::Utf8Value importName(pIsolate, specifier);
-    CV8Module*        pModule = CV8::GetModuleByName(*importName);
+    CV8Module*        pModule = self->m_pCV8->GetModuleByName(*importName);
     std::string       strImportName = *importName;
 
     if (!strcmp(strReferrer.c_str(), *importName))
@@ -232,7 +196,7 @@ MaybeLocal<Module> CV8Isolate::InstantiateModule(Local<Context> context, Local<S
     }
 }
 
-MaybeLocal<Module> CV8Isolate::GetScriptModule(const char* name)
+MaybeLocal<Module> CV8Isolate::GetScriptModule(std::string name)
 {
     MaybeLocal<Module> module;
     auto const&        result = m_mapScriptModules.find(name);
@@ -253,9 +217,9 @@ void CV8Isolate::AddPromise(std::unique_ptr<CV8Promise> pPromise)
 
 MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Local<Module> module)
 {
-    Locker      lock(m_pIsolate);
-    const char* name = modulesListName.front().c_str();
-    CV8Module*  pModule = CV8::GetModuleByName(name);
+    CV8Isolate* self = (CV8Isolate*)m_pIsolate->GetData(0);
+    std::string moduleName = modulesListName.front();
+    CV8Module*  pModule = self->m_pCV8->GetModuleByName(moduleName);
     modulesListName.pop();
     if (pModule)
     {
@@ -282,8 +246,8 @@ void CV8Isolate::InitializeModules()
         // Result always true even module does not exists.
         Maybe<bool> result = module->InstantiateModule(
             m_context.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
-                String::Utf8Value importName(context->GetIsolate(), specifier);
-                CV8Isolate*       self = (CV8Isolate*)context->GetIsolate()->GetData(0);
+                String::Utf8Value  importName(context->GetIsolate(), specifier);
+                CV8Isolate*        self = (CV8Isolate*)context->GetIsolate()->GetData(0);
                 MaybeLocal<Module> module;
                 if (self->HasInitializationError())
                 {
@@ -305,11 +269,10 @@ void CV8Isolate::InitializeModules()
     }
 }
 
-void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
+void CV8Isolate::RunCode(std::string& code, std::string originFileName)
 {
     m_iRunCodeCount++;
     m_strCurrentOriginFileName = originFileName;
-    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
     Context::Scope contextScope(m_context.Get(m_pIsolate));
@@ -337,9 +300,8 @@ void CV8Isolate::RunCode(std::string& code, std::string& originFileName)
     {
         case Module::Status::kUninstantiated:
         {
-            const char* szName = originFileName.c_str();
-            m_mapScriptModules[szName] = Global<Module>(m_pIsolate, module);
-            m_loadingOrder.push_back(szName);
+            m_mapScriptModules[originFileName] = Global<Module>(m_pIsolate, module);
+            m_loadingOrder.push_back(originFileName);
         }
         break;
         case Module::Status::kInstantiating:
@@ -424,7 +386,6 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
 
 void CV8Isolate::SetJsEvalSetting(eJsEval value)
 {
-    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
@@ -445,19 +406,19 @@ void CV8Isolate::TerminateExecution()
     // m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
 }
 
-Local<Object> CV8Isolate::CreateGlobalObject(const char* mapName)
+Local<Object> CV8Isolate::CreateGlobalObject(std::string mapName)
 {
     Local<Object> object = Object::New(m_pIsolate);
     m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(mapName), object);
     return object;
 }
 
-void CV8Isolate::SetObjectKeyValue(Local<Object> object, const char* key, Local<Value> value)
+void CV8Isolate::SetObjectKeyValue(Local<Object> object, std::string key, Local<Value> value)
 {
     object->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
 }
 
-void CV8Isolate::SetKeyValue(const char* key, Local<Value> value)
+void CV8Isolate::SetKeyValue(std::string key, Local<Value> value)
 {
     m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
 }
@@ -467,7 +428,6 @@ Local<Function> CV8Isolate::CreateFunction(void (*callback)(CV8FunctionCallbackB
     Local<Value> value = External::New(m_pIsolate, callback);
 
     FunctionCallback functionCallback = [](const FunctionCallbackInfo<Value>& args) {
-        Locker          lock(args.GetIsolate());
         HandleScope     handleScope(args.GetIsolate());
         Local<External> ext = args.Data().As<External>();
         void (*func)(CV8FunctionCallbackBase*) = static_cast<void (*)(CV8FunctionCallbackBase*)>(ext->Value());
@@ -481,7 +441,6 @@ Local<Function> CV8Isolate::CreateFunction(void (*callback)(CV8FunctionCallbackB
 
 void CV8Isolate::Evaluate()
 {
-    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
@@ -503,6 +462,7 @@ void CV8Isolate::Evaluate()
         Execution     execution(this);
         TryCatch      evaluateTryCatch(m_pIsolate);
         Local<Module> module = pair.Get(m_pIsolate);
+        auto          st = module->GetStatus();
         if (Module::Status::kInstantiated == module->GetStatus())
         {
             Local<Value> val;
@@ -520,13 +480,10 @@ void CV8Isolate::Evaluate()
 CV8Isolate::~CV8Isolate()
 {
     {
-        Locker         lock(m_pIsolate);
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_context.Get(m_pIsolate);
         thisContext->Enter();
-
-        m_pIsolate->VisitWeakHandles(m_pGC.get());
 
         m_pIsolate->LowMemoryNotification();
 #if DEBUG

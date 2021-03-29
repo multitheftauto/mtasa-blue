@@ -1,13 +1,13 @@
 class CV8Module : public CV8ModuleBase
 {
 public:
-    CV8Module(const char* name);
+    CV8Module(std::string name);
     ~CV8Module();
-    void                                                                AddFunction(const char* name, void (*callback)(CV8FunctionCallbackBase*));
-    std::unordered_map<const char*, void (*)(CV8FunctionCallbackBase*)> GetFunctions() const;
+    void                                                                AddFunction(std::string name, void (*callback)(CV8FunctionCallbackBase*));
+    std::unordered_map<std::string, void (*)(CV8FunctionCallbackBase*)> GetFunctions() const;
 
     std::vector<Local<String>> GetExports(Isolate* pIsolate);
 private:
-    const char* m_strName;
-    std::unordered_map<const char*, void (*)(CV8FunctionCallbackBase*)> m_mapFunctions;
+    std::string                                                         m_strName;
+    std::unordered_map<std::string, void (*)(CV8FunctionCallbackBase*)> m_mapFunctions;
 };

@@ -40,7 +40,6 @@ void CV8Promise::Resolve(std::string arg)
 {
     m_pIsolate->EnqueueMicrotask([arg, this](CV8Isolate* pIsolate) {
         Isolate*    isolate = pIsolate->GetIsolate();
-        Locker      lock(isolate);
         HandleScope scope(isolate);
         Resolve(CV8Utils::ToV8String(arg));
     });

@@ -9,7 +9,6 @@
 #include "jsdefs/CJsDefs.h"
 #include "jsdefs/CJsClassConstructionInfo.h"
 #include "jsdefs/CJsVector2Defs.h"
-#include "jsdefs/CJsUtilDefs.h"
 
 class CJsShared
 {

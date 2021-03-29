@@ -2,7 +2,7 @@
 
 using namespace v8;
 
-CV8Module::CV8Module(const char* name) : m_strName(name)
+CV8Module::CV8Module(std::string name) : m_strName(name)
 {
 }
 
@@ -10,12 +10,13 @@ CV8Module::~CV8Module()
 {
 }
 
-void CV8Module::AddFunction(const char* name, void (*callback)(CV8FunctionCallbackBase*))
+void CV8Module::AddFunction(std::string name, void (*callback)(CV8FunctionCallbackBase*))
 {
+    assert(m_mapFunctions.find(name) == m_mapFunctions.end());
     m_mapFunctions[name] = callback;
 }
 
-std::unordered_map<const char*, void (*)(CV8FunctionCallbackBase*)> CV8Module::GetFunctions() const
+std::unordered_map<std::string, void (*)(CV8FunctionCallbackBase*)> CV8Module::GetFunctions() const
 {
     return m_mapFunctions;
 }
