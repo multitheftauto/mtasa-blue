@@ -12,6 +12,8 @@ public:
     Isolate* GetIsolate() const { return m_callback.GetIsolate(); };
 
     bool ReadString(std::string& value, int index);
+    bool ReadAsString(std::string& value, int index);
+
     bool ReadNumber(float& value, int index);
     bool ReadNumber(double& value, int index);
     //bool ReadVector(CVector2D& value);

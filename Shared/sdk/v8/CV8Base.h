@@ -5,6 +5,7 @@
 #include "CV8IsolateBase.h"
 #include "CV8ModuleBase.h"
 #include "CV8ClassBase.h"
+#include "CV8ObjectBase.h"
 
 class CV8Base
 {

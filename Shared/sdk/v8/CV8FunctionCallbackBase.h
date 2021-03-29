@@ -4,6 +4,7 @@ public:
     virtual int CountArguments() const = 0;
 
     virtual bool ReadString(std::string& value, int index) = 0;
+    virtual bool ReadAsString(std::string& value, int index) = 0;
     virtual bool ReadNumber(float& value, int index) = 0;
     virtual bool ReadNumber(double& value, int index) = 0;
 

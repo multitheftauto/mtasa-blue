@@ -16,7 +16,7 @@
 
 #ifndef MTA_CLIENT
     #include <core/CServerInterface.h>
-extern CServerInterface* g_pServerInterface;
+    extern CServerInterface* g_pServerInterface;
 #endif
 
 void CCryptDefs::LoadLuaFunctions()
@@ -43,14 +43,14 @@ void CCryptDefs::LoadLuaFunctions()
 void CCryptDefs::LoadJsFunctions()
 {
 #ifndef MTA_CLIENT
-    CV8ModuleBase* pHashModule = g_pServerInterface->GetV8()->CreateModule("crypt");
+    CV8ModuleBase* pCryptModule = g_pServerInterface->GetV8()->CreateModule("crypt");
 
     constexpr static const std::pair<const char*, void(*)(CV8FunctionCallbackBase*)> functions[]{
         {"md5", JsArgumentParser<Md5>},
     };
 
     for (const auto& [name, func] : functions)
-        pHashModule->AddFunction(name, func);
+        pCryptModule->AddFunction(name, func);
 #endif
 }
 

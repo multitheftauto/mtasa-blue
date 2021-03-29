@@ -110,23 +110,23 @@ void CLuaMain::InitSecurity()
     // Disable dangerous Lua Os library functions
     static const luaL_reg osfuncs[] =
     {
-        { "execute", CLuaUtilDefs::DisabledFunction },
-        { "rename", CLuaUtilDefs::DisabledFunction },
-        { "remove", CLuaUtilDefs::DisabledFunction },
-        { "exit", CLuaUtilDefs::DisabledFunction },
-        { "getenv", CLuaUtilDefs::DisabledFunction },
-        { "tmpname", CLuaUtilDefs::DisabledFunction },
-        { "setlocale", CLuaUtilDefs::DisabledFunction },
+        { "execute", CUtilDefs::DisabledFunction },
+        { "rename", CUtilDefs::DisabledFunction },
+        { "remove", CUtilDefs::DisabledFunction },
+        { "exit", CUtilDefs::DisabledFunction },
+        { "getenv", CUtilDefs::DisabledFunction },
+        { "tmpname", CUtilDefs::DisabledFunction },
+        { "setlocale", CUtilDefs::DisabledFunction },
         { NULL, NULL }
     };
     luaL_register(m_luaVM, "os", osfuncs);
 
-    lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "require", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
-    lua_register(m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
+    lua_register(m_luaVM, "dofile", CUtilDefs::DisabledFunction);
+    lua_register(m_luaVM, "loadfile", CUtilDefs::DisabledFunction);
+    lua_register(m_luaVM, "require", CUtilDefs::DisabledFunction);
+    lua_register(m_luaVM, "loadlib", CUtilDefs::DisabledFunction);
+    lua_register(m_luaVM, "getfenv", CUtilDefs::DisabledFunction);
+    lua_register(m_luaVM, "newproxy", CUtilDefs::DisabledFunction);
 }
 
 void CLuaMain::InitClasses(lua_State* luaVM)

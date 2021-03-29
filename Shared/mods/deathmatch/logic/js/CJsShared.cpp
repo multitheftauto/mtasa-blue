@@ -10,7 +10,7 @@
 
 void CJsShared::AddFunctions()
 {
-    CJsUtilDefs::LoadFunctions();
+    //CJsUtilDefs::LoadFunctions();
 }
 
 void CJsShared::AddClasses()

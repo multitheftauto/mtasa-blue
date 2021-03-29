@@ -148,7 +148,11 @@ struct CLuaFunctionParserBase
     template <typename T>
     inline T Pop(CV8FunctionCallbackBase* JS, std::size_t& index)
     {
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        if constexpr (std::is_same_v<std::remove_pointer_t<T>, CV8FunctionCallbackBase>)
+        {
+            return JS;
+        }
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
         {
             if (JS->IsString(index))
             {

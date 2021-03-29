@@ -11,10 +11,14 @@
 #pragma once
 #include "luadefs/CLuaDefs.h"
 
-class CLuaUtilDefs : public CLuaDefs
+class CV8ObjectBase;
+class CV8FunctionCallbackBase;
+
+class CUtilDefs : public CLuaDefs, public CJsDefs
 {
 public:
-    static void LoadFunctions();
+    static void LoadLuaFunctions();
+    static void LoadJsFunctions();
 
     // Reserved functions
     LUA_DECLARE(DisabledFunction);
@@ -52,4 +56,6 @@ public:
     // Utility functions
     LUA_DECLARE(GetTok);
     LUA_DECLARE(tocolor);
+
+    static bool JsPrint(CV8FunctionCallbackBase* arguments);
 };
