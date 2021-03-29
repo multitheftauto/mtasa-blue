@@ -13,6 +13,7 @@
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
 #include "CLanguageSelector.h"
+#include <optional>
 
 #define NATIVE_RES_X    1280.0f
 #define NATIVE_RES_Y    1024.0f
@@ -403,7 +404,7 @@ void CMainMenu::LoadMenuItems(float fBase, float fGap)
             // Check if its hidden
             bool value;
             CVARS_GET(*item.setting, value);
-            if (!value)
+            if (value)
                 continue;
         }
         m_menuItems.push_back(CreateItem(item.item, item.image, CVector2D(0.168f, fBase + fOffset)));

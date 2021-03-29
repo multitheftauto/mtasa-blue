@@ -20,7 +20,6 @@ class CMainMenu;
 #include "CSettings.h"
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
-#include <optional>
 class CNewsBrowser;
 class CLanguageSelector;
 
