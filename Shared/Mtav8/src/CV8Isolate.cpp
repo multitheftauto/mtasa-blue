@@ -34,15 +34,8 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
     m_pIsolate->EnableMemorySavingsMode();
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
 
-    m_context.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
-    Context::Scope contextScope(m_context.Get(m_pIsolate));
-
-    Local<Context> context = m_context.Get(m_pIsolate);
-    Local<Object>  global = context->Global();
-    // m_pIsolate->SetCounterFunction([](const char* name) {
-    //    printf("%s\n", name);
-    //    return new int(0);
-    //});
+    m_rootContext.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
+    Context::Scope contextScope(m_rootContext.Get(m_pIsolate));
 
     InitSecurity();
     InitClasses();
@@ -50,7 +43,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
 
 void CV8Isolate::InitSecurity()
 {
-    Local<Context> context = m_context.Get(m_pIsolate);
+    Local<Context> context = m_rootContext.Get(m_pIsolate);
     Local<Object>  global = context->Global();
     global->Set(context, CV8Utils::ToV8String("WebAssembly"), Undefined(m_pIsolate));
 }
@@ -245,7 +238,7 @@ void CV8Isolate::InitializeModules()
         Local<Module> module = pair.Get(m_pIsolate);
         // Result always true even module does not exists.
         Maybe<bool> result = module->InstantiateModule(
-            m_context.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
+            m_rootContext.Get(m_pIsolate), [](Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer) {
                 String::Utf8Value  importName(context->GetIsolate(), specifier);
                 CV8Isolate*        self = (CV8Isolate*)context->GetIsolate()->GetData(0);
                 MaybeLocal<Module> module;
@@ -275,7 +268,7 @@ void CV8Isolate::RunCode(std::string& code, std::string originFileName)
     m_strCurrentOriginFileName = originFileName;
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
-    Context::Scope contextScope(m_context.Get(m_pIsolate));
+    Context::Scope rootContextScope(m_rootContext.Get(m_pIsolate));
 
     Local<String> source = CV8Utils::ToV8String(code);
     Local<String> fileName = CV8Utils::ToV8String(originFileName);
@@ -393,7 +386,7 @@ void CV8Isolate::SetJsEvalSetting(eJsEval value)
     switch (m_eJsEval)
     {
         case eJsEval::DISABLED:
-            m_context.Get(m_pIsolate)->AllowCodeGenerationFromStrings(false);
+            m_rootContext.Get(m_pIsolate)->AllowCodeGenerationFromStrings(false);
             break;
         case eJsEval::ACL_ALLOWED:
             assert(false && "unimplemented eval setting");
@@ -409,18 +402,18 @@ void CV8Isolate::TerminateExecution()
 Local<Object> CV8Isolate::CreateGlobalObject(std::string mapName)
 {
     Local<Object> object = Object::New(m_pIsolate);
-    m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(mapName), object);
+    m_rootContext.Get(m_pIsolate)->Global()->Set(m_rootContext.Get(m_pIsolate), CV8Utils::ToV8String(mapName), object);
     return object;
 }
 
 void CV8Isolate::SetObjectKeyValue(Local<Object> object, std::string key, Local<Value> value)
 {
-    object->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
+    object->Set(m_rootContext.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
 }
 
 void CV8Isolate::SetKeyValue(std::string key, Local<Value> value)
 {
-    m_context.Get(m_pIsolate)->Global()->Set(m_context.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
+    m_rootContext.Get(m_pIsolate)->Global()->Set(m_rootContext.Get(m_pIsolate), CV8Utils::ToV8String(key), value);
 }
 
 Local<Function> CV8Isolate::CreateFunction(void (*callback)(CV8FunctionCallbackBase*))
@@ -444,18 +437,18 @@ void CV8Isolate::Evaluate()
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
-    Local<Context> context = m_context.Get(m_pIsolate);
-    Context::Scope contextScope(m_context.Get(m_pIsolate));
-    m_context.Get(m_pIsolate)->Enter();
+    Local<Context> context = m_rootContext.Get(m_pIsolate);
+    Context::Scope contextScope(m_rootContext.Get(m_pIsolate));
+    m_rootContext.Get(m_pIsolate)->Enter();
     InitializeModules();
 
     if (HasInitializationError())
     {
-        m_context.Get(m_pIsolate)->Exit();
+        m_rootContext.Get(m_pIsolate)->Exit();
         return;
     }
 
-    std::reverse(m_loadingOrder.begin(), m_loadingOrder.end());
+    //std::reverse(m_loadingOrder.begin(), m_loadingOrder.end());
     for (std::string moduleName : m_loadingOrder)
     {
         auto const&   pair = m_mapScriptModules[moduleName];
@@ -465,8 +458,8 @@ void CV8Isolate::Evaluate()
         auto          st = module->GetStatus();
         if (Module::Status::kInstantiated == module->GetStatus())
         {
-            Local<Value> val;
-            if (!module->Evaluate(m_context.Get(m_pIsolate)).ToLocal(&val))
+            Local<Value> val; // value returned by loaded script.
+            if (!module->Evaluate(m_rootContext.Get(m_pIsolate)).ToLocal(&val))
             {
                 ReportException(&evaluateTryCatch);
                 continue;
@@ -474,7 +467,7 @@ void CV8Isolate::Evaluate()
         }
     }
 
-    m_context.Get(m_pIsolate)->Exit();
+    m_rootContext.Get(m_pIsolate)->Exit();
 }
 
 CV8Isolate::~CV8Isolate()
@@ -482,7 +475,7 @@ CV8Isolate::~CV8Isolate()
     {
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
-        Local<Context> thisContext = m_context.Get(m_pIsolate);
+        Local<Context> thisContext = m_rootContext.Get(m_pIsolate);
         thisContext->Enter();
 
         m_pIsolate->LowMemoryNotification();
@@ -490,7 +483,7 @@ CV8Isolate::~CV8Isolate()
         m_pIsolate->RequestGarbageCollectionForTesting(Isolate::GarbageCollectionType::kFullGarbageCollection);
 #endif
         m_global.Reset();
-        m_context.Reset();
+        m_rootContext.Reset();
 
         for (auto& pair : m_mapScriptModules)
         {

@@ -98,7 +98,9 @@ private:
     Isolate*               m_pIsolate;
     CV8*                   m_pCV8;
     Global<ObjectTemplate> m_global;
-    Global<Context>        m_context;
+
+    Global<Context>        m_rootContext;
+
     ResourceConstraints    m_constraints;
 
     std::unordered_set<std::string> m_loadedModules;
