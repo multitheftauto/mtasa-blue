@@ -25,18 +25,18 @@ float CV8Vector3D::MethodGetLengthSquared(CV8FunctionCallback& info, Local<Objec
 
 void CV8Vector3D::MethodCrossProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value)
 {
-    CVector other;
-    if (!info.Read(other))
-        return;
-    value->CrossProduct(&other);
+    //CVector other;
+    //if (!info.Read(other))
+    //    return;
+    //value->CrossProduct(&other);
 }
 
 void CV8Vector3D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector* value)
 {
-    CVector other;
-    if (!info.Read(other))
-        return;
-    value->DotProduct(&other);
+//    CVector other;
+//    if (!info.Read(other))
+//        return;
+//    value->DotProduct(&other);
 }
 
 void CV8Vector3D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self, CVector* value)
@@ -46,13 +46,13 @@ void CV8Vector3D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self,
 
 bool CV8Vector3D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector* value)
 {
-    double x, y, z;
-    if (!info.Read(x, y, z))
-        return false;
-    value->fX = x;
-    value->fY = y;
-    value->fZ = z;
-    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    //double x, y, z;
+    //if (!info.Read(x, y, z))
+    //    return false;
+    //value->fX = x;
+    //value->fY = y;
+    //value->fZ = z;
+    //object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
     return true;
 }
 

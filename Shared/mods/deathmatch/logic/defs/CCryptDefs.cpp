@@ -47,12 +47,10 @@ void CCryptDefs::LoadJsFunctions()
 
     constexpr static const std::pair<const char*, void(*)(CV8FunctionCallbackBase*)> functions[]{
         {"md5", JsArgumentParser<Md5>},
-        //{"BCrypt", BCrypt}
     };
 
-    // Add functions
-    //for (const auto& [name, func] : functions)
-    //    pHashModule->AddFunction(name, func);
+    for (const auto& [name, func] : functions)
+        pHashModule->AddFunction(name, func);
 #endif
 }
 
@@ -83,7 +81,7 @@ void CCryptDefs::LoadJsFunctions()
 //#endif
 
 std::string CCryptDefs::Md5(std::string strMd5)
-    {
+{
     MD5        md5bytes;
     char       szResult[33];
     CMD5Hasher hasher;

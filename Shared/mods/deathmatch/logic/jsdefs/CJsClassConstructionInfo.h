@@ -29,12 +29,12 @@ public:
 
 private:
     template <typename Arg>
-    static constexpr Arg ReadArgument(CV8FunctionCallbackBase& args)
+    static constexpr Arg ReadArgument(CV8FunctionCallbackBase& args, int index)
     {
         if constexpr (std::is_same_v<Arg, float>)
         {
             float value;
-            if (args.ReadNumber(value))
+            if (args.ReadNumber(value, index))
             {
                 return value;
             }
@@ -47,13 +47,14 @@ private:
     }
 
     template <typename Arg, typename... Args>
-    static constexpr Arg... ReadArguments(CV8FunctionCallbackBase& args)
+    static constexpr Arg... ReadArguments(CV8FunctionCallbackBase& args, int index)
     {
+        index++;
         if constexpr (sizeof...(Args) > 0)
         {
-            return ReadArguments<Args...>(args);
+            return ReadArguments<Args...>(args, index);
         }
-        return ReadArgument<Arg>(args);
+        return ReadArgument<Arg>(args, index);
     }
 
 public:
@@ -64,7 +65,8 @@ public:
         std::function<void*(CV8FunctionCallbackBase&, void*)> constructor = [](CV8FunctionCallbackBase& args, void* ptr) {
             if constexpr (sizeof...(Ts) > 0)
             {
-                return (void*)new (ptr) T(std::forward<Ts>(ReadArguments<Ts>(args))...);
+                int index = -1;
+                return (void*)new (ptr) T(std::forward<Ts>(ReadArguments<Ts>(args, index))...);
             }
             return (void*)new (ptr) T{};
         };

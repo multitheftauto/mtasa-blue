@@ -18,6 +18,7 @@ class CV8FunctionBase;
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
+#include "js/JsBasic.h"
 #include <lua/CLuaMultiReturn.h>
 
 
@@ -141,6 +142,22 @@ struct CLuaFunctionParserBase
                 return GetUserDataClassName(lua_touserdata(L, index), L);
         }
         return "";
+    }
+
+    // Pop should remove a T from the Lua Stack after verifying that it is a valid type
+    template <typename T>
+    inline T Pop(CV8FunctionCallbackBase* JS, std::size_t& index)
+    {
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        {
+            if (JS->IsString(index))
+            {
+                std::string str;
+                JS->ReadString(str, index);
+                return str;
+            }
+        }
+        return T{};
     }
 
     // Pop should remove a T from the Lua Stack after verifying that it is a valid type
@@ -690,6 +707,31 @@ struct CLuaFunctionParser<Runtime, ErrorOnFailure, ReturnOnFailure, Func> : CLua
         }
     }
 
+    template <typename... Params>
+    inline auto Call(CV8FunctionCallbackBase* JS, Params&&... ps)
+    {
+        if (strError.length() != 0)
+        {
+            return -1;
+        }
+        if constexpr (sizeof...(Params) == sizeof...(Args))
+        {
+            if constexpr (std::is_same_v<Ret, void>)
+            {
+                Func(std::forward<Params>(ps)...);
+                return 0;
+            }
+            else
+            {
+                return PushResult(JS, Func(std::forward<Params>(ps)...));
+            }
+        }
+        else
+        {
+            return Call(JS, ps..., Pop<typename nth_element_impl<sizeof...(Params), Args...>::type>(JS, iIndex));
+        }
+    }
+
     // Tuples can be used to return multiple results
     template <typename... Ts>
     inline int PushResult(lua_State* L, const CLuaMultiReturn<Ts...>& result)
@@ -712,6 +754,14 @@ struct CLuaFunctionParser<Runtime, ErrorOnFailure, ReturnOnFailure, Func> : CLua
     inline int PushResult(lua_State* L, const T& value)
     {
         lua::Push(L, value);
+        return 1;
+    }
+
+    // JS can return only one value
+    template <typename T>
+    inline int PushResult(CV8FunctionCallbackBase* JS, const T& value)
+    {
+        js::Push(JS, value);
         return 1;
     }
 
@@ -744,6 +794,17 @@ struct CLuaFunctionParser<Runtime, ErrorOnFailure, ReturnOnFailure, Func> : CLua
         return iResult;
     }
 
-    inline CV8FunctionBase* operator()(CV8FunctionCallbackBase* JS, CScriptDebugging* pScriptDebugging) { return nullptr;
+    inline void operator()(CV8FunctionCallbackBase* JS, CScriptDebugging* pScriptDebugging)
+    {
+        iIndex--; // Js starts from 0
+
+        try
+        {
+            Call(JS);
+        }
+        catch (std::invalid_argument& e)
+        {
+            int a = 5;
+        }
     }
 };

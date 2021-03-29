@@ -21,8 +21,11 @@ class CVector2D;
 class CVector;
 class CVector4D;
 
-namespace lua
+namespace js
 {
+    inline void Push(CV8FunctionCallbackBase* JS, float value) { JS->Return(value); }
+    inline void Push(CV8FunctionCallbackBase* JS, std::string value) { JS->Return(value); }
+    inline void Push(CV8FunctionCallbackBase* JS, nullptr_t) { JS->ReturnUndefined(); }
     // PopTrival should read a simple value of type T from the stack without extra type checks
     // If whatever is at that point in the stack is not convertible to T, the behavior is undefined
     //template <typename T>
@@ -50,11 +53,6 @@ namespace lua
     //inline void Push(lua_State* L, bool value)
     //{
     //    lua_pushboolean(L, value);
-    //}
-
-    //inline void Push(lua_State* L, nullptr_t)
-    //{
-    //    lua_pushnil(L);
     //}
 
     //inline void Push(lua_State* L, const std::string& value)

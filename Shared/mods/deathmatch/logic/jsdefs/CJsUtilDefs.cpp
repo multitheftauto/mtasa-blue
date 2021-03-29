@@ -38,32 +38,32 @@ void CJsUtilDefs::GetTickCount(CV8FunctionCallbackBase* callback)
 
 void CJsUtilDefs::Print(CV8FunctionCallbackBase* callback)
 {
-    std::stringstream stream;
-    std::string       str;
-    int               count = callback->CountArguments();
-    for (int i = 0; i < count; i++)
-    {
-        if (!strcmp(callback->GetType(), "string"))
-        {
-            if (callback->ReadString(str, false))
-            {
-                stream << "\"" << str << "\"";
-            }
-        }
-        else
-        {
-            if (callback->ReadString(str, false))
-            {
-                stream << str;
-            }
-        }
-        if (i + 1 != count)
-        {
-            stream << " ";
-        }
-    }
-    printf("[%s] %s\n", *GetLocalTimeString(false), stream.str().c_str());
-    callback->Return(true);
+    //std::stringstream stream;
+    //std::string       str;
+    //int               count = callback->CountArguments();
+    //for (int i = 0; i < count; i++)
+    //{
+    //    if (!strcmp(callback->GetType(), "string"))
+    //    {
+    //        if (callback->ReadString(str, false))
+    //        {
+    //            stream << "\"" << str << "\"";
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if (callback->ReadString(str, false))
+    //        {
+    //            stream << str;
+    //        }
+    //    }
+    //    if (i + 1 != count)
+    //    {
+    //        stream << " ";
+    //    }
+    //}
+    //printf("[%s] %s\n", *GetLocalTimeString(false), stream.str().c_str());
+    //callback->Return(true);
 }
 
 #endif

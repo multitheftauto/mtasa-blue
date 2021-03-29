@@ -81,25 +81,26 @@ void CV8Matrix::MethodInvert(CV8FunctionCallback& info, Local<Object> self, CMat
 CVector CV8Matrix::MethodTransformVector(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue)
 {
     CVector vector;
-    if (!info.Read(vector))
-        return {};
-    return internalValue->TransformVector(vector);
+    return vector;
+    //if (!info.Read(vector))
+    //    return {};
+    //return internalValue->TransformVector(vector);
 }
 
 bool CV8Matrix::ConstructorCall(CV8FunctionCallback& info, Local<Object> self, CMatrix* internalValue)
 {
-    CVector position, rotation, scale;
-    if (!info.Read(position, rotation, scale))
-        return false;
+    //CVector position, rotation, scale;
+    //if (!info.Read(position, rotation, scale))
+    //    return false;
 
-    rotation.fX *= PI / 180;
-    rotation.fY *= PI / 180;
-    rotation.fZ *= PI / 180;
-    //ConvertDegreesToRadians(rotation);
-    internalValue->SetPosition(position);
-    internalValue->SetRotation(rotation);
-    internalValue->SetScale(scale);
-    self->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    //rotation.fX *= PI / 180;
+    //rotation.fY *= PI / 180;
+    //rotation.fZ *= PI / 180;
+    ////ConvertDegreesToRadians(rotation);
+    //internalValue->SetPosition(position);
+    //internalValue->SetRotation(rotation);
+    //internalValue->SetScale(scale);
+    //self->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
     return true;
 }
 

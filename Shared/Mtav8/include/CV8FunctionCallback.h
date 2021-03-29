@@ -7,72 +7,25 @@ public:
     CV8FunctionCallback(const FunctionCallbackInfo<Value>& callback);
     int CountArguments() const { return m_callback.Length(); };
     // Returns current argument index for error purpose
-    int GetArgumentIndex() const { return m_iIndex; };
     // Return true when one of "read" method failed while reading argument.
     bool     HasError() const { return bHasError; };
     Isolate* GetIsolate() const { return m_callback.GetIsolate(); };
 
-    template <typename T>
-    constexpr bool Read(T& arg)
-    {
-        if (CountArguments() == 0)
-        {
-            GetIsolate()->ThrowException(CV8Utils::ToV8String("Expected 1 argument, got 0 arguments."));
+    bool ReadString(std::string& value, int index);
+    bool ReadNumber(float& value, int index);
+    bool ReadNumber(double& value, int index);
+    //bool ReadVector(CVector2D& value);
+    //bool ReadVector(CVector& value);
+    //bool ReadVector(CVector4D& value);
 
-            return false;
-        }
-        using rawT = std::remove_reference_t<T>;
-        if constexpr (std::is_same<rawT, double>::value)
-        {
-            return ReadNumber(arg);
-        }
-        else if constexpr (std::is_same<rawT, CVector2D>::value)
-        {
-            return ReadVector(arg);
-        }
-        else if constexpr (std::is_same<rawT, CVector>::value)
-        {
-            return ReadVector(arg);
-        }
-        else if constexpr (std::is_same<rawT, CVector4D>::value)
-        {
-            return ReadVector(arg);
-        }
-        //else
-        //    static_assert(false && "Unimplemented read type");
-    }
-
-    template <typename T, typename... Ty>
-    constexpr bool Read(T& arg, Ty&... args)
-    {
-        if (1 + sizeof...(args) > CountArguments())
-        {
-            auto exception = std::string("Expected ") + std::to_string(CountArguments()) + std::string(" argument, got ") + std::to_string(1 + sizeof...(args));
-            GetIsolate()->ThrowException(CV8Utils::ToV8String(exception));
-            return false;
-        }
-        if (Read(arg))
-        {
-            if (sizeof...(args) > 0)
-            {
-                return Read(args...);
-            }
-        }
-        return true;
-    }
-
-    bool ReadString(std::string& value, bool strict = true);
-    bool ReadNumber(float&value);
-    bool ReadNumber(double& value);
-    bool ReadVector(CVector2D& value);
-    bool ReadVector(CVector& value);
-    bool ReadVector(CVector4D& value);
-
-    const char* GetType();
+    std::string GetType(int index);
+    bool IsString(int index);
 
     void Return(std::string arg);
     void Return(double arg);
+    void Return(float arg);
     void Return(bool arg);
+    void ReturnUndefined();
 
     void ReturnPromise(std::unique_ptr<CV8AsyncFunction> pAsyncFunction);
 
@@ -113,6 +66,5 @@ private:
         return false;
     }
     const FunctionCallbackInfo<Value>& m_callback;
-    mutable int                        m_iIndex = 0;
     bool                               bHasError = false;
 };

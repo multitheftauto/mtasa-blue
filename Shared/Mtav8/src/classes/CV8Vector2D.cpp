@@ -41,22 +41,23 @@ bool CV8Vector2D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self,
 
 float CV8Vector2D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector2D* value)
 {
-    CVector2D other;
-    if (!info.ReadVector(other))
-    {
-        throw std::invalid_argument("Expected vector at argument 1");
-    }
-    return value->DotProduct(other);
+    //CVector2D other;
+    //if (!info.ReadVector(other))
+    //{
+    //    throw std::invalid_argument("Expected vector at argument 1");
+    //}
+    //return value->DotProduct(other);
+    return 0;
 }
 
 bool CV8Vector2D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector2D* value)
 {
-    double x, y;
-    if (!info.Read(x, y))
-        return false;
-    value->fX = x;
-    value->fY = y;
-    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    //double x, y;
+    //if (!info.Read(x, y))
+    //    return false;
+    //value->fX = x;
+    //value->fY = y;
+    //object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
     return true;
 }
 

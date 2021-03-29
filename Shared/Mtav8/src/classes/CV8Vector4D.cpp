@@ -30,22 +30,22 @@ void CV8Vector4D::MethodNormalize(CV8FunctionCallback& info, Local<Object> self,
 
 void CV8Vector4D::MethodDotProduct(CV8FunctionCallback& info, Local<Object> self, CVector4D* value)
 {
-    CVector4D other;
-    if (!info.Read(other))
-        return;
-    value->DotProduct(other);
+    //CVector4D other;
+    //if (!info.Read(other))
+    //    return;
+    //value->DotProduct(other);
 }
 
 bool CV8Vector4D::ConstructorCall(CV8FunctionCallback& info, Local<Object> object, CVector4D* value)
 {
-    double x, y, z, w;
-    if (!info.Read(x, y, z, w))
-        return false;
-    value->fX = x;
-    value->fY = y;
-    value->fZ = z;
-    value->fW = w;
-    object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
+    //double x, y, z, w;
+    //if (!info.Read(x, y, z, w))
+    //    return false;
+    //value->fX = x;
+    //value->fY = y;
+    //value->fZ = z;
+    //value->fW = w;
+    //object->SetInternalField(EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)m_eClass));
     return true;
 }
 
