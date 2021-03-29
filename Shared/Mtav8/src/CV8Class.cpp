@@ -5,10 +5,12 @@ Handle<FunctionTemplate> CV8Class::Initialize(CV8Isolate* pIsolate)
     Isolate*                 pV8Isolate = pIsolate->GetIsolate();
     Local<Context>           pV8Context = pV8Isolate->GetCurrentContext();
     EscapableHandleScope     handleScope{pV8Isolate};
+
     Handle<FunctionTemplate> classTemplate = FunctionTemplate::New(pV8Isolate);
+    classTemplate->SetLength(m_length);
+
     SetConstructor(classTemplate);
 
-    // vector2dTemplate->SetLength(sizeof(CVector2D) / sizeof(float));
     Local<ObjectTemplate> objectTemplate = classTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(CV8::EInternalFieldPurpose::Count);
     SetAccessors(objectTemplate);
@@ -73,5 +75,7 @@ void CV8Class::SetConstructor(Handle<FunctionTemplate> objectTemplate)
 
 void CV8Class::AddAccessor(std::string name, float (*getter)(void*), void (*setter)(void*, float))
 {
+    assert(m_floatAccessors.find(name) == m_floatAccessors.end());
+    m_length++;
     m_floatAccessors[name] = {getter, setter};
 }

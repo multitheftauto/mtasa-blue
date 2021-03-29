@@ -144,6 +144,7 @@ public:
 private:
     size_t                                                m_parametersCount;
     size_t                                                m_sizeOf;
+    int                                                   m_length; // Accessor count
     std::string                                           m_name;
     uint16_t                                              m_classId;
     std::function<void*(CV8FunctionCallbackBase&, void*)> m_constructorFunc;
