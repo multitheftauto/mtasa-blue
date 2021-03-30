@@ -220,5 +220,6 @@ private:
     int                        m_bDatabaseCredentialsProtectionEnabled;
     int                        m_bFakeLagCommandEnabled;
 
-    eJsEval m_eJsEval;
+    eJsEval m_eJsEval = eJsEval::DISABLED;
+    int m_iJsExecutionTimeLimit = 2000;
 };

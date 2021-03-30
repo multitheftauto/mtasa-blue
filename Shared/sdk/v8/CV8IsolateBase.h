@@ -5,7 +5,7 @@ public:
     virtual bool GetErrorMessage(std::string& error) = 0;
     virtual bool GetMissingModulesErrorMessage(std::string& error) = 0;
 
-    virtual void SetJsEvalSetting(eJsEval value) = 0;
+    virtual void SetEvalEnabled(bool value) = 0;
 
     virtual void Evaluate() = 0;
 };

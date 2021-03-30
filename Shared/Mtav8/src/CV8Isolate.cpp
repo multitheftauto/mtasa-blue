@@ -377,23 +377,14 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
     return true;
 }
 
-void CV8Isolate::SetJsEvalSetting(eJsEval value)
+void CV8Isolate::SetEvalEnabled(bool value)
 {
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
-    m_eJsEval = value;
-    switch (m_eJsEval)
-    {
-        case eJsEval::DISABLED:
-            m_rootContext.Get(m_pIsolate)->AllowCodeGenerationFromStrings(false);
-            break;
-        case eJsEval::ACL_ALLOWED:
-            assert(false && "unimplemented eval setting");
-        default:
-            assert(false && "unimplemented eval setting");
-    }
+    m_rootContext.Get(m_pIsolate)->AllowCodeGenerationFromStrings(value);
 }
+
 void CV8Isolate::TerminateExecution()
 {
     // m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);

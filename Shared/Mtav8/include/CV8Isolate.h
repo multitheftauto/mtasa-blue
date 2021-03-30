@@ -31,7 +31,7 @@ public:
     void ReportMissingModule(std::string name);
 
     void TerminateExecution();
-    void SetJsEvalSetting(eJsEval value);
+    void        SetEvalEnabled(bool value);
     std::string GetModuleName(Local<Module> module);
 
     // May be used as a namespace for module imports. Equivalent of js "let object = {}"
@@ -116,6 +116,5 @@ private:
     int                                                       m_iRunCodeCount = 0;
 
     std::queue<std::string> modulesListName;
-    eJsEval                 m_eJsEval;
     bool                    m_bHasInitializationError = false;
 };

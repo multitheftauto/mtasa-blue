@@ -1151,7 +1151,21 @@ bool CResource::CreateJsVM()
 
     CV8Base* v8 = g_pServerInterface->GetV8();
     m_pJsVm = v8->CreateIsolate(m_strResourceName);
-    m_pJsVm->SetJsEvalSetting(g_pGame->GetConfig()->GetJsEvalSetting());
+    if (g_pGame->GetConfig()->GetJsEvalSetting() == eJsEval::ACL_ALLOWED)
+    {
+        const char* szFunctionRightName = "javascript.dangerouslyAllowEval";
+
+        CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
+        bool allowEval = pACLManager->CanObjectUseRight(m_strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, szFunctionRightName,
+                                                        CAccessControlListRight::RIGHT_TYPE_FUNCTION, false);
+    
+        m_pJsVm->SetEvalEnabled(allowEval);
+    }
+    else
+    {
+        m_pJsVm->SetEvalEnabled(false);
+    }
+
 
     return true;
 }

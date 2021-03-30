@@ -13,6 +13,8 @@ CV8::CV8()
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
 
+    // Todo, expose it in mtaserver.conf
+    // V8::SetFlagsFromString("--expose-gc --trace-opt --trace-deopt", 38);
 #if DEBUG
     V8::SetFlagsFromString("--expose-gc --trace-opt --trace-deopt", 38);
 #endif
