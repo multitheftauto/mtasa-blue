@@ -1580,6 +1580,9 @@ void CGame::AddBuiltInEvents()
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
     m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", NULL, false);
+    m_Events.AddEvent("onPlayerWeaponGiven", "weapon", NULL, false);
+    m_Events.AddEvent("onPlayerWeaponTaken", "weapon", NULL, false);
+    m_Events.AddEvent("onPlayerWeaponsTaken", "weapon", NULL, false);
 }
 
 void CGame::ProcessTrafficLights(long long llCurrentTime)
