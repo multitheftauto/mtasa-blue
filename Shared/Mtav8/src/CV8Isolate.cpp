@@ -31,7 +31,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
             return (size_t)current_heap_limit + increaseMB;
         },
         this);
-    m_pIsolate->EnableMemorySavingsMode();
+
     m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
 
     m_rootContext.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));

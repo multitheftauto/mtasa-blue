@@ -99,8 +99,32 @@ void CUtilDefs::LoadJsFunctions()
         //{"tocolor", tocolor},
     };
 
+
     for (const auto& [name, func] : functions)
         pUtilsModule->AddFunction(name, func);
+
+    CV8EnumBase* eEasingCurve = g_pServerInterface->GetV8()->CreateEnum();
+    eEasingCurve->SetValue("linear", EnumToString(CEasingCurve::eType::Linear));
+    eEasingCurve->SetValue("inQuad", EnumToString(CEasingCurve::eType::InQuad));
+    eEasingCurve->SetValue("qutQuad", EnumToString(CEasingCurve::eType::OutQuad));
+    eEasingCurve->SetValue("inOutQuad", EnumToString(CEasingCurve::eType::InOutQuad));
+    eEasingCurve->SetValue("outInQuad", EnumToString(CEasingCurve::eType::OutInQuad));
+    eEasingCurve->SetValue("inElastic", EnumToString(CEasingCurve::eType::InElastic));
+    eEasingCurve->SetValue("outElastic", EnumToString(CEasingCurve::eType::OutElastic));
+    eEasingCurve->SetValue("inOutElastic", EnumToString(CEasingCurve::eType::InOutElastic));
+    eEasingCurve->SetValue("outInElastic", EnumToString(CEasingCurve::eType::OutInElastic));
+    eEasingCurve->SetValue("inBack", EnumToString(CEasingCurve::eType::InBack));
+    eEasingCurve->SetValue("outBack", EnumToString(CEasingCurve::eType::OutBack));
+    eEasingCurve->SetValue("inOutBack", EnumToString(CEasingCurve::eType::InOutBack));
+    eEasingCurve->SetValue("outInBack", EnumToString(CEasingCurve::eType::OutInBack));
+    eEasingCurve->SetValue("inBounce", EnumToString(CEasingCurve::eType::InBounce));
+    eEasingCurve->SetValue("outBounce", EnumToString(CEasingCurve::eType::OutBounce));
+    eEasingCurve->SetValue("inOutBounce", EnumToString(CEasingCurve::eType::InOutBounce));
+    eEasingCurve->SetValue("outInBounce", EnumToString(CEasingCurve::eType::OutInBounce));
+    eEasingCurve->SetValue("sineCurve", EnumToString(CEasingCurve::eType::SineCurve));
+    eEasingCurve->SetValue("cosineCurve", EnumToString(CEasingCurve::eType::CosineCurve));
+    pUtilsModule->AddEnum("easingCurve", eEasingCurve);
+
 #endif
 }
 

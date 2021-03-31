@@ -180,6 +180,14 @@ CV8Module* CV8::GetModuleByName(std::string name)
     return nullptr;
 }
 
+CV8EnumBase* CV8::CreateEnum()
+{
+    std::unique_ptr<CV8Enum> pPtrEnum = std::make_unique<CV8Enum>();
+    CV8Enum*                 pEnum = pPtrEnum.get();
+    m_vecEnums.push_back(std::move(pPtrEnum));
+    return pEnum;
+}
+
 CV8ModuleBase* CV8::CreateModule(std::string name)
 {
     std::string moduleName(V8Config::szMtaModulePrefix);

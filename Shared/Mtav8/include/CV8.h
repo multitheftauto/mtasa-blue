@@ -1,6 +1,7 @@
 using namespace v8;
 
 class CV8Module;
+class CV8Enum;
 class CV8Isolate;
 class CV8Class;
 
@@ -25,6 +26,7 @@ public:
     void            RemoveIsolate(CV8IsolateBase* pIsolate);
 
     CV8ModuleBase* CreateModule(std::string name);
+    CV8EnumBase*   CreateEnum();
 
     CV8ClassBase* CreateClass(std::string name, size_t classId);
 
@@ -44,6 +46,7 @@ private:
     std::unique_ptr<Platform>                m_pPlatform;
     std::vector<std::unique_ptr<CV8Isolate>> m_vecIsolates;
     std::vector<std::unique_ptr<CV8Class>>   m_vecClasses;
+    std::vector<std::unique_ptr<CV8Enum>>    m_vecEnums;
 
     std::thread                              m_longExecutionGuardThread;
     std::mutex                               m_lock;
