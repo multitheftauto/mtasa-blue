@@ -55,6 +55,10 @@ void CCryptDefs::LoadJsFunctions()
 
     for (const auto& [name, func] : functions)
         pCryptModule->AddFunction(name, func);
+
+    CV8ExportObjectBase* bCrypt = g_pServerInterface->GetV8()->CreateExportObject();
+    bCrypt->AddFunction("md5", JsArgumentParser<Md5>);
+    pCryptModule->AddObject("bCrypt", bCrypt);
 #endif
 }
 

@@ -245,6 +245,11 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
             Local<Object> objectEnum = pEnum->Initialize(self, importName);
             module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(importName), objectEnum);
         }
+        for (auto const& [importName, pObject] : pModule->GetObjects())
+        {
+            Local<Object> objectEnum = pObject->Initialize(self, importName);
+            module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(importName), objectEnum);
+        }
         return True(context->GetIsolate());
     }
     return False(context->GetIsolate());

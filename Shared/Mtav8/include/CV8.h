@@ -4,6 +4,7 @@ class CV8Module;
 class CV8Enum;
 class CV8Isolate;
 class CV8Class;
+class CV8ExportObject;
 
 class CV8 : public CV8Base
 {
@@ -30,6 +31,7 @@ public:
     CV8EnumBase*   CreateEnum();
 
     CV8ClassBase* CreateClass(std::string name, size_t classId);
+    CV8ExportObjectBase* CreateExportObject();
 
     void           DoPulse();
 
@@ -48,6 +50,7 @@ private:
     std::vector<std::unique_ptr<CV8Isolate>> m_vecIsolates;
     std::vector<std::unique_ptr<CV8Class>>   m_vecClasses;
     std::vector<std::unique_ptr<CV8Enum>>    m_vecEnums;
+    std::vector<std::unique_ptr<CV8ExportObject>> m_vecObjects;
 
     std::thread                              m_longExecutionGuardThread;
     std::mutex                               m_lock;

@@ -22,6 +22,12 @@ void CV8Module::AddEnum(std::string name, CV8EnumBase* pEnum)
     m_enums[name] = (CV8Enum*)pEnum;
 }
 
+void CV8Module::AddObject(std::string name, CV8ExportObjectBase* pObject)
+{
+    assert(m_objects.find(name) == m_objects.end());
+    m_objects[name] = (CV8ExportObject*)pObject;
+}
+
 std::unordered_map<std::string, void (*)(CV8FunctionCallbackBase*)> CV8Module::GetFunctions() const
 {
     return m_mapFunctions;
@@ -32,6 +38,11 @@ std::unordered_map<std::string, CV8Enum*> CV8Module::GetEnums() const
     return m_enums;
 }
 
+std::unordered_map<std::string, CV8ExportObject*> CV8Module::GetObjects() const
+{
+    return m_objects;
+}
+
 std::vector<Local<String>> CV8Module::GetExports(Isolate* pIsolate)
 {
     std::vector<Local<String>> exports;
@@ -39,6 +50,9 @@ std::vector<Local<String>> CV8Module::GetExports(Isolate* pIsolate)
         exports.push_back(CV8Utils::ToV8String(pair.first));
 
     for (auto const& pair : m_enums)
+        exports.push_back(CV8Utils::ToV8String(pair.first));
+    
+    for (auto const& pair : m_objects)
         exports.push_back(CV8Utils::ToV8String(pair.first));
 
     return exports;

@@ -209,3 +209,11 @@ CV8ClassBase* CV8::CreateClass(std::string name, size_t classId)
     m_vecClasses.push_back(std::move(v8Class));
     return pClass;
 }
+
+CV8ExportObjectBase* CV8::CreateExportObject()
+{
+    std::unique_ptr<CV8ExportObject> v8Object = std::make_unique<CV8ExportObject>();
+    CV8ExportObject*                 pObject = v8Object.get();
+    m_vecObjects.push_back(std::move(v8Object));
+    return pObject;
+}
