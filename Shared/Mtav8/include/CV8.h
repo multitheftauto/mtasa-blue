@@ -19,6 +19,7 @@ public:
     ~CV8();
     void Shutdown();
 
+    void SetExecutionTimeLimit(int iTime) { m_iTime = iTime; }
     void EnterExecution(CV8Isolate* pIsolate);
     void ExitExecution(CV8Isolate* pIsolate);
 
@@ -55,4 +56,5 @@ private:
     std::mutex                               m_executionGuard;
     CV8Isolate*                              m_pCurrentExecutionIsolate = nullptr;
     int                                      m_pIsolateExecutionTicks = 0;
+    int                                      m_iTime = 2000;
 };

@@ -124,6 +124,7 @@ public:
     bool                        IsDatabaseCredentialsProtectionEnabled() const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
     eJsEval                     GetJsEvalSetting() const { return m_eJsEval; }
+    int                         GetJsExecutionTimeLimit() const { return m_iJsExecutionTimeLimit; }
 
     SString GetSetting(const SString& configSetting);
     bool    GetSetting(const SString& configSetting, SString& strValue);

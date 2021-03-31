@@ -70,7 +70,7 @@ void CV8::Shutdown()
 void CV8::EnterExecution(CV8Isolate* pIsolate)
 {
     std::lock_guard lock(m_executionGuard);
-    m_pIsolateExecutionTicks = 2000 / V8Config::iGuardThreadSleep;
+    m_pIsolateExecutionTicks = m_iTime / V8Config::iGuardThreadSleep;
     m_pCurrentExecutionIsolate = pIsolate;
 }
 

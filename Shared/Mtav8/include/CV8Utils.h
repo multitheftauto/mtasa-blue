@@ -65,6 +65,8 @@ public:
     static Local<String> ToV8String(std::string str);
     static Local<Number> ToV8Number(double number);
 
+    static const char* ToString(const String::Utf8Value& value);
+
     // Returns global variable, "print(name)"
     static MaybeLocal<Value> GetGlobal(const char* name);
     static MaybeLocal<Value> GetClassByName(const char* className);

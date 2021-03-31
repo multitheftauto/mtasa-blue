@@ -74,37 +74,56 @@ void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
         new CMicrotask(microtask, this));
 }
 
+
 void CV8Isolate::ReportException(TryCatch* pTryCatch)
 {
-    HandleScope handle_scope(m_pIsolate);
+    v8::HandleScope        handle_scope(m_pIsolate);
 
     if (pTryCatch->HasTerminated())
     {
         printf("%s: Long execution has been termianted.\n", m_strOriginResource.c_str());
         return;
     }
-    String::Utf8Value utf8(m_pIsolate, pTryCatch->Exception());
-    Local<Message>    message = pTryCatch->Message();
-    if (!message.IsEmpty())
+
+    v8::String::Utf8Value  exception(m_pIsolate, pTryCatch->Exception());
+    const char*            exception_string = CV8Utils::ToString(exception);
+    v8::Local<v8::Message> message = pTryCatch->Message();
+    if (message.IsEmpty())
     {
-        int line = message->GetLineNumber(m_pIsolate->GetCurrentContext()).FromJust();
-        int column = message->GetEndColumn(m_pIsolate->GetCurrentContext()).FromJust();
-        printf("%s: '%s' at %i:%i\n", m_strOriginResource.c_str(), *utf8, line, column);
+        // V8 didn't provide any extra information about this error; just
+        // print the exception.
+        fprintf(stderr, "%s\n", exception_string);
     }
     else
     {
-        printf("%s: '%s'\n", m_strOriginResource.c_str(), *utf8);
-    }
-    Local<Value> stackTraceStringV8;
-    if (pTryCatch->StackTrace(m_pIsolate->GetCurrentContext()).ToLocal(&stackTraceStringV8))
-    {
-        if (stackTraceStringV8->IsString() && Local<String>::Cast(stackTraceStringV8)->Length() > 0)
+        v8::String::Utf8Value  filename(m_pIsolate, message->GetScriptOrigin().ResourceName());
+        v8::Local<v8::Context> context(m_pIsolate->GetCurrentContext());
+        const char*            filename_string = CV8Utils::ToString(filename);
+        int                    linenum = message->GetLineNumber(context).FromJust();
+        v8::Local<v8::Value>   stack_trace_string;
+        if (pTryCatch->StackTrace(context).ToLocal(&stack_trace_string) && stack_trace_string->IsString() && stack_trace_string.As<v8::String>()->Length() > 0)
         {
-            String::Utf8Value stackTrace(m_pIsolate, stackTraceStringV8);
-            std::string       strStackTrace = std::string(*stackTrace);
-            strStackTrace.erase(0, strStackTrace.find("\n") + 1);
-            printf("%s\n", strStackTrace.c_str());
+            v8::String::Utf8Value stack_trace(m_pIsolate, stack_trace_string);
+            const char*           stack_trace_string = CV8Utils::ToString(stack_trace);
+            fprintf(stderr, "%s\n", stack_trace_string);
         }
+
+        // Print line of source code.
+        v8::String::Utf8Value sourceline(m_pIsolate, message->GetSourceLine(context).ToLocalChecked());
+        const char*           sourceline_string = CV8Utils::ToString(sourceline);
+        fprintf(stderr, "\n%s\n", sourceline_string);
+        // Print wavy underline (GetUnderline is deprecated).
+        int start = message->GetStartColumn(context).FromJust();
+        for (int i = 0; i < start; i++)
+        {
+            fprintf(stderr, " ");
+        }
+        int end = message->GetEndColumn(context).FromJust();
+        for (int i = start; i < end; i++)
+        {
+            fprintf(stderr, "^");
+        }
+        fprintf(stderr, "\n");
     }
 }
 
@@ -216,10 +235,15 @@ MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Lo
     modulesListName.pop();
     if (pModule)
     {
-        for (auto const& [import, callback] : pModule->GetFunctions())
+        for (auto const& [importName, callback] : pModule->GetFunctions())
         {
             Local<Function> function = CreateFunction(callback);
-            module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(import), function);
+            module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(importName), function);
+        }
+        for (auto const& [importName, pEnum] : pModule->GetEnums())
+        {
+            Local<Object> objectEnum = pEnum->Initialize(self, importName);
+            module->SetSyntheticModuleExport(context->GetIsolate(), CV8Utils::ToV8String(importName), objectEnum);
         }
         return True(context->GetIsolate());
     }
@@ -387,7 +411,15 @@ void CV8Isolate::SetEvalEnabled(bool value)
 
 void CV8Isolate::TerminateExecution()
 {
-    // m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
+    m_pIsolate->RequestInterrupt(
+        [](Isolate* isolate, void* data) {
+            isolate->TerminateExecution();
+            //isolate->ThrowException(CV8Utils::ToV8String("Error"));
+            /*isolate->ThrowException(CV8Utils::ToV8String("Error"));
+            isolate->*/
+            //isolate->CancelTerminateExecution();
+        },
+        nullptr);
 }
 
 Local<Object> CV8Isolate::CreateGlobalObject(std::string mapName)
@@ -443,17 +475,16 @@ void CV8Isolate::Evaluate()
     for (std::string moduleName : m_loadingOrder)
     {
         auto const&   pair = m_mapScriptModules[moduleName];
-        Execution     execution(this);
-        TryCatch      evaluateTryCatch(m_pIsolate);
         Local<Module> module = pair.Get(m_pIsolate);
         auto          st = module->GetStatus();
         if (Module::Status::kInstantiated == module->GetStatus())
         {
+            TryCatch      evaluateTryCatch(m_pIsolate);
+            Execution    execution(this);
             Local<Value> val; // value returned by loaded script.
             if (!module->Evaluate(m_rootContext.Get(m_pIsolate)).ToLocal(&val))
             {
                 ReportException(&evaluateTryCatch);
-                continue;
             }
         }
     }

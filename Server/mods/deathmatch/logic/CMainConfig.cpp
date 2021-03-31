@@ -532,10 +532,16 @@ bool CMainConfig::Load()
         }
         if (pChildNode = pNode->FindSubNode("execution_time_limit"))
         {
-            GetInteger(pChildNode, "execution_time_limit", iInt);
+            iInt = 0;
+            pChildNode->GetTagContent(iInt);
+
             iInt = Clamp(200, iInt, 1000 * 60 * 30); // Maybe add a warning if value is greater than 30 seconds??
             m_iJsExecutionTimeLimit = iInt;
         }
+
+        
+        CV8Base* v8 = g_pServerInterface->GetV8();
+        v8->SetExecutionTimeLimit(m_iJsExecutionTimeLimit);
 
     }
 

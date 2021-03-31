@@ -6,6 +6,7 @@
 #include "CV8ModuleBase.h"
 #include "CV8ClassBase.h"
 #include "CV8ObjectBase.h"
+#include "CV8EnumBase.h"
 
 class CV8Base
 {
@@ -14,6 +15,7 @@ public:
     virtual void            RemoveIsolate(CV8IsolateBase* pIsolate) = 0;
 
     virtual CV8ModuleBase* CreateModule(std::string name) = 0;
+    virtual CV8EnumBase* CreateEnum() = 0;
 
     virtual CV8ClassBase* CreateClass(std::string name, size_t classId) = 0;
 
@@ -21,4 +23,6 @@ public:
     virtual void Shutdown() = 0;
 
     virtual std::vector<CV8IsolateBase*> GetIsolates() = 0;
+
+    virtual void SetExecutionTimeLimit(int iTime) = 0;
 };

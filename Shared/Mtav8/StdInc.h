@@ -30,6 +30,7 @@ class CV8Class;
 #include "include/CV8FunctionCallback.h"
 #include "include/CV8Class.h"
 #include "include/CV8Object.h"
+#include "include/CV8Enum.h"
 
 #include "async/CV8Delegate.h"
 #include "async/CV8AsyncFunction.h"

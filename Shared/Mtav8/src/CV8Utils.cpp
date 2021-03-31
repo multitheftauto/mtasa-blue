@@ -50,3 +50,8 @@ MaybeLocal<Value> CV8Utils::GetClassByName(const char* className)
 
     return handleScope.EscapeMaybe(MaybeLocal<Value>());
 }
+
+const char* CV8Utils::ToString(const v8::String::Utf8Value& value)
+{
+    return *value ? *value : "<string conversion failed>";
+}
