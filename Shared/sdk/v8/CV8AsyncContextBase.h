@@ -1,6 +1,4 @@
-#pragma once
-
-class CV8DelegateBase
+class CV8AsyncContextBase
 {
 public:
     virtual void Resolve(std::string value) = 0;

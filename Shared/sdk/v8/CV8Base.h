@@ -7,6 +7,7 @@
 #include "CV8ClassBase.h"
 #include "CV8ExportObjectBase.h"
 #include "CV8EnumBase.h"
+#include "CV8AsyncContextBase.h"
 
 class CV8Base
 {

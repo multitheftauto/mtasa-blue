@@ -12,12 +12,14 @@
 #pragma once
 
 class CV8FunctionCallbackBase;
+class CV8AsyncContextBase;
 class CV8FunctionBase;
+
+typedef std::function<void(CV8AsyncContextBase*)> Promise;
 
 class CJsDefs : CDefs
 {
 public:
-    
     // hard error on usage mistakes
     template <auto T>
     static inline void JsArgumentParser(CV8FunctionCallbackBase* Js)

@@ -1,3 +1,5 @@
+class CV8AsyncContextBase;
+
 class CV8FunctionCallbackBase
 {
 public:
@@ -18,5 +20,5 @@ public:
     virtual void Return(bool arg) = 0;
     virtual void ReturnUndefined() = 0;
 
-    virtual void ReturnPromise(std::unique_ptr<class CV8AsyncFunction> pAsyncFunction) = 0;
+    virtual void ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncFunction) = 0;
 };

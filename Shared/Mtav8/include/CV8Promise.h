@@ -1,13 +1,13 @@
 using namespace v8;
 
+class CV8AsyncFunction;
 typedef Persistent<Promise::Resolver> PersistentResolver;
 typedef Persistent<Context>           PersistentContext;
-class CV8AsyncFunction;
 
 class CV8Promise : public CV8PromiseBase, public Task
 {
 public:
-    CV8Promise(CV8Isolate* pIsolate, std::unique_ptr<CV8AsyncFunction> pAsyncFunction);
+    CV8Promise(CV8Isolate* pIsolate, std::function<void(CV8AsyncContextBase*)> pFunctionAsyncCallback);
     ~CV8Promise();
 
     void           Resolve(std::string arg);
@@ -17,10 +17,10 @@ public:
 private:
     void Resolve(Local<Value> value);
 
-    CV8Isolate*                       m_pIsolate;
-    PersistentContext                 m_pContext;
-    PersistentResolver                m_promiseResolver;
-    std::unique_ptr<CV8AsyncFunction> m_pAsyncFunction;
-    bool                              bHasResult = false;
-    std::mutex                        m_lock;
+    CV8Isolate*                               m_pIsolate;
+    PersistentContext                         m_pContext;
+    PersistentResolver                        m_promiseResolver;
+    std::function<void(CV8AsyncContextBase*)> m_pFunctionAsyncCallback;
+    bool                                      bHasResult = false;
+    std::mutex                                m_lock;
 };

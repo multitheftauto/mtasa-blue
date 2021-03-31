@@ -11,9 +11,6 @@
 #include <SharedUtil.Crypto.h>
 #include <lua/CLuaFunctionParser.h>
 
-#include "./../Shared/Mtav8/include/async/functions/CV8InlineAsyncFunction.h"
-#include "./../Shared/Mtav8/include/async/functions/CV8PasswordHash.h"
-
 #ifndef MTA_CLIENT
     #include <core/CServerInterface.h>
     extern CServerInterface* g_pServerInterface;
@@ -51,6 +48,7 @@ void CCryptDefs::LoadJsFunctions()
         {"teaEncode", JsArgumentParser<TeaEncode>},
         {"base64encode", JsArgumentParser<Base64encode>},
         {"base64decode", JsArgumentParser<Base64decode>},
+        {"testAsync", JsArgumentParser<TestAsync>},
     };
 
     for (const auto& [name, func] : functions)
@@ -117,6 +115,13 @@ std::string CCryptDefs::TeaDecode(std::string str, std::string key)
 std::string CCryptDefs::Base64encode(std::string str)
 {
     return SharedUtil::Base64encode(str);
+}
+
+Promise CCryptDefs::TestAsync(std::string str)
+{
+    return [str](CV8AsyncContextBase* asyncContext) {
+        asyncContext->Resolve("foo: " + str);
+    };
 }
 
 std::string CCryptDefs::Base64decode(std::string str)

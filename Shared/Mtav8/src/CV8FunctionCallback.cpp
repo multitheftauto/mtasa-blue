@@ -82,7 +82,7 @@ bool CV8FunctionCallback::ReadNumber(double& value, int index)
     return false;
 }
 //
-//bool CV8FunctionCallback::ReadVector(CVector& value)
+// bool CV8FunctionCallback::ReadVector(CVector& value)
 //{
 //    if (m_callback.Length() > m_iIndex)
 //    {
@@ -96,7 +96,7 @@ bool CV8FunctionCallback::ReadNumber(double& value, int index)
 //    return false;
 //}
 //
-//bool CV8FunctionCallback::ReadVector(CVector2D& value)
+// bool CV8FunctionCallback::ReadVector(CVector2D& value)
 //{
 //    if (m_callback.Length() > m_iIndex)
 //    {
@@ -110,7 +110,7 @@ bool CV8FunctionCallback::ReadNumber(double& value, int index)
 //    return false;
 //}
 //
-//bool CV8FunctionCallback::ReadVector(CVector4D& value)
+// bool CV8FunctionCallback::ReadVector(CVector4D& value)
 //{
 //    if (m_callback.Length() > m_iIndex)
 //    {
@@ -152,10 +152,10 @@ void CV8FunctionCallback::ReturnUndefined()
     m_callback.GetReturnValue().SetUndefined();
 }
 
-void CV8FunctionCallback::ReturnPromise(std::unique_ptr<CV8AsyncFunction> pAsyncFunction)
+void CV8FunctionCallback::ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncContext)
 {
     CV8Isolate*                 pIsolate = (CV8Isolate*)m_callback.GetIsolate()->GetData(0);
-    std::unique_ptr<CV8Promise> pPromise = std::make_unique<CV8Promise>(pIsolate, std::move(pAsyncFunction));
+    std::unique_ptr<CV8Promise> pPromise = std::make_unique<CV8Promise>(pIsolate, pAsyncContext);
     Local<Promise>              promise = pPromise->GetPromise();
     pIsolate->AddPromise(std::move(pPromise));
     m_callback.GetReturnValue().Set(promise);

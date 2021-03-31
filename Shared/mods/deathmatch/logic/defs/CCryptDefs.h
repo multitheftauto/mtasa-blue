@@ -33,4 +33,6 @@ public:
     LUA_DECLARE(PasswordVerify);
     LUA_DECLARE(EncodeString);
     LUA_DECLARE(DecodeString);
+
+    static Promise CCryptDefs::TestAsync(std::string str);
 };

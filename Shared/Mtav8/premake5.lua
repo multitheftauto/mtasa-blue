@@ -10,18 +10,14 @@ project "Mtav8"
 
 	vpaths { 
 		["Headers"] = "include/*.h",
-		["Headers/Async"] = "include/async/*.h",
 		["Sources"] = "src/*.cpp",
-		["Sources/Async"] = "src/async/*.cpp",
 		["*"] = {"premake5.lua", "StdInc.h", "StdInc.cpp"}
 	}
 	
 	files {
 		"premake5.lua",
 		"src/*.cpp",
-		"src/async/*.cpp",
 		"include/*.h",
-		"include/async/*.h",
 		"v8/**.h",
 		"**.hpp",
 		

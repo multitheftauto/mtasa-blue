@@ -58,6 +58,7 @@ void CV8Isolate::InitClasses()
 
 void CV8Isolate::DoPulse()
 {
+    Locker      lock(m_pIsolate);
     HandleScope handleScope(m_pIsolate);
     m_pIsolate->PerformMicrotaskCheckpoint();
 }
@@ -462,6 +463,7 @@ Local<Function> CV8Isolate::CreateFunction(void (*callback)(CV8FunctionCallbackB
 
 void CV8Isolate::Evaluate()
 {
+    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
@@ -499,6 +501,7 @@ void CV8Isolate::Evaluate()
 
 CV8Isolate::~CV8Isolate()
 {
+    Locker lock(m_pIsolate);
     {
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);

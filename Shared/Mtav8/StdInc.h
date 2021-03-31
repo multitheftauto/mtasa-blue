@@ -1,6 +1,5 @@
 #define PI (3.14159265358979323846f)
 
-class CV8Delegate;
 class CV8Class;
 
 #include <stdio.h>
@@ -31,6 +30,4 @@ class CV8Class;
 #include "include/CV8Class.h"
 #include "include/CV8ExportObject.h"
 #include "include/CV8Enum.h"
-
-#include "async/CV8Delegate.h"
-#include "async/CV8AsyncFunction.h"
+#include "include/CV8AsyncContext.h"

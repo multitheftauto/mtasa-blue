@@ -29,7 +29,7 @@ public:
     void Return(bool arg);
     void ReturnUndefined();
 
-    void ReturnPromise(std::unique_ptr<CV8AsyncFunction> pAsyncFunction);
+    void ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncFunction);
 
 private:
     const FunctionCallbackInfo<Value>& m_callback;
