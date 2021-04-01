@@ -281,9 +281,9 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ShowChat(bool bShow)
+bool CStaticFunctionDefinitions::ShowChat(bool bShow, bool bInputBlocked)
 {
-    g_pCore->SetChatVisible(bShow);
+    g_pCore->SetChatVisible(bShow, bInputBlocked);
     return true;
 }
 

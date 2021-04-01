@@ -438,11 +438,11 @@ void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned cha
     }
 }
 
-void CCore::SetChatVisible(bool bVisible)
+void CCore::SetChatVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible(bVisible);
+        m_pLocalGUI->SetChatBoxVisible(bVisible, bInputBlocked);
     }
 }
 

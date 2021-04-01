@@ -69,7 +69,7 @@ public:
     bool       IsMainMenuVisible();
 
     CChat* GetChat();
-    void   SetChatBoxVisible(bool bVisible);
+    void   SetChatBoxVisible(bool bVisible, bool bInputBlocked = true);
     bool   IsChatBoxVisible();
     void   SetChatBoxInputEnabled(bool bInputEnabled);
     bool   IsChatBoxInputEnabled();

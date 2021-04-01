@@ -40,7 +40,7 @@ public:
     // Output funcs
     static bool OutputConsole(const char* szText);
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
-    static bool ShowChat(bool bShow);
+    static bool ShowChat(bool bShow, bool bInputBlocked);
     static bool SetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();

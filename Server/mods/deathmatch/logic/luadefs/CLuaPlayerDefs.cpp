@@ -2053,14 +2053,16 @@ int CLuaPlayerDefs::ShowChat(lua_State* luaVM)
 {
     CElement* pPlayer;
     bool      bShow;
+    bool      bInputBlocked;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
     argStream.ReadBool(bShow);
+    argStream.ReadBool(bInputBlocked, true);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::ShowChat(pPlayer, bShow))
+        if (CStaticFunctionDefinitions::ShowChat(pPlayer, bShow, bInputBlocked))
         {
             lua_pushboolean(luaVM, true);
             return 1;

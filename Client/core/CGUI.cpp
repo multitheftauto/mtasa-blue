@@ -455,12 +455,12 @@ CDebugView* CLocalGUI::GetDebugView()
     return m_pDebugView;
 }
 
-void CLocalGUI::SetChatBoxVisible(bool bVisible)
+void CLocalGUI::SetChatBoxVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pChat)
     {
-        if (m_pChat->IsVisible() != bVisible)
-            m_pChat->SetVisible(bVisible);
+        if (m_pChat->IsVisible() != bVisible || (!bVisible && m_pChat->IsInputBlocked() != bInputBlocked))
+            m_pChat->SetVisible(bVisible, bInputBlocked);
         m_bChatboxVisible = bVisible;
     }
 }
@@ -505,7 +505,7 @@ bool CLocalGUI::IsChatBoxInputEnabled()
 {
     if (m_pChat)
     {
-        return m_pChat->IsInputVisible() && m_bChatboxVisible;
+        return m_pChat->IsInputVisible() && !m_pChat->IsInputBlocked();
     }
     return false;
 }

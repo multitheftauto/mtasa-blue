@@ -729,7 +729,7 @@ public:
     static bool ShowCursor(CElement* pElement, CLuaMain* pLuaMain, bool bShow, bool bToggleControls);
 
     // Chat funcs
-    static bool ShowChat(CElement* pElement, bool bShow);
+    static bool ShowChat(CElement* pElement, bool bShow, bool bInputBlocked);
 
     // Misc funcs
     static bool ResetMapInfo(CElement* pElement);
