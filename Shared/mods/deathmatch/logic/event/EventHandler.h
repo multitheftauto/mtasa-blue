@@ -52,8 +52,6 @@ struct EventHandler
 
     const auto& GetPriority() const { return m_priority; }
 
-    bool CanBeCalled() const;
-
     void operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client) const;
     //bool CanBeCalled() const { return !IsBeingDeleted(); }  TODO: Add check if m_fn is valid (VERIFY_FUNCTION)
 protected:

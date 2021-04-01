@@ -45,14 +45,13 @@ EventHandler::Priority::Priority(std::string_view value)
 
 void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client) const
 {
-    using namespace std::chrono;
-    using namespace std::chrono_literals;
-    using namespace std::string_view_literals;
-
     if (!m_lmain)
         return;
 
-    const auto begin = high_resolution_clock::now();
+    if (!m_handlesPropagated && source != us)
+        return;
+
+    const auto beginTimeUS = GetTimeUs();
 
     //if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName().c_str(), args, source, client, nullptr)) // TODO
         //return;
@@ -112,10 +111,6 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
             lua_unref(L, ref);
         }
     }
-}
 
-bool EventHandler::CanBeCalled() const
-{
-    return true; // TODO call VERIFY_FUNCTION here
+    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, event.GetName().c_str(), GetTimeUs() - beginTimeUS);
 }
-
