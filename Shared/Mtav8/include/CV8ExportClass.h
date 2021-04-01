@@ -20,7 +20,7 @@ private:
     void*          m_pExternalData;
 };
 
-class CV8Class : public CV8ClassBase
+class CV8Class : public CV8ExportClassBase
 {
 public:
     CV8Class(std::string name, uint16_t classId) : m_name(name), m_classId(classId) {}

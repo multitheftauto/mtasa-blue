@@ -1,7 +1,7 @@
-class CV8Enum : public CV8EnumBase
+class CV8ExportEnum : public CV8ExportEnumBase
 {
 public:
-    CV8Enum();
+    CV8ExportEnum();
 
     Local<Object> Initialize(CV8Isolate* pIsolate, std::string name);
     void          SetValue(std::string key, std::string value);

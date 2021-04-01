@@ -1,7 +1,7 @@
 #pragma once
 
 // Don't use directly, use `CJsClassConstructionInfo` in scope variant.
-class CV8ClassBase
+class CV8ExportClassBase
 {
 public:
     virtual void SetParametersCount(size_t count) = 0;

@@ -188,10 +188,10 @@ CV8Module* CV8::GetModuleByName(std::string name)
     return nullptr;
 }
 
-CV8EnumBase* CV8::CreateEnum()
+CV8ExportEnumBase* CV8::CreateEnum()
 {
-    std::unique_ptr<CV8Enum> pPtrEnum = std::make_unique<CV8Enum>();
-    CV8Enum*                 pEnum = pPtrEnum.get();
+    std::unique_ptr<CV8ExportEnum> pPtrEnum = std::make_unique<CV8ExportEnum>();
+    CV8ExportEnum*                 pEnum = pPtrEnum.get();
     m_vecEnums.push_back(std::move(pPtrEnum));
     return pEnum;
 }
@@ -210,7 +210,7 @@ CV8ModuleBase* CV8::CreateModule(std::string name)
     return pModule;
 }
 
-CV8ClassBase* CV8::CreateClass(std::string name, size_t classId)
+CV8ExportClassBase* CV8::CreateClass(std::string name, size_t classId)
 {
     std::unique_ptr<CV8Class> v8Class = std::make_unique<CV8Class>(name, classId);
     CV8Class*                 pClass = v8Class.get();

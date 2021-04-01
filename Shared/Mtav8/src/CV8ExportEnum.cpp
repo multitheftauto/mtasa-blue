@@ -1,16 +1,16 @@
 #include "StdInc.h"
 
-CV8Enum::CV8Enum()
+CV8ExportEnum::CV8ExportEnum()
 {
 }
 
-void CV8Enum::SetValue(std::string key, std::string value)
+void CV8ExportEnum::SetValue(std::string key, std::string value)
 {
     assert(m_stringKeys.find(key) == m_stringKeys.end() && "Duplicated enum key");
     m_stringKeys.insert({key, value});
 }
 
-Local<Object> CV8Enum::Initialize(CV8Isolate* pV8Isolate, std::string name)
+Local<Object> CV8ExportEnum::Initialize(CV8Isolate* pV8Isolate, std::string name)
 {
     Isolate*       pIsolate = pV8Isolate->GetIsolate();
     Local<Context> context = pIsolate->GetCurrentContext();

@@ -16,10 +16,10 @@ void CV8Module::AddFunction(std::string name, void (*callback)(CV8FunctionCallba
     m_mapFunctions[name] = callback;
 }
 
-void CV8Module::AddEnum(std::string name, CV8EnumBase* pEnum)
+void CV8Module::AddEnum(std::string name, CV8ExportEnumBase* pEnum)
 {
     assert(m_mapFunctions.find(name) == m_mapFunctions.end());
-    m_enums[name] = (CV8Enum*)pEnum;
+    m_enums[name] = (CV8ExportEnum*)pEnum;
 }
 
 void CV8Module::AddObject(std::string name, CV8ExportObjectBase* pObject)
@@ -33,7 +33,7 @@ std::unordered_map<std::string, void (*)(CV8FunctionCallbackBase*)> CV8Module::G
     return m_mapFunctions;
 }
 
-std::unordered_map<std::string, CV8Enum*> CV8Module::GetEnums() const
+std::unordered_map<std::string, CV8ExportEnum*> CV8Module::GetEnums() const
 {
     return m_enums;
 }

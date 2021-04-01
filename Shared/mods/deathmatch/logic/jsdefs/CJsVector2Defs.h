@@ -20,6 +20,6 @@ class CJsVector2Defs : public CJsDefs
 public:
     static void AddClass();
 
-    static CV8ClassBase* m_jsClass;
+    static CV8ExportClassBase* m_jsClass;
     static CJsClassConstructionInfo<CVector2D>* m_constructionInfo;
 };

@@ -103,7 +103,7 @@ void CUtilDefs::LoadJsFunctions()
     for (const auto& [name, func] : functions)
         pUtilsModule->AddFunction(name, func);
 
-    CV8EnumBase* eEasingCurve = g_pServerInterface->GetV8()->CreateEnum();
+    CV8ExportEnumBase* eEasingCurve = g_pServerInterface->GetV8()->CreateEnum();
     eEasingCurve->SetValue("linear", EnumToString(CEasingCurve::eType::Linear));
     eEasingCurve->SetValue("inQuad", EnumToString(CEasingCurve::eType::InQuad));
     eEasingCurve->SetValue("qutQuad", EnumToString(CEasingCurve::eType::OutQuad));

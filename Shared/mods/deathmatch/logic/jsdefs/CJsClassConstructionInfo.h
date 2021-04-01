@@ -91,6 +91,6 @@ public:
         int       c = 5;*/
     }
 
-    CV8ClassBase*    v8Class;
+    CV8ExportClassBase*    v8Class;
     EClass  classId;
 };
