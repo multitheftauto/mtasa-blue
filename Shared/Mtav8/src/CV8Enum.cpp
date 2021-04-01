@@ -12,11 +12,11 @@ void CV8Enum::SetValue(std::string key, std::string value)
 
 Local<Object> CV8Enum::Initialize(CV8Isolate* pV8Isolate, std::string name)
 {
-    Isolate*             pIsolate = pV8Isolate->GetIsolate();
-    Local<Context>       context = pIsolate->GetCurrentContext();
+    Isolate*       pIsolate = pV8Isolate->GetIsolate();
+    Local<Context> context = pIsolate->GetCurrentContext();
 
-    EscapableHandleScope handleScope{pIsolate};
-    Context::Scope   context_scope(context);
+    EscapableHandleScope  handleScope{pIsolate};
+    Context::Scope        context_scope(context);
     Local<ObjectTemplate> object = ObjectTemplate::New(pIsolate);
     object->Set(Symbol::GetToStringTag(pV8Isolate->GetIsolate()), CV8Utils::ToV8String(name));
 

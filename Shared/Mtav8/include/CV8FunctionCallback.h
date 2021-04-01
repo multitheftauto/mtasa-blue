@@ -16,13 +16,13 @@ public:
 
     bool ReadNumber(float& value, int index);
     bool ReadNumber(double& value, int index);
-    //bool ReadVector(CVector2D& value);
-    //bool ReadVector(CVector& value);
-    //bool ReadVector(CVector4D& value);
+    // bool ReadVector(CVector2D& value);
+    // bool ReadVector(CVector& value);
+    // bool ReadVector(CVector4D& value);
 
     std::string GetType(int index);
-    bool IsString(int index);
-    bool IsNumber(int index);
+    bool        IsString(int index);
+    bool        IsNumber(int index);
 
     void Return(std::string arg);
     void Return(double arg);

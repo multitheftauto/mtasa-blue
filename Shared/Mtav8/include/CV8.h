@@ -18,6 +18,7 @@ public:
 
     CV8();
     ~CV8();
+    void Initialize(int iThreadPool);
     void Shutdown();
 
     void SetExecutionTimeLimit(int iTime) { m_iTime = iTime; }
@@ -30,10 +31,10 @@ public:
     CV8ModuleBase* CreateModule(std::string name);
     CV8EnumBase*   CreateEnum();
 
-    CV8ClassBase* CreateClass(std::string name, size_t classId);
+    CV8ClassBase*        CreateClass(std::string name, size_t classId);
     CV8ExportObjectBase* CreateExportObject();
 
-    void           DoPulse();
+    void DoPulse();
 
     static Local<Module>         GetDummyModule(Isolate* pIsolate);
     static void                  RegisterAllModules(CV8Isolate* pIsolate);
@@ -46,18 +47,18 @@ public:
     static std::unordered_map<std::string, std::unique_ptr<CV8Module>> m_mapModules;
 
 private:
-    std::unique_ptr<Platform>                m_pPlatform;
-    std::vector<std::unique_ptr<CV8Isolate>> m_vecIsolates;
-    std::vector<std::unique_ptr<CV8Class>>   m_vecClasses;
-    std::vector<std::unique_ptr<CV8Enum>>    m_vecEnums;
+    std::unique_ptr<Platform>                     m_pPlatform;
+    std::vector<std::unique_ptr<CV8Isolate>>      m_vecIsolates;
+    std::vector<std::unique_ptr<CV8Class>>        m_vecClasses;
+    std::vector<std::unique_ptr<CV8Enum>>         m_vecEnums;
     std::vector<std::unique_ptr<CV8ExportObject>> m_vecObjects;
 
-    std::thread                              m_longExecutionGuardThread;
-    std::mutex                               m_lock;
-    bool                                     m_bDisposing = false;
+    std::thread m_longExecutionGuardThread;
+    std::mutex  m_lock;
+    bool        m_bDisposing = false;
 
-    std::mutex                               m_executionGuard;
-    CV8Isolate*                              m_pCurrentExecutionIsolate = nullptr;
-    int                                      m_pIsolateExecutionTicks = 0;
-    int                                      m_iTime = 2000;
+    std::mutex  m_executionGuard;
+    CV8Isolate* m_pCurrentExecutionIsolate = nullptr;
+    int         m_pIsolateExecutionTicks = 0;
+    int         m_iTime = 2000;
 };

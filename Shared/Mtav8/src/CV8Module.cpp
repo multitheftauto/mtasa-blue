@@ -51,7 +51,7 @@ std::vector<Local<String>> CV8Module::GetExports(Isolate* pIsolate)
 
     for (auto const& pair : m_enums)
         exports.push_back(CV8Utils::ToV8String(pair.first));
-    
+
     for (auto const& pair : m_objects)
         exports.push_back(CV8Utils::ToV8String(pair.first));
 

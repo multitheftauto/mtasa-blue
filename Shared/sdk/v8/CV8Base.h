@@ -15,13 +15,14 @@ public:
     virtual CV8IsolateBase* CreateIsolate(std::string originResource) = 0;
     virtual void            RemoveIsolate(CV8IsolateBase* pIsolate) = 0;
 
-    virtual CV8ModuleBase* CreateModule(std::string name) = 0;
-    virtual CV8EnumBase*   CreateEnum() = 0;
+    virtual CV8ModuleBase*       CreateModule(std::string name) = 0;
+    virtual CV8EnumBase*         CreateEnum() = 0;
     virtual CV8ExportObjectBase* CreateExportObject() = 0;
 
     virtual CV8ClassBase* CreateClass(std::string name, size_t classId) = 0;
 
     virtual void DoPulse() = 0;
+    virtual void Initialize(int iThreadPool) = 0;
     virtual void Shutdown() = 0;
 
     virtual std::vector<CV8IsolateBase*> GetIsolates() = 0;

@@ -2,7 +2,6 @@
 
 CV8ExportObject::CV8ExportObject()
 {
-
 }
 
 void CV8ExportObject::AddFunction(std::string name, void (*callback)(CV8FunctionCallbackBase*))

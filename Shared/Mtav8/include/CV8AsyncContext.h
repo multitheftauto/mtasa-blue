@@ -13,7 +13,7 @@ public:
     bool HasResult() const { return hasResult; }
 
 private:
-    CV8Promise* m_pPromise;
+    CV8Promise*                                   m_pPromise;
     std::shared_ptr<CV8Isolate::CancelationToken> m_pCancelationToken;
-    bool        hasResult = false;
+    bool                                          hasResult = false;
 };

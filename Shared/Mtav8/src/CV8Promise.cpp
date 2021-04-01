@@ -6,8 +6,8 @@ using namespace v8;
 CV8Promise::CV8Promise(CV8Isolate* pIsolate, std::function<void(CV8AsyncContextBase*)> pFunctionAsyncCallback)
     : m_pIsolate(pIsolate), m_pFunctionAsyncCallback(pFunctionAsyncCallback)
 {
-    Isolate* isolate = pIsolate->GetIsolate();
-    Local<Promise::Resolver>    promiseResolver = Promise::Resolver::New(isolate->GetCurrentContext()).ToLocalChecked();
+    Isolate*                 isolate = pIsolate->GetIsolate();
+    Local<Promise::Resolver> promiseResolver = Promise::Resolver::New(isolate->GetCurrentContext()).ToLocalChecked();
     m_promiseResolver.Reset(isolate, promiseResolver);
     m_pContext.Reset(isolate, isolate->GetCurrentContext());
 }
@@ -28,7 +28,7 @@ void CV8Promise::Run()
 {
     bool pending = false;
     {
-        Locker lock(m_pIsolate->GetIsolate());
+        Locker         lock(m_pIsolate->GetIsolate());
         Isolate::Scope scope(m_pIsolate->GetIsolate());
         HandleScope    handleScope(m_pIsolate->GetIsolate());
 
@@ -47,9 +47,9 @@ void CV8Promise::Run()
 
 bool CV8Promise::IsPending()
 {
-    Locker                   lock(m_pIsolate->GetIsolate());
-    Isolate::Scope           scope(m_pIsolate->GetIsolate());
-    HandleScope              handleScope(m_pIsolate->GetIsolate());
+    Locker         lock(m_pIsolate->GetIsolate());
+    Isolate::Scope scope(m_pIsolate->GetIsolate());
+    HandleScope    handleScope(m_pIsolate->GetIsolate());
 
     Local<Promise::Resolver> resolver = m_promiseResolver.Get(m_pIsolate->GetIsolate());
     if (!resolver.IsEmpty())
@@ -123,8 +123,8 @@ void CV8Promise::Resolve(std::string arg)
 {
     Locker lock(m_pIsolate->GetIsolate());
     m_pIsolate->EnqueueMicrotask([arg, this](CV8Isolate* pIsolate) {
-        Isolate*        isolate = pIsolate->GetIsolate();
-        Isolate::Scope  scope(isolate);
+        Isolate*       isolate = pIsolate->GetIsolate();
+        Isolate::Scope scope(isolate);
         Resolve(CV8Utils::ToV8String(arg));
     });
 }

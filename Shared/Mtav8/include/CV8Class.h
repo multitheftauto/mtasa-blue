@@ -2,11 +2,7 @@
 class JavascriptWrapper
 {
 public:
-
-    ~JavascriptWrapper()
-    {
-        delete m_pExternalData;
-    }
+    ~JavascriptWrapper() { delete m_pExternalData; }
 
     JavascriptWrapper(Isolate* pIsolate, Local<Object> object, uint16_t classId)
     {
@@ -21,9 +17,8 @@ private:
     static void WeakCallbackForObjectHolder(const WeakCallbackInfo<JavascriptWrapper>& data) { delete data.GetParameter(); }
 
     Global<Object> wrapper;
-    void* m_pExternalData;
+    void*          m_pExternalData;
 };
-
 
 class CV8Class : public CV8ClassBase
 {
@@ -60,7 +55,7 @@ public:
     void SetAccessors(Local<ObjectTemplate> objectTemplate);
 
     template <typename T>
-    constexpr void SetAccessor(Local<ObjectTemplate> objectTemplate, std::string name, T(*getter)(void*), void (*setter)(void*, T))
+    constexpr void SetAccessor(Local<ObjectTemplate> objectTemplate, std::string name, T (*getter)(void*), void (*setter)(void*, T))
     {
         Isolate*     isolate = Isolate::GetCurrent();
         auto         externalGetter = External::New(isolate, getter);
@@ -77,12 +72,12 @@ public:
                 void*           pointerToValue = external->Value();
                 assert(pointerToValue);
 
-                Local<Array>            array = info.Data().As<Array>();
-                Local<External>         externalData = array->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
+                Local<Array>    array = info.Data().As<Array>();
+                Local<External> externalData = array->Get(info.GetIsolate()->GetCurrentContext(), 0).ToLocalChecked().As<External>();
 
                 auto getter = (T(*)(void*))externalData->Value();
                 T    result = getter(pointerToValue);
-                auto                    n = typeid(T).name();
+                auto n = typeid(T).name();
                 info.GetReturnValue().SetUndefined();
                 if constexpr (std::is_same_v<T, void>)
                 {
@@ -117,8 +112,8 @@ public:
                 Local<External> external = Local<External>::Cast(self->GetInternalField(CV8::EInternalFieldPurpose::PointerToValue));
                 void*           pointerToValue = external->Value();
 
-                Local<Array>                  data = info.Data().As<Array>();
-                Local<External>               externalData = data->Get(isolate->GetCurrentContext(), 1).ToLocalChecked().As<External>();
+                Local<Array>    data = info.Data().As<Array>();
+                Local<External> externalData = data->Get(isolate->GetCurrentContext(), 1).ToLocalChecked().As<External>();
 
                 auto setter = (void (*)(void*, T))(externalData->Value());
                 if constexpr (std::is_same_v<T, double>)
@@ -144,7 +139,7 @@ public:
 private:
     size_t                                                m_parametersCount;
     size_t                                                m_sizeOf;
-    int                                                   m_length; // Accessor count
+    int                                                   m_length;            // Accessor count
     std::string                                           m_name;
     uint16_t                                              m_classId;
     std::function<void*(CV8FunctionCallbackBase&, void*)> m_constructorFunc;

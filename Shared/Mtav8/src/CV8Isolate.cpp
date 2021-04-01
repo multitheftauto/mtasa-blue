@@ -63,10 +63,7 @@ void CV8Isolate::DoPulse()
     HandleScope handleScope(m_pIsolate);
 
     // Clear all rejected, fulfilled promises
-    m_vecPromises.erase(std::remove_if(m_vecPromises.begin(), m_vecPromises.end(),
-                                       [](std::unique_ptr<CV8Promise> &promise) {
-                                           return !promise->IsPending();
-                                       }),
+    m_vecPromises.erase(std::remove_if(m_vecPromises.begin(), m_vecPromises.end(), [](std::unique_ptr<CV8Promise>& promise) { return !promise->IsPending(); }),
                         m_vecPromises.end());
 
     // Continue async await execution
@@ -85,45 +82,41 @@ void CV8Isolate::EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask)
         new CMicrotask(microtask, this));
 }
 
-
 void CV8Isolate::ReportException(TryCatch* pTryCatch)
 {
-    v8::HandleScope        handle_scope(m_pIsolate);
+    HandleScope handleScope(m_pIsolate);
 
     if (pTryCatch->HasTerminated())
     {
         printf("%s: Long execution has been termianted.\n", m_strOriginResource.c_str());
-        return;
     }
 
-    v8::String::Utf8Value  exception(m_pIsolate, pTryCatch->Exception());
-    const char*            exception_string = CV8Utils::ToString(exception);
-    v8::Local<v8::Message> message = pTryCatch->Message();
+    String::Utf8Value exception(m_pIsolate, pTryCatch->Exception());
+    const char*       exceptionString = CV8Utils::ToString(exception);
+    Local<Message>    message = pTryCatch->Message();
     if (message.IsEmpty())
     {
         // V8 didn't provide any extra information about this error; just
         // print the exception.
-        fprintf(stderr, "%s\n", exception_string);
+        fprintf(stderr, "%s\n", exceptionString);
     }
     else
     {
-        v8::String::Utf8Value  filename(m_pIsolate, message->GetScriptOrigin().ResourceName());
-        v8::Local<v8::Context> context(m_pIsolate->GetCurrentContext());
-        const char*            filename_string = CV8Utils::ToString(filename);
-        int                    linenum = message->GetLineNumber(context).FromJust();
-        v8::Local<v8::Value>   stack_trace_string;
-        if (pTryCatch->StackTrace(context).ToLocal(&stack_trace_string) && stack_trace_string->IsString() && stack_trace_string.As<v8::String>()->Length() > 0)
+        Local<Context> context(m_pIsolate->GetCurrentContext());
+        int            linenum = message->GetLineNumber(context).FromJust();
+        Local<Value>   stackTraceString;
+        if (pTryCatch->StackTrace(context).ToLocal(&stackTraceString) && stackTraceString->IsString() && stackTraceString.As<String>()->Length() > 0)
         {
-            v8::String::Utf8Value stack_trace(m_pIsolate, stack_trace_string);
-            const char*           stack_trace_string = CV8Utils::ToString(stack_trace);
-            fprintf(stderr, "%s\n", stack_trace_string);
+            String::Utf8Value stackTrace(m_pIsolate, stackTraceString);
+            const char*       stackTraceString = CV8Utils::ToString(stackTrace);
+            fprintf(stderr, "%s\n", stackTraceString);
         }
 
         // Print line of source code.
-        v8::String::Utf8Value sourceline(m_pIsolate, message->GetSourceLine(context).ToLocalChecked());
-        const char*           sourceline_string = CV8Utils::ToString(sourceline);
-        fprintf(stderr, "\n%s\n", sourceline_string);
-        // Print wavy underline (GetUnderline is deprecated).
+        String::Utf8Value sourceLine(m_pIsolate, message->GetSourceLine(context).ToLocalChecked());
+        const char*       sourceLineString = CV8Utils::ToString(sourceLine);
+        fprintf(stderr, "\n%s\n", sourceLineString);
+        // Print wavy underline.
         int start = message->GetStartColumn(context).FromJust();
         for (int i = 0; i < start; i++)
         {
@@ -233,12 +226,10 @@ MaybeLocal<Module> CV8Isolate::GetScriptModule(std::string name)
 
 void CV8Isolate::AddPromise(std::unique_ptr<CV8Promise> pPromise)
 {
-    CV8Promise* promise = pPromise.get();
+    CV8Promise*                       promise = pPromise.get();
     std::shared_ptr<CancelationToken> token = std::make_shared<CancelationToken>();
     promise->SetCancelationToken(token);
-    m_pCV8->GetPlatform()->CallOnWorkerThread(std::make_unique<CV8Task>(token, [promise]() {
-        promise->Run();
-    }));
+    m_pCV8->GetPlatform()->CallOnWorkerThread(std::make_unique<CV8Task>(token, [promise]() { promise->Run(); }));
     m_vecPromises.push_back(std::move(pPromise));
 }
 
@@ -415,7 +406,11 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
         {
             stream << "\"" << importName << "\", ";
         }
-        stream << "\n";
+        limit--;
+        if (limit)
+            stream << "\n";
+        else
+            break;
     }
 
     error = stream.str();
@@ -433,15 +428,7 @@ void CV8Isolate::SetEvalEnabled(bool value)
 
 void CV8Isolate::TerminateExecution()
 {
-    m_pIsolate->RequestInterrupt(
-        [](Isolate* isolate, void* data) {
-            isolate->TerminateExecution();
-            //isolate->ThrowException(CV8Utils::ToV8String("Error"));
-            /*isolate->ThrowException(CV8Utils::ToV8String("Error"));
-            isolate->*/
-            //isolate->CancelTerminateExecution();
-        },
-        nullptr);
+    m_pIsolate->RequestInterrupt([](Isolate* isolate, void* data) { isolate->TerminateExecution(); }, nullptr);
 }
 
 Local<Object> CV8Isolate::CreateGlobalObject(std::string mapName)
@@ -494,7 +481,7 @@ void CV8Isolate::Evaluate()
         return;
     }
 
-    //std::reverse(m_loadingOrder.begin(), m_loadingOrder.end());
+    // std::reverse(m_loadingOrder.begin(), m_loadingOrder.end());
     for (std::string moduleName : m_loadingOrder)
     {
         auto const&   pair = m_mapScriptModules[moduleName];
@@ -502,9 +489,9 @@ void CV8Isolate::Evaluate()
         auto          st = module->GetStatus();
         if (Module::Status::kInstantiated == module->GetStatus())
         {
-            TryCatch      evaluateTryCatch(m_pIsolate);
+            TryCatch     evaluateTryCatch(m_pIsolate);
             Execution    execution(this);
-            Local<Value> val; // value returned by loaded script.
+            Local<Value> val;            // value returned by loaded script.
             if (!module->Evaluate(m_rootContext.Get(m_pIsolate)).ToLocal(&val))
             {
                 ReportException(&evaluateTryCatch);
@@ -515,23 +502,32 @@ void CV8Isolate::Evaluate()
     m_rootContext.Get(m_pIsolate)->Exit();
 }
 
+void CV8Isolate::RequestGC()
+{
+    Locker         lock(m_pIsolate);
+    Isolate::Scope isolateScope(m_pIsolate);
+    HandleScope    handleScope(m_pIsolate);
+    Local<Context> thisContext = m_rootContext.Get(m_pIsolate);
+    m_pIsolate->RequestGarbageCollectionForTesting(Isolate::GarbageCollectionType::kFullGarbageCollection);
+}
+
+void CV8Isolate::Shutdown()
+{
+}
 CV8Isolate::~CV8Isolate()
 {
     {
-        Locker lock(m_pIsolate);
+        Locker         lock(m_pIsolate);
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_rootContext.Get(m_pIsolate);
-        thisContext->Enter();
 
         m_vecPromises.clear();
         // Continue async await execution
         m_pIsolate->PerformMicrotaskCheckpoint();
 
         m_pIsolate->LowMemoryNotification();
-#if DEBUG
-        m_pIsolate->RequestGarbageCollectionForTesting(Isolate::GarbageCollectionType::kFullGarbageCollection);
-#endif
+
         m_global.Reset();
         m_rootContext.Reset();
 
@@ -543,7 +539,6 @@ CV8Isolate::~CV8Isolate()
         {
             module->m_module.Reset();
         }
-        thisContext->Exit();
     }
 
     delete m_createParams.array_buffer_allocator;

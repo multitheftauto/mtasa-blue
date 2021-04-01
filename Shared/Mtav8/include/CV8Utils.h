@@ -35,7 +35,7 @@ class CV8Utils
             objectValue = v;
             m_type = eType::Object;
         }
-        
+
         any(MaybeLocal<Object> v)
         {
             assert(!v.IsEmpty());

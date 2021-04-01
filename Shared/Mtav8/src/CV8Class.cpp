@@ -2,9 +2,9 @@
 
 Handle<FunctionTemplate> CV8Class::Initialize(CV8Isolate* pIsolate)
 {
-    Isolate*                 pV8Isolate = pIsolate->GetIsolate();
-    Local<Context>           pV8Context = pV8Isolate->GetCurrentContext();
-    EscapableHandleScope     handleScope{pV8Isolate};
+    Isolate*             pV8Isolate = pIsolate->GetIsolate();
+    Local<Context>       pV8Context = pV8Isolate->GetCurrentContext();
+    EscapableHandleScope handleScope{pV8Isolate};
 
     Handle<FunctionTemplate> classTemplate = FunctionTemplate::New(pV8Isolate);
     classTemplate->SetLength(m_length);

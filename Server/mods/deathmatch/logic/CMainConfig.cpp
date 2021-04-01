@@ -535,14 +535,19 @@ bool CMainConfig::Load()
             iInt = 0;
             pChildNode->GetTagContent(iInt);
 
-            iInt = Clamp(200, iInt, 1000 * 60 * 30); // Maybe add a warning if value is greater than 30 seconds??
+            iInt = Clamp(200, iInt, 1000 * 60 * 30);            // Maybe add a warning if value is greater than 30 seconds??
             m_iJsExecutionTimeLimit = iInt;
         }
+        if (pChildNode = pNode->FindSubNode("thread_pool_size"))
+        {
+            iInt = 0;
+            pChildNode->GetTagContent(iInt);
 
+            iInt = Clamp(0, iInt, 128);
+            m_iJsThreadPoolSize = iInt;
+        }
         
         CV8Base* v8 = g_pServerInterface->GetV8();
-        v8->SetExecutionTimeLimit(m_iJsExecutionTimeLimit);
-
     }
 
     ApplyNetOptions();

@@ -6,10 +6,14 @@ std::unordered_map<std::string, std::unique_ptr<CV8Module>> CV8::m_mapModules;
 
 CV8::CV8()
 {
+}
+
+void CV8::Initialize(int iThreadPool)
+{
     V8::InitializeICUDefaultLocation(V8Config::szExecPath);
     V8::InitializeExternalStartupData(V8Config::szExternalStartupData);
 
-    m_pPlatform = platform::NewDefaultPlatform(4, platform::IdleTaskSupport::kEnabled);
+    m_pPlatform = platform::NewDefaultPlatform(iThreadPool);
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
 
@@ -58,8 +62,12 @@ CV8::~CV8()
 
 void CV8::Shutdown()
 {
+    for (auto const& isolate : m_vecIsolates)
     {
-        std::lock_guard guard(m_lock);
+        isolate->Shutdown();
+    }
+    {
+        std::lock_guard lk(m_lock);
         m_bDisposing = true;
     }
     m_longExecutionGuardThread.join();
@@ -69,14 +77,14 @@ void CV8::Shutdown()
 
 void CV8::EnterExecution(CV8Isolate* pIsolate)
 {
-    std::lock_guard lock(m_executionGuard);
+    std::lock_guard lk(m_executionGuard);
     m_pIsolateExecutionTicks = m_iTime / V8Config::iGuardThreadSleep;
     m_pCurrentExecutionIsolate = pIsolate;
 }
 
 void CV8::ExitExecution(CV8Isolate* pIsolate)
 {
-    std::lock_guard lock(m_executionGuard);
+    std::lock_guard lk(m_executionGuard);
     m_pCurrentExecutionIsolate = nullptr;
 }
 

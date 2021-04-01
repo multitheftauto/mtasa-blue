@@ -601,6 +601,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Encrypt crash dumps for uploading
     HandleCrashDumpEncryption();
 
+    CV8Base* pV8 = g_pServerInterface->GetV8();
+    pV8->Initialize(m_pMainConfig->GetJsThreadPoolSize());
+    pV8->SetExecutionTimeLimit(m_pMainConfig->GetJsExecutionTimeLimit());
+
     // Check Windows server is using correctly compiled Lua dll
     #ifndef MTA_DEBUG
         #ifdef WIN32

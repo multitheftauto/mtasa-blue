@@ -8,7 +8,7 @@ public:
     class CancelationToken
     {
     public:
-        ~CancelationToken() { }
+        ~CancelationToken() {}
         void Cancel()
         {
             std::lock_guard lk(lock);
@@ -34,6 +34,8 @@ public:
     void InitClasses();
 
     void DoPulse();
+    void RequestGC();
+    void Shutdown();
 
     void               RunCode(std::string& code, std::string originFileName);
     MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer);
@@ -52,7 +54,7 @@ public:
 
     void ReportMissingModule(std::string name);
 
-    void TerminateExecution();
+    void        TerminateExecution();
     void        SetEvalEnabled(bool value);
     std::string GetModuleName(Local<Module> module);
 
@@ -121,9 +123,9 @@ private:
     CV8*                   m_pCV8;
     Global<ObjectTemplate> m_global;
 
-    Global<Context>        m_rootContext;
+    Global<Context> m_rootContext;
 
-    ResourceConstraints    m_constraints;
+    ResourceConstraints m_constraints;
 
     std::unordered_set<std::string> m_loadedModules;
 

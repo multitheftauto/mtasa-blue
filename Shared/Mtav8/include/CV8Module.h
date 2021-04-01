@@ -12,6 +12,7 @@ public:
     std::unordered_map<std::string, CV8ExportObject*>                   GetObjects() const;
 
     std::vector<Local<String>> GetExports(Isolate* pIsolate);
+
 private:
     std::string                                                         m_strName;
     std::unordered_map<std::string, void (*)(CV8FunctionCallbackBase*)> m_mapFunctions;

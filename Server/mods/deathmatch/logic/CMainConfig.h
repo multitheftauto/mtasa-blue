@@ -125,6 +125,7 @@ public:
     bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
     eJsEval                     GetJsEvalSetting() const { return m_eJsEval; }
     int                         GetJsExecutionTimeLimit() const { return m_iJsExecutionTimeLimit; }
+    int                         GetJsThreadPoolSize() const { return m_iJsThreadPoolSize; }
 
     SString GetSetting(const SString& configSetting);
     bool    GetSetting(const SString& configSetting, SString& strValue);
@@ -223,4 +224,5 @@ private:
 
     eJsEval m_eJsEval = eJsEval::DISABLED;
     int m_iJsExecutionTimeLimit = 2000;
+    int m_iJsThreadPoolSize = 4;
 };
