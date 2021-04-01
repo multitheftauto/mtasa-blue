@@ -15,8 +15,12 @@ CV8Promise::CV8Promise(CV8Isolate* pIsolate, std::function<void(CV8AsyncContextB
 CV8Promise::~CV8Promise()
 {
     if (m_pCancelationToken)
-    {
         m_pCancelationToken->Cancel();
+
+    // If something interrupted execution, eg resource restart
+    if (!bHasResult)
+    {
+        Reject();
     }
 }
 
@@ -43,14 +47,10 @@ void CV8Promise::Run()
 
 bool CV8Promise::IsPending()
 {
-    if (m_pCancelationToken->IsCanceled())
-        return false;
-
     Locker                   lock(m_pIsolate->GetIsolate());
     Isolate::Scope           scope(m_pIsolate->GetIsolate());
     HandleScope              handleScope(m_pIsolate->GetIsolate());
 
-    bool asdf = m_promiseResolver.IsEmpty();
     Local<Promise::Resolver> resolver = m_promiseResolver.Get(m_pIsolate->GetIsolate());
     if (!resolver.IsEmpty())
     {
@@ -93,6 +93,7 @@ void CV8Promise::Resolve(Local<Value> value)
         resolver->Resolve(m_pContext.Get(m_pIsolate->GetIsolate()), value).ToChecked();
         m_promiseResolver.Reset();
         m_pContext.Reset();
+        bHasResult = true;
     }
 }
 
@@ -114,6 +115,7 @@ void CV8Promise::Reject(Local<Value> value)
         resolver->Reject(m_pContext.Get(m_pIsolate->GetIsolate()), value).ToChecked();
         m_promiseResolver.Reset();
         m_pContext.Reset();
+        bHasResult = true;
     }
 }
 
