@@ -9,7 +9,7 @@
  *****************************************************************************/
 
 #pragma once
-#include "defs/CDefs.h"
+#include "defs/CApiDefs.h"
 
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 #define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
@@ -35,7 +35,7 @@ class CRenderWare;
 class CResourceManager;
 class CScriptDebugging;
 
-class CLuaDefs : public CDefs
+class CLuaDefs : public CApiDefs
 {
 public:
     static void Initialize(class CClientGame* pClientGame, CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging);

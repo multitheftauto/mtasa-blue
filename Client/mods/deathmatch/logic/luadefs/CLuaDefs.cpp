@@ -33,7 +33,7 @@ bool                       ms_bRegisterdPostCallHook = false;
 
 void CLuaDefs::Initialize(CClientGame* pClientGame, CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging)
 {
-    CDefs::Initialize(pScriptDebugging);
+    CApiDefs::Initialize(pScriptDebugging);
     m_pLuaManager = pLuaManager;
     m_pElementDeleter = pClientGame->GetElementDeleter();
     m_pClientGame = pClientGame;

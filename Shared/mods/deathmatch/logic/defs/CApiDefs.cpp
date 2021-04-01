@@ -11,15 +11,15 @@
 
 #include "StdInc.h"
 
-CScriptDebugging* CDefs::m_pScriptDebugging = nullptr;
+CScriptDebugging* CApiDefs::m_pScriptDebugging = nullptr;
 
 #ifdef MTA_CLIENT
-void CDefs::Initialize(CScriptDebugging* pScriptDebugging)
+void CApiDefs::Initialize(CScriptDebugging* pScriptDebugging)
 {
     m_pScriptDebugging = pScriptDebugging;
 }
 #else
-void CDefs::Initialize(CGame* pGame)
+void CApiDefs::Initialize(CGame* pGame)
 {
     m_pScriptDebugging = pGame->GetScriptDebugging();
 }

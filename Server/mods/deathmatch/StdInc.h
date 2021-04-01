@@ -116,7 +116,7 @@ struct SAclRequest;
 // has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
 #include "CRemoteCalls.h"
 
-#include "defs/CDefs.h"
+#include "defs/CApiDefs.h"
 // Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaAccountDefs.h"

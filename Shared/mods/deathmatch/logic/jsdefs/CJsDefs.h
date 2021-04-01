@@ -17,7 +17,7 @@ class CV8FunctionBase;
 
 typedef std::function<void(CV8AsyncContextBase*)> Promise;
 
-class CJsDefs : CDefs
+class CJsDefs : CApiDefs
 {
 public:
     // hard error on usage mistakes

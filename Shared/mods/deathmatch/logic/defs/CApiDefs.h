@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/defs/CDefs.h
+ *  FILE:        mods/deathmatch/logic/defs/CApiDefs.h
  *  PURPOSE:     Definitions base class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -15,7 +15,7 @@
 #else
     //#include "CScriptDebugging.h"
 #endif
-class CDefs
+class CApiDefs
 {
 public:
     #ifdef MTA_CLIENT

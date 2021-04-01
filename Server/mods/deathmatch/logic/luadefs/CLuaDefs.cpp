@@ -51,7 +51,7 @@ CMainConfig*               CLuaDefs::m_pMainConfig = NULL;
 
 void CLuaDefs::Initialize(CGame* pGame)
 {
-    CDefs::Initialize(pGame);
+    CApiDefs::Initialize(pGame);
     m_pRootElement = pGame->GetMapManager()->GetRootElement();
     m_pElementDeleter = pGame->GetElementDeleter();
     m_pBlipManager = pGame->GetBlipManager();
