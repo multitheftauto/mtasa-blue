@@ -13,6 +13,7 @@ public:
     virtual std::string GetType(int index) = 0;
 
     virtual bool IsString(int index) = 0;
+    virtual bool IsNumber(int index) = 0;
 
     virtual void Return(std::string arg) = 0;
     virtual void Return(double arg) = 0;

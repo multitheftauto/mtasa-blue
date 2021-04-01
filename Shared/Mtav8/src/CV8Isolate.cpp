@@ -14,6 +14,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
     m_createParams.constraints = m_constraints;
     m_pIsolate = Isolate::New(m_createParams);
 
+    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
@@ -60,6 +61,15 @@ void CV8Isolate::DoPulse()
 {
     Locker      lock(m_pIsolate);
     HandleScope handleScope(m_pIsolate);
+
+    // Clear all rejected, fulfilled promises
+    m_vecPromises.erase(std::remove_if(m_vecPromises.begin(), m_vecPromises.end(),
+                                       [](std::unique_ptr<CV8Promise> &promise) {
+                                           return !promise->IsPending();
+                                       }),
+                        m_vecPromises.end());
+
+    // Continue async await execution
     m_pIsolate->PerformMicrotaskCheckpoint();
 }
 
@@ -224,7 +234,11 @@ MaybeLocal<Module> CV8Isolate::GetScriptModule(std::string name)
 void CV8Isolate::AddPromise(std::unique_ptr<CV8Promise> pPromise)
 {
     CV8Promise* promise = pPromise.get();
-    m_pCV8->GetPlatform()->CallOnWorkerThread(std::make_unique<CV8Task>([promise]() { promise->Run(); }));
+    std::shared_ptr<CancelationToken> token = std::make_shared<CancelationToken>();
+    promise->SetCancelationToken(token);
+    m_pCV8->GetPlatform()->CallOnWorkerThread(std::make_unique<CV8Task>(token, [promise]() {
+        promise->Run();
+    }));
     m_vecPromises.push_back(std::move(pPromise));
 }
 
@@ -296,6 +310,7 @@ void CV8Isolate::RunCode(std::string& code, std::string originFileName)
 {
     m_iRunCodeCount++;
     m_strCurrentOriginFileName = originFileName;
+    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
     Context::Scope rootContextScope(m_rootContext.Get(m_pIsolate));
@@ -409,6 +424,7 @@ bool CV8Isolate::GetMissingModulesErrorMessage(std::string& error)
 
 void CV8Isolate::SetEvalEnabled(bool value)
 {
+    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
@@ -501,12 +517,16 @@ void CV8Isolate::Evaluate()
 
 CV8Isolate::~CV8Isolate()
 {
-    Locker lock(m_pIsolate);
     {
+        Locker lock(m_pIsolate);
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_rootContext.Get(m_pIsolate);
         thisContext->Enter();
+
+        m_vecPromises.clear();
+        // Continue async await execution
+        m_pIsolate->PerformMicrotaskCheckpoint();
 
         m_pIsolate->LowMemoryNotification();
 #if DEBUG

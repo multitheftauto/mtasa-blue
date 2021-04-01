@@ -14,8 +14,17 @@ public:
     Local<Promise> GetPromise() const { return m_promiseResolver.Get(m_pIsolate->GetIsolate())->GetPromise(); }
     void           Run();
 
+    bool IsPending();
+    bool IsFulfilled();
+    bool IsRejected();
+
+    void Reject();
+    void SetCancelationToken(std::shared_ptr<CV8Isolate::CancelationToken> token) { m_pCancelationToken = token; }
+    std::shared_ptr<CV8Isolate::CancelationToken> GetCancelationToken() const { return m_pCancelationToken; }
+
 private:
     void Resolve(Local<Value> value);
+    void Reject(Local<Value> value);
 
     CV8Isolate*                               m_pIsolate;
     PersistentContext                         m_pContext;
@@ -23,4 +32,5 @@ private:
     std::function<void(CV8AsyncContextBase*)> m_pFunctionAsyncCallback;
     bool                                      bHasResult = false;
     std::mutex                                m_lock;
+    std::shared_ptr<CV8Isolate::CancelationToken> m_pCancelationToken;
 };

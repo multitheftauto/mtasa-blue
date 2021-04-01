@@ -28,6 +28,15 @@ bool CV8FunctionCallback::IsString(int index)
     return m_callback[index]->IsString();
 }
 
+bool CV8FunctionCallback::IsNumber(int index)
+{
+    if (m_callback.Length() < index)
+    {
+        throw new std::invalid_argument("Index");
+    }
+    return m_callback[index]->IsNumber();
+}
+
 bool CV8FunctionCallback::ReadString(std::string& value, int index)
 {
     if (m_callback.Length() < index)
@@ -137,6 +146,12 @@ void CV8FunctionCallback::Return(double arg)
 }
 
 void CV8FunctionCallback::Return(float arg)
+{
+    Local<Number> result = Number::New(m_callback.GetIsolate(), arg);
+    m_callback.GetReturnValue().Set(result);
+}
+
+void CV8FunctionCallback::Return(int arg)
 {
     Local<Number> result = Number::New(m_callback.GetIsolate(), arg);
     m_callback.GetReturnValue().Set(result);

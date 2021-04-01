@@ -34,5 +34,5 @@ public:
     LUA_DECLARE(EncodeString);
     LUA_DECLARE(DecodeString);
 
-    static Promise CCryptDefs::TestAsync(std::string str);
+    static Promise Sleep_(int str);
 };

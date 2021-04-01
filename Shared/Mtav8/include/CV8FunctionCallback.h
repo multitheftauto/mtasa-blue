@@ -22,10 +22,12 @@ public:
 
     std::string GetType(int index);
     bool IsString(int index);
+    bool IsNumber(int index);
 
     void Return(std::string arg);
     void Return(double arg);
     void Return(float arg);
+    void Return(int arg);
     void Return(bool arg);
     void ReturnUndefined();
 

@@ -9,7 +9,7 @@ CV8::CV8()
     V8::InitializeICUDefaultLocation(V8Config::szExecPath);
     V8::InitializeExternalStartupData(V8Config::szExternalStartupData);
 
-    m_pPlatform = platform::NewDefaultPlatform(4);
+    m_pPlatform = platform::NewDefaultPlatform(4, platform::IdleTaskSupport::kEnabled);
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
 

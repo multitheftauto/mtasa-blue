@@ -152,13 +152,23 @@ struct CLuaFunctionParserBase
         {
             return JS;
         }
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
         {
             if (JS->IsString(index))
             {
                 std::string str;
                 JS->ReadString(str, index);
                 return str;
+            }
+        }
+        if constexpr (std::is_arithmetic_v<T>)
+        {
+            if (JS->IsNumber(index))
+            {
+                double value;
+                JS->ReadNumber(value, index);
+                return (int)value;
             }
         }
         return T{};

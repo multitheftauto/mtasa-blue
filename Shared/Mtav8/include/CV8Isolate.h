@@ -5,6 +5,28 @@ class CV8Promise;
 class CV8Isolate : public CV8IsolateBase
 {
 public:
+    class CancelationToken
+    {
+    public:
+        ~CancelationToken() { }
+        void Cancel()
+        {
+            std::lock_guard lk(lock);
+            assert(!canceled && "Cancelation token canceled twice");
+            canceled = true;
+        }
+
+        bool IsCanceled()
+        {
+            std::lock_guard lk(lock);
+            return canceled;
+        }
+
+    private:
+        std::mutex lock;
+        bool       canceled = false;
+    };
+
     CV8Isolate(CV8* pCV8, std::string originResource);
     ~CV8Isolate();
 

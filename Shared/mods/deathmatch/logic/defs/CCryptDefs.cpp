@@ -48,7 +48,7 @@ void CCryptDefs::LoadJsFunctions()
         {"teaEncode", JsArgumentParser<TeaEncode>},
         {"base64encode", JsArgumentParser<Base64encode>},
         {"base64decode", JsArgumentParser<Base64decode>},
-        {"testAsync", JsArgumentParser<TestAsync>},
+        {"sleep", JsArgumentParser<Sleep_>},
     };
 
     for (const auto& [name, func] : functions)
@@ -117,10 +117,11 @@ std::string CCryptDefs::Base64encode(std::string str)
     return SharedUtil::Base64encode(str);
 }
 
-Promise CCryptDefs::TestAsync(std::string str)
+Promise CCryptDefs::Sleep_(int time)
 {
-    return [str](CV8AsyncContextBase* asyncContext) {
-        asyncContext->Resolve("foo: " + str);
+    return [time](CV8AsyncContextBase* asyncContext) {
+        Sleep(time);
+        asyncContext->Resolve("");
     };
 }
 
