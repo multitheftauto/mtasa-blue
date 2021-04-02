@@ -55,9 +55,5 @@ bool CDummy::ReadSpecialData(const int iLine)
     GetCustomDataFloat("posY", m_vecPosition.fY, true);
     GetCustomDataFloat("posZ", m_vecPosition.fZ, true);
 
-    // Grab the rotation data
-    GetCustomDataFloat("rotX", m_vecRotation.fX, true);
-    GetCustomDataFloat("rotY", m_vecRotation.fY, true);
-    GetCustomDataFloat("rotZ", m_vecRotation.fZ, true);
     return true;
 }

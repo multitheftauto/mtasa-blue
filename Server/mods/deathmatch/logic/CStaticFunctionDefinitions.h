@@ -102,9 +102,6 @@ public:
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
 
-    // Dummy set funcs
-    static bool SetDummyRotation(CElement* pElement, const CVector& vecRotation);
-
     // Player get funcs
     static unsigned int       GetPlayerCount();
     static CPlayer*           GetPlayerFromName(const char* szNick);

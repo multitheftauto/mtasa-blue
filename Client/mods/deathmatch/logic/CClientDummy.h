@@ -24,13 +24,9 @@ public:
     eClientEntityType GetType() const { return CCLIENTDUMMY; }
     const CVector&    GetPosition() { return m_vecPosition; };
     void              GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
-    const CVector&    GetRotation() { return m_vecRotation; };
-    void              GetRotation(CVector& vecRotation) const { vecRotation = m_vecRotation; };
     void              SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
-    void              SetRotation(const CVector& vecRotation) { m_vecRotation = vecRotation; };
 
 private:
     class CClientGroups* m_pGroups;
     CVector              m_vecPosition;
-    CVector              m_vecRotation;
 };
