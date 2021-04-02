@@ -33,6 +33,18 @@ void CClientGroups::DeleteAll()
     m_bDontRemoveFromList = false;
 }
 
+CClientDummy* CClientGroups::Get(ElementID ID)
+{
+    // Grab the element with the given id. Check its type.
+    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    if (pEntity && pEntity->GetType() == CCLIENTDUMMY)
+    {
+        return static_cast<CClientDummy*>(pEntity);
+    }
+
+    return NULL;
+}
+
 void CClientGroups::RemoveFromList(CClientDummy* pDummy)
 {
     if (!m_bDontRemoveFromList)

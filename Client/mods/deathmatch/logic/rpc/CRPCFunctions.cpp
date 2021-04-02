@@ -31,6 +31,7 @@
 #include "CWaterRPCs.h"
 #include "CWorldRPCs.h"
 #include "CColShapeRPCs.h"
+#include "CDummyRPCs.h"
 
 CClientManager*            CRPCFunctions::m_pManager;
 CClientCamera*             CRPCFunctions::m_pCamera;
@@ -48,7 +49,7 @@ CClientPedManager*         CRPCFunctions::m_pPedManager;
 CBlendedWeather*           CRPCFunctions::m_pBlendedWeather;
 CClientGame*               CRPCFunctions::m_pClientGame;
 CClientWaterManager*       CRPCFunctions::m_pWaterManager;
-
+CClientGroups*             CRPCFunctions::m_pGroups;
 SFixedArray<CRPCFunctions::SRPCHandler, CRPCFunctions::NUM_RPC_FUNCS>        CRPCFunctions::m_RPCHandlers;
 SFixedArray<CRPCFunctions::SElementRPCHandler, CRPCFunctions::NUM_RPC_FUNCS> CRPCFunctions::m_ElementRPCHandlers;
 
@@ -70,6 +71,7 @@ CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
     m_pPedManager = m_pManager->GetPedManager();
     m_pBlendedWeather = pClientGame->GetBlendedWeather();
     m_pWaterManager = m_pManager->GetWaterManager();
+    m_pGroups = m_pManager->GetGroups();
     m_pClientGame = pClientGame;
 
     AddHandlers();
@@ -100,6 +102,7 @@ void CRPCFunctions::AddHandlers()
     CWaterRPCs::LoadFunctions();
     CWorldRPCs::LoadFunctions();
     CColShapeRPCs::LoadFunctions();
+    CDummyRPCs::LoadFunctions();
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)

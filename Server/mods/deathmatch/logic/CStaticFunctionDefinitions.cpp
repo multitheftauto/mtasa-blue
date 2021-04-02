@@ -1085,6 +1085,18 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
 
             break;
         }
+        case CElement::DUMMY:
+        {
+            CDummy* pDummy = static_cast<CDummy*>(pElement);
+            pDummy->GetRotation(vecRotation);
+            ConvertRadiansToDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+
+            break;
+        }
         default:
             return false;
     }
@@ -1204,6 +1216,26 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetDummyRotation(CElement* pElement, const CVector& vecRotation)
+{
+    RUN_CHILDREN(SetDummyRotation(*iter, vecRotation))
+    if (IS_DUMMY(pElement))
+    {
+        CDummy* pDummy = static_cast<CDummy*>(pElement);
+
+        CVector vecRadians = vecRotation;
+        ConvertDegreesToRadians(vecRadians);
+        pDummy->SetRotation(vecRadians);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(vecRadians.fX);
+        BitStream.pBitStream->Write(vecRadians.fY);
+        BitStream.pBitStream->Write(vecRadians.fZ);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pDummy, SET_DUMMY_ROTATION, *BitStream.pBitStream));
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CVector& vecRotation, eEulerRotationOrder argumentRotOrder, bool bNewWay)
 {
     assert(pElement);
@@ -1248,6 +1280,21 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
             }
             break;
         }
+        case CElement::DUMMY:
+        {
+            CDummy* pDummy = static_cast<CDummy*>(pElement);
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                SetDummyRotation(pDummy, vecRotation);
+            }
+            else
+            {
+                CVector vZYX = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY);
+                SetDummyRotation(pDummy, vecRotation);
+            }
+            break;
+        }
+
         default:
             return false;
     }
