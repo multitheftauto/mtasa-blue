@@ -6,9 +6,11 @@
  *
  *****************************************************************************/
 #include "v8/CV8Base.h"
-#include "jsdefs/CJsDefs.h"
+#include "jsdefs/CJsClass.h"
 #include "jsdefs/CJsClassConstructionInfo.h"
 #include "jsdefs/CJsVector2Defs.h"
+#include "jsdefs/CJsVector3Defs.h"
+#include "jsdefs/CJsVector4Defs.h"
 
 class CJsShared
 {

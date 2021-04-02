@@ -47,7 +47,7 @@ private:
     }
 
     template <typename Arg, typename... Args>
-    static constexpr Arg... ReadArguments(CV8FunctionCallbackBase& args, int index)
+    static constexpr Arg ReadArguments(CV8FunctionCallbackBase& args, int index)
     {
         index++;
         if constexpr (sizeof...(Args) > 0)

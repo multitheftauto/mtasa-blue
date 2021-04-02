@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CV8ExportClassBase* CJsVector2Defs::m_jsClass;
+CV8ExportClassBase*                  CJsVector2Defs::m_jsClass;
 CJsClassConstructionInfo<CVector2D>* CJsVector2Defs::m_constructionInfo;
 
 void CJsVector2Defs::AddClass()
