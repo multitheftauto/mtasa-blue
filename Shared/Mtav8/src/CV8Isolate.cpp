@@ -38,6 +38,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
     m_rootContext.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
     Context::Scope contextScope(m_rootContext.Get(m_pIsolate));
 
+    global->Set(context, CV8Utils::ToV8String("Version"), CV8Utils::ToV8String(V8::GetVersion()));
     InitSecurity();
     InitClasses();
 }
