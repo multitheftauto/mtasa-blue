@@ -167,7 +167,7 @@ public:
 
     bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible, bool bInputBlocked = true);
-    bool IsInputBlocked() { return m_bInputBlocked; }
+    bool IsInputBlocked() const { return m_bInputBlocked; }
     bool IsInputVisible() { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
