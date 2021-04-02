@@ -16,7 +16,7 @@ CJsClassConstructionInfo<CVector4D>* CJsVector4Defs::m_constructionInfo;
 
 void CJsVector4Defs::AddClass()
 {
-    m_constructionInfo = new CJsClassConstructionInfo<CVector>("Vector4", EClass::Vector4);
+    m_constructionInfo = new CJsClassConstructionInfo<CVector4D>("Vector4", EClass::Vector4);
 
     m_constructionInfo->SetConstructor<float, float, float, float>();
 
