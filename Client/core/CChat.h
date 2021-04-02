@@ -166,7 +166,7 @@ public:
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
-    void SetVisible(bool bVisible, bool bInputBlocked = true);
+    void SetVisible(bool bVisible, bool bInputBlocked);
     bool IsInputBlocked() const { return m_bInputBlocked; }
     bool IsInputVisible() const { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);

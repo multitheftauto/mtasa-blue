@@ -779,18 +779,10 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 void CChat::SetVisible(bool bVisible, bool bInputBlocked)
 {
     m_bVisible = bVisible;
+    m_bInputBlocked = bInputBlocked;
 
-    if (!m_bVisible)
-    {
-        m_bInputBlocked = bInputBlocked;
-
-        if (m_bInputBlocked)
-            SetInputVisible(false);
-    }
-    else
-    {
-        m_bInputBlocked = false;
-    }
+    if (m_bInputBlocked)
+        SetInputVisible(false);
 }
 
 void CChat::SetInputVisible(bool bVisible)

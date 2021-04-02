@@ -97,30 +97,6 @@ int CLuaFunctionDefs::SetClipboard(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ShowChat(lua_State* luaVM)
-{
-    bool             bShow = false;
-    bool             bInputBlocked = true;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bShow);
-    argStream.ReadBool(bInputBlocked, true);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::ShowChat(bShow, bInputBlocked))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFunctionDefs::IsChatVisible(lua_State* luaVM)
 {
     //  bool isChatVisible ()

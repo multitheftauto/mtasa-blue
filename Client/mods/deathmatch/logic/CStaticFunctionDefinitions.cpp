@@ -281,12 +281,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ShowChat(bool bShow, bool bInputBlocked)
-{
-    g_pCore->SetChatVisible(bShow, bInputBlocked);
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetWindowFlashing(bool flash, uint count)
 {
     // Don't flash if the window is active

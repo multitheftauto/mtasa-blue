@@ -455,6 +455,15 @@ bool CCore::IsChatVisible()
     return false;
 }
 
+bool CCore::IsChatInputBlocked()
+{
+    if (m_pLocalGUI)
+    {
+        return m_pLocalGUI->IsChatBoxInputBlocked();
+    }
+    return false;
+}
+
 bool CCore::ClearChat()
 {
     if (m_pLocalGUI)
