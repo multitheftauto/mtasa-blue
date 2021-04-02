@@ -1116,14 +1116,13 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
         case CCLIENTDUMMY:
         {
             CClientDummy& Dummy = static_cast<CClientDummy&>(Entity);
-            ConvertDegreesToRadians(const_cast<CVector&>(vecRotation));
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
             {
-                Dummy.SetRotation(vecRotation);
+                Dummy.SetRotationDegrees(vecRotation);
             }
             else
             {
-                Dummy.SetRotation(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX));
+                Dummy.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX));
             }
 
             break;

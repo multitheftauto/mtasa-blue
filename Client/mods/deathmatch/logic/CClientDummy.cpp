@@ -30,6 +30,19 @@ CClientDummy::CClientDummy(CClientManager* pManager, ElementID ID, const char* s
     }
 }
 
+void CClientDummy::GetRotationDegrees(CVector& vecRotation)
+{
+    GetRotationRadians(vecRotation);
+    ConvertRadiansToDegrees(vecRotation);
+}
+
+void CClientDummy::SetRotationDegrees(const CVector& vecRotation)
+{
+    CVector vecTemp = vecRotation;
+    ConvertDegreesToRadians(vecTemp);
+    SetRotationRadians(vecTemp);
+}
+
 CClientDummy::~CClientDummy()
 {
     Unlink();
