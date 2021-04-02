@@ -688,13 +688,13 @@ struct CLuaFunctionParserBase
     }
 };
 
-template <eRuntime, bool, auto, auto*>
+template <bool, auto, auto*>
 struct CLuaFunctionParser
 {
 };
 
-template <eRuntime Runtime, bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct CLuaFunctionParser<Runtime, ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
+template <bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
+struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
 {
     template <typename... Params>
     inline auto Call(lua_State* L, Params&&... ps)

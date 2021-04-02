@@ -73,7 +73,7 @@ protected:
     template <auto ReturnOnError, auto T>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<eRuntime::LUA, false, ReturnOnError, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<false, ReturnOnError, T>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads
@@ -95,7 +95,7 @@ protected:
     template <auto T>
     static inline int ArgumentParser(lua_State* L)
     {
-        return CLuaFunctionParser<eRuntime::LUA, true, nullptr, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads

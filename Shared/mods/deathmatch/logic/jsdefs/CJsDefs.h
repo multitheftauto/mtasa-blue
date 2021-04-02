@@ -47,7 +47,7 @@ public:
     template <auto T>
     static inline void JsArgumentParser(CV8FunctionCallbackBase* Js)
     {
-        CLuaFunctionParser<eRuntime::JS, true, nullptr, T > ()(Js, m_pScriptDebugging);
+        CLuaFunctionParser<true, nullptr, T > ()(Js, m_pScriptDebugging);
     }
 
 protected:
