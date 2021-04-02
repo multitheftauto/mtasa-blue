@@ -97,13 +97,6 @@ int CLuaFunctionDefs::SetClipboard(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::IsChatVisible(lua_State* luaVM)
-{
-    //  bool isChatVisible ()
-    lua_pushboolean(luaVM, g_pCore->IsChatVisible());
-    return 1;
-}
-
 int CLuaFunctionDefs::OutputClientDebugString(lua_State* luaVM)
 {
     SString          strText = "";

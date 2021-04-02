@@ -47,7 +47,6 @@ public:
     // Output functions
     LUA_DECLARE(OutputConsole);
     LUA_DECLARE(OutputChatBox);
-    LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
     LUA_DECLARE(SetWindowFlashing);

@@ -19,7 +19,9 @@ void CLuaClientDefs::LoadFunctions()
         {"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
         {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
         {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
-        {"showChat", ArgumentParserWarn<false, ShowChat>}
+        {"showChat", ArgumentParserWarn<false, ShowChat>},
+        {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
+        {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>}
     };
 
     for (const auto& [name, func] : functions)
@@ -50,4 +52,14 @@ bool CLuaClientDefs::ShowChat(bool bVisible, std::optional<bool> optInputBlocked
 
     g_pCore->SetChatVisible(bVisible, bInputBlocked);
     return true;
+}
+
+bool CLuaClientDefs::IsChatVisible()
+{
+    return g_pCore->IsChatVisible();
+}
+
+bool CLuaClientDefs::IsChatInputBlocked()
+{
+    return g_pCore->IsChatInputBlocked();
 }

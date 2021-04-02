@@ -23,4 +23,6 @@ private:
     static bool IsTransferBoxVisible();
     static bool IsTransferBoxAlwaysVisible();
     static bool ShowChat(bool bVisible, std::optional<bool> optInputBlocked);
+    static bool IsChatVisible();
+    static bool IsChatInputBlocked();
 };

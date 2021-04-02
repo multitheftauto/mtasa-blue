@@ -170,7 +170,6 @@ void CLuaManager::LoadCFunctions()
         // Output funcs
         {"outputConsole", CLuaFunctionDefs::OutputConsole},
         {"outputChatBox", CLuaFunctionDefs::OutputChatBox},
-        {"isChatVisible", CLuaFunctionDefs::IsChatVisible},
         {"outputDebugString", CLuaFunctionDefs::OutputClientDebugString},
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
