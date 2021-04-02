@@ -23,6 +23,7 @@ public:
     ~CClientGroups() { DeleteAll(); };
 
     void DeleteAll();
+    static CClientDummy* Get(ElementID ID);
 
 private:
     void AddToList(CClientDummy* pDummy) { m_List.push_back(pDummy); };
