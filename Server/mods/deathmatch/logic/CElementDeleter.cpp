@@ -21,7 +21,7 @@ void CElementDeleter::Delete(class CElement* pElement, bool bUnlink, bool bUpdat
         {
             // Before we do anything, fire the on-destroy event
             CLuaArguments Arguments;
-            pElement->CallEvent("onElementDestroy", Arguments);
+            pElement->CallEvent(BuiltInEvents::onElementDestroy, Arguments);
 
             // Add it to our list
             if (!pElement->IsBeingDeleted())

@@ -26,9 +26,9 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    const char*    GetName() { return m_strName; }
-    ElementID      GetElementID() { return m_ElementID; }
-    CLuaArguments* GetArguments() { return m_pArguments; }
+    const std::string& GetName() { return m_strName; }
+    ElementID          GetElementID() { return m_ElementID; }
+    CLuaArguments*     GetArguments() { return m_pArguments; }
 
 private:
     SString        m_strName;

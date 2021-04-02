@@ -131,14 +131,19 @@ bool CStaticFunctionDefinitions::RemoveEventHandler(CLuaMain* pLuaMain, const ch
 bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool& bWasCanceled)
 {
     // There is such event?
-    if (m_pEvents->Exists(szName))
+    //if (m_pEvents->Exists(szName))
+    //{
+    //    // Call the event
+    //    pElement->CallEvent(szName, Arguments);
+    //    bWasCanceled = m_pEvents->WasEventCancelled();
+    //    return true;
+    //}
+
+    if (auto* event = Event::Get(szName))
     {
-        // Call the event
-        pElement->CallEvent(szName, Arguments);
-        bWasCanceled = m_pEvents->WasEventCancelled();
+        bWasCanceled = !pElement->CallEvent(*event, Arguments);
         return true;
     }
-
     return false;
 }
 
@@ -1637,7 +1642,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             Arguments.PushNumber(pPed->GetModel());            // Get the old model
             pPed->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                     // Get the new model
-            pPed->CallEvent("onElementModelChange", Arguments);
+            pPed->CallEvent(BuiltInEvents::onElementModelChange, Arguments);
             break;
         }
         case CElement::VEHICLE:
@@ -1651,7 +1656,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             Arguments.PushNumber(pVehicle->GetModel());            // Get the old model
             pVehicle->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                         // Get the new model
-            pVehicle->CallEvent("onElementModelChange", Arguments);
+            pVehicle->CallEvent(BuiltInEvents::onElementModelChange, Arguments);
 
             // Check for any passengers above the max seat list
             unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers();
@@ -1682,7 +1687,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             Arguments.PushNumber(pObject->GetModel());            // Get the old model
             pObject->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                        // Get the new model
-            pObject->CallEvent("onElementModelChange", Arguments);
+            pObject->CallEvent(BuiltInEvents::onElementModelChange, Arguments);
             break;
         }
         default:
@@ -1948,7 +1953,7 @@ bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* s
                             Arguments.PushString(szNick);
                             Arguments.PushString(szName);
                             Arguments.PushBoolean(false);            // manually changed
-                            pPlayer->CallEvent("onPlayerChangeNick", Arguments);
+                            pPlayer->CallEvent(BuiltInEvents::onPlayerChangeNick, Arguments);
 
                             // Tell the console
                             CLogger::LogPrintf("NICK: %s is now known as %s\n", szNick, szName);
@@ -3310,9 +3315,9 @@ bool CStaticFunctionDefinitions::SetPlayerMuted(CElement* pElement, bool bMuted)
             CLuaArguments arguments;
 
             if (bMuted)
-                bEventCancelled = !pPlayer->CallEvent("onPlayerMute", arguments);
+                bEventCancelled = !pPlayer->CallEvent(BuiltInEvents::onPlayerMute, arguments);
             else
-                bEventCancelled = !pPlayer->CallEvent("onPlayerUnmute", arguments);
+                bEventCancelled = !pPlayer->CallEvent(BuiltInEvents::onPlayerUnmute, arguments);
 
             if (!bEventCancelled)
             {
@@ -3664,14 +3669,14 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
                 // Tell everyone to kill this player
                 CPlayerWastedPacket WastedPacket(pPed, pKiller, ucKillerWeapon, ucBodyPart, bStealth);
                 m_pPlayerManager->BroadcastOnlyJoined(WastedPacket);
-                pPed->CallEvent("onPlayerWasted", Arguments);
+                pPed->CallEvent(BuiltInEvents::onPlayerWasted, Arguments);
             }
             else
             {
                 // Tell everyone to kill this player
                 CPedWastedPacket WastedPacket(pPed, pKiller, ucKillerWeapon, ucBodyPart, bStealth);
                 m_pPlayerManager->BroadcastOnlyJoined(WastedPacket);
-                pPed->CallEvent("onPedWasted", Arguments);
+                pPed->CallEvent(BuiltInEvents::onPedWasted, Arguments);
             }
 
             for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
@@ -4121,9 +4126,9 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                         PlayerVehicleArguments.PushBoolean(false);
                     // Leave onPlayerVehicleEnter for backwards compatibility
                     if (IS_PLAYER(pPed))
-                        pPed->CallEvent("onPlayerVehicleEnter", PlayerVehicleArguments);
+                        pPed->CallEvent(BuiltInEvents::onPlayerVehicleEnter, PlayerVehicleArguments);
                     else
-                        pPed->CallEvent("onPedVehicleEnter", PlayerVehicleArguments);
+                        pPed->CallEvent(BuiltInEvents::onPedVehicleEnter, PlayerVehicleArguments);
 
                     // Call the vehicle->player event
                     CLuaArguments VehiclePlayerArguments;
@@ -4133,7 +4138,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                         VehiclePlayerArguments.PushElement(pPreviousOccupant);
                     else
                         VehiclePlayerArguments.PushBoolean(false);
-                    pVehicle->CallEvent("onVehicleEnter", VehiclePlayerArguments);
+                    pVehicle->CallEvent(BuiltInEvents::onVehicleEnter, VehiclePlayerArguments);
 
                     // Used to check if f.e. lua changed the player's vehicle (fix for #7570)
                     pVehicle->m_bOccupantChanged = true;
@@ -4168,9 +4173,9 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
             Arguments.PushBoolean(false);                    // jacker
             Arguments.PushBoolean(true);                     // forcedByScript
             if (IS_PLAYER(pPed))
-                pPed->CallEvent("onPlayerVehicleExit", Arguments);
+                pPed->CallEvent(BuiltInEvents::onPlayerVehicleExit, Arguments);
             else
-                pPed->CallEvent("onPedVehicleExit", Arguments);
+                pPed->CallEvent(BuiltInEvents::onPedVehicleExit, Arguments);
 
             // Call the vehicle->ped event
             CLuaArguments Arguments2;
@@ -4178,7 +4183,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
             Arguments2.PushNumber(ucOccupiedSeat);            // seat
             Arguments2.PushBoolean(false);                    // jacker
             Arguments2.PushBoolean(true);                     // forcedByScript
-            pVehicle->CallEvent("onVehicleExit", Arguments2);
+            pVehicle->CallEvent(BuiltInEvents::onVehicleExit, Arguments2);
 
             // Remove him from the vehicle
             pVehicle->SetOccupant(NULL, ucOccupiedSeat);
@@ -4594,9 +4599,9 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                     Arguments.PushNumber(ucWeaponID);
                     bool bEventRet;
                     if (IS_PLAYER(pElement))
-                        bEventRet = pPed->CallEvent("onPlayerWeaponSwitch", Arguments);
+                        bEventRet = pPed->CallEvent(BuiltInEvents::onPlayerWeaponSwitch, Arguments);
                     else
-                        bEventRet = pPed->CallEvent("onPedWeaponSwitch", Arguments);
+                        bEventRet = pPed->CallEvent(BuiltInEvents::onPedWeaponSwitch, Arguments);
 
                     if (!bEventRet)
                         bSetAsCurrent = false;
@@ -5285,7 +5290,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
     vehicle->SetIsBlown(true);
 
     CLuaArguments Arguments;
-    vehicle->CallEvent("onVehicleExplode", Arguments);
+    vehicle->CallEvent(BuiltInEvents::onVehicleExplode, Arguments);
 
     // Abort if vehicle got fixed or destroyed
     if (!vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
@@ -6820,7 +6825,7 @@ bool CStaticFunctionDefinitions::RespawnVehicle(CElement* pElement)
         // Call the respawn event?
         CLuaArguments Arguments;
         Arguments.PushBoolean(false);
-        pVehicle->CallEvent("onVehicleRespawn", Arguments);
+        pVehicle->CallEvent(BuiltInEvents::onVehicleRespawn, Arguments);
 
         // Tell everyone to respawn it
         CVehicleSpawnPacket Packet;
@@ -6896,7 +6901,7 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle(CVehicle* pVehicle, CVeh
             // Execute the attach trailer script function
             CLuaArguments Arguments;
             Arguments.PushElement(pVehicle);
-            bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+            bool bContinue = pTrailer->CallEvent(BuiltInEvents::onTrailerAttach, Arguments);
 
             if (!bContinue)
             {
@@ -6936,7 +6941,7 @@ bool CStaticFunctionDefinitions::DetachTrailerFromVehicle(CVehicle* pVehicle, CV
         // Execute the detach trailer script function
         CLuaArguments Arguments;
         Arguments.PushElement(pVehicle);
-        pTempTrailer->CallEvent("onTrailerDetach", Arguments);
+        pTempTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
 
         return true;
     }
@@ -9602,7 +9607,7 @@ bool CStaticFunctionDefinitions::FireWeapon(CCustomWeapon* pWeapon)
         CLuaArguments Arguments;
         Arguments.PushElement(NULL);
 
-        if (pWeapon->CallEvent("onWeaponFire", Arguments))
+        if (pWeapon->CallEvent(BuiltInEvents::onWeaponFire, Arguments))
         {
             CBitStream BitStream;
 
@@ -10048,7 +10053,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
         Arguments.PushString(szText);
         if (pResource)
             Arguments.PushResource(pResource);
-        m_pMapManager->GetRootElement()->CallEvent("onChatMessage", Arguments);
+        m_pMapManager->GetRootElement()->CallEvent(BuiltInEvents::onChatMessage, Arguments);
     }
 
     return false;
@@ -11353,7 +11358,7 @@ bool CStaticFunctionDefinitions::SetAccountData(CAccount* pAccount, const char* 
     Arguments.PushAccount(pAccount);
     Arguments.PushString(szKey);
     Arguments.PushString(strArgumentAsString);
-    if (m_pMapManager->GetRootElement()->CallEvent("onAccountDataChange", Arguments))
+    if (m_pMapManager->GetRootElement()->CallEvent(BuiltInEvents::onAccountDataChange, Arguments))
         return m_pAccountManager->SetAccountData(pAccount, szKey, strArgumentAsString, pArgument->GetType());
     return false;
 }
@@ -11483,14 +11488,14 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
             // Call the event with the responsible player as the source
             CLuaArguments Arguments;
             Arguments.PushBan(pBan);
-            pResponsible->CallEvent("onBan", Arguments);
+            pResponsible->CallEvent(BuiltInEvents::onBan, Arguments);
         }
         else
         {
             // Call the event with the root element as the source
             CLuaArguments Arguments;
             Arguments.PushBan(pBan);
-            m_pMapManager->GetRootElement()->CallEvent("onBan", Arguments);
+            m_pMapManager->GetRootElement()->CallEvent(BuiltInEvents::onBan, Arguments);
         }
 
         // Save the ban list
@@ -11511,7 +11516,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // show him the 'kicked' message instead of our 'banned' message.
         const bool bLeavingServer = pPlayer->IsLeavingServer();
         pPlayer->SetLeavingServer(true);
-        pPlayer->CallEvent("onPlayerBan", Arguments);
+        pPlayer->CallEvent(BuiltInEvents::onPlayerBan, Arguments);
         pPlayer->SetLeavingServer(bLeavingServer);
 
         // Check if script removed the ban
@@ -11609,14 +11614,14 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
             // Call the event with the responsible player as the source
             CLuaArguments Arguments;
             Arguments.PushBan(pBan);
-            pResponsible->CallEvent("onBan", Arguments);
+            pResponsible->CallEvent(BuiltInEvents::onBan, Arguments);
         }
         else
         {
             // Call the event with the root element as the source
             CLuaArguments Arguments;
             Arguments.PushBan(pBan);
-            m_pMapManager->GetRootElement()->CallEvent("onBan", Arguments);
+            m_pMapManager->GetRootElement()->CallEvent(BuiltInEvents::onBan, Arguments);
         }
 
         // Check if script removed the ban
@@ -11684,7 +11689,7 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // show him the 'kicked' message instead of our 'banned' message.
                 const bool bLeavingServer = pPlayer->IsLeavingServer();
                 pPlayer->SetLeavingServer(true);
-                pPlayer->CallEvent("onPlayerBan", Arguments);
+                pPlayer->CallEvent(BuiltInEvents::onPlayerBan, Arguments);
                 pPlayer->SetLeavingServer(bLeavingServer);
 
                 // Check if script removed the ban
@@ -11717,7 +11722,7 @@ bool CStaticFunctionDefinitions::RemoveBan(CBan* pBan, CPlayer* pResponsible)
     Arguments.PushBan(pBan);
     if (pResponsible)
         Arguments.PushElement(pResponsible);
-    m_pMapManager->GetRootElement()->CallEvent("onUnban", Arguments);
+    m_pMapManager->GetRootElement()->CallEvent(BuiltInEvents::onUnban, Arguments);
 
     // Check if script removed the ban
     if (pBan->IsBeingDeleted())

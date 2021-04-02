@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <event/Event.h>
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {
@@ -134,7 +135,7 @@ void CPedSync::StartSync(CPlayer* pPlayer, CPed* pPed)
     // Call the onElementStartSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pPlayer);            // New syncer
-    pPed->CallEvent("onElementStartSync", Arguments);
+    pPed->CallEvent(BuiltInEvents::onElementStartSync, Arguments);
 }
 
 void CPedSync::StopSync(CPed* pPed)
@@ -149,7 +150,7 @@ void CPedSync::StopSync(CPed* pPed)
     // Call the onElementStopSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pSyncer);            // Old syncer
-    pPed->CallEvent("onElementStopSync", Arguments);
+    pPed->CallEvent(BuiltInEvents::onElementStopSync, Arguments);
 }
 
 CPlayer* CPedSync::FindPlayerCloseToPed(CPed* pPed, float fMaxDistance)
@@ -234,10 +235,15 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
 
                             if (fDeltaHealth > 0.0f)
                             {
-                                // Call the onPedDamage event
-                                CLuaArguments Arguments;
-                                Arguments.PushNumber(fDeltaHealth);
-                                pPed->CallEvent("onPedDamage", Arguments);
+                                // This event wasn't registered as built-in for whatever reason
+                                // But we must keep it, as people might've discovered it (and registered it with addEvent)
+                                if (auto* event = CustomEvent::Get("onPedDamage"))
+                                {
+                                    // Call the onPedDamage event
+                                    CLuaArguments Arguments;
+                                    Arguments.PushNumber(fDeltaHealth);
+                                    pPed->CallEvent(*event, Arguments); // 
+                                }
                             }
                         }
                     }

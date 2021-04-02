@@ -421,29 +421,29 @@ bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFuncti
     return m_pEventManager->Add(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod);
 }
 
-bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller)
+bool CElement::CallEvent(const Event& event, const CLuaArguments& Arguments, CPlayer* pCaller)
 {
-    if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
-        return false;
+    //if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
+        //return false;
 
-    CEvents* pEvents = g_pGame->GetEvents();
+    //CEvents* pEvents = g_pGame->GetEvents();
 
-    // Make sure our event-manager knows we're about to call an event
-    pEvents->PreEventPulse();
+    //// Make sure our event-manager knows we're about to call an event
+    //pEvents->PreEventPulse();
 
-    // Call the event on our parents/us first
-    CallParentEvent(szName, Arguments, this, pCaller);
+    //// Call the event on our parents/us first
+    //CallParentEvent(szName, Arguments, this, pCaller);
 
-    // Call it on all our children
-    CallEventNoParent(szName, Arguments, this, pCaller);
+    //// Call it on all our children
+    //CallEventNoParent(szName, Arguments, this, pCaller);
 
-    // Tell the event manager that we're done calling the event
-    pEvents->PostEventPulse();
+    //// Tell the event manager that we're done calling the event
+    //pEvents->PostEventPulse();
 
-    g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
+    //g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
 
     // Return whether our event was cancelled or not
-    return (!pEvents->WasEventCancelled());
+    return s_EventDispatcher.Call(event, Arguments, this, pCaller);
 }
 
 bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
@@ -744,7 +744,7 @@ void CElement::DeleteCustomData(const char* szName)
         Arguments.PushString(szName);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
-        CallEvent("onElementDataChange", Arguments);
+        CallEvent(BuiltInEvents::onElementDataChange, Arguments);
     }
 }
 
@@ -1071,7 +1071,7 @@ void CElement::SetDimension(unsigned short usDimension)
     CLuaArguments Arguments;
     Arguments.PushNumber(usOldDimension);
     Arguments.PushNumber(usDimension);
-    CallEvent("onElementDimensionChange", Arguments);
+    CallEvent(BuiltInEvents::onElementDimensionChange, Arguments);
 }
 
 void CElement::SetInterior(unsigned char ucInterior)
@@ -1085,7 +1085,7 @@ void CElement::SetInterior(unsigned char ucInterior)
     CLuaArguments Arguments;
     Arguments.PushNumber(ucOldInterior);
     Arguments.PushNumber(ucInterior);
-    CallEvent("onElementInteriorChange", Arguments);
+    CallEvent(BuiltInEvents::onElementInteriorChange, Arguments);
 }
 
 CClient* CElement::GetClient()

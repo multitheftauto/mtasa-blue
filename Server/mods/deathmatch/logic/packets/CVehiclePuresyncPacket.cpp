@@ -154,7 +154,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                         // Call the onVehicleDamage event
                         CLuaArguments Arguments;
                         Arguments.PushNumber(fDeltaHealth);
-                        pVehicle->CallEvent("onVehicleDamage", Arguments);
+                        pVehicle->CallEvent(BuiltInEvents::onVehicleDamage, Arguments);
                     }
                 }
                 pVehicle->SetHealth(fHealth);
@@ -208,7 +208,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                 // Execute the attach trailer script function
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pTowedByVehicle);
-                                pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                                pCurrentTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
                             }
 
                             // If something else is towing this trailer
@@ -225,7 +225,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                 // Execute the attach trailer script function
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pCurrentVehicle);
-                                pTrailer->CallEvent("onTrailerDetach", Arguments);
+                                pTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
                             }
 
                             pTowedByVehicle->SetTowedVehicle(pTrailer);
@@ -234,7 +234,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                             // Execute the attach trailer script function
                             CLuaArguments Arguments;
                             Arguments.PushElement(pTowedByVehicle);
-                            bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+                            bool bContinue = pTrailer->CallEvent(BuiltInEvents::onTrailerAttach, Arguments);
 
                             // Attach or detach trailers depending on the event outcome
                             CVehicleTrailerPacket TrailerPacket(pTowedByVehicle, pTrailer, bContinue);
@@ -264,7 +264,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     // Execute the detach trailer script function
                     CLuaArguments Arguments;
                     Arguments.PushElement(pTowedByVehicle);
-                    pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                    pCurrentTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
                 }
             }
 
@@ -309,7 +309,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     Arguments.PushNumber(false);
                     Arguments.PushNumber(false);
                     Arguments.PushNumber(fHealthLoss);
-                    pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
+                    pSourcePlayer->CallEvent(BuiltInEvents::onPlayerDamage, Arguments);
                 }
                 else
                 {
@@ -324,7 +324,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     Arguments.PushNumber(pSourcePlayer->GetAttackWeapon());
                     Arguments.PushNumber(pSourcePlayer->GetAttackBodyPart());
                     Arguments.PushNumber(fHealthLoss);
-                    pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
+                    pSourcePlayer->CallEvent(BuiltInEvents::onPlayerDamage, Arguments);
                 }
             }
             pSourcePlayer->SetHealth(fHealth);
@@ -349,7 +349,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     Arguments.PushNumber(false);
                     Arguments.PushNumber(false);
                     Arguments.PushNumber(fArmorLoss);
-                    pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
+                    pSourcePlayer->CallEvent(BuiltInEvents::onPlayerDamage, Arguments);
                 }
                 else
                 {
@@ -364,7 +364,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     Arguments.PushNumber(pSourcePlayer->GetAttackWeapon());
                     Arguments.PushNumber(pSourcePlayer->GetAttackBodyPart());
                     Arguments.PushNumber(fArmorLoss);
-                    pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
+                    pSourcePlayer->CallEvent(BuiltInEvents::onPlayerDamage, Arguments);
                 }
             }
             pSourcePlayer->SetArmor(fArmor);

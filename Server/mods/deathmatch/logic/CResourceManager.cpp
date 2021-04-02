@@ -275,7 +275,7 @@ void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const cha
     else
         Arguments.PushNil();
 
-    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourceLoadStateChange", Arguments);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent(BuiltInEvents::onResourceLoadStateChange, Arguments);
 }
 
 const char* CResourceManager::GetResourceDirectory()

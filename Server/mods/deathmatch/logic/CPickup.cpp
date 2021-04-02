@@ -396,17 +396,17 @@ void CPickup::Use(CPlayer& Player)
     // Call the onPickupUse event
     CLuaArguments Arguments;
     Arguments.PushElement(&Player);
-    if (!CallEvent("onPickupUse", Arguments))
+    if (!CallEvent(BuiltInEvents::onPickupUse, Arguments))
     {
         CLuaArguments Arguments2;
         Arguments2.PushElement(this);            // pickup
-        Player.CallEvent("onPlayerPickupUse", Arguments2);
+        Player.CallEvent(BuiltInEvents::onPlayerPickupUse, Arguments2);
     }
     else
     {
         CLuaArguments Arguments2;
         Arguments2.PushElement(this);            // pickup
-        if (Player.CallEvent("onPlayerPickupUse", Arguments2))
+        if (Player.CallEvent(BuiltInEvents::onPlayerPickupUse, Arguments2))
         {
             // Tell all the other players to hide it if the respawn intervals are bigger than 0
             if (m_ulRespawnIntervals > 0)
@@ -487,11 +487,11 @@ void CPickup::Callback_OnCollision(CColShape& Shape, CElement& Element)
                     // Call the onPickupHit event
                     CLuaArguments Arguments;
                     Arguments.PushElement(&Player);
-                    bool bContinue1 = CallEvent("onPickupHit", Arguments);
+                    bool bContinue1 = CallEvent(BuiltInEvents::onPickupHit, Arguments);
 
                     CLuaArguments Arguments2;
                     Arguments2.PushElement(this);            // pickup
-                    bool bContinue2 = Element.CallEvent("onPlayerPickupHit", Arguments2);
+                    bool bContinue2 = Element.CallEvent(BuiltInEvents::onPlayerPickupHit, Arguments2);
 
                     if (bContinue1 && bContinue2)
                     {
@@ -530,11 +530,11 @@ void CPickup::Callback_OnLeave(CColShape& Shape, CElement& Element)
                     // Call the onPickupLeave event
                     CLuaArguments Arguments;
                     Arguments.PushElement(&Player);
-                    CallEvent("onPickupLeave", Arguments);
+                    CallEvent(BuiltInEvents::onPickupLeave, Arguments);
 
                     CLuaArguments Arguments2;
                     Arguments2.PushElement(this);            // pickup
-                    Element.CallEvent("onPlayerPickupLeave", Arguments2);
+                    Element.CallEvent(BuiltInEvents::onPlayerPickupLeave, Arguments2);
                 }
             }
         }

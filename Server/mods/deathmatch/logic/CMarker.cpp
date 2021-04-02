@@ -304,14 +304,14 @@ void CMarker::Callback_OnCollision(CColShape& Shape, CElement& Element)
         CLuaArguments Arguments;
         Arguments.PushElement(&Element);                                            // Hit element
         Arguments.PushBoolean(GetDimension() == Element.GetDimension());            // Matching dimension?
-        CallEvent("onMarkerHit", Arguments);
+        CallEvent(BuiltInEvents::onMarkerHit, Arguments);
 
         if (IS_PLAYER(&Element))
         {
             CLuaArguments Arguments2;
             Arguments2.PushElement(this);                                                // marker
             Arguments2.PushBoolean(GetDimension() == Element.GetDimension());            // Matching dimension?
-            Element.CallEvent("onPlayerMarkerHit", Arguments2);
+            Element.CallEvent(BuiltInEvents::onPlayerMarkerHit, Arguments2);
         }
     }
 }
@@ -325,14 +325,14 @@ void CMarker::Callback_OnLeave(CColShape& Shape, CElement& Element)
         CLuaArguments Arguments;
         Arguments.PushElement(&Element);                                            // Hit element
         Arguments.PushBoolean(GetDimension() == Element.GetDimension());            // Matching dimension?
-        CallEvent("onMarkerLeave", Arguments);
+        CallEvent(BuiltInEvents::onMarkerLeave, Arguments);
 
         if (IS_PLAYER(&Element))
         {
             CLuaArguments Arguments2;
             Arguments2.PushElement(this);                                                // marker
             Arguments2.PushBoolean(GetDimension() == Element.GetDimension());            // Matching dimension?
-            Element.CallEvent("onPlayerMarkerLeave", Arguments2);
+            Element.CallEvent(BuiltInEvents::onPlayerMarkerLeave, Arguments2);
         }
     }
 }

@@ -53,7 +53,7 @@ void CBanManager::DoPulse()
                     // Trigger the event
                     CLuaArguments Arguments;
                     Arguments.PushBan(*iter);
-                    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onUnban", Arguments);
+                    g_pGame->GetMapManager()->GetRootElement()->CallEvent(BuiltInEvents::onUnban, Arguments);
 
                     RemoveBan(*iter);
                     iter = m_BanManager.begin();

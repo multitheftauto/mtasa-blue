@@ -341,7 +341,7 @@ bool CConsoleCommands::Say(CConsole* pConsole, const char* szInArguments, CClien
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
                             Arguments.PushNumber(0);            // Normal chat
-                            bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
+                            bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent(BuiltInEvents::onPlayerChat, Arguments);
                             if (bContinue)
                             {
                                 // Log it in the console
@@ -364,7 +364,7 @@ bool CConsoleCommands::Say(CConsole* pConsole, const char* szInArguments, CClien
                                 CLuaArguments Arguments2;
                                 Arguments2.PushString(szArguments);
                                 Arguments2.PushElement(pPlayer);
-                                pPlayer->CallEvent("onChatMessage", Arguments2);
+                                pPlayer->CallEvent(BuiltInEvents::onChatMessage, Arguments2);
                             }
 
                             break;
@@ -476,7 +476,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
                             Arguments.PushNumber(2);            // Team chat
-                            bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
+                            bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent(BuiltInEvents::onPlayerChat, Arguments);
                             if (bContinue)
                             {
                                 // Log it in the console
@@ -494,7 +494,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                                 CLuaArguments Arguments2;
                                 Arguments2.PushString(szArguments);
                                 Arguments2.PushElement(pTeam);
-                                static_cast<CPlayer*>(pClient)->CallEvent("onChatMessage", Arguments2);
+                                static_cast<CPlayer*>(pClient)->CallEvent(BuiltInEvents::onChatMessage, Arguments2);
                             }
 
                             // Success
@@ -584,7 +584,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLuaArguments Arguments;
                                         Arguments.PushString(szArguments);
                                         Arguments.PushElement(pPlayer);
-                                        bool bContinue = pSender->CallEvent("onPlayerPrivateMessage", Arguments);
+                                        bool bContinue = pSender->CallEvent(BuiltInEvents::onPlayerPrivateMessage, Arguments);
                                         if (bContinue)
                                         {
                                             // Send it to the player
@@ -682,7 +682,7 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                         CLuaArguments Arguments;
                         Arguments.PushString(szArguments);            // text
                         Arguments.PushNumber(1);                      // Me chat
-                        bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
+                        bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent(BuiltInEvents::onPlayerChat, Arguments);
                         if (bContinue)
                         {
                             // Log it in the console
@@ -696,7 +696,7 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                             CLuaArguments Arguments2;
                             Arguments2.PushString(szArguments);
                             Arguments2.PushElement(pPlayer);
-                            static_cast<CPlayer*>(pClient)->CallEvent("onChatMessage", Arguments2);
+                            static_cast<CPlayer*>(pClient)->CallEvent(BuiltInEvents::onChatMessage, Arguments2);
                         }
                     }
 
@@ -751,7 +751,7 @@ bool CConsoleCommands::Nick(CConsole* pConsole, const char* szArguments, CClient
                                 Arguments.PushString(pClient->GetNick());
                                 Arguments.PushString(szNewNick);
                                 Arguments.PushBoolean(true);            // manually changed
-                                if (pPlayer->CallEvent("onPlayerChangeNick", Arguments))
+                                if (pPlayer->CallEvent(BuiltInEvents::onPlayerChangeNick, Arguments))
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("NICK: %s is now known as %s\n", szNick, szNewNick);

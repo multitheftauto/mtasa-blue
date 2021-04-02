@@ -50,7 +50,7 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
             CLuaArguments Arguments;
             Arguments.PushString(szKey);
 
-            if (!pPlayer->CallEvent("onPlayerCommand", Arguments))
+            if (!pPlayer->CallEvent(BuiltInEvents::onPlayerCommand, Arguments))
                 return false;
         }
 
@@ -93,7 +93,7 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
                     // Call the console event
                     CLuaArguments Arguments;
                     Arguments.PushString(szCommand);
-                    pPlayer->CallEvent("onConsole", Arguments);
+                    pPlayer->CallEvent(BuiltInEvents::onConsole, Arguments);
                 }
                 break;
             }
@@ -106,7 +106,7 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
                 // Call the console event
                 CLuaArguments Arguments;
                 Arguments.PushString(szCommand);
-                pConsole->CallEvent("onConsole", Arguments);
+                pConsole->CallEvent(BuiltInEvents::onConsole, Arguments);
                 break;
             }
             default:

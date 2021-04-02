@@ -141,12 +141,12 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
                 CLuaArguments Arguments;
                 Arguments.PushElement(pEntity);
                 Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-                pShape->CallEvent("onColShapeHit", Arguments);
+                pShape->CallEvent(BuiltInEvents::onColShapeHit, Arguments);
 
                 CLuaArguments Arguments2;
                 Arguments2.PushElement(pShape);
                 Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-                pEntity->CallEvent("onElementColShapeHit", Arguments2);
+                pEntity->CallEvent(BuiltInEvents::onElementColShapeHit, Arguments2);
             }
 
             // Run whatever callback the collision item might have attached
@@ -166,12 +166,12 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             CLuaArguments Arguments;
             Arguments.PushElement(pEntity);
             Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pShape->CallEvent("onColShapeLeave", Arguments);
+            pShape->CallEvent(BuiltInEvents::onColShapeLeave, Arguments);
 
             CLuaArguments Arguments2;
             Arguments2.PushElement(pShape);
             Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pEntity->CallEvent("onElementColShapeLeave", Arguments2);
+            pEntity->CallEvent(BuiltInEvents::onElementColShapeLeave, Arguments2);
 
             pShape->CallLeaveCallback(*pEntity);
         }

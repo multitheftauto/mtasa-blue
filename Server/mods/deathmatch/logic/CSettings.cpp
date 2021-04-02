@@ -370,7 +370,7 @@ bool CSettings::Set(const char* szLocalResource, const char* szSetting, const ch
 
             Arguments.PushString(szContent);
 
-            g_pGame->GetMapManager()->GetRootElement()->CallEvent("onSettingChange", Arguments);
+            g_pGame->GetMapManager()->GetRootElement()->CallEvent(BuiltInEvents::onSettingChange, Arguments);
 
             // Save the XML file
             if (m_pFile->Write())

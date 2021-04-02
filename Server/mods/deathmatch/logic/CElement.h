@@ -23,6 +23,7 @@
 #include <list>
 #include <cstring>
 #include <event/EventHandlerCallDispatcher.h>
+#include <event/BuiltInEvents.h>
 // Used to check fast version of getElementsByType
 //#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
@@ -131,7 +132,7 @@ public:
 
     bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                   float fPriorityMod);
-    bool CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL);
+    bool CallEvent(const Event& event, const CLuaArguments& Arguments, CPlayer* pCaller = NULL);
     bool DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents();

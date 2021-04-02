@@ -723,7 +723,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     CLuaArguments PreStartArguments;
     PreStartArguments.PushResource(this);
 
-    if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourcePreStart", PreStartArguments))
+    if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent(BuiltInEvents::onResourcePreStart, PreStartArguments))
     {
         // Start cancelled by another resource
         m_strFailureReason = "Start cancelled by script\n";
@@ -957,7 +957,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     CLuaArguments Arguments;
     Arguments.PushResource(this);
 
-    if (!m_pResourceElement->CallEvent("onResourceStart", Arguments))
+    if (!m_pResourceElement->CallEvent(BuiltInEvents::onResourceStart, Arguments))
     {
         // We're no longer active. stop the resource
         CLogger::LogPrintf("Start up of resource %s cancelled by script\n", m_strResourceName.c_str());
@@ -1025,7 +1025,7 @@ bool CResource::Stop(bool bManualStop)
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     Arguments.PushBoolean(m_bDestroyed);
-    m_pResourceElement->CallEvent("onResourceStop", Arguments);
+    m_pResourceElement->CallEvent(BuiltInEvents::onResourceStop, Arguments);
 
     // Remove us from the resources we depend on (they might unload too first)
     for (CIncludedResources* pIncludedResources : m_IncludedResources)

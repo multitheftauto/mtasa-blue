@@ -131,7 +131,7 @@ void CObjectSync::StartSync(CPlayer* pPlayer, CObject* pObject)
     // Call the onElementStartSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pPlayer);            // New syncer
-    pObject->CallEvent("onElementStartSync", Arguments);
+    pObject->CallEvent(BuiltInEvents::onElementStartSync, Arguments);
 }
 
 void CObjectSync::StopSync(CObject* pObject)
@@ -146,7 +146,7 @@ void CObjectSync::StopSync(CObject* pObject)
     // Call the onElementStopSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pSyncer);            // Old syncer
-    pObject->CallEvent("onElementStopSync", Arguments);
+    pObject->CallEvent(BuiltInEvents::onElementStopSync, Arguments);
 }
 
 CPlayer* CObjectSync::FindPlayerCloseToObject(CObject* pObject, float fMaxDistance)

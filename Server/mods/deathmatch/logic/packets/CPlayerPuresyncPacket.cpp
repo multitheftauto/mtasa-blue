@@ -77,7 +77,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             else
                 Arguments.PushNil();
 
-            pSourcePlayer->CallEvent("onPlayerContact", Arguments);
+            pSourcePlayer->CallEvent(BuiltInEvents::onPlayerContact, Arguments);
         }
 
         // Player position
@@ -260,7 +260,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             Arguments.PushNumber(pSourcePlayer->GetAttackBodyPart());
             Arguments.PushNumber(fDamage);
 
-            pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
+            pSourcePlayer->CallEvent(BuiltInEvents::onPlayerDamage, Arguments);
         }
 
         // Success

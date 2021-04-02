@@ -608,7 +608,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
     OnPlayerSpawnArguments.PushNumber(usModel);
     OnPlayerSpawnArguments.PushNumber(ucInterior);
     OnPlayerSpawnArguments.PushNumber(usDimension);
-    Player.CallEvent("onPlayerSpawn", OnPlayerSpawnArguments);
+    Player.CallEvent(BuiltInEvents::onPlayerSpawn, OnPlayerSpawnArguments);
 }
 
 void CMapManager::DoRespawning()
@@ -671,7 +671,7 @@ void CMapManager::DoPickupRespawning()
 
             // Call the on pickup spawn event
             CLuaArguments Arguments;
-            pPickup->CallEvent("onPickupSpawn", Arguments);
+            pPickup->CallEvent(BuiltInEvents::onPickupSpawn, Arguments);
         }
     }
 }
@@ -801,7 +801,7 @@ void CMapManager::DoVehicleRespawning()
             // Call the respawn event
             CLuaArguments Arguments;
             Arguments.PushBoolean(bExploded);
-            pVehicle->CallEvent("onVehicleRespawn", Arguments);
+            pVehicle->CallEvent(BuiltInEvents::onVehicleRespawn, Arguments);
         }
     }
 

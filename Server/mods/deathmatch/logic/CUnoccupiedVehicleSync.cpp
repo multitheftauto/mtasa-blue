@@ -181,7 +181,7 @@ void CUnoccupiedVehicleSync::StartSync(CPlayer* pPlayer, CVehicle* pVehicle)
     // Call the onElementStartSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pPlayer);            // New syncer
-    pVehicle->CallEvent("onElementStartSync", Arguments);
+    pVehicle->CallEvent(BuiltInEvents::onElementStartSync, Arguments);
 }
 
 void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
@@ -196,7 +196,7 @@ void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
     // Call the onElementStopSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pSyncer);            // Old syncer
-    pVehicle->CallEvent("onElementStopSync", Arguments);
+    pVehicle->CallEvent(BuiltInEvents::onElementStopSync, Arguments);
 }
 
 CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle(CVehicle* pVehicle, float fMaxDistance)
@@ -315,7 +315,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                     // Call the onVehicleDamage event
                                     CLuaArguments Arguments;
                                     Arguments.PushNumber(fDeltaHealth);
-                                    pVehicle->CallEvent("onVehicleDamage", Arguments);
+                                    pVehicle->CallEvent(BuiltInEvents::onVehicleDamage, Arguments);
                                 }
                             }
                             pVehicle->SetHealth(vehicle.data.fHealth);
@@ -346,7 +346,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                         // Execute the attach trailer script function
                                         CLuaArguments Arguments;
                                         Arguments.PushElement(pVehicle);
-                                        pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                                        pCurrentTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
 
                                         pVehicle->SetTowedVehicle(NULL);
                                         pCurrentTrailer->SetTowedByVehicle(NULL);
@@ -363,7 +363,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                         // Execute the attach trailer script function
                                         CLuaArguments Arguments;
                                         Arguments.PushElement(pCurrentVehicle);
-                                        pTrailer->CallEvent("onTrailerDetach", Arguments);
+                                        pTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
 
                                         pCurrentVehicle->SetTowedVehicle(NULL);
                                         pTrailer->SetTowedByVehicle(NULL);
@@ -379,7 +379,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                     // Execute the attach trailer script function
                                     CLuaArguments Arguments;
                                     Arguments.PushElement(pVehicle);
-                                    bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+                                    bool bContinue = pTrailer->CallEvent(BuiltInEvents::onTrailerAttach, Arguments);
 
                                     if (!bContinue)
                                     {
@@ -409,7 +409,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                     // Execute the detach trailer script function
                                     CLuaArguments Arguments;
                                     Arguments.PushElement(pVehicle);
-                                    pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                                    pCurrentTrailer->CallEvent(BuiltInEvents::onTrailerDetach, Arguments);
                                 }
                             }
                         }

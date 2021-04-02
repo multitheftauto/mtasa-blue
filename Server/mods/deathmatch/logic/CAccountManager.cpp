@@ -583,7 +583,7 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const std::s
     Arguments.PushAccount(pCurrentAccount);
     Arguments.PushAccount(pAccount);
     Arguments.PushBoolean(false);            // was bAutoLogin
-    if (!pPlayer->CallEvent("onPlayerLogin", Arguments))
+    if (!pPlayer->CallEvent(BuiltInEvents::onPlayerLogin, Arguments))
     {
         // DENIED!
         pClient->SetAccount(pCurrentAccount);
@@ -640,7 +640,7 @@ bool CAccountManager::LogOut(CClient* pClient, CClient* pEchoClient)
     CLuaArguments Arguments;
     Arguments.PushAccount(pCurrentAccount);
     Arguments.PushAccount(pAccount);
-    if (!pPlayer->CallEvent("onPlayerLogout", Arguments))
+    if (!pPlayer->CallEvent(BuiltInEvents::onPlayerLogout, Arguments))
     {
         // DENIED!
         pClient->SetAccount(pCurrentAccount);

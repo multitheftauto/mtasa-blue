@@ -357,7 +357,7 @@ void CPlayer::RemoveAllSyncingVehicles()
 
         CLuaArguments Arguments;
         Arguments.PushElement(this);
-        (*iter)->CallEvent("onElementStopSync", Arguments);
+        (*iter)->CallEvent(BuiltInEvents::onElementStopSync, Arguments);
     }
 }
 
@@ -403,7 +403,7 @@ void CPlayer::RemoveAllSyncingPeds()
 
         CLuaArguments Arguments;
         Arguments.PushElement(this);
-        (*iter)->CallEvent("onElementStopSync", Arguments);
+        (*iter)->CallEvent(BuiltInEvents::onElementStopSync, Arguments);
     }
 }
 
@@ -449,7 +449,7 @@ void CPlayer::RemoveAllSyncingObjects()
 
         CLuaArguments Arguments;
         Arguments.PushElement(this);
-        (*iter)->CallEvent("onElementStopSync", Arguments);
+        (*iter)->CallEvent(BuiltInEvents::onElementStopSync, Arguments);
     }
 }
 

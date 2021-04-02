@@ -134,7 +134,7 @@ void CRPCFunctions::PlayerTarget(NetBitStreamInterface& bitStream)
         else
             Arguments.PushBoolean(false);
 
-        m_pSourcePlayer->CallEvent("onPlayerTarget", Arguments);
+        m_pSourcePlayer->CallEvent(BuiltInEvents::onPlayerTarget, Arguments);
     }
     UNCLOCK("NetServerPulse::RPC", "PlayerTarget");
 }
@@ -168,7 +168,7 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
             Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(ucPrevSlot));
             Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(uiSlot));
 
-            m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
+            m_pSourcePlayer->CallEvent(BuiltInEvents::onPlayerWeaponSwitch, Arguments);
         }
 
         m_pSourcePlayer->SetWeaponSlot(uiSlot);
@@ -286,7 +286,7 @@ void CRPCFunctions::CursorEvent(NetBitStreamInterface& bitStream)
                     Arguments.PushNumber(vecPosition.fX);
                     Arguments.PushNumber(vecPosition.fY);
                     Arguments.PushNumber(vecPosition.fZ);
-                    pElement->CallEvent("onElementClicked", Arguments);
+                    pElement->CallEvent(BuiltInEvents::onElementClicked, Arguments);
                 }
                 // Call the onPlayerClick event
                 CLuaArguments Arguments;
@@ -301,7 +301,7 @@ void CRPCFunctions::CursorEvent(NetBitStreamInterface& bitStream)
                 Arguments.PushNumber(vecPosition.fZ);
                 Arguments.PushNumber(vecCursorPosition.fX);
                 Arguments.PushNumber(vecCursorPosition.fY);
-                m_pSourcePlayer->CallEvent("onPlayerClick", Arguments);
+                m_pSourcePlayer->CallEvent(BuiltInEvents::onPlayerClick, Arguments);
 
                 // TODO: iterate server-side element managers for the click events, eg: colshapes
             }
@@ -334,7 +334,7 @@ void CRPCFunctions::RequestStealthKill(NetBitStreamInterface& bitStream)
                     {
                         CLuaArguments Arguments;
                         Arguments.PushElement(pTarget);
-                        if (m_pSourcePlayer->CallEvent("onPlayerStealthKill", Arguments))
+                        if (m_pSourcePlayer->CallEvent(BuiltInEvents::onPlayerStealthKill, Arguments))
                         {
                             // Start the stealth kill
                             CStaticFunctionDefinitions::KillPed(pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9 /*BODYPART_HEAD*/, true);

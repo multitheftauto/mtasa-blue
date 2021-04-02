@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <event/BuiltInEvents.h>
 
 #define MAX_STRING_LENGTH 2048
 
@@ -226,7 +227,7 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
 #ifdef MTA_CLIENT
         notCancelled = g_pClientGame->GetRootEntity()->CallEvent("onClientDebugMessage", Arguments, false);
 #else
-        notCancelled = g_pGame->GetMapManager()->GetRootElement()->CallEvent("onDebugMessage", Arguments);
+        notCancelled = g_pGame->GetMapManager()->GetRootElement()->CallEvent(BuiltInEvents::onDebugMessage, Arguments);
 #endif
 
         // Reset trigger state, so onDebugMessage can be called again at a later moment
