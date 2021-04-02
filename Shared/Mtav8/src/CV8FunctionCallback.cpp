@@ -175,3 +175,9 @@ void CV8FunctionCallback::ReturnPromise(std::function<void(CV8AsyncContextBase*)
     pIsolate->AddPromise(std::move(pPromise));
     m_callback.GetReturnValue().Set(promise);
 }
+
+void CV8FunctionCallback::ThrowException(std::string exception)
+{
+    m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(exception));
+    m_callback.GetReturnValue().SetUndefined();
+}

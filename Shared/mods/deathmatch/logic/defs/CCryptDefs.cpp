@@ -49,6 +49,7 @@ void CCryptDefs::LoadJsFunctions()
         {"base64encode", JsArgumentParser<Base64encode>},
         {"base64decode", JsArgumentParser<Base64decode>},
         {"sleep", JsArgumentParser<Sleep_>},
+        {"testException", JsArgumentParser<TestException>},
     };
 
     for (const auto& [name, func] : functions)
@@ -106,6 +107,11 @@ Promise CCryptDefs::Sleep_(int time)
         Sleep(time);
         asyncContext->Resolve();
     };
+}
+
+std::string CCryptDefs::TestException(std::string str)
+{
+    throw std::invalid_argument("foo exception");
 }
 
 std::string CCryptDefs::Base64decode(std::string str)

@@ -23,4 +23,5 @@ public:
     virtual void ReturnUndefined() = 0;
 
     virtual void ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncFunction) = 0;
+    virtual void ThrowException(std::string exception) = 0;
 };

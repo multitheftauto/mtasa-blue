@@ -818,7 +818,7 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
         }
         catch (std::invalid_argument& e)
         {
-            int a = 5;
+            JS->ThrowException(e.what());
         }
     }
 };

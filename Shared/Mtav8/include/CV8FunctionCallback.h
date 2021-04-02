@@ -33,6 +33,7 @@ public:
 
     void ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncFunction);
 
+    void ThrowException(std::string exception);
 private:
     const FunctionCallbackInfo<Value>& m_callback;
     bool                               bHasError = false;

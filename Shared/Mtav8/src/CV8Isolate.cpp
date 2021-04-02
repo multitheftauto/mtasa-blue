@@ -103,7 +103,6 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
     else
     {
         Local<Context> context(m_pIsolate->GetCurrentContext());
-        int            linenum = message->GetLineNumber(context).FromJust();
         Local<Value>   stackTraceString;
         if (pTryCatch->StackTrace(context).ToLocal(&stackTraceString) && stackTraceString->IsString() && stackTraceString.As<String>()->Length() > 0)
         {
@@ -111,6 +110,11 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
             const char*       stackTraceString = CV8Utils::ToString(stackTrace);
             fprintf(stderr, "%s\n", stackTraceString);
         }
+
+        v8::String::Utf8Value  fileName(m_pIsolate, message->GetScriptOrigin().ResourceName());
+        const char*            fileNameString = CV8Utils::ToString(fileName);
+        int                    lineNum = message->GetLineNumber(context).FromJust();
+        fprintf(stderr, "%s:%i: %s\n", fileNameString, lineNum, exceptionString);
 
         // Print line of source code.
         String::Utf8Value sourceLine(m_pIsolate, message->GetSourceLine(context).ToLocalChecked());

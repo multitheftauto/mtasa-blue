@@ -35,4 +35,6 @@ public:
     LUA_DECLARE(DecodeString);
 
     static Promise Sleep_(int str);
+
+    static std::string TestException(std::string str);
 };
