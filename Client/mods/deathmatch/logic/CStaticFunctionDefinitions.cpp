@@ -431,8 +431,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
         case CCLIENTDUMMY:
         {
             CClientDummy& Dummy = static_cast<CClientDummy&>(Entity);
-            Dummy.GetRotation(vecRotation);
-            ConvertRadiansToDegrees(vecRotation);
+            Dummy.GetRotationDegrees(vecRotation);
             if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
             {
                 vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);

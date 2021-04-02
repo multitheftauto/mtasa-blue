@@ -1222,13 +1222,12 @@ bool CStaticFunctionDefinitions::SetDummyRotation(CElement* pElement, const CVec
     {
         CDummy* pDummy = static_cast<CDummy*>(pElement);
 
-        CVector vecRadians = vecRotation;
-        pDummy->SetRotationDegrees(vecRadians);
+        pDummy->SetRotationDegrees(vecRotation);
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write(vecRadians.fX);
-        BitStream.pBitStream->Write(vecRadians.fY);
-        BitStream.pBitStream->Write(vecRadians.fZ);
+        BitStream.pBitStream->Write(vecRotation.fX);
+        BitStream.pBitStream->Write(vecRotation.fY);
+        BitStream.pBitStream->Write(vecRotation.fZ);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pDummy, SET_DUMMY_ROTATION, *BitStream.pBitStream));
     }
     return false;

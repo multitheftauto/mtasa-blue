@@ -17,6 +17,7 @@ void CDummyRPCs::LoadFunctions()
     AddHandler(SET_DUMMY_ROTATION, SetDummyRotation);
 }
 
+// Rotation is in degrees
 void CDummyRPCs::SetDummyRotation(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Grab the dummy element
@@ -27,7 +28,7 @@ void CDummyRPCs::SetDummyRotation(CClientEntity* pSource, NetBitStreamInterface&
         CVector vecRotation;
         if (bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ))
         {
-            pDummy->SetRotation(vecRotation);
+            pDummy->SetRotationDegrees(vecRotation);
         }
     }
 }
