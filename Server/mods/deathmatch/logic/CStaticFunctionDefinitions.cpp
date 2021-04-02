@@ -1088,8 +1088,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
         case CElement::DUMMY:
         {
             CDummy* pDummy = static_cast<CDummy*>(pElement);
-            pDummy->GetRotation(vecRotation);
-            ConvertRadiansToDegrees(vecRotation);
+            pDummy->GetRotationDegrees(vecRotation);
             if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
             {
                 vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
@@ -1224,8 +1223,7 @@ bool CStaticFunctionDefinitions::SetDummyRotation(CElement* pElement, const CVec
         CDummy* pDummy = static_cast<CDummy*>(pElement);
 
         CVector vecRadians = vecRotation;
-        ConvertDegreesToRadians(vecRadians);
-        pDummy->SetRotation(vecRadians);
+        pDummy->SetRotationDegrees(vecRadians);
 
         CBitStream BitStream;
         BitStream.pBitStream->Write(vecRadians.fX);

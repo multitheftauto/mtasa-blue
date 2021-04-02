@@ -48,6 +48,19 @@ void CDummy::Unlink()
     }
 }
 
+void CDummy::GetRotationDegrees(CVector& vecRotation)
+{
+    ConvertDegreesToRadians(vecRotation);
+    GetRotationRadians(vecRotation);
+}
+
+void CDummy::SetRotationDegrees(const CVector& vecRotation)
+{
+    CVector vecTemp = vecRotation;
+    ConvertDegreesToRadians(vecTemp);
+    SetRotationRadians(vecTemp);
+}
+
 bool CDummy::ReadSpecialData(const int iLine)
 {
     // Grab the position data
