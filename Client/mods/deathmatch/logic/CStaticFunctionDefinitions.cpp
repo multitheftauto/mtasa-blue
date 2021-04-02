@@ -428,6 +428,17 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             Entity.GetRotationDegrees(vecRotation);
             break;
         }
+        case CCLIENTDUMMY:
+        {
+            CClientDummy& Dummy = static_cast<CClientDummy&>(Entity);
+            Dummy.GetRotation(vecRotation);
+            ConvertRadiansToDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+            break;
+        }
         default:
             return false;
     }
@@ -1102,6 +1113,22 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             Entity.SetRotationDegrees(vecRotation);
             break;
         }
+        case CCLIENTDUMMY:
+        {
+            CClientDummy& Dummy = static_cast<CClientDummy&>(Entity);
+            ConvertDegreesToRadians(const_cast<CVector&>(vecRotation));
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
+            {
+                Dummy.SetRotation(vecRotation);
+            }
+            else
+            {
+                Dummy.SetRotation(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX));
+            }
+
+            break;
+        }
+
         default:
             return false;
     }
