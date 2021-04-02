@@ -531,6 +531,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pACLManager = new CAccessControlListManager;
     m_pHqComms = new CHqComms;
 
+    CJsDefs::Initialize();
+    CJsShared::AddFunctions();
+    CJsShared::AddClasses();
+
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
@@ -546,9 +550,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
-
-    CJsShared::AddFunctions();
-    CJsShared::AddClasses();
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))

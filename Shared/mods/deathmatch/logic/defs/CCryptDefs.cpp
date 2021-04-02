@@ -40,7 +40,7 @@ void CCryptDefs::LoadLuaFunctions()
 void CCryptDefs::LoadJsFunctions()
 {
 #ifndef MTA_CLIENT
-    CV8ModuleBase* pCryptModule = g_pServerInterface->GetV8()->CreateModule("crypt");
+    m_pModule = m_pJs->CreateModule("crypt");
 
     constexpr static const std::pair<const char*, void(*)(CV8FunctionCallbackBase*)> functions[]{
         {"md5", JsArgumentParser<Md5>},
@@ -52,30 +52,13 @@ void CCryptDefs::LoadJsFunctions()
     };
 
     for (const auto& [name, func] : functions)
-        pCryptModule->AddFunction(name, func);
+        m_pModule->AddFunction(name, func);
 
     CV8ExportObjectBase* bCrypt = g_pServerInterface->GetV8()->CreateExportObject();
     bCrypt->AddFunction("md5", JsArgumentParser<Md5>);
-    pCryptModule->AddObject("bCrypt", bCrypt);
+    m_pModule->AddObject("bCrypt", bCrypt);
 #endif
 }
-
-//#ifndef MTA_CLIENT
-
-//
-//void CJsCryptDefs::BCrypt(CV8FunctionCallbackBase* callback)
-//{
-//    std::string password;
-//    double      value;
-//    if (callback->ReadString(password) && callback->ReadNumber(value))
-//    {
-//        callback->ReturnPromise(std::make_unique<CV8PasswordHash>(password, (int)value));
-//        return;
-//    }
-//    callback->Return(false);
-//}
-//
-//#endif
 
 std::string CCryptDefs::Md5(std::string strMd5)
 {
@@ -121,7 +104,7 @@ Promise CCryptDefs::Sleep_(int time)
 {
     return [time](CV8AsyncContextBase* asyncContext) {
         Sleep(time);
-        asyncContext->Resolve("");
+        asyncContext->Resolve();
     };
 }
 

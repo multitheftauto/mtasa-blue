@@ -11,6 +11,7 @@ public:
     ~CV8Promise();
 
     void           Resolve(std::string arg);
+    void           Resolve();
     Local<Promise> GetPromise() const { return m_promiseResolver.Get(m_pIsolate->GetIsolate())->GetPromise(); }
     void           Run();
 
@@ -24,6 +25,7 @@ public:
 
 private:
     void Resolve(Local<Value> value);
+    void RejectUndefined();
     void Reject(Local<Value> value);
 
     CV8Isolate*                                   m_pIsolate;

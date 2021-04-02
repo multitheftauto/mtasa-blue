@@ -49,24 +49,24 @@ void CV8Class::SetConstructor(Handle<FunctionTemplate> objectTemplate)
             Isolate*        pV8Isolate = Isolate::GetCurrent();
             HandleScope     scope(pV8Isolate);
             Local<External> data = info.Data().As<External>();
-            CV8Class*       thisClass = (CV8Class*)data->Value();
+            CV8Class*       that = (CV8Class*)data->Value();
 
-            if (info.Length() != thisClass->GetParametersCount())
+            if (info.Length() != that->GetParametersCount())
             {
                 pV8Isolate->ThrowException(CV8Utils::ToV8String("Error"));
                 return;
             }
 
-            std::function<void*(CV8FunctionCallbackBase&, void*)> constructionFunction = thisClass->GetConstrutorFunction();
+            std::function<void*(CV8FunctionCallbackBase&, void*)> constructionFunction = that->GetConstrutorFunction();
             CV8FunctionCallback                                   funcCallback(info);
-            void*                                                 wrappedClass = constructionFunction(funcCallback, thisClass->Allocate(pV8Isolate));
+            void*                                                 wrappedClass = constructionFunction(funcCallback, that->Allocate(pV8Isolate));
 
             Local<Object> wrapper = info.Holder();
 
-            wrapper->SetInternalField(CV8::EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)thisClass->GetClassId()));
+            wrapper->SetInternalField(CV8::EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)that->GetClassId()));
             wrapper->SetInternalField(CV8::EInternalFieldPurpose::PointerToValue, External::New(pV8Isolate, wrappedClass));
 
-            thisClass->AttachGC(pV8Isolate, wrapper);
+            that->AttachGC(pV8Isolate, wrapper);
 
             info.GetReturnValue().Set(wrapper);
         },

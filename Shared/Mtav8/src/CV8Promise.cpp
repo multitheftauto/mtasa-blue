@@ -109,10 +109,15 @@ void CV8Promise::Reject()
 
 void CV8Promise::Reject(Local<Value> value)
 {
+
+}
+
+void CV8Promise::RejectUndefined()
+{
     if (IsPending())
     {
         Local<Promise::Resolver> resolver = Local<Promise::Resolver>::New(m_pIsolate->GetIsolate(), m_promiseResolver);
-        resolver->Reject(m_pContext.Get(m_pIsolate->GetIsolate()), value).ToChecked();
+        resolver->Reject(m_pContext.Get(m_pIsolate->GetIsolate()), Undefined(m_pIsolate->GetIsolate())).ToChecked();
         m_promiseResolver.Reset();
         m_pContext.Reset();
         bHasResult = true;
@@ -126,5 +131,15 @@ void CV8Promise::Resolve(std::string arg)
         Isolate*       isolate = pIsolate->GetIsolate();
         Isolate::Scope scope(isolate);
         Resolve(CV8Utils::ToV8String(arg));
+    });
+}
+
+void CV8Promise::Resolve()
+{
+    Locker lock(m_pIsolate->GetIsolate());
+    m_pIsolate->EnqueueMicrotask([this](CV8Isolate* pIsolate) {
+        Isolate*       isolate = pIsolate->GetIsolate();
+        Isolate::Scope scope(isolate);
+        Resolve(Undefined(isolate));
     });
 }

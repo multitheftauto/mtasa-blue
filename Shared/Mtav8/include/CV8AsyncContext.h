@@ -4,6 +4,7 @@ class CV8AsyncContext : public CV8AsyncContextBase
 {
 public:
     CV8AsyncContext(CV8Promise* pPromise);
+    void Resolve();
     void Resolve(std::string value);
 
     bool IsPending() const { return m_pPromise->IsPending(); }

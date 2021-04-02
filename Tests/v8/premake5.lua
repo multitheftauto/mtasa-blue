@@ -40,7 +40,7 @@ project "v8Tests"
 		"./../../vendor/v8/library/win32bit/v8_libplatform.dll.lib",
 	}
 
-	postbuildcommands {
-	  "{COPY} %{cfg.buildtarget.directory}../../../vendor/v8/library/win32bit/dlls/required/v8.dll %{cfg.buildtarget.directory}/v8.dll",
-	}
+	--postbuildcommands {
+	--  "{COPY} %{cfg.buildtarget.directory}../../../vendor/v8/library/win32bit/dlls/required/v8.dll %{cfg.buildtarget.directory}/v8.dll",
+    --}
 

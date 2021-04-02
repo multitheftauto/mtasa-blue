@@ -17,8 +17,11 @@
     
 #include <lua/CLuaFunctionParser.h>
 
+CV8Base* CJsDefs::m_pJs;
+CV8ModuleBase* CJsDefs::m_pModule;
+
 void CUtilDefs::LoadLuaFunctions()
-{
+    {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Util functions to make scripting easier for the end user
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -63,7 +66,7 @@ void CUtilDefs::LoadLuaFunctions()
 void CUtilDefs::LoadJsFunctions()
 {
 #ifndef MTA_CLIENT
-    CV8ModuleBase* pUtilsModule = g_pServerInterface->GetV8()->CreateModule("utils");
+    m_pModule = m_pJs->CreateModule("utils");
 
     constexpr static const std::pair<const char*, void (*)(CV8FunctionCallbackBase*)> functions[]{
         //{"deref", Dereference}, // Unsupported, useless in case of js
@@ -101,9 +104,9 @@ void CUtilDefs::LoadJsFunctions()
 
 
     for (const auto& [name, func] : functions)
-        pUtilsModule->AddFunction(name, func);
+        m_pModule->AddFunction(name, func);
 
-    CV8ExportEnumBase* eEasingCurve = g_pServerInterface->GetV8()->CreateEnum();
+    CV8ExportEnumBase* eEasingCurve = m_pJs->CreateEnum();
     eEasingCurve->SetValue("linear", EnumToString(CEasingCurve::eType::Linear));
     eEasingCurve->SetValue("inQuad", EnumToString(CEasingCurve::eType::InQuad));
     eEasingCurve->SetValue("qutQuad", EnumToString(CEasingCurve::eType::OutQuad));
@@ -123,7 +126,7 @@ void CUtilDefs::LoadJsFunctions()
     eEasingCurve->SetValue("outInBounce", EnumToString(CEasingCurve::eType::OutInBounce));
     eEasingCurve->SetValue("sineCurve", EnumToString(CEasingCurve::eType::SineCurve));
     eEasingCurve->SetValue("cosineCurve", EnumToString(CEasingCurve::eType::CosineCurve));
-    pUtilsModule->AddEnum("easingCurve", eEasingCurve);
+    m_pModule->AddEnum("easingCurve", eEasingCurve);
 
 #endif
 }

@@ -15,8 +15,10 @@ public:
     virtual CV8IsolateBase* CreateIsolate(std::string originResource) = 0;
     virtual void            RemoveIsolate(CV8IsolateBase* pIsolate) = 0;
 
+    // Creates new module importable under name: `\@mta/NAME`
+    // Names must be globally unique, assert will thrown otherwise
     virtual CV8ModuleBase*       CreateModule(std::string name) = 0;
-    virtual CV8ExportEnumBase*         CreateEnum() = 0;
+    virtual CV8ExportEnumBase*   CreateEnum() = 0;
     virtual CV8ExportObjectBase* CreateExportObject() = 0;
 
     virtual CV8ExportClassBase* CreateClass(std::string name, size_t classId) = 0;
