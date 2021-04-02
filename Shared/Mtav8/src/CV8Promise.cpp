@@ -29,8 +29,6 @@ void CV8Promise::Run()
     bool pending = false;
     {
         Locker         lock(m_pIsolate->GetIsolate());
-        Isolate::Scope scope(m_pIsolate->GetIsolate());
-        HandleScope    handleScope(m_pIsolate->GetIsolate());
 
         pending = IsPending();
     }

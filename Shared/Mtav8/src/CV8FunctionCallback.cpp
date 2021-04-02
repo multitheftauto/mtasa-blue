@@ -59,8 +59,12 @@ bool CV8FunctionCallback::ReadAsString(std::string& value, int index)
         throw new std::invalid_argument("Index");
     }
     String::Utf8Value str(m_callback.GetIsolate(), m_callback[index].As<String>());
-    value = *str;
-    return true;
+    if (str.length() > 0)
+    {
+        value = *str;
+        return true;
+    }
+    return false;
 }
 
 bool CV8FunctionCallback::ReadNumber(float& value, int index)
