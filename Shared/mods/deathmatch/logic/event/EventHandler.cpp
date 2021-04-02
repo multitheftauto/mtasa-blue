@@ -1,7 +1,8 @@
+#include <StdInc.h>
+
 #include "EventHandler.h"
 #include "Event.h"
-
-#include "StdInc.h"
+using namespace SharedUtil;
 
 #include <stdexcept>
 #include <charconv>
@@ -28,6 +29,9 @@ auto GetGame()
 // high      |  high        |   0
 EventHandler::Priority::Priority(std::string_view value)
 {
+    if (value.empty())
+        return; // Variables are initalized at this to default values
+
     std::string_view priority = value;
     if (auto at = value.find_first_of("+-"); at != std::string_view::npos) // find +-
     {
@@ -38,12 +42,23 @@ EventHandler::Priority::Priority(std::string_view value)
         // NOTE: from_chars might fail, in which case m_mod remains 0.0f
         // ideally we would throw here but we have to remain backwards compatible.
     }
-
-    //if (!StringToEnum(priorityStr, m_lvl))
-    //    throw std::invalid_argument("Unknown priority level"); // TODO: Include string with std::format
+    if (!StringToEnum(std::string{priority}, m_lvl)) // TODO: Use std::less<> in StringToEnum map, thus enabling transparent lookup
+        throw std::invalid_argument("Unknown priority level"); // TODO(C++20): Include string with std::format
 }
 
-void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client) const
+std::string EventHandler::Priority::ToString() const
+{
+    return SString("%s%+f", EnumToString(m_lvl).c_str(), m_mod);
+}
+
+IMPLEMENT_ENUM_CLASS_BEGIN(EventHandler::Priority::Level)
+ADD_ENUM(EventHandler::Priority::Level::LOW, "low")
+ADD_ENUM(EventHandler::Priority::Level::NORMAL, "normal")
+ADD_ENUM(EventHandler::Priority::Level::HIGH, "high")
+IMPLEMENT_ENUM_CLASS_END("EventHandlerPriority")
+
+// TODO Benchmark this. Maybe use a Lua function to handle all this
+void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client)
 {
     if (!m_lmain)
         return;
@@ -51,10 +66,8 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     if (!m_handlesPropagated && source != us)
         return;
 
-    const auto beginTimeUS = GetTimeUs();
-
-    //if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName().c_str(), args, source, client, nullptr)) // TODO
-        //return;
+    const bool wasDeletable = m_canBeDeleted;
+    m_canBeDeleted = false; // Keep this object alive (Lua callback could call removeEventHandler)
 
     lua_State* L = GetLuaMain()->GetVM();
     LUA_CHECKSTACK(L, 1);
@@ -111,6 +124,5 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
             lua_unref(L, ref);
         }
     }
-
-    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, event.GetName().c_str(), GetTimeUs() - beginTimeUS);
+    m_canBeDeleted = wasDeletable;
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <lua/CLuaFunctionRef.h>
-
+#include <SharedUtil.Misc.h>
 #include <string_view>
 
 class CLuaMain;
@@ -9,8 +9,9 @@ class CElement;
 class Event;
 class CLuaArguments;
 
-struct EventHandler
+class EventHandler
 {
+public:
     struct Priority
     {
         enum class Level
@@ -27,13 +28,17 @@ struct EventHandler
         friend bool operator<(const Priority& l, const Priority& r)
         {
             if (l.m_lvl == r.m_lvl)
-                return l.m_mod < r.m_mod;
+                return l.m_mod < r.m_mod; // Same level, check modifiers
             return l.m_lvl < r.m_lvl;
         }
         friend bool operator>(const Priority& l, const Priority& r) { return r < l; }
         friend bool operator<=(const Priority& l, const Priority& r) { return !(l > r); }
         friend bool operator>=(const Priority& l, const Priority& r) { return !(l < r); }
 
+        friend bool operator==(const Priority& l, const Priority& r) { return std::tie(l.m_lvl, l.m_mod) == std::tie(r.m_lvl, r.m_mod); }
+        friend bool operator!=(const Priority& l, const Priority& r) { return !(l == r); }
+
+        std::string ToString() const;
     protected:
         Level m_lvl = Level::LOW;
         float m_mod = 0.0f;
@@ -52,14 +57,37 @@ struct EventHandler
 
     const auto& GetPriority() const { return m_priority; }
 
-    void operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client) const;
+    void operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client);
     //bool CanBeCalled() const { return !IsBeingDeleted(); }  TODO: Add check if m_fn is valid (VERIFY_FUNCTION)
+
+    void SetListRev(size_t rev) { m_listRevWhenInserted = rev; }
+    size_t GetListRev() const { return m_listRevWhenInserted; }
+
+    friend bool operator==(const EventHandler& l, const EventHandler& r)
+    {
+        const auto GetTie = [](const EventHandler& h) {
+            return std::tie(h.m_priority, h.m_lmain, h.m_fn, h.m_handlesPropagated);
+        };
+        return GetTie(l) == GetTie(r);
+    }
+    friend bool operator!=(const EventHandler& l, const EventHandler& r) { return !(l == r); }
+
+    void DoMarkToBeDeleted() { m_markedToBeDeleted = true; }
+    bool IsMarkedToBeDeleted() const { return m_markedToBeDeleted; }
+
+    bool CanBeDeleted() const { return m_canBeDeleted; }
 protected:
     Priority m_priority{};
 
     CLuaMain* m_lmain = nullptr;
     CLuaFunctionRef m_fn{};
 
+    size_t m_listRevWhenInserted = 0;
+
     bool m_handlesPropagated = false;
+
+    bool m_canBeDeleted = true;
+    bool m_markedToBeDeleted = false;
 };
 
+DECLARE_ENUM_CLASS(EventHandler::Priority::Level);

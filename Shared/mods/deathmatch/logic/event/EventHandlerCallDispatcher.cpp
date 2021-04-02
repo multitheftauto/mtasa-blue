@@ -1,9 +1,10 @@
-#include "EventHandlerCallDispatcher.h"
+#include <StdInc.h>
 
+#include "EventHandlerCallDispatcher.h"
 #include "EventHandlerCollection.h"
 #include "Event.h"
 
-EventHandlerCollection* EventHandlerCallDispatcher::GetHandlers(const Event& event, bool allowCreate = false)
+EventHandlerCollection* EventHandlerCallDispatcher::GetHandlers(const Event& event, bool allowCreate)
 {
     if (event.IsBuiltIn())
     {
@@ -12,7 +13,7 @@ EventHandlerCollection* EventHandlerCallDispatcher::GetHandlers(const Event& eve
     }
     else
     {
-        const auto custom = static_cast<const CustomEvent&>(event);
+        const auto& custom = static_cast<const CustomEvent&>(event);
         if (allowCreate)
             return &m_custom[&custom]; // operator[] will construct object if not in map
         else
@@ -26,11 +27,9 @@ EventHandlerCollection* EventHandlerCallDispatcher::GetHandlers(const Event& eve
 
 bool EventHandlerCallDispatcher::Remove(const Event& event, CLuaMain* lmain, const CLuaFunctionRef& fn)
 {
-    bool out = false;
-    ForAll([&](EventHandlerCollection& c) {
-        out |= c.Remove(lmain, fn);
-    });
-    return out;
+    if (auto handlers = GetHandlers(event); handlers)
+        return handlers->Remove(lmain, fn);
+    return false;
 }
 
 // LuaFunctionRef's are automatically invalidated when a VM closes

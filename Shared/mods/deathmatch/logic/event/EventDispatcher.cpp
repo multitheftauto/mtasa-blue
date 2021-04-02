@@ -1,20 +1,42 @@
+#include <StdInc.h>
+
 #include "EventDispatcher.h"
 
 #include "Event.h"
-//#include "CElement.h"
+#include <logic/CPlayer.h>
+#include <logic/CElement.h>
 
 
-void DispatchParent(CElement* source, CElement* current, CPlayer* client)
+void DispatchTo(CElement* to, const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client)
 {
-	if (current)
-	{
-		// current call
-		//DispatchParent()
-	}
+    to->GetEventHandlerCallDispatcher().Emmit(event, args, source, to, client);
 }
 
-void DispatchChildren(CElement* source, CElement* current, CPlayer* client)
+void DispatchToParents(CElement* current, const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client)
 {
+    if (!current)
+        return;
+    DispatchTo(current, event, args, source, client);
+    DispatchToParents(current->GetParentEntity(), event, args, source, client);
+}
+
+void DispatchToChildren(CElement* parent, const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client)
+{
+    if (!parent->CountChildren()) 
+        return; // Doesn't have any alive children
+
+    auto snapshot = parent->GetChildrenListSnapshot();
+    snapshot->AddRef();
+    for (auto child : *snapshot)
+    {
+        if (parent->IsBeingDeleted())
+            continue; // Event handler might've destroyed us
+        if (child->IsBeingDeleted())
+            continue; // ...or our children
+        DispatchTo(child, event, args, source, client);
+        DispatchToChildren(child, event, args, source, client);
+    }
+    snapshot->Release();
 }
 
 void EventDispatcher::PreEventPulse()
@@ -31,13 +53,14 @@ void EventDispatcher::PostEventPulse()
 	m_cancelStack.pop_back();
 }
 
-bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, CElement* source)
+bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client)
 {
 	//if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
 	//	return false;
 	PreEventPulse();
 
-
+    DispatchToParents(source, event, args, source, client); // Also calls event on source
+    DispatchToChildren(source, event, args, source, client);
 
 	PostEventPulse();
 	return !WasEventCancelled();

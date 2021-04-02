@@ -1,20 +1,21 @@
 #pragma once
 
 #include "BuiltInEvents.h"
+#include "EventHandlerCollection.h"
 
 #include <array>
 #include <unordered_map>
 #include <utility>
 
-class EventHandlerCollection;
 class CLuaMain;
 class Event;
 class CLuaFunctionRef;
 class CustomEvent;
 class BuiltInEvent;
 
-struct EventHandlerCallDispatcher
+class EventHandlerCallDispatcher
 {
+public:
     bool Remove(const Event& event, CLuaMain* lmain, const CLuaFunctionRef& fn);
 
     // LuaFunctionRef's are automatically invalidated when a VM closes
@@ -24,11 +25,13 @@ struct EventHandlerCallDispatcher
     void Remove(const CustomEvent& event);
 
     template<typename... Ts>
-    void Emmit(const Event& event, Ts&&... ts) // CElement* source, CElement* us, CPlayer* client
+    void Emmit(const Event& event, Ts&&... ts) // const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client
     {
         if (auto handlers = GetHandlers(event))
-            (*handlers)(event, std::forward<Ts>(ts)...);
+            handlers->Emmit(event, std::forward<Ts>(ts)...);
     }
+
+    auto Add(const Event& event, EventHandler handler) { return GetHandlers(event, true)->Add(handler); }
 protected:
     EventHandlerCollection* GetHandlers(const Event& event, bool allowCreate = false);
 
@@ -47,9 +50,9 @@ protected:
     template<typename Fn>
     void ForAll(Fn fn)
     {
-        for (const auto& c : m_builtins)
+        for (auto& c : m_builtins)
             fn(c);
-        for (const auto& [k, c] : m_custom)
+        for (auto& [k, c] : m_custom)
             fn(c);
     }
 

@@ -6,52 +6,55 @@
 #include <algorithm>
 
 class Event;
+struct lua_State;
 
 // Collection of handler functions attached to the same event and element
-struct EventHandlerCollection
+class EventHandlerCollection
 {
-    void Add(EventHandler handler);
+public:
+    bool Add(EventHandler handler);
 
     bool Remove(CLuaMain* lmain, const CLuaFunctionRef& fn);
-
-    void Remove(CLuaMain* lmain)
-    {
-        EraseIf([lmain](const EventHandler& h) {
-            return h.GetLuaMain() == lmain;
-        });
-    }
+    void Remove(CLuaMain* lmain);
 
     bool HandleExists(CLuaMain* lmain, const CLuaFunctionRef& fn) const;
+    bool HandleExists(const EventHandler& toFind) const;
 
-    void PushToLua(CLuaMain* lmain, lua_State* L) const; // Push handles to Lua
-
+    void PushToLua(CLuaMain* lmain, lua_State* L) const;
     bool Empty() const { return m_handlers.empty(); }
-
-    void Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement, CPlayer* client)
-    {
-        const size_t listRev = m_listRev;
-        for (const auto& [revWhenAdded, handler] : m_handlers)
-        {
-            if (revWhenAdded > listRev) // Was it after we've started iterating?
-                continue;
-
-            // TODO
-        }
-    }
-
+    void Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement, CPlayer* client);
 protected:
     template<typename Pred>
-    size_t EraseIf(Pred pred) // Returns number of erased elements
+    bool EraseIf(Pred pred) // Returns if any handlers were erased / marked to be erased(deleted)
     {
-        const size_t size = m_handlers.size();
-        m_handlers.erase(
-            std::remove_if(m_handlers.begin(), m_handlers.end(), pred),
-            m_handlers.end()
-        );
-        return m_handlers.size() - size;
+        bool anyMatched = false;
+        for (auto it = m_handlers.begin(); it != m_handlers.end();)
+        { 
+            if (auto& handler = *it; pred(handler))
+            {
+                anyMatched = true;
+                if (handler.CanBeDeleted())
+                {
+                    it = m_handlers.erase(it);
+                    continue; // Skip it++
+                }
+                else
+                    handler.DoMarkToBeDeleted(); // Just mark it, don't erase it from the list yet as that may make us crash
+            }
+            it++;
+        }
+        return anyMatched;
     }
+
+    // With this we can track when a handler was added.
+    // Increased every time a handler is added.
     size_t m_listRev = 0;
 
-    // Pair of `m_listRev` when the handler was added + the actual handler
-    std::list<std::pair<size_t, EventHandler>> m_handlers;
+    // TODO: If performance is crap, maybe we could use some kind of object pool allocator for better data locality?
+    // NOTE: vector cant be used, because it invalidates iterators on reallocation (while we might be in the middle of iterating thru it)
+    // TODO: Somehow move the `to-be-deleted` handler out of the list, because this way there has to be checks for `IsMarkedToBeDeleted`
+    //
+    // ACHTUNG!!: This list might contain `to-be-deleted` handler(s). This happens when the handler calls removeEventHandler.
+    //
+    std::list<EventHandler> m_handlers;
 };

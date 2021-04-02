@@ -10,7 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include <event/EventDispatcher.h>
+#include <event/BuiltInEvents.h>
 extern CGame* g_pGame;
 
 #if defined(_MSC_VER)
@@ -454,6 +455,7 @@ void CElement::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
 {
     // Delete it from our events
     m_pEventManager->Delete(pLuaMain);
+    GetEventHandlerCallDispatcher().Remove(pLuaMain);
 
     // Delete it from all our children's events
     if (bRecursive)
@@ -720,7 +722,8 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, E
         Arguments.PushString(szName);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(Variable);
-        CallEvent("onElementDataChange", Arguments, pClient);
+        s_EventDispatcher.Call(BuiltInEvents::onElementDataChange, Arguments, this, pClient);
+        //CallEvent("onElementDataChange", Arguments, pClient);
     }
 }
 
@@ -791,7 +794,6 @@ void CElement::CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive)
     // Delete all our events and custom datas attached to that VM
     DeleteEvents(pLuaMain, false);
     // DeleteCustomData ( pLuaMain, false ); * Removed to keep custom data global
-
     // If recursive, do it on our children too
     if (bRecursive)
     {

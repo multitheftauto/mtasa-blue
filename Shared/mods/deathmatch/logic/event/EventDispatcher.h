@@ -4,10 +4,12 @@
 class Event;
 class CLuaArguments;
 class CElement;
+class CPlayer;
 
-struct EventDispatcher
+class EventDispatcher
 {
-	bool Call(const Event& event, const CLuaArguments& args, CElement* source);
+public:
+	bool Call(const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client);
 
 	void PreEventPulse();
 	void PostEventPulse();

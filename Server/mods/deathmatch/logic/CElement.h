@@ -11,15 +11,18 @@
 
 #pragma once
 
+#include <CFastList.h>
+#include <CSphere.h>
+#include <CMatrix.h>
 #include <core/CServerInterface.h>
 #include <CVector.h>
 #include "CMapEventManager.h"
 #include "CCustomData.h"
 #include "CEvents.h"
+#include "CElementGroup.h"
 #include <list>
 #include <cstring>
-#include "CElementGroup.h"
-
+#include <event/EventHandlerCallDispatcher.h>
 // Used to check fast version of getElementsByType
 //#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
@@ -234,6 +237,7 @@ public:
     bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
+    EventHandlerCallDispatcher& GetEventHandlerCallDispatcher() { return m_eventHandlerCallDispatcher; }
 protected:
     CElement*    GetRootElement();
     virtual bool ReadSpecialData(const int iLine) = 0;
@@ -247,6 +251,8 @@ protected:
 
     CMapEventManager* m_pEventManager;
     CCustomData*      m_pCustomData;
+
+    EventHandlerCallDispatcher m_eventHandlerCallDispatcher;
 
     EElementType m_iType;
     ElementID    m_ID;
