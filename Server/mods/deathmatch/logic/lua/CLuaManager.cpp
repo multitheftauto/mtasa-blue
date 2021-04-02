@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "../luadefs/CLuaGenericDefs.h"
+#include <lua/CLuaFunctionParser.h>
 
 extern CGame* g_pGame;
 
@@ -160,6 +161,11 @@ void CLuaManager::LoadCFunctions()
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
         {"removeEventHandler", CLuaFunctionDefs::RemoveEventHandler},
+
+        {"addEvent2", CLuaDefs::ArgumentParser<CLuaFunctionDefs::AddEvent2>},
+        {"addEventHandler2", CLuaDefs::ArgumentParser<CLuaFunctionDefs::AddEventHandler2>},
+        {"removeEventHandler2", CLuaDefs::ArgumentParser<CLuaFunctionDefs::RemoveEventHandler2>},
+
         {"getEventHandlers", CLuaFunctionDefs::GetEventHandlers},
         {"triggerEvent", CLuaFunctionDefs::TriggerEvent},
         {"triggerClientEvent", CLuaFunctionDefs::TriggerClientEvent},

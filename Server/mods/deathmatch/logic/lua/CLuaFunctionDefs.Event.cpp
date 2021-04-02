@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <event/CustomEvents.h>
+
 #define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
 
 int CLuaFunctionDefs::AddEvent(lua_State* luaVM)
@@ -41,6 +43,36 @@ int CLuaFunctionDefs::AddEvent(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+const Event* ResolveEvent(const std::string& name)
+{
+    if (const Event* event = Event::Get(name))
+        return event;
+    throw std::invalid_argument("Event doesn't exist");
+}
+
+bool CLuaFunctionDefs::RemoveEventHandler2(lua_State* L, std::string eventName, CElement* attachedTo, CLuaFunctionRef handlerfn)
+{
+    return attachedTo->GetEventHandlerCallDispatcher().Remove(*ResolveEvent(eventName), m_pLuaManager->GetVirtualMachine(L), handlerfn);
+}
+
+bool CLuaFunctionDefs::AddEventHandler2(lua_State* L, std::string eventName, CElement* attachedTo,
+    CLuaFunctionRef handlerfn, std::optional<bool> propagated, std::optional<std::string_view> priorityToParse)
+{
+    EventHandler::Priority priority{ priorityToParse.value_or("") }; // Might throw invalid_argument
+
+    const Event* event = ResolveEvent(eventName);
+    std::cout << "Add event " << eventName << "[Priority: " << priority.ToString() << "]\n"; // TODO Remove
+
+    return attachedTo->GetEventHandlerCallDispatcher().Add(*event,
+        { priority, m_pLuaManager->GetVirtualMachine(L), handlerfn, propagated.value_or(true) }
+    );
+}
+
+bool CLuaFunctionDefs::AddEvent2(lua_State* L, std::string name, std::optional<bool> allowRemoteTrigger)
+{
+    return CustomEvent::Add(name, m_pLuaManager->GetVirtualMachine(L), allowRemoteTrigger.value_or(false));
 }
 
 int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)

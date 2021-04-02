@@ -23,6 +23,9 @@ class CAccessControlListManager;
 #include "LuaCommon.h"
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
+#include <optional>
+#include <string_view>
+#include <string>
 
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
@@ -39,6 +42,10 @@ public:
     LUA_DECLARE(AddEvent);
     LUA_DECLARE(AddEventHandler);
     LUA_DECLARE(RemoveEventHandler);
+    static bool RemoveEventHandler2(lua_State* L, std::string eventName, CElement* attachedTo, CLuaFunctionRef handlerfn);
+    static bool AddEventHandler2(lua_State* L, std::string eventName, CElement* attachedTo,
+        CLuaFunctionRef handlerfn, std::optional<bool> propagated, std::optional<std::string_view> priorityToParse);
+    static bool AddEvent2(lua_State* L, std::string name, std::optional<bool> allowRemoteTrigger);
     LUA_DECLARE(GetEventHandlers);
     LUA_DECLARE(TriggerEvent);
     LUA_DECLARE(TriggerClientEvent);

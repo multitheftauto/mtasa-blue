@@ -65,7 +65,7 @@ public:
     static CClientColModelManager*    m_pColModelManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
 
-protected:
+
     // Old style: Only warn on failure. This should
     // not be used for new functions. ReturnOnError
     // must be a value to use as result on invalid argument
