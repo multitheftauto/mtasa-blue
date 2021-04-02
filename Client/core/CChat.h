@@ -168,7 +168,7 @@ public:
     bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible, bool bInputBlocked = true);
     bool IsInputBlocked() const { return m_bInputBlocked; }
-    bool IsInputVisible() { return !m_bInputBlocked && m_bInputVisible; }
+    bool IsInputVisible() const { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
