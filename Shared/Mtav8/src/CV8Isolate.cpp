@@ -38,7 +38,14 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
     m_rootContext.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
     Context::Scope contextScope(m_rootContext.Get(m_pIsolate));
 
+    //m_pIsolate->SetPromiseHook([](PromiseHookType type, Local<Promise> promise, Local<Value> parent) {
+    //    ((CV8Isolate*)promise->GetIsolate()->GetData(0))->PromiseHook(type, promise, parent);
+    //});
+
+    Local<Context> context = m_rootContext.Get(m_pIsolate);
+    Local<Object>  global = context->Global();
     global->Set(context, CV8Utils::ToV8String("Version"), CV8Utils::ToV8String(V8::GetVersion()));
+
     InitSecurity();
     InitClasses();
 }
@@ -58,14 +65,51 @@ void CV8Isolate::InitClasses()
     }
 }
 
+// Triggered when user do `new Promise(...)`.
+// Each element of chain is hooked, eg: `new Promise(...).then(...)` counts as two promises
+// All promises should be tracked and rejected on eg. resource stop.
+void CV8Isolate::PromiseHook(PromiseHookType type, Local<Promise> promise, Local<Value> parent)
+{
+    // `new Promise(...)`, false for `.then(...)`, `.catch(...)`
+    bool isTopLevelPromise = parent->IsNullOrUndefined();
+    switch (type)
+    {
+        case PromiseHookType::kInit:
+            if (isTopLevelPromise)
+            {
+                m_vecPromises.emplace_back(m_pIsolate, promise);
+            }
+            break;
+        case PromiseHookType::kResolve:
+            if (isTopLevelPromise)
+            {
+                for (auto it = m_vecPromises.begin(); it != m_vecPromises.end(); ++it)
+                {
+                    if (*it == promise)
+                    {
+                        (*it).Reset();
+                        m_vecPromises.erase(it);
+                        break;
+                    }
+                }
+            }
+            break;
+        case PromiseHookType::kBefore:
+            break;
+        case PromiseHookType::kAfter:
+            break;
+    }
+}
+
 void CV8Isolate::DoPulse()
 {
     Locker      lock(m_pIsolate);
     HandleScope handleScope(m_pIsolate);
 
     // Clear all rejected, fulfilled promises
-    m_vecPromises.erase(std::remove_if(m_vecPromises.begin(), m_vecPromises.end(), [](std::unique_ptr<CV8Promise>& promise) { return !promise->IsPending(); }),
-                        m_vecPromises.end());
+    m_vecCV8Promises.erase(
+        std::remove_if(m_vecCV8Promises.begin(), m_vecCV8Promises.end(), [](std::unique_ptr<CV8Promise>& promise) { return !promise->IsPending(); }),
+        m_vecCV8Promises.end());
 
     // Continue async await execution
     m_pIsolate->PerformMicrotaskCheckpoint();
@@ -235,7 +279,7 @@ void CV8Isolate::AddPromise(std::unique_ptr<CV8Promise> pPromise)
     std::shared_ptr<CancelationToken> token = std::make_shared<CancelationToken>();
     promise->SetCancelationToken(token);
     m_pCV8->GetPlatform()->CallOnWorkerThread(std::make_unique<CV8Task>(token, [promise]() { promise->Run(); }));
-    m_vecPromises.push_back(std::move(pPromise));
+    m_vecCV8Promises.push_back(std::move(pPromise));
 }
 
 MaybeLocal<Value> CV8Isolate::InitializeModuleExports(Local<Context> context, Local<Module> module)
@@ -527,7 +571,8 @@ CV8Isolate::~CV8Isolate()
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_rootContext.Get(m_pIsolate);
 
-        m_vecPromises.clear();
+        m_vecCV8Promises.clear();
+
         // Continue async await execution
         m_pIsolate->PerformMicrotaskCheckpoint();
 

@@ -33,6 +33,7 @@ public:
     void InitSecurity();
     void InitClasses();
 
+    void PromiseHook(PromiseHookType type, Local<Promise> promise, Local<Value> parent);
     void DoPulse();
     void RequestGC();
     void Shutdown();
@@ -133,9 +134,10 @@ private:
     // It prevents from error: ReferenceError: Cannot access 'ImportName' before initialization
     std::vector<std::string>                                  m_loadingOrder;
     std::unordered_map<std::string, Global<Module>>           m_mapScriptModules;
-    std::vector<std::unique_ptr<CV8Promise>>                  m_vecPromises;
+    std::vector<std::unique_ptr<CV8Promise>>                  m_vecCV8Promises;
     std::vector<std::unique_ptr<SModule>>                     m_vecModules;
     std::vector<std::unique_ptr<STryCatch>>                   m_vecCompilationErrors;
+    std::vector<Global<Promise>>                              m_vecPromises;
     std::unordered_map<std::string, std::vector<std::string>> m_mapMissingModules;
     int                                                       m_iRunCodeCount = 0;
 
