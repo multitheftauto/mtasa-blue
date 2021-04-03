@@ -16,10 +16,12 @@
 
 #include "StdInc.h"
 
-CResourceScriptItem::CResourceScriptItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes)
+CResourceScriptItem::CResourceScriptItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes,
+                                         eScriptLanguage scriptLanguage)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)
 {
     m_type = RESOURCE_FILE_TYPE_SCRIPT;
+    m_language = scriptLanguage;
 }
 
 CResourceScriptItem::~CResourceScriptItem()
@@ -28,16 +30,23 @@ CResourceScriptItem::~CResourceScriptItem()
 
 bool CResourceScriptItem::Start()
 {
-    m_pVM = m_resource->GetVirtualMachine();
-
-    // Load the file
     std::vector<char> buffer;
     FileLoad(m_strResourceFileName, buffer);
     unsigned int iSize = buffer.size();
 
+    m_pVM = m_resource->GetVirtualMachine();
+    CV8IsolateBase* isolateBase = m_resource->GetJsVm();
     if (iSize > 0)
     {
-        m_pVM->LoadScriptFromBuffer(&buffer.at(0), iSize, m_strResourceFileName.c_str());
+        switch (m_language)
+        {
+            case eScriptLanguage::LUA:
+                m_pVM->LoadScriptFromBuffer(&buffer.at(0), iSize, m_strResourceFileName.c_str());
+                break;
+            case eScriptLanguage::JAVASCRIPT:
+                isolateBase->RunCode(std::string(buffer.begin(), buffer.end()), m_strShortName);
+                break;
+        }
     }
 
     return true;
