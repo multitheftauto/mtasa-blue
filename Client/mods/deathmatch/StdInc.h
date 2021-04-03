@@ -150,7 +150,6 @@
 #include "CLatentTransferManager.h"
 #include "CDebugHookManager.h"
 #include "lua/CLuaShared.h"
-#include "js/CJsShared.h"
 
 // Deathmatch includes
 #include "ClientCommands.h"
