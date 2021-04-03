@@ -2483,23 +2483,28 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
     CElement* pElement = CElementIDs::GetElement(ElementID);
     if (pElement)
     {
-        if (BuiltInEvent::Get(name))
-            goto fail_remote_trigger; // Built in events aren't remote triggerable
-
-        if (auto* event = CustomEvent::Get(name))
+        if (BuiltInEvent::Get(name)) 
         {
-            if (event->IsRemoteTriggerAllowed())
-                pElement->CallEvent(*event, *pArguments, pCaller);
-            else
-            {
-            fail_remote_trigger:
-                m_pScriptDebugging->LogError(nullptr,
-                    "Client (%s) triggered serverside event %s, but event is not marked as remotly triggerable", pCaller->GetNick(), name.c_str());
-            }
+            // Built-in-events are not remote triggerable by default
+            m_pScriptDebugging->LogError(nullptr,
+                "Client (%s) triggered serverside event %s, but it is not marked as remotly triggerable", pCaller->GetNick(), name.c_str());
         }
         else
-            m_pScriptDebugging->LogError(nullptr,
-                "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), name.c_str());
+        {
+            if (auto* event = CustomEvent::Get(name))
+            {
+                if (event->IsRemoteTriggerAllowed())
+                    pElement->CallEvent(*event, *pArguments, pCaller);
+                else
+                {
+                    m_pScriptDebugging->LogError(nullptr,
+                        "Client (%s) triggered serverside event %s, but it is not marked as remotly triggerable", pCaller->GetNick(), name.c_str());
+                }
+            }
+            else
+                m_pScriptDebugging->LogError(nullptr,
+                    "Client (%s) triggered serverside event %s, but it is not added serverside", pCaller->GetNick(), name.c_str());
+        }
     }
 }
 
