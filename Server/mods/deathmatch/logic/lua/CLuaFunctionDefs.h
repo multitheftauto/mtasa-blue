@@ -39,19 +39,16 @@ public:
     static void Initialize(class CLuaManager* pLuaManager, class CGame* pClientGame);
 
     // Event functions
-    LUA_DECLARE(AddEvent);
-    LUA_DECLARE(AddEventHandler);
-    LUA_DECLARE(RemoveEventHandler);
-    static bool RemoveEventHandler2(lua_State* L, std::string eventName, CElement* attachedTo, CLuaFunctionRef handlerfn);
-    static bool AddEventHandler2(lua_State* L, std::string eventName, CElement* attachedTo,
+    static bool RemoveEventHandler(lua_State* L, std::string eventName, CElement* attachedTo, CLuaFunctionRef handlerfn);
+    static bool AddEventHandler(lua_State* L, std::string eventName, CElement* attachedTo,
         CLuaFunctionRef handlerfn, std::optional<bool> propagated, std::optional<std::string_view> priorityToParse);
-    static bool AddEvent2(lua_State* L, std::string name, std::optional<bool> allowRemoteTrigger);
+    static bool AddEvent(lua_State* L, std::string name, std::optional<bool> allowRemoteTrigger);
+    static bool CancelEvent(std::optional<bool> cancel, std::optional<std::string_view> reason);
+    static const std::string& GetCancelReason();
+    static bool WasEventCancelled();
     LUA_DECLARE(GetEventHandlers);
     LUA_DECLARE(TriggerEvent);
     LUA_DECLARE(TriggerClientEvent);
-    LUA_DECLARE(CancelEvent);
-    LUA_DECLARE(GetCancelReason);
-    LUA_DECLARE(WasEventCancelled);
     LUA_DECLARE(TriggerLatentClientEvent);
     LUA_DECLARE(GetLatentEventHandles);
     LUA_DECLARE(GetLatentEventStatus);

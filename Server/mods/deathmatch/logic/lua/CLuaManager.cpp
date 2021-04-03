@@ -158,20 +158,16 @@ CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
 void CLuaManager::LoadCFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"addEvent", CLuaFunctionDefs::AddEvent},
-        {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
-        {"removeEventHandler", CLuaFunctionDefs::RemoveEventHandler},
-
-        {"addEvent2", CLuaDefs::ArgumentParser<CLuaFunctionDefs::AddEvent2>},
-        {"addEventHandler2", CLuaDefs::ArgumentParser<CLuaFunctionDefs::AddEventHandler2>},
-        {"removeEventHandler2", CLuaDefs::ArgumentParser<CLuaFunctionDefs::RemoveEventHandler2>},
+        {"addEvent", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::AddEvent>},
+        {"addEventHandler", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::AddEventHandler>},
+        {"removeEventHandler", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::RemoveEventHandler>},
+        {"cancelEvent", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::CancelEvent>},
+        {"wasEventCancelled", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::WasEventCancelled>},
+        {"getCancelReason", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::GetCancelReason>},
 
         {"getEventHandlers", CLuaFunctionDefs::GetEventHandlers},
         {"triggerEvent", CLuaFunctionDefs::TriggerEvent},
         {"triggerClientEvent", CLuaFunctionDefs::TriggerClientEvent},
-        {"cancelEvent", CLuaFunctionDefs::CancelEvent},
-        {"wasEventCancelled", CLuaFunctionDefs::WasEventCancelled},
-        {"getCancelReason", CLuaFunctionDefs::GetCancelReason},
         {"triggerLatentClientEvent", CLuaFunctionDefs::TriggerLatentClientEvent},
         {"getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles},
         {"getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus},

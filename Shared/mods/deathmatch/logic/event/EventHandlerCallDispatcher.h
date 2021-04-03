@@ -32,8 +32,9 @@ public:
     }
 
     auto Add(const Event& event, EventHandler handler) { return GetHandlers(event, true)->Add(handler); }
-protected:
+
     EventHandlerCollection* GetHandlers(const Event& event, bool allowCreate = false);
+protected:
 
     auto GetHandlers(const BuiltInEvent& event)
     {

@@ -53,6 +53,12 @@ void EventDispatcher::PostEventPulse()
 	m_cancelStack.pop_back();
 }
 
+void EventDispatcher::CancelEvent(bool cancelled, std::string reason)
+{
+    m_eventCancelled = cancelled;
+    m_cancelReason = std::move(reason);
+}
+
 bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client)
 {
 	//if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))

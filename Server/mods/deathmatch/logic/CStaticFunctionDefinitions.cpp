@@ -76,58 +76,6 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
-bool CStaticFunctionDefinitions::AddEvent(CLuaMain* pLuaMain, const char* szName, const char* szArguments, bool bAllowRemoteTrigger)
-{
-    assert(pLuaMain);
-    assert(szName);
-    assert(szArguments);
-
-    // Valid name?
-    if (strlen(szName) > 0)
-    {
-        // Add our event to CEvents
-        return m_pEvents->AddEvent(szName, szArguments, pLuaMain, bAllowRemoteTrigger);
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::AddEventHandler(CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction,
-                                                 bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod)
-{
-    assert(pLuaMain);
-    assert(szName);
-    assert(pElement);
-
-    // We got an event with that name?
-    if (m_pEvents->Exists(szName))
-    {
-        // Add the event handler
-        if (pElement->AddEvent(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
-            return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::RemoveEventHandler(CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction)
-{
-    assert(pLuaMain);
-    assert(szName);
-    assert(pElement);
-
-    // We got an event and handler with that name?
-    if (m_pEvents->Exists(szName))
-    {
-        if (pElement->DeleteEvent(pLuaMain, szName, iLuaFunction))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool& bWasCanceled)
 {
     // There is such event?
@@ -182,22 +130,6 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPla
 
     CPerfStatEventPacketUsage::GetSingleton()->UpdateEventUsageOut(szName, sendList.size());
     return true;
-}
-
-bool CStaticFunctionDefinitions::CancelEvent(bool bCancel, const char* szReason)
-{
-    m_pEvents->CancelEvent(bCancel, szReason);
-    return true;
-}
-
-const char* CStaticFunctionDefinitions::GetCancelReason()
-{
-    return m_pEvents->GetLastError();
-}
-
-bool CStaticFunctionDefinitions::WasEventCancelled()
-{
-    return m_pEvents->WasEventCancelled();
 }
 
 CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const char* szTypeName, const char* szID)
