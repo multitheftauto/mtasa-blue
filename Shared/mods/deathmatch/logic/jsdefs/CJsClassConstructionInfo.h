@@ -70,6 +70,11 @@ public:
             v8Class->AddAccessor(
                 name, [](void* ptr) { return (T*)ptr->*P; }, [](void* ptr, float value) { (T*)ptr->*P = value; });
         }
+        if constexpr (std::is_same_v<U, unsigned char>)
+        {
+            v8Class->AddAccessor(
+                name, [](void* ptr) { return (T*)ptr->*P; }, [](void* ptr, unsigned char value) { (T*)ptr->*P = value; });
+        }
     }
 
     CV8ExportClassBase* v8Class;

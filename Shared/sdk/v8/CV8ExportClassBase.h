@@ -7,5 +7,6 @@ public:
     virtual void SetSizeOf(size_t count) = 0;
     virtual void SetConstructorFunction(std::function<void(CV8FunctionCallbackBase*)> func) = 0;
     virtual void AddAccessor(std::string name, float (*getter)(void*), void (*setter)(void*, float)) = 0;
+    virtual void AddAccessor(std::string name, unsigned char (*getter)(void*), void (*setter)(void*, unsigned char)) = 0;
     virtual void SetInheritance(uint16_t baseClass) = 0;
 };

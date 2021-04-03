@@ -76,5 +76,6 @@ enum class EClass : uint16_t
     Vector3,
     Vector4,
     Matrix,
+    Color,
     Count,
 };

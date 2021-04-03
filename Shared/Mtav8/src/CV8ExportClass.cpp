@@ -2,7 +2,6 @@
 
 CV8ExportClass::CV8ExportClass(std::string name, uint16_t classId) : m_name(name), m_classId(classId)
 {
-
 }
 
 Local<FunctionTemplate> CV8ExportClass::Initialize(CV8Isolate* pV8Isolate)
@@ -42,9 +41,11 @@ void* CV8ExportClass::Allocate(Isolate* isolate)
 void CV8ExportClass::SetAccessors(Local<ObjectTemplate> objectTemplate)
 {
     for (auto const& accessors : m_floatAccessors)
-    {
         SetAccessor<float>(objectTemplate, accessors.first, accessors.second.first, accessors.second.second);
-    }
+    
+    for (auto const& accessors : m_ucharAccessors)
+        SetAccessor<unsigned char>(objectTemplate, accessors.first, accessors.second.first, accessors.second.second);
+
 }
 
 void CV8ExportClass::SetConstructor(Handle<FunctionTemplate> objectTemplate)
@@ -56,14 +57,14 @@ void CV8ExportClass::SetConstructor(Handle<FunctionTemplate> objectTemplate)
             Local<External> data = info.Data().As<External>();
             CV8ExportClass* that = (CV8ExportClass*)data->Value();
 
-            //if (info.Length() != that->GetParametersCount())
+            // if (info.Length() != that->GetParametersCount())
             //{
             //    pV8Isolate->ThrowException(CV8Utils::ToV8String("Error"));
             //    return;
             //}
 
             std::function<void(CV8FunctionCallbackBase*)> constructionFunction = that->GetConstrutorFunction();
-            CV8FunctionCallback                                   funcCallback(info);
+            CV8FunctionCallback                           funcCallback(info);
 
             constructionFunction(&funcCallback);
 
@@ -84,4 +85,11 @@ void CV8ExportClass::AddAccessor(std::string name, float (*getter)(void*), void 
     assert(m_floatAccessors.find(name) == m_floatAccessors.end());
     m_length++;
     m_floatAccessors[name] = {getter, setter};
+}
+
+void CV8ExportClass::AddAccessor(std::string name, unsigned char (*getter)(void*), void (*setter)(void*, unsigned char))
+{
+    assert(m_floatAccessors.find(name) == m_floatAccessors.end());
+    m_length++;
+    m_ucharAccessors[name] = {getter, setter};
 }

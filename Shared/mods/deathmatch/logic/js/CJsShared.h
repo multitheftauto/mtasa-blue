@@ -11,6 +11,7 @@
 #include "jsdefs/CJsVector2Defs.h"
 #include "jsdefs/CJsVector3Defs.h"
 #include "jsdefs/CJsVector4Defs.h"
+#include "jsdefs/CJsColorDefs.h"
 
 class CJsShared
 {

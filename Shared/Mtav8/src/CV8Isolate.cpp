@@ -38,7 +38,7 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
     m_rootContext.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
     Context::Scope contextScope(m_rootContext.Get(m_pIsolate));
 
-    //m_pIsolate->SetPromiseHook([](PromiseHookType type, Local<Promise> promise, Local<Value> parent) {
+    // m_pIsolate->SetPromiseHook([](PromiseHookType type, Local<Promise> promise, Local<Value> parent) {
     //    ((CV8Isolate*)promise->GetIsolate()->GetData(0))->PromiseHook(type, promise, parent);
     //});
 
@@ -52,8 +52,8 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
 
 void CV8Isolate::InitSecurity()
 {
-    Local<Context> context = m_rootContext.Get(m_pIsolate);
-    Local<ObjectTemplate>  global = m_global.Get(m_pIsolate);
+    Local<Context>        context = m_rootContext.Get(m_pIsolate);
+    Local<ObjectTemplate> global = m_global.Get(m_pIsolate);
     global->Set(m_pIsolate, "WebAssembly", Undefined(m_pIsolate));
 }
 
@@ -178,9 +178,9 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
             fprintf(stderr, "%s\n", stackTraceString);
         }
 
-        v8::String::Utf8Value  fileName(m_pIsolate, message->GetScriptOrigin().ResourceName());
-        const char*            fileNameString = CV8Utils::ToString(fileName);
-        int                    lineNum = message->GetLineNumber(context).FromJust();
+        v8::String::Utf8Value fileName(m_pIsolate, message->GetScriptOrigin().ResourceName());
+        const char*           fileNameString = CV8Utils::ToString(fileName);
+        int                   lineNum = message->GetLineNumber(context).FromJust();
         fprintf(stderr, "%s:%i: %s\n", fileNameString, lineNum, exceptionString);
 
         // Print line of source code.

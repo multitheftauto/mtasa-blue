@@ -23,5 +23,6 @@ namespace js
     inline void Push(CV8FunctionCallbackBase* JS, CVector2D* value) { JS->Return((void*)value); }
     inline void Push(CV8FunctionCallbackBase* JS, CVector* value) { JS->Return((void*)value); }
     inline void Push(CV8FunctionCallbackBase* JS, CVector4D* value) { JS->Return((void*)value); }
+    inline void Push(CV8FunctionCallbackBase* JS, SColor* value) { JS->Return((void*)value); }
     inline void Push(CV8FunctionCallbackBase* JS, std::function<void(CV8AsyncContextBase*)> value) { JS->ReturnPromise(value); }
 }

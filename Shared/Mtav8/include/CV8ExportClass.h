@@ -50,6 +50,7 @@ public:
 
     void SetConstructor(Handle<FunctionTemplate> objectTemplate);
     void AddAccessor(std::string name, float (*getter)(void*), void (*setter)(void*, float));
+    void AddAccessor(std::string name, unsigned char (*getter)(void*), void (*setter)(void*, unsigned char));
 
     void SetAccessors(Local<ObjectTemplate> objectTemplate);
 
@@ -82,7 +83,7 @@ public:
                 {
                     info.GetReturnValue().SetUndefined();
                 }
-                else if constexpr (std::is_same_v<T, float>)
+                else if constexpr (std::is_arithmetic_v<T>)
                 {
                     info.GetReturnValue().Set(Number::New(isolate, result));
                 }
@@ -123,6 +124,10 @@ public:
                 {
                     setter(pointerToValue, (float)value->NumberValue(isolate->GetCurrentContext()).ToChecked());
                 }
+                else if constexpr (std::is_same_v<T, unsigned char>)
+                {
+                    setter(pointerToValue, (unsigned char)value->NumberValue(isolate->GetCurrentContext()).ToChecked());
+                }
                 else
                 {
                     static_assert(0);
@@ -145,4 +150,5 @@ private:
     std::function<void(CV8FunctionCallbackBase*)> m_constructorFunc;
 
     std::map<std::string, std::pair<float (*)(void*), void (*)(void*, float)>> m_floatAccessors;
+    std::map<std::string, std::pair<unsigned char (*)(void*), void (*)(void*, unsigned char)>> m_ucharAccessors;
 };
