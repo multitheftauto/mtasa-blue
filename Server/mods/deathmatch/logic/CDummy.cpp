@@ -50,8 +50,8 @@ void CDummy::Unlink()
 
 void CDummy::GetRotationDegrees(CVector& vecRotation)
 {
-    ConvertDegreesToRadians(vecRotation);
     GetRotationRadians(vecRotation);
+    ConvertRadiansToDegrees(vecRotation);
 }
 
 void CDummy::SetRotationDegrees(const CVector& vecRotation)
@@ -59,6 +59,17 @@ void CDummy::SetRotationDegrees(const CVector& vecRotation)
     CVector vecTemp = vecRotation;
     ConvertDegreesToRadians(vecTemp);
     SetRotationRadians(vecTemp);
+}
+
+void CDummy::GetMatrix(CMatrix& matrix)
+{
+    matrix = CMatrix(m_vecPosition, m_vecRotation);
+}
+
+void CDummy::SetMatrix(const CMatrix& matrix)
+{
+    m_vecRotation = matrix.GetRotation();
+    m_vecPosition = matrix.GetPosition();
 }
 
 bool CDummy::ReadSpecialData(const int iLine)

@@ -29,10 +29,12 @@ public:
     const CVector& GetRotationRadians() { return m_vecRotation; };
     void           GetRotationRadians(CVector& vecRotation) const { vecRotation = m_vecRotation; };
     void           GetRotationDegrees(CVector& vecRotation);
+    void           GetMatrix(CMatrix& matrix);
 
     void           SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
     void           SetRotationRadians(const CVector& vecRotation) { m_vecRotation = vecRotation; };
     void           SetRotationDegrees(const CVector& vecRotation);
+    void           SetMatrix(const CMatrix& matrix);
 
 protected:
     bool ReadSpecialData(const int iLine) override;
