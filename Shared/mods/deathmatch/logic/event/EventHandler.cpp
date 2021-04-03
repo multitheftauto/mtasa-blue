@@ -37,11 +37,7 @@ EventHandler::Priority::Priority(std::string_view value)
         if (at == 0)
             throw std::invalid_argument("Missing priority level in priority string");
         priority = value.substr(at);
-
-        // Temporary hack for gcc?
-        const auto ptr = static_cast<const decltype(value)::value_type*>(value.data());
-        std::from_chars(ptr, ptr + at, m_mod);
-
+        std::from_chars(value.data(), value.data() + at, m_mod);
         // NOTE: from_chars might fail, in which case m_mod remains 0.0f
         // ideally we would throw here but we have to remain backwards compatible.
     }
