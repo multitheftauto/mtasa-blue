@@ -206,9 +206,9 @@ void GetDebugInfo(lua_State* luaVM, lua_Debug& debugInfo, const char*& szFilenam
 // Get current Lua source file and line number
 //
 ///////////////////////////////////////////////////////////////
-void GetMapEventDebugInfo(CMapEvent* pMapEvent, const char*& szFilename, int& iLineNumber)
+void GetMapEventDebugInfo(const EventHandler& handler, const char*& szFilename, int& iLineNumber)
 {
-    CLuaMain* pLuaMain = pMapEvent->GetVM();
+    CLuaMain* pLuaMain = handler.GetLuaMain();
 
     if (!pLuaMain)
         return;
@@ -218,7 +218,7 @@ void GetMapEventDebugInfo(CMapEvent* pMapEvent, const char*& szFilename, int& iL
     if (!luaVM)
         return;
 
-    const CLuaFunctionRef& iLuaFunction = pMapEvent->GetLuaFunction();
+    const CLuaFunctionRef& iLuaFunction = handler.GetCallback();
     lua_Debug              debugInfo;
     lua_getref(luaVM, iLuaFunction.ToInt());
 
@@ -425,7 +425,7 @@ void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, c
 // Returns false if function call should be skipped
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+bool CDebugHookManager::OnPreEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, const EventHandler& handler)
 {
     if (m_PreEventFunctionHookList.empty())
         return true;
@@ -435,7 +435,7 @@ bool CDebugHookManager::OnPreEventFunction(const std::string& name, const CLuaAr
         return true;
 
     CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, name, Arguments, pSource, pCaller, pMapEvent);
+    GetEventFunctionCallHookArguments(NewArguments, name, Arguments, pSource, pCaller, handler);
 
     return CallHook(name, m_PreEventFunctionHookList, NewArguments);
 }
@@ -447,7 +447,7 @@ bool CDebugHookManager::OnPreEventFunction(const std::string& name, const CLuaAr
 // Called after a Lua event function is called
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+void CDebugHookManager::OnPostEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, const EventHandler& handler)
 {
     if (m_PostEventFunctionHookList.empty())
         return;
@@ -457,7 +457,7 @@ void CDebugHookManager::OnPostEventFunction(const std::string& name, const CLuaA
         return;
 
     CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, name, Arguments, pSource, pCaller, pMapEvent);
+    GetEventFunctionCallHookArguments(NewArguments, name, Arguments, pSource, pCaller, handler);
 
     CallHook(name, m_PostEventFunctionHookList, NewArguments);
 }
@@ -469,7 +469,7 @@ void CDebugHookManager::OnPostEventFunction(const std::string& name, const CLuaA
 // Get call hook arguments for OnPre/PostEventFunction
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, const EventHandler& handler)
 {
     CLuaMain*  pEventLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
     CResource* pEventResource = pEventLuaMain ? pEventLuaMain->GetResource() : NULL;
@@ -485,9 +485,9 @@ void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArgu
     // Get file/line number for function
     const char* szFunctionFilename = "";
     int         iFunctionLineNumber = 0;
-    GetMapEventDebugInfo(pMapEvent, szFunctionFilename, iFunctionLineNumber);
+    GetMapEventDebugInfo(handler, szFunctionFilename, iFunctionLineNumber);
 
-    CLuaMain*  pFunctionLuaMain = pMapEvent->GetVM();
+    CLuaMain*  pFunctionLuaMain = handler.GetLuaMain();
     CResource* pFunctionResource = pFunctionLuaMain ? pFunctionLuaMain->GetResource() : NULL;
 
     // resource eventResource, string eventName, element eventSource, element eventClient, string eventFilename, int eventLineNumber,

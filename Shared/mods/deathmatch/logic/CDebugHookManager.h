@@ -57,13 +57,13 @@ public:
     void OnPostFunction(lua_CFunction f, lua_State* luaVM);
     bool OnPreEvent(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
     void OnPostEvent(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
-    bool OnPreEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
-    void OnPostEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
+    bool OnPreEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, const EventHandler& handler);
+    void OnPostEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, const EventHandler& handler);
     bool HasPostFunctionHooks() const { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
     void GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed);
-    void GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
+    void GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, const EventHandler& handler);
     void GetEventCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
 
     std::vector<SDebugHookCallInfo>& GetHookInfoListForType(EDebugHookType hookType);
