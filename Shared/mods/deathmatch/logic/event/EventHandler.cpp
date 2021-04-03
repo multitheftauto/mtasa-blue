@@ -4,7 +4,6 @@
 #include "Event.h"
 
 #include <stdexcept>
-#include <charconv>
 #include <chrono>
 #include <array>
 
@@ -37,7 +36,7 @@ EventHandler::Priority::Priority(std::string_view value)
         if (at == 0)
             throw std::invalid_argument("Missing priority level in priority string");
         priority = value.substr(at);
-        std::from_chars(value.data(), value.data() + at, m_mod);
+        m_mod = std::stof(std::string{ value.data(), at }); // TODO: replace this with from_chars when GCC is updated from 10.2
         // NOTE: from_chars might fail, in which case m_mod remains 0.0f
         // ideally we would throw here but we have to remain backwards compatible.
     }
