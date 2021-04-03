@@ -72,24 +72,24 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     lua_State* L = GetLuaMain()->GetVM();
     LUA_CHECKSTACK(L, 1);
 
-    // Save globals
     constexpr std::array<const char*, 6> globalsToSave = {
         "source", "this", "sourceResource", "sourceResourceRoot", "eventName", "client"
     };
-    std::array<int, globalsToSave.size()> savedGlobalRefs = {};
 
+    // Save globals
+    std::array<CLuaArgument, globalsToSave.size()> globalValues = {};
     {
         size_t i = 0;
-        for (const char* name : globalsToSave)
+        for (auto name : globalsToSave)
         {
             lua_getglobal(L, name);
-            savedGlobalRefs[i] = lua_ref(L, true);
+            globalValues[i] = { L, -1 };
         }
     }
 
     // Set new globals
     {
-        const auto SetGlobal = [L](auto name, auto value) {
+        const auto SetGlobal = [L](const auto& name, const auto& value) {
             lua::Push(L, value);
             lua_setglobal(L, name);
         };
@@ -117,11 +117,10 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     // Reset globals
     {
         size_t i = 0;
-        for (int ref : savedGlobalRefs)
+        for (auto& luaArg : globalValues)
         {
-            lua_getref(L, ref);
+            luaArg.Push(L);
             lua_setglobal(L, globalsToSave[i]);
-            lua_unref(L, ref);
         }
     }
     m_canBeDeleted = wasDeletable;
