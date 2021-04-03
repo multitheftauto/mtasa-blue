@@ -1142,7 +1142,7 @@ LUA_API int lua_ncallresult(lua_State *L)
 }
 
 // MTA Addition to access `owner` value
-LUA_API void *lua_getowner(lua_State* L)
+LUA_API void *lua_getmtasaowner(lua_State* L)
 {
-    return G(L)->owner;
+    return G(L)->mtasaowner;
 }
