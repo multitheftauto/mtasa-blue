@@ -60,10 +60,10 @@ IMPLEMENT_ENUM_CLASS_END("EventHandlerPriority")
 // TODO Benchmark this. Maybe use a Lua function to handle all this
 void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client)
 {
-    if (!m_lmain)
+    if (!m_handlesPropagated && source != us)
         return;
 
-    if (!m_handlesPropagated && source != us)
+    if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName(), args, source, client, *this))
         return;
 
     const bool wasDeletable = m_canBeDeleted;
@@ -71,6 +71,7 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
 
     lua_State* L = GetLuaMain()->GetVM();
     LUA_CHECKSTACK(L, 1);
+    LUA_STACK_EXPECT(0);
 
     constexpr std::array<const char*, 6> globalsToSave = {
         "source", "this", "sourceResource", "sourceResourceRoot", "eventName", "client"
@@ -112,7 +113,10 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
         }
     }
 
-    args.Call(m_lmain, m_fn);
+    if (m_lmain) // As per old code.. Pretty sure this can never happen
+        args.Call(m_lmain, m_fn);
+
+    GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, client, *this);
 
     // Reset globals
     {

@@ -61,13 +61,15 @@ void EventDispatcher::CancelEvent(bool cancelled, std::string reason)
 
 bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client)
 {
-	//if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
-	//	return false;
+	if (!g_pGame->GetDebugHookManager()->OnPreEvent(event.GetName(), args, source, client))
+	    return false;
 	PreEventPulse();
 
     DispatchToParents(source, event, args, source, client); // Also calls event on source
     DispatchToChildren(source, event, args, source, client);
 
 	PostEventPulse();
+    g_pGame->GetDebugHookManager()->OnPostEvent(event.GetName(), args, source, client);
+
 	return !WasEventCancelled();
 }
