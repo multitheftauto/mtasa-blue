@@ -1,8 +1,8 @@
 #ifdef WIN32
 
-#include <winsock2.h>
-#include <windows.h>
-#include <mmsystem.h>
+    #include <winsock2.h>
+    #include <windows.h>
+    #include <mmsystem.h>
 #endif
 
 #include <string.h>
@@ -116,7 +116,6 @@ struct SAclRequest;
 // has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
 #include "CRemoteCalls.h"
 
-#include "defs/CApiDefs.h"
 // Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaAccountDefs.h"
@@ -147,9 +146,6 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
-
-// Js function definitions
-#include "js/CJsShared.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
@@ -182,7 +178,6 @@ struct SAclRequest;
 // Logic includes
 #include "ASE.h"
 #include "ASEQuerySDK.h"
-#include "CRemoteDebugger.h"
 #include "CAccessControlList.h"
 #include "CAccessControlListGroup.h"
 #include "CAccessControlListManager.h"

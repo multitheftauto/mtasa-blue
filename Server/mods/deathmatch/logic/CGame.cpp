@@ -16,7 +16,6 @@
 #include "../utils/CFunctionUseLogger.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
-#include "../../../launcher/CDynamicLibrary.h"
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -254,8 +253,6 @@ CGame::~CGame()
     if (m_pHTTPD)
         m_pHTTPD->StopHTTPD();
 
-    g_pServerInterface->GetV8()->Shutdown();
-
     // Stop the performance stats modules
     if (CPerfStatManager::GetSingleton() != NULL)
         CPerfStatManager::GetSingleton()->Stop();
@@ -329,7 +326,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pFunctionUseLogger);
     SAFE_DELETE(m_pOpenPortsTester);
     SAFE_DELETE(m_pMasterServerAnnouncer);
-    SAFE_DELETE(m_pRemoteDebugger);
+    SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
     CSimControl::Shutdown();
 
@@ -382,7 +379,6 @@ void CGame::DoPulse()
 
     UpdateModuleTickCount64();
 
-    CV8Base* v8 = g_pServerInterface->GetV8();
     // Calculate FPS
     long long llCurrentTime = SharedUtil::GetModuleTickCount64();
     long long ulDiff = llCurrentTime - m_llLastFPSTime;
@@ -406,8 +402,6 @@ void CGame::DoPulse()
         ucProgress = (ucProgress + 1) & 3;
         ucProgressSkip = (uchar)llCurrentTime;
     }
-
-    v8->DoPulse();
 
     // Handle critical things
     CSimControl::DoPulse();
@@ -447,12 +441,6 @@ void CGame::DoPulse()
         CLOCK_CALL1(ProcessTrafficLights(llCurrentTime););
     }
 
-    // Pulse Remote debugger
-    if (m_pRemoteDebugger)
-    {
-        CLOCK_CALL1(m_pRemoteDebugger->DoPulse(););
-    }
-
     // Pulse ASE
     if (m_pASE)
     {
@@ -490,8 +478,6 @@ void CGame::DoPulse()
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
 
-    v8->DoPulse();
-
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
@@ -504,6 +490,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Init
     m_pASE = NULL;
     IsMainThread();
+
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot();
 
@@ -530,10 +517,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
                                     &m_Events, m_pScriptDebugging, &m_ElementDeleter);
     m_pACLManager = new CAccessControlListManager;
     m_pHqComms = new CHqComms;
-
-    CJsDefs::Initialize();
-    CJsShared::AddFunctions();
-    CJsShared::AddClasses();
 
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
@@ -601,10 +584,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     // Encrypt crash dumps for uploading
     HandleCrashDumpEncryption();
-
-    CV8Base* pV8 = g_pServerInterface->GetV8();
-    pV8->Initialize(m_pMainConfig->GetJsThreadPoolSize());
-    pV8->SetExecutionTimeLimit(m_pMainConfig->GetJsExecutionTimeLimit());
 
     // Check Windows server is using correctly compiled Lua dll
     #ifndef MTA_DEBUG
@@ -896,8 +875,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         }
     }
 
-    m_pRemoteDebugger = new CRemoteDebugger(m_pMainConfig, m_pPlayerManager, 1234, strServerIPList);
-    m_pRemoteDebugger->SetPortEnabled(true, true);
     // If ASE is enabled
     m_pASE = new ASE(m_pMainConfig, m_pPlayerManager, static_cast<int>(usServerPort), strServerIPList);
     if (m_pMainConfig->GetSerialVerificationEnabled())

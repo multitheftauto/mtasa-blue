@@ -1,31 +1,8 @@
 using namespace v8;
 
-class CV8Promise;
-
 class CV8Isolate : public CV8IsolateBase
 {
 public:
-    class CancelationToken
-    {
-    public:
-        ~CancelationToken() {}
-        void Cancel()
-        {
-            std::lock_guard lk(lock);
-            assert(!canceled && "Cancelation token canceled twice");
-            canceled = true;
-        }
-
-        bool IsCanceled()
-        {
-            std::lock_guard lk(lock);
-            return canceled;
-        }
-
-    private:
-        std::mutex lock;
-        bool       canceled = false;
-    };
 
     CV8Isolate(CV8* pCV8, std::string originResource);
     ~CV8Isolate();
@@ -33,24 +10,16 @@ public:
     void InitSecurity();
     void InitClasses();
 
-    void PromiseHook(PromiseHookType type, Local<Promise> promise, Local<Value> parent);
     void DoPulse();
     void RequestGC();
     void Shutdown();
 
-    void               RunCode(std::string& code, std::string originFileName);
-    MaybeLocal<Module> InstantiateModule(Local<Context> context, Local<String> specifier, Local<FixedArray> import_assertions, Local<Module> referrer);
+    bool RunCode(std::string& code, std::string originFileName);
 
-    void               EnqueueMicrotask(std::function<void(CV8Isolate*)> microtask);
-    MaybeLocal<Value>  InitializeModuleExports(Local<Context> context, Local<Module> module);
-    MaybeLocal<Module> GetScriptModule(std::string name);
-    void               AddPromise(std::unique_ptr<CV8Promise> pPromise);
     Isolate*           GetIsolate() const { return m_pIsolate; }
 
     bool GetErrorMessage(std::string& error);
-    bool GetMissingModulesErrorMessage(std::string& error);
 
-    void InitializeModules();
     void Evaluate();
 
     void ReportMissingModule(std::string name);
@@ -79,23 +48,6 @@ public:
     Local<Function> CreateFunction(void (*callback)(CV8FunctionCallbackBase*));
 
 private:
-    // Perform common execution checks, long execution protection.
-    // Use before each time js starts to execute
-    class Execution
-    {
-    public:
-        Execution(CV8Isolate* pIsolate) : m_pIsolate(pIsolate) { pIsolate->m_pCV8->EnterExecution(pIsolate); }
-        ~Execution() { m_pIsolate->m_pCV8->ExitExecution(m_pIsolate); }
-
-    private:
-        CV8Isolate* m_pIsolate;
-    };
-
-    struct SModule
-    {
-        Global<Module> m_module;
-    };
-
     // TryCatch can't be copied
     struct STryCatch
     {
@@ -109,13 +61,6 @@ private:
         }
     };
 
-    class CMicrotask
-    {
-    public:
-        CMicrotask(std::function<void(CV8Isolate*)> microtask, CV8Isolate* isolate) : m_microtask(microtask), m_isolate(isolate) {}
-        std::function<void(CV8Isolate*)> m_microtask;
-        CV8Isolate*                      m_isolate;
-    };
     void                   ReportException(TryCatch* pTryCatch);
     std::string            m_strOriginResource;
     std::string            m_strCurrentOriginFileName;
@@ -132,17 +77,8 @@ private:
 
     std::unordered_set<std::string> m_loadedModules;
 
-    // Module from index X can only import modules at index < X. eg index 3 can import index 0,1 or 2 only.
-    // It prevents from error: ReferenceError: Cannot access 'ImportName' before initialization
-    std::vector<std::string>                                  m_loadingOrder;
-    std::unordered_map<std::string, Global<Module>>           m_mapScriptModules;
-    std::vector<std::unique_ptr<CV8Promise>>                  m_vecCV8Promises;
-    std::vector<std::unique_ptr<SModule>>                     m_vecModules;
-    std::vector<std::unique_ptr<STryCatch>>                   m_vecCompilationErrors;
-    std::vector<Global<Promise>>                              m_vecPromises;
-    std::unordered_map<std::string, std::vector<std::string>> m_mapMissingModules;
-    int                                                       m_iRunCodeCount = 0;
+    std::vector<std::unique_ptr<STryCatch>> m_vecCompilationErrors;
+    int                                     m_iRunCodeCount = 0;
 
-    std::queue<std::string> modulesListName;
-    bool                    m_bHasInitializationError = false;
+    bool m_bHasInitializationError = false;
 };

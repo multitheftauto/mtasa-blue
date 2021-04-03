@@ -510,45 +510,6 @@ bool CMainConfig::Load()
         GetInteger(m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync);
         g_TickRateSettings.iLightSync = Clamp(200, g_TickRateSettings.iLightSync, 4000);
     }
-    
-    pNode = m_pRootNode->FindSubNode("javascript");
-    if (pNode)
-    {
-        CXMLNode* pChildNode = nullptr;
-        int       iInt;
-        if (pChildNode = pNode->FindSubNode("eval"))
-        {
-            iInt = 0;
-            if(pChildNode->GetTagContent(iInt))
-            {
-                if (iInt >= (int)eJsEval::COUNT)
-                {
-                    iInt = (int)eJsEval::DISABLED;
-                    CLogger::ErrorPrintf("Invalid 'eval' value in mtaserver.conf, set to default ( Disabled ).\n");
-                }
-            }
-            
-            m_eJsEval = (eJsEval)iInt;
-        }
-        if (pChildNode = pNode->FindSubNode("execution_time_limit"))
-        {
-            iInt = 0;
-            pChildNode->GetTagContent(iInt);
-
-            iInt = Clamp(200, iInt, 1000 * 60 * 30);            // Maybe add a warning if value is greater than 30 seconds??
-            m_iJsExecutionTimeLimit = iInt;
-        }
-        if (pChildNode = pNode->FindSubNode("thread_pool_size"))
-        {
-            iInt = 0;
-            pChildNode->GetTagContent(iInt);
-
-            iInt = Clamp(0, iInt, 128);
-            m_iJsThreadPoolSize = iInt;
-        }
-        
-        CV8Base* v8 = g_pServerInterface->GetV8();
-    }
 
     ApplyNetOptions();
 

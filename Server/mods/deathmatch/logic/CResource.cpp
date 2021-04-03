@@ -831,21 +831,6 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (m_bSyncMapElementDataDefined)
         m_pResourceManager->ApplySyncMapElementDataOption(this, m_bSyncMapElementData);
 
-    bool hasJsFile = false;
-    for (CResourceFile* pResourceFile : m_ResourceFiles)
-    {
-        if (pResourceFile->GetLanguageType() == CResourceFile::eScriptLanguage::JAVASCRIPT)
-        {
-            hasJsFile = true;
-            break;
-        }
-    }
-
-    if (hasJsFile)
-    {
-        CreateJsVM();
-    }
-
     // Start all our sub resourcefiles
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -964,26 +949,6 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     {
         for (CResource* pDependent : *pDependents)
             AddDependent(pDependent);
-    }
-
-    if (m_pJsVm)
-    {
-        std::string error;
-        if (!m_pJsVm->GetErrorMessage(error))
-        {
-            if (!m_pJsVm->GetMissingModulesErrorMessage(error))
-            {
-                m_pJsVm->Evaluate();
-            }
-            else
-            {
-                CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
-            }
-        }
-        else
-        {
-            CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
-        }
     }
 
     m_eState = EResourceState::Running;
@@ -1144,32 +1109,6 @@ bool CResource::CreateVM(bool bEnableOOP)
     return true;
 }
 
-bool CResource::CreateJsVM()
-{
-    if (m_pJsVm)
-        return false;
-
-    CV8Base* v8 = g_pServerInterface->GetV8();
-    m_pJsVm = v8->CreateIsolate(m_strResourceName);
-    if (g_pGame->GetConfig()->GetJsEvalSetting() == eJsEval::ACL_ALLOWED)
-    {
-        const char* szFunctionRightName = "javascript.dangerouslyAllowEval";
-
-        CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-        bool allowEval = pACLManager->CanObjectUseRight(m_strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, szFunctionRightName,
-                                                        CAccessControlListRight::RIGHT_TYPE_FUNCTION, false);
-    
-        m_pJsVm->SetEvalEnabled(allowEval);
-    }
-    else
-    {
-        m_pJsVm->SetEvalEnabled(false);
-    }
-
-
-    return true;
-}
-
 bool CResource::DestroyVM()
 {
     // Remove all player keybinds on this VM
@@ -1191,13 +1130,6 @@ bool CResource::DestroyVM()
     m_pResourceManager->NotifyResourceVMClose(this, m_pVM);
     g_pGame->GetLuaManager()->RemoveVirtualMachine(m_pVM);
     m_pVM = nullptr;
-
-    if (m_pJsVm)
-    {
-        CV8Base* v8 = g_pServerInterface->GetV8();
-        v8->RemoveIsolate(m_pJsVm);
-        m_pJsVm = nullptr;
-    }
     return true;
 }
 
@@ -1730,7 +1662,6 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 {
     int i = 0;
 
-    bool hasAnyJsScript = false;
     // Loop through all script nodes under the root
     for (CXMLNode* pScript = pRoot->FindSubNode("script", i); pScript != nullptr; pScript = pRoot->FindSubNode("script", ++i))
     {
@@ -1739,22 +1670,6 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
         // Grab the type attribute (server / client)
         bool           bServer = true;
         bool           bClient = false;
-        CResourceScriptItem::eScriptLanguage eLanguage = CResourceScriptItem::eScriptLanguage::LUA;
-        CXMLAttribute* pLang = Attributes.Find("lang");
-        if (pLang)
-        {
-            const char* szLang = pLang->GetValue().c_str();
-            if (!stricmp(szLang, "js"))
-            {
-                eLanguage = CResourceScriptItem::eScriptLanguage::JAVASCRIPT;
-                if (!hasAnyJsScript)
-                {
-                    CreateJsVM();
-                }
-                hasAnyJsScript = true;
-            }
-        }
-
         CXMLAttribute* pType = Attributes.Find("type");
 
         if (pType)
@@ -1802,7 +1717,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                 {
                     // Create it depending on the type (client or server or shared) and add it to the list of resource files
                     if (bServer)
-                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, eLanguage));
+                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
                     if (bClient)
                         m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
                 }

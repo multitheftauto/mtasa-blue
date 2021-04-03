@@ -41,6 +41,7 @@ CPlayerManager*            CLuaDefs::m_pPlayerManager = NULL;
 CRadarAreaManager*         CLuaDefs::m_pRadarAreaManager = NULL;
 CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands;
 CElement*                  CLuaDefs::m_pRootElement = NULL;
+CScriptDebugging*          CLuaDefs::m_pScriptDebugging = NULL;
 CVehicleManager*           CLuaDefs::m_pVehicleManager = NULL;
 CTeamManager*              CLuaDefs::m_pTeamManager = NULL;
 CAccountManager*           CLuaDefs::m_pAccountManager = NULL;
@@ -51,7 +52,6 @@ CMainConfig*               CLuaDefs::m_pMainConfig = NULL;
 
 void CLuaDefs::Initialize(CGame* pGame)
 {
-    CApiDefs::Initialize(pGame);
     m_pRootElement = pGame->GetMapManager()->GetRootElement();
     m_pElementDeleter = pGame->GetElementDeleter();
     m_pBlipManager = pGame->GetBlipManager();
@@ -63,6 +63,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pPlayerManager = pGame->GetPlayerManager();
     m_pRadarAreaManager = pGame->GetRadarAreaManager();
     m_pRegisteredCommands = pGame->GetRegisteredCommands();
+    m_pScriptDebugging = pGame->GetScriptDebugging();
     m_pVehicleManager = pGame->GetVehicleManager();
     m_pTeamManager = pGame->GetTeamManager();
     m_pAccountManager = pGame->GetAccountManager();

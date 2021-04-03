@@ -239,9 +239,6 @@ public:
     CLuaMain*       GetVirtualMachine() { return m_pVM; }
     const CLuaMain* GetVirtualMachine() const { return m_pVM; }
 
-    CV8IsolateBase*       GetJsVm() { return m_pJsVm; }
-    const CV8IsolateBase* GetJsVm() const { return m_pJsVm; }
-
     void AddDependent(CResource* pResource);
     void RemoveDependent(CResource* pResource);
     bool IsDependentResource(CResource* pResource);
@@ -357,7 +354,6 @@ private:
     bool ReadIncludedExports(CXMLNode* pRoot);
     bool ReadIncludedFiles(CXMLNode* pRoot);
     bool CreateVM(bool bEnableOOP);
-    bool CreateJsVM();
     bool DestroyVM();
     void TidyUp();
 
@@ -396,7 +392,6 @@ private:
     CDummy*        m_pResourceDynamicElementRoot = nullptr;
     CElementGroup* m_pDefaultElementGroup = nullptr;            // stores elements created by scripts in this resource
     CLuaMain*      m_pVM = nullptr;
-    CV8IsolateBase* m_pJsVm = nullptr;
 
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded

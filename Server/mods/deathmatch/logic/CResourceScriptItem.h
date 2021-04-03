@@ -16,10 +16,11 @@
 class CResourceScriptItem : public CResourceFile
 {
 public:
-    CResourceScriptItem(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes,
-                        eScriptLanguage scriptLanguage = eScriptLanguage::LUA);
+    CResourceScriptItem(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes);
     ~CResourceScriptItem();
 
     bool Start();
     bool Stop();
+
+private:
 };

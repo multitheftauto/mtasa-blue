@@ -61,7 +61,6 @@ class CGame;
 
 // Forward declarations
 class ASE;
-class CRemoteDebugger;
 class CAccessControlListManager;
 class CAccountManager;
 class CBlipManager;
@@ -551,7 +550,6 @@ private:
     CAccessControlListManager* m_pACLManager;
     CSettings*                 m_pSettings;
     CZoneNames*                m_pZoneNames;
-    CRemoteDebugger*           m_pRemoteDebugger;
     ASE*                       m_pASE;
     CHandlingManager*          m_pHandlingManager;
     CRPCFunctions*             m_pRPCFunctions;

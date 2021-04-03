@@ -123,9 +123,6 @@ public:
     const std::vector<SString>& GetOwnerEmailAddressList() const { return m_OwnerEmailAddressList; }
     bool                        IsDatabaseCredentialsProtectionEnabled() const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
-    eJsEval                     GetJsEvalSetting() const { return m_eJsEval; }
-    int                         GetJsExecutionTimeLimit() const { return m_iJsExecutionTimeLimit; }
-    int                         GetJsThreadPoolSize() const { return m_iJsThreadPoolSize; }
 
     SString GetSetting(const SString& configSetting);
     bool    GetSetting(const SString& configSetting, SString& strValue);
@@ -221,8 +218,4 @@ private:
     int                        m_bFilterDuplicateLogLinesEnabled;
     int                        m_bDatabaseCredentialsProtectionEnabled;
     int                        m_bFakeLagCommandEnabled;
-
-    eJsEval m_eJsEval = eJsEval::DISABLED;
-    int m_iJsExecutionTimeLimit = 2000;
-    int m_iJsThreadPoolSize = 4;
 };
