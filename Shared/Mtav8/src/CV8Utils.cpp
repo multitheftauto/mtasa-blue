@@ -21,7 +21,7 @@ Local<Number> CV8Utils::ToV8Number(double number)
     return Number::New(isolate, number);
 }
 
-const char* CV8Utils::ToString(const v8::String::Utf8Value& value)
+const char* CV8Utils::ToString(const String::Utf8Value& value)
 {
     return *value ? *value : "<string conversion failed>";
 }

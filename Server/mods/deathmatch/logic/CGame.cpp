@@ -268,6 +268,8 @@ CGame::~CGame()
     // Stop networking
     Stop();
 
+    g_pServerInterface->GetV8()->Shutdown();
+
     // Stop async task scheduler
     SAFE_DELETE(m_pAsyncTaskScheduler);
 
@@ -478,6 +480,8 @@ void CGame::DoPulse()
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
 
+    g_pServerInterface->GetV8()->DoPulse();
+
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
@@ -584,6 +588,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     // Encrypt crash dumps for uploading
     HandleCrashDumpEncryption();
+
+    CV8Base* pV8 = g_pServerInterface->GetV8();
+    pV8->Initialize();
 
     // Check Windows server is using correctly compiled Lua dll
     #ifndef MTA_DEBUG

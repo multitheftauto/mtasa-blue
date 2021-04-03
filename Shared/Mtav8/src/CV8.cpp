@@ -6,7 +6,7 @@ CV8::CV8()
 {
 }
 
-void CV8::Initialize(int iThreadPool)
+void CV8::Initialize()
 {
     V8::InitializeICUDefaultLocation("");
     V8::InitializeExternalStartupData("");

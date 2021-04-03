@@ -7,7 +7,7 @@ class CV8 : public CV8Base
 public:
     CV8();
     ~CV8();
-    void Initialize(int iThreadPool);
+    void Initialize();
     void Shutdown();
 
     CV8IsolateBase* CreateIsolate(std::string originResource);

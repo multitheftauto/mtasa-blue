@@ -18,7 +18,6 @@ public:
 
 
 private:
-    void                   ReportException(TryCatch* pTryCatch);
     std::string            m_strOriginResource;
     std::string            m_strCurrentOriginFileName;
     Isolate::CreateParams  m_createParams;
@@ -29,8 +28,6 @@ private:
     std::map<uint16_t, Global<FunctionTemplate>> m_classInstances;
 
     Global<Context> m_rootContext;
-
-    ResourceConstraints m_constraints;
 
     std::unordered_set<std::string> m_loadedModules;
 };

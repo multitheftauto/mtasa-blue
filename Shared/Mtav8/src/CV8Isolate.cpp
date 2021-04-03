@@ -5,30 +5,53 @@
 
 using namespace v8;
 
+void Print(const FunctionCallbackInfo<Value>& args)
+{
+    bool first = true;
+    for (int i = 0; i < args.Length(); i++)
+    {
+        HandleScope handle_scope(args.GetIsolate());
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            printf(" ");
+        }
+        String::Utf8Value str(args.GetIsolate(), args[i]);
+        const char*       cstr = CV8Utils::ToString(str);
+        printf("%s", cstr);
+    }
+    printf("\n");
+    fflush(stdout);
+}
+
 CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
 {
     m_strOriginResource = originResource;
+
     m_createParams.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
-    m_createParams.constraints = m_constraints;
     m_pIsolate = Isolate::New(m_createParams);
 
-    Locker         lock(m_pIsolate);
     Isolate::Scope isolateScope(m_pIsolate);
     HandleScope    handleScope(m_pIsolate);
 
     m_pIsolate->SetMicrotasksPolicy(MicrotasksPolicy::kExplicit);
     m_pIsolate->SetData(0, this);
 
-    m_global.Reset(m_pIsolate, ObjectTemplate::New(m_pIsolate));
+    Local<ObjectTemplate> global = ObjectTemplate::New(m_pIsolate);
+    m_global.Reset(m_pIsolate, global);
+    global->Set(m_pIsolate, "version", CV8Utils::ToV8String(V8::GetVersion()));
+    global->Set(m_pIsolate, "print", FunctionTemplate::New(m_pIsolate, Print));
 
-    m_rootContext.Reset(m_pIsolate, Context::New(m_pIsolate, nullptr, m_global.Get(m_pIsolate)));
-    Context::Scope contextScope(m_rootContext.Get(m_pIsolate));
+    Local<Context> context = Context::New(m_pIsolate, nullptr, global);
 
-    Local<Context> context = m_rootContext.Get(m_pIsolate);
-    Local<Object>  global = context->Global();
-    global->Set(context, CV8Utils::ToV8String("Version"), CV8Utils::ToV8String(V8::GetVersion()));
+    m_rootContext.Reset(m_pIsolate, context);
+    Context::Scope contextScope(context);
 
     InitSecurity();
+
 }
 
 void CV8Isolate::InitSecurity()
@@ -38,55 +61,38 @@ void CV8Isolate::InitSecurity()
     global->Set(m_pIsolate, "WebAssembly", Undefined(m_pIsolate));
 }
 
-
 void CV8Isolate::DoPulse()
 {
-    Locker      lock(m_pIsolate);
     HandleScope handleScope(m_pIsolate);
 
     // Continue async await execution
     m_pIsolate->PerformMicrotaskCheckpoint();
 }
 
-void CV8Isolate::ReportException(TryCatch* pTryCatch)
+void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch)
 {
-    HandleScope handleScope(m_pIsolate);
-
-    if (pTryCatch->HasTerminated())
-    {
-        printf("%s: Long execution has been termianted.\n", m_strOriginResource.c_str());
-    }
-
-    String::Utf8Value exception(m_pIsolate, pTryCatch->Exception());
-    const char*       exceptionString = CV8Utils::ToString(exception);
-    Local<Message>    message = pTryCatch->Message();
+    v8::String::Utf8Value  exception(isolate, try_catch->Exception());
+    const char*            exception_string = CV8Utils::ToString(exception);
+    v8::Local<v8::Message> message = try_catch->Message();
     if (message.IsEmpty())
     {
         // V8 didn't provide any extra information about this error; just
         // print the exception.
-        fprintf(stderr, "%s\n", exceptionString);
+        fprintf(stderr, "%s\n", exception_string);
     }
     else
     {
-        Local<Context> context(m_pIsolate->GetCurrentContext());
-        Local<Value>   stackTraceString;
-        if (pTryCatch->StackTrace(context).ToLocal(&stackTraceString) && stackTraceString->IsString() && stackTraceString.As<String>()->Length() > 0)
-        {
-            String::Utf8Value stackTrace(m_pIsolate, stackTraceString);
-            const char*       stackTraceString = CV8Utils::ToString(stackTrace);
-            fprintf(stderr, "%s\n", stackTraceString);
-        }
-
-        v8::String::Utf8Value fileName(m_pIsolate, message->GetScriptOrigin().ResourceName());
-        const char*           fileNameString = CV8Utils::ToString(fileName);
-        int                   lineNum = message->GetLineNumber(context).FromJust();
-        fprintf(stderr, "%s:%i: %s\n", fileNameString, lineNum, exceptionString);
-
+        // Print (filename):(line number): (message).
+        v8::String::Utf8Value  filename(isolate, message->GetScriptOrigin().ResourceName());
+        v8::Local<v8::Context> context(isolate->GetCurrentContext());
+        const char*            filename_string = CV8Utils::ToString(filename);
+        int                    linenum = message->GetLineNumber(context).FromJust();
+        fprintf(stderr, "%s:%i: %s\n", filename_string, linenum, exception_string);
         // Print line of source code.
-        String::Utf8Value sourceLine(m_pIsolate, message->GetSourceLine(context).ToLocalChecked());
-        const char*       sourceLineString = CV8Utils::ToString(sourceLine);
-        fprintf(stderr, "\n%s\n", sourceLineString);
-        // Print wavy underline.
+        v8::String::Utf8Value sourceline(isolate, message->GetSourceLine(context).ToLocalChecked());
+        const char*           sourceline_string = CV8Utils::ToString(sourceline);
+        fprintf(stderr, "%s\n", sourceline_string);
+        // Print wavy underline (GetUnderline is deprecated).
         int start = message->GetStartColumn(context).FromJust();
         for (int i = 0; i < start; i++)
         {
@@ -98,6 +104,13 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
             fprintf(stderr, "^");
         }
         fprintf(stderr, "\n");
+        v8::Local<v8::Value> stack_trace_string;
+        if (try_catch->StackTrace(context).ToLocal(&stack_trace_string) && stack_trace_string->IsString() && stack_trace_string.As<v8::String>()->Length() > 0)
+        {
+            v8::String::Utf8Value stack_trace(isolate, stack_trace_string);
+            const char*           stack_trace_string = CV8Utils::ToString(stack_trace);
+            fprintf(stderr, "%s\n", stack_trace_string);
+        }
     }
 }
 
@@ -105,21 +118,31 @@ bool CV8Isolate::RunCode(std::string& code, std::string originFileName)
 {
     m_strCurrentOriginFileName = originFileName;
 
-    Local<String>          source = CV8Utils::ToV8String(code);
-    Local<String>          fileName = CV8Utils::ToV8String(originFileName);
+    Isolate::Scope isolateScope(m_pIsolate);
+    HandleScope    handleScope(m_pIsolate);
 
-    v8::HandleScope        handleScope(m_pIsolate);
-    v8::TryCatch           tryCatch(m_pIsolate);
-    v8::ScriptOrigin       origin(fileName);
-    v8::Local<v8::Context> context(m_pIsolate->GetCurrentContext());
-    v8::Local<v8::Script>  script;
+    Local<String> source = CV8Utils::ToV8String(code);
+    Local<String> fileName = CV8Utils::ToV8String(originFileName);
+
+    TryCatch       tryCatchCompile(m_pIsolate);
+    ScriptOrigin   origin(fileName);
+    Local<Context> context = m_rootContext.Get(m_pIsolate);
+
+    Context::Scope context_scope(context);
 
     ScriptCompiler::Source compilerSource(source, origin);
-    Local<Module>          module;
     TryCatch               compileTryCatch(m_pIsolate);
+    Local<Script>          script;
     if (!Script::Compile(context, source, &origin).ToLocal(&script))
     {
-        ReportException(&tryCatch);
+        ReportException(m_pIsolate, &tryCatchCompile);
+        return false;
+    }
+    TryCatch     tryCatchRun(m_pIsolate);
+    Local<Value> result;
+    if (!script->Run(context).ToLocal(&result))
+    {
+        ReportException(m_pIsolate, &tryCatchRun);
         return false;
     }
     return true;
@@ -128,10 +151,10 @@ bool CV8Isolate::RunCode(std::string& code, std::string originFileName)
 void CV8Isolate::Shutdown()
 {
 }
+
 CV8Isolate::~CV8Isolate()
 {
     {
-        Locker         lock(m_pIsolate);
         Isolate::Scope isolateScope(m_pIsolate);
         HandleScope    handleScope(m_pIsolate);
         Local<Context> thisContext = m_rootContext.Get(m_pIsolate);

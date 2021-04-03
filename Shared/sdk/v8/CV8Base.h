@@ -9,7 +9,7 @@ public:
     virtual void            RemoveIsolate(CV8IsolateBase* pIsolate) = 0;
 
     virtual void DoPulse() = 0;
-    virtual void Initialize(int iThreadPool) = 0;
+    virtual void Initialize() = 0;
     virtual void Shutdown() = 0;
 
     virtual std::vector<CV8IsolateBase*> GetIsolates() = 0;

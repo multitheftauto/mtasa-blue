@@ -966,26 +966,6 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             AddDependent(pDependent);
     }
 
-    if (m_pJsVm)
-    {
-        std::string error;
-        if (!m_pJsVm->GetErrorMessage(error))
-        {
-            if (!m_pJsVm->GetMissingModulesErrorMessage(error))
-            {
-                m_pJsVm->Evaluate();
-            }
-            else
-            {
-                CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
-            }
-        }
-        else
-        {
-            CLogger::LogPrintf(error.c_str(), m_strResourceName.c_str());
-        }
-    }
-
     m_eState = EResourceState::Running;
 
     // Call the onResourceStart event. If it returns false, cancel this script again
