@@ -23,9 +23,9 @@ private:
 class CV8ExportClass : public CV8ExportClassBase
 {
 public:
-    CV8ExportClass(std::string name, uint16_t classId) : m_name(name), m_classId(classId) {}
+    CV8ExportClass(std::string name, uint16_t classId);
 
-    Handle<FunctionTemplate> Initialize(CV8Isolate* pIsolate);
+    Local<FunctionTemplate> Initialize(CV8Isolate* pV8Isolate);
 
     void SetConstructorFunction(std::function<void(CV8FunctionCallbackBase*)> func) { m_constructorFunc = func; };
     void SetSizeOf(size_t size) { m_sizeOf = size; }
@@ -35,6 +35,7 @@ public:
     // Allocates memory of size of underlying class
     void* Allocate(Isolate* isolate);
 
+    void SetInheritance(uint16_t baseClass) { m_parentClassId = baseClass; }
     // template <typename T>
     // static T* CreateGarbageCollected(Local<Object> object)
     //{
@@ -130,14 +131,17 @@ public:
             arr);
     };
 
+    uint16_t                                              GetParentClassId() const { return m_parentClassId; }
     uint16_t                                              GetClassId() const { return m_classId; }
+    std::string                                           GetName() const { return m_name; }
     std::function<void(CV8FunctionCallbackBase*)>         GetConstrutorFunction() const { return m_constructorFunc; }
 
 private:
     size_t                                                m_sizeOf;
     int                                                   m_length;            // Accessor count
     std::string                                           m_name;
-    uint16_t                                              m_classId;
+    uint16_t                                              m_classId = 0;
+    uint16_t                                              m_parentClassId = 0;
     std::function<void(CV8FunctionCallbackBase*)> m_constructorFunc;
 
     std::map<std::string, std::pair<float (*)(void*), void (*)(void*, float)>> m_floatAccessors;

@@ -19,11 +19,11 @@ public:
     {
         assert(classId != EClass::Invalid);
         assert(classId < EClass::Count);
-        #ifdef MTA_CLIENT
-            v8Class = g_pCore->GetV8()->CreateClass(name, (size_t)classId);
-        #else
-            v8Class = g_pServerInterface->GetV8()->CreateClass(name, (size_t)classId);
-        #endif
+#ifdef MTA_CLIENT
+        v8Class = g_pCore->GetV8()->CreateClass(name, (uint16_t)classId);
+#else
+        v8Class = g_pServerInterface->GetV8()->CreateClass(name, (uint16_t)classId);
+#endif
         v8Class->SetSizeOf(sizeof(T));
     }
 
@@ -58,28 +58,20 @@ private:
     }
 
 public:
+    void SetConstructor(void (*callback)(CV8FunctionCallbackBase*)) { v8Class->SetConstructorFunction(callback); }
 
-    void SetConstructor(void (*callback)(CV8FunctionCallbackBase*))
-    {
-        v8Class->SetConstructorFunction(callback);
-    }
+    void SetInheritance(EClass eBaseClass) { v8Class->SetInheritance((uint16_t)eBaseClass); }
 
     template <auto P, typename U>
     constexpr void SetAccessor(std::string name)
     {
-        //static_assert(std::is_same_v<P, float>::value);
-
         if constexpr (std::is_same_v<U, float>)
         {
-            v8Class->AddAccessor(name, [](void* ptr) { return (T*)ptr->*P; }, [](void* ptr, float value) { (T*)ptr->*P = value; });
+            v8Class->AddAccessor(
+                name, [](void* ptr) { return (T*)ptr->*P; }, [](void* ptr, float value) { (T*)ptr->*P = value; });
         }
-        
-        /*T* asd = new T(2.0f,3.0f);
-        set(asd, 5.0f);
-        auto b = get(asd);
-        int       c = 5;*/
     }
 
-    CV8ExportClassBase*    v8Class;
-    EClass  classId;
+    CV8ExportClassBase* v8Class;
+    EClass              classId;
 };

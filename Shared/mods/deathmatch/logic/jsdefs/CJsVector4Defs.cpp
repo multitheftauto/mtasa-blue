@@ -25,6 +25,8 @@ void CJsVector4Defs::AddClass()
     m_constructionInfo->SetAccessor<&CVector4D::fY, float>("y");
     m_constructionInfo->SetAccessor<&CVector4D::fZ, float>("z");
     m_constructionInfo->SetAccessor<&CVector4D::fW, float>("w");
+
+    m_constructionInfo->SetInheritance(EClass::Vector3);
 }
 
 CVector4D* CJsVector4Defs::Constructor(float x, float y, float z, float w)

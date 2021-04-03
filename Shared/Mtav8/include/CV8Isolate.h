@@ -124,6 +124,8 @@ private:
     CV8*                   m_pCV8;
     Global<ObjectTemplate> m_global;
 
+    std::map<uint16_t, Global<FunctionTemplate>> m_classInstances;
+
     Global<Context> m_rootContext;
 
     ResourceConstraints m_constraints;

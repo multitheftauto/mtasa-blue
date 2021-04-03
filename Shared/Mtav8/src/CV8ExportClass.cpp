@@ -1,12 +1,17 @@
 #include "StdInc.h"
 
-Handle<FunctionTemplate> CV8ExportClass::Initialize(CV8Isolate* pIsolate)
+CV8ExportClass::CV8ExportClass(std::string name, uint16_t classId) : m_name(name), m_classId(classId)
 {
-    Isolate*             pV8Isolate = pIsolate->GetIsolate();
-    Local<Context>       pV8Context = pV8Isolate->GetCurrentContext();
-    EscapableHandleScope handleScope{pV8Isolate};
 
-    Handle<FunctionTemplate> classTemplate = FunctionTemplate::New(pV8Isolate);
+}
+
+Local<FunctionTemplate> CV8ExportClass::Initialize(CV8Isolate* pV8Isolate)
+{
+    Isolate*             pIsolate = pV8Isolate->GetIsolate();
+    Local<Context>       pV8Context = pIsolate->GetCurrentContext();
+    EscapableHandleScope handleScope{pIsolate};
+
+    Local<FunctionTemplate> classTemplate = FunctionTemplate::New(pIsolate);
     classTemplate->SetLength(m_length);
 
     SetConstructor(classTemplate);
@@ -14,10 +19,10 @@ Handle<FunctionTemplate> CV8ExportClass::Initialize(CV8Isolate* pIsolate)
     Local<ObjectTemplate> objectTemplate = classTemplate->InstanceTemplate();
     objectTemplate->SetInternalFieldCount(CV8::EInternalFieldPurpose::Count);
     SetAccessors(objectTemplate);
+    objectTemplate->Set(Symbol::GetToStringTag(pIsolate), CV8Utils::ToV8String(m_name));
 
+    classTemplate->Set(Symbol::GetToStringTag(pIsolate), CV8Utils::ToV8String(m_name));
     classTemplate->SetClassName(CV8Utils::ToV8String(m_name));
-    objectTemplate->Set(Symbol::GetToStringTag(pV8Isolate), CV8Utils::ToV8String(m_name));
-    pV8Isolate->GetCurrentContext()->Global()->Set(pV8Context, CV8Utils::ToV8String(m_name), classTemplate->GetFunction(pV8Context).ToLocalChecked());
     return handleScope.Escape(classTemplate);
 }
 

@@ -107,15 +107,15 @@ std::vector<CV8IsolateBase*> CV8::GetIsolates()
     return isolates;
 }
 
-std::vector<CV8ExportClass*> CV8::GetClasses()
+std::map<uint16_t, CV8ExportClass*> CV8::GetClasses()
 {
-    std::vector<CV8ExportClass*> isolates = std::vector<CV8ExportClass*>();
-    isolates.reserve(m_vecClasses.size());
-    for (auto const& isolate : m_vecClasses)
+    std::map<uint16_t, CV8ExportClass*> mapClasses;
+
+    for (auto const& jsClass : m_vecClasses)
     {
-        isolates.push_back(isolate.get());
+        mapClasses[jsClass.get()->GetClassId()] = jsClass.get();
     }
-    return isolates;
+    return mapClasses;
 }
 
 CV8IsolateBase* CV8::CreateIsolate(std::string originResource)

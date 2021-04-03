@@ -53,15 +53,37 @@ CV8Isolate::CV8Isolate(CV8* pCV8, std::string originResource) : m_pCV8(pCV8)
 void CV8Isolate::InitSecurity()
 {
     Local<Context> context = m_rootContext.Get(m_pIsolate);
-    Local<Object>  global = context->Global();
-    global->Set(context, CV8Utils::ToV8String("WebAssembly"), Undefined(m_pIsolate));
+    Local<ObjectTemplate>  global = m_global.Get(m_pIsolate);
+    global->Set(m_pIsolate, "WebAssembly", Undefined(m_pIsolate));
 }
 
 void CV8Isolate::InitClasses()
 {
-    for (auto const& pClass : m_pCV8->GetClasses())
+    auto classes = m_pCV8->GetClasses();
+
+    // Create classes
+    for (auto const& [classId, pClass] : classes)
     {
-        pClass->Initialize(this);
+        m_classInstances[classId] = Global<FunctionTemplate>(m_pIsolate, pClass->Initialize(this));
+    }
+
+    // Create inheritance
+    for (auto const& [classId, pClass] : m_classInstances)
+    {
+        auto parentClassId = classes[classId]->GetParentClassId();
+        if (parentClassId)
+        {
+            pClass.Get(m_pIsolate)->Inherit(m_classInstances[parentClassId].Get(m_pIsolate));
+        }
+    }
+
+    // Add to global namespace, let use it in javascript
+    Local<Context> context = m_pIsolate->GetCurrentContext();
+    Local<Object>  global = context->Global();
+    for (auto const& [classId, pClass] : classes)
+    {
+        Local<FunctionTemplate> functionTemplate = m_classInstances[classId].Get(m_pIsolate);
+        global->Set(context, CV8Utils::ToV8String(classes[classId]->GetName()), functionTemplate->GetFunction(context).ToLocalChecked());
     }
 }
 
@@ -578,9 +600,6 @@ CV8Isolate::~CV8Isolate()
 
         m_pIsolate->LowMemoryNotification();
 
-        m_global.Reset();
-        m_rootContext.Reset();
-
         for (auto& pair : m_mapScriptModules)
         {
             pair.second.Reset();
@@ -589,6 +608,14 @@ CV8Isolate::~CV8Isolate()
         {
             module->m_module.Reset();
         }
+
+        for (auto& [classId, classInstance] : m_classInstances)
+        {
+            classInstance.Empty();
+        }
+
+        m_global.Reset();
+        m_rootContext.Reset();
     }
 
     delete m_createParams.array_buffer_allocator;
