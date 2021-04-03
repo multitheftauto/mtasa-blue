@@ -28,6 +28,7 @@ public:
     Local<FunctionTemplate> Initialize(CV8Isolate* pV8Isolate);
 
     void SetConstructorFunction(std::function<void(CV8FunctionCallbackBase*)> func) { m_constructorFunc = func; };
+    void SetMethodFunction(std::string name, std::function<void(CV8FunctionCallbackBase*)> func);
     void SetSizeOf(size_t size) { m_sizeOf = size; }
 
     void AttachGC(Isolate* isolate, Local<Object> object);
@@ -136,19 +137,21 @@ public:
             arr);
     };
 
-    uint16_t                                              GetParentClassId() const { return m_parentClassId; }
-    uint16_t                                              GetClassId() const { return m_classId; }
-    std::string                                           GetName() const { return m_name; }
-    std::function<void(CV8FunctionCallbackBase*)>         GetConstrutorFunction() const { return m_constructorFunc; }
+    uint16_t                                      GetParentClassId() const { return m_parentClassId; }
+    uint16_t                                      GetClassId() const { return m_classId; }
+    std::string                                   GetName() const { return m_name; }
+    std::function<void(CV8FunctionCallbackBase*)> GetConstrutorFunction() const { return m_constructorFunc; }
 
 private:
-    size_t                                                m_sizeOf;
-    int                                                   m_length;            // Accessor count
-    std::string                                           m_name;
-    uint16_t                                              m_classId = 0;
-    uint16_t                                              m_parentClassId = 0;
+    size_t                                        m_sizeOf;
+    int                                           m_length;            // Accessor count
+    std::string                                   m_name;
+    uint16_t                                      m_classId = 0;
+    uint16_t                                      m_parentClassId = 0;
     std::function<void(CV8FunctionCallbackBase*)> m_constructorFunc;
 
-    std::map<std::string, std::pair<float (*)(void*), void (*)(void*, float)>> m_floatAccessors;
+    std::map<std::string, std::pair<float (*)(void*), void (*)(void*, float)>>                 m_floatAccessors;
     std::map<std::string, std::pair<unsigned char (*)(void*), void (*)(void*, unsigned char)>> m_ucharAccessors;
+
+    std::map<std::string, std::function<void(CV8FunctionCallbackBase*)>> m_methods;
 };

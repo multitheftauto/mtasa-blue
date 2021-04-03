@@ -19,7 +19,7 @@ void CJsVector2Defs::AddClass()
 {
     m_constructionInfo = new CJsClassConstructionInfo<CVector2D>("Vector2", EClass::Vector2);
 
-    m_constructionInfo->SetConstructor(JsArgumentParser<Constructor>);
+    m_constructionInfo->SetConstructor<Constructor>();
 
     m_constructionInfo->SetAccessor<&CVector2D::fX, float>("x");
     m_constructionInfo->SetAccessor<&CVector2D::fY, float>("y");

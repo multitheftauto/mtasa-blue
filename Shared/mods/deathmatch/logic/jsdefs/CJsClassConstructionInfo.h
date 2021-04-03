@@ -58,8 +58,22 @@ private:
     }
 
 public:
-    void SetConstructor(void (*callback)(CV8FunctionCallbackBase*)) { v8Class->SetConstructorFunction(callback); }
+    template<auto Constructor>
+    void SetConstructor()
+    {
+        v8Class->SetConstructorFunction(CJsDefs::JsArgumentParser<Constructor>);
+    }
 
+    // Use type `That` to get access wrapped class.
+    // Eg. `That that`, get `fX` field with: `that->fX`
+    // Underlying type depends on current class context.
+    template<auto Method>
+    void SetMethod(std::string name)
+    {
+        v8Class->SetMethodFunction(name, CJsDefs::JsArgumentParser<Method>);
+    }
+
+    // Should be the same as c++ inheritence.
     void SetInheritance(EClass eBaseClass) { v8Class->SetInheritance((uint16_t)eBaseClass); }
 
     template <auto P, typename U>

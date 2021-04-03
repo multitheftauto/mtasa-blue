@@ -19,6 +19,7 @@ class CV8FunctionBase;
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 #include "js/JsBasic.h"
+#include "jsdefs/CJsClass.h"
 #include <lua/CLuaMultiReturn.h>
 
 
@@ -144,7 +145,6 @@ struct CLuaFunctionParserBase
         return "";
     }
 
-    // Pop should remove a T from the Lua Stack after verifying that it is a valid type
     template <typename T>
     inline T Pop(CV8FunctionCallbackBase* JS, std::size_t& index)
     {
@@ -152,8 +152,7 @@ struct CLuaFunctionParserBase
         {
             return JS;
         }
-
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
         {
             if (JS->IsString(index))
             {
@@ -163,7 +162,7 @@ struct CLuaFunctionParserBase
                 return str;
             }
         }
-        if constexpr (std::is_arithmetic_v<T>)
+        else if constexpr (std::is_arithmetic_v<T>)
         {
             if (JS->IsNumber(index))
             {
@@ -173,7 +172,15 @@ struct CLuaFunctionParserBase
                 return (int)value;
             }
         }
-        return T{};
+        else if constexpr (std::is_same<T, CJsClass<CVector>::That>::value)
+        {
+            T that(nullptr);
+            return that;
+        }
+        else
+        {
+            return T{};
+        }
     }
 
     // Pop should remove a T from the Lua Stack after verifying that it is a valid type

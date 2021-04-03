@@ -19,11 +19,13 @@ void CJsVector3Defs::AddClass()
 {
     m_constructionInfo = new CJsClassConstructionInfo<CVector>("Vector3", EClass::Vector3);
 
-    m_constructionInfo->SetConstructor(JsArgumentParser<Constructor>);
+    m_constructionInfo->SetConstructor<Constructor>();
 
     m_constructionInfo->SetAccessor<&CVector::fX, float>("x");
     m_constructionInfo->SetAccessor<&CVector::fY, float>("y");
     m_constructionInfo->SetAccessor<&CVector::fZ, float>("z");
+
+    m_constructionInfo->SetMethod<GetLength>("getLength");
 
     m_constructionInfo->SetInheritance(EClass::Vector2);
 }
@@ -31,4 +33,9 @@ void CJsVector3Defs::AddClass()
 CVector* CJsVector3Defs::Constructor(float x, float y, float z)
 {
     return new CVector(x, y, z);
+}
+
+float CJsVector3Defs::GetLength(That that)
+{
+    return that->Length();
 }

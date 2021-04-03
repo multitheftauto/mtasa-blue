@@ -48,6 +48,12 @@ void CV8ExportClass::SetAccessors(Local<ObjectTemplate> objectTemplate)
 
 }
 
+void CV8ExportClass::SetMethodFunction(std::string name, std::function<void(CV8FunctionCallbackBase*)> func)
+{
+    assert(m_methods.find(name) == m_methods.end());
+    m_methods[name] = func;
+}
+
 void CV8ExportClass::SetConstructor(Handle<FunctionTemplate> objectTemplate)
 {
     objectTemplate->SetCallHandler(

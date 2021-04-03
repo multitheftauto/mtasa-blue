@@ -17,4 +17,5 @@ public:
     static void AddClass();
 
     static CVector* Constructor(float x, float y, float z);
+    static float    GetLength(That that);
 };

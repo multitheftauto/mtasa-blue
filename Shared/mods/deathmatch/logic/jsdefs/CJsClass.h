@@ -19,6 +19,17 @@ template <typename T>
 class CJsClass : public CJsDefs
 {
 public:
+    class That
+    {
+    public:
+        That(T* value) : m_value(value) {}
+
+        T* operator->() { return m_value; }
+
+    private:
+        T* m_value;
+    };
+
     static CV8ExportClassBase*          m_jsClass;
     static CJsClassConstructionInfo<T>* m_constructionInfo;
 };

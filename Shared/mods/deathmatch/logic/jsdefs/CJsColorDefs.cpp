@@ -19,7 +19,7 @@ void CJsColorDefs::AddClass()
 {
     m_constructionInfo = new CJsClassConstructionInfo<SColor>("Color", EClass::Color);
 
-    m_constructionInfo->SetConstructor(JsArgumentParser<Constructor>);
+    m_constructionInfo->SetConstructor<Constructor>();
 
     m_constructionInfo->SetAccessor<&SColor::R, unsigned char>("r");
     m_constructionInfo->SetAccessor<&SColor::G, unsigned char>("g");
