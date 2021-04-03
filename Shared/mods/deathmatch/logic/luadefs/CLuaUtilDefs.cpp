@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/logic/defs/CUtilDefs.cpp
+ *  FILE:        Shared/mods/logic/luadefs/CLuaUtilDefs.cpp
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -10,24 +10,14 @@
 
 #include "StdInc.h"
 
-#ifndef MTA_CLIENT
-    #include <core/CServerInterface.h>
-    extern CServerInterface* g_pServerInterface;
-#endif
-    
-#include <lua/CLuaFunctionParser.h>
-
-CV8Base* CJsDefs::m_pJs;
-CV8ModuleBase* CJsDefs::m_pModule;
-
-void CUtilDefs::LoadLuaFunctions()
-    {
+void CLuaUtilDefs::LoadFunctions()
+{
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Util functions to make scripting easier for the end user
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
         {"deref", Dereference},
         {"ref", Reference},
-        {"getTickCount", ArgumentParser<GetTickCount_>},
+        {"getTickCount", GetTickCount_},
         {"getRealTime", GetCTime},
         {"split", Split},
         {"isOOPEnabled", IsOOPEnabled},
@@ -63,106 +53,7 @@ void CUtilDefs::LoadLuaFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-void CUtilDefs::LoadJsFunctions()
-{
-#ifndef MTA_CLIENT
-    m_pModule = m_pJs->CreateModule("utils");
-
-    constexpr static const std::pair<const char*, void (*)(CV8FunctionCallbackBase*)> functions[]{
-        //{"deref", Dereference}, // Unsupported, useless in case of js
-        //{"ref", Reference}, // Unsupported, useless in case of js
-        {"print", JsArgumentParser<JsPrint>},
-        {"getTickCount", JsArgumentParser<GetTickCount_>},
-        //{"getRealTime", GetCTime}, // Use `Date` class instead.
-        //{"split", Split}, // Use `split` method in `String` class
-        //{"isOOPEnabled", IsOOPEnabled}, // OOP in V8 is always enabled, may be implemented anyway to check if lua has oop enabled.
-        //{"getUserdataType", GetUserdataType}, // use `typeof` operator
-        //{"getColorFromString", GetColorFromString},
-
-        //// Utility vector math functions
-        //{"getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D},
-        //{"getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D},
-        //{"getEasingValue", GetEasingValue},
-        //{"interpolateBetween", InterpolateBetween},
-
-        //// JSON funcs
-        //{"toJSON", toJSON}, // use JSON.stringify
-        //{"fromJSON", fromJSON}, // use JSON.parse
-
-        //// PCRE functions // Use v8 build in `RegExp` class.
-        //{"pregFind", PregFind},
-        //{"pregReplace", PregReplace},
-        //{"pregMatch", PregMatch},
-
-        //// Debug functions
-        //{"debugSleep", DebugSleep},
-
-        //// Utility functions
-        //{"gettok", GetTok}, // Useless, duplicate of `split`
-        //{"tocolor", tocolor},
-    };
-
-
-    for (const auto& [name, func] : functions)
-        m_pModule->AddFunction(name, func);
-
-    CV8ExportEnumBase* eEasingCurve = m_pJs->CreateEnum();
-    eEasingCurve->SetValue("linear", EnumToString(CEasingCurve::eType::Linear));
-    eEasingCurve->SetValue("inQuad", EnumToString(CEasingCurve::eType::InQuad));
-    eEasingCurve->SetValue("qutQuad", EnumToString(CEasingCurve::eType::OutQuad));
-    eEasingCurve->SetValue("inOutQuad", EnumToString(CEasingCurve::eType::InOutQuad));
-    eEasingCurve->SetValue("outInQuad", EnumToString(CEasingCurve::eType::OutInQuad));
-    eEasingCurve->SetValue("inElastic", EnumToString(CEasingCurve::eType::InElastic));
-    eEasingCurve->SetValue("outElastic", EnumToString(CEasingCurve::eType::OutElastic));
-    eEasingCurve->SetValue("inOutElastic", EnumToString(CEasingCurve::eType::InOutElastic));
-    eEasingCurve->SetValue("outInElastic", EnumToString(CEasingCurve::eType::OutInElastic));
-    eEasingCurve->SetValue("inBack", EnumToString(CEasingCurve::eType::InBack));
-    eEasingCurve->SetValue("outBack", EnumToString(CEasingCurve::eType::OutBack));
-    eEasingCurve->SetValue("inOutBack", EnumToString(CEasingCurve::eType::InOutBack));
-    eEasingCurve->SetValue("outInBack", EnumToString(CEasingCurve::eType::OutInBack));
-    eEasingCurve->SetValue("inBounce", EnumToString(CEasingCurve::eType::InBounce));
-    eEasingCurve->SetValue("outBounce", EnumToString(CEasingCurve::eType::OutBounce));
-    eEasingCurve->SetValue("inOutBounce", EnumToString(CEasingCurve::eType::InOutBounce));
-    eEasingCurve->SetValue("outInBounce", EnumToString(CEasingCurve::eType::OutInBounce));
-    eEasingCurve->SetValue("sineCurve", EnumToString(CEasingCurve::eType::SineCurve));
-    eEasingCurve->SetValue("cosineCurve", EnumToString(CEasingCurve::eType::CosineCurve));
-    m_pModule->AddEnum("easingCurve", eEasingCurve);
-
-#endif
-}
-
-bool CUtilDefs::JsPrint(CV8FunctionCallbackBase* arguments)
-{
-    std::stringstream stream;
-    std::string       str;
-    int               count = arguments->CountArguments();
-    for (int index = 0; index < count; index++)
-    {
-        if (arguments->IsString(index))
-        {
-            if (arguments->ReadString(str, index))
-            {
-                stream << "\"" << str << "\"";
-            }
-        }
-        else
-        {
-            if (arguments->ReadAsString(str, index))
-            {
-                stream << str;
-            }
-        }
-        if (index + 1 != count)
-        {
-            stream << " ";
-        }
-    }
-    //m_pScriptDebugging->LogInformation(L, "%s", stream.str().c_str());
-    printf("[%s] %s\n", *GetLocalTimeString(false), stream.str().c_str());
-    return true;
-}
-
-int CUtilDefs::DisabledFunction(lua_State* luaVM)
+int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)
 {
     m_pScriptDebugging->LogError(luaVM, "Unsafe function was called.");
 
@@ -170,7 +61,7 @@ int CUtilDefs::DisabledFunction(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::Dereference(lua_State* luaVM)
+int CLuaUtilDefs::Dereference(lua_State* luaVM)
 {
     int              iPointer = 0;
     CScriptArgReader argStream(luaVM);
@@ -188,7 +79,7 @@ int CUtilDefs::Dereference(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::Reference(lua_State* luaVM)
+int CLuaUtilDefs::Reference(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
@@ -202,12 +93,14 @@ int CUtilDefs::Reference(lua_State* luaVM)
     return 1;
 }
 
-double CUtilDefs::GetTickCount_()
+int CLuaUtilDefs::GetTickCount_(lua_State* luaVM)
 {
-    return static_cast<double>(GetTickCount64_());
+    double dTime = static_cast<double>(GetTickCount64_());
+    lua_pushnumber(luaVM, dTime);
+    return 1;
 }
 
-int CUtilDefs::GetCTime(lua_State* luaVM)
+int CLuaUtilDefs::GetCTime(lua_State* luaVM)
 {
     // table getRealTime( [int seconds = current], bool localTime = true )
     time_t timer;
@@ -270,7 +163,7 @@ int CUtilDefs::GetCTime(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::Split(lua_State* luaVM)
+int CLuaUtilDefs::Split(lua_State* luaVM)
 {
     SString          strInput = "";
     unsigned int     uiDelimiter = 0;
@@ -319,7 +212,7 @@ int CUtilDefs::Split(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::IsOOPEnabled(lua_State* luaVM)
+int CLuaUtilDefs::IsOOPEnabled(lua_State* luaVM)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -330,7 +223,7 @@ int CUtilDefs::IsOOPEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::GetUserdataType(lua_State* luaVM)
+int CLuaUtilDefs::GetUserdataType(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     int              iArgument = lua_type(luaVM, 1);
@@ -359,7 +252,7 @@ int CUtilDefs::GetUserdataType(lua_State* luaVM)
 }
 
 /* Modified from Lua's own print */
-int CUtilDefs::luaB_print(lua_State* L)
+int CLuaUtilDefs::luaB_print(lua_State* L)
 {
     int     n = lua_gettop(L); /* number of arguments */
     int     i;
@@ -383,7 +276,7 @@ int CUtilDefs::luaB_print(lua_State* L)
     return 0;
 }
 
-int CUtilDefs::GetColorFromString(lua_State* luaVM)
+int CLuaUtilDefs::GetColorFromString(lua_State* luaVM)
 {
     //  int int int int getColorFromString ( string theColor )
     SString strColor;
@@ -410,7 +303,7 @@ int CUtilDefs::GetColorFromString(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::GetDistanceBetweenPoints2D(lua_State* luaVM)
+int CLuaUtilDefs::GetDistanceBetweenPoints2D(lua_State* luaVM)
 {
     //  float getDistanceBetweenPoints2D ( float x1, float y1, float x2, float y2 )
     CVector2D vecA, vecB;
@@ -432,7 +325,7 @@ int CUtilDefs::GetDistanceBetweenPoints2D(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::GetDistanceBetweenPoints3D(lua_State* luaVM)
+int CLuaUtilDefs::GetDistanceBetweenPoints3D(lua_State* luaVM)
 {
     //  float getDistanceBetweenPoints3D ( float x1, float y1, float z1, float x2, float y2, float z2 )
     CVector vecA, vecB;
@@ -454,7 +347,7 @@ int CUtilDefs::GetDistanceBetweenPoints3D(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::GetEasingValue(lua_State* luaVM)
+int CLuaUtilDefs::GetEasingValue(lua_State* luaVM)
 {
     //  float getEasingValue( float fProgress, string strEasingType [, float fEasingPeriod, float fEasingAmplitude, float fEasingOvershoot] )
     float               fProgress;
@@ -483,7 +376,7 @@ int CUtilDefs::GetEasingValue(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::InterpolateBetween(lua_State* luaVM)
+int CLuaUtilDefs::InterpolateBetween(lua_State* luaVM)
 {
     //  float float float interpolateBetween ( float x1, float y1, float z1,
     //      float x2, float y2, float z2,
@@ -520,7 +413,7 @@ int CUtilDefs::InterpolateBetween(lua_State* luaVM)
     return 3;
 }
 
-int CUtilDefs::toJSON(lua_State* luaVM)
+int CLuaUtilDefs::toJSON(lua_State* luaVM)
 {
     // Got a string argument?
     CScriptArgReader argStream(luaVM);
@@ -564,7 +457,7 @@ int CUtilDefs::toJSON(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::fromJSON(lua_State* luaVM)
+int CLuaUtilDefs::fromJSON(lua_State* luaVM)
 {
     // Got a string argument?
     SString          strJson = "";
@@ -590,7 +483,7 @@ int CUtilDefs::fromJSON(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::PregFind(lua_State* luaVM)
+int CLuaUtilDefs::PregFind(lua_State* luaVM)
 {
     //  bool pregFind ( string base, string pattern, uint/string flags = 0 )
     SString             strBase, strPattern;
@@ -618,7 +511,7 @@ int CUtilDefs::PregFind(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::PregReplace(lua_State* luaVM)
+int CLuaUtilDefs::PregReplace(lua_State* luaVM)
 {
     //  string pregReplace ( string base, string pattern, string replace, uint/string flags = 0 )
     SString             strBase, strPattern, strReplace;
@@ -648,7 +541,7 @@ int CUtilDefs::PregReplace(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::PregMatch(lua_State* luaVM)
+int CLuaUtilDefs::PregMatch(lua_State* luaVM)
 {
     //  table pregMatch ( string base, string pattern, uint/string flags = 0, int maxResults = 100000 )
     SString             strBase, strPattern;
@@ -688,7 +581,7 @@ int CUtilDefs::PregMatch(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::DebugSleep(lua_State* luaVM)
+int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
 {
     std::size_t milliseconds;
 
@@ -728,7 +621,7 @@ int CUtilDefs::DebugSleep(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::GetTok(lua_State* luaVM)
+int CLuaUtilDefs::GetTok(lua_State* luaVM)
 {
     SString          strInput = "";
     unsigned int     uiToken = 0;
@@ -791,7 +684,7 @@ int CUtilDefs::GetTok(lua_State* luaVM)
     return 1;
 }
 
-int CUtilDefs::tocolor(lua_State* luaVM)
+int CLuaUtilDefs::tocolor(lua_State* luaVM)
 {
     //  int tocolor ( int red, int green, int blue [, int alpha = 255 ] )
     int iRed;
