@@ -33,9 +33,9 @@ class CJsDefs : CApiDefs
 public:
     static void Initialize()
     {
-    #ifndef MTA_CLIENT
+#ifndef MTA_CLIENT
         m_pJs = g_pServerInterface->GetV8();
-    #endif
+#endif
     }
 
     // use `throw std::invalid_argument(...)` to throw JS exception
@@ -47,7 +47,7 @@ public:
     template <auto T>
     static inline void JsArgumentParser(CV8FunctionCallbackBase* Js)
     {
-        CLuaFunctionParser<true, nullptr, T > ()(Js, m_pScriptDebugging);
+        CLuaFunctionParser<true, nullptr, T>()(Js, m_pScriptDebugging);
     }
 
 protected:

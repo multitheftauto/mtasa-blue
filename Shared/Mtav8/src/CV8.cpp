@@ -107,9 +107,9 @@ std::vector<CV8IsolateBase*> CV8::GetIsolates()
     return isolates;
 }
 
-std::vector<CV8Class*> CV8::GetClasses()
+std::vector<CV8ExportClass*> CV8::GetClasses()
 {
-    std::vector<CV8Class*> isolates = std::vector<CV8Class*>();
+    std::vector<CV8ExportClass*> isolates = std::vector<CV8ExportClass*>();
     isolates.reserve(m_vecClasses.size());
     for (auto const& isolate : m_vecClasses)
     {
@@ -212,8 +212,8 @@ CV8ModuleBase* CV8::CreateModule(std::string name)
 
 CV8ExportClassBase* CV8::CreateClass(std::string name, size_t classId)
 {
-    std::unique_ptr<CV8Class> v8Class = std::make_unique<CV8Class>(name, classId);
-    CV8Class*                 pClass = v8Class.get();
+    std::unique_ptr<CV8ExportClass> v8Class = std::make_unique<CV8ExportClass>(name, classId);
+    CV8ExportClass*                 pClass = v8Class.get();
     m_vecClasses.push_back(std::move(v8Class));
     return pClass;
 }

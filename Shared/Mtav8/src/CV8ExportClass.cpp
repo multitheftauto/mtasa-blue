@@ -1,6 +1,6 @@
 #include "StdInc.h"
 
-Handle<FunctionTemplate> CV8Class::Initialize(CV8Isolate* pIsolate)
+Handle<FunctionTemplate> CV8ExportClass::Initialize(CV8Isolate* pIsolate)
 {
     Isolate*             pV8Isolate = pIsolate->GetIsolate();
     Local<Context>       pV8Context = pV8Isolate->GetCurrentContext();
@@ -21,12 +21,12 @@ Handle<FunctionTemplate> CV8Class::Initialize(CV8Isolate* pIsolate)
     return handleScope.Escape(classTemplate);
 }
 
-void CV8Class::AttachGC(Isolate* isolate, Local<Object> object)
+void CV8ExportClass::AttachGC(Isolate* isolate, Local<Object> object)
 {
     new JavascriptWrapper(isolate, object, m_classId);
 }
 
-void* CV8Class::Allocate(Isolate* isolate)
+void* CV8ExportClass::Allocate(Isolate* isolate)
 {
     ArrayBuffer::Allocator* allocator = isolate->GetArrayBufferAllocator();
 
@@ -34,7 +34,7 @@ void* CV8Class::Allocate(Isolate* isolate)
     return allocator->AllocateUninitialized(m_sizeOf);
 }
 
-void CV8Class::SetAccessors(Local<ObjectTemplate> objectTemplate)
+void CV8ExportClass::SetAccessors(Local<ObjectTemplate> objectTemplate)
 {
     for (auto const& accessors : m_floatAccessors)
     {
@@ -42,29 +42,30 @@ void CV8Class::SetAccessors(Local<ObjectTemplate> objectTemplate)
     }
 }
 
-void CV8Class::SetConstructor(Handle<FunctionTemplate> objectTemplate)
+void CV8ExportClass::SetConstructor(Handle<FunctionTemplate> objectTemplate)
 {
     objectTemplate->SetCallHandler(
         [](const FunctionCallbackInfo<Value>& info) {
             Isolate*        pV8Isolate = Isolate::GetCurrent();
             HandleScope     scope(pV8Isolate);
             Local<External> data = info.Data().As<External>();
-            CV8Class*       that = (CV8Class*)data->Value();
+            CV8ExportClass* that = (CV8ExportClass*)data->Value();
 
-            if (info.Length() != that->GetParametersCount())
-            {
-                pV8Isolate->ThrowException(CV8Utils::ToV8String("Error"));
-                return;
-            }
+            //if (info.Length() != that->GetParametersCount())
+            //{
+            //    pV8Isolate->ThrowException(CV8Utils::ToV8String("Error"));
+            //    return;
+            //}
 
-            std::function<void*(CV8FunctionCallbackBase&, void*)> constructionFunction = that->GetConstrutorFunction();
+            std::function<void(CV8FunctionCallbackBase*)> constructionFunction = that->GetConstrutorFunction();
             CV8FunctionCallback                                   funcCallback(info);
-            void*                                                 wrappedClass = constructionFunction(funcCallback, that->Allocate(pV8Isolate));
+
+            constructionFunction(&funcCallback);
 
             Local<Object> wrapper = info.Holder();
 
             wrapper->SetInternalField(CV8::EInternalFieldPurpose::TypeOfClass, CV8Utils::ToV8Number((double)that->GetClassId()));
-            wrapper->SetInternalField(CV8::EInternalFieldPurpose::PointerToValue, External::New(pV8Isolate, wrappedClass));
+            wrapper->SetInternalField(CV8::EInternalFieldPurpose::PointerToValue, External::New(pV8Isolate, funcCallback.GetReturnValuePtr()));
 
             that->AttachGC(pV8Isolate, wrapper);
 
@@ -73,7 +74,7 @@ void CV8Class::SetConstructor(Handle<FunctionTemplate> objectTemplate)
         External::New(Isolate::GetCurrent(), this));
 }
 
-void CV8Class::AddAccessor(std::string name, float (*getter)(void*), void (*setter)(void*, float))
+void CV8ExportClass::AddAccessor(std::string name, float (*getter)(void*), void (*setter)(void*, float))
 {
     assert(m_floatAccessors.find(name) == m_floatAccessors.end());
     m_length++;

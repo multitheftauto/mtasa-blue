@@ -1,6 +1,6 @@
 #define PI (3.14159265358979323846f)
 
-class CV8Class;
+class CV8ExportClass;
 
 #include <stdio.h>
 #include <stdlib.h>

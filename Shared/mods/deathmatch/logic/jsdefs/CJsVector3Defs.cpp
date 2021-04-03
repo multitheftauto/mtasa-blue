@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 CV8ExportClassBase*                CJsVector3Defs::m_jsClass;
 CJsClassConstructionInfo<CVector>* CJsVector3Defs::m_constructionInfo;
@@ -18,9 +19,14 @@ void CJsVector3Defs::AddClass()
 {
     m_constructionInfo = new CJsClassConstructionInfo<CVector>("Vector3", EClass::Vector3);
 
-    m_constructionInfo->SetConstructor<float, float, float>();
+    m_constructionInfo->SetConstructor(JsArgumentParser<Constructor>);
 
     m_constructionInfo->SetAccessor<&CVector::fX, float>("x");
     m_constructionInfo->SetAccessor<&CVector::fY, float>("y");
     m_constructionInfo->SetAccessor<&CVector::fZ, float>("z");
+}
+
+CVector* CJsVector3Defs::Constructor(float x, float y, float z)
+{
+    return new CVector(x, y, z);
 }

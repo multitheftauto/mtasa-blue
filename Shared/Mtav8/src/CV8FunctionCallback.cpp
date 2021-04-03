@@ -166,6 +166,11 @@ void CV8FunctionCallback::Return(bool arg)
     m_callback.GetReturnValue().Set(Boolean::New(m_callback.GetIsolate(), arg));
 }
 
+void CV8FunctionCallback::Return(void* ptr)
+{
+    m_callback.GetReturnValue().Set(External::New(m_callback.GetIsolate(), ptr));
+}
+
 void CV8FunctionCallback::ReturnUndefined()
 {
     m_callback.GetReturnValue().SetUndefined();
@@ -184,4 +189,12 @@ void CV8FunctionCallback::ThrowException(std::string exception)
 {
     m_callback.GetIsolate()->ThrowException(CV8Utils::ToV8String(exception));
     m_callback.GetReturnValue().SetUndefined();
+}
+
+void* CV8FunctionCallback::GetReturnValuePtr()
+{
+    Local<Value> returnValue = m_callback.GetReturnValue().Get();
+    assert(!returnValue.IsEmpty());
+    assert(returnValue->IsExternal());
+    return returnValue.As<External>()->Value();
 }

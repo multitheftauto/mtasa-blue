@@ -20,6 +20,7 @@ public:
     virtual void Return(double arg) = 0;
     virtual void Return(float arg) = 0;
     virtual void Return(bool arg) = 0;
+    virtual void Return(void* arg) = 0;
     virtual void ReturnUndefined() = 0;
 
     virtual void ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncFunction) = 0;

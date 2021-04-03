@@ -29,11 +29,15 @@ public:
     void Return(float arg);
     void Return(int arg);
     void Return(bool arg);
+    void Return(void* ptr);
     void ReturnUndefined();
 
     void ReturnPromise(std::function<void(CV8AsyncContextBase*)> pAsyncFunction);
 
     void ThrowException(std::string exception);
+
+    void* GetReturnValuePtr();
+
 private:
     const FunctionCallbackInfo<Value>& m_callback;
     bool                               bHasError = false;

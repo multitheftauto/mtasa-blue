@@ -16,4 +16,6 @@ void CJsShared::AddFunctions()
 void CJsShared::AddClasses()
 {
     CJsVector2Defs::AddClass();
+    CJsVector3Defs::AddClass();
+    CJsVector4Defs::AddClass();
 }

@@ -19,6 +19,6 @@ template <typename T>
 class CJsClass : public CJsDefs
 {
 public:
-    static CV8ExportClassBase*                  m_jsClass;
+    static CV8ExportClassBase*          m_jsClass;
     static CJsClassConstructionInfo<T>* m_constructionInfo;
 };

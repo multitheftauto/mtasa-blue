@@ -41,7 +41,7 @@ public:
     static void                  RegisterAllModulesInGlobalNamespace(CV8Isolate* pIsolate);
     CV8Module*                   GetModuleByName(std::string name);
     std::vector<CV8IsolateBase*> GetIsolates();
-    std::vector<CV8Class*>       GetClasses();
+    std::vector<CV8ExportClass*> GetClasses();
     Platform*                    GetPlatform() const { return m_pPlatform.get(); }
 
     static std::unordered_map<std::string, std::unique_ptr<CV8Module>> m_mapModules;
@@ -49,7 +49,7 @@ public:
 private:
     std::unique_ptr<Platform>                     m_pPlatform;
     std::vector<std::unique_ptr<CV8Isolate>>      m_vecIsolates;
-    std::vector<std::unique_ptr<CV8Class>>        m_vecClasses;
+    std::vector<std::unique_ptr<CV8ExportClass>>  m_vecClasses;
     std::vector<std::unique_ptr<CV8ExportEnum>>         m_vecEnums;
     std::vector<std::unique_ptr<CV8ExportObject>> m_vecObjects;
 

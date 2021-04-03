@@ -59,21 +59,10 @@ private:
 
 public:
 
-    template<typename... Ts>
-    constexpr void SetConstructor()
+    void SetConstructor(void (*callback)(CV8FunctionCallbackBase*))
     {
-        std::function<void*(CV8FunctionCallbackBase&, void*)> constructor = [](CV8FunctionCallbackBase& args, void* ptr) {
-            if constexpr (sizeof...(Ts) > 0)
-            {
-                int index = -1;
-                return (void*)new (ptr) T(std::forward<Ts>(ReadArguments<Ts>(args, index))...);
-            }
-            return (void*)new (ptr) T{};
-        };
-        v8Class->SetParametersCount(sizeof...(Ts));
-        v8Class->SetConstructorFunction(constructor);
+        v8Class->SetConstructorFunction(callback);
     }
-
 
     template <auto P, typename U>
     constexpr void SetAccessor(std::string name)

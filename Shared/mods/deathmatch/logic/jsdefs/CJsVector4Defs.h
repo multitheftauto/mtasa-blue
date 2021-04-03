@@ -15,4 +15,6 @@ class CJsVector4Defs : public CJsClass<CVector4D>
 {
 public:
     static void AddClass();
+
+    static CVector4D* Constructor(float x, float y, float z, float w);
 };

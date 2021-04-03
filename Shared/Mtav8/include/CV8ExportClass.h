@@ -20,16 +20,14 @@ private:
     void*          m_pExternalData;
 };
 
-class CV8Class : public CV8ExportClassBase
+class CV8ExportClass : public CV8ExportClassBase
 {
 public:
-    CV8Class(std::string name, uint16_t classId) : m_name(name), m_classId(classId) {}
+    CV8ExportClass(std::string name, uint16_t classId) : m_name(name), m_classId(classId) {}
 
     Handle<FunctionTemplate> Initialize(CV8Isolate* pIsolate);
 
-    void SetConstructorFunction(std::function<void*(CV8FunctionCallbackBase&, void*)> func) { m_constructorFunc = func; };
-    // Fast fail purpose
-    void SetParametersCount(size_t count) { m_parametersCount = count; }
+    void SetConstructorFunction(std::function<void(CV8FunctionCallbackBase*)> func) { m_constructorFunc = func; };
     void SetSizeOf(size_t size) { m_sizeOf = size; }
 
     void AttachGC(Isolate* isolate, Local<Object> object);
@@ -133,16 +131,14 @@ public:
     };
 
     uint16_t                                              GetClassId() const { return m_classId; }
-    std::function<void*(CV8FunctionCallbackBase&, void*)> GetConstrutorFunction() const { return m_constructorFunc; }
-    size_t                                                GetParametersCount() const { return m_parametersCount; }
+    std::function<void(CV8FunctionCallbackBase*)>         GetConstrutorFunction() const { return m_constructorFunc; }
 
 private:
-    size_t                                                m_parametersCount;
     size_t                                                m_sizeOf;
     int                                                   m_length;            // Accessor count
     std::string                                           m_name;
     uint16_t                                              m_classId;
-    std::function<void*(CV8FunctionCallbackBase&, void*)> m_constructorFunc;
+    std::function<void(CV8FunctionCallbackBase*)> m_constructorFunc;
 
     std::map<std::string, std::pair<float (*)(void*), void (*)(void*, float)>> m_floatAccessors;
 };

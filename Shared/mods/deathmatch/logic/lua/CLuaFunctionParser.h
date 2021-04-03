@@ -159,6 +159,7 @@ struct CLuaFunctionParserBase
             {
                 std::string str;
                 JS->ReadString(str, index);
+                index++;
                 return str;
             }
         }
@@ -168,6 +169,7 @@ struct CLuaFunctionParserBase
             {
                 double value;
                 JS->ReadNumber(value, index);
+                index++;
                 return (int)value;
             }
         }
