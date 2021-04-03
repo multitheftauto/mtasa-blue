@@ -2,7 +2,6 @@
 
 #include "EventHandler.h"
 #include "Event.h"
-using namespace SharedUtil;
 
 #include <stdexcept>
 #include <charconv>
@@ -57,7 +56,6 @@ ADD_ENUM(EventHandler::Priority::Level::NORMAL, "normal")
 ADD_ENUM(EventHandler::Priority::Level::HIGH, "high")
 IMPLEMENT_ENUM_CLASS_END("EventHandlerPriority")
 
-// TODO Benchmark this. Maybe use a Lua function to handle all this
 void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client)
 {
     if (!m_handlesPropagated && source != us)
@@ -109,7 +107,7 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
 
         m_lmain->ResetInstructionCount();
 
-        switch (m_lmain->PCall(L, 1 + 6 + args.Count(), 0, 0)) // 7 args for DispatchEvent + variadic (args.Count())
+        switch (m_lmain->PCall(L, 7 + args.Count(), 0, 0)) // 7 args for DispatchEvent + variadic (args.Count())
         {
         case LUA_ERRRUN:
         case LUA_ERRMEM:
@@ -121,62 +119,6 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
             CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, m_lmain->GetFunctionTag(m_fn.ToInt()), GetTimeUs() - timeBeginUS); 
         }
     }
-
     GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, client, *this);
-
-    //constexpr std::array<const char*, 6> globalsToSave = {
-    //    "source", "this", "sourceResource", "sourceResourceRoot", "eventName", "client"
-    //};
-
-    //// Save globals
-    //std::array<CLuaArgument, globalsToSave.size()> globalValues = {};
-    //{
-    //    size_t i = 0;
-    //    for (auto name : globalsToSave)
-    //    {
-    //        lua_getglobal(L, name);
-    //        globalValues[i] = { L, -1 };
-    //    }
-    //}
-
-    //// Set new globals
-    //{
-    //    const auto SetGlobal = [L](const auto& name, const auto& value) {
-    //        lua::Push(L, value);
-    //        lua_setglobal(L, name);
-    //    };
-
-    //    SetGlobal("source", source);
-    //    SetGlobal("this", us);
-    //    SetGlobal("client", client);
-    //    SetGlobal("eventName", event.GetName());
-
-    //    if (auto topLuaMain = GetGame()->GetScriptDebugging()->GetTopLuaMain())
-    //    {
-    //        auto sourceResource = topLuaMain->GetResource();
-    //        SetGlobal("sourceResource", sourceResource);
-    //        SetGlobal("sourceResourceRoot", sourceResource->GetResourceRootElement());
-    //    }
-    //    else
-    //    {
-    //        SetGlobal("sourceResource", nullptr);
-    //        SetGlobal("sourceResourceRoot", nullptr);
-    //    }
-    //}
-
-    //if (m_lmain) // As per old code.. Pretty sure this can never happen
-        //args.Call(m_lmain, m_fn);
-
-    //GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, client, *this);
-
-    //// Reset globals
-    //{
-    //    size_t i = 0;
-    //    for (auto& luaArg : globalValues)
-    //    {
-    //        luaArg.Push(L);
-    //        lua_setglobal(L, globalsToSave[i]);
-    //    }
-    //}
     m_canBeDeleted = wasDeletable;
 }
