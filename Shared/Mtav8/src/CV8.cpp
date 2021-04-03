@@ -8,10 +8,10 @@ CV8::CV8()
 
 void CV8::Initialize(int iThreadPool)
 {
-    V8::InitializeICUDefaultLocation(V8Config::szExecPath);
-    V8::InitializeExternalStartupData(V8Config::szExternalStartupData);
+    V8::InitializeICUDefaultLocation("");
+    V8::InitializeExternalStartupData("");
 
-    m_pPlatform = platform::NewDefaultPlatform(iThreadPool);
+    m_pPlatform = platform::NewDefaultPlatform();
     V8::InitializePlatform(m_pPlatform.get());
     V8::Initialize();
 

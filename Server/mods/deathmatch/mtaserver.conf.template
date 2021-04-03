@@ -262,10 +262,5 @@ R"=====(
          *NOTE* This only protects resources which use dbConnect with mysql
          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
     <database_credentials_protection>1</database_credentials_protection>
-    
-    <javascript>
-        <eval>0</eval>
-        <execution_time_limit>2000</execution_time_limit>
-    </javascript>
 </config>
 )====="

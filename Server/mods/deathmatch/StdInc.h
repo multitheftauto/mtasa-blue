@@ -1,8 +1,8 @@
 #ifdef WIN32
 
-    #include <winsock2.h>
-    #include <windows.h>
-    #include <mmsystem.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <mmsystem.h>
 #endif
 
 #include <string.h>

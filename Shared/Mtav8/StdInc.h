@@ -10,10 +10,8 @@
 #include "SharedUtil.h"
 #include "Common.h"
 
-#include "include/config.h"
 #include "include/v8.h"
 #include "include/libplatform/libplatform.h"
-#include "v8-inspector.h"
 
 #include "v8/CV8Base.h"
 

@@ -27,16 +27,14 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
-			"../../../vendor/v8/include",
 			"logic",
 			"utils",
 			"."
 		}
 
 	defines { "SDK_WITH_BCRYPT" }
-
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt"
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
@@ -55,9 +53,6 @@ project "Deathmatch"
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp",
-		"../../../vendor/v8/include/async/functions/**.h",
-		"../../../Shared/Mtav8/src/async/functions/**.cpp",
-
 	}
 
 	filter "system:windows"

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
 CServer* g_pServer = NULL;
 
 MTAEXPORT CServerBase* InitServer(void)
