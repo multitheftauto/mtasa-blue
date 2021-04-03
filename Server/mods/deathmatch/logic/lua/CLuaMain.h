@@ -109,6 +109,7 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
+    int GetDispatchEventFnRef() const { return m_fnrefDispatchEvent; }
 private:
     void InitSecurity();
     void InitClasses(lua_State* luaVM);
@@ -150,6 +151,9 @@ private:
     uint                 m_uiOpenXMLFileCountWarnThresh;
     static SString       ms_strExpectedUndumpHash;
 
+    // Ref to special event handler function from internal script in InitVM()
+    // Code: "luascripts/DispatchEvent.lua.h"
+    int m_fnrefDispatchEvent;
 public:
     CFastHashMap<const void*, CRefInfo> m_CallbackTable;
     std::map<int, SString>              m_FunctionTagMap;
