@@ -124,7 +124,7 @@ public:
     // CPerfStatLuaTiming
     virtual void OnLuaMainCreate(CLuaMain* pLuaMain);
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain);
-    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs);
+    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const std::string& eventName, TIMEUS timeUs);
 
     // CPerfStatLuaTimingImpl functions
     void GetLuaTimingStats(CPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter);
@@ -220,29 +220,19 @@ void CPerfStatLuaTimingImpl::OnLuaMainDestroy(CLuaMain* pLuaMain)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs)
+void CPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const std::string& eventName, TIMEUS timeUs)
 {
-    CLuaMainTiming* pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
-    if (!pLuaMainTiming)
-    {
-        MapSet(AllLuaTiming.LuaMainTimingMap, pLuaMain, CLuaMainTiming());
-        pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
-    }
+    CLuaMainTiming& luaMainTiming = AllLuaTiming.LuaMainTimingMap[pLuaMain];
 
+    // Resource
     {
-        CTiming& acc = pLuaMainTiming->ResourceTiming.s5.acc;
+        CTiming& acc = luaMainTiming.ResourceTiming.s5.acc;
         acc.total_us += timeUs;
     }
 
-    CTimingBlock* pEventTiming = MapFind(pLuaMainTiming->EventTimingMap, szEventName);
-    if (!pEventTiming)
+    // This event
     {
-        MapSet(pLuaMainTiming->EventTimingMap, szEventName, CTimingBlock());
-        pEventTiming = MapFind(pLuaMainTiming->EventTimingMap, szEventName);
-    }
-
-    {
-        CTiming& acc = pEventTiming->s5.acc;
+        CTiming& acc = luaMainTiming.EventTimingMap[eventName].s5.acc;
         acc.calls++;
         acc.total_us += timeUs;
         acc.max_us = std::max(acc.max_us, timeUs);
