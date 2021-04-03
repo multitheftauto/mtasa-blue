@@ -103,20 +103,17 @@ void CV8Isolate::ReportException(TryCatch* pTryCatch)
 
 bool CV8Isolate::RunCode(std::string& code, std::string originFileName)
 {
-    m_iRunCodeCount++;
     m_strCurrentOriginFileName = originFileName;
 
     Local<String>          source = CV8Utils::ToV8String(code);
     Local<String>          fileName = CV8Utils::ToV8String(originFileName);
 
-    v8::HandleScope        handle_scope(m_pIsolate);
+    v8::HandleScope        handleScope(m_pIsolate);
     v8::TryCatch           tryCatch(m_pIsolate);
     v8::ScriptOrigin       origin(fileName);
     v8::Local<v8::Context> context(m_pIsolate->GetCurrentContext());
     v8::Local<v8::Script>  script;
 
-
-    ScriptOrigin           origin(fileName, 0, 0, false, -1, Local<Value>(), false, false, true);
     ScriptCompiler::Source compilerSource(source, origin);
     Local<Module>          module;
     TryCatch               compileTryCatch(m_pIsolate);
