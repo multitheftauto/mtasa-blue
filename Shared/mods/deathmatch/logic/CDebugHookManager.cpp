@@ -348,19 +348,19 @@ void CDebugHookManager::GetFunctionCallHookArguments(CLuaArguments& NewArguments
 // Returns false if event should be skipped
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
+bool CDebugHookManager::OnPreEvent(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
 {
     if (m_PreEventHookList.empty())
         return true;
 
     // Check if named event is pre hooked
-    if (!IsNameAllowed(szName, m_PreEventHookList))
+    if (!IsNameAllowed(name, m_PreEventHookList))
         return true;
 
     CLuaArguments NewArguments;
-    GetEventCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller);
+    GetEventCallHookArguments(NewArguments, name, Arguments, pSource, pCaller);
 
-    return CallHook(szName, m_PreEventHookList, NewArguments);
+    return CallHook(name, m_PreEventHookList, NewArguments);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -370,19 +370,19 @@ bool CDebugHookManager::OnPreEvent(const char* szName, const CLuaArguments& Argu
 // Called after a Lua event is triggered
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
+void CDebugHookManager::OnPostEvent(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
 {
     if (m_PostEventHookList.empty())
         return;
 
     // Check if named event is post hooked
-    if (!IsNameAllowed(szName, m_PostEventHookList))
+    if (!IsNameAllowed(name, m_PostEventHookList))
         return;
 
     CLuaArguments NewArguments;
-    GetEventCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller);
+    GetEventCallHookArguments(NewArguments, name, Arguments, pSource, pCaller);
 
-    CallHook(szName, m_PostEventHookList, NewArguments);
+    CallHook(name, m_PostEventHookList, NewArguments);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -425,19 +425,19 @@ void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, c
 // Returns false if function call should be skipped
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+bool CDebugHookManager::OnPreEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
 {
     if (m_PreEventFunctionHookList.empty())
         return true;
 
     // Check if named event function is pre hooked
-    if (!IsNameAllowed(szName, m_PreEventFunctionHookList))
+    if (!IsNameAllowed(name, m_PreEventFunctionHookList))
         return true;
 
     CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller, pMapEvent);
+    GetEventFunctionCallHookArguments(NewArguments, name, Arguments, pSource, pCaller, pMapEvent);
 
-    return CallHook(szName, m_PreEventFunctionHookList, NewArguments);
+    return CallHook(name, m_PreEventFunctionHookList, NewArguments);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -447,19 +447,19 @@ bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArgumen
 // Called after a Lua event function is called
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+void CDebugHookManager::OnPostEventFunction(const std::string& name, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
 {
     if (m_PostEventFunctionHookList.empty())
         return;
 
     // Check if named event function is post hooked
-    if (!IsNameAllowed(szName, m_PostEventFunctionHookList))
+    if (!IsNameAllowed(name, m_PostEventFunctionHookList))
         return;
 
     CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller, pMapEvent);
+    GetEventFunctionCallHookArguments(NewArguments, name, Arguments, pSource, pCaller, pMapEvent);
 
-    CallHook(szName, m_PostEventFunctionHookList, NewArguments);
+    CallHook(name, m_PostEventFunctionHookList, NewArguments);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -520,7 +520,7 @@ void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArgu
 // Returns true if there is a debughook which handles the name
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::IsNameAllowed(const char* szName, const std::vector<SDebugHookCallInfo>& eventHookList, bool bNameMustBeExplicitlyAllowed)
+bool CDebugHookManager::IsNameAllowed(const std::string& name, const std::vector<SDebugHookCallInfo>& eventHookList, bool bNameMustBeExplicitlyAllowed)
 {
     for (uint i = 0; i < eventHookList.size(); i++)
     {
@@ -529,7 +529,7 @@ bool CDebugHookManager::IsNameAllowed(const char* szName, const std::vector<SDeb
         if (info.allowedNameMap.empty() && !bNameMustBeExplicitlyAllowed)
             return true;            // All names allowed
 
-        if (MapContains(info.allowedNameMap, szName))
+        if (MapContains(info.allowedNameMap, name))
             return true;            // Name allowed
     }
     return false;
@@ -593,7 +593,7 @@ void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, 
 // Return false if function/event should be skipped
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHookCallInfo>& eventHookList, const CLuaArguments& Arguments,
+bool CDebugHookManager::CallHook(const std::string& name, const std::vector<SDebugHookCallInfo>& eventHookList, const CLuaArguments& Arguments,
                                  bool bNameMustBeExplicitlyAllowed)
 {
     static bool bRecurse = false;
@@ -608,7 +608,7 @@ bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHoo
 
         if (!info.allowedNameMap.empty() || bNameMustBeExplicitlyAllowed)
         {
-            if (!MapContains(info.allowedNameMap, szName))
+            if (!MapContains(info.allowedNameMap, name))
                 continue;
         }
 
