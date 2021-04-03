@@ -46,3 +46,10 @@ void EventHandlerCallDispatcher::Remove(const CustomEvent& event)
     if (auto [it, success] = GetHandlers(event); success)
         m_custom.erase(it);
 }
+
+void EventHandlerCallDispatcher::Clear()
+{
+    ForAll([](EventHandlerCollection& c) {
+        c.Clear();
+    });
+}

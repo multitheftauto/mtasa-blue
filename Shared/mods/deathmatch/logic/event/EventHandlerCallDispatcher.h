@@ -34,6 +34,8 @@ public:
     auto Add(const Event& event, EventHandler handler) { return GetHandlers(event, true)->Add(handler); }
 
     EventHandlerCollection* GetHandlers(const Event& event, bool allowCreate = false);
+
+    void Clear();
 protected:
 
     auto GetHandlers(const BuiltInEvent& event)

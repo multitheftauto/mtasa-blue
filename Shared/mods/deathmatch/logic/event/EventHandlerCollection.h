@@ -22,6 +22,7 @@ public:
 
     void PushToLua(CLuaMain* lmain, lua_State* L) const;
     bool Empty() const { return m_handlers.empty(); }
+    void Clear() { m_handlers.clear(); }
     void Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement, CPlayer* client);
 protected:
     template<typename Pred>

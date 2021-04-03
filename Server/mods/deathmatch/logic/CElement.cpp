@@ -51,7 +51,6 @@ CElement::CElement(CElement* pParent)
         CElement::AddEntityFromRoot(m_uiTypeHash, this);
 
     // Make an event manager for us
-    m_pEventManager = new CMapEventManager;
     m_pCustomData = new CCustomData;
 
     m_pAttachedTo = NULL;
@@ -69,7 +68,6 @@ CElement::~CElement()
 
     // Delete our event manager
     delete m_pCustomData;
-    delete m_pEventManager;
 
     // Unreference us from what's referencing us
     list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
@@ -415,46 +413,15 @@ CElement* CElement::SetParentObject(CElement* pParent, bool bUpdatePerPlayerEnti
     return pParent;
 }
 
-bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
-                        float fPriorityMod)
-{
-    return m_pEventManager->Add(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod);
-}
-
 bool CElement::CallEvent(const Event& event, const CLuaArguments& Arguments, CPlayer* pCaller)
 {
-    //if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
-        //return false;
-
-    //CEvents* pEvents = g_pGame->GetEvents();
-
-    //// Make sure our event-manager knows we're about to call an event
-    //pEvents->PreEventPulse();
-
-    //// Call the event on our parents/us first
-    //CallParentEvent(szName, Arguments, this, pCaller);
-
-    //// Call it on all our children
-    //CallEventNoParent(szName, Arguments, this, pCaller);
-
-    //// Tell the event manager that we're done calling the event
-    //pEvents->PostEventPulse();
-
-    //g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
-
     // Return whether our event was cancelled or not
     return s_EventDispatcher.Call(event, Arguments, this, pCaller);
-}
-
-bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
-{
-    return m_pEventManager->Delete(pLuaMain, szName, iLuaFunction);
 }
 
 void CElement::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
 {
     // Delete it from our events
-    m_pEventManager->Delete(pLuaMain);
     GetEventHandlerCallDispatcher().Remove(pLuaMain);
 
     // Delete it from all our children's events
@@ -470,7 +437,7 @@ void CElement::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
 
 void CElement::DeleteAllEvents()
 {
-    m_pEventManager->DeleteAll();
+    GetEventHandlerCallDispatcher().Clear();
 }
 
 void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
@@ -992,48 +959,6 @@ void CElement::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* pL
     for (; iter != m_Children.end(); iter++)
     {
         (*iter)->FindAllChildrenByTypeIndex(uiTypeHash, pLua, uiIndex);
-    }
-}
-
-void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
-{
-    // Call it on us if this isn't the same class it was raised on
-    if (pSource != this && m_pEventManager->HasEvents())
-    {
-        m_pEventManager->Call(szName, Arguments, pSource, this, pCaller);
-    }
-
-    // Call it on all our children
-    CElementListSnapshot* pList = GetChildrenListSnapshot();
-    pList->AddRef();            // Keep list alive during use
-    for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
-    {
-        CElement* pElement = *iter;
-        if (!pElement->IsBeingDeleted())
-        {
-            if (!pElement->m_pEventManager || pElement->m_pEventManager->HasEvents() || !pElement->m_Children.empty())
-            {
-                pElement->CallEventNoParent(szName, Arguments, pSource, pCaller);
-                if (m_bIsBeingDeleted)
-                    break;
-            }
-        }
-    }
-    pList->Release();
-}
-
-void CElement::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
-{
-    // Call the event on us
-    if (m_pEventManager->HasEvents())
-    {
-        m_pEventManager->Call(szName, Arguments, pSource, this, pCaller);
-    }
-
-    // Call parent's handler
-    if (m_pParent)
-    {
-        m_pParent->CallParentEvent(szName, Arguments, pSource, pCaller);
     }
 }
 
