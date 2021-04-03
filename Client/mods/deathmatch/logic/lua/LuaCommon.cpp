@@ -192,6 +192,16 @@ void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
+CLuaMain* lua_getmtasacluamain(lua_State* L)
+{
+    return static_cast<class CLuaMain*>(lua_getmtasaowner(L));
+}
+
+CResource* lua_getmtasaresource(lua_State* L)
+{
+    return lua_getmtasacluamain(L)->GetResource();
+}
+
 // Just do a type check vs LUA_TNONE before calling this, or bant
 const char* lua_makestring(lua_State* luaVM, int iArgument)
 {

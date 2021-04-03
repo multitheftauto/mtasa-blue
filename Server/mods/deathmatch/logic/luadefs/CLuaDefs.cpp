@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/LuaCommon.h>
 extern uint g_uiNetSentByteCounter;
 
 namespace
@@ -115,8 +116,7 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     }
     
     // Get associated resource
-    auto pLuaMain{ static_cast<CLuaMain*>(lua_getmtasaowner(luaVM)) };
-    auto pResource{ pLuaMain->GetResource() };
+    auto pResource{ lua_getownerresource(luaVM) };
 
     // Update execution time check
     pResource->GetVirtualMachine()->CheckExecutionTime();
