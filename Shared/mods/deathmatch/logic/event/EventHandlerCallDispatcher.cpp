@@ -32,8 +32,6 @@ bool EventHandlerCallDispatcher::Remove(const Event& event, CLuaMain* lmain, con
     return false;
 }
 
-// LuaFunctionRef's are automatically invalidated when a VM closes
-// Then this function is called to remove all that
 void EventHandlerCallDispatcher::Remove(CLuaMain* lmain)
 {
     ForAll([lmain](EventHandlerCollection& c) {
