@@ -26,7 +26,7 @@ public:
     void Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement, CPlayer* client);
 protected:
     template<typename Pred>
-    bool EraseIf(Pred pred) // Returns if any handlers were erased / marked to be erased(deleted)
+    bool EraseIf(Pred pred, bool checkCanBeDeleted = true) // Returns if any handlers were erased / marked to be erased(deleted)
     {
         bool anyMatched = false;
         for (auto it = m_handlers.begin(); it != m_handlers.end();)
@@ -34,7 +34,7 @@ protected:
             if (auto& handler = *it; pred(handler))
             {
                 anyMatched = true;
-                if (handler.CanBeDeleted())
+                if (!checkCanBeDeleted || handler.CanBeDeleted())
                 {
                     it = m_handlers.erase(it);
                     continue; // Skip it++

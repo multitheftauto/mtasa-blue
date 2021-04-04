@@ -25,11 +25,12 @@ bool EventHandlerCollection::Remove(CLuaMain* lmain, const CLuaFunctionRef& fn)
     });
 }
 
+// See note in EventHandlerCallDispatcher::Remove(CLuaMain*) (caller of this function)
 void EventHandlerCollection::Remove(CLuaMain* lmain)
 {
     EraseIf([lmain](const EventHandler& h) {
         return h.GetLuaMain() == lmain;
-    });
+    }, false);
 }
 
 bool EventHandlerCollection::HandleExists(CLuaMain* lmain, const CLuaFunctionRef& fn) const

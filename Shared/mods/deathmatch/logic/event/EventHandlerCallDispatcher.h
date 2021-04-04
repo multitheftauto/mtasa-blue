@@ -18,14 +18,15 @@ class EventHandlerCallDispatcher
 public:
     bool Remove(const Event& event, CLuaMain* lmain, const CLuaFunctionRef& fn);
 
-    // LuaFunctionRef's are automatically invalidated when a VM closes
-    // Then this function is called to remove all that
+    // This function is called to remove all handlers created by the given lmain.
+    // Note: In theory, it's never called while we're processing an event
+    // since resource stops are queued up, and executed at frame end
     void Remove(CLuaMain* lmain);
 
     void Remove(const CustomEvent& event);
 
     template<typename... Ts>
-    void Emmit(const Event& event, Ts&&... ts) // const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client
+    void Emmit(const Event& event, Ts&&... ts)
     {
         if (auto handlers = GetHandlers(event))
             handlers->Emmit(event, std::forward<Ts>(ts)...);

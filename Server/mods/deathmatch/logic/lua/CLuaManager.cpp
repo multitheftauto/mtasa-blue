@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "../luadefs/CLuaGenericDefs.h"
 #include <lua/CLuaFunctionParser.h>
+#include <event/CustomEvents.h>
 
 extern CGame* g_pGame;
 
@@ -76,7 +77,7 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
     if (pLuaMain)
     {
         // Remove all events registered by it and all commands added
-        m_pEvents->RemoveAllEvents(pLuaMain);
+        s_CustomEvents.RemoveAllOf(pLuaMain);
         m_pRegisteredCommands->CleanUpForVM(pLuaMain);
 
         // Delete it unless it is already

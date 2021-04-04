@@ -19,6 +19,9 @@ public:
     // TODO: Implement CustomEventIDArray so we can eliminate the need of
     // always using Event* => HandlerCollection
 
+    // TODO: Fix name inconsistency (we clamp name length in `Add` but nowhere else)
+    // Maybe move this crap to API side
+
     const CustomEvent* Get(const std::string& name)
     {
         if (auto it = m_events.find(name); it != m_events.end())
@@ -44,21 +47,36 @@ public:
         return false;
     }
 
-    bool Remove(const std::string& event) { return m_events.erase(event); }
+    // If you decide to add removeEvent function to the API
+    // remember that it might be called mid event iteration
+    // and if you delete the event object it will crash
+    // you will have to store the delete state, and also
+    // check if the event is being delete in the EventHandlerCollection call loop
+    // if it is, then stop the event iteration, and delte it
+    //bool Remove(const std::string& event) { return m_events.erase(event); }
 
+    // tl;dr; we dont have to worry about events getting deleted while they're in use
+    // because resource stops are queued up and executed end frame
     bool RemoveAllOf(CLuaMain* owner)
     {
         for (auto it = m_events.begin(); it != m_events.end();)
         {
             if (it->second->GetCreatedBy() == owner)
+            {
+                OnEventRemove(*it->second);
                 it = m_events.erase(it);
+            }
             else
                 it++;
         }
     }
 
+protected:
+    void OnEventRemove(const CustomEvent& event);
+
     // Since Event objects are interned we must ensure their addresses never change
     // so we must use unique_ptr here.
+    // TODO: Or std::map without unique_ptr
     std::unordered_map<std::string, std::unique_ptr<CustomEvent>> m_events;
 };
 
