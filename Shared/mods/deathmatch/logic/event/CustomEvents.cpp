@@ -11,7 +11,7 @@ bool CustomEvent::Add(std::string name, CLuaMain* lmain, bool allowRemoteTrigger
     return s_CustomEvents.Add(std::move(name), lmain, allowRemoteTrigger);
 }
 
-void CustomEvents::OnEventDelete(const CustomEvent& event)
+void CustomEvents::OnEventRemove(const CustomEvent& event)
 {
     // Remove all refs to this event
     g_pGame->GetMapManager()->GetRootElement()->IterChildren([&](CElement* elem) {

@@ -57,7 +57,7 @@ public:
 
     // tl;dr; we dont have to worry about events getting deleted while they're in use
     // because resource stops are queued up and executed end frame
-    bool RemoveAllOf(CLuaMain* owner)
+    void RemoveAllOf(CLuaMain* owner)
     {
         for (auto it = m_events.begin(); it != m_events.end();)
         {
