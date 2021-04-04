@@ -134,9 +134,10 @@ void CServerImpl::Printf(const char* szFormat, ...)
 bool CServerImpl::IsRequestingExit()
 {
 #ifdef WIN32
-    m_pThreadCommandQueue->Process(m_bRequestedQuit, NULL);
+    bool quit = m_bRequestedQuit.load();
+    m_pThreadCommandQueue->Process(quit, NULL);
 #endif
-    return m_bRequestedQuit;
+    return quit;
 }
 
 #ifndef WIN32
@@ -440,6 +441,15 @@ void CServerImpl::MainLoop()
 #ifdef WIN32
     timeBeginPeriod(1);            // Change sleep resolution to 1ms
 #endif
+    // Handle the interpreter input
+    m_threadConsoleInput = std::thread([&]() {
+        bool quit = m_bRequestedQuit.load();
+        while (!quit)
+        {
+            HandleInput();
+            Sleep(1);
+        }
+    });
 
     // Loop until a termination is requested
     while (!m_bRequestedQuit)
@@ -463,12 +473,10 @@ void CServerImpl::MainLoop()
             ShowInfoTag(szInfoTag);
         }
 
-        // Handle the interpreter input
-        HandleInput();
-
         // Handle input from the secondary thread
         #ifdef WIN32
-        m_pThreadCommandQueue->Process(m_bRequestedQuit, m_pModManager);
+        bool quit = m_bRequestedQuit.load();
+        m_pThreadCommandQueue->Process(quit, m_pModManager);
         #endif
 
         // Pulse the modmanager

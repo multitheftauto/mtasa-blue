@@ -93,8 +93,8 @@ private:
     SString m_strServerPath;
     SString m_strServerModPath;
 
-    bool m_bRequestedQuit;
-    bool m_bRequestedReset;
+    mutable std::atomic<bool> m_bRequestedQuit;
+    bool                      m_bRequestedReset;
 
     wchar_t m_szInputBuffer[255];
     uint    m_uiInputCount;
@@ -107,6 +107,7 @@ private:
     std::vector<std::vector<SString>> m_vecCommandHistory = {{"", ""}};
     uint                              m_uiSelectedCommandHistoryEntry = 0;
 
+    std::thread m_threadConsoleInput;
 #ifdef WIN32
     HANDLE    m_hConsole;
     HANDLE    m_hConsoleInput;
