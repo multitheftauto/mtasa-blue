@@ -261,14 +261,14 @@ public:
             if (m_bIsBeingDeleted)
                 break;            
             // Check if the function returns a bool
-            if constexpr (std::is_same_v<bool, std::invoke_result_t<Fn, decltype(child)>)
+            if constexpr (std::is_same_v<bool, std::invoke_result_t<Fn, decltype(child)>>)
             {
                 if (!fn(child))
                     continue; // Skip child and it's sub-tree
             }
             else
                 fn(child);
-            child->IterChildrenSnapshot(fn); // Recurse into child
+            child->IterChildren(fn); // Recurse into child
         }
         childrenSnapshot->Release();
     }
