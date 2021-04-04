@@ -133,8 +133,8 @@ void CServerImpl::Printf(const char* szFormat, ...)
 
 bool CServerImpl::IsRequestingExit()
 {
-#ifdef WIN32
     bool quit = m_bRequestedQuit.load();
+#ifdef WIN32
     m_pThreadCommandQueue->Process(quit, NULL);
 #endif
     return quit;
