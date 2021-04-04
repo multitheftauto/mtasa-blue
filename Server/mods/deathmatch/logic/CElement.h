@@ -236,7 +236,7 @@ public:
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
     EventHandlerCallDispatcher& GetEventHandlerCallDispatcher() { return m_eventHandlerCallDispatcher; }
-
+    
     // Iter a snapshot list of our children
     // The snapshot list is inmutable, thus even if it gets modified by
     // scripts it wont crash.
@@ -284,7 +284,7 @@ public:
     void IterAncestorsThenChildren(const Fn& fn)
     {
         IterAncestors(fn);
-        IterChildrenSnapshot(fn);
+        IterChildren(fn);
     }
 protected:
     CElement*    GetRootElement();
