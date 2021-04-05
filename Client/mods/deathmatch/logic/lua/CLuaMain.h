@@ -29,7 +29,6 @@ class CLuaMain;
 
 class CLuaPhysicsRigidBodyManager;
 class CLuaPhysicsStaticCollisionManager;
-class CLuaPhysicsConstraintManager;
 class CLuaPhysicsShapeManager;
 
 struct CRefInfo
@@ -60,9 +59,7 @@ public:
     CLuaTimerManager*                  GetTimerManager() const { return m_pLuaTimerManager; };
     CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
     CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
-    CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager; };
     CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
-    CLuaPhysicsConstraint*             GetContraintFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
@@ -121,7 +118,6 @@ private:
     CLuaTimerManager*                  m_pLuaTimerManager;
     CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
     CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
-    CLuaPhysicsConstraintManager*      m_pLuaPhysicsContraintManager;
     CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;
 
     bool m_bBeingDeleted;            // prevent it being deleted twice

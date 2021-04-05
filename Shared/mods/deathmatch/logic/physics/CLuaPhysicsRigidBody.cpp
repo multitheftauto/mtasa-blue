@@ -28,13 +28,6 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
-    while (!m_constraintList.empty())
-    {
-        auto const& constraint = m_constraintList.back();
-        RemoveConstraintRef(constraint);
-        GetPhysics()->DestroyElement(constraint);
-    }
-    m_constraintList.clear();
 }
 
 bool CLuaPhysicsRigidBody::Destroy()
@@ -432,13 +425,6 @@ void CLuaPhysicsRigidBody::ClearForces()
     m_pRigidBodyProxy->setInterpolationAngularVelocity(btVector3(0, 0, 0));
     m_pRigidBodyProxy->setInterpolationLinearVelocity(btVector3(0, 0, 0));
     m_pRigidBodyProxy->clearForces();
-}
-
-void CLuaPhysicsRigidBody::RemoveConstraintRef(CLuaPhysicsConstraint* pConstraint)
-{
-    ElementLock lk(this);
-    m_pRigidBodyProxy->removeConstraintRef(pConstraint->GetConstraint());
-    ListRemove(m_constraintList, pConstraint);
 }
 
 int CLuaPhysicsRigidBody::GetIslandTag()

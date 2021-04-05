@@ -67,84 +67,6 @@ DECLARE_ENUM(EHashFunction::EHashFunctionType);
 DECLARE_ENUM_CLASS(PasswordHashFunction);
 DECLARE_ENUM_CLASS(StringEncryptFunction);
 
-
-enum class ePhysicsDebugMode
-{
-    // Bullet physics specific
-    NoDebug = -1,
-    DrawWireframe,
-    DrawAabb,
-    DrawFeaturesText,
-    DrawContactPoints,
-    NoDeactivation,
-    NoHelpText,
-    DrawText,
-    ProfileTimings,
-    EnableSatComparison,
-    DisableBulletLCP,
-    EnableCCD,
-    DrawConstraints,
-    DrawConstraintLimits,
-    FastWireframe,
-    DrawNormals,
-    DrawFrames,
-    // Custom
-    LINE_WIDTH,
-    DRAW_DISTANCE,
-    COUNT,
-};
-DECLARE_ENUM_CLASS(ePhysicsDebugMode);
-
-enum class ePhysicsProperty
-{
-    MASS,
-    SLEEPING_LINEAR_THRESHOLDS,
-    SLEEPING_ANGULAR_THRESHOLDS,
-    RESTITUTION,
-    SCALE,
-    DEBUG_COLOR,
-    FILTER_MASK,
-    FILTER_GROUP,
-    SIZE,
-    RADIUS,
-    HEIGHT,
-    MOTION_CCD_THRESHOLD,
-    GRAVITY,
-    SWEPT_SPHERE_RADIUS,
-    SLEEP,
-    WANTS_SLEEPING,
-    // constraints properties
-    STIFFNESS,
-    PIVOT_A,
-    PIVOT_B,
-    LOWER_LIN_LIMIT,
-    UPPER_LIN_LIMIT,
-    LOWER_ANG_LIMIT,
-    UPPER_ANG_LIMIT,
-    BREAKING_IMPULSE_THRESHOLD,
-    APPLIED_IMPULSE,
-    RIGID_BODY_A,
-    RIGID_BODY_B,
-    JOINTS_FEEDBACK,
-    ENABLED,
-    COUNT,
-};
-DECLARE_ENUM_CLASS(ePhysicsProperty);
-
-enum class ePhysicsWorldProperty
-{
-    GRAVITY,
-    USE_CONTINOUS,
-    SIMULATION_ENABLED,
-    SUBSTEPS,
-    WORLDSIZE,
-    TRIGGEREVENTS,
-    TRIGGERCOLLISIONEVENTS,
-    TRIGGERCONSTRAINTEVENTS,
-    COUNT,
-};
-DECLARE_ENUM_CLASS(ePhysicsWorldProperty);
-
 enum class ePhysicsElementType
 {
     Unknown,
@@ -155,20 +77,7 @@ enum class ePhysicsElementType
     // Shapes
     Shape,
     ConvexShape,
-    ConcaveShape,
     BoxShape,
-    SphereShape,
-    ConeShape,
-    BvhTriangleMeshShape,
-    CompoundShape,
-    ConvexHullShape,
-    CylinderShape,
-    GimpactTriangleMeshShape,
-    HeightfieldTerrainShape,
-
-    // Constraints
-    Constraint,
-    PointToPointConstraint,
 };
 DECLARE_ENUM_CLASS(ePhysicsElementType);
 

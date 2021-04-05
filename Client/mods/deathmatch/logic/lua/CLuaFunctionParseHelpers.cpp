@@ -12,7 +12,6 @@
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsConstraintManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
 
 //
@@ -699,8 +698,6 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))            // Try rigid body
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))   // Try static collision
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, ptr, luaVM))            // Try constraint
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, ptr, luaVM))            // Try collision shape
         return GetClassTypeName(pVar);

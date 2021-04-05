@@ -31,7 +31,6 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsConstraintManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
@@ -43,7 +42,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_pLuaTimerManager = new CLuaTimerManager;
     m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
     m_pLuaPhysicsStaticCollisionManager = new CLuaPhysicsStaticCollisionManager;
-    m_pLuaPhysicsContraintManager = new CLuaPhysicsConstraintManager;
     m_pLuaPhysicsShapeManager = new CLuaPhysicsShapeManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
@@ -72,12 +70,10 @@ CLuaMain::~CLuaMain()
     // Physics
     delete m_pLuaPhysicsRigidBodyManager;
     delete m_pLuaPhysicsStaticCollisionManager;
-    delete m_pLuaPhysicsContraintManager;
     delete m_pLuaPhysicsShapeManager;
 
     m_pLuaPhysicsRigidBodyManager = nullptr;
     m_pLuaPhysicsStaticCollisionManager = nullptr;
-    m_pLuaPhysicsContraintManager = nullptr;
     m_pLuaPhysicsShapeManager = nullptr;
 
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
@@ -87,11 +83,6 @@ CLuaMain::~CLuaMain()
 bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
-}
-
-CLuaPhysicsConstraint* CLuaMain::GetContraintFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsContraintManager->GetFromScriptID(uiScriptID);
 }
 
 CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
@@ -120,9 +111,6 @@ CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScrip
     auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
     if (pRigidBody != nullptr)
         return (CLuaPhysicsElement*)pRigidBody;
-    auto pConstraint = GetContraintFromScriptID(uiScriptID);
-    if (pConstraint != nullptr)
-        return (CLuaPhysicsElement*)pConstraint;
     return nullptr;
 }
 
