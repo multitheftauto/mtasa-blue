@@ -88,7 +88,6 @@ class CElementGroup;
 class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
-class CMapEventManager;
 typedef CFastList<CClientEntity*> CChildListType;
 
 // List of elements which is auto deleted when the last user calls Release()
@@ -243,12 +242,7 @@ public:
     virtual bool   IsAttachToable();
     virtual void   DoAttaching();
 
-    bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
-                  float fPriorityMod);
     bool CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren);
-    void CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource);
-    void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource);
-    bool DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction);
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents();
 
@@ -281,8 +275,6 @@ public:
     void           SetElementGroup(CElementGroup* elementGroup) { m_pElementGroup = elementGroup; }
 
     static unsigned int GetTypeID(const char* szTypeName);
-
-    CMapEventManager* GetEventManager() { return m_pEventManager; };
 
     void DeleteClientChildren();
 
@@ -414,7 +406,6 @@ protected:
 
     bool                              m_bBeingDeleted;
     bool                              m_bSystemEntity;
-    CMapEventManager*                 m_pEventManager;
     CModelInfo*                       m_pModelInfo;
     CFastList<class CClientColShape*> m_Collisions;
     CElementGroup*                    m_pElementGroup;

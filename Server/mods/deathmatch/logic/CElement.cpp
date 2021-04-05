@@ -416,7 +416,7 @@ CElement* CElement::SetParentObject(CElement* pParent, bool bUpdatePerPlayerEnti
 bool CElement::CallEvent(const Event& event, const CLuaArguments& Arguments, CPlayer* pCaller)
 {
     // Return whether our event was cancelled or not
-    return s_EventDispatcher.Call(event, Arguments, this, pCaller);
+    return s_EventDispatcher.Call(event, Arguments, true, this, pCaller);
 }
 
 void CElement::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)

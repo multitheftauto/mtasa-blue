@@ -63,28 +63,38 @@ void EventHandlerCollection::PushToLua(CLuaMain* lmain, lua_State* L) const
 
 void EventHandlerCollection::Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement SERVER_ONLY_ARG(CPlayer* client))
 {
-    const auto ItIsValid = [&](auto it) {
-        
-        for (auto i = m_handlers.begin(); i != m_handlers.end(); i++)
-            if (i == it)
-                return true;
-        return false;
-    };
+    CLIENT_ONLY(std::string timingStats;)
+    CLIENT_ONLY(const auto emmitBeginUs = GetTimeUs();)
 
     const size_t listRev = m_listRev;
     for (auto it = m_handlers.begin(); it != m_handlers.end();
         (it->IsMarkedToBeDeleted() && it->CanBeDeleted()) ? it = m_handlers.erase(it) : it++)
     {
         auto& handler = *it;
-        dassert(ItIsValid(it));
         if (handler.IsMarkedToBeDeleted())
             continue;
         if (handler.GetListRev() > listRev) // Was it after we've started iterating?
             continue; // Yes, this can happen if a previously called handler added it
 
-        const auto beginTimeUS = GetTimeUs();
-
+#ifdef MTA_CLIENT
+        const auto handlerBeginUs = GetTimeUs();
         handler(event, args, sourceElement, thisElement SERVER_ONLY_ARG(client));
-        dassert(ItIsValid(it));
+        if (IS_TIMING_CHECKPOINTS())
+        {
+            if (auto delta = GetTimeUs() - handlerBeginUs; delta >= 3000)
+                timingStats += SString(" (%s %d ms)", handler.GetLuaMain()->GetScriptName(), delta / 1000);
+        }
+#else
+        handler(event, args, sourceElement, thisElement, client);
+#endif
     }
+
+#ifdef MTA_CLIENT
+    if (IS_TIMING_CHECKPOINTS())
+    {
+        TIMEUS deltaTimeUs = GetTimeUs() - emmitBeginUs;
+        if (deltaTimeUs > 5000)
+            TIMING_DETAIL(SString("CMapEventManager::Call ( %s, ... ) took %d ms ( %s )", event.GetName().c_str(), deltaTimeUs / 1000, timingStats.c_str()));
+    }
+#endif
 }

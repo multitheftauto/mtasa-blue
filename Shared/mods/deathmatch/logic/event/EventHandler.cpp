@@ -68,6 +68,12 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     if (!m_handlesPropagated && source != us)
         return;
 
+#ifdef MTA_CLIENT
+    static bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000);
+    if (bEnabled)
+        g_pCore->LogEvent(0, "Lua Event", m_lmain->GetScriptName(), event.GetName().c_str());
+#endif
+
     if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client), *this))
         return;
 

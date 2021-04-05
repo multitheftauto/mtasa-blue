@@ -42,11 +42,13 @@ auto GetGame()
 #endif
 }
 
-bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, CElement* source SERVER_ONLY_ARG(CPlayer* client))
+bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, const bool callOnChildren, CElement* source SERVER_ONLY_ARG(CPlayer* client))
 {
 	if (!GetGame()->GetDebugHookManager()->OnPreEvent(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client)))
 	    return false;
 	PreEventPulse();
+
+    CLIENT_ONLY(const auto timeBegin = GetTimeUs();)
 
     // Call all event handlers (us, ancestors, children)
     {
@@ -54,10 +56,20 @@ bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, CEleme
             elem->GetEventHandlerCallDispatcher().Emmit(event, args, source, elem SERVER_ONLY_ARG(client));
         };
         CallHandlers(source);
-        source->IterAncestorsThenChildren(CallHandlers);
+        source->IterAncestors(CallHandlers);
+        if (callOnChildren)
+            source->IterChildren(CallHandlers);
     }
 
 	PostEventPulse();
+#ifdef MTA_CLIENT
+    if (IS_TIMING_CHECKPOINTS())
+    {
+        TIMEUS deltaTimeUs = GetTimeUs() - timeBegin;
+        if (deltaTimeUs > 10000)
+            TIMING_DETAIL(SString("Event: %s [%d ms]", event.GetName().c_str(), deltaTimeUs / 1000));
+    }
+#endif
     GetGame()->GetDebugHookManager()->OnPostEvent(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client));
 
 	return !WasEventCancelled();

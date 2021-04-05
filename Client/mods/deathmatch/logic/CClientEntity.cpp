@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <event/EventDispatcher.h>
 
 using std::list;
 
@@ -41,7 +42,6 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     CElementIDs::SetElement(ID, this);
 
     m_pCustomData = new CCustomData;
-    m_pEventManager = new CMapEventManager;
 
     m_pAttachedToEntity = NULL;
 
@@ -100,12 +100,6 @@ CClientEntity::~CClientEntity()
     assert(!m_pAttachedToEntity && m_AttachedEntities.empty());
 
     RemoveAllCollisions();
-
-    if (m_pEventManager)
-    {
-        delete m_pEventManager;
-        m_pEventManager = NULL;
-    }
 
     if (m_pElementGroup)
     {
@@ -724,104 +718,16 @@ void CClientEntity::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotatio
     m_vecAttachedRotation = vecRotation;
 }
 
-bool CClientEntity::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
-                             float fPriorityMod)
-{
-    return m_pEventManager->Add(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod);
-}
-
 bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren)
 {
-    if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, NULL))
-        return false;
-
-    TIMEUS startTime = GetTimeUs();
-
-    CEvents* pEvents = g_pClientGame->GetEvents();
-
-    // Make sure our event-manager knows we're about to call an event
-    pEvents->PreEventPulse();
-
-    // Call the event on our parents/us first
-    CallParentEvent(szName, Arguments, this);
-
-    if (bCallOnChildren)
-    {
-        // Call it on all our children
-        CallEventNoParent(szName, Arguments, this);
-    }
-
-    // Tell the event manager that we're done calling the event
-    pEvents->PostEventPulse();
-
-    if (IS_TIMING_CHECKPOINTS())
-    {
-        TIMEUS deltaTimeUs = GetTimeUs() - startTime;
-        if (deltaTimeUs > 10000)
-            TIMING_DETAIL(SString("Event: %s [%d ms]", szName, deltaTimeUs / 1000));
-    }
-
-    g_pClientGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, NULL);
-
-    // Return whether it got cancelled or not
-    return (!pEvents->WasEventCancelled());
+    return s_EventDispatcher.Call(szName, Arguments, bCallOnChildren, this);
 }
 
-void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource)
-{
-    // Call it on us if this isn't the same class it was raised on
-    // TODO not sure why the null check is necessary (eAi)
-    if (pSource != this && m_pEventManager != NULL && m_pEventManager->HasEvents())
-    {
-        m_pEventManager->Call(szName, Arguments, pSource, this);
-    }
-
-    // Call it on all our children
-    if (!m_Children.empty())
-    {
-        CElementListSnapshot* pList = GetChildrenListSnapshot();
-        pList->AddRef();            // Keep list alive during use
-        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
-        {
-            CClientEntity* pEntity = *iter;
-            if (!pEntity->IsBeingDeleted())
-            {
-                if (!pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents() || !pEntity->m_Children.empty())
-                {
-                    pEntity->CallEventNoParent(szName, Arguments, pSource);
-                    if (m_bBeingDeleted)
-                        break;
-                }
-            }
-        }
-        pList->Release();
-    }
-}
-
-void CClientEntity::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource)
-{
-    // Call the event on us
-    if (m_pEventManager && m_pEventManager->HasEvents())
-    {
-        m_pEventManager->Call(szName, Arguments, pSource, this);
-    }
-
-    // Call parent's handler
-    if (m_pParent)
-    {
-        m_pParent->CallParentEvent(szName, Arguments, pSource);
-    }
-}
-
-bool CClientEntity::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
-{
-    return m_pEventManager->Delete(pLuaMain, szName, iLuaFunction);
-}
 
 void CClientEntity::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
 {
     // Delete it from our events
-    m_pEventManager->Delete(pLuaMain);
+    GetEventHandlerCallDispatcher().Remove(pLuaMain);
 
     // Delete it from all our children's events
     if (bRecursive)
@@ -836,7 +742,7 @@ void CClientEntity::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
 
 void CClientEntity::DeleteAllEvents()
 {
-    m_pEventManager->DeleteAll();
+    GetEventHandlerCallDispatcher().Clear();
 }
 
 void CClientEntity::CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive)
