@@ -16,6 +16,7 @@
 #include "game/CAnimBlendHierarchy.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
+#include <event/CustomEvents.h>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -459,6 +460,9 @@ CClientGame::~CClientGame()
     pKeyBinds->SetAllControlsEnabled(true, true, true);
     g_pCore->ForceCursorVisible(false);
     SetCursorEventsEnabled(false);
+
+    // Probably not neccessary as (im not sure) dll i unloaded on (re)connect
+    s_CustomEvents.Clear();
 
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop

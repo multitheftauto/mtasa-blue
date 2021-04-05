@@ -71,6 +71,11 @@ public:
         }
     }
 
+#ifdef MTA_CLIENT
+    // Should only be called from CClientGame
+    // It probably isn't needed as on reconnects the dll is unloaded
+    void Clear() { m_events.clear(); }
+#endif
 protected:
     void OnEventRemove(const CustomEvent& event);
 
