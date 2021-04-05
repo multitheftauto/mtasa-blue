@@ -26,6 +26,7 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
+#include "luascripts/DispatchEvent.lua.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {
@@ -188,6 +189,19 @@ void CLuaMain::InitVM()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+    {
+        LoadScript(EmbeddedLuaCode::DispatchEvent);
+
+        lua_getglobal(m_luaVM, "DispatchEvent");
+        //const auto ptr = lua_topointer(m_luaVM, -1);
+        //const int ref = lua_ref(m_luaVM, true); // it pops the value
+        //m_fnDispatchEvent = { m_luaVM, ref, ptr };
+        m_fnrefDispatchEvent = lua_ref(m_luaVM, true);
+        dassert(m_fnrefDispatchEvent != LUA_REFNIL);
+
+        lua_pushnil(m_luaVM);
+        lua_setglobal(m_luaVM, "DispatchEvent"); // nil function out, so it doesn't conflit with people's code
+    }
     DECLARE_PROFILER_SECTION(OnPostLoadScript)
 }
 

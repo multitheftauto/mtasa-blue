@@ -15,6 +15,11 @@ class BuiltInEvent;
 
 class EventHandlerCallDispatcher
 {
+#ifdef MTA_CLIENT
+#ifndef CElement 
+    using CElement = CClientEntity;
+#endif
+#endif
 public:
     bool Remove(const Event& event, CLuaMain* lmain, const CLuaFunctionRef& fn);
 

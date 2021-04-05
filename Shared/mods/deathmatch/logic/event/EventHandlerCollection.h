@@ -11,6 +11,11 @@ struct lua_State;
 // Collection of handler functions attached to the same event and element
 class EventHandlerCollection
 {
+#ifdef MTA_CLIENT
+#ifndef CElement 
+    using CElement = CClientEntity;
+#endif
+#endif
 public:
     bool Add(EventHandler handler);
 
@@ -23,7 +28,7 @@ public:
     void PushToLua(CLuaMain* lmain, lua_State* L) const;
     bool Empty() const { return m_handlers.empty(); }
     void Clear() { m_handlers.clear(); }
-    void Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement, CPlayer* client);
+    void Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement SERVER_ONLY_ARG(CPlayer* client));
 protected:
     template<typename Pred>
     bool EraseIf(Pred pred, bool checkCanBeDeleted = true) // Returns if any handlers were erased / marked to be erased(deleted)

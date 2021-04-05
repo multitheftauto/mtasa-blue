@@ -16,6 +16,7 @@ class CClientEntity;
 #include "CClientCommon.h"
 #include <core/CClientEntityBase.h>
 #include "logic/CClientEntityRefManager.h"
+#include <event/EventHandlerCallDispatcher.h>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -327,6 +328,57 @@ public:
     bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
+    EventHandlerCallDispatcher& GetEventHandlerCallDispatcher() { return m_eventHandlerCallDispatcher; }
+
+    // Iter a snapshot list of our children
+    // The snapshot list is inmutable, thus even if it gets modified by
+    // scripts it wont crash.
+    // If the provided `Fn` function returns bool `false`
+    // the given child and its sub-tree will be skipped
+    // 
+    // TODO: This snapshot list stuff seems absolute bs
+    // Its inconsistent compared to IterAncestors
+    // since that function iterates the `live` version
+    // while this one a `snapshot`
+    // eg.: Parent gets changed in the middle of iteration:
+    // it will still iterate the old children, as the snapshot wont be updated
+    template<typename Fn>
+    void IterChildren(const Fn& fn)
+    {
+        auto childrenSnapshot = GetChildrenListSnapshot();
+        childrenSnapshot->AddRef();
+        for (auto* child : *childrenSnapshot)
+        {
+            if (child->IsBeingDeleted())
+                continue;
+            if (m_bIsBeingDeleted)
+                break;
+            // Check if the function returns a bool
+            if constexpr (std::is_same_v<bool, std::invoke_result_t<Fn, decltype(child)>>)
+            {
+                if (!fn(child))
+                    continue; // Skip child and it's sub-tree
+            }
+            else
+                fn(child);
+            child->IterChildren(fn); // Recurse into child
+        }
+        childrenSnapshot->Release();
+    }
+
+    template<typename Fn>
+    void IterAncestors(const Fn& fn)
+    {
+        for (CClientEntity* it = m_pParent; it; it = it->m_pParent)
+            fn(it);
+    }
+
+    template<typename Fn>
+    void IterAncestorsThenChildren(const Fn& fn)
+    {
+        IterAncestors(fn);
+        IterChildren(fn);
+    }
 protected:
     CClientManager*       m_pManager;
     CClientEntity*        m_pParent;
@@ -335,6 +387,8 @@ protected:
     uint                  m_uiChildrenListSnapshotRevision;
 
     CCustomData* m_pCustomData;
+
+    EventHandlerCallDispatcher m_eventHandlerCallDispatcher;
 
     ElementID m_ID;
     CVector   m_vecRelativePosition;

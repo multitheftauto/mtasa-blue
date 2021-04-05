@@ -79,6 +79,7 @@ public:
 
     bool IsOOPEnabled() { return m_bEnableOOP; }
 
+    int GetDispatchEventFnRef() const { return m_fnrefDispatchEvent; }
 private:
     void InitSecurity();
 
@@ -101,6 +102,10 @@ private:
 
     bool m_bEnableOOP;
 
+
+    // Ref to special event handler function from internal script in InitVM()
+    // Code: "luascripts/DispatchEvent.lua.h"
+    int m_fnrefDispatchEvent;
 public:
     CFastHashMap<const void*, CRefInfo> m_CallbackTable;
     std::map<int, SString>              m_FunctionTagMap;

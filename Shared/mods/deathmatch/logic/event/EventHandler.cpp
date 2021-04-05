@@ -3,9 +3,13 @@
 #include "EventHandler.h"
 #include "Event.h"
 
+#include <lua/LuaBasic.h>
+#include <lua/CLuaStackChecker.h>
+
 #include <stdexcept>
 #include <chrono>
 #include <array>
+
 
 // Server/Client code compatibility crap
 auto GetGame()
@@ -58,12 +62,13 @@ ADD_ENUM(EventHandler::Priority::Level::NORMAL, "normal")
 ADD_ENUM(EventHandler::Priority::Level::HIGH, "high")
 IMPLEMENT_ENUM_CLASS_END("EventHandlerPriority")
 
-void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client)
+
+void EventHandler::operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us SERVER_ONLY_ARG(CPlayer* client))
 {
     if (!m_handlesPropagated && source != us)
         return;
 
-    if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName(), args, source, client, *this))
+    if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client), *this))
         return;
 
     const bool wasDeletable = m_canBeDeleted;
@@ -91,14 +96,18 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
         PushFn(m_fn.ToInt()); // handlerfn
         lua::Push(L, source); // source
         lua::Push(L, us); // this
-        lua::Push(L, client); // client
+        SERVER_ONLY(lua::Push(L, client);) // client
 
         // sourceResource and sourceResourceRoot
         if (auto topLuaMain = GetGame()->GetScriptDebugging()->GetTopLuaMain())
         {
             auto sourceResource = topLuaMain->GetResource();
             lua::Push(L, sourceResource);
+            #ifdef MTA_CLIENT
+            lua::Push(L, sourceResource->GetResourceDynamicEntity());
+            #else
             lua::Push(L, sourceResource->GetResourceRootElement());
+            #endif
         }
         else
         {
@@ -120,10 +129,16 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
             break;
         }
         default: // Only if successful record timing
+        {
+
+        #ifdef MTA_CLIENT
+            using CPerfStatLuaTiming = CClientPerfStatLuaTiming;
+        #endif
             CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, m_lmain->GetFunctionTag(m_fn.ToInt()), GetTimeUs() - timeBeginUS); 
+        }
         }
         lua_settop(L, preCallTop);
     }
-    GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, client, *this);
+    GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client), *this);
     m_canBeDeleted = wasDeletable;
 }

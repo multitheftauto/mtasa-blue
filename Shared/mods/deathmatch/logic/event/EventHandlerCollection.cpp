@@ -61,7 +61,7 @@ void EventHandlerCollection::PushToLua(CLuaMain* lmain, lua_State* L) const
     }
 }
 
-void EventHandlerCollection::Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement, CPlayer* client)
+void EventHandlerCollection::Emmit(const Event& event, const CLuaArguments& args, CElement* sourceElement, CElement* thisElement SERVER_ONLY_ARG(CPlayer* client))
 {
     const auto ItIsValid = [&](auto it) {
         
@@ -84,14 +84,7 @@ void EventHandlerCollection::Emmit(const Event& event, const CLuaArguments& args
 
         const auto beginTimeUS = GetTimeUs();
 
-        //if (!GetGame()->GetDebugHookManager()->OnPreEventFunction(event.GetName().c_str(), args, source, client, nullptr)) // TODO
-            //return;
-
-        handler(event, args, sourceElement, thisElement, client);
+        handler(event, args, sourceElement, thisElement SERVER_ONLY_ARG(client));
         dassert(ItIsValid(it));
-
-        //g_pGame->GetDebugHookManager()->OnPostEventFunction(szName, Arguments, pSource, pCaller, pMapEvent);
-
-        CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(handler.GetLuaMain(), event.GetName().c_str(), GetTimeUs() - beginTimeUS);
     }
 }

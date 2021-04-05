@@ -1,4 +1,5 @@
 #pragma once
+#include <SharedUtil.Template.h>
 #include <vector>
 #include <string>
 
@@ -10,7 +11,7 @@ class CPlayer;
 class EventDispatcher
 {
 public:
-	bool Call(const Event& event, const CLuaArguments& args, CElement* source, CPlayer* client);
+	bool Call(const Event& event, const CLuaArguments& args, CElement* source SERVER_ONLY_ARG(CPlayer* client));
 
 	void PreEventPulse();
 	void PostEventPulse();

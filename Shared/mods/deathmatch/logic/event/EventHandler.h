@@ -2,6 +2,7 @@
 #include <lua/CLuaFunctionRef.h>
 #include <SharedUtil.Misc.h>
 #include <string_view>
+#include <SharedUtil.Template.h>
 
 class CLuaMain;
 class CPlayer;
@@ -11,6 +12,13 @@ class CLuaArguments;
 
 class EventHandler
 {
+// TODO Deal with CElement define at some point, and replace it with a `using CElement = CClientEntity` OR refactor CClientEntity to be CElement
+#ifdef MTA_CLIENT
+#ifndef CElement 
+    using CElement = CClientEntity;
+#endif
+#endif
+
 public:
     struct Priority
     {
@@ -57,7 +65,7 @@ public:
 
     const auto& GetPriority() const { return m_priority; }
 
-    void operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us, CPlayer* client);
+    void operator()(const Event& event, const CLuaArguments& args, CElement* source, CElement* us SERVER_ONLY_ARG(CPlayer* client));
     //bool CanBeCalled() const { return !IsBeingDeleted(); }  TODO: Add check if m_fn is valid (VERIFY_FUNCTION)
 
     void SetListRev(size_t rev) { m_listRevWhenInserted = rev; }

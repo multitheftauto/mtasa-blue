@@ -248,3 +248,21 @@ struct pad_func_with_func<Func, FuncB> : pad_func_with_func_impl<Func, typename 
                                                                                         std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args) == 0>::type>
 {
 };
+
+
+// (hopefully) Quality of life macros
+#ifdef MTA_CLIENT
+#define SERVER_ONLY(code)
+#define CLIENT_ONLY(code) code
+#define CLIENT_ONLY_ARG(arg) ,arg
+#define SERVER_ONLY_ARG(arg)
+#define SPECIFIC_CODE(client, server) client
+#else
+#define CLIENT_ONLY(code)
+#define SERVER_ONLY(code) code
+#define SERVER_ONLY_ARG(arg) ,arg
+#define CLIENT_ONLY_ARG(arg)
+#define SPECIFIC_CODE(client, server) server
+#endif
+
+// For the SERVER/CLIENT_ONLY macros don't forget to put the ; inside of the macro
