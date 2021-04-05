@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <lua/LuaCommon.h>
+#include "lua/LuaCommon.h"
 extern uint g_uiNetSentByteCounter;
 
 namespace
