@@ -309,7 +309,7 @@ private:
     bool m_bLastFocused;
     int  m_iUnminimizeFrameCounter;
     bool m_bDidRecreateRenderTargets;
-    std::atomic<bool> m_bIsWindowMinimized;
+    bool m_bIsWindowMinimized;
 
     // Module loader objects.
     CModuleLoader m_GameModule;
