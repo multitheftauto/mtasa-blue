@@ -78,21 +78,7 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 
 bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool& bWasCanceled)
 {
-    // There is such event?
-    //if (m_pEvents->Exists(szName))
-    //{
-    //    // Call the event
-    //    pElement->CallEvent(szName, Arguments);
-    //    bWasCanceled = m_pEvents->WasEventCancelled();
-    //    return true;
-    //}
 
-    if (auto* event = Event::Get(szName))
-    {
-        bWasCanceled = !pElement->CallEvent(*event, Arguments);
-        return true;
-    }
-    return false;
 }
 
 bool CStaticFunctionDefinitions::TriggerClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,

@@ -94,11 +94,9 @@ int CLuaFunctionDefs::TriggerEvent(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Trigger it
-        bool bWasCancelled;
-        if (CStaticFunctionDefinitions::TriggerEvent(strName, pElement, Arguments, bWasCancelled))
+        if (auto* event = Event::Get(strName))
         {
-            lua_pushboolean(luaVM, !bWasCancelled);
+            lua_pushboolean(luaVM, !pElement->CallEvent(*event, Arguments));
             return 1;
         }
     }

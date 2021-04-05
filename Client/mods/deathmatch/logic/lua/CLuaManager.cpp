@@ -154,14 +154,14 @@ void CLuaManager::LoadCFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Event funcs
-        {"addEvent", CLuaFunctionDefs::AddEvent},
-        {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
-        {"removeEventHandler", CLuaFunctionDefs::RemoveEventHandler},
+        {"addEvent", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::AddEvent>},
+        {"addEventHandler", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::AddEventHandler>},
+        {"removeEventHandler", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::RemoveEventHandler>},
+        {"cancelEvent", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::CancelEvent>},
+        {"wasEventCancelled", CLuaDefs::ArgumentParserWarn<false, CLuaFunctionDefs::WasEventCancelled>},
         {"getEventHandlers", CLuaFunctionDefs::GetEventHandlers},
         {"triggerEvent", CLuaFunctionDefs::TriggerEvent},
         {"triggerServerEvent", CLuaFunctionDefs::TriggerServerEvent},
-        {"cancelEvent", CLuaFunctionDefs::CancelEvent},
-        {"wasEventCancelled", CLuaFunctionDefs::WasEventCancelled},
         {"triggerLatentServerEvent", CLuaFunctionDefs::TriggerLatentServerEvent},
         {"getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles},
         {"getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus},

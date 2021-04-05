@@ -28,14 +28,15 @@ public:
     static void Initialize(class CLuaManager* pLuaManager, class CScriptDebugging* pScriptDebugging, class CClientGame* pClientGame);
 
     // Event functions
-    LUA_DECLARE(AddEvent);
-    LUA_DECLARE(AddEventHandler);
-    LUA_DECLARE(RemoveEventHandler);
+    static bool RemoveEventHandler(lua_State* L, std::string eventName, CClientEntity* attachedTo, CLuaFunctionRef handlerfn);
+    static bool AddEventHandler(lua_State* L, std::string eventName, CClientEntity* attachedTo,
+        CLuaFunctionRef handlerfn, std::optional<bool> propagated, std::optional<std::string_view> priorityToParse);
+    static bool AddEvent(lua_State* L, std::string name, std::optional<bool> allowRemoteTrigger);
+    static bool CancelEvent();
+    static bool WasEventCancelled();
     LUA_DECLARE(GetEventHandlers);
     LUA_DECLARE(TriggerEvent);
     LUA_DECLARE(TriggerServerEvent);
-    LUA_DECLARE(CancelEvent);
-    LUA_DECLARE(WasEventCancelled);
     LUA_DECLARE(TriggerLatentServerEvent);
     LUA_DECLARE(GetLatentEventHandles);
     LUA_DECLARE(GetLatentEventStatus);

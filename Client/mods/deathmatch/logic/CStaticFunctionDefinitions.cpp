@@ -82,67 +82,6 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
-bool CStaticFunctionDefinitions::AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger)
-{
-    assert(szName);
-
-    // Valid name?
-    if (szName[0] != '\0')
-    {
-        // Add our event to CEvents
-        return m_pEvents->AddEvent(szName, "", &LuaMain, bAllowRemoteTrigger);
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::AddEventHandler(CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction,
-                                                 bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod)
-{
-    assert(szName);
-
-    // We got an event with that name?
-    if (m_pEvents->Exists(szName))
-    {
-        // Add the event handler
-        if (Entity.AddEvent(&LuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
-            return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::RemoveEventHandler(CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction)
-{
-    assert(szName);
-
-    // We got an event and handler with that name?
-    if (m_pEvents->Exists(szName))
-    {
-        // ACHTUNG: CHECK WHETHER THE LUA FUNCTION REF IS CORRECTLY FOUND
-        if (Entity.DeleteEvent(&LuaMain, szName, iLuaFunction))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled)
-{
-    // There is such event?
-    if (m_pEvents->Exists(szName))
-    {
-        // Call the event
-        Entity.CallEvent(szName, Arguments, true);
-        bWasCancelled = m_pEvents->WasEventCancelled();
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments)
 {
     assert(szName);
@@ -200,17 +139,6 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
     }
 
     return false;
-}
-
-bool CStaticFunctionDefinitions::CancelEvent(bool bCancel)
-{
-    m_pEvents->CancelEvent(bCancel);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::WasEventCancelled()
-{
-    return m_pEvents->WasEventCancelled();
 }
 
 bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)

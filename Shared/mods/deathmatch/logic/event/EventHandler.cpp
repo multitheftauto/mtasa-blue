@@ -79,7 +79,7 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     {
         g_bAllowAspectRatioAdjustment = true;
         using namespace std::string_view_literals;
-        if (m_islmainCustomBlips) // customblips resource forces aspect ratio on
+        if (m_lmain->GetScriptName() == "customblips"sv) // customblips resource forces aspect ratio on
         {
             g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled(true);
         }

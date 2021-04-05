@@ -9,134 +9,40 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <iostream> // TOOD remove
+#include <event/Event.h>
+#include <event/EventDispatcher.h>
 
-int CLuaFunctionDefs::AddEvent(lua_State* luaVM)
+const Event* ResolveEvent(const std::string& name)
 {
-    //  bool addEvent ( string eventName [, bool allowRemoteTrigger = false ] )
-    SString strName;
-    bool    bAllowRemoteTrigger;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
-    argStream.ReadBool(bAllowRemoteTrigger, false);
-
-    if (!argStream.HasErrors())
-    {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Do it
-            if (CStaticFunctionDefinitions::AddEvent(*pLuaMain, strName, bAllowRemoteTrigger))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (const Event* event = Event::Get(name))
+        return event;
+    throw std::invalid_argument("Event doesn't exist");
 }
 
-int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)
+bool CLuaFunctionDefs::RemoveEventHandler(lua_State* L, std::string eventName, CClientEntity* attachedTo, CLuaFunctionRef handlerfn)
 {
-    //  bool addEventHandler ( string eventName, element attachedTo, function handlerFunction [, bool getPropagated = true, string priority = "normal" ] )
-    SString         strName;
-    CClientEntity*  pEntity;
-    CLuaFunctionRef iLuaFunction;
-    bool            bPropagated;
-    SString         strPriority;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadFunction(iLuaFunction);
-    argStream.ReadBool(bPropagated, true);
-    argStream.ReadString(strPriority, "normal");
-    argStream.ReadFunctionComplete();
-
-    // Check if strPriority has a number as well. e.g. name+1 or name-1.32
-    float              fPriorityMod = 0;
-    EEventPriorityType eventPriority;
-    {
-        uint iPos = strPriority.find_first_of("-+");
-        if (iPos != SString::npos)
-        {
-            fPriorityMod = (float)atof(strPriority.SubStr(iPos));
-            strPriority = strPriority.Left(iPos);
-        }
-
-        if (!StringToEnum(strPriority, eventPriority))
-            argStream.SetTypeError(GetEnumTypeName(eventPriority), 5);            // priority is argument #5
-    }
-
-    if (!argStream.HasErrors())
-    {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Check if the handle is in use
-            if (pEntity->GetEventManager()->HandleExists(pLuaMain, strName, iLuaFunction))
-            {
-                argStream.SetCustomError(SString("'%s' with this function is already handled", *strName));
-            }
-            else
-            {
-                // Do it
-                if (CStaticFunctionDefinitions::AddEventHandler(*pLuaMain, strName, *pEntity, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-            }
-        }
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return attachedTo->GetEventHandlerCallDispatcher().Remove(*ResolveEvent(eventName), m_pLuaManager->GetVirtualMachine(L), handlerfn);
 }
 
-int CLuaFunctionDefs::RemoveEventHandler(lua_State* luaVM)
+bool CLuaFunctionDefs::AddEventHandler(lua_State* L, std::string eventName, CClientEntity* attachedTo,
+    CLuaFunctionRef handlerfn, std::optional<bool> propagated, std::optional<std::string_view> priorityToParse)
 {
-    //  bool removeEventHandler ( string eventName, element attachedTo, function functionVar )
-    SString         strName;
-    CClientEntity*  pEntity;
-    CLuaFunctionRef iLuaFunction;
+    EventHandler::Priority priority{ priorityToParse.value_or("") }; // Might throw invalid_argument
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadFunction(iLuaFunction);
-    argStream.ReadFunctionComplete();
+    const Event* event = ResolveEvent(eventName);
+    std::cout << "Add event " << eventName << "[Priority: " << priority.ToString() << "]\n"; // TODO Remove
 
-    if (!argStream.HasErrors())
-    {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Do it
-            if (CStaticFunctionDefinitions::RemoveEventHandler(*pLuaMain, strName, *pEntity, iLuaFunction))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    return attachedTo->GetEventHandlerCallDispatcher().Add(*event,
+        { priority, m_pLuaManager->GetVirtualMachine(L), handlerfn, propagated.value_or(true) }
+    );
+}
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+bool CLuaFunctionDefs::AddEvent(lua_State* L, std::string name, std::optional<bool> allowRemoteTrigger)
+{
+    if (name.empty())
+        return false; // Invalid name (maybe throw here?)
+    return CustomEvent::Add(name, m_pLuaManager->GetVirtualMachine(L), allowRemoteTrigger.value_or(false));
 }
 
 int CLuaFunctionDefs::GetEventHandlers(lua_State* luaVM)
@@ -174,29 +80,26 @@ int CLuaFunctionDefs::GetEventHandlers(lua_State* luaVM)
 int CLuaFunctionDefs::TriggerEvent(lua_State* luaVM)
 {
     //  bool triggerEvent ( string eventName, element baseElement, [ var argument1, ... ] )
-    SString        strName;
-    CClientEntity* pEntity;
-    CLuaArguments  Arguments;
+    SString       strName;
+    CElement* pElement;
+    CLuaArguments Arguments;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strName);
-    argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pElement);
     argStream.ReadLuaArguments(Arguments);
 
     if (!argStream.HasErrors())
     {
-        // Trigger it
-        bool bWasCancelled;
-        if (CStaticFunctionDefinitions::TriggerEvent(strName, *pEntity, Arguments, bWasCancelled))
+        if (auto* event = Event::Get(strName))
         {
-            lua_pushboolean(luaVM, !bWasCancelled);
+            lua_pushboolean(luaVM, !pElement->CallEvent(*event, Arguments));
             return 1;
         }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // Error
     lua_pushnil(luaVM);
     return 1;
 }
@@ -267,25 +170,15 @@ int CLuaFunctionDefs::TriggerServerEvent(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::CancelEvent(lua_State* luaVM)
+bool CLuaFunctionDefs::CancelEvent()
 {
-    // Cancel it
-    if (CStaticFunctionDefinitions::CancelEvent(true))
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    s_EventDispatcher.CancelEvent(true, "");
+    return true;
 }
 
-int CLuaFunctionDefs::WasEventCancelled(lua_State* luaVM)
+bool CLuaFunctionDefs::WasEventCancelled()
 {
-    // Return whether the last event was cancelled or not
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::WasEventCancelled());
-    return 1;
+    return s_EventDispatcher.WasEventCancelled();
 }
 
 int CLuaFunctionDefs::TriggerLatentServerEvent(lua_State* luaVM)

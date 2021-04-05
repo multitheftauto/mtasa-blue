@@ -94,7 +94,7 @@ void EventHandlerCollection::Emmit(const Event& event, const CLuaArguments& args
     {
         TIMEUS deltaTimeUs = GetTimeUs() - emmitBeginUs;
         if (deltaTimeUs > 5000)
-            TIMING_DETAIL(SString("CMapEventManager::Call ( %s, ... ) took %d ms ( %s )", event.GetName().c_str(), deltaTimeUs / 1000, timingStats.c_str()));
+            TIMING_DETAIL(SString("EventHandlerCollection::Call ( %s, ... ) took %d ms ( %s )", event.GetName().c_str(), deltaTimeUs / 1000, timingStats.c_str()));
     }
 #endif
 }
