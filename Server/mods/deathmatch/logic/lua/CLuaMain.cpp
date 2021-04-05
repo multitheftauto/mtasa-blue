@@ -40,7 +40,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
 
     m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
     m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
-    m_pLuaPhysicsContraintManager = std::make_unique<CLuaPhysicsConstraintManager>();
     m_pLuaPhysicsShapeManager = std::make_unique<CLuaPhysicsShapeManager>();
 
     m_FunctionEnterTimer.SetMaxIncrement(500);
@@ -100,7 +99,6 @@ CLuaMain::~CLuaMain()
     CPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
     m_pLuaPhysicsShapeManager->RemoveAll();
-    m_pLuaPhysicsContraintManager->RemoveAll();
     m_pLuaPhysicsRigidBodyManager->RemoveAll();
     m_pLuaPhysicsStaticCollisionManager->RemoveAll();
 }
@@ -672,11 +670,6 @@ int CLuaMain::OnUndump(const char* p, size_t n)
     return 1;
 }
 
-CLuaPhysicsConstraint* CLuaMain::GetContraintFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsContraintManager->GetFromScriptID(uiScriptID);
-}
-
 CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
 {
     return m_pLuaPhysicsRigidBodyManager->GetFromScriptID(uiScriptID);
@@ -703,8 +696,5 @@ CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScrip
     auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
     if (pRigidBody != nullptr)
         return (CLuaPhysicsElement*)pRigidBody;
-    auto pConstraint = GetContraintFromScriptID(uiScriptID);
-    if (pConstraint != nullptr)
-        return (CLuaPhysicsElement*)pConstraint;
     return nullptr;
 }

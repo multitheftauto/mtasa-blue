@@ -33,10 +33,6 @@ inline SString GetClassTypeName(CLuaPhysicsStaticCollision*)
 {
     return "physics-static-collision";
 }
-inline SString GetClassTypeName(CLuaPhysicsConstraint*)
-{
-    return "physics-constraint";
-}
 inline SString GetClassTypeName(CLuaPhysicsShape*)
 {
     return "physics-shape";
@@ -82,23 +78,6 @@ CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr,
     return nullptr;
 }
 
-//
-// CLuaPhysicsContraint from userdata
-//
-template <class T>
-CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State* luaVM)
-{
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsConstraintManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
-}
 //
 // CLuaPhysicsShape from userdata
 //

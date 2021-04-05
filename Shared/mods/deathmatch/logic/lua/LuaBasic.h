@@ -143,12 +143,6 @@ namespace lua
         lua_pushstaticcollision(L, value.get());
         return 1;
     }
-
-    inline int Push(lua_State* L, std::shared_ptr<CLuaPhysicsConstraint> value)
-    {
-        lua_pushconstraint(L, value.get());
-        return 1;
-    }
     
     inline int Push(lua_State* L, CLuaPhysicsShape* value)
     {
@@ -165,12 +159,6 @@ namespace lua
     inline int Push(lua_State* L, CLuaPhysicsStaticCollision* value)
     {
         lua_pushstaticcollision(L, value);
-        return 1;
-    }
-    
-    inline int Push(lua_State* L, CLuaPhysicsConstraint* value)
-    {
-        lua_pushconstraint(L, value);
         return 1;
     }
 

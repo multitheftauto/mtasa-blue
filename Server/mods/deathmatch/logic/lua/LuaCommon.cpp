@@ -152,16 +152,6 @@ void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pStat
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pStaticCollision->GetScriptID()));
 }
 
-void lua_pushconstraint(lua_State* luaVM, CLuaPhysicsConstraint* pConstraint)
-{
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    // if (pLuaMain->IsOOPEnabled())
-    //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
-
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pConstraint->GetScriptID()));
-}
-
 void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape)
 {
     const char* szClass = NULL;

@@ -56,13 +56,13 @@ public:
 
     void draw3dText(const btVector3& location, const char* textString);
 
-    void setDebugMode(ePhysicsDebugMode bit, bool bEnabled) { m_debugMode.set((size_t)bit, bEnabled); };
+    void setDebugMode(int bit, bool bEnabled) { m_debugMode.set((size_t)bit, bEnabled); };
     void setDebugMode(int debugMode) { m_debugMode = debugMode; };
 
     void reset() { m_debugMode = 0; };
 
     int getDebugMode() const { return m_debugMode.to_ulong(); }
-    bool getDebugMode(ePhysicsDebugMode bit) const { return m_debugMode.test((size_t)bit); }
+    bool getDebugMode(int bit) const { return m_debugMode.test((size_t)bit); }
 
     std::vector<CPhysicsDebugLine> m_vecLines;
 };

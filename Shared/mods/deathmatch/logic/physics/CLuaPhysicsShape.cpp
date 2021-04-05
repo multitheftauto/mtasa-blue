@@ -42,8 +42,6 @@ void CLuaPhysicsShape::Unlink()
         pRigidBody->Destroy();
     for (auto const& pStaticCollision : staticCollisions)
         pStaticCollision->Destroy();
-    for (auto const& pShape : shapes)
-        pShape->RemoveChildShape(this);
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()

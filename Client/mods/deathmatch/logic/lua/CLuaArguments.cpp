@@ -15,8 +15,6 @@
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsConstraintManager.h"
-#include "physics/CLuaPhysicsShapeManager.h"
 
 using namespace std;
 
@@ -371,14 +369,6 @@ CLuaArgument* CLuaArguments::PushPhysicsStaticCollision(CLuaPhysicsStaticCollisi
 {
     CLuaArgument* pArgument = new CLuaArgument;
     pArgument->ReadScriptID(pStaticCollision->GetScriptID());
-    m_Arguments.push_back(pArgument);
-    return pArgument;
-}
-
-CLuaArgument* CLuaArguments::PushPhysicsConstraint(CLuaPhysicsConstraint* pConstraint)
-{
-    CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadScriptID(pConstraint->GetScriptID());
     m_Arguments.push_back(pArgument);
     return pArgument;
 }

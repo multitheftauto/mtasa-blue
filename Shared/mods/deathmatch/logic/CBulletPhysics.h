@@ -26,14 +26,12 @@ class CPhysicsDebugDrawer;
 #include "physics/CLuaPhysicsWorldElement.h"
 #include "physics/CLuaPhysicsShape.h"
 #include "physics/CLuaPhysicsConvexShape.h"
-#include "physics/CLuaPhysicsConcaveShape.h"
 
 #include "CBulletPhysicsProfiler.h"
 
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
-#include "physics/CLuaPhysicsConstraintManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
 
 #include <list>
@@ -46,17 +44,6 @@ class CPhysicsDebugDrawer;
 #include "CBulletPhysicsManager.h"
 
 #include "physics/CLuaPhysicsBoxShape.h"
-#include "physics/CLuaPhysicsSphereShape.h"
-#include "physics/CLuaPhysicsCapsuleShape.h"
-#include "physics/CLuaPhysicsConeShape.h"
-#include "physics/CLuaPhysicsCylinderShape.h"
-#include "physics/CLuaPhysicsCompoundShape.h"
-#include "physics/CLuaPhysicsConvexHullShape.h"
-#include "physics/CLuaPhysicsBvhTriangleMeshShape.h"
-#include "physics/CLuaPhysicsGimpactTriangleMeshShape.h"
-#include "physics/CLuaPhysicsHeightfieldTerrainShape.h"
-
-#include "physics/CLuaPhysicsPointToPointConstraint.h"
 #include "physics/CPhysicsStaticCollisionProxy.h"
 
 #pragma once
@@ -75,14 +62,12 @@ public:
     CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld physicsWorldType);
     ~CBulletPhysics();
 #endif
-    friend CLuaPhysicsConstraintManager;
     friend CLuaPhysicsRigidBodyManager;
     friend CLuaPhysicsShapeManager;
     friend CLuaPhysicsStaticCollisionManager;
 
     friend CPhysicsRigidBodyProxy;
     friend CPhysicsStaticCollisionProxy;
-    friend CLuaPhysicsConstraint;
 
     bool ReadSpecialData(const int iLine) { return true; }
 
@@ -92,6 +77,8 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     // BulletPhysics specific methods
+    void    SetGravity(CVector vecGravity) const;
+    CVector GetGravity() const;
 
     // Thread-safe access to bullet physics world
     class WorldContext
@@ -99,6 +86,7 @@ public:
         friend CBulletPhysics;
 
         std::unique_lock<std::mutex> m_lock;
+
     public:
         // static void* operator new(size_t) = delete;
 
@@ -119,9 +107,7 @@ public:
             static_assert((int)ePhysicsWorld::Count == 2, "Unimplemented world type");
         }
 
-        ~WorldContext()
-        {
-        }
+        ~WorldContext() {}
         bool                     IsLocked() { return m_pPhysics->m_lockBtWorld.owns_lock(); }
         btDiscreteDynamicsWorld* operator->() { return m_btWorld; }
 
@@ -130,218 +116,24 @@ public:
         btDiscreteDynamicsWorld* m_btWorld;
     };
 
-    struct SAllRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
-    {
-        std::vector<int> m_hitTriangleIndices;
-        std::vector<int> m_hitShapeParts;
-
-        SAllRayResultCallback(const btVector3& rayFrom, const btVector3& rayTo) : btCollisionWorld::AllHitsRayResultCallback(rayFrom, rayTo) {}
-
-        ~SAllRayResultCallback() {}
-
-        bool needsCollision(btBroadphaseProxy* proxy0) const { return true; }
-
-        btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
-        {
-            if (rayResult.m_localShapeInfo)
-            {
-                m_hitTriangleIndices.emplace_back(rayResult.m_localShapeInfo->m_triangleIndex);
-                m_hitShapeParts.emplace_back(rayResult.m_localShapeInfo->m_shapePart);
-            }
-            else
-            {
-                m_hitTriangleIndices.emplace_back(-1);
-                m_hitShapeParts.emplace_back(-1);
-            }
-            return AllHitsRayResultCallback::addSingleResult(rayResult, normalInWorldSpace);
-        }
-    };
-
-    struct SClosestRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
-    {
-        int m_hitTriangleIndex;
-        int m_hitShapePart;
-
-        SClosestRayResultCallback(CVector rayFrom, CVector rayTo)
-            : btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo), m_hitTriangleIndex(0), m_hitShapePart(0)
-        {
-        }
-
-        ~SClosestRayResultCallback() {}
-
-        bool needsCollision(btBroadphaseProxy* proxy0) const { return true; }
-
-        btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
-        {
-            if (rayResult.m_localShapeInfo)
-            {
-                m_hitTriangleIndex = rayResult.m_localShapeInfo->m_triangleIndex;
-                m_hitShapePart = rayResult.m_localShapeInfo->m_shapePart;
-            }
-            else
-            {
-                m_hitTriangleIndex = -1;
-                m_hitShapePart = -1;
-            }
-            return ClosestRayResultCallback::addSingleResult(rayResult, normalInWorldSpace);
-        }
-    };
-
-    struct SClosestConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
-    {
-        int     m_hitTriangleIndex;
-        int     m_hitShapePart;
-        CVector m_closestPosition;
-
-        SClosestConvexResultCallback(CVector rayFrom, CVector rayTo)
-            : btCollisionWorld::ClosestConvexResultCallback(rayFrom, rayTo), m_hitTriangleIndex(0), m_hitShapePart(0)
-        {
-        }
-
-        ~SClosestConvexResultCallback() {}
-
-        bool needsCollision(btBroadphaseProxy* proxy0) const { return true; }
-
-        btScalar addSingleResult(btCollisionWorld::LocalConvexResult& rayResult, bool normalInWorldSpace)
-        {
-            if (rayResult.m_localShapeInfo)
-            {
-                m_hitTriangleIndex = rayResult.m_localShapeInfo->m_triangleIndex;
-                m_hitShapePart = rayResult.m_localShapeInfo->m_shapePart;
-            }
-            else
-            {
-                m_hitTriangleIndex = -1;
-                m_hitShapePart = -1;
-            }
-            return btCollisionWorld::ClosestConvexResultCallback::addSingleResult(rayResult, normalInWorldSpace);
-        }
-    };
-
-    struct SIslandCallback : public btSimulationIslandManager::IslandCallback
-    {
-    public:
-        ~SIslandCallback() {}
-        void processIsland(btCollisionObject** bodies, int numBodies, btPersistentManifold** manifolds, int numManifolds, int islandId)
-        {
-            m_mapIslandsBodies[islandId] = std::vector<CLuaPhysicsRigidBody*>(numBodies);
-            for (int i = 0; i < numBodies; i++)
-                m_mapIslandsBodies[islandId].push_back((CLuaPhysicsRigidBody*)(bodies[i]->getUserPointer()));
-        }
-
-        std::unordered_map<int, std::vector<CLuaPhysicsRigidBody*>> m_mapIslandsBodies;
-    };
-
-    struct BroadphaseAabbCallback : public btBroadphaseAabbCallback
-    {
-
-        btAlignedObjectArray<CLuaPhysicsWorldElement*>& m_collisionObjectArray;
-        short int                                 m_collisionFilterGroup, m_collisionFilterMask;            // Optional
-        BroadphaseAabbCallback(btAlignedObjectArray<CLuaPhysicsWorldElement*>& collisionObjectArray, short collisionGroup = btBroadphaseProxy::DefaultFilter,
-                               int collisionMask = btBroadphaseProxy::AllFilter)
-            : m_collisionObjectArray(collisionObjectArray), m_collisionFilterGroup(collisionGroup), m_collisionFilterMask(collisionMask)
-        {
-            m_collisionObjectArray.resize(0);
-        }
-
-        SIMD_FORCE_INLINE bool needsCollision(const btBroadphaseProxy* proxy) const
-        {
-            bool collides = (proxy->m_collisionFilterGroup & m_collisionFilterMask) != 0;
-            collides = collides && (m_collisionFilterGroup & proxy->m_collisionFilterMask);
-            return collides;
-        }
-
-        virtual bool process(const btBroadphaseProxy* proxy)
-        {
-            if (needsCollision(proxy))
-            {
-                m_collisionObjectArray.push_back((CLuaPhysicsWorldElement*)((btCollisionObject*)proxy->m_clientObject)->getUserPointer());
-            }
-            return true;
-        }
-    };
-
     void Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed);
 
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
-    // Thread safe
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
-    bool                                         LineCast(CVector from, CVector to, bool bFilterBackfaces, int iFilterGroup, int iFilterMask) const;
-    // Thread safe
-    CBulletPhysics::SClosestConvexResultCallback ShapeCast(CLuaPhysicsShape* pShape, const btTransform& from, const btTransform& to, int iFilterGroup,
-                                                           int iFilterMask) const;
-
-    CBulletPhysics::SClosestRayResultCallback RayCast(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
-
-    CBulletPhysics::SAllRayResultCallback RayCastAll(CVector from, CVector to, int iFilterGroup, int iFilterMask, bool bFilterBackfaces) const;
-
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
+    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
+                                                CVector vecLocalInertia = CVector{0, 0, 0}, CVector vecCenterOfMass = CVector{0, 0, 0});
 
-    // Thread safe
-    void SetGravity(CVector vecGravity) const;
-    // Thread safe
-    CVector GetGravity() const;
-    // Thread safe
-    bool GetUseContinous() const;
-    // Thread safe
-    void SetUseContinous(bool bUse) const;
-    // Thread safe
-    void SetSubSteps(int iSubSteps);
-    // Thread safe
-    int     GetSubSteps() const;
-    void    SetSimulationEnabled(bool bSimulationEnabled) { m_bSimulationEnabled = bSimulationEnabled; }
-    bool    GetSimulationEnabled() const { return m_bSimulationEnabled; }
-    void    SetTriggerEvents(bool bTriggerEvents) { m_bTriggerEvents = bTriggerEvents; }
-    void    GetTriggerEvents(bool& bTriggerEvents) const { bTriggerEvents = m_bTriggerEvents; }
-    void    SetTriggerCollisionEvents(bool bTriggerCollisionEvents) { m_bTriggerCollisionEvents = bTriggerCollisionEvents; }
-    bool    GetTriggerCollisionEvents() const { return m_bTriggerCollisionEvents; }
-    void    SetTriggerConstraintEvents(bool bTriggerConstraintEvents) { m_bTriggerConstraintEvents = bTriggerConstraintEvents; }
-    bool    GetTriggerConstraintvents() const { return m_bTriggerConstraintEvents; }
-    void    SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
-    CVector GetWorldSize() const { return m_vecWorldSize; }
-
-    void GetSimulationIslandCallback(CBulletPhysics::SIslandCallback& callback);
-
-    CLuaPhysicsRigidBody* CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
-                                          CVector vecLocalInertia = CVector{0, 0, 0}, CVector vecCenterOfMass = CVector{0, 0, 0});
-
-    CLuaPhysicsBoxShape*                 CreateBoxShape(CVector vector);
-    CLuaPhysicsSphereShape*              CreateSphereShape(float radius);
-    CLuaPhysicsCapsuleShape*             CreateCapsuleShape(float fRadius, float fHeight);
-    CLuaPhysicsConeShape*                CreateConeShape(float fRadius, float fHeight);
-    CLuaPhysicsCylinderShape*            CreateCylinderShape(CVector half);
-    CLuaPhysicsCompoundShape*            CreateCompoundShape(int iInitialChildCapacity = 0);
-    CLuaPhysicsConvexHullShape*          CreateConvexHullShape(std::vector<float>& vecFloats);
-    CLuaPhysicsConvexHullShape*          CreateConvexHullShape(std::vector<CVector>& vecVertices);
-    CLuaPhysicsBvhTriangleMeshShape*     CreateBhvTriangleMeshShape(std::vector<float>& vecFloats);
-    CLuaPhysicsBvhTriangleMeshShape*     CreateBhvTriangleMeshShape(std::vector<CVector>& vecVertices);
-    CLuaPhysicsGimpactTriangleMeshShape* CreateGimpactTriangleMeshShape(std::vector<float>& vecFloats);
-    CLuaPhysicsGimpactTriangleMeshShape* CreateGimpactTriangleMeshShape(std::vector<CVector>& vecVertices);
-    CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY);
-    CLuaPhysicsHeightfieldTerrainShape*  CreateHeightfieldTerrainShape(int iSizeX, int iSizeY, const std::vector<float>& vecHeights);
-
-    // Links two bodies together using custom pivots offsets
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector vecPivotA,
-                                                                    CVector vecPivotB, bool bDisableCollisionsBetweenLinkedBodies);
-
-    // Links body to position
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector position,
-                                                                    bool bDisableCollisionsBetweenLinkedBodies);
-    // Automatically calculate bodies pivot
-    CLuaPhysicsPointToPointConstraint* CreatePointToPointConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB,
-                                                                    bool bDisableCollisionsBetweenLinkedBodies);
+    CLuaPhysicsBoxShape* CreateBoxShape(CVector vector);
 
     std::atomic<bool> isDuringSimulation = false;
-
-    void OverlapBox(CVector min, CVector max, std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies, std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions,
-                    short collisionGroup, int collisionMask);
-
-    void AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody);
-    void AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody);
-    void AddToChangesStack(CLuaPhysicsElement* pElement);
-    void AddToBatchUpdate(CLuaPhysicsElement* pElement);
+    void              AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody);
+    void              AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody);
+    void              AddToChangesStack(CLuaPhysicsElement* pElement);
+    void              AddToBatchUpdate(CLuaPhysicsElement* pElement);
+    void              AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
     CLuaPhysicsRigidBody*       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
@@ -353,7 +145,6 @@ public:
     std::vector<CLuaPhysicsShape*>           GetShapes() const { return m_vecShapes; }
     std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const { return m_vecRigidBodies; }
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
-    std::vector<CLuaPhysicsConstraint*>      GetConstraints() const { return m_vecConstraints; }
 
 #ifdef MTA_CLIENT
     void DrawDebug() { m_bDrawDebugNextTime = true; };
@@ -365,7 +156,6 @@ public:
     bool CanDoPulse();
     void WaitForSimulationToFinish();
 
-    
     // For elements managment
     mutable std::recursive_mutex m_elementsLock;
 
@@ -373,7 +163,6 @@ private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
-    std::vector<CLuaPhysicsConstraint*>      m_vecConstraints;
 
     // Thread safe
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
@@ -384,31 +173,22 @@ private:
     // Thread safe
     void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
     // Thread safe
-    void AddConstraint(btTypedConstraint* pBtTypedConstraint, bool bDisableCollisionsBetweenLinkedBodies) const;
-    // Thread safe
-    void RemoveConstraint(btTypedConstraint* pBtTypedConstraint) const;
 
     // Use DestroyElement instead
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     // Use DestroyElement instead
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     // Use DestroyElement instead
-    void DestroyConstraint(CLuaPhysicsConstraint* pLuaConstraint);
-    // Use DestroyElement instead
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     void StepSimulation();
-    void ClearOutsideWorldRigidBodies();
-    void PostProcessCollisions();
 
     void AddShape(CLuaPhysicsShape* pShape);
     void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void AddConstraint(CLuaPhysicsConstraint* pConstraint);
-    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
-    mutable std::mutex         lock;
+    mutable std::mutex lock;
     // stepSimulation, doPulse thread safety lock
-    mutable std::mutex         pulseLock;
+    mutable std::mutex pulseLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
     std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;
@@ -419,10 +199,10 @@ private:
     std::unique_ptr<btDefaultCollisionConfiguration>       m_pCollisionConfiguration;
 
     // Don't use directly, use "WorldContext world(this)" instead
-    std::unique_ptr<btDiscreteDynamicsWorldMt>             m_pDynamicsWorldMt;
+    std::unique_ptr<btDiscreteDynamicsWorldMt> m_pDynamicsWorldMt;
     // Don't use directly, use "WorldContext world(this)" instead
-    std::unique_ptr<btDiscreteDynamicsWorld>               m_pDynamicsWorld;
-    bool                                                   m_bUseMt = false;            // true when multithreaded world is in use
+    std::unique_ptr<btDiscreteDynamicsWorld> m_pDynamicsWorld;
+    bool                                     m_bUseMt = false;            // true when multithreaded world is in use
 
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 
@@ -431,34 +211,29 @@ private:
 
     CBulletPhysicsManager* m_pPhysicsManager;
 
-    const ePhysicsWorld m_ePhysicsWorldType;
-    bool               m_canDoPulse = false;
-    CTickCount         m_LastTimeMs;
-    std::atomic<float> m_fSpeed = 1.0f;
-    bool               m_bDuringSimulation = false;
-    std::atomic<int>   m_iSubSteps = 10;
-    std::atomic<bool>  m_bWorldHasChanged = false;
-    mutable std::unique_lock<std::mutex>         m_lockBtWorld;
-    std::mutex         m_lockWorldHasChanged;
-    float              m_fImpulseThreshold = 0.01f;
-    std::atomic<bool>  m_bSimulationEnabled = false;
-    bool               m_bTriggerEvents = true;
-    bool               m_bTriggerCollisionEvents = false;            // spam alert
-    bool               m_bTriggerConstraintEvents = false;
-    CVector            m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f);            // negative and positive
-
-    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
-    bool                                                                m_bObjectsCached = false;
+    const ePhysicsWorld                  m_ePhysicsWorldType;
+    bool                                 m_canDoPulse = false;
+    CTickCount                           m_LastTimeMs;
+    std::atomic<float>                   m_fSpeed = 1.0f;
+    bool                                 m_bDuringSimulation = false;
+    std::atomic<int>                     m_iSubSteps = 10;
+    std::atomic<bool>                    m_bWorldHasChanged = false;
+    mutable std::unique_lock<std::mutex> m_lockBtWorld;
+    std::mutex                           m_lockWorldHasChanged;
+    float                                m_fImpulseThreshold = 0.01f;
+    std::atomic<bool>                    m_bSimulationEnabled = false;
+    bool                                 m_bTriggerEvents = true;
+    bool                                 m_bTriggerCollisionEvents = false;            // spam alert
+    bool                                 m_bTriggerConstraintEvents = false;
 
     SharedUtil::ConcurrentList<CLuaPhysicsStaticCollision*> m_InitializeStaticCollisionsList;
-    SharedUtil::ConcurrentList<CLuaPhysicsConstraint*>      m_InitializeConstraintsList;
 
     SharedUtil::ConcurrentList<CLuaPhysicsElement*>   m_elementChangesList;
     SharedUtil::ConcurrentList<CLuaPhysicsElement*>   m_elementUpdatesList;
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*> m_rigidBodiesActivationList;
     SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*> m_rigidBodiesUpdateAABBList;
 
-    std::vector<CLuaPhysicsWorldElement*>         m_vecLastContact;
+    std::vector<CLuaPhysicsWorldElement*> m_vecLastContact;
 
 #ifdef MTA_CLIENT
     bool m_bDrawDebugNextTime = false;

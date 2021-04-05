@@ -17,7 +17,6 @@ class CLuaPhysicsRigidBody;
 #pragma once
 
 struct SPhysicsCollisionReport;
-class CLuaPhysicsConstraint;
 struct SBoundingBox;
 struct SBoundingSphere;
 
@@ -94,9 +93,6 @@ public:
 
     CPhysicsRigidBodyProxy* GetBtRigidBody() const { return m_pRigidBodyProxy.get(); }
 
-    void AddConstraintRef(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
-    void RemoveConstraintRef(CLuaPhysicsConstraint* pConstraint);
-
     btTransform& PredictTransform(float time) const;
     void         ClearForces();
     void         NeedsActivation() const;
@@ -121,7 +117,6 @@ public:
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;
     CLuaPhysicsShape*     m_pShape;
-    std::vector<CLuaPhysicsConstraint*>     m_constraintList;
     mutable std::atomic<bool>               m_bActivationRequested;
     mutable std::atomic<bool>               m_bAABBUpdateRequested;
     std::unique_ptr<MotionState>            m_pMotionState;            // Thread safe

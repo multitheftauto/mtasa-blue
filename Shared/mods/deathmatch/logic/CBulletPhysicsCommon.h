@@ -14,14 +14,7 @@
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsConstraintManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
-
-
-enum class eTempDataKey;
-enum class eConstraintVariant;
-struct SPhysicsCollisionContact;
-struct SPhysicsCollisionReport;
 
 #pragma once
 

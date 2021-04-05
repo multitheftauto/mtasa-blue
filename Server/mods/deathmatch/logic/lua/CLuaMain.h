@@ -73,9 +73,7 @@ public:
 
     CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager.get(); };
     CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager.get(); };
-    CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager.get(); };
     CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager.get(); };
-    CLuaPhysicsConstraint*             GetContraintFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
@@ -168,7 +166,6 @@ private:
 
     std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;
     std::unique_ptr<CLuaPhysicsStaticCollisionManager> m_pLuaPhysicsStaticCollisionManager;
-    std::unique_ptr<CLuaPhysicsConstraintManager>      m_pLuaPhysicsContraintManager;
     std::unique_ptr<CLuaPhysicsShapeManager>           m_pLuaPhysicsShapeManager;
 
     list<CXMLFile*>                                 m_XMLFiles;
