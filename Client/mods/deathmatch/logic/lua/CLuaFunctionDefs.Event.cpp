@@ -57,16 +57,17 @@ int CLuaFunctionDefs::GetEventHandlers(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        if (CLuaMain* lmain = m_pLuaManager->GetVirtualMachine(luaVM))
         {
-            // Create a new table
-            lua_newtable(luaVM);
-
-            pElement->GetEventManager()->GetHandles(pLuaMain, (const char*)strName, luaVM);
-
-            return 1;
+            if (auto* event = Event::Get(strName))
+            {
+                if (auto* handlers = pElement->GetEventHandlerCallDispatcher().GetHandlers(*event))
+                {
+                    lua_newtable(luaVM);
+                    handlers->PushToLua(lmain, luaVM);
+                    return 1;
+                }
+            }
         }
     }
     else
