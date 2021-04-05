@@ -162,18 +162,3 @@ void CLuaPhysicsStaticCollision::Unlink()
     ElementLock lk(this);
     m_btCollisionObject->setCollisionShape(nullptr);
 }
-
-SBoundingBox CLuaPhysicsStaticCollision::GetBoundingBox(btTransform transform)
-{
-    return m_pShape->GetBoundingBox(transform);
-}
-
-SBoundingSphere CLuaPhysicsStaticCollision::GetBoundingSphere()
-{
-    return m_pShape->GetBoundingSphere();
-}
-
-int CLuaPhysicsStaticCollision::GetIslandTag()
-{
-    return m_btCollisionObject->getIslandTag();
-}

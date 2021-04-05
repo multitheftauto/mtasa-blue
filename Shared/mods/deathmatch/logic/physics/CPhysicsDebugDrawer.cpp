@@ -45,11 +45,7 @@ void CPhysicsDebugDrawer::drawContactPoint(const btVector3& PointOnB, const btVe
 
 void CPhysicsDebugDrawer::draw3dText(const btVector3& location, const char* textString)
 {
-    CVector vecScreen;
-    // if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector) location), vecScreen, 50.0f, false))
-    //{
-    //    m_pGraphics->DrawString(vecScreen.fX, vecScreen.fY, SColorARGB(255, 255, 255, 255), m_fLineWidth, textString);
-    //}
+    // Unused
 }
 
 void CPhysicsDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)

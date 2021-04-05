@@ -139,8 +139,6 @@ public:
     CLuaPhysicsRigidBody*       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
 
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
-    void                 FlushAllChanges();
-    bool                 WorldHasChanged();
 
     std::vector<CLuaPhysicsShape*>           GetShapes() const { return m_vecShapes; }
     std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const { return m_vecRigidBodies; }
@@ -227,13 +225,6 @@ private:
     bool                                 m_bTriggerConstraintEvents = false;
 
     SharedUtil::ConcurrentList<CLuaPhysicsStaticCollision*> m_InitializeStaticCollisionsList;
-
-    SharedUtil::ConcurrentList<CLuaPhysicsElement*>   m_elementChangesList;
-    SharedUtil::ConcurrentList<CLuaPhysicsElement*>   m_elementUpdatesList;
-    SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*> m_rigidBodiesActivationList;
-    SharedUtil::ConcurrentList<CLuaPhysicsRigidBody*> m_rigidBodiesUpdateAABBList;
-
-    std::vector<CLuaPhysicsWorldElement*> m_vecLastContact;
 
 #ifdef MTA_CLIENT
     bool m_bDrawDebugNextTime = false;

@@ -22,7 +22,7 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    bool          Destroy();
+    bool Destroy();
 
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;
@@ -44,23 +44,18 @@ public:
 
     void Unlink();
 
-    btCollisionObject* GetBtCollisionObject() const { return m_btCollisionObject.get(); }
+    btCollisionObject*            GetBtCollisionObject() const { return m_btCollisionObject.get(); }
     CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
     CLuaPhysicsShape*             GetShape() const { return m_pShape; }
 
     void Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::StaticCollision; }
-    
+
     void SetEnabled(bool bEnabled) { m_btCollisionObject->SetEnabled(bEnabled); }
     bool IsEnabled() const { return m_btCollisionObject->IsEnabled(); }
 
-    SBoundingBox    GetBoundingBox(btTransform transform);
-    SBoundingSphere GetBoundingSphere();
-    int             GetIslandTag();
-    const std::vector<CLuaPhysicsWorldElement*>& GetAllContacts() const;
-
-        private:
+private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
     CLuaPhysicsShape*                             m_pShape;
 

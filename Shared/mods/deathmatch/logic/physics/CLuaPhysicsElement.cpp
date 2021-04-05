@@ -31,27 +31,3 @@ void CLuaPhysicsElement::RemoveScriptID()
         m_uiScriptID = INVALID_ARRAY_ID;
     }
 }
-
-bool CLuaPhysicsElement::IsSafeToAccess() const
-{
-    return m_pPhysics->isDuringSimulation;
-}
-
-void CLuaPhysicsElement::ApplyChanges()
-{
-    while (!m_listChanges.empty())
-    {
-        m_listChanges.pop()();
-    }
-    Update();
-    m_bHasEnqueuedChanges = false;
-}
-
-void CLuaPhysicsElement::NeedsUpdate()
-{
-    if (!m_bNeedsUpdate)
-    {
-        m_bNeedsUpdate = true;
-        GetPhysics()->AddToBatchUpdate(this);
-    }
-}

@@ -15,17 +15,3 @@ CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half)
 {
 }
 
-bool CLuaPhysicsBoxShape::SetSize(CVector vecSize)
-{
-    vecSize -= GetBtShape()->getMargin();
-    GetBtShape()->setImplicitShapeDimensions(vecSize);
-    UpdateRigids();
-    return true;
-}
-
-CVector CLuaPhysicsBoxShape::GetSize()
-{
-    CVector                vecHalfSize = GetBtShape()->getImplicitShapeDimensions();
-    vecHalfSize += GetBtShape()->getMargin();
-    return vecHalfSize * 2;
-}

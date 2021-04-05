@@ -328,22 +328,11 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
 {
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
     CClientEntity*              pEntity = nullptr;
     bool           bBadSyntax;
 
     CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
-        argStream.ReadUserData(pRigidBody);
-    }
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
-    {
-        argStream.ReadUserData(pStaticCollision);
-    }
-    else
-        argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pEntity);
     argStream.ReadBool(bBadSyntax, true);
 
     // Verify the arguments
@@ -351,22 +340,8 @@ int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
     {
         // Grab the position
         CMatrix matrix;
-        bool    bHasMatrix = false;
-        if (pRigidBody)
-        {
-            matrix = pRigidBody->GetMatrix();
-            bHasMatrix = true;
-        }
-        else if (pStaticCollision)
-        {
-            matrix = pStaticCollision->GetMatrix();
-            bHasMatrix = true;
-        }
-        else
-            if (pEntity)
-                bHasMatrix = CStaticFunctionDefinitions::GetElementMatrix(*pEntity, matrix);
 
-        if (bHasMatrix)
+        if (CStaticFunctionDefinitions::GetElementMatrix(*pEntity, matrix))
         {
             // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
             float fData = bBadSyntax == true ? 1.0f : 0.0f;
@@ -630,33 +605,15 @@ int CLuaElementDefs::GetElementVelocity(lua_State* luaVM)
 {
     // Verify the argument
     CClientEntity*   pEntity = nullptr;
-    CLuaPhysicsRigidBody* pRigidBody = nullptr;
     CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
-        argStream.ReadUserData(pRigidBody);
-    }
-    else
-        argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pEntity);
 
     if (!argStream.HasErrors())
     {
         // Grab the velocity
         CVector vecVelocity;
-        bool    bHasVelocity = false;
 
-        if (pRigidBody != nullptr)
-        {
-            vecVelocity = pRigidBody->GetLinearVelocity();
-            bHasVelocity = true;
-        }
-        else if (pEntity)
-            if (CStaticFunctionDefinitions::GetElementVelocity(*pEntity, vecVelocity))
-            {
-                bHasVelocity = true;
-            }
-
-        if (bHasVelocity)
+        if (CStaticFunctionDefinitions::GetElementVelocity(*pEntity, vecVelocity))
         {
             // Return it
             lua_pushnumber(luaVM, vecVelocity.fX);
@@ -699,33 +656,15 @@ int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
 {
     // Verify the argument
     CClientEntity*        pEntity = nullptr;
-    CLuaPhysicsRigidBody* pRigidBody = nullptr;
     CScriptArgReader      argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
-        argStream.ReadUserData(pRigidBody);
-    }
-    else
-        argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pEntity);
 
     if (!argStream.HasErrors())
     {
         // Grab the turn velocity
         CVector vecTurnVelocity;
-        bool    bHasVelocity = false;
 
-        if (pRigidBody != nullptr)
-        {
-            vecTurnVelocity = pRigidBody->GetAngularVelocity();
-            bHasVelocity = true;
-        }
-        else if (pEntity)
-            if (CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity))
-            {
-                bHasVelocity = true;
-            }
-
-        if (bHasVelocity)
+        if (CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity))
         {
             // Return it
             lua_pushnumber(luaVM, vecTurnVelocity.fX);
@@ -1920,23 +1859,12 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 {
     //  setElementMatrix ( element theElement, table matrix )
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
     CClientEntity*              pEntity = nullptr;
 
     CMatrix        matrix;
 
     CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
-        argStream.ReadUserData(pRigidBody);
-    }
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
-    {
-        argStream.ReadUserData(pStaticCollision);
-    }
-    else
-        argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pEntity);
 
     if (argStream.NextIsTable())
     {
@@ -1953,27 +1881,12 @@ int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        if (pRigidBody)
-        {
-            pRigidBody->SetMatrix(matrix);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else if (pStaticCollision)
-        {
-            pStaticCollision->SetMatrix(matrix);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-        {
-            if (pEntity)
-                if (CStaticFunctionDefinitions::SetElementMatrix(*pEntity, matrix))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-        }
+        if (pEntity)
+            if (CStaticFunctionDefinitions::SetElementMatrix(*pEntity, matrix))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2141,19 +2054,12 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 {
-    CLuaPhysicsRigidBody* pRigidBody = nullptr;
     CClientEntity*        pEntity = nullptr;
     CVector               vecVelocity;
 
     CScriptArgReader argStream(luaVM);
 
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
-        argStream.ReadUserData(pRigidBody);
-    }
-    else
-        argStream.ReadUserData(pEntity);
-
+    argStream.ReadUserData(pEntity);
     argStream.ReadVector3D(vecVelocity);
     // previous code did this for some reason.
     if (pEntity && pEntity->GetType() == CCLIENTRADARAREA)
@@ -2164,19 +2070,12 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
     {
         // Set the velocity
 
-        if (pRigidBody)
-        {
-            pRigidBody->SetLinearVelocity(vecVelocity);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-            if (pEntity)            // because of C6011, should always be true anyway
-                if (CStaticFunctionDefinitions::SetElementVelocity(*pEntity, vecVelocity))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
+        if (pEntity)            // because of C6011, should always be true anyway
+            if (CStaticFunctionDefinitions::SetElementVelocity(*pEntity, vecVelocity))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2188,31 +2087,18 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
 {
-    CLuaPhysicsRigidBody* pRigidBody = nullptr;
     CClientEntity*        pEntity = nullptr;
     CVector               vecTurnVelocity;
 
     CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
-        argStream.ReadUserData(pRigidBody);
-    }
-    else
-        argStream.ReadUserData(pEntity);
-
+    argStream.ReadUserData(pEntity);
     argStream.ReadVector3D(vecTurnVelocity);
 
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        if (pRigidBody)
-        {
-            pRigidBody->SetAngularVelocity(vecTurnVelocity);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else if (pEntity)            // because of C6011, should always be true anyway
-        // Set the turn velocity
+        if (pEntity)            // because of C6011, should always be true anyway
+            // Set the turn velocity
             if (CStaticFunctionDefinitions::SetElementAngularVelocity(*pEntity, vecTurnVelocity))
             {
                 lua_pushboolean(luaVM, true);

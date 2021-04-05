@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 class CLuaPhysicsWorldElement;
-struct SPhysicsCollisionContact;
-struct SPhysicsCollisionReport;
 
 #include "CLuaPhysicsElement.h"
 
@@ -28,27 +26,7 @@ public:
     virtual const CVector GetPosition() const = 0;
     virtual void          SetRotation(CVector vecRotation) = 0;
     virtual const CVector GetRotation() const = 0;
-    virtual void          SetScale(const CVector& vecScale) = 0;
-    virtual const CVector GetScale() const = 0;
-    virtual void          SetMatrix(const CMatrix& matrix) = 0;
-    virtual const CMatrix GetMatrix() const = 0;
-
-    virtual void         RemoveDebugColor() = 0;
-    virtual void         SetDebugColor(const SColor& color) = 0;
-    virtual const SColor GetDebugColor() const = 0;
-
-    virtual int  GetFilterGroup() const = 0;
-    virtual void SetFilterGroup(int iGroup) = 0;
-    virtual int  GetFilterMask() const = 0;
-    virtual void SetFilterMask(int mask) = 0;
-
-    virtual int GetIslandTag() = 0;
     virtual btCollisionObject* GetBtCollisionObject() const = 0;
-
-    void ClearCollisionContacts();
-    void ReportCollisionContact(CLuaPhysicsWorldElement* pElement);
-    void GetAllContacts(std::vector<CLuaPhysicsRigidBody*>& vecRigidBodies, std::vector<CLuaPhysicsStaticCollision*>& vecStaticCollisions);
-    void GetContactManifoldsWithElement(CLuaPhysicsWorldElement* pElement);
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::WorldElement; }
 

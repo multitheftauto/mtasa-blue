@@ -101,9 +101,6 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(CBulletPhysics* pPhysic
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
 {
-    if (!pShape->SupportRigidBody())
-        throw std::invalid_argument(SString("Shape %s is not supported", pShape->GetName()).c_str());
-
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
     if (!options.has_value() || options.value().empty())
     {
@@ -155,6 +152,5 @@ bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
 // from, to, color
 std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius)
 {
-    pPhysics->FlushAllChanges();
     return pPhysics->GetDebugLines(vecPosition, fRadius);
 }

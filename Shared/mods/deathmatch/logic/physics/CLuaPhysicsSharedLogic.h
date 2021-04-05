@@ -31,17 +31,6 @@ public:
     static CVector GetRotation(btCollisionObject* pCollisionObject);
 
     static btBoxShape*      CreateBox(const CVector half, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector{0, 0, 0});
-    static btSphereShape*   CreateSphere(const float fRadius, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector{0, 0, 0});
-    static btCapsuleShape*  CreateCapsule(const float fRadius, const float fHeight);
-    static btConeShape*     CreateCone(const float fRadius, const float fHeight);
-    static btCylinderShape* CreateCylinder(const CVector half);
-    static btCompoundShape* CreateCompound(int iInitialChildCapacity = 0);
-
-    static btBvhTriangleMeshShape* CreateBvhTriangleMesh(const std::vector<CVector>& vecVertices);
-    static btGImpactMeshShape*     CreateGimpactMeshShape(const std::vector<CVector>& vecVertices);
-
-    static heightfieldTerrainShape* CreateHeightfieldTerrain(const int iSizeX, const int iSizeY, const std::vector<float>& vecHeightData);
-    static btConvexHullShape*       CreateConvexHull(const std::vector<CVector>& vecPoints);
 
     static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, const float fMass, const CVector vecLocalInertia,
                                                         const CVector vecCenterOfMass);

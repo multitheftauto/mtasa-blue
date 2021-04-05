@@ -18,15 +18,10 @@ class CLuaPhysicsCompoundShape;
 #include "CLuaPhysicsStaticCollision.h"
 #include "CShapeHolder.h"
 
-class heightfieldTerrainShape;
-
 class CLuaPhysicsShape : public CLuaPhysicsElement, CShapeHolder<btCollisionShape>
 {
 protected:
     CLuaPhysicsShape(CBulletPhysics* pPhysics, btCollisionShape* pShape);
-    CLuaPhysicsShape(CBulletPhysics* pPhysics, heightfieldTerrainShape* pHeightfieldTerrainShape);
-
-
 public:
     virtual ~CLuaPhysicsShape();
     bool Destroy();
@@ -38,23 +33,6 @@ public:
     void RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    void AddCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape);
-    void RemoveCompoundShape(CLuaPhysicsCompoundShape* pCompoundShape);
-
-    bool                    SetScale(CVector scale);
-    const CVector&          GetScale();
-    virtual SBoundingBox    GetBoundingBox(btTransform transform);
-    virtual SBoundingSphere GetBoundingSphere();
-    float                   GetMargin();
-
-    void UpdateRigids();
-
-    BroadphaseNativeTypes GetBtType() const;
-    const char*           GetBtName();
-
-    // for CLuaPhysicsHeightfieldTerrainShape shape
-    float* GetHeightfieldData() { return &m_vecHeightfieldData[0]; }
-    bool   SupportRigidBody() const;
 
     const std::vector<CLuaPhysicsRigidBody*>&       GetRigidBodies() const { return m_vecRigidBodyList; }
     const std::vector<CLuaPhysicsStaticCollision*>& GetStaticCollisions() const { return m_vecStaticCollisions; }

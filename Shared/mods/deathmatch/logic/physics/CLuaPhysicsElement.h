@@ -19,27 +19,7 @@ class CLuaPhysicsElement;
 
 class CBulletPhysics;
 
-struct SBoundingBox
-{
-    CVector vecMin;
-    CVector vecMax;
-};
-
-struct SBoundingSphere
-{
-    CVector vecCenter;
-    float   fRadius;
-};
-
-class ILuaPhysicsElement
-{
-public:
-    virtual void Update() = 0;
-    virtual SBoundingBox    GetBoundingBox(btTransform transform) = 0;
-    virtual SBoundingSphere GetBoundingSphere() = 0;
-};
-
-class CLuaPhysicsElement : public ILuaPhysicsElement
+class CLuaPhysicsElement
 {
 protected:
     CLuaPhysicsElement(CBulletPhysics* pPhysics, EIdClass::EIdClassType classType);
@@ -51,14 +31,11 @@ public:
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
     virtual bool           Destroy() = 0;
-    bool                   IsSafeToAccess() const;
-    void                   ApplyChanges();
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Shape; }
 
     const char* GetName() { return EnumToString(GetType()); }
 
-    void NeedsUpdate();
 
     // Thread-safe access to bullet physics element
     template <typename T>

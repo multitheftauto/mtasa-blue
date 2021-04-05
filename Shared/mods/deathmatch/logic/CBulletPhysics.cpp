@@ -168,7 +168,6 @@ void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
-    m_rigidBodiesActivationList.remove(pLuaRigidBody);
     ListRemove(m_vecRigidBodies, pLuaRigidBody);
 }
 
@@ -244,104 +243,10 @@ void CBulletPhysics::DrawDebugLines()
 }
 #endif
 
-void CBulletPhysics::AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody)
-{
-    m_rigidBodiesActivationList.push(pRigidBody);
-    m_bWorldHasChanged = true;
-}
-
-void CBulletPhysics::AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody)
-{
-    m_rigidBodiesUpdateAABBList.push(pRigidBody);
-    m_bWorldHasChanged = true;
-}
-
-void CBulletPhysics::AddToChangesStack(CLuaPhysicsElement* pElement)
-{
-    m_elementChangesList.push(pElement);
-    m_bWorldHasChanged = true;
-}
-
-void CBulletPhysics::AddToBatchUpdate(CLuaPhysicsElement* pElement)
-{
-    m_elementUpdatesList.push(pElement);
-    m_bWorldHasChanged = true;
-}
-
-bool CBulletPhysics::WorldHasChanged()
-{
-    return m_bWorldHasChanged;
-}
-
-void CBulletPhysics::FlushAllChanges()
-{
-    if (!m_bWorldHasChanged)
-        return;
-
-    //auto shapeManager = m_pLuaMain->GetPhysicsShapeManager();
-    auto rigidBodiesManager = m_pLuaMain->GetPhysicsRigidBodyManager();
-
-    if (!m_rigidBodiesUpdateAABBList.empty())
-    {
-        BT_PROFILE("updateRigidBodiesAABB");
-        WorldContext world(this);
-        while (!m_rigidBodiesUpdateAABBList.empty())
-        {
-            CLuaPhysicsRigidBody* pRigidBody = m_rigidBodiesUpdateAABBList.pop();
-            world->updateSingleAabb(pRigidBody->GetBtRigidBody());
-            pRigidBody->AABBUpdated();
-        }
-    }
-
-    if (!m_elementChangesList.empty())
-    {
-        BT_PROFILE("applyChanges");
-        while (!m_elementChangesList.empty())
-        {
-            CLuaPhysicsElement* pElement = m_elementChangesList.pop();
-            pElement->ApplyChanges();
-        }
-    }
-
-    if (!m_elementUpdatesList.empty())
-    {
-        BT_PROFILE("update");
-        while (!m_elementUpdatesList.empty())
-        {
-            CLuaPhysicsElement* pElement = m_elementUpdatesList.pop();
-            pElement->Update();
-        }
-    }
-
-    if (!m_rigidBodiesActivationList.empty())
-    {
-        BT_PROFILE("activateRigidBodies");
-        CLuaPhysicsRigidBody* pRigidBody;
-
-        WorldContext world(this);
-        while (!m_rigidBodiesActivationList.empty())
-        {
-            pRigidBody = m_rigidBodiesActivationList.pop();
-            if (pRigidBody->Activate())
-            {
-                world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(pRigidBody->GetBtRigidBody()->getBroadphaseHandle(),
-                                                                                       m_pDynamicsWorld->getDispatcher());
-            }
-        }
-    }
-
-    m_bWorldHasChanged = false;
-}
-
 void CBulletPhysics::DoPulse()
 {
     std::lock_guard<std::mutex>           guard(pulseLock);
     std::lock_guard<std::recursive_mutex>  lk(m_elementsLock);
-
-    {
-        BT_PROFILE("flushAllChanges");
-        FlushAllChanges();
-    }
 
     CTickCount tickCountNow = CTickCount::Now();
 
