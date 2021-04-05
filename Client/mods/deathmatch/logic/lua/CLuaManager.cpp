@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"
 #include "../luadefs/CLuaClientDefs.h"
+#include <lua/CLuaFunctionParser.h>
 
 using std::list;
 
