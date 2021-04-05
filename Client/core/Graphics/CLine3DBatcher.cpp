@@ -74,6 +74,7 @@ void CLine3DBatcher::Flush()
     std::vector<SPDVertex> vertices;
     vertices.resize(m_LineList.size() * 6);
     SPDVertex* pBuffer = &vertices[0];
+
     // For each line
     for (std::vector<SLine3DItem>::iterator iter = m_LineList.begin(); iter != m_LineList.end(); ++iter)
     {

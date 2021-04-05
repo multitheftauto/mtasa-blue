@@ -64,17 +64,12 @@ CLuaMain::~CLuaMain()
     UnloadScript();
     m_bBeingDeleted = true;
 
-    // Delete the managers
+    // Delete the timer manager
     delete m_pLuaTimerManager;
 
-    // Physics
     delete m_pLuaPhysicsRigidBodyManager;
     delete m_pLuaPhysicsStaticCollisionManager;
     delete m_pLuaPhysicsShapeManager;
-
-    m_pLuaPhysicsRigidBodyManager = nullptr;
-    m_pLuaPhysicsStaticCollisionManager = nullptr;
-    m_pLuaPhysicsShapeManager = nullptr;
 
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
@@ -373,9 +368,6 @@ void CLuaMain::UnloadScript()
 
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers();
-    
-    // BULLETPHYSICS3 TODO
-    //m_pLuaPhysicsRigidBodyManager->RemoveAllRigidBodies();
 
     // Delete all GUI elements
     // m_pLuaManager->m_pGUIManager->DeleteAll ( this );

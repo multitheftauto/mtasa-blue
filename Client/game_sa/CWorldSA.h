@@ -121,10 +121,7 @@ public:
     CSurfaceType*     GetSurfaceInfo() override;
     void              ResetAllSurfaceInfo() override;
     bool              ResetSurfaceInfo(short sSurfaceID) override;
-
-    void GetWorldModels(unsigned char usInterior, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
-
-        private:
+private:
     std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
     std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
     std::multimap<unsigned short, sBuildingRemovalItem*>*     m_pBinaryBuildings;

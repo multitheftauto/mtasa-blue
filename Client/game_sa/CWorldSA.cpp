@@ -1332,16 +1332,6 @@ void CWorldSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface)
     m_pAddedEntities[(DWORD)pInterface] = false;
 }
 
-inline float WrapAround(float fValue, float fHigh)
-{
-    return fValue - (fHigh * floor(static_cast<float>(fValue / fHigh)));
-}
-
-inline float ConvertDegreesToRadians(float fRotation)
-{
-    return WrapAround(static_cast<float>(fRotation * PI / 180.0f + 2 * PI), static_cast<float>(2 * PI));
-}
-
 bool CWorldSA::CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd)
 {
     // get our position

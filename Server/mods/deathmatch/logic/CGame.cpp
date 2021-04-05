@@ -475,6 +475,7 @@ void CGame::DoPulse()
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););
 
     CLOCK_CALL1(m_pLatentTransferManager->DoPulse(););
+
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
     m_pPhysicsManager->DoPulse();

@@ -83,7 +83,6 @@ enum eDXVerticalAlign
     DX_ALIGN_VCENTER = DT_VCENTER,
     DX_ALIGN_BOTTOM = DT_BOTTOM,
 };
-
 DECLARE_ENUM(eDXVerticalAlign);
 
 DECLARE_ENUM(eHudComponent);

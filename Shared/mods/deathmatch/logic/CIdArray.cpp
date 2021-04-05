@@ -218,8 +218,6 @@ static const char* GetIdClassTypeName(EIdClassType eClass)
             return "Static Collision";
         case EIdClassType::RIGID_BODY:
             return "Rigid Body";
-        case EIdClassType::CONSTRAINT:
-            return "Constraint";
         default:
             return "None";
     }

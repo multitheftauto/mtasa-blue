@@ -32,7 +32,6 @@ class CVehicleManager;
 class CMapManager;
 class CLuaPhysicsRigidBodyManager;
 class CLuaPhysicsStaticCollisionManager;
-class CLuaPhysicsConstraintManager;
 class CLuaPhysicsShapeManager;
 class CLuaPhysicsElement;
 

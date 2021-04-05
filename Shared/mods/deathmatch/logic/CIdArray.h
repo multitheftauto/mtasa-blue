@@ -56,7 +56,6 @@ namespace EIdClass
         RIGID_BODY,
         SHAPE,
         STATIC_COLLISION,
-        CONSTRAINT,
     };
 };
 
