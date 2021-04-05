@@ -2631,12 +2631,6 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
 
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
-
-    // Physics events
-    m_Events.AddEvent("onPhysicsCollision", "collisionA, collisionB, contactPointsA, contactPointsB", nullptr, false);
-    m_Events.AddEvent("onPhysicsConstraintBreak", "constraint", nullptr, false);
-
-    m_Events.AddEvent("onPhysicsRigidBodyFallOutsideWorld", "rigidBody", nullptr, false);
 }
 
 void CClientGame::DrawFPS()
@@ -3697,7 +3691,6 @@ void CClientGame::PostWorldProcessHandler()
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
-
 }
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
