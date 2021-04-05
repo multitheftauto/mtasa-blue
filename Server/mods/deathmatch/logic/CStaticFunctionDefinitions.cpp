@@ -76,11 +76,6 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
-bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool& bWasCanceled)
-{
-
-}
-
 bool CStaticFunctionDefinitions::TriggerClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
                                                     CLuaArguments& Arguments)
 {

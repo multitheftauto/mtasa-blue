@@ -689,7 +689,7 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, E
         Arguments.PushString(szName);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(Variable);
-        s_EventDispatcher.Call(BuiltInEvents::onElementDataChange, Arguments, this, pClient);
+        CallEvent(BuiltInEvents::onElementDataChange, Arguments, pClient);
         //CallEvent("onElementDataChange", Arguments, pClient);
     }
 }

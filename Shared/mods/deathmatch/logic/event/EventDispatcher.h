@@ -11,7 +11,7 @@ class CPlayer;
 class EventDispatcher
 {
 public:
-    bool Call(const Event& event, const CLuaArguments& args, const bool callOnChildren, CElement* source SERVER_ONLY_ARG(CPlayer* client));
+    bool Call(const Event& event, const CLuaArguments& args, bool callOnChildren, CElement* source SERVER_ONLY_ARG(CPlayer* client));
 
 	void PreEventPulse();
 	void PostEventPulse();

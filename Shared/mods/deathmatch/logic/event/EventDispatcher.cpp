@@ -42,7 +42,7 @@ static auto GetGame()
 #endif
 }
 
-bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, const bool callOnChildren, CElement* source SERVER_ONLY_ARG(CPlayer* client))
+bool EventDispatcher::Call(const Event& event, const CLuaArguments& args, bool callOnChildren, CElement* source SERVER_ONLY_ARG(CPlayer* client))
 {
 	if (!GetGame()->GetDebugHookManager()->OnPreEvent(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client)))
 	    return false;
