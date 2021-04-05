@@ -113,33 +113,46 @@ void CClientGUIElement::SetEvents(const char* szFunc1, const char* szFunc2)
         _strCallbackFunc2 = szFunc2;
 }
 
+// Hackery for CGUI callback stuff
 bool CClientGUIElement::_CallbackEvent1(CGUIElement* pCGUIElement)
 {
-    CLuaArguments Arg;
-    if (pCGUIElement)
+    if (_strCallbackFunc1.empty())
+        return false;
+
+    if (const Event* event = Event::Get(_strCallbackFunc1))
     {
-        CClientGUIElement* pElement = m_pGUIManager->Get(pCGUIElement);
-        if (pElement)
+        CLuaArguments Arg;
+        if (pCGUIElement)
         {
-            Arg.PushElement(pElement);
-            pElement->CallEvent(_strCallbackFunc1, Arg, true);
-            return true;
+            CClientGUIElement* pElement = m_pGUIManager->Get(pCGUIElement);
+            if (pElement)
+            {
+                Arg.PushElement(pElement);
+                pElement->CallEvent(*event, Arg, true);
+                return true;
+            }
         }
+        return false;
     }
-    return false;
 }
 
 bool CClientGUIElement::_CallbackEvent2(CGUIElement* pCGUIElement)
 {
-    CLuaArguments Arg;
-    if (pCGUIElement)
+    if (_strCallbackFunc2.empty())
+        return false;
+
+    if (const Event* event = Event::Get(_strCallbackFunc2))
     {
-        CClientGUIElement* pElement = m_pGUIManager->Get(pCGUIElement);
-        if (pElement)
+        CLuaArguments Arg;
+        if (pCGUIElement)
         {
-            Arg.PushElement(pElement);
-            pElement->CallEvent(_strCallbackFunc2, Arg, true);
-            return true;
+            CClientGUIElement* pElement = m_pGUIManager->Get(pCGUIElement);
+            if (pElement)
+            {
+                Arg.PushElement(pElement);
+                pElement->CallEvent(*event, Arg, true);
+                return true;
+            }
         }
     }
     return false;

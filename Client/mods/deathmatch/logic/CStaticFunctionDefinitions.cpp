@@ -4934,7 +4934,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow(CLuaMain& LuaMain
     pGUIElement->SetParent(LuaMain.GetResource()->GetResourceGUIEntity());
 
     // set events
-    pGUIElement->SetEvents("onClientGUIClose", "onClientGUIKeyDown");
+    pGUIElement->SetEvents("onClientGUIClose", "onClientGUIKeyDown"); // TODO: This event isn't even registered, nor does it exist on Wiki...
     static_cast<CGUIWindow*>(pElement)->SetCloseClickHandler(pGUIElement->GetCallback1());
     static_cast<CGUIWindow*>(pElement)->SetKeyDownHandler(pGUIElement->GetCallback2());
 
@@ -5042,7 +5042,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton(CLuaMain& LuaMain
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // set events
-    pGUIElement->SetEvents("onClientGUIClicked");
+    pGUIElement->SetEvents("onClientGUIClicked"); // TODO: This event isn't even registered, nor does it exist on Wiki...
     static_cast<CGUIButton*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
 
     return pGUIElement;
@@ -5092,7 +5092,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox(CLuaMain& LuaMa
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // set events
-    pGUIElement->SetEvents("onClientGUIStateChanged");
+    pGUIElement->SetEvents("onClientGUIStateChanged"); // TODO: This event isn't even registered, nor does it exist on Wiki...
     static_cast<CGUICheckBox*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
 
     return pGUIElement;
@@ -5110,7 +5110,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton(CLuaMain& Lu
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // set events
-    pGUIElement->SetEvents("onClientGUIStateChanged");
+    pGUIElement->SetEvents("onClientGUIStateChanged"); // TODO: This event isn't even registered, nor does it exist on Wiki...
     static_cast<CGUIRadioButton*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
 
     return pGUIElement;
@@ -5281,7 +5281,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox(CLuaMain& LuaMa
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // set events
-    pGUIElement->SetEvents("onClientGUIComboBoxAccepted");
+    pGUIElement->SetEvents("onClientGUIComboBoxAccepted"); 
     static_cast<CGUIComboBox*>(pElement)->SetSelectionHandler(pGUIElement->GetCallback1());
 
     return pGUIElement;
