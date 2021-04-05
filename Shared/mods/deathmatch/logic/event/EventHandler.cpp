@@ -35,10 +35,13 @@ EventHandler::Priority::Priority(std::string_view value)
     {
         if (at == 0)
             throw std::invalid_argument("Missing priority level in priority string");
-        priority = value.substr(at);
-        m_mod = std::stof(std::string{ value.data(), at }); // TODO: replace this with from_chars when GCC is updated from 10.2
+
+        // Parse modifier
+        m_mod = std::stof(std::string{value.substr(at)}); // TODO: replace this with from_chars when GCC is updated from 10.2
         // NOTE: from_chars might fail, in which case m_mod remains 0.0f
-        // ideally we would throw here but we have to remain backwards compatible.
+        // Ideally we would throw here but we have to remain backwards compatible.
+
+        priority = value.substr(0, at);
     }
     if (!StringToEnum(std::string{priority}, m_lvl)) // TODO: Use std::less<> in StringToEnum map, thus enabling transparent lookup
         throw std::invalid_argument("Unknown priority level"); // TODO(C++20): Include string with std::format
