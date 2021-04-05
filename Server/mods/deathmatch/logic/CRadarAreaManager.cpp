@@ -34,11 +34,11 @@ CRadarArea* CRadarAreaManager::Create(CElement* pParent)
     return pArea;
 }
 
-CRadarArea* CRadarAreaManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CRadarArea* CRadarAreaManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CRadarArea* const pArea = new CRadarArea(this, pParent);
 
-    if (pArea->GetID() == INVALID_ELEMENT_ID || !pArea->LoadFromCustomData(pEvents, Node))
+    if (pArea->GetID() == INVALID_ELEMENT_ID || !pArea->LoadFromCustomData(Node))
     {
         delete pArea;
         return nullptr;

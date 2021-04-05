@@ -26,7 +26,7 @@ public:
     ~CMarkerManager() { DeleteAll(); };
 
     CMarker* Create(CElement* pParent);
-    CMarker* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CMarker* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void     DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_Markers.size()); };

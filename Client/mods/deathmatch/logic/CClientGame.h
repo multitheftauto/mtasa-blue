@@ -33,7 +33,6 @@
 #include "lua/CLuaManager.h"
 #include "CScriptDebugging.h"
 #include "CZoneNames.h"
-#include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
 #include "CElementDeleter.h"
@@ -280,7 +279,6 @@ public:
     CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
-    CEvents*       GetEvents() { return &m_Events; }
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
@@ -366,8 +364,6 @@ public:
     void SetCursorEventsEnabled(bool bCursorEventsEnabled) { m_bCursorEventsEnabled = bCursorEventsEnabled; }
 
     CClientPlayer* GetClosestRemotePlayer(const CVector& vecTemp, float fMaxDistance);
-
-    void AddBuiltInEvents();
 
     const char* GetModRoot() { return m_strModRoot; };
 
@@ -808,7 +804,6 @@ public:
     void UpdateDiscordState(); // If netc allows this function not to be here it would be better
 
 private:
-    CEvents                                     m_Events;
     std::list<SScreenShotArgs>                  m_ScreenShotArgList;
     ushort                                      m_usNextScreenShotId;
     std::list<SDelayedPacketInfo>               m_DelayedSendList;

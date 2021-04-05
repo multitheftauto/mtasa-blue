@@ -63,11 +63,11 @@ CTeam* CTeamManager::Create(CElement* pParent, char* szName, unsigned char ucRed
     return pTeam;
 }
 
-CTeam* CTeamManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CTeam* CTeamManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CTeam* const pTeam = new CTeam(this, pParent);
 
-    if (pTeam->GetID() == INVALID_ELEMENT_ID || !pTeam->LoadFromCustomData(pEvents, Node))
+    if (pTeam->GetID() == INVALID_ELEMENT_ID || !pTeam->LoadFromCustomData(Node))
     {
         delete pTeam;
         return nullptr;

@@ -28,11 +28,11 @@ CBlip* CBlipManager::Create(CElement* pParent)
     return pBlip;
 }
 
-CBlip* CBlipManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CBlip* CBlipManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CBlip* const pBlip = new CBlip(pParent, this);
 
-    if (pBlip->GetID() == INVALID_ELEMENT_ID || !pBlip->LoadFromCustomData(pEvents, Node))
+    if (pBlip->GetID() == INVALID_ELEMENT_ID || !pBlip->LoadFromCustomData(Node))
     {
         delete pBlip;
         return nullptr;

@@ -17,7 +17,6 @@
 #include <core/CServerInterface.h>
 #include <CVector.h>
 #include "CCustomData.h"
-#include "CEvents.h"
 #include "CElementGroup.h"
 #include <list>
 #include <cstring>
@@ -133,7 +132,7 @@ public:
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents();
 
-    void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
+    void           ReadCustomData(CXMLNode& Node);
     CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
     CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
@@ -166,7 +165,7 @@ public:
     const std::string& GetName() { return m_strName; };
     void               SetName(const std::string& strName) { m_strName = strName; };
 
-    bool LoadFromCustomData(CEvents* pEvents, CXMLNode& Node);
+    bool LoadFromCustomData(CXMLNode& Node);
 
     void OnSubtreeAdd(CElement* pElement);
     void OnSubtreeRemove(CElement* pElement);

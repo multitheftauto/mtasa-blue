@@ -16,7 +16,6 @@ class CGame;
 #include "CCommon.h"
 #include <net/CNetServer.h>
 #include "CClient.h"
-#include "CEvents.h"
 #include "CCommandLineParser.h"
 #include "CConnectHistory.h"
 #include "CElementDeleter.h"
@@ -224,7 +223,6 @@ public:
     CRegistry*                       GetRegistry() { return m_pRegistry; }
     CAccountManager*                 GetAccountManager() { return m_pAccountManager; }
     CScriptDebugging*                GetScriptDebugging() { return m_pScriptDebugging; }
-    CEvents*                         GetEvents() { return &m_Events; }
     CColManager*                     GetColManager() { return m_pColManager; }
     CLatentTransferManager*          GetLatentTransferManager() { return m_pLatentTransferManager; }
     CDebugHookManager*               GetDebugHookManager() { return m_pDebugHookManager; }
@@ -463,7 +461,6 @@ public:
     void SetClientTransferBoxVisible(bool visible) { m_showClientTransferBox = visible; }
 
 private:
-    void AddBuiltInEvents();
     void RelayPlayerPuresync(class CPacket& Packet);
     void RelayNearbyPacket(class CPacket& Packet);
 
@@ -508,7 +505,6 @@ private:
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
 
-    CEvents                 m_Events;
     CRemoteCalls*           m_pRemoteCalls;
     CHTTPD*                 m_pHTTPD;
     CMainConfig*            m_pMainConfig;

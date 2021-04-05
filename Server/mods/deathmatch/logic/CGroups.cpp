@@ -16,11 +16,11 @@ CDummy* CGroups::Create(CElement* pParent)
     return new CDummy(this, pParent);
 }
 
-CDummy* CGroups::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CDummy* CGroups::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CDummy* const pTemp = new CDummy(this, pParent);
 
-    if (!pTemp->LoadFromCustomData(pEvents, Node))
+    if (!pTemp->LoadFromCustomData(Node))
     {
         delete pTemp;
         return nullptr;

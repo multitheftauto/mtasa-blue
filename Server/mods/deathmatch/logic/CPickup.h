@@ -17,7 +17,6 @@ class CPickup;
 #include "CColManager.h"
 #include "CColSphere.h"
 #include "CElement.h"
-#include "CEvents.h"
 
 class CPickup final : public CElement, private CColCallback
 {

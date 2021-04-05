@@ -27,7 +27,6 @@ CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName
     m_pTeamManager = g_pGame->GetTeamManager();
     m_pPedManager = g_pGame->GetPedManager();
     m_pWaterManager = g_pGame->GetWaterManager();
-    m_pEvents = g_pGame->GetEvents();
     m_pElementGroup = nullptr;
     m_iDimension = iDimension;
     m_type = RESOURCE_FILE_TYPE_MAP;
@@ -131,52 +130,52 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
     {
         case CElement::VEHICLE:
         {
-            pNode = m_pVehicleManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pVehicleManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::OBJECT:
         {
-            pNode = m_pObjectManager->CreateFromXML(pParent, Node, m_pEvents, false);
+            pNode = m_pObjectManager->CreateFromXML(pParent, Node, false);
             break;
         }
         case CElement::BLIP:
         {
-            pNode = m_pBlipManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pBlipManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::PICKUP:
         {
-            pNode = m_pPickupManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pPickupManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::MARKER:
         {
-            pNode = m_pMarkerManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pMarkerManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::RADAR_AREA:
         {
-            pNode = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pRadarAreaManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::TEAM:
         {
-            pNode = m_pTeamManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pTeamManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::PED:
         {
-            pNode = m_pPedManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pPedManager->CreateFromXML(pParent, Node);
             break;
         }
         case CElement::WATER:
         {
-            pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pWaterManager->CreateFromXML(pParent, Node);
             break;
         }
         default:
         {
-            pNode = m_pGroups->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pGroups->CreateFromXML(pParent, Node);
             break;
         }
     }

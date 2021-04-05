@@ -19,7 +19,7 @@ class CStaticFunctionDefinitions;
 class CStaticFunctionDefinitions
 {
 public:
-    CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CEvents* pEvents, CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame,
+    CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame,
                                CClientManager* pManager);
     ~CStaticFunctionDefinitions();
 

@@ -440,10 +440,8 @@ void CElement::DeleteAllEvents()
     GetEventHandlerCallDispatcher().Clear();
 }
 
-void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
+void CElement::ReadCustomData(CXMLNode& Node)
 {
-    assert(pEvents);
-
     // Iterate the attributes of our XML node
     CXMLAttributes* pAttributes = &(Node.GetAttributes());
     unsigned int    uiAttributeCount = pAttributes->Count();
@@ -772,12 +770,10 @@ void CElement::CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive)
     }
 }
 
-bool CElement::LoadFromCustomData(CEvents* pEvents, CXMLNode& Node)
+bool CElement::LoadFromCustomData(CXMLNode& Node)
 {
-    assert(pEvents);
-
     // Read out all the attributes into our custom data records
-    ReadCustomData(pEvents, Node);
+    ReadCustomData(Node);
 
     // Grab the "id" custom data into our m_strName member
     char szBuf[MAX_ELEMENT_NAME_LENGTH + 1] = {0};

@@ -25,7 +25,6 @@ static int DummyPreCall(lua_CFunction f, lua_State* L)
 
 CLuaManager::CLuaManager(CClientGame* pClientGame)
 {
-    m_pEvents = pClientGame->GetEvents();
     m_pGUIManager = pClientGame->GetGUIManager();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands();
 

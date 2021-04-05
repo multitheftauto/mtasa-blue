@@ -16,7 +16,6 @@ class CVehicle;
 #include "CCommon.h"
 #include "packets/CPacket.h"
 #include "CElement.h"
-#include "CEvents.h"
 #include "CVehicleUpgrades.h"
 #include "CHandlingEntry.h"
 

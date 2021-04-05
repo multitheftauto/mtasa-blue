@@ -29,7 +29,6 @@ class CVehicleManager;
 class CTeamManager;
 class CPedManager;
 class CWaterManager;
-class CEvents;
 
 // This class represents a single resource map item, being a .map file
 // It's task is to load the .map file into elements and store them
@@ -65,7 +64,6 @@ private:
     CTeamManager*      m_pTeamManager;
     CPedManager*       m_pPedManager;
     CWaterManager*     m_pWaterManager;
-    CEvents*           m_pEvents;
     CDummy*            m_pMapElement;
     CElementGroup*     m_pElementGroup;
     int                m_iDimension;

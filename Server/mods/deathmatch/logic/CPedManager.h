@@ -22,7 +22,7 @@ public:
     ~CPedManager();
 
     class CPed* Create(unsigned short usModel, CElement* pParent);
-    class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void        DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };

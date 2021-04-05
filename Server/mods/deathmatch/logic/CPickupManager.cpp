@@ -38,11 +38,11 @@ CPickup* CPickupManager::Create(CElement* pParent)
     return pPickup;
 }
 
-CPickup* CPickupManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CPickup* CPickupManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CPickup* const pPickup = new CPickup(pParent, this, m_pColManager);
 
-    if (pPickup->GetID() == INVALID_ELEMENT_ID || !pPickup->LoadFromCustomData(pEvents, Node))
+    if (pPickup->GetID() == INVALID_ELEMENT_ID || !pPickup->LoadFromCustomData(Node))
     {
         delete pPickup;
         return nullptr;

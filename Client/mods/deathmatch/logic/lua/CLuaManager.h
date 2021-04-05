@@ -16,7 +16,6 @@ class CLuaManager;
 
 #include <list>
 #include "../CClientGUIManager.h"
-#include "../CEvents.h"
 #include "../CScriptDebugging.h"
 #include "CLuaMain.h"
 #include "../CRegisteredCommands.h"
@@ -48,7 +47,6 @@ public:
 private:
     void LoadCFunctions();
 
-    CEvents*             m_pEvents;
     CRegisteredCommands* m_pRegisteredCommands;
 
     CFastHashMap<lua_State*, CLuaMain*> m_VirtualMachineMap;

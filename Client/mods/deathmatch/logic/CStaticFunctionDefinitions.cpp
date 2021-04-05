@@ -14,7 +14,6 @@
 using std::list;
 
 static CLuaManager*              m_pLuaManager;
-static CEvents*                  m_pEvents;
 static CCoreInterface*           m_pCore;
 static CGame*                    m_pGame;
 static CClientGame*              m_pClientGame;
@@ -49,11 +48,10 @@ static CClientSoundManager*      m_pSoundManager;
                 func; \
         pList->Release(); \
     }
-CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager, CEvents* pEvents, CCoreInterface* pCore, CGame* pGame,
+CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager, CCoreInterface* pCore, CGame* pGame,
                                                        CClientGame* pClientGame, CClientManager* pManager)
 {
     m_pLuaManager = pLuaManager;
-    m_pEvents = pEvents;
     m_pCore = pCore;
     m_pGame = pGame;
     m_pClientGame = pClientGame;

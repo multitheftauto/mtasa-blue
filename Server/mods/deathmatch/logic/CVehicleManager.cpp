@@ -388,12 +388,12 @@ CVehicle* CVehicleManager::Create(CElement* pParent, unsigned short usModel, uns
     return pVehicle;
 }
 
-CVehicle* CVehicleManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CVehicle* CVehicleManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     RandomizeRandomSeed();
     CVehicle* pVehicle = new CVehicle(this, pParent, 400, 254, 254);
 
-    if (pVehicle->GetID() == INVALID_ELEMENT_ID || !pVehicle->LoadFromCustomData(pEvents, Node))
+    if (pVehicle->GetID() == INVALID_ELEMENT_ID || !pVehicle->LoadFromCustomData(Node))
     {
         delete pVehicle;
         return nullptr;

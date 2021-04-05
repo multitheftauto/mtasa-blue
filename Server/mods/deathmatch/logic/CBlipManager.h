@@ -25,7 +25,7 @@ public:
     ~CBlipManager() { DeleteAll(); };
 
     CBlip* Create(CElement* pParent);
-    CBlip* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CBlip* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void   DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };

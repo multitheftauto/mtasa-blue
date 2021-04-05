@@ -105,11 +105,11 @@ CObject* CObjectManager::Create(CElement* pParent, bool bIsLowLod)
     return pObject;
 }
 
-CObject* CObjectManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod)
+CObject* CObjectManager::CreateFromXML(CElement* pParent, CXMLNode& Node, bool bIsLowLod)
 {
     CObject* const pObject = new CObject(pParent, this, bIsLowLod);
 
-    if (pObject->GetID() == INVALID_ELEMENT_ID || !pObject->LoadFromCustomData(pEvents, Node))
+    if (pObject->GetID() == INVALID_ELEMENT_ID || !pObject->LoadFromCustomData(Node))
     {
         delete pObject;
         return nullptr;

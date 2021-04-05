@@ -217,7 +217,6 @@ struct SAclRequest;
 #include "CElementGroup.h"
 #include "CElementIDs.h"
 #include "CElementRefManager.h"
-#include "CEvents.h"
 #include "CGame.h"
 #include "CGroups.h"
 #include "CHTTPD.h"

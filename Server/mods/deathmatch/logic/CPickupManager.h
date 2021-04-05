@@ -26,7 +26,7 @@ public:
     ~CPickupManager() { DeleteAll(); };
 
     CPickup* Create(CElement* pParent);
-    CPickup* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CPickup* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void     DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };

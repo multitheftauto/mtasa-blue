@@ -23,7 +23,7 @@ public:
     ~CRadarAreaManager();
 
     CRadarArea* Create(CElement* pParent);
-    CRadarArea* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CRadarArea* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void        DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };

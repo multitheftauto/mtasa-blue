@@ -33,11 +33,11 @@ CPed* CPedManager::Create(unsigned short usModel, CElement* pParent)
     return pPed;
 }
 
-CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CPed* const pPed = new CPed(this, pParent, 400);
 
-    if (pPed->GetID() == INVALID_ELEMENT_ID || !pPed->LoadFromCustomData(pEvents, Node))
+    if (pPed->GetID() == INVALID_ELEMENT_ID || !pPed->LoadFromCustomData(Node))
     {
         delete pPed;
         return nullptr;

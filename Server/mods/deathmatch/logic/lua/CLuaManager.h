@@ -15,13 +15,11 @@ class CLuaManager;
 #pragma once
 
 #include <list>
-#include "../CEvents.h"
 #include "CLuaMain.h"
 #include "CLuaCFunctions.h"
 
 // Predeclarations
 class CBlipManager;
-class CEvents;
 class CMapManager;
 class CObjectManager;
 class CPlayerManager;
@@ -33,7 +31,7 @@ class CLuaManager
 {
 public:
     CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager, CBlipManager* pBlipManager,
-                CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager, CEvents* pEvents);
+                CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager);
     ~CLuaManager();
 
     CLuaMain*  CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP);
@@ -60,7 +58,6 @@ private:
     class CRegisteredCommands* m_pRegisteredCommands;
     CVehicleManager*           m_pVehicleManager;
     CMapManager*               m_pMapManager;
-    CEvents*                   m_pEvents;
     CLuaModuleManager*         m_pLuaModuleManager;
 
     CFastHashMap<lua_State*, CLuaMain*> m_VirtualMachineMap;

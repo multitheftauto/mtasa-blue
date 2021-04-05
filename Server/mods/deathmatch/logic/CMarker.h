@@ -15,7 +15,6 @@
 #include "CColCallback.h"
 #include "CColManager.h"
 #include "CColShape.h"
-#include "CEvents.h"
 #include "CPerPlayerEntity.h"
 
 class CMarker : public CPerPlayerEntity, private CColCallback

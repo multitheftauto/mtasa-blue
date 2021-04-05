@@ -25,7 +25,6 @@ static CBlipManager*         m_pBlipManager;
 static CRadarAreaManager*    m_pRadarAreaManager;
 static CTeamManager*         m_pTeamManager;
 static CClock*               m_pClock;
-static CEvents*              m_pEvents;
 static CElementDeleter*      m_pElementDeleter;
 static CMainConfig*          m_pMainConfig;
 static CRegistry*            m_pRegistry;
@@ -61,7 +60,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
     m_pRadarAreaManager = pGame->GetRadarAreaManager();
     m_pTeamManager = pGame->GetTeamManager();
     m_pClock = pGame->GetClock();
-    m_pEvents = pGame->GetEvents();
     m_pElementDeleter = pGame->GetElementDeleter();
     m_pMainConfig = pGame->GetConfig();
     m_pRegistry = pGame->GetRegistry();

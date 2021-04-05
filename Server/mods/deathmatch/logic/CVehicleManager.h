@@ -31,7 +31,7 @@ public:
     ~CVehicleManager();
 
     CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
-    CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void      DeleteAll();
 
     bool Exists(CVehicle* pVehicle);

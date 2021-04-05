@@ -30,11 +30,11 @@ CMarker* CMarkerManager::Create(CElement* pParent)
     return pMarker;
 }
 
-CMarker* CMarkerManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
+CMarker* CMarkerManager::CreateFromXML(CElement* pParent, CXMLNode& Node)
 {
     CMarker* const pMarker = new CMarker(this, m_pColManager, pParent);
 
-    if (pMarker->GetID() == INVALID_ELEMENT_ID || !pMarker->LoadFromCustomData(pEvents, Node))
+    if (pMarker->GetID() == INVALID_ELEMENT_ID || !pMarker->LoadFromCustomData(Node))
     {
         delete pMarker;
         return nullptr;

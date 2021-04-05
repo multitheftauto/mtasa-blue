@@ -28,7 +28,7 @@ public:
     ~CObjectManager();
 
     CObject* Create(CElement* pParent, bool bIsLowLod);
-    CObject* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod);
+    CObject* CreateFromXML(CElement* pParent, CXMLNode& Node, bool bIsLowLod);
     void     DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };

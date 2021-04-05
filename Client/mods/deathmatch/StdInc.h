@@ -153,7 +153,6 @@
 // Deathmatch includes
 #include "ClientCommands.h"
 #include "CClient.h"
-#include "CEvents.h"
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
 #include "logic/CClientModelCacheManager.h"

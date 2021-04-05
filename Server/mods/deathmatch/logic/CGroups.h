@@ -24,7 +24,7 @@ public:
     ~CGroups() { DeleteAll(); }
 
     CDummy* Create(CElement* pParent);
-    CDummy* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CDummy* CreateFromXML(CElement* pParent, CXMLNode& Node);
 
     void Delete(CDummy* pDummy);
     void DeleteAll();

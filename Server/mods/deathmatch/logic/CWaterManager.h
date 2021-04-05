@@ -22,7 +22,7 @@ public:
     ~CWaterManager();
 
     CWater* Create(CWater::EWaterType waterType, CElement* pParent, bool bShallow = false);
-    CWater* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
+    CWater* CreateFromXML(CElement* pParent, CXMLNode& Node);
     void    DeleteAll();
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };

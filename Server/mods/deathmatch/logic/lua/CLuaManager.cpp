@@ -17,7 +17,7 @@
 extern CGame* g_pGame;
 
 CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager, CBlipManager* pBlipManager,
-                         CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager, CEvents* pEvents)
+                         CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager)
 {
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
@@ -26,7 +26,6 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
     m_pRadarAreaManager = pRadarAreaManager;
     m_pRegisteredCommands = pRegisteredCommands;
     m_pMapManager = pMapManager;
-    m_pEvents = pEvents;
 
     // Create our lua dynamic module manager
     m_pLuaModuleManager = new CLuaModuleManager(this);

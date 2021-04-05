@@ -33,7 +33,7 @@ public:
     CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
                 CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
                 CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock,
-                CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter);
+                CGroups* pGroups, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter);
     ~CMapManager();
 
     CBlendedWeather* GetWeather() { return m_pBlendedWeather; };
@@ -92,7 +92,6 @@ private:
     CWaterManager*          m_pWaterManager;
     CClock*                 m_pServerClock;
     CGroups*                m_pGroups;
-    CEvents*                m_pEvents;
     class CScriptDebugging* m_pScriptDebugging;
     CElementDeleter*        m_pElementDeleter;
 

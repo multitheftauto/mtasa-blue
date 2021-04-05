@@ -16,7 +16,7 @@ extern CGame* g_pGame;
 CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
                          CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
                          CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock,
-                         CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
+                         CGroups* pGroups, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -32,7 +32,6 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pWaterManager = pWaterManager;
     m_pServerClock = pClock;
     m_pGroups = pGroups;
-    m_pEvents = pEvents;
     m_pScriptDebugging = pScriptDebugging;
     m_pElementDeleter = pElementDeleter;
 
@@ -853,16 +852,16 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     CElement* pNode = NULL;
     if (elementType == CElement::VEHICLE)
     {
-        pNode = m_pVehicleManager->CreateFromXML(pParent, Node, m_pEvents);
+        pNode = m_pVehicleManager->CreateFromXML(pParent, Node);
     }
     else if (elementType == CElement::OBJECT)
     {
         bool bIsLowLod = false;
-        pNode = m_pObjectManager->CreateFromXML(pParent, Node, m_pEvents, bIsLowLod);
+        pNode = m_pObjectManager->CreateFromXML(pParent, Node, bIsLowLod);
     }
     else if (elementType == CElement::BLIP)
     {
-        CBlip* pBlip = m_pBlipManager->CreateFromXML(pParent, Node, m_pEvents);
+        CBlip* pBlip = m_pBlipManager->CreateFromXML(pParent, Node);
         pNode = pBlip;
         /*if ( pBlip )
         {
@@ -871,11 +870,11 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     }
     else if (elementType == CElement::PICKUP)
     {
-        pNode = m_pPickupManager->CreateFromXML(pParent, Node, m_pEvents);
+        pNode = m_pPickupManager->CreateFromXML(pParent, Node);
     }
     else if (elementType == CElement::MARKER)
     {
-        CMarker* pMarker = m_pMarkerManager->CreateFromXML(pParent, Node, m_pEvents);
+        CMarker* pMarker = m_pMarkerManager->CreateFromXML(pParent, Node);
         pNode = pMarker;
         if (pMarker)
         {
@@ -884,7 +883,7 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     }
     else if (elementType == CElement::RADAR_AREA)
     {
-        CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
+        CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML(pParent, Node);
         pNode = pRadarArea;
         if (pRadarArea)
         {
@@ -893,15 +892,15 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     }
     else if (elementType == CElement::TEAM)
     {
-        pNode = m_pTeamManager->CreateFromXML(pParent, Node, m_pEvents);
+        pNode = m_pTeamManager->CreateFromXML(pParent, Node);
     }
     else if (elementType == CElement::PED)
     {
-        pNode = m_pPedManager->CreateFromXML(pParent, Node, m_pEvents);
+        pNode = m_pPedManager->CreateFromXML(pParent, Node);
     }
     else if (elementType == CElement::WATER)
     {
-        pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
+        pNode = m_pWaterManager->CreateFromXML(pParent, Node);
     }
     else if (strBuffer.empty())
     {
@@ -910,7 +909,7 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     }
     else
     {
-        pNode = m_pGroups->CreateFromXML(pParent, Node, m_pEvents);
+        pNode = m_pGroups->CreateFromXML(pParent, Node);
     }
 
     // Set the node we created in the pointer we were given
