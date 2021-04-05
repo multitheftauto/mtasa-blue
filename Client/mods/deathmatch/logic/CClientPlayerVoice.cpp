@@ -60,7 +60,7 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
 
         if (pVoice->m_bVoiceActive)
         {
-            pVoice->m_EventQueue.push_back("onClientPlayerVoiceStop");
+            pVoice->m_EventQueue.push_back(&BuiltInEvents::onClientPlayerVoiceStop);
             pVoice->m_bVoiceActive = false;
         }
     }
@@ -155,17 +155,14 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
 
 void CClientPlayerVoice::ServiceEventQueue()
 {
-    std::list<SString> eventQueue;
+    std::list<const BuiltInEvent*> eventQueue;
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
         std::swap(eventQueue, m_EventQueue);
     }
 
-    for (const SString& strEvent : eventQueue)
-    {
-        CLuaArguments Arguments;
-        m_pPlayer->CallEvent(strEvent, Arguments, true);
-    }
+    for (auto* event : eventQueue)
+        m_pPlayer->CallEvent(*event, {}, true);
 }
 
 ////////////////////////////////////////////////////////////
