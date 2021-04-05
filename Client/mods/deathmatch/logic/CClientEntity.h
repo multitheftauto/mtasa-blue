@@ -343,7 +343,7 @@ public:
         {
             if (child->IsBeingDeleted())
                 continue;
-            if (m_bIsBeingDeleted)
+            if (IsBeingDeleted())
                 break;
             // Check if the function returns a bool
             if constexpr (std::is_same_v<bool, std::invoke_result_t<Fn, decltype(child)>>)
