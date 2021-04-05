@@ -225,7 +225,7 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
 
         // Call on(Client)DebugMessage
 #ifdef MTA_CLIENT
-        notCancelled = g_pClientGame->GetRootEntity()->CallEvent("onClientDebugMessage", Arguments, false);
+        notCancelled = g_pClientGame->GetRootEntity()->CallEvent(BuiltInEvents::onClientDebugMessage, Arguments, false);
 #else
         notCancelled = g_pGame->GetMapManager()->GetRootElement()->CallEvent(BuiltInEvents::onDebugMessage, Arguments);
 #endif
