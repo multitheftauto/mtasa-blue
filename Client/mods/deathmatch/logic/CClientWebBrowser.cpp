@@ -227,14 +227,13 @@ void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
 
 void CClientWebBrowser::Events_OnTriggerEvent(const SString& strEventName, const std::vector<std::string>& arguments)
 {
-    CLuaArguments Arguments;
-    for (std::vector<std::string>::const_iterator iter = arguments.begin(); iter != arguments.end(); ++iter)
+    if (auto* event = Event::Get(strEventName))
     {
-        Arguments.PushString(*iter);
+        CLuaArguments luaargs;
+        for (auto& arg : arguments)
+            luaargs.PushString(arg);
+        CallEvent(*event, luaargs, true);
     }
-
-    bool bWasCancelled;
-    CStaticFunctionDefinitions::TriggerEvent(strEventName, *this, Arguments, bWasCancelled);
 }
 
 void CClientWebBrowser::Events_OnTooltip(const SString& strTooltip)
