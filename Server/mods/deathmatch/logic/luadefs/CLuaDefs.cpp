@@ -116,16 +116,16 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     }
     
     // Get associated resource
-    auto pResource{ lua_getownerresource(luaVM) };
+    CResource& resource{ lua_getownerresource(luaVM) };
 
     // Update execution time check
-    pResource->GetVirtualMachine()->CheckExecutionTime();
+    resource.GetVirtualMachine()->CheckExecutionTime();
 
     // Check function right cache in resource
     bool bAllowed;
 
     // Check cached ACL rights
-    if (pResource->CheckFunctionRightCache(f, &bAllowed))
+    if (resource.CheckFunctionRightCache(f, &bAllowed))
     {
         // If in cache, and not allowed, do warning here
         if (!bAllowed)
@@ -167,7 +167,7 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
             }
         }
         // Update cache in resource
-        pResource->UpdateFunctionRightCache(f, bAllowed);
+        resource.UpdateFunctionRightCache(f, bAllowed);
     }
 
     if (!g_pGame->GetDebugHookManager()->OnPreFunction(f, luaVM, bAllowed))
