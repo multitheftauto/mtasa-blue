@@ -75,7 +75,7 @@ void CSingularFileDownload::CallFinished(bool bSuccess)
             Arguments.PushBoolean(false);                 // or false
         }
 
-        m_pResource->GetResourceEntity()->CallEvent("onClientFileDownloadComplete", Arguments, false);
+        m_pResource->GetResourceEntity()->CallEvent(BuiltInEvents::onClientFileDownloadComplete, Arguments, false);
     }
     SetComplete();
 }

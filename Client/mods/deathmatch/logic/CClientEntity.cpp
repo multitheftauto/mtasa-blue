@@ -478,7 +478,7 @@ void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variab
     Arguments.PushString(szName);
     Arguments.PushArgument(oldVariable);
     Arguments.PushArgument(Variable);
-    CallEvent("onClientElementDataChange", Arguments, true);
+    CallEvent(BuiltInEvents::onClientElementDataChange, Arguments, true);
 }
 
 void CClientEntity::DeleteCustomData(const char* szName)
@@ -498,7 +498,7 @@ void CClientEntity::DeleteCustomData(const char* szName)
         Arguments.PushString(szName);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
-        CallEvent("onClientElementDataChange", Arguments, true);
+        CallEvent(BuiltInEvents::onClientElementDataChange, Arguments, true);
     }
 }
 
@@ -598,7 +598,7 @@ void CClientEntity::SetDimension(unsigned short usDimension)
     CLuaArguments Arguments;
     Arguments.PushNumber(usOldDimension);
     Arguments.PushNumber(usDimension);
-    CallEvent("onClientElementDimensionChange", Arguments, true);
+    CallEvent(BuiltInEvents::onClientElementDimensionChange, Arguments, true);
 }
 
 bool CClientEntity::IsOutOfBounds()
@@ -718,11 +718,10 @@ void CClientEntity::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotatio
     m_vecAttachedRotation = vecRotation;
 }
 
-bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren)
+bool CClientEntity::CallEvent(const Event& event, const CLuaArguments& Arguments, bool bCallOnChildren)
 {
-    return s_EventDispatcher.Call(szName, Arguments, bCallOnChildren, this);
+    return s_EventDispatcher.Call(event, Arguments, bCallOnChildren, this);
 }
-
 
 void CClientEntity::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
 {
@@ -1216,7 +1215,7 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     CLuaArguments Arguments;
     Arguments.PushNumber(ucOldInterior);
     Arguments.PushNumber(ucInterior);
-    CallEvent("onClientElementInteriorChange", Arguments, true);
+    CallEvent(BuiltInEvents::onClientElementInteriorChange, Arguments, true);
 }
 
 bool CClientEntity::IsOnScreen()

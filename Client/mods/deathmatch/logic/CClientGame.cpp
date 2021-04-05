@@ -739,7 +739,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
     {
         CLuaArguments Arguments;
         Arguments.PushBoolean(bDidRecreateRenderTargets);
-        m_pRootEntity->CallEvent("onClientRestore", Arguments, false);
+        m_pRootEntity->CallEvent(BuiltInEvents::onClientRestore, Arguments, false);
         m_bWasMinimized = false;
 
         // Reverse any mute on minimize effects
@@ -750,7 +750,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 
     // Call onClientHUDRender LUA event
     CLuaArguments Arguments;
-    m_pRootEntity->CallEvent("onClientHUDRender", Arguments, false);
+    m_pRootEntity->CallEvent(BuiltInEvents::onClientHUDRender, Arguments, false);
 
     // Disallow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
@@ -1132,7 +1132,7 @@ void CClientGame::DoPulses()
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
-        m_pRootEntity->CallEvent("onClientRender", Arguments, false);
+        m_pRootEntity->CallEvent(BuiltInEvents::onClientRender, Arguments, false);
 
         // Disallow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
@@ -1613,7 +1613,7 @@ void CClientGame::UpdatePlayerTarget()
             Arguments.PushElement(m_pTargetedEntity);
         else
             Arguments.PushBoolean(false);
-        m_pLocalPlayer->CallEvent("onClientPlayerTarget", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerTarget, Arguments, true);
     }
 }
 
@@ -1626,7 +1626,7 @@ void CClientGame::UpdatePlayerWeapons()
         CLuaArguments Arguments;
         Arguments.PushNumber(m_lastWeaponSlot);
         Arguments.PushNumber(currentSlot);
-        bool bCancelled = !m_pLocalPlayer->CallEvent("onClientPlayerWeaponSwitch", Arguments, true);
+        bool bCancelled = !m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerWeaponSwitch, Arguments, true);
 
         if (bCancelled)
         {
@@ -1827,7 +1827,7 @@ void CClientGame::UpdateFireKey()
                                 pControl->bState = false;
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pTargetPed);
-                                if (m_pLocalPlayer->CallEvent("onClientPlayerStealthKill", Arguments, false))
+                                if (m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStealthKill, Arguments, false))
                                 {
                                     if (pTargetPed->IsLocalEntity())
                                     {
@@ -1865,7 +1865,7 @@ void CClientGame::UpdateStunts()
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("2wheeler");
-        m_pLocalPlayer->CallEvent("onClientPlayerStuntStart", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStuntStart, Arguments, true);
     }
     // Did we finish a stunt?
     else if (ulLastCarTwoWheelCounter != 0 && ulTemp == 0)
@@ -1877,7 +1877,7 @@ void CClientGame::UpdateStunts()
         Arguments.PushString("2wheeler");
         Arguments.PushNumber(ulLastCarTwoWheelCounter);
         Arguments.PushNumber(fDistance);
-        m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStuntFinish, Arguments, true);
     }
     ulLastCarTwoWheelCounter = ulTemp;
     fLastCarTwoWheelDist = g_pGame->GetPlayerInfo()->GetCarTwoWheelDist();
@@ -1892,7 +1892,7 @@ void CClientGame::UpdateStunts()
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("wheelie");
-        m_pLocalPlayer->CallEvent("onClientPlayerStuntStart", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStuntStart, Arguments, true);
     }
     // Did we finish a stunt?
     else if (ulLastBikeRearWheelCounter != 0 && ulTemp == 0)
@@ -1904,7 +1904,7 @@ void CClientGame::UpdateStunts()
         Arguments.PushString("wheelie");
         Arguments.PushNumber(ulLastBikeRearWheelCounter);
         Arguments.PushNumber(fDistance);
-        m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStuntFinish, Arguments, true);
     }
     ulLastBikeRearWheelCounter = ulTemp;
     fLastBikeRearWheelDist = g_pGame->GetPlayerInfo()->GetBikeRearWheelDist();
@@ -1919,7 +1919,7 @@ void CClientGame::UpdateStunts()
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("stoppie");
-        m_pLocalPlayer->CallEvent("onClientPlayerStuntStart", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStuntStart, Arguments, true);
     }
     // Did we finish a stunt?
     else if (ulLastBikeFrontWheelCounter != 0 && ulTemp == 0)
@@ -1931,7 +1931,7 @@ void CClientGame::UpdateStunts()
         Arguments.PushString("stoppie");
         Arguments.PushNumber(ulLastBikeFrontWheelCounter);
         Arguments.PushNumber(fDistance);
-        m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
+        m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerStuntFinish, Arguments, true);
     }
     ulLastBikeFrontWheelCounter = ulTemp;
     fLastBikeFrontWheelDist = g_pGame->GetPlayerInfo()->GetBikeFrontWheelDist();
@@ -2051,7 +2051,7 @@ bool CClientGame::KeyStrokeHandler(const SString& strKey, bool bState, bool bIsC
             CLuaArguments Arguments;
             Arguments.PushString(strKey);
             Arguments.PushBoolean(bState);
-            bAllow = m_pRootEntity->CallEvent("onClientKey", Arguments, false);
+            bAllow = m_pRootEntity->CallEvent(BuiltInEvents::onClientKey, Arguments, false);
             if (bState == true)
             {
                 if (bAllow == false && strKey == "escape")
@@ -2102,7 +2102,7 @@ bool CClientGame::CharacterKeyHandler(WPARAM wChar)
             // Call our character event
             CLuaArguments Arguments;
             Arguments.PushString(strANSI);
-            m_pRootEntity->CallEvent("onClientCharacter", Arguments, false);
+            m_pRootEntity->CallEvent(BuiltInEvents::onClientCharacter, Arguments, false);
         }
     }
 
@@ -2306,7 +2306,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             Arguments.PushElement(pCollisionEntity);
                         else
                             Arguments.PushBoolean(false);
-                        m_pRootEntity->CallEvent("onClientClick", Arguments, false);
+                        m_pRootEntity->CallEvent(BuiltInEvents::onClientClick, Arguments, false);
 
                         // Send the button, cursor position, 3d position and the entity collided with
                         CBitStream bitStream;
@@ -2350,7 +2350,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                                     DoubleClickArguments.PushElement(pCollisionEntity);
                                 else
                                     DoubleClickArguments.PushBoolean(false);
-                                m_pRootEntity->CallEvent("onClientDoubleClick", DoubleClickArguments, false);
+                                m_pRootEntity->CallEvent(BuiltInEvents::onClientDoubleClick, DoubleClickArguments, false);
                             }
 
                             m_ulLastClickTick = GetTickCount32();
@@ -2388,7 +2388,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 Arguments.PushNumber((double)vecTarget.fX);
                 Arguments.PushNumber((double)vecTarget.fY);
                 Arguments.PushNumber((double)vecTarget.fZ);
-                m_pRootEntity->CallEvent("onClientCursorMove", Arguments, false);
+                m_pRootEntity->CallEvent(BuiltInEvents::onClientCursorMove, Arguments, false);
             }
             break;
         }
@@ -3222,7 +3222,7 @@ void CClientGame::QuitPlayer(CClientPlayer* pPlayer, eQuitReason Reason)
     // Call our onClientPlayerQuit event
     CLuaArguments Arguments;
     Arguments.PushString(szReason);
-    pPlayer->CallEvent("onClientPlayerQuit", Arguments, true);
+    pPlayer->CallEvent(BuiltInEvents::onClientPlayerQuit, Arguments, true);
 
     // Detach the camera from this player if we're watching them
     m_pManager->GetCamera()->UnreferencePlayer(pPlayer);
@@ -3347,7 +3347,7 @@ void CClientGame::SetupGlobalLuaEvents()
         // Call event now
         CLuaArguments args;
         args.PushString(clipboardText);
-        m_pRootEntity->CallEvent("onClientPaste", args, false);
+        m_pRootEntity->CallEvent(BuiltInEvents::onClientPaste, args, false);
     });
 }
 
@@ -3652,7 +3652,7 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
     // Call our creation event
     CLuaArguments Arguments;
     Arguments.PushElement(pProjectile->GetCreator());
-    pProjectile->CallEvent("onClientProjectileCreation", Arguments, true);
+    pProjectile->CallEvent(BuiltInEvents::onClientProjectileCreation, Arguments, true);
 }
 
 void CClientGame::Render3DStuffHandler()
@@ -3681,13 +3681,13 @@ void CClientGame::PostWorldProcessHandler()
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
-    m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
+    m_pRootEntity->CallEvent(BuiltInEvents::onClientPreRender, Arguments, false);
 }
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
-    m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
+    m_pRootEntity->CallEvent(BuiltInEvents::onClientPedsProcessed, Arguments, false);
 }
 
 void CClientGame::IdleHandler()
@@ -3700,7 +3700,7 @@ void CClientGame::IdleHandler()
             m_bWasMinimized = true;
             // Call onClientMinimize LUA event
             CLuaArguments Arguments;
-            m_pRootEntity->CallEvent("onClientMinimize", Arguments, false);
+            m_pRootEntity->CallEvent(BuiltInEvents::onClientMinimize, Arguments, false);
 
             bool bMuteAll = g_pCore->GetCVars()->GetValue<bool>("mute_master_when_minimized");
 
@@ -3731,7 +3731,7 @@ bool CClientGame::ChokingHandler(unsigned char ucWeaponType)
         return true;
     CLuaArguments Arguments;
     Arguments.PushNumber(ucWeaponType);
-    return m_pLocalPlayer->CallEvent("onClientPlayerChoke", Arguments, true);
+    return m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerChoke, Arguments, true);
 }
 
 void CClientGame::CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis)
@@ -4203,8 +4203,8 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
         Arguments.PushNumber(fDamage);
 
         // Call our event
-        if ((IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent("onClientPlayerDamage", Arguments, true)) ||
-            (!IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent("onClientPedDamage", Arguments, true)))
+        if ((IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent(BuiltInEvents::onClientPlayerDamage, Arguments, true)) ||
+            (!IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent(BuiltInEvents::onClientPedDamage, Arguments, true)))
         {
             // Stop here if they cancelEvent it
             if (pDamagedPed->IsLocalPlayer())
@@ -4306,7 +4306,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                 if (pDamagedPed->IsLocalEntity() && fPreviousHealth > 0.0f)
                 {
                     // Client-side ped
-                    pDamagedPed->CallEvent("onClientPedWasted", Arguments, true);
+                    pDamagedPed->CallEvent(BuiltInEvents::onClientPedWasted, Arguments, true);
                     AssocGroupId animGroup;
                     AnimationId  animID;
                     GetDeathAnim(pDamagedPed, pEvent, animGroup, animID);
@@ -4372,7 +4372,7 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
     Arguments.PushNumber(ucDeathReason);
     Arguments.PushNumber(ucBodyPart);
 
-    pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
+    pKilledPed->CallEvent(BuiltInEvents::onClientPedWasted, Arguments, true);
 
     // Notify the server
     SendPedWastedPacket(pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart);
@@ -4416,7 +4416,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             Arguments.PushNumber(fCollidingDamageImpulseMag);
             Arguments.PushNumber(iModelIndex);
 
-            pVehicleClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
+            pVehicleClientEntity->CallEvent(BuiltInEvents::onClientVehicleCollision, Arguments, true);
 
             // Update the colliding vehicle, because it might have been invalidated in onClientVehicleCollision (e.g. fixVehicle)
             pCollidingVehicle = reinterpret_cast<CVehicleSAInterface*>(pVehicleClientEntity->GetGameEntity()->GetInterface());
@@ -4517,9 +4517,9 @@ bool CClientGame::HeliKillHandler(CVehicleSAInterface* pHeliInterface, CEntitySA
                 // Trigger our event
                 bool bContinue;
                 if (IS_PLAYER(pClientPed))
-                    bContinue = pClientPed->CallEvent("onClientPlayerHeliKilled", Arguments, true);
+                    bContinue = pClientPed->CallEvent(BuiltInEvents::onClientPlayerHeliKilled, Arguments, true);
                 else
-                    bContinue = pClientPed->CallEvent("onClientPedHeliKilled", Arguments, true);
+                    bContinue = pClientPed->CallEvent(BuiltInEvents::onClientPedHeliKilled, Arguments, true);
 
                 // Was our event cancelled
                 if (!bContinue)
@@ -4576,7 +4576,7 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         else
             Arguments.PushNil();
 
-        if (!pClientVehicle->CallEvent("onClientVehicleDamage", Arguments, true))
+        if (!pClientVehicle->CallEvent(BuiltInEvents::onClientVehicleDamage, Arguments, true))
         {
             bAllowDamage = false;
         }
@@ -4607,7 +4607,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             else
                 Arguments.PushNil();
 
-            return pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
+            return pClientObject->CallEvent(BuiltInEvents::onClientObjectDamage, Arguments, true);
         }
     }
     return true;
@@ -4641,7 +4641,7 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
             else
                 Arguments.PushNil();
 
-            return pClientObject->CallEvent("onClientObjectBreak", Arguments, true);
+            return pClientObject->CallEvent(BuiltInEvents::onClientObjectBreak, Arguments, true);
         }
     }
     return true;
@@ -4681,9 +4681,9 @@ bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPe
             // Trigger our event
             bool bContinue = true;
             if (pClientPed && !IS_PLAYER(pClientPed))
-                bContinue = pCannonClientVehicle->CallEvent("onClientPedHitByWaterCannon", Arguments, true);
+                bContinue = pCannonClientVehicle->CallEvent(BuiltInEvents::onClientPedHitByWaterCannon, Arguments, true);
             else
-                bContinue = pCannonClientVehicle->CallEvent("onClientPlayerHitByWaterCannon", Arguments, true);
+                bContinue = pCannonClientVehicle->CallEvent(BuiltInEvents::onClientPlayerHitByWaterCannon, Arguments, true);
 
             // Return if it was cancelled
             return bContinue;
@@ -4969,10 +4969,10 @@ void CClientGame::PostWeaponFire()
                     Arguments.PushNumber((double)vecOrigin.fX);
                     Arguments.PushNumber((double)vecOrigin.fY);
                     Arguments.PushNumber((double)vecOrigin.fZ);
-                    pPed->CallEvent("onClientPlayerWeaponFire", Arguments, true);
+                    pPed->CallEvent(BuiltInEvents::onClientPlayerWeaponFire, Arguments, true);
                 }
                 else
-                    pPed->CallEvent("onClientPedWeaponFire", Arguments, true);
+                    pPed->CallEvent(BuiltInEvents::onClientPedWeaponFire, Arguments, true);
             }
             pPed->PostWeaponFire();
 #ifdef MTA_DEBUG
@@ -5452,7 +5452,7 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(false);
-            m_pLocalPlayer->CallEvent("onClientPlayerWasted", Arguments, true);
+            m_pLocalPlayer->CallEvent(BuiltInEvents::onClientPlayerWasted, Arguments, true);
 
             // Write some death info
             pBitStream->WriteCompressed(animGroup);
@@ -5527,7 +5527,7 @@ bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
-            pGUIElement->CallEvent("onClientGUIClick", Arguments, true);
+            pGUIElement->CallEvent(BuiltInEvents::onClientGUIClick, Arguments, true);
         }
     }
 
@@ -5568,7 +5568,7 @@ bool CClientGame::OnMouseDoubleClick(CGUIMouseEventArgs Args)
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
-            pGUIElement->CallEvent("onClientGUIDoubleClick", Arguments, true);
+            pGUIElement->CallEvent(BuiltInEvents::onClientGUIDoubleClick, Arguments, true);
         }
     }
 
@@ -5604,7 +5604,7 @@ bool CClientGame::OnMouseButtonDown(CGUIMouseEventArgs Args)
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
-            pGUIElement->CallEvent("onClientGUIMouseDown", Arguments, true);
+            pGUIElement->CallEvent(BuiltInEvents::onClientGUIMouseDown, Arguments, true);
         }
     }
 
@@ -5640,7 +5640,7 @@ bool CClientGame::OnMouseButtonUp(CGUIMouseEventArgs Args)
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
-            pGUIElement->CallEvent("onClientGUIMouseUp", Arguments, true);
+            pGUIElement->CallEvent(BuiltInEvents::onClientGUIMouseUp, Arguments, true);
         }
     }
 
@@ -5658,7 +5658,7 @@ bool CClientGame::OnMouseMove(CGUIMouseEventArgs Args)
 
     CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
     if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseMove", Arguments, true);
+        pGUIElement->CallEvent(BuiltInEvents::onClientMouseMove, Arguments, true);
 
     return true;
 }
@@ -5680,7 +5680,7 @@ bool CClientGame::OnMouseEnter(CGUIMouseEventArgs Args)
 
     CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
     if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseEnter", Arguments, true);
+        pGUIElement->CallEvent(BuiltInEvents::onClientMouseEnter, Arguments, true);
 
     return true;
 }
@@ -5702,7 +5702,7 @@ bool CClientGame::OnMouseLeave(CGUIMouseEventArgs Args)
 
     CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
     if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseLeave", Arguments, true);
+        pGUIElement->CallEvent(BuiltInEvents::onClientMouseLeave, Arguments, true);
 
     return true;
 }
@@ -5717,7 +5717,7 @@ bool CClientGame::OnMouseWheel(CGUIMouseEventArgs Args)
 
     CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
     if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseWheel", Arguments, true);
+        pGUIElement->CallEvent(BuiltInEvents::onClientMouseWheel, Arguments, true);
 
     return true;
 }
@@ -5731,7 +5731,7 @@ bool CClientGame::OnMove(CGUIElement* pElement)
 
     CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(pElement);
     if (pGUIElement && GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientGUIMove", Arguments, true);
+        pGUIElement->CallEvent(BuiltInEvents::onClientGUIMove, Arguments, true);
 
     return true;
 }
@@ -5745,7 +5745,7 @@ bool CClientGame::OnSize(CGUIElement* pElement)
 
     CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(pElement);
     if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientGUISize", Arguments, true);
+        pGUIElement->CallEvent(BuiltInEvents::onClientGUISize, Arguments, true);
 
     return true;
 }
@@ -5763,11 +5763,11 @@ bool CClientGame::OnFocusGain(CGUIFocusEventArgs Args)
     {
         CClientGUIElement* pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pDeactivatedWindow);
         if (GetGUIManager()->Exists(pDeactivatedGUIElement))
-            pDeactivatedGUIElement->CallEvent("onClientGUIBlur", Arguments, true);
+            pDeactivatedGUIElement->CallEvent(BuiltInEvents::onClientGUIBlur, Arguments, true);
     }
 
     if (GetGUIManager()->Exists(pActivatedGUIElement))
-        pActivatedGUIElement->CallEvent("onClientGUIFocus", Arguments, true);
+        pActivatedGUIElement->CallEvent(BuiltInEvents::onClientGUIFocus, Arguments, true);
 
     return true;
 }
@@ -5787,7 +5787,7 @@ bool CClientGame::OnFocusLoss(CGUIFocusEventArgs Args)
 
     CClientGUIElement* pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pDeactivatedWindow);
     if (GetGUIManager()->Exists(pDeactivatedGUIElement))
-        pDeactivatedGUIElement->CallEvent("onClientGUIBlur", Arguments, true);
+        pDeactivatedGUIElement->CallEvent(BuiltInEvents::onClientGUIBlur, Arguments, true);
 
     return true;
 }
@@ -6195,7 +6195,7 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
             Arguments.PushNumber(event.vecPosition.fX);
             Arguments.PushNumber(event.vecPosition.fY);
             Arguments.PushNumber(event.vecPosition.fZ);
-            return pEntity->CallEvent("onClientWorldSound", Arguments, true);
+            return pEntity->CallEvent(BuiltInEvents::onClientWorldSound, Arguments, true);
         }
     }
 
@@ -6454,7 +6454,7 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     }
     Arguments.PushTable(&LuaTable);
 
-    return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
+    return GetRootEntity()->CallEvent(BuiltInEvents::onClientBrowserWhitelistChange, Arguments, false);
 }
 
 void CClientGame::RestreamModel(unsigned short usModel)
@@ -6628,7 +6628,7 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
     if (pClientPed)
     {
         Arguments.PushBoolean(bFoot);
-        pClientPed->CallEvent("onClientPedStep", Arguments, true);
+        pClientPed->CallEvent(BuiltInEvents::onClientPedStep, Arguments, true);
     }
 }
 
@@ -6662,7 +6662,7 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     arguments.PushNumber(event.vecPosition.fZ);
     arguments.PushNumber(event.iModel);
     arguments.PushNumber(event.iColSurface);
-    pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
+    pVehicle->CallEvent(BuiltInEvents::onClientVehicleWeaponHit, arguments, false);
 }
 
 void CClientGame::UpdateDiscordState()

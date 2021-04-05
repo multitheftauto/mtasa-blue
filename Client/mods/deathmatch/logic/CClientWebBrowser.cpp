@@ -174,7 +174,7 @@ void CClientWebBrowser::Refresh(bool bIgnoreCache)
 void CClientWebBrowser::Events_OnCreated()
 {
     CLuaArguments Arguments;
-    CallEvent("onClientBrowserCreated", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserCreated, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnLoadingStart(const SString& strURL, bool bMainFrame)
@@ -182,14 +182,14 @@ void CClientWebBrowser::Events_OnLoadingStart(const SString& strURL, bool bMainF
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bMainFrame);
-    CallEvent("onClientBrowserLoadingStart", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserLoadingStart, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnDocumentReady(const SString& strURL)
 {
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
-    CallEvent("onClientBrowserDocumentReady", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserDocumentReady, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnLoadingFailed(const SString& strURL, int errorCode, const SString& errorDescription)
@@ -198,7 +198,7 @@ void CClientWebBrowser::Events_OnLoadingFailed(const SString& strURL, int errorC
     Arguments.PushString(strURL);
     Arguments.PushNumber(errorCode);
     Arguments.PushString(errorDescription);
-    CallEvent("onClientBrowserLoadingFailed", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserLoadingFailed, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnNavigate(const SString& strURL, bool bIsBlocked, bool bIsMainFrame)
@@ -207,7 +207,7 @@ void CClientWebBrowser::Events_OnNavigate(const SString& strURL, bool bIsBlocked
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bIsBlocked);
     Arguments.PushBoolean(bIsMainFrame);
-    CallEvent("onClientBrowserNavigate", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserNavigate, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SString& strOpenerURL)
@@ -215,14 +215,14 @@ void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SStrin
     CLuaArguments Arguments;
     Arguments.PushString(strTargetURL);
     Arguments.PushString(strOpenerURL);
-    CallEvent("onClientBrowserPopup", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserPopup, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
 {
     CLuaArguments Arguments;
     Arguments.PushNumber(ucCursor);
-    CallEvent("onClientBrowserCursorChange", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserCursorChange, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnTriggerEvent(const SString& strEventName, const std::vector<std::string>& arguments)
@@ -241,14 +241,14 @@ void CClientWebBrowser::Events_OnTooltip(const SString& strTooltip)
 {
     CLuaArguments Arguments;
     Arguments.PushString(strTooltip);
-    CallEvent("onClientBrowserTooltip", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserTooltip, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 {
     CLuaArguments Arguments;
     Arguments.PushBoolean(bGainedFocus);
-    CallEvent("onClientBrowserInputFocusChanged", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserInputFocusChanged, Arguments, false);
 }
 
 bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
@@ -287,7 +287,7 @@ void CClientWebBrowser::Events_OnResourceBlocked(const SString& strURL, const SS
     Arguments.PushString(strURL);
     Arguments.PushString(strDomain);
     Arguments.PushNumber(reason);
-    CallEvent("onClientBrowserResourceBlocked", Arguments, false);
+    CallEvent(BuiltInEvents::onClientBrowserResourceBlocked, Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL)

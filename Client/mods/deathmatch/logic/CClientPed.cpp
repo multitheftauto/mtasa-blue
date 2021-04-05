@@ -4690,7 +4690,7 @@ bool CClientPed::SetCurrentRadioChannel(unsigned char ucChannel)
         {
             CLuaArguments Arguments;
             Arguments.PushNumber(ucChannel);
-            if (!CallEvent("onClientPlayerRadioSwitch", Arguments, true))
+            if (!CallEvent(BuiltInEvents::onClientPlayerRadioSwitch, Arguments, true))
             {
                 // if we cancel the radio channel setting at 12 then when they go through previous it will get to 0, then the next time it is used set to 13 in
                 // preperation to set to 12 but if it is cancelled it stays at 13. Issue 6113 - Caz
@@ -4955,7 +4955,7 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
                 Arguments.PushNumber(vecPosition.fY);
                 Arguments.PushNumber(vecPosition.fZ);
                 Arguments.PushNumber(EXP_TYPE_GRENADE);
-                bool bCancelExplosion = !CallEvent("onClientExplosion", Arguments, true);
+                bool bCancelExplosion = !CallEvent(BuiltInEvents::onClientExplosion, Arguments, true);
 
                 if (!bCancelExplosion)
                     m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
@@ -6560,7 +6560,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     Arguments.PushNumber(uiSeat);            // seat
     Arguments.PushNumber(uiDoor);            // door
 
-    if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true))
+    if (!pVehicle->CallEvent(BuiltInEvents::onClientVehicleStartEnter, Arguments, true))
     {
         // Event has been cancelled
         return false;

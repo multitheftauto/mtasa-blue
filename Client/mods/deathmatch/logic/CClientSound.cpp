@@ -69,7 +69,7 @@ void CClientSound::DistanceStreamIn()
 
             // Call Stream In event
             CLuaArguments Arguments;
-            CallEvent("onClientElementStreamIn", Arguments, true);
+            CallEvent(BuiltInEvents::onClientElementStreamIn, Arguments, true);
         }
     }
 }
@@ -90,7 +90,7 @@ void CClientSound::DistanceStreamOut()
 
         // Call Stream Out event
         CLuaArguments Arguments;
-        CallEvent("onClientElementStreamOut", Arguments, true);
+        CallEvent(BuiltInEvents::onClientElementStreamOut, Arguments, true);
     }
 }
 
@@ -461,14 +461,14 @@ void CClientSound::SetPaused(bool bPaused)
             // call onClientSoundStopped
             CLuaArguments Arguments;
             Arguments.PushString("paused");            // Reason
-            this->CallEvent("onClientSoundStopped", Arguments, false);
+            this->CallEvent(BuiltInEvents::onClientSoundStopped, Arguments, false);
         }
         else
         {
             // call onClientSoundStarted
             CLuaArguments Arguments;
             Arguments.PushString("resumed");            // Reason
-            this->CallEvent("onClientSoundStarted", Arguments, false);
+            this->CallEvent(BuiltInEvents::onClientSoundStarted, Arguments, false);
         }
     }
 
@@ -685,7 +685,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
                     {
                         CLuaArguments Arguments;
                         Arguments.PushString("enabled");            // Reason
-                        CallEvent("onClientSoundStarted", Arguments, false);
+                        CallEvent(BuiltInEvents::onClientSoundStarted, Arguments, false);
                     }
                 }
             }
@@ -695,7 +695,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
             Destroy();
             CLuaArguments Arguments;
             Arguments.PushString("disabled");            // Reason
-            CallEvent("onClientSoundStopped", Arguments, false);
+            CallEvent(BuiltInEvents::onClientSoundStopped, Arguments, false);
         }
     }
 
@@ -714,14 +714,14 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         {
             CLuaArguments Arguments;
             Arguments.PushNumber(eventInfo.dNumber);
-            CallEvent("onClientSoundFinishedDownload", Arguments, true);
+            CallEvent(BuiltInEvents::onClientSoundFinishedDownload, Arguments, true);
             OutputDebugLine(SString("[ClientSound] onClientSoundFinishedDownload %f", eventInfo.dNumber));
         }
         else if (eventInfo.type == SOUND_EVENT_CHANGED_META)
         {
             CLuaArguments Arguments;
             Arguments.PushString(eventInfo.strString);
-            CallEvent("onClientSoundChangedMeta", Arguments, true);
+            CallEvent(BuiltInEvents::onClientSoundChangedMeta, Arguments, true);
             OutputDebugLine(SString("[ClientSound] onClientSoundChangedMeta %s", *eventInfo.strString));
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
@@ -732,7 +732,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
             Arguments.PushNumber(eventInfo.dNumber);
             Arguments.PushString(eventInfo.strString);
             Arguments.PushString(eventInfo.strError);
-            CallEvent("onClientSoundStream", Arguments, true);
+            CallEvent(BuiltInEvents::onClientSoundStream, Arguments, true);
             OutputDebugLine(
                 SString("[ClientSound] onClientSoundStream %d %f %s %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString, *eventInfo.strError));
         }
@@ -740,7 +740,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         {
             CLuaArguments Arguments;
             Arguments.PushNumber(eventInfo.dNumber);
-            CallEvent("onClientSoundBeat", Arguments, true);
+            CallEvent(BuiltInEvents::onClientSoundBeat, Arguments, true);
         }
     }
 }

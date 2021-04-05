@@ -211,13 +211,13 @@ void CClientPickup::Callback_OnCollision(CClientColShape& Shape, CClientEntity& 
         CLuaArguments Arguments;
         Arguments.PushElement(&Entity);            // The element that hit the pickup
         Arguments.PushBoolean(bMatchingDimensions);
-        CallEvent("onClientPickupHit", Arguments, true);
+        CallEvent(BuiltInEvents::onClientPickupHit, Arguments, true);
 
         // Call the player pickup hit (source = player that hit the pickup)
         CLuaArguments Arguments2;
         Arguments2.PushElement(this);            // The pickup that was hit
         Arguments2.PushBoolean(bMatchingDimensions);
-        Entity.CallEvent("onClientPlayerPickupHit", Arguments2, true);
+        Entity.CallEvent(BuiltInEvents::onClientPlayerPickupHit, Arguments2, true);
     }
 }
 
@@ -231,12 +231,12 @@ void CClientPickup::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Enti
         CLuaArguments Arguments;
         Arguments.PushElement(&Entity);            // The element that left the pickup
         Arguments.PushBoolean(bMatchingDimensions);
-        CallEvent("onClientPickupLeave", Arguments, true);
+        CallEvent(BuiltInEvents::onClientPickupLeave, Arguments, true);
 
         // Call the player pickup leave event (source = the player that left the pickup)
         CLuaArguments Arguments2;
         Arguments2.PushElement(this);            // The pickup that was left (this)
         Arguments2.PushBoolean(bMatchingDimensions);
-        Entity.CallEvent("onClientPlayerPickupLeave", Arguments2, true);
+        Entity.CallEvent(BuiltInEvents::onClientPlayerPickupLeave, Arguments2, true);
     }
 }

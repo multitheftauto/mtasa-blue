@@ -84,7 +84,7 @@ void CClientStreamElement::InternalStreamOut()
         }
 
         CLuaArguments Arguments;
-        CallEvent("onClientElementStreamOut", Arguments, true);
+        CallEvent(BuiltInEvents::onClientElementStreamOut, Arguments, true);
     }
 }
 
@@ -99,7 +99,7 @@ void CClientStreamElement::NotifyCreate()
     m_bAttemptingToStreamIn = false;
 
     CLuaArguments Arguments;
-    CallEvent("onClientElementStreamIn", Arguments, true);
+    CallEvent(BuiltInEvents::onClientElementStreamIn, Arguments, true);
 }
 
 void CClientStreamElement::NotifyUnableToCreate()

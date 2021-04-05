@@ -91,7 +91,7 @@ void CResourceFileDownloadManager::UpdatePendingDownloads()
             arguments.PushString("queued");
 
             CClientEntity* resourceEntity = pResourceFile->GetResource()->GetResourceEntity();
-            resourceEntity->CallEvent("onClientResourceFileDownload", arguments, false);
+            resourceEntity->CallEvent(BuiltInEvents::onClientResourceFileDownload, arguments, false);
         }
     }
 }
@@ -156,7 +156,7 @@ void CResourceFileDownloadManager::DoPulse()
     arguments.PushNumber(uiDownloadedSizeTotal);
     arguments.PushNumber(GetTransferBox()->GetDownloadTotalSize());
 
-    g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxProgressChange", arguments, false);
+    g_pClientGame->GetRootEntity()->CallEvent(BuiltInEvents::onClientTransferBoxProgressChange, arguments, false);
 
     // Check if completed downloading current group
     if (m_ActiveFileDownloadList.empty())
@@ -171,7 +171,7 @@ void CResourceFileDownloadManager::DoPulse()
             CLuaArguments arguments;
             arguments.PushBoolean(false);
 
-            g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxVisibilityChange", arguments, false);
+            g_pClientGame->GetRootEntity()->CallEvent(BuiltInEvents::onClientTransferBoxVisibilityChange, arguments, false);
         }
 
         // Load our newly ready resources
@@ -203,7 +203,7 @@ void CResourceFileDownloadManager::AddDownloadSize(int iSize)
         CLuaArguments arguments;
         arguments.PushBoolean(true);
 
-        g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxVisibilityChange", arguments, false);
+        g_pClientGame->GetRootEntity()->CallEvent(BuiltInEvents::onClientTransferBoxVisibilityChange, arguments, false);
     }
 
     GetTransferBox()->AddToDownloadTotalSize(iSize);
@@ -306,7 +306,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
     arguments.PushString(result.bSuccess ? "finished" : "failed");
 
     CClientEntity* resourceEntity = pResourceFile->GetResource()->GetResourceEntity();
-    resourceEntity->CallEvent("onClientResourceFileDownload", arguments, false);
+    resourceEntity->CallEvent(BuiltInEvents::onClientResourceFileDownload, arguments, false);
 
     if (result.bSuccess)
     {

@@ -70,7 +70,7 @@ void CDeathmatchObject::StartMovement(const CPositionRotationAnimation& a_rMoveA
         SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
     }
     CLuaArguments Arguments;
-    this->CallEvent("onClientObjectMoveStart", Arguments, true);
+    this->CallEvent(BuiltInEvents::onClientObjectMoveStart, Arguments, true);
 }
 
 void CDeathmatchObject::StopMovement()
@@ -89,7 +89,7 @@ void CDeathmatchObject::_StopMovement(bool a_bUnregister)
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
         CLuaArguments Arguments;
-        this->CallEvent("onClientObjectMoveStop", Arguments, true);
+        this->CallEvent(BuiltInEvents::onClientObjectMoveStop, Arguments, true);
     }
 }
 

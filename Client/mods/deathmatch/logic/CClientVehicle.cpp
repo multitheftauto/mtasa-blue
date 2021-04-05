@@ -2521,7 +2521,7 @@ void CClientVehicle::StreamedInPulse()
             {
                 CLuaArguments Arguments;
                 Arguments.PushBoolean(bActivated);
-                this->CallEvent("onClientVehicleNitroStateChange", Arguments, false);
+                this->CallEvent(BuiltInEvents::onClientVehicleNitroStateChange, Arguments, false);
             }
 
             m_bNitroActivated = bActivated;

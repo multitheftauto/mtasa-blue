@@ -94,7 +94,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
         Arguments.PushNumber(vecPosition.fY);
         Arguments.PushNumber(vecPosition.fZ);
         Arguments.PushNumber(explosionWeaponType);
-        const bool bAllowExplosion = pResponsible->CallEvent("onClientExplosion", Arguments, true);
+        const bool bAllowExplosion = pResponsible->CallEvent(BuiltInEvents::onClientExplosion, Arguments, true);
         return bAllowExplosion;
     }
 

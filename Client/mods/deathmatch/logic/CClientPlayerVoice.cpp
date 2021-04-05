@@ -129,7 +129,7 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
         ServiceEventQueue();
 
         CLuaArguments Arguments;
-        if (!m_pPlayer->CallEvent("onClientPlayerVoiceStart", Arguments, true))
+        if (!m_pPlayer->CallEvent(BuiltInEvents::onClientPlayerVoiceStart, Arguments, true))
             return;
 
         m_bVoiceActive = true;
@@ -430,14 +430,14 @@ void CClientPlayerVoice::SetPaused(bool bPaused)
             // call onClientPlayerVoicePause
             CLuaArguments Arguments;
             Arguments.PushString("paused");            // Reason
-            m_pPlayer->CallEvent("onClientPlayerVoicePause", Arguments, false);
+            m_pPlayer->CallEvent(BuiltInEvents::onClientPlayerVoicePause, Arguments, false);
         }
         else
         {
             // call onClientPlayerVoiceResumed
             CLuaArguments Arguments;
             Arguments.PushString("resumed");            // Reason
-            m_pPlayer->CallEvent("onClientPlayerVoiceResumed", Arguments, false);
+            m_pPlayer->CallEvent(BuiltInEvents::onClientPlayerVoiceResumed, Arguments, false);
         }
     }
 

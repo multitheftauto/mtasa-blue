@@ -425,7 +425,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
         Arguments.PushNumber(pColPoint->GetSurfaceTypeB());                    // Surface type "B"
         Arguments.PushNumber(pColPoint->GetLightingForTimeOfDay());            // Lighting
         Arguments.PushNumber(pColPoint->GetPieceTypeB());                      // Piece
-        if (!CallEvent("onClientWeaponFire", Arguments, true))
+        if (!CallEvent(BuiltInEvents::onClientWeaponFire, Arguments, true))
         {
             if (pColPoint)
                 pColPoint->Destroy();

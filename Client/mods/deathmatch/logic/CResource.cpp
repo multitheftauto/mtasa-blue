@@ -323,7 +323,7 @@ void CResource::Load()
         // Call the Lua "onClientResourceStart" event
         CLuaArguments Arguments;
         Arguments.PushResource(this);
-        m_pResourceEntity->CallEvent("onClientResourceStart", Arguments, true);
+        m_pResourceEntity->CallEvent(BuiltInEvents::onClientResourceStart, Arguments, true);
     }
     else
         assert(0);
@@ -335,7 +335,7 @@ void CResource::Stop()
     m_bStopping = true;
     CLuaArguments Arguments;
     Arguments.PushResource(this);
-    m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
+    m_pResourceEntity->CallEvent(BuiltInEvents::onClientResourceStop, Arguments, true);
 }
 
 SString CResource::GetState()

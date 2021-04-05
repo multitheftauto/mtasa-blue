@@ -455,7 +455,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
                     CLuaArguments Arguments;
                     Arguments.PushNumber(usCurrentModel);
                     Arguments.PushNumber(usModel);
-                    pPed->CallEvent("onClientElementModelChange", Arguments, true);
+                    pPed->CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
                 }
             }
 
@@ -481,7 +481,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);
                 Arguments.PushNumber(usModel);
-                pVehicle->CallEvent("onClientElementModelChange", Arguments, true);
+                pVehicle->CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
             }
 
             break;
@@ -499,7 +499,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);
                 Arguments.PushNumber(usModel);
-                pObject->CallEvent("onClientElementModelChange", Arguments, true);
+                pObject->CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
             }
 
             break;

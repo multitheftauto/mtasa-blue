@@ -177,7 +177,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char
         Arguments.PushNumber(ucGreen);
         Arguments.PushNumber(ucBlue);
 
-        bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
+        bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent(BuiltInEvents::onClientChatMessage, Arguments, false);
         if (!bCancelled)
         {
             m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
@@ -1388,7 +1388,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
             Arguments.PushNumber(usModel);
-            Ped.CallEvent("onClientElementModelChange", Arguments, true);
+            Ped.CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
             break;
         }
         case CCLIENTVEHICLE:
@@ -1407,7 +1407,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
             Arguments.PushNumber(usModel);
-            Vehicle.CallEvent("onClientElementModelChange", Arguments, true);
+            Vehicle.CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
             break;
         }
         case CCLIENTOBJECT:
@@ -1427,7 +1427,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
             Arguments.PushNumber(usModel);
-            Object.CallEvent("onClientElementModelChange", Arguments, true);
+            Object.CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
             break;
         }
         case CCLIENTPROJECTILE:
@@ -1446,7 +1446,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
             Arguments.PushNumber(usModel);
-            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
+            Projectile.CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
             break;
         }
         default:
@@ -1991,7 +1991,7 @@ bool CStaticFunctionDefinitions::KillPed(CClientEntity& Entity, CClientEntity* p
         Arguments.PushBoolean(false);
     Arguments.PushBoolean(bStealth);
 
-    pPed.CallEvent("onClientPedWasted", Arguments, false);
+    pPed.CallEvent(BuiltInEvents::onClientPedWasted, Arguments, false);
     pPed.RemoveAllWeapons();
 
     return true;
@@ -7767,7 +7767,7 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
     // call onClientSoundStopped
     CLuaArguments Arguments;
     Arguments.PushString("destroyed");            // Reason
-    Sound.CallEvent("onClientSoundStopped", Arguments, false);
+    Sound.CallEvent(BuiltInEvents::onClientSoundStopped, Arguments, false);
     g_pClientGame->GetElementDeleter()->Delete(&Sound);
     return true;
 }
@@ -9691,15 +9691,15 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     Arguments.PushElement(pVehicle);            // vehicle
     Arguments.PushNumber(uiSeat);               // seat
     if (IS_PLAYER(pPed))
-        pPed->CallEvent("onClientPlayerVehicleEnter", Arguments, true);
+        pPed->CallEvent(BuiltInEvents::onClientPlayerVehicleEnter, Arguments, true);
     else
-        pPed->CallEvent("onClientPedVehicleEnter", Arguments, true);
+        pPed->CallEvent(BuiltInEvents::onClientPedVehicleEnter, Arguments, true);
 
     // Call the onClientVehicleEnter event
     CLuaArguments Arguments2;
     Arguments2.PushElement(pPed);             // player / ped
     Arguments2.PushNumber(uiSeat);            // seat
-    pVehicle->CallEvent("onClientVehicleEnter", Arguments2, true);
+    pVehicle->CallEvent(BuiltInEvents::onClientVehicleEnter, Arguments2, true);
 
     return true;
 }
@@ -9745,15 +9745,15 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CClientPed* pPed)
         Arguments.PushNumber(uiSeat);               // seat
         Arguments.PushBoolean(false);               // jacker
         if (IS_PLAYER(pPed))
-            pPed->CallEvent("onClientPlayerVehicleExit", Arguments, true);
+            pPed->CallEvent(BuiltInEvents::onClientPlayerVehicleExit, Arguments, true);
         else
-            pPed->CallEvent("onClientPedVehicleExit", Arguments, true);
+            pPed->CallEvent(BuiltInEvents::onClientPedVehicleExit, Arguments, true);
 
         // Call onClientVehicleExit
         CLuaArguments Arguments2;
         Arguments2.PushElement(pPed);             // player / ped
         Arguments2.PushNumber(uiSeat);            // seat
-        pVehicle->CallEvent("onClientVehicleExit", Arguments2, true);
+        pVehicle->CallEvent(BuiltInEvents::onClientVehicleExit, Arguments2, true);
         return true;
     }
 

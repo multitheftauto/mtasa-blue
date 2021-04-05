@@ -242,7 +242,7 @@ public:
     virtual bool   IsAttachToable();
     virtual void   DoAttaching();
 
-    bool CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren);
+    bool CallEvent(const Event& event, const CLuaArguments& Arguments, bool bCallOnChildren);
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents();
 

@@ -87,7 +87,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             CLuaArguments Arguments;
             Arguments.PushNumber(m_iModelID);
             Arguments.PushNumber(usParentID);
-            element.CallEvent("onClientElementModelChange", Arguments, true);
+            element.CallEvent(BuiltInEvents::onClientElementModelChange, Arguments, true);
         }
     };
 

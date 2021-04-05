@@ -73,7 +73,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
                 Arguments.PushString(strClumpedCommand);
             }
 
-            pLocalPlayer->CallEvent("onClientConsole", Arguments, true);
+            pLocalPlayer->CallEvent(BuiltInEvents::onClientConsole, Arguments, true);
         }
 
         // Write the chatlength and the content

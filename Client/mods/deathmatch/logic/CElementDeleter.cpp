@@ -26,7 +26,7 @@ void CElementDeleter::Delete(class CClientEntity* pElement)
     {
         // Before we do anything, fire the on-destroy event
         CLuaArguments Arguments;
-        pElement->CallEvent("onClientElementDestroy", Arguments, true);
+        pElement->CallEvent(BuiltInEvents::onClientElementDestroy, Arguments, true);
 
         // Add it to our list
         if (!pElement->IsBeingDeleted())
