@@ -74,6 +74,8 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
 
     if (m_lmain) // As per old code.. Pretty sure this can never happen
     {
+        const int preCallTop = lua_gettop(L);
+
         const auto PushFn = [L](int ref) {
             lua_getref(L, ref);
             assert(lua_type(L, -1) == LUA_TFUNCTION);
@@ -117,6 +119,7 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
         default: // Only if successful record timing
             CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, m_lmain->GetFunctionTag(m_fn.ToInt()), GetTimeUs() - timeBeginUS); 
         }
+        lua_settop(L, preCallTop);
     }
     GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, client, *this);
     m_canBeDeleted = wasDeletable;
