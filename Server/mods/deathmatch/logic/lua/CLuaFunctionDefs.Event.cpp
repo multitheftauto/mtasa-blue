@@ -65,6 +65,7 @@ int CLuaFunctionDefs::GetEventHandlers(lua_State* luaVM)
             {
                 if (auto* handlers = pElement->GetEventHandlerCallDispatcher().GetHandlers(*event))
                 {
+                    lua_newtable(luaVM);
                     handlers->PushToLua(lmain, luaVM);
                     return 1;
                 }
