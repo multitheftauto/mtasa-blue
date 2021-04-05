@@ -33,7 +33,7 @@ void EventDispatcher::CancelEvent(bool cancelled, std::string reason)
 }
 
 // Server/Client code compatibility crap
-auto GetGame()
+static auto GetGame()
 {
 #ifdef MTA_CLIENT
     return g_pClientGame;
