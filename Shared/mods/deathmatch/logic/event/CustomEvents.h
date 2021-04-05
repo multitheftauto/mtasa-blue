@@ -80,4 +80,6 @@ protected:
     std::unordered_map<std::string, std::unique_ptr<CustomEvent>> m_events;
 };
 
-static inline CustomEvents s_CustomEvents;
+// This variable has external linkage, thus it must be the same object across all TUs (.cpp file)
+// TODO: Maybe move this to CGame / CClientGame
+inline CustomEvents s_CustomEvents{};
