@@ -10,7 +10,7 @@ bool EventHandlerCollection::Add(EventHandler handler)
 
     const auto whereIt = std::lower_bound(m_handlers.begin(), m_handlers.end(), handler.GetPriority(),
         [](const auto& handler, const auto& priority) {
-            return handler.GetPriority() < priority;
+            return handler.GetPriority() > priority;
         }
     );
     const auto emplacedIt = m_handlers.emplace(whereIt, std::move(handler));
