@@ -5,6 +5,7 @@
 #include <variant>
 
 #include "BuiltInEventsListMacroApply.h"
+#include <SharedUtil.Template.h>
 
 class CLuaMain;
 
@@ -48,6 +49,13 @@ public:
     virtual bool IsBuiltIn() const override { return true; }
     ID GetID() const { return m_id; }
 
+#ifdef MTA_CLIENT
+    bool AllowAspectRatioAdjustment() const
+    {
+        return m_id == ID::ON_CLIENT_PRE_RENDER || m_id == ID::ON_CLIENT_RENDER || m_id == ID::ON_CLIENT_H_U_D_RENDER;
+    }
+#endif
+
     // Wrappers around BuiltInEvents::Get
     static const BuiltInEvent* Get(const std::string& name);
     static const BuiltInEvent* Get(BuiltInEvent::ID id); // Intended for API uses only. To access a builtin event, just use BuiltInEvents
@@ -60,6 +68,7 @@ protected:
     }
 private:
     ID m_id;
+
 };
 
 class CustomEvent final : public Event

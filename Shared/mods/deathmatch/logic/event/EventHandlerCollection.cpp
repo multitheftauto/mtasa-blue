@@ -76,17 +76,17 @@ void EventHandlerCollection::Emmit(const Event& event, const CLuaArguments& args
         if (handler.GetListRev() > listRev) // Was it after we've started iterating?
             continue; // Yes, this can happen if a previously called handler added it
 
-#ifdef MTA_CLIENT
+    #ifdef MTA_CLIENT
         const auto handlerBeginUs = GetTimeUs();
-        handler(event, args, sourceElement, thisElement SERVER_ONLY_ARG(client));
+        handler(event, args, sourceElement, thisElement);
         if (IS_TIMING_CHECKPOINTS())
         {
             if (auto delta = GetTimeUs() - handlerBeginUs; delta >= 3000)
                 timingStats += SString(" (%s %d ms)", handler.GetLuaMain()->GetScriptName(), delta / 1000);
         }
-#else
+    #else
         handler(event, args, sourceElement, thisElement, client);
-#endif
+    #endif
     }
 
 #ifdef MTA_CLIENT

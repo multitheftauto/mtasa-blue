@@ -96,6 +96,10 @@ protected:
 
     bool m_canBeDeleted = true;
     bool m_markedToBeDeleted = false;
+
+#ifdef MTA_CLIENT
+    bool m_islmainCustomBlips = m_lmain->GetScriptName() == std::string_view{ "customblips" };
+#endif
 };
 
 DECLARE_ENUM_CLASS(EventHandler::Priority::Level);

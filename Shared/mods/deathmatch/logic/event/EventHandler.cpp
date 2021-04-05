@@ -1,4 +1,7 @@
 #include <StdInc.h>
+#ifdef MTA_CLIENT
+bool g_bAllowAspectRatioAdjustment = false;
+#endif
 
 #include "EventHandler.h"
 #include "Event.h"
@@ -68,7 +71,20 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     if (!m_handlesPropagated && source != us)
         return;
 
+    const auto timeBeginUS = GetTimeUs();
+
 #ifdef MTA_CLIENT
+    const bool allowAspectRatioAdjustment = event.IsBuiltIn() && static_cast<const BuiltInEvent&>(event).AllowAspectRatioAdjustment();
+    if (allowAspectRatioAdjustment)
+    {
+        g_bAllowAspectRatioAdjustment = true;
+        using namespace std::string_view_literals;
+        if (m_islmainCustomBlips) // customblips resource forces aspect ratio on
+        {
+            g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled(true);
+        }
+    }
+
     static bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000);
     if (bEnabled)
         g_pCore->LogEvent(0, "Lua Event", m_lmain->GetScriptName(), event.GetName().c_str());
@@ -80,14 +96,20 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
     const bool wasDeletable = m_canBeDeleted;
     m_canBeDeleted = false; // Keep this object alive (Lua callback could call removeEventHandler)
 
-    const auto timeBeginUS = GetTimeUs();
-
     lua_State* L = GetLuaMain()->GetVM();
     LUA_CHECKSTACK(L, 1);
     LUA_STACK_EXPECT(0);
 
+#ifdef MTA_CLIENT
+    using CPerfStatLuaTiming = CClientPerfStatLuaTiming;
+#endif
+
     if (m_lmain) // As per old code.. Pretty sure this can never happen
     {
+        // Call event handler with our wrapper function
+        // the wrapper function is responsible for setting and restoring globals
+        // see it's source code in EmbedLuaCode::DispatchEvent
+
         const int preCallTop = lua_gettop(L);
 
         const auto PushFn = [L](int ref) {
@@ -96,24 +118,24 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
         };
         // Based on code from CLuaArguments::Call
 
-        PushFn(m_lmain->GetDispatchEventFnRef());
+        PushFn(m_lmain->GetDispatchEventFnRef()); // Push wrapper
 
-        // DispatchEvent Push args
+        // Push wrapper args
         PushFn(m_fn.ToInt()); // handlerfn
         lua::Push(L, source); // source
         lua::Push(L, us); // this
-        SERVER_ONLY(lua::Push(L, client);) // client
+        SERVER_ONLY(lua::Push(L, client);) // client (server only)
 
         // sourceResource and sourceResourceRoot
         if (auto topLuaMain = GetGame()->GetScriptDebugging()->GetTopLuaMain())
         {
             auto sourceResource = topLuaMain->GetResource();
             lua::Push(L, sourceResource);
-            #ifdef MTA_CLIENT
+        #ifdef MTA_CLIENT
             lua::Push(L, sourceResource->GetResourceDynamicEntity());
-            #else
+        #else
             lua::Push(L, sourceResource->GetResourceRootElement());
-            #endif
+        #endif
         }
         else
         {
@@ -126,7 +148,11 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
 
         m_lmain->ResetInstructionCount();
 
-        switch (m_lmain->PCall(L, 7 + args.Count(), 0, 0)) // 7 args for DispatchEvent + variadic (args.Count())
+    #ifdef MTA_CLIENT
+        switch (m_lmain->PCall(L, 6 + args.Count(), 0, 0)) // 6 args for wrapper + variadic (args.Count())
+    #else
+        switch (m_lmain->PCall(L, 7 + args.Count(), 0, 0)) // 7 args for wrapper + variadic (args.Count())
+    #endif
         {
         case LUA_ERRRUN:
         case LUA_ERRMEM:
@@ -134,17 +160,26 @@ void EventHandler::operator()(const Event& event, const CLuaArguments& args, CEl
             GetGame()->GetScriptDebugging()->LogPCallError(L, ConformResourcePath(lua_tostring(L, -1)));
             break;
         }
-        default: // Only if successful record timing
+        default: 
         {
-
-        #ifdef MTA_CLIENT
-            using CPerfStatLuaTiming = CClientPerfStatLuaTiming;
-        #endif
+            // Record timing of this function call
             CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, m_lmain->GetFunctionTag(m_fn.ToInt()), GetTimeUs() - timeBeginUS); 
         }
         }
         lua_settop(L, preCallTop);
     }
+
+#ifdef MTA_CLIENT
+    if (allowAspectRatioAdjustment)
+    {
+        g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled(false);
+        g_bAllowAspectRatioAdjustment = false;
+    }
+#endif
+
+    // Record timing of this event (separatly from the function call)
+    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(m_lmain, event.GetName().c_str(), GetTimeUs() - timeBeginUS);
+
     GetGame()->GetDebugHookManager()->OnPostEventFunction(event.GetName(), args, source, SPECIFIC_CODE(nullptr, client), *this);
     m_canBeDeleted = wasDeletable;
 }
