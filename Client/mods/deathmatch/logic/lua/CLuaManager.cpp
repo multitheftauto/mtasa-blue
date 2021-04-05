@@ -13,6 +13,7 @@
 #include "../luadefs/CLuaFireDefs.h"
 #include "../luadefs/CLuaClientDefs.h"
 #include <lua/CLuaFunctionParser.h>
+#include <event/CustomEvents.h>
 
 using std::list;
 
@@ -70,7 +71,7 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
     if (pLuaMain)
     {
         // Remove all events registered by it
-        m_pEvents->RemoveAllEvents(pLuaMain);
+        s_CustomEvents.RemoveAllOf(pLuaMain);
         m_pRegisteredCommands->CleanUpForVM(pLuaMain);
 
         // Remove it from our list
