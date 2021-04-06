@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::RIGID_BODY), m_pShape(pShape)
+    : CLuaPhysicsWorldElement(EIdClass::RIGID_BODY), m_pShape(pShape)
 {
     m_pMotionState = std::make_unique<MotionState>();
 
@@ -28,7 +28,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 
 bool CLuaPhysicsRigidBody::Destroy()
 {
-    GetPhysics()->DestroyElement(this);
+    g_pGame->GetPhysics()->DestroyElement(this);
     m_pShape->RemoveRigidBody(this);
     return true;
 }

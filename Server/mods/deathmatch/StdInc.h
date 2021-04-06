@@ -181,7 +181,6 @@ struct SAclRequest;
 #include "ConcurrentList.hpp"
 #include "CBulletPhysicsCommon.h"
 #include <CBulletPhysics.h>
-#include <CBulletPhysicsManager.h>
 
 #include "ASE.h"
 #include "ASEQuerySDK.h"

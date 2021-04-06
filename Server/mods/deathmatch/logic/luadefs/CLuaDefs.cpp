@@ -49,7 +49,6 @@ CColManager*               CLuaDefs::m_pColManager = NULL;
 CResourceManager*          CLuaDefs::m_pResourceManager = NULL;
 CAccessControlListManager* CLuaDefs::m_pACLManager = NULL;
 CMainConfig*               CLuaDefs::m_pMainConfig = NULL;
-CBulletPhysicsManager*     CLuaDefs::m_pPhysicsManager = nullptr;
 
 void CLuaDefs::Initialize(CGame* pGame)
 {
@@ -72,7 +71,6 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pResourceManager = pGame->GetResourceManager();
     m_pACLManager = pGame->GetACLManager();
     m_pMainConfig = pGame->GetConfig();
-    m_pPhysicsManager = pGame->GetBulletPhysicsManager();
 }
 
 bool CLuaDefs::CanUseFunction(const char* szFunction, lua_State* luaVM, bool bRestricted)

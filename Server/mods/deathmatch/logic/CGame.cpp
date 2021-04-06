@@ -206,6 +206,8 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
 
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
+
+    m_pPhysics = std::make_unique<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
 }
 
 void CGame::ResetMapInfo()
@@ -413,7 +415,7 @@ void CGame::DoPulse()
     g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE)->ProcessQueuedFiles();
     UNCLOCK1("HTTPDownloadManager");
 
-    m_pPhysicsManager->WaitForSimulationsToFinish();
+    g_pGame->GetPhysics()->WaitForSimulationToFinish();
 
     CLOCK_CALL1(m_pPlayerManager->DoPulse(););
 
@@ -478,7 +480,7 @@ void CGame::DoPulse()
 
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
-    m_pPhysicsManager->DoPulse();
+    g_pGame->GetPhysics()->DoPulse();
 
     CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
 
@@ -534,8 +536,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pBuildingRemovalManager = new CBuildingRemovalManager;
 
     m_pCustomWeaponManager = new CCustomWeaponManager();
-
-    m_pPhysicsManager = new CBulletPhysicsManager();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 

@@ -43,7 +43,6 @@ std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::New(CLuaPhysicsS
     const CPhysicsRigidBodyProxy::btRigidBodyConstructionInfo rigidBodyCI(fMass, pMotionstate, pCollisionShape, vecLocalInertia);
 
     std::unique_ptr<CPhysicsRigidBodyProxy> pRigidBody = std::make_unique<CPhysicsRigidBodyProxy>(rigidBodyCI);
-    pRigidBody->m_pPhysics = pShape->GetPhysics();
 
     return pRigidBody;
 }

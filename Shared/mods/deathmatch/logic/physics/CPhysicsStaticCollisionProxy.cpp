@@ -14,7 +14,6 @@
 std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::New(CLuaPhysicsShape* pShape)
 {
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject = std::make_unique<CPhysicsStaticCollisionProxy>();
-    m_btCollisionObject->m_pPhysics = pShape->GetPhysics();
     m_btCollisionObject->setCollisionShape(pShape->InternalGetBtShape());
     return std::move(m_btCollisionObject);
 }

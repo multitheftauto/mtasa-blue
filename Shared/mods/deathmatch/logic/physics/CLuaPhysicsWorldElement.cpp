@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsWorldElement::CLuaPhysicsWorldElement(CBulletPhysics* pPhysics, EIdClass::EIdClassType classType) : CLuaPhysicsElement(pPhysics, classType)
+CLuaPhysicsWorldElement::CLuaPhysicsWorldElement(EIdClass::EIdClassType classType) : CLuaPhysicsElement(classType)
 {
 }
 

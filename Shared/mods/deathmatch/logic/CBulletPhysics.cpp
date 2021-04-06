@@ -16,25 +16,10 @@
 #include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CPhysicsDebugDrawer.h"
 
-#ifdef MTA_CLIENT
-CBulletPhysics::CBulletPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain, ePhysicsWorld physicsWorldType)
-    : ClassInit(this), CClientEntity(ID), m_ePhysicsWorldType(physicsWorldType)
+
+CBulletPhysics::CBulletPhysics(ePhysicsWorld physicsWorldType) : m_ePhysicsWorldType(physicsWorldType)
 {
-    m_pManager = pManager;
-    m_pPhysicsManager = pManager->GetPhysicsManager();
-#else
-CBulletPhysics::CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld physicsWorldType) : CElement(parent), m_ePhysicsWorldType(physicsWorldType)
-{
-    m_pPhysicsManager = g_pGame->GetBulletPhysicsManager();
-    m_iType = CElement::CBULLETPHYSICS;
-#endif
 
-    m_pLuaMain = luaMain;
-
-    SetTypeName("physics");
-
-    // Add us to Physics manager's list
-    m_pPhysicsManager->AddToList(this);
 }
 
 // Requires ~3789,34KB of ram
@@ -65,7 +50,7 @@ void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned l
         m_bUseMt = false;
     }
 
-    WorldContext world(this);
+    WorldContext world;
     world->setGravity(BulletPhysics::Defaults::Gravity);
     world->setDebugDrawer(m_pDebugDrawer.get());
     world->getSimulationIslandManager()->setSplitIslands(true);
@@ -83,39 +68,27 @@ void CBulletPhysics::WaitForSimulationToFinish()
         Sleep(1);
 }
 
-void CBulletPhysics::Unlink()
-{
-    m_pPhysicsManager->RemoveFromList(this);
-
-    //// Only shapes need to be removed, everything linking to some shape, rigid bodies
-    //// It causes chains of DestroyElement on rigid bodies, static collisions and constraints
-    //for (auto shape = m_vecShapes.rbegin(); shape != m_vecShapes.rend(); ++shape)
-    //{
-    //    DestroyElement(*shape);
-    //}
-}
-
 void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
-    WorldContext world(this);
+    WorldContext world;
     world->addCollisionObject(pBtCollisionObject);
 }
 
 void CBulletPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
-    WorldContext world(this);
+    WorldContext world;
     world->removeCollisionObject(pBtCollisionObject);
 }
 
 void CBulletPhysics::AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const
 {
-    WorldContext world(this);
+    WorldContext world;
     world->addRigidBody(pRigidBodyProxy);
 }
 
 void CBulletPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
 {
-    WorldContext world(this);
+    WorldContext world;
     world->removeRigidBody(pBtRigidBody);
 }
 
@@ -185,7 +158,7 @@ void CBulletPhysics::StepSimulation()
 {
     BT_PROFILE("stepSimulation");
 
-    WorldContext world(this);
+    WorldContext world;
     isDuringSimulation = true;
     world->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
     isDuringSimulation = false;
@@ -193,7 +166,7 @@ void CBulletPhysics::StepSimulation()
 
 CLuaPhysicsBoxShape* CBulletPhysics::CreateBoxShape(CVector vector)
 {
-    CLuaPhysicsBoxShape* pShape = new CLuaPhysicsBoxShape(this, vector);
+    CLuaPhysicsBoxShape* pShape = new CLuaPhysicsBoxShape(vector);
     AddShape(pShape);
     return pShape;
 }
@@ -219,7 +192,7 @@ std::vector<std::vector<float>> CBulletPhysics::GetDebugLines(CVector vecPositio
     m_pDebugDrawer->SetCameraPosition(vecPosition);
     m_pDebugDrawer->SetDrawDistance(radius);
     {
-        WorldContext world(this);
+        WorldContext world;
         world->debugDrawWorld();
     }
 
@@ -275,12 +248,12 @@ void CBulletPhysics::DoPulse()
 
 void CBulletPhysics::SetGravity(CVector vecGravity) const
 {
-    WorldContext world(this);
+    WorldContext world;
     world->setGravity(vecGravity);
 }
 
 CVector CBulletPhysics::GetGravity() const
 {
-    WorldContext world(this);
+    WorldContext world;
     return world->getGravity();
 }

@@ -22,12 +22,10 @@ class CBulletPhysics;
 class CLuaPhysicsElement
 {
 protected:
-    CLuaPhysicsElement(CBulletPhysics* pPhysics, EIdClass::EIdClassType classType);
+    CLuaPhysicsElement(EIdClass::EIdClassType classType);
     ~CLuaPhysicsElement();
 
 public:
-
-    CBulletPhysics*        GetPhysics() const { return m_pPhysics; }
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
     virtual bool           Destroy() = 0;
@@ -49,7 +47,7 @@ public:
     public:
         // static void* operator new(size_t) = delete;
 
-        ElementLock(T pElement) : m_pElement(pElement), m_lock(pElement->m_lockElement, std::try_to_lock), m_elementsLock(pElement->GetPhysics()->m_elementsLock)
+        ElementLock(T pElement) : m_pElement(pElement), m_lock(pElement->m_lockElement, std::try_to_lock), m_elementsLock(g_pGame->GetPhysics()->m_elementsLock)
         {
             assert(m_lock.owns_lock() && "Element is already locked");
         }
@@ -67,7 +65,6 @@ private:
     void RemoveScriptID();
 
     std::atomic<bool>                                 m_bHasEnqueuedChanges = false;
-    CBulletPhysics*                                   m_pPhysics;
     EIdClass::EIdClassType                            m_classType;
     unsigned int                                      m_uiScriptID;
     SharedUtil::ConcurrentList<std::function<void()>> m_listChanges;

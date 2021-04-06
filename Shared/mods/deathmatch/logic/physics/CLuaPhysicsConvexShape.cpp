@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsConvexShape::CLuaPhysicsConvexShape(CBulletPhysics* pPhysics, btCollisionShape* pShape) : CLuaPhysicsShape(pPhysics, pShape)
+CLuaPhysicsConvexShape::CLuaPhysicsConvexShape(btCollisionShape* pShape) : CLuaPhysicsShape(pShape)
 {
 
 }

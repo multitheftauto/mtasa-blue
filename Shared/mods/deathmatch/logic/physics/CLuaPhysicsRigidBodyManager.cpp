@@ -24,7 +24,7 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
     }
 
     // Remove all references
-    pRigidBody->GetPhysics()->DestroyRigidBody(pRigidBody);
+    g_pGame->GetPhysics()->DestroyRigidBody(pRigidBody);
 
     {
         std::lock_guard guard(lock);

@@ -12,19 +12,6 @@
 
 #include "Enums.h"
 
-#ifdef MTA_CLIENT
-inline eClientEntityType GetClassType(class CBulletPhysics*)
-{
-    return CBULLETPHYSICS;
-}
-#else
-typedef int        eEntityType;
-inline eEntityType GetClassType(class CBulletPhysics*)
-{
-    return CElement::CBULLETPHYSICS;
-}
-#endif
-
 inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
 {
     return "physics-rigid-body";

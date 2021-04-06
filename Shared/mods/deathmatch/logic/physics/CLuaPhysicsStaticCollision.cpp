@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
-    : CLuaPhysicsWorldElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pShape))
+    : CLuaPhysicsWorldElement(EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pShape))
 {
     // pShape->AddStaticCollision(this);
     m_pShape = pShape;
@@ -28,7 +28,7 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 
 bool CLuaPhysicsStaticCollision::Destroy()
 {
-    GetPhysics()->DestroyElement(this);
+    g_pGame->GetPhysics()->DestroyElement(this);
     m_pShape->RemoveStaticCollision(this);
     return true;
 }
@@ -39,7 +39,7 @@ void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
     btTransform& transform = GetCollisionObject()->getWorldTransform();
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
     GetCollisionObject()->setWorldTransform(transform);
-    CBulletPhysics::WorldContext world(GetPhysics());
+    CBulletPhysics::WorldContext world;
     world->updateAabbs();
 }
 
@@ -49,7 +49,7 @@ void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation)
     btTransform& transform = GetCollisionObject()->getWorldTransform();
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     GetCollisionObject()->setWorldTransform(transform);
-    CBulletPhysics::WorldContext world(GetPhysics());
+    CBulletPhysics::WorldContext world;
     world->updateAabbs();
 }
 

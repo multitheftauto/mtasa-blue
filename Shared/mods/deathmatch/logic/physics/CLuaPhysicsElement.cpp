@@ -11,9 +11,8 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsElement::CLuaPhysicsElement(CBulletPhysics* pPhysics, EIdClass::EIdClassType classType)
+CLuaPhysicsElement::CLuaPhysicsElement(EIdClass::EIdClassType classType)
 {
-    m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, classType);
     m_classType = classType;
 }

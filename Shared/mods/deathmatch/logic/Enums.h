@@ -85,7 +85,6 @@ DECLARE_ENUM_CLASS(ePhysicsElementType);
 enum class ePhysicsWorld
 {
     DiscreteDynamicsWorld,
-    DiscreteDynamicsWorldMt,
     Count,
 };
 

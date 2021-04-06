@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, btCollisionShape* pShape) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
+CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pShape) : CLuaPhysicsElement(EIdClass::SHAPE)
 {
     m_pBtShape.reset(pShape);
     m_pBtShape->setUserPointer((void*)this);
@@ -20,7 +20,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CBulletPhysics* pPhysics, btCollisionShape* p
 
 bool CLuaPhysicsShape::Destroy()
 {
-    GetPhysics()->DestroyElement(this);
+    g_pGame->GetPhysics()->DestroyElement(this);
     return true;
 }
 

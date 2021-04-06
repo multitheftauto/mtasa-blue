@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half) : CLuaPhysicsConvexShape(pPhysics, CPhysicsSharedLogic::CreateBox(half))
+CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CVector half) : CLuaPhysicsConvexShape(CPhysicsSharedLogic::CreateBox(half))
 {
 }
 

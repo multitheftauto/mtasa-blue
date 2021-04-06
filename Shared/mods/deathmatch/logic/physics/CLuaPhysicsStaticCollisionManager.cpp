@@ -22,7 +22,7 @@ void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaS
 
     // Remove all references
     pLuaStaticCollision->Unlink();
-    pLuaStaticCollision->GetPhysics()->DestroyStaticCollision(pLuaStaticCollision);
+    g_pGame->GetPhysics()->DestroyStaticCollision(pLuaStaticCollision);
     ListRemove(m_elementsList, pLuaStaticCollision);
 
     delete pLuaStaticCollision;

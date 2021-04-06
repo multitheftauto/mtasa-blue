@@ -27,8 +27,6 @@ class CPhysicsDebugDrawer;
 #include "physics/CLuaPhysicsShape.h"
 #include "physics/CLuaPhysicsConvexShape.h"
 
-#include "CBulletPhysicsProfiler.h"
-
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
@@ -41,27 +39,17 @@ class CPhysicsDebugDrawer;
     #include "./../Server/mods/deathmatch/logic/CElement.h"
 #endif
 
-#include "CBulletPhysicsManager.h"
-
 #include "physics/CLuaPhysicsBoxShape.h"
 #include "physics/CPhysicsStaticCollisionProxy.h"
 
 #pragma once
 
-#ifdef MTA_CLIENT
-class CBulletPhysics : public CClientEntity
-{
-    DECLARE_CLASS(CBulletPhysics, CClientEntity)
-    CBulletPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain, ePhysicsWorld physicsWorldType);
-    ~CBulletPhysics();
-    eClientEntityType GetType() const { return CBULLETPHYSICS; }
-#else
-class CBulletPhysics : public CElement
+class CBulletPhysics
 {
 public:
-    CBulletPhysics(CDummy* parent, CLuaMain* luaMain, ePhysicsWorld physicsWorldType);
+    CBulletPhysics(ePhysicsWorld physicsWorldType);
     ~CBulletPhysics();
-#endif
+
     friend CLuaPhysicsRigidBodyManager;
     friend CLuaPhysicsShapeManager;
     friend CLuaPhysicsStaticCollisionManager;
@@ -90,7 +78,7 @@ public:
     public:
         // static void* operator new(size_t) = delete;
 
-        WorldContext(const CBulletPhysics* pPhysics) : m_pPhysics(pPhysics), m_lock(pPhysics->lock, std::try_to_lock)
+        WorldContext() : m_pPhysics(g_pGame->GetPhysics()), m_lock(m_pPhysics->lock, std::try_to_lock)
         {
             assert(m_lock.owns_lock() && "Physics world is already locked");
             m_btWorld = [&]() {
@@ -98,13 +86,11 @@ public:
                 {
                     case ePhysicsWorld::DiscreteDynamicsWorld:
                         return m_pPhysics->m_pDynamicsWorld.get();
-                    case ePhysicsWorld::DiscreteDynamicsWorldMt:
-                        return (btDiscreteDynamicsWorld*)m_pPhysics->m_pDynamicsWorldMt.get();
                 }
             }();
 
             // Implement your world, and bump number.
-            static_assert((int)ePhysicsWorld::Count == 2, "Unimplemented world type");
+            static_assert((int)ePhysicsWorld::Count == 1, "Unimplemented world type");
         }
 
         ~WorldContext() {}
@@ -206,8 +192,6 @@ private:
 
     std::atomic<int> m_iDeltaTimeMs = 0;
     CLuaMain*        m_pLuaMain;
-
-    CBulletPhysicsManager* m_pPhysicsManager;
 
     const ePhysicsWorld                  m_ePhysicsWorldType;
     bool                                 m_canDoPulse = false;

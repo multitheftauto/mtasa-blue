@@ -18,20 +18,20 @@ typedef std::unordered_map<std::string, std::variant<int, double, CVector>> Crea
 class CLuaPhysicsDefs : public CLuaDefs
 {
 public:
+    static CBulletPhysics* GetPhysics();
     static void LoadFunctions(void);
     static void AddClass(lua_State* luaVM);
 
-    static CBulletPhysics*       PhysicsCreateWorld(lua_State* luaVM, std::optional<CreateWorldOptions> vecGravity);
     static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
 
     static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position, std::optional<CVector> rotation);
 
-    static CLuaPhysicsShape* PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant);
+    static CLuaPhysicsShape* PhysicsCreateBoxShape(std::variant<CVector, float> variant);
 
 #ifdef MTA_CLIENT
-    static bool PhysicsDrawDebug(CBulletPhysics* pPhysics);
+    static bool PhysicsDrawDebug();
 #endif
-    static std::vector<std::vector<float>> PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius);
+    static std::vector<std::vector<float>> PhysicsGetDebugLines(CVector vecPosition, float fRadius);
 
     template <typename T, typename U>
     static U getOption(const T& options, const std::string& szProperty, const U& default)

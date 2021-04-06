@@ -19,7 +19,7 @@ class CLuaPhysicsBoxShape : public CLuaPhysicsConvexShape, CShapeHolder<btBoxSha
     friend class CBulletPhysics;
 
 public:
-    CLuaPhysicsBoxShape(CBulletPhysics* pPhysics, CVector half);
+    CLuaPhysicsBoxShape(CVector half);
     void    Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BoxShape; }

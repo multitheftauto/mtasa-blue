@@ -20,10 +20,14 @@
 #include "Enums.h"
 #include "physics/CPhysicsDebugDrawer.h"
 
+CBulletPhysics* CLuaPhysicsDefs::GetPhysics()
+{
+    return g_pGame->GetPhysics();
+}
+
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"physicsCreateWorld", ArgumentParser<PhysicsCreateWorld>},
         {"physicsCreateRigidBody", ArgumentParser<PhysicsCreateRigidBody>},
         {"physicsCreateStaticCollision", ArgumentParser<PhysicsCreateStaticCollision>},
         {"physicsCreateBoxShape", ArgumentParser<PhysicsCreateBoxShape>},
@@ -47,42 +51,9 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
     lua_registerstaticclass(luaVM, "Physics");
 }
 
-CBulletPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optional<CreateWorldOptions> options)
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(std::variant<CVector, float> variant)
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        CreateWorldOptions mapOptions = options.value_or(CreateWorldOptions());
-        int                iParallelSolvers = getOption(mapOptions, "parallelSolvers", BulletPhysics::Defaults::ParallelSolvers);
-
-        if (iParallelSolvers < 1 || iParallelSolvers > BulletPhysics::Limits::ParallelSolversLimit)
-        {
-            throw std::invalid_argument(SString("Parallel solvers should be between 1 and %i", BulletPhysics::Limits::ParallelSolversLimit).c_str());
-        }
-
-        CBulletPhysics* pPhysics = [&]() {
-            if (iParallelSolvers == 1)
-                return pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
-            return pLuaMain->CreateElement<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorldMt);
-        }();
-
-        if (pPhysics)
-        {
-            CVector gravity = getOption(mapOptions, "gravity", BulletPhysics::Defaults::Gravity);
-            int     iGrainSize = getOption(mapOptions, "grainSize", BulletPhysics::Defaults::GrainSize);
-            double  ulSeed = getOption(mapOptions, "seed", BulletPhysics::Defaults::Seed);
-
-            pPhysics->Initialize(iParallelSolvers, iGrainSize, (unsigned long)ulSeed);
-            pPhysics->SetGravity(gravity);
-            return pPhysics;
-        }
-    }
-    throw std::invalid_argument("Unknown error");
-}
-
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(CBulletPhysics* pPhysics, std::variant<CVector, float> variant)
-{
-    CVector vecSize = [&]() {
+    const CVector vecSize = [&]() {
         if (std::holds_alternative<CVector>(variant))
         {
             return std::get<CVector>(variant);
@@ -96,7 +67,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(CBulletPhysics* pPhysic
 
     CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
-    return pPhysics->CreateBoxShape(vecSize / 2);
+    return GetPhysics()->CreateBoxShape(vecSize / 2);
 }
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
@@ -104,7 +75,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
     if (!options.has_value() || options.value().empty())
     {
-        pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape);
+        pRigidBody = GetPhysics()->CreateRigidBody(pShape);
         pRigidBody->SetPosition(CVector{0, 0, 0});
         pRigidBody->SetEnabled(true);
         return pRigidBody;
@@ -122,7 +93,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
     CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
     CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
 
-    pRigidBody = pShape->GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation);
@@ -133,7 +104,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = pShape->GetPhysics()->CreateStaticCollision(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
 
     pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
     pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
@@ -144,13 +115,13 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
 #ifdef MTA_CLIENT
 bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
 {
-    pPhysics->DrawDebug();
+    GetPhysics()->DrawDebug();
     return true;
 }
 #endif
 
 // from, to, color
-std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CBulletPhysics* pPhysics, CVector vecPosition, float fRadius)
+std::vector<std::vector<float>> CLuaPhysicsDefs::PhysicsGetDebugLines(CVector vecPosition, float fRadius)
 {
-    return pPhysics->GetDebugLines(vecPosition, fRadius);
+    return GetPhysics()->GetDebugLines(vecPosition, fRadius);
 }

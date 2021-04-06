@@ -18,7 +18,7 @@ class CLuaPhysicsWorldElement;
 class CLuaPhysicsWorldElement : public CLuaPhysicsElement
 {
 protected:
-    CLuaPhysicsWorldElement(CBulletPhysics* pPhysics, EIdClass::EIdClassType classType);
+    CLuaPhysicsWorldElement(EIdClass::EIdClassType classType);
     ~CLuaPhysicsWorldElement();
 
 public:
