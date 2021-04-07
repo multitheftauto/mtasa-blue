@@ -89,7 +89,7 @@ std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, st
             if (auto it = options.find("cost"); it != options.end())
             {
                 auto [__, err] = std::from_chars(it->second.data(), it->second.data() + it->second.length(), cost);
-                if (err == std::errc{})
+                if (err != std::errc{})
                     throw std::invalid_argument("Invalid value for field 'cost'");
             }
 
