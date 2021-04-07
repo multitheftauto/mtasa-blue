@@ -24,17 +24,12 @@ int CLuaFunctionDefs::AddEvent(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CLuaMain& lmain = lua_getownercluamain(luaVM);
+        if (CStaticFunctionDefinitions::AddEvent(&lmain, strName, "", bAllowRemoteTrigger))
         {
-            // Do it
-            if (CStaticFunctionDefinitions::AddEvent(pLuaMain, strName, "", bAllowRemoteTrigger))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }   
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -78,32 +73,29 @@ int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CLuaMain& lmain = lua_getownercluamain(luaVM); 
+        CResourceFile* file = lmain.GetResourceFile();
+        if (file && file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML)
         {
-            CResourceFile* file = pLuaMain->GetResourceFile();
-            if (file && file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML)
+            argStream.SetCustomError("You cannot have event handlers in HTML scripts");
+        }
+        else
+        {
+            // check if the handle is in use
+            if (pElement->GetEventManager()->HandleExists(&lmain, strName, iLuaFunction))
             {
-                argStream.SetCustomError("You cannot have event handlers in HTML scripts");
+                argStream.SetCustomError(SString("'%s' with this function is already handled", *strName));
             }
             else
             {
-                // check if the handle is in use
-                if (pElement->GetEventManager()->HandleExists(pLuaMain, strName, iLuaFunction))
+                // Do it
+                if (CStaticFunctionDefinitions::AddEventHandler(&lmain, strName, pElement, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
                 {
-                    argStream.SetCustomError(SString("'%s' with this function is already handled", *strName));
-                }
-                else
-                {
-                    // Do it
-                    if (CStaticFunctionDefinitions::AddEventHandler(pLuaMain, strName, pElement, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
-                    {
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
+                    lua_pushboolean(luaVM, true);
+                    return 1;
                 }
             }
-        }
+        }      
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -128,14 +120,11 @@ int CLuaFunctionDefs::RemoveEventHandler(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CLuaMain& lmain = lua_getownercluamain(luaVM);
+        if (CStaticFunctionDefinitions::RemoveEventHandler(&lmain, strName, pElement, iLuaFunction))
         {
-            if (CStaticFunctionDefinitions::RemoveEventHandler(pLuaMain, strName, pElement, iLuaFunction))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
@@ -157,17 +146,10 @@ int CLuaFunctionDefs::GetEventHandlers(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Create a new table
-            lua_newtable(luaVM);
-
-            pElement->GetEventManager()->GetHandles(pLuaMain, (const char*)strName, luaVM);
-
-            return 1;
-        }
+        // Create a new table
+        lua_newtable(luaVM);
+        pElement->GetEventManager()->GetHandles(&lua_getownercluamain(luaVM), (const char*)strName, luaVM);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -283,19 +265,13 @@ int CLuaFunctionDefs::TriggerLatentClientEvent(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Get resource details if transfer should be stopped when resource stops
-        CLuaMain* pLuaMain = NULL;
+        CLuaMain* pLuaMain = nullptr;
         ushort    usResourceNetId = 0xFFFF;
         if (!bPersist)
         {
-            pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                CResource* pResource = pLuaMain->GetResource();
-                if (pResource)
-                {
-                    usResourceNetId = pResource->GetNetID();
-                }
-            }
+            pLuaMain = &lua_getownercluamain(luaVM);
+            if (CResource* pResource = pLuaMain->GetResource())
+                usResourceNetId = pResource->GetNetID();         
         }
 
         markerLatentEvent.SetAndStoreString(SString("Get args (%d,%s)", sendList.size(), *strName));
