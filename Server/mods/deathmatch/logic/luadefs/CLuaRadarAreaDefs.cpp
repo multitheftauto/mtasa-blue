@@ -78,24 +78,15 @@ int CLuaRadarAreaDefs::CreateRadarArea(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain*  pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-        if (pResource)
+        CResource& resource = lua_getownerresource(luaVM);
+        CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea(
+            &resource, vecPosition, vecSize, SColorRGBA{dRed, dGreen, dBlue, dAlpha}, pVisibleTo);
+        if (pRadarArea)
         {
-            SColorRGBA color(dRed, dGreen, dBlue, dAlpha);
-
-            // Create it
-            CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea(pResource, vecPosition, vecSize, color, pVisibleTo);
-            if (pRadarArea)
-            {
-                CElementGroup* pGroup = pResource->GetElementGroup();
-                if (pGroup)
-                {
-                    pGroup->Add(pRadarArea);
-                }
-                lua_pushelement(luaVM, pRadarArea);
-                return 1;
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pRadarArea);
+            lua_pushelement(luaVM, pRadarArea);
+            return 1;
         }
     }
     else

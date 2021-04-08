@@ -33,8 +33,15 @@ class CMapManager;
 
 struct CRefInfo
 {
-    unsigned long int ulUseCount;
-    int               iFunction;
+    CRefInfo() = default;
+
+    constexpr CRefInfo(int ref) :
+        iFunction(ref)
+    {
+    }
+
+    unsigned long int ulUseCount = 0;
+    int               iFunction = LUA_REFNIL;
 };
 
 class CLuaMain            //: public CClient

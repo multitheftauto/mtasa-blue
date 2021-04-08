@@ -370,20 +370,12 @@ bool StringToBool(const SString& strText)
 // Check min server is correct
 //
 void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason)
-{
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(argStream.m_luaVM);
-    if (pLuaMain)
+{  
+    if (lua_getownerresource(argStream.m_luaVM).GetMinServerRequirement() < szVersionReq)
     {
-        CResource* pResource = pLuaMain->GetResource();
-        if (pResource)
-        {
-            if (pResource->GetMinServerRequirement() < szVersionReq)
-            {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-                argStream.SetVersionWarning(szVersionReq, "server", szReason);
-                #endif
-            }
-        }
+        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+        argStream.SetVersionWarning(szVersionReq, "server", szReason);
+        #endif
     }
 }
 

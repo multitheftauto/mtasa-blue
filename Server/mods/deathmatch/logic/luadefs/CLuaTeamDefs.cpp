@@ -102,24 +102,14 @@ int CLuaTeamDefs::CreateTeam(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CTeam* pTeam = CStaticFunctionDefinitions::CreateTeam(&resource, strName, ucRed, ucGreen, ucBlue);
+        if (pTeam)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CTeam* pTeam = CStaticFunctionDefinitions::CreateTeam(pResource, strName, ucRed, ucGreen, ucBlue);
-                if (pTeam)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pTeam);
-                    }
-                    lua_pushelement(luaVM, pTeam);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pTeam);
+            lua_pushelement(luaVM, pTeam);
+            return 1;
         }
     }
     else

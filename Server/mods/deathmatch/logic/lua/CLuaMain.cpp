@@ -222,22 +222,18 @@ void CLuaMain::RegisterHTMLDFunctions()
 
 void CLuaMain::InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug)
 {
-    // Grab our lua VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    CLuaMain& lmain = lua_getownercluamain(luaVM);
+    // Above max time?
+    if (lmain.m_FunctionEnterTimer.Get() > HOOK_MAXIMUM_TIME)
     {
-        // Above max time?
-        if (pLuaMain->m_FunctionEnterTimer.Get() > HOOK_MAXIMUM_TIME)
-        {
-            // Print it in the console
-            CLogger::ErrorPrintf("Infinite/too long execution (%s)\n", pLuaMain->GetScriptName());
+        // Print it in the console
+        CLogger::ErrorPrintf("Infinite/too long execution (%s)\n", lmain.GetScriptName());
 
-            SString strAbortInf = "Aborting; infinite running script in ";
-            strAbortInf += pLuaMain->GetScriptName();
+        SString strAbortInf = "Aborting; infinite running script in ";
+        strAbortInf += lmain.GetScriptName();
 
-            // Error out
-            luaL_error(luaVM, strAbortInf);
-        }
+        // Error out
+        luaL_error(luaVM, strAbortInf);
     }
 }
 

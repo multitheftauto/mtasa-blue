@@ -87,13 +87,8 @@ int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            lua_pushnumber(luaVM, pColShape->GetShapeType());
-            return 1;
-        }
+        lua_pushnumber(luaVM, pColShape->GetShapeType());
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -117,25 +112,14 @@ int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
         if (fRadius < 0.0f)
             fRadius = 0.1f;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CColCircle* pShape = CStaticFunctionDefinitions::CreateColCircle(&resource, vecPosition, fRadius);
+        if (pShape)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColCircle* pShape = CStaticFunctionDefinitions::CreateColCircle(pResource, vecPosition, fRadius);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pShape);
+            lua_pushelement(luaVM, pShape);
+            return 1;
         }
     }
     else
@@ -163,25 +147,14 @@ int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
         if (vecSize.fZ < 0.0f)
             vecSize.fZ = 0.1f;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CColCuboid* pShape = CStaticFunctionDefinitions::CreateColCuboid(&resource, vecPosition, vecSize);
+        if (pShape)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColCuboid* pShape = CStaticFunctionDefinitions::CreateColCuboid(pResource, vecPosition, vecSize);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pShape);
+            lua_pushelement(luaVM, pShape);
+            return 1;
         }
     }
     else
@@ -205,25 +178,14 @@ int CLuaColShapeDefs::CreateColSphere(lua_State* luaVM)
         if (fRadius < 0.0f)
             fRadius = 0.1f;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CColSphere* pShape = CStaticFunctionDefinitions::CreateColSphere(&resource, vecPosition, fRadius);
+        if (pShape)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColSphere* pShape = CStaticFunctionDefinitions::CreateColSphere(pResource, vecPosition, fRadius);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pShape);
+            lua_pushelement(luaVM, pShape);
+            return 1;
         }
     }
     else
@@ -249,25 +211,14 @@ int CLuaColShapeDefs::CreateColRectangle(lua_State* luaVM)
         if (vecSize.fY < 0.0f)
             vecSize.fY = 0.1f;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CColRectangle* pShape = CStaticFunctionDefinitions::CreateColRectangle(&resource, vecPosition, vecSize);
+        if (pShape)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColRectangle* pShape = CStaticFunctionDefinitions::CreateColRectangle(pResource, vecPosition, vecSize);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pShape);
+            lua_pushelement(luaVM, pShape);
+            return 1;
         }
     }
     else
@@ -292,24 +243,14 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon(&resource, vecPointList);
+        if (pShape)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon(pResource, vecPointList);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pShape);
+            lua_pushelement(luaVM, pShape);
+            return 1;
         }
     }
     else
@@ -336,25 +277,14 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
         if (fHeight < 0.0f)
             fHeight = 0.1f;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CColTube* pShape = CStaticFunctionDefinitions::CreateColTube(&resource, vecPosition, fRadius, fHeight);
+        if (pShape)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColTube* pShape = CStaticFunctionDefinitions::CreateColTube(pResource, vecPosition, fRadius, fHeight);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pShape);
+            lua_pushelement(luaVM, pShape);
+            return 1;
         }
     }
     else

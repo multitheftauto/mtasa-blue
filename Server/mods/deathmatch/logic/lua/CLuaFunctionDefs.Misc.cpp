@@ -87,16 +87,12 @@ int CLuaFunctionDefs::LoadMapData(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CElement* pLoadedRoot = CStaticFunctionDefinitions::LoadMapData(&lua_getownercluamain(luaVM), pParent, pXML);
+        if (pLoadedRoot)
         {
-            CElement* pLoadedRoot = CStaticFunctionDefinitions::LoadMapData(pLuaMain, pParent, pXML);
-            if (pLoadedRoot)
-            {
-                lua_pushelement(luaVM, pLoadedRoot);
-                return 1;
-            }
-        }
+            lua_pushelement(luaVM, pLoadedRoot);
+            return 1;
+        }   
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

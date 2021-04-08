@@ -293,59 +293,29 @@ bool CLuaModule::RegisterFunction(lua_State* luaVM, const char* szFunctionName, 
 
 bool CLuaModule::GetResourceName(lua_State* luaVM, std::string& strName)
 {
-    if (luaVM)
-    {
-        CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                strName = pResource->GetName();
-                return true;
-            }
-        }
-    }
-    return false;
+    if (!luaVM)
+        return false;
+    strName = lua_getownerresource(luaVM).GetName();
+    return true;
 }
 
 CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM)
 {
-    if (luaVM)
-    {
-        CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                return pResource->GetLastMetaChecksum();
-            }
-        }
-    }
-    return CChecksum();
+    if (!luaVM)
+        return {};
+    return lua_getownerresource(luaVM).GetLastMetaChecksum();
 }
 
 CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile)
 {
-    if (luaVM)
+    if (!luaVM)
+        return {};
+    CResource& resource = lua_getownerresource(luaVM);
+    for (auto iter = resource.IterBegin(); iter != resource.IterEnd(); ++iter)
     {
-        CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                list<CResourceFile*>::iterator iter = pResource->IterBegin();
-                for (; iter != pResource->IterEnd(); ++iter)
-                {
-                    if (strcmp((*iter)->GetName(), szFile) == 0)
-                        return (*iter)->GetLastChecksum();
-                }
-            }
-        }
+        if (strcmp((*iter)->GetName(), szFile) == 0)
+            return (*iter)->GetLastChecksum();
     }
-    return CChecksum();
 }
 
 unsigned long CLuaModule::GetVersion()
@@ -406,16 +376,8 @@ bool CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName, cha
     if (!luaVM)
         return false;
 
-    CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-        return false;
-
-    CResource* pResource = pLuaMain->GetResource();
-    if (!pResource)
-        return false;
-
     std::string p;
-    if (!pResource->GetFilePath(fileName, p))
+    if (!lua_getownerresource(luaVM).GetFilePath(fileName, p))
         return false;
 
     std::strncpy(path, p.c_str(), length);

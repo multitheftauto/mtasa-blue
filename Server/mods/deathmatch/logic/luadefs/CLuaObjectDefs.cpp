@@ -67,26 +67,15 @@ int CLuaObjectDefs::CreateObject(lua_State* luaVM)
     {
         if (CObjectManager::IsValidModel(usModelID))
         {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
+            CResource& resource = lua_getownerresource(luaVM);
+            CObject* pObject = CStaticFunctionDefinitions::CreateObject(&resource, usModelID, vecPosition, vecRotation, bIsLowLod);
+            if (pObject)
             {
-                CResource* pResource = pLuaMain->GetResource();
-                if (pResource)
-                {
-                    CObject* pObject = CStaticFunctionDefinitions::CreateObject(pResource, usModelID, vecPosition, vecRotation, bIsLowLod);
-                    if (pObject)
-                    {
-                        CElementGroup* pGroup = pResource->GetElementGroup();
-                        if (pGroup)
-                        {
-                            pGroup->Add(pObject);
-                        }
-
-                        lua_pushelement(luaVM, pObject);
-                        return 1;
-                    }
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pObject);
+            lua_pushelement(luaVM, pObject);
+            return 1;
+        }
         }
         else
             argStream.SetCustomError("Invalid model id");
@@ -236,20 +225,9 @@ int CLuaObjectDefs::MoveObject(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                if (CStaticFunctionDefinitions::MoveObject(pResource, pElement, iTime, vecTargetPosition, vecTargetRotation, easingType, fEasingPeriod,
-                                                           fEasingAmplitude, fEasingOvershoot))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-            }
-        }
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::MoveObject(
+            &lua_getownerresource(luaVM), pElement, iTime, vecTargetPosition, vecTargetRotation, easingType, fEasingPeriod, fEasingAmplitude, fEasingOvershoot));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

@@ -53,13 +53,6 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
 int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     CVector          v1, v2, v3, v4;
     CVector*         pv4 = NULL;
     bool             bShallow;
@@ -78,14 +71,12 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CWater* pWater = CStaticFunctionDefinitions::CreateWater(pLuaMain->GetResource(), &v1, &v2, &v3, pv4, bShallow);
+        CResource& resource = lua_getownerresource(luaVM);
+        CWater* pWater = CStaticFunctionDefinitions::CreateWater(&resource, &v1, &v2, &v3, pv4, bShallow);
         if (pWater)
         {
-            CElementGroup* pGroup = pLuaMain->GetResource()->GetElementGroup();
-            if (pGroup)
-            {
+            if (CElementGroup* pGroup = resource.GetElementGroup())
                 pGroup->Add(pWater);
-            }
             lua_pushelement(luaVM, pWater);
             return 1;
         }
@@ -99,14 +90,6 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 
 int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
 {
-    CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-    if (!pResource)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserData())
     {

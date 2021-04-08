@@ -131,35 +131,28 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
                 }
                 else            // Async
                 {
-                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                    if (pLuaMain)
-                    {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [password, salt = options["salt"], cost] {
-                                // Execute time-consuming task
-                                return SharedUtil::BcryptHash(password, salt, cost);
-                            },
-                            [luaFunctionRef](const SString& hash) {
-                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
-                                if (pLuaMain)
-                                {
-                                    CLuaArguments arguments;
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [password, salt = options["salt"], cost] {
+                            // Execute time-consuming task
+                            return SharedUtil::BcryptHash(password, salt, cost);
+                        },
+                        [luaFunctionRef](const SString& hash) {
+                            if (!luaFunctionRef.GetLuaVM())
+                                return; // VM has closed in the meantime
+                            CLuaMain& lmain = lua_getownercluamain(luaFunctionRef.GetLuaVM());
+                            CLuaArguments arguments;
+                            if (hash.empty())
+                            {
+                                m_pScriptDebugging->LogCustom(lmain.GetVM(), "Invalid value for field 'salt'");
+                                arguments.PushBoolean(false);
+                            }
+                            else
+                                arguments.PushString(hash);
+                            arguments.Call(&lmain, luaFunctionRef);
+                        });
 
-                                    if (hash.empty())
-                                    {
-                                        m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
-                                        arguments.PushBoolean(false);
-                                    }
-                                    else
-                                        arguments.PushString(hash);
-
-                                    arguments.Call(pLuaMain, luaFunctionRef);
-                                }
-                            });
-
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
+                    lua_pushboolean(luaVM, true);
+                    return 1;             
                 }
             }
             else
@@ -219,26 +212,22 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
             }
             else            // Async
             {
-                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                if (pLuaMain)
-                {
-                    CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                        [password, hash] {
-                            // Execute time-consuming task
-                            return SharedUtil::BcryptVerify(password, hash);
-                        },
-                        [luaFunctionRef](const bool& correct) {
-                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
-                            if (pLuaMain)
-                            {
-                                CLuaArguments arguments;
-                                arguments.PushBoolean(correct);
-                                arguments.Call(pLuaMain, luaFunctionRef);
-                            }
-                        });
+                CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+                    [password, hash] {
+                        // Execute time-consuming task
+                        return SharedUtil::BcryptVerify(password, hash);
+                    },
+                    [luaFunctionRef](const bool& correct) {
+                        if (!luaFunctionRef.GetLuaVM())
+                            return; // VM has closed in the meantime
+                        CLuaMain& lmain = lua_getownercluamain(luaFunctionRef.GetLuaVM());
 
-                    lua_pushboolean(luaVM, true);
-                }
+                        CLuaArguments arguments;
+                        arguments.PushBoolean(correct);
+                        arguments.Call(&lmain, luaFunctionRef);              
+                    }
+                );
+                lua_pushboolean(luaVM, true);
             }
             return 1;
         }
@@ -287,28 +276,24 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 // Async
                 if (VERIFY_FUNCTION(luaFunctionRef))
                 {
-                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                    if (pLuaMain)
-                    {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [data, key] {
-                                // Execute time-consuming task
-                                SString result;
-                                SharedUtil::TeaEncode(data, key, &result);
-                                return result;
-                            },
-                            [luaFunctionRef](const SString& result) {
-                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
-                                if (pLuaMain)
-                                {
-                                    CLuaArguments arguments;
-                                    arguments.PushString(result);
-                                    arguments.Call(pLuaMain, luaFunctionRef);
-                                }
-                            });
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [data, key] {
+                            // Execute time-consuming task
+                            SString result;
+                            SharedUtil::TeaEncode(data, key, &result);
+                            return result;
+                        },
+                        [luaFunctionRef](const SString& result) {
+                            if (!luaFunctionRef.GetLuaVM())
+                                return; // VM has closed in the meantime
+                            CLuaMain& lmain = lua_getownercluamain(luaFunctionRef.GetLuaVM());
 
-                        lua_pushboolean(luaVM, true);
-                    }
+                            CLuaArguments arguments;
+                            arguments.PushString(result);
+                            arguments.Call(&lmain, luaFunctionRef);
+                        }
+                    );
+                    lua_pushboolean(luaVM, true);
                 }
                 else            // Sync
                 {
@@ -366,28 +351,24 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 // Async
                 if (VERIFY_FUNCTION(luaFunctionRef))
                 {
-                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                    if (pLuaMain)
-                    {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [data, key] {
-                                // Execute time-consuming task
-                                SString result;
-                                SharedUtil::TeaDecode(data, key, &result);
-                                return result;
-                            },
-                            [luaFunctionRef](const SString& result) {
-                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
-                                if (pLuaMain)
-                                {
-                                    CLuaArguments arguments;
-                                    arguments.PushString(result);
-                                    arguments.Call(pLuaMain, luaFunctionRef);
-                                }
-                            });
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [data, key] {
+                            // Execute time-consuming task
+                            SString result;
+                            SharedUtil::TeaDecode(data, key, &result);
+                            return result;
+                        },
+                        [luaFunctionRef](const SString& result) {
+                            if (!luaFunctionRef.GetLuaVM())
+                                return; // VM has closed in the meantime
+                            CLuaMain& lmain = lua_getownercluamain(luaFunctionRef.GetLuaVM());
 
-                        lua_pushboolean(luaVM, true);
-                    }
+                            CLuaArguments arguments;
+                            arguments.PushString(result);
+                            arguments.Call(&lmain, luaFunctionRef);
+                        }
+                    );
+                    lua_pushboolean(luaVM, true);
                 }
                 else            // Sync
                 {

@@ -109,10 +109,11 @@ bool CDebugHookManager::AddDebugHook(EDebugHookType hookType, const CLuaFunction
     }
 
     SDebugHookCallInfo info;
-    info.functionRef = functionRef;
-    info.pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(functionRef.GetLuaVM());
-    if (!info.pLuaMain)
+    if (!functionRef.GetLuaVM())
         return false;
+
+    info.functionRef = functionRef;
+    info.pLuaMain = &lua_getownercluamain(functionRef.GetLuaVM());
 
     for (uint i = 0; i < allowedNameList.size(); i++)
         MapInsert(info.allowedNameMap, allowedNameList[i]);
@@ -130,12 +131,14 @@ bool CDebugHookManager::AddDebugHook(EDebugHookType hookType, const CLuaFunction
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::RemoveDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef)
 {
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(functionRef.GetLuaVM());
+    if (!functionRef.GetLuaVM())
+        return false;
+    CLuaMain* pLuaMain = &lua_getownercluamain(functionRef.GetLuaVM());
 
-    std::vector<SDebugHookCallInfo>& hookInfoList = GetHookInfoListForType(hookType);
-    for (std::vector<SDebugHookCallInfo>::iterator iter = hookInfoList.begin(); iter != hookInfoList.end(); ++iter)
+    auto& hookInfoList = GetHookInfoListForType(hookType);
+    for (auto iter = hookInfoList.begin(); iter != hookInfoList.end(); ++iter)
     {
-        if ((*iter).pLuaMain == pLuaMain && (*iter).functionRef == functionRef)
+        if (iter->pLuaMain == pLuaMain && iter->functionRef == functionRef)
         {
             hookInfoList.erase(iter);
             return true;

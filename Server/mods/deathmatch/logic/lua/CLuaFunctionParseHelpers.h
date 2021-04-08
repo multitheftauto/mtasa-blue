@@ -269,12 +269,8 @@ CXMLNode* UserDataCast(CXMLNode*, void* ptr, lua_State*)
 template <class T>
 CLuaTimer* UserDataCast(CLuaTimer*, void* ptr, lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return NULL;
+    return lua_getownercluamain(luaVM).GetTimerManager()->GetTimerFromScriptID(
+        reinterpret_cast<unsigned long>(ptr));
 }
 
 //
@@ -319,12 +315,8 @@ CAccessControlListGroup* UserDataCast(CAccessControlListGroup*, void* ptr, lua_S
 template <class T>
 CTextItem* UserDataCast(CTextItem*, void* ptr, lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetTextItemFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return NULL;
+    return lua_getownercluamain(luaVM).GetTextItemFromScriptID(
+        reinterpret_cast<unsigned long>(ptr));
 }
 
 //
@@ -333,12 +325,8 @@ CTextItem* UserDataCast(CTextItem*, void* ptr, lua_State* luaVM)
 template <class T>
 CTextDisplay* UserDataCast(CTextDisplay*, void* ptr, lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        return pLuaMain->GetTextDisplayFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return NULL;
+    return lua_getownercluamain(luaVM).GetTextDisplayFromScriptID(
+        reinterpret_cast<unsigned long>(ptr));
 }
 
 //

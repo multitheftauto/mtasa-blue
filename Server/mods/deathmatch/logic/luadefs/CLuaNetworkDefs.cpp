@@ -83,15 +83,9 @@ int CLuaNetworkDefs::CallRemote(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                CRemoteCall* pRemoteCall = g_pGame->GetRemoteCalls()->Call(strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction,
-                                                                           strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-
-                lua_pushuserdata(luaVM, pRemoteCall);
-                return 1;
-            }
+            lua_pushuserdata(luaVM, g_pGame->GetRemoteCalls()->Call(
+                strHost, strResourceName, strFunctionName, &args, &lua_getownercluamain(luaVM), iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
+            return 1;      
         }
     }
     else if (argStream.NextIsFunction())
@@ -102,16 +96,12 @@ int CLuaNetworkDefs::CallRemote(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                CRemoteCall* pRemoteCall =
-                    g_pGame->GetRemoteCalls()->Call(strHost, &args, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-
-                lua_pushuserdata(luaVM, pRemoteCall);
-                return 1;
-            }
-        }
+            CLuaMain& lmain = lua_getownercluamain(luaVM);
+            CRemoteCall* pRemoteCall = g_pGame->GetRemoteCalls()->Call(
+                    strHost, &args, &lmain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
+            lua_pushuserdata(luaVM, pRemoteCall);
+            return 1;
+    }
     }
     else
     {
@@ -157,15 +147,10 @@ int CLuaNetworkDefs::FetchRemote(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                httpRequestOptions.bIsLegacy = true;
-                CRemoteCall* pRemoteCall = g_pGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
-
-                lua_pushuserdata(luaVM, pRemoteCall);
-                return 1;
-            }
+            httpRequestOptions.bIsLegacy = true;
+            lua_pushuserdata(luaVM, g_pGame->GetRemoteCalls()->Call(
+                strURL, &callbackArguments, &lua_getownercluamain(luaVM), iLuaFunction, strQueueName, httpRequestOptions));
+            return 1;
         }
     }
     else
@@ -197,14 +182,9 @@ int CLuaNetworkDefs::FetchRemote(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (luaMain)
-            {
-                CRemoteCall* pRemoteCall = g_pGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
-
-                lua_pushuserdata(luaVM, pRemoteCall);
-                return 1;
-            }
+            lua_pushuserdata(luaVM, g_pGame->GetRemoteCalls()->Call(
+                strURL, &callbackArguments, &lua_getownercluamain(luaVM), iLuaFunction, strQueueName, httpRequestOptions));
+            return 1;
         }
     }
 

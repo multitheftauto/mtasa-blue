@@ -204,25 +204,14 @@ int CLuaPedDefs::CreatePed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CPed* pPed = CStaticFunctionDefinitions::CreatePed(&resource, usModel, vecPosition, fRotation, bSynced);
+        if (pPed)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create the ped and return its handle
-                CPed* pPed = CStaticFunctionDefinitions::CreatePed(pResource, usModel, vecPosition, fRotation, bSynced);
-                if (pPed)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pPed);
-                    }
-                    lua_pushelement(luaVM, pPed);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pPed);
+            lua_pushelement(luaVM, pPed);
+            return 1;
         }
     }
     else

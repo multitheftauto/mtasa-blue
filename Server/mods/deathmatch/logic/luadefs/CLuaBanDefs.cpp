@@ -168,18 +168,8 @@ int CLuaBanDefs::RemoveBan(lua_State* luaVM)
 
 int CLuaBanDefs::GetBans(lua_State* luaVM)
 {
-    // Grab its lua
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        lua_newtable(luaVM);
-
-        CStaticFunctionDefinitions::GetBans(luaVM);
-
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
+    lua_newtable(luaVM);
+    CStaticFunctionDefinitions::GetBans(luaVM);
     return 1;
 }
 

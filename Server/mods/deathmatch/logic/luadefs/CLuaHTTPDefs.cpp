@@ -32,28 +32,22 @@ int CLuaHTTPDefs::httpWrite(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResourceFile* file = lua_getownercluamain(luaVM).GetResourceFile();
+        if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
         {
-            CResourceFile* file = pLuaMain->GetResourceFile();
-            if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
-            {
-                CResourceHTMLItem* html = (CResourceHTMLItem*)file;
-                unsigned long      ulLength;
-                if (argStream.NextIsNumber())
-                    argStream.ReadNumber(ulLength);
-                else
-                    ulLength = strData.length();
-
-                html->AppendToPageBuffer(strData, ulLength);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            CResourceHTMLItem* html = static_cast<CResourceHTMLItem*>(file);
+            unsigned long      ulLength;
+            if (argStream.NextIsNumber())
+                argStream.ReadNumber(ulLength);
             else
-                m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
+                ulLength = strData.length();
+
+            html->AppendToPageBuffer(strData, ulLength);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
         else
-            m_pScriptDebugging->LogError(luaVM, lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -74,22 +68,16 @@ int CLuaHTTPDefs::httpSetResponseHeader(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResourceFile* file = lua_getownercluamain(luaVM).GetResourceFile();
+        if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
         {
-            CResourceFile* file = pLuaMain->GetResourceFile();
-            if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
-            {
-                CResourceHTMLItem* html = (CResourceHTMLItem*)file;
-                html->SetResponseHeader(strHeaderName, strHeaderValue);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
+            CResourceHTMLItem* html = (CResourceHTMLItem*)file;
+            html->SetResponseHeader(strHeaderName, strHeaderValue);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
         else
-            m_pScriptDebugging->LogError(luaVM, lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -110,22 +98,16 @@ int CLuaHTTPDefs::httpSetResponseCookie(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResourceFile* file = lua_getownercluamain(luaVM).GetResourceFile();
+        if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
         {
-            CResourceFile* file = pLuaMain->GetResourceFile();
-            if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
-            {
-                CResourceHTMLItem* html = (CResourceHTMLItem*)file;
-                html->SetResponseCookie(strCookieName, strCookieValue);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
+            CResourceHTMLItem* html = (CResourceHTMLItem*)file;
+            html->SetResponseCookie(strCookieName, strCookieValue);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
         else
-            m_pScriptDebugging->LogError(luaVM, lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -144,22 +126,16 @@ int CLuaHTTPDefs::httpSetResponseCode(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResourceFile* file = lua_getownercluamain(luaVM).GetResourceFile();
+        if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
         {
-            CResourceFile* file = pLuaMain->GetResourceFile();
-            if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
-            {
-                CResourceHTMLItem* html = (CResourceHTMLItem*)file;
-                html->SetResponseCode(uiResponseCode);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
+            CResourceHTMLItem* html = (CResourceHTMLItem*)file;
+        html->SetResponseCode(uiResponseCode);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
         else
-            m_pScriptDebugging->LogError(luaVM, lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -171,23 +147,16 @@ int CLuaHTTPDefs::httpSetResponseCode(lua_State* luaVM)
 int CLuaHTTPDefs::httpClear(lua_State* luaVM)
 {
     //  bool httpClear ( )
-
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    CResourceFile* file = lua_getownercluamain(luaVM).GetResourceFile();
+    if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
     {
-        CResourceFile* file = pLuaMain->GetResourceFile();
-        if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
-        {
-            CResourceHTMLItem* html = (CResourceHTMLItem*)file;
-            html->ClearPageBuffer();
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
+        CResourceHTMLItem* html = (CResourceHTMLItem*)file;
+        html->ClearPageBuffer();
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
-        m_pScriptDebugging->LogError(luaVM, lua_tostring(luaVM, lua_upvalueindex(1)));
+        m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -195,26 +164,20 @@ int CLuaHTTPDefs::httpClear(lua_State* luaVM)
 int CLuaHTTPDefs::httpRequestLogin(lua_State* luaVM)
 {
     //  bool httpRequestLogin ( )
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    CResourceFile* file = lua_getownercluamain(luaVM).GetResourceFile();
+    if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
     {
-        CResourceFile* file = pLuaMain->GetResourceFile();
-        if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
-        {
-            CResourceHTMLItem* html = (CResourceHTMLItem*)file;
+        CResourceHTMLItem* html = (CResourceHTMLItem*)file;
 
-            char szName[255];
-            sprintf(szName, "Basic realm=\"%s\"", m_pMainConfig->GetServerName().c_str());
-            html->SetResponseHeader("WWW-Authenticate", szName);
-            html->SetResponseCode(401);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
+        char szName[255];
+        sprintf(szName, "Basic realm=\"%s\"", m_pMainConfig->GetServerName().c_str());
+        html->SetResponseHeader("WWW-Authenticate", szName);
+        html->SetResponseCode(401);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
-        m_pScriptDebugging->LogError(luaVM, lua_tostring(luaVM, lua_upvalueindex(1)));
+        m_pScriptDebugging->LogError(luaVM, "%s: Can only be used in HTML scripts", lua_tostring(luaVM, lua_upvalueindex(1)));
     lua_pushboolean(luaVM, false);
     return 1;
 }

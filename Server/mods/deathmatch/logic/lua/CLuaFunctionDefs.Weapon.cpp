@@ -123,26 +123,19 @@ int CLuaFunctionDefs::CreateWeapon(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CCustomWeapon* pWeapon = CStaticFunctionDefinitions::CreateWeapon(&resource, weaponType, vecPos);
+        if (pWeapon)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
+            CElementGroup* pGroup = resource.GetElementGroup();
+            if (pGroup)
             {
-                CCustomWeapon* pWeapon = CStaticFunctionDefinitions::CreateWeapon(pResource, weaponType, vecPos);
-                if (pWeapon)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CElement*)pWeapon);
-                    }
-
-                    lua_pushelement(luaVM, pWeapon);
-                    return 1;
-                }
+                pGroup->Add((CElement*)pWeapon);
             }
-        }
+
+            lua_pushelement(luaVM, pWeapon);
+            return 1;
+        }      
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

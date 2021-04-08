@@ -228,30 +228,16 @@ int CLuaElementDefs::createElement(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Get the virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CDummy* pDummy = CStaticFunctionDefinitions::CreateElement(&resource, strTypeName, strId);
+        if (pDummy)
         {
-            // Get the resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Try to create
-                CDummy* pDummy = CStaticFunctionDefinitions::CreateElement(pResource, strTypeName, strId);
-                if (pDummy)
-                {
-                    // Get the group
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pDummy);
-                    }
-                    lua_pushelement(luaVM, pDummy);
-                    return 1;
-                }
-                argStream.SetCustomError(SString("element type '%s' cannot be used", *strTypeName));
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pDummy);
+            lua_pushelement(luaVM, pDummy);
+            return 1;
         }
+        argStream.SetCustomError(SString("element type '%s' cannot be used", *strTypeName));
     }
 
     if (argStream.HasErrors())
@@ -301,25 +287,14 @@ int CLuaElementDefs::cloneElement(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CElement* pNewElement = CStaticFunctionDefinitions::CloneElement(&resource, pElement, vecPosition, bCloneChildren);
+        if (pNewElement)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CElement* pNewElement = CStaticFunctionDefinitions::CloneElement(pResource, pElement, vecPosition, bCloneChildren);
-
-                if (pNewElement)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pNewElement);
-                    }
-                    lua_pushelement(luaVM, pNewElement);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pNewElement);
+            lua_pushelement(luaVM, pNewElement);
+            return 1;
         }
     }
     else

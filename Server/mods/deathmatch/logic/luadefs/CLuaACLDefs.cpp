@@ -14,8 +14,7 @@
 // Helper function
 static const char* GetResourceName(lua_State* luaVM)
 {
-    CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    return luaMain ? luaMain->GetScriptName() : "";
+    return lua_getownercluamain(luaVM).GetScriptName();
 }
 
 void CLuaACLDefs::LoadFunctions()

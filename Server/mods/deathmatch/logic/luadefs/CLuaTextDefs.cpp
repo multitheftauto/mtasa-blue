@@ -90,17 +90,8 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
 
 int CLuaTextDefs::textCreateDisplay(lua_State* luaVM)
 {
-    // Get our current VM
-    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (luaMain)
-    {
-        // Create a text display and return it
-        CTextDisplay* textDisplay = luaMain->CreateDisplay();
-        lua_pushtextdisplay(luaVM, textDisplay);
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
+    // Create a text display and return it
+    lua_pushtextdisplay(luaVM, lua_getownercluamain(luaVM).CreateDisplay());
     return 1;
 }
 
@@ -113,14 +104,9 @@ int CLuaTextDefs::textDestroyDisplay(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            luaMain->DestroyDisplay(pTextDisplay);
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        lua_getownercluamain(luaVM).DestroyDisplay(pTextDisplay);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -181,14 +167,9 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
         else if (strVertAlign == "bottom")
             ucFormat |= 0x00000008;            // DT_BOTTOM
 
-        // Grab our virtual machine
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            CTextItem* pTextItem = luaMain->CreateTextItem(strText, fX, fY, (eTextPriority)iPriority, color, fScale, ucFormat, ucShadowAlpha);
-            lua_pushtextitem(luaVM, pTextItem);
-            return 1;
-        }
+        lua_pushtextitem(luaVM, lua_getownercluamain(luaVM).CreateTextItem(
+            strText, fX, fY, (eTextPriority)iPriority, color, fScale, ucFormat, ucShadowAlpha));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -206,14 +187,9 @@ int CLuaTextDefs::textDestroyTextItem(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            luaMain->DestroyTextItem(pTextItem);
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        lua_getownercluamain(luaVM).DestroyTextItem(pTextItem);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

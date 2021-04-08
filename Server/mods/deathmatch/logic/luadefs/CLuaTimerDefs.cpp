@@ -60,26 +60,21 @@ int CLuaTimerDefs::SetTimer(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
+        // Check for the minimum interval
+        if (dTimeInterval < LUA_TIMER_MIN_INTERVAL)
         {
-            // Check for the minimum interval
-            if (dTimeInterval < LUA_TIMER_MIN_INTERVAL)
+            argStream.SetCustomError("Interval is below " MTA_STR(LUA_TIMER_MIN_INTERVAL));
+        }
+        else
+        {
+            CLuaTimer* pLuaTimer = lua_getownercluamain(luaVM).GetTimerManager()->AddTimer(
+                iLuaFunction, CTickCount(dTimeInterval), uiTimesToExecute, Arguments);
+            if (pLuaTimer)
             {
-                argStream.SetCustomError("Interval is below " MTA_STR(LUA_TIMER_MIN_INTERVAL));
-            }
-            else
-            {
-                CLuaTimer* pLuaTimer = luaMain->GetTimerManager()->AddTimer(iLuaFunction, CTickCount(dTimeInterval), uiTimesToExecute, Arguments);
-
-                if (pLuaTimer)
-                {
-                    // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
-                    pLuaTimer->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
-
-                    lua_pushtimer(luaVM, pLuaTimer);
-                    return 1;
-                }
+                // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
+                pLuaTimer->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
+                lua_pushtimer(luaVM, pLuaTimer);
+                return 1;
             }
         }
     }
@@ -100,14 +95,9 @@ int CLuaTimerDefs::KillTimer(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            luaMain->GetTimerManager()->RemoveTimer(pLuaTimer);
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        lua_getownercluamain(luaVM).GetTimerManager()->RemoveTimer(pLuaTimer);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -126,14 +116,9 @@ int CLuaTimerDefs::ResetTimer(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            luaMain->GetTimerManager()->ResetTimer(pLuaTimer);
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        lua_getownercluamain(luaVM).GetTimerManager()->ResetTimer(pLuaTimer);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -170,34 +155,29 @@ int CLuaTimerDefs::GetTimers(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Find our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        // Create a new table
+        lua_newtable(luaVM);
+
+        // Add all the timers with less than ulTime left
+        CLuaTimerManager*                     pLuaTimerManager = lua_getownercluamain(luaVM).GetTimerManager();
+        CTickCount                            llCurrentTime = CTickCount::Now();
+        unsigned int                          uiIndex = 0;
+        CFastList<CLuaTimer*>::const_iterator iter = pLuaTimerManager->IterBegin();
+        for (; iter != pLuaTimerManager->IterEnd(); ++iter)
         {
-            // Create a new table
-            lua_newtable(luaVM);
+            CLuaTimer* pLuaTimer = *iter;
 
-            // Add all the timers with less than ulTime left
-            CLuaTimerManager*                     pLuaTimerManager = pLuaMain->GetTimerManager();
-            CTickCount                            llCurrentTime = CTickCount::Now();
-            unsigned int                          uiIndex = 0;
-            CFastList<CLuaTimer*>::const_iterator iter = pLuaTimerManager->IterBegin();
-            for (; iter != pLuaTimerManager->IterEnd(); ++iter)
+            // If the time left is less than the time specified, or the time specifed is 0
+            CTickCount llTimeLeft = (pLuaTimer->GetStartTime() + pLuaTimer->GetDelay()) - llCurrentTime;
+            if (dTime == 0 || llTimeLeft.ToDouble() <= dTime)
             {
-                CLuaTimer* pLuaTimer = *iter;
-
-                // If the time left is less than the time specified, or the time specifed is 0
-                CTickCount llTimeLeft = (pLuaTimer->GetStartTime() + pLuaTimer->GetDelay()) - llCurrentTime;
-                if (dTime == 0 || llTimeLeft.ToDouble() <= dTime)
-                {
-                    // Add it to the table
-                    lua_pushnumber(luaVM, ++uiIndex);
-                    lua_pushtimer(luaVM, pLuaTimer);
-                    lua_settable(luaVM, -3);
-                }
+                // Add it to the table
+                lua_pushnumber(luaVM, ++uiIndex);
+                lua_pushtimer(luaVM, pLuaTimer);
+                lua_settable(luaVM, -3);
             }
-            return 1;
         }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

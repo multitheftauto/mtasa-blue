@@ -79,25 +79,14 @@ int CLuaPickupDefs::createPickup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CPickup* pPickup = CStaticFunctionDefinitions::CreatePickup(&resource, vecPosition, ucType, dValue, ulRespawnInterval, dAmmo);
+        if (pPickup)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CPickup* pPickup = CStaticFunctionDefinitions::CreatePickup(pResource, vecPosition, ucType, dValue, ulRespawnInterval, dAmmo);
-                if (pPickup)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pPickup);
-                    }
-                    // Return the handle
-                    lua_pushelement(luaVM, pPickup);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pPickup);
+            lua_pushelement(luaVM, pPickup);
+            return 1;
         }
     }
     else

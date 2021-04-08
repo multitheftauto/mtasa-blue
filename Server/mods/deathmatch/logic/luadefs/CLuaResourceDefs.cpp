@@ -274,32 +274,24 @@ int CLuaResourceDefs::addResourceMap(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our LUA instance
-        CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLUA)
-        {
-            // Read out the resource and make sure it exists
-            CResource* pResource = pLUA->GetResource();
-            CResource* pThisResource = pResource;
-            if (pResource)
-            {
-                // Grab the mapname string
-                SString strPath;
-                SString strMetaName;
+        // Read out the resource and make sure it exists
+        CResource* const pThisResource = &lua_getownerresource(luaVM);
+        CResource* pResource = pThisResource;
 
-                if (CResourceManager::ParseResourcePathInput(strMapName, pResource, &strPath, NULL))
+        // Grab the mapname string
+        SString strPath;
+        SString strMetaName;
+        if (CResourceManager::ParseResourcePathInput(strMapName, pResource, &strPath, NULL)) // This function might change pResource depending on the path
+        {
+            CheckCanModifyOtherResource(argStream, pThisResource, pResource);
+            if (!argStream.HasErrors())
+            {
+                // Add the resource map and return it if we succeeded
+                CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap(pResource, strPath, strMetaName, usDimension, pThisResource->GetVirtualMachine());
+                if (pXMLNode)
                 {
-                    CheckCanModifyOtherResource(argStream, pThisResource, pResource);
-                    if (!argStream.HasErrors())
-                    {
-                        // Add the resource map and return it if we succeeded
-                        CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap(pResource, strPath, strMetaName, usDimension, pLUA);
-                        if (pXMLNode)
-                        {
-                            lua_pushxmlnode(luaVM, pXMLNode);
-                            return 1;
-                        }
-                    }
+                    lua_pushxmlnode(luaVM, pXMLNode);
+                    return 1;
                 }
             }
         }
@@ -337,32 +329,24 @@ int CLuaResourceDefs::addResourceConfig(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our LUA instance
-        CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLUA)
+        // Read out the resource and make sure it exists
+        CResource* const pThisResource = &lua_getownerresource(luaVM);
+        CResource* pResource = pThisResource;
+        
+        // Grab the mapname string
+        std::string strPath;
+        std::string strConfigName;
+        if (CResourceManager::ParseResourcePathInput(strMapName, pResource, &strPath, &strConfigName)) // This function might change pResource depending on the path
         {
-            // Read out the resource and make sure it exists
-            CResource* pResource = pLUA->GetResource();
-            CResource* pThisResource = pResource;
-            if (pResource)
+            CheckCanModifyOtherResource(argStream, pThisResource, pResource);
+            if (!argStream.HasErrors())
             {
-                // Grab the mapname string
-                std::string strPath;
-                std::string strConfigName;
-
-                if (CResourceManager::ParseResourcePathInput(strMapName, pResource, &strPath, &strConfigName))
+                // Add the resource map and return it if we succeeded
+                CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig(pResource, strPath, strConfigName, iType, pThisResource->GetVirtualMachine());
+                if (pXMLNode)
                 {
-                    CheckCanModifyOtherResource(argStream, pThisResource, pResource);
-                    if (!argStream.HasErrors())
-                    {
-                        // Add the resource map and return it if we succeeded
-                        CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig(pResource, strPath, strConfigName, iType, pLUA);
-                        if (pXMLNode)
-                        {
-                            lua_pushxmlnode(luaVM, pXMLNode);
-                            return 1;
-                        }
-                    }
+                    lua_pushxmlnode(luaVM, pXMLNode);
+                    return 1;
                 }
             }
         }
@@ -386,21 +370,14 @@ int CLuaResourceDefs::removeResourceFile(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pThisResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
-        if (pThisResource)
+        CResource* pThisResource = &lua_getownerresource(luaVM);
+        CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
+        CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strFileName);
+        if (!argStream.HasErrors())
         {
-            CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
-            CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strFileName);
-            if (!argStream.HasErrors())
-            {
-                if (CStaticFunctionDefinitions::RemoveResourceFile(pOtherResource, strFileName))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-            }
-        }
+            lua_pushboolean(luaVM, CStaticFunctionDefinitions::RemoveResourceFile(pOtherResource, strFileName));
+            return 1;
+        }       
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -511,19 +488,9 @@ int CLuaResourceDefs::startResource(lua_State* luaVM)
             {
                 // Add the new resource to the list of included resources so that when
                 // we unload this resource, the new resource goes with it
-                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-
-                if (pLuaMain)
-                {
-                    CResource* pThisResource = pLuaMain->GetResource();
-
-                    if (pThisResource)
-                    {
-                        pThisResource->AddTemporaryInclude(pResource);
-                        // Make sure the new resource is dependent on this one
-                        pResource->AddDependent(pThisResource);
-                    }
-                }
+                CResource* pThisResource = &lua_getownerresource(luaVM);
+                pThisResource->AddTemporaryInclude(pResource);
+                pResource->AddDependent(pThisResource); // Make sure the new resource is dependent on this one
             }
 
             CLogger::LogPrintf("%s: Resource '%s' started\n", lua_tostring(luaVM, lua_upvalueindex(1)), pResource->GetName().c_str());
@@ -563,9 +530,7 @@ int CLuaResourceDefs::stopResource(lua_State* luaVM)
     {
         if (pResource->IsProtected())
         {
-            CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-
-            if (!pThisResource || !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+            if (!m_pACLManager->CanObjectUseRight(lua_getownerresource(luaVM).GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
                                                                     "stopResource.protected", CAccessControlListRight::RIGHT_TYPE_FUNCTION, false))
             {
                 m_pScriptDebugging->LogError(luaVM, "%s: Resource could not be stopped as it is protected", lua_tostring(luaVM, lua_upvalueindex(1)));
@@ -624,14 +589,7 @@ int CLuaResourceDefs::restartResource(lua_State* luaVM)
 
 int CLuaResourceDefs::getThisResource(lua_State* luaVM)
 {
-    CLuaMain* amain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (amain)
-    {
-        CResource* thisResource = amain->GetResource();
-        lua_pushresource(luaVM, thisResource);
-        return 1;
-    }
-    lua_pushboolean(luaVM, false);
+    lua_pushresource(luaVM, &lua_getownerresource(luaVM));
     return 1;
 }
 
@@ -752,23 +710,15 @@ int CLuaResourceDefs::setResourceInfo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource* pThisResource = &lua_getownerresource(luaVM);
+        CheckCanModifyOtherResource(argStream, pThisResource, pResource);
+        if (!argStream.HasErrors())
         {
-            CResource* pThisResource = pLuaMain->GetResource();
-            if (pResource)
+            if (pResource->IsLoaded())
             {
-                CheckCanModifyOtherResource(argStream, pThisResource, pResource);
-                if (!argStream.HasErrors())
-                {
-                    if (pResource->IsLoaded())
-                    {
-                        pResource->SetInfoValue(strInfoValueKey, szInfoValue, bSave);
-
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
-                }
+                pResource->SetInfoValue(strInfoValueKey, szInfoValue, bSave);
+                lua_pushboolean(luaVM, true);
+                return 1;
             }
         }
     }
@@ -788,7 +738,7 @@ int CLuaResourceDefs::getResourceConfig(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
+        CResource* const pThisResource = &lua_getownerresource(luaVM);
         CResource* pResource = pThisResource;
 
         if (pThisResource && CResourceManager::ParseResourcePathInput(strConfigName, pResource, NULL, &strMetaPath))
@@ -919,20 +869,7 @@ int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (!pResource)
-        {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                pResource = pLuaMain->GetResource();
-            }
-
-            // No Lua VM or no assigned resource?
-            if (!pResource)
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-        }
+            pResource = &lua_getownerresource(luaVM);
 
         if (pResource->IsActive())
         {
@@ -962,21 +899,7 @@ int CLuaResourceDefs::getResourceDynamicElementRoot(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (!pResource)
-        {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                pResource = pLuaMain->GetResource();
-            }
-
-            // No Lua VM or no assigned resource?
-            if (!pResource)
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-        }
-
+            pResource = &lua_getownerresource(luaVM);
         if (pResource->IsActive())
         {
             CElement* pElement = pResource->GetDynamicElementRoot();
@@ -1038,28 +961,14 @@ int CLuaResourceDefs::getResourceExportedFunctions(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (!pResource)
-        {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                pResource = pLuaMain->GetResource();
-            }
-
-            // No Lua VM or no assigned resource?
-            if (!pResource)
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-        }
+            pResource = &lua_getownerresource(luaVM);
 
         lua_newtable(luaVM);
-        unsigned int                      uiIndex = 0;
-        list<CExportedFunction>::iterator iterd = pResource->IterBeginExportedFunctions();
-        for (; iterd != pResource->IterEndExportedFunctions(); ++iterd)
+        size_t uiIndex = 0;
+        for (auto it = pResource->IterBeginExportedFunctions(); it != pResource->IterEndExportedFunctions(); ++it)
         {
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, iterd->GetFunctionName().c_str());
+            lua_pushstring(luaVM, it->GetFunctionName().c_str());
             lua_settable(luaVM, -3);
         }
         return 1;
@@ -1132,57 +1041,54 @@ int CLuaResourceDefs::call(lua_State* luaVM)
 
         if (pResource->IsActive())
         {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
+            // Get the target Lua VM
+            lua_State* targetLuaVM = pResource->GetVirtualMachine()->GetVirtualMachine();
+
+            CResource* pThisResource = &lua_getownerresource(luaVM);
+
+            CLuaArguments args;
+            args.ReadArguments(luaVM, 3);
+            CLuaArguments returns;
+
+            LUA_CHECKSTACK(targetLuaVM, 1);            // Ensure some room
+
+            // Lets grab the original hidden variables so we can restore them later
+            lua_getglobal(targetLuaVM, "sourceResource");
+            CLuaArgument OldResource(luaVM, -1);
+            lua_pop(targetLuaVM, 1);
+
+            lua_getglobal(targetLuaVM, "sourceResourceRoot");
+            CLuaArgument OldResourceRoot(luaVM, -1);
+            lua_pop(targetLuaVM, 1);
+
+            // Set the new values for the current sourceResource, and sourceResourceRoot
+            lua_pushresource(targetLuaVM, pThisResource);
+            lua_setglobal(targetLuaVM, "sourceResource");
+
+            lua_pushelement(targetLuaVM, pThisResource->GetResourceRootElement());
+            lua_setglobal(targetLuaVM, "sourceResourceRoot");
+
+            if (pResource->CallExportedFunction(strFunctionName, args, returns, *pThisResource))
             {
-                // Get the target Lua VM
-                lua_State* targetLuaVM = pResource->GetVirtualMachine()->GetVirtualMachine();
-
-                CResource*    resourceThis = pLuaMain->GetResource();
-                CLuaArguments args;
-                args.ReadArguments(luaVM, 3);
-                CLuaArguments returns;
-
-                LUA_CHECKSTACK(targetLuaVM, 1);            // Ensure some room
-
-                // Lets grab the original hidden variables so we can restore them later
-                lua_getglobal(targetLuaVM, "sourceResource");
-                CLuaArgument OldResource(luaVM, -1);
-                lua_pop(targetLuaVM, 1);
-
-                lua_getglobal(targetLuaVM, "sourceResourceRoot");
-                CLuaArgument OldResourceRoot(luaVM, -1);
-                lua_pop(targetLuaVM, 1);
-
-                // Set the new values for the current sourceResource, and sourceResourceRoot
-                lua_pushresource(targetLuaVM, resourceThis);
+                returns.PushArguments(luaVM);
+                // Restore the old variables
+                OldResource.Push(targetLuaVM);
                 lua_setglobal(targetLuaVM, "sourceResource");
-
-                lua_pushelement(targetLuaVM, resourceThis->GetResourceRootElement());
+                OldResourceRoot.Push(targetLuaVM);
                 lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
-                if (pResource->CallExportedFunction(strFunctionName, args, returns, *resourceThis))
-                {
-                    returns.PushArguments(luaVM);
-                    // Restore the old variables
-                    OldResource.Push(targetLuaVM);
-                    lua_setglobal(targetLuaVM, "sourceResource");
-                    OldResourceRoot.Push(targetLuaVM);
-                    lua_setglobal(targetLuaVM, "sourceResourceRoot");
+                return returns.Count();
+            }
+            else
+            {
+                // Restore the old variables
+                OldResource.Push(targetLuaVM);
+                lua_setglobal(targetLuaVM, "sourceResource");
+                OldResourceRoot.Push(targetLuaVM);
+                lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
-                    return returns.Count();
-                }
-                else
-                {
-                    // Restore the old variables
-                    OldResource.Push(targetLuaVM);
-                    lua_setglobal(targetLuaVM, "sourceResource");
-                    OldResourceRoot.Push(targetLuaVM);
-                    lua_setglobal(targetLuaVM, "sourceResourceRoot");
-
-                    m_pScriptDebugging->LogError(luaVM, "%s: failed to call '%s:%s'", lua_tostring(luaVM, lua_upvalueindex(1)), pResource->GetName().c_str(),
-                                                 *strFunctionName);
-                }
+                m_pScriptDebugging->LogError(luaVM, "%s: failed to call '%s:%s'", lua_tostring(luaVM, lua_upvalueindex(1)), pResource->GetName().c_str(),
+                                                *strFunctionName);
             }
         }
         else
@@ -1293,9 +1199,8 @@ int CLuaResourceDefs::updateResourceACLRequest(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-        if (strUserName.empty() && pThisResource)
-            strUserName = pThisResource->GetName();
+        if (strUserName.empty())
+            strUserName = lua_getownerresource(luaVM).GetName();
 
         if (pResource->HandleAclRequestChange(CAclRightName(strRightName), bAccess, strUserName))
         {
@@ -1378,25 +1283,27 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         // Should apply some limit here?
         SString       strInput;
         CLuaArguments callbackArguments;
-        CLuaMain*     pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        while (pLuaMain)
+        for(CLuaMain* pLuaMain = &lua_getownercluamain(luaVM);;)
         {
+            // iLuaFunction seems like some generator function??
+            // If it returns nil the loop stops.
+            // It has to returns string(s), the code will join
+            // all the strings together.
+
             CLuaArguments returnValues;
             callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
             if (returnValues.Count())
             {
                 CLuaArgument* returnedValue = *returnValues.IterBegin();
                 int           iType = returnedValue->GetType();
+
                 if (iType == LUA_TNIL)
                     break;
-
                 else if (iType == LUA_TSTRING)
                 {
-                    std::string str = returnedValue->GetString();
-                    if (str.length() == 0)
+                    if (returnedValue->GetString().empty())
                         break;
-
-                    strInput += str;
+                    strInput += returnedValue->GetString();
                     continue;
                 }
             }

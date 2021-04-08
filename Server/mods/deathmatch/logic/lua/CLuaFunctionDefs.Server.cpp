@@ -78,34 +78,31 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        if (pElement)
         {
-            if (pElement)
+            if (IS_TEAM(pElement))
             {
-                if (IS_TEAM(pElement))
+                CTeam* pTeam = static_cast<CTeam*>(pElement);
+                for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
                 {
-                    CTeam* pTeam = static_cast<CTeam*>(pElement);
-                    for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
-                    {
-                        sendList.push_back(*iter);
-                    }
-                }
-                else
-                {
-                    CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-                    lua_pushboolean(luaVM, true);
-                    return 1;
+                    sendList.push_back(*iter);
                 }
             }
-
-            if (sendList.size() > 0)
+            else
             {
-                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
+                CStaticFunctionDefinitions::OutputChatBox(
+                    (const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, &lua_getownercluamain(luaVM));
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
+
+        if (sendList.size() > 0)
+        {
+            CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }       
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -141,13 +138,9 @@ int CLuaFunctionDefs::OOP_OutputChatBox(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CStaticFunctionDefinitions::OutputChatBox(strText, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        CStaticFunctionDefinitions::OutputChatBox(strText, pElement, ucRed, ucGreen, ucBlue, bColorCoded, &lua_getownercluamain(luaVM));
+        lua_pushboolean(luaVM, true);
+        return 1;   
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -278,16 +271,11 @@ int CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        // Add them to our list over command handlers
+        if (m_pRegisteredCommands->AddCommand(&lua_getownercluamain(luaVM), strKey, iLuaFunction, bRestricted, bCaseSensitive))
         {
-            // Add them to our list over command handlers
-            if (m_pRegisteredCommands->AddCommand(pLuaMain, strKey, iLuaFunction, bRestricted, bCaseSensitive))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
@@ -310,16 +298,11 @@ int CLuaFunctionDefs::RemoveCommandHandler(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        // Remove it from our list
+        if (m_pRegisteredCommands->RemoveCommand(&lua_getownercluamain(luaVM), strKey, iLuaFunction))
         {
-            // Remove it from our list
-            if (m_pRegisteredCommands->RemoveCommand(pLuaMain, strKey, iLuaFunction))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
@@ -343,24 +326,19 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CClient* pClient = NULL;
-            if (pElement->GetType() == CElement::PLAYER)
-                pClient = static_cast<CClient*>(static_cast<CPlayer*>(pElement));
+        CClient* pClient = NULL;
+        if (pElement->GetType() == CElement::PLAYER)
+            pClient = static_cast<CClient*>(static_cast<CPlayer*>(pElement));
 
-            if (pClient)
+        if (pClient)
+        {
+            // Call it
+            if (m_pRegisteredCommands->ProcessCommand(strKey, strArgs, pClient))
             {
-                // Call it
-                if (m_pRegisteredCommands->ProcessCommand(strKey, strArgs, pClient))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
+                lua_pushboolean(luaVM, true);
+                return 1;
             }
-        }
+        } 
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -442,19 +420,11 @@ int CLuaFunctionDefs::Set(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CResource* pResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-        if (pResource)
-        {
-            std::string strResourceName = pResource->GetName();
-            std::string strJSON;
-            Args.WriteToJSONString(strJSON);
-
-            if (g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), strJSON.c_str()))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        std::string strResourceName = lua_getownerresource(luaVM).GetName();
+        std::string strJSON;
+        Args.WriteToJSONString(strJSON);
+        lua_pushboolean(luaVM, g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), strJSON.c_str()));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -482,84 +452,81 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CResource* pResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-        if (pResource)
+
+        unsigned int uiIndex = 0;
+        bool         bDeleteNode;
+
+        // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
+        SString         strAttribute = "value";
+        vector<SString> Result;
+        strSetting.Split(".", Result);
+        if (Result.size() == 3 && Result[2].length())
         {
-            unsigned int uiIndex = 0;
-            bool         bDeleteNode;
+            strAttribute = Result[2];
+        }
 
-            // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
-            SString         strAttribute = "value";
-            vector<SString> Result;
-            strSetting.Split(".", Result);
-            if (Result.size() == 3 && Result[2].length())
+        // Get the setting
+        CXMLNode *pSubNode, *pNode = g_pGame->GetSettings()->Get(lua_getownerresource(luaVM).GetName().c_str(), strSetting.c_str(), bDeleteNode);
+
+        // Only proceed if we have a valid node
+        if (pNode)
+        {
+            // Argument count
+            unsigned int uiArgCount = 1;
+
+            // See if we need to return a table with single or multiple entries
+            if (pNode->GetSubNodeCount() == 0)
             {
-                strAttribute = Result[2];
-            }
-
-            // Get the setting
-            CXMLNode *pSubNode, *pNode = g_pGame->GetSettings()->Get(pResource->GetName().c_str(), strSetting.c_str(), bDeleteNode);
-
-            // Only proceed if we have a valid node
-            if (pNode)
-            {
-                // Argument count
-                unsigned int uiArgCount = 1;
-
-                // See if we need to return a table with single or multiple entries
-                if (pNode->GetSubNodeCount() == 0)
+                // See if required attribute exists
+                CXMLAttribute* pAttribute = pNode->GetAttributes().Find(strAttribute.c_str());
+                if (!pAttribute)
                 {
-                    // See if required attribute exists
-                    CXMLAttribute* pAttribute = pNode->GetAttributes().Find(strAttribute.c_str());
-                    if (!pAttribute)
-                    {
-                        if (bDeleteNode)
-                            delete pNode;
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    // We only have a single entry for a specific setting, so output a string
-                    const std::string& strDataValue = pAttribute->GetValue();
+                    if (bDeleteNode)
+                        delete pNode;
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+                // We only have a single entry for a specific setting, so output a string
+                const std::string& strDataValue = pAttribute->GetValue();
+                if (!Args.ReadFromJSONString(strDataValue.c_str()))
+                {
+                    // No valid JSON? Parse as plain text
+                    Args.PushString(strDataValue);
+                }
+
+                Args.PushArguments(luaVM);
+                uiArgCount = Args.Count();
+
+                /* Don't output a table because although it is more consistent with the multiple values output below,
+                ** due to lua's implementation of associative arrays (assuming we use the "setting-name", "value" key-value pairs)
+                ** it would require the scripter to walk through an array that only has a single entry which is a Bad Thing, performance wise.
+                **
+                PUSH_SETTING ( pNode );
+                Args.PushAsTable ( luaVM );
+                **/
+            }
+            else
+            {
+                // We need to return multiply entries, so push all subnodes
+                while ((pSubNode = pNode->FindSubNode("setting", uiIndex++)))
+                {
+                    CXMLAttributes& attributes = pSubNode->GetAttributes();
+                    Args.PushString(attributes.Find("name")->GetValue());
+                    const std::string& strDataValue = attributes.Find("value")->GetValue();
                     if (!Args.ReadFromJSONString(strDataValue.c_str()))
                     {
-                        // No valid JSON? Parse as plain text
                         Args.PushString(strDataValue);
                     }
-
-                    Args.PushArguments(luaVM);
-                    uiArgCount = Args.Count();
-
-                    /* Don't output a table because although it is more consistent with the multiple values output below,
-                    ** due to lua's implementation of associative arrays (assuming we use the "setting-name", "value" key-value pairs)
-                    ** it would require the scripter to walk through an array that only has a single entry which is a Bad Thing, performance wise.
-                    **
-                    PUSH_SETTING ( pNode );
-                    Args.PushAsTable ( luaVM );
-                    **/
                 }
-                else
-                {
-                    // We need to return multiply entries, so push all subnodes
-                    while ((pSubNode = pNode->FindSubNode("setting", uiIndex++)))
-                    {
-                        CXMLAttributes& attributes = pSubNode->GetAttributes();
-                        Args.PushString(attributes.Find("name")->GetValue());
-                        const std::string& strDataValue = attributes.Find("value")->GetValue();
-                        if (!Args.ReadFromJSONString(strDataValue.c_str()))
-                        {
-                            Args.PushString(strDataValue);
-                        }
-                    }
-                    // Push a table and return
-                    Args.PushAsTable(luaVM);
-                }
-
-                // Check if we have to delete the node
-                if (bDeleteNode)
-                    delete pNode;
-
-                return uiArgCount;
+                // Push a table and return
+                Args.PushAsTable(luaVM);
             }
+
+            // Check if we have to delete the node
+            if (bDeleteNode)
+                delete pNode;
+
+            return uiArgCount;
         }
     }
     else
@@ -695,25 +662,16 @@ int CLuaFunctionDefs::shutdown(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Get the VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Get the resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Log it
-                CLogger::LogPrintf("Server shutdown as requested by resource %s (%s)\n", pResource->GetName().c_str(), *strReason);
+        // Log it
+        CLogger::LogPrintf("Server shutdown as requested by resource %s (%s)\n",
+            lua_getownerresource(luaVM).GetName().c_str(), *strReason);
 
-                // Shut it down
-                g_pGame->SetIsFinished(true);
+        // Shut it down
+        g_pGame->SetIsFinished(true);
 
-                // Success
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        // Success
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

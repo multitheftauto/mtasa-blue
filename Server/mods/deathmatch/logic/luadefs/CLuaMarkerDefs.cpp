@@ -92,25 +92,14 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource& resource = lua_getownerresource(luaVM);
+        CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(&resource, vecPosition, strType, fSize, color, pVisibleTo);
+        if (pMarker)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it
-                CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(pResource, vecPosition, strType, fSize, color, pVisibleTo);
-                if (pMarker)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pMarker);
-                    }
-                    lua_pushelement(luaVM, pMarker);
-                    return 1;
-                }
-            }
+            if (CElementGroup* pGroup = resource.GetElementGroup())
+                pGroup->Add(pMarker);
+            lua_pushelement(luaVM, pMarker);
+            return 1;
         }
     }
     else

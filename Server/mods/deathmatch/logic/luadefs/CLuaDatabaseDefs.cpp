@@ -237,79 +237,77 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-        if (pThisResource)
+        CResource* const pThisResource = &lua_getownerresource(luaVM);
+
+        // If type is sqlite, and has a host, try to resolve path
+        if (strType == "sqlite" && !strHost.empty())
         {
-            // If type is sqlite, and has a host, try to resolve path
-            if (strType == "sqlite" && !strHost.empty())
+            // If path starts with :/ then use global database directory
+            if (strHost.BeginsWith(":/"))
             {
-                // If path starts with :/ then use global database directory
-                if (strHost.BeginsWith(":/"))
+                strHost = strHost.SubStr(1);
+                if (!IsValidFilePath(strHost))
                 {
-                    strHost = strHost.SubStr(1);
-                    if (!IsValidFilePath(strHost))
-                    {
-                        argStream.SetCustomError(SString("host path %s not valid", *strHost));
-                    }
-                    else
-                    {
-                        strHost = PathJoin(g_pGame->GetConfig()->GetGlobalDatabasesPath(), strHost);
-                    }
+                    argStream.SetCustomError(SString("host path %s not valid", *strHost));
                 }
                 else
                 {
-                    std::string strAbsPath;
-
-                    // Parse path
-                    CResource* pPathResource = pThisResource;
-                    if (CResourceManager::ParseResourcePathInput(strHost, pPathResource, &strAbsPath))
-                    {
-                        strHost = strAbsPath;
-                        CheckCanModifyOtherResource(argStream, pThisResource, pPathResource);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("host path %s not found", *strHost));
-                    }
+                    strHost = PathJoin(g_pGame->GetConfig()->GetGlobalDatabasesPath(), strHost);
                 }
             }
-
-            if (!argStream.HasErrors())
+            else
             {
-                if (strType == "mysql")
-                    pThisResource->SetUsingDbConnectMysql(true);
+                std::string strAbsPath;
 
-                // Add logging options
-                bool    bLoggingEnabled;
-                SString strLogTag;
-                SString strQueueName;
-                // Set default values if required
-                GetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled, 1);
-                GetOption<CDbOptionsMap>(strOptions, "tag", strLogTag, "script");
-                GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT);
-                SetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled);
-                SetOption<CDbOptionsMap>(strOptions, "tag", strLogTag);
-                SetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
-                // Do connect
-                SConnectionHandle connection = g_pGame->GetDatabaseManager()->Connect(strType, strHost, strUsername, strPassword, strOptions);
-                if (connection == INVALID_DB_HANDLE)
+                // Parse path
+                CResource* pPathResource = pThisResource;
+                if (CResourceManager::ParseResourcePathInput(strHost, pPathResource, &strAbsPath))
                 {
-                    argStream.SetCustomError(g_pGame->GetDatabaseManager()->GetLastErrorMessage());
+                    strHost = strAbsPath;
+                    CheckCanModifyOtherResource(argStream, pThisResource, pPathResource);
                 }
                 else
                 {
-                    // Use an element to wrap the connection for auto disconnected when the resource stops
-                    // Don't set a parent because the element should not be accessible from other resources
-                    CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement(NULL, connection);
-                    CElementGroup*              pGroup = pThisResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pElement);
-                    }
-
-                    lua_pushelement(luaVM, pElement);
-                    return 1;
+                    argStream.SetCustomError(SString("host path %s not found", *strHost));
                 }
+            }
+        }
+
+        if (!argStream.HasErrors())
+        {
+            if (strType == "mysql")
+                pThisResource->SetUsingDbConnectMysql(true);
+
+            // Add logging options
+            bool    bLoggingEnabled;
+            SString strLogTag;
+            SString strQueueName;
+            // Set default values if required
+            GetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled, 1);
+            GetOption<CDbOptionsMap>(strOptions, "tag", strLogTag, "script");
+            GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT);
+            SetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled);
+            SetOption<CDbOptionsMap>(strOptions, "tag", strLogTag);
+            SetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
+            // Do connect
+            SConnectionHandle connection = g_pGame->GetDatabaseManager()->Connect(strType, strHost, strUsername, strPassword, strOptions);
+            if (connection == INVALID_DB_HANDLE)
+            {
+                argStream.SetCustomError(g_pGame->GetDatabaseManager()->GetLastErrorMessage());
+            }
+            else
+            {
+                // Use an element to wrap the connection for auto disconnected when the resource stops
+                // Don't set a parent because the element should not be accessible from other resources
+                CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement(NULL, connection);
+                CElementGroup*              pGroup = pThisResource->GetElementGroup();
+                if (pGroup)
+                {
+                    pGroup->Add(pElement);
+                }
+
+                lua_pushelement(luaVM, pElement);
+                return 1;
             }
         }
     }
@@ -360,14 +358,11 @@ int CLuaDatabaseDefs::DbQuery(lua_State* luaVM)
         // Make callback function if required
         if (VERIFY_FUNCTION(iLuaFunction))
         {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                CLuaArguments Arguments;
-                Arguments.PushDbQuery(pJobData);
-                Arguments.PushArguments(callbackArgs);
-                pJobData->SetCallback(DbQueryCallback, g_pGame->GetLuaCallbackManager()->CreateCallback(pLuaMain, iLuaFunction, Arguments));
-            }
+            CLuaArguments Arguments;
+            Arguments.PushDbQuery(pJobData);
+            Arguments.PushArguments(callbackArgs);
+            pJobData->SetCallback(DbQueryCallback, g_pGame->GetLuaCallbackManager()->CreateCallback(
+                &lua_getownercluamain(luaVM), iLuaFunction, Arguments));
         }
         // Add debug info incase query result does not get collected
         pJobData->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
@@ -420,14 +415,11 @@ int CLuaDatabaseDefs::OOP_DbQuery(lua_State* luaVM)
         // Make callback function if required
         if (VERIFY_FUNCTION(iLuaFunction))
         {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                CLuaArguments Arguments;
-                Arguments.PushDbQuery(pJobData);
-                Arguments.PushArguments(callbackArgs);
-                pJobData->SetCallback(CLuaDatabaseDefs::DbQueryCallback, g_pGame->GetLuaCallbackManager()->CreateCallback(pLuaMain, iLuaFunction, Arguments));
-            }
+            CLuaArguments Arguments;
+            Arguments.PushDbQuery(pJobData);
+            Arguments.PushArguments(callbackArgs);
+            pJobData->SetCallback(CLuaDatabaseDefs::DbQueryCallback, g_pGame->GetLuaCallbackManager()->CreateCallback(
+                &lua_getownercluamain(luaVM), iLuaFunction, Arguments));
         }
         // Add debug info incase query result does not get collected
         pJobData->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));

@@ -298,32 +298,22 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+
+        // if ( usModel != 570 || m_pResourceManager->GetMinClientRequirement () > "1.3.2-xx" ) // Todo: On merge: Please insert the revision
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
+            CResource& resource = lua_getownerresource(luaVM);
+            CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle(
+                &resource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2);
+            if (pVehicle)
             {
-                // if ( usModel != 570 || m_pResourceManager->GetMinClientRequirement () > "1.3.2-xx" ) // Todo: On merge: Please insert the revision
-                {
-                    // Create the vehicle and return its handle
-                    CVehicle* pVehicle =
-                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2);
-                    if (pVehicle)
-                    {
-                        CElementGroup* pGroup = pResource->GetElementGroup();
-                        if (pGroup)
-                        {
-                            pGroup->Add(pVehicle);
-                        }
-                        lua_pushelement(luaVM, pVehicle);
-                        return 1;
-                    }
-                }
-                /*else
-                m_pScriptDebugging->LogCustom ( luaVM, "Please set min_mta_version to xxx" ); // Todo*/
+                if (CElementGroup* pGroup = resource.GetElementGroup())
+                    pGroup->Add(pVehicle);
+                lua_pushelement(luaVM, pVehicle);
+                return 1;
             }
         }
+        /*else
+        m_pScriptDebugging->LogCustom ( luaVM, "Please set min_mta_version to xxx" ); // Todo*/
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

@@ -85,53 +85,49 @@ int CLuaXMLDefs::xmlCreateFile(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, "xmlCreateFile may be using an outdated syntax. Please check and update.");
 #endif // !MTA_CLIENT
 
-    // Grab our resource
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    SString strInputPath, strRootNodeName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strInputPath);
+    argStream.ReadString(strRootNodeName);
+
+    if (!argStream.HasErrors())
     {
-        SString strInputPath, strRootNodeName;
+        CLuaMain& thisLMain = lua_getownercluamain(luaVM);
+        CResource* const pThisResource = thisLMain.GetResource();
+        CResource* pOtherResource = pThisResource; // clientside, this variable will always be pThisResource
 
-        CScriptArgReader argStream(luaVM);
-        argStream.ReadString(strInputPath);
-        argStream.ReadString(strRootNodeName);
-
-        if (!argStream.HasErrors())
+        // Resolve other resource from name
+        SString strPath;
+        if (CResourceManager::ParseResourcePathInput(strInputPath, pOtherResource, &strPath, nullptr))
         {
-            SString    strPath;
-            CResource* pThisResource = pLuaMain->GetResource();
-            CResource* pOtherResource = pThisResource;            // clientside, this variable will always be pThisResource
-
-            // Resolve other resource from name
-            if (CResourceManager::ParseResourcePathInput(strInputPath, pOtherResource, &strPath, nullptr))
+            CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
+            CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strPath);
+            if (!argStream.HasErrors())
             {
-                CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
-                CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strPath);
-                if (!argStream.HasErrors())
-                {
-                    // Make sure the dir exists so we can successfully make the file
-                    MakeSureDirExists(strPath);
+                // Make sure the dir exists so we can successfully make the file
+                MakeSureDirExists(strPath);
 
-                    // Create the XML file
-                    CXMLFile* xmlFile = pLuaMain->CreateXML(strPath);
-                    if (xmlFile)
+                // Create the XML file
+                CXMLFile* xmlFile = thisLMain.CreateXML(strPath);
+                if (xmlFile)
+                {
+                    // Create its root node
+                    CXMLNode* pRootNode = xmlFile->CreateRootNode(strRootNodeName);
+                    if (pRootNode)
                     {
-                        // Create its root node
-                        CXMLNode* pRootNode = xmlFile->CreateRootNode(strRootNodeName);
-                        if (pRootNode)
-                        {
-                            lua_pushxmlnode(luaVM, pRootNode);
-                            return 1;
-                        }
-                        // Destroy it if we failed
-                        pLuaMain->DestroyXML(xmlFile);
+                        lua_pushxmlnode(luaVM, pRootNode);
+                        return 1;
                     }
+                    // Destroy it if we failed
+                    thisLMain.DestroyXML(xmlFile);
                 }
             }
         }
-
-        if (argStream.HasErrors())
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -144,71 +140,67 @@ int CLuaXMLDefs::xmlLoadFile(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, "xmlLoadFile may be using an outdated syntax. Please check and update.");
 #endif // !MTA_CLIENT
 
-    // Grab our resource
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    SString strFileInput;
+    bool    bReadOnly;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strFileInput);
+    argStream.ReadIfNextIsBool(bReadOnly, false);
+
+    if (!argStream.HasErrors())
     {
-        SString strFileInput;
-        bool    bReadOnly;
+        CLuaMain& thisLMain = lua_getownercluamain(luaVM);
+        CResource* const pThisResource = thisLMain.GetResource();
+        CResource* pOtherResource = pThisResource;
 
-        CScriptArgReader argStream(luaVM);
-        argStream.ReadString(strFileInput);
-        argStream.ReadIfNextIsBool(bReadOnly, false);
-
-        if (!argStream.HasErrors())
+        // Resolve other resource from name
+        SString strPath;
+        if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, &strPath))
         {
-            SString    strPath;
-            CResource* pThisResource = pLuaMain->GetResource();
-            CResource* pOtherResource = pThisResource;
-
-            // Resolve other resource from name
-            if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, &strPath))
+            CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
+            CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strPath, &bReadOnly);
+            if (!argStream.HasErrors())
             {
-                CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
-                CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strPath, &bReadOnly);
-                if (!argStream.HasErrors())
+                // Make sure the dir exists so we can successfully make the file
+                MakeSureDirExists(strPath);
+
+                // Create the XML
+                CXMLFile* xmlFile = thisLMain.CreateXML(strPath.c_str(), true, bReadOnly);
+                if (xmlFile)
                 {
-                    // Make sure the dir exists so we can successfully make the file
-                    MakeSureDirExists(strPath);
-
-                    // Create the XML
-                    CXMLFile* xmlFile = pLuaMain->CreateXML(strPath.c_str(), true, bReadOnly);
-                    if (xmlFile)
+                    // Try to parse it
+                    if (xmlFile->Parse())
                     {
-                        // Try to parse it
-                        if (xmlFile->Parse())
-                        {
-                            // Grab the root node. If it didn't exist, create one
-                            CXMLNode* pRootNode = xmlFile->GetRootNode();
-                            if (!pRootNode)
-                                pRootNode = xmlFile->CreateRootNode("root");
+                        // Grab the root node. If it didn't exist, create one
+                        CXMLNode* pRootNode = xmlFile->GetRootNode();
+                        if (!pRootNode)
+                            pRootNode = xmlFile->CreateRootNode("root");
 
-                            // Could we create one?
-                            if (pRootNode)
-                            {
-                                // Return the root node
-                                lua_pushxmlnode(luaVM, pRootNode);
-                                return 1;
-                            }
-                        }
-
-                        if (FileExists(strPath))
+                        // Could we create one?
+                        if (pRootNode)
                         {
-                            SString strError;
-                            xmlFile->GetLastError(strError);
-                            if (!strError.empty())
-                                argStream.SetCustomError(strError, SString("Unable to read XML file %s", strFileInput.c_str()));
+                            // Return the root node
+                            lua_pushxmlnode(luaVM, pRootNode);
+                            return 1;
                         }
-                        // Destroy it if we failed
-                        pLuaMain->DestroyXML(xmlFile);
                     }
+
+                    if (FileExists(strPath))
+                    {
+                        SString strError;
+                        xmlFile->GetLastError(strError);
+                        if (!strError.empty())
+                            argStream.SetCustomError(strError, SString("Unable to read XML file %s", strFileInput.c_str()));
+                    }
+                    // Destroy it if we failed
+                    thisLMain.DestroyXML(xmlFile);
                 }
             }
         }
-
-        if (argStream.HasErrors())
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -224,20 +216,14 @@ int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    // Grab our resource
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    CXMLNode* rootNode = lua_getownercluamain(luaVM).ParseString(strXmlContent);
+    if (rootNode && rootNode->IsValid())
     {
-        CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent);
-
-        if (rootNode && rootNode->IsValid())
-        {
-            lua_pushxmlnode(luaVM, rootNode);
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, "Unable to load XML string");
+        lua_pushxmlnode(luaVM, rootNode);
+        return 1;
     }
+    else // TODO Possible Leak? Maybe node should be destroyed here?
+        m_pScriptDebugging->LogCustom(luaVM, "Unable to load XML string");
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -250,79 +236,74 @@ int CLuaXMLDefs::xmlCopyFile(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, "xmlCopyFile may be using an outdated syntax. Please check and update.");
 #endif // !MTA_CLIENT
 
-    // Grab our resource
-    CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLUA)
+    SString   strFile;
+    CXMLNode* pSourceNode;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pSourceNode);
+    argStream.ReadString(strFile);
+
+    if (!argStream.HasErrors())
     {
-        SString   strFile;
-        CXMLNode* pSourceNode;
+        CLuaMain& thisLMain = lua_getownercluamain(luaVM);
+        CResource* const pThisResource = thisLMain.GetResource();
+        CResource* pOtherResource = pThisResource;
 
-        CScriptArgReader argStream(luaVM);
-        argStream.ReadUserData(pSourceNode);
-        argStream.ReadString(strFile);
-
-        if (!argStream.HasErrors())
+        SString strPath;
+        if (CResourceManager::ParseResourcePathInput(strFile, pOtherResource, &strPath, NULL)) // This function might change pResource based on the path given
         {
-            SString    strPath;
-            CResource* pThisResource = pLUA->GetResource();
-            CResource* pOtherResource = pThisResource;
-
-            // Resolve other resource from name
-            if (CResourceManager::ParseResourcePathInput(strFile, pOtherResource, &strPath, NULL))
+            CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
+            CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strPath);
+            if (!argStream.HasErrors())
             {
-                CheckCanModifyOtherResource(argStream, pThisResource, pOtherResource);
-                CheckCanAccessOtherResourceFile(argStream, pThisResource, pOtherResource, strPath);
-                if (!argStream.HasErrors())
+                if (pSourceNode)
                 {
-                    if (pSourceNode)
+                    // Make sure the dir exists so we can successfully make the file
+                    MakeSureDirExists(strPath);
+
+                    // Grab the roots tag name
+                    std::string strRootTagName;
+                    strRootTagName = pSourceNode->GetTagName();
+
+                    // Create the new XML file and its root node
+                    CXMLFile* pNewXML = thisLMain.CreateXML(strPath.c_str());
+                    if (pNewXML)
                     {
-                        // Make sure the dir exists so we can successfully make the file
-                        MakeSureDirExists(strPath);
-
-                        // Grab the roots tag name
-                        std::string strRootTagName;
-                        strRootTagName = pSourceNode->GetTagName();
-
-                        // Create the new XML file and its root node
-                        CXMLFile* pNewXML = pLUA->CreateXML(strPath.c_str());
-                        if (pNewXML)
+                        // Grab the root of the new XML
+                        CXMLNode* pNewRoot = pNewXML->CreateRootNode(strRootTagName);
+                        if (pNewRoot)
                         {
-                            // Grab the root of the new XML
-                            CXMLNode* pNewRoot = pNewXML->CreateRootNode(strRootTagName);
-                            if (pNewRoot)
+                            // Copy over the attributes from the root
+                            int            iAttributeCount = pSourceNode->GetAttributes().Count();
+                            int            i = 0;
+                            CXMLAttribute* pAttribute;
+                            for (; i < iAttributeCount; i++)
                             {
-                                // Copy over the attributes from the root
-                                int            iAttributeCount = pSourceNode->GetAttributes().Count();
-                                int            i = 0;
-                                CXMLAttribute* pAttribute;
-                                for (; i < iAttributeCount; i++)
-                                {
-                                    pAttribute = pSourceNode->GetAttributes().Get(i);
-                                    if (pAttribute)
-                                        pNewRoot->GetAttributes().Create(*pAttribute);
-                                }
-
-                                // Copy the stuff from the given source node to the destination root
-                                if (pSourceNode->CopyChildrenInto(pNewRoot, true))
-                                {
-                                    lua_pushxmlnode(luaVM, pNewRoot);
-                                    return 1;
-                                }
+                                pAttribute = pSourceNode->GetAttributes().Get(i);
+                                if (pAttribute)
+                                    pNewRoot->GetAttributes().Create(*pAttribute);
                             }
 
-                            // Delete the XML again
-                            pLUA->DestroyXML(pNewXML);
+                            // Copy the stuff from the given source node to the destination root
+                            if (pSourceNode->CopyChildrenInto(pNewRoot, true))
+                            {
+                                lua_pushxmlnode(luaVM, pNewRoot);
+                                return 1;
+                            }
                         }
+
+                        // Delete the XML again
+                        thisLMain.DestroyXML(pNewXML);
                     }
-                    else
-                        argStream.SetCustomError(SString("Unable to copy XML file %s", strFile.c_str()), "Bad filepath");
                 }
+                else
+                    argStream.SetCustomError(SString("Unable to copy XML file %s", strFile.c_str()), "Bad filepath");
             }
         }
-
-        if (argStream.HasErrors())
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Error
     lua_pushboolean(luaVM, false);
@@ -338,15 +319,8 @@ int CLuaXMLDefs::xmlSaveFile(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            if (luaMain->SaveXML(pNode))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        lua_pushboolean(luaVM, lua_getownercluamain(luaVM).SaveXML(pNode));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -364,14 +338,10 @@ int CLuaXMLDefs::xmlUnloadFile(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
+        if (lua_getownercluamain(luaVM).DestroyXML(pNode))
         {
-            if (luaMain->DestroyXML(pNode))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else

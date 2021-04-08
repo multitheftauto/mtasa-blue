@@ -519,63 +519,36 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
 
 int CLuaPlayerDefs::GetAlivePlayers(lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-
-    if (pLuaMain)
+    lua_newtable(luaVM);
+    unsigned int uiIndex = 0;
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
     {
-        // Create a new table
-        lua_newtable(luaVM);
-
-        // Add all alive players
-        unsigned int uiIndex = 0;
-
-        for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+        CPlayer* pPlayer = *iter;
+        if (pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
         {
-            CPlayer* pPlayer = *iter;
-
-            if (pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
-            {
-                lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, pPlayer);
-                lua_settable(luaVM, -3);
-            }
+            lua_pushnumber(luaVM, ++uiIndex);
+            lua_pushelement(luaVM, pPlayer);
+            lua_settable(luaVM, -3);
         }
-
-        return 1;
     }
-
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
 int CLuaPlayerDefs::GetDeadPlayers(lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    lua_newtable(luaVM);
+    unsigned int uiIndex = 0;
 
-    if (pLuaMain)
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
     {
-        // Create a new table
-        lua_newtable(luaVM);
-
-        // Add all dead players
-        unsigned int uiIndex = 0;
-
-        for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+        CPlayer* pPlayer = *iter;
+        if (pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
         {
-            CPlayer* pPlayer = *iter;
-
-            if (pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
-            {
-                lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, pPlayer);
-                lua_settable(luaVM, -3);
-            }
+            lua_pushnumber(luaVM, ++uiIndex);
+            lua_pushelement(luaVM, pPlayer);
+            lua_settable(luaVM, -3);
         }
-
-        return 1;
     }
-
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -922,18 +895,10 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-        if (pResource)
-        {
-            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-            if (CStaticFunctionDefinitions::TakePlayerScreenShot(pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::TakePlayerScreenShot(
+            pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, &lua_getownerresource(luaVM)));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1496,17 +1461,12 @@ int CLuaPlayerDefs::BindKey(lua_State* luaVM)
     SString  strCommand;
     SString  strArguments;
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
     argStream.ReadString(strKey);
     argStream.ReadString(strHitState);
+
+    CLuaMain& lmain = lua_getownercluamain(luaVM);
 
     if (argStream.NextIsString())
     {
@@ -1515,7 +1475,7 @@ int CLuaPlayerDefs::BindKey(lua_State* luaVM)
         argStream.ReadString(strArguments, "");
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, strCommand, strArguments, pLuaMain->GetResource()->GetName().c_str()))
+            if (CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, strCommand, strArguments, lmain.GetResource()->GetName().c_str()))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1532,7 +1492,7 @@ int CLuaPlayerDefs::BindKey(lua_State* luaVM)
         argStream.ReadFunctionComplete();
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, pLuaMain, iLuaFunction, Arguments))
+            if (CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, &lmain, iLuaFunction, Arguments))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1554,12 +1514,7 @@ int CLuaPlayerDefs::UnbindKey(lua_State* luaVM)
     SString  strHitState;
     SString  strCommand;
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+    CLuaMain& lmain = lua_getownercluamain(luaVM);
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
@@ -1572,7 +1527,7 @@ int CLuaPlayerDefs::UnbindKey(lua_State* luaVM)
         argStream.ReadString(strCommand);
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::UnbindKey(pPlayer, strKey, strHitState, strCommand, pLuaMain->GetResource()->GetName().c_str()))
+            if (CStaticFunctionDefinitions::UnbindKey(pPlayer, strKey, strHitState, strCommand, lmain.GetResource()->GetName().c_str()))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1588,7 +1543,7 @@ int CLuaPlayerDefs::UnbindKey(lua_State* luaVM)
         argStream.ReadFunctionComplete();
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::UnbindKey(pPlayer, strKey, pLuaMain, strHitState, iLuaFunction))
+            if (CStaticFunctionDefinitions::UnbindKey(pPlayer, strKey, &lmain, strHitState, iLuaFunction))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1612,13 +1567,6 @@ int CLuaPlayerDefs::IsKeyBound(lua_State* luaVM)
     SString         strArguments;
     CLuaFunctionRef iLuaFunction;
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
     argStream.ReadString(strKey);
@@ -1630,7 +1578,7 @@ int CLuaPlayerDefs::IsKeyBound(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         bool bBound;
-        if (CStaticFunctionDefinitions::IsKeyBound(pPlayer, strKey, pLuaMain, strHitState.empty() ? NULL : strHitState.c_str(), iLuaFunction, bBound))
+        if (CStaticFunctionDefinitions::IsKeyBound(pPlayer, strKey, &lua_getownercluamain(luaVM), strHitState.empty() ? NULL : strHitState.c_str(), iLuaFunction, bBound))
         {
             lua_pushboolean(luaVM, bBound);
             return 1;
@@ -2034,13 +1982,9 @@ int CLuaPlayerDefs::ShowCursor(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pPlayer);
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain && CStaticFunctionDefinitions::ShowCursor(pPlayer, pLuaMain, bShow, bToggleControls))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::ShowCursor(
+            pPlayer, &lua_getownercluamain(luaVM), bShow, bToggleControls));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
