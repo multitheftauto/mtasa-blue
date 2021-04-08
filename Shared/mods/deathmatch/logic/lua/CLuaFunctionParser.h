@@ -452,7 +452,7 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
         {
-            CLuaMain& lmain = lua_getownercluamain(luaVM);
+            CLuaMain& lmain = lua_getownercluamain(L);
             const void* pFuncPtr = lua_topointer(L, index);
 
             if (CRefInfo* pInfo = MapFind(lmain.m_CallbackTable, pFuncPtr))
@@ -469,7 +469,7 @@ struct CLuaFunctionParserBase
                 int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
                 // Save ref info
-                lmain.m_CallbackTable[pFunctionPtr] = {ref};
+                lmain.m_CallbackTable[pFuncPtr] = {ref};
 
                 ++index;
                 return CLuaFunctionRef(L, ref, pFuncPtr);
