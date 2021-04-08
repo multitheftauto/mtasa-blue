@@ -58,94 +58,73 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::variant<CVector, float> variant)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        const CVector vecSize = [&]() {
-            if (std::holds_alternative<CVector>(variant))
-            {
-                return std::get<CVector>(variant);
-            }
-            else if (std::holds_alternative<float>(variant))
-            {
-                float fSize = std::get<float>(variant);
-                return CVector{fSize, fSize, fSize};
-            }
-        }();
+    auto& pLuaMain = lua_getownercluamain(luaVM);
 
-        CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
+    const CVector vecSize = [&]() {
+        if (std::holds_alternative<CVector>(variant))
+        {
+            return std::get<CVector>(variant);
+        }
+        else if (std::holds_alternative<float>(variant))
+        {
+            float fSize = std::get<float>(variant);
+            return CVector{fSize, fSize, fSize};
+        }
+    }();
 
-        CLuaPhysicsBoxShape* pBox = GetPhysics()->CreateBoxShape(vecSize / 2);
-        pLuaMain->GetPhysicsShapeManager()->Add(pBox);
+    CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
-        return pBox;
-    }
-    throw std::invalid_argument("Invalid lua state.");
+    CLuaPhysicsBoxShape* pBox = GetPhysics()->CreateBoxShape(vecSize / 2);
+    pLuaMain.GetPhysicsShapeManager()->Add(pBox);
+
+    return pBox;
 }
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
+    if (!options.has_value() || options.value().empty())
     {
-        CLuaPhysicsRigidBody* pRigidBody = nullptr;
-        if (!options.has_value() || options.value().empty())
-        {
-            pRigidBody = GetPhysics()->CreateRigidBody(pShape);
-            pRigidBody->SetPosition(CVector{0, 0, 0});
-            pRigidBody->SetEnabled(true);
-            return pRigidBody;
-        }
-
-        float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
-
-        if (fMass < 0)
-            throw std::invalid_argument("Mass can not be negative");
-        if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
-            throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
-
-        CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
-        CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
-        CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
-        CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
-
-        pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
-
-        pRigidBody->SetPosition(vecPosition);
-        pRigidBody->SetRotation(vecRotation);
+        pRigidBody = GetPhysics()->CreateRigidBody(pShape);
+        pRigidBody->SetPosition(CVector{0, 0, 0});
         pRigidBody->SetEnabled(true);
-        pLuaMain->GetPhysicsRigidBodyManager()->Add(pRigidBody);
         return pRigidBody;
     }
-    throw std::invalid_argument("Invalid lua state.");
+
+    float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
+
+    if (fMass < 0)
+        throw std::invalid_argument("Mass can not be negative");
+    if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
+        throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
+
+    CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
+    CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
+    CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
+    CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
+
+    pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+
+    pRigidBody->SetPosition(vecPosition);
+    pRigidBody->SetRotation(vecRotation);
+    pRigidBody->SetEnabled(true);
+    pLuaMain.GetPhysicsRigidBodyManager()->Add(pRigidBody);
+    return pRigidBody;
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
+    auto&                       pLuaMain = lua_getownercluamain(luaVM);
+    CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
 
-        pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
-        pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
-        pStaticCollision->SetEnabled(true);
-        pLuaMain->GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
-        return pStaticCollision;
-    }
+    pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
+    pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
+    pStaticCollision->SetEnabled(true);
+    pLuaMain.GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
+    return pStaticCollision;
 }
 
 #ifdef MTA_CLIENT

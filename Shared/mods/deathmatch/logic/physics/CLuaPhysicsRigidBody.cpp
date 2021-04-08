@@ -29,9 +29,9 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 bool CLuaPhysicsRigidBody::Destroy()
 {
 #ifdef MTA_CLIENT
-    g_pClientGame->GetPhysics()->DestroyElement(this);
+    g_pClientGame->GetPhysics()->DestroyRigidBody(this);
 #else
-    g_pGame->GetPhysics()->DestroyElement(this);
+    g_pGame->GetPhysics()->DestroyRigidBody(this);
 #endif
     m_pShape->RemoveRigidBody(this);
     return true;

@@ -30,11 +30,19 @@ void CPhysicsStaticCollisionProxy::SetEnabled(bool bEnabled)
     {
         if (bEnabled)
         {
-            m_pPhysics->AddStaticCollision(this);
+#ifdef MTA_CLIENT
+            g_pClientGame->GetPhysics()->AddStaticCollision(this);
+#else
+            g_pGame->GetPhysics()->AddStaticCollision(this);
+#endif
         }
         else
         {
-            m_pPhysics->RemoveStaticCollision(this);
+#ifdef MTA_CLIENT
+            g_pClientGame->GetPhysics()->RemoveStaticCollision(this);
+#else
+            g_pGame->GetPhysics()->RemoveStaticCollision(this);
+#endif
         }
         m_bEnabled = bEnabled;
     }

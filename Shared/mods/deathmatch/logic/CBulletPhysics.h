@@ -46,33 +46,24 @@ class CPhysicsDebugDrawer;
 
 class CBulletPhysics
 {
-public:
-    CBulletPhysics();
-    ~CBulletPhysics();
-
     friend CLuaPhysicsRigidBodyManager;
     friend CLuaPhysicsShapeManager;
     friend CLuaPhysicsStaticCollisionManager;
 
     friend CPhysicsRigidBodyProxy;
     friend CPhysicsStaticCollisionProxy;
+    friend CLuaPhysicsShape;
+    friend CLuaPhysicsRigidBody;
+    friend CLuaPhysicsStaticCollision;
 
-    bool ReadSpecialData(const int iLine) { return true; }
+public:
+    CBulletPhysics();
+    ~CBulletPhysics();
 
-    // Sorta a hack that these are required by CClientEntity...
-    void Unlink();
-    void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
-
-    // BulletPhysics specific methods
     void    SetGravity(CVector vecGravity) const;
     CVector GetGravity() const;
 
-    void Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed);
-
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
-
-    void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
     CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
@@ -101,21 +92,13 @@ private:
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
 
-    // Thread safe
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
-    // Thread safe
     void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
-    // Thread safe
     void AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
-    // Thread safe
     void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
-    // Thread safe
 
-    // Use DestroyElement instead
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    // Use DestroyElement instead
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
-    // Use DestroyElement instead
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     void StepSimulation();

@@ -23,12 +23,9 @@ public:
     {
     }
 
-    CBulletPhysics* GetPhysics() const { return m_pPhysics; }
-
     virtual void SetEnabled(bool bEnabled) = 0;
     bool         IsEnabled() const { return m_bEnabled; }
 
 protected:
-    CBulletPhysics* m_pPhysics;
     bool            m_bEnabled = false;
 };

@@ -66,24 +66,6 @@ CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsSha
     return pStaticCollision;
 }
 
-
-void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
-{
-    switch (pPhysicsElement->GetClassType())
-    {
-        case EIdClassType::RIGID_BODY:
-            m_pLuaMain->GetPhysicsRigidBodyManager()->Remove((CLuaPhysicsRigidBody*)pPhysicsElement);
-            return;
-        case EIdClassType::SHAPE:
-            m_pLuaMain->GetPhysicsShapeManager()->Remove((CLuaPhysicsShape*)pPhysicsElement);
-            return;
-        case EIdClassType::STATIC_COLLISION:
-            m_pLuaMain->GetPhysicsStaticCollisionManager()->Remove((CLuaPhysicsStaticCollision*)pPhysicsElement);
-            return;
-    }
-    assert(false && "Unimplemented class type");
-}
-
 void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     m_vecStaticCollisions.push_back(pStaticCollision);

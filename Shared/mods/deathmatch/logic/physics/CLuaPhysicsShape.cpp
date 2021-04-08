@@ -21,9 +21,9 @@ CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pShape) : CLuaPhysicsElemen
 bool CLuaPhysicsShape::Destroy()
 {
 #ifdef MTA_CLIENT
-    g_pClientGame->GetPhysics()->DestroyElement(this);
+    g_pClientGame->GetPhysics()->DestroyShape(this);
 #else
-    g_pGame->GetPhysics()->DestroyElement(this);
+    g_pGame->GetPhysics()->DestroyShape(this);
 #endif
     return true;
 }

@@ -53,11 +53,19 @@ void CPhysicsRigidBodyProxy::SetEnabled(bool bEnabled)
     {
         if (bEnabled)
         {
-            m_pPhysics->AddRigidBody(this);
+#ifdef MTA_CLIENT
+            g_pClientGame->GetPhysics()->AddRigidBody(this);
+#else
+            g_pGame->GetPhysics()->AddRigidBody(this);
+#endif
         }
         else
         {
-            m_pPhysics->RemoveRigidBody(this);
+#ifdef MTA_CLIENT
+            g_pClientGame->GetPhysics()->RemoveRigidBody(this);
+#else
+            g_pGame->GetPhysics()->RemoveRigidBody(this);
+#endif
         }
         m_bEnabled = bEnabled;
     } 
