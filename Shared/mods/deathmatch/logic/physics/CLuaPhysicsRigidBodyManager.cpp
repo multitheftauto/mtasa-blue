@@ -24,7 +24,12 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
     }
 
     // Remove all references
+
+#ifdef MTA_CLIENT
+    g_pClientGame->GetPhysics()->DestroyRigidBody(pRigidBody);
+#else
     g_pGame->GetPhysics()->DestroyRigidBody(pRigidBody);
+#endif
 
     {
         std::lock_guard guard(lock);

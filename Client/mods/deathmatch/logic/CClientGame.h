@@ -278,6 +278,7 @@ public:
     CRPCFunctions*                GetRPCFunctions() { return m_pRPCFunctions; }
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
     CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
+    CBulletPhysics*               GetPhysics() { return m_pPhysics.get(); }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }
@@ -839,6 +840,8 @@ private:
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
+
+    std::unique_ptr<CBulletPhysics> m_pPhysics;
 };
 
 extern CClientGame* g_pClientGame;

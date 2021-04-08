@@ -24,7 +24,11 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
     }
 
     pShape->Unlink();
+#ifdef MTA_CLIENT
+    g_pClientGame->GetPhysics()->DestroyShape(pShape);
+#else
     g_pGame->GetPhysics()->DestroyShape(pShape);
+#endif
 
     {
         std::lock_guard lk(lock);

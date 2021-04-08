@@ -33,6 +33,8 @@
 
 CGame* g_pGame = NULL;
 
+#define g_pDeathmatch g_pGame
+
 char          szProgress[4] = {'-', '\\', '|', '/'};
 unsigned char ucProgress = 0;
 unsigned char ucProgressSkip = 0;
@@ -207,7 +209,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
 
-    m_pPhysics = std::make_unique<CBulletPhysics>(ePhysicsWorld::DiscreteDynamicsWorld);
+    m_pPhysics = std::make_unique<CBulletPhysics>();
 }
 
 void CGame::ResetMapInfo()
@@ -414,8 +416,6 @@ void CGame::DoPulse()
     GetRemoteCalls()->ProcessQueuedFiles();
     g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE)->ProcessQueuedFiles();
     UNCLOCK1("HTTPDownloadManager");
-
-    g_pGame->GetPhysics()->WaitForSimulationToFinish();
 
     CLOCK_CALL1(m_pPlayerManager->DoPulse(););
 

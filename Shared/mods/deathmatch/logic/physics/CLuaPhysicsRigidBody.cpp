@@ -28,22 +28,20 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 
 bool CLuaPhysicsRigidBody::Destroy()
 {
+#ifdef MTA_CLIENT
+    g_pClientGame->GetPhysics()->DestroyElement(this);
+#else
     g_pGame->GetPhysics()->DestroyElement(this);
+#endif
     m_pShape->RemoveRigidBody(this);
     return true;
 }
 
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
 {
-    btTransform transform;
-    {
-        ElementLock lk(this);
-        btTransform transform = m_pRigidBodyProxy->getWorldTransform();
-        CPhysicsSharedLogic::SetPosition(transform, vecPosition);
-        // m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
-        m_pRigidBodyProxy->setWorldTransform(transform);
-        m_pRigidBodyProxy->proceedToTransform(transform);
-    }
+    btTransform transform = m_pRigidBodyProxy->getWorldTransform();
+    CPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    m_pRigidBodyProxy->proceedToTransform(transform);
 }
 
 const CVector CLuaPhysicsRigidBody::GetPosition() const
@@ -57,12 +55,8 @@ void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation)
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    {
-        ElementLock lk(this);
-        btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
-        CPhysicsSharedLogic::SetRotation(transform, vecRotation);
-        m_pRigidBodyProxy->proceedToTransform(transform);
-    }
+    CPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    m_pRigidBodyProxy->proceedToTransform(transform);
 }
 
 const CVector CLuaPhysicsRigidBody::GetRotation() const

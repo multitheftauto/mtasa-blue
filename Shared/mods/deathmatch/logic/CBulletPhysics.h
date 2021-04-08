@@ -47,7 +47,7 @@ class CPhysicsDebugDrawer;
 class CBulletPhysics
 {
 public:
-    CBulletPhysics(ePhysicsWorld physicsWorldType);
+    CBulletPhysics();
     ~CBulletPhysics();
 
     friend CLuaPhysicsRigidBodyManager;
@@ -68,40 +68,6 @@ public:
     void    SetGravity(CVector vecGravity) const;
     CVector GetGravity() const;
 
-    // Thread-safe access to bullet physics world
-    class WorldContext
-    {
-        friend CBulletPhysics;
-
-        std::unique_lock<std::mutex> m_lock;
-
-    public:
-        // static void* operator new(size_t) = delete;
-
-        WorldContext() : m_pPhysics(g_pGame->GetPhysics()), m_lock(m_pPhysics->lock, std::try_to_lock)
-        {
-            assert(m_lock.owns_lock() && "Physics world is already locked");
-            m_btWorld = [&]() {
-                switch (m_pPhysics->m_ePhysicsWorldType)
-                {
-                    case ePhysicsWorld::DiscreteDynamicsWorld:
-                        return m_pPhysics->m_pDynamicsWorld.get();
-                }
-            }();
-
-            // Implement your world, and bump number.
-            static_assert((int)ePhysicsWorld::Count == 1, "Unimplemented world type");
-        }
-
-        ~WorldContext() {}
-        bool                     IsLocked() { return m_pPhysics->m_lockBtWorld.owns_lock(); }
-        btDiscreteDynamicsWorld* operator->() { return m_btWorld; }
-
-    private:
-        const CBulletPhysics*    m_pPhysics;
-        btDiscreteDynamicsWorld* m_btWorld;
-    };
-
     void Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed);
 
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
@@ -114,15 +80,7 @@ public:
 
     CLuaPhysicsBoxShape* CreateBoxShape(CVector vector);
 
-    std::atomic<bool> isDuringSimulation = false;
-    void              AddToActivationStack(CLuaPhysicsRigidBody* pRigidBody);
-    void              AddToUpdateAABBStack(CLuaPhysicsRigidBody* pRigidBody);
-    void              AddToChangesStack(CLuaPhysicsElement* pElement);
-    void              AddToBatchUpdate(CLuaPhysicsElement* pElement);
-    void              AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-
-    CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionObject* pCollisionObject);
-    CLuaPhysicsRigidBody*       GetRigidBodyFromCollisionShape(const btCollisionObject* pCollisionObject);
+    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
 
@@ -137,11 +95,6 @@ public:
 
     // Running on worker thread
     void DoPulse();
-    bool CanDoPulse();
-    void WaitForSimulationToFinish();
-
-    // For elements managment
-    mutable std::recursive_mutex m_elementsLock;
 
 private:
     std::vector<CLuaPhysicsShape*>           m_vecShapes;
@@ -174,41 +127,23 @@ private:
     // stepSimulation, doPulse thread safety lock
     mutable std::mutex pulseLock;
 
-    std::unique_ptr<btSequentialImpulseConstraintSolver>   m_pSolver;
-    std::unique_ptr<btSequentialImpulseConstraintSolverMt> m_pSolverMt;
-    std::unique_ptr<btConstraintSolverPoolMt>              m_pMtSolverPool;
-    std::unique_ptr<btBroadphaseInterface>                 m_pOverlappingPairCache;
-    std::unique_ptr<btCollisionDispatcher>                 m_pDispatcher;
-    std::unique_ptr<btCollisionDispatcherMt>               m_pDispatcherMt;
-    std::unique_ptr<btDefaultCollisionConfiguration>       m_pCollisionConfiguration;
+    std::unique_ptr<btSequentialImpulseConstraintSolver> m_pSolver;
+    std::unique_ptr<btConstraintSolverPoolMt>            m_pMtSolverPool;
+    std::unique_ptr<btBroadphaseInterface>               m_pOverlappingPairCache;
+    std::unique_ptr<btCollisionDispatcher>               m_pDispatcher;
+    std::unique_ptr<btDefaultCollisionConfiguration>     m_pCollisionConfiguration;
 
-    // Don't use directly, use "WorldContext world(this)" instead
-    std::unique_ptr<btDiscreteDynamicsWorldMt> m_pDynamicsWorldMt;
-    // Don't use directly, use "WorldContext world(this)" instead
     std::unique_ptr<btDiscreteDynamicsWorld> m_pDynamicsWorld;
-    bool                                     m_bUseMt = false;            // true when multithreaded world is in use
 
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 
-    std::atomic<int> m_iDeltaTimeMs = 0;
-    CLuaMain*        m_pLuaMain;
-
-    const ePhysicsWorld                  m_ePhysicsWorldType;
-    bool                                 m_canDoPulse = false;
     CTickCount                           m_LastTimeMs;
     std::atomic<float>                   m_fSpeed = 1.0f;
-    bool                                 m_bDuringSimulation = false;
     std::atomic<int>                     m_iSubSteps = 10;
     std::atomic<bool>                    m_bWorldHasChanged = false;
     mutable std::unique_lock<std::mutex> m_lockBtWorld;
-    std::mutex                           m_lockWorldHasChanged;
-    float                                m_fImpulseThreshold = 0.01f;
     std::atomic<bool>                    m_bSimulationEnabled = false;
-    bool                                 m_bTriggerEvents = true;
-    bool                                 m_bTriggerCollisionEvents = false;            // spam alert
-    bool                                 m_bTriggerConstraintEvents = false;
-
-    SharedUtil::ConcurrentList<CLuaPhysicsStaticCollision*> m_InitializeStaticCollisionsList;
+    float                                m_fDeltaTime;
 
 #ifdef MTA_CLIENT
     bool m_bDrawDebugNextTime = false;

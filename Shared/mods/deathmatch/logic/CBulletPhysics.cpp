@@ -17,79 +17,45 @@
 #include "physics/CPhysicsDebugDrawer.h"
 
 
-CBulletPhysics::CBulletPhysics(ePhysicsWorld physicsWorldType) : m_ePhysicsWorldType(physicsWorldType)
-{
-
-}
-
-// Requires ~3789,34KB of ram
-void CBulletPhysics::Initialize(int iParallelSolvers, int iGrainSize, unsigned long ulSeed)
+CBulletPhysics::CBulletPhysics()
 {
     m_pOverlappingPairCache = std::make_unique<btDbvtBroadphase>();
     m_pCollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
     m_pDebugDrawer = std::make_unique<CPhysicsDebugDrawer>();
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 
-    if (iParallelSolvers > 1)
-    {
-        m_pSolverMt = std::make_unique<btSequentialImpulseConstraintSolverMt>();
-        m_pSolverMt->setRandSeed(ulSeed);
-        m_pMtSolverPool = std::make_unique<btConstraintSolverPoolMt>(iParallelSolvers);
-        m_pDispatcherMt = std::make_unique<btCollisionDispatcherMt>(m_pCollisionConfiguration.get(), iGrainSize);
-        m_pDynamicsWorldMt = std::make_unique<btDiscreteDynamicsWorldMt>(m_pDispatcherMt.get(), m_pOverlappingPairCache.get(), m_pMtSolverPool.get(),
-                                                                         m_pSolverMt.get(), m_pCollisionConfiguration.get());
-        m_bUseMt = true;
-    }
-    else
-    {
-        m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
-        m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
-        m_pSolver->setRandSeed(ulSeed);
-        m_pDynamicsWorld =
-            std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
-        m_bUseMt = false;
-    }
+    m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
+    m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
+    m_pDynamicsWorld =
+        std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
 
-    WorldContext world;
-    world->setGravity(BulletPhysics::Defaults::Gravity);
-    world->setDebugDrawer(m_pDebugDrawer.get());
-    world->getSimulationIslandManager()->setSplitIslands(true);
+    m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
+    m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
     m_bSimulationEnabled = true;
 }
 
 CBulletPhysics::~CBulletPhysics()
 {
-    WaitForSimulationToFinish();
-}
-
-void CBulletPhysics::WaitForSimulationToFinish()
-{
-    while (isDuringSimulation)
-        Sleep(1);
 }
 
 void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
-    WorldContext world;
-    world->addCollisionObject(pBtCollisionObject);
+    m_pDynamicsWorld->addCollisionObject(pBtCollisionObject);
 }
 
 void CBulletPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
-    WorldContext world;
-    world->removeCollisionObject(pBtCollisionObject);
+    m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
 }
 
 void CBulletPhysics::AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const
 {
-    WorldContext world;
-    world->addRigidBody(pRigidBodyProxy);
+    m_pDynamicsWorld->addRigidBody(pRigidBodyProxy);
 }
 
 void CBulletPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
 {
-    WorldContext world;
-    world->removeRigidBody(pBtRigidBody);
+    m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
 }
 
 CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
@@ -103,8 +69,6 @@ CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsSha
 
 void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
 {
-    std::lock_guard<std::recursive_mutex> lk(m_elementsLock);
-
     switch (pPhysicsElement->GetClassType())
     {
         case EIdClassType::RIGID_BODY:
@@ -122,20 +86,16 @@ void CBulletPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
 
 void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    m_pLuaMain->GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
-    m_InitializeStaticCollisionsList.push(pStaticCollision);
     m_vecStaticCollisions.push_back(pStaticCollision);
 }
 
 void CBulletPhysics::AddShape(CLuaPhysicsShape* pShape)
 {
-    m_pLuaMain->GetPhysicsShapeManager()->Add(pShape);
     m_vecShapes.push_back(pShape);
 }
 
 void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    m_pLuaMain->GetPhysicsRigidBodyManager()->Add(pRigidBody);
     m_vecRigidBodies.push_back(pRigidBody);
 }
 
@@ -156,12 +116,7 @@ void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticC
 
 void CBulletPhysics::StepSimulation()
 {
-    BT_PROFILE("stepSimulation");
-
-    WorldContext world;
-    isDuringSimulation = true;
-    world->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
-    isDuringSimulation = false;
+    m_pDynamicsWorld->stepSimulation(((float)m_fDeltaTime) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
 }
 
 CLuaPhysicsBoxShape* CBulletPhysics::CreateBoxShape(CVector vector)
@@ -178,23 +133,13 @@ CLuaPhysicsRigidBody* CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, 
     return pRigidBody;
 }
 
-bool CBulletPhysics::CanDoPulse()
-{
-    if (!m_bSimulationEnabled)
-        return false;
-    return (m_pLuaMain != nullptr && !m_pLuaMain->BeingDeleted());
-}
-
 std::vector<std::vector<float>> CBulletPhysics::GetDebugLines(CVector vecPosition, float radius)
 {
     m_pDebugDrawer->Clear();
 
     m_pDebugDrawer->SetCameraPosition(vecPosition);
     m_pDebugDrawer->SetDrawDistance(radius);
-    {
-        WorldContext world;
-        world->debugDrawWorld();
-    }
+    m_pDynamicsWorld->debugDrawWorld();
 
     std::vector<std::vector<float>> vecLines;
     vecLines.reserve(vecLines.size());
@@ -219,11 +164,10 @@ void CBulletPhysics::DrawDebugLines()
 void CBulletPhysics::DoPulse()
 {
     std::lock_guard<std::mutex>           guard(pulseLock);
-    std::lock_guard<std::recursive_mutex>  lk(m_elementsLock);
 
     CTickCount tickCountNow = CTickCount::Now();
 
-    m_iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
+    m_fDeltaTime = (float)(tickCountNow - m_LastTimeMs).ToLongLong();
     m_LastTimeMs = tickCountNow;
 
     StepSimulation();
@@ -231,29 +175,23 @@ void CBulletPhysics::DoPulse()
 #ifdef MTA_CLIENT
     if (m_bDrawDebugNextTime)
     {
-        BT_PROFILE("drawDebug");
         m_pDebugDrawer->Clear();
 
         CVector vecPosition, vecLookAt;
         float   fRoll, fFOV;
         CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV);
         m_pDebugDrawer->SetCameraPosition(vecPosition);
-        {
-            WorldContext world(this);
-            world->debugDrawWorld();
-        }
+        m_pDynamicsWorld->debugDrawWorld();
     }
 #endif
 }
 
 void CBulletPhysics::SetGravity(CVector vecGravity) const
 {
-    WorldContext world;
-    world->setGravity(vecGravity);
+    m_pDynamicsWorld->setGravity(vecGravity);
 }
 
 CVector CBulletPhysics::GetGravity() const
 {
-    WorldContext world;
-    return world->getGravity();
+    return m_pDynamicsWorld->getGravity();
 }

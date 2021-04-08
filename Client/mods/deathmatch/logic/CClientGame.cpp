@@ -177,7 +177,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pGUIManager = m_pManager->GetGUIManager();
     m_pResourceManager = m_pManager->GetResourceManager();
     m_pProjectileManager = m_pManager->GetProjectileManager();
-    m_pPhysicsManager = m_pManager->GetPhysicsManager();
     m_pLocalServer = NULL;
 
     m_pLatentTransferManager = new CLatentTransferManager();
@@ -342,6 +341,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Setup builtin Lua events
     SetupGlobalLuaEvents();
+    
+    m_pPhysics = std::make_unique<CBulletPhysics>();
 }
 
 CClientGame::~CClientGame()
@@ -500,9 +501,6 @@ CClientGame::~CClientGame()
 
     // Packet handler
     SAFE_DELETE(m_pPacketHandler);
-
-    // Physics
-    SAFE_DELETE(m_pPhysicsManager);
 
     // Delete PerfStatManager
     delete CClientPerfStatManager::GetSingleton();
@@ -1138,7 +1136,7 @@ void CClientGame::DoPulses()
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent("onClientRender", Arguments, false);
 
-        m_pManager->GetPhysicsManager()->DoPulse();
+        g_pClientGame->GetPhysics()->DoPulse();
 
         // Disallow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
@@ -3684,8 +3682,7 @@ void CClientGame::PostWorldProcessHandler()
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
 
-    m_pManager->GetPhysicsManager()->WaitForSimulationsToFinish();
-    m_pManager->GetPhysicsManager()->DrawDebug();
+    m_pPhysics->DrawDebug();
 
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;

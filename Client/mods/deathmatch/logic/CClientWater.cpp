@@ -12,6 +12,8 @@
 
 extern CGame* g_pGame;
 
+#define g_pDeathmatch g_pClientGame
+
 CClientWater::CClientWater(CClientManager* pManager, ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow)
     : ClassInit(this), CClientEntity(ID)
 {

@@ -20,7 +20,11 @@ CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pShape) : CLuaPhysicsElemen
 
 bool CLuaPhysicsShape::Destroy()
 {
+#ifdef MTA_CLIENT
+    g_pClientGame->GetPhysics()->DestroyElement(this);
+#else
     g_pGame->GetPhysics()->DestroyElement(this);
+#endif
     return true;
 }
 
@@ -44,7 +48,6 @@ CLuaPhysicsShape::~CLuaPhysicsShape()
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    ElementLock lk(this);
     if (ListContains(m_vecRigidBodyList, pRigidBody))
         return;
 
@@ -53,7 +56,6 @@ void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 
 void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    ElementLock lk(this);
     if (!ListContains(m_vecRigidBodyList, pRigidBody))
         return;
 
@@ -62,7 +64,6 @@ void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 
 void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    ElementLock lk(this);
     if (ListContains(m_vecStaticCollisions, pStaticCollision))
         return;
 
@@ -71,7 +72,6 @@ void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCol
 
 void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    ElementLock lk(this);
     if (!ListContains(m_vecStaticCollisions, pStaticCollision))
         return;
 

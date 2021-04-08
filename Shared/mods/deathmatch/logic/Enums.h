@@ -81,12 +81,4 @@ enum class ePhysicsElementType
 };
 DECLARE_ENUM_CLASS(ePhysicsElementType);
 
-// For internal usage for physics
-enum class ePhysicsWorld
-{
-    DiscreteDynamicsWorld,
-    Count,
-};
-
-
 DECLARE_ENUM(ePacketID);

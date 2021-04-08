@@ -22,11 +22,12 @@ public:
     static void LoadFunctions(void);
     static void AddClass(lua_State* luaVM);
 
-    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
+    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
 
-    static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position, std::optional<CVector> rotation);
+    static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
+                                                                    std::optional<CVector> rotation);
 
-    static CLuaPhysicsShape* PhysicsCreateBoxShape(std::variant<CVector, float> variant);
+    static CLuaPhysicsShape* PhysicsCreateBoxShape(lua_State* luaVM, std::variant<CVector, float> variant);
 
 #ifdef MTA_CLIENT
     static bool PhysicsDrawDebug();

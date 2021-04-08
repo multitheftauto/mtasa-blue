@@ -34,38 +34,9 @@ public:
 
     const char* GetName() { return EnumToString(GetType()); }
 
-
-    // Thread-safe access to bullet physics element
-    template <typename T>
-    class ElementLock
-    {
-        friend CBulletPhysics;
-
-        std::unique_lock<std::mutex> m_lock;
-        std::unique_lock<std::recursive_mutex> m_elementsLock;
-
-    public:
-        // static void* operator new(size_t) = delete;
-
-        ElementLock(T pElement) : m_pElement(pElement), m_lock(pElement->m_lockElement, std::try_to_lock), m_elementsLock(g_pGame->GetPhysics()->m_elementsLock)
-        {
-            assert(m_lock.owns_lock() && "Element is already locked");
-        }
-
-    private:
-        const T               m_pElement;
-    };
-
-    mutable std::mutex m_lockElement;
-
-protected:
-    std::atomic<bool> m_bNeedsUpdate = false;
-
 private:
     void RemoveScriptID();
 
-    std::atomic<bool>                                 m_bHasEnqueuedChanges = false;
-    EIdClass::EIdClassType                            m_classType;
-    unsigned int                                      m_uiScriptID;
-    SharedUtil::ConcurrentList<std::function<void()>> m_listChanges;
+    EIdClass::EIdClassType m_classType;
+    unsigned int           m_uiScriptID;
 };

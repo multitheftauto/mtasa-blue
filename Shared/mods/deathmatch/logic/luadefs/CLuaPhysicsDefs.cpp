@@ -19,18 +19,23 @@
 
 #include "Enums.h"
 #include "physics/CPhysicsDebugDrawer.h"
-
+ 
 CBulletPhysics* CLuaPhysicsDefs::GetPhysics()
 {
+#ifdef MTA_CLIENT
+    return g_pClientGame->GetPhysics();
+#else
     return g_pGame->GetPhysics();
+#endif
 }
 
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"physicsCreateBoxShape", ArgumentParser<PhysicsCreateBoxShape>},
         {"physicsCreateRigidBody", ArgumentParser<PhysicsCreateRigidBody>},
         {"physicsCreateStaticCollision", ArgumentParser<PhysicsCreateStaticCollision>},
-        {"physicsCreateBoxShape", ArgumentParser<PhysicsCreateBoxShape>},
+        {"physicsGetDebugLines", ArgumentParser<PhysicsGetDebugLines>},
 
 #ifdef MTA_CLIENT
         {"physicsDrawDebug", ArgumentParser<PhysicsDrawDebug>},
@@ -51,69 +56,100 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
     lua_registerstaticclass(luaVM, "Physics");
 }
 
-CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(std::variant<CVector, float> variant)
+CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::variant<CVector, float> variant)
 {
-    const CVector vecSize = [&]() {
-        if (std::holds_alternative<CVector>(variant))
-        {
-            return std::get<CVector>(variant);
-        }
-        else if (std::holds_alternative<float>(variant))
-        {
-            float fSize = std::get<float>(variant);
-            return CVector{fSize, fSize, fSize};
-        }
-    }();
+#ifdef MTA_CLIENT
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#else
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#endif
+    if (pLuaMain)
+    {
+        const CVector vecSize = [&]() {
+            if (std::holds_alternative<CVector>(variant))
+            {
+                return std::get<CVector>(variant);
+            }
+            else if (std::holds_alternative<float>(variant))
+            {
+                float fSize = std::get<float>(variant);
+                return CVector{fSize, fSize, fSize};
+            }
+        }();
 
-    CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
+        CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
-    return GetPhysics()->CreateBoxShape(vecSize / 2);
+        CLuaPhysicsBoxShape* pBox = GetPhysics()->CreateBoxShape(vecSize / 2);
+        pLuaMain->GetPhysicsShapeManager()->Add(pBox);
+
+        return pBox;
+    }
+    throw std::invalid_argument("Invalid lua state.");
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
+CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
 {
-    CLuaPhysicsRigidBody* pRigidBody = nullptr;
-    if (!options.has_value() || options.value().empty())
+#ifdef MTA_CLIENT
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#else
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#endif
+    if (pLuaMain)
     {
-        pRigidBody = GetPhysics()->CreateRigidBody(pShape);
-        pRigidBody->SetPosition(CVector{0, 0, 0});
+        CLuaPhysicsRigidBody* pRigidBody = nullptr;
+        if (!options.has_value() || options.value().empty())
+        {
+            pRigidBody = GetPhysics()->CreateRigidBody(pShape);
+            pRigidBody->SetPosition(CVector{0, 0, 0});
+            pRigidBody->SetEnabled(true);
+            return pRigidBody;
+        }
+
+        float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
+
+        if (fMass < 0)
+            throw std::invalid_argument("Mass can not be negative");
+        if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
+            throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
+
+        CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
+        CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
+        CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
+        CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
+
+        pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+
+        pRigidBody->SetPosition(vecPosition);
+        pRigidBody->SetRotation(vecRotation);
         pRigidBody->SetEnabled(true);
+        pLuaMain->GetPhysicsRigidBodyManager()->Add(pRigidBody);
         return pRigidBody;
     }
-
-    float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
-
-    if (fMass < 0)
-        throw std::invalid_argument("Mass can not be negative");
-    if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
-        throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
-
-    CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
-    CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
-    CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
-    CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
-
-    pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
-
-    pRigidBody->SetPosition(vecPosition);
-    pRigidBody->SetRotation(vecRotation);
-    pRigidBody->SetEnabled(true);
-    return pRigidBody;
+    throw std::invalid_argument("Invalid lua state.");
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape, std::optional<CVector> position,
+CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
+#ifdef MTA_CLIENT
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#else
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+#endif
+    if (pLuaMain)
+    {
+        CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
 
-    pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
-    pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
-    pStaticCollision->SetEnabled(true);
-    return pStaticCollision;
+        pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
+        pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
+        pStaticCollision->SetEnabled(true);
+        pLuaMain->GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
+        return pStaticCollision;
+    }
 }
 
 #ifdef MTA_CLIENT
-bool CLuaPhysicsDefs::PhysicsDrawDebug(CBulletPhysics* pPhysics)
+bool CLuaPhysicsDefs::PhysicsDrawDebug()
 {
     GetPhysics()->DrawDebug();
     return true;
