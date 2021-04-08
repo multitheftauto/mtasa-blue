@@ -41,7 +41,7 @@ struct SAclRequest;
 #include "CMatrix.h"
 #include "net/Packets.h"
 #include "Enums.h"
-#include <bochs_internal/crc32.h>
+#include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
 #include "CIdArray.h"
 #include "pcrecpp.h"
@@ -126,6 +126,7 @@ struct SAclRequest;
 #include "luadefs/CLuaCameraDefs.h"
 #include "luadefs/CLuaClassDefs.h"
 #include "luadefs/CLuaColShapeDefs.h"
+#include "luadefs/CLuaCompatibilityDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
@@ -308,7 +309,7 @@ struct SAclRequest;
 #include "CServer.h"
 #include "Config.h"
 #define SHOW_SELF_COMPILE_WARNING
-#include "../../version.h"
+#include "version.h"
 
 extern CNetServer* g_pRealNetServer;
 extern CGame*      g_pGame;

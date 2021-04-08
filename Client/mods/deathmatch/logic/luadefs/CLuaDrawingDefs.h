@@ -40,7 +40,7 @@ public:
         std::variant<CClientDxFont*, eFontType> font, const std::string text, const std::optional<float> optWidth,
         const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded);
 
-    static inline std::tuple<float, float> DxGetTextSize(std::string text, std::optional<float> optWidth,
+    static inline CLuaMultiReturn<float, float> DxGetTextSize(std::string text, std::optional<float> optWidth,
                                                          std::optional<std::variant<CVector2D, float>>          optScaleXY,
                                                          std::optional<std::variant<CClientDxFont*, eFontType>> optFont, std::optional<bool> optWordBreak,
                                                          std::optional<bool> optColorCoded)

@@ -354,6 +354,15 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     pBuildingResult->usLODModelID = 0;
 
                 pBuildingResult->pInterface = targetEntity;
+                if (targetEntity->Placeable.matrix)
+                {
+                    pBuildingResult->vecPosition = targetEntity->Placeable.matrix->vPos;
+                    CVector& vecRotation = pBuildingResult->vecRotation;
+                    ConvertMatrixToEulerAngles(*targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+                    vecRotation = -vecRotation;
+                }
+                else
+                    pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
             }
         }
     }

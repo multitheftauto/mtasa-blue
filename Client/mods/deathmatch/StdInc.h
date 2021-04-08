@@ -20,6 +20,8 @@
 #include <vector>
 #include <cstdio>
 #include <cstring>
+#include <variant>
+#include <optional>
 
 #include <zlib.h>
 
@@ -116,6 +118,7 @@
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaCameraDefs.h>
 #include <luadefs/CLuaColShapeDefs.h>
+#include <luadefs/CLuaCompatibilityDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
@@ -160,4 +163,4 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
-#include "../../version.h"
+#include "version.h"

@@ -69,13 +69,18 @@ void CFxSystemSA::GetPosition(CVector& vecPos)
 
 void CFxSystemSA::SetPosition(const CVector& vecPos)
 {
-    m_pInterface->matPosition.pos.x = vecPos.fX;
-    m_pInterface->matPosition.pos.y = vecPos.fY;
-    m_pInterface->matPosition.pos.z = vecPos.fZ;
+    SetPosition(m_pInterface, vecPos);
+}
+
+void CFxSystemSA::SetPosition(CFxSystemSAInterface* fxSystem, const CVector& position)
+{
+    fxSystem->matPosition.pos.x = position.fX;
+    fxSystem->matPosition.pos.y = position.fY;
+    fxSystem->matPosition.pos.z = position.fZ;
 
     // Set the update flag(s)
     // this is what RwMatrixUpdate (@0x7F18E0) does
-    m_pInterface->matPosition.flags &= 0xFFFDFFFC;
+    fxSystem->matPosition.flags &= 0xFFFDFFFC;
 }
 
 float CFxSystemSA::GetEffectDensity()

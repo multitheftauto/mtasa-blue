@@ -11,16 +11,18 @@
 
 #pragma once
 
+#include <stdint.h>
+
 struct CStreamingInfo
 {
-    uint16 prevId;
-    uint16 nextId;
-    uint16 nextInImg;
-    uint8  flg;
-    uint8  archiveId;
-    uint32 offsetInBlocks;
-    uint32 sizeInBlocks;
-    uint32 loadState;
+    uint16_t prevId;
+    uint16_t nextId;
+    uint16_t nextInImg;
+    uint8_t  flg;
+    uint8_t  archiveId;
+    uint32_t offsetInBlocks;
+    uint32_t sizeInBlocks;
+    uint32_t loadState;
 
 public:
     void Reset()
@@ -35,6 +37,7 @@ public:
         this->sizeInBlocks = 0;
     };
 };
+static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo");
 
 class CStreaming
 {
@@ -43,6 +46,6 @@ public:
     virtual void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL) = 0;
     virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
-    virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned short id) = 0;
+    virtual CStreamingInfo* GetStreamingInfoFromModelId(uint32 id) = 0;
     virtual void ReinitStreaming() = 0;
 };

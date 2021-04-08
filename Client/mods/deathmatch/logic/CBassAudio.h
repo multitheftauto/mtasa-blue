@@ -81,6 +81,7 @@ public:
     bool    IsFreed();
     float   GetPan();
     void    SetPan(float fPan);
+    bool    SetLooped(bool bLoop);
 
     void   DoPulse(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
     void   AddQueuedEvent(eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false, const SString& strError = "");
@@ -111,7 +112,6 @@ private:
     const bool    m_bStream;
     const SString m_strPath;
     const bool    m_b3D;
-    const bool    m_bLoop;
     const bool    m_bThrottle;
     void*         m_pBuffer;
     unsigned int  m_uiBufferLength;
@@ -120,6 +120,7 @@ private:
     DWORD m_pSound;
 
     // Playback state
+    bool    m_bLoop;
     bool    m_bPaused;
     bool    m_bReversed;
     bool    m_bPan;
