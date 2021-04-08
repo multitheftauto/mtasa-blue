@@ -7,12 +7,14 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
 #include <thread>
 #include <queue>
 #include <future>
 #include <vector>
 #include <algorithm>
+#include "SharedUtil.Misc.h"
 
 namespace SharedUtil
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+#include <variant>
 
 /**
     nth_element

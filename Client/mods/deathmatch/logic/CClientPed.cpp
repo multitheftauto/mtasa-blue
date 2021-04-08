@@ -565,7 +565,7 @@ void CClientPed::SetInterior(unsigned char ucInterior)
         }
     }
 
-    m_ucInterior = ucInterior;
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientPed::Teleport(const CVector& vecPosition)
@@ -6636,12 +6636,6 @@ bool CClientPed::ExitVehicle()
 
     // We dead?
     if (IsDead())
-    {
-        return false;
-    }
-
-    // Dead vehicle?
-    if (pOccupiedVehicle->GetHealth() <= 0.0f)
     {
         return false;
     }

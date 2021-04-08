@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 #include <variant>
 
 class CLuaColShapeDefs : public CLuaDefs
@@ -39,6 +40,9 @@ public:
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
 
-    static std::tuple<float, float> GetColPolygonHeight(CClientColPolygon* pColPolygon);
-    static bool                     SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
+    static bool SetShowCollision(bool state);
+    static bool IsShowCollisionsEnabled();
+
+    static CLuaMultiReturn<float, float> GetColPolygonHeight(CClientColPolygon* pColPolygon);
+    static bool                          SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };

@@ -1,6 +1,6 @@
 ## Multi Theft Auto: San Andreas
 
-[![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://multitheftauto.com/discord) [![Translate](https://img.shields.io/website?down_message=offline&up_message=translate&url=https%3A%2F%2Ftranslate.multitheftauto.com)](https://translate.multitheftauto.com/)
+[![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Unique servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Fservers-shields.io.json)](https://community.multitheftauto.com/index.php?p=servers) [![Unique players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Fplayers-shields.io.json)](https://multitheftauto.com) [![Unique players last 24 hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Funique-players-shields.io.json)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://multitheftauto.com/discord) [![Translate](https://img.shields.io/website?down_message=offline&up_message=translate&url=https%3A%2F%2Ftranslate.multitheftauto.com)](https://translate.multitheftauto.com/)
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
@@ -26,9 +26,9 @@ Using a framework based on resources has a number of advantages. It allows conte
 
 Our project's code repository can be found on the [multitheftauto/mtasa-blue](https://github.com/multitheftauto/mtasa-blue/) Git repository at [GitHub](https://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
 
-* [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
+* [Coding guidelines](https://github.com/multitheftauto/mtasa-blue/blob/master/CONTRIBUTING.md#contributors-guide)
 * [Nightly Builds](https://nightly.mtasa.com/)
-* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
+* [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
 ### IDE Setup
 If not using Visual Studio 2017, download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) plugin to automatically set up your IDE for the correct formatting.
@@ -38,7 +38,7 @@ If not using Visual Studio 2017, download and install the [EditorConfig](https:/
 
 Prerequisites
 - [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-- [Microsoft DirectX SDK](https://www.microsoft.com/en-us/download/details.aspx?id=23549)
+- [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
 1. Execute `win-create-projects.bat`
