@@ -156,7 +156,6 @@ public:
 
     virtual std::list<CKeyBind*>::const_iterator IterBegin() = 0;
     virtual std::list<CKeyBind*>::const_iterator IterEnd() = 0;
-    virtual size_t CountAll() const noexcept = 0;
 
     // Command-bind funcs
     virtual bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL,

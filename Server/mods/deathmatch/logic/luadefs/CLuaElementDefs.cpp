@@ -990,7 +990,11 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
         unsigned int              uiIndex = 0;
         list<CElement*>::iterator iter = pColShape->CollidersBegin();
 
-        lua_createtable(luaVM, pColShape->CountColliders(), 0);
+        // Preallocate space if no filter was provided 
+        if (szType && szType[0])
+            lua_newtable(luaVM); 
+        else 
+            lua_createtable(luaVM, pColShape->CountColliders(), 0);
         for (; iter != pColShape->CollidersEnd(); ++iter)
         {
             if ((strType.empty() || strType == (*iter)->GetTypeName()) && !(*iter)->IsBeingDeleted())

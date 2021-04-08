@@ -439,7 +439,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey(lua_State* luaVM)
             list<CScriptKeyBind*>::const_iterator iter = m_pClientGame->GetScriptKeyBinds()->IterBegin();
 
             // Create new table
-            lua_createtable(luaVM, m_pClientGame->GetScriptKeyBinds()->CountBinds(), 0);
+            lua_newtable(luaVM);
 
             // Push values into the table
             for (; iter != m_pClientGame->GetScriptKeyBinds()->IterEnd(); iter++)
@@ -574,7 +574,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
             }
             list<CKeyBind*>::const_iterator iter = g_pCore->GetKeyBinds()->IterBegin();
 
-            lua_createtable(luaVM, 0, g_pCore->GetKeyBinds()->CountAll());
+            lua_newtable(luaVM);
             for (; iter != g_pCore->GetKeyBinds()->IterEnd(); iter++)
             {
                 CKeyBind* pKeyBind = *iter;
