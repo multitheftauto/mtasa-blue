@@ -173,7 +173,6 @@ void CLuaMain::InitVM()
 
     // Create a new VM
     m_luaVM = lua_open(this);
-    m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
     lua_sethook(m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT);
@@ -369,7 +368,6 @@ void CLuaMain::UnloadScript()
     if (m_luaVM)
     {
         CLuaFunctionRef::RemoveLuaFunctionRefsForVM(m_luaVM);
-        m_pLuaManager->OnLuaMainCloseVM(this, m_luaVM);
         lua_close(m_luaVM);
         m_luaVM = NULL;
     }

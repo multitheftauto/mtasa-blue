@@ -38,10 +38,6 @@ public:
 
     CLuaMain*  CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP);
     bool       RemoveVirtualMachine(CLuaMain* vm);
-    CLuaMain*  GetVirtualMachine(lua_State* luaVM);
-    CResource* GetVirtualMachineResource(lua_State* luaVM);
-    void       OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
-    void       OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
 
     CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; };
 
@@ -62,7 +58,5 @@ private:
     CMapManager*               m_pMapManager;
     CEvents*                   m_pEvents;
     CLuaModuleManager*         m_pLuaModuleManager;
-
-    CFastHashMap<lua_State*, CLuaMain*> m_VirtualMachineMap;
-    list<CLuaMain*>                     m_virtualMachines;
+    std::list<CLuaMain*>       m_virtualMachines;
 };

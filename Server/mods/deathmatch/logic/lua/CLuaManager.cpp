@@ -92,66 +92,11 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
     return false;
 }
 
-void CLuaManager::OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM)
-{
-    MapSet(m_VirtualMachineMap, pLuaMain->GetVirtualMachine(), pLuaMain);
-}
-
-void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
-{
-    MapRemove(m_VirtualMachineMap, pLuaMain->GetVirtualMachine());
-}
-
 void CLuaManager::DoPulse()
 {
-    list<CLuaMain*>::iterator iter;
-    for (iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter)
-    {
-        (*iter)->DoPulse();
-    }
+    for (auto it = m_virtualMachines.begin(); it != m_virtualMachines.end(); ++it)
+        (*it)->DoPulse();
     m_pLuaModuleManager->DoPulse();
-}
-
-CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
-{
-    if (!luaVM)
-        return NULL;
-
-    // Grab the main virtual state because the one we've got passed might be a coroutine state
-    // and only the main state is in our list.
-    lua_State* main = lua_getmainstate(luaVM);
-    if (main)
-    {
-        luaVM = main;
-    }
-
-    // Find a matching VM in our map
-    CLuaMain* pLuaMain = MapFindRef(m_VirtualMachineMap, luaVM);
-    if (pLuaMain)
-        return pLuaMain;
-
-    // Find a matching VM in our list
-    list<CLuaMain*>::const_iterator iter = m_virtualMachines.begin();
-    for (; iter != m_virtualMachines.end(); ++iter)
-    {
-        if (luaVM == (*iter)->GetVirtualMachine())
-        {
-            dassert(0);            // Why not in map?
-            return *iter;
-        }
-    }
-
-    // Doesn't exist
-    return NULL;
-}
-
-// Return resource associated with a lua state
-CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
-{
-    CLuaMain* pLuaMain = GetVirtualMachine(luaVM);
-    if (pLuaMain)
-        return pLuaMain->GetResource();
-    return NULL;
 }
 
 void CLuaManager::LoadCFunctions()
