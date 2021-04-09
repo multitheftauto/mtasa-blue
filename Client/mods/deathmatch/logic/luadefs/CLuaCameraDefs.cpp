@@ -11,13 +11,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaCameraDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Cam get funcs
         {"getCamera", GetCamera},
-        {"getCameraViewMode", GetCameraViewMode},
+        {"getCameraViewMode", ArgumentParserWarn<false, GetCameraViewMode>},
         {"getCameraMatrix", GetCameraMatrix},
         {"getCameraTarget", GetCameraTarget},
         {"getCameraInterior", GetCameraInterior},
@@ -33,7 +34,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"fadeCamera", FadeCamera},
         {"setCameraClip", SetCameraClip},
         {"getCameraClip", GetCameraClip},
-        {"setCameraViewMode", SetCameraViewMode},
+        {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
         {"setCameraShakeLevel", SetCameraShakeLevel},
     };
@@ -102,17 +103,14 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::GetCameraViewMode(lua_State* luaVM)
+CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
 {
-    unsigned short ucMode;
-    if (CStaticFunctionDefinitions::GetCameraViewMode(ucMode))
-    {
-        lua_pushnumber(luaVM, ucMode);
-        return 1;
-    }
+    CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    unsigned char ucVehicleMode = (unsigned char)pCamera->GetCameraVehicleViewMode();
+    unsigned char ucPedMode = (unsigned char)pCamera->GetCameraPedViewMode();
+
+    return {ucVehicleMode, ucPedMode};
 }
 
 int CLuaCameraDefs::GetCameraMatrix(lua_State* luaVM)
@@ -439,24 +437,17 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
     return 2;
 }
 
-int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleViewMode, std::optional<unsigned char> ucPedViewMode)
 {
-    unsigned short   usViewMode = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usViewMode);
+    CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    if (!argStream.HasErrors())
-    {
-        CStaticFunctionDefinitions::SetCameraViewMode(usViewMode);
+    if (ucVehicleViewMode)
+        pCamera->SetCameraVehicleViewMode((eVehicleCamMode)ucVehicleViewMode.value());
 
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (ucPedViewMode)
+        pCamera->SetCameraPedViewMode((ePedCamMode)ucPedViewMode.value());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return true;
 }
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)

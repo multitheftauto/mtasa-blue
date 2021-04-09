@@ -85,6 +85,11 @@ namespace lua
     void Push(lua_State* L, const CLuaArgument& arg);
     void Push(lua_State* L, const CLuaArguments& args);
 
+    inline void Push(lua_State* L, const std::string_view& value)
+    {
+        lua_pushlstring(L, value.data(), value.length());
+    }
+
     // Script entities
 #ifdef MTA_CLIENT
 #ifndef CElement

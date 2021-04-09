@@ -74,6 +74,16 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     lua_pushlightuserdata(luaVM, pData);
 }
 
+CLuaMain& lua_getownercluamain(lua_State* L)
+{
+    return *static_cast<class CLuaMain*>(lua_getmtasaowner(L));
+}
+
+CResource& lua_getownerresource(lua_State* L)
+{
+    return *lua_getownercluamain(L).GetResource();
+}
+
 // Just do a type check vs LUA_TNONE before calling this, or bant
 const char* lua_makestring(lua_State* luaVM, int iArgument)
 {

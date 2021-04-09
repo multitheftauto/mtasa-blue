@@ -886,15 +886,17 @@ bool CMainConfig::IsValidPassword(const char* szPassword)
 
 bool CMainConfig::SetPassword(const char* szPassword, bool bSave)
 {
-    if (IsValidPassword(szPassword))
+    if (!IsValidPassword(szPassword))
+        return false;
+
+    m_strPassword = szPassword;
+
+    if (bSave)
     {
-        m_strPassword = szPassword;
-        if (bSave)
-        {
-            SetString(m_pRootNode, "password", szPassword);
-            Save();
-        }
+        SetString(m_pRootNode, "password", szPassword);
+        Save();
     }
+
     return true;
 }
 
