@@ -35,7 +35,7 @@ public:
     static std::vector<std::vector<float>> PhysicsGetDebugLines(CVector vecPosition, float fRadius);
 
     template <typename T, typename U>
-    static U getOption(const T& options, const std::string& szProperty, const U default)
+    static U getOption(const T& options, const std::string& szProperty, const U defaultValue)
     {
         if (const auto it = options.find(szProperty); it != options.end())
         {
@@ -43,6 +43,6 @@ public:
                 throw std::invalid_argument(SString("'%s' value must be ...", szProperty.c_str()).c_str());
             return std::get<U>(it->second);
         }
-        return U{};
+        return defaultValue;
     }
 };
