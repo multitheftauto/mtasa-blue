@@ -12,20 +12,10 @@
 template <class T>
 class CLuaPhysicsBaseManager;
 
-template <class T>
-class ILuaPhysicsBaseManager;
-
 #pragma once
 
 template <class T>
-class ILuaPhysicsBaseManager
-{
-public:
-    virtual void Remove(T pElement) = 0;
-};
-
-template <class T>
-class CLuaPhysicsBaseManager : public ILuaPhysicsBaseManager<T>
+class CLuaPhysicsBaseManager
 {
 public:
     CLuaPhysicsBaseManager(EIdClassType idClass) : m_IdClass(idClass){};
@@ -49,6 +39,8 @@ public:
             return nullptr;
         return pElement;
     }
+
+    virtual void Remove(T pElement) = 0;
 
     void Add(T pElement) { m_elementsList.push_back(pElement); }
 
