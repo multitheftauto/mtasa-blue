@@ -28,6 +28,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 
 bool CLuaPhysicsRigidBody::Destroy()
 {
+    SetEnabled(false);
 #ifdef MTA_CLIENT
     g_pClientGame->GetPhysics()->DestroyRigidBody(this);
 #else
@@ -39,9 +40,9 @@ bool CLuaPhysicsRigidBody::Destroy()
 
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
 {
-    btTransform transform = m_pRigidBodyProxy->getWorldTransform();
+    btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    m_pRigidBodyProxy->proceedToTransform(transform);
+    m_pRigidBodyProxy->setWorldTransform(transform);
 }
 
 const CVector CLuaPhysicsRigidBody::GetPosition() const

@@ -28,6 +28,7 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 
 bool CLuaPhysicsStaticCollision::Destroy()
 {
+    SetEnabled(false);
 #ifdef MTA_CLIENT
     g_pClientGame->GetPhysics()->DestroyStaticCollision(this);
 #else

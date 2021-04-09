@@ -88,8 +88,8 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
     if (!options.has_value() || options.value().empty())
     {
         pRigidBody = GetPhysics()->CreateRigidBody(pShape);
-        pRigidBody->SetPosition(CVector{0, 0, 0});
         pRigidBody->SetEnabled(true);
+        pLuaMain.GetPhysicsRigidBodyManager()->Add(pRigidBody);
         return pRigidBody;
     }
 
@@ -107,10 +107,10 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
 
     pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
-    pRigidBody->SetPosition(vecPosition);
-    pRigidBody->SetRotation(vecRotation);
     pRigidBody->SetEnabled(true);
     pLuaMain.GetPhysicsRigidBodyManager()->Add(pRigidBody);
+    pRigidBody->SetPosition(vecPosition);
+    pRigidBody->SetRotation(vecRotation);
     return pRigidBody;
 }
 
@@ -120,9 +120,9 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_St
     auto&                       pLuaMain = lua_getownercluamain(luaVM);
     CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
 
+    pStaticCollision->SetEnabled(true);
     pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
     pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
-    pStaticCollision->SetEnabled(true);
     pLuaMain.GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
     return pStaticCollision;
 }

@@ -22,7 +22,4 @@ public:
     CLuaPhysicsRigidBodyManager() : CLuaPhysicsBaseManager<CLuaPhysicsRigidBody*>(EIdClassType::RIGID_BODY) {}
     void Remove(CLuaPhysicsRigidBody* pRigidBody);
     bool IsRigidBodyValid(CLuaPhysicsRigidBody* pRigidBody);
-
-private:
-    std::mutex lock;
 };

@@ -131,24 +131,6 @@ namespace lua
     inline void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
     inline void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
 
-    inline int Push(lua_State* L, std::shared_ptr<CLuaPhysicsShape> value)
-    {
-        lua_pushshape(L, value);
-        return 1;
-    }
-
-    inline int Push(lua_State* L, std::shared_ptr<CLuaPhysicsRigidBody> value)
-    {
-        lua_pushrigidbody(L, value.get());
-        return 1;
-    }
-
-    inline int Push(lua_State* L, std::shared_ptr<CLuaPhysicsStaticCollision> value)
-    {
-        lua_pushstaticcollision(L, value.get());
-        return 1;
-    }
-    
     inline int Push(lua_State* L, CLuaPhysicsShape* value)
     {
         lua_pushshape(L, value);

@@ -22,17 +22,14 @@ protected:
     ~CLuaPhysicsWorldElement();
 
 public:
-    virtual void          SetPosition(CVector vecPosition) = 0;
-    virtual const CVector GetPosition() const = 0;
-    virtual void          SetRotation(CVector vecRotation) = 0;
-    virtual const CVector GetRotation() const = 0;
+    virtual void               SetPosition(CVector vecPosition) = 0;
+    virtual const CVector      GetPosition() const = 0;
+    virtual void               SetRotation(CVector vecRotation) = 0;
+    virtual const CVector      GetRotation() const = 0;
     virtual btCollisionObject* GetBtCollisionObject() const = 0;
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::WorldElement; }
 
     virtual void SetEnabled(bool bEnabled) = 0;
     virtual bool IsEnabled() const = 0;
-
-protected:
-    std::vector<CLuaPhysicsWorldElement*> m_vecCollisionContacts;
 };

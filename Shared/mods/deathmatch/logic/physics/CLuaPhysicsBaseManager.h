@@ -44,7 +44,7 @@ public:
         T pElement = (T)CIdArray::FindEntry(uiScriptID, m_IdClass);
         if (!pElement)
             return nullptr;
-
+        
         if (!ListContains(m_elementsList, pElement))
             return nullptr;
         return pElement;

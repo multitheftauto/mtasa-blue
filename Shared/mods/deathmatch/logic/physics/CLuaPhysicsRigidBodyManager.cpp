@@ -16,12 +16,9 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
 {
     assert(pRigidBody);
 
-    {
-        std::lock_guard guard(lock);
-        // Check if already removed
-        if (!ListContains(m_elementsList, pRigidBody))
-            return;
-    }
+    // Check if already removed
+    if (!ListContains(m_elementsList, pRigidBody))
+        return;
 
     // Remove all references
 
@@ -31,10 +28,7 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
     g_pGame->GetPhysics()->DestroyRigidBody(pRigidBody);
 #endif
 
-    {
-        std::lock_guard guard(lock);
-        ListRemove(m_elementsList, pRigidBody);
-    }
+    ListRemove(m_elementsList, pRigidBody);
     delete pRigidBody;
 }
 
@@ -42,6 +36,5 @@ bool CLuaPhysicsRigidBodyManager::IsRigidBodyValid(CLuaPhysicsRigidBody* pRigidB
 {
     assert(pRigidBody);
 
-    std::lock_guard guard(lock);
     return ListContains(m_elementsList, pRigidBody);
 }

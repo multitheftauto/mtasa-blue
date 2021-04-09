@@ -88,8 +88,8 @@ void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
 
 void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pRigidBody)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    const char* szClass = nullptr;
+    auto&       pLuaMain = lua_getownercluamain(luaVM);
     //if (pLuaMain->IsOOPEnabled())
     //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
 
@@ -98,8 +98,8 @@ void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pRigidBody)
 
 void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    const char* szClass = nullptr;
+    auto&       pLuaMain = lua_getownercluamain(luaVM);
     //if (pLuaMain->IsOOPEnabled())
     //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
 
@@ -108,17 +108,12 @@ void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pStat
 
 void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape)
 {
-    const char* szClass = NULL;
-    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    const char* szClass = nullptr;
+    auto&   pLuaMain = lua_getownercluamain(luaVM);
     //if (pLuaMain->IsOOPEnabled())
     //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
 
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pShape->GetScriptID()));
-}
-
-void lua_pushshape(lua_State* luaVM, std::shared_ptr<CLuaPhysicsShape> pShape)
-{
-    lua_pushshape(luaVM, pShape.get());
 }
 
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)

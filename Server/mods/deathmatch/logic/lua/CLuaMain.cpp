@@ -368,6 +368,7 @@ void CLuaMain::UnloadScript()
 {
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers();
+    m_pLuaPhysicsShapeManager->RemoveAll();
 
     // Delete all keybinds
     list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();

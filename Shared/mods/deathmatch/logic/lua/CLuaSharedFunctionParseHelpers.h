@@ -29,58 +29,25 @@ inline SString GetClassTypeName(CLuaPhysicsElement*)
     return "physics-element";
 }
 
-//
-// CLuaPhysicsRigidBody from userdata
-//
 template <class T>
 CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsRigidBodyManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsRigidBodyManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
 }
 
-//
-// CLuaPhysicsStaticCollision from userdata
-//
 template <class T>
 CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsStaticCollisionManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsStaticCollisionManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
 }
 
-//
-// CLuaPhysicsShape from userdata
-//
 template <class T>
 CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsShapeManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsShapeManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
 }
 //
 // CLuaPhysicsContraint from userdata

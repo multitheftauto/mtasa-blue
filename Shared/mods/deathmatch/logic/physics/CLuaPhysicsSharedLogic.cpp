@@ -108,8 +108,7 @@ CVector CPhysicsSharedLogic::GetRotation(const btTransform& transform)
 
 CVector CPhysicsSharedLogic::GetPosition(const btTransform& transform)
 {
-    const btVector3& vecPosition = transform.getOrigin();
-    return vecPosition;
+    return transform.getOrigin();
 }
 
 void CPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector vecPosition)

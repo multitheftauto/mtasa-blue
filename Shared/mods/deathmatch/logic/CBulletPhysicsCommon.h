@@ -31,12 +31,8 @@ namespace BulletPhysics
         inline constexpr float   MinimumPrimitiveSize = 0.05f;
         inline constexpr float   MaximumPrimitiveSize = 8196.f;
         inline constexpr int     MaximumSubSteps = 256;
-        inline constexpr int     MaximumInitialCompoundShapeCapacity = 256;
-        inline constexpr int     MinimumHeightfieldTerrain = 2;
-        inline constexpr int     MaximumHeightfieldTerrain = 1024;
         inline constexpr int     RaycastAllUpperResultsLimit = 8196;
         inline constexpr float   RigidBodyMassLimit = 1000000.0f;
-        inline constexpr int     ParallelSolversLimit = 128;
     }            // namespace Limits
     namespace Defaults
     {
@@ -46,11 +42,7 @@ namespace BulletPhysics
         inline constexpr float   RigidBodyAngularDumping = 0.005f;            // 0.0 - 1.0
         inline constexpr float   RigidBodyLinearSleepingThreshold = 0.1f;
         inline constexpr float   RigidBodyAngularSleepingThreshold = 0.1f;
-        inline constexpr int     RaycastAllDefaultLimit = 64;
         inline constexpr int     FilterGroup = 1;
         inline constexpr int     FilterMask = -1;
-        inline constexpr int     ParallelSolvers = 1;
-        inline constexpr int     GrainSize = 40;
-        inline constexpr double  Seed = 0;
     }            // namespace Defaults
 }            // namespace BulletPhysics
