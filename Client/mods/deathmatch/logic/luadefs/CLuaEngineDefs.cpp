@@ -1127,7 +1127,7 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHou
     return false;
 }
 
-std::variant<bool, std::tuple<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
+std::variant<bool, CLuaMultiReturn<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
 {
     ushort      usModelID = CModelNames::ResolveModelID(strModelId);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
@@ -1183,8 +1183,8 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
-        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
-                                                                                                         RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair));
+
         if (pTexture)
         {
             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());

@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #include "StdInc.h"
+#include <charconv>
 #include <SharedUtil.Crypto.h>
 #include <lua/CLuaFunctionParser.h>
 
@@ -21,7 +22,7 @@ void CLuaCryptDefs::LoadFunctions()
         {"teaDecode", ArgumentParserWarn<false, TeaDecode>},
         {"base64Encode", ArgumentParserWarn<false, Base64encode>},
         {"base64Decode", ArgumentParserWarn<false, Base64decode>},
-        {"passwordHash", PasswordHash},
+        {"passwordHash", ArgumentParserWarn<false, PasswordHash>},
         {"passwordVerify", PasswordVerify},
         {"encodeString", EncodeString},
         {"decodeString", DecodeString},
@@ -77,100 +78,75 @@ std::string CLuaCryptDefs::Base64decode(std::string str)
     return SharedUtil::Base64decode(str);
 }
 
-int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
+std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, std::string password, PasswordHashFunction algorithm, std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback)
 {
-    //  string password_hash(string password, string algorithm, table options = {} [, function callback])
-    SString              password;
-    PasswordHashFunction algorithm;
-    CStringMap           options;
-    CLuaFunctionRef      luaFunctionRef;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(password);
-    argStream.ReadEnumString(algorithm);
-    argStream.ReadStringMap(options);
-
-    if (argStream.NextIsFunction())
+    switch (algorithm)
     {
-        argStream.ReadFunction(luaFunctionRef);
-        argStream.ReadFunctionComplete();
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (algorithm == PasswordHashFunction::Bcrypt)
+        case PasswordHashFunction::Bcrypt:
         {
-            // Set default value to 10
-            if (options["cost"].empty())
-                options["cost"] = "10";
+            std::size_t cost = 10;
 
-            std::stringstream ss(options["cost"]);
-            std::size_t       cost;
-            ss >> cost;
-
-            if (!ss.fail())
+            if (auto it = options.find("cost"); it != options.end())
             {
-                // Using custom salts are deprecated (Luxy.c)
+                auto [__, err] = std::from_chars(it->second.data(), it->second.data() + it->second.length(), cost);
+                if (err != std::errc{})
+                    throw std::invalid_argument("Invalid value for field 'cost'");
+            }
+
+            if (auto it = options.find("salt"); it != options.end())
+            {
+                // Using custom salts is deprecated
                 // See: https://stackoverflow.com/questions/40993645/understanding-bcrypt-salt-as-used-by-php-password-hash
-                if (options["salt"].length() > 0)
-                {
-                    m_pScriptDebugging->LogWarning(luaVM, "Custom generated salts are deprecated and will be removed in the future.");
-                }
+                m_pScriptDebugging->LogWarning(luaVM, "Custom generated salts are deprecated and will be removed in the future.");
+            }
 
-                // Sync
-                if (luaFunctionRef == CLuaFunctionRef{})
+            if (callback.has_value())
+            {
+                // Async
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                if (pLuaMain)
                 {
-                    SString hash = SharedUtil::BcryptHash(password, options["salt"], cost);
-                    if (!hash.empty())
-                    {
-                        lua_pushstring(luaVM, hash);
-                        return 1;
-                    }
-                    else
-                        m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'salt'");
-                }
-                else            // Async
-                {
-                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                    if (pLuaMain)
-                    {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [password, salt = options["salt"], cost] {
-                                // Execute time-consuming task
-                                return SharedUtil::BcryptHash(password, salt, cost);
-                            },
-                            [luaFunctionRef](const SString& hash) {
-                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
-                                if (pLuaMain)
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        [password, salt = options["salt"], cost] {
+                            // Execute time-consuming task
+                            return SharedUtil::BcryptHash(password, salt, cost);
+                        },
+                        [luaFunctionRef = callback.value()](const SString& hash) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+
+                                if (hash.empty())
                                 {
-                                    CLuaArguments arguments;
-
-                                    if (hash.empty())
-                                    {
-                                        m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
-                                        arguments.PushBoolean(false);
-                                    }
-                                    else
-                                        arguments.PushString(hash);
-
-                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                    m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
+                                    arguments.PushBoolean(false);
                                 }
-                            });
+                                else
+                                    arguments.PushString(hash);
 
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
+                        });
                 }
             }
             else
-                m_pScriptDebugging->LogWarning(luaVM, "Invalid value for field 'cost'");
+            {
+                // Sync
+                SString hash = SharedUtil::BcryptHash(password, options["salt"], cost);
+                if (!hash.empty())
+                {
+                    return hash;
+                }
+                else
+                    throw std::invalid_argument("Invalid value for field 'salt'");
+            }
+            return true;
         }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        default:
+            throw std::invalid_argument("Unknown algorithm");
+    }
 }
 
 

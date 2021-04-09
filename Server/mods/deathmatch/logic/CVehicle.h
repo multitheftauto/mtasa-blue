@@ -338,7 +338,7 @@ public:
     void ResetDoors();
     void ResetDoorsWheelsPanelsLights();
     void SetIsBlown(bool bBlown);
-    bool GetIsBlown();
+    bool GetIsBlown() const noexcept { return m_llBlowTime.ToLongLong() != 0; }
     bool IsBlowTimerFinished();
     void StopIdleTimer();
     void RestartIdleTimer();

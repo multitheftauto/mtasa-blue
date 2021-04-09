@@ -64,8 +64,14 @@ public:
     LUA_DECLARE(SetSoundPan);
     LUA_DECLARE(GetSoundPan);
 
+    static bool SetSoundLooped(CClientSound* pSound, bool bLoop);
+    static bool IsSoundLooped(CClientSound* pSound);
+
     // Radio functions
     LUA_DECLARE(SetRadioChannel);
     LUA_DECLARE(GetRadioChannel);
     LUA_DECLARE(GetRadioChannelName);
+
+    static bool ShowSound(bool state);
+    static bool IsShowSoundEnabled();
 };

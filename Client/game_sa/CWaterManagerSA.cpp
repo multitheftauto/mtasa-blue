@@ -752,10 +752,10 @@ bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool
         for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
         {
             m_Vertices[i].GetPosition(vecVertexPos);
-            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel())) 
+            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel()))
                 vecVertexPos.fZ = fLevel;
             m_Vertices[i].SetPosition(vecVertexPos, pChangeSource);
-        }        
+        }
     }
 
     if (bIncludeOutsideWorldLevel)
@@ -866,7 +866,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     {
         return false;
     }
-   
+
     std::deque<CVector> vecVertices;
     for (auto& zone : vecZones)
     {
@@ -905,7 +905,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
                     return true;
                 }
             }
-            
+
         }
     }
 

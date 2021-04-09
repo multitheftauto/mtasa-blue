@@ -1273,6 +1273,9 @@ void CGame::InitialDataStream(CPlayer& Player)
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals(&Player);
 
+    // Tell client the transfer box visibility
+    CStaticFunctionDefinitions::SendClientTransferBoxVisibility(&Player);
+
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
 
@@ -1468,6 +1471,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
+    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
     // Blip events
 
@@ -1537,6 +1541,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
@@ -2624,12 +2629,12 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 if (pVehicle->GetIsBlown() == false)
                                 {
                                     pVehicle->SetIsBlown(true);
+                                    pVehicle->SetEngineOn(false);
 
-                                    // Call the onVehicleExplode event
                                     CLuaArguments Arguments;
                                     pVehicle->CallEvent("onVehicleExplode", Arguments);
-                                    // Update our engine State
-                                    pVehicle->SetEngineOn(false);
+
+                                    bBroadcast = pVehicle->GetIsBlown() && !pVehicle->IsBeingDeleted();
                                 }
                                 else
                                 {
