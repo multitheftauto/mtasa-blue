@@ -10,7 +10,7 @@ struct remove_cr
 };
 
 template<typename T>
-using remove_cr_t = remove_cr<T>::type;
+using remove_cr_t = typename remove_cr<T>::type;
 
 /**
     nth_element
