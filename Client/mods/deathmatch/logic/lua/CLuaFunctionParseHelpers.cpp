@@ -726,7 +726,7 @@ ADD_ENUM(eSoundEffectParams::Flanger::PHASE, "phase")
 IMPLEMENT_ENUM_CLASS_END("soundeffect-params-flanger")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Gargle)
-ADD_ENUM(eSoundEffectParams::Gargle::RATE_HZ, "rateHZ")
+ADD_ENUM(eSoundEffectParams::Gargle::RATE_HZ, "rateHz")
 ADD_ENUM(eSoundEffectParams::Gargle::WAVE_SHAPE, "waveShape")
 IMPLEMENT_ENUM_CLASS_END("soundeffect-params-gargle")
 
@@ -737,7 +737,8 @@ ADD_ENUM(eSoundEffectParams::I3DL2Reverb::ROOM_ROLLOFF_FACTOR, "roomRolloffFacto
 ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DECAY_TIME, "decayTime")
 ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DECAY_HF_RATIO, "decayHFRatio")
 ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REFLECTIONS, "reflections")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REVERB, "reflectionsDelay")
+ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REFLECTIONS_DELAY, "reflectionsDelay")
+ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REVERB, "reverb")
 ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REVERB_DELAY, "reverbDelay")
 ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DIFFUSION, "diffusion")
 ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DENSITY, "density")
