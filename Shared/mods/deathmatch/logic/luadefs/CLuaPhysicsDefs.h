@@ -35,7 +35,7 @@ public:
     static std::vector<std::vector<float>> PhysicsGetDebugLines(CVector vecPosition, float fRadius);
 
     template <typename T, typename U>
-    static U getOption(const T& options, const std::string& szProperty, const U& default)
+    static U getOption(const T& options, const std::string& szProperty, const U default)
     {
         if (const auto it = options.find(szProperty); it != options.end())
         {
