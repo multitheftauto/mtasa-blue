@@ -11,13 +11,8 @@
 
 #pragma once
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include <cmath>
 
-#define FLOAT_EPSILON 0.0001f
 #include "CVector4D.h"
 
 /**
@@ -25,6 +20,8 @@
  */
 class CVector
 {
+private:
+    static constexpr float FLOAT_EPSILON = 0.0001f;
 public:
     float fX = 0.0f;
     float fY = 0.0f;
@@ -96,7 +93,8 @@ public:
         vecRotation.fZ = atan2(fY, fX);
         CVector vecTemp(std::hypotf(fX, fY), fZ, 0);
         vecTemp.Normalize();
-        vecRotation.fY = atan2(vecTemp.fX, vecTemp.fY) - PI / 2;
+        constexpr float pi = 3.14159265358979323846f;
+        vecRotation.fY = atan2(vecTemp.fX, vecTemp.fY) - pi / 2;
         return vecRotation;
     }
 

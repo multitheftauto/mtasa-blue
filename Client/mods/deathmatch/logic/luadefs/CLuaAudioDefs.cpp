@@ -65,6 +65,10 @@ void CLuaAudioDefs::LoadFunctions()
         {"setRadioChannel", SetRadioChannel},
         {"getRadioChannel", GetRadioChannel},
         {"getRadioChannelName", GetRadioChannelName},
+
+        // Dev funcs
+        {"showSound", ArgumentParser<ShowSound>},
+        {"isShowSoundEnabled", ArgumentParser<IsShowSoundEnabled>}
     };
 
     // Add functions
@@ -1803,4 +1807,18 @@ int CLuaAudioDefs::GetRadioChannelName(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaAudioDefs::ShowSound(bool state)
+{
+    if (!g_pClientGame->GetDevelopmentMode())
+        return false;
+
+    g_pClientGame->SetShowSound(state);
+    return true;
+}
+
+bool CLuaAudioDefs::IsShowSoundEnabled()
+{
+    return g_pClientGame->GetShowSound();
 }
