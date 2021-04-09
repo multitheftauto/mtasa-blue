@@ -987,20 +987,19 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int              uiIndex = 0;
-        list<CElement*>::iterator iter = pColShape->CollidersBegin();
-
         // Preallocate space if no filter was provided 
-        if (szType && szType[0])
-            lua_newtable(luaVM); 
-        else 
+        if (strType.empty())
             lua_createtable(luaVM, pColShape->CountColliders(), 0);
-        for (; iter != pColShape->CollidersEnd(); ++iter)
+        else 
+            lua_newtable(luaVM);
+
+        int index = 0;
+        for (auto it = pColShape->CollidersBegin(); it != pColShape->CollidersEnd(); ++it)
         {
-            if ((strType.empty() || strType == (*iter)->GetTypeName()) && !(*iter)->IsBeingDeleted())
+            if ((strType.empty() || strType == (*it)->GetTypeName()) && !(*it)->IsBeingDeleted())
             {
-                lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, *iter);
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, *it);
                 lua_settable(luaVM, -3);
             }
         }
