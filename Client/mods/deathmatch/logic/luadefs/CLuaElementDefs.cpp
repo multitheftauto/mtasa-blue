@@ -924,7 +924,12 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
             unsigned int uiIndex = 0;
             auto         iter = pColShape->CollidersBegin();
 
-            lua_createtable(luaVM, pColShape->CountColliders(), 0);
+            // Preallocate space if no filter was provided
+            if (szType)
+                lua_newtable(luaVM);
+            else
+                lua_createtable(luaVM, pColShape->CountColliders(), 0);
+
             for (; iter != pColShape->CollidersEnd(); ++iter)
             {
                 if (szType == NULL || strcmp((*iter)->GetTypeName(), szType) == 0)

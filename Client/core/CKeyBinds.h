@@ -52,7 +52,6 @@ public:
 
     std::list<CKeyBind*>::const_iterator IterBegin() { return m_pList->begin(); }
     std::list<CKeyBind*>::const_iterator IterEnd() { return m_pList->end(); }
-    size_t                               CountAll() const noexcept { return m_pList->size(); }
 
     // Command-bind funcs
     bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL, bool bScriptCreated = false,
