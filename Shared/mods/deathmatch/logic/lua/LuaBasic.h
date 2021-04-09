@@ -218,7 +218,7 @@ namespace lua
     {
         // TODO: Key might be an int inside an optional / variant. Add some way to handle that as well.
         using KNoCV = std::remove_cv_t<K>;
-        if constexpr (std::is_arithmetic<KNoCV> && !std::is_same_v<KNoCV, bool>)
+        if constexpr (std::is_arithmetic_v<KNoCV> && !std::is_same_v<KNoCV, bool>)
             lua_newtable(L); // Key is arithmetic type, let Lua handle it (It would be too complex to figure out the sizes ourselves)
         else
             lua_createtable(L, 0, val.size()); // String key type - can preallocated as it is known all will go into the hash part
