@@ -55,8 +55,8 @@ private:
     static tBoatHandlingDataSA   m_OriginalBoatHandlingData[12];
     static CBoatHandlingEntrySA* m_pOriginalBoatEntries[12];
 
-    static tBikeHandlingDataSA   m_OriginalBikeHandlingData[13];
-    static CBikeHandlingEntrySA* m_pOriginalBikeEntries[13];
+    static tBikeHandlingDataSA   m_OriginalBikeHandlingData[14];
+    static CBikeHandlingEntrySA* m_pOriginalBikeEntries[14];
 
     std::map<std::string, eHandlingProperty> m_HandlingNames;
     int                                      iChangedVehicles;

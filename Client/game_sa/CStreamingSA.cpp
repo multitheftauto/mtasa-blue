@@ -11,7 +11,10 @@
 
 #include "StdInc.h"
 
-CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
+#include "CModelInfoSA.h"
+
+// count: 26316 in unmodified game
+CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;
 
 namespace
 {
@@ -137,7 +140,7 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
     }
 }
 
-CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint32 id)
 {
     return &ms_aInfoForModel[id];
 }

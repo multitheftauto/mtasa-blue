@@ -7,13 +7,13 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
-//
-// class WString
-//
-// Adds some functionality to the std::wstring class
-//
-#include <stdarg.h>
+#include <string>
+#include <vector>
+#include <cstdarg>
+#include "SharedUtil.IntTypes.h"
+#include "SString.h"
 
 #ifdef WIN32
 #ifndef va_copy

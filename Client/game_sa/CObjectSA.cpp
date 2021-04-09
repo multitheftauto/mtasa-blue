@@ -13,6 +13,40 @@
 
 //#define MTA_USE_BUILDINGS_AS_OBJECTS
 
+static void CObject_PreRender(CObjectSAInterface* objectInterface)
+{
+    SClientEntity<CObjectSA>* objectEntity = pGame->GetPools()->GetObject((DWORD*)objectInterface);
+    if (objectEntity && objectEntity->pEntity)
+        objectEntity->pEntity->SetPreRenderRequired(true);
+}
+
+const std::uintptr_t RETURN_CCObject_PreRender = 0x59FD56;
+static void _declspec(naked) HOOK_CCObject_PreRender()
+{
+    __asm
+    {
+        push ecx
+        call CObject_PreRender
+        pop  ecx
+        sub  esp, 10h
+        push esi
+        mov  esi, ecx
+        jmp  RETURN_CCObject_PreRender
+    }
+}
+
+void CObjectSA::StaticSetHooks()
+{
+    // Patch CObject::PreRender. We don't want the scaling code to execute
+    // We'll scale the object entity matrix after onClientPedsProcessed event
+    // 5E       - pop asi
+    // 83 C4 10 - add esp, 0x10
+    // C3       - ret
+    std::uint8_t bytes[5] = {0x5E, 0x83, 0xC4, 0x10, 0xC3};
+    MemCpy((void*)0x59FE0E, bytes, sizeof(bytes));
+    HookInstall(0x59FD50, HOOK_CCObject_PreRender);
+}
+
 // GTA uses this to pass to CFileLoader::LoadObjectInstance the info it wants to load
 struct CFileObjectInstance
 {
@@ -117,7 +151,12 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     _asm
     {
         mov     eax, dwModel
-        mov     eax, 0xA9B0C8[eax*4]
+
+        push    ecx
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
         mov     eax, [eax+20]
         movzx   eax, byte ptr [eax+40]
         push    eax
@@ -184,18 +223,20 @@ CObjectSA::~CObjectSA()
     // OutputDebugString("Attempting to destroy Object\n");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
-        DWORD dwInterface = (DWORD)this->GetInterface();
-        if (dwInterface)
+        CEntitySAInterface* pInterface = GetInterface();
+        if (pInterface)
         {
-            if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
+            pGame->GetRopes()->RemoveEntityRope(pInterface);
+
+            if ((DWORD)pInterface->vtbl != VTBL_CPlaceable)
             {
                 CWorldSA* world = (CWorldSA*)pGame->GetWorld();
-                world->Remove(this->GetInterface(), CObject_Destructor);
+                world->Remove(pInterface, CObject_Destructor);
 
-                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
+                DWORD dwFunc = pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
                 _asm
                 {
-                    mov     ecx, dwInterface
+                    mov     ecx, pInterface
                     push    1            // delete too
                     call    dwFunc
                 }
@@ -207,7 +248,12 @@ CObjectSA::~CObjectSA()
                 _asm
                 {
                     mov     eax, dwModelID
-                    mov     eax, 0xA9B0C8[eax*4]
+
+                    push    ecx
+                    mov     ecx, dword ptr[ARRAY_ModelInfo]
+                    mov     eax, dword ptr[ecx + eax*4]
+                    pop     ecx
+
                     mov     eax, [eax+20]
                     movzx   eax, byte ptr [eax+40]
                     push    eax

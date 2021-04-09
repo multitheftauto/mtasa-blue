@@ -485,7 +485,7 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
 
         if (!pGameEntity && pAESound->pAudioEntity)
             pGameEntity = pAESound->pAudioEntity->pEntity;
-        
+
         SWorldSoundEvent event = {
             pAESound->usGroup,
             pAESound->usIndex,
