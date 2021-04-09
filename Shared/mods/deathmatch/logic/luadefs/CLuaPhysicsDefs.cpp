@@ -11,14 +11,7 @@
 
 #include "StdInc.h"
 
-#include "physics/CLuaPhysicsBaseManager.h"
-#include "physics/CLuaPhysicsRigidBodyManager.h"
-#include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsShapeManager.h"
-#include "physics/CLuaPhysicsElement.h"
-
 #include "Enums.h"
-#include "physics/CPhysicsDebugDrawer.h"
  
 CBulletPhysics* CLuaPhysicsDefs::GetPhysics()
 {

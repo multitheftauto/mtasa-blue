@@ -149,6 +149,10 @@ struct SAclRequest;
 #include "luadefs/CLuaPhysicsDefs.h"
 
 // Lua includes
+
+#include "CBulletPhysicsCommon.h"
+#include <CBulletPhysics.h>
+
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
 #include "CEasingCurve.h"
@@ -179,8 +183,6 @@ struct SAclRequest;
 
 // Logic includes
 #include "ConcurrentList.hpp"
-#include "CBulletPhysicsCommon.h"
-#include <CBulletPhysics.h>
 
 #include "ASE.h"
 #include "ASEQuerySDK.h"

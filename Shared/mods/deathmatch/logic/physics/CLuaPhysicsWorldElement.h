@@ -11,8 +11,6 @@
 
 class CLuaPhysicsWorldElement;
 
-#include "CLuaPhysicsElement.h"
-
 #pragma once
 
 class CLuaPhysicsWorldElement : public CLuaPhysicsElement
