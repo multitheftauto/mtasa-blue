@@ -3,6 +3,15 @@
 #include <type_traits>
 #include <variant>
 
+template<typename T>
+struct remove_cr
+{
+    using type = std::remove_const_t<std::remove_reference_t<T>>; // Must first remove ref, then const: https://stackoverflow.com/questions/15887144
+};
+
+template<typename T>
+using remove_cr_t = remove_cr<T>::type;
+
 /**
     nth_element
 
@@ -49,12 +58,21 @@ struct is_specialization : std::false_type
 {
 };
 
+/* 
+Fix this if you need it (size and param_t). 
+Param_t must be available in both structs under GCC.
+
 template <template <typename...> class Ref, typename... Args>
 struct is_specialization<Ref<Args...>, Ref> : std::true_type
 {
     template <std::size_t N>
     using param_t = nth_element_t<N, Args...>;
     static constexpr auto size = sizeof...(Args);
+}; */
+
+template <template <typename...> class Ref, typename... Args>
+struct is_specialization<Ref<Args...>, Ref> : std::true_type
+{
 };
 
 // common_variant

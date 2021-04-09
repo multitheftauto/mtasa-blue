@@ -33,13 +33,13 @@ struct CLuaFunctionParserBase
     template <typename T, std::size_t typeIndex = 0>
     inline void TypeToNameVariant(SString& accumulator)
     {
-        using param = typename is_specialization<T, std::variant>::param_t<typeIndex>;
+        using param = typename std::variant_alternative_t<typeIndex, T>;
         if (accumulator.length() == 0)
             accumulator = TypeToName<param>();
         else
             accumulator += "/" + TypeToName<param>();
 
-        if constexpr (typeIndex < is_specialization<T, std::variant>::size - 1)
+        if constexpr (typeIndex < std::variant_size_v<T> - 1)
             return TypeToNameVariant<T, typeIndex + 1>(accumulator);
     }
 
@@ -56,8 +56,7 @@ struct CLuaFunctionParserBase
             return "enum";
         else if constexpr (is_specialization<T, std::optional>::value)
         {
-            using param_t = typename is_specialization<T, std::optional>::param_t<0>;
-            return TypeToName<param_t>();
+            return TypeToName<T::value_type>();
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
             return "value";
@@ -163,18 +162,17 @@ struct CLuaFunctionParserBase
     {
         // If the variant is empty, we have exhausted all options
         // The type therefore doesn't match the variant
-        if constexpr (is_specialization<T, std::variant>::size == typeIndex)
+        if constexpr (std::variant_size_v<T> == typeIndex)
             return -1;
         else
         {
             // Try to match the first type of the variant
             // If it matches, we've found our index
-            using first_t = typename is_specialization<T, std::variant>::param_t<typeIndex>;
-            if (TypeMatch<first_t>(L, index))
+            if (TypeMatch<std::variant_alternative_t<typeIndex, T>>(L, index))
                 return 0;
 
             // Else try the remaining types of the variant
-            int iResult = TypeMatchVariant<T, typeIndex+1>(L, index);
+            int iResult = TypeMatchVariant<T, typeIndex + 1>(L, index);
             if (iResult == -1)
                 return -1;
             return 1 + iResult;
@@ -304,10 +302,9 @@ struct CLuaFunctionParserBase
         // As std::variant<> cannot be constructed, we simply return the first value
         // in the error case. This is actually unreachable in the regular path,
         // due to TypeMatch making sure that vindex refers to a valid variant index
-        if constexpr (is_specialization<T, std::variant>::size== currIndex)
+        if constexpr (std::variant_size_v<T> == currIndex)
         {
-            using type_t = typename is_specialization<T, std::variant>::param_t<0>;
-            return type_t{};
+            return std::variant_alternative_t<0, T>{};
         }
         else
         {
@@ -316,8 +313,7 @@ struct CLuaFunctionParserBase
                 return PopUnsafeVariant<T, currIndex + 1>(L, index, vindex);
 
             // Pop the actual type
-            using type_t = std::remove_reference_t<decltype(std::get<currIndex>(T{}))>;
-            return PopUnsafe<type_t>(L, index);
+            return PopUnsafe<remove_cr_t<std::variant_alternative_t<currIndex, T>>>(L, index);
         }
     }
 
@@ -396,14 +392,13 @@ struct CLuaFunctionParserBase
         else if constexpr (is_specialization<T, std::optional>::value)
         {
             // optionals may either type match the desired value, or be nullopt
-            using param = typename is_specialization<T, std::optional>::param_t<0>;
-            if (TypeMatch<param>(L, index))
-                return PopUnsafe<param>(L, index);
+            if (TypeMatch<T::value_type>(L, index))
+                return PopUnsafe<T::value_type>(L, index);
 
             if (!lua_isnoneornil(L, index))
             {
                 SString strReceived = ReadParameterAsString(L, index);
-                SString strExpected = TypeToName<param>();
+                SString strExpected = TypeToName<T::value_type>();
                 SetBadArgumentError(L, strExpected, index, strReceived);
             }
 
@@ -415,12 +410,11 @@ struct CLuaFunctionParserBase
 
         else if constexpr (is_specialization<T, std::vector>::value)
         {
-            using param = typename is_specialization<T, std::vector>::param_t<0>;
             T vecData;
             lua_pushnil(L); /* first key */
             while (lua_next(L, index) != 0)
             {
-                if (!TypeMatch<param>(L, -1))
+                if (!TypeMatch<T::value_type>(L, -1))
                 {
                     // skip
                     lua_pop(L, 1);
@@ -428,7 +422,7 @@ struct CLuaFunctionParserBase
                 }
 
                 std::size_t i = -1;
-                vecData.emplace_back(PopUnsafe<param>(L, i));
+                vecData.emplace_back(PopUnsafe<T::value_type>(L, i));
                 lua_pop(L, 1);            // drop value, keep key for lua_next
             }
             ++index;
@@ -436,13 +430,11 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (is_specialization<T, std::unordered_map>::value)
         {
-            using key_t = typename is_specialization<T, std::unordered_map>::param_t<0>;
-            using value_t = typename is_specialization<T, std::unordered_map>::param_t<1>;
             T map;
             lua_pushnil(L); /* first key */
             while (lua_next(L, index) != 0)
             {
-                if (!TypeMatch<value_t>(L, -1) || !TypeMatch<key_t>(L, -2))
+                if (!TypeMatch<T::mapped_type>(L, -1) || !TypeMatch<T::key_type>(L, -2))
                 {
                     // skip
                     lua_pop(L, 1);
@@ -450,8 +442,8 @@ struct CLuaFunctionParserBase
                 }
 
                 std::size_t i = -2;
-                auto        k = PopUnsafe<key_t>(L, i);
-                auto        v = PopUnsafe<value_t>(L, i);
+                auto        k = PopUnsafe<T::key_type>(L, i);
+                auto        v = PopUnsafe<T::mapped_type>(L, i);
                 map.emplace(std::move(k), std::move(v));
                 lua_pop(L, 1);            // drop value, keep key for lua_next
             }
