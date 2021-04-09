@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
 {
     return "physics-rigid-body";
