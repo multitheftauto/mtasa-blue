@@ -182,8 +182,6 @@ struct SAclRequest;
 #include "lua/CLuaShared.h"
 
 // Logic includes
-#include "ConcurrentList.hpp"
-
 #include "ASE.h"
 #include "ASEQuerySDK.h"
 #include "CAccessControlList.h"

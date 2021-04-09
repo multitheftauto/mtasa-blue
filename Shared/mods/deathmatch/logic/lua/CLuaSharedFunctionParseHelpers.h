@@ -8,10 +8,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#include "Enums.h"
-
 inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
 {
     return "physics-rigid-body";

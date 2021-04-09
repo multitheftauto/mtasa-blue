@@ -8,10 +8,6 @@
  *
  *****************************************************************************/
 
-class CBulletPhysics;
-class CLuaPhysicsShape;
-class CPhysicsDebugDrawer;
-
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
@@ -31,8 +27,8 @@ class CPhysicsDebugDrawer;
 #include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
+#include "physics/CPhysicsDebugDrawer.h"
 
-#include <list>
 #ifdef MTA_CLIENT
     #include "CClientEntity.h"
 #else
