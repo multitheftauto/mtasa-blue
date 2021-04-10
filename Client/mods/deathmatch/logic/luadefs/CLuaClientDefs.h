@@ -22,4 +22,5 @@ private:
     static bool SetTransferBoxVisible(bool visible);
     static bool IsTransferBoxVisible();
     static bool IsTransferBoxAlwaysVisible();
+    static bool ClearDebug();
 };
