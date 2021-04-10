@@ -11,8 +11,11 @@
 
 #pragma once
 
+#include "SharedUtil.IntTypes.h"
 #include "CVector.h"
 #include <array>
+#include <cassert>
+
 
 /**
  * Contains full positional data for a point
@@ -153,7 +156,7 @@ public:
         matResult.vFront = vFront.Clone();
         matResult.vUp = vUp.Clone();
         matResult.vPos = vPos.Clone();
-        
+
         return matResult;
     }
 
@@ -231,7 +234,7 @@ public:
         // Operate only on rotation, ignore scale.
         CMatrix matRot = GetRotationMatrix();
 
-        float fRotY = atan2(matRot.vRight.fZ, sqrtf(Square(matRot.vRight.fX) + Square(matRot.vRight.fY)));
+        float fRotY = atan2(matRot.vRight.fZ, sqrtf((matRot.vRight.fX * matRot.vRight.fX) + (matRot.vRight.fY * matRot.vRight.fY)));
         float fRotZ = atan2(matRot.vRight.fY, matRot.vRight.fX);
 
         float fSinZ = -sin(fRotZ);
@@ -282,7 +285,7 @@ public:
         return CVector(vRight.Length(), vFront.Length(), vUp.Length());
     }
 
-    void SetScale(const CVector& vecScale) 
+    void SetScale(const CVector& vecScale)
     {
         CMatrix matRot = GetRotationMatrix();
         vRight = matRot.vRight * vecScale.fX;

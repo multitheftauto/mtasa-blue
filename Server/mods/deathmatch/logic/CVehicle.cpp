@@ -898,11 +898,6 @@ void CVehicle::SetIsBlown(bool bBlown)
         m_llBlowTime = CTickCount::Now();
 }
 
-bool CVehicle::GetIsBlown()
-{
-    return m_llBlowTime.ToLongLong() != 0;
-}
-
 bool CVehicle::IsBlowTimerFinished()
 {
     return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);

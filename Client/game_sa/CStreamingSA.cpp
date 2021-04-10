@@ -150,7 +150,7 @@ void CStreamingSA::ReinitStreaming()
 // ReinitStreaming should be called after this.
 // Otherwise the model wont be restreamed
 // TODO: Somehow restream a single model instead of the whole world
-void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
+void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
 

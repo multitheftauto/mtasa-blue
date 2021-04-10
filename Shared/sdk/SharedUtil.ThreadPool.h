@@ -7,12 +7,14 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
 #include <thread>
 #include <queue>
 #include <future>
 #include <vector>
 #include <algorithm>
+#include "SharedUtil.Misc.h"
 
 namespace SharedUtil
 {
@@ -84,7 +86,7 @@ namespace SharedUtil
             {
                 if (m_tasks.empty())
                     break;
-                // Run each task but skip execution of the actual 
+                // Run each task but skip execution of the actual
                 // function (-> just delete the task)
                 auto task = std::move(m_tasks.front());
                 task(true);
@@ -92,7 +94,7 @@ namespace SharedUtil
         }
 
         static CThreadPool& getDefaultThreadPool()
-        { 
+        {
             static CThreadPool DefaultThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
             return DefaultThreadPool;
         }

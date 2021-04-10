@@ -1245,6 +1245,18 @@ void CGame::JoinPlayer(CPlayer& Player)
     if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
+    // Control server RPC functions
+    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
+
+    // Disable CURSOR_EVENT RPC by default
+    disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = true;
+
+    // If suitable event exists (e.g. onPlayerClick/onElementClicked), tell client to enable RPC function instead
+    if (!m_pMapManager->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunctions::CURSOR_EVENT).empty())
+        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = false;
+
+    Player.Send(CServerRPCControlPacket(disabledServerRPCFunctions));
+
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
         CPerfStatDebugInfo::GetSingleton()->AddLine("PlayerInGameNotice", marker.GetString());
@@ -1272,6 +1284,9 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals(&Player);
+
+    // Tell client the transfer box visibility
+    CStaticFunctionDefinitions::SendClientTransferBoxVisibility(&Player);
 
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
@@ -1468,6 +1483,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
+    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
     // Blip events
 
@@ -1496,22 +1512,22 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerJoin", "", NULL, false);
     m_Events.AddEvent("onPlayerQuit", "reason", NULL, false);
     m_Events.AddEvent("onPlayerSpawn", "spawnpoint, team", NULL, false);
-    m_Events.AddEvent("onPlayerTarget", "target", NULL, false);
+    m_Events.AddEvent("onPlayerTarget", "target", NULL, false, eServerRPCFunctions::PLAYER_TARGET);
     m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart", NULL, false);
-    m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false);
+    m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false, eServerRPCFunctions::PLAYER_WEAPON);
     m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerPickupHit", "pickup", NULL, false);
     m_Events.AddEvent("onPlayerPickupLeave", "pickup", NULL, false);
     m_Events.AddEvent("onPlayerPickupUse", "pickup", NULL, false);
-    m_Events.AddEvent("onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false);
+    m_Events.AddEvent("onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false, eServerRPCFunctions::CURSOR_EVENT);
     m_Events.AddEvent("onPlayerContact", "previous, current", NULL, false);
     m_Events.AddEvent("onPlayerBan", "ban", NULL, false);
     m_Events.AddEvent("onPlayerLogin", "guest_account, account, auto-login", NULL, false);
     m_Events.AddEvent("onPlayerLogout", "account, guest_account", NULL, false);
     m_Events.AddEvent("onPlayerChangeNick", "oldnick, newnick, manuallyChanged", NULL, false);
     m_Events.AddEvent("onPlayerPrivateMessage", "text, player", NULL, false);
-    m_Events.AddEvent("onPlayerStealthKill", "target", NULL, false);
+    m_Events.AddEvent("onPlayerStealthKill", "target", NULL, false, eServerRPCFunctions::REQUEST_STEALTH_KILL);
     m_Events.AddEvent("onPlayerMute", "", NULL, false);
     m_Events.AddEvent("onPlayerUnmute", "", NULL, false);
     m_Events.AddEvent("onPlayerCommand", "command", NULL, false);
@@ -1530,13 +1546,14 @@ void CGame::AddBuiltInEvents()
     // Element events
     m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
     m_Events.AddEvent("onElementColShapeLeave", "colshape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false);
+    m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false, eServerRPCFunctions::CURSOR_EVENT);
     m_Events.AddEvent("onElementDataChange", "key, oldValue", NULL, false);
     m_Events.AddEvent("onElementDestroy", "", NULL, false);
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
@@ -1924,8 +1941,14 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     {
         pPed->SetIsDead(true);
         pPed->SetPosition(Packet.m_vecPosition);
+
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPed->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -1977,8 +2000,13 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPlayer->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -2613,12 +2641,12 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 if (pVehicle->GetIsBlown() == false)
                                 {
                                     pVehicle->SetIsBlown(true);
+                                    pVehicle->SetEngineOn(false);
 
-                                    // Call the onVehicleExplode event
                                     CLuaArguments Arguments;
                                     pVehicle->CallEvent("onVehicleExplode", Arguments);
-                                    // Update our engine State
-                                    pVehicle->SetEngineOn(false);
+
+                                    bBroadcast = pVehicle->GetIsBlown() && !pVehicle->IsBeingDeleted();
                                 }
                                 else
                                 {
@@ -2814,7 +2842,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                 }
 
                 // Check we have a valid ped & he is spawned
-                if (bValidPed && pPed->IsSpawned())
+                if (bValidPed)
                 {
                     // Handle it depending on the action
                     switch (ucAction)

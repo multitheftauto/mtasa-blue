@@ -5,7 +5,11 @@ project "Client Launcher"
 	targetdir(buildpath("."))
 	debugdir(buildpath("."))
 
-	includedirs { "../sdk" }
+	includedirs {
+		"../../Shared/sdk",
+		"../sdk",
+	}
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 

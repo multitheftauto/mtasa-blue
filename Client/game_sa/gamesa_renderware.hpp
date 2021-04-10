@@ -71,6 +71,7 @@ void InitRwFunctions(eGameVersion version)
             RwMatrixInvert = (RwMatrixInvert_t)0x007F20B0;
             RpWorldAddClump = (RpWorldAddClump_t)0x00751350;
             RwFrameScale = (RwFrameScale_t)0x007F0F10;
+            RwFrameUpdateObjects = (RwFrameUpdateObjects_t)0x7F0950;
             RwV3dTransformVector = (RwV3dTransformVector_t)0x007EDE00;
             RpLightCreate = (RpLightCreate_t)0x00752160;
             RpClumpAddLight = (RpClumpAddLight_t)0x0074A540;
@@ -166,6 +167,7 @@ void InitRwFunctions(eGameVersion version)
             RwMatrixInvert = (RwMatrixInvert_t)0x007F2070;
             RpWorldAddClump = (RpWorldAddClump_t)0x00751300;
             RwFrameScale = (RwFrameScale_t)0x007F0ED0;
+            RwFrameUpdateObjects = (RwFrameUpdateObjects_t)0x7F0910;
             RwV3dTransformVector = (RwV3dTransformVector_t)0x007EDDC0;
             RpLightCreate = (RpLightCreate_t)0x00752110;
             RpClumpAddLight = (RpClumpAddLight_t)0x0074A4F0;

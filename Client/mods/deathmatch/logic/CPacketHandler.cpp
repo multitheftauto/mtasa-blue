@@ -210,6 +210,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ServerInfoSync(bitStream);
             return true;
 
+        case PACKET_ID_SERVER_RPC_CONTROL:
+            Packet_ServerRPCControl(bitStream);
+            return true;
+
         default:
             break;
     }
@@ -3964,6 +3968,12 @@ retry:
                                 pPolygon->AddPoint(vertex.data.vecPosition);
                             }
                             pEntity = pShape = pPolygon;
+                            if (bitStream.Can(eBitStreamVersion::SetColPolygonHeight))
+                            {
+                                float fFloor, fCeil;
+                                if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
+                                    pPolygon->SetHeight(fFloor, fCeil);
+                            }
                             break;
                         }
                         default:
@@ -5311,6 +5321,21 @@ void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
             return;
 
         g_pClientGame->GetServerInfo()->SetMaxPlayers(maxPlayersCount);
+    }
+}
+
+void CPacketHandler::Packet_ServerRPCControl(NetBitStreamInterface& bitStream)
+{
+    unsigned short usNumFunctions;
+    if (bitStream.ReadCompressed(usNumFunctions))
+    {
+        for (unsigned short us = 0; us < usNumFunctions; us++)
+        {
+            unsigned int uiServerRPCFunction;
+            bool         bDisabled;
+            if (bitStream.Read(uiServerRPCFunction) && bitStream.ReadBit(bDisabled))
+                g_pClientGame->SetServerRPCFunctionDisabled(static_cast<eServerRPCFunctions>(uiServerRPCFunction), bDisabled);
+        }
     }
 }
 

@@ -48,6 +48,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_WEAPON_OWNER, SetWeaponOwner, "setWeaponOwner");
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
+    AddHandler(SET_COLPOLYGON_HEIGHT, SetColPolygonHeight, "setColShapePolygonHeight");
 }
 
 #define RUN_CHILDREN_SERVER(func) \
@@ -438,7 +439,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
     if (!bitStream.Read(usModel))
         return;
-    
+
     switch (pSource->GetType())
     {
         case CCLIENTPED:
@@ -491,7 +492,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         {
             CClientObject* pObject = static_cast<CClientObject*>(pSource);
             const unsigned short usCurrentModel = pObject->GetModel();
-            
+
             if (usCurrentModel != usModel)
             {
                 pObject->SetModel(usModel);
@@ -750,5 +751,15 @@ void CElementRPCs::SetCallPropagationEnabled(CClientEntity* pSource, NetBitStrea
     if (bitStream.ReadBit(bEnabled))
     {
         pSource->SetCallPropagationEnabled(bEnabled);
+    }
+}
+
+void CElementRPCs::SetColPolygonHeight(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    float fFloor, fCeil;
+    if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
+    {
+        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
+        pColPolygon->SetHeight(fFloor, fCeil);
     }
 }

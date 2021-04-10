@@ -20,6 +20,8 @@
 #include <vector>
 #include <cstdio>
 #include <cstring>
+#include <variant>
+#include <optional>
 
 #include <zlib.h>
 
@@ -45,6 +47,7 @@
 #include <ijsify.h>
 #include <Common.h>
 #include "net/Packets.h"
+#include "net/rpc_enums.h"
 #include "Enums.h"
 #include "net/SyncStructures.h"
 #include "CIdArray.h"
@@ -162,4 +165,4 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
-#include "../../version.h"
+#include "version.h"
