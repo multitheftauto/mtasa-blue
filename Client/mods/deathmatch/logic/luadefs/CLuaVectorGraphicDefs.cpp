@@ -113,7 +113,7 @@ void CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM, CClientVectorGra
 {
     std::string strXML = pXMLNode->ToString();
 
-    if (pVectorGraphic->LoadFromData(strXML.c_str()))
+    if (pVectorGraphic->LoadFromData(strXML))
         return;
 
     throw std::invalid_argument("Unable to set SVG XML document");
