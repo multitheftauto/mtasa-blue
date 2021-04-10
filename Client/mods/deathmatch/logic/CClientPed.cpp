@@ -1144,6 +1144,9 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromCloses
     for (; iter != listEnd; iter++)
     {
         pTempVehicle = *iter;
+        if (pTempVehicle->IsLocalEntity())
+            continue;
+
         CVehicle* pGameVehicle = pTempVehicle->GetGameVehicle();
 
         if (!pGameVehicle && bGetPositionFromClosestDoor)
