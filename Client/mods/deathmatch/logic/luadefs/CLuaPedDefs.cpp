@@ -993,7 +993,7 @@ bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* ent
     return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
 }
 
-std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     CVector  position;
@@ -1002,7 +1002,7 @@ std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBoneP
     return false;
 }
 
-std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     float    yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
     CEntity* theEntity = entity->GetGameEntity();
@@ -1040,6 +1040,15 @@ bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* en
     if (theEntity)
     {
         theEntity->UpdateRpHAnim();
+
+        if (theEntity->GetModelIndex() == 0)            // CJ skin
+        {
+            RpClump* clump = theEntity->GetRpClump();
+            if (clump)
+            {
+                ((void(__cdecl*)(RpClump*))0x5DF560)(clump);            // CPed::ShoulderBoneRotation
+            }
+        }
         return true;
     }
     return false;

@@ -14,6 +14,11 @@
 #include "Common.h"
 #include "../Common.h"
 #include <string>
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Math.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Logging.h"
+#include <vector>
 #ifndef WIN32
     #include <alloca.h>
 #endif

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <type_traits>
+#include <variant>
+
 /**
     is_Nspecialization
 

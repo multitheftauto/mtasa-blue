@@ -8,8 +8,18 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#include "SharedUtil.File.h"
+#include "SharedUtil.Defines.h"
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Buffer.h"
+#include <algorithm>
 
 #ifdef WIN32
+    #ifndef NOMINMAX
+    #define NOMINMAX
+    #endif
+    #include "Windows.h"
     #include "shellapi.h"
     #include "shlobj.h"
     #include <shlwapi.h>

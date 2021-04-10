@@ -273,6 +273,7 @@ public:
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
+    static bool           IsObjectMoving(CClientEntity& Entity);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
     static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
     static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);
@@ -379,7 +380,6 @@ public:
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
 
     // Camera get funcs
-    static bool           GetCameraViewMode(unsigned short& ucMode);
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);
     static CClientEntity* GetCameraTarget();
     static bool           GetCameraInterior(unsigned char& ucInterior);
@@ -390,7 +390,6 @@ public:
     static bool SetCameraTarget(const CVector& vecTarget);
     static bool SetCameraInterior(unsigned char ucInterior);
     static bool FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    static bool SetCameraViewMode(unsigned short ucMode);
 
     // Cursor funcs
     static bool GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld);
