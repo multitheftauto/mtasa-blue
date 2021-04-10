@@ -1127,7 +1127,7 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHou
     return false;
 }
 
-std::variant<bool, std::tuple<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
+std::variant<bool, CLuaMultiReturn<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
 {
     ushort      usModelID = CModelNames::ResolveModelID(strModelId);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);

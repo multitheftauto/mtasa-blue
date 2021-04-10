@@ -46,7 +46,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_pAttachedToEntity = NULL;
 
     m_strTypeName = "unknown";
-    m_uiTypeHash = HashString(m_strTypeName);
+    m_uiTypeHash = GetTypeHashFromString(m_strTypeName);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 
@@ -173,7 +173,7 @@ void CClientEntity::SetTypeName(const SString& name)
 {
     CClientEntity::RemoveEntityFromRoot(m_uiTypeHash, this);
     m_strTypeName.AssignLeft(name, MAX_TYPENAME_LENGTH);
-    m_uiTypeHash = HashString(name);
+    m_uiTypeHash = GetTypeHashFromString(name);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 }
@@ -1303,7 +1303,14 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     {
         pEntity->SetAreaCode(ucInterior);
     }
+
+    unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(ucOldInterior);
+    Arguments.PushNumber(ucInterior);
+    CallEvent("onClientElementInteriorChange", Arguments, true);
 }
 
 bool CClientEntity::IsOnScreen()

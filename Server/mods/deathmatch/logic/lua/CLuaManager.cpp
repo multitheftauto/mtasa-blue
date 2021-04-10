@@ -222,20 +222,6 @@ void CLuaManager::LoadCFunctions()
         {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
         {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
 
-        // Server standard funcs
-        {"getMaxPlayers", CLuaFunctionDefs::GetMaxPlayers},
-        {"setMaxPlayers", CLuaFunctionDefs::SetMaxPlayers},
-        {"outputChatBox", CLuaFunctionDefs::OutputChatBox},
-        {"outputConsole", CLuaFunctionDefs::OutputConsole},
-        {"outputDebugString", CLuaFunctionDefs::OutputDebugString},
-        {"outputServerLog", CLuaFunctionDefs::OutputServerLog},
-        {"getServerName", CLuaFunctionDefs::GetServerName},
-        {"getServerHttpPort", CLuaFunctionDefs::GetServerHttpPort},
-        {"getServerPassword", CLuaFunctionDefs::GetServerPassword},
-        {"setServerPassword", CLuaFunctionDefs::SetServerPassword},
-        {"getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting},
-        {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
-
         // Loaded map funcs
         {"getRootElement", CLuaFunctionDefs::GetRootElement},
         {"loadMapData", CLuaFunctionDefs::LoadMapData},
@@ -288,7 +274,7 @@ void CLuaManager::LoadCFunctions()
     // Add all functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
-    
+
     // Restricted functions
     CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
     CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);

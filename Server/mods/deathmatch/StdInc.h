@@ -42,7 +42,7 @@ struct SAclRequest;
 #include "net/Packets.h"
 #include "net/rpc_enums.h"
 #include "Enums.h"
-#include <bochs_internal/crc32.h>
+#include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
 #include "CIdArray.h"
 #include "pcrecpp.h"
@@ -311,7 +311,7 @@ struct SAclRequest;
 #include "CServer.h"
 #include "Config.h"
 #define SHOW_SELF_COMPILE_WARNING
-#include "../../version.h"
+#include "version.h"
 
 extern CNetServer* g_pRealNetServer;
 extern CGame*      g_pGame;

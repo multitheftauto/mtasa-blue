@@ -2788,11 +2788,6 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity)
 
     return false;
 }
-bool CStaticFunctionDefinitions::IsVehicleBlown(CClientVehicle& Vehicle, bool& bBlown)
-{
-    bBlown = Vehicle.IsVehicleBlown();
-    return true;
-}
 
 bool CStaticFunctionDefinitions::GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2)
 {
@@ -3605,6 +3600,17 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition)
+{
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(usModel);
+
+    if (modelInfo == nullptr || !modelInfo->IsVehicle())
+        return false;
+
+    vecPosition = modelInfo->GetVehicleDummyDefaultPosition(eDummy);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -3857,6 +3863,12 @@ bool CStaticFunctionDefinitions::IsObjectBreakable(CClientObject& Object, bool& 
 {
     bBreakable = Object.IsBreakable();
     return true;
+}
+
+bool CStaticFunctionDefinitions::IsObjectMoving(CClientEntity& Entity)
+{
+    CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+    return Object.IsMoving();
 }
 
 bool CStaticFunctionDefinitions::GetObjectMass(CClientObject& Object, float& fMass)
@@ -4882,18 +4894,6 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
         g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
 
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetCameraViewMode(unsigned short ucMode)
-{
-    m_pCamera->SetCameraViewMode((eVehicleCamMode)ucMode);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetCameraViewMode(unsigned short& ucMode)
-{
-    ucMode = m_pCamera->GetCameraViewMode();
     return true;
 }
 

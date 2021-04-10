@@ -466,7 +466,7 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
         }
         Sleep(10);
     }
-    
+
     // Process input
     bool doNotCheckAgainOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0) == BST_CHECKED;
     SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", strFileHash);

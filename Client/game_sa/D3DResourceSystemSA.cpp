@@ -22,7 +22,7 @@ void D3DResourceSystem_Init()
 {
     auto D3DTextureBuffer_Setup = (void(__thiscall*) (D3DTextureBuffer * pThis, int format, int width, int bOneLevel, int capacity))0x72FE80;
     auto D3DIndexDataBuffer_Setup = (void(__thiscall*)(D3DIndexDataBuffer * pThis, int format, int a3, int capacity))0x730190;
-    
+
     D3DResourceSystem_UseD3DResourceBuffering = false;
     D3DResourceSystem_FreeTextureBufferIndex = 0;
     D3DTextureBuffer_Setup(&D3DResourceSystem_TextureBuffer, 0, 0, -1, 16);

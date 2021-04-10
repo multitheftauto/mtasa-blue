@@ -242,6 +242,12 @@ namespace
         {"setTransferBoxVisible", "1.5.8-9.20788"},
         {"isTransferBoxVisible", "1.5.8-9.20788"},
         {"isTransferBoxAlwaysVisible", "1.5.8-9.20788"},
+        {"getVehicleDummyPosition", "1.5.8-9.20797"},
+        {"getVehicleModelDummyDefaultPosition", "1.5.8-9.20797"},
+        {"setVehicleDummyPosition", "1.5.8-9.20797"},
+        {"resetVehicleDummyPositions", "1.5.8-9.20797"},
+        {"getColPolygonHeight", "1.5.8-9.20807"},
+        {"setColPolygonHeight", "1.5.8-9.20807"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -348,6 +354,8 @@ namespace
         // Features added in 1.5.8
         {"setTransferBoxVisible", "1.5.8-9.20788"},
         {"isTransferBoxVisible", "1.5.8-9.20788"},
+        {"getColPolygonHeight", "1.5.8-9.20807"},
+        {"setColPolygonHeight", "1.5.8-9.20807"},
     };
 
     //

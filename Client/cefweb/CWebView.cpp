@@ -159,7 +159,15 @@ const SString& CWebView::GetTitle()
 void CWebView::SetRenderingPaused(bool bPaused)
 {
     if (m_pWebView)
+    {
         m_pWebView->GetHost()->WasHidden(bPaused);
+        m_bIsRenderingPaused = bPaused;
+    }
+}
+
+const bool CWebView::GetRenderingPaused() const
+{
+    return m_pWebView ? m_bIsRenderingPaused : false;
 }
 
 void CWebView::Focus(bool state)

@@ -5,6 +5,7 @@ require "install_data"
 require "install_resources"
 require "install_cef"
 require "install_discord"
+require "install_unifont"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -36,7 +37,6 @@ workspace "MTASA"
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
 		"vendor",
-		"Shared/sdk",
 	}
 
 	defines {
@@ -136,6 +136,7 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
+		include "vendor/detours"
 	end
 
 	filter {}
@@ -156,7 +157,6 @@ workspace "MTASA"
 		include "vendor/curl"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
-		include "vendor/hwbrk"
 		include "vendor/json-c"
 		include "vendor/lua"
 		include "vendor/mbedtls"

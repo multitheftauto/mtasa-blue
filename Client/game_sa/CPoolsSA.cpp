@@ -97,21 +97,21 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
-        eVehicleModelTypes eVehicleModelType = (eVehicleModelTypes)pGame->GetModelInfo(eVehicleType)->GetVehicleType();
-        
-        switch (eVehicleModelType)
-	    {
-            case eVehicleModelTypes::BOAT:
+        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
+
+        switch (vehicleClass)
+        {
+            case VehicleClass::BOAT:
                 pVehicle = new CBoatSA(eVehicleType, ucVariation, ucVariation2);
                 break;
-            case eVehicleModelTypes::BMX:
-            case eVehicleModelTypes::BIKE:
+            case VehicleClass::BMX:
+            case VehicleClass::BIKE:
                 pVehicle = new CBikeSA(eVehicleType, ucVariation, ucVariation2);
                 break;
             default:
                 pVehicle = new CVehicleSA(eVehicleType, ucVariation, ucVariation2);
                 break;
-	    }
+        }
 
         if (!AddVehicleToPool(pClientVehicle, pVehicle))
         {
@@ -147,20 +147,19 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInter
             }
             else
             {
-        
-                switch ((eVehicleModelTypes)pInterface->m_type)
-	             {
-                    case eVehicleModelTypes::BOAT:
-                         pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
+                switch ((VehicleClass)pInterface->m_vehicleClass)
+                {
+                    case VehicleClass::BOAT:
+                        pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
                         break;
-                    case eVehicleModelTypes::BMX:
-                    case eVehicleModelTypes::BIKE:
+                    case VehicleClass::BMX:
+                    case VehicleClass::BIKE:
                         pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
                         break;
                     default:
                         pVehicle = new CVehicleSA(pInterface);
                         break;
-	             }
+                }
 
                 if (!AddVehicleToPool(pClientVehicle, pVehicle))
                 {
