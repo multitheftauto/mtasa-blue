@@ -154,7 +154,7 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
 
-    // Change nextInImg filed for prev model
+    // Change nextInImg field for prev model
     for (CStreamingInfo& info : ms_aInfoForModel)
     {
         if (info.archiveId == pItemInfo->archiveId)
