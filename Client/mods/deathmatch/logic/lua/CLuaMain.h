@@ -26,10 +26,7 @@ class CLuaMain;
 #define MAX_SCRIPTNAME_LENGTH 64
 
 #include <list>
-
-class CLuaPhysicsRigidBodyManager;
-class CLuaPhysicsStaticCollisionManager;
-class CLuaPhysicsShapeManager;
+#include "CSharedLuaMain.h"
 
 struct CRefInfo
 {
@@ -37,16 +34,16 @@ struct CRefInfo
     int               iFunction;
 };
 
-class CLuaMain            //: public CClient
+class CLuaMain : public CSharedLuaMain            //: public CClient
 {
 public:
     ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP);
-    ~CLuaMain();
+    virtual ~CLuaMain();
 
     bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
     bool LoadScript(const char* szLUAScript);
-    void UnloadScript();
+    virtual void UnloadScript();
 
     void Start();
 
@@ -57,13 +54,6 @@ public:
 
     lua_State*                         GetVM() { return m_luaVM; };
     CLuaTimerManager*                  GetTimerManager() const { return m_pLuaTimerManager; };
-    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
-    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
-    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
-    CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
-    CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
-    CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
-    CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };
@@ -88,23 +78,6 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
-    template <class T, typename... Ty>
-    T* CreateElement(Ty... args)
-    {
-        static_assert(std::is_base_of<CClientEntity, T>::value);
-        if (m_pResource)
-        {
-            T*             pElement = new T(CLuaDefs::m_pManager, INVALID_ELEMENT_ID, this, args...);
-            CElementGroup* pGroup = m_pResource->GetElementGroup();
-            if (pGroup)
-            {
-                pGroup->Add((CClientEntity*)pElement);
-            }
-            return pElement;
-        }
-        return nullptr;
-    }
-
     bool IsOOPEnabled() { return m_bEnableOOP; }
 
 private:
@@ -114,11 +87,8 @@ private:
 
     SString m_strScriptName;
 
-    lua_State*                         m_luaVM;
-    CLuaTimerManager*                  m_pLuaTimerManager;
-    CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
-    CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
-    CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;
+    lua_State*        m_luaVM;
+    CLuaTimerManager* m_pLuaTimerManager;
 
     bool m_bBeingDeleted;            // prevent it being deleted twice
 

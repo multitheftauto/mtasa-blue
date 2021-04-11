@@ -21,6 +21,7 @@ class CLuaMain;
 #include "../CTextDisplay.h"
 
 #include "CLuaFunctionDefs.h"
+#include "CSharedLuaMain.h"
 
 #define MAX_SCRIPTNAME_LENGTH 64
 
@@ -30,10 +31,6 @@ class CPlayerManager;
 class CRadarAreaManager;
 class CVehicleManager;
 class CMapManager;
-class CLuaPhysicsRigidBodyManager;
-class CLuaPhysicsStaticCollisionManager;
-class CLuaPhysicsShapeManager;
-class CLuaPhysicsElement;
 
 struct CRefInfo
 {
@@ -41,18 +38,18 @@ struct CRefInfo
     int               iFunction;
 };
 
-class CLuaMain            //: public CClient
+class CLuaMain : public CSharedLuaMain            //: public CClient
 {
 public:
     ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
              CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP);
 
-    ~CLuaMain();
+    virtual ~CLuaMain();
 
     bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
     bool LoadScript(const char* szLUAScript);
-    void UnloadScript();
+    virtual void UnloadScript();
 
     void Start();
 
@@ -69,14 +66,6 @@ public:
     CPlayerManager*  GetPlayerManager() const { return m_pPlayerManager; };
     CVehicleManager* GetVehicleManager() const { return m_pVehicleManager; };
     CMapManager*     GetMapManager() const { return m_pMapManager; };
-
-    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager.get(); };
-    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager.get(); };
-    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager.get(); };
-    CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
-    CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
-    CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
-    CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
     CXMLNode*     ParseString(const char* strXmlContent);
@@ -121,23 +110,6 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
-    template <class T, typename ...Ty>
-    T* CreateElement(Ty... args)
-    {
-        static_assert(std::is_base_of<CElement, T>::value);
-        if (m_pResource)
-        {
-            T*             pElement = new T(m_pResource->GetDynamicElementRoot(), this, args...);
-            CElementGroup* pGroup = m_pResource->GetElementGroup();
-            if (pGroup)
-            {
-                pGroup->Add((CElement*)pElement);
-            }
-            return pElement;
-        }
-        return nullptr;
-    }
-
 
 private:
     void InitSecurity();
@@ -162,10 +134,6 @@ private:
     CRadarAreaManager*   m_pRadarAreaManager;
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
-
-    std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;
-    std::unique_ptr<CLuaPhysicsStaticCollisionManager> m_pLuaPhysicsStaticCollisionManager;
-    std::unique_ptr<CLuaPhysicsShapeManager>           m_pLuaPhysicsShapeManager;
 
     list<CXMLFile*>                                 m_XMLFiles;
     std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;

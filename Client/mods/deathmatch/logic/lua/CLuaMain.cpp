@@ -27,12 +27,6 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
-// i can not use forward declaration here
-#include "physics/CLuaPhysicsBaseManager.h"
-#include "physics/CLuaPhysicsRigidBodyManager.h"
-#include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsShapeManager.h"
-
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {
     // Initialise everything to be setup in the Start function
@@ -40,9 +34,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_luaVM = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
-    m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
-    m_pLuaPhysicsStaticCollisionManager = new CLuaPhysicsStaticCollisionManager;
-    m_pLuaPhysicsShapeManager = new CLuaPhysicsShapeManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
     m_pResource = pResourceOwner;
@@ -67,10 +58,6 @@ CLuaMain::~CLuaMain()
     // Delete the timer manager
     delete m_pLuaTimerManager;
 
-    delete m_pLuaPhysicsRigidBodyManager;
-    delete m_pLuaPhysicsStaticCollisionManager;
-    delete m_pLuaPhysicsShapeManager;
-
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
@@ -78,35 +65,6 @@ CLuaMain::~CLuaMain()
 bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
-}
-
-CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
-{
-    return (CLuaPhysicsRigidBody*)m_pLuaPhysicsRigidBodyManager->GetFromScriptID(uiScriptID);
-}
-
-CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsStaticCollisionManager->GetFromScriptID(uiScriptID);
-}
-
-CLuaPhysicsShape* CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsShapeManager->GetFromScriptID(uiScriptID);
-}
-
-CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScriptID)
-{
-    auto pShape = GetShapeFromScriptID(uiScriptID);
-    if (pShape != nullptr)
-        return (CLuaPhysicsElement*)pShape;
-    auto pStaticCollision = GetStaticCollisionFromScriptID(uiScriptID);
-    if (pStaticCollision != nullptr)
-        return (CLuaPhysicsElement*)pStaticCollision;
-    auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
-    if (pRigidBody != nullptr)
-        return (CLuaPhysicsElement*)pRigidBody;
-    return nullptr;
 }
 
 void CLuaMain::ResetInstructionCount()
@@ -364,6 +322,8 @@ void CLuaMain::Start()
 
 void CLuaMain::UnloadScript()
 {
+    CSharedLuaMain::UnloadScript();
+
     // ACHTUNG: UNLOAD MODULES!
 
     // Delete all timers and events

@@ -357,22 +357,6 @@ CLuaArgument* CLuaArguments::PushResource(CResource* pResource)
     return pArgument;
 }
 
-CLuaArgument* CLuaArguments::PushPhysicsRigidBody(CLuaPhysicsRigidBody* pRigidBody)
-{
-    CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadScriptID(pRigidBody->GetScriptID());
-    m_Arguments.push_back(pArgument);
-    return pArgument;
-}
-
-CLuaArgument* CLuaArguments::PushPhysicsStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
-{
-    CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadScriptID(pStaticCollision->GetScriptID());
-    m_Arguments.push_back(pArgument);
-    return pArgument;
-}
-
 CLuaArgument* CLuaArguments::PushElement(CClientEntity* pElement)
 {
     CLuaArgument* pArgument = new CLuaArgument;

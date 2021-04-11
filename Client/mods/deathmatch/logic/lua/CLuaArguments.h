@@ -59,8 +59,6 @@ public:
     CLuaArgument* PushElement(CClientEntity* pElement);
     CLuaArgument* PushArgument(const CLuaArgument& argument);
     CLuaArgument* PushResource(CResource* pResource);
-    CLuaArgument* PushPhysicsRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    CLuaArgument* PushPhysicsStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     CLuaArgument* PushTable(CLuaArguments* table);
 
     void DeleteArguments();

@@ -42,7 +42,6 @@ class CClientWater;
 class CClientWeapon;
 class CClientRadarArea;
 class CClientPointLights;
-class CBulletPhysics;
 class CLuaTimer;
 class CLuaPhysicsElement;
 class CLuaPhysicsRigidBody;

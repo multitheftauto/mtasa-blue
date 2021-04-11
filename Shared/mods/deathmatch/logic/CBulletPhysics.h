@@ -12,10 +12,6 @@
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "bulletphysics3d/BulletCollision/Gimpact/btGImpactShape.h"
-#include "bulletphysics3d/BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
-#include "bulletphysics3d/BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"
-#include "bulletphysics3d/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h"
-#include "bulletphysics3d/BulletCollision/CollisionDispatch/btCollisionDispatcherMt.h"
 
 #include "physics/CLuaPhysicsSharedLogic.h"
 #include "physics/CLuaPhysicsElement.h"
@@ -107,7 +103,6 @@ private:
     mutable std::mutex pulseLock;
 
     std::unique_ptr<btSequentialImpulseConstraintSolver> m_pSolver;
-    std::unique_ptr<btConstraintSolverPoolMt>            m_pMtSolverPool;
     std::unique_ptr<btBroadphaseInterface>               m_pOverlappingPairCache;
     std::unique_ptr<btCollisionDispatcher>               m_pDispatcher;
     std::unique_ptr<btDefaultCollisionConfiguration>     m_pCollisionConfiguration;

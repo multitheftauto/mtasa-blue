@@ -38,10 +38,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
 
-    m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
-    m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
-    m_pLuaPhysicsShapeManager = std::make_unique<CLuaPhysicsShapeManager>();
-
     m_FunctionEnterTimer.SetMaxIncrement(500);
     m_WarningTimer.SetMaxIncrement(1000);
     m_uiOpenFileCountWarnThresh = 10;
@@ -98,9 +94,6 @@ CLuaMain::~CLuaMain()
 
     CPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
-    m_pLuaPhysicsShapeManager->RemoveAll();
-    m_pLuaPhysicsRigidBodyManager->RemoveAll();
-    m_pLuaPhysicsStaticCollisionManager->RemoveAll();
 }
 
 bool CLuaMain::BeingDeleted()
@@ -366,9 +359,10 @@ void CLuaMain::Start()
 
 void CLuaMain::UnloadScript()
 {
+    CSharedLuaMain::UnloadScript();
+
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers();
-    m_pLuaPhysicsShapeManager->RemoveAll();
 
     // Delete all keybinds
     list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
@@ -669,33 +663,4 @@ int CLuaMain::OnUndump(const char* p, size_t n)
         return 0;
     }
     return 1;
-}
-
-CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsRigidBodyManager->GetFromScriptID(uiScriptID);
-}
-
-CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsStaticCollisionManager->GetFromScriptID(uiScriptID);
-}
-
-CLuaPhysicsShape* CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
-{
-    return m_pLuaPhysicsShapeManager->GetFromScriptID(uiScriptID);
-}
-
-CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScriptID)
-{
-    auto pShape = GetShapeFromScriptID(uiScriptID);
-    if (pShape != nullptr)
-        return (CLuaPhysicsElement*)pShape;
-    auto pStaticCollision = GetStaticCollisionFromScriptID(uiScriptID);
-    if (pStaticCollision != nullptr)
-        return (CLuaPhysicsElement*)pStaticCollision;
-    auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
-    if (pRigidBody != nullptr)
-        return (CLuaPhysicsElement*)pRigidBody;
-    return nullptr;
 }

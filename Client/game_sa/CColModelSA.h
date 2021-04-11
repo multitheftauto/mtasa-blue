@@ -14,8 +14,8 @@
 #include <windows.h>
 #include <game/CColModel.h>
 
-#define FUNC_CColModel_Constructor  0x40FB60
-#define FUNC_CColModel_Destructor   0x40F700
+#define FUNC_CColModel_Constructor      0x40FB60
+#define FUNC_CColModel_Destructor       0x40F700
 
 typedef struct
 {
