@@ -32,6 +32,21 @@ struct CArchiveInfo
     DWORD uiStreamHandleId;
 };
 
+struct SGtaStream
+{
+    uint32_t nSectorsOffset;
+    uint32_t nSectorsToRead;
+    uint32_t lpBuffer;
+    uint8_t  bUnknow1;
+    uint8_t  bLocked;
+    uint8_t  bInUse;
+    uint8_t  bUnknow2;
+    uint32_t uiStatus;
+    uint32_t handle;
+    uint32_t file;
+    uint8_t  pad[20];
+};
+static_assert(sizeof(SGtaStream) == 0x30, "Invalid size for SGtaStream");
 
 class CStreamingSA : public CStreaming
 {
@@ -50,8 +65,11 @@ public:
     unsigned char   GetUnusedStreamHandle();
     unsigned char   AddArchive(const char* szFilePath);
     void            RemoveArchive(unsigned char ucStreamHandler);
+    void            SetStreamingBufferSize(uint32 uiSize);
 
 private:
+    static int    (&ms_pStreamingBuffer)[2];
+    static uint32 (&ms_streamingBufferSize);
     static CStreamingInfo (&ms_aInfoForModel)[26316];
     static HANDLE (&m_aStreamingHandlers)[32];
     static CArchiveInfo (&ms_aAchiveInfo)[8];

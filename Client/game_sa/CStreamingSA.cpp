@@ -12,10 +12,14 @@
 #include "StdInc.h"
 #include "Fileapi.h"
 #include "CModelInfoSA.h"
+#include "processthreadsapi.h"
 
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
 HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // Contains open files
 CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
+HANDLE* phStreamingThread = (HANDLE*)0x8E4008;
+uint32  (&CStreamingSA::ms_streamingBufferSize) = *(uint32*)0x8E4CA8;
+int (&CStreamingSA::ms_pStreamingBuffer)[2] = *(int (*)[2])0x8E4CAC;
 
 namespace
 {
@@ -246,4 +250,48 @@ void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
 
     CloseHandle(m_aStreamingHandlers[uiStreamHandlerID]);
     m_aStreamingHandlers[uiStreamHandlerID] = NULL;
+}
+
+void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
+{
+    if (uiBlockSize <= ms_streamingBufferSize * 2)
+        return;
+
+    // Close old streaming handle
+    TerminateThread(*phStreamingThread, 0);
+
+    // Create new buffer
+    if (uiBlockSize & 1)
+        uiBlockSize = uiBlockSize++ + 1;
+
+    typedef int(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
+    int iPointer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(uiBlockSize << 11, 2048);
+
+    // Copy data from old buffer to new buffer
+    MemCpyFast((void*)iPointer, (void*)ms_pStreamingBuffer[0], ms_streamingBufferSize);
+    MemCpyFast((void*)(iPointer + 1024 * uiBlockSize), (void*)ms_pStreamingBuffer[1], ms_streamingBufferSize);
+
+    ms_streamingBufferSize = uiBlockSize / 2;
+
+    ms_pStreamingBuffer[0] = iPointer;
+    ms_pStreamingBuffer[1] = iPointer + 2048 * ms_streamingBufferSize;
+
+    int pointer = *(int*)0x8E3FFC;
+    SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
+
+    streaming[0].lpBuffer = ms_pStreamingBuffer[0];
+    streaming[1].lpBuffer = ms_pStreamingBuffer[1];
+
+    free(reinterpret_cast<void*>(ms_pStreamingBuffer[0] - 1));
+
+    // Create new streming handle
+    auto pStreamingThreadId = *(LPDWORD)0x8E4000;
+    HANDLE   hStreamingThread = CreateThread(0, 0x10000u, (LPTHREAD_START_ROUTINE)0x406560, 0, 4u, &pStreamingThreadId);
+
+    HANDLE hCurrentThread = GetCurrentThread();
+    int    iPriority = GetThreadPriority(hCurrentThread);
+    SetThreadPriority(hStreamingThread, iPriority);
+    ResumeThread(hStreamingThread);
+
+    phStreamingThread = &hStreamingThread;
 }
