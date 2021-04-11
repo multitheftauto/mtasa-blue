@@ -537,7 +537,7 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     return 1;
 }
 
-CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strFilePath)
+CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
@@ -550,7 +550,7 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
 
     std::string strFullPath;
 
-    if (CResourceManager::ParseResourcePathInput(strFilePath, pResource, &strFullPath))
+    if (CResourceManager::ParseResourcePathInput(strRelativeFilePath, pResource, &strFullPath))
     {
         // Grab the resource root entity
         CClientEntity* pRoot = pResource->GetResourceIMGRoot();
