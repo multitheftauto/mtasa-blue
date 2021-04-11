@@ -550,7 +550,7 @@ int CLuaElementDefs::getElementParent(lua_State* luaVM)
 int CLuaElementDefs::getElementPosition(lua_State* luaVM)
 {
     //  float, float, float getElementPosition ( element theElement )
-    CElement*                pElement;
+    CElement*                pElement = nullptr;
     CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
 
     CScriptArgReader argStream(luaVM);

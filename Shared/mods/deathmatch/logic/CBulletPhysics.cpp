@@ -144,8 +144,6 @@ void CBulletPhysics::DrawDebugLines()
 
 void CBulletPhysics::DoPulse()
 {
-    std::lock_guard<std::mutex> guard(pulseLock);
-
     CTickCount tickCountNow = CTickCount::Now();
 
     m_fDeltaTime = (float)(tickCountNow - m_LastTimeMs).ToLongLong();

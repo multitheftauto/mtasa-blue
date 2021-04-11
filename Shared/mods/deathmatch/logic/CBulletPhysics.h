@@ -8,10 +8,7 @@
  *
  *****************************************************************************/
 
-#include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
-#include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
-#include "bulletphysics3d/BulletCollision/Gimpact/btGImpactShape.h"
 
 #include "physics/CLuaPhysicsSharedLogic.h"
 #include "physics/CLuaPhysicsElement.h"
@@ -24,12 +21,6 @@
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
 #include "physics/CPhysicsDebugDrawer.h"
-
-#ifdef MTA_CLIENT
-    #include "CClientEntity.h"
-#else
-    #include "./../Server/mods/deathmatch/logic/CElement.h"
-#endif
 
 #include "physics/CLuaPhysicsBoxShape.h"
 #include "physics/CPhysicsStaticCollisionProxy.h"
@@ -63,8 +54,6 @@ public:
 
     CLuaPhysicsBoxShape* CreateBoxShape(CVector vector);
 
-    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
 
     std::vector<CLuaPhysicsShape*>           GetShapes() const { return m_vecShapes; }
@@ -76,7 +65,6 @@ public:
     void DrawDebugLines();
 #endif
 
-    // Running on worker thread
     void DoPulse();
 
 private:
@@ -97,10 +85,7 @@ private:
 
     void AddShape(CLuaPhysicsShape* pShape);
     void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-
-    mutable std::mutex lock;
-    // stepSimulation, doPulse thread safety lock
-    mutable std::mutex pulseLock;
+    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     std::unique_ptr<btSequentialImpulseConstraintSolver> m_pSolver;
     std::unique_ptr<btBroadphaseInterface>               m_pOverlappingPairCache;
@@ -111,13 +96,11 @@ private:
 
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 
-    CTickCount                           m_LastTimeMs;
-    std::atomic<float>                   m_fSpeed = 1.0f;
-    std::atomic<int>                     m_iSubSteps = 10;
-    std::atomic<bool>                    m_bWorldHasChanged = false;
-    mutable std::unique_lock<std::mutex> m_lockBtWorld;
-    std::atomic<bool>                    m_bSimulationEnabled = false;
-    float                                m_fDeltaTime;
+    CTickCount         m_LastTimeMs;
+    std::atomic<float> m_fSpeed = 1.0f;
+    std::atomic<int>   m_iSubSteps = 10;
+    std::atomic<bool>  m_bSimulationEnabled = false;
+    float              m_fDeltaTime;
 
 #ifdef MTA_CLIENT
     bool m_bDrawDebugNextTime = false;

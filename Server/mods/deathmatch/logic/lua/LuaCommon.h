@@ -18,7 +18,6 @@ extern "C"
     #include "lauxlib.h"
 }
 
-class CLuaPhysicsElement;
 class CLuaPhysicsRigidBody;
 class CLuaPhysicsStaticCollision;
 class CLuaPhysicsShape;

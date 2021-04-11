@@ -52,8 +52,8 @@ public:
     const char* GetScriptName() const { return m_strScriptName; }
     void        SetScriptName(const char* szName) { m_strScriptName.AssignLeft(szName, MAX_SCRIPTNAME_LENGTH); }
 
-    lua_State*                         GetVM() { return m_luaVM; };
-    CLuaTimerManager*                  GetTimerManager() const { return m_pLuaTimerManager; };
+    lua_State*        GetVM() { return m_luaVM; };
+    CLuaTimerManager* GetTimerManager() const { return m_pLuaTimerManager; };
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };

@@ -1,6 +1,7 @@
 class CLuaPhysicsRigidBodyManager;
 class CLuaPhysicsStaticCollisionManager;
 class CLuaPhysicsShapeManager;
+class CLuaPhysicsElement;
 
 class CSharedLuaMain
 {

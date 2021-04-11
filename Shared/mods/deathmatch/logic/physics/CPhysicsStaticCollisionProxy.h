@@ -15,16 +15,10 @@ class CPhysicsStaticCollisionProxy;
 
 #pragma once
 
+// Create using static member method "New"
 class CPhysicsStaticCollisionProxy : public CPhysicsProxyElement, public btCollisionObject
 {
 public:
-    //CPhysicsStaticCollisionProxy(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape,
-    //                             const btVector3& localInertia = btVector3(0, 0, 0))
-    //    : btRigidBody(mass, motionState, collisionShape, localInertia){};
-
-    //CPhysicsStaticCollisionProxy(const btRigidBodyConstructionInfo& constructionInfo) : btRigidBody(constructionInfo){};
-
-    // Use 'CPhysicsStaticCollisionProxy::New' instead.
     CPhysicsStaticCollisionProxy(){};
     ~CPhysicsStaticCollisionProxy();
 

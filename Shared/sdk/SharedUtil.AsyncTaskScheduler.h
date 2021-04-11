@@ -46,7 +46,7 @@ namespace SharedUtil
         // Creates a new async task scheduler
         // with a fixed number of worker threads
         //
-        CAsyncTaskScheduler(std::size_t numWorkers, int sleep = 4);
+        CAsyncTaskScheduler(std::size_t numWorkers);
 
         //
         // Ends all worker threads (waits for the last task to finish)
@@ -88,7 +88,5 @@ namespace SharedUtil
 
         std::vector<std::unique_ptr<SBaseTask>> m_TaskResults;
         std::mutex                              m_TaskResultsMutex;
-
-        int                              m_intSleepMs;
     };
 }            // namespace SharedUtil

@@ -110,7 +110,6 @@ public:
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
     static int     OnUndump(const char* p, size_t n);
 
-
 private:
     void InitSecurity();
     void InitClasses(lua_State* luaVM);

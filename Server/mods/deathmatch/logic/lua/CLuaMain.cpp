@@ -37,7 +37,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_pResourceFile = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
-
     m_FunctionEnterTimer.SetMaxIncrement(500);
     m_WarningTimer.SetMaxIncrement(1000);
     m_uiOpenFileCountWarnThresh = 10;
