@@ -32,9 +32,6 @@ public:
     bool        RestoreModel(unsigned int uiModel);
     static bool IsLinkableModel(unsigned int uiModel);
 
-    std::list<CClientIMG*>::const_iterator IterBegin() { return m_List.begin(); }
-    std::list<CClientIMG*>::const_iterator IterEnd() { return m_List.end(); }
-
 private:
     void AddToList(CClientIMG* pIMG) { m_List.push_back(pIMG); }
     void RemoveFromList(CClientIMG* pIMG);
