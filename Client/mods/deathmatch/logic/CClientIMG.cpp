@@ -161,6 +161,12 @@ bool CClientIMG::StreamEnable()
     if (IsStreamed())
         return false;
 
+    ushort usRequestStreamSize = 0;
+    for (const auto& fileInfo : m_fileInfos)
+        usRequestStreamSize = Max(usRequestStreamSize, fileInfo.usSize);
+
+    g_pGame->GetStreaming()->SetStreamingBufferSize(usRequestStreamSize);
+
     m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(m_filePath.c_str());
     return IsStreamed();
 }
