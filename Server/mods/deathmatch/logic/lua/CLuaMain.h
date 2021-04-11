@@ -125,7 +125,6 @@ private:
     lua_State*        m_luaVM;
     CLuaTimerManager* m_pLuaTimerManager;
 
-    class CResource*     m_pResource;
     class CResourceFile* m_pResourceFile;
     CBlipManager*        m_pBlipManager;
     CObjectManager*      m_pObjectManager;

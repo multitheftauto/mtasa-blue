@@ -2,11 +2,12 @@ class CLuaPhysicsRigidBodyManager;
 class CLuaPhysicsStaticCollisionManager;
 class CLuaPhysicsShapeManager;
 class CLuaPhysicsElement;
+class CResource;
 
 class CSharedLuaMain
 {
 public:
-    CSharedLuaMain();
+    CSharedLuaMain(CResource* pResource);
     ~CSharedLuaMain();
 
 #ifdef MTA_CLIENT
@@ -55,6 +56,9 @@ public:
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
+
+protected:
+    CResource* m_pResource;
 
 private:
     std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;

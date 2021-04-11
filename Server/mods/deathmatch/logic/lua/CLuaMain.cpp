@@ -29,11 +29,11 @@ extern CNetServer* g_pRealNetServer;
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
                    CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
+    : CSharedLuaMain(pResourceOwner)
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
     m_luaVM = NULL;
-    m_pResource = pResourceOwner;
     m_pResourceFile = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
