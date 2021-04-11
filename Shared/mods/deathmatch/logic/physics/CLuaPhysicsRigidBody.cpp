@@ -43,11 +43,13 @@ void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
     btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
     m_pRigidBodyProxy->setWorldTransform(transform);
+    m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
 }
 
 const CVector CLuaPhysicsRigidBody::GetPosition() const
 {
-    btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
+    btTransform transform;
+    m_pRigidBodyProxy->getMotionState()->getWorldTransform(transform);
     return CPhysicsSharedLogic::GetPosition(transform);
 }
 

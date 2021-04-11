@@ -19,8 +19,8 @@ class CLuaPhysicsDefs : public CLuaDefs
 {
 public:
     static CBulletPhysics* GetPhysics();
-    static void LoadFunctions(void);
-    static void AddClass(lua_State* luaVM);
+    static void            LoadFunctions(void);
+    static void            AddClass(lua_State* luaVM);
 
     static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
 
