@@ -540,8 +540,6 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
 CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-        return false;
 
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
