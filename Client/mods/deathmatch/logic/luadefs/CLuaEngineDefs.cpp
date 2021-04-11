@@ -59,7 +59,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineAddImage", ArgumentParser<EngineAddImage>},
         {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
         {"engineImageGetFilesCount", ArgumentParser<EngineImageGetFilesCount>},
-        {"engineImageGetFileList", ArgumentParser<EngineImageGetFileList>},
+        {"engineImageGetFiles", ArgumentParser<EngineImageGetFileList>},
         {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
 
@@ -140,7 +140,7 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "add", "engineAddImage");
     lua_classfunction(luaVM, "remove", "engineRemoveImage");
     lua_classfunction(luaVM, "getFile", "engineImageGetFile");
-    lua_classfunction(luaVM, "getFileList", "engineImageGetFileList");
+    lua_classfunction(luaVM, "getFiles", "engineImageGetFiles");
     lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
     lua_classfunction(luaVM, "linkTXD", "engineImageLinkTXD");
     lua_classfunction(luaVM, "linkDFF", "engineImageLinkDFF");
