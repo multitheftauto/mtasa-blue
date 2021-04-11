@@ -604,7 +604,7 @@ int CLuaElementDefs::OOP_GetElementRotation(lua_State* luaVM)
 int CLuaElementDefs::GetElementVelocity(lua_State* luaVM)
 {
     // Verify the argument
-    CClientEntity*   pEntity = nullptr;
+    CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
 
@@ -612,7 +612,6 @@ int CLuaElementDefs::GetElementVelocity(lua_State* luaVM)
     {
         // Grab the velocity
         CVector vecVelocity;
-
         if (CStaticFunctionDefinitions::GetElementVelocity(*pEntity, vecVelocity))
         {
             // Return it
@@ -655,8 +654,8 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
 int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
 {
     // Verify the argument
-    CClientEntity*        pEntity = nullptr;
-    CScriptArgReader      argStream(luaVM);
+    CClientEntity*   pEntity = NULL;
+    CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
 
     if (!argStream.HasErrors())
@@ -1859,7 +1858,7 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 {
     //  setElementMatrix ( element theElement, table matrix )
-    CClientEntity*              pEntity = nullptr;
+    CClientEntity* pEntity = nullptr;
 
     CMatrix        matrix;
 
@@ -1881,12 +1880,11 @@ int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        if (pEntity)
-            if (CStaticFunctionDefinitions::SetElementMatrix(*pEntity, matrix))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        if (CStaticFunctionDefinitions::SetElementMatrix(*pEntity, matrix))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2054,8 +2052,8 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 {
-    CClientEntity*        pEntity = nullptr;
-    CVector               vecVelocity;
+    CClientEntity* pEntity = NULL;
+    CVector        vecVelocity;
 
     CScriptArgReader argStream(luaVM);
 
@@ -2069,13 +2067,11 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Set the velocity
-
-        if (pEntity)            // because of C6011, should always be true anyway
-            if (CStaticFunctionDefinitions::SetElementVelocity(*pEntity, vecVelocity))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        if (CStaticFunctionDefinitions::SetElementVelocity(*pEntity, vecVelocity))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2087,8 +2083,8 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
 {
-    CClientEntity*        pEntity = nullptr;
-    CVector               vecTurnVelocity;
+    CClientEntity* pEntity = nullptr;
+    CVector        vecTurnVelocity;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -2097,13 +2093,12 @@ int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        if (pEntity)            // because of C6011, should always be true anyway
-            // Set the turn velocity
-            if (CStaticFunctionDefinitions::SetElementAngularVelocity(*pEntity, vecTurnVelocity))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        // Set the turn velocity
+        if (CStaticFunctionDefinitions::SetElementAngularVelocity(*pEntity, vecTurnVelocity))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

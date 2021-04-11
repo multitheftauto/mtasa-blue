@@ -41,7 +41,6 @@ public:
 
 private:
     std::unique_ptr<btCollisionShape> m_pBtShape;
-    std::vector<float>                m_vecHeightfieldData;
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;

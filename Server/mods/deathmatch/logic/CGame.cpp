@@ -33,8 +33,6 @@
 
 CGame* g_pGame = NULL;
 
-#define g_pDeathmatch g_pGame
-
 char          szProgress[4] = {'-', '\\', '|', '/'};
 unsigned char ucProgress = 0;
 unsigned char ucProgressSkip = 0;

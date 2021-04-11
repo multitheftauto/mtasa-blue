@@ -244,8 +244,6 @@ private:
 
     std::vector<SString> m_FontResourceNames;
 
-    std::mutex drawLineLock;
-
     // ******* Drawing queue code ***********
     // Used by client scripts to draw DX stuff. Rather than drawing immediately,
     // we delay drawing so we can keep renderstates and perform drawing after

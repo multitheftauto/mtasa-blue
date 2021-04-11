@@ -16,7 +16,6 @@
 #include <list>
 #include <map>
 #include <set>
-#include <memory>
 
 #include "SString.h"
 #include "WString.h"

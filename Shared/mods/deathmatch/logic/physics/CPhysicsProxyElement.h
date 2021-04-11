@@ -16,16 +16,13 @@ class CPhysicsProxyElement;
 class CPhysicsProxyElement
 {
 public:
-    CPhysicsProxyElement(){};
+    CPhysicsProxyElement() {}
 
-
-    ~CPhysicsProxyElement()
-    {
-    }
+    ~CPhysicsProxyElement() {}
 
     virtual void SetEnabled(bool bEnabled) = 0;
     bool         IsEnabled() const { return m_bEnabled; }
 
 protected:
-    bool            m_bEnabled = false;
+    bool m_bEnabled = false;
 };

@@ -31,16 +31,6 @@
           by specializting the template for Test<Arg, Arg2>
 **/
 
-template <class T>
-struct is_shared_ptr : std::false_type
-{
-};
-
-template <class T>
-struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
-{
-};
-
 template <typename Test, template <typename> class Ref>
 struct is_specialization : std::false_type
 {

@@ -48,6 +48,11 @@ void CPhysicsDebugDrawer::draw3dText(const btVector3& location, const char* text
     // Unused
 }
 
+void CPhysicsDebugDrawer::reportErrorWarning(const char* warningString)
+{
+    // Probably unused
+}
+
 void CPhysicsDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
 {
     DrawLine(a, b, lineColor);

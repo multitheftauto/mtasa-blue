@@ -3,7 +3,7 @@ project "Client Deathmatch"
 	kind "SharedLib"
 	targetname "client"
 	targetdir(buildpath("mods/deathmatch"))
-	
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
@@ -13,7 +13,7 @@ project "Client Deathmatch"
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
-		"../../../vendor/bass/lib/tags",
+		"../../../vendor/bass/lib/tags"
 	}
 
 	vpaths {
@@ -57,9 +57,7 @@ project "Client Deathmatch"
 		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp",
-		"../../../vendor/bulletphysics3d/LinearMath/TaskScheduler/btThreadSupportWin32.cpp",
-		"../../../vendor/bulletphysics3d/LinearMath/TaskScheduler/btThreadSupportPosix.cpp"
+		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
 	}
 
 	configuration "windows"

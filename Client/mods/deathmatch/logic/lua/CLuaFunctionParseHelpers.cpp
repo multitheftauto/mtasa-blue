@@ -695,12 +695,6 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))            // Try rigid body
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))   // Try static collision
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, ptr, luaVM))            // Try collision shape
-        return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, ptr, luaVM))            // Try 3D Vector

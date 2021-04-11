@@ -276,7 +276,6 @@ public:
 
     inline bool operator!=(const CVector& param) const noexcept { return !(*this == param); }
 
-    std::vector<float>              AsVector() const { return std::vector<float>{fX, fY, fZ}; }
     std::tuple<float, float, float> AsXYZ() const { return {fX, fY, fZ}; }
     CVector(const btVector3& other) : fX(other.x()), fY(other.y()), fZ(other.z()) {}
     operator btVector3() const { return btVector3{fX, fY, fZ}; }
