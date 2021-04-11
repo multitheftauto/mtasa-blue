@@ -328,7 +328,7 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
 {
-    CClientEntity*              pEntity = nullptr;
+    CClientEntity* pEntity = NULL;
     bool           bBadSyntax;
 
     CScriptArgReader argStream(luaVM);
@@ -340,7 +340,6 @@ int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
     {
         // Grab the position
         CMatrix matrix;
-
         if (CStaticFunctionDefinitions::GetElementMatrix(*pEntity, matrix))
         {
             // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
@@ -662,7 +661,6 @@ int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
     {
         // Grab the turn velocity
         CVector vecTurnVelocity;
-
         if (CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity))
         {
             // Return it
@@ -1858,7 +1856,7 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 {
     //  setElementMatrix ( element theElement, table matrix )
-    CClientEntity* pEntity = nullptr;
+    CClientEntity* pEntity = NULL;
 
     CMatrix        matrix;
 
@@ -2052,11 +2050,10 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 {
-    CClientEntity* pEntity = NULL;
+    CClientEntity* pEntity;
     CVector        vecVelocity;
 
     CScriptArgReader argStream(luaVM);
-
     argStream.ReadUserData(pEntity);
     argStream.ReadVector3D(vecVelocity);
     // previous code did this for some reason.
@@ -2083,7 +2080,7 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
 {
-    CClientEntity* pEntity = nullptr;
+    CClientEntity* pEntity;
     CVector        vecTurnVelocity;
 
     CScriptArgReader argStream(luaVM);

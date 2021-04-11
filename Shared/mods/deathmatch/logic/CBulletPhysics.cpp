@@ -16,7 +16,6 @@
 #include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CPhysicsDebugDrawer.h"
 
-
 CBulletPhysics::CBulletPhysics()
 {
     m_pOverlappingPairCache = std::make_unique<btDbvtBroadphase>();
@@ -145,7 +144,7 @@ void CBulletPhysics::DrawDebugLines()
 
 void CBulletPhysics::DoPulse()
 {
-    std::lock_guard<std::mutex>           guard(pulseLock);
+    std::lock_guard<std::mutex> guard(pulseLock);
 
     CTickCount tickCountNow = CTickCount::Now();
 

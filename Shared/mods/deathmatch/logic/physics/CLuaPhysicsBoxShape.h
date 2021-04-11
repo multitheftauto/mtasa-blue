@@ -13,7 +13,6 @@ class CLuaPhysicsBoxShape;
 
 #pragma once
 
-
 class CLuaPhysicsBoxShape : public CLuaPhysicsConvexShape, CShapeHolder<btBoxShape>
 {
     friend class CBulletPhysics;

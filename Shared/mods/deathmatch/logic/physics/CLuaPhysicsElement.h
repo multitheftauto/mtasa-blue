@@ -13,11 +13,6 @@ class CLuaPhysicsElement;
 
 #pragma once
 
-#include <unordered_map>
-#include <variant>
-
-class CBulletPhysics;
-
 class CLuaPhysicsElement
 {
 protected:

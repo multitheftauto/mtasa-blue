@@ -10,14 +10,11 @@
  *****************************************************************************/
 
 class CPhysicsRigidBodyProxy;
-
-#include "CPhysicsProxyElement.h"
-#include "CLuaPhysicsShape.h"
+class MotionState;
 
 #pragma once
-
-class CLuaPhysicsShape;
-class CBulletPhysics;
+#include "CPhysicsProxyElement.h"
+#include "CLuaPhysicsShape.h"
 
 // Thread safe motion state
 class MotionState : public btMotionState

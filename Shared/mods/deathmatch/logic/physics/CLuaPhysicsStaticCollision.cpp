@@ -66,16 +66,6 @@ const CVector CLuaPhysicsStaticCollision::GetRotation() const
     return CPhysicsSharedLogic::GetRotation(transform);
 }
 
-void CLuaPhysicsStaticCollision::SetScale(const CVector& vecScale)
-{
-    m_btCollisionObject->getCollisionShape()->setLocalScaling(vecScale);
-}
-
-const CVector CLuaPhysicsStaticCollision::GetScale() const
-{
-    return m_btCollisionObject->getCollisionShape()->getLocalScaling();
-}
-
 void CLuaPhysicsStaticCollision::Unlink()
 {
     m_btCollisionObject->setCollisionShape(nullptr);
