@@ -10062,22 +10062,19 @@ void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::ve
     CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
-bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+void CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
 {
     assert(pElement);
-
     RUN_CHILDREN(ClearChatBox(*iter))
 
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CChatClearPacket());
-        return true;
     }
-    return false;
 }
 
-bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
+void CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
 {
     assert(pElement);
     assert(szText);
@@ -10087,10 +10084,7 @@ bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pEl
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CConsoleEchoPacket(szText));
-        return true;
     }
-
-    return false;
 }
 
 bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, bool bSave)
@@ -10101,6 +10095,7 @@ bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, b
             CLogger::LogPrintf("Server password set to '%s'\n", *strPassword);
         else
             CLogger::LogPrintf("Server password cleared\n");
+
         return true;
     }
 

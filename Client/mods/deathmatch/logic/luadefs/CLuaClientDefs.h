@@ -25,4 +25,5 @@ private:
     static bool ShowChat(bool bVisible, std::optional<bool> optInputBlocked);
     static bool IsChatVisible();
     static bool IsChatInputBlocked();
+    static bool ClearDebug();
 };

@@ -21,7 +21,8 @@ void CLuaClientDefs::LoadFunctions()
         {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
         {"showChat", ArgumentParserWarn<false, ShowChat>},
         {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
-        {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>}
+        {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
+        {"clearDebugBox", ArgumentParser<ClearDebug>}
     };
 
     for (const auto& [name, func] : functions)
@@ -62,4 +63,10 @@ bool CLuaClientDefs::IsChatVisible()
 bool CLuaClientDefs::IsChatInputBlocked()
 {
     return g_pCore->IsChatInputBlocked();
+}
+
+bool CLuaClientDefs::ClearDebug()
+{
+    g_pCore->DebugClear();
+    return true;
 }
