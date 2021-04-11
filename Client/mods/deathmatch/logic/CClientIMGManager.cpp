@@ -59,20 +59,7 @@ void CClientIMGManager::RemoveAll()
 
 bool CClientIMGManager::Exists(CClientIMG* pIMG)
 {
-    // Matches given IMG?
-    std::list<CClientIMG*>::iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
-    {
-        // Match?
-        if (pIMG == *iter)
-        {
-            // It exists
-            return true;
-        }
-    }
-
-    // It doesn't
-    return false;
+    return std::find(m_List.begin(), m_List.end(), pIMG) != m_List.end();
 }
 
 CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
