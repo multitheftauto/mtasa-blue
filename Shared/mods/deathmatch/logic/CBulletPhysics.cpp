@@ -87,6 +87,7 @@ void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
+    pLuaShape->Unlink();
     ListRemove(m_vecShapes, pLuaShape);
 }
 

@@ -20,7 +20,4 @@ public:
     ~CLuaPhysicsShapeManager();
     void Remove(CLuaPhysicsShape* pShape);
     bool IsShapeValid(CLuaPhysicsShape* pShape);
-
-private:
-    std::mutex lock;
 };

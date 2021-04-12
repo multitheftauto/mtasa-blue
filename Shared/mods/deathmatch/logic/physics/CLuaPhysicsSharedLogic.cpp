@@ -149,15 +149,15 @@ void CPhysicsSharedLogic::CheckMaximumPrimitiveSize(const CVector vector)
 
 void CPhysicsSharedLogic::CheckMinimumPrimitiveSize(const CVector vector)
 {
-    if (abs(vector.fX) < BulletPhysics::Limits::MinimumPrimitiveSize || abs(vector.fY) < BulletPhysics::Limits::MinimumPrimitiveSize ||
-        abs(vector.fZ) < BulletPhysics::Limits::MinimumPrimitiveSize)
-        throw std::invalid_argument(SString("Minimum x,y,z must be equal or greater than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+    if (vector.fX < BulletPhysics::Limits::MinimumPrimitiveSize || vector.fY < BulletPhysics::Limits::MinimumPrimitiveSize ||
+        vector.fZ < BulletPhysics::Limits::MinimumPrimitiveSize)
+        throw std::invalid_argument(SString("Minimum x,y,z must be equal or greater than %.03f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 }
 
 void CPhysicsSharedLogic::CheckMinimumPrimitiveSize(const float value)
 {
     if (BulletPhysics::Limits::MinimumPrimitiveSize > value)
-        throw std::invalid_argument(SString("Minumum value must be equal or smaller than %.02f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
+        throw std::invalid_argument(SString("Minumum value must be equal or smaller than %.03f units", BulletPhysics::Limits::MinimumPrimitiveSize).c_str());
 }
 
 void CPhysicsSharedLogic::CheckMaximumPrimitiveSize(const float value)

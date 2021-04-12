@@ -16,12 +16,9 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
 {
     assert(pShape);
 
-    {
-        std::lock_guard lk(lock);
-        // Check if already removed
-        if (!ListContains(m_elementsList, pShape))
-            return;
-    }
+    // Check if already removed
+    if (!ListContains(m_elementsList, pShape))
+        return;
 
     pShape->Unlink();
 #ifdef MTA_CLIENT
@@ -30,24 +27,18 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
     g_pGame->GetPhysics()->DestroyShape(pShape);
 #endif
 
-    {
-        std::lock_guard lk(lock);
-        ListRemove(m_elementsList, pShape);
-    }
+    ListRemove(m_elementsList, pShape);
     
     delete pShape;
 }
 
 CLuaPhysicsShapeManager::~CLuaPhysicsShapeManager()
 {
-    std::lock_guard guard(lock);
-
 }
 
 bool CLuaPhysicsShapeManager::IsShapeValid(CLuaPhysicsShape* pShape)
 {
     assert(pShape);
 
-    std::lock_guard lk(lock);
     return ListContains(m_elementsList, pShape);
 }

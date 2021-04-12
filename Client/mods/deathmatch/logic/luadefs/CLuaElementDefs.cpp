@@ -1706,16 +1706,30 @@ int CLuaElementDefs::CreateElement(lua_State* luaVM)
 int CLuaElementDefs::DestroyElement(lua_State* luaVM)
 {
     // Verify the argument
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    CClientEntity*      pEntity = nullptr;
+    CLuaPhysicsElement* pPhysicsElement = NULL;
+    CScriptArgReader    argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    {
+        argStream.ReadUserData(pPhysicsElement);
+    }
+    else
+        argStream.ReadUserData(pEntity);
 
     if (!argStream.HasErrors())
     {
-        // Destroy it
-        if (CStaticFunctionDefinitions::DestroyElement(*pEntity))
+        if (pEntity)
         {
-            lua_pushboolean(luaVM, true);
+            // Destroy it
+            if (CStaticFunctionDefinitions::DestroyElement(*pEntity))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+        {
+            lua_pushboolean(luaVM, pPhysicsElement->Destroy());
             return 1;
         }
     }

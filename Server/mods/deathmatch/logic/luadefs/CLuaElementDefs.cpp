@@ -261,25 +261,41 @@ int CLuaElementDefs::createElement(lua_State* luaVM)
     return 1;
 }
 
+
 int CLuaElementDefs::destroyElement(lua_State* luaVM)
 {
-    //  bool destroyElement ( element elementToDestroy )
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    // Verify the argument
+    CElement*           pElement = nullptr;
+    CLuaPhysicsElement* pPhysicsElement = NULL;
+    CScriptArgReader    argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    {
+        argStream.ReadUserData(pPhysicsElement);
+    }
+    else
+        argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::DestroyElement(pElement))
+        if (pElement)
         {
-            lua_pushboolean(luaVM, true);
+            // Destroy it
+            if (CStaticFunctionDefinitions::DestroyElement(pElement))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+        {
+            lua_pushboolean(luaVM, pPhysicsElement->Destroy());
             return 1;
         }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }
