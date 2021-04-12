@@ -531,10 +531,7 @@ BOOL CModelInfoSA::DoIsLoaded()
 
 unsigned short CModelInfoSA::GetFlags()
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
-        return m_pInterface->usFlags;
-    return 0;
+    return ppModelInfo[m_dwModelID]->usFlags;
 }
 
 unsigned short CModelInfoSA::GetOriginalFlags()
@@ -542,11 +539,7 @@ unsigned short CModelInfoSA::GetOriginalFlags()
     if (MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
         return MapGet(ms_ModelDefaultFlagsMap, m_dwModelID);
 
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface)
-        return 0;
-
-    return m_pInterface->usFlags;
+    return ppModelInfo[m_dwModelID]->usFlags;
 }
 
 void CModelInfoSA::SetFlags(unsigned short usFlags)
