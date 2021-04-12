@@ -36,7 +36,7 @@ struct SGtaStream
 {
     uint32_t nSectorsOffset;
     uint32_t nSectorsToRead;
-    uint32_t lpBuffer;
+    void*    pBuffer;
     uint8_t  bUnknow1;
     uint8_t  bLocked;
     uint8_t  bInUse;
@@ -68,7 +68,7 @@ public:
     void            SetStreamingBufferSize(uint32 uiSize);
 
 private:
-    static int    (&ms_pStreamingBuffer)[2];
+    static void* (&ms_pStreamingBuffer)[2];
     static uint32 (&ms_streamingBufferSize);
     static CStreamingInfo (&ms_aInfoForModel)[26316];
     static HANDLE (&m_aStreamingHandlers)[32];

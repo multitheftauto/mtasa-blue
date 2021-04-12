@@ -19,7 +19,7 @@ HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // 
 CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
 HANDLE* phStreamingThread = (HANDLE*)0x8E4008;
 uint32  (&CStreamingSA::ms_streamingBufferSize) = *(uint32*)0x8E4CA8;
-int (&CStreamingSA::ms_pStreamingBuffer)[2] = *(int (*)[2])0x8E4CAC;
+void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void*(*)[2])0x8E4CAC;
 
 namespace
 {
@@ -264,29 +264,30 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
     if (uiBlockSize & 1)
         uiBlockSize = uiBlockSize++ + 1;
 
-    typedef int(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
-    int iPointer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(uiBlockSize << 11, 2048);
+    typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
+    void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(uiBlockSize << 11, 2048);
 
     // Copy data from old buffer to new buffer
-    MemCpyFast((void*)iPointer, (void*)ms_pStreamingBuffer[0], ms_streamingBufferSize);
-    MemCpyFast((void*)(iPointer + 1024 * uiBlockSize), (void*)ms_pStreamingBuffer[1], ms_streamingBufferSize);
+    MemCpyFast(pNewBuffer, (void*)ms_pStreamingBuffer[0], ms_streamingBufferSize);
+    MemCpyFast((void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize), (void*)ms_pStreamingBuffer[1], ms_streamingBufferSize);
+
+    typedef void(__cdecl * Function_CMemoryMgr_FreeAlign)(void* pos);
+    ((Function_CMemoryMgr_FreeAlign)(0x72F4F0))(ms_pStreamingBuffer[0]);
 
     ms_streamingBufferSize = uiBlockSize / 2;
 
-    ms_pStreamingBuffer[0] = iPointer;
-    ms_pStreamingBuffer[1] = iPointer + 2048 * ms_streamingBufferSize;
+    ms_pStreamingBuffer[0] = pNewBuffer;
+    ms_pStreamingBuffer[1] = (void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize);
 
     int pointer = *(int*)0x8E3FFC;
     SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
 
-    streaming[0].lpBuffer = ms_pStreamingBuffer[0];
-    streaming[1].lpBuffer = ms_pStreamingBuffer[1];
-
-    free(reinterpret_cast<void*>(ms_pStreamingBuffer[0] - 1));
+    streaming[0].pBuffer = ms_pStreamingBuffer[0];
+    streaming[1].pBuffer = ms_pStreamingBuffer[1];
 
     // Create new streming handle
     auto pStreamingThreadId = *(LPDWORD)0x8E4000;
-    HANDLE   hStreamingThread = CreateThread(0, 0x10000u, (LPTHREAD_START_ROUTINE)0x406560, 0, 4u, &pStreamingThreadId);
+    HANDLE hStreamingThread = CreateThread(0, 0x10000u, (LPTHREAD_START_ROUTINE)0x406560, 0, 4u, &pStreamingThreadId);
 
     HANDLE hCurrentThread = GetCurrentThread();
     int    iPriority = GetThreadPriority(hCurrentThread);
