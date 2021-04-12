@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../luadefs/CLuaGenericDefs.h"
 
 extern CGame* g_pGame;
 
@@ -221,20 +222,6 @@ void CLuaManager::LoadCFunctions()
         {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
         {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
 
-        // Server standard funcs
-        {"getMaxPlayers", CLuaFunctionDefs::GetMaxPlayers},
-        {"setMaxPlayers", CLuaFunctionDefs::SetMaxPlayers},
-        {"outputChatBox", CLuaFunctionDefs::OutputChatBox},
-        {"outputConsole", CLuaFunctionDefs::OutputConsole},
-        {"outputDebugString", CLuaFunctionDefs::OutputDebugString},
-        {"outputServerLog", CLuaFunctionDefs::OutputServerLog},
-        {"getServerName", CLuaFunctionDefs::GetServerName},
-        {"getServerHttpPort", CLuaFunctionDefs::GetServerHttpPort},
-        {"getServerPassword", CLuaFunctionDefs::GetServerPassword},
-        {"setServerPassword", CLuaFunctionDefs::SetServerPassword},
-        {"getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting},
-        {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
-
         // Loaded map funcs
         {"getRootElement", CLuaFunctionDefs::GetRootElement},
         {"loadMapData", CLuaFunctionDefs::LoadMapData},
@@ -282,78 +269,12 @@ void CLuaManager::LoadCFunctions()
 
         {"setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode},
         {"getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode},
-
-        // Backward compat functions at the end, so the new function name is used in ACL
-
-        // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-        {"getPlayerSkin", CLuaElementDefs::getElementModel},
-        {"setPlayerSkin", CLuaElementDefs::setElementModel},
-        {"getVehicleModel", CLuaElementDefs::getElementModel},
-        {"setVehicleModel", CLuaElementDefs::setElementModel},
-        {"getObjectModel", CLuaElementDefs::getElementModel},
-        {"setObjectModel", CLuaElementDefs::setElementModel},
-        {"getVehicleID", CLuaElementDefs::getElementModel},
-        {"getVehicleIDFromName", CLuaVehicleDefs::GetVehicleModelFromName},
-        {"getVehicleNameFromID", CLuaVehicleDefs::GetVehicleNameFromModel},
-        {"getPlayerWeaponSlot", CLuaPedDefs::GetPedWeaponSlot},
-        {"getPlayerArmor", CLuaPedDefs::GetPedArmor},
-        {"getPlayerRotation", CLuaPedDefs::GetPedRotation},
-        {"isPlayerChoking", CLuaPedDefs::IsPedChoking},
-        {"isPlayerDead", CLuaPedDefs::IsPedDead},
-        {"isPlayerDucked", CLuaPedDefs::IsPedDucked},
-        {"getPlayerStat", CLuaPedDefs::GetPedStat},
-        {"getPlayerTarget", CLuaPedDefs::GetPedTarget},
-        {"getPlayerClothes", CLuaPedDefs::GetPedClothes},
-        {"doesPlayerHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
-        {"isPlayerInWater", CLuaElementDefs::isElementInWater},
-        {"isPedInWater", CLuaElementDefs::isElementInWater},
-        {"isPlayerOnGround", CLuaPedDefs::IsPedOnGround},
-        {"getPlayerFightingStyle", CLuaPedDefs::GetPedFightingStyle},
-        {"getPlayerGravity", CLuaPedDefs::GetPedGravity},
-        {"getPlayerContactElement", CLuaPedDefs::GetPedContactElement},
-        {"setPlayerArmor", CLuaPedDefs::SetPedArmor},
-        {"setPlayerWeaponSlot", CLuaPedDefs::SetPedWeaponSlot},
-        {"killPlayer", CLuaPedDefs::KillPed},
-        {"setPlayerRotation", CLuaPedDefs::SetPedRotation},
-        {"setPlayerStat", CLuaPedDefs::SetPedStat},
-        {"addPlayerClothes", CLuaPedDefs::AddPedClothes},
-        {"removePlayerClothes", CLuaPedDefs::RemovePedClothes},
-        {"givePlayerJetPack", CLuaPedDefs::GivePedJetPack},
-        {"removePlayerJetPack", CLuaPedDefs::RemovePedJetPack},
-        {"setPlayerFightingStyle", CLuaPedDefs::SetPedFightingStyle},
-        {"setPlayerGravity", CLuaPedDefs::SetPedGravity},
-        {"setPlayerChoking", CLuaPedDefs::SetPedChoking},
-        {"warpPlayerIntoVehicle", CLuaPedDefs::WarpPedIntoVehicle},
-        {"removePlayerFromVehicle", CLuaPedDefs::RemovePedFromVehicle},
-        {"getPlayerOccupiedVehicle", CLuaPedDefs::GetPedOccupiedVehicle},
-        {"getPlayerOccupiedVehicleSeat", CLuaPedDefs::GetPedOccupiedVehicleSeat},
-        {"isPlayerInVehicle", CLuaPedDefs::IsPedInVehicle},
-        {"getClientName", CLuaPlayerDefs::GetPlayerName},
-        {"getClientIP", CLuaPlayerDefs::GetPlayerIP},
-        {"getClientAccount", CLuaPlayerDefs::GetPlayerAccount},
-        {"setClientName", CLuaPlayerDefs::SetPlayerName},
-        {"getPlayerWeapon", CLuaPedDefs::GetPedWeapon},
-        {"getPlayerTotalAmmo", CLuaPedDefs::GetPedTotalAmmo},
-        {"getPlayerAmmoInClip", CLuaPedDefs::GetPedAmmoInClip},
-        {"getPedSkin", CLuaElementDefs::getElementModel},
-        {"setPedSkin", CLuaElementDefs::setElementModel},
-        {"xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren},
-        {"xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild},
-        {"xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild},
-        {"attachElementToElement", CLuaElementDefs::attachElements},
-        {"detachElementFromElement", CLuaElementDefs::detachElements},
-        
-        // Deprecated since 1.5.5-9.13846
-        {"doesPedHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
-        {"givePedJetPack", CLuaPedDefs::GivePedJetPack},
-        {"removePedJetPack", CLuaPedDefs::RemovePedJetPack}
-        // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
     };
 
     // Add all functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
-    
+
     // Restricted functions
     CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
     CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);
@@ -385,4 +306,7 @@ void CLuaManager::LoadCFunctions()
     CLuaWaterDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
+    CLuaGenericDefs::LoadFunctions();
+    // Backward compatibility functions at the end, so the new function name is used in ACL
+    CLuaCompatibilityDefs::LoadFunctions();
 }

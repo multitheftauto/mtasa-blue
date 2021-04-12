@@ -33,10 +33,9 @@ struct
     {26, "data/timecyc.dat"},
 };
 
-CMainConfig::CMainConfig(CConsole* pConsole, CLuaManager* pLuaMain) : CXMLConfig(NULL)
+CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
 {
     m_pConsole = pConsole;
-    m_pLuaManager = pLuaMain;
     m_pRootNode = NULL;
     m_pCommandLineParser = NULL;
 
@@ -643,7 +642,7 @@ bool CMainConfig::LoadExtended()
 
                 if (IsValidFilePath(strBuffer.c_str()))
                 {
-                    m_pLuaManager->GetLuaModuleManager()->LoadModule(strBuffer.c_str(), strFilename, false);
+                    g_pGame->GetLuaManager()->GetLuaModuleManager()->LoadModule(strBuffer.c_str(), strFilename, false);
                 }
             }
         }
@@ -887,15 +886,17 @@ bool CMainConfig::IsValidPassword(const char* szPassword)
 
 bool CMainConfig::SetPassword(const char* szPassword, bool bSave)
 {
-    if (IsValidPassword(szPassword))
+    if (!IsValidPassword(szPassword))
+        return false;
+
+    m_strPassword = szPassword;
+
+    if (bSave)
     {
-        m_strPassword = szPassword;
-        if (bSave)
-        {
-            SetString(m_pRootNode, "password", szPassword);
-            Save();
-        }
+        SetString(m_pRootNode, "password", szPassword);
+        Save();
     }
+
     return true;
 }
 

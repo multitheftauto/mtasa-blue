@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaEngineDefs : public CLuaDefs
 {
@@ -64,7 +65,7 @@ public:
     static bool EngineResetModelFlags(uint uiModelID);
     static bool EngineRestreamWorld();
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
-    static std::variant<bool, std::tuple<char, char>> EngineGetModelVisibleTime(std::string strModelId);
+    static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

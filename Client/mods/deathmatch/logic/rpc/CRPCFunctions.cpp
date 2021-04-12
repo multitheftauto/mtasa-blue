@@ -49,8 +49,8 @@ CBlendedWeather*           CRPCFunctions::m_pBlendedWeather;
 CClientGame*               CRPCFunctions::m_pClientGame;
 CClientWaterManager*       CRPCFunctions::m_pWaterManager;
 
-SFixedArray<CRPCFunctions::SRPCHandler, CRPCFunctions::NUM_RPC_FUNCS>        CRPCFunctions::m_RPCHandlers;
-SFixedArray<CRPCFunctions::SElementRPCHandler, CRPCFunctions::NUM_RPC_FUNCS> CRPCFunctions::m_ElementRPCHandlers;
+SFixedArray<CRPCFunctions::SRPCHandler, eElementRPCFunctions::NUM_RPC_FUNCS>        CRPCFunctions::m_RPCHandlers;
+SFixedArray<CRPCFunctions::SElementRPCHandler, eElementRPCFunctions::NUM_RPC_FUNCS> CRPCFunctions::m_ElementRPCHandlers;
 
 CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
 {
@@ -99,7 +99,7 @@ void CRPCFunctions::AddHandlers()
     CWeaponRPCs::LoadFunctions();
     CWaterRPCs::LoadFunctions();
     CWorldRPCs::LoadFunctions();
-    CColShapeRPCs::LoadFunctions(); 
+    CColShapeRPCs::LoadFunctions();
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)

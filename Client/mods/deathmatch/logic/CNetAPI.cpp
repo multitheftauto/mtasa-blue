@@ -373,7 +373,7 @@ void CNetAPI::DoPulse()
             // Time to freeze because of lack of return sync?
             if (!g_pClientGame->IsDownloadingBigPacket() && (m_bStoredReturnSync) && (m_ulLastPuresyncTime != 0) && (m_ulLastSyncReturnTime != 0) &&
                 (ulCurrentTime <= m_ulLastPuresyncTime + 5000) && (ulCurrentTime >= m_ulLastSyncReturnTime + 10000) &&
-                (!g_pClientGame->IsGettingIntoVehicle()) && (!m_bIncreaseTimeoutTime))
+                (!g_pClientGame->GetLocalPlayer()->m_bIsGettingIntoVehicle) && (!m_bIncreaseTimeoutTime))
             {
                 // No vehicle or vehicle in seat 0?
                 if (!pVehicle || pPlayer->GetOccupiedVehicleSeat() == 0)
@@ -1993,6 +1993,9 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
 
 void CNetAPI::RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream)
 {
+    if (g_pClientGame->IsServerRPCFunctionDisabled(ID))
+        return;
+
     NetBitStreamInterface* pRPCBitStream = g_pNet->AllocateNetBitStream();
     if (pRPCBitStream)
     {

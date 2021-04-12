@@ -31,6 +31,8 @@ float*         CGameSA::VAR_OldTimeStep;
 float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
+unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
+
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
  */
@@ -41,6 +43,10 @@ CGameSA::CGameSA()
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
+
+    const unsigned int modelInfoMax = GetCountOfAllFileIDs();
+    ModelInfo = new CModelInfoSA[modelInfoMax];
+    ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
 
@@ -63,7 +69,7 @@ CGameSA::CGameSA()
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (int i = 0; i < MODELINFO_MAX; i++)
+    for (int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
@@ -96,7 +102,6 @@ CGameSA::CGameSA()
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
-    this->m_pText = new CTextSA();
     this->m_pStats = new CStatsSA();
     this->m_pFont = new CFontSA();
     this->m_pPathFind = new CPathFindSA();
@@ -203,6 +208,7 @@ CGameSA::CGameSA()
 
     CEntitySAInterface::StaticSetHooks();
     CPhysicalSAInterface::StaticSetHooks();
+    CObjectSA::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();
@@ -237,7 +243,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
-    delete reinterpret_cast<CTextSA*>(m_pText);
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
@@ -259,6 +264,9 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+
+    delete[] ModelInfo;
+    delete[] ObjectGroupsInfo;
 }
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -310,7 +318,7 @@ bool CGameSA::IsInForeground()
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
-    if (dwModelID < MODELINFO_MAX)
+    if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
@@ -496,6 +504,7 @@ void CGameSA::Initialize()
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
+    SetupBrokenModels();
     m_pRenderWare->Initialize();
 
     // *Sebas* Hide the GTA:SA Main menu.
@@ -814,6 +823,26 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[316].MakePedModel ( "COPGRL2" );
     ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
+}
+
+void CGameSA::FixModelCol(uint iFixModel, uint iFromModel)
+{
+    CBaseModelInfoSAInterface* pFixModelInterface = ModelInfo[iFixModel].GetInterface();
+    if (!pFixModelInterface || pFixModelInterface->pColModel)
+        return;
+
+    CBaseModelInfoSAInterface* pAviableModelInterface = ModelInfo[iFromModel].GetInterface();
+
+    if (!pAviableModelInterface)
+        return;
+
+    pFixModelInterface->pColModel = pAviableModelInterface->pColModel;
+}
+
+void CGameSA::SetupBrokenModels()
+{
+    FixModelCol(3118, 3059);
+    FixModelCol(3553, 3554);
 }
 
 // Well, has it?
