@@ -85,14 +85,21 @@ enum eCamMode
     MODE_AIMWEAPON_ATTACHED            // 65
 };
 
-enum eVehicleCamMode
+enum class eVehicleCamMode
 {
-    MODE_BUMPER,
-    MODE_CLOSE_EXTERNAL,
-    MODE_MIDDLE_EXTERNAL,
-    MODE_FAR_EXTERNAL,
-    MODE_LOW_EXTERNAL,
-    MODE_CINEMATIC
+    BUMPER,
+    CLOSE_EXTERNAL,
+    MIDDLE_EXTERNAL,
+    FAR_EXTERNAL,
+    LOW_EXTERNAL,
+    CINEMATIC
+};
+
+enum class ePedCamMode
+{
+    CLOSE,
+    MIDDLE,
+    MAX,
 };
 
 enum
@@ -135,8 +142,10 @@ public:
     virtual CEntity*  GetTargetEntity() = 0;
     virtual void      SetCameraClip(bool bObjects, bool bVehicles) = 0;
     virtual void      GetCameraClip(bool& bObjects, bool& bVehicles) = 0;
-    virtual VOID      SetCameraViewMode(BYTE dwCamMode) = 0;
-    virtual BYTE      GetCameraViewMode() = 0;
+    virtual VOID      SetCameraVehicleViewMode(BYTE dwCamMode) = 0;
+    virtual VOID      SetCameraPedViewMode(BYTE dwCamMode) = 0;
+    virtual BYTE      GetCameraVehicleViewMode() = 0;
+    virtual BYTE      GetCameraPedViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;
     virtual float     GetShakeForce() = 0;
 };

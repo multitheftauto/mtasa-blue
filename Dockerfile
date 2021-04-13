@@ -10,16 +10,12 @@ ENV BUILD_BITS 64
 # This is important for using apt-get
 USER root
 
-# Install dependencies to install the latest gcc
-RUN apt-get update && \
-    apt-get install -y software-properties-common wget && \
-    add-apt-repository ppa:ubuntu-toolchain-r/test
-
 # Install latest gcc and libs
 RUN dpkg --add-architecture i386 && apt-get update && \
-    apt-get install -y ca-certificates git build-essential gcc-multilib g++-multilib gcc-8-multilib g++-8-multilib curl subversion ncftp \
+    apt-get install -y software-properties-common wget ca-certificates git build-essential \
+        gcc-multilib g++-multilib gcc-10-multilib g++-10-multilib curl subversion ncftp \
         libncursesw5-dev libmysqlclient-dev \
-        lib32ncursesw5-dev libncursesw5-dev:i386
+        lib32ncursesw5-dev libncursesw5-dev:i386 
 
 # Set build directory
 VOLUME /build

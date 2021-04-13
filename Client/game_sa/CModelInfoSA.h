@@ -21,7 +21,9 @@ class CPedModelInfoSAInterface;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
-#define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+// #define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+static void* CStreaming__ms_aInfoForModel = *(void**)(0x5B8B08 + 6);
+static void* ARRAY_ModelLoaded = (char*)CStreaming__ms_aInfoForModel + 0x10;
 
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
 
@@ -33,7 +35,8 @@ class CPedModelInfoSAInterface;
 #define     DWORD_AtomicsReplacerModelID    0xB71840
 #define     FUNC_AtomicsReplacer            0x537150
 
-#define     ARRAY_ModelInfo                 0xA9B0C8
+// #define     ARRAY_ModelInfo                 0xA9B0C8
+static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     CLASS_CText                     0xC1B340
 #define     FUNC_CText_Get                  0x6A0050
 #define     FUNC_GetModelFlags              0x4044E0
@@ -332,7 +335,7 @@ public:
     BOOL IsQuadBike();
     BOOL IsBmx();
     BOOL IsTrailer();
-    BOOL IsVehicle();
+    bool IsVehicle() const override;
     BOOL IsUpgrade();
 
     char* GetNameIfVehicle();
@@ -380,7 +383,9 @@ public:
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
+    CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
+    bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();

@@ -3615,8 +3615,13 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
         // Is the ped alive?
         if (!pPed->IsDead() && pPed->IsSpawned())
         {
+            // Reset his vehicle action, but only if not jacking
+            // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+            // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+            if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+                pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
             // Remove him from any occupied vehicle
-            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
             CVehicle* pVehicle = pPed->GetOccupiedVehicle();
             if (pVehicle)
             {
@@ -5265,43 +5270,34 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
+bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 {
-    assert(pElement);
-    RUN_CHILDREN(BlowVehicle(*iter, bExplode))
+    RUN_CHILDREN(BlowVehicle(*iter))
 
-    if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+    if (!IS_VEHICLE(pElement))
+        return false;
 
-        // Blow it up on our records. Also change the sync time context or this vehicle
-        // is likely to blow up twice, call the events twice and all that if someone's
-        // nearby and syncing it.
-        if (IsVehicleBlown(pVehicle) == false)
-        {
-            // Call the onVehicleExplode event
-            CLuaArguments Arguments;
-            pVehicle->CallEvent("onVehicleExplode", Arguments);
-        }
-        pVehicle->SetHealth(0.0f);
-        if (!bExplode)
-            pVehicle->SetIsBlown(true);
+    CVehicle* vehicle = static_cast<CVehicle*>(pElement);
 
-        // Update our engine State
-        pVehicle->SetEngineOn(false);
+    if (vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+        return false;
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pVehicle->GenerateSyncTimeContext());
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, BLOW_VEHICLE, *BitStream.pBitStream));
+    vehicle->SetIsBlown(true);
+
+    CLuaArguments Arguments;
+    vehicle->CallEvent("onVehicleExplode", Arguments);
+
+    // Abort if vehicle got fixed or destroyed
+    if (!vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
         return true;
-    }
 
-    return false;
-}
-bool CStaticFunctionDefinitions::IsVehicleBlown(CVehicle* pVehicle)
-{
-    assert(pVehicle);
-    return pVehicle->GetIsBlown();
+    vehicle->SetHealth(0.0f);
+    vehicle->SetEngineOn(false);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor)
@@ -10066,22 +10062,19 @@ void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::ve
     CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
-bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+void CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
 {
     assert(pElement);
-
     RUN_CHILDREN(ClearChatBox(*iter))
 
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CChatClearPacket());
-        return true;
     }
-    return false;
 }
 
-bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
+void CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
 {
     assert(pElement);
     assert(szText);
@@ -10091,10 +10084,7 @@ bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pEl
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CConsoleEchoPacket(szText));
-        return true;
     }
-
-    return false;
 }
 
 bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, bool bSave)
@@ -10105,6 +10095,7 @@ bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, b
             CLogger::LogPrintf("Server password set to '%s'\n", *strPassword);
         else
             CLogger::LogPrintf("Server password cleared\n");
+
         return true;
     }
 
@@ -10632,6 +10623,27 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
     else
         m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
 
+    return true;
+}
+
+void CStaticFunctionDefinitions::SendClientTransferBoxVisibility(CPlayer* player)
+{
+    CBitStream BitStream;
+    BitStream->WriteBit(g_pGame->IsClientTransferBoxVisible());
+
+    if (player)
+        player->Send(CLuaPacket(SET_TRANSFER_BOX_VISIBILITY, *BitStream.pBitStream));
+    else
+        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_TRANSFER_BOX_VISIBILITY, *BitStream.pBitStream));
+}
+
+bool CStaticFunctionDefinitions::SetClientTransferBoxVisible(bool visible)
+{
+    if (g_pGame->IsClientTransferBoxVisible() == visible)
+        return false;
+
+    g_pGame->SetClientTransferBoxVisible(visible);
+    SendClientTransferBoxVisibility();
     return true;
 }
 
@@ -11348,6 +11360,11 @@ bool CStaticFunctionDefinitions::CopyAccountData(CAccount* pAccount, CAccount* p
 
     m_pAccountManager->CopyAccountData(pFromAccount, pAccount);
     return true;
+}
+
+bool CStaticFunctionDefinitions::LogIn(CPlayer* pPlayer, CAccount* pAccount, const char* szPassword)
+{
+    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), szPassword);
 }
 
 bool CStaticFunctionDefinitions::LogOut(CPlayer* pPlayer)
@@ -12159,4 +12176,20 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag()
 CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 {
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, float fFloor, float fCeil)
+{
+    if (pColPolygon->SetHeight(fFloor, fCeil))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(fFloor);
+        BitStream.pBitStream->Write(fCeil);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, SET_COLPOLYGON_HEIGHT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }

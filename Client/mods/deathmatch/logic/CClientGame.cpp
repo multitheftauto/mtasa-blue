@@ -212,8 +212,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     */
 
     // Create the transfer boxes (GUI)
-    m_pTransferBox = new CTransferBox();
-    m_pBigPacketTransferBox = new CTransferBox();
+    m_pTransferBox = new CTransferBox(TransferBoxType::RESOURCE_DOWNLOAD);
+    m_pBigPacketTransferBox = new CTransferBox(TransferBoxType::MAP_DOWNLOAD);
 
     // Store the time we started on
     if (bLocalPlay)
@@ -1537,6 +1537,13 @@ void CClientGame::DoVehicleInKeyCheck()
             else
             {
                 // Enter
+                // Are we holding the aim_weapon key?
+                SBindableGTAControl* pBind = g_pCore->GetKeyBinds()->GetBindableFromControl("aim_weapon");
+                if (pBind && pBind->bState)
+                {
+                    // Stop because the player is probably doing special attack
+                    return;
+                }
                 m_pLocalPlayer->EnterVehicle(nullptr, false);
             }
         }
@@ -2458,6 +2465,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2591,6 +2599,8 @@ void CClientGame::AddBuiltInEvents()
     // Object events
     m_Events.AddEvent("onClientObjectDamage", "loss, attacker", NULL, false);
     m_Events.AddEvent("onClientObjectBreak", "attacker", NULL, false);
+    m_Events.AddEvent("onClientObjectMoveStart", "", NULL, false);
+    m_Events.AddEvent("onClientObjectMoveStop", "", NULL, false);
 
     // Web events
     m_Events.AddEvent("onClientBrowserWhitelistChange", "newPages", NULL, false);
@@ -2607,6 +2617,10 @@ void CClientGame::AddBuiltInEvents()
 
     // Misc events
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
+
+    m_Events.AddEvent("onClientResourceFileDownload", "resource, fileName, fileSize, state", nullptr, false);
+    m_Events.AddEvent("onClientTransferBoxProgressChange", "downloadedBytes, downloadTotalBytes", nullptr, false);
+    m_Events.AddEvent("onClientTransferBoxVisibilityChange", "isVisible", nullptr, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
 
@@ -5801,12 +5815,12 @@ void CClientGame::NotifyBigPacketProgress(unsigned long ulBytesReceived, unsigne
         m_bReceivingBigPacket = true;
         m_ulBigPacketSize = ulTotalSize;
         m_pBigPacketTransferBox->Hide();
-        m_pBigPacketTransferBox->AddToTotalSize(ulTotalSize);
+        m_pBigPacketTransferBox->AddToDownloadTotalSize(ulTotalSize);
         m_pBigPacketTransferBox->Show();
     }
 
     m_pBigPacketTransferBox->DoPulse();
-    m_pBigPacketTransferBox->SetInfo(std::min(ulTotalSize, ulBytesReceived), CTransferBox::PACKET);
+    m_pBigPacketTransferBox->SetDownloadProgress(std::min(ulTotalSize, ulBytesReceived));
 }
 
 bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
@@ -6488,7 +6502,9 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::RestreamWorld()
 {
-    for (unsigned int uiModelID = 0; uiModelID < 26316; uiModelID++)
+    unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
+
+    for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
     {
         g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
     }

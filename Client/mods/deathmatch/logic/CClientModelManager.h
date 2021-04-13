@@ -26,7 +26,7 @@ class CClientModelManager
     friend class CClientModel;
 
 public:
-    CClientModelManager() = default;
+    CClientModelManager::CClientModelManager();
     ~CClientModelManager(void);
 
     void RemoveAll(void);
@@ -45,6 +45,6 @@ public:
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
 private:
-    std::shared_ptr<CClientModel> m_Models[MAX_MODEL_ID];
-    unsigned int                  m_modelCount = 0;
+    std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
+    unsigned int m_modelCount = 0;
 };

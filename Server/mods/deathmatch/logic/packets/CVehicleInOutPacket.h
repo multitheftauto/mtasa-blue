@@ -14,7 +14,7 @@
 #include "CPacket.h"
 #include <CVector.h>
 
-class CVehicleInOutPacket : public CPacket
+class CVehicleInOutPacket final : public CPacket
 {
 public:
     CVehicleInOutPacket();

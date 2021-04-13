@@ -140,7 +140,7 @@ public:
         Release(index);
     }
 
-    bool IsFreeAt(uint index) { return this->m_byteMap[index].bEmpty; }
+    bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
     bool IsContains(uint index)
     {
         if (this->m_nSize <= index)
@@ -148,12 +148,7 @@ public:
         return !IsFreeAt(index);
     }
 
-    B* GetAt(uint index)
-    {
-        if (this->m_byteMap[index].bEmpty)
-            return nullptr;
-        return this->m_pObjects[index];
-    }
+    B*   GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
 
     uint GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)this->m_pObjects) / sizeof(B); }
 };
@@ -196,6 +191,7 @@ public:
     DWORD                     GetObjectRef(CObject* pObject);
     DWORD                     GetObjectRef(DWORD* pGameInterface);
     CObject*                  GetObjectFromRef(DWORD dwGameRef);
+    CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool);
     unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
 

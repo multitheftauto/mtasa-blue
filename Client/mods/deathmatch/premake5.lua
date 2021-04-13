@@ -28,6 +28,7 @@ project "Client Deathmatch"
 
 	filter {}
 		includedirs {
+			"../../../Shared/sdk",
 			".",
 			"./logic",
 			"../../sdk/",
@@ -53,9 +54,8 @@ project "Client Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bochs/bochs_internal/crc32.cpp"
+		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
 	}
 
 	configuration "windows"

@@ -1128,6 +1128,10 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // clear our component data to regenerate it
         m_ComponentData.clear();
 
+        // Reset stored dummy positions
+        m_copyDummyPositions = true;
+        m_dummyPositions = {};
+
         // Create the vehicle if we're streamed in
         if (IsStreamedIn())
         {
@@ -3008,6 +3012,20 @@ void CClientVehicle::Create()
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
 
+        // Copy or apply our vehicle dummy positions
+        if (m_copyDummyPositions)
+        {
+            const CVector* positions = m_pVehicle->GetDummyPositions();
+            std::copy(positions, positions + VEHICLE_DUMMY_COUNT, m_dummyPositions.begin());
+        }
+        else
+        {
+            for (size_t i = 0; i < VEHICLE_DUMMY_COUNT; ++i)
+            {
+                m_pVehicle->SetDummyPosition(static_cast<eVehicleDummies>(i), m_dummyPositions[i]);
+            }
+        }
+
         // We've just been streamed in
         m_bJustStreamedIn = true;
 
@@ -3054,7 +3072,7 @@ void CClientVehicle::Destroy()
                 break;
             default:
                 break;
-        }            
+        }
 
         if (m_eVehicleType == CLIENTVEHICLE_CAR || m_eVehicleType == CLIENTVEHICLE_PLANE || m_eVehicleType == CLIENTVEHICLE_QUADBIKE)
         {
@@ -3123,7 +3141,7 @@ void CClientVehicle::Destroy()
             // Force the trailer to stream out
             GetTowedVehicle()->StreamOut();
         }
-        
+
         if (m_pTowedByVehicle)
         {
             m_pVehicle->BreakTowLink();
@@ -5053,6 +5071,60 @@ bool CClientVehicle::OnVehicleFallThroughMap()
     }
     // unhandled
     return false;
+}
+
+bool CClientVehicle::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        position = m_dummyPositions[dummy];
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        m_dummyPositions[dummy] = position;
+        m_copyDummyPositions = false;
+
+        if (m_pVehicle != nullptr)
+            return m_pVehicle->SetDummyPosition(dummy, position);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::ResetDummyPositions()
+{
+    if (m_pVehicle)
+    {
+        std::array<CVector, VEHICLE_DUMMY_COUNT> positions;
+
+        if (!m_pModelInfo->GetVehicleDummyPositions(positions))
+            return false;
+
+        for (size_t i = 0; i < positions.size(); ++i)
+        {
+            SetDummyPosition(static_cast<eVehicleDummies>(i), positions[i]);
+        }
+
+        return true;
+    }
+    else
+    {
+        if (m_copyDummyPositions)
+            return false;
+
+        m_copyDummyPositions = true;
+        m_dummyPositions = {};
+        return true;
+    }
 }
 
 bool CClientVehicle::DoesNeedToWaitForGroundToLoad()

@@ -565,7 +565,7 @@ void CClientPed::SetInterior(unsigned char ucInterior)
         }
     }
 
-    m_ucInterior = ucInterior;
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientPed::Teleport(const CVector& vecPosition)
@@ -2758,11 +2758,11 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         // Not in a vehicle?
         else
         {
-            // Not the local player or ped we sync?
-            if (!m_bIsLocalPlayer && !IsSyncing())
+            // Not the local player?
+            if (!m_bIsLocalPlayer)
             {
-                // Force the player in/out?
-                if (m_bForceGettingIn)
+                // Force the ped in/out? Only if remote player or ped we dont sync
+                if (m_bForceGettingIn && !IsSyncing())
                 {
                     // Are we entering a vehicle and it's a different vehicle from the one we've entered?
                     if (m_pOccupyingVehicle)
@@ -2784,8 +2784,8 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                     }
                 }
                 // Force him to get out of the vehicle as this tasks can sometimes cancel. This also
-                // applies to the local player and can cause problem #2870.
-                if (m_bForceGettingOut)
+                // applies to the local player and can cause problem #2870. Only if remote player or ped we dont sync
+                if (m_bForceGettingOut && !IsSyncing())
                 {
                     // Are we out of the car? If not, continue forcing.
                     if (GetRealOccupiedVehicle())
@@ -6438,7 +6438,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // We dead?
+    // We dead or in water?
     if (IsDead())
     {
         return false;
@@ -6495,6 +6495,14 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (!pVehicle->IsEnterable())
     {
         // Stop if the vehicle is not enterable
+        return false;
+    }
+
+    // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
+    unsigned short vehicleModel = pVehicle->GetModel();
+
+    if (IsInWater() && !(vehicleModel == VT_SKIMMER || vehicleModel == VT_SEASPAR || vehicleModel == VT_LEVIATHN || vehicleModel == VT_VORTEX))
+    {
         return false;
     }
 
@@ -6628,12 +6636,6 @@ bool CClientPed::ExitVehicle()
 
     // We dead?
     if (IsDead())
-    {
-        return false;
-    }
-
-    // Dead vehicle?
-    if (pOccupiedVehicle->GetHealth() <= 0.0f)
     {
         return false;
     }
@@ -6799,7 +6801,8 @@ void CClientPed::UpdateVehicleInOut()
         else if (m_bIsGettingIntoVehicle)
         {
             // If we aren't working on entering the car (he's either finished or cancelled)
-            if (!IsEnteringVehicle())
+            // Or we are dead (fix for #908) or we are in water (fix for #521)
+            if (!IsEnteringVehicle() || IsDead() || IsInWater())
             {
                 // Is he in a vehicle now?
                 CClientVehicle* pVehicle = GetRealOccupiedVehicle();

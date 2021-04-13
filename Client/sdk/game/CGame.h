@@ -249,4 +249,14 @@ public:
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
     virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+
+    virtual int32_t GetBaseIDforDFF() = 0;
+    virtual int32_t GetBaseIDforTXD() = 0;
+    virtual int32_t GetBaseIDforCOL() = 0;
+    virtual int32_t GetBaseIDforIPL() = 0;
+    virtual int32_t GetBaseIDforDAT() = 0;
+    virtual int32_t GetBaseIDforIFP() = 0;
+    virtual int32_t GetBaseIDforRRR() = 0;
+    virtual int32_t GetBaseIDforSCM() = 0;
+    virtual int32_t GetCountOfAllFileIDs() = 0;
 };
