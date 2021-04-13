@@ -1462,9 +1462,7 @@ void CPoolsSA::RemoveTextureDictonarySlot(uint uiTxdId)
         return;
 
     typedef uint(__cdecl * Function_TxdReleaseSlot)(uint uiTxdId);
-    Function_TxdReleaseSlot freeTxdSlot = (Function_TxdReleaseSlot)(0x731E90);
-
-    freeTxdSlot(uiTxdId);
+    ((Function_TxdReleaseSlot)(0x731E90))(uiTxdId);
 
     (*m_ppTxdPoolInterface)->Release(uiTxdId);
 }
