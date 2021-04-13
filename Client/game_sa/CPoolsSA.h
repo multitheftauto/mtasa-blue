@@ -145,7 +145,7 @@ public:
     {
         if (this->m_nSize <= index)
             return false;
-        return !IsFreeAt(index);
+        return !IsEmpty(index);
     }
 
     B*   GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }

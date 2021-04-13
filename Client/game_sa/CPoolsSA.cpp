@@ -1471,7 +1471,7 @@ void CPoolsSA::RemoveTextureDictonarySlot(uint uiTxdId)
 
 bool CPoolsSA::IsFreeTextureDictonarySlot(uint uiTxdId)
 {
-    return (*m_ppTxdPoolInterface)->IsFreeAt(uiTxdId);
+    return (*m_ppTxdPoolInterface)->IsEmpty(uiTxdId);
 }
 
 ushort CPoolsSA::GetFreeTextureDictonarySlot()
