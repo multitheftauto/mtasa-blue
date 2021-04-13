@@ -2054,8 +2054,5 @@ uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxd
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(20000 + txdID);
-    if (pModel && pModel->Deallocate())
-        return true;
-
-    return false;
+    return pModel && pModel->Deallocate();
 }
