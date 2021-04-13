@@ -848,7 +848,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
         return true;
     }
 
-    //Commented out, why would we check if both points are outside of the game area? That should'nt change a thing. (Issue 2178)
+    //Commented out, why would we check if both points are outside of the game area? That shouldn't change a thing. (Issue 2178)
 
     // Early out in case of both points being out of map
     //if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
