@@ -143,10 +143,7 @@ bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
 bool CClientModel::AllocateTXD(std::string &strTxdName)
 {
     uint uiSlotID = g_pGame->GetPools()->AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
-    if (uiSlotID == -1)
-        return false;
-
-    return true;
+    return uiSlotID != -1;
 }
 
 bool CClientModel::DeallocateTXD(CModelInfo* pModelInfo)
