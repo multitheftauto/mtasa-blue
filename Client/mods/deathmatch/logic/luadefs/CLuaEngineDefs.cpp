@@ -2037,7 +2037,7 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
 {
     if (strTxdName.size() > 24)
-        throw std::invalid_argument("Expected string size up to 24");
+        throw std::invalid_argument("TXD name length shoudn't be more than 24 characters");
 
     int iModelID = m_pManager->GetModelManager()->GetFreeTxdModelID();
     if (iModelID == INVALID_MODEL_ID)
