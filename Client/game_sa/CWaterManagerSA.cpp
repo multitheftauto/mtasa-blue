@@ -839,25 +839,29 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
 
     // Check if we're outside of map area.
     CVector zeroPoint;
-    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
+    float   waterHeight;
+    CVector pvecUnknown;
+    GetWaterLevel(CVector(0, 0, 0), &waterHeight, true, &pvecUnknown);
+    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
     {
         *vecCollision = zeroPoint;
         return true;
     }
 
+    //Commented out, why would we check if both points are outside of the game area? That should'nt change a thing. (Issue 2178)
+
     // Early out in case of both points being out of map
-    if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
-    {
-        // Check if both points are on the same side of the map, in case of some mad person
-        // trying to testLineAgainstWater over entire SA landmass, which is still a valid option.
-        if ((vecStart.fX < -3000.0f && vecEnd.fX < -3000.0f) ||
-            (vecStart.fX > 3000.0f && vecEnd.fX > 3000.0f) ||
-            (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) ||
-            (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
-        {
-            return false;
-        }
-    }
+    //if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
+    //{
+    //    // Check if both points are on the same side of the map, in case of some mad person
+    //    // trying to testLineAgainstWater over entire SA landmass, which is still a valid option.
+    //    if ((vecStart.fX < -3000.0f && vecEnd.fX < -3000.0f) ||
+    //        (vecStart.fX > 3000.0f && vecEnd.fX > 3000.0f) ||
+    //        (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) ||
+    //        (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
+    //    {
+    //        return false;
+    //    }
 
     std::vector<CWaterZoneSA*> vecZones;
     GetZonesIntersecting(vecStart, vecEnd, vecZones);
