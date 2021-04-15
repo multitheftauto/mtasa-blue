@@ -779,8 +779,6 @@ public:
     static bool   GetSoundLevelData(CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight);
     static bool   GetSoundSpeed(CClientPlayer& Player, float& fSpeed);
     static bool   SetSoundEffectEnabled(CClientPlayer& Player, const SString& strEffectName, bool bEnable);
-    static bool   SetSoundEffectParameters(CClientPlayer& Sound, eSoundEffectType eEffectType, void* params);
-    static bool   GetSoundEffectParameters(CClientPlayer& Sound, eSoundEffectType eEffectType, void* params);
     static bool   SetSoundPan(CClientPlayer& Player, float fPan);
     static bool   GetSoundPan(CClientPlayer& Player, float& fPan);
 

@@ -2161,10 +2161,6 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
             }
         }
-        else if (pPlayer)
-        {
-            // TODO: Make it work with player voice
-        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

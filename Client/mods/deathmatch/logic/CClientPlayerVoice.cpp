@@ -398,30 +398,6 @@ bool CClientPlayerVoice::IsFxEffectEnabled(uint uiFxEffect)
     return m_EnabledEffects[uiFxEffect] ? true : false;
 }
 
-bool CClientPlayerVoice::SetFxEffectParameters(uint uiFxEffect, void* params)
-{
-    if (uiFxEffect >= NUMELMS(m_EnabledEffects))
-        return false;
-
-    if (m_pBassPlaybackStream)
-        if (BASS_FXSetParameters(m_FxEffects[uiFxEffect], params))
-            return true;
-
-    return false;
-}
-
-bool CClientPlayerVoice::GetFxEffectParameters(uint uiFxEffect, void* params)
-{
-    if (uiFxEffect >= NUMELMS(m_EnabledEffects))
-        return false;
-
-    if (m_pBassPlaybackStream)
-        if (BASS_FXGetParameters(m_FxEffects[uiFxEffect], params))
-            return true;
-
-    return false;
-}
-
 bool CClientPlayerVoice::GetPan(float& fPan)
 {
     fPan = 0.0f;
