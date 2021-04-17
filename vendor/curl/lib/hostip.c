@@ -631,7 +631,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
  * within a signal handler which is nonportable and could lead to problems.
  */
 static
-RETSIGTYPE alarmfunc(int sig)
+void alarmfunc(int sig)
 {
   /* this is for "-ansi -Wall -pedantic" to stop complaining!   (rabe) */
   (void)sig;
@@ -1130,6 +1130,7 @@ CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_done)
  * resolve error
  */
 
+#ifdef USE_CURL_ASYNC
 CURLcode Curl_resolver_error(struct Curl_easy *data)
 {
   const char *host_or_proxy;
@@ -1153,3 +1154,4 @@ CURLcode Curl_resolver_error(struct Curl_easy *data)
 
   return result;
 }
+#endif /* USE_CURL_ASYNC */
