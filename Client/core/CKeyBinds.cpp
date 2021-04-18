@@ -2094,9 +2094,12 @@ void CKeyBinds::DoPreFramePulse()
         m_pChatBoxBind = NULL;
     }
 
-    if (!m_vecBindQueue.empty())
+    // Execute two binds from queue
+    for (auto i = 0; i < 2; i++)
     {
         auto it = m_vecBindQueue.begin();
+        if (it == m_vecBindQueue.end())
+            break;
         Call(*it);
         m_vecBindQueue.erase(it);
     }
