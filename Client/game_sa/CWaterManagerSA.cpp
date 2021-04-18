@@ -840,8 +840,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     // Check if we're outside of map area.
     CVector zeroPoint;
     float   waterHeight;
-    CVector pvecUnknown;
-    GetWaterLevel(CVector(0, 0, 0), &waterHeight, true, &pvecUnknown);
+    GetWaterLevel(CVector(0, 0, 0), &waterHeight, true, null);
     if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
     {
         *vecCollision = zeroPoint;
