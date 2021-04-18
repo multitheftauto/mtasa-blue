@@ -2,21 +2,6 @@
 #include "gamesa_renderware.h"
 #include "CFileLoaderSA.h"
 
-CFileLoaderSA::CFileLoaderSA()
-{
-}
-
-CFileLoaderSA::~CFileLoaderSA()
-{
-
-}
-
-void CFileLoaderSA::StaticSetHooks()
-{
-    HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
-    HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
-}
-
 class CAtomicModelInfo
 {
 public:
@@ -158,4 +143,88 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
        }
     }
     return atomic;
+}
+
+bool IsMatrixNeeed(SFileObjectInstance* pInst, CEntitySAInterface* pEntity)
+{
+    const bool bHasRotation = std::fabs(pInst->rotation.fX) > 0.050000001f || std::fabs(pInst->rotation.fY) > 0.050000001f ||
+        ((pInst->interiorID & 0xFF00) >> 8) & 2;
+    if (!bHasRotation) {
+        return false;
+    }
+
+    pInst->rotation.fX *= -1.0f;
+    pInst->rotation.fY *= -1.0f;
+    pInst->rotation.fZ *= -1.0f;
+
+    CPlaceableSAInterface* pPlaceable = reinterpret_cast<CPlaceableSAInterface*>(pEntity);
+
+    pPlaceable->AllocateStaticMatrix();
+
+    // We don't want to modify the original instance. So we have to copy the rotation.
+    CVector4D vecQuaternion(pInst->rotation);
+
+    /*
+        A quaternion is must be normalized. GTA is relying on an internal R* exporter and everything is OK,
+        but custom exporters might not contain the normalization. And we must do it yourself in MTA.
+    */
+    const float fLenSqr = vecQuaternion.LengthSquared();
+    if (std::fabs(fLenSqr - 1.0f) > std::numeric_limits<float>::epsilon() && fLenSqr > 0.0f)
+        vecQuaternion /= std::sqrt(fLenSqr);
+
+    if (!pEntity->Placeable.matrix) {
+        pPlaceable->AllocateMatrix();
+        pPlaceable->m_transform.UpdateMatrix(pEntity->Placeable.matrix);
+    }
+
+    pEntity->Placeable.matrix->SetRotate(vecQuaternion);
+
+    return true;
+}
+
+const static DWORD RETURN_CFileLoader_LoadObjectInstance = 0x538229;
+const static DWORD RETURN_CFileLoader_LoadObjectInstanceSkip = 0x5382ED;
+
+void _declspec(naked) CFileLoader_LoadObjectInstance()
+{
+    static SFileObjectInstance* pInst{};
+    static CEntitySAInterface* pEntity{};
+
+    _asm
+    {
+        mov pInst, edi
+        mov pEntity, esi
+        pushad
+    }
+
+    if (IsMatrixNeeed(pInst, pEntity)) {
+        _asm
+        {
+            popad
+            jmp RETURN_CFileLoader_LoadObjectInstanceSkip
+        }
+    }
+    else {
+        _asm
+        {
+            popad
+            jmp RETURN_CFileLoader_LoadObjectInstance
+        }
+    }
+}
+
+CFileLoaderSA::CFileLoaderSA()
+{
+}
+
+CFileLoaderSA::~CFileLoaderSA()
+{
+
+}
+
+void CFileLoaderSA::StaticSetHooks()
+{
+    HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
+    HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
+    HookInstall(0x5381E0, (DWORD)CFileLoader_LoadObjectInstance, 5);
 }

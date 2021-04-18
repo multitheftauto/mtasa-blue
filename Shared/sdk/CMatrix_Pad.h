@@ -33,6 +33,11 @@ public:
 
     CMatrix_Padded(const CMatrix& Matrix) { SetFromMatrix(Matrix); }
 
+    void SetRotate(const CVector4D& vecQuaternion)
+    {
+        ((void(__thiscall*)(CMatrix_Padded*, CVector4D const&))0x59BBF0)(this, vecQuaternion);
+    }
+
     void ConvertToMatrix(CMatrix& Matrix) const
     {
         Matrix.vPos = vPos;

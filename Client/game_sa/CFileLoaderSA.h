@@ -6,6 +6,15 @@ struct SRelatedModelInfo
     bool bDeleteOldRwObject;
 };
 
+struct SFileObjectInstance
+{
+    CVector     position;
+    CVector4D   rotation;
+    int         modelID;
+    int         interiorID;
+    int         lod;
+};
+
 class CFileLoaderSA
 {
 public:
