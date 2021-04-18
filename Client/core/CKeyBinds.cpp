@@ -483,7 +483,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                                                 // don't add if its already added to queue
                                                 if (!bAlreadyProcessed)
                                                 {
-                                                    if (processedList.empty())
+                                                    if (pCommandBind->bScriptCreated || processedList.empty())
                                                         Call(pCommandBind);
                                                     else
                                                         m_vecBindQueue.push_back(pCommandBind);
