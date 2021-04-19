@@ -1106,6 +1106,7 @@ bool CResource::CreateVM(bool bEnableOOP)
         return false;
 
     m_pVM->SetScriptName(m_strResourceName.c_str());
+    m_pVM->LoadEmbeddedScripts();
     return true;
 }
 
