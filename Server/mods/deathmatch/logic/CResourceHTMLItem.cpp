@@ -294,6 +294,7 @@ bool CResourceHTMLItem::Start()
 
         m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(m_resource, m_bOOPEnabled);
         m_pVM->LoadEmbeddedScripts();
+        m_pVM->RegisterModuleFunctions();
         m_pVM->LoadScript(strScript.c_str());
         m_pVM->SetResourceFile(this);
         m_pVM->RegisterHTMLDFunctions();

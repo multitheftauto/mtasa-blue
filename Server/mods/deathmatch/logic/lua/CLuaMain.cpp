@@ -167,7 +167,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM()
+void CLuaMain::Initialize()
 {
     assert(!m_luaVM);
 
@@ -214,6 +214,11 @@ void CLuaMain::LoadEmbeddedScripts()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+}
+
+void CLuaMain::RegisterModuleFunctions()
+{
+    m_pLuaManager->GetLuaModuleManager()->RegisterFunctions(m_luaVM);
 }
 
 // Special function(s) that are only visible to HTMLD scripts
