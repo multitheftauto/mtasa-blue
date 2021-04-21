@@ -848,7 +848,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
         return true;
     }
 
-    Early out in case of both points being out of map
+    //Early out in case of both points being out of map
     if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
     {
        // Check if both points are on the same side of the map, in case of some mad person
