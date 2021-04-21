@@ -841,14 +841,15 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     CVector oceanWaterIntersectPoint;
 
     float waterHeight = *(float*)0x6E873F;
+    
     //This checks for intersections between Line and Plane(water is treated like a flat surface) outside a Game Area and returns a CVector with its coordinates if any were found.
     if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &oceanWaterIntersectPoint) && IsPointOutsideOfGameArea(oceanWaterIntersectPoint))
     {
-       *vecCollision = oceanWaterIntersectPoint;
-       return true;
+        *vecCollision = oceanWaterIntersectPoint;
+        return true;
     }
 
-     //Early out in case of both points being out of map
+    //Early out in case of both points being out of map
     if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
     {
         // Check if both points are on the same side of the map, in case of some mad person
@@ -858,7 +859,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
             (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) ||
             (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
         {
-        return false;
+            return false;
         }
     }
     
