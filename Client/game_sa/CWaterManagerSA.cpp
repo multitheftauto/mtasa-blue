@@ -838,12 +838,13 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     CVector rayDir = vecEnd - vecStart;
 
     // Check if we're outside of map area.
-    CVector zeroPoint;
-    float   waterHeight;
-    GetWaterLevel(CVector(0, 0, 0), &waterHeight, true, null);
-    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
+    CVector oceanWaterIntersectPoint;
+
+    float waterHeight = *(float*)0x6E873F;
+    
+    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &oceanWaterIntersectPoint) && IsPointOutsideOfGameArea(oceanWaterIntersectPoint))
     {
-        *vecCollision = zeroPoint;
+        *vecCollision = oceanWaterIntersectPoint;
         return true;
     }
 
