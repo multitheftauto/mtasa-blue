@@ -114,28 +114,13 @@ class CSimpleTransformSAInterface            // 16 bytes
 public:
     CVector m_translate;
     FLOAT   m_heading;
-
-    void UpdateMatrix(CMatrix_Padded* outMatrix)
-    {
-        ((void(__thiscall*)(CSimpleTransformSAInterface*, class CMatrix_Padded*))0x54F1B0)(this, outMatrix);
-    }
 };
 
 class CPlaceableSAInterface            // 20 bytes
 {
 public:
     CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
-
-    void AllocateStaticMatrix()
-    {
-        ((void(__thiscall*)(CPlaceableSAInterface*))0x54F4C0)(this);
-    }
-
-    void AllocateMatrix()
-    {
-        ((void(__thiscall*)(CPlaceableSAInterface*))0x54F560)(this);
-    }
+    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later   
 };
 
 class CEntitySAInterface
