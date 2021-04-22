@@ -186,9 +186,9 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
        A quaternion is must be normalized. GTA is relying on an internal R* exporter and everything is OK,
        but custom exporters might not contain the normalization. And we must do it yourself.
    */
-    const float fLenSqr = inst.rotation.LengthSquared();
-    if (fLenSqr > 0.0f && std::fabs(fLenSqr - 1.0f) > std::numeric_limits<float>::epsilon())
-        inst.rotation /= std::sqrt(fLenSqr);
+    const float fLenSq = inst.rotation.LengthSquared();
+    if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
+        inst.rotation /= std::sqrt(fLenSq);
 
     return ((CEntitySAInterface*(__cdecl*)(SFileObjectInstance*))0x538090)(&inst);
 }
