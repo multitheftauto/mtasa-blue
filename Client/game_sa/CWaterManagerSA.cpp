@@ -842,7 +842,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     // If a hit is detected, and it is outside, we early out, as custom water can't be created outside game boundaries
     {
         CVector intersection{};
-        const float waterHeight = *(float*)0x6E873F;
+        const float waterHeight = *reinterpret_cast<float*>(0x6E873F);
         if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &intersection))
         {
             if (IsPointOutsideOfGameArea(intersection))
