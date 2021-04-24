@@ -22,6 +22,11 @@ CClientIMGManager::~CClientIMGManager()
     RemoveAll();
 }
 
+void CClientIMGManager::InitDefaultBufferSize()
+{
+    m_uiDefaultStreamerBufferSize = g_pGame->GetStreaming()->GetStreamingBufferSize();
+}
+
 CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID)
 {
     // By default GTA has 5 IMG's
@@ -94,4 +99,19 @@ void CClientIMGManager::RemoveFromList(CClientIMG* pIMG)
     {
         m_List.remove(pIMG);
     }
+}
+
+void CClientIMGManager::UpdateStreamerBufferSize()
+{
+    ushort usRequestStreamSize = m_uiDefaultStreamerBufferSize;
+
+    for (const auto& pImg : m_List)
+    {
+        if (!pImg->IsStreamed())
+            continue;
+        ushort usStreamSize = pImg->GetRequiredBufferSize();
+        if (usStreamSize > usRequestStreamSize)
+            usRequestStreamSize = usStreamSize;
+    }
+    g_pGame->GetStreaming()->SetStreamingBufferSize(usRequestStreamSize);
 }

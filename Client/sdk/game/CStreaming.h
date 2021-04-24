@@ -39,4 +39,5 @@ public:
     virtual void RemoveArchive(unsigned char ucArchiveID) = 0;
     virtual void SetStreamingInfo(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
     virtual void SetStreamingBufferSize(uint32 uiSize) = 0;
+    virtual uint32 GetStreamingBufferSize() = 0;
 };

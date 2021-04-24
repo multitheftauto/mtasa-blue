@@ -61,6 +61,7 @@ public:
     unsigned char     GetArchiveID() { return m_ucArchiveID; }
     unsigned int      GetFilesCount() { return m_fileInfos.size(); }
     const auto&       GetFileInfos() const noexcept { return m_fileInfos; }
+    unsigned short    GetRequiredBufferSize() { return m_usRequiredBufferSize; }
 
     bool Load(fs::path filePath);
     void Unload();
@@ -83,6 +84,7 @@ private:
     std::string                m_filePath;
     unsigned char              m_ucArchiveID;
     std::vector<tImgFileInfo>  m_fileInfos;
+    unsigned short             m_usRequiredBufferSize;
 
     std::vector<tLinkedModelRestoreInfo> m_restoreInfo;
 };

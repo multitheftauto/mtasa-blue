@@ -66,6 +66,7 @@ public:
     unsigned char   AddArchive(const char* szFilePath);
     void            RemoveArchive(unsigned char ucStreamHandler);
     void            SetStreamingBufferSize(uint32 uiSize);
+    uint32          GetStreamingBufferSize() { return ms_streamingBufferSize * 2; };
 
 private:
     static void* (&ms_pStreamingBuffer)[2];

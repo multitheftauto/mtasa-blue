@@ -10,7 +10,6 @@
 
 #include <StdInc.h>
 
-
 #define INVALID_ARCHIVE_ID 0xFF
 
 struct tImgHeader
@@ -23,7 +22,8 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) :
     ClassInit(this),
     CClientEntity(ID),
     m_pImgManager(pManager->GetIMGManager()),
-    m_ucArchiveID(INVALID_ARCHIVE_ID)
+    m_ucArchiveID(INVALID_ARCHIVE_ID),
+    m_usRequiredBufferSize(0)
 {
     m_pManager = pManager;
     SetTypeName("img");
@@ -161,14 +161,20 @@ bool CClientIMG::StreamEnable()
     if (IsStreamed())
         return false;
 
-    ushort usRequestStreamSize = 0;
-    for (const auto& fileInfo : m_fileInfos)
-        usRequestStreamSize = Max(usRequestStreamSize, fileInfo.usSize);
-
-    g_pGame->GetStreaming()->SetStreamingBufferSize(usRequestStreamSize);
+    if (m_usRequiredBufferSize == 0)
+    {
+        for (const auto& fileInfo : m_fileInfos)
+            m_usRequiredBufferSize = Max(m_usRequiredBufferSize, fileInfo.usSize);
+    }
 
     m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(m_filePath.c_str());
-    return IsStreamed();
+
+    if (IsStreamed())
+    {
+        m_pImgManager->UpdateStreamerBufferSize();
+        return true;
+    }
+    return false;
 }
 
 bool CClientIMG::StreamDisable()
@@ -190,6 +196,9 @@ bool CClientIMG::StreamDisable()
     g_pGame->GetStreaming()->RemoveArchive(m_ucArchiveID);
     m_ucArchiveID = INVALID_ARCHIVE_ID;
 
+    m_pImgManager->UpdateStreamerBufferSize();
+
+    g_pClientGame->RestreamWorld();
     return true;
 }
 

@@ -23,6 +23,7 @@ public:
     CClientIMGManager(class CClientManager* pManager);
     ~CClientIMGManager();
 
+    void InitDefaultBufferSize();
     void RemoveAll();
     bool Exists(CClientIMG* pIMG);
 
@@ -31,6 +32,7 @@ public:
 
     bool        RestoreModel(unsigned int uiModel);
     static bool IsLinkableModel(unsigned int uiModel);
+    void        UpdateStreamerBufferSize();
 
 private:
     void AddToList(CClientIMG* pIMG) { m_List.push_back(pIMG); }
@@ -38,4 +40,5 @@ private:
 
     std::list<CClientIMG*> m_List;
     bool                   m_bRemoveFromList;
+    uint32                 m_uiDefaultStreamerBufferSize;
 };
