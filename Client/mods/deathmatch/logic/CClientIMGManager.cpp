@@ -105,7 +105,7 @@ void CClientIMGManager::UpdateStreamerBufferSize()
 {
     ushort usRequestStreamSize = m_uiDefaultStreamerBufferSize;
 
-    for (const auto& pImg : m_List)
+    for (CClientIMG* pImg : m_List)
     {
         if (!pImg->IsStreamed())
             continue;
