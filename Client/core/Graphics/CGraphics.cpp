@@ -844,7 +844,7 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
 }
 
 void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
-                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bUseFaceToward, const CVector& vecFaceToward,
+                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward, const CVector& vecFaceToward,
                                          bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
@@ -858,10 +858,10 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
 
     // Add it to the queue
     if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
-        m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward,
+        m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                    vecFaceToward);
     else
-        m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward,
+        m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                   vecFaceToward);
 }
 
@@ -1348,7 +1348,7 @@ bool CGraphics::LoadStandardDXFonts()
         m_FontResourceNames.push_back("sabankgothic.ttf");
         m_FontResourceNames.push_back("saheader.ttf");
         m_FontResourceNames.push_back("sagothic.ttf");
-        m_FontResourceNames.push_back("unifont-5.1.20080907.ttf");
+        m_FontResourceNames.push_back("unifont.ttf");
     }
 
     for (uint i = 0; i < m_FontResourceNames.size(); i++)

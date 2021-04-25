@@ -68,3 +68,6 @@ DECLARE_ENUM_CLASS(PasswordHashFunction);
 DECLARE_ENUM_CLASS(StringEncryptFunction);
 
 DECLARE_ENUM(ePacketID);
+
+DECLARE_ENUM(eElementRPCFunctions);
+DECLARE_ENUM(eServerRPCFunctions);

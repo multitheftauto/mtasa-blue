@@ -12,7 +12,7 @@
 
 class CClientPointLightsManager;
 
-class CClientSearchLight : public CClientStreamElement
+class CClientSearchLight final : public CClientStreamElement
 {
     DECLARE_CLASS(CClientSearchLight, CClientEntity);
     friend class CClientPointLightsManager;

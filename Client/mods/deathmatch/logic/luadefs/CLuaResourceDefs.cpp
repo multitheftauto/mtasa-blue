@@ -398,7 +398,7 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
     {
         lua_createtable(luaVM, 0, pResource->GetExportedFunctions().size());
 
-        unsigned int index = 0;
+        unsigned int index = 1;
         for (const auto& strName : pResource->GetExportedFunctions())
         {
             lua_pushstring(luaVM, strName.c_str());

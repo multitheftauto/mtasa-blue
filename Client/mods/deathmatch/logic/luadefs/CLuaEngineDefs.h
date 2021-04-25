@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaEngineDefs : public CLuaDefs
 {
@@ -57,9 +58,9 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
-    static bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM);
+    static bool EngineRestreamWorld(lua_State* const luaVM);
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
-    static std::variant<bool, std::tuple<char, char>>                  EngineGetModelVisibleTime(std::string strModelId);
+    static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
     static std::unordered_map<std::string, std::variant<float, int, CVector>> EngineGetModelCollisionProperties(lua_State* luaVM);
     LUA_DECLARE(EngineGetModelCollisionData);
     LUA_DECLARE(EngineSetModelCollisionData);

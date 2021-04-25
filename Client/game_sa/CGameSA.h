@@ -14,6 +14,7 @@
 #include "CModelInfoSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
+#include <game/CStreaming.h>
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
@@ -33,8 +34,7 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_MAX                   26000       // Actual max is 25755
-#define     OBJECTDYNAMICINFO_MAX           160
+extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -107,8 +107,8 @@ class CGameSA : public CGame
 
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA ModelInfo[MODELINFO_MAX];
-    CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
+    CModelInfoSA* ModelInfo;
+    CObjectGroupPhysicalPropertiesSA* ObjectGroupsInfo;
 public:
     ZERO_ON_NEW
 
@@ -309,6 +309,16 @@ public:
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
+    int32_t GetBaseIDforDFF() { return 0; }
+    int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
+    int32_t GetBaseIDforCOL() { return *(int32_t*)(0x410344 + 2); }
+    int32_t GetBaseIDforIPL() { return *(int32_t*)(0x4044F4 + 2); }
+    int32_t GetBaseIDforDAT() { return *(int32_t*)(0x44D064 + 2); }
+    int32_t GetBaseIDforIFP() { return *(int32_t*)(0x407124 + 2); }
+    int32_t GetBaseIDforRRR() { return *(int32_t*)(0x4594A1 + 2); }
+    int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
+    int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
+
     DWORD GetSystemTime()
     {
         DEBUG_TRACE("DWORD     GetSystemTime (  )");
@@ -409,6 +419,7 @@ public:
     bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
+    void         FixModelCol(uint iFixModel, uint iFromModel);
     void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);

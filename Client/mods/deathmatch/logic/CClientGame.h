@@ -251,8 +251,6 @@ public:
     bool IsNickValid(const char* szNick);
     bool IsNametagValid(const char* szNick);
 
-    bool IsGettingIntoVehicle() { return m_bIsGettingIntoVehicle; };
-
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
@@ -344,10 +342,6 @@ public:
     unsigned char  GetDamageBodyPiece() { return m_ucDamageBodyPiece; }
     bool           GetDamageSent() { return m_bDamageSent; }
     void           SetDamageSent(bool b) { m_bDamageSent = b; }
-
-    void ProcessVehicleInOutKey(bool bPassenger);
-
-    void ResetVehicleInOut();
 
     void SetAllDimensions(unsigned short usDimension);
     void SetAllInteriors(unsigned char ucInterior);
@@ -446,6 +440,12 @@ public:
 
     void TriggerDiscordJoin(SString strSecret);
 
+    inline const bool IsServerRPCFunctionDisabled(const eServerRPCFunctions eServerRPCFunction) const { return m_disabledServerRPCFunctions[eServerRPCFunction]; };
+    inline void SetServerRPCFunctionDisabled(const eServerRPCFunctions eServerRPCFunction, const bool bDisabled = true)
+    {
+        m_disabledServerRPCFunctions[eServerRPCFunction] = bDisabled;
+    };
+
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
@@ -464,7 +464,6 @@ private:
 
     // Network update functions
     void DoVehicleInKeyCheck();
-    void UpdateVehicleInOut();
     void UpdatePlayerTarget();
     void UpdatePlayerWeapons();
     void UpdateTrailers();
@@ -725,18 +724,6 @@ private:
     bool m_bTriggeredIngameAndConnected;
     bool m_bGracefulDisconnect;
 
-    // Network update vars
-    unsigned long  m_ulLastVehicleInOutTime;
-    bool           m_bIsGettingOutOfVehicle;
-    bool           m_bIsGettingIntoVehicle;
-    bool           m_bIsJackingVehicle;
-    bool           m_bIsGettingJacked;
-    ElementID      m_VehicleInOutID;
-    unsigned char  m_ucVehicleInOutSeat;
-    bool           m_bNoNewVehicleTask;
-    ElementID      m_NoNewVehicleTaskReasonID;
-    CClientPlayer* m_pGettingJackedBy;
-
     CEntity*       m_pTargetedGameEntity;
     CClientEntity* m_pTargetedEntity;
     bool           m_bTargetSent;
@@ -842,6 +829,8 @@ private:
     uint                    m_uiAltPulseOrderCounter;
     SString                 m_strACInfo;
     std::map<uint, uint>    m_SentMessageIds;
+
+    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> m_disabledServerRPCFunctions;
 
     bool              m_bLastKeyWasEscapeCancelled;
     std::set<SString> m_AllowKeyUpMap;

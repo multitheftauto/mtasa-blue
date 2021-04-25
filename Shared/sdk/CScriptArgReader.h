@@ -550,7 +550,7 @@ public:
         if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             size_t length = lua_strlen(m_luaVM, m_iIndex);
-            
+
             try
             {
                 outValue.assign(lua_tostring(m_luaVM, m_iIndex++), length);
@@ -1012,7 +1012,7 @@ public:
     //
     void ReadPairTable(std::vector<std::pair<SString, SString>>& outPairs, bool bKeyValue = true)
     {
-        outPairs.clear();        
+        outPairs.clear();
 
         int argument = lua_type(m_luaVM, m_iIndex);
         if (argument == LUA_TTABLE)
@@ -1115,7 +1115,7 @@ protected:
         }
 
         return false;
-    }    
+    }
 
     // Reads { key, value } as a pair
     void InternalReadPairTable(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
@@ -1144,7 +1144,7 @@ protected:
             }
 
             lua_pop(m_luaVM, 1);
-        }       
+        }
     }
 
     // Reads [ key ] = value as a pair
