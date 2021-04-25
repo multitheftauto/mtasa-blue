@@ -257,7 +257,13 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
     if (uiBlockSize == ms_streamingBufferSize * 2)
         return;
 
-    // Suspend old streaming handle
+    int pointer = *(int*)0x8E3FFC;
+    SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
+
+    // Wait while streaming threads ends tasks
+    while (streaming[0].bInUse && streaming[1].bInUse)
+
+    // Suspend streaming handle
     SuspendThread(*phStreamingThread);
 
     // Create new buffer
@@ -279,9 +285,6 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
 
     ms_pStreamingBuffer[0] = pNewBuffer;
     ms_pStreamingBuffer[1] = (void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize);
-
-    int pointer = *(int*)0x8E3FFC;
-    SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
 
     streaming[0].pBuffer = ms_pStreamingBuffer[0];
     streaming[1].pBuffer = ms_pStreamingBuffer[1];
