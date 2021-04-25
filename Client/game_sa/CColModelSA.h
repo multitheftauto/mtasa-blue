@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CColModelSA.h
  *  PURPOSE:     Header file for collision model entity class
@@ -11,10 +11,11 @@
 
 #pragma once
 
+#include <windows.h>
 #include <game/CColModel.h>
 
 #define FUNC_CColModel_Constructor 0x40FB60
-#define FUNC_CColModel_Destructor 0x40F700
+#define FUNC_CColModel_Destructor  0x40F700
 
 enum class eCollisionShape;
 
@@ -201,7 +202,7 @@ public:
     CColModelSA(CColModelSAInterface* pInterface);
     ~CColModelSA();
 
-    CColModelSAInterface* GetInterface() const { return m_pInterface; }
+    CColModelSAInterface* GetInterface() { return m_pInterface; }
     void                  Destroy() { delete this; }
 
 private:

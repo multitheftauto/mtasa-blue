@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/game/CColModel.h
  *  PURPOSE:     Collision model entity interface
@@ -16,6 +16,6 @@ class CColModelSAInterface;
 class CColModel
 {
 public:
-    virtual CColModelSAInterface* GetInterface() const = 0;
+    virtual CColModelSAInterface* GetInterface() = 0;
     virtual void                  Destroy() = 0;
 };

@@ -220,7 +220,7 @@ namespace lua
         for (const auto& [k, v] : val)
         {
             Push(L, k);
-            Push<V>(L, v);
+            Push(L, v);
             lua_settable(L, -3);
         }
     }

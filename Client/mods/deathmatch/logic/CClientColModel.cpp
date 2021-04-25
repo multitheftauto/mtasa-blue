@@ -16,10 +16,10 @@ CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : Class
     // Init
     m_pManager = pManager;
     m_pColModelManager = pManager->GetColModelManager();
+    m_pColModel = NULL;
 
     SetTypeName("col");
 
-    m_pColModel = nullptr;
 
     // Add us to DFF manager's list
     m_pColModelManager->AddToList(this);
@@ -88,7 +88,9 @@ bool CClientColModel::Replace(unsigned short usModel)
         // it replaced it. We're the new replacer.
         CClientColModel* pAlready = m_pColModelManager->GetElementThatReplaced(usModel);
         if (pAlready)
+        {
             pAlready->m_Replaced.remove(usModel);
+        }
 
         // Replace the collisions
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
@@ -117,9 +119,12 @@ void CClientColModel::Restore(unsigned short usModel)
 void CClientColModel::RestoreAll()
 {
     // Loop through our replaced ids
-    for (auto& iter : m_Replaced)
+    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    for (; iter != m_Replaced.end(); iter++)
+    {
         // Restore this model
-        InternalRestore(iter);
+        InternalRestore(*iter);
+    }
 
     // Clear the list
     m_Replaced.clear();
@@ -128,11 +133,14 @@ void CClientColModel::RestoreAll()
 bool CClientColModel::HasReplaced(unsigned short usModel)
 {
     // Loop through our replaced ids
-    for (auto& iter : m_Replaced)
+    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    for (; iter != m_Replaced.end(); iter++)
+    {
         // Is this the given ID
-        if (iter == usModel)
+        if (*iter == usModel)
             // We have replaced it
             return true;
+    }
 
     // We have not replaced it
     return false;

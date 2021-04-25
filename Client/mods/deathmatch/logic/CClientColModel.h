@@ -12,8 +12,8 @@
 #include <list>
 #include "CClientEntity.h"
 
-#define MAX_COLLISION_SIZE 128             // collision bounding box in each axis
-#define MAX_COLLISION_SIZE2 256            // twice bigger than MAX_COLLISION_SIZE
+constexpr int MaxCollisionSize = 128;            // collision bounding box in each axis
+constexpr int MaxCollisionSize2 = MaxCollisionSize * 2;
 
 class CClientColModel : public CClientEntity
 {
@@ -41,25 +41,25 @@ public:
     {
         if (fRadius > 0)
         {
-            return (MAX_COLLISION_SIZE >= vec.fX + fRadius && vec.fX + fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY + fRadius &&
-                    vec.fY + fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ + fRadius && vec.fZ + fRadius >= -MAX_COLLISION_SIZE) &&
-                   (MAX_COLLISION_SIZE >= vec.fX - fRadius && vec.fX - fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY - fRadius &&
-                    vec.fY - fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ - fRadius && vec.fZ - fRadius >= -MAX_COLLISION_SIZE);
+            return (MaxCollisionSize >= vec.fX + fRadius && vec.fX + fRadius >= -MaxCollisionSize && MaxCollisionSize >= vec.fY + fRadius &&
+                    vec.fY + fRadius >= -MaxCollisionSize && MaxCollisionSize >= vec.fZ + fRadius && vec.fZ + fRadius >= -MaxCollisionSize) &&
+                   (MaxCollisionSize >= vec.fX - fRadius && vec.fX - fRadius >= -MaxCollisionSize && MaxCollisionSize >= vec.fY - fRadius &&
+                    vec.fY - fRadius >= -MaxCollisionSize && MaxCollisionSize >= vec.fZ - fRadius && vec.fZ - fRadius >= -MaxCollisionSize);
         }
-        return (MAX_COLLISION_SIZE >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE &&
-                    MAX_COLLISION_SIZE >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE);
+        return (MaxCollisionSize >= vec.fX && vec.fX >= -MaxCollisionSize && MaxCollisionSize >= vec.fY && vec.fY >= -MaxCollisionSize &&
+                    MaxCollisionSize >= vec.fZ && vec.fZ >= -MaxCollisionSize);
     }
     static bool CheckMoveVector(CVector& vec, float fRadius = 0)
     {
         if (fRadius > 0)
         {
-            return ((MAX_COLLISION_SIZE2 >= vec.fX + fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY + fRadius >= -MAX_COLLISION_SIZE2 &&
-                     MAX_COLLISION_SIZE2 >= vec.fZ + fRadius >= -MAX_COLLISION_SIZE2) &&
-                    (MAX_COLLISION_SIZE2 >= vec.fX - fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY - fRadius >= -MAX_COLLISION_SIZE2 &&
-                     MAX_COLLISION_SIZE2 >= vec.fZ - fRadius >= -MAX_COLLISION_SIZE2));
+            return ((MaxCollisionSize2 >= vec.fX + fRadius >= -MaxCollisionSize2 && MaxCollisionSize2 >= vec.fY + fRadius >= -MaxCollisionSize2 &&
+                     MaxCollisionSize2 >= vec.fZ + fRadius >= -MaxCollisionSize2) &&
+                    (MaxCollisionSize2 >= vec.fX - fRadius >= -MaxCollisionSize2 && MaxCollisionSize2 >= vec.fY - fRadius >= -MaxCollisionSize2 &&
+                     MaxCollisionSize2 >= vec.fZ - fRadius >= -MaxCollisionSize2));
         }
-        return (MAX_COLLISION_SIZE2 >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE2 &&
-                    MAX_COLLISION_SIZE2 >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE2);
+        return (MaxCollisionSize2 >= vec.fX && vec.fX >= -MaxCollisionSize2 && MaxCollisionSize2 >= vec.fY && vec.fY >= -MaxCollisionSize2 &&
+                    MaxCollisionSize2 >= vec.fZ && vec.fZ >= -MaxCollisionSize2);
     }
 
     // CompareVector returns true if all points in the second vector are greater than the corresponding points in the first vector
