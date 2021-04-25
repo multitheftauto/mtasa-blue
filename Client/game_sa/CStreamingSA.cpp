@@ -257,8 +257,8 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
     if (uiBlockSize == ms_streamingBufferSize * 2)
         return;
 
-    // Close old streaming handle
-    TerminateThread(*phStreamingThread, 0);
+    // Suspend old streaming handle
+    SuspendThread(*phStreamingThread);
 
     // Create new buffer
     if (uiBlockSize & 1)
@@ -286,14 +286,6 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
     streaming[0].pBuffer = ms_pStreamingBuffer[0];
     streaming[1].pBuffer = ms_pStreamingBuffer[1];
 
-    // Create new streming handle
-    auto pStreamingThreadId = *(LPDWORD)0x8E4000;
-    HANDLE hStreamingThread = CreateThread(0, 0x10000u, (LPTHREAD_START_ROUTINE)0x406560, 0, 4u, &pStreamingThreadId);
-
-    HANDLE hCurrentThread = GetCurrentThread();
-    int    iPriority = GetThreadPriority(hCurrentThread);
-    SetThreadPriority(hStreamingThread, iPriority);
-    ResumeThread(hStreamingThread);
-
-    phStreamingThread = &hStreamingThread;
+    // Well done
+    ResumeThread(*phStreamingThread);
 }
