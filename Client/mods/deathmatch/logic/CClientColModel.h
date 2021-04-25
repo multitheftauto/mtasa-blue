@@ -1,8 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CClientColModel.h
+ *  FILE:        mods/shared_logic/CClientColModel.h
  *  PURPOSE:     Model collision (.col file) entity class
  *
  *****************************************************************************/
