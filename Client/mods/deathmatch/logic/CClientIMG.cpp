@@ -54,11 +54,6 @@ bool CClientIMG::Load(fs::path filePath)
     m_filePath = filePath.string();
     m_ifs = std::ifstream(filePath, std::ios::binary);
 
-/*    g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, nullptr, 0);
-    if (!g_pCore->GetNetwork()->CheckFile("img", m_strFilename))
-        return false;
-*/
-
     // Open the file
     if (m_ifs.fail())
     {

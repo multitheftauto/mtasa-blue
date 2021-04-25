@@ -626,14 +626,32 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 {
     if (uiModelID >= 20000)
         throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
-    return pIMG->LinkModel(uiModelID, ResolveIMGFileID(pIMG, file));
+
+    size_t fileID = ResolveIMGFileID(pIMG, file);
+    std::string buffer;
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+        throw std::exception("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
+        throw std::exception("Failed to link file. Make sure the archieve isn't corrupted.");
+
+    return pIMG->LinkModel(uiModelID, fileID);
 }
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
     if (uiTxdID >= 5000)
         throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
-    return pIMG->LinkModel(20000 + uiTxdID, ResolveIMGFileID(pIMG, file));
+
+    size_t fileID = ResolveIMGFileID(pIMG, file);
+    std::string buffer;
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+        throw std::exception("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
+        throw std::exception("Failed to link file. Make sure the archieve isn't corrupted.");
+
+    return pIMG->LinkModel(20000 + uiTxdID, fileID);
 }
 
 bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
