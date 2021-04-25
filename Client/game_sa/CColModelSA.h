@@ -130,16 +130,14 @@ typedef struct
         return vertices;
     }
 
-    size_t getNumVertices() const
+    unsigned short getNumVertices() const
     {
-        std::map<ushort, bool> vertices;
+        unsigned short numVertices = 0;
         for (uint i = 0; numColTriangles > i; i++)
         {
-            vertices[pColTriangles[i].vertex[0]] = true;
-            vertices[pColTriangles[i].vertex[1]] = true;
-            vertices[pColTriangles[i].vertex[2]] = true;
+            numVertices = std::max(std::max(numVertices, pColTriangles[i].vertex[0]), std::max(pColTriangles[i].vertex[1], pColTriangles[i].vertex[2]));
         }
-        return vertices.size();
+        return numVertices;
     }
 
     bool isValidIndex(eCollisionShape eShape, ushort usIndex, ushort numVertices = 0) const

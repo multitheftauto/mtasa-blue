@@ -62,7 +62,7 @@ public:
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
     static std::unordered_map<std::string, std::variant<float, int, CVector>> EngineGetModelCollisionProperties(lua_State* luaVM);
-    LUA_DECLARE(EngineGetModelCollisionData);
+    static int EngineGetModelCollisionData(std::variant<ushort, CClientColModel*> model, eCollisionShape eShape);
     LUA_DECLARE(EngineSetModelCollisionData);
     static bool EngineUpdateModelCollisionBoundingBox(CClientColModel* pColModel, std::optional<CVector> vecCenter);
     static bool IsModelCollisionLoaded(ushort usModel);

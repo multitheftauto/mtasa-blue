@@ -57,7 +57,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineGetModelCollisionProperties", ArgumentParser<EngineGetModelCollisionProperties>},
-        {"engineGetModelCollisionData", EngineGetModelCollisionData},
+        {"engineGetModelCollisionData", ArgumentParser<EngineGetModelCollisionData>},
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
         {"engineUpdateModelCollisionBoundingBox", ArgumentParser<EngineUpdateModelCollisionBoundingBox>},
         {"isModelCollisionLoaded", ArgumentParser<IsModelCollisionLoaded> },
@@ -429,7 +429,7 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineReplaceCOL(lua_State* luaVM)
 {
-    CClientColModel* pCol = nullptr;
+    CClientColModel* pCol = NULL;
     unsigned short   usModel = 0;
     CScriptArgReader argStream(luaVM);
     // Grab the COL and model ID
@@ -486,7 +486,7 @@ int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
 {
-    CClientTXD*      pTXD = nullptr;
+    CClientTXD*      pTXD = NULL;
     SString          strModelName;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTXD);
@@ -2113,357 +2113,64 @@ std::unordered_map<std::string, std::variant<float, int, CVector>> CLuaEngineDef
     return map;
 }
 
-    bool CLuaEngineDefs::IsModelCollisionLoaded(ushort usModel)
+bool CLuaEngineDefs::IsModelCollisionLoaded(ushort usModel)
 {
     return GetModelCollisionInterface(usModel) != nullptr;
 }
 
-int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
+int CLuaEngineDefs::EngineGetModelCollisionData(std::variant<ushort, CClientColModel*> model, eCollisionShape eShape)
 {
-    CClientColModel* pCol = NULL;
-    unsigned short   usModel = 0;
-    CScriptArgReader argStream(luaVM);
-    // Grab the COL or model ID
-    // If COL element then read custom collision, otherwise read original collision
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(usModel);
+    CColModelSAInterface* pColModelSAInterface;
+    if (std::holds_alternative<CClientColModel*>(model))
+        pColModelSAInterface = std::get<CClientColModel*>(model)->GetColModelInterface();
     else
-        argStream.ReadUserData(pCol);
+        pColModelSAInterface = GetModelCollisionInterface(std::get<ushort>(model));
 
-    if (!argStream.HasErrors())
+    if (!pColModelSAInterface)
+        throw std::invalid_argument("Invalid or not loaded in model.");
+
+    std::vector<std::vector<float>> collisionData;
+
+    switch (eShape)
     {
-        CColModelSAInterface* pColModelSAInterface;
-        if (pCol)
-            pColModelSAInterface = pCol->GetColModelInterface();
-        else
-            pColModelSAInterface = GetModelCollisionInterface(usModel);
-
-        if (pColModelSAInterface)
-        {
-
-            ushort usIndex;
-            eCollisionShape eCollisionShape;
-            argStream.ReadEnumString(eCollisionShape);
-            argStream.ReadNumber(usIndex, 0);
-            CColDataSA* pColData = pColModelSAInterface->pColData;
-            if (pColData)
+        case eCollisionShape::BOX:
+            collisionData.reserve(pColModelSAInterface->pColData->numColBoxes);
+            for (int i = 0; i < pColModelSAInterface->pColData->numColBoxes; i++)
             {
-                switch (eCollisionShape)
-                {
-                    case eCollisionShape::BOX:
-                    if (usIndex > 0)
-                    {
-                        usIndex--;
-                        if (pColData->isValidIndex(eCollisionShape::BOX, usIndex))
-                        {
-                            CColBoxSA pBox = pColData->pColBoxes[usIndex];
-                            lua_newtable(luaVM);
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, pBox.min.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, pBox.min.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, pBox.min.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 4);
-                            lua_pushnumber(luaVM, pBox.max.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 5);
-                            lua_pushnumber(luaVM, pBox.max.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 6);
-                            lua_pushnumber(luaVM, pBox.max.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 7);
-                            lua_pushnumber(luaVM, pBox.material);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 8);
-                            lua_pushnumber(luaVM, pBox.lighting.day);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 9);
-                            lua_pushnumber(luaVM, pBox.lighting.night);
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Invalid box index.");
-                            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-                            lua_pushboolean(luaVM, false);
-                        }
-                    }
-                    else
-                    {
-                        lua_newtable(luaVM);
-                        for (uint i = 0; pColData->numColBoxes > i; i++)
-                        {
-                            lua_pushnumber(luaVM, i + 1);
-                            CColBoxSA pBox = pColData->pColBoxes[i];
-                            lua_newtable(luaVM);
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, pBox.min.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, pBox.min.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, pBox.min.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 4);
-                            lua_pushnumber(luaVM, pBox.max.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 5);
-                            lua_pushnumber(luaVM, pBox.max.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 6);
-                            lua_pushnumber(luaVM, pBox.max.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 7);
-                            lua_pushnumber(luaVM, pBox.material);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 8);
-                            lua_pushnumber(luaVM, pBox.lighting.day);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 9);
-                            lua_pushnumber(luaVM, pBox.lighting.night);
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                        }
-                        return 1;
-                    }
-                    break;
-                case eCollisionShape::SPHERE:
-                    if (usIndex > 0)
-                    {
-                        usIndex--;
-                        if (pColData->isValidIndex(eCollisionShape::SPHERE, usIndex))
-                        {
-                            CColSphereSA pSphere = pColData->pColSpheres[usIndex];
-                            lua_newtable(luaVM);
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, pSphere.vecCenter.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, pSphere.vecCenter.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, pSphere.vecCenter.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 4);
-                            lua_pushnumber(luaVM, pSphere.fRadius);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 5);
-                            lua_pushnumber(luaVM, pSphere.material);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 6);
-                            lua_pushnumber(luaVM, pSphere.lighting.day);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 7);
-                            lua_pushnumber(luaVM, pSphere.lighting.night);
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Invalid sphere index.");
-                            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-                            lua_pushboolean(luaVM, false);
-                            return 1;
-                        }
-                    }
-                    else
-                    {
-                        lua_newtable(luaVM);
-                        CColSphereSA pSphere;
-                        for (uint i = 0; pColData->numColSpheres > i; i++)
-                        {
-                            lua_pushnumber(luaVM, i + 1);
-                            pSphere = pColData->pColSpheres[i];
-                            lua_newtable(luaVM);
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, pSphere.vecCenter.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, pSphere.vecCenter.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, pSphere.vecCenter.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 4);
-                            lua_pushnumber(luaVM, pSphere.fRadius);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 5);
-                            lua_pushnumber(luaVM, pSphere.material);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 6);
-                            lua_pushnumber(luaVM, pSphere.lighting.day);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 7);
-                            lua_pushnumber(luaVM, pSphere.lighting.night);
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                        }
-                        return 1;
-                    }
-                    break;
-                case eCollisionShape::TRIANGLE:
-                    if (usIndex > 0)
-                    {
-                        usIndex--;
-                        if (pColData->isValidIndex(eCollisionShape::TRIANGLE, usIndex))
-                        {
-                            CColTriangleSA pTriangle = pColData->pColTriangles[usIndex];
-                            lua_newtable(luaVM);
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.vertex[0] + 1));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.vertex[1] + 1));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.vertex[2] + 1));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 4);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.material));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 5);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.lighting.day));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 6);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.lighting.night));
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                            return 1;
-
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Invalid triangle index.");
-                            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-                            lua_pushboolean(luaVM, false);
-                            return 1;
-                        }
-                    }
-                    else
-                    {
-                        lua_newtable(luaVM);
-                        CColTriangleSA pTriangle;
-                        for (uint i = 0; pColData->numColTriangles > i; i++)
-                        {
-                            lua_pushnumber(luaVM, i + 1);
-                            pTriangle = pColData->pColTriangles[i];
-                            lua_newtable(luaVM);
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.vertex[0] + 1));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.vertex[1] + 1));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.vertex[2] + 1));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 4);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.material));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 5);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.lighting.day));
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 6);
-                            lua_pushnumber(luaVM, static_cast<float>(pTriangle.lighting.night));
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                        }
-                        return 1;
-                    }
-                    break;
-                case eCollisionShape::VERTEX:
-                    if (usIndex > 0)
-                    {
-                        usIndex--;
-                        unsigned short usNumVertices;
-                        if (pCol)
-                        {
-                            usNumVertices = pCol->GetVerticesCount();
-                        }
-                        else
-                        {
-                            usNumVertices = pColData->getNumVertices();
-                        }
-
-                        if (pColData->isValidIndex(eCollisionShape::VERTEX, usIndex, usNumVertices))
-                        {
-                            CompressedVector pTriangle = pColData->pVertices[usIndex];
-                            lua_newtable(luaVM);
-                            CVector vec = pTriangle.getVector();
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, vec.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, vec.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, vec.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Invalid vertex index.");
-                            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-                            lua_pushboolean(luaVM, false);
-                            return 1;
-                        }
-                    }
-                    else
-                    {
-                        int iNumVertices;
-                        if (pCol)
-                        {
-                            iNumVertices = pCol->GetVerticesCount();
-                        }
-                        else
-                        {
-                            iNumVertices = pColData->getNumVertices();
-                        }
-
-                        CVector vec;
-                        CompressedVector pVertex;
-
-                        lua_newtable(luaVM);
-                        for (int i = 0; i < iNumVertices; i++)
-                        {
-                            lua_pushnumber(luaVM, i + 1);
-                            lua_newtable(luaVM);
-                            pVertex = pColData->pVertices[i];
-                            vec = pVertex.getVector();
-                            lua_pushnumber(luaVM, 1);
-                            lua_pushnumber(luaVM, vec.fX);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 2);
-                            lua_pushnumber(luaVM, vec.fY);
-                            lua_settable(luaVM, -3);
-                            lua_pushnumber(luaVM, 3);
-                            lua_pushnumber(luaVM, vec.fZ);
-                            lua_settable(luaVM, -3);
-                            lua_settable(luaVM, -3);
-                        }
-                        return 1;
-                    }
-                    break;
-                }
+                CColBoxSA* pBox = pColModelSAInterface->pColData->pColBoxes + i;
+                collisionData.push_back({pBox->min.fX, pBox->min.fY, pBox->min.fZ, pBox->max.fX, pBox->max.fY, pBox->max.fZ, (float)pBox->material,
+                                            (float)pBox->lighting.day, (float)pBox->lighting.night});
             }
-        }
+        case eCollisionShape::SPHERE:
+            collisionData.reserve(pColModelSAInterface->pColData->numColSpheres);
+            for (int i = 0; i < pColModelSAInterface->pColData->numColSpheres; i++)
+            {
+                CColSphereSA* pSphere = pColModelSAInterface->pColData->pColSpheres + i;
+                collisionData.push_back({pSphere->vecCenter.fX, pSphere->vecCenter.fY, pSphere->vecCenter.fZ, (float)pSphere->material,
+                                         (float)pSphere->lighting.day,
+                                         (float)pSphere->lighting.night});
+            }
+        case eCollisionShape::TRIANGLE:
+            collisionData.reserve(pColModelSAInterface->pColData->numColTriangles);
+            for (int i = 0; i < pColModelSAInterface->pColData->numColTriangles; i++)
+            {
+                CColTriangleSA* pTriangle = pColModelSAInterface->pColData->pColTriangles + i;
+                collisionData.push_back({pTriangle->vertex[0] + 1.0f, pTriangle->vertex[1] + 1.0f, pTriangle->vertex[2] + 1.0f, (float)pTriangle->material,
+                                         (float)pTriangle->lighting.day,
+                                         (float)pTriangle->lighting.night});
+            }
+        case eCollisionShape::VERTEX:
+            {
+                collisionData.reserve(pColModelSAInterface->pColData->getNumVertices());
+                CVector vector;
+                for (int i = 0; i < pColModelSAInterface->pColData->numColTriangles; i++)
+                {
+                    vector = pColModelSAInterface->pColData->pVertices[i].getVector();
+                    collisionData.push_back({vector.fX, vector.fY, vector.fZ});
+                }
+                break;
+            }
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 bool CLuaEngineDefs::EngineUpdateModelCollisionBoundingBox(CClientColModel* pColModel, std::optional<CVector> vecCenter)
