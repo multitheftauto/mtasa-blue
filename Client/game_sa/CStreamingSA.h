@@ -66,11 +66,11 @@ public:
     unsigned char   AddArchive(const char* szFilePath);
     void            RemoveArchive(unsigned char ucStreamHandler);
     void            SetStreamingBufferSize(uint32 uiSize);
-    uint32          GetStreamingBufferSize() { return ms_streamingBufferSize * 2; };
+    uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; };
 
 private:
     static void* (&ms_pStreamingBuffer)[2];
-    static uint32 (&ms_streamingBufferSize);
+    static uint32 (&ms_streamingHalfOfBufferSize);
     static CStreamingInfo (&ms_aInfoForModel)[26316];
     static HANDLE (&m_aStreamingHandlers)[32];
     static CArchiveInfo (&ms_aAchiveInfo)[8];

@@ -18,7 +18,7 @@ CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26
 HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // Contains open files
 CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
 HANDLE* phStreamingThread = (HANDLE*)0x8E4008;
-uint32  (&CStreamingSA::ms_streamingBufferSize) = *(uint32*)0x8E4CA8;
+uint32  (&CStreamingSA::ms_streamingHalfOfBufferSize) = *(uint32*)0x8E4CA8;
 void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void*(*)[2])0x8E4CAC;
 
 namespace
@@ -254,7 +254,7 @@ void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
 
 void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
 {
-    if (uiBlockSize == ms_streamingBufferSize * 2)
+    if (uiBlockSize == ms_streamingHalfOfBufferSize * 2)
         return;
 
     int pointer = *(int*)0x8E3FFC;
@@ -274,14 +274,14 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
     void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(uiBlockSize << 11, 2048);
 
     // Copy data from old buffer to new buffer
-    uint uiCopySize = std::min(ms_streamingBufferSize, uiBlockSize / 2);
+    uint uiCopySize = std::min(ms_streamingHalfOfBufferSize, uiBlockSize / 2);
     MemCpyFast(pNewBuffer, (void*)ms_pStreamingBuffer[0], uiCopySize);
     MemCpyFast((void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize), (void*)ms_pStreamingBuffer[1], uiCopySize);
 
     typedef void(__cdecl * Function_CMemoryMgr_FreeAlign)(void* pos);
     ((Function_CMemoryMgr_FreeAlign)(0x72F4F0))(ms_pStreamingBuffer[0]);
 
-    ms_streamingBufferSize = uiBlockSize / 2;
+    ms_streamingHalfOfBufferSize = uiBlockSize / 2;
 
     ms_pStreamingBuffer[0] = pNewBuffer;
     ms_pStreamingBuffer[1] = (void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize);
