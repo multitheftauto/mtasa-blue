@@ -617,7 +617,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<si
     std::string buffer;
 
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer)) // Get file might throw 
-        throw std::exception("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     return buffer;
 }
@@ -630,10 +630,10 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
     size_t fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
-        throw std::exception("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
-        throw std::exception("Failed to link file. Make sure the archieve isn't corrupted.");
+        throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
 
     return pIMG->LinkModel(uiModelID, fileID);
 }
@@ -646,10 +646,10 @@ bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, s
     size_t fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
-        throw std::exception("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
-        throw std::exception("Failed to link file. Make sure the archieve isn't corrupted.");
+        throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
 
     return pIMG->LinkModel(20000 + uiTxdID, fileID);
 }
