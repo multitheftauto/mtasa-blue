@@ -337,6 +337,8 @@ void CResourceHTMLItem::GetMimeType(const char* szFilename)
             m_strMime = "image/jpg";
         else if (strcmp(pExtn, "js") == 0)
             m_strMime = "text/javascript";
+        else if (strcmp(pExtn, "map") == 0)
+            m_strMime = "application/json";
         else
             m_strMime = "text/html";
     }
