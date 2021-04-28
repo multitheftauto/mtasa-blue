@@ -1138,8 +1138,7 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
             fRight = floor(fRight);
             fBottom = floor(fBottom);
         }
-        if (fLineHeight == 0.0f)
-            fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
+
         sDrawQueueItem Item;
         Item.eType = QUEUE_TEXT;
         Item.blendMode = m_ActiveBlendMode;
