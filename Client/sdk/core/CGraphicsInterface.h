@@ -157,7 +157,8 @@ public:
 
     virtual void DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* wszText, float fScaleX,
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
-                                  bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
+                                  bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0,
+                                  const std::optional<float>&lineHeight) = 0;
 
     virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
