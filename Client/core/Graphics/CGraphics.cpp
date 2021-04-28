@@ -1098,11 +1098,7 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
 
 void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY,
                                  unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation,
-<<<<<<< HEAD
-                                 float fRotationCenterX, float fRotationCenterY, const std::optional<float>& lineHeight)
-=======
-                                 float fRotationCenterX, float fRotationCenterY, float fLineHeight)
->>>>>>> 14824a3641bf81dd67bbe55a12be0accb17caab0
+                                 float fRotationCenterX, float fRotationCenterY, float fLineHeight = 0)
 {
     if (!szText || !m_pDXSprite)
         return;
