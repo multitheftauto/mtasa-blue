@@ -148,7 +148,11 @@ public:
 
     void DrawStringQueued(float iLeft, float iTop, float iRight, float iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
+<<<<<<< HEAD
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0, const std::optional<float>& lineHeight);
+=======
+                          float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0, float fLineHeight = 0);
+>>>>>>> 14824a3641bf81dd67bbe55a12be0accb17caab0
 
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
@@ -283,6 +287,7 @@ private:
         float         fRotation;
         float         fRotationCenterX;
         float         fRotationCenterY;
+        float         fLineHeight;
     };
 
     struct sDrawQueueRect
