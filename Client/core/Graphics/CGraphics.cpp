@@ -1156,7 +1156,6 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
         Item.Text.fRotation = fRotation;
         Item.Text.fRotationCenterX = fRotationCenterX;
         Item.Text.fRotationCenterY = fRotationCenterY;
-        Item.Text.fLineHeight = fLineHeight;
 
         // Convert to wstring
         Item.wstrText = MbUTF8ToUTF16(szText);

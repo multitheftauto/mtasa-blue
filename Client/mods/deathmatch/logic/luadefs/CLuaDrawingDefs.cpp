@@ -326,7 +326,6 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     bool               bSubPixelPositioning;
     float              fRotation;
     CVector2D          vecRotationOrigin;
-    float              fLineHeight;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strText);
