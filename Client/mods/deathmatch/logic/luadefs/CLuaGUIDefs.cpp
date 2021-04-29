@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{
     "chat_font",
@@ -49,6 +50,9 @@ void CLuaGUIDefs::LoadFunctions()
         {"isMainMenuActive", GUIIsMainMenuActive},
         {"isMTAWindowActive", GUIIsMTAWindowActive},
         {"isTransferBoxActive", GUIIsTransferBoxActive},
+
+        {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
+        {"getChatboxCharacterLimit", ArgumentParser<GUIGetChatboxCharacterLimit>},
 
         {"guiCreateWindow", GUICreateWindow},
         {"guiCreateLabel", GUICreateLabel},
@@ -240,6 +244,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInputEnabled", "guiGetInputEnabled");
     lua_classfunction(luaVM, "getInputMode", "guiGetInputMode");
     lua_classfunction(luaVM, "getCursorType", "guiGetCursorType");
+    lua_classfunction(luaVM, "setChatboxCharacterLimit", "setChatboxCharacterLimit");
+    lua_classfunction(luaVM, "getChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_classfunction(luaVM, "getScreenSize", "guiGetScreenSize");
     lua_classfunction(luaVM, "getProperties", "guiGetProperties");
@@ -281,6 +287,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
+    //lua_classvariable(luaVM, "chatboxCharacterLimit", "setChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_registerclass(luaVM, "GuiElement", "Element");
 }
@@ -4060,4 +4067,23 @@ int CLuaGUIDefs::GUIGetCursorType(lua_State* luaVM)
     auto eType = CStaticFunctionDefinitions::GUIGetCursorType();
     lua_pushstring(luaVM, EnumToString(eType));
     return 1;
+}
+
+bool CLuaGUIDefs::GUISetChatboxCharacterLimit(std::optional<int> charLimit)
+{
+    if (!charLimit.has_value())
+    {
+        g_pCore->ResetChatboxCharacterLimit();
+        return true;
+    }
+
+    if (charLimit < 0 || charLimit > 512)
+        throw std::invalid_argument(SString("Character limit must be %s than, or equal to %i (got: %i)", (charLimit < 0) ? "greater" : "less", (charLimit < 0) ? 0 : 512, charLimit));
+
+    return g_pCore->SetChatboxCharacterLimit(charLimit.value());
+}
+
+int CLuaGUIDefs::GUIGetChatboxCharacterLimit()
+{
+    return g_pCore->GetChatboxCharacterLimit();
 }

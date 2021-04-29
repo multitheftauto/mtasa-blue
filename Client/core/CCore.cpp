@@ -498,6 +498,37 @@ bool CCore::IsChatInputEnabled()
     return false;
 }
 
+bool CCore::SetChatboxCharacterLimit(int charLimit)
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return false;
+
+    pChat->SetCharacterLimit(charLimit);
+    return true;
+}
+
+void CCore::ResetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return;
+
+    pChat->SetCharacterLimit(pChat->GetDefaultCharacterLimit());
+}
+
+int CCore::GetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetCharacterLimit();
+}
+
 bool CCore::IsSettingsVisible()
 {
     if (m_pLocalGUI)
@@ -1274,6 +1305,9 @@ void CCore::OnModUnload()
 
     // Destroy tray icon
     m_pTrayIcon->DestroyTrayIcon();
+
+    // Reset chatbox character limit
+    ResetChatboxCharacterLimit();
 }
 
 void CCore::RegisterCommands()

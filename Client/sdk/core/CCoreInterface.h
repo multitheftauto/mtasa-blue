@@ -100,6 +100,10 @@ public:
     virtual bool IsCursorControlsToggled() = 0;
     virtual void CallSetCursorPos(int X, int Y) = 0;
 
+    virtual bool SetChatboxCharacterLimit(int charLimit) = 0;
+    virtual void ResetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxCharacterLimit() = 0;
+
     virtual void SetConnected(bool bConnected) = 0;
     virtual void SetOfflineMod(bool bOffline) = 0;
     virtual void ApplyHooks3(bool bEnable) = 0;

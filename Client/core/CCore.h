@@ -125,6 +125,9 @@ public:
     bool IsChatInputEnabled();
     bool ClearChat();
     void OnGameTimerUpdate();
+    bool SetChatboxCharacterLimit(int charLimit);
+    void ResetChatboxCharacterLimit();
+    int  GetChatboxCharacterLimit();
 
     // Screenshots
     void TakeScreenShot();

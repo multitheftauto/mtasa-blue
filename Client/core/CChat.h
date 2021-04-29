@@ -19,7 +19,6 @@ class CChatLineSection;
 #define CHAT_WIDTH 320                                   // Chatbox default width
 #define CHAT_TEXT_COLOR CColor(235, 221, 178)            // Chatbox default text color
 #define CHAT_MAX_LINES 100                               // Chatbox maximum chat lines
-#define CHAT_MAX_CHAT_LENGTH 96                          // Chatbox maximum chat message length
 #define CHAT_BUFFER 1024                                 // Chatbox buffer size
 #define CHAT_INPUT_HISTORY_LENGTH 128                    // Chatbox input history length
 
@@ -202,6 +201,10 @@ public:
     void SetChatFont(eChatFont Font);
     void OnModLoad();
 
+    void      SetCharacterLimit(int charLimit);
+    int       GetCharacterLimit() const { return m_iCharacterLimit; }
+    const int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
+
 private:
     void LoadCVars();
 
@@ -290,4 +293,7 @@ protected:
     CTickCount m_lastRenderTargetCreationFail;
 
     bool m_bNickCompletion;
+
+    int m_iCharacterLimit;
+    const int m_iDefaultCharacterLimit = 96;
 };
