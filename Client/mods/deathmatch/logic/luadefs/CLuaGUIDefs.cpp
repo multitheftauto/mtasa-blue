@@ -4077,8 +4077,10 @@ bool CLuaGUIDefs::GUISetChatboxCharacterLimit(std::optional<int> charLimit)
         return true;
     }
 
-    if (charLimit < 0 || charLimit > 512)
-        throw std::invalid_argument(SString("Character limit must be %s than, or equal to %i (got: %i)", (charLimit < 0) ? "greater" : "less", (charLimit < 0) ? 0 : 512, charLimit));
+    int maxCharLimit = g_pCore->GetChatboxMaxCharacterLimit();
+
+    if (charLimit < 0 || charLimit > maxCharLimit)
+        throw std::invalid_argument(SString("Character limit must be %s than, or equal to %i (got: %i)", (charLimit < 0) ? "greater" : "less", (charLimit < 0) ? 0 : maxCharLimit, charLimit));
 
     return g_pCore->SetChatboxCharacterLimit(charLimit.value());
 }

@@ -529,6 +529,16 @@ int CCore::GetChatboxCharacterLimit()
     return pChat->GetCharacterLimit();
 }
 
+int CCore::GetChatboxMaxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetMaxCharacterLimit();
+}
+
 bool CCore::IsSettingsVisible()
 {
     if (m_pLocalGUI)
