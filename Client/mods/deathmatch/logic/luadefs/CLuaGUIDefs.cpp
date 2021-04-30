@@ -52,7 +52,6 @@ void CLuaGUIDefs::LoadFunctions()
         {"isTransferBoxActive", GUIIsTransferBoxActive},
 
         {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
-        {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
         {"getChatboxCharacterLimit", ArgumentParser<GUIGetChatboxCharacterLimit>},
 
         {"guiCreateWindow", GUICreateWindow},
