@@ -204,6 +204,7 @@ public:
     void      SetCharacterLimit(int charLimit);
     int       GetCharacterLimit() const { return m_iCharacterLimit; }
     const int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
+    const int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
 
 private:
     void LoadCVars();
@@ -296,4 +297,6 @@ protected:
 
     int m_iCharacterLimit;
     const int m_iDefaultCharacterLimit = 96;
+    const int m_iMaxCharacterLimit = 255;
+    const int m_iMaxInputLines = 5;
 };

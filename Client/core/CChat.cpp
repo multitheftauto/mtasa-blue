@@ -860,7 +860,7 @@ void CChat::UpdateGUI()
     m_pBackground->SetSize(m_vecBackgroundSize);
 
     // Make sure there is enough room for all the lines
-    uint uiMaxNumLines = g_pCore->GetGraphics()->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - 3;
+    uint uiMaxNumLines = g_pCore->GetGraphics()->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - m_iMaxInputLines;
     if (m_uiNumLines > uiMaxNumLines)
         SetNumLines(uiMaxNumLines);
 
@@ -962,7 +962,7 @@ void CChat::SetInputText(const char* szText)
 
     CChatLine* pLine = NULL;
 
-    while (szRemainingText && m_InputLine.m_ExtraLines.size() < 3)
+    while (szRemainingText && m_InputLine.m_ExtraLines.size() < m_iMaxInputLines)
     {
         m_InputLine.m_ExtraLines.resize(m_InputLine.m_ExtraLines.size() + 1);
         CChatLine& line = *(m_InputLine.m_ExtraLines.end() - 1);
