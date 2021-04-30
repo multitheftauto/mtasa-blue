@@ -52,6 +52,7 @@ void CLuaGUIDefs::LoadFunctions()
         {"isTransferBoxActive", GUIIsTransferBoxActive},
 
         {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
+        {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
         {"getChatboxCharacterLimit", ArgumentParser<GUIGetChatboxCharacterLimit>},
 
         {"guiCreateWindow", GUICreateWindow},
@@ -4069,9 +4070,9 @@ int CLuaGUIDefs::GUIGetCursorType(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaGUIDefs::GUISetChatboxCharacterLimit(std::optional<int> charLimit)
+bool CLuaGUIDefs::GUISetChatboxCharacterLimit(int charLimit)
 {
-    if (!charLimit.has_value())
+    if (charLimit == -1)
     {
         g_pCore->ResetChatboxCharacterLimit();
         return true;
@@ -4082,7 +4083,7 @@ bool CLuaGUIDefs::GUISetChatboxCharacterLimit(std::optional<int> charLimit)
     if (charLimit < 0 || charLimit > maxCharLimit)
         throw std::invalid_argument(SString("Character limit must be %s than, or equal to %i (got: %i)", (charLimit < 0) ? "greater" : "less", (charLimit < 0) ? 0 : maxCharLimit, charLimit));
 
-    return g_pCore->SetChatboxCharacterLimit(charLimit.value());
+    return g_pCore->SetChatboxCharacterLimit(charLimit);
 }
 
 int CLuaGUIDefs::GUIGetChatboxCharacterLimit()

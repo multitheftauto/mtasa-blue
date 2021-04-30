@@ -159,7 +159,7 @@ public:
     LUA_DECLARE(GUIComboBoxIsOpen);
     LUA_DECLARE(GUIGetCursorType);
 
-    static bool GUISetChatboxCharacterLimit(std::optional<int> charLimit);
+    static bool GUISetChatboxCharacterLimit(int charLimit);
     static int  GUIGetChatboxCharacterLimit();
 
 private:
