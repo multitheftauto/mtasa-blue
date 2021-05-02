@@ -91,7 +91,6 @@ public:
     virtual void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...) = 0;
     virtual void SetChatVisible(bool bVisible, bool bInputBlocked = true) = 0;
     virtual bool IsChatVisible() = 0;
-    virtual bool IsChatInputBlocked() = 0;
     virtual void TakeScreenShot() = 0;
     virtual void EnableChatInput(char* szCommand, DWORD dwColor) = 0;
     virtual bool IsChatInputEnabled() = 0;
@@ -177,6 +176,8 @@ public:
     virtual void        OnGameTimerUpdate() = 0;
 
     virtual CDiscordManagerInterface* GetDiscordManager() = 0;
+
+    virtual bool IsChatInputBlocked() = 0;
 };
 
 class CClientTime
