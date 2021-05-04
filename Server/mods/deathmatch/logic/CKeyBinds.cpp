@@ -654,7 +654,7 @@ void CKeyBinds::CheckAndUpdatePlayerRPC()
     }
     else if (m_bIsRPCEnabled && listSize == 0)
     {
-        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = false;
+        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = true;
         m_pPlayer->Send(CServerRPCControlPacket(disabledServerRPCFunctions));
         m_bIsRPCEnabled = false;
     }
