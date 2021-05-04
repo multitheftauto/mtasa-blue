@@ -206,6 +206,7 @@ void CKeyBinds::Add(CKeyBind* pKeyBind)
     if (pKeyBind)
     {
         m_List.push_back(pKeyBind);
+        CheckAndUpdatePlayerRPC();
     }
 }
 
@@ -215,6 +216,9 @@ bool CKeyBinds::Remove(CKeyBind* pKeyBind)
     {
         m_List.remove(pKeyBind);
         delete pKeyBind;
+
+        CheckAndUpdatePlayerRPC();
+
         return true;
     }
 
@@ -240,6 +244,8 @@ void CKeyBinds::Clear(eKeyBindType bindType)
         }
         iter++;
     }
+
+    CheckAndUpdatePlayerRPC();
 }
 
 void CKeyBinds::Call(CKeyBind* pKeyBind)
@@ -363,6 +369,8 @@ bool CKeyBinds::AddKeyFunction(const char* szKey, bool bHitState, CLuaMain* pLua
         pBind->m_Arguments = Arguments;
 
         m_List.push_back(pBind);
+        
+        CheckAndUpdatePlayerRPC();
 
         return true;
     }
@@ -381,6 +389,8 @@ bool CKeyBinds::AddKeyFunction(const SBindableKey* pKey, bool bHitState, CLuaMai
         pBind->m_Arguments = Arguments;
 
         m_List.push_back(pBind);
+
+        CheckAndUpdatePlayerRPC();
 
         return true;
     }
@@ -424,6 +434,9 @@ bool CKeyBinds::RemoveKeyFunction(const char* szKey, CLuaMain* pLuaMain, bool bC
         }
         ++iter;
     }
+
+    CheckAndUpdatePlayerRPC();
+
     return bFound;
 }
 
@@ -480,6 +493,8 @@ void CKeyBinds::RemoveAllKeys(CLuaMain* pLuaMain)
         }
         ++iter;
     }
+    
+    CheckAndUpdatePlayerRPC();
 }
 
 bool CKeyBinds::AddControlFunction(const char* szControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments)
@@ -621,5 +636,26 @@ void CKeyBinds::RemoveDeletedBinds()
         }
         else
             ++iter;
+    }
+
+    CheckAndUpdatePlayerRPC();
+}
+
+void CKeyBinds::CheckAndUpdatePlayerRPC()
+{
+    int listSize = m_List.size();
+    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
+
+    if (!m_bIsRPCEnabled && listSize > 0)
+    {   
+        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = false;
+        m_pPlayer->Send(CServerRPCControlPacket(disabledServerRPCFunctions));
+        m_bIsRPCEnabled = true;
+    }
+    else if (m_bIsRPCEnabled && listSize == 0)
+    {
+        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = false;
+        m_pPlayer->Send(CServerRPCControlPacket(disabledServerRPCFunctions));
+        m_bIsRPCEnabled = false;
     }
 }

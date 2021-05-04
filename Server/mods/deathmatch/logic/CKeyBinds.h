@@ -122,7 +122,10 @@ public:
 protected:
     bool Remove(CKeyBind* pKeyBind);
 
+    void CheckAndUpdatePlayerRPC();
+
     CPlayer*             m_pPlayer;
     std::list<CKeyBind*> m_List;
     bool                 m_bProcessingKey;
+    bool                 m_bIsRPCEnabled;
 };
