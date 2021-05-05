@@ -1245,18 +1245,6 @@ void CGame::JoinPlayer(CPlayer& Player)
     if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
-    // Control server RPC functions
-    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> disabledServerRPCFunctions;
-
-    // Disable CURSOR_EVENT RPC by default
-    disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = true;
-
-    // If suitable event exists (e.g. onPlayerClick/onElementClicked), tell client to enable RPC function instead
-    if (!m_pMapManager->GetRootElement()->GetEventManager()->GetHandlesByServerRPCFunction(eServerRPCFunctions::CURSOR_EVENT).empty())
-        disabledServerRPCFunctions[eServerRPCFunctions::CURSOR_EVENT] = false;
-
-    Player.Send(CServerRPCControlPacket(disabledServerRPCFunctions));
-
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
         CPerfStatDebugInfo::GetSingleton()->AddLine("PlayerInGameNotice", marker.GetString());
@@ -1512,22 +1500,22 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerJoin", "", NULL, false);
     m_Events.AddEvent("onPlayerQuit", "reason", NULL, false);
     m_Events.AddEvent("onPlayerSpawn", "spawnpoint, team", NULL, false);
-    m_Events.AddEvent("onPlayerTarget", "target", NULL, false, eServerRPCFunctions::PLAYER_TARGET);
+    m_Events.AddEvent("onPlayerTarget", "target", NULL, false);
     m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart", NULL, false);
-    m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false, eServerRPCFunctions::PLAYER_WEAPON);
+    m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerPickupHit", "pickup", NULL, false);
     m_Events.AddEvent("onPlayerPickupLeave", "pickup", NULL, false);
     m_Events.AddEvent("onPlayerPickupUse", "pickup", NULL, false);
-    m_Events.AddEvent("onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false, eServerRPCFunctions::CURSOR_EVENT);
+    m_Events.AddEvent("onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false);
     m_Events.AddEvent("onPlayerContact", "previous, current", NULL, false);
     m_Events.AddEvent("onPlayerBan", "ban", NULL, false);
     m_Events.AddEvent("onPlayerLogin", "guest_account, account, auto-login", NULL, false);
     m_Events.AddEvent("onPlayerLogout", "account, guest_account", NULL, false);
     m_Events.AddEvent("onPlayerChangeNick", "oldnick, newnick, manuallyChanged", NULL, false);
     m_Events.AddEvent("onPlayerPrivateMessage", "text, player", NULL, false);
-    m_Events.AddEvent("onPlayerStealthKill", "target", NULL, false, eServerRPCFunctions::REQUEST_STEALTH_KILL);
+    m_Events.AddEvent("onPlayerStealthKill", "target", NULL, false);
     m_Events.AddEvent("onPlayerMute", "", NULL, false);
     m_Events.AddEvent("onPlayerUnmute", "", NULL, false);
     m_Events.AddEvent("onPlayerCommand", "command", NULL, false);
@@ -1546,7 +1534,7 @@ void CGame::AddBuiltInEvents()
     // Element events
     m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
     m_Events.AddEvent("onElementColShapeLeave", "colshape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false, eServerRPCFunctions::CURSOR_EVENT);
+    m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false);
     m_Events.AddEvent("onElementDataChange", "key, oldValue", NULL, false);
     m_Events.AddEvent("onElementDestroy", "", NULL, false);
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
