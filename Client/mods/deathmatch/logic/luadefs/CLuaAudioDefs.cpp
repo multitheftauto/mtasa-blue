@@ -1858,6 +1858,8 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 break;
             }
         }
+
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
     lua_pushboolean(luaVM, false);
