@@ -1369,7 +1369,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 4;
         }
 
-        if (bitStream.Version() >= 0x06D)
+        if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
         {
             // Get the message type and push the argument
             bitStream.Read(ucMessageType);
@@ -1401,7 +1401,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
                 Arguments.PushNumber(ucGreen);
                 Arguments.PushNumber(ucBlue);
 
-                if (bitStream.Version() >= 0x06D)
+                if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
                 {
                     Arguments.PushNumber(ucMessageType);
                 }
