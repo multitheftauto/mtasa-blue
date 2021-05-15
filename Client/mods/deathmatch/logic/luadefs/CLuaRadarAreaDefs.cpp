@@ -14,7 +14,7 @@
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createRadarArea", CreateRadarArea},
         {"getRadarAreaColor", GetRadarAreaColor},
         {"getRadarAreaSize", GetRadarAreaSize},
@@ -26,10 +26,8 @@ void CLuaRadarAreaDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
@@ -48,7 +46,6 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setColor", "setRadarAreaColor");
 
     lua_classvariable(luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing");
-    // lua_classvariable ( luaVM, "color", "setRadarAreaColor", "getRadarAreaColor" );
     lua_classvariable(luaVM, "size", SetRadarAreaSize, OOP_GetRadarAreaSize);
 
     lua_registerclass(luaVM, "RadarArea", "Element");

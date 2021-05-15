@@ -42,9 +42,7 @@ CWebView::~CWebView()
     // Make sure we don't dead lock the CEF render thread
     m_RenderData.cv.notify_all();
 
-#ifdef MTA_DEBUG
     OutputDebugLine("CWebView::~CWebView");
-#endif
 }
 
 void CWebView::Initialise()
@@ -161,7 +159,15 @@ const SString& CWebView::GetTitle()
 void CWebView::SetRenderingPaused(bool bPaused)
 {
     if (m_pWebView)
+    {
         m_pWebView->GetHost()->WasHidden(bPaused);
+        m_bIsRenderingPaused = bPaused;
+    }
+}
+
+const bool CWebView::GetRenderingPaused() const
+{
+    return m_pWebView ? m_bIsRenderingPaused : false;
 }
 
 void CWebView::Focus(bool state)
@@ -705,22 +711,6 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-// Implementation: CefRenderHandler::OnCursorChange               //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-void CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo)
-{
-    // Find the cursor index by the cursor handle
-    unsigned char cursorIndex = static_cast<unsigned char>(type);
-
-    // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
-}
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
 // Implementation: CefLoadHandler::OnLoadStart                    //
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
 //                                                                //
@@ -1044,6 +1034,24 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
     }
 
     return true;
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefDisplayHandler::OnCursorChange              //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo& cursorInfo)
+{
+    // Find the cursor index by the cursor handle
+    unsigned char cursorIndex = static_cast<unsigned char>(type);
+
+    // Queue event to run on the main thread
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
+
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////

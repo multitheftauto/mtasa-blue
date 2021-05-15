@@ -20,7 +20,7 @@
 
 class CClientMarkerManager;
 
-class CClientMarker : public CClientStreamElement, private CClientColCallback
+class CClientMarker final : public CClientStreamElement, private CClientColCallback
 {
     DECLARE_CLASS(CClientMarker, CClientStreamElement)
     friend class CClientMarkerManager;
@@ -45,6 +45,9 @@ public:
     void GetPosition(CVector& vecPosition) const;
     void SetPosition(const CVector& vecPosition);
     bool SetMatrix(const CMatrix& matrix);
+
+    void AttachTo(CClientEntity* pEntity) override;
+    void SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation) override;
 
     void DoPulse();
 
@@ -91,6 +94,7 @@ private:
     CClientMarkerManager* m_pMarkerManager;
     CClientMarkerCommon*  m_pMarker;
 
+    CVector             m_vecPosition;
     static unsigned int m_uiStreamedInMarkers;
 
     CClientColShape* m_pCollision;

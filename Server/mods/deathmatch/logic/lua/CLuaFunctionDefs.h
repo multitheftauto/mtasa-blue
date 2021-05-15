@@ -35,12 +35,6 @@ class CLuaFunctionDefs
 public:
     static void Initialize(class CLuaManager* pLuaManager, class CGame* pClientGame);
 
-    LUA_DECLARE(CallRemote);
-    LUA_DECLARE(FetchRemote);
-    LUA_DECLARE(GetRemoteRequests);
-    LUA_DECLARE(GetRemoteRequestInfo);
-    LUA_DECLARE(AbortRemoteRequest);
-
     // Event functions
     LUA_DECLARE(AddEvent);
     LUA_DECLARE(AddEventHandler);
@@ -103,22 +97,7 @@ public:
     LUA_DECLARE(GetCommandHandlers);
 
     // Standard server functions
-    LUA_DECLARE(GetMaxPlayers);
-    LUA_DECLARE(SetMaxPlayers);
-    LUA_DECLARE(OutputChatBox);
-    LUA_DECLARE(OOP_OutputChatBox);
-    LUA_DECLARE(OutputConsole);
-    LUA_DECLARE(OutputDebugString);
-    LUA_DECLARE(OutputServerLog);
-    LUA_DECLARE(GetServerName);
-    LUA_DECLARE(GetServerHttpPort);
-    LUA_DECLARE(GetServerIP);
-    LUA_DECLARE(GetServerPassword);
-    LUA_DECLARE(SetServerPassword);
-    LUA_DECLARE(GetServerConfigSetting);
     LUA_DECLARE(SetServerConfigSetting);
-    LUA_DECLARE(ClearChatBox);
-
     LUA_DECLARE(shutdown);
 
     // Loaded Map Functions

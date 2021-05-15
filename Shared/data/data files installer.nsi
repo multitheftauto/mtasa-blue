@@ -147,8 +147,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 
-	File "${FILES_ROOT}\MTA San Andreas\mta\discord_game_sdk.dll"
-
 	SetOutPath "$INSTDIR\MTA\config"
 	File "${FILES_ROOT}\MTA San Andreas\mta\config\chatboxpresets.xml"
 
@@ -180,7 +178,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont.ttf"
 
 	SetOutPath "$INSTDIR\MTA\cgui\images"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"

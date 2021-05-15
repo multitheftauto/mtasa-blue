@@ -72,6 +72,7 @@ public:
 
     void           InitClasses(lua_State* luaVM);
     void           InitVM();
+    void           LoadEmbeddedScripts();
     const SString& GetFunctionTag(int iLuaFunction);
     int            PCall(lua_State* L, int nargs, int nresults, int errfunc);
     static int     LuaLoadBuffer(lua_State* L, const char* buff, size_t sz, const char* name);
@@ -95,7 +96,8 @@ private:
 
     class CResource* m_pResource;
 
-    std::list<CXMLFile*> m_XMLFiles;
+    std::list<CXMLFile*>                            m_XMLFiles;
+    std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
     static SString       ms_strExpectedUndumpHash;
 
     bool m_bEnableOOP;

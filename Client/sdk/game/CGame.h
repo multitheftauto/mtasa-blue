@@ -70,7 +70,6 @@ typedef void(InRenderer)();
 #include "CStreaming.h"
 #include "CTaskManagementSystem.h"
 #include "CTasks.h"
-#include "CText.h"
 #include "CTheCarGenerators.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
@@ -146,7 +145,6 @@ public:
     virtual CAESoundManager*          GetAESoundManager() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CMenuManager*             GetMenuManager() = 0;
-    virtual CText*                    GetText() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
     virtual CFont*                    GetFont() = 0;
@@ -251,4 +249,14 @@ public:
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
     virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+
+    virtual int32_t GetBaseIDforDFF() = 0;
+    virtual int32_t GetBaseIDforTXD() = 0;
+    virtual int32_t GetBaseIDforCOL() = 0;
+    virtual int32_t GetBaseIDforIPL() = 0;
+    virtual int32_t GetBaseIDforDAT() = 0;
+    virtual int32_t GetBaseIDforIFP() = 0;
+    virtual int32_t GetBaseIDforRRR() = 0;
+    virtual int32_t GetBaseIDforSCM() = 0;
+    virtual int32_t GetCountOfAllFileIDs() = 0;
 };

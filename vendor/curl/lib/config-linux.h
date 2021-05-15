@@ -16,6 +16,9 @@
 /* Default SSL backend */
 /* #undef CURL_DEFAULT_SSL_BACKEND */
 
+/* disable alt-svc */
+/* #undef CURL_DISABLE_ALTSVC */
+
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
 
@@ -33,6 +36,9 @@
 
 /* to disable FTP */
 /* #undef CURL_DISABLE_FTP */
+
+/* to disable curl_easy_options */
+/* #undef CURL_DISABLE_GETOPTIONS */
 
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
@@ -57,6 +63,9 @@
 
 /* disable mime API */
 /* #undef CURL_DISABLE_MIME */
+
+/* to disable MQTT */
+/* #undef CURL_DISABLE_MQTT */
 
 /* disable netrc parsing */
 /* #undef CURL_DISABLE_NETRC */
@@ -87,6 +96,9 @@
 
 /* to disable SMTP */
 /* #undef CURL_DISABLE_SMTP */
+
+/* to disable socketpair support */
+/* #undef CURL_DISABLE_SOCKETPAIR */
 
 /* to disable TELNET */
 /* #undef CURL_DISABLE_TELNET */
@@ -158,7 +170,7 @@
 /* #undef HAVE_BUILTIN_AVAILABLE */
 
 /* Define to 1 if you have the clock_gettime function and monotonic timer. */
-#define HAVE_CLOCK_GETTIME_MONOTONIC 1
+/* #undef HAVE_CLOCK_GETTIME_MONOTONIC */
 
 /* Define to 1 if you have the closesocket function. */
 /* #undef HAVE_CLOSESOCKET */
@@ -297,17 +309,7 @@
 /* #undef HAVE_GLIBC_STRERROR_R */
 
 /* Define to 1 if you have a working gmtime_r function. */
-#define HAVE_GMTIME_R 1
-
-/* Define to 1 if you have the `gnutls_alpn_set_protocols' function. */
-/* #undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS */
-
-/* Define to 1 if you have the `gnutls_certificate_set_x509_key_file2'
-   function. */
-/* #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2 */
-
-/* Define to 1 if you have the `gnutls_ocsp_req_init' function. */
-/* #undef HAVE_GNUTLS_OCSP_REQ_INIT */
+/* #undef HAVE_GMTIME_R */
 
 /* if you have the function gnutls_srp_verifier */
 /* #undef HAVE_GNUTLS_SRP */
@@ -332,6 +334,9 @@
 
 /* if you have MIT Kerberos */
 /* #undef HAVE_GSSMIT */
+
+/* Define to 1 if you have the <hyper.h> header file. */
+/* #undef HAVE_HYPER_H */
 
 /* Define to 1 if you have the <idn2.h> header file. */
 /* #undef HAVE_IDN2_H */
@@ -440,7 +445,10 @@
 /* #undef HAVE_LIBWOLFSSH */
 
 /* if zlib is available */
-#define HAVE_LIBZ 1
+/* #undef HAVE_LIBZ */
+
+/* Define to 1 if you have the `zstd' library (-lzstd). */
+/* #undef HAVE_LIBZSTD */
 
 /* Define to 1 if you have the <linux/tcp.h> header file. */
 #define HAVE_LINUX_TCP_H 1
@@ -452,7 +460,7 @@
 #define HAVE_LOCALE_H 1
 
 /* Define to 1 if you have a working localtime_r function. */
-#define HAVE_LOCALTIME_R 1
+/* #undef HAVE_LOCALTIME_R */
 
 /* Define to 1 if the compiler supports the 'long long' data type. */
 #define HAVE_LONGLONG 1
@@ -502,6 +510,9 @@
 /* if you have an old MIT Kerberos version, lacking GSS_C_NT_HOSTBASED_SERVICE
    */
 /* #undef HAVE_OLD_GSSMIT */
+
+/* Define to 1 if using OpenSSL 3 or later. */
+/* #undef HAVE_OPENSSL3 */
 
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 /* #undef HAVE_OPENSSL_CRYPTO_H */
@@ -556,6 +567,9 @@
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
+
+/* Define to 1 if you have the `quiche_conn_set_qlog_fd' function. */
+/* #undef HAVE_QUICHE_CONN_SET_QLOG_FD */
 
 /* Define to 1 if you have the <quiche.h> header file. */
 /* #undef HAVE_QUICHE_H */
@@ -632,8 +646,8 @@
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
 
-/* Define to 1 if you have the `SSL_get_esni_status' function. */
-/* #undef HAVE_SSL_GET_ESNI_STATUS */
+/* Define to 1 if you have the `SSL_get_ech_status' function. */
+/* #undef HAVE_SSL_GET_ECH_STATUS */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -668,9 +682,6 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the strncasecmp function. */
-#define HAVE_STRNCASECMP 1
-
 /* Define to 1 if you have the strncmpi function. */
 /* #undef HAVE_STRNCMPI */
 
@@ -678,7 +689,7 @@
 /* #undef HAVE_STRNICMP */
 
 /* Define to 1 if you have the <stropts.h> header file. */
-#define HAVE_STROPTS_H 1
+/* #undef HAVE_STROPTS_H */
 
 /* Define to 1 if you have the strstr function. */
 #define HAVE_STRSTR 1
@@ -694,6 +705,9 @@
 
 /* Define to 1 if you have the timeval struct. */
 #define HAVE_STRUCT_TIMEVAL 1
+
+/* Define to 1 if suseconds_t is an available type. */
+#define HAVE_SUSECONDS_T 1
 
 /* Define to 1 if you have the <sys/filio.h> header file. */
 /* #undef HAVE_SYS_FILIO_H */
@@ -779,6 +793,9 @@
 /* Define to 1 if you have the winber.h header file. */
 /* #undef HAVE_WINBER_H */
 
+/* Define to 1 if you have the wincrypt.h header file. */
+/* #undef HAVE_WINCRYPT_H */
+
 /* Define to 1 if you have the windows.h header file. */
 /* #undef HAVE_WINDOWS_H */
 
@@ -797,6 +814,9 @@
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
+/* if you have wolfSSL_DES_ecb_encrypt */
+/* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
+
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
 
@@ -804,7 +824,7 @@
 /* #undef HAVE_WOLFSSL_USEALPN */
 
 /* Define this symbol if your OS supports changing the contents of argv */
-/* #undef HAVE_WRITABLE_ARGV */
+#define HAVE_WRITABLE_ARGV 1
 
 /* Define to 1 if you have the writev function. */
 #define HAVE_WRITEV 1
@@ -816,7 +836,13 @@
 /* #undef HAVE_X509_H */
 
 /* if you have the zlib.h header file */
-#define HAVE_ZLIB_H 1
+/* #undef HAVE_ZLIB_H */
+
+/* if libzstd is in use */
+/* #undef HAVE_ZSTD */
+
+/* Define to 1 if you have the <zstd.h> header file. */
+/* #undef HAVE_ZSTD_H */
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
@@ -849,7 +875,7 @@
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "a suitable curl mailing list: https://curl.haxx.se/mail/"
+#define PACKAGE_BUGREPORT "a suitable curl mailing list: https://curl.se/mail/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
@@ -883,9 +909,6 @@
 
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV ssize_t
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
 
 /* Define to the type qualifier of arg 5 for select. */
 #define SELECT_QUAL_ARG5 
@@ -950,12 +973,6 @@
 /* Define to the type of arg 3 for strerror_r. */
 #define STRERROR_R_TYPE_ARG3 size_t
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#define TIME_WITH_SYS_TIME 1
-
-/* to enable alt-svc */
-/* #undef USE_ALTSVC */
-
 /* if AmiSSL is in use */
 /* #undef USE_AMISSL */
 
@@ -965,14 +982,20 @@
 /* if BearSSL is enabled */
 /* #undef USE_BEARSSL */
 
-/* if ESNI support is available */
-/* #undef USE_ESNI */
+/* if ECH support is available */
+/* #undef USE_ECH */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
-/* if GnuTLS uses nettle as crypto backend */
-/* #undef USE_GNUTLS_NETTLE */
+/* GSASL support enabled */
+/* #undef USE_GSASL */
+
+/* to enable HSTS */
+/* #undef USE_HSTS */
+
+/* if hyper is in use */
+/* #undef USE_HYPER */
 
 /* PSL support enabled */
 /* #undef USE_LIBPSL */
@@ -1007,6 +1030,9 @@
 /* if ngtcp2 is in use */
 /* #undef USE_NGTCP2 */
 
+/* if ngtcp2_crypto_gnutls is in use */
+/* #undef USE_NGTCP2_CRYPTO_GNUTLS */
+
 /* if ngtcp2_crypto_openssl is in use */
 /* #undef USE_NGTCP2_CRYPTO_OPENSSL */
 
@@ -1021,6 +1047,9 @@
 
 /* if quiche is in use */
 /* #undef USE_QUICHE */
+
+/* if rustls is enabled */
+/* #undef USE_RUSTLS */
 
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
@@ -1039,6 +1068,10 @@
 
 /* Use Unix domain sockets */
 #define USE_UNIX_SOCKETS 1
+
+/* Define to 1 if you are building a Windows target with crypto API support.
+   */
+/* #undef USE_WIN32_CRYPTO */
 
 /* Define to 1 if you have the `normaliz' (WinIDN) library (-lnormaliz). */
 /* #undef USE_WIN32_IDN */

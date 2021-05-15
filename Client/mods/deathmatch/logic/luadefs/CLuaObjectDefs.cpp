@@ -10,10 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaObjectDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Object create/destroy funcs
         {"createObject", CreateObject},
 
@@ -23,6 +24,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"isObjectBreakable", IsObjectBreakable},
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
+        {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -38,10 +40,8 @@ void CLuaObjectDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaObjectDefs::AddClass(lua_State* luaVM)
@@ -60,12 +60,14 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
+    lua_classfunction(luaVM, "isMoving", "isObjectMoving");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "setMass", "setObjectMass");
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
+    lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "mass", "setObjectMass", "getObjectMass");
@@ -209,6 +211,11 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaObjectDefs::IsObjectMoving(CClientEntity* pEntity)
+{
+    return CStaticFunctionDefinitions::IsObjectMoving(*pEntity);
 }
 
 int CLuaObjectDefs::GetObjectMass(lua_State* luaVM)

@@ -14,7 +14,7 @@
 
 void CLuaFileDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"fileOpen", fileOpen},
         {"fileCreate", fileCreate},
         {"fileExists", fileExists},
@@ -36,10 +36,8 @@ void CLuaFileDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaFileDefs::AddClass(lua_State* luaVM)
@@ -953,7 +951,7 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
         // This file wasn't closed, so we should warn
         // the scripter that they forgot to close it.
         m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
-       
+
         // Close the file and delete it from elements
         pFile->Unload();
         m_pElementDeleter->Delete(pFile);

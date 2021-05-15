@@ -103,9 +103,15 @@ void InitLocalization(bool bShowErrors)
     {
         if (!bShowErrors)
             return;
+#ifdef MTA_DEBUG
+        DisplayErrorMessageBox(("Loading core failed.  Please ensure that \n"
+                                "the latest DirectX is correctly installed and you executed win-install-data.bat"),
+                               _E("CL24"), "core-not-loadable");
+#else
         DisplayErrorMessageBox(("Loading core failed.  Please ensure that \n"
                                 "the latest DirectX is correctly installed."),
                                _E("CL24"), "core-not-loadable");
+#endif
         return ExitProcess(EXIT_ERROR);
     }
 
@@ -625,20 +631,8 @@ void ValidateGTAPath()
             _E("CL13"));
         return ExitProcess(EXIT_ERROR);
     }
-    else if (iResult == GAME_PATH_STEAM)
-    {
-        DisplayErrorMessageBox(_("It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to "
-                                 "a page where you can find information to resolve this issue."),
-                               _E("CL14"));
-        BrowseToSolution("downgrade-steam");
-        return ExitProcess(EXIT_ERROR);
-    }
 
-    SString strGTAPath = GetGTAPath();
-
-    // We can now set this
-    SetCurrentDirectory(strGTAPath);
-
+    const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     if (strGTAPath.Contains(";") || strMTASAPath.Contains(";"))
     {
@@ -829,7 +823,7 @@ void CheckDataFiles()
     if (!VerifyEmbeddedSignature(PathJoin(strMTASAPath, MTA_EXE_NAME)))
     {
         SString strMessage(_("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly."));
-        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC) && !defined(MTA_DEBUG)
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_PUBLIC_CONNECTIONS) && !defined(MTA_DEBUG)
         DisplayErrorMessageBox(strMessage, _E("CL29"), "maybe-virus1");
         #endif
     }
@@ -838,13 +832,13 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"B15F1875F447DBB2A849050E5FD6125D", "bass.dll"},
-                              {"853933A2518EBF8E966C04C2EAA95391", "bass_aac.dll"},
+    } integrityCheckList[] = {{"99E6C7CBD3775EAA1A2A7860E90FCDEE", "bass.dll"},
+                              {"0867D67B8F5A822D20EDA6D55ADE0089", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
-                              {"C176D670BF5440A6C704B55A21B01FEF", "bass_fx.dll"},
-                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
-                              {"8BF45CFAC7219673DEC8BB0ED54D0365", "bassmidi.dll"},
-                              {"5387D7484E6CAA959144DFE524BB3B05", "bassmix.dll"},
+                              {"03FB421991634C85D7AA7A914506381E", "bass_fx.dll"},
+                              {"E2A26F0C195B75D520D39EAC4E4C804B", "bassflac.dll"},
+                              {"712EE5767116D0DF439C69FB8D52FC53", "bassmidi.dll"},
+                              {"3DEF1697D07960AB940E11EE48471D58", "bassmix.dll"},
                               {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
                               {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},

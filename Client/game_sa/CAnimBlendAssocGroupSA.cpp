@@ -97,14 +97,14 @@ CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int I
     return pReturn;
 }
 
-AssocGroupId CAnimBlendAssocGroupSA::GetGroupID()
-{ 
+eAnimGroup CAnimBlendAssocGroupSA::GetGroupID()
+{
     if ((DWORD)m_pInterface < 0x250)
     {
         g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface",
             SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
     }
-    return m_pInterface->groupID; 
+    return static_cast<eAnimGroup>(m_pInterface->groupID);
 };
 
 bool CAnimBlendAssocGroupSA::IsLoaded()

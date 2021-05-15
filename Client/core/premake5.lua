@@ -11,47 +11,42 @@ project "Client Core"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			".",
 			"../sdk",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-9b",
+			"../../vendor/jpeg-9d",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk",
-			"../../vendor/discordgsdk/cpp"
+			"../../vendor/detours/4.0.1/src",
 		}
-
-	libdirs {
-		"../../vendor/detours/lib",
-		"../../vendor/discordgsdk/lib/x86",
-	}
-
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
 	vpaths {
-		["Headers/*"] = "**.h",
+		["Headers/*"] = {"**.h", "**.hpp"},
 		["Sources/*"] = "**.cpp",
 		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
 	}
 
-	links { "hwbrk" }
+	links { "detours" }
 
 	files {
 		"premake5.lua",
 		"../launch/resource/mtaicon.ico",
 		"core.rc",
 		"**.h",
+		"**.hpp",
 		"**.cpp"
 	}
 
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "discordgsdk", "discord_game_sdk.dll.lib"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext",
 	}
 
 	defines {

@@ -72,10 +72,9 @@ CLuaMain::~CLuaMain()
     delete m_pLuaTimerManager;
 
     // Eventually delete the XML files the LUA script didn't
-    list<CXMLFile*>::iterator iterXML = m_XMLFiles.begin();
-    for (; iterXML != m_XMLFiles.end(); ++iterXML)
+    for (auto& xmlFile : m_XMLFiles)
     {
-        delete *iterXML;
+        delete xmlFile;
     }
 
     // Eventually delete the text displays the LUA script didn't
@@ -168,12 +167,12 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM()
+void CLuaMain::Initialize()
 {
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open();
+    m_luaVM = lua_open(this);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
@@ -208,11 +207,18 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceRootElement());
     lua_setglobal(m_luaVM, "resourceRoot");
+}
 
-    // Load pre-loaded lua scripts
+void CLuaMain::LoadEmbeddedScripts()
+{
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+}
+
+void CLuaMain::RegisterModuleFunctions()
+{
+    m_pLuaManager->GetLuaModuleManager()->RegisterFunctions(m_luaVM);
 }
 
 // Special function(s) that are only visible to HTMLD scripts
@@ -418,8 +424,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
-    return xmlNode;
+    auto xmlStringNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)

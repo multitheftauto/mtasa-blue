@@ -143,7 +143,7 @@ void CLuaMain::InitVM()
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open();
+    m_luaVM = lua_open(this);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
@@ -182,8 +182,10 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, g_pClientGame->GetLocalPlayer());
     lua_setglobal(m_luaVM, "localPlayer");
+}
 
-    // Load pre-loaded lua scripts
+void CLuaMain::LoadEmbeddedScripts()
+{
     DECLARE_PROFILER_SECTION(OnPreLoadScript)
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
@@ -365,8 +367,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = g_pCore->GetXML()->ParseString(strXmlContent);
-    return xmlNode;
+    auto xmlStringNode = g_pCore->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)

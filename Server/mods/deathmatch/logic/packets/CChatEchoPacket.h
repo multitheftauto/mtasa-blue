@@ -31,7 +31,7 @@ enum eMessageType
     MESSAGE_TYPE_HARDCODED
 };
 
-class CChatEchoPacket : public CPacket
+class CChatEchoPacket final : public CPacket
 {
 public:
     CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false, unsigned char ucMessageType = MESSAGE_TYPE_NORMAL)

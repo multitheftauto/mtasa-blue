@@ -10,10 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaGenericDefs.h"
 
 void CLuaTeamDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Team create/destroy functions
         {"createTeam", CreateTeam},
 
@@ -33,10 +34,8 @@ void CLuaTeamDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaTeamDefs::AddClass(lua_State* luaVM)
@@ -47,7 +46,7 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFromName", "getTeamFromName");
     lua_classfunction(luaVM, "countPlayers", "countPlayersInTeam");
     lua_classfunction(luaVM, "getPlayers", "getPlayersInTeam");
-    lua_classfunction(luaVM, "outputChat", "outputChatBox", CLuaFunctionDefs::OOP_OutputChatBox);
+    lua_classfunction(luaVM, "outputChat", "outputChatBox", ArgumentParserWarn<false, CLuaGenericDefs::OOP_OutputChatBox>);
 
     lua_classfunction(luaVM, "getFriendlyFire", "getTeamFriendlyFire");
     lua_classfunction(luaVM, "getName", "getTeamName");
@@ -59,9 +58,8 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "playerCount", NULL, "countPlayersInTeam");
     lua_classvariable(luaVM, "friendlyFire", "setTeamFriendlyFire", "getTeamFriendlyFire");
-    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");            // todo: perhaps table.insert/nilvaluing?
+    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
     lua_classvariable(luaVM, "name", "setTeamName", "getTeamName");
-    // lua_classvariable ( luaVM, "color", "setTeamColor", "getTeamColor" );
 
     lua_registerclass(luaVM, "Team", "Element");
 }

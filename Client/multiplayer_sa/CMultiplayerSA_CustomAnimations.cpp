@@ -37,7 +37,7 @@ BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = nullptr;
 
 static bool bDisableCallsToCAnimBlendNode = true;
 
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId);
+eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimGroup, eAnimID* pAnimId);
 
 void CMultiplayerSA::SetAddAnimationHandler(AddAnimationHandler* pHandler)
 {
@@ -64,16 +64,16 @@ void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
     bDisableCallsToCAnimBlendNode = bDisableCalls;
 }
 
-CAnimationStyleDescriptorSAInterface* getAnimStyleDescriptorInterface(AssocGroupId animGroup)
+CAnimationStyleDescriptorSAInterface* getAnimStyleDescriptorInterface(eAnimGroup animGroup)
 {
     auto pAnimAssocDefinitionsArray = (CAnimationStyleDescriptorSAInterface*)0x8AA5A8;
-    return &pAnimAssocDefinitionsArray[animGroup];
+    return &pAnimAssocDefinitionsArray[(int)animGroup];
 }
 
-CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(eAnimGroup animGroup)
 {
     auto pAnimGroupArray = reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(*(DWORD*)0xb4ea34);
-    return &pAnimGroupArray[animGroup];
+    return &pAnimGroupArray[(int)animGroup];
 }
 
 void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
@@ -126,7 +126,7 @@ void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
     }
 }
 
-CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, AssocGroupId u32AnimGroupID, AnimationId animID)
+CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, eAnimGroup u32AnimGroupID, eAnimID animID)
 {
     auto CAnimBlendAssociation_NewOperator =
         pGameInterface->GetGameVersion() == VERSION_EU_10 ? CAnimBlendAssociation_NewOperator_EU : CAnimBlendAssociation_NewOperator_US;

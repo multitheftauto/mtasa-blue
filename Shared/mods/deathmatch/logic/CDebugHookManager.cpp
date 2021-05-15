@@ -44,6 +44,10 @@ CDebugHookManager::CDebugHookManager()
                         {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
                         {"passwordHash", {{EArgType::Password, 0}}},                    // 0=PASSWORD, ...
                         {"passwordVerify", {{EArgType::Password, 0}}},                  // 0=PASSWORD, ...
+                        {"encodeString", {{EArgType::MaxArgs, 2}}},                     // algorithm, input, 2=SECRETKEY, ...
+                        {"decodeString", {{EArgType::MaxArgs, 2}}},                     // algorithm, input, 2=SECRETKEY, ...
+                        {"teaEncode", {{EArgType::Password, 1}}},                       // input, 1=SECRETKEY
+                        {"teaDecode", {{EArgType::Password, 1}}},                       // input, 1=SECRETKEY
                     };
 }
 
@@ -570,7 +574,7 @@ void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, 
                 {
                     // Remove query portion of URL
                     SString strUrlCleaned = SString(pArgument->GetString()).ReplaceI("%3F","?").Replace("#","?").SplitLeft("?");
-                    pArgument->ReadString(strUrlCleaned);   
+                    pArgument->ReadString(strUrlCleaned);
                 }
             }
             else if (maskArgument.argType == EArgType::MaxArgs)

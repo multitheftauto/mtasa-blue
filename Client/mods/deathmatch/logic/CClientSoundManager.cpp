@@ -172,7 +172,7 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
         size_t size = strSound.size();
         void* pMemory = new char[size];
         memcpy(pMemory, strSound.data(), size);
-        if (pSound->Play((void*)pMemory, size, bLoop))
+        if (pSound->Play3D((void*)pMemory, size, bLoop))
         {
             pSound->SetPosition(vecPosition);
             return pSound;
@@ -380,7 +380,7 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
             if (MapContains(m_DistanceStreamedInMap, pSound))
                 pSound->DistanceStreamOut();
         }
-        else if (fDistance < 20) 
+        else if (fDistance < 20)
             pSound->DistanceStreamIn();
     }
 }

@@ -20,7 +20,7 @@ CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const st
     m_bChanged = false;
     m_pManager = pManager;
     m_AccountType = accountType;
-    m_strName = strName;
+    m_strName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
     m_iUserID = iUserID;
     m_strIP = strIP;
     m_strSerial = strSerial;
@@ -44,10 +44,11 @@ CAccount::~CAccount()
 
 void CAccount::SetName(const std::string& strName)
 {
-    if (m_strName != strName)
+    std::string strNewName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
+    if (m_strName != strNewName)
     {
-        m_pManager->ChangingName(this, m_strName, strName);
-        m_strName = strName;
+        m_pManager->ChangingName(this, m_strName, strNewName);
+        m_strName = std::move(strNewName);
         m_pManager->MarkAsChanged(this);
     }
 }
@@ -119,17 +120,26 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
 
     if (pData)
     {
-        if (pData->GetType() == LUA_TBOOLEAN)
+        switch (pData->GetType())
         {
-            pResult->ReadBool(pData->GetStrValue() == "true");
-        }
-        else if (pData->GetType() == LUA_TNUMBER)
-        {
+        case LUA_TBOOLEAN:
+            pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
+            break;
+
+        case LUA_TNUMBER:
             pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
-        }
-        else
-        {
+            break;
+
+        case LUA_TNIL:
+            break;
+
+        case LUA_TSTRING:
             pResult->ReadString(pData->GetStrValue());
+            break;
+
+        default:
+            dassert(0); // It never should hit this, if so, something corrupted
+            break;
         }
     }
     else

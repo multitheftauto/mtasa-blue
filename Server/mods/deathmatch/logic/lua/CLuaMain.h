@@ -102,7 +102,9 @@ public:
 
     void RegisterHTMLDFunctions();
 
-    void           InitVM();
+    void           Initialize();
+    void           LoadEmbeddedScripts();
+    void           RegisterModuleFunctions();
     const SString& GetFunctionTag(int iFunctionNumber);
     int            PCall(lua_State* L, int nargs, int nresults, int errfunc);
     void           CheckExecutionTime();
@@ -133,9 +135,10 @@ private:
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
 
-    list<CXMLFile*>     m_XMLFiles;
-    list<CTextDisplay*> m_Displays;
-    list<CTextItem*>    m_TextItems;
+    list<CXMLFile*>                                 m_XMLFiles;
+    std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
+    list<CTextDisplay*>                             m_Displays;
+    list<CTextItem*>                                m_TextItems;
 
     bool m_bEnableOOP;
 

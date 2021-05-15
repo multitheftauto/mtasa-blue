@@ -40,14 +40,39 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_pVehicle = NULL;
     m_pUpgrades = new CVehicleUpgrades(this);
     m_pClump = NULL;
-    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(static_cast<eVehicleTypes>(usModel));
+
+    // Grab the model info
+    m_pModelInfo = g_pGame->GetModelInfo(usModel);
+
+    // Apply handling
+    ushort usHandlingModelID = m_usModel;
+    if (m_usModel < 400 || m_usModel > 611)
+        usHandlingModelID = m_pModelInfo->GetParentID();
+
+    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
     m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
 
+    m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pFlyingHandlingEntry = g_pGame->GetHandlingManager()->CreateFlyingHandlingData();
+    m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
+
+    m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    if (m_pOriginalBoatHandlingEntry)
+    {
+        m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+        m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
+    }
+
+    m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    if (m_pOriginalBikeHandlingEntry)
+    {
+        m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+        m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
+    }
+
     SetTypeName("vehicle");
 
-    // Grab the model info and the bounding box
-    m_pModelInfo = g_pGame->GetModelInfo(usModel);
     m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
 
     // Set our default properties
@@ -112,10 +137,9 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bJustBlewUp = false;
     m_ucAlpha = 255;
     m_bAlphaChanged = false;
-    m_bBlowNextFrame = false;
+    m_blowAfterStreamIn = false;
     m_bIsOnGround = false;
     m_ulIllegalTowBreakTime = 0;
-    m_bBlown = false;
     m_LastSyncedData = new SLastSyncedVehData;
     m_bIsDerailed = false;
     m_bIsDerailable = true;
@@ -135,6 +159,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bEnableHeliBladeCollisions = true;
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
+    m_fWheelScale = 1.0f;
 
     for (unsigned int i = 0; i < MAX_WINDOWS; ++i)
     {
@@ -170,6 +195,10 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not yet been streamed in
     m_bJustStreamedIn = false;
+
+    // We've not changed the wheel scale
+    m_bWheelScaleChanged = false;
+    m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 }
 
 CClientVehicle::~CClientVehicle()
@@ -239,9 +268,13 @@ CClientVehicle::~CClientVehicle()
 
     delete m_pUpgrades;
     delete m_pHandlingEntry;
+    delete m_pFlyingHandlingEntry;
+    delete m_pBoatHandlingEntry;
+    delete m_pBikeHandlingEntry;
     delete m_LastSyncedData;
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle,
                                               &m_pPickedUpWinchEntity, NULL);
+    m_clientModel = nullptr;
 }
 
 void CClientVehicle::Unlink()
@@ -778,10 +811,6 @@ void CClientVehicle::SetDoorsUndamageable(bool bUndamageable)
 
 float CClientVehicle::GetHealth() const
 {
-    // If we're blown, return 0
-    if (m_bBlown)
-        return 0.0f;
-
     if (m_pVehicle)
     {
         return m_pVehicle->GetHealth();
@@ -790,34 +819,34 @@ float CClientVehicle::GetHealth() const
     return m_fHealth;
 }
 
-void CClientVehicle::SetHealth(float fHealth)
+void CClientVehicle::SetHealth(float health)
 {
+    if (health < 0.0f || IsBlown())
+        health = 0.0f;
+
+    m_fHealth = health;
+
     if (m_pVehicle)
     {
-        // Is the car is dead and we want to un-die it?
-        if (fHealth > 0.0f && GetHealth() <= 0.0f)
-        {
-            Destroy();
-            m_fHealth = fHealth;            // NEEDS to be here!
-            Create();
-        }
-        else
-        {
-            m_pVehicle->SetHealth(fHealth);
-        }
+        m_pVehicle->SetHealth(health);
     }
-    m_fHealth = fHealth;
 }
 
 void CClientVehicle::Fix()
 {
-    m_bBlown = false;
-    m_bBlowNextFrame = false;
     if (m_pVehicle)
     {
         m_pVehicle->Fix();
         // Make sure its visible, if its supposed to be
         m_pVehicle->SetVisible(m_bVisible);
+    }
+
+    m_blowAfterStreamIn = false;
+
+    if (m_blowState != VehicleBlowState::INTACT)
+    {
+        m_blowState = VehicleBlowState::INTACT;
+        ReCreate();
     }
 
     SetHealth(DEFAULT_VEHICLE_HEALTH);
@@ -898,8 +927,14 @@ void CClientVehicle::Fix()
     }
 }
 
-void CClientVehicle::Blow(bool bAllowMovement)
+void CClientVehicle::Blow(VehicleBlowFlags blow)
 {
+    if (m_blowState != VehicleBlowState::INTACT)
+        return;
+
+    m_blowState = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
+    m_fHealth = 0.0f;
+
     if (m_pVehicle)
     {
         // Make sure it can be damaged
@@ -918,13 +953,19 @@ void CClientVehicle::Blow(bool bAllowMovement)
 
         m_pVehicle->BlowUp(NULL, 0);
 
+        // Blowing up a vehicle will cause an explosion in the original game code, but we have a hook in place,
+        // which will prevent the explosion and forward the information to the server to relay it to everyone from there.
+        // That hook may call further Lua events, which could result in a fixed vehicle and we have to check for that here.
+        if (m_blowState == VehicleBlowState::INTACT)
+            return;
+
         // And force the wheel states to "burst"
         SetWheelStatus(FRONT_LEFT_WHEEL, DT_WHEEL_BURST);
         SetWheelStatus(FRONT_RIGHT_WHEEL, DT_WHEEL_BURST);
         SetWheelStatus(REAR_LEFT_WHEEL, DT_WHEEL_BURST);
         SetWheelStatus(REAR_RIGHT_WHEEL, DT_WHEEL_BURST);
 
-        if (!bAllowMovement)
+        if (!blow.withMovement)
         {
             // Make sure it doesn't change speeds (slightly cleaner for syncing)
             SetMoveSpeed(vecMoveSpeed);
@@ -934,8 +975,6 @@ void CClientVehicle::Blow(bool bAllowMovement)
         // Restore the old can be damaged state
         CalcAndUpdateCanBeDamagedFlag();
     }
-    m_fHealth = 0.0f;
-    m_bBlown = true;
 }
 
 CVehicleColor& CClientVehicle::GetColor()
@@ -1023,6 +1062,8 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Set the new vehicle id and type
         eClientVehicleType eOldVehicleType = m_eVehicleType;
         m_usModel = usModel;
+        if (m_clientModel && m_clientModel->GetModelID() != m_usModel)
+            m_clientModel = nullptr;
         m_eVehicleType = CClientVehicleManager::GetVehicleType(usModel);
         m_bHasDamageModel = CClientVehicleManager::HasDamageModel(m_eVehicleType);
 
@@ -1057,14 +1098,44 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
 
         // Reset handling to fit the vehicle
-        m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usModel);
+        ushort usHandlingModelID = usModel;
+        if (usHandlingModelID < 400 || usHandlingModelID > 611)
+            usHandlingModelID = m_pModelInfo->GetParentID();
+
+        m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usHandlingModelID);
         m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
+
+        m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData((eVehicleTypes)usHandlingModelID);
+        m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
+
+        m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData((eVehicleTypes)usHandlingModelID);
+        if (m_pOriginalBoatHandlingEntry)
+        {
+            if (!m_pBoatHandlingEntry)
+                m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+
+             m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
+        }
+
+        m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData((eVehicleTypes)usHandlingModelID);
+        if (m_pOriginalBikeHandlingEntry)
+        {
+            if (!m_pBikeHandlingEntry)
+                m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+
+            m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
+        }
+
         ApplyHandling();
 
         SetSirenOrAlarmActive(false);
 
         // clear our component data to regenerate it
         m_ComponentData.clear();
+
+        // Reset stored dummy positions
+        m_copyDummyPositions = true;
+        m_dummyPositions = {};
 
         // Create the vehicle if we're streamed in
         if (IsStreamedIn())
@@ -1109,12 +1180,6 @@ void CClientVehicle::SetEngineBroken(bool bEngineBroken)
     {
         m_pVehicle->SetEngineBroken(bEngineBroken);
         m_pVehicle->SetEngineOn(!bEngineBroken);
-
-        // We need to recreate the vehicle if we're going from broken to unbroken
-        if (!bEngineBroken && m_pVehicle->IsEngineBroken())
-        {
-            ReCreate();
-        }
     }
     m_bEngineBroken = bEngineBroken;
 }
@@ -1280,12 +1345,6 @@ bool CClientVehicle::IsUpsideDown() const
 
     // TODO: Figure out this using matrix?
     return false;
-}
-
-bool CClientVehicle::IsBlown() const
-{
-    // Game layer functions aren't reliable
-    return m_bBlown;
 }
 
 bool CClientVehicle::IsSirenOrAlarmActive()
@@ -1455,6 +1514,11 @@ bool CClientVehicle::IsWheelCollided(unsigned char ucWheel)
         return m_pVehicle->IsWheelCollided(ucWheel);
     }
     return true;
+}
+
+int CClientVehicle::GetWheelFrictionState(unsigned char ucWheel)
+{
+    return m_pVehicle->GetWheelFrictionState(ucWheel);
 }
 
 unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
@@ -2239,10 +2303,20 @@ void CClientVehicle::StreamedInPulse()
             m_bJustStreamedIn = false;
         }
 
-        if (m_bBlowNextFrame)
+        if (m_blowAfterStreamIn)
         {
-            Blow(false);
-            m_bBlowNextFrame = false;
+            m_blowAfterStreamIn = false;
+
+            VehicleBlowState previousBlowState = m_blowState;
+            m_blowState = VehicleBlowState::INTACT;
+
+            VehicleBlowFlags blow;
+            blow.withMovement = false;
+            blow.withExplosion = (previousBlowState == VehicleBlowState::AWAITING_EXPLOSION_SYNC);
+            Blow(blow);
+
+            if (m_blowState != VehicleBlowState::INTACT)
+                m_blowState = previousBlowState;
         }
 
         // Handle door ratio auto reallowment
@@ -2263,7 +2337,7 @@ void CClientVehicle::StreamedInPulse()
         }
 
         // Are we an unmanned, invisible, blown-up plane?
-        if (!GetOccupant() && m_eVehicleType == CLIENTVEHICLE_PLANE && m_bBlown && !m_pVehicle->IsVisible())
+        if (!GetOccupant() && m_eVehicleType == CLIENTVEHICLE_PLANE && IsBlown() && !m_pVehicle->IsVisible())
         {
             // Disable our collisions
             m_pVehicle->SetUsesCollision(false);
@@ -2375,20 +2449,6 @@ void CClientVehicle::StreamedInPulse()
                 pCarriage = pCarriage->m_pPreviousLink;
             }
         }
-
-        /*
-        // Are we blown?
-        if ( m_bBlown )
-        {
-            // Has our engine status been reset to on_fire somewhere?
-            CDamageManager* pDamageManager = m_pVehicle->GetDamageManager ();
-            if ( pDamageManager->GetEngineStatus () == DT_ENGINE_ON_FIRE )
-            {
-                // Change it back to fucked
-                pDamageManager->SetEngineStatus ( DT_ENGINE_ENGINE_PIPES_BURST );
-            }
-        }
-        */
 
         // Limit burnout turn speed to ensure smoothness
         if (m_pDriver)
@@ -2701,9 +2761,7 @@ void CClientVehicle::Create()
             m_pVehicle->SetAlpha(m_ucAlpha);
 
         m_pVehicle->SetHealth(m_fHealth);
-
-        if (m_bBlown || m_fHealth == 0.0f)
-            m_bBlowNextFrame = true;
+        m_blowAfterStreamIn = IsBlown();
 
         CalcAndUpdateCanBeDamagedFlag();
 
@@ -2819,13 +2877,39 @@ void CClientVehicle::Create()
         if (m_pHandlingEntry)
         {
             m_pVehicle->SetHandlingData(m_pHandlingEntry);
+            m_pVehicle->SetFlyingHandlingData(m_pFlyingHandlingEntry);
+
+            switch (m_eVehicleType)
+            {
+                case CLIENTVEHICLE_BOAT:
+                    dynamic_cast<CBoat*>(m_pVehicle)->SetBoatHandlingData(m_pBoatHandlingEntry);
+                    break;
+                case CLIENTVEHICLE_BIKE:
+                case CLIENTVEHICLE_BMX:
+                    dynamic_cast<CBike*>(m_pVehicle)->SetBikeHandlingData(m_pBikeHandlingEntry);
+                    break;
+            }
 
             if (m_bHasCustomHandling)
                 ApplyHandling();
         }
+
+        // Applying wheel upgrades can change these values.
+        // We should keep track of the original values to restore them
+        bool  bPreviousWheelScaleChanged = m_bWheelScaleChanged;
+        float fPreviousWheelScale = m_fWheelScale;
+
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if (m_pUpgrades)
             m_pUpgrades->ReAddAll();
+
+        // Restore custom wheel scale
+        if (bPreviousWheelScaleChanged)
+        {
+            m_pVehicle->SetWheelScale(fPreviousWheelScale);
+            m_fWheelScale = fPreviousWheelScale;
+            m_bWheelScaleChanged = true;
+        }
 
         if (m_ComponentData.empty())
         {
@@ -2921,6 +3005,20 @@ void CClientVehicle::Create()
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
 
+        // Copy or apply our vehicle dummy positions
+        if (m_copyDummyPositions)
+        {
+            const CVector* positions = m_pVehicle->GetDummyPositions();
+            std::copy(positions, positions + VEHICLE_DUMMY_COUNT, m_dummyPositions.begin());
+        }
+        else
+        {
+            for (size_t i = 0; i < VEHICLE_DUMMY_COUNT; ++i)
+            {
+                m_pVehicle->SetDummyPosition(static_cast<eVehicleDummies>(i), m_dummyPositions[i]);
+            }
+        }
+
         // We've just been streamed in
         m_bJustStreamedIn = true;
 
@@ -2954,6 +3052,21 @@ void CClientVehicle::Destroy()
         m_fHeliRotorSpeed = GetHeliRotorSpeed();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible();
         m_pHandlingEntry = m_pVehicle->GetHandlingData();
+        m_pFlyingHandlingEntry = m_pVehicle->GetFlyingHandlingData();
+
+        switch (m_eVehicleType)
+        {
+            case CLIENTVEHICLE_BOAT:
+                m_pBoatHandlingEntry = dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
+                break;
+            case CLIENTVEHICLE_BIKE:
+            case CLIENTVEHICLE_BMX:
+                m_pBikeHandlingEntry = dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
+                break;
+            default:
+                break;
+        }
+
         if (m_eVehicleType == CLIENTVEHICLE_CAR || m_eVehicleType == CLIENTVEHICLE_PLANE || m_eVehicleType == CLIENTVEHICLE_QUADBIKE)
         {
             m_pVehicle->GetTurretRotation(&m_fTurretHorizontal, &m_fTurretVertical);
@@ -2981,14 +3094,19 @@ void CClientVehicle::Destroy()
         {
             // Only remove him physically. Don't let the ped update us
             pPed->InternalRemoveFromVehicle(m_pVehicle);
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE))
+                pPed->SetWarpInToVehicleRequired(true);
         }
 
         // Remove all the passengers physically
+        bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
         for (unsigned int i = 0; i < 8; i++)
         {
-            if (m_pPassengers[i])
+            CClientPed* pPassenger = m_pPassengers[i];
+            if (pPassenger)
             {
-                m_pPassengers[i]->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->SetWarpInToVehicleRequired(bWarpInToVehicleRequired);
             }
         }
 
@@ -3016,7 +3134,7 @@ void CClientVehicle::Destroy()
             // Force the trailer to stream out
             GetTowedVehicle()->StreamOut();
         }
-        
+
         if (m_pTowedByVehicle)
         {
             m_pVehicle->BreakTowLink();
@@ -3598,11 +3716,32 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+    switch (m_usModel)
+    {
+        case VT_BAGGAGE:
+        case VT_BANDITO:
+        case VT_BFINJECT:
+        case VT_CADDY:
+        case VT_DOZER:
+        case VT_FORKLIFT:
+        case VT_KART:
+        case VT_MOWER:
+        case VT_QUAD:
+        case VT_RCBANDIT:
+        case VT_RCCAM:
+        case VT_RCGOBLIN:
+        case VT_RCRAIDER:
+        case VT_RCTIGER:
+        case VT_TRACTOR:
+        case VT_VORTEX:
+            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
-    // Keep the bonet and boot intact
-    ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+            // Keep the bonet and boot intact
+            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
+            break;
+        default:
+            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+    }
 }
 
 void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ)
@@ -4248,10 +4387,15 @@ void CClientVehicle::UnpairPedAndVehicle(CClientPed* pClientPed)
 
 void CClientVehicle::ApplyHandling()
 {
-    if (m_pVehicle)
-        m_pVehicle->RecalculateHandling();
-
     m_bHasCustomHandling = true;
+
+    if (!m_pVehicle)
+        return;
+
+    m_pVehicle->RecalculateHandling();
+
+    if (m_eVehicleType == CLIENTVEHICLE_BMX || m_eVehicleType == CLIENTVEHICLE_BIKE)
+        dynamic_cast<CBike*>(m_pVehicle)->RecalculateBikeHandling();
 }
 
 CHandlingEntry* CClientVehicle::GetHandlingData()
@@ -4265,6 +4409,51 @@ CHandlingEntry* CClientVehicle::GetHandlingData()
         return m_pHandlingEntry;
     }
     return NULL;
+}
+
+CFlyingHandlingEntry* CClientVehicle::GetFlyingHandlingData()
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetFlyingHandlingData();
+    }
+    else if (m_pFlyingHandlingEntry)
+    {
+        return m_pFlyingHandlingEntry;
+    }
+    return nullptr;
+}
+
+CBoatHandlingEntry* CClientVehicle::GetBoatHandlingData()
+{
+    if (m_eVehicleType != CLIENTVEHICLE_BOAT)
+        return NULL;
+
+    if (m_pVehicle)
+    {
+        return reinterpret_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
+    }
+    else if (m_pBoatHandlingEntry)
+    {
+        return m_pBoatHandlingEntry;
+    }
+    return nullptr;
+}
+
+CBikeHandlingEntry* CClientVehicle::GetBikeHandlingData()
+{
+    if (m_eVehicleType != CLIENTVEHICLE_BIKE && m_eVehicleType != CLIENTVEHICLE_BMX)
+        return nullptr;
+
+    if (m_pVehicle)
+    {
+        return reinterpret_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
+    }
+    else if (m_pBikeHandlingEntry)
+    {
+        return m_pBikeHandlingEntry;
+    }
+    return nullptr;
 }
 
 CSphere CClientVehicle::GetWorldBoundingSphere()
@@ -4877,6 +5066,60 @@ bool CClientVehicle::OnVehicleFallThroughMap()
     return false;
 }
 
+bool CClientVehicle::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        position = m_dummyPositions[dummy];
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        m_dummyPositions[dummy] = position;
+        m_copyDummyPositions = false;
+
+        if (m_pVehicle != nullptr)
+            return m_pVehicle->SetDummyPosition(dummy, position);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::ResetDummyPositions()
+{
+    if (m_pVehicle)
+    {
+        std::array<CVector, VEHICLE_DUMMY_COUNT> positions;
+
+        if (!m_pModelInfo->GetVehicleDummyPositions(positions))
+            return false;
+
+        for (size_t i = 0; i < positions.size(); ++i)
+        {
+            SetDummyPosition(static_cast<eVehicleDummies>(i), positions[i]);
+        }
+
+        return true;
+    }
+    else
+    {
+        if (m_copyDummyPositions)
+            return false;
+
+        m_copyDummyPositions = true;
+        m_dummyPositions = {};
+        return true;
+    }
+}
+
 bool CClientVehicle::DoesNeedToWaitForGroundToLoad()
 {
     if (!g_pGame->IsASyncLoadingEnabled())
@@ -4955,4 +5198,40 @@ bool CClientVehicle::IsWindowOpen(uchar ucWindow)
         return m_bWindowOpen[ucWindow];
     }
     return false;
+}
+
+void CClientVehicle::SetWheelScale(float fWheelScale)
+{
+    if (m_pVehicle)
+    {
+        m_pVehicle->SetWheelScale(fWheelScale);
+    }
+    m_fWheelScale = fWheelScale;
+
+    m_bWheelScaleChanged = true;
+}
+
+float CClientVehicle::GetWheelScale()
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetWheelScale();
+    }
+    return m_fWheelScale;
+}
+
+// This function is meant to be called after GTA resets wheel scale
+// (i.e. after installing a wheel upgrade)
+void CClientVehicle::ResetWheelScale()
+{
+    assert(m_pUpgrades);
+
+    // The calculation of the default wheel scale is based on original GTA code at functions
+    // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
+    if (m_pUpgrades->GetSlotState(12) != 0)
+        m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE);
+    else
+        m_fWheelScale = 1.0f;
+
+    m_bWheelScaleChanged = false;
 }
