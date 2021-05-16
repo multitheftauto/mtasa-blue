@@ -24,17 +24,17 @@
 
 enum eMessageType
 {
-    MESSAGE_TYPE_NORMAL,
+    MESSAGE_TYPE_PLAYER,
     MESSAGE_TYPE_ACTION,
     MESSAGE_TYPE_TEAM,
     MESSAGE_TYPE_PRIVATE,
-    MESSAGE_TYPE_HARDCODED
+    MESSAGE_TYPE_INTERNAL
 };
 
 class CChatEchoPacket final : public CPacket
 {
 public:
-    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false, unsigned char ucMessageType = MESSAGE_TYPE_NORMAL)
+    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false, unsigned char ucMessageType = MESSAGE_TYPE_PLAYER)
     {
         m_strMessage = strMessage;
         m_ucRed = ucRed;
