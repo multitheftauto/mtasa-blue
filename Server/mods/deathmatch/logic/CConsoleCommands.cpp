@@ -588,7 +588,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         if (bContinue)
                                         {
                                             // Send it to the player
-                                            pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_TEAM));
+                                            pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
 
                                             // Send a reponse to the player who sent it
                                             pEchoClient->SendEcho(SString("-> %s: %s", pPlayer->GetNick(), szMessage));
@@ -601,7 +601,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLogger::LogPrintf("CONSOLEMSG: %s to %s: %s\n", szNick, pPlayer->GetNick(), szMessage);
 
                                         // Send it to the player
-                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_TEAM));
+                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
                                         break;
                                     }
                                     case CClient::CLIENT_SCRIPT:
@@ -610,7 +610,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLogger::LogPrintf("SCRIPTMSG: %s to %s: %s\n", szNick, pPlayer->GetNick(), szMessage);
 
                                         // Send it to the player
-                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_TEAM));
+                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
                                         break;
                                     }
                                     default:
