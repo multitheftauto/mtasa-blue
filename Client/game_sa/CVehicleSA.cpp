@@ -204,6 +204,16 @@ void CVehicleSA::Init()
     GetVehicleInterface()->m_pVehicle = this;
     g_bVehiclePointerInvalid = false;
 
+    CModelInfo* modelInfo = pGame->GetModelInfo(GetModelIndex());
+
+    if (modelInfo != nullptr)
+    {
+        for (size_t i = 0; i < m_dummyPositions.size(); ++i)
+        {
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((eVehicleDummies)i);
+        }
+    }
+
     // Unlock doors as they spawn randomly with locked doors
     LockDoors(false);
 
@@ -725,8 +735,8 @@ bool CVehicleSA::AreSwingingDoorsAllowed() const
 
 bool CVehicleSA::AreDoorsLocked()
 {
-    return (GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED || GetVehicleInterface()->m_doorLock == DOOR_LOCK_COP_CAR || 
-            GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED_PLAYER_INSIDE || GetVehicleInterface()->m_doorLock == DOOR_LOCK_SKIP_SHUT_DOORS || 
+    return (GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED || GetVehicleInterface()->m_doorLock == DOOR_LOCK_COP_CAR ||
+            GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED_PLAYER_INSIDE || GetVehicleInterface()->m_doorLock == DOOR_LOCK_SKIP_SHUT_DOORS ||
             GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKOUT_PLAYER_ONLY);
 }
 
@@ -1950,19 +1960,24 @@ void CVehicleSA::SetBikeWheelStatus(BYTE bWheel, BYTE bStatus)
 bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    switch (vehicle->m_type)
+    switch ((VehicleClass)vehicle->m_vehicleClass)
     {
-        case 0:
+        case VehicleClass::AUTOMOBILE:
             if (eWheelPosition < 4)
                 return vehicle->m_wheelCollisionState[eWheelPosition] == 4.f;
             break;
-
-        case 9:
+        case VehicleClass::BIKE:
             if (eWheelPosition < 2)
                 return *(float*)((DWORD)vehicle + 0x730 + eWheelPosition * 8) == 4.f || *(float*)((DWORD)vehicle + 0x734 + eWheelPosition * 8) == 4.f;
             break;
     }
     return false;
+}
+
+int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
+{
+    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
+    return vehicle->m_wheelFrictionState[eWheelPosition];
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
@@ -2662,6 +2677,63 @@ void CVehicleSA::UpdateLandingGearPosition()
         }
     }
 }
+
+bool CVehicleSA::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+{
+    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    {
+        position = m_dummyPositions[dummy];
+        return true;
+    }
+
+    return false;
+}
+
+bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+{
+    if (dummy < 0 || dummy >= VEHICLE_DUMMY_COUNT)
+        return false;
+
+    auto vehicle = reinterpret_cast<CVehicleSAInterface*>(m_pInterface);
+
+    m_dummyPositions[dummy] = position;
+
+    if (dummy == ENGINE)
+    {
+        if (vehicle->m_overheatParticle != nullptr)
+            CFxSystemSA::SetPosition(vehicle->m_overheatParticle, position);
+
+        if (vehicle->m_fireParticle != nullptr)
+            CFxSystemSA::SetPosition(vehicle->m_fireParticle, position);
+    }
+
+    bool isAutomobileClass = static_cast<VehicleClass>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
+
+    if (isAutomobileClass)
+    {
+        SetAutomobileDummyPosition(reinterpret_cast<CAutomobileSAInterface*>(m_pInterface), dummy, position);
+    }
+
+    return true;
+}
+
+//
+// NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
+//
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position)
+{
+    if (dummy == EXHAUST)
+    {
+        if (automobile->pNitroParticle[0] != nullptr)
+            CFxSystemSA::SetPosition(automobile->pNitroParticle[0], position);
+    }
+    else if (dummy == EXHAUST_SECONDARY)
+    {
+        if (automobile->pNitroParticle[1] != nullptr)
+            CFxSystemSA::SetPosition(automobile->pNitroParticle[1], position);
+    }
+}
+
 // Change plate text of existing vehicle
 bool CVehicleSA::SetPlateText(const SString& strText)
 {

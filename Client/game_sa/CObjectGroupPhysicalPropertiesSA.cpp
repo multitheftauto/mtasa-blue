@@ -13,7 +13,7 @@
 #include "CObjectGroupPhysicalPropertiesSA.h"
 extern CGameSA* pGame;
 
-CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = (CObjectGroupPhysicalPropertiesSAInterface*)ARRAY_ObjectGroupsDynamicInfo;
+CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = *(CObjectGroupPhysicalPropertiesSAInterface**)(0x59F857 + 6);
 std::unordered_map<unsigned char, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
 
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA() : m_pInterface(nullptr)
@@ -22,7 +22,7 @@ CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA() : m_pInterf
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup) : m_ucObjectGroup(ucObjectGroup)
 {
     m_pInterface = &pObjectInfo[ucObjectGroup];
-    m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);    
+    m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);
 }
 
 CObjectGroupPhysicalPropertiesSAInterface* CObjectGroupPhysicalPropertiesSA::GetInterface() const

@@ -21,6 +21,10 @@
  *
  * $Id: scim_utility.cpp,v 1.48.2.5 2006/11/02 04:11:51 suzhe Exp $
  */
+#pragma once
+
+#include "SharedUtil.IntTypes.h"
+#include <string>
 
 /* Return code if invalid. (xxx_mbtowc, xxx_wctomb) */
 #define RET_ILSEQ      0
@@ -218,7 +222,6 @@ std::wstring utf8_mbstowcs(const std::string& str)
             sn += un;
         }
         size_t usedsize = ptr - buffer;
-        dassert(usedsize < cCharacters);
         return std::wstring(buffer, usedsize);
     }
     else
@@ -255,7 +258,6 @@ std::string utf8_wcstombs(const std::wstring& wstr)
             ptr += utf8_wctomb((unsigned char*)ptr, wstr[i], 6);
         }
         size_t usedsize = ptr - buffer;
-        dassert(usedsize < cBytes);
         return std::string(buffer, usedsize);
     }
     else

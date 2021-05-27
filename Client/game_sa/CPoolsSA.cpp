@@ -97,21 +97,21 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
-        eVehicleModelTypes eVehicleModelType = (eVehicleModelTypes)pGame->GetModelInfo(eVehicleType)->GetVehicleType();
-        
-        switch (eVehicleModelType)
-	    {
-            case eVehicleModelTypes::BOAT:
+        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
+
+        switch (vehicleClass)
+        {
+            case VehicleClass::BOAT:
                 pVehicle = new CBoatSA(eVehicleType, ucVariation, ucVariation2);
                 break;
-            case eVehicleModelTypes::BMX:
-            case eVehicleModelTypes::BIKE:
+            case VehicleClass::BMX:
+            case VehicleClass::BIKE:
                 pVehicle = new CBikeSA(eVehicleType, ucVariation, ucVariation2);
                 break;
             default:
                 pVehicle = new CVehicleSA(eVehicleType, ucVariation, ucVariation2);
                 break;
-	    }
+        }
 
         if (!AddVehicleToPool(pClientVehicle, pVehicle))
         {
@@ -147,20 +147,19 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInter
             }
             else
             {
-        
-                switch ((eVehicleModelTypes)pInterface->m_type)
-	             {
-                    case eVehicleModelTypes::BOAT:
-                         pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
+                switch ((VehicleClass)pInterface->m_vehicleClass)
+                {
+                    case VehicleClass::BOAT:
+                        pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
                         break;
-                    case eVehicleModelTypes::BMX:
-                    case eVehicleModelTypes::BIKE:
+                    case VehicleClass::BMX:
+                    case VehicleClass::BIKE:
                         pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
                         break;
                     default:
                         pVehicle = new CVehicleSA(pInterface);
                         break;
-	             }
+                }
 
                 if (!AddVehicleToPool(pClientVehicle, pVehicle))
                 {
@@ -499,6 +498,23 @@ CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
     }
 
     return NULL;
+}
+
+CObject* CPoolsSA::GetObjectFromIndex(std::uint32_t elementIndexInPool)
+{
+    if (elementIndexInPool >= MAX_OBJECTS)
+        return nullptr;
+    auto objectPool = *m_ppObjectPoolInterface;
+    if (objectPool->IsEmpty(elementIndexInPool))
+        return nullptr;
+    CObjectSAInterface* pInterface = objectPool->GetObject(elementIndexInPool);
+    if (pInterface)
+    {
+        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[elementIndexInPool].pEntity;
+        if (pObject)
+            return pObject;
+    }
+    return nullptr;
 }
 
 void CPoolsSA::DeleteAllObjects()
@@ -1051,7 +1067,10 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     // Finally search model info array
     CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-    for (uint i = 1; i < 20000; i++)
+
+    unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
+
+    for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
         CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
         if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
