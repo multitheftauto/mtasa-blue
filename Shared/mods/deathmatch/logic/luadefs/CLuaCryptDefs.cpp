@@ -294,6 +294,57 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
+            case StringEncryptFunction::AES128:
+            {
+                SString& key = options["key"];
+                SString& iv = options["iv"];
+
+                if (key.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                if (iv.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'iv'");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key, iv] {
+                                // Execute time-consuming task
+                                SString result = SharedUtil::Aes128encode(data, key, iv);
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    arguments.PushString(result);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString result = SharedUtil::Aes128encode(data, key, iv);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
             default:
             {
                 m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
@@ -369,6 +420,57 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 {
                     SString result;
                     SharedUtil::TeaDecode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
+            case StringEncryptFunction::AES128:
+            {
+                SString& key = options["key"];
+                SString& iv = options["iv"];
+
+                if (key.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                if (iv.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'iv'");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key, iv] {
+                                // Execute time-consuming task
+                                SString result = SharedUtil::Aes128decode(data, key, iv);
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    arguments.PushString(result);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString result = SharedUtil::Aes128decode(data, key, iv);
                     lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;
