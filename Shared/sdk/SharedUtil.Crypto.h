@@ -33,53 +33,55 @@ namespace SharedUtil
 
     inline SString Aes128encode(const SString& sData, const SString& sKey, const SString& sIv)
     {
-		SString result;
+        SString result;
 
-		CryptoPP::byte iv[ CryptoPP::AES::BLOCKSIZE ];
-		CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ];
+        CryptoPP::byte iv[ CryptoPP::AES::BLOCKSIZE ];
+        CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ];
 
-		memcpy(iv, sIv.c_str(), CryptoPP::AES::BLOCKSIZE );
-		memcpy(key, sKey.c_str(), CryptoPP::AES::DEFAULT_KEYLENGTH);
+        memcpy(iv, sIv.c_str(), sIv.length());
+        memcpy(key, sKey.c_str(), sKey.length());
 
-		CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
-		CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption( aesEncryption, iv );
+        CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+        CryptoPP::CTR_Mode_ExternalCipher::Encryption ctrEncryption(aesEncryption, iv);
 
-		try
-		{
-			CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink( result ) );
-			stfEncryptor.Put( reinterpret_cast<const unsigned char*>( sData.c_str() ), sData.length() );
-			stfEncryptor.MessageEnd();
-		}
-		catch(const CryptoPP::Exception& exception) {
-			return exception.what();
-		}
+        try
+        {
+            CryptoPP::StreamTransformationFilter stfEncryptor(ctrEncryption, new CryptoPP::StringSink(result));
+            stfEncryptor.Put((const CryptoPP::byte*)&sData[0], sData.size());
+            stfEncryptor.MessageEnd();
+        }
+        catch (const CryptoPP::Exception& exception)
+        {
+            return "";
+        }
 
-		return result;
+        return result;
     }
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, const SString& sIv)
     {
-		SString result;
+        SString result;
 
-		CryptoPP::byte iv[ CryptoPP::AES::BLOCKSIZE ];
-		CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ];
+        CryptoPP::byte iv[ CryptoPP::AES::BLOCKSIZE ];
+        CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ];
 
-		memcpy(iv, sIv.c_str(), CryptoPP::AES::BLOCKSIZE );
-		memcpy(key, sKey.c_str(), CryptoPP::AES::DEFAULT_KEYLENGTH);
+        memcpy(iv, sIv.c_str(), sIv.length());
+        memcpy(key, sKey.c_str(), sKey.length());
 
-		CryptoPP::AES::Decryption aesDecryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
-    	CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption( aesDecryption, iv );
+        CryptoPP::AES::Encryption aesDecryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+        CryptoPP::CTR_Mode_ExternalCipher::Encryption ctrDecryption(aesDecryption, iv);
 
-		try
-		{
-			CryptoPP::StreamTransformationFilter stfDecryptor(cbcDecryption, new CryptoPP::StringSink( result ) );
-			stfDecryptor.Put( reinterpret_cast<const unsigned char*>( sData.c_str() ), sData.size() );
-			stfDecryptor.MessageEnd();
-		}
-		catch(const CryptoPP::Exception& exception) {
-			return exception.what();
-		}
+        try
+        {
+            CryptoPP::StreamTransformationFilter stfDecryptor(ctrDecryption, new CryptoPP::StringSink(result));
+            stfDecryptor.Put((const CryptoPP::byte*)&sData[0], sData.size());
+            stfDecryptor.MessageEnd();
+        }
+        catch(const CryptoPP::Exception& exception)
+        {
+            return "";
+        }
 
-		return result;
+        return result;
     }
 }            // namespace SharedUtil
