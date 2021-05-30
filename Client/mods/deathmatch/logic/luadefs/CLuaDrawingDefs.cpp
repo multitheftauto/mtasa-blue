@@ -214,13 +214,14 @@ int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 {
-    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color =
+    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, [bool flipUV,] element material, int width [, int color =
     //  white,
     //                          float faceX, float faceY, float faceZ ] )
     CVector          vecBegin;
     CVector          vecEnd;
+    bool             bFlipUV;
     CClientMaterial* pMaterial;
-    float            fWidth;
+    float            fWidth;   
     SColor           color;
     bool             bPostGUI;
     CVector          vecFaceToward;
@@ -229,8 +230,9 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
     argStream.ReadVector3D(vecEnd);
+    argStream.ReadIfNextIsBool(bFlipUV, false);
     argStream.ReadUserData(pMaterial);
-    argStream.ReadNumber(fWidth);
+    argStream.ReadNumber(fWidth);    
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
@@ -241,7 +243,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bUseFaceToward,
+        g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bFlipUV, bUseFaceToward,
                                                          vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
@@ -258,13 +260,14 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
 {
     //  bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float
     //  vsize,
-    //                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
+    //                                  [bool flipUV,] element material, int width, [int color = white, float faceX, float faceY, float faceZ ] )
     CVector          vecBegin;
     CVector          vecEnd;
     CVector2D        vecSectionPos;
     CVector2D        vecSectionSize;
+    bool             bFlipUV;
     CClientMaterial* pMaterial;
-    float            fWidth;
+    float            fWidth;    
     SColor           color;
     bool             bPostGUI;
     CVector          vecFaceToward;
@@ -275,8 +278,9 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadVector3D(vecEnd);
     argStream.ReadVector2D(vecSectionPos);
     argStream.ReadVector2D(vecSectionSize);
+    argStream.ReadIfNextIsBool(bFlipUV, false);
     argStream.ReadUserData(pMaterial);
-    argStream.ReadNumber(fWidth);
+    argStream.ReadNumber(fWidth);    
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
@@ -288,7 +292,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), vecSectionPos.fX, vecSectionPos.fY,
-                                                         vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward, bPostGUI);
+                                                         vecSectionSize.fX, vecSectionSize.fY, false, bFlipUV, bUseFaceToward, vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }

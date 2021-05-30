@@ -2653,6 +2653,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // CMatrix              (48)    - matrix
         // unsigned char        (1)     - vehicle id
         // float                (4)     - health
+        // unsigned char        (1)     - blow state (if supported)
         // unsigned char        (1)     - color 1
         // unsigned char        (1)     - color 2
         // unsigned char        (1)     - color 3
@@ -3202,6 +3203,35 @@ retry:
                         return;
                     }
 
+                    // Read out blow state
+                    VehicleBlowState blowState = VehicleBlowState::INTACT;
+                    unsigned char    rawBlowState = 0;
+
+                    if (bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+                    {
+                        if (!bitStream.ReadBits(&rawBlowState, 2))
+                        {
+                            RaiseEntityAddError(75);
+                            return;
+                        }
+
+                        switch (rawBlowState)
+                        {
+                            case 1:
+                                blowState = VehicleBlowState::AWAITING_EXPLOSION_SYNC;
+                                break;
+                            case 2:
+                                blowState = VehicleBlowState::BLOWN;
+                                break;
+                        }
+                    }
+                    else if (health.data.fValue <= 0.0f)
+                    {
+                        // Blow state is not supported by the server and we are required to blow the vehicle
+                        // if the health is equal to or below zero
+                        blowState = VehicleBlowState::AWAITING_EXPLOSION_SYNC;
+                    }
+
                     // Read out the color
                     CVehicleColor vehColor;
                     uchar         ucNumColors = 0;
@@ -3255,8 +3285,9 @@ retry:
                         return;
                     }
 
-                    // Set the health, color and paintjob
+                    // Set the health, blow state, color and paintjob
                     pVehicle->SetHealth(health.data.fValue);
+                    pVehicle->SetBlowState(blowState);
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
@@ -4398,6 +4429,19 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
     if (bHasOrigin && !bitStream.Read(OriginID))
         return;
 
+    // Explosion sync may include information, whether a vehicle was blown without an explosion
+    bool isVehicleResponsible = false;
+    bool blowVehicleWithoutExplosion = false;
+
+    if (bHasOrigin && bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+    {
+        if (!bitStream.ReadBit(isVehicleResponsible))
+            return;
+
+        if (isVehicleResponsible && !bitStream.ReadBit(blowVehicleWithoutExplosion))
+            return;
+    }
+
     // Read out the position
     SPositionSync position(false);
     if (!bitStream.Read(&position))
@@ -4503,17 +4547,34 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
             case EXP_TYPE_CAR_QUICK:
             case EXP_TYPE_HELI:
             {
-                // Make sure the vehicle's blown
-                CClientVehicle* pExplodingVehicle = static_cast<CClientVehicle*>(pOrigin);
-                pExplodingVehicle->Blow(false);
+                CClientVehicle* vehicle = static_cast<CClientVehicle*>(pOrigin);
+
+                if (blowVehicleWithoutExplosion)
+                    bCancelExplosion = true;
+
+                // Make sure the vehicle is blown (even if fixed before)
+                if (vehicle->GetBlowState() == VehicleBlowState::INTACT)
+                {
+                    VehicleBlowFlags blow;
+                    blow.withMovement = false;
+                    blow.withExplosion = !bCancelExplosion;
+                    vehicle->Blow(blow);
+                }
+
+                // Change the blow state only if the vehicle wasn't fixed
+                if (vehicle->GetBlowState() != VehicleBlowState::INTACT)
+                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
 
                 // Call onClientVehicleExplode
-                CLuaArguments Arguments;
-                pExplodingVehicle->CallEvent("onClientVehicleExplode", Arguments, true);
+                CLuaArguments arguments;
+                arguments.PushBoolean(!bCancelExplosion);            // withExplosion
+                vehicle->CallEvent("onClientVehicleExplode", arguments, true);
 
                 if (!bCancelExplosion)
+                {
                     g_pClientGame->m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, position.data.vecPosition, pCreator, true, -1.0f, false,
                                                                              WEAPONTYPE_EXPLOSION);
+                }
                 break;
             }
             default:
