@@ -170,7 +170,7 @@
 /* #undef HAVE_BUILTIN_AVAILABLE */
 
 /* Define to 1 if you have the clock_gettime function and monotonic timer. */
-#define HAVE_CLOCK_GETTIME_MONOTONIC 1
+/* #undef HAVE_CLOCK_GETTIME_MONOTONIC */
 
 /* Define to 1 if you have the closesocket function. */
 /* #undef HAVE_CLOSESOCKET */
@@ -309,7 +309,7 @@
 /* #undef HAVE_GLIBC_STRERROR_R */
 
 /* Define to 1 if you have a working gmtime_r function. */
-#define HAVE_GMTIME_R 1
+/* #undef HAVE_GMTIME_R */
 
 /* if you have the function gnutls_srp_verifier */
 /* #undef HAVE_GNUTLS_SRP */
@@ -445,7 +445,7 @@
 /* #undef HAVE_LIBWOLFSSH */
 
 /* if zlib is available */
-#define HAVE_LIBZ 1
+/* #undef HAVE_LIBZ */
 
 /* Define to 1 if you have the `zstd' library (-lzstd). */
 /* #undef HAVE_LIBZSTD */
@@ -460,7 +460,7 @@
 #define HAVE_LOCALE_H 1
 
 /* Define to 1 if you have a working localtime_r function. */
-#define HAVE_LOCALTIME_R 1
+/* #undef HAVE_LOCALTIME_R */
 
 /* Define to 1 if the compiler supports the 'long long' data type. */
 #define HAVE_LONGLONG 1
@@ -682,9 +682,6 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the strncasecmp function. */
-#define HAVE_STRNCASECMP 1
-
 /* Define to 1 if you have the strncmpi function. */
 /* #undef HAVE_STRNCMPI */
 
@@ -796,6 +793,9 @@
 /* Define to 1 if you have the winber.h header file. */
 /* #undef HAVE_WINBER_H */
 
+/* Define to 1 if you have the wincrypt.h header file. */
+/* #undef HAVE_WINCRYPT_H */
+
 /* Define to 1 if you have the windows.h header file. */
 /* #undef HAVE_WINDOWS_H */
 
@@ -836,7 +836,7 @@
 /* #undef HAVE_X509_H */
 
 /* if you have the zlib.h header file */
-#define HAVE_ZLIB_H 1
+/* #undef HAVE_ZLIB_H */
 
 /* if libzstd is in use */
 /* #undef HAVE_ZSTD */
@@ -910,9 +910,6 @@
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV ssize_t
 
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
-
 /* Define to the type qualifier of arg 5 for select. */
 #define SELECT_QUAL_ARG5 
 
@@ -976,9 +973,6 @@
 /* Define to the type of arg 3 for strerror_r. */
 #define STRERROR_R_TYPE_ARG3 size_t
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#define TIME_WITH_SYS_TIME 1
-
 /* if AmiSSL is in use */
 /* #undef USE_AMISSL */
 
@@ -994,8 +988,8 @@
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
-/* if GnuTLS uses nettle as crypto backend */
-/* #undef USE_GNUTLS_NETTLE */
+/* GSASL support enabled */
+/* #undef USE_GSASL */
 
 /* to enable HSTS */
 /* #undef USE_HSTS */
@@ -1054,6 +1048,9 @@
 /* if quiche is in use */
 /* #undef USE_QUICHE */
 
+/* if rustls is enabled */
+/* #undef USE_RUSTLS */
+
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
 
@@ -1071,6 +1068,10 @@
 
 /* Use Unix domain sockets */
 #define USE_UNIX_SOCKETS 1
+
+/* Define to 1 if you are building a Windows target with crypto API support.
+   */
+/* #undef USE_WIN32_CRYPTO */
 
 /* Define to 1 if you have the `normaliz' (WinIDN) library (-lnormaliz). */
 /* #undef USE_WIN32_IDN */

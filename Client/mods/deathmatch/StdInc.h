@@ -47,7 +47,6 @@
 #include <ijsify.h>
 #include <Common.h>
 #include "net/Packets.h"
-#include "net/rpc_enums.h"
 #include "Enums.h"
 #include "net/SyncStructures.h"
 #include "CIdArray.h"
