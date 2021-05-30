@@ -4,7 +4,7 @@
 #define HAVE_SYS_STAT_H 1
 #define HAVE_SYS_TYPES_H 1
 /* #undef HAVE_UNISTD_H */
-#define HAVE_WINDOWS_H 1
+/* #undef HAVE_WINDOWS_H */
 #define HAVE_STDINT_H 1                                                   
 #define HAVE_INTTYPES_H 1    
 
