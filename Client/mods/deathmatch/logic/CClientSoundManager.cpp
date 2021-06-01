@@ -380,7 +380,7 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
             if (MapContains(m_DistanceStreamedInMap, pSound))
                 pSound->DistanceStreamOut();
         }
-        else if (fDistance < 20) 
+        else if (fDistance < 20)
             pSound->DistanceStreamIn();
     }
 }

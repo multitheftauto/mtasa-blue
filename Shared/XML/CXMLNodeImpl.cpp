@@ -553,3 +553,14 @@ void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankL
     SString strComment = " " + SString::Join("\n", lineList) + " ";
     pCommentNode->SetValue(strComment);
 }
+
+std::string CXMLNodeImpl::ToString()
+{
+    TiXmlPrinter printer;
+    printer.SetIndent("\t");
+
+    if (m_pNode->Accept(&printer))
+        return {printer.CStr()};
+
+    return {};
+}

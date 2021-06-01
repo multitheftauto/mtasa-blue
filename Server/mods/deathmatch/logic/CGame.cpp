@@ -511,9 +511,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pWaterManager = new CWaterManager;
-    m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
+    m_pScriptDebugging = new CScriptDebugging();
     m_pMapManager = new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager,
-                                    m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pLuaManager, m_pGroups,
+                                    m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups,
                                     &m_Events, m_pScriptDebugging, &m_ElementDeleter);
     m_pACLManager = new CAccessControlListManager;
     m_pHqComms = new CHqComms;
@@ -521,9 +521,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager,
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager,
                               m_pBanManager, m_pACLManager);
-    m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
+    m_pMainConfig = new CMainConfig(m_pConsole);
     m_pRPCFunctions = new CRPCFunctions;
 
     m_pWeaponStatsManager = new CWeaponStatManager();
@@ -1242,7 +1242,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06E)
+    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
@@ -1272,6 +1272,9 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals(&Player);
+
+    // Tell client the transfer box visibility
+    CStaticFunctionDefinitions::SendClientTransferBoxVisibility(&Player);
 
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
@@ -1468,6 +1471,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
+    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
     // Blip events
 
@@ -1522,6 +1526,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
 
     // Ped events
+    m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
+    m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
     m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
 
@@ -1534,6 +1540,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
+    m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
@@ -1921,8 +1929,14 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     {
         pPed->SetIsDead(true);
         pPed->SetPosition(Packet.m_vecPosition);
+
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPed->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -1974,8 +1988,13 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPlayer->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -2605,17 +2624,23 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                             case 7:             // EXP_TYPE_HELI
                             case 12:            // EXP_TYPE_TINY - RC Vehicles
                             {
-                                CVehicle* pVehicle = static_cast<CVehicle*>(pOrigin);
-                                // Is this vehicle not already blown?
-                                if (pVehicle->GetIsBlown() == false)
-                                {
-                                    pVehicle->SetIsBlown(true);
+                                CVehicle*        vehicle = static_cast<CVehicle*>(pOrigin);
+                                VehicleBlowState previousBlowState = vehicle->GetBlowState();
 
-                                    // Call the onVehicleExplode event
-                                    CLuaArguments Arguments;
-                                    pVehicle->CallEvent("onVehicleExplode", Arguments);
-                                    // Update our engine State
-                                    pVehicle->SetEngineOn(false);
+                                if (previousBlowState != VehicleBlowState::BLOWN)
+                                {
+                                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                    vehicle->SetEngineOn(false);
+
+                                    // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
+                                    if (previousBlowState == VehicleBlowState::INTACT)
+                                    {
+                                        CLuaArguments arguments;
+                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                        vehicle->CallEvent("onVehicleExplode", arguments);
+                                    }
+
+                                    bBroadcast = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
                                 }
                                 else
                                 {
@@ -2711,18 +2736,108 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
         // Joined?
         if (pPlayer->IsJoined())
         {
-            // Grab the vehicle with the chosen ID
-            ElementID     ID = Packet.GetID();
-            unsigned char ucAction = Packet.GetAction();
-
-            // Spawned?
-            if (pPlayer->IsSpawned())
+            // Grab the ped with the chosen ID
+            ElementID PedID = Packet.GetPedID();
+            CElement* pPedElement = CElementIDs::GetElement(PedID);
+            if (pPedElement && IS_PED(pPedElement))
             {
-                CElement* pVehicleElement = CElementIDs::GetElement(ID);
-                if (pVehicleElement && IS_VEHICLE(pVehicleElement))
-                {
-                    CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
+                CPed* pPed = static_cast<CPed*>(pPedElement);
+                bool  bValidPed = false;
+                bool  bValidVehicle = false;
+                CSendList sendListIncompatiblePlayers;
 
+                // Grab the vehicle with the chosen ID
+                ElementID VehicleID = Packet.GetVehicleID();
+                CElement* pVehicleElement = CElementIDs::GetElement(VehicleID);
+                if (!pVehicleElement || !IS_VEHICLE(pVehicleElement))
+                {
+                    // Tell the client we failed
+                    CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                    pPlayer->Send(Reply);
+                    return;
+                }
+                CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
+
+                // Grab the action
+                unsigned char ucAction = Packet.GetAction();
+
+                if (pPed)
+                {
+                    if (pPed->IsPlayer())
+                    {
+                        // Make sure the source player is also the ped
+                        CPlayer* pPlayerPed = static_cast<CPlayer*>(pPed);
+                        if (pPlayerPed == pPlayer)
+                        {
+                            bValidPed = true;
+                        }
+                        switch (ucAction)
+                        {
+                            // Check if we are finishing a jacking sequence
+                            case VEHICLE_NOTIFY_JACK:
+                            case VEHICLE_NOTIFY_JACK_ABORT:
+                            {
+                                // Are we jacking a ped?
+                                CPed* pJacked = pVehicle->GetOccupant(0);
+                                if (pJacked && !pJacked->IsPlayer())
+                                {
+                                    // Check that all clients have a compatible bitstream
+                                    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+                                    {
+                                        CPlayer* pSendPlayer = *iter;
+                                        if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
+                                        {
+                                            if (pSendPlayer->IsJoined())
+                                                // Store this player as incompatible for later
+                                                // This happens because the player joined during a player jacking a ped
+                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Make sure the source player is the syncer of the ped
+                        if (pPed->GetSyncer() == pPlayer)
+                        {
+                            bValidPed = true;
+
+                            // Check that all clients have a compatible bitstream when we have a ped enter/exit
+                            for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+                            {
+                                CPlayer* pSendPlayer = *iter;
+                                if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
+                                {
+                                    switch (ucAction)
+                                    {
+                                        // Is he requesting to start enter/exit then reject it
+                                        case VEHICLE_REQUEST_IN:
+                                        case VEHICLE_REQUEST_OUT:
+                                        case VEHICLE_NOTIFY_FELL_OFF:
+                                        {
+                                            bValidPed = false;
+                                            break;
+                                        }
+                                        // Otherwise allow it to move on
+                                        default:
+                                        {
+                                            if (pSendPlayer->IsJoined())
+                                                // Store this player as incompatible for later
+                                                // This happens because the player joined during a ped enter/exit
+                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Check we have a valid ped & he is spawned
+                if (bValidPed)
+                {
                     // Handle it depending on the action
                     switch (ucAction)
                     {
@@ -2748,17 +2863,17 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (!CVehicleManager::IsTrailer(usVehicleModel))
                             {
                                 // He musn't already be doing something
-                                if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_NONE)
+                                if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
                                 {
                                     // He musn't already be in a vehicle
-                                    if (!pPlayer->GetOccupiedVehicle())
+                                    if (!pPed->GetOccupiedVehicle())
                                     {
                                         float fCutoffDistance = 50.0f;
                                         bool  bWarpIn = false;
                                         // Jax: is he in water and trying to get in a floating vehicle
                                         // Cazomino05: changed to check if the vehicle is in water not player
-                                        if ((pPlayer->IsInWater() || Packet.GetOnWater()) && (usVehicleModel == VT_SKIMMER || usVehicleModel == VT_SEASPAR ||
-                                                                                              usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
+                                        if ((pPed->IsInWater() || Packet.GetOnWater()) && (usVehicleModel == VT_SKIMMER || usVehicleModel == VT_SEASPAR ||
+                                                                                            usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
                                         {
                                             fCutoffDistance = 10.0f;
                                             bWarpIn = true;
@@ -2775,13 +2890,13 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                             fCutoffDistance = 10.0f;
 
                                         // Is he close enough to the vehicle?
-                                        if (IsPointNearPoint3D(pPlayer->GetPosition(), pVehicle->GetPosition(), fCutoffDistance))
+                                        if (IsPointNearPoint3D(pPed->GetPosition(), pVehicle->GetPosition(), fCutoffDistance))
                                         {
                                             unsigned char ucSeat = Packet.GetSeat();
                                             unsigned char ucDoor = Packet.GetDoor();
 
-                                            // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player
-                                            // on the first seat being the vehicle syncer (Todo)
+                                            // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the
+                                            // player on the first seat being the vehicle syncer (Todo)
                                             if (pVehicle->GetVehicleType() == VEHICLE_TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle())
                                                 ucSeat++;
 
@@ -2792,22 +2907,22 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                 if (!pOccupant)
                                                 {
                                                     // Mark him as entering the vehicle
-                                                    pPlayer->SetOccupiedVehicle(pVehicle, 0);
-                                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_ENTERING);
+                                                    pPed->SetOccupiedVehicle(pVehicle, 0);
+                                                    pPed->SetVehicleAction(CPlayer::VEHICLEACTION_ENTERING);
                                                     pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
-                                                    Arguments.PushElement(pPlayer);            // player
-                                                    Arguments.PushNumber(0);                   // seat
-                                                    Arguments.PushBoolean(false);              // jacked
-                                                    Arguments.PushNumber(ucDoor);              // Door
+                                                    Arguments.PushElement(pPed);             // player / ped
+                                                    Arguments.PushNumber(0);                 // seat
+                                                    Arguments.PushBoolean(false);            // jacked
+                                                    Arguments.PushNumber(ucDoor);            // Door
                                                     if (pVehicle->CallEvent("onVehicleStartEnter", Arguments))
                                                     {
-                                                        // HACK?: check the player's vehicle-action is still the same (not warped in?)
-                                                        if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_ENTERING)
+                                                        // HACK?: check the ped's vehicle-action is still the same (not warped in?)
+                                                        if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                                                         {
-                                                            // Force the player as the syncer of the vehicle to which they are entering
+                                                            // Force the player (or ped syncer) as the syncer of the vehicle to which they are entering
                                                             m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
 
                                                             if (bWarpIn)
@@ -2815,26 +2930,25 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                                 // Unmark him as entering the vehicle so WarpPedIntoVehicle will work
                                                                 if (!pVehicle->m_bOccupantChanged)
                                                                 {
-                                                                    pPlayer->SetOccupiedVehicle(NULL, 0);
+                                                                    pPed->SetOccupiedVehicle(NULL, 0);
                                                                     pVehicle->SetOccupant(NULL, 0);
                                                                 }
 
-                                                                if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPlayer, pVehicle, 0))
+                                                                if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, 0))
                                                                 {
                                                                     bFailed = false;
                                                                 }
                                                                 else
                                                                 {
                                                                     // Warp failed
-                                                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                                                     failReason = FAIL_SCRIPT;
                                                                 }
                                                             }
                                                             else
                                                             {
                                                                 // Tell everyone he can start entering the vehicle from his current position
-                                                                CVehicleInOutPacket Reply(ID, 0, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor);
-                                                                Reply.SetSourceElement(pPlayer);
+                                                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor);
                                                                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                                                 bFailed = false;
                                                             }
@@ -2844,54 +2958,73 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                     {
                                                         if (!pVehicle->m_bOccupantChanged)
                                                         {
-                                                            pPlayer->SetOccupiedVehicle(NULL, 0);
+                                                            pPed->SetOccupiedVehicle(NULL, 0);
                                                             pVehicle->SetOccupant(NULL, 0);
                                                         }
-                                                        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                                        pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    // TODO: support jacking peds (not simple!)
-                                                    // Is the jacked person a player and stationary in the car (ie not getting in or out)
-                                                    if (IS_PLAYER(pOccupant) && pOccupant->GetVehicleAction() == CPlayer::VEHICLEACTION_NONE)
+                                                    bool bValidOccupant = false;
+                                                    // Is the jacked ped stationary in the car (ie not getting in or out)
+                                                    if (IS_PED(pOccupant) && pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
+                                                    {
+                                                        bValidOccupant = true;
+                                                        // Check if we are jacking a ped
+                                                        if (!IS_PLAYER(pOccupant))
+                                                        {
+                                                            // Check that all clients have a compatible bitstream
+                                                            for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+                                                            {
+                                                                CPlayer* pSendPlayer = *iter;
+                                                                if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
+                                                                {
+                                                                    bValidOccupant = false;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (bValidOccupant)
                                                     {
                                                         // He's now jacking the car and the occupant is getting jacked
-                                                        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_JACKING);
-                                                        pPlayer->SetJackingVehicle(pVehicle);
-                                                        pVehicle->SetJackingPlayer(pPlayer);
-                                                        pOccupant->SetVehicleAction(CPlayer::VEHICLEACTION_JACKED);
+                                                        pPed->SetVehicleAction(CPed::VEHICLEACTION_JACKING);
+                                                        pPed->SetJackingVehicle(pVehicle);
+                                                        pVehicle->SetJackingPed(pPed);
+                                                        pOccupant->SetVehicleAction(CPed::VEHICLEACTION_JACKED);
 
                                                         // Call the entering vehicle event
                                                         CLuaArguments EnterArguments;
-                                                        EnterArguments.PushElement(pPlayer);              // player
+                                                        EnterArguments.PushElement(pPed);                 // player / ped
                                                         EnterArguments.PushNumber(0);                     // seat
                                                         EnterArguments.PushElement(pOccupant);            // jacked
                                                         EnterArguments.PushNumber(ucDoor);                // Door
                                                         if (pVehicle->CallEvent("onVehicleStartEnter", EnterArguments))
                                                         {
-                                                            // HACK?: check the player's vehicle-action is still the same (not warped in?)
-                                                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_JACKING)
+                                                            // HACK?: check the peds vehicle-action is still the same (not warped in?)
+                                                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
                                                             {
                                                                 // Call the exiting vehicle event
                                                                 CLuaArguments ExitArguments;
-                                                                ExitArguments.PushElement(pOccupant);            // player
+                                                                ExitArguments.PushElement(pOccupant);            // player / ped
                                                                 ExitArguments.PushNumber(ucSeat);                // seat
-                                                                ExitArguments.PushElement(pPlayer);              // jacker
+                                                                ExitArguments.PushElement(pPed);              // jacker
                                                                 if (pVehicle->CallEvent("onVehicleStartExit", ExitArguments))
                                                                 {
                                                                     // HACK?: check the player's vehicle-action is still the same (not warped out?)
-                                                                    if (pOccupant->GetVehicleAction() == CPlayer::VEHICLEACTION_JACKED)
+                                                                    if (pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_JACKED)
                                                                     {
-                                                                        /* Jax: we don't need to worry about a syncer if we already have and will have a driver
+                                                                        /* Jax: we don't need to worry about a syncer if we already have and will have a
+                                                                        driver
                                                                         // Force the player as the syncer of the vehicle to which they are entering
                                                                         m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
                                                                         */
 
                                                                         // Broadcast a jack message (tells him he can get in, but he must jack it)
-                                                                        CVehicleInOutPacket Reply(ID, 0, VEHICLE_REQUEST_JACK_CONFIRMED, ucDoor);
-                                                                        Reply.SetSourceElement(pPlayer);
+                                                                        CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_REQUEST_JACK_CONFIRMED, ucDoor);
                                                                         m_pPlayerManager->BroadcastOnlyJoined(Reply);
 
                                                                         bFailed = false;
@@ -2901,8 +3034,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                         }
                                                         else
                                                         {
-                                                            pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
-                                                            pOccupant->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                                            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+                                                            pOccupant->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                                             failReason = FAIL_SCRIPT_2;
                                                         }
                                                     }
@@ -2921,20 +3054,20 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                 if (ucSeat <= 8)
                                                 {
                                                     // Mark him as entering the vehicle
-                                                    pPlayer->SetOccupiedVehicle(pVehicle, ucSeat);
-                                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_ENTERING);
+                                                    pPed->SetOccupiedVehicle(pVehicle, ucSeat);
+                                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_ENTERING);
                                                     pVehicle->m_bOccupantChanged = false;
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
-                                                    Arguments.PushElement(pPlayer);            // player
-                                                    Arguments.PushNumber(ucSeat);              // seat
-                                                    Arguments.PushBoolean(false);              // jacked
-                                                    Arguments.PushNumber(ucDoor);              // Door
+                                                    Arguments.PushElement(pPed);             // player / ped
+                                                    Arguments.PushNumber(ucSeat);            // seat
+                                                    Arguments.PushBoolean(false);            // jacked
+                                                    Arguments.PushNumber(ucDoor);            // Door
                                                     if (pVehicle->CallEvent("onVehicleStartEnter", Arguments))
                                                     {
                                                         // HACK?: check the player's vehicle-action is still the same (not warped in?)
-                                                        if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_ENTERING)
+                                                        if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                                                         {
                                                             if (bWarpIn)
                                                             {
@@ -2945,22 +3078,21 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                                     pVehicle->SetOccupant(NULL, ucSeat);
                                                                 }
 
-                                                                if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPlayer, pVehicle, ucSeat))
+                                                                if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, ucSeat))
                                                                 {
                                                                     bFailed = false;
                                                                 }
                                                                 else
                                                                 {
                                                                     // Warp failed
-                                                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                                                     failReason = FAIL_SCRIPT;
                                                                 }
                                                             }
                                                             else
                                                             {
                                                                 // Tell everyone he can start entering the vehicle from his current position
-                                                                CVehicleInOutPacket Reply(ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor);
-                                                                Reply.SetSourceElement(pPlayer);
+                                                                CVehicleInOutPacket Reply(PedID, VehicleID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor);
                                                                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                                                 bFailed = false;
                                                             }
@@ -2970,10 +3102,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                     {
                                                         if (!pVehicle->m_bOccupantChanged)
                                                         {
-                                                            pPlayer->SetOccupiedVehicle(NULL, 0);
+                                                            pPed->SetOccupiedVehicle(NULL, 0);
                                                             pVehicle->SetOccupant(NULL, ucSeat);
                                                         }
-                                                        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                                        pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                                         failReason = FAIL_SCRIPT;
                                                     }
                                                 }
@@ -2996,8 +3128,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (bFailed)
                             {
                                 // He can't get in
-                                CVehicleInOutPacket Reply(ID, 0, VEHICLE_ATTEMPT_FAILED);
-                                Reply.SetSourceElement(pPlayer);
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
                                 Reply.SetFailReason((unsigned char)failReason);
                                 // Was he too far away from the vehicle?
                                 if (failReason == FAIL_DISTANCE)
@@ -3015,33 +3146,35 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         case VEHICLE_NOTIFY_IN:
                         {
                             // Is he entering?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_ENTERING)
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
                                 // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                                if (pPlayer == pVehicle->GetOccupant(ucOccupiedSeat))
+                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     // Mark him as successfully entered
-                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                                     // Update our engine State
                                     pVehicle->SetEngineOn(true);
 
                                     // Tell everyone he's in (they should warp him in)
-                                    CVehicleInOutPacket Reply(ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_RETURN);
-                                    Reply.SetSourceElement(pPlayer);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
 
                                     // Call the player->vehicle event
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pVehicle);                 // vehice
+                                    Arguments.PushElement(pVehicle);                 // vehicle
                                     Arguments.PushNumber(ucOccupiedSeat);            // seat
                                     Arguments.PushBoolean(false);                    // jacked
-                                    pPlayer->CallEvent("onPlayerVehicleEnter", Arguments);
+                                    if (pPed->IsPlayer())
+                                        pPed->CallEvent("onPlayerVehicleEnter", Arguments);
+                                    else
+                                        pPed->CallEvent("onPedVehicleEnter", Arguments);
 
                                     // Call the vehicle->player event
                                     CLuaArguments Arguments2;
-                                    Arguments2.PushElement(pPlayer);                  // player
+                                    Arguments2.PushElement(pPed);                     // player / ped
                                     Arguments2.PushNumber(ucOccupiedSeat);            // seat
                                     Arguments2.PushBoolean(false);                    // jacked
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
@@ -3055,28 +3188,33 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         case VEHICLE_NOTIFY_IN_ABORT:
                         {
                             // Is he entering?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_ENTERING)
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
                                 // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                                if (pPlayer == pVehicle->GetOccupant(ucOccupiedSeat))
+                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     unsigned char ucDoor = Packet.GetDoor();
                                     float         fDoorAngle = Packet.GetDoorAngle();
 
                                     // Mark that he's in no vehicle
-                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
-                                    pPlayer->SetOccupiedVehicle(NULL, 0);
+                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+                                    pPed->SetOccupiedVehicle(NULL, 0);
                                     pVehicle->SetOccupant(NULL, ucOccupiedSeat);
 
                                     // Update the door angle.
                                     pVehicle->SetDoorOpenRatio(ucDoor + 2, fDoorAngle);
 
-                                    // Tell everyone he's in (they should warp him in)
-                                    CVehicleInOutPacket Reply(ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
-                                    Reply.SetSourceElement(pPlayer);
+                                    // Tell everyone he's out (they should warp him out)
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
                                     Reply.SetDoorAngle(fDoorAngle);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                    if (!sendListIncompatiblePlayers.empty())
+                                    {
+                                        CBitStream BitStream;
+                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                    }
                                 }
                             }
 
@@ -3087,50 +3225,46 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         case VEHICLE_REQUEST_OUT:
                         {
                             // Is he getting jacked?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_NONE)
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
                             {
-                                // Does it have an occupant and is the occupant the requesting player?
-                                unsigned ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                                if (pPlayer == pVehicle->GetOccupant(ucOccupiedSeat))
+                                // Does it have an occupant and is the occupant the requesting ped?
+                                unsigned ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     // Call the exiting vehicle event
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pPlayer);                    // player
+                                    Arguments.PushElement(pPed);                       // player / ped
                                     Arguments.PushNumber(ucOccupiedSeat);              // seat
                                     Arguments.PushBoolean(false);                      // jacked
                                     Arguments.PushNumber(Packet.GetDoor());            // door being used
-                                    if (pVehicle->CallEvent("onVehicleStartExit", Arguments) && pPlayer->GetOccupiedVehicle() == pVehicle)
+                                    if (pVehicle->CallEvent("onVehicleStartExit", Arguments) && pPed->GetOccupiedVehicle() == pVehicle)
                                     {
                                         // Mark him as exiting the vehicle
-                                        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_EXITING);
+                                        pPed->SetVehicleAction(CPed::VEHICLEACTION_EXITING);
 
                                         // Tell everyone he can start exiting the vehicle
-                                        CVehicleInOutPacket Reply(ID, ucOccupiedSeat, VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
-                                        Reply.SetSourceElement(pPlayer);
+                                        CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
                                         m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                     }
                                     else
                                     {
                                         // Tell him he can't exit (script denied it or he was
                                         // already warped out)
-                                        CVehicleInOutPacket Reply(ID, 0, VEHICLE_ATTEMPT_FAILED);
-                                        Reply.SetSourceElement(pPlayer);
+                                        CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
                                         pPlayer->Send(Reply);
                                     }
                                 }
                                 else
                                 {
                                     // Tell him he can't exit
-                                    CVehicleInOutPacket Reply(ID, 0, VEHICLE_ATTEMPT_FAILED);
-                                    Reply.SetSourceElement(pPlayer);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
                                     pPlayer->Send(Reply);
                                 }
                             }
                             else
                             {
                                 // Tell him he can't exit
-                                CVehicleInOutPacket Reply(ID, 0, VEHICLE_ATTEMPT_FAILED);
-                                Reply.SetSourceElement(pPlayer);
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
                                 pPlayer->Send(Reply);
                             }
 
@@ -3141,36 +3275,45 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         case VEHICLE_NOTIFY_OUT:
                         {
                             // Is he already getting out?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_EXITING)
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                             {
-                                // Does it have an occupant and is the occupant the requesting player?
-                                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                                if (pPlayer == pVehicle->GetOccupant(ucOccupiedSeat))
+                                // Does it have an occupant and is the occupant the requesting ped?
+                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
-                                    // Mark the player/vehicle as empty
+                                    // Mark the ped/vehicle as empty
                                     pVehicle->SetOccupant(NULL, ucOccupiedSeat);
-                                    pPlayer->SetOccupiedVehicle(NULL, 0);
-                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                    pPed->SetOccupiedVehicle(NULL, 0);
+                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-                                    // Force the player that just left the vehicle as the syncer
+                                    // Force the player (or ped syncer) that just left the vehicle as the syncer
                                     m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
 
                                     // Tell everyone he can start exiting the vehicle
-                                    CVehicleInOutPacket Reply(ID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN);
-                                    Reply.SetSourceElement(pPlayer);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                    if (!sendListIncompatiblePlayers.empty())
+                                    {
+                                        // Warp the ped out of the vehicle manually for incompatible players
+                                        CBitStream BitStream;
+                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                    }
 
-                                    // Call the player->vehicle event
+                                    // Call the ped->vehicle event
                                     CLuaArguments Arguments;
                                     Arguments.PushElement(pVehicle);                 // vehicle
                                     Arguments.PushNumber(ucOccupiedSeat);            // seat
                                     Arguments.PushBoolean(false);                    // jacker
                                     Arguments.PushBoolean(false);                    // forcedByScript
-                                    pPlayer->CallEvent("onPlayerVehicleExit", Arguments);
+                                    if (pPed->IsPlayer())
+                                        pPed->CallEvent("onPlayerVehicleExit", Arguments);
+                                    else
+                                        pPed->CallEvent("onPedVehicleExit", Arguments);
 
                                     // Call the vehicle->player event
                                     CLuaArguments Arguments2;
-                                    Arguments2.PushElement(pPlayer);                  // player
+                                    Arguments2.PushElement(pPed);                     // player / ped
                                     Arguments2.PushNumber(ucOccupiedSeat);            // seat
                                     Arguments2.PushBoolean(false);                    // jacker
                                     Arguments2.PushBoolean(false);                    // forcedByScript
@@ -3184,19 +3327,18 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         // Vehicle out aborted notification?
                         case VEHICLE_NOTIFY_OUT_ABORT:
                         {
-                            // Is he entering?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_EXITING)
+                            // Is he exiting?
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                             {
                                 // Is he the occupant?
-                                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                                if (pPlayer == pVehicle->GetOccupant(ucOccupiedSeat))
+                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
-                                    // Mark that he's in no vehicle
-                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                    // Mark that he's no longer exiting
+                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                                     // Tell everyone he's in (they should warp him in)
-                                    CVehicleInOutPacket Reply(ID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_ABORT_RETURN);
-                                    Reply.SetSourceElement(pPlayer);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_ABORT_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                 }
                             }
@@ -3206,34 +3348,40 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                         case VEHICLE_NOTIFY_FELL_OFF:
                         {
-                            // Check that the player is in the given vehicle
-                            unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                            if (pVehicle->GetOccupant(ucOccupiedSeat) == pPlayer)
+                            // Check that the ped is in the given vehicle
+                            unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                            if (pVehicle->GetOccupant(ucOccupiedSeat) == pPed)
                             {
                                 // Remove him from the vehicle
-                                pPlayer->SetOccupiedVehicle(NULL, 0);
+                                pPed->SetOccupiedVehicle(NULL, 0);
                                 pVehicle->SetOccupant(NULL, ucOccupiedSeat);
 
-                                // Force the player that just left the vehicle as the syncer
+                                // Force the player (or ped syncer) that just left the vehicle as the syncer
                                 m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
 
-                                pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                 // Tell the other players about it
-                                CVehicleInOutPacket Reply(ID, ucOccupiedSeat, VEHICLE_NOTIFY_FELL_OFF_RETURN);
-                                Reply.SetSourceElement(pPlayer);
+                                CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_FELL_OFF_RETURN);
                                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
 
-                                // Call the player->vehicle event
+                                // Call the ped->vehicle event
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pVehicle);                 // vehicle
                                 Arguments.PushNumber(ucOccupiedSeat);            // seat
                                 Arguments.PushBoolean(false);                    // jacker
                                 Arguments.PushBoolean(false);                    // forcedByScript
-                                pPlayer->CallEvent("onPlayerVehicleExit", Arguments);
+                                if (pPed->IsPlayer())
+                                {
+                                    pPed->CallEvent("onPlayerVehicleExit", Arguments);
+                                }
+                                else
+                                {
+                                    pPed->CallEvent("onPedVehicleExit", Arguments);
+                                }
 
                                 // Call the vehicle->player event
                                 CLuaArguments Arguments2;
-                                Arguments2.PushElement(pPlayer);                  // player
+                                Arguments2.PushElement(pPed);                     // player / ped
                                 Arguments2.PushNumber(ucOccupiedSeat);            // seat
                                 Arguments2.PushBoolean(false);                    // jacker
                                 Arguments2.PushBoolean(false);                    // forcedByScript
@@ -3245,88 +3393,104 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                         case VEHICLE_NOTIFY_JACK:            // Finished jacking him
                         {
-                            // Is the sender jacking?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_JACKING)
+                            // Is the ped jacking?
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
                             {
-                                // Grab the jacked player
+                                // Grab the jacked ped
                                 CPed* pJacked = pVehicle->GetOccupant(0);
                                 if (pJacked)
                                 {
                                     // TODO! CHECK THE CAR ID
-                                    // Throw the jacked player out
+                                    // Throw the jacked ped out
                                     pJacked->SetOccupiedVehicle(NULL, 0);
-                                    pJacked->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                    pJacked->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-                                    // Put the jacking player into it
-                                    pPlayer->SetOccupiedVehicle(pVehicle, 0);
-                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
-                                    pPlayer->SetJackingVehicle(NULL);
-                                    pVehicle->SetJackingPlayer(NULL);
+                                    // Put the jacking ped into it
+                                    pPed->SetOccupiedVehicle(pVehicle, 0);
+                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+                                    pPed->SetJackingVehicle(NULL);
+                                    pVehicle->SetJackingPed(NULL);
 
                                     // Tell everyone about it
-                                    ElementID           PlayerID = pPlayer->GetID();
                                     ElementID           JackedID = pJacked->GetID();
-                                    CVehicleInOutPacket Reply(ID, 0, VEHICLE_NOTIFY_JACK_RETURN, PlayerID, JackedID);
-                                    Reply.SetSourceElement(pPlayer);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_NOTIFY_JACK_RETURN, PedID, JackedID);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
 
-                                    // Execute the player->vehicle script function for the jacked player
+                                    // Execute the ped->vehicle script function for the jacked ped
                                     CLuaArguments ArgumentsExit;
                                     ArgumentsExit.PushElement(pVehicle);            // vehicle
                                     ArgumentsExit.PushNumber(0);                    // seat
-                                    ArgumentsExit.PushElement(pPlayer);             // jacker
+                                    ArgumentsExit.PushElement(pPed);                // jacker
                                     ArgumentsExit.PushBoolean(false);               // forcedByScript
-                                    pJacked->CallEvent("onPlayerVehicleExit", ArgumentsExit);
+                                    if (pJacked->IsPlayer())
+                                        pJacked->CallEvent("onPlayerVehicleExit", ArgumentsExit);
+                                    else
+                                        pJacked->CallEvent("onPedVehicleExit", ArgumentsExit);
 
-                                    // Execute the vehicle->vehicle script function for the jacked player
+                                    // Execute the vehicle->ped script function for the jacked ped
                                     CLuaArguments ArgumentsExit2;
-                                    ArgumentsExit2.PushElement(pJacked);            // player
+                                    ArgumentsExit2.PushElement(pJacked);            // player / ped
                                     ArgumentsExit2.PushNumber(0);                   // seat
-                                    ArgumentsExit2.PushElement(pPlayer);            // jacker
+                                    ArgumentsExit2.PushElement(pPed);               // jacker
                                     ArgumentsExit2.PushBoolean(false);              // forcedByScript
                                     pVehicle->CallEvent("onVehicleExit", ArgumentsExit2);
 
-                                    // Execute the player->vehicle script function
+                                    // Execute the ped->vehicle script function
                                     CLuaArguments ArgumentsEnter;
                                     ArgumentsEnter.PushElement(pVehicle);            // vehicle
                                     ArgumentsEnter.PushNumber(0);                    // seat
                                     ArgumentsEnter.PushElement(pJacked);             // jacked
-                                    pPlayer->CallEvent("onPlayerVehicleEnter", ArgumentsEnter);
+                                    if (pPed->IsPlayer())
+                                        pPed->CallEvent("onPlayerVehicleEnter", ArgumentsEnter);
+                                    else
+                                        pPed->CallEvent("onPedVehicleEnter", ArgumentsEnter);
 
-                                    // Execute the vehicle->player script function
+                                    // Execute the vehicle->ped script function
                                     CLuaArguments ArgumentsEnter2;
-                                    ArgumentsEnter2.PushElement(pPlayer);            // player
+                                    ArgumentsEnter2.PushElement(pPed);               // player / ped
                                     ArgumentsEnter2.PushNumber(0);                   // seat
                                     ArgumentsEnter2.PushElement(pJacked);            // jacked
                                     pVehicle->CallEvent("onVehicleEnter", ArgumentsEnter2);
                                 }
                                 else
                                 {
-                                    // Put the jacking player into it
-                                    pPlayer->SetOccupiedVehicle(pVehicle, 0);
-                                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
-                                    pPlayer->SetJackingVehicle(NULL);
-                                    pVehicle->SetJackingPlayer(NULL);
+                                    // Put the jacking ped into it
+                                    pPed->SetOccupiedVehicle(pVehicle, 0);
+                                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+                                    pPed->SetJackingVehicle(NULL);
+                                    pVehicle->SetJackingPed(NULL);
 
                                     // Tell everyone about it
-                                    CVehicleInOutPacket Reply(ID, 0, VEHICLE_NOTIFY_IN_RETURN);
-                                    Reply.SetSourceElement(pPlayer);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_NOTIFY_IN_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
 
                                     // Execute the player->vehicle script function
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pVehicle);            // vehice
+                                    Arguments.PushElement(pVehicle);            // vehicle
                                     Arguments.PushNumber(0);                    // seat
                                     Arguments.PushBoolean(false);               // jacked
-                                    pPlayer->CallEvent("onPlayerVehicleEnter", Arguments);
+                                    if (pPed->IsPlayer())
+                                        pPed->CallEvent("onPlayerVehicleEnter", Arguments);
+                                    else
+                                        pPed->CallEvent("onPedVehicleEnter", Arguments);
 
                                     // Execute the vehicle->player script function
                                     CLuaArguments Arguments2;
-                                    Arguments2.PushElement(pPlayer);            // player
-                                    Arguments2.PushNumber(0);                   // seat
-                                    Arguments2.PushBoolean(false);              // jacked
+                                    Arguments2.PushElement(pPed);             // player / ped
+                                    Arguments2.PushNumber(0);                 // seat
+                                    Arguments2.PushBoolean(false);            // jacked
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
                                 }
+
+                                if (!sendListIncompatiblePlayers.empty())
+                                    {
+                                        // Warp the ped into the vehicle manually for incompatible players
+                                        CBitStream BitStream;
+                                        BitStream.pBitStream->Write(pVehicle->GetID());
+                                        BitStream.pBitStream->Write((unsigned char)0);
+                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                    }
                             }
 
                             break;
@@ -3335,24 +3499,23 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         case VEHICLE_NOTIFY_JACK_ABORT:
                         {
                             // Is the sender jacking?
-                            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_JACKING)
+                            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
                             {
                                 unsigned char ucDoor = Packet.GetDoor();
                                 float         fAngle = Packet.GetDoorAngle();
                                 CPed*         pJacked = pVehicle->GetOccupant(0);
 
                                 // Mark that the jacker is in no vehicle
-                                pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
-                                pPlayer->SetOccupiedVehicle(NULL, 0);
-                                pPlayer->SetJackingVehicle(NULL);
-                                pVehicle->SetJackingPlayer(NULL);
+                                pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+                                pPed->SetOccupiedVehicle(NULL, 0);
+                                pPed->SetJackingVehicle(NULL);
+                                pVehicle->SetJackingPed(NULL);
 
                                 // Set the door angle.
                                 pVehicle->SetDoorOpenRatio(ucDoor, fAngle);
 
                                 // Tell everyone he aborted
-                                CVehicleInOutPacket Reply(ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
-                                Reply.SetSourceElement(pPlayer);
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
                                 Reply.SetDoorAngle(fAngle);
                                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
 
@@ -3369,11 +3532,18 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         pVehicle->SetOccupant(NULL, 0);
 
                                         // Tell everyone to get the jacked person out
-                                        CVehicleInOutPacket JackedReply(ID, 0, VEHICLE_NOTIFY_OUT_RETURN);
-                                        JackedReply.SetSourceElement(pJacked);
+                                        CVehicleInOutPacket JackedReply(pJacked->GetID(), VehicleID, 0, VEHICLE_NOTIFY_OUT_RETURN);
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
+
+                                        if (!sendListIncompatiblePlayers.empty())
+                                        {
+                                            // Warp the ped out of the vehicle manually for incompatible players
+                                            CBitStream BitStream;
+                                            BitStream.pBitStream->Write(pJacked->GetSyncTimeContext());
+                                            m_pPlayerManager->Broadcast(CElementRPCPacket(pJacked, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                        }
                                     }
-                                    pJacked->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                                    pJacked->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                 }
                             }
 
@@ -3386,25 +3556,18 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             return;
                         }
                     }
+
+                    return;
                 }
-                else
-                {
-                    CVehicleInOutPacket Reply(ID, 0, VEHICLE_ATTEMPT_FAILED);
-                    Reply.SetSourceElement(pPlayer);
-                    pPlayer->Send(Reply);
-                }
+
+                // Tell the client we failed
+                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                pPlayer->Send(Reply);
             }
             else
             {
-                CVehicleInOutPacket Reply(ID, 0, VEHICLE_ATTEMPT_FAILED);
-                Reply.SetSourceElement(pPlayer);
-                pPlayer->Send(Reply);
+                return;
             }
-        }
-        else
-        {
-            DisconnectConnectionDesync(this, *pPlayer, 5);
-            return;
         }
     }
 }

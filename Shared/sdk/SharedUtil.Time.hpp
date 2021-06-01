@@ -8,9 +8,15 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+#include "SharedUtil.Time.h"
+#include "SharedUtil.Logging.h"
 #ifndef WIN32
     #include "sys/time.h"
+#else
+    #ifndef NOMINMAX
+    #define NOMINMAX
+    #endif
+    #include <windows.h>
 #endif
 
 static CCriticalSection ms_criticalSection;
