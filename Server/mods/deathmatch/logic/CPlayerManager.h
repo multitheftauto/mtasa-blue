@@ -66,6 +66,8 @@ private:
     void AddToList(CPlayer* pPlayer);
     void RemoveFromList(CPlayer* pPlayer);
 
+    const static bool ValidPlayerModels[];
+
     class CScriptDebugging* m_pScriptDebugging;
 
     CMappedList<CPlayer*>                 m_Players;
