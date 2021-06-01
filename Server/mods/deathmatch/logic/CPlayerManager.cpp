@@ -320,15 +320,31 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
     DoBroadcast(Packet, groupMap);
 }
 
-const bool CPlayerManager::ValidPlayerModels[313] = {1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
-bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
+bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 {
-    if (usPlayerModel < 0 || usPlayerModel > 312)
+    if (model > 312)
+        return false; // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
+        
+    switch (model)
     {
-        return false;
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 8:
+        case 42:
+        case 65:
+        case 74:
+        case 86:
+        case 119:
+        case 149:
+        case 208:
+        case 273:
+        case 289:
+            return false;
+        default:
+            return true;
     }
-    return (ValidPlayerModels[usPlayerModel]);
 }
 
 void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
