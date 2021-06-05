@@ -348,7 +348,8 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pAddressFavoriteIcon[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFavouritesClick, this));
     
     // Remove recent played icon
-    if (type == ServerBrowserTypes::RECENTLY_PLAYED){
+    if (type == ServerBrowserTypes::RECENTLY_PLAYED)
+    {
         m_pRemoveFromRecentIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pEditAddress[type]));
         m_pRemoveFromRecentIcon[type]->SetPosition(CVector2D(fWidth - 40 - 8, (SB_BUTTON_SIZE_Y - 16) / 2), false);
         m_pRemoveFromRecentIcon[type]->SetSize(CVector2D(16, 16), false);
