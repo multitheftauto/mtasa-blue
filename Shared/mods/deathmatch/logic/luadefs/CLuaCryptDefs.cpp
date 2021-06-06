@@ -297,18 +297,10 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             case StringEncryptFunction::AES128:
             {
                 SString& key = options["key"];
-                SString& iv = options["iv"];
 
                 if (key.empty())
                 {
                     m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-
-                if (iv.empty())
-                {
-                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'iv'");
                     lua_pushboolean(luaVM, false);
                     return 1;
                 }
@@ -319,19 +311,35 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [data, key, iv] {
-                                // Execute time-consuming task
-                                SString result = SharedUtil::Aes128encode(data, key, iv);
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
+                            [data, key] {
+                                std::pair<SString, SString> result;
+                                try
+                                {
+                                    result = SharedUtil::Aes128encode(data, key);
+                                }
+                                catch (const CryptoPP::Exception&)
+                                {
+
+                                }
                                 return result;
                             },
-                            [luaFunctionRef](const SString& result) {
+                            [luaFunctionRef](const std::pair<SString, SString> result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    arguments.PushString(result);
-                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                    if (result.first.empty())
+                                    {
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+									}
+                                    else
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.PushString(result.second);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
                                 }
                             });
 
@@ -340,10 +348,20 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 else            // Sync
                 {
-                    SString result = SharedUtil::Aes128encode(data, key, iv);
-                    lua_pushlstring(luaVM, result, result.length());
+                    std::pair<SString, SString> result;
+                    try
+                    {
+                        result = SharedUtil::Aes128encode(data, key);
+                    }
+                    catch (const CryptoPP::Exception&)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    lua_pushlstring(luaVM, result.first, result.first.length());
+                    lua_pushlstring(luaVM, result.second, result.second.length());
                 }
-                return 1;
+                return 2;
             }
             default:
             {
@@ -452,7 +470,15 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
                             [data, key, iv] {
                                 // Execute time-consuming task
-                                SString result = SharedUtil::Aes128decode(data, key, iv);
+                                SString result;
+                                try
+                                {
+                                    result = SharedUtil::Aes128decode(data, key, iv);
+                                }
+                                catch (const CryptoPP::Exception&)
+                                {
+
+                                }
                                 return result;
                             },
                             [luaFunctionRef](const SString& result) {
@@ -460,8 +486,16 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    arguments.PushString(result);
-                                    arguments.Call(pLuaMain, luaFunctionRef);
+									if (result.empty())
+									{
+										arguments.PushBoolean(false);
+										arguments.Call(pLuaMain, luaFunctionRef);
+									}
+									else
+									{
+										arguments.PushString(result);
+										arguments.Call(pLuaMain, luaFunctionRef);
+									}
                                 }
                             });
 
@@ -470,7 +504,16 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 }
                 else            // Sync
                 {
-                    SString result = SharedUtil::Aes128decode(data, key, iv);
+                    SString result;
+                    try
+                    {
+                        result = SharedUtil::Aes128decode(data, key, iv);
+                    }
+                    catch (const CryptoPP::Exception&)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
                     lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;

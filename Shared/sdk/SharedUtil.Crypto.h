@@ -11,6 +11,7 @@
 #include <cryptopp/base64.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
+#include <cryptopp/osrng.h>
 #include "SString.h"
 
 namespace SharedUtil
@@ -31,56 +32,46 @@ namespace SharedUtil
         return result;
     }
 
-    inline SString Aes128encode(const SString& sData, const SString& sKey, const SString& sIv)
+    inline std::pair<SString, SString> Aes128encode(const SString& sData, const SString& sKey)
     {
+		using namespace CryptoPP;
+
+		AutoSeededRandomPool rnd;
+
         SString result;
+		SString sIv;
 
-        CryptoPP::byte iv[ CryptoPP::AES::BLOCKSIZE ];
-        CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ];
+		SecByteBlock key(0x00, AES::DEFAULT_KEYLENGTH);
+		SecByteBlock iv(0x00, AES::BLOCKSIZE);
 
-        memcpy(iv, sIv.c_str(), sIv.length());
-        memcpy(key, sKey.c_str(), sKey.length());
+       	memcpy(key, sKey.c_str(), sKey.size());
 
-        CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
-        CryptoPP::CTR_Mode_ExternalCipher::Encryption ctrEncryption(aesEncryption, iv);
+        sIv.resize(sizeof(iv));
+        rnd.GenerateBlock((CryptoPP::byte*)sIv.data(), sIv.size());
+        memcpy(iv, sIv.c_str(), sIv.size());
 
-        try
-        {
-            CryptoPP::StreamTransformationFilter stfEncryptor(ctrEncryption, new CryptoPP::StringSink(result));
-            stfEncryptor.Put((const CryptoPP::byte*)&sData[0], sData.size());
-            stfEncryptor.MessageEnd();
-        }
-        catch (const CryptoPP::Exception& exception)
-        {
-            return "";
-        }
+		CTR_Mode<AES>::Encryption aesEncryption;
+        aesEncryption.SetKeyWithIV(key, sizeof(key), iv);
+        StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
 
-        return result;
+        return std::pair<SString, SString>(result, sIv);
     }
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, const SString& sIv)
     {
+		using namespace CryptoPP;
+
         SString result;
 
-        CryptoPP::byte iv[ CryptoPP::AES::BLOCKSIZE ];
-        CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ];
+		SecByteBlock key(0x00, AES::DEFAULT_KEYLENGTH);
+		SecByteBlock iv(0x00, AES::BLOCKSIZE);
 
-        memcpy(iv, sIv.c_str(), sIv.length());
-        memcpy(key, sKey.c_str(), sKey.length());
+       	memcpy(key, sKey.c_str(), sKey.size());
+        memcpy(iv, sIv.c_str(), sIv.size());
 
-        CryptoPP::AES::Encryption aesDecryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
-        CryptoPP::CTR_Mode_ExternalCipher::Encryption ctrDecryption(aesDecryption, iv);
-
-        try
-        {
-            CryptoPP::StreamTransformationFilter stfDecryptor(ctrDecryption, new CryptoPP::StringSink(result));
-            stfDecryptor.Put((const CryptoPP::byte*)&sData[0], sData.size());
-            stfDecryptor.MessageEnd();
-        }
-        catch(const CryptoPP::Exception& exception)
-        {
-            return "";
-        }
+		CTR_Mode<AES>::Decryption aesDecryption;
+        aesDecryption.SetKeyWithIV(key, sizeof(key), iv);
+        StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
 
         return result;
     }
