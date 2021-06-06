@@ -782,6 +782,25 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
+    // Aes128encode/Aes128decode
+    {
+        TEST_FUNCTION
+        std::pair<std::string, std::string> res = Aes128encode(data, key);
+        assert(!res.first.empty());
+        assert(!res.second.empty());
+        SString strDecoded = Aes128decode(res.first, key, res.second);
+        assert(data == strDecoded);
+        TEST_VARS
+        const SString key;
+        const SString data;
+        TEST_DATA = {
+            {"1234", "AB12£$_ "},
+            {"Hello thereHello there", "78111E998C42243285635E39AFDD614B\0 AB12£$_ "},
+            {"78111E998C42243285635E39AFD\0D614B AB12£$_ ", "Hello thereHello there"},
+        };
+        TEST_END
+    }
+
     #define szTempFilename "hash_""\xD0""\x98""_test"
 
     // MD5
