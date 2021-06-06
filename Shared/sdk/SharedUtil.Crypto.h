@@ -34,23 +34,23 @@ namespace SharedUtil
 
     inline std::pair<SString, SString> Aes128encode(const SString& sData, const SString& sKey)
     {
-		using namespace CryptoPP;
+        using namespace CryptoPP;
 
-		AutoSeededRandomPool rnd;
+        AutoSeededRandomPool rnd;
 
         SString result;
-		SString sIv;
+        SString sIv;
 
-		SecByteBlock key(0x00, AES::DEFAULT_KEYLENGTH);
-		SecByteBlock iv(0x00, AES::BLOCKSIZE);
+        SecByteBlock key(0x00, AES::DEFAULT_KEYLENGTH);
+        SecByteBlock iv(0x00, AES::BLOCKSIZE);
 
-       	memcpy(key, sKey.c_str(), sKey.size());
+        memcpy(key, sKey.c_str(), sKey.size());
 
         sIv.resize(sizeof(iv));
         rnd.GenerateBlock((CryptoPP::byte*)sIv.data(), sIv.size());
         memcpy(iv, sIv.c_str(), sIv.size());
 
-		CTR_Mode<AES>::Encryption aesEncryption;
+        CTR_Mode<AES>::Encryption aesEncryption;
         aesEncryption.SetKeyWithIV(key, sizeof(key), iv);
         StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
 
@@ -59,17 +59,17 @@ namespace SharedUtil
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, const SString& sIv)
     {
-		using namespace CryptoPP;
+        using namespace CryptoPP;
 
         SString result;
 
-		SecByteBlock key(0x00, AES::DEFAULT_KEYLENGTH);
-		SecByteBlock iv(0x00, AES::BLOCKSIZE);
+        SecByteBlock key(0x00, AES::DEFAULT_KEYLENGTH);
+        SecByteBlock iv(0x00, AES::BLOCKSIZE);
 
-       	memcpy(key, sKey.c_str(), sKey.size());
+        memcpy(key, sKey.c_str(), sKey.size());
         memcpy(iv, sIv.c_str(), sIv.size());
 
-		CTR_Mode<AES>::Decryption aesDecryption;
+        CTR_Mode<AES>::Decryption aesDecryption;
         aesDecryption.SetKeyWithIV(key, sizeof(key), iv);
         StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
 

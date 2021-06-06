@@ -333,7 +333,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                     {
                                         arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
-									}
+                                    }
                                     else
                                     {
                                         arguments.PushString(result.first);
@@ -486,16 +486,16 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-									if (result.empty())
-									{
-										arguments.PushBoolean(false);
-										arguments.Call(pLuaMain, luaFunctionRef);
-									}
-									else
-									{
-										arguments.PushString(result);
-										arguments.Call(pLuaMain, luaFunctionRef);
-									}
+                                    if (result.empty())
+                                    {
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        arguments.PushString(result);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
                                 }
                             });
 
