@@ -20,7 +20,6 @@ project "CEF"
 	postbuildcommands {
 		"{COPY} \""..cef_path.."Release/*\" \""..path.."mta\"",
 		"{COPY} \""..cef_path.."Resources/icudtl.dat\" \""..path.."mta\"",
-	-- The .pak line below will now only generate chrome_100_percent.pak and chrome_200_percent.pak (see https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef)
 		"{COPY} \""..cef_path.."Resources/*.pak\" \""..path.."mta/cef\"",
 		"{COPY} \""..cef_path.."Resources/locales/*\" \""..path.."mta/cef/locales\""
 	}

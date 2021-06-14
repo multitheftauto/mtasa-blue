@@ -675,6 +675,12 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
 
+
+	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\resources.pak"
+
 	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
         #File "${FILES_ROOT}\mta\CEF\cef.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
