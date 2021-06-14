@@ -675,13 +675,13 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
 
-		# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
         #File "${FILES_ROOT}\mta\CEF\cef.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
         #File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
 		
-		# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
+	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
 
         SetOutPath "$INSTDIR\MTA\CEF\locales"
