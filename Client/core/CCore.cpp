@@ -1933,8 +1933,8 @@ void CCore::CalculateStreamingMemoryRange()
     int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
 
     // Calc min and max from lookup table
-    SSamplePoint<float> minPoints[] = {{512, 64}, {1024, 96}, {2048, 128}};
-    SSamplePoint<float> maxPoints[] = {{512, 96}, {1024, 128}, {2048, 256}};
+    SSamplePoint<float> minPoints[] = {{512, 64}, {1024, 96}, {2048, 128}, {4096, 128}, {6144, 128}, {8192, 128}};
+    SSamplePoint<float> maxPoints[] = {{512, 96}, {1024, 128}, {2048, 256}, {4096, 512}, {6144, 768}, {8192, 1024}};
 
     float fMinAmount = EvalSamplePosition<float>(minPoints, NUMELMS(minPoints), iSystemRamMB);
     float fMaxAmount = EvalSamplePosition<float>(maxPoints, NUMELMS(maxPoints), iSystemRamMB);
