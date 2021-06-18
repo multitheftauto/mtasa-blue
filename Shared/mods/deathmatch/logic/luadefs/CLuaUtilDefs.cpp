@@ -15,6 +15,42 @@
 #endif
 #include <lua/CLuaFunctionParser.h>
 
+#ifdef MTA_CLIENT
+namespace mta
+{
+const auto& GetSystemInfo()
+{
+    using DataSubTable = std::unordered_map<std::string, std::variant<std::string, lua_Number>>;
+    using MainTable = std::unordered_map<std::string, std::variant<DataSubTable, lua_Number>>;
+
+    static MainTable outValue{};
+    if (outValue.empty()) {
+        {
+            auto info = SharedUtil::GetWMISystemInfo();
+            outValue.emplace("CPU", DataSubTable{
+                {"MaxClockSpeed", (lua_Number)info.CPU.MaxClockSpeed},
+                {"Name", info.CPU.Name},
+                {"NaNumberOfCores", (lua_Number)info.CPU.NumberOfCores},
+                {"NumberOfLogicalProcessors", (lua_Number)info.CPU.NumberOfLogicalProcessors},
+            });
+            outValue["TotalPhysicalMemory"] = (lua_Number)info.TotalPhysicalMemory;
+        }
+
+        {
+            BasicGPUInfo gpu;
+            g_pCore->GetGraphics()->GetRenderItemManager()->GetBasicGPUInfo(gpu);
+            outValue.emplace("GPU", DataSubTable{
+                { "RAM", (lua_Number)gpu.memoryKB},
+                { "Name", gpu.name },
+            });
+        }
+
+    }
+    return outValue;
+}
+};
+#endif
+
 void CLuaUtilDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -53,7 +89,7 @@ void CLuaUtilDefs::LoadFunctions()
         {"tocolor", tocolor},
 
 #ifdef MTA_CLIENT
-        {"getSystemInfo", ArgumentParser<GetSystemInfo>}
+        {"getSystemInfo", ArgumentParser<mta::GetSystemInfo>}
 #endif
     };
 
@@ -720,34 +756,3 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
 }
-
-#ifdef MTA_CLIENT
-std::unordered_map<std::string, std::variant<std::unordered_map<std::string, std::variant<std::string, lua_Number>>, lua_Number>>
-CLuaUtilDefs::GetSystemInfo()
-{
-    using KVTable = std::unordered_map<std::string, std::variant<std::string, lua_Number>>;
-    static std::unordered_map<std::string, std::variant<KVTable, lua_Number>> outValue;
-    if (outValue.empty()) {
-        auto info = SharedUtil::GetWMISystemInfo();
-        {
-            outValue.emplace("CPU", KVTable{
-                {"MaxClockSpeed", (lua_Number)info.CPU.MaxClockSpeed},
-                {"Name", info.CPU.Name},
-                {"NaNumberOfCores", (lua_Number)info.CPU.NumberOfCores},
-                {"NumberOfLogicalProcessors", (lua_Number)info.CPU.NumberOfLogicalProcessors},
-            });
-        }
-        outValue["TotalPhysicalMemory"] = (lua_Number)info.TotalPhysicalMemory;
-
-        {
-            BasicGPUInfo gpu;
-            g_pCore->GetGraphics()->GetRenderItemManager()->GetBasicGPUInfo(gpu);
-            outValue.emplace("GPU", KVTable{
-                { "RAM", (lua_Number)gpu.memoryKB},
-                { "Name", gpu.name },
-            });
-        }
-    }
-    return outValue;
-}
-#endif
