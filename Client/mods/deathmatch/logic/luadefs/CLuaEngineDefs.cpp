@@ -12,6 +12,11 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 
+void EngineStreamingFreeUpMemory(std::uint32_t bytes)
+{
+    g_pGame->GetStreaming()->MakeSpaceFor(bytes);
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -51,6 +56,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
+
+        {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );

@@ -152,3 +152,8 @@ void CStreamingSA::ReinitStreaming()
 
     reinitStreaming();
 }
+
+void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
+{
+    ((int(__cdecl*)(std::uint32_t))0x40E560)(memoryToCleanInBytes);
+}
