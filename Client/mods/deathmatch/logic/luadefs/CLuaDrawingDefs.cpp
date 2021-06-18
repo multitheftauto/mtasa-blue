@@ -9,9 +9,13 @@
  *
  *****************************************************************************/
 
+
 #include "StdInc.h"
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
+
+#include <SharedUtil.SysInfo.h>
+#include <SharedUtil.SysInfo.hpp>
 
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
@@ -1705,6 +1709,11 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushstring(luaVM, "SettingHighDetailPeds");
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
         lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "TotalPhysicalMemory");
+        lua_pushnumber(luaVM, (lua_Number)(SharedUtil::GetWMITotalPhysicalMemory() / 1024 / 1024));
+        lua_settable(luaVM, -3);
+
         return 1;
     }
     else
