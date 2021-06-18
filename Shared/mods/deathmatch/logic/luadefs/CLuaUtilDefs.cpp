@@ -725,11 +725,12 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
 std::unordered_map<std::string, std::variant<std::unordered_map<std::string, std::variant<std::string, lua_Number>>, lua_Number>>
 CLuaUtilDefs::GetSystemInfo()
 {
-    static std::unordered_map<std::string, std::variant<std::unordered_map<std::string, std::variant<std::string, lua_Number>>, lua_Number>> outValue;
+    using KVTable = std::unordered_map<std::string, std::variant<std::string, lua_Number>>;
+    static std::unordered_map<std::string, std::variant<KVTable, lua_Number>> outValue;
     if (outValue.empty()) {
         auto info = SharedUtil::GetWMISystemInfo();
         {
-            outValue.emplace("CPU", std::unordered_map<std::string, std::variant<std::string, lua_Number>>{
+            outValue.emplace("CPU", KVTable{
                 {"MaxClockSpeed", (lua_Number)info.CPU.MaxClockSpeed},
                 {"Name", info.CPU.Name},
                 {"NaNumberOfCores", (lua_Number)info.CPU.NumberOfCores},
@@ -737,6 +738,15 @@ CLuaUtilDefs::GetSystemInfo()
             });
         }
         outValue["TotalPhysicalMemory"] = (lua_Number)info.TotalPhysicalMemory;
+
+        {
+            BasicGPUInfo gpu;
+            g_pCore->GetGraphics()->GetRenderItemManager()->GetBasicGPUInfo(gpu);
+            outValue.emplace("GPU", KVTable{
+                { "RAM", (lua_Number)gpu.memoryKB},
+                { "Name", gpu.name },
+            });
+        }
     }
     return outValue;
 }

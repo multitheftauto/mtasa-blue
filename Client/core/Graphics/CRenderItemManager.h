@@ -56,6 +56,7 @@ public:
     virtual void               FlushNonAARenderTarget();
     virtual void HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                    int Filter);
+    virtual void               GetBasicGPUInfo(BasicGPUInfo& outInfo);
 
     // CRenderItemManager
     void NotifyContructRenderItem(CRenderItem* pItem);

@@ -29,7 +29,7 @@ namespace SharedUtil
     struct WMISystemInfo
     {
         WMIProcessorInfo CPU = {};
-        uint64_t TotalPhysicalMemory = 0; 
+        uint64_t TotalPhysicalMemory = 0; // In KiB
     };
 
     struct SQueryWMIResult : public std::vector<std::vector<SString> >

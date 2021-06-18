@@ -362,7 +362,7 @@ static void _declspec(naked) HOOK_CTimer_Update()
     {
         popad
         mov     ecx,dword ptr ds:[0B7CB28h]
-        jmp     CONTINUE_CTimer_UpdateEsz
+        jmp     CONTINUE_CTimer_Update
     }
 }
 

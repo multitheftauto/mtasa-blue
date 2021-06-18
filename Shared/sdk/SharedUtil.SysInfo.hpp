@@ -329,7 +329,7 @@ SharedUtil::WMISystemInfo SharedUtil::GetWMISystemInfo()
         return info;
     // Only query stuff it havent already (otherwise TotalPhysicalMemory is non zero)
 
-    info.TotalPhysicalMemory = GetWMITotalPhysicalMemory() / 1024 / 1024;
+    info.TotalPhysicalMemory = GetWMITotalPhysicalMemory() / 1024;
 
     SQueryWMIResult result;
     QueryWMI(result, "Win32_Processor", "MaxClockSpeed,Name,NumberOfCores,NumberOfLogicalProcessors");
