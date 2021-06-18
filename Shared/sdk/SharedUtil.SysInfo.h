@@ -18,6 +18,20 @@
 
 namespace SharedUtil
 {
+    struct WMIProcessorInfo
+    {
+        uint32_t MaxClockSpeed = 0;
+        std::string Name = {};
+        uint32_t NumberOfCores = 0;
+        uint32_t NumberOfLogicalProcessors = 0;
+    };
+
+    struct WMISystemInfo
+    {
+        WMIProcessorInfo CPU = {};
+        uint64_t TotalPhysicalMemory = 0; 
+    };
+
     struct SQueryWMIResult : public std::vector<std::vector<SString> >
     {
     };
@@ -40,6 +54,7 @@ namespace SharedUtil
     SString      GetWMIOSVersion();
     unsigned int GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev);
     long long    GetWMITotalPhysicalMemory();
+    WMISystemInfo GetWMISystemInfo();
     void         GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
     void         GetInstalledHotFixList(std::vector<SString>& outInstalledList);
     bool         IsHotFixInstalled(const SString& strHotFixId);

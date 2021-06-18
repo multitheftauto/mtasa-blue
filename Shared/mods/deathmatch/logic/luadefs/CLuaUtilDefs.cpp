@@ -9,6 +9,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#ifdef MTA_CLIENT
+#include <SharedUtil.SysInfo.h>
+#include <SharedUtil.SysInfo.hpp>
+#endif
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaUtilDefs::LoadFunctions()
 {
@@ -46,6 +51,10 @@ void CLuaUtilDefs::LoadFunctions()
         // Utility functions
         {"gettok", GetTok},
         {"tocolor", tocolor},
+
+#ifdef MTA_CLIENT
+        {"getSystemInfo", ArgumentParser<GetSystemInfo>}
+#endif
     };
 
     // Add functions
@@ -711,3 +720,24 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
 }
+
+#ifdef MTA_CLIENT
+std::unordered_map<std::string, std::variant<std::unordered_map<std::string, std::variant<std::string, lua_Number>>, lua_Number>>
+CLuaUtilDefs::GetSystemInfo()
+{
+    static std::unordered_map<std::string, std::variant<std::unordered_map<std::string, std::variant<std::string, lua_Number>>, lua_Number>> outValue;
+    if (outValue.empty()) {
+        auto info = SharedUtil::GetWMISystemInfo();
+        {
+            outValue.emplace("CPU", std::unordered_map<std::string, std::variant<std::string, lua_Number>>{
+                {"MaxClockSpeed", (lua_Number)info.CPU.MaxClockSpeed},
+                {"Name", info.CPU.Name},
+                {"NaNumberOfCores", (lua_Number)info.CPU.NumberOfCores},
+                {"NumberOfLogicalProcessors", (lua_Number)info.CPU.NumberOfLogicalProcessors},
+            });
+        }
+        outValue["TotalPhysicalMemory"] = (lua_Number)info.TotalPhysicalMemory;
+    }
+    return outValue;
+}
+#endif

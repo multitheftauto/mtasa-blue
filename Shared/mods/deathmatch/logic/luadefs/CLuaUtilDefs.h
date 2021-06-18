@@ -52,4 +52,6 @@ public:
     // Utility functions
     LUA_DECLARE(GetTok);
     LUA_DECLARE(tocolor);
+
+    static std::unordered_map<std::string, std::variant<std::unordered_map<std::string, std::variant<std::string, lua_Number>>, lua_Number>> GetSystemInfo();
 };

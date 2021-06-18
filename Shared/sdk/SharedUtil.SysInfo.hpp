@@ -319,6 +319,37 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
     return llResult;
 }
 
+SharedUtil::WMISystemInfo SharedUtil::GetWMISystemInfo()
+{
+    // Cache result, because these wont change while the PC is running
+    static WMISystemInfo info;
+
+    static bool queried = false;
+    if (queried)
+        return info;
+    // Only query stuff it havent already (otherwise TotalPhysicalMemory is non zero)
+
+    info.TotalPhysicalMemory = GetWMITotalPhysicalMemory() / 1024 / 1024;
+
+    SQueryWMIResult result;
+    QueryWMI(result, "Win32_Processor", "MaxClockSpeed,Name,NumberOfCores,NumberOfLogicalProcessors");
+
+    if (result.empty()) 
+        return {}; // Something had went wrong
+
+    const auto& cpuInfoResultRow = result[0];
+
+    auto& cpu = info.CPU;
+    cpu.MaxClockSpeed = (uint32_t)atoll(cpuInfoResultRow[0]);
+    cpu.Name = cpuInfoResultRow[1];
+    cpu.NumberOfCores = (uint32_t)atoll(cpuInfoResultRow[2]);
+    cpu.NumberOfLogicalProcessors = (uint32_t)atoll(cpuInfoResultRow[3]);
+
+    queried = true;
+
+    return info;
+}
+
 /////////////////////////////////////////////////////////////////////
 //
 // GetWMIVideoAdapterMemorySize
