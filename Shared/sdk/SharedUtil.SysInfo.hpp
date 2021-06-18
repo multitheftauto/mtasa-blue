@@ -341,7 +341,7 @@ SharedUtil::WMISystemInfo SharedUtil::GetWMISystemInfo()
 
     auto& cpu = info.CPU;
     cpu.MaxClockSpeed = (uint32_t)atoll(cpuInfoResultRow[0]);
-    cpu.Name = cpuInfoResultRow[1];
+    cpu.Name = cpuInfoResultRow[1].TrimEnd(" "); // Remove whitespace from the end
     cpu.NumberOfCores = (uint32_t)atoll(cpuInfoResultRow[2]);
     cpu.NumberOfLogicalProcessors = (uint32_t)atoll(cpuInfoResultRow[3]);
 
