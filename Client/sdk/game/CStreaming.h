@@ -48,4 +48,5 @@ public:
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
     virtual CStreamingInfo* GetStreamingInfoFromModelId(uint32 id) = 0;
     virtual void ReinitStreaming() = 0;
+    virtual std::uint32_t GetMemoryUsed() = 0;
 };
