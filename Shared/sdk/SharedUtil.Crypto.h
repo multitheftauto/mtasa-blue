@@ -54,7 +54,7 @@ namespace SharedUtil
         aesEncryption.SetKeyWithIV(key, sizeof(key), iv);
         StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
 
-        return std::pair<SString, SString>(result, sIv);
+        return {result, sIv};
     }
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, const SString& sIv)
