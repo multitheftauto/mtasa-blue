@@ -298,9 +298,9 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             {
                 SString& key = options["key"];
 
-                if (key.empty())
+                if (key.size() != CryptoPP::AES::DEFAULT_KEYLENGTH)
                 {
-                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid key length (must be 16 characters long)");
                     lua_pushboolean(luaVM, false);
                     return 1;
                 }
@@ -447,16 +447,16 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 SString& key = options["key"];
                 SString& iv = options["iv"];
 
-                if (key.empty())
+                if (key.size() != CryptoPP::AES::DEFAULT_KEYLENGTH)
                 {
-                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid key length (must be 16 characters long)");
                     lua_pushboolean(luaVM, false);
                     return 1;
                 }
 
-                if (iv.empty())
+                if (iv.size() != CryptoPP::AES::BLOCKSIZE)
                 {
-                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'iv'");
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid iv length (must be 16 characters long)");
                     lua_pushboolean(luaVM, false);
                     return 1;
                 }

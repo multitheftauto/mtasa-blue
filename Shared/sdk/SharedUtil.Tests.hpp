@@ -794,9 +794,9 @@ void SharedUtil_Hash_Tests()
         const SString key;
         const SString data;
         TEST_DATA = {
-            {"1234", "AB12£$_ "},
-            {"Hello thereHello there", "78111E998C42243285635E39AFDD614B\0 AB12£$_ "},
-            {"78111E998C42243285635E39AFD\0D614B AB12£$_ ", "Hello thereHello there"},
+            {"5347123412340000", "AB12£$_ "},
+            {"gHtySkGerYnhDxAs", "78111E998C42243285635E39AFDD614B\0 AB12£$_ "},
+            {"!@#$%^&*()_+|:<>", "Hello thereHello there"},
         };
         TEST_END
     }
