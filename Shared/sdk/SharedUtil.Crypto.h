@@ -52,7 +52,7 @@ namespace SharedUtil
         return {result, sIv};
     }
 
-    inline SString Aes128decode(const SString& sData, const SString& sKey, const SString& sIv)
+    inline SString Aes128decode(const SString& sData, const SString& sKey, SString sIv)
     {
         using namespace CryptoPP;
         using CryptoPP::byte;
