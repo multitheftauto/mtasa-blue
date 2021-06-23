@@ -57,6 +57,7 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
+        sIv.resize(AES::BLOCKSIZE);
         SString result;
 
         CTR_Mode<AES>::Decryption aesDecryption;
