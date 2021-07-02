@@ -412,12 +412,12 @@ public:
     uint32_t         m_lastBlowUpTime;                      // 1240
     uint16_t         m_policeChaseLeaveCarTimer;            // 1244
     uint16_t         m_delayedExplosionTimer;               // 1246
-    void*            m_responsibleForDetonation;            // 1250
-    float            m_frontGroundZ;                        // 1254
-    float            m_rearGroundZ;                         // 1258
+    void*            m_responsibleForDetonation;            // 1248
+    float            m_frontGroundZ;                        // 1252
+    float            m_rearGroundZ;                         // 1256
 
     /*** BEGIN SECTION that was added by us ***/
-    uint8_t   _padding1262[6];            // 1262
+    uint8_t   _padding1262[8];            // 1260
     CVehicle* m_pVehicle;                 // 1268
     /*** END SECTION that was added by us ***/
 
