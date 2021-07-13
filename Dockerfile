@@ -25,7 +25,7 @@ WORKDIR /build
 # Copy entrypoint script
 COPY utils/docker-entrypoint.sh /docker-entrypoint.sh
 
-# Add GLIB compat
+# Add GLIB compat 
 COPY utils/compat /compat
 
 # Set entrypoint
