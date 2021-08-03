@@ -14,7 +14,7 @@ class CClientVectorGraphicDisplay;
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
 
-class CClientVectorGraphicDisplay : public CClientDisplay
+class CClientVectorGraphicDisplay final : public CClientDisplay
 {
     friend class CClientDisplayManager;
 
@@ -29,8 +29,8 @@ public:
     void UpdateTexture();
     void ClearTexture();
 
-    const bool IsCleared() { return m_bIsCleared; }
-    const bool HasUpdated() { return m_bHasUpdated; }
+    bool IsCleared() const { return m_bIsCleared; }
+    bool HasUpdated() const { return m_bHasUpdated; }
 
     void Update();
 private:

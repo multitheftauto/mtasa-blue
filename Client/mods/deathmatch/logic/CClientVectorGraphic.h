@@ -15,7 +15,7 @@ namespace lunasvg {
     class SVGDocument;
 }
 
-class CClientVectorGraphic : public CClientTexture
+class CClientVectorGraphic final : public CClientTexture
 {
     DECLARE_CLASS(CClientVectorGraphic, CClientTexture)
 public:
