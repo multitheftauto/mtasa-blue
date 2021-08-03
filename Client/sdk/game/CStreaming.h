@@ -49,4 +49,5 @@ public:
     virtual CStreamingInfo* GetStreamingInfoFromModelId(uint32 id) = 0;
     virtual void ReinitStreaming() = 0;
     virtual void MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
+    virtual std::uint32_t GetMemoryUsed() const = 0;
 };

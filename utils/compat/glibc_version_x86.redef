@@ -10,3 +10,5 @@ powf powf@GLIBC_2.0
 log log@GLIBC_2.0
 pow pow@GLIBC_2.0
 exp exp@GLIBC_2.0
+fcntl64 fcntl@GLIBC_2.0
+fcntl fcntl@GLIBC_2.0
