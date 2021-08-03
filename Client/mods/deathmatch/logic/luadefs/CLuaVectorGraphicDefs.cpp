@@ -56,12 +56,15 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
     if (pathOrRawData.has_value())
     {
-        std::string strRawData = pathOrRawData.value();
+        std::string& strRawData = pathOrRawData.value();
         std::size_t szCharPos = strRawData.find_first_not_of(" \t\n\r\f\v", 0);
 
-        const char charAuto = strRawData.at(szCharPos);
+        char charAuto;
 
-        if (charAuto == '<')
+        if (szCharPos != std::string::npos)
+            charAuto = strRawData.at(szCharPos);
+
+        if (charAuto && charAuto == '<')
         {
             if (!pVectorGraphic->LoadFromData(pathOrRawData.value()))
             {
@@ -82,6 +85,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             }
             else
             {
+                pVectorGraphic->Destroy();
                 throw std::invalid_argument(SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
             }
         }
@@ -92,18 +96,14 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
 CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic)
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CLuaMain* pLuaMain = &lua_getownercluamain(luaVM);
 
     if (pLuaMain)
     {
-        std::string strXmlContent = pVectorGraphic->GetSVGDocumentXML();
-
-        CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent.c_str());
+        CXMLNode* rootNode = pLuaMain->ParseString(pVectorGraphic->GetSVGDocumentXML().c_str());
 
         if (rootNode && rootNode->IsValid())
             return rootNode;
-        else
-            throw std::invalid_argument("Unable to get SVG XML document");
     }
 
     throw std::invalid_argument("Unable to get SVG XML document");
@@ -111,9 +111,7 @@ CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVect
 
 void CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
 {
-    std::string strXML = pXMLNode->ToString();
-
-    if (pVectorGraphic->LoadFromData(strXML))
+    if (pVectorGraphic->LoadFromData(pXMLNode->ToString()))
         return;
 
     throw std::invalid_argument("Unable to set SVG XML document");
