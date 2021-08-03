@@ -155,5 +155,5 @@ void CStreamingSA::ReinitStreaming()
 
 void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
 {
-    ((int(__cdecl*)(std::uint32_t))0x40E120)(memoryToCleanInBytes);
+    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x40E120))(memoryToCleanInBytes);
 }
