@@ -29,6 +29,7 @@ public:
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
     CStreamingInfo* GetStreamingInfoFromModelId(uint32 id);
+    std::uint32_t GetMemoryUsed() const override;
 
 private:
     static CStreamingInfo* ms_aInfoForModel; // count: 26316 in unmodified game

@@ -152,3 +152,8 @@ void CStreamingSA::ReinitStreaming()
 
     reinitStreaming();
 }
+
+std::uint32_t CStreamingSA::GetMemoryUsed() const
+{
+    return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
+}
