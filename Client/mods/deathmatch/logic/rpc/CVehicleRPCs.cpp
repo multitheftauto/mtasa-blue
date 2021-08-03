@@ -78,17 +78,25 @@ void CVehicleRPCs::FixVehicle(CClientEntity* pSource, NetBitStreamInterface& bit
 
 void CVehicleRPCs::BlowVehicle(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    // Read out the vehicle id
-    unsigned char ucTimeContext;
-    if (bitStream.Read(ucTimeContext))
+    unsigned char syncTimeContext;
+    bool          withExplosion = true;
+
+    if (bitStream.Read(syncTimeContext))
     {
-        // Grab the vehicle
-        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
-        if (pVehicle)
+        if (bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport) && !bitStream.ReadBit(withExplosion))
         {
-            // Blow it and change the time context
-            pVehicle->Blow(true);
-            pVehicle->SetSyncTimeContext(ucTimeContext);
+            return;
+        }
+
+        CClientVehicle* vehicle = m_pVehicleManager->Get(pSource->GetID());
+        
+        if (vehicle)
+        {
+            VehicleBlowFlags blow;
+            blow.withExplosion = withExplosion;
+            vehicle->Blow(blow);
+
+            vehicle->SetSyncTimeContext(syncTimeContext);
         }
     }
 }

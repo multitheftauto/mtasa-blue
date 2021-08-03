@@ -294,6 +294,75 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
+            case StringEncryptFunction::AES128:
+            {
+                SString& key = options["key"];
+
+                if (key.size() != CryptoPP::AES::DEFAULT_KEYLENGTH)
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid key length (must be 16 characters long)");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
+                            [data, key] {
+                                std::pair<SString, SString> result;
+                                try
+                                {
+                                    result = SharedUtil::Aes128encode(data, key);
+                                }
+                                catch (const CryptoPP::Exception&)
+                                {
+
+                                }
+                                return result;
+                            },
+                            [luaFunctionRef](const std::pair<SString, SString> result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.first.empty())
+                                    {
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.PushString(result.second);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    std::pair<SString, SString> result;
+                    try
+                    {
+                        result = SharedUtil::Aes128encode(data, key);
+                    }
+                    catch (const CryptoPP::Exception&)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    lua_pushlstring(luaVM, result.first, result.first.length());
+                    lua_pushlstring(luaVM, result.second, result.second.length());
+                }
+                return 2;
+            }
             default:
             {
                 m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
@@ -369,6 +438,82 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 {
                     SString result;
                     SharedUtil::TeaDecode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
+            case StringEncryptFunction::AES128:
+            {
+                SString& key = options["key"];
+                SString& iv = options["iv"];
+
+                if (key.size() != CryptoPP::AES::DEFAULT_KEYLENGTH)
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid key length (must be 16 characters long)");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                if (iv.size() != CryptoPP::AES::BLOCKSIZE)
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid iv length (must be 16 characters long)");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key, iv] {
+                                // Execute time-consuming task
+                                SString result;
+                                try
+                                {
+                                    result = SharedUtil::Aes128decode(data, key, iv);
+                                }
+                                catch (const CryptoPP::Exception&)
+                                {
+
+                                }
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.empty())
+                                    {
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        arguments.PushString(result);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString result;
+                    try
+                    {
+                        result = SharedUtil::Aes128decode(data, key, iv);
+                    }
+                    catch (const CryptoPP::Exception&)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
                     lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;

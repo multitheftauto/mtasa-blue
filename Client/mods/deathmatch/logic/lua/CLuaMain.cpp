@@ -182,8 +182,10 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, g_pClientGame->GetLocalPlayer());
     lua_setglobal(m_luaVM, "localPlayer");
+}
 
-    // Load pre-loaded lua scripts
+void CLuaMain::LoadEmbeddedScripts()
+{
     DECLARE_PROFILER_SECTION(OnPreLoadScript)
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);

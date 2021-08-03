@@ -64,6 +64,21 @@ enum eWindow
     MAX_WINDOWS
 };
 
+enum class VehicleBlowState : unsigned char
+{
+    INTACT,
+    AWAITING_EXPLOSION_SYNC,
+    BLOWN,
+};
+
+struct VehicleBlowFlags
+{
+    bool withMovement : 1;
+    bool withExplosion : 1;
+
+    constexpr VehicleBlowFlags() : withMovement(true), withExplosion(true) {}
+};
+
 namespace EComponentBase
 {
     enum EComponentBaseType
@@ -195,10 +210,13 @@ public:
     void SetDoorsUndamageable(bool bUndamageable);
 
     float GetHealth() const;
-    void  SetHealth(float fHealth);
+    void  SetHealth(float health);
     void  Fix();
-    void  Blow(bool bAllowMovement = false);
-    bool  IsVehicleBlown() const noexcept { return m_bBlown; };
+
+    void             Blow(VehicleBlowFlags blow);
+    bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
+    void             SetBlowState(VehicleBlowState state) { m_blowState = state; }
+    VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
 
     CVehicleColor& GetColor();
     void           SetColor(const CVehicleColor& color);
@@ -235,7 +253,6 @@ public:
     bool IsDrowning() const;
     bool IsDriven() const;
     bool IsUpsideDown() const;
-    bool IsBlown() const;
 
     bool IsSirenOrAlarmActive();
     void SetSirenOrAlarmActive(bool bActive);
@@ -619,7 +636,7 @@ protected:
     unsigned char                          m_ucAlpha;
     bool                                   m_bAlphaChanged;
     double                                 m_dLastRotationTime;
-    bool                                   m_bBlowNextFrame;
+    bool                                   m_blowAfterStreamIn;
     bool                                   m_bIsOnGround;
     bool                                   m_bHeliSearchLightVisible;
     float                                  m_fHeliRotorSpeed;
@@ -675,8 +692,9 @@ protected:
 
     unsigned long m_ulIllegalTowBreakTime;
 
-    bool m_bBlown;
     bool m_bHasDamageModel;
+
+    VehicleBlowState m_blowState = VehicleBlowState::INTACT;
 
     bool                          m_bTaxiLightOn;
     std::list<CClientProjectile*> m_Projectiles;

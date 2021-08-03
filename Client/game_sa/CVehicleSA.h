@@ -406,9 +406,19 @@ public:
     CVehicleSAInterface* m_towingVehicle;      // 1220
     CVehicleSAInterface* m_trailerVehicle;     // 1224
 
+    CPedSAInterface* m_bombPlanter;                         // 1228
+    uint32_t         m_deleteAfterTime;                     // 1232
+    uint32_t         m_lastGunFireTime;                     // 1236
+    uint32_t         m_lastBlowUpTime;                      // 1240
+    uint16_t         m_policeChaseLeaveCarTimer;            // 1244
+    uint16_t         m_delayedExplosionTimer;               // 1246
+    void*            m_responsibleForDetonation;            // 1248
+    float            m_frontGroundZ;                        // 1252
+    float            m_rearGroundZ;                         // 1256
+
     /*** BEGIN SECTION that was added by us ***/
-    BYTE      Padding200[37];            // 1228
-    CVehicle* m_pVehicle;                // 1268
+    uint8_t   _padding1262[8];            // 1260
+    CVehicle* m_pVehicle;                 // 1268
     /*** END SECTION that was added by us ***/
 
     // 1272

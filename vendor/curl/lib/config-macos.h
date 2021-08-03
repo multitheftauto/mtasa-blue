@@ -43,6 +43,9 @@
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
 
+/* disable alt-svc */
+#define CURL_DISABLE_HSTS 1
+
 /* to disable HTTP */
 /* #undef CURL_DISABLE_HTTP */
 
@@ -682,9 +685,6 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the strncasecmp function. */
-#define HAVE_STRNCASECMP 1
-
 /* Define to 1 if you have the strncmpi function. */
 /* #undef HAVE_STRNCMPI */
 
@@ -796,6 +796,9 @@
 /* Define to 1 if you have the winber.h header file. */
 /* #undef HAVE_WINBER_H */
 
+/* Define to 1 if you have the wincrypt.h header file. */
+/* #undef HAVE_WINCRYPT_H */
+
 /* Define to 1 if you have the windows.h header file. */
 /* #undef HAVE_WINDOWS_H */
 
@@ -810,9 +813,6 @@
 
 /* Define to 1 if you have the <wolfssh/ssh.h> header file. */
 /* #undef HAVE_WOLFSSH_SSH_H */
-
-/* Define to 1 if you have the `wolfSSLv3_client_method' function. */
-/* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
 /* if you have wolfSSL_DES_ecb_encrypt */
 /* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
@@ -869,7 +869,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin20.3.0"
+#define OS "x86_64-apple-darwin20.5.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -909,9 +909,6 @@
 
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV ssize_t
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
 
 /* Define to the type qualifier of arg 5 for select. */
 #define SELECT_QUAL_ARG5 
@@ -976,9 +973,6 @@
 /* Define to the type of arg 3 for strerror_r. */
 #define STRERROR_R_TYPE_ARG3 size_t
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#define TIME_WITH_SYS_TIME 1
-
 /* if AmiSSL is in use */
 /* #undef USE_AMISSL */
 
@@ -994,11 +988,8 @@
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
-/* if GnuTLS uses nettle as crypto backend */
-/* #undef USE_GNUTLS_NETTLE */
-
-/* to enable HSTS */
-/* #undef USE_HSTS */
+/* GSASL support enabled */
+/* #undef USE_GSASL */
 
 /* if hyper is in use */
 /* #undef USE_HYPER */
@@ -1054,6 +1045,9 @@
 /* if quiche is in use */
 /* #undef USE_QUICHE */
 
+/* if rustls is enabled */
+/* #undef USE_RUSTLS */
+
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
 
@@ -1071,6 +1065,10 @@
 
 /* Use Unix domain sockets */
 #define USE_UNIX_SOCKETS 1
+
+/* Define to 1 if you are building a Windows target with crypto API support.
+   */
+/* #undef USE_WIN32_CRYPTO */
 
 /* Define to 1 if you have the `normaliz' (WinIDN) library (-lnormaliz). */
 /* #undef USE_WIN32_IDN */

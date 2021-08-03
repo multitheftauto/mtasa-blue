@@ -118,18 +118,18 @@ public:
 
         if (fabs(fDenom) > 1e-4f)
         {
-            *fOutDist = (vecPosition.Length() - vecNormal.DotProduct(this)) / fDenom;
+            *fOutDist = (vecNormal.DotProduct(&vecPosition) - vecNormal.DotProduct(this)) / fDenom;
             return true;
         }
 
         if (fDenom != 0.0f)
         {
-            *fOutDist = (vecPosition.Length() - vecNormal.DotProduct(this)) / fDenom;
+            *fOutDist = (vecNormal.DotProduct(&vecPosition) - vecNormal.DotProduct(this)) / fDenom;
             return fabs(*fOutDist) < 1e-4f;
         }
 
         *fOutDist = 0.0f;
-        return fabs(vecNormal.DotProduct(this) - vecPosition.Length()) < 1e-3f;;
+        return fabs(vecNormal.DotProduct(this) - vecNormal.DotProduct(&vecPosition)) < 1e-3f;;
     }
 
     bool IntersectsSegmentPlane(const CVector& vecSegment, const CVector& vecNormal, const CVector& vecPosition, CVector* outVec) const noexcept
