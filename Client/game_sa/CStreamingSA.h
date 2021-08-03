@@ -29,6 +29,7 @@ public:
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
     CStreamingInfo* GetStreamingInfoFromModelId(uint32 id);
+    void MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t GetMemoryUsed() const override;
 
 private:

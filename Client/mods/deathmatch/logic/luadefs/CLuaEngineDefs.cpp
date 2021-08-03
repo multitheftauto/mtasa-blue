@@ -12,6 +12,11 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 
+void EngineStreamingFreeUpMemory(std::uint32_t bytes)
+{
+    g_pGame->GetStreaming()->MakeSpaceFor(bytes);
+}
+
 std::uint32_t EngineStreamingGetUsedMemory()
 {
     return g_pGame->GetStreaming()->GetMemoryUsed();
@@ -56,7 +61,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
-
+        {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
