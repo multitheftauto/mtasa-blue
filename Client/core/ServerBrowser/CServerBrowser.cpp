@@ -354,7 +354,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
         m_pRemoveFromRecentIcon[type]->SetPosition(CVector2D(fWidth - 40 - 8, (SB_BUTTON_SIZE_Y - 16) / 2), false);
         m_pRemoveFromRecentIcon[type]->SetSize(CVector2D(16, 16), false);
         m_pRemoveFromRecentIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\trashcan.png");
-        m_pRemoveFromRecentIcon[type]->SetAlpha(1.0f);
+        m_pRemoveFromRecentIcon[type]->SetAlpha(0.3f);
         m_pRemoveFromRecentIcon[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnRemoveFromRecentClick, this));
     }
 
