@@ -4122,7 +4122,7 @@ retry:
             pTempEntity->SetParent(pParent);
         }
 
-        if (TempAttachedToID != INVALID_ELEMENT_ID && pTempEntity->GetType() != CCLIENTPLAYER)
+        if (TempAttachedToID != INVALID_ELEMENT_ID)
         {
             CClientEntity* pAttachedToEntity = CElementIDs::GetElement(TempAttachedToID);
             if (pAttachedToEntity)
