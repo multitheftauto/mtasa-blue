@@ -1729,7 +1729,7 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
 
 bool CLuaVehicleDefs::IsVehicleBlown(CVehicle* vehicle)
 {
-    return vehicle->GetIsBlown();
+    return vehicle->IsBlown();
 }
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
