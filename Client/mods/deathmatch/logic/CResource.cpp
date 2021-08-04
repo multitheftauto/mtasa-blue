@@ -331,7 +331,7 @@ void CResource::Load()
             if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
             {
                 // Write resource net ID
-                pBitStream->Write(this->GetNetID());
+                pBitStream->Write(GetNetID());
 
                 g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             }
