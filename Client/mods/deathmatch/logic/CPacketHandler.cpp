@@ -1362,7 +1362,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         {
             // Get the message type and push the argument
             bitStream.Read(ucMessageType);
-            iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 1;
+            iNumberOfBytesUsed -= 1;
         }
 
         // Valid length?
