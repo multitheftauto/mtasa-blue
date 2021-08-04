@@ -12,7 +12,7 @@
 #include "CClientVectorGraphicDisplay.h"
 
 namespace lunasvg {
-    class SVGDocument;
+    class Document;
 }
 
 class CClientVectorGraphic final : public CClientTexture
@@ -28,28 +28,28 @@ public:
     eClientEntityType GetType() const { return CCLIENTVECTORGRAPHIC; }
 
     void CreateDocument();
-
-    bool LoadFromFile(std::string strFilePath);
     bool LoadFromData(std::string strData);
 
     void Destroy();
     bool IsDestroyed() const { return m_bIsDestroyed; }
 
-    lunasvg::SVGDocument*   GetSVGDocument() const { return m_pDocument.get(); }
-    CVectorGraphicItem*     GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
+    lunasvg::Document*   GetSVGDocument() const { return m_pDocument.get(); }
+    CVectorGraphicItem*  GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
 
-    std::string GetSVGDocumentXML() const;
-    bool        SetSVGDocumentXML(CXMLNode* xmlNode);
+    CXMLNode* GetSVGDocumentXML() const;
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
 
     float GetDPI() const { return m_fDPI; }
     void  SetDPI(const float dpi) { m_fDPI = dpi; }
 private:
-    CResource*                                        m_pResource;
-    CClientManager*                                   m_pManager;
-    std::unique_ptr<lunasvg::SVGDocument>             m_pDocument;
-    std::unique_ptr<CClientVectorGraphicDisplay>      m_pVectorGraphicDisplay;
+    CResource*                                     m_pResource;
+    CClientManager*                                m_pManager;
+
+    std::unique_ptr<lunasvg::Document>             m_pDocument;
+    CXMLNode*                                      m_pXMLDocument;
+
+    std::unique_ptr<CClientVectorGraphicDisplay>   m_pVectorGraphicDisplay;
 
     float m_fDPI = 96.0;
     bool  m_bIsDestroyed = false;

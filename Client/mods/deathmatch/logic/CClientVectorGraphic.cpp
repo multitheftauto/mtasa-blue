@@ -9,9 +9,7 @@
 
 #include "StdInc.h"
 #include "CClientVectorGraphic.h"
-#include <svgdocument.h>
-
-using namespace lunasvg;
+#include <document.h>
 
 CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
     : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)
@@ -19,75 +17,40 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     SetTypeName("svg");
 
     m_pDocument = nullptr;
+    m_pXMLDocument = nullptr;
+
     m_pResource = nullptr;
     m_pManager = pManager;
     
     m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
-
-    CreateDocument();
-}
-
-void CClientVectorGraphic::CreateDocument()
-{
-    if (m_pDocument)
-        return;
-
-    m_pDocument = std::make_unique<SVGDocument>();
-
-    SVGElement* rootElement = m_pDocument->rootElement();
-
-    uint uiWidth = GetRenderItem()->m_uiSurfaceSizeX;
-    uint uiHeight = GetRenderItem()->m_uiSurfaceSizeY;
-
-    std::string strWidth = std::to_string(uiWidth);
-    std::string strHeight = std::to_string(uiHeight);
-
-    rootElement->setAttribute("viewBox", "0, 0, " + strWidth + ", " + strHeight);
-    rootElement->setAttribute("x", "50%");
-    rootElement->setAttribute("y", "50%");
-    rootElement->setAttribute("width", strWidth);
-    rootElement->setAttribute("height", strHeight);
-}
-
-bool CClientVectorGraphic::LoadFromFile(std::string strFilePath)
-{
-    if(!m_pDocument)
-        return false;
-
-    if (m_pDocument->loadFromFile(strFilePath))
-    {
-        m_pVectorGraphicDisplay->Update();
-        return true;
-    }
-
-    return false;
 }
 
 bool CClientVectorGraphic::LoadFromData(std::string strData)
 {
-    if(!m_pDocument)
+    m_pDocument = lunasvg::Document::loadFromData(strData);
+    auto xmlStringNode = g_pCore->GetXML()->ParseString(strData.c_str());
+
+    if (!m_pDocument || !xmlStringNode)
         return false;
 
-    if (m_pDocument->loadFromData(strData))
-    {
-        m_pVectorGraphicDisplay->Update();
-        return true;
-    }
+    CXMLNode* node = xmlStringNode->node;
 
-    return false;
+    if (!node || !node->IsValid())
+        return false;
+
+    m_pXMLDocument = node;
+    m_pVectorGraphicDisplay->Update();
+    return true;
 }
 
-std::string CClientVectorGraphic::GetSVGDocumentXML() const
+CXMLNode* CClientVectorGraphic::GetSVGDocumentXML() const
 {
-    return m_pDocument->toString();
-}
-
-bool CClientVectorGraphic::SetSVGDocumentXML(CXMLNode* xmlDocument)
-{
-    return LoadFromData(xmlDocument->ToString());
+    return m_pXMLDocument;
 }
 
 void CClientVectorGraphic::Destroy()
 {
+    delete m_pXMLDocument;
+
     m_bIsDestroyed = true;
 }

@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "CClientVectorGraphicDisplay.h"
 #include "CClientVectorGraphic.h"
-#include <svgdocument.h>
+#include <document.h>
 
 using namespace lunasvg;
 
@@ -56,7 +56,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     if (m_pVectorGraphic->IsDestroyed())
         return;
 
-    SVGDocument* svgDocument = m_pVectorGraphic->GetSVGDocument();
+    Document* svgDocument = m_pVectorGraphic->GetSVGDocument();
 
     if(svgDocument == nullptr)
         return;
@@ -73,7 +73,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     uint width = pVectorGraphicItem->m_uiSizeX;
     uint height = pVectorGraphicItem->m_uiSizeY;
 
-    Bitmap bitmap = svgDocument->renderToBitmap(width, height, m_pVectorGraphic->GetDPI());
+    Bitmap bitmap = svgDocument->renderToBitmap(width, height);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;

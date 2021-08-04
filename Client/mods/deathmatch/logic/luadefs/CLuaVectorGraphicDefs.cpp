@@ -40,8 +40,8 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     if (size.fX <= 0 || size.fY <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    CResource* pParentResource = pLuaMain->GetResource();
+    CLuaMain&  pLuaMain = lua_getownercluamain(luaVM);
+    CResource* pParentResource = pLuaMain.GetResource();
 
     CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
@@ -75,13 +75,32 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         else
         {
             std::string strPath;
-            if (CResourceManager::ParseResourcePathInput(pathOrRawData.value(), pParentResource, &strPath) && FileExists(strPath))
+            std::string strMetaPath;
+
+            if (CResourceManager::ParseResourcePathInput(pathOrRawData.value(), pParentResource, &strPath, &strMetaPath))
             {
-                if (!pVectorGraphic->LoadFromFile(strPath))
+                eAccessType  accessType = strPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+                CScriptFile* pFile = new CScriptFile(pParentResource->GetScriptID(), strMetaPath.c_str(), 52428800, accessType); // 52428800 is from CLuaFileDefs, maybe move that definition elsewhere so we can share it?
+
+                if (!pFile->Load(pParentResource, CScriptFile::MODE_READ))
+                {
+                    delete pFile;
+                    pVectorGraphic->Destroy();
+                    throw std::invalid_argument(SString("Unable to load SVG file [%s]", pathOrRawData.value().c_str()));
+                }
+
+                SString strXmlData;
+                pFile->Read(pFile->GetSize(), strXmlData);
+
+                // We don't need the file handler anymore
+                delete pFile;
+
+                if (strXmlData.empty() || !pVectorGraphic->LoadFromData(strXmlData))
                 {
                     pVectorGraphic->Destroy();
-                    throw std::invalid_argument(SString("Unable to load SVG (check for syntax errors) [%s]", pathOrRawData.value().c_str()));
+                    throw std::invalid_argument("Unable to load raw SVG data (check for XML syntax errors)");
                 }
+
             }
             else
             {
@@ -96,23 +115,18 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
 CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic)
 {
-    CLuaMain* pLuaMain = &lua_getownercluamain(luaVM);
+    CXMLNode* xmlDocument = pVectorGraphic->GetSVGDocumentXML();
 
-    if (pLuaMain)
-    {
-        CXMLNode* rootNode = pLuaMain->ParseString(pVectorGraphic->GetSVGDocumentXML().c_str());
+    if (!xmlDocument)
+        throw std::invalid_argument("Unable to get SVG XML document");
 
-        if (rootNode && rootNode->IsValid())
-            return rootNode;
-    }
-
-    throw std::invalid_argument("Unable to get SVG XML document");
+    return xmlDocument;
 }
 
 void CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
 {
-    if (pVectorGraphic->LoadFromData(pXMLNode->ToString()))
-        return;
+    if (!pVectorGraphic->LoadFromData(pXMLNode->ToString()))
+        throw std::invalid_argument("Unable to set SVG XML document");
 
-    throw std::invalid_argument("Unable to set SVG XML document");
+    return;
 }
