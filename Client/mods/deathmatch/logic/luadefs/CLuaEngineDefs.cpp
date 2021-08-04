@@ -72,7 +72,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelCollisionData", ArgumentParser<EngineGetModelCollisionData>},
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
         {"engineUpdateModelCollisionBoundingBox", ArgumentParser<EngineUpdateModelCollisionBoundingBox>},
-        {"isModelCollisionLoaded", ArgumentParser<IsModelCollisionLoaded> },
+        {"isModelCollisionLoaded", ArgumentParser<IsModelCollisionLoaded>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2086,7 +2086,7 @@ std::unordered_map<std::string, std::variant<float, int, CVector>> CLuaEngineDef
     CScriptArgReader argStream(luaVM);
     // Grab the COL or model ID
     // If COL element then read custom collision, otherwise read original collision
-    if( argStream.NextIsNumber())
+    if (argStream.NextIsNumber())
         argStream.ReadNumber(usModel);
     else
         argStream.ReadUserData(pCol);
