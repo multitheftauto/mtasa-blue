@@ -2,6 +2,22 @@
 
 #include <math.h>
 
+void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, double h)
+{
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
+}
+
+void plutovg_rect_init_zero(plutovg_rect_t* rect)
+{
+    rect->x = 0.0;
+    rect->y = 0.0;
+    rect->w = 0.0;
+    rect->h = 0.0;
+}
+
 void plutovg_matrix_init(plutovg_matrix_t* matrix, double m00, double m10, double m01, double m11, double m02, double m12)
 {
     matrix->m00 = m00; matrix->m10 = m10;

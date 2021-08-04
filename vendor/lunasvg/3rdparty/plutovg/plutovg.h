@@ -29,6 +29,9 @@ typedef struct {
     double h;
 } plutovg_rect_t;
 
+void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, double h);
+void plutovg_rect_init_zero(plutovg_rect_t* rect);
+
 typedef struct {
     double m00; double m10;
     double m01; double m11;
@@ -122,6 +125,8 @@ plutovg_gradient_t* plutovg_gradient_create_radial(double cx, double cy, double 
 plutovg_gradient_t* plutovg_gradient_reference(plutovg_gradient_t* gradient);
 void plutovg_gradient_destroy(plutovg_gradient_t* gradient);
 int plutovg_gradient_get_reference_count(const plutovg_gradient_t* gradient);
+void plutovg_gradient_set_type(plutovg_gradient_t* gradient, plutovg_gradient_type_t type);
+plutovg_gradient_type_t plutovg_gradient_get_type(const plutovg_gradient_t* gradient);
 void plutovg_gradient_set_spread(plutovg_gradient_t* gradient, plutovg_spread_method_t spread);
 plutovg_spread_method_t plutovg_gradient_get_spread(const plutovg_gradient_t* gradient);
 void plutovg_gradient_set_matrix(plutovg_gradient_t* gradient, const plutovg_matrix_t* matrix);
@@ -132,7 +137,6 @@ void plutovg_gradient_add_stop(plutovg_gradient_t* gradient, const plutovg_gradi
 void plutovg_gradient_clear_stops(plutovg_gradient_t* gradient);
 int plutovg_gradient_get_stop_count(const plutovg_gradient_t* gradient);
 plutovg_gradient_stop_t* plutovg_gradient_get_stops(const plutovg_gradient_t* gradient);
-plutovg_gradient_type_t plutovg_gradient_get_type(const plutovg_gradient_t* gradient);
 void plutovg_gradient_get_values_linear(const plutovg_gradient_t* gradient, double* x1, double* y1, double* x2, double* y2);
 void plutovg_gradient_get_values_radial(const plutovg_gradient_t* gradient, double* cx, double* cy, double* cr, double* fx, double* fy, double* fr);
 void plutovg_gradient_set_values_linear(plutovg_gradient_t* gradient, double x1, double y1, double x2, double y2);
@@ -275,6 +279,7 @@ void plutovg_paint(plutovg_t* pluto);
 void plutovg_fill_preserve(plutovg_t* pluto);
 void plutovg_stroke_preserve(plutovg_t* pluto);
 void plutovg_clip_preserve(plutovg_t* pluto);
+void plutovg_reset_clip(plutovg_t* pluto);
 
 #ifdef __cplusplus
 }

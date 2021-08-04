@@ -9,9 +9,12 @@ project "lunasvg"
 
   defines { "LUNASVG_EXPORTS", "LUNASVG_SHARED", "_CRT_SECURE_NO_WARNINGS" }
 
-	vpaths {
-		["Headers/*"] = "**.h",
-		["Sources/*"] = "**.cpp",
+    vpaths {
+    	["Headers"] = "source/**.h",
+        ["Headers/*"] = "include/**.h",
+		["Headers/3rdparty/*"] = "3rdparty/**.h",
+		["Sources"] = "source/**.cpp",
+		["Sources/*"] = "3rdparty/**.cpp",
 		["Sources/*"] = "**.c",
 		["*"] = "premake5.lua"
 	}
@@ -24,18 +27,14 @@ project "lunasvg"
   }
 
   includedirs { 
-    "3rdparty/stb", 
     "3rdparty/plutovg", 
     "3rdparty/software", 
-    "source/geometry", 
-    "source/graphics", 
     "source", 
-    "include", 
-    "contrib"
+    "include"
   }
 
 configuration "vs2019"
   flags { "MultiProcessorCompile" }
 
 configuration "vs2019 and Release"
-  flags { "LinkTimeOptimization" }
+  flags { "LinkTimeOptimization" } 

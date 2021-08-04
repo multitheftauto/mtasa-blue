@@ -142,6 +142,11 @@ void plutovg_blend_color(plutovg_t* pluto, const plutovg_rle_t* rle, const pluto
 void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_gradient_t* gradient);
 void plutovg_blend_texture(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_texture_t* texture);
 
+#define plutovg_alpha(c) ((c) >> 24)
+#define plutovg_red(c) (((c) >> 16) & 0xff)
+#define plutovg_green(c) (((c) >> 8) & 0xff)
+#define plutovg_blue(c) (((c) >> 0) & 0xff)
+
 #define plutovg_array_init(array) \
     do { \
         array.data = NULL; \

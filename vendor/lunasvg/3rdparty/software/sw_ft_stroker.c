@@ -1915,11 +1915,14 @@ SW_FT_Error SW_FT_Stroker_ParseOutline(SW_FT_Stroker        stroker,
     Close:
         if (error) goto Exit;
 
-        /* don't try to end the path if no segments have been generated */
-        if (!stroker->first_point) {
-            error = SW_FT_Stroker_EndSubPath(stroker);
+        if (stroker->first_point) {
+            stroker->subpath_open = TRUE;
+            error = ft_stroker_subpath_start(stroker, 0, 0);
             if (error) goto Exit;
         }
+
+        error = SW_FT_Stroker_EndSubPath(stroker);
+        if (error) goto Exit;
 
         first = last + 1;
     }

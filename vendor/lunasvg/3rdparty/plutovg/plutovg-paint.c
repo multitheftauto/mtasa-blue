@@ -22,12 +22,7 @@ plutovg_gradient_t* plutovg_gradient_create_linear(double x1, double y1, double 
     gradient->opacity = 1.0;
     plutovg_array_init(gradient->stops);
     plutovg_matrix_init_identity(&gradient->matrix);
-
-    gradient->values[0] = x1;
-    gradient->values[1] = y1;
-    gradient->values[2] = x2;
-    gradient->values[3] = y2;
-
+    plutovg_gradient_set_values_linear(gradient, x1, y1, x2, y2);
     return gradient;
 }
 
@@ -40,14 +35,7 @@ plutovg_gradient_t* plutovg_gradient_create_radial(double cx, double cy, double 
     gradient->opacity = 1.0;
     plutovg_array_init(gradient->stops);
     plutovg_matrix_init_identity(&gradient->matrix);
-
-    gradient->values[0] = cx;
-    gradient->values[1] = cy;
-    gradient->values[2] = cr;
-    gradient->values[3] = fx;
-    gradient->values[4] = fy;
-    gradient->values[5] = fr;
-
+    plutovg_gradient_set_values_radial(gradient, cx, cy, cr, fx, fy, fr);
     return gradient;
 }
 
@@ -74,6 +62,16 @@ int plutovg_gradient_get_reference_count(const plutovg_gradient_t* gradient)
     return gradient->ref;
 }
 
+void plutovg_gradient_set_type(plutovg_gradient_t* gradient, plutovg_gradient_type_t type)
+{
+    gradient->type = type;
+}
+
+plutovg_gradient_type_t plutovg_gradient_get_type(const plutovg_gradient_t* gradient)
+{
+    return gradient->type;
+}
+
 void plutovg_gradient_set_spread(plutovg_gradient_t* gradient, plutovg_spread_method_t spread)
 {
     gradient->spread = spread;
@@ -86,12 +84,12 @@ plutovg_spread_method_t plutovg_gradient_get_spread(const plutovg_gradient_t* gr
 
 void plutovg_gradient_set_matrix(plutovg_gradient_t* gradient, const plutovg_matrix_t* matrix)
 {
-    memcpy(&gradient->matrix, matrix, sizeof(plutovg_matrix_t));
+    gradient->matrix = *matrix;
 }
 
-void plutovg_gradient_get_matrix(const plutovg_gradient_t* gradient, plutovg_matrix_t *matrix)
+void plutovg_gradient_get_matrix(const plutovg_gradient_t* gradient, plutovg_matrix_t* matrix)
 {
-    memcpy(matrix, &gradient->matrix, sizeof(plutovg_matrix_t));
+    *matrix = gradient->matrix;
 }
 
 void plutovg_gradient_add_stop_rgb(plutovg_gradient_t* gradient, double offset, double r, double g, double b)
@@ -141,11 +139,6 @@ int plutovg_gradient_get_stop_count(const plutovg_gradient_t* gradient)
 plutovg_gradient_stop_t* plutovg_gradient_get_stops(const plutovg_gradient_t* gradient)
 {
     return gradient->stops.data;
-}
-
-plutovg_gradient_type_t plutovg_gradient_get_type(const plutovg_gradient_t* gradient)
-{
-    return gradient->type;
 }
 
 void plutovg_gradient_get_values_linear(const plutovg_gradient_t* gradient, double* x1, double* y1, double* x2, double* y2)
