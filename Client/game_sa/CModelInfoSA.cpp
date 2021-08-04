@@ -1292,6 +1292,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // If no collision model has been set before, store the original in case we want to restore it
         if (!m_pOriginalColModelInterface)
             m_pOriginalColModelInterface = m_pInterface->pColModel;
+            m_pInterface->bAlphaTransparency = false;
 
         // Apply some low-level hacks
         pColModelInterface->level = 0xA9;
@@ -1299,6 +1300,8 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // Call SetColModel
         DWORD dwFunc = FUNC_SetColModel;
         DWORD ModelID = m_dwModelID;
+        // Don't force the isLod argument to prevent collisionless problem
+        bool  isLOD = m_pInterface->bIsLod;
         _asm
         {
             mov     ecx, ModelID
@@ -1308,7 +1311,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
             mov     ecx, dword ptr[eax + ecx*4]
             pop     eax
 
-            push    1
+            push    isLOD
             push    pColModelInterface
             call    dwFunc
         }
@@ -1357,6 +1360,8 @@ void CModelInfoSA::RestoreColModel()
             DWORD dwFunc = FUNC_SetColModel;
             DWORD dwOriginalColModelInterface = (DWORD)m_pOriginalColModelInterface;
             DWORD ModelID = m_dwModelID;
+            // Don't force the isLod argument to prevent collisionless problem
+            bool  isLOD = m_pInterface->bIsLod;
             _asm
             {
                 mov     ecx, ModelID
@@ -1366,7 +1371,7 @@ void CModelInfoSA::RestoreColModel()
                 mov     ecx, dword ptr[eax + ecx*4]
                 pop     eax
 
-                push    1
+                push    isLOD
                 push    dwOriginalColModelInterface
                 call    dwFunc
             }
@@ -1475,7 +1480,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->uObjectInfoIndex = 65535;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1493,7 +1498,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->pVisualInfo = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->uObjectInfoIndex = 65535;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;

@@ -151,34 +151,53 @@ public:
     unsigned char  ucAlpha : 8;                         // +12
 
     unsigned char  ucNumOf2DEffects : 8;            // +13
-    unsigned short usUnknown : 16;                  // +14     Something with 2d effects
+    unsigned short uObjectInfoIndex : 16;            // +14
 
     unsigned short usDynamicIndex : 16;            // +16
 
     // Flags used by CBaseModelInfo
-    unsigned char bHasBeenPreRendered : 1;            // +18
-    unsigned char bAlphaTransparency : 1;
-    unsigned char bIsLod : 1;
-    unsigned char bDontWriteZBuffer : 1;
-    unsigned char bDontCastShadowsOn : 1;
+    unsigned char bHasBeenPreRendered : 1;  // Confirmed: Has Pre-Rendered          // +18
+    unsigned char bDrawLast : 1;            // Confirmed: Drawn Last
     unsigned char bDrawAdditive : 1;
-    unsigned char bDrawLast : 1;
+    unsigned char bDontWriteZBuffer : 1;    // Confirmed: Don't Write Z Buffer
+    unsigned char bDontCastShadowsOn : 1;   // Confirmed: Don't Cast Shadow On
+    unsigned char bIsLod : 1;               // Confirmed: is LOD
+    unsigned char bAlphaTransparency : 1;
     unsigned char bDoWeOwnTheColModel : 1;
-
-    unsigned char bHasAnimation : 1;            // +19
-    unsigned char dwUnknownFlag26 : 1;
-    unsigned char dwUnknownFlag27 : 1;
-    unsigned char bSwaysInWind : 1;
-    unsigned char bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
-    unsigned char bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
-    unsigned char bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
-    unsigned char bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
-
+    union
+    {
+        struct
+        {            // Atomic flags
+            unsigned char bIsRoad : 1;
+            unsigned char : 1;
+            unsigned char bDontCollideWithFlyer : 1;            // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
+            unsigned char nSpecialType : 4;
+            unsigned char bWetRoadReflection : 1;               // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+        };
+        struct
+        {            // Vehicle flags
+            unsigned char bUsesVehDummy : 1;
+            unsigned char : 1;
+            unsigned char nCarmodId : 5;
+            unsigned char bUseCommonVehicleDictionary : 1;
+        };
+        struct
+        {            // Clump flags
+            unsigned char bHasAnimBlend : 1;                    // Confirmed: has animation
+            unsigned char bHasComplexHierarchy : 1;             // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
+            unsigned char bUnknown1 : 1;
+            unsigned char bSwaysInWind : 1;                     // Confirmed: Sways in wind
+            unsigned char bCollisionWasStreamedWithModel : 1;   // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
+            unsigned char bOwnsCollisionModel : 1;
+            unsigned char bUnknown2 : 1;
+            unsigned char bTagDisabled : 1;
+        };
+    };
+   
     CColModelSAInterface* pColModel;            // +20      CColModel: public CBoundingBox
 
     float     fLodDistanceUnscaled;            // +24      Scaled is this value multiplied with flt_B6F118
     RwObject* pRwObject;                       // +28
-
     // CWeaponModelInfo:
     // +36 = Weapon info as int
 
