@@ -184,6 +184,7 @@ CCredits::CCredits()
         "mickdermack\n"
         "NeO_D-Power\n"
         "Patrick2562\n"
+        "PauloKim1246\n"
         "Pawelo / 4O4\n"
         "pentaflops\n"
         "PerikiyoXD\n"
