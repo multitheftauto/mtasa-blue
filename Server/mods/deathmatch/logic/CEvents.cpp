@@ -17,7 +17,7 @@ CEvents::CEvents()
     m_bEventCancelled = false;
 }
 
-bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pLuaMain, bool bAllowRemoteTrigger, eServerRPCFunctions eServerRPCFunction)
+bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pLuaMain, bool bAllowRemoteTrigger)
 {
     assert(szName);
     assert(szArguments);
@@ -32,7 +32,6 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
     pEvent->strArguments = szArguments;
     pEvent->pLuaMain = pLuaMain;
     pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
-    pEvent->eServerRPCFunction = eServerRPCFunction;
 
     m_EventHashMap[szName] = pEvent;
 

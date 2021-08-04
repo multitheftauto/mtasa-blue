@@ -438,11 +438,11 @@ void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned cha
     }
 }
 
-void CCore::SetChatVisible(bool bVisible)
+void CCore::SetChatVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible(bVisible);
+        m_pLocalGUI->SetChatBoxVisible(bVisible, bInputBlocked);
     }
 }
 
@@ -451,6 +451,15 @@ bool CCore::IsChatVisible()
     if (m_pLocalGUI)
     {
         return m_pLocalGUI->IsChatBoxVisible();
+    }
+    return false;
+}
+
+bool CCore::IsChatInputBlocked()
+{
+    if (m_pLocalGUI)
+    {
+        return m_pLocalGUI->IsChatBoxInputBlocked();
     }
     return false;
 }
@@ -1185,6 +1194,9 @@ void CCore::DoPostFramePulse()
         ApplyGameSettings();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
+
+        // Change the main thread affinity to first core
+        SetThreadAffinityMask(GetCurrentThread(), 0x1);
     }
 
     if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE

@@ -275,16 +275,3 @@ enum eElementRPCFunctions
 
     NUM_RPC_FUNCS // Add above this line
 };
-
-enum eServerRPCFunctions
-{
-    PLAYER_INGAME_NOTICE,
-    INITIAL_DATA_STREAM,
-    PLAYER_TARGET,
-    PLAYER_WEAPON,
-    KEY_BIND,
-    CURSOR_EVENT,
-    REQUEST_STEALTH_KILL,
-
-    NUM_SERVER_RPC_FUNCS // Add above this line
-};

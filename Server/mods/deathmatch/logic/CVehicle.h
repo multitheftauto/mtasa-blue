@@ -136,6 +136,13 @@ struct SSirenInfo
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
 };
 
+enum class VehicleBlowState : unsigned char
+{
+    INTACT,
+    AWAITING_EXPLOSION_SYNC,
+    BLOWN,
+};
+
 class CTrainTrack;
 
 class CVehicle final : public CElement
@@ -187,7 +194,7 @@ public:
     void           SetTurnSpeed(const CVector& vecTurnSpeed) { m_vecTurnSpeed = vecTurnSpeed; };
 
     float GetHealth() { return m_fHealth; };
-    void  SetHealth(float fHealth) { m_fHealth = fHealth; };
+    void  SetHealth(float fHealth);
     float GetLastSyncedHealth() { return m_fLastSyncedHealthHealth; };
     void  SetLastSyncedHealth(float fHealth) { m_fLastSyncedHealthHealth = fHealth; };
 
@@ -337,9 +344,14 @@ public:
 
     void ResetDoors();
     void ResetDoorsWheelsPanelsLights();
-    void SetIsBlown(bool bBlown);
-    bool GetIsBlown() const noexcept { return m_llBlowTime.ToLongLong() != 0; }
+
     bool IsBlowTimerFinished();
+    void ResetExplosionTimer();
+
+    bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
+    void             SetBlowState(VehicleBlowState state);
+    VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
+
     void StopIdleTimer();
     void RestartIdleTimer();
     bool IsIdleTimerRunning();
@@ -368,6 +380,8 @@ private:
     float          m_fLastSyncedHealthHealth;
     CTickCount     m_llBlowTime;
     CTickCount     m_llIdleTime;
+
+    VehicleBlowState m_blowState = VehicleBlowState::INTACT;
 
     unsigned char m_ucMaxPassengersOverride;
 

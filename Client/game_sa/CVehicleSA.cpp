@@ -1495,7 +1495,10 @@ void CVehicleSA::SetHealth(FLOAT fHealth)
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     vehicle->m_nHealth = fHealth;
     if (fHealth >= 250.0f)
+    {
         vehicle->m_fBurningTime = 0.0f;
+        vehicle->m_delayedExplosionTimer = 0;
+    }
 }
 
 // SHould be plane funcs

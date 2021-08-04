@@ -19,7 +19,9 @@ void CLuaClientDefs::LoadFunctions()
         {"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
         {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
         {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
-
+        {"showChat", ArgumentParserWarn<false, ShowChat>},
+        {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
+        {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
         {"clearDebugBox", ArgumentParser<ClearDebug>}
     };
 
@@ -40,6 +42,27 @@ bool CLuaClientDefs::IsTransferBoxVisible()
 bool CLuaClientDefs::IsTransferBoxAlwaysVisible()
 {
     return g_pClientGame->GetTransferBox()->IsAlwaysVisible();
+}
+
+bool CLuaClientDefs::ShowChat(bool bVisible, std::optional<bool> optInputBlocked)
+{
+    // Keep old behaviour: input is blocked when chat is hidden
+    bool bInputBlocked = !bVisible;
+    if (optInputBlocked.has_value())
+        bInputBlocked = optInputBlocked.value();
+
+    g_pCore->SetChatVisible(bVisible, bInputBlocked);
+    return true;
+}
+
+bool CLuaClientDefs::IsChatVisible()
+{
+    return g_pCore->IsChatVisible();
+}
+
+bool CLuaClientDefs::IsChatInputBlocked()
+{
+    return g_pCore->IsChatInputBlocked();
 }
 
 bool CLuaClientDefs::ClearDebug()
