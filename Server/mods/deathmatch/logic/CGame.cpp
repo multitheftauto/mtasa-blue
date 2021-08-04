@@ -2630,17 +2630,23 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                             case 7:             // EXP_TYPE_HELI
                             case 12:            // EXP_TYPE_TINY - RC Vehicles
                             {
-                                CVehicle* pVehicle = static_cast<CVehicle*>(pOrigin);
-                                // Is this vehicle not already blown?
-                                if (pVehicle->GetIsBlown() == false)
+                                CVehicle*        vehicle = static_cast<CVehicle*>(pOrigin);
+                                VehicleBlowState previousBlowState = vehicle->GetBlowState();
+
+                                if (previousBlowState != VehicleBlowState::BLOWN)
                                 {
-                                    pVehicle->SetIsBlown(true);
-                                    pVehicle->SetEngineOn(false);
+                                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                    vehicle->SetEngineOn(false);
 
-                                    CLuaArguments Arguments;
-                                    pVehicle->CallEvent("onVehicleExplode", Arguments);
+                                    // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
+                                    if (previousBlowState == VehicleBlowState::INTACT)
+                                    {
+                                        CLuaArguments arguments;
+                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                        vehicle->CallEvent("onVehicleExplode", arguments);
+                                    }
 
-                                    bBroadcast = pVehicle->GetIsBlown() && !pVehicle->IsBeingDeleted();
+                                    bBroadcast = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
                                 }
                                 else
                                 {

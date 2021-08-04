@@ -527,7 +527,7 @@ int CLuaUtilDefs::PregReplace(lua_State* luaVM)
     {
         pcrecpp::RE pPattern(strPattern, pOptions);
 
-        string strNew = strBase;
+        std::string strNew = strBase;
         if (pPattern.GlobalReplace(strReplace, &strNew))
         {
             lua_pushstring(luaVM, strNew.c_str());
@@ -562,7 +562,7 @@ int CLuaUtilDefs::PregMatch(lua_State* luaVM)
 
         pcrecpp::StringPiece strInput(strBase);
 
-        string strGet;
+        std::string strGet;
         int    i = 1;
         while (pPattern.FindAndConsume(&strInput, &strGet) && i <= iMaxResults)
         {

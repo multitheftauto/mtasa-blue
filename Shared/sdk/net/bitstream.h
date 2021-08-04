@@ -461,8 +461,12 @@ enum class eBitStreamVersion : unsigned short
     // 2021-01-16 0x72
     SetColPolygonHeight,
 
-    // Add serverside event "onPlayerResourceStart" #2150
-    // 2021-03-25 0x73
+    // Support for vehicle blow without explosion and blow state synchronisation
+    // 2021-02-26 0x73
+    VehicleBlowStateSupport,
+
+    // Add serverside event "onPlayerResourceStart" (#2150)
+    // 2021-03-25 0x74
     OnPlayerResourceStart,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.

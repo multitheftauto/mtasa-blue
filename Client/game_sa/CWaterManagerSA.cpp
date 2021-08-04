@@ -838,11 +838,19 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     CVector rayDir = vecEnd - vecStart;
 
     // Check if we're outside of map area.
-    CVector zeroPoint;
-    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
+    // Check for intersection with ocean outside the game area (takes water level into account)
+    // If a hit is detected, and it is outside, we early out, as custom water can't be created outside game boundaries
     {
-        *vecCollision = zeroPoint;
-        return true;
+        CVector intersection{};
+        const float waterHeight = *reinterpret_cast<float*>(0x6E873F);
+        if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &intersection))
+        {
+            if (IsPointOutsideOfGameArea(intersection))
+            {
+                *vecCollision = intersection;
+                return true;
+            }
+        }
     }
 
     // Early out in case of both points being out of map
@@ -858,7 +866,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
             return false;
         }
     }
-
+    
     std::vector<CWaterZoneSA*> vecZones;
     GetZonesIntersecting(vecStart, vecEnd, vecZones);
 

@@ -83,6 +83,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     if (m_pLuaVM)
     {
         m_pLuaVM->SetScriptName(szResourceName);
+        m_pLuaVM->LoadEmbeddedScripts();
     }
 }
 

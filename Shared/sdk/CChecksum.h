@@ -66,7 +66,10 @@ public:
     {
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromBuffer(cpBuffer, ulLength);
-        CMD5Hasher().Calculate(cpBuffer, ulLength, result.md5);
+
+        if (result.ulCRC != 0)
+            CMD5Hasher().Calculate(cpBuffer, ulLength, result.md5);
+        
         return result;
     }
 
