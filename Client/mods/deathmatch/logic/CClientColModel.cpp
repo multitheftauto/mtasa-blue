@@ -20,7 +20,6 @@ CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : Class
 
     SetTypeName("col");
 
-
     // Add us to DFF manager's list
     m_pColModelManager->AddToList(this);
 }
@@ -138,8 +137,10 @@ bool CClientColModel::HasReplaced(unsigned short usModel)
     {
         // Is this the given ID
         if (*iter == usModel)
+        {
             // We have replaced it
             return true;
+        }
     }
 
     // We have not replaced it
