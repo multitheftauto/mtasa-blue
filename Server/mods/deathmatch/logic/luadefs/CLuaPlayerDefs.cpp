@@ -95,7 +95,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"showCursor", ShowCursor},
 
         // Chat funcs
-        {"showChat", ShowChat},
+        {"showChat", ArgumentParserWarn<false, ShowChat>},
 
         // Admin functions
         {"kickPlayer", KickPlayer},
@@ -2050,28 +2050,15 @@ int CLuaPlayerDefs::ShowCursor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::ShowChat(lua_State* luaVM)
+bool CLuaPlayerDefs::ShowChat(CElement* pPlayer, bool bShow, std::optional<bool> optInputBlocked)
 {
-    CElement* pPlayer;
-    bool      bShow;
+    // Keep old behaviour: input is blocked when chat is hidden
+    bool bInputBlocked = !bShow;
+    if (optInputBlocked.has_value())
+        bInputBlocked = optInputBlocked.value();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-    argStream.ReadBool(bShow);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::ShowChat(pPlayer, bShow))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CStaticFunctionDefinitions::ShowChat(pPlayer, bShow, bInputBlocked);
+    return true;
 }
 
 int CLuaPlayerDefs::BanPlayer(lua_State* luaVM)

@@ -119,8 +119,9 @@ public:
     void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
     void ChatPrintf(const char* szFormat, bool bColorCoded, ...);
     void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...);
-    void SetChatVisible(bool bVisible);
+    void SetChatVisible(bool bVisible, bool bInputBlocked);
     bool IsChatVisible();
+    bool IsChatInputBlocked();
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled();
     bool ClearChat();

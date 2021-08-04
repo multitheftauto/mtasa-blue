@@ -43,6 +43,9 @@
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
 
+/* disable alt-svc */
+#define CURL_DISABLE_HSTS 1
+
 /* to disable HTTP */
 /* #undef CURL_DISABLE_HTTP */
 
@@ -811,9 +814,6 @@
 /* Define to 1 if you have the <wolfssh/ssh.h> header file. */
 /* #undef HAVE_WOLFSSH_SSH_H */
 
-/* Define to 1 if you have the `wolfSSLv3_client_method' function. */
-/* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
-
 /* if you have wolfSSL_DES_ecb_encrypt */
 /* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
 
@@ -990,9 +990,6 @@
 
 /* GSASL support enabled */
 /* #undef USE_GSASL */
-
-/* to enable HSTS */
-/* #undef USE_HSTS */
 
 /* if hyper is in use */
 /* #undef USE_HYPER */
