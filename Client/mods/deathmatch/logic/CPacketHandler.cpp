@@ -1336,14 +1336,15 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-    bool          ucColorCoded;
+    bool          bColorCoded;
 
     CClientEntity* pClient = nullptr;
 
-    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(ucColorCoded))
+    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(bColorCoded))
     {
         // Read the client's ID
-        int iNumberOfBytesUsed;
+        int           iNumberOfBytesUsed;
+        unsigned char ucMessageType;
 
         if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
@@ -1355,6 +1356,13 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         else
         {
             iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 4;
+        }
+
+        if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
+        {
+            // Get the message type and push the argument
+            bitStream.Read(ucMessageType);
+            iNumberOfBytesUsed -= 1;
         }
 
         // Valid length?
@@ -1381,11 +1389,16 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
                 Arguments.PushNumber(ucRed);
                 Arguments.PushNumber(ucGreen);
                 Arguments.PushNumber(ucBlue);
-                bool bCancelled = !pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity);
-                if (!bCancelled)
+
+                if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
+                {
+                    Arguments.PushNumber(ucMessageType);
+                }
+
+                if (pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity))
                 {
                     // Echo it
-                    g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, ucColorCoded);
+                    g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, bColorCoded);
                 }
             }
             delete[] szMessage;

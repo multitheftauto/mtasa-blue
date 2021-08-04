@@ -1493,7 +1493,7 @@ void CGame::AddBuiltInEvents()
 
     // Player events
     m_Events.AddEvent("onPlayerConnect", "player", NULL, false);
-    m_Events.AddEvent("onPlayerChat", "text", NULL, false);
+    m_Events.AddEvent("onPlayerChat", "text, messageType", NULL, false);
     m_Events.AddEvent("onPlayerDamage", "attacker, weapon, bodypart, loss", NULL, false);
     m_Events.AddEvent("onPlayerVehicleEnter", "vehicle, seat, jacked", NULL, false);
     m_Events.AddEvent("onPlayerVehicleExit", "vehicle, reason, jacker", NULL, false);

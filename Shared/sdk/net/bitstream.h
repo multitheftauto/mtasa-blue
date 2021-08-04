@@ -465,6 +465,10 @@ enum class eBitStreamVersion : unsigned short
     // 2021-02-26 0x73
     VehicleBlowStateSupport,
 
+    // Implement messageType parameter to onClientChatMessage (#1020)
+    // 2021-05-15 0x74
+    OnClientChatMessage_MessageType,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
