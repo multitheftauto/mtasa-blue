@@ -117,6 +117,7 @@ CCredits::CCredits()
         "Florian \"Flobu\" Busse\n"
         "Emiliano \"Sasu\" Castro\n"
         "Callum \"Callum\" Dawson\n"
+        "Pieter Dewachter\n"
         "Philip \"Fenix\" Farquharson\n"
         "Seweryn \"Neproify\" Figura\n"
         "Alejandro \"AlexTMjugador\" González\n"
