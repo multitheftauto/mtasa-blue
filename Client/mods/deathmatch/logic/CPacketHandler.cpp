@@ -1346,17 +1346,6 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         int           iNumberOfBytesUsed;
         unsigned char ucMessageType;
 
-        /*
-             enum eMessageType
-            {
-                MESSAGE_TYPE_NORMAL,
-                MESSAGE_TYPE_ACTION,
-                MESSAGE_TYPE_TEAM,
-                MESSAGE_TYPE_PRIVATE,
-                MESSAGE_TYPE_HARDCODED
-            };               
-        */
-
         if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
             ElementID ClientID;
