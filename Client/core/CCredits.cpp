@@ -119,6 +119,7 @@ CCredits::CCredits()
         "Breno \"iDannz\" Danyel\n"
         "Callum \"Callum\" Dawson\n"
         "Pieter Dewachter\n"
+        "Mateusz \"Allerek\" Domińczak\n"
         "Philip \"Fenix\" Farquharson\n"
         "Seweryn \"Neproify\" Figura\n"
         "Alejandro \"AlexTMjugador\" González\n"
