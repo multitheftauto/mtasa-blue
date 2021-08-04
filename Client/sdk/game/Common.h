@@ -1718,7 +1718,7 @@ namespace eSoundEffectParams
     {
         CENTER,
         BANDWIDTH,
-        GAIN
+        GAIN,
     };
 
     enum class Reverb
