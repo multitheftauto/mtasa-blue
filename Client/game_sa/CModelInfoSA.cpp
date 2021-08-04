@@ -1299,8 +1299,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // Call SetColModel
         DWORD dwFunc = FUNC_SetColModel;
         DWORD ModelID = m_dwModelID;
-        // Don't force the isLod argument to prevent collisionless problem
-        bool  isLOD = m_pInterface->bIsLod;
+
         _asm
         {
             mov     ecx, ModelID
@@ -1310,7 +1309,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
             mov     ecx, dword ptr[eax + ecx*4]
             pop     eax
 
-            push    isLOD
+            push    1
             push    pColModelInterface
             call    dwFunc
         }
@@ -1359,8 +1358,7 @@ void CModelInfoSA::RestoreColModel()
             DWORD dwFunc = FUNC_SetColModel;
             DWORD dwOriginalColModelInterface = (DWORD)m_pOriginalColModelInterface;
             DWORD ModelID = m_dwModelID;
-            // Don't force the isLod argument to prevent collisionless problem
-            bool  isLOD = m_pInterface->bIsLod;
+
             _asm
             {
                 mov     ecx, ModelID
@@ -1370,7 +1368,7 @@ void CModelInfoSA::RestoreColModel()
                 mov     ecx, dword ptr[eax + ecx*4]
                 pop     eax
 
-                push    isLOD
+                push    1
                 push    dwOriginalColModelInterface
                 call    dwFunc
             }
