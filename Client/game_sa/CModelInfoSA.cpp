@@ -1299,8 +1299,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // Call SetColModel
         DWORD dwFunc = FUNC_SetColModel;
         DWORD ModelID = m_dwModelID;
-        // Don't force the isLod argument to prevent collisionless problem
-        bool  isLOD = m_pInterface->bIsLod;
         _asm
         {
             mov     ecx, ModelID
@@ -1310,7 +1308,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
             mov     ecx, dword ptr[eax + ecx*4]
             pop     eax
 
-            push    isLOD
+            push    1
             push    pColModelInterface
             call    dwFunc
         }
@@ -1359,8 +1357,6 @@ void CModelInfoSA::RestoreColModel()
             DWORD dwFunc = FUNC_SetColModel;
             DWORD dwOriginalColModelInterface = (DWORD)m_pOriginalColModelInterface;
             DWORD ModelID = m_dwModelID;
-            // Don't force the isLod argument to prevent collisionless problem
-            bool  isLOD = m_pInterface->bIsLod;
             _asm
             {
                 mov     ecx, ModelID
@@ -1370,7 +1366,7 @@ void CModelInfoSA::RestoreColModel()
                 mov     ecx, dword ptr[eax + ecx*4]
                 pop     eax
 
-                push    isLOD
+                push    1
                 push    dwOriginalColModelInterface
                 call    dwFunc
             }
@@ -1479,7 +1475,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->uObjectInfoIndex = 65535;
+    m_pInterface->usUnknown = 65535;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1497,7 +1493,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->pVisualInfo = nullptr;
-    m_pInterface->uObjectInfoIndex = 65535;
+    m_pInterface->usUnknown = 65535;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
