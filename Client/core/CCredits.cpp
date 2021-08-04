@@ -152,6 +152,7 @@ CCredits::CCredits()
         "correaAlex\n"
         "CubedDeath\n"
         "Deihim007\n"
+        "delinx\n"
         "DetectedStorm\n"
         "DirtY_iCE\n"
         "Disinterpreter\n"
