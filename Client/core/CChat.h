@@ -166,8 +166,9 @@ public:
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
-    void SetVisible(bool bVisible);
-    bool IsInputVisible() { return m_bVisible && m_bInputVisible; }
+    void SetVisible(bool bVisible, bool bInputBlocked);
+    bool IsInputBlocked() const { return m_bInputBlocked; }
+    bool IsInputVisible() const { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
@@ -257,6 +258,7 @@ protected:
     int            m_iSelectedInputHistoryEntry;
 
     bool  m_bVisible;
+    bool  m_bInputBlocked;
     bool  m_bInputVisible;
     int   m_iScrollingBack;                    // Non zero if currently scrolling back
     float m_fCssStyleOverrideAlpha;            // For fading out 'CssStyle' effect. (When entering text or scrolling back)

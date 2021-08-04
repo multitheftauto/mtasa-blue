@@ -41,9 +41,10 @@ project "Core"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
 	filter "system:linux"
-		links { "ncursesw", "breakpad", "rt" }
+		links { "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
+		linkoptions { "-l:libncursesw.so.5" }
 
 	filter "system:macosx"
 		links { "ncurses", "breakpad", "CoreFoundation.framework" }
