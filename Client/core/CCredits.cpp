@@ -155,6 +155,7 @@ CCredits::CCredits()
         "DirtY_iCE\n"
         "Disinterpreter\n"
         "Dragon\n"
+        "drop-club\n"
         "dvarnai\n"
         "Einheit-101\n"
         "emre1702\n"
