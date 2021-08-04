@@ -438,11 +438,11 @@ void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned cha
     }
 }
 
-void CCore::SetChatVisible(bool bVisible)
+void CCore::SetChatVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible(bVisible);
+        m_pLocalGUI->SetChatBoxVisible(bVisible, bInputBlocked);
     }
 }
 
@@ -451,6 +451,15 @@ bool CCore::IsChatVisible()
     if (m_pLocalGUI)
     {
         return m_pLocalGUI->IsChatBoxVisible();
+    }
+    return false;
+}
+
+bool CCore::IsChatInputBlocked()
+{
+    if (m_pLocalGUI)
+    {
+        return m_pLocalGUI->IsChatBoxInputBlocked();
     }
     return false;
 }
@@ -1144,6 +1153,9 @@ void CCore::DoPostFramePulse()
         ApplyGameSettings();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
+
+        // Change the main thread affinity to first core
+        SetThreadAffinityMask(GetCurrentThread(), 0x1);
     }
 
     if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
@@ -1911,10 +1923,12 @@ void CCore::OnPreHUDRender()
 //
 // Streaming memory range based on system installed memory:
 //
-//     System RAM MB     min     max
-//           512     =   64      96
-//          1024     =   96     128
-//          2048     =  128     256
+//     System RAM MB   min     max
+//           512    =  64      96
+//          1024    =  96      128
+//          2048    =  128     256
+//          4096    =  128     384
+//          6146    =  128     512
 //
 // Also:
 //   Max should be no more than 2 * installed video memory
@@ -1933,8 +1947,8 @@ void CCore::CalculateStreamingMemoryRange()
     int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
 
     // Calc min and max from lookup table
-    SSamplePoint<float> minPoints[] = {{512, 64}, {1024, 96}, {2048, 128}};
-    SSamplePoint<float> maxPoints[] = {{512, 96}, {1024, 128}, {2048, 256}};
+    SSamplePoint<float> minPoints[] = {{512, 64}, {1024, 96}, {2048, 128}, {4096, 128}, {6144, 128}};
+    SSamplePoint<float> maxPoints[] = {{512, 96}, {1024, 128}, {2048, 256}, {4096, 384}, {6144, 512}};
 
     float fMinAmount = EvalSamplePosition<float>(minPoints, NUMELMS(minPoints), iSystemRamMB);
     float fMaxAmount = EvalSamplePosition<float>(maxPoints, NUMELMS(maxPoints), iSystemRamMB);

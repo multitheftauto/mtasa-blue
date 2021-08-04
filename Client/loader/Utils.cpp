@@ -1966,7 +1966,7 @@ void BsodDetectionOnGameEnd()
 //////////////////////////////////////////////////////////
 void ForbodenProgramsMessage()
 {
-    std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
+    std::vector<SString> forbodenList = {"CheatEngine", "PCHunter"};
     std::vector<SString> foundList;
     for (auto processId : MyEnumProcesses(true))
     {
