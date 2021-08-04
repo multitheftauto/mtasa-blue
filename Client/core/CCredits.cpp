@@ -116,6 +116,7 @@ CCredits::CCredits()
         "Pacal \"buepas\" Buerklin\n"
         "Florian \"Flobu\" Busse\n"
         "Emiliano \"Sasu\" Castro\n"
+        "Breno \"iDannz\" Danyel\n"
         "Callum \"Callum\" Dawson\n"
         "Pieter Dewachter\n"
         "Philip \"Fenix\" Farquharson\n"
