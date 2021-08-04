@@ -461,7 +461,7 @@ enum class eBitStreamVersion : unsigned short
     // 2021-01-16 0x72
     SetColPolygonHeight,
 
-    // Add serverside event "onPlayerResourceStart" #0000
+    // Add serverside event "onPlayerResourceStart" #2150
     // 2021-03-25 0x73
     OnPlayerResourceStart,
 
