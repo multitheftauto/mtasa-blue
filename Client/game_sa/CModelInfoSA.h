@@ -165,7 +165,7 @@ public:
     unsigned char bDrawLast : 1;
     unsigned char bDoWeOwnTheColModel : 1;
 
-    unsigned char dwUnknownFlag25 : 1;            // +19
+    unsigned char bHasAnimation : 1;            // +19
     unsigned char dwUnknownFlag26 : 1;
     unsigned char dwUnknownFlag27 : 1;
     unsigned char bSwaysInWind : 1;
