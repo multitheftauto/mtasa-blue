@@ -340,7 +340,7 @@ bool CConsoleCommands::Say(CConsole* pConsole, const char* szInArguments, CClien
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
-                            Arguments.PushNumber(eMessageType::MESSAGE_TYPE_PLAYER);            // Normal chat
+                            Arguments.PushNumber(MESSAGE_TYPE_PLAYER);            // Normal chat
                             bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                             if (bContinue)
                             {
@@ -475,7 +475,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
-                            Arguments.PushNumber(eMessageType::MESSAGE_TYPE_TEAM);            // Team chat
+                            Arguments.PushNumber(MESSAGE_TYPE_TEAM);            // Team chat
                             bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                             if (bContinue)
                             {
@@ -680,8 +680,8 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                     if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
                     {
                         CLuaArguments Arguments;
-                        Arguments.PushString(szArguments);            // text
-                        Arguments.PushNumber(eMessageType::MESSAGE_TYPE_ACTION);            // Me chat
+                        Arguments.PushString(szArguments);                    // text
+                        Arguments.PushNumber(MESSAGE_TYPE_ACTION);            // Me chat
                         bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                         if (bContinue)
                         {
