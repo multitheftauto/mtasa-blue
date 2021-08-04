@@ -38,6 +38,9 @@ bool CClientVectorGraphic::LoadFromData(std::string strData)
     if (!node || !node->IsValid())
         return false;
 
+    // We might already have a document
+    delete m_pXMLDocument;
+
     m_pXMLDocument = node;
     m_pVectorGraphicDisplay->Update();
     return true;
