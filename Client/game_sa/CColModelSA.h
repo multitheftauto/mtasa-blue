@@ -108,7 +108,7 @@ typedef struct
     BYTE                 ucNumWheels;
     BYTE                 m_nFlags;
     CColSphereSA*        pColSpheres;
-    CColBoxSA*           pColBoxes; 
+    CColBoxSA*           pColBoxes;
     void*                pSuspensionLines;
     CompressedVector*    pVertices;
     CColTriangleSA*      pColTriangles;
