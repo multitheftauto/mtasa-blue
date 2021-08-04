@@ -15,6 +15,7 @@ void CFileLoaderSA::StaticSetHooks()
 {
     HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
+    HookInstall(0x538690, (DWORD)CFileLoader_LoadObjectInstance, 5);
 }
 
 class CAtomicModelInfo
@@ -158,4 +159,36 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
        }
     }
     return atomic;
+}
+
+CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
+{
+    char szModelName[24];
+    SFileObjectInstance inst;
+
+    sscanf(
+        szLine,
+        "%d %s %d %f %f %f %f %f %f %f %d",
+        &inst.modelID,
+        szModelName,
+        &inst.interiorID,
+        &inst.position.fX,
+        &inst.position.fY,
+        &inst.position.fZ,
+        &inst.rotation.fX,
+        &inst.rotation.fY,
+        &inst.rotation.fZ,
+        &inst.rotation.fW,
+        &inst.lod
+    );
+
+    /*
+       A quaternion is must be normalized. GTA is relying on an internal R* exporter and everything is OK,
+       but custom exporters might not contain the normalization. And we must do it yourself.
+   */
+    const float fLenSq = inst.rotation.LengthSquared();
+    if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
+        inst.rotation /= std::sqrt(fLenSq);
+
+    return ((CEntitySAInterface*(__cdecl*)(SFileObjectInstance*))0x538090)(&inst);
 }

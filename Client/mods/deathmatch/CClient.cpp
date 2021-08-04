@@ -49,7 +49,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->SetOfflineMod(false);
 
     // HACK FOR CHATBOX NOT VISIBLE. WILL CAUSE SAVING CHATBOX STATE NOT TO WORK
-    g_pCore->SetChatVisible(true);
+    g_pCore->SetChatVisible(true, false);
 
     // Register our local commands
     g_pCore->GetCommands()->SetExecuteHandler(COMMAND_Executed);

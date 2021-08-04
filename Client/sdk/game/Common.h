@@ -19,7 +19,7 @@
 #define MAX_PEDS_MTA                        110         // Real limit is 140
 #define MAX_OBJECTS_MTA                     1000        // Real limit is 1200
 #define MAX_ENTRY_INFO_NODES_MTA            72000       // Real limit is 72600  ( MAX_OBJECTS_MTA * 72 ) [Large col models are the cause of high usage]
-#define MAX_POINTER_SINGLE_LINKS_MTA        65000       // Real limit is 70000
+#define MAX_POINTER_SINGLE_LINKS_MTA        85000       // Real limit is 90000 [Large col models are the cause of high usage]
 #define MAX_POINTER_DOUBLE_LINKS_MTA        74000       // Real limit is 74800  ( MAX_OBJECTS_MTA * 72 + 2000 )
 
 // Real limits for GTA
@@ -28,7 +28,7 @@
 #define MAX_OBJECTS                         ( MAX_OBJECTS_MTA + 200 )               // 1200
 #define MAX_BUILDINGS                       13000
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
-#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 70000
+#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 90000
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
 #define MAX_RWOBJECT_INSTANCES              2500
 
