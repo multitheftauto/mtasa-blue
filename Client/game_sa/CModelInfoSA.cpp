@@ -1292,7 +1292,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // If no collision model has been set before, store the original in case we want to restore it
         if (!m_pOriginalColModelInterface)
             m_pOriginalColModelInterface = m_pInterface->pColModel;
-            m_pInterface->bAlphaTransparency = false;
 
         // Apply some low-level hacks
         pColModelInterface->level = 0xA9;
