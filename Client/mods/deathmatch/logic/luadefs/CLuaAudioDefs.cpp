@@ -1580,7 +1580,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     }
                     case Echo::FEEDBACK:
                     {
-                        argStream.ReadNumber(params.fWetDryMix);
+                        argStream.ReadNumber(params.fFeedback);
                         break;
                     }
                     case Echo::LEFT_DELAY:
