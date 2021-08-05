@@ -1157,6 +1157,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
+
+            break;
         }
         case EResourceState::Stopping:
         {
