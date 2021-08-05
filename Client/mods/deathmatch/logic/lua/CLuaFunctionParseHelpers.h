@@ -435,31 +435,6 @@ inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 {
     return "surface-adhesion-group";
 }
-inline SString GetClassByTypeName(eObjectGroup::Modifiable*)
-{
-    return "objectgroup-modifiable";
-}
-inline SString GetClassByTypeName(eObjectGroup::DamageEffect*)
-{
-    return "objectgroup-damageeffect";
-}
-inline SString GetClassByTypeName(eObjectGroup::CollisionResponse*)
-{
-    return "objectgroup-collisionresponse";
-}
-inline SString GetClassByTypeName(eObjectGroup::FxType*)
-{
-    return "objectgroup-fxtype";
-}
-inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
-{
-    return "objectgroup-breakmode";
-}
-
-inline SString GetClassByTypeName(eClientModelType)
-{
-    return "client-model-type";
-}
 
 //
 // CResource from userdata
