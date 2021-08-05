@@ -63,9 +63,7 @@ CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEna
     CLuaMain* pLuaMain = new CLuaMain(this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager,
                                       pResourceOwner, bEnableOOP);
     m_virtualMachines.push_back(pLuaMain);
-    pLuaMain->InitVM();
-
-    m_pLuaModuleManager->RegisterFunctions(pLuaMain->GetVirtualMachine());
+    pLuaMain->Initialize();
 
     return pLuaMain;
 }
@@ -221,20 +219,6 @@ void CLuaManager::LoadCFunctions()
         {"removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler},
         {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
         {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
-
-        // Server standard funcs
-        {"getMaxPlayers", CLuaFunctionDefs::GetMaxPlayers},
-        {"setMaxPlayers", CLuaFunctionDefs::SetMaxPlayers},
-        {"outputChatBox", CLuaFunctionDefs::OutputChatBox},
-        {"outputConsole", CLuaFunctionDefs::OutputConsole},
-        {"outputDebugString", CLuaFunctionDefs::OutputDebugString},
-        {"outputServerLog", CLuaFunctionDefs::OutputServerLog},
-        {"getServerName", CLuaFunctionDefs::GetServerName},
-        {"getServerHttpPort", CLuaFunctionDefs::GetServerHttpPort},
-        {"getServerPassword", CLuaFunctionDefs::GetServerPassword},
-        {"setServerPassword", CLuaFunctionDefs::SetServerPassword},
-        {"getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting},
-        {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
 
         // Loaded map funcs
         {"getRootElement", CLuaFunctionDefs::GetRootElement},
