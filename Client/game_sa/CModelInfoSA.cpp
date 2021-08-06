@@ -1341,23 +1341,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
     }
 }
 
-struct ColDef
-{
-    CRect    area;
-    uint32_t field0x10;
-    uint32_t field0x14;
-    uint32_t field0x18;
-    uint32_t field0x1C;
-    uint16_t field0x20;
-    int16_t  modelRangeStart;
-    int16_t  modelRangeEnd;
-    bool     isActive;
-    bool     isRequired;
-    bool     isProcedural;
-    bool     isInterior;
-};
-static_assert(sizeof(ColDef) == 0x2C, "Invalid size for ColDef");
-
 void CModelInfoSA::RestoreColModel()
 {
     m_pInterface = ppModelInfo[m_dwModelID];
