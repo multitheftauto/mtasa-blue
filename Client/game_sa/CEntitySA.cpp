@@ -41,8 +41,8 @@ void CEntitySAInterface::UpdateRpHAnim()
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 {
     CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
-    CVector               vecMin = colModel->boundingBox.vecMin;
-    CVector               vecMax = colModel->boundingBox.vecMax;
+    CVector               vecMin = colModel->bounds.vecMin;
+    CVector               vecMax = colModel->bounds.vecMax;
     CRect                 rect;
     CVector               point;
     TransformFromObjectSpace(point, vecMin);

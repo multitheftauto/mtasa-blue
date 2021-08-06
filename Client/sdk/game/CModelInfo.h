@@ -17,6 +17,7 @@
 
 #include <windows.h>
 #include "CColModel.h"
+#include "CColStore.h"
 class CPedModelInfo;
 
 class CBoundingBox
@@ -190,6 +191,12 @@ public:
     virtual void RestoreOriginalModel() = 0;
     virtual void SetColModel(CColModel* pColModel) = 0;
     virtual void RestoreColModel() = 0;
+
+    // Increases the collision slot reference counter for the model
+    virtual void AddColRef(std::uint16_t model) = 0;
+
+    // Decreases the collision slot reference counter for the model
+    virtual void RemoveColRef(std::uint16_t model) = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;
