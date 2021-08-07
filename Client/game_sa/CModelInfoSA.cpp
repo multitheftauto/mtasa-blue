@@ -1389,7 +1389,7 @@ void CModelInfoSA::MakeCustomModel()
     }
 }
 
-void CModelInfoSA::AddColRef(std::uint16_t model)
+void CModelInfoSA::AddColRef()
 {
     CColModelSAInterface* originalColModel = nullptr;
 
@@ -1410,7 +1410,7 @@ void CModelInfoSA::AddColRef(std::uint16_t model)
     }
 }
 
-void CModelInfoSA::RemoveColRef(std::uint16_t model)
+void CModelInfoSA::RemoveColRef()
 {
     CColModelSAInterface* originalColModel = nullptr;
 

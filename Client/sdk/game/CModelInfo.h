@@ -192,11 +192,11 @@ public:
     virtual void SetColModel(CColModel* pColModel) = 0;
     virtual void RestoreColModel() = 0;
 
-    // Increases the collision slot reference counter for the model
-    virtual void AddColRef(std::uint16_t model) = 0;
+    // Increases the collision slot reference counter for this model
+    virtual void AddColRef() = 0;
 
-    // Decreases the collision slot reference counter for the model
-    virtual void RemoveColRef(std::uint16_t model) = 0;
+    // Decreases the collision slot reference counter for this model
+    virtual void RemoveColRef() = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;

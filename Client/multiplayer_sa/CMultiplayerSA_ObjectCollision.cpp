@@ -14,7 +14,7 @@ static void ColStoreAddRef(CObjectSAInterface* gameObject)
     CModelInfo* modelInfo = pGameInterface->GetModelInfo(gameObject->m_nModelIndex);
 
     if (modelInfo)
-        modelInfo->AddColRef(gameObject->m_nModelIndex);
+        modelInfo->AddColRef();
 }
 
 static void ColStoreRemoveRef(CObjectSAInterface* gameObject)
@@ -22,7 +22,7 @@ static void ColStoreRemoveRef(CObjectSAInterface* gameObject)
     CModelInfo* modelInfo = pGameInterface->GetModelInfo(gameObject->m_nModelIndex);
 
     if (modelInfo)
-        modelInfo->RemoveColRef(gameObject->m_nModelIndex);
+        modelInfo->RemoveColRef();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ static void _declspec(naked) HOOK_CObject_Init()
     _asm
     {
         pushad
-        push    esi
+        push    esi     // CObjectSAInterface*
         call    ColStoreAddRef
         add     esp, 4
         popad
@@ -90,7 +90,7 @@ static void _declspec(naked) HOOK_CObject_Destructor()
     _asm
     {
         pushad
-        push    esi
+        push    esi     // CObjectSAInterface*
         call    ColStoreRemoveRef
         add     esp, 4
         popad

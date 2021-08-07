@@ -414,11 +414,11 @@ public:
     void RestoreColModel() override;
     void MakeCustomModel() override;
 
-    // Increases the collision slot reference counter for the original model
-    void AddColRef(std::uint16_t model) override;
+    // Increases the collision slot reference counter for the original collision model
+    void AddColRef() override;
 
-    // Decreases the collision slot reference counter for the original model
-    void RemoveColRef(std::uint16_t model) override;
+    // Decreases the collision slot reference counter for the original collision model
+    void RemoveColRef() override;
 
     void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
 
