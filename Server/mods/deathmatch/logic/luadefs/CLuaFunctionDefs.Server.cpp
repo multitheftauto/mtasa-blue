@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionDefs.h"
+
 #define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
@@ -329,41 +331,21 @@ int CLuaFunctionDefs::SetServerConfigSetting(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::shutdown(lua_State* luaVM)
+bool CLuaFunctionDefs::Shutdown(lua_State* luaVM, std::optional<std::string_view> maybeReason, std::optional<int> maybeExitCode)
 {
-    SString strReason;
+    std::string_view reason = maybeReason.value_or("No reason specified");
+    CResource&       resource = lua_getownerresource(luaVM);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strReason, "No reason specified");
+    if (reason.empty() || reason.find_first_not_of("\x09\x0A\x0B\x0C\x0D\x20") == std::string_view::npos)
+        reason = "No reason specified";
 
-    if (!argStream.HasErrors())
-    {
-        // Get the VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Get the resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Log it
-                CLogger::LogPrintf("Server shutdown as requested by resource %s (%s)\n", pResource->GetName().c_str(), *strReason);
+    CLogger::LogPrintf("Server shutdown as requested by resource %s (%.*s)\n", resource.GetName().c_str(), reason.size(), reason.data());
 
-                // Shut it down
-                g_pGame->SetIsFinished(true);
+    if (maybeExitCode.has_value())
+        g_pServerInterface->GetModManager()->SetExitCode(maybeExitCode.value());
 
-                // Success
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Fail
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pGame->SetIsFinished(true);
+    return true;
 }
 
 int CLuaFunctionDefs::GetMapName(lua_State* luaVM)

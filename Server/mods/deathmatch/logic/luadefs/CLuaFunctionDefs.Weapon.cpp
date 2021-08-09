@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionDefs.h"
+
 #define MIN_SERVER_REQ_WEAPON_PROPERTY_FLAG                 "1.3.5-9.06139"
 
 int CLuaFunctionDefs::SetWeaponAmmo(lua_State* luaVM)
