@@ -26,7 +26,7 @@ std::unordered_map<DWORD, unsigned short>                             CModelInfo
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
-static constexpr uintptr_t RESOURCE_ID_COL = 25000;
+static constexpr size_t RESOURCE_ID_COL = 25000;
 
 static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
 {
