@@ -70,7 +70,7 @@ struct CColSphereSA : CSphereSA
         {
             std::uint8_t hasSpheresBoxesTriangles : 1;
             std::uint8_t isSingleAllocationCollisionData : 1;
-            std::uint8_t flag0x04 : 1;
+            std::uint8_t isActive: 1;
             std::uint8_t flag0x08 : 1;
             std::uint8_t flag0x10 : 1;
             std::uint8_t flag0x20 : 1;
