@@ -1018,14 +1018,14 @@ unsigned int CModelInfoSA::GetNumRemaps()
 
 void* CModelInfoSA::GetVehicleSuspensionData()
 {
-    return GetInterface()->pColModel->data->suspensionLines;
+    return GetInterface()->pColModel->m_data->m_suspensionLines;
 }
 
 void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 {
-    CColDataSA* pColData = GetInterface()->pColModel->data;
-    void*       pOrigSuspensionLines = pColData->suspensionLines;
-    pColData->suspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
+    CColDataSA* pColData = GetInterface()->pColModel->m_data;
+    void*       pOrigSuspensionLines = pColData->m_suspensionLines;
+    pColData->m_suspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
     return pOrigSuspensionLines;
 }
 
@@ -1313,7 +1313,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         }
 
         // Apply some low-level hacks
-        pColModelInterface->sphere.collisionSlot = 0xA9;
+        pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
 
         CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
         CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
@@ -1323,18 +1323,18 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         m_pInterface->bCollisionWasStreamedWithModel = false;
 
         // Set some lighting for this collision if not already present
-        CColDataSA* pColData = pColModelInterface->data;
+        CColDataSA* pColData = pColModelInterface->m_data;
 
         if (pColData)
         {
-            for (uint i = 0; i < pColData->numTriangles; i++)
+            for (uint i = 0; i < pColData->m_numTriangles; i++)
             {
-                CColTriangleSA* pTriangle = pColData->triangles + i;
+                CColTriangleSA* pTriangle = pColData->m_triangles + i;
 
-                if (pTriangle->lighting.night == 0 && pTriangle->lighting.day == 0)
+                if (pTriangle->m_lighting.night == 0 && pTriangle->m_lighting.day == 0)
                 {
-                    pTriangle->lighting.night = 1;
-                    pTriangle->lighting.day = 12;
+                    pTriangle->m_lighting.night = 1;
+                    pTriangle->m_lighting.day = 12;
                 }
             }
         }
@@ -1355,9 +1355,9 @@ void CModelInfoSA::RestoreColModel()
 
         // Force the game to load the original collision model data, if we applied a custom collision model before
         // there was any object/building, which would've provoked CColStore to request it.
-        if (!m_pInterface->pColModel->data && m_dwReferences > 1)
+        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
-            CStreaming_RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->sphere.collisionSlot);
+            CStreaming_RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
         }
     }
 
@@ -1406,7 +1406,7 @@ void CModelInfoSA::AddColRef()
 
     if (originalColModel)
     {
-        pGame->GetCollisionStore()->AddRef(originalColModel->sphere.collisionSlot);
+        pGame->GetCollisionStore()->AddRef(originalColModel->m_sphere.m_collisionSlot);
     }
 }
 
@@ -1427,7 +1427,7 @@ void CModelInfoSA::RemoveColRef()
 
     if (originalColModel)
     {
-        pGame->GetCollisionStore()->RemoveRef(originalColModel->sphere.collisionSlot);
+        pGame->GetCollisionStore()->RemoveRef(originalColModel->m_sphere.m_collisionSlot);
     }
 }
 

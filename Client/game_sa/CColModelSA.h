@@ -19,8 +19,8 @@
 
 struct CBoxSA
 {
-    CVector vecMin;
-    CVector vecMax;
+    CVector m_vecMin;
+    CVector m_vecMax;
 };
 static_assert(sizeof(CBoxSA) == 0x18, "Invalid size for CBoxSA");
 
@@ -31,26 +31,38 @@ static_assert(sizeof(CBoundingBoxSA) == 0x18, "Invalid size for CBoundingBoxSA")
 
 struct CColBoxSA : CBoxSA
 {
-    EColSurface  material;
-    std::uint8_t flags;
-    CColLighting lighting;
-    std::uint8_t brightness;
+    EColSurface  m_material;
+    std::uint8_t m_flags;
+    CColLighting m_lighting;
+    std::uint8_t m_brightness;
 };
 static_assert(sizeof(CColBoxSA) == 0x1C, "Invalid size for CColBoxSA");
 
 struct CColLineSA
 {
-    CVector vecStart;
-    float   startSize;
-    CVector vecStop;
-    float   stopSize;
+    CVector m_vecStart;
+    float   m_startSize;
+    CVector m_vecStop;
+    float   m_stopSize;
 };
 static_assert(sizeof(CColLineSA) == 0x20, "Invalid size for CColLineSA");
 
+struct CColDiskSA
+{
+    CVector m_startPosition;
+    float   m_startRadius;
+    uint8_t m_material;
+    uint8_t m_piece;
+    uint8_t m_lighting;
+    CVector m_stopPosition;
+    float   m_stopRadius;
+};
+static_assert(sizeof(CColDiskSA) == 0x24, "Invalid size for CColDiskSA");
+
 struct CSphereSA
 {
-    CVector vecCenter;
-    float   radius;
+    CVector m_center;
+    float   m_radius;
 };
 static_assert(sizeof(CSphereSA) == 0x10, "Invalid size for CSphereSA");
 
@@ -58,13 +70,13 @@ struct CColSphereSA : CSphereSA
 {
     union
     {
-        EColSurface  material;
-        std::uint8_t collisionSlot;
+        EColSurface  m_material;
+        std::uint8_t m_collisionSlot;
     };
 
     union
     {
-        std::uint8_t flags;
+        std::uint8_t m_flags;
 
         struct
         {
@@ -79,32 +91,32 @@ struct CColSphereSA : CSphereSA
         };
     };
 
-    std::uint8_t lighting;
-    std::uint8_t light;
+    std::uint8_t m_lighting;
+    std::uint8_t m_light;
 
     CColSphereSA()
     {
-        collisionSlot = 0;
-        flags = 0;
-        lighting = 0;
-        light = 0;
+        m_collisionSlot = 0;
+        m_flags = 0;
+        m_lighting = 0;
+        m_light = 0;
     }
 };
 static_assert(sizeof(CColSphereSA) == 0x14, "Invalid size for CColSphereSA");
 
 struct CColTriangleSA
 {
-    std::uint16_t indices[3];
-    EColSurface   material;
-    CColLighting  lighting;
+    std::uint16_t m_indices[3];
+    EColSurface   m_material;
+    CColLighting  m_lighting;
 };
 static_assert(sizeof(CColTriangleSA) == 0x8, "Invalid size for CColTriangleSA");
 
 struct CColTrianglePlaneSA
 {
-    CCompressedVectorSA normal;
-    std::uint16_t       distance;
-    std::uint8_t        orientation;
+    CCompressedVectorSA m_normal;
+    std::uint16_t       m_distance;
+    std::uint8_t        m_orientation;
 };
 static_assert(sizeof(CColTrianglePlaneSA) == 0xA, "Invalid size for CColTrianglePlaneSA");
 
@@ -117,29 +129,33 @@ struct ColModelFileHeader
 
 struct CColDataSA
 {
-    std::uint16_t        numSpheres;
-    std::uint16_t        numBoxes;
-    std::uint16_t        numTriangles;
-    std::uint8_t         numSuspensionLines;
-    std::uint8_t         flags;
-    CColSphereSA*        spheres;
-    CColBoxSA*           boxes;
-    CColLineSA*          suspensionLines;
-    CCompressedVectorSA* vertices;
-    CColTriangleSA*      triangles;
-    CColTrianglePlaneSA* trianglePlanes;
-    std::uint32_t        numShadowTriangles;
-    std::uint32_t        numShadowVertices;
-    CCompressedVectorSA* shadowVertices;
-    CColTriangleSA*      shadowTriangles;
+    std::uint16_t m_numSpheres;
+    std::uint16_t m_numBoxes;
+    std::uint16_t m_numTriangles;
+    std::uint8_t  m_numSuspensionLines;
+    std::uint8_t  m_flags;
+    CColSphereSA* m_spheres;
+    CColBoxSA*    m_boxes;
+    union
+    {
+        CColLineSA* m_suspensionLines;
+        CColDiskSA* m_disks;
+    };
+    CCompressedVectorSA* m_vertices;
+    CColTriangleSA*      m_triangles;
+    CColTrianglePlaneSA* m_trianglePlanes;
+    std::uint32_t        m_numShadowTriangles;
+    std::uint32_t        m_numShadowVertices;
+    CCompressedVectorSA* m_shadowVertices;
+    CColTriangleSA*      m_shadowTriangles;
 };
 static_assert(sizeof(CColDataSA) == 0x30, "Invalid size for CColDataSA");
 
 struct CColModelSAInterface
 {
-    CBoundingBoxSA bounds;
-    CColSphereSA   sphere;
-    CColDataSA*    data;
+    CBoundingBoxSA m_bounds;
+    CColSphereSA   m_sphere;
+    CColDataSA*    m_data;
 };
 static_assert(sizeof(CColModelSAInterface) == 0x30, "Invalid size for CColModelSAInterface");
 
