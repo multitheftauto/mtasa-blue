@@ -42,29 +42,10 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
     function(idx, colModel);
 }
 
-static void CStreaming_RemoveModel(int idx)
-{
-    using Signature = void(__cdecl*)(int);
-    auto function = reinterpret_cast<Signature>(0x4089A0);
-    function(idx);
-}
-
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
     this->m_dwModelID = 0xFFFFFFFF;
-    m_dwReferences = 0;
-    m_dwPendingInterfaceRef = 0;
-    m_pOriginalColModelInterface = NULL;
-    m_pCustomClump = NULL;
-    m_pCustomColModel = NULL;
-    m_bAddedRefForCollision = false;
-}
-
-CModelInfoSA::CModelInfoSA(DWORD dwModelID)
-{
-    this->m_dwModelID = dwModelID;
-    m_pInterface = ppModelInfo[m_dwModelID];
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
@@ -449,7 +430,7 @@ VOID CModelInfoSA::Remove()
             RestoreColModel();
 
             // Remove the model.
-            CStreaming_RemoveModel(m_dwModelID);
+            pGame->GetStreaming()->RemoveModel(m_dwModelID);
         }
     }
 }
@@ -798,7 +779,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     std::set<unsigned short>::iterator it;
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
-        CStreaming_RemoveModel(*it);
+        pGame->GetStreaming()->RemoveModel(*it);
         pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
     }
 }
@@ -1272,7 +1253,7 @@ void CModelInfoSA::RestoreOriginalModel()
     // Are we loaded?
     if (IsLoaded())
     {
-        CStreaming_RemoveModel(m_dwModelID);
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
 
     // Reset the stored custom vehicle clump
@@ -1357,7 +1338,7 @@ void CModelInfoSA::RestoreColModel()
         // there was any object/building, which would've provoked CColStore to request it.
         if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
-            CStreaming_RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
+            pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
         }
     }
 

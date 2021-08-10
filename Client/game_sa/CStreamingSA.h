@@ -20,10 +20,11 @@
 #define FUNC_CStreaming_RequestAnimations            0x407120
 #define FUNC_CStreaming_RequestSpecialModel          0x409d10
 
-class CStreamingSA : public CStreaming
+class CStreamingSA final : public CStreaming
 {
 public:
     void RequestModel(DWORD dwModelID, DWORD dwFlags);
+    void RemoveModel(std::uint32_t model) override;
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);

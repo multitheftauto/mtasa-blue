@@ -320,7 +320,6 @@ protected:
 
 public:
     CModelInfoSA();
-    CModelInfoSA(DWORD dwModelID);
 
     CBaseModelInfoSAInterface* GetInterface();
     CPedModelInfoSAInterface*  GetPedModelInfoInterface() { return reinterpret_cast<CPedModelInfoSAInterface*>(GetInterface()); }
