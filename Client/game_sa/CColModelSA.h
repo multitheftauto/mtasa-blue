@@ -49,13 +49,13 @@ static_assert(sizeof(CColLineSA) == 0x20, "Invalid size for CColLineSA");
 
 struct CColDiskSA
 {
-    CVector m_startPosition;
-    float   m_startRadius;
-    uint8_t m_material;
-    uint8_t m_piece;
-    uint8_t m_lighting;
-    CVector m_stopPosition;
-    float   m_stopRadius;
+    CVector      m_startPosition;
+    float        m_startRadius;
+    std::uint8_t m_material;
+    std::uint8_t m_piece;
+    std::uint8_t m_lighting;
+    CVector      m_stopPosition;
+    float        m_stopRadius;
 };
 static_assert(sizeof(CColDiskSA) == 0x24, "Invalid size for CColDiskSA");
 
@@ -133,7 +133,19 @@ struct CColDataSA
     std::uint16_t m_numBoxes;
     std::uint16_t m_numTriangles;
     std::uint8_t  m_numSuspensionLines;
-    std::uint8_t  m_flags;
+    union
+    {
+        std::uint8_t m_flags;
+
+        struct
+        {
+            std::uint8_t m_usesDisks : 1;
+            std::uint8_t m_notEmpty : 1;
+            std::uint8_t m_hasShadowInfo : 1;
+            std::uint8_t m_hasFaceGroups : 1;
+            std::uint8_t m_hasShadow : 1;
+        };
+    };
     CColSphereSA* m_spheres;
     CColBoxSA*    m_boxes;
     union
