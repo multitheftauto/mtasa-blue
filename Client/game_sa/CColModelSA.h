@@ -80,14 +80,14 @@ struct CColSphereSA : CSphereSA
 
         struct
         {
-            std::uint8_t hasSpheresBoxesTriangles : 1;
-            std::uint8_t isSingleAllocationCollisionData : 1;
-            std::uint8_t isActive: 1;
-            std::uint8_t flag0x08 : 1;
-            std::uint8_t flag0x10 : 1;
-            std::uint8_t flag0x20 : 1;
-            std::uint8_t flag0x40 : 1;
-            std::uint8_t flag0x80 : 1;
+            std::uint8_t m_hasSpheresBoxesTriangles : 1;
+            std::uint8_t m_isSingleAllocationCollisionData : 1;
+            std::uint8_t m_isActive: 1;
+            std::uint8_t m_flag0x08 : 1;
+            std::uint8_t m_flag0x10 : 1;
+            std::uint8_t m_flag0x20 : 1;
+            std::uint8_t m_flag0x40 : 1;
+            std::uint8_t m_flag0x80 : 1;
         };
     };
 
