@@ -800,7 +800,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pZoneNames = new CZoneNames;
 
     CStaticFunctionDefinitions(this);
-    CLuaFunctionDefs::Initialize(m_pLuaManager, this);
     CLuaDefs::Initialize(this);
 
     m_pPlayerManager->SetScriptDebugging(m_pScriptDebugging);

@@ -72,6 +72,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pResourceManager = pGame->GetResourceManager();
     m_pACLManager = pGame->GetACLManager();
     m_pMainConfig = pGame->GetConfig();
+    m_pLuaModuleManager = m_pLuaManager->GetLuaModuleManager();
 }
 
 bool CLuaDefs::CanUseFunction(const char* szFunction, lua_State* luaVM, bool bRestricted)

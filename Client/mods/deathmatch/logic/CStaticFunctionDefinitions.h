@@ -566,7 +566,7 @@ public:
                                    CEntity* pIgnoredEntity = NULL);
     static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);
     static CClientWater* CreateWater(CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
-    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown);
+    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool ignoreDistanceToWaterThreshold, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);
     static bool          GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);

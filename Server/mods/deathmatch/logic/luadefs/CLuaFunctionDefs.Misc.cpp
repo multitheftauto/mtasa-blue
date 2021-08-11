@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionDefs.h"
 
 int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
 {
