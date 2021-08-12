@@ -39,15 +39,6 @@
 /* Define cpu-machine-OS */
 #define OS "OS/400"
 
-/* Define if you have the gethostbyaddr_r() function with 5 arguments */
-#define HAVE_GETHOSTBYADDR_R_5
-
-/* Define if you have the gethostbyaddr_r() function with 7 arguments */
-#undef HAVE_GETHOSTBYADDR_R_7
-
-/* Define if you have the gethostbyaddr_r() function with 8 arguments */
-#undef HAVE_GETHOSTBYADDR_R_8
-
 /* OS400 supports a 3-argument ASCII version of gethostbyaddr_r(), but its
  *  prototype is incompatible with the "standard" one (1st argument is not
  *  const). However, getaddrinfo() is supported (ASCII version defined as
@@ -94,26 +85,14 @@
 /* Define if you have the `closesocket' function. */
 #undef HAVE_CLOSESOCKET
 
-/* Define if you have the <crypto.h> header file. */
-#undef HAVE_CRYPTO_H
-
 /* Define if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H
-
-/* Define if you have the <err.h> header file. */
-#undef HAVE_ERR_H
 
 /* Define if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H
 
 /* Define if you have the `geteuid' function. */
 #define HAVE_GETEUID
-
-/* Define if you have the `gethostbyaddr' function. */
-#define HAVE_GETHOSTBYADDR
-
-/* Define if you have the `gethostbyaddr_r' function. */
-#define HAVE_GETHOSTBYADDR_R
 
 /* Define if you have the `gethostname' function. */
 #define HAVE_GETHOSTNAME
@@ -229,9 +208,6 @@
 /* Define if you have the <pem.h> header file. */
 #undef HAVE_PEM_H
 
-/* Define if you have the `perror' function. */
-#define HAVE_PERROR
-
 /* Define if you have the <pwd.h> header file. */
 #define HAVE_PWD_H
 
@@ -244,17 +220,11 @@
 /* Define if you have the `RAND_status' function. */
 #undef HAVE_RAND_STATUS
 
-/* Define if you have the <rsa.h> header file. */
-#undef HAVE_RSA_H
-
 /* Define if you have the `select' function. */
 #define HAVE_SELECT
 
 /* Define if you have the `setvbuf' function. */
 #define HAVE_SETVBUF
-
-/* Define if you have the <sgtty.h> header file. */
-#undef HAVE_SGTTY_H
 
 /* Define if you have the `sigaction' function. */
 #define HAVE_SIGACTION

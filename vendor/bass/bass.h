@@ -55,13 +55,13 @@ extern "C" {
 
 typedef DWORD HMUSIC;		// MOD music handle
 typedef DWORD HSAMPLE;		// sample handle
-typedef DWORD HCHANNEL;		// playing sample's channel handle
+typedef DWORD HCHANNEL;		// sample playback handle
 typedef DWORD HSTREAM;		// sample stream handle
 typedef DWORD HRECORD;		// recording handle
 typedef DWORD HSYNC;		// synchronizer handle
 typedef DWORD HDSP;			// DSP handle
-typedef DWORD HFX;			// DX8 effect handle
-typedef DWORD HPLUGIN;		// Plugin handle
+typedef DWORD HFX;			// effect handle
+typedef DWORD HPLUGIN;		// plugin handle
 
 // Error codes returned by BASS_ErrorGetCode
 #define BASS_OK				0	// all is OK
@@ -103,6 +103,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_ERROR_ENDED	45	// the channel/file has ended
 #define BASS_ERROR_BUSY		46	// the device is busy
 #define BASS_ERROR_UNSTREAMABLE	47	// unstreamable file
+#define BASS_ERROR_PROTOCOL	48	// unsupported protocol
 #define BASS_ERROR_UNKNOWN	-1	// some other mystery problem
 
 // BASS_SetConfig options
@@ -157,7 +158,9 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_REC_WASAPI		66
 #define BASS_CONFIG_ANDROID_AAUDIO	67
 #define BASS_CONFIG_SAMPLE_ONEHANDLE	69
+#define BASS_CONFIG_DEV_TIMEOUT		70
 #define BASS_CONFIG_NET_META		71
+#define BASS_CONFIG_NET_RESTRATE	72
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
@@ -249,7 +252,7 @@ typedef struct {
 } BASS_INFO;
 
 // BASS_INFO flags (from DSOUND.H)
-#define DSCAPS_EMULDRIVER		0x00000020	// device does NOT have hardware DirectSound support
+#define DSCAPS_EMULDRIVER		0x00000020	// device does not have hardware DirectSound support
 #define DSCAPS_CERTIFIED		0x00000040	// device driver has been certified by Microsoft
 
 #define DSCAPS_HARDWARE			0x80000000	// hardware mixed
@@ -264,7 +267,7 @@ typedef struct {
 } BASS_RECORDINFO;
 
 // BASS_RECORDINFO flags (from DSOUND.H)
-#define DSCCAPS_EMULDRIVER		DSCAPS_EMULDRIVER	// device does NOT have hardware DirectSound recording support
+#define DSCCAPS_EMULDRIVER		DSCAPS_EMULDRIVER	// device does not have hardware DirectSound recording support
 #define DSCCAPS_CERTIFIED		DSCAPS_CERTIFIED	// device driver has been certified by Microsoft
 
 // defines for formats field of BASS_RECORDINFO (from MMSYSTEM.H)
@@ -317,11 +320,11 @@ typedef struct {
 #define BASS_SAMPLE_OVER_POS	0x20000	// override longest playing
 #define BASS_SAMPLE_OVER_DIST	0x30000 // override furthest from listener (3D only)
 
-#define BASS_STREAM_PRESCAN		0x20000 // enable pin-point seeking/length (MP3/MP2/MP1)
-#define BASS_STREAM_AUTOFREE	0x40000	// automatically free the stream when it stop/ends
-#define BASS_STREAM_RESTRATE	0x80000	// restrict the download rate of internet file streams
-#define BASS_STREAM_BLOCK		0x100000 // download/play internet file stream in small blocks
-#define BASS_STREAM_DECODE		0x200000 // don't play the stream, only decode (BASS_ChannelGetData)
+#define BASS_STREAM_PRESCAN		0x20000 // scan file for accurate seeking and length
+#define BASS_STREAM_AUTOFREE	0x40000	// automatically free the stream when it stops/ends
+#define BASS_STREAM_RESTRATE	0x80000	// restrict the download rate of internet file stream
+#define BASS_STREAM_BLOCK		0x100000 // download internet file stream in small blocks
+#define BASS_STREAM_DECODE		0x200000 // don't play the stream, only decode
 #define BASS_STREAM_STATUS		0x800000 // give server status info (HTTP/ICY tags) in DOWNLOADPROC
 
 #define BASS_MP3_IGNOREDELAY	0x200 // ignore LAME/Xing/VBRI/iTunes delay & padding info
@@ -367,8 +370,8 @@ typedef struct {
 #define BASS_SPEAKER_REAR2LEFT	BASS_SPEAKER_REAR2|BASS_SPEAKER_LEFT
 #define BASS_SPEAKER_REAR2RIGHT	BASS_SPEAKER_REAR2|BASS_SPEAKER_RIGHT
 
-#define BASS_ASYNCFILE			0x40000000
-#define BASS_UNICODE			0x80000000
+#define BASS_ASYNCFILE			0x40000000	// read file asynchronously
+#define BASS_UNICODE			0x80000000	// UTF-16
 
 #define BASS_RECORD_PAUSE		0x8000	// start recording paused
 #define BASS_RECORD_ECHOCANCEL	0x2000
@@ -385,12 +388,12 @@ typedef struct {
 typedef struct {
 	DWORD freq;		// default playback rate
 	DWORD chans;	// channels
-	DWORD flags;	// BASS_SAMPLE/STREAM/MUSIC/SPEAKER flags
+	DWORD flags;
 	DWORD ctype;	// type of channel
 	DWORD origres;	// original resolution
-	HPLUGIN plugin;	// plugin
-	HSAMPLE sample; // sample
-	const char *filename; // filename
+	HPLUGIN plugin;
+	HSAMPLE sample;
+	const char *filename;
 } BASS_CHANNELINFO;
 
 #define BASS_ORIGRES_FLOAT		0x10000
@@ -411,7 +414,7 @@ typedef struct {
 #define BASS_CTYPE_STREAM_SAMPLE	0x1000a
 #define BASS_CTYPE_STREAM_DUMMY		0x18000
 #define BASS_CTYPE_STREAM_DEVICE	0x18001
-#define BASS_CTYPE_STREAM_WAV	0x40000 // WAVE flag, LOWORD=codec
+#define BASS_CTYPE_STREAM_WAV	0x40000 // WAVE flag (LOWORD=codec)
 #define BASS_CTYPE_STREAM_WAV_PCM	0x50001
 #define BASS_CTYPE_STREAM_WAV_FLOAT	0x50003
 #define BASS_CTYPE_MUSIC_MOD	0x20000
@@ -461,8 +464,8 @@ typedef struct BASS_3DVECTOR {
 #define BASS_3DALG_LIGHT	3
 
 // BASS_SampleGetChannel flags
-#define BASS_SAMCHAN_NEW		1
-#define BASS_SAMCHAN_STREAM		2
+#define BASS_SAMCHAN_NEW		1	// get a new playback channel
+#define BASS_SAMCHAN_STREAM		2	// create a stream
 
 typedef DWORD (CALLBACK STREAMPROC)(HSTREAM handle, void *buffer, DWORD length, void *user);
 /* User stream callback function.
@@ -621,11 +624,11 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_DATA_FFT_NYQUIST	0x100	// FFT flag: return extra Nyquist value
 
 // BASS_ChannelGetLevelEx flags
-#define BASS_LEVEL_MONO		1
-#define BASS_LEVEL_STEREO	2
-#define BASS_LEVEL_RMS		4
-#define BASS_LEVEL_VOLPAN	8
-#define BASS_LEVEL_NOREMOVE	16
+#define BASS_LEVEL_MONO		1	// get mono level
+#define BASS_LEVEL_STEREO	2	// get stereo level
+#define BASS_LEVEL_RMS		4	// get RMS levels
+#define BASS_LEVEL_VOLPAN	8	// apply VOL/PAN attributes to the levels
+#define BASS_LEVEL_NOREMOVE	16	// don't remove data from recording buffer
 
 // BASS_ChannelGetTags types : what's returned
 #define BASS_TAG_ID3		0	// ID3v1 tags : TAG_ID3 structure
@@ -829,7 +832,7 @@ typedef const WAVEFORMATEX *LPCWAVEFORMATEX;
 #define BASS_POS_OGG			3		// OGG bitstream number
 #define BASS_POS_END			0x10	// trimmed end position
 #define BASS_POS_LOOP			0x11	// loop start positiom
-#define BASS_POS_FLUSH			0x1000000 // flag: flush decoder's output buffers
+#define BASS_POS_FLUSH			0x1000000 // flag: flush decoder/FX buffers
 #define BASS_POS_RESET			0x2000000 // flag: reset user file buffers
 #define BASS_POS_RELATIVE		0x4000000 // flag: seek relative to the current position
 #define BASS_POS_INEXACT		0x8000000 // flag: allow seeking to inexact position
@@ -987,7 +990,7 @@ BOOL BASSDEF(BASS_GetInfo)(BASS_INFO *info);
 BOOL BASSDEF(BASS_Start)(void);
 BOOL BASSDEF(BASS_Stop)(void);
 BOOL BASSDEF(BASS_Pause)(void);
-BOOL BASSDEF(BASS_IsStarted)(void);
+DWORD BASSDEF(BASS_IsStarted)(void);
 BOOL BASSDEF(BASS_Update)(DWORD length);
 float BASSDEF(BASS_GetCPU)(void);
 BOOL BASSDEF(BASS_SetVolume)(float volume);

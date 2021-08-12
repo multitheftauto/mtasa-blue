@@ -246,6 +246,10 @@ namespace SharedUtil
     bool IsLuaCompiledScript(const void* pData, uint uiLength);
     bool IsLuaObfuscatedScript(const void* pData, uint uiLength);
 
+    // Return a pointer to the (shifted) trimmed string
+    // @ref https://stackoverflow.com/a/26984026
+    char* Trim(char* szText);
+
     //
     // Some templates
     //

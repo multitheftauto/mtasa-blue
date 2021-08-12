@@ -11,6 +11,10 @@
 #include "StdInc.h"
 using namespace LatentTransfer;
 
+#ifndef MTA_CLIENT
+extern CTimeUsMarker<20> markerLatentEvent;
+#endif
+
 ///////////////////////////////////////////////////////////////
 //
 // CLatentTransferManager::CLatentTransferManager

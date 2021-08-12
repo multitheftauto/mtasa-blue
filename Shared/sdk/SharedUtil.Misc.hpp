@@ -1466,6 +1466,31 @@ bool SharedUtil::IsColorCodeW(const wchar_t* wszColorCode)
     return true;
 }
 
+char* SharedUtil::Trim(char* szText)
+{
+    char*  szOriginal = szText;
+    size_t uiLen = 0;
+
+    while (isspace((unsigned char)*szText))
+        szText++;
+
+    if (*szText)
+    {
+        char* p = szText;
+        while (*p)
+            p++;
+        while (isspace((unsigned char)*(--p)))
+            ;
+        p[1] = '\0';
+        uiLen = (size_t)(p - szText + 1);
+    }
+
+    if (szText == szOriginal)
+        return szText;
+
+    return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
+}
+
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
 std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
