@@ -4,12 +4,12 @@ premake.modules.install_cef = {}
 
 -- Config variables
 local CEF_PATH = "vendor/cef3/"
-local CEF_URL_PREFIX = "http://opensource.spotify.com/cefbuilds/cef_binary_"
+local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "86.0.18+gd3ead8b+chromium-86.0.4240.111"
-local CEF_HASH = "f97a1007a08234db0269180df834708ae74dfebb4102c60bb630db88658b6a9d"
+local CEF_VERSION = "92.0.21+ga9ec100+chromium-92.0.4515.107"
+local CEF_HASH = "2b8c2345768e4d116a2721485e2b3708503526d1b6ea2351e61b8a7a70bc751c"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
@@ -44,6 +44,13 @@ function update_install_cef(version, hash)
 	f:close()
 end
 
+local function cef_version_comparator(a, b)
+	local a_major, a_minor, a_patch = a.cef_version:match("^(%d+).(%d+).(%d+)%+*")
+	local b_major, b_minor, c_patch = b.cef_version:match("^(%d+).(%d+).(%d+)%+*")
+
+	return a_major > b_major and a_minor > b_minor and a_patch > c_patch
+end
+
 newaction {
 	trigger = "install_cef",
 	description = "Downloads and installs CEF",
@@ -62,7 +69,7 @@ newaction {
 			CEF_HASH = ""
 		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
-			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.json")
+			resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
 			if result_str ~= "OK" or result_code ~= 200 then
 				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
 				return
@@ -75,7 +82,7 @@ newaction {
 			end
 
 			local builds_by_version = table.filter(meta["windows32"]["versions"], function(build) return build.channel == "stable" end)
-			table.sort(builds_by_version, function(a, b) return a.cef_version > b.cef_version end)
+			table.sort(builds_by_version, cef_version_comparator)
 			local latest_build = builds_by_version[1]
 
 			if latest_build.cef_version == CEF_VERSION then

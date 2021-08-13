@@ -66,7 +66,9 @@ public:
     void                InitHooks_Files();
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
+    void                InitHooks_ObjectCollision();
     void                InitHooks_VehicleCollision();
+    void                InitHooks_VehicleDummies();
     void                InitHooks_Vehicles();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();
@@ -315,6 +317,7 @@ private:
     eAnimGroup          m_dwLastStaticAnimGroupID;
     eAnimID          m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
+    float               m_fShadowsOffset;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

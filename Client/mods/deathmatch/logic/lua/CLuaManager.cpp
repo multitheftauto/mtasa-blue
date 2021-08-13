@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"
+#include "../luadefs/CLuaClientDefs.h"
 
 using std::list;
 
@@ -47,8 +48,8 @@ CLuaManager::~CLuaManager()
         delete (*iter);
     }
 
-	// Close and remove LVM from memory
-	ProcessPendingDeleteList();
+    // Close and remove LVM from memory
+    ProcessPendingDeleteList();
 
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
@@ -169,8 +170,6 @@ void CLuaManager::LoadCFunctions()
         // Output funcs
         {"outputConsole", CLuaFunctionDefs::OutputConsole},
         {"outputChatBox", CLuaFunctionDefs::OutputChatBox},
-        {"showChat", CLuaFunctionDefs::ShowChat},
-        {"isChatVisible", CLuaFunctionDefs::IsChatVisible},
         {"outputDebugString", CLuaFunctionDefs::OutputClientDebugString},
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
@@ -277,4 +276,5 @@ void CLuaManager::LoadCFunctions()
     CLuaWeaponDefs::LoadFunctions();
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
+    CLuaClientDefs::LoadFunctions();
 }

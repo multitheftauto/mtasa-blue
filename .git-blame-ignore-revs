@@ -91,3 +91,9 @@ eefde6d95260aef53308baa7fb1e59cf24522cd9
 # Date:   Thu Apr 2 12:03:34 2020 +0100
 #
 # Convert more line endings to LF
+
+6c29e89e4f79c2d88ad77f1e4763e6c62b6095e2
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sun Jan 17 13:23:58 2021 +0200
+#
+# Run clang-format (PR #2013)

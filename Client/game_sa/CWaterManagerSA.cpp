@@ -727,9 +727,9 @@ bool CWaterManagerSA::DeletePoly(CWaterPoly* pPoly)
     return true;
 }
 
-bool CWaterManagerSA::GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown)
+bool CWaterManagerSA::GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool ignoreDistanceToWaterThreshold, CVector* pvecUnknown)
 {
-    return ((GetWaterLevel_t)FUNC_GetWaterLevel)(vecPosition.fX, vecPosition.fY, vecPosition.fZ, pfLevel, bCheckWaves, pvecUnknown);
+    return ((GetWaterLevel_t)FUNC_GetWaterLevel)(vecPosition.fX, vecPosition.fY, vecPosition.fZ, pfLevel, ignoreDistanceToWaterThreshold, pvecUnknown);
 }
 
 bool CWaterManagerSA::SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource)
@@ -752,10 +752,10 @@ bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool
         for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
         {
             m_Vertices[i].GetPosition(vecVertexPos);
-            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel())) 
+            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel()))
                 vecVertexPos.fZ = fLevel;
             m_Vertices[i].SetPosition(vecVertexPos, pChangeSource);
-        }        
+        }
     }
 
     if (bIncludeOutsideWorldLevel)
@@ -838,11 +838,19 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     CVector rayDir = vecEnd - vecStart;
 
     // Check if we're outside of map area.
-    CVector zeroPoint;
-    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
+    // Check for intersection with ocean outside the game area (takes water level into account)
+    // If a hit is detected, and it is outside, we early out, as custom water can't be created outside game boundaries
     {
-        *vecCollision = zeroPoint;
-        return true;
+        CVector intersection{};
+        const float waterHeight = *reinterpret_cast<float*>(0x6E873F);
+        if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &intersection))
+        {
+            if (IsPointOutsideOfGameArea(intersection))
+            {
+                *vecCollision = intersection;
+                return true;
+            }
+        }
     }
 
     // Early out in case of both points being out of map
@@ -858,7 +866,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
             return false;
         }
     }
-
+    
     std::vector<CWaterZoneSA*> vecZones;
     GetZonesIntersecting(vecStart, vecEnd, vecZones);
 
@@ -866,7 +874,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     {
         return false;
     }
-   
+
     std::deque<CVector> vecVertices;
     for (auto& zone : vecZones)
     {
@@ -905,7 +913,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
                     return true;
                 }
             }
-            
+
         }
     }
 

@@ -66,6 +66,16 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM_CLASS(eClientModelType);
+DECLARE_ENUM(eSoundEffectType);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Chorus);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Compressor);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Distortion);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Echo);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Flanger);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
+DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
+DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eShadowType);
 
 class CRemoteCall;
@@ -436,34 +446,49 @@ inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 {
     return "surface-adhesion-group";
 }
-inline SString GetClassByTypeName(eObjectGroup::Modifiable*)
+inline SString GetClassTypeName(eSoundEffectType*)
 {
-    return "objectgroup-modifiable";
+    return "soundeffect-type";
 }
-inline SString GetClassByTypeName(eObjectGroup::DamageEffect*)
+inline SString GetClassTypeName(eSoundEffectParams::Chorus*)
 {
-    return "objectgroup-damageeffect";
+    return "soundeffect-params-chorus";
 }
-inline SString GetClassByTypeName(eObjectGroup::CollisionResponse*)
+inline SString GetClassTypeName(eSoundEffectParams::Compressor*)
 {
-    return "objectgroup-collisionresponse";
+    return "soundeffect-params-compressor";
 }
-inline SString GetClassByTypeName(eObjectGroup::FxType*)
+inline SString GetClassTypeName(eSoundEffectParams::Distortion*)
 {
-    return "objectgroup-fxtype";
+    return "soundeffect-params-distortion";
 }
-inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
+inline SString GetClassTypeName(eSoundEffectParams::Echo*)
 {
-    return "objectgroup-breakmode";
+    return "soundeffect-params-echo";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Flanger*)
+{
+    return "soundeffect-params-flanger";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Gargle*)
+{
+    return "soundeffect-params-gargle";
+}
+inline SString GetClassTypeName(eSoundEffectParams::I3DL2Reverb*)
+{
+    return "soundeffect-params-i3dl2reverb";
+}
+inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
+{
+    return "soundeffect-params-parameq";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
+{
+    return "soundeffect-params-reverb";
 }
 inline SString GetClassTypeName(eShadowType*)
 {
     return "shadow-type";
-}
-
-inline SString GetClassByTypeName(eClientModelType)
-{
-    return "client-model-type";
 }
 
 //
@@ -554,7 +579,7 @@ template <class T>
 CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
 {
     CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
-    
+
     if (pRemoteCall && g_pClientGame->GetRemoteCalls()->CallExists(pRemoteCall))
         return pRemoteCall;
 

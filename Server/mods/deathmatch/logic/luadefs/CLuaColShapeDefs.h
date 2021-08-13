@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+class CColPolygon;
+
 class CLuaColShapeDefs : public CLuaDefs
 {
 public:
@@ -25,7 +27,7 @@ public:
     LUA_DECLARE(CreateColRectangle);
     LUA_DECLARE(CreateColPolygon);
     LUA_DECLARE(CreateColTube);
-    
+
     LUA_DECLARE(GetColShapeRadius);
     LUA_DECLARE(SetColShapeRadius);
     LUA_DECLARE_OOP(GetColShapeSize);
@@ -38,4 +40,7 @@ public:
 
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
+
+    static std::tuple<float, float> GetColPolygonHeight(CColPolygon* pColPolygon);
+    static bool                     SetColPolygonHeight(CColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };

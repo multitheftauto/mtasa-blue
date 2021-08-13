@@ -9,10 +9,15 @@
  *
  *****************************************************************************/
 
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Time.h"
+#include <map>
 #include "UTF8.h"
 #include "UTF8Detect.hpp"
+#include "CDuplicateLineFilter.h"
 #ifdef WIN32
     #include <ctime>
+    #include <windows.h>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
@@ -56,7 +61,7 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 #ifndef MTA_DM_ASE_VERSION
-    #include <../../Client/version.h>
+    #include <version.h>
 #endif
 
 //
@@ -1248,7 +1253,7 @@ DWORD SharedUtil::GetMainThreadId()
         // Get the module information for the currently running process
         DWORD      processEntryPointAddress = 0;
         MODULEINFO moduleInfo = {};
-        
+
         if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
         {
             processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
@@ -1459,6 +1464,31 @@ bool SharedUtil::IsColorCodeW(const wchar_t* wszColorCode)
         }
     }
     return true;
+}
+
+char* SharedUtil::Trim(char* szText)
+{
+    char*  szOriginal = szText;
+    size_t uiLen = 0;
+
+    while (isspace((unsigned char)*szText))
+        szText++;
+
+    if (*szText)
+    {
+        char* p = szText;
+        while (*p)
+            p++;
+        while (isspace((unsigned char)*(--p)))
+            ;
+        p[1] = '\0';
+        uiLen = (size_t)(p - szText + 1);
+    }
+
+    if (szText == szOriginal)
+        return szText;
+
+    return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
 }
 
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring

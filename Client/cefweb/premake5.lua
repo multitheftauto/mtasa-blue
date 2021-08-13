@@ -11,6 +11,7 @@ project "Client Webbrowser"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			".",
 			"../sdk",
 			"../../vendor/cef3",

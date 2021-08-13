@@ -13,7 +13,7 @@
 
 #include "CElement.h"
 
-class CDummy : public CElement
+class CDummy final : public CElement
 {
 public:
     CDummy(class CGroups* pGroups, CElement* pParent);
