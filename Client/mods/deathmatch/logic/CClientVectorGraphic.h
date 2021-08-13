@@ -20,17 +20,16 @@ class CClientVectorGraphic final : public CClientTexture
     DECLARE_CLASS(CClientVectorGraphic, CClientTexture)
 public:
     CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem);
-    ~CClientVectorGraphic() = default;
+    ~CClientVectorGraphic();
+
+    virtual void Unlink() override;
 
     CResource* GetResource() const { return m_pResource; }
     void       SetResource(CResource* pResource) { m_pResource = pResource; }
 
     eClientEntityType GetType() const { return CCLIENTVECTORGRAPHIC; }
 
-    void CreateDocument();
     bool LoadFromData(std::string strData);
-
-    void Destroy();
     bool IsDestroyed() const { return m_bIsDestroyed; }
 
     lunasvg::Document*   GetSVGDocument() const { return m_pDocument.get(); }
@@ -39,9 +38,6 @@ public:
     CXMLNode* GetSVGDocumentXML() const;
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
-
-    float GetDPI() const { return m_fDPI; }
-    void  SetDPI(const float dpi) { m_fDPI = dpi; }
 private:
     CResource*                                     m_pResource;
     CClientManager*                                m_pManager;
@@ -51,6 +47,5 @@ private:
 
     std::unique_ptr<CClientVectorGraphicDisplay>   m_pVectorGraphicDisplay;
 
-    float m_fDPI = 96.0;
     bool  m_bIsDestroyed = false;
 };

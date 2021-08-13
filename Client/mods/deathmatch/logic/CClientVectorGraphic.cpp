@@ -25,6 +25,11 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
 }
 
+CClientVectorGraphic::~CClientVectorGraphic()
+{
+    Unlink();
+}
+
 bool CClientVectorGraphic::LoadFromData(std::string strData)
 {
     m_pDocument = lunasvg::Document::loadFromData(strData);
@@ -38,9 +43,6 @@ bool CClientVectorGraphic::LoadFromData(std::string strData)
     if (!node || !node->IsValid())
         return false;
 
-    // We might already have a document
-    delete m_pXMLDocument;
-
     m_pXMLDocument = node;
     m_pVectorGraphicDisplay->Update();
     return true;
@@ -51,9 +53,9 @@ CXMLNode* CClientVectorGraphic::GetSVGDocumentXML() const
     return m_pXMLDocument;
 }
 
-void CClientVectorGraphic::Destroy()
+void CClientVectorGraphic::Unlink()
 {
-    delete m_pXMLDocument;
-
     m_bIsDestroyed = true;
+
+    CClientRenderElement::Unlink();
 }
