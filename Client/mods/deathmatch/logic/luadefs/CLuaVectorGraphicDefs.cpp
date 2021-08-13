@@ -68,7 +68,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         {
             if (!pVectorGraphic->LoadFromData(pathOrRawData.value()))
             {
-                pVectorGraphic->Destroy();
+                delete pVectorGraphic;
                 throw std::invalid_argument("Unable to load raw SVG data (check for syntax errors)");
             }
         }
@@ -85,7 +85,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 if (!pFile->Load(pParentResource, CScriptFile::MODE_READ))
                 {
                     delete pFile;
-                    pVectorGraphic->Destroy();
+                    delete pVectorGraphic;
                     throw std::invalid_argument(SString("Unable to load SVG file [%s]", pathOrRawData.value().c_str()));
                 }
 
@@ -97,14 +97,14 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
                 if (strXmlData.empty() || !pVectorGraphic->LoadFromData(strXmlData))
                 {
-                    pVectorGraphic->Destroy();
+                    delete pVectorGraphic;
                     throw std::invalid_argument("Unable to load raw SVG data (check for XML syntax errors)");
                 }
 
             }
             else
             {
-                pVectorGraphic->Destroy();
+                delete pVectorGraphic;
                 throw std::invalid_argument(SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
             }
         }
@@ -113,7 +113,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     return pVectorGraphic;
 }
 
-CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic)
+CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(CClientVectorGraphic* pVectorGraphic)
 {
     CXMLNode* xmlDocument = pVectorGraphic->GetSVGDocumentXML();
 
@@ -123,10 +123,7 @@ CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(lua_State* luaVM, CClientVect
     return xmlDocument;
 }
 
-void CLuaVectorGraphicDefs::SVGSetDocumentXML(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
+bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
 {
-    if (!pVectorGraphic->LoadFromData(pXMLNode->ToString()))
-        throw std::invalid_argument("Unable to set SVG XML document");
-
-    return;
+    return pVectorGraphic->LoadFromData(pXMLNode->ToString());
 }
