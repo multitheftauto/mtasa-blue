@@ -53,7 +53,7 @@ void CClientVectorGraphicDisplay::Render()
 
 void CClientVectorGraphicDisplay::UpdateTexture()
 {
-    if (m_pVectorGraphic->IsDestroyed())
+    if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
         return;
 
     Document* svgDocument = m_pVectorGraphic->GetSVGDocument();
@@ -62,6 +62,9 @@ void CClientVectorGraphicDisplay::UpdateTexture()
         return;
 
     CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
+
+    if (!pVectorGraphicItem)
+        return;
 
     IDirect3DSurface9* surface = m_pVectorGraphic->GetRenderItem()->m_pD3DRenderTargetSurface;
 
@@ -99,8 +102,15 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 
 void CClientVectorGraphicDisplay::ClearTexture()
 {
-   CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
-   IDirect3DSurface9*  surface = pVectorGraphicItem->m_pD3DRenderTargetSurface;
+    if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
+        return;
+
+    CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
+
+    if (!pVectorGraphicItem)
+        return;
+
+    IDirect3DSurface9*  surface = pVectorGraphicItem->m_pD3DRenderTargetSurface;
 
     if (!surface)
         return;
