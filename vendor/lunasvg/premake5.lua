@@ -1,17 +1,21 @@
 project "lunasvg"
-  language "C++"
-  cppdialect "C++17"
-  kind "SharedLib"
-  targetname "lunasvg"
-  targetdir(buildpath("mta"))
-  floatingpoint "Fast"
-  rtti "Off"
+	language "C++"
+	cppdialect "C++17"
+	kind "SharedLib"
+	targetname "lunasvg"
+	targetdir(buildpath("mta"))
+	floatingpoint "Fast"
+	rtti "Off"
 
-  defines { "LUNASVG_EXPORTS", "LUNASVG_SHARED", "_CRT_SECURE_NO_WARNINGS" }
+	defines { 
+		"LUNASVG_EXPORTS", 
+		"LUNASVG_SHARED", 
+		"_CRT_SECURE_NO_WARNINGS"
+	}
 
-    vpaths {
-    	["Headers"] = "source/**.h",
-        ["Headers/*"] = "include/**.h",
+	vpaths {
+		["Headers"] = "source/**.h",
+		["Headers/*"] = "include/**.h",
 		["Headers/3rdparty/*"] = "3rdparty/**.h",
 		["Sources"] = "source/**.cpp",
 		["Sources/*"] = "3rdparty/**.cpp",
@@ -19,22 +23,16 @@ project "lunasvg"
 		["*"] = "premake5.lua"
 	}
 
-  files { 
-    "premake5.lua",
-    "**.cpp",
-    "**.h",
-    "**.c"
-  }
+	files { 
+		"premake5.lua",
+		"**.cpp",
+		"**.h",
+		"**.c"
+	}
 
-  includedirs { 
-    "3rdparty/plutovg", 
-    "3rdparty/software", 
-    "source", 
-    "include"
-  }
-
-configuration "vs2019"
-  flags { "MultiProcessorCompile" }
-
-configuration "vs2019 and Release"
-  flags { "LinkTimeOptimization" } 
+	includedirs { 
+		"3rdparty/plutovg", 
+		"3rdparty/software", 
+		"source", 
+		"include"
+	}
