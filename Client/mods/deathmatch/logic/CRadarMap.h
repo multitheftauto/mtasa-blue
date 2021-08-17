@@ -113,6 +113,7 @@ private:
 
     bool m_bHudVisible;
     bool m_bChatVisible;
+    bool m_bChatInputBlocked;
     bool m_bRadarVisible;
     bool m_bDebugVisible;
     bool m_bTextVisible;

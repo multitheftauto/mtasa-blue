@@ -143,7 +143,7 @@ void CLuaMain::InitVM()
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open();
+    m_luaVM = lua_open(this);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
@@ -182,8 +182,10 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, g_pClientGame->GetLocalPlayer());
     lua_setglobal(m_luaVM, "localPlayer");
+}
 
-    // Load pre-loaded lua scripts
+void CLuaMain::LoadEmbeddedScripts()
+{
     DECLARE_PROFILER_SECTION(OnPreLoadScript)
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);

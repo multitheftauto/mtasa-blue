@@ -18,7 +18,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-class CColModelSAInterface;
+struct CColModelSAInterface;
 
 /*****************************************************************************/
 /** Renderware functions                                                    **/

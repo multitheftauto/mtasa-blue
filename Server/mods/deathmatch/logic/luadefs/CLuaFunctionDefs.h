@@ -9,31 +9,14 @@
  *
  *****************************************************************************/
 
-class CLuaFunctionDefs;
-class CBlipManager;
-class CMarkerManager;
-class CPickupManager;
-class CRadarAreaManager;
-class CRegisteredCommands;
-class CAccountManager;
-class CColManager;
-class CAccessControlListManager;
-
 #pragma once
-#include "LuaCommon.h"
-#include "CLuaMain.h"
-#include "CLuaTimerManager.h"
 
-#define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
-#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
+#include "CLuaDefs.h"
 
-
-extern CTimeUsMarker<20> markerLatentEvent;            // For timing triggerLatentClientEvent
-
-class CLuaFunctionDefs
+class CLuaFunctionDefs : public CLuaDefs
 {
 public:
-    static void Initialize(class CLuaManager* pLuaManager, class CGame* pClientGame);
+    static void LoadFunctions();
 
     // Event functions
     LUA_DECLARE(AddEvent);
@@ -97,23 +80,8 @@ public:
     LUA_DECLARE(GetCommandHandlers);
 
     // Standard server functions
-    LUA_DECLARE(GetMaxPlayers);
-    LUA_DECLARE(SetMaxPlayers);
-    LUA_DECLARE(OutputChatBox);
-    LUA_DECLARE(OOP_OutputChatBox);
-    LUA_DECLARE(OutputConsole);
-    LUA_DECLARE(OutputDebugString);
-    LUA_DECLARE(OutputServerLog);
-    LUA_DECLARE(GetServerName);
-    LUA_DECLARE(GetServerHttpPort);
-    LUA_DECLARE(GetServerIP);
-    LUA_DECLARE(GetServerPassword);
-    LUA_DECLARE(SetServerPassword);
-    LUA_DECLARE(GetServerConfigSetting);
     LUA_DECLARE(SetServerConfigSetting);
-    LUA_DECLARE(ClearChatBox);
-
-    LUA_DECLARE(shutdown);
+    static bool Shutdown(lua_State* luaVM, std::optional<std::string_view> maybeReason, std::optional<int> maybeExitCode);
 
     // Loaded Map Functions
     LUA_DECLARE(GetRootElement);
@@ -152,24 +120,4 @@ public:
 
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);
-
-private:
-    // Static references to objects
-    static CBlipManager*              m_pBlipManager;
-    static CLuaManager*               m_pLuaManager;
-    static CMarkerManager*            m_pMarkerManager;
-    static CObjectManager*            m_pObjectManager;
-    static CPickupManager*            m_pPickupManager;
-    static CPlayerManager*            m_pPlayerManager;
-    static CRadarAreaManager*         m_pRadarAreaManager;
-    static CRegisteredCommands*       m_pRegisteredCommands;
-    static CElement*                  m_pRootElement;
-    static CScriptDebugging*          m_pScriptDebugging;
-    static CVehicleManager*           m_pVehicleManager;
-    static CTeamManager*              m_pTeamManager;
-    static CAccountManager*           m_pAccountManager;
-    static CColManager*               m_pColManager;
-    static CResourceManager*          m_pResourceManager;
-    static CAccessControlListManager* m_pACLManager;
-    static CLuaModuleManager*         m_pLuaModuleManager;
 };

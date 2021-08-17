@@ -40,7 +40,6 @@ public:
     // Output funcs
     static bool OutputConsole(const char* szText);
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
-    static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
@@ -228,7 +227,7 @@ public:
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
-    static bool BlowVehicle(CClientEntity& Entity);
+    static bool BlowVehicle(CClientEntity& Entity, std::optional<bool> withExplosion);
     static bool SetVehicleColor(CClientEntity& Entity, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CClientEntity& Entity, bool bLandingGearDown);
     static bool SetVehicleLocked(CClientEntity& Entity, bool bLocked);
@@ -380,7 +379,6 @@ public:
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
 
     // Camera get funcs
-    static bool           GetCameraViewMode(unsigned short& ucMode);
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);
     static CClientEntity* GetCameraTarget();
     static bool           GetCameraInterior(unsigned char& ucInterior);
@@ -391,7 +389,6 @@ public:
     static bool SetCameraTarget(const CVector& vecTarget);
     static bool SetCameraInterior(unsigned char ucInterior);
     static bool FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    static bool SetCameraViewMode(unsigned short ucMode);
 
     // Cursor funcs
     static bool GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld);
@@ -569,7 +566,7 @@ public:
                                    CEntity* pIgnoredEntity = NULL);
     static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);
     static CClientWater* CreateWater(CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
-    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown);
+    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool ignoreDistanceToWaterThreshold, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);
     static bool          GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);

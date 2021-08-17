@@ -66,6 +66,11 @@ namespace lua
         lua_pushlstring(L, value.data(), value.length());
     }
 
+    inline void Push(lua_State* L, const std::string_view& value)
+    {
+        lua_pushlstring(L, value.data(), value.length());
+    }
+
     inline void Push(lua_State* L, const CLuaArgument& arg)
     {
         if (arg.GetType() == LUA_TNONE)

@@ -120,7 +120,7 @@ class CPlaceableSAInterface            // 20 bytes
 {
 public:
     CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
+    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later   
 };
 
 class CEntitySAInterface
