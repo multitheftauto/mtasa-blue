@@ -486,10 +486,10 @@ int CLuaVector3Defs::GetZ(lua_State* luaVM)
 }
 
 std::variant<CVector, bool> CLuaVector3Defs::IntersectsSegmentTriangle(
-    CLuaVector3D* pVector, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2)
+    CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2)
 {
     CVector intersectionPoint;
-    if (pVector->IntersectsSegmentTriangle(segmentDir, triVert0, triVert1, triVert2, &intersectionPoint))
+    if (origin.IntersectsSegmentTriangle(segmentDir, triVert0, triVert1, triVert2, &intersectionPoint))
         return intersectionPoint;
     return false;
 }

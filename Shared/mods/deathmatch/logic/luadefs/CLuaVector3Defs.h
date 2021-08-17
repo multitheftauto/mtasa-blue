@@ -43,7 +43,7 @@ public:
     LUA_DECLARE(GetZ);
 
     static std::variant<CVector, bool> IntersectsSegmentTriangle(
-        CLuaVector3D* pVector, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2);
+        CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2);
 
     LUA_DECLARE(Add);
     LUA_DECLARE(Sub);
