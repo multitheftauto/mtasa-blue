@@ -1298,9 +1298,6 @@ unsigned char CClientEntity::GetInterior()
 
 void CClientEntity::SetInterior(unsigned char ucInterior)
 {
-    if (m_ucInterior == ucInterior)
-        return;
-
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
     {
