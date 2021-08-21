@@ -16,10 +16,6 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
 {
     SetTypeName("svg");
 
-    m_pDocument = nullptr;
-    m_pXMLDocument = nullptr;
-
-    m_pResource = nullptr;
     m_pManager = pManager;
     
     m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
@@ -46,11 +42,6 @@ bool CClientVectorGraphic::LoadFromData(std::string strData)
     m_pXMLDocument = node;
     m_pVectorGraphicDisplay->Update();
     return true;
-}
-
-CXMLNode* CClientVectorGraphic::GetSVGDocumentXML() const
-{
-    return m_pXMLDocument;
 }
 
 void CClientVectorGraphic::Unlink()

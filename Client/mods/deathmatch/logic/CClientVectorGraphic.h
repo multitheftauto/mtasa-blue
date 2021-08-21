@@ -34,16 +34,15 @@ public:
 
     lunasvg::Document*   GetSVGDocument() const { return m_pDocument.get(); }
     CVectorGraphicItem*  GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
-
-    CXMLNode* GetSVGDocumentXML() const;
+    CXMLNode*            GetSVGDocumentXML() const { return m_pXMLDocument; }
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
 private:
-    CResource*                                     m_pResource;
+    CResource*                                     m_pResource = nullptr;
     CClientManager*                                m_pManager;
 
-    std::unique_ptr<lunasvg::Document>             m_pDocument;
-    CXMLNode*                                      m_pXMLDocument;
+    std::unique_ptr<lunasvg::Document>             m_pDocument = nullptr;
+    CXMLNode*                                      m_pXMLDocument = nullptr;
 
     std::unique_ptr<CClientVectorGraphicDisplay>   m_pVectorGraphicDisplay;
 
