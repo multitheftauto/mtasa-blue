@@ -47,19 +47,13 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
     if (!pVectorGraphic)
         throw std::invalid_argument("Unknown error occurred creating SVG element");
-        
-    // Make it a child of the resource's file root
-    pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
-
-    // Set our owner resource
-    pVectorGraphic->SetResource(pParentResource);
 
     if (pathOrRawData.has_value())
     {
         std::string& strRawData = pathOrRawData.value();
         std::size_t szCharPos = strRawData.find_first_not_of(" \t\n\r\f\v", 0);
 
-        char charAuto;
+        char charAuto = 0;
 
         if (szCharPos != std::string::npos)
             charAuto = strRawData.at(szCharPos);
@@ -109,6 +103,12 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             }
         }
     }
+  
+    // Make our element a child of the resource's file root
+    pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
+
+    // Set our owner resource
+    pVectorGraphic->SetResource(pParentResource);
 
     return pVectorGraphic;
 }
