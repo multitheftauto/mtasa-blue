@@ -625,5 +625,6 @@ int CLuaPlayerDefs::GetPlayerMapBoundingBox(lua_State* luaVM)
 
 unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
 {
-    return g_pCore->GetCVars()->GetValue<int>("mapalpha");
+    int iMapOpacity = g_pCore->GetCVars()->GetValue<int>("mapalpha");
+    return Clamp(0, iMapOpacity, 255);
 }
