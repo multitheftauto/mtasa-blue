@@ -18,14 +18,14 @@ bool            g_bVehiclePointerInvalid = false;
 
 namespace
 {
-    bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
+    RpAtomic* ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
         CVehicleSA* pVehicleSA = (CVehicleSA*)data;
         RwFrame*    pFrame = RpGetFrame(pAtomic);
         pVehicleSA->AddComponent(pFrame, false);
         // g_pCore->GetConsole()->Print ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
         // OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
-        return true;
+        return pAtomic;
     }
 
     void ClumpDump(RpClump* pClump, CVehicleSA* pVehicleSA)

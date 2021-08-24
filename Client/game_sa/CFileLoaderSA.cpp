@@ -43,12 +43,42 @@ public:
     }
 };
 
-static char* GetFrameNodeName(RwFrame* frame) {
-    return ((char* (__cdecl*)(RwFrame*))0x72FB30)(frame);
+static const char* GetFrameNodeName(RwFrame* frame) {
+    return ((const char* (__cdecl*)(RwFrame*))0x72FB30)(frame);
 }
 
-static void GetNameAndDamage(char const* nodeName, char* outName, bool& outDamage) {
-    return ((void(__cdecl*)(char const*, char*, bool&))0x5370A0)(nodeName, outName, outDamage);
+template<size_t BuffSize>
+void GetNameAndDamage(const char* nodeName, char (&outName)[BuffSize], bool& outDamage) {
+    const size_t nodeNameLen = strlen(nodeName);
+
+    const auto EndsWith = [=](const char* with) {
+        const auto withlen = strlen(with);
+        assert(withlen <= nodeNameLen);
+        return strncmp(nodeName + nodeNameLen - withlen, with, withlen) == 0;
+    };
+
+    auto TerminatedCopy = [=](size_t off) mutable {
+        assert(nodeNameLen - off < BuffSize);
+
+        strncpy_s(outName, nodeName, nodeNameLen - off);
+        outName[nodeNameLen - off] = 0;
+    };
+
+    if (EndsWith("_dam"))
+    {
+        outDamage = true;
+        TerminatedCopy(sizeof("_dam") - 1);
+    }
+    else
+    {
+        outDamage = false;
+        if (EndsWith("_l0") || EndsWith("_L0"))
+            TerminatedCopy(sizeof("_l0") - 1);
+        else {
+            assert(nodeNameLen < BuffSize);
+            strcpy_s(outName, nodeName);
+        }
+    }
 }
 
 static void CVisibilityPlugins_SetAtomicRenderCallback(RpAtomic *pRpAtomic, RpAtomic * (*renderCB)(RpAtomic *)) {
@@ -102,7 +132,7 @@ bool CFileLoader_LoadAtomicFile(RwStream *stream, unsigned int modelId)
         relatedModelInfo.pClump = pReadClump;
         relatedModelInfo.bDeleteOldRwObject = false;
 
-        RpClumpForAllAtomics(pReadClump, (RpClumpForAllAtomicsCB_t)CFileLoader_SetRelatedModelInfoCB, &relatedModelInfo);
+        RpClumpForAllAtomics(pReadClump, CFileLoader_SetRelatedModelInfoCB, &relatedModelInfo);
         RpClumpDestroy(pReadClump);
     }
 
@@ -118,15 +148,19 @@ bool CFileLoader_LoadAtomicFile(RwStream *stream, unsigned int modelId)
     return true;
 }
 
-RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo)
+RpAtomic* __cdecl CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, void* data)
 {
-    char name[24];
+    auto pRelatedModelInfo = (SRelatedModelInfo*)data;
+
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[gAtomicModelId];
     auto pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
     RwFrame* pOldFrame = reinterpret_cast<RwFrame*>(atomic->object.object.parent);
-    char* frameNodeName = GetFrameNodeName(pOldFrame);
+    const char* frameNodeName = GetFrameNodeName(pOldFrame);
     bool bDamage = false;
-    GetNameAndDamage(frameNodeName, (char*)&name, bDamage);
+
+    char name[24];
+    GetNameAndDamage(frameNodeName, name, bDamage);
+
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);

@@ -91,7 +91,7 @@ typedef int(__cdecl* RwStreamClose_t)(RwStream* stream, void* pData);
 typedef int(__cdecl* RwStreamRead_t)(RwStream* stream, void* pData, uint size);
 typedef int(__cdecl* RwStreamSkip_t)(RwStream* stream, uint size);
 typedef int(__cdecl* RpClumpDestroy_t)(RpClump* clump);
-using RpClumpForAllAtomicsCB_t = bool(__cdecl*)(RpAtomic*, void*);
+using RpClumpForAllAtomicsCB_t = RpAtomic*(__cdecl*)(RpAtomic*, void*);
 typedef RpClump*(__cdecl* RpClumpForAllAtomics_t)(RpClump* clump, RpClumpForAllAtomicsCB_t callback, void* pData);
 typedef RwTexDictionary*(__cdecl* RwTexDictionaryStreamRead_t)(RwStream* stream);
 typedef RwTexDictionary*(__cdecl* RwTexDictionaryGtaStreamRead_t)(RwStream* stream);

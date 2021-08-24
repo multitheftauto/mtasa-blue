@@ -62,7 +62,7 @@ static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
 }
 
 // RpClumpForAllAtomics callback used to add atomics to a vehicle
-static bool AddAllAtomicsCB(RpAtomic* atomic, void* pClump)
+static RpAtomic* AddAllAtomicsCB(RpAtomic* atomic, void* pClump)
 {
     RpClump* data = reinterpret_cast<RpClump*>(pClump);
     RwFrame* pFrame = RpGetFrame(data);
@@ -71,7 +71,7 @@ static bool AddAllAtomicsCB(RpAtomic* atomic, void* pClump)
     RpAtomicSetFrame(atomic, pFrame);
     RpClumpAddAtomic(data, atomic);
 
-    return true;
+    return atomic;
 }
 
 // RpClumpForAllAtomics struct and callback used to replace all wheels with a given wheel model
@@ -82,7 +82,7 @@ struct SReplaceWheels
     RpAtomicContainer* pReplacements;             // replacement atomics
     unsigned int       uiReplacements;            // number of replacements
 };
-static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
+static RpAtomic* ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 {
     SReplaceWheels* data = reinterpret_cast<SReplaceWheels*>(pData);
     RwFrame*        Frame = RpGetFrame(atomic);
@@ -111,7 +111,7 @@ static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
         }
     }
 
-    return true;
+    return atomic;
 }
 
 // RpClumpForAllAtomics struct and callback used to replace all atomics for a vehicle
@@ -121,12 +121,12 @@ struct SReplaceAll
     RpAtomicContainer* pReplacements;             // replacement atomics
     unsigned int       uiReplacements;            // number of replacements
 };
-static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
+static RpAtomic* ReplaceAllCB(RpAtomic* atomic, void* pData)
 {
     SReplaceAll* data = reinterpret_cast<SReplaceAll*>(pData);
     RwFrame*     Frame = RpGetFrame(atomic);
     if (Frame == NULL)
-        return true;
+        return atomic;
 
     // find a replacement atomic
     for (unsigned int i = 0; i < data->uiReplacements; i++)
@@ -155,7 +155,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
         }
     }
 
-    return true;
+    return atomic;
 }
 
 // RpClumpForAllAtomics struct and callback used to load the atomics from a specific clump into a container
@@ -164,7 +164,7 @@ struct SLoadAtomics
     RpAtomicContainer* pReplacements;             // replacement atomics
     unsigned int       uiReplacements;            // number of replacements
 };
-static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
+static RpAtomic* LoadAtomicsCB(RpAtomic* atomic, void* pData)
 {
     SLoadAtomics* data = reinterpret_cast<SLoadAtomics*>(pData);
     RwFrame*      Frame = RpGetFrame(atomic);
@@ -176,7 +176,7 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
     // and increment the counter
     data->uiReplacements++;
 
-    return true;
+    return atomic;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& 
     RpClumpForAllAtomics(pClump,
                          [](RpAtomic* pAtomic, void* pData) {
                              reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
-                             return true;
+                             return pAtomic;
                          },
                          &outAtomicList);
 }
@@ -466,7 +466,7 @@ typedef struct
     unsigned short usTxdID;
     RpClump*       pClump;
 } SAtomicsReplacer;
-bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
+RpAtomic* AtomicsReplacer(RpAtomic* pAtomic, void* data)
 {
     SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
     SRelatedModelInfo relatedModelInfo = { 0 };
@@ -477,7 +477,7 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     // The above function adds a reference to the model's TXD by either
     // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
-    return true;
+    return pAtomic;
 }
 
 void CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)

@@ -25,5 +25,5 @@ public:
 };
 
 bool CFileLoader_LoadAtomicFile(RwStream *stream, unsigned int modelId);
-RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo);
+RpAtomic* __cdecl CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, void* pRelatedModelInfo);
 CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine);
