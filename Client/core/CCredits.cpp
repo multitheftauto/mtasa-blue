@@ -64,6 +64,7 @@ CCredits::CCredits()
 
         "Patrik \"Pirulax\" Jankovics-Szmolenicki\n"
         "Patrik \"myonlake\" Juvonen\n"
+        "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Nikita \"StrixG\" Obrecht\n"
         "Arran\n"
         "colistro123\n"
@@ -131,7 +132,6 @@ CCredits::CCredits()
         "Gabrielius \"Dezash\" Laurinavičius\n"
         "John \"jlillis\" Lillis\n"
         "Kamil \"forkerer\" Marciniak\n"
-        "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Tete \"Tete\" Omar\n"
         "Marcin \"FileEX\" Pawlicki\n"
         "Ali \"Haxardous\" Qamber\n"
