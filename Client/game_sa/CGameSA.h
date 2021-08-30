@@ -302,6 +302,7 @@ public:
     CWaterManager*      GetWaterManager() { return m_pWaterManager; }
     CWeaponStatManager* GetWeaponStatManager() { return m_pWeaponStatsManager; }
     CPointLights*       GetPointLights() { return m_pPointLights; }
+    CColStore*          GetCollisionStore() override { return m_collisionStore; }
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
@@ -477,6 +478,7 @@ private:
     CWaterManager*                  m_pWaterManager;
     CWeaponStatManager*             m_pWeaponStatsManager;
     CPointLights*                   m_pPointLights;
+    CColStore*                      m_collisionStore;
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;

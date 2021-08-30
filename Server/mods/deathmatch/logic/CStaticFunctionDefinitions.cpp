@@ -11,7 +11,8 @@
 
 #include "StdInc.h"
 
-extern CGame* g_pGame;
+extern CGame*            g_pGame;
+extern CTimeUsMarker<20> markerLatentEvent;
 
 static CLuaManager*          m_pLuaManager;
 static CColManager*          m_pColManager;

@@ -355,18 +355,18 @@ int CLuaWaterDefs::GetWaterLevel(lua_State* luaVM)
     if (!argStream.NextIsUserData())
     {
         // Call type 1
-        //  float getWaterLevel ( float posX, float posY, float posZ [ , bool bCheckWaves = false ] )
+        //  float getWaterLevel ( float posX, float posY, float posZ [ , bool ignoreDistanceToWaterThreshold = false ] )
         CVector vecPosition;
-        bool    bCheckWaves;
+        bool    ignoreDistanceToWaterThreshold;
 
         argStream.ReadVector3D(vecPosition);
-        argStream.ReadBool(bCheckWaves, false);
+        argStream.ReadBool(ignoreDistanceToWaterThreshold, false);
 
         if (!argStream.HasErrors())
         {
             float   fWaterLevel;
             CVector vecUnknown;
-            if (CStaticFunctionDefinitions::GetWaterLevel(vecPosition, fWaterLevel, bCheckWaves, vecUnknown))
+            if (CStaticFunctionDefinitions::GetWaterLevel(vecPosition, fWaterLevel, ignoreDistanceToWaterThreshold, vecUnknown))
             {
                 lua_pushnumber(luaVM, fWaterLevel);
                 return 1;

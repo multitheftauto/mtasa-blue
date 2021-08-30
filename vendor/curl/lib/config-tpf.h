@@ -99,16 +99,8 @@
 /* #undef HAVE_CRYPTO_CLEANUP_ALL_EX_DATA */
 #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
 
-/* Define to 1 if you have the <crypto.h> header file. */
-/* #undef HAVE_CRYPTO_H */
-#define HAVE_CRYPTO_H 1
-
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
-
-/* Define to 1 if you have the <err.h> header file. */
-/* #undef HAVE_ERR_H */
-#define HAVE_ERR_H 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
@@ -119,10 +111,6 @@
 /* Define to 1 if you have a working fcntl O_NONBLOCK function. */
 #define HAVE_FCNTL_O_NONBLOCK 1
 
-/* Define to 1 if you have the `fork' function. */
-/* #undef HAVE_FORK */
-#define HAVE_FORK 1
-
 /* Define to 1 if you have the `ftruncate' function. */
 #define HAVE_FTRUNCATE 1
 
@@ -131,9 +119,6 @@
 
 /* Define to 1 if you have the `geteuid' function. */
 #define HAVE_GETEUID 1
-
-/* Define to 1 if you have the `gethostbyaddr' function. */
-#define HAVE_GETHOSTBYADDR 1
 
 /* If you have gethostbyname */
 #define HAVE_GETHOSTBYNAME 1
@@ -325,9 +310,6 @@
 /* #undef HAVE_PEM_H */
 #define HAVE_PEM_H 1
 
-/* Define to 1 if you have the `perror' function. */
-#define HAVE_PERROR 1
-
 /* Define to 1 if you have the `pipe' function. */
 #define HAVE_PIPE 1
 
@@ -354,10 +336,6 @@
 /* #undef HAVE_RAND_STATUS */
 #define HAVE_RAND_STATUS 1
 
-/* Define to 1 if you have the <rsa.h> header file. */
-/* #undef HAVE_RSA_H */
-#define HAVE_RSA_H 1
-
 /* Define to 1 if you have the `select' function. */
 #define HAVE_SELECT 1
 
@@ -375,9 +353,6 @@
 
 /* Define to 1 if you have a working setsockopt SO_NONBLOCK function. */
 /* #undef HAVE_SETSOCKOPT_SO_NONBLOCK */
-
-/* Define to 1 if you have the <sgtty.h> header file. */
-/* #undef HAVE_SGTTY_H 1 */
 
 /* Define to 1 if you have the `sigaction' function. */
 #define HAVE_SIGACTION 1

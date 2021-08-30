@@ -749,8 +749,8 @@ bool CVehicle::SetTowedByVehicle(CVehicle* pVehicle)
 
 void CVehicle::SpawnAt(const CVector& vecPosition, const CVector& vecRotation)
 {
-    SetHealth(GetRespawnHealth());
     SetBlowState(VehicleBlowState::INTACT);
+    SetHealth(GetRespawnHealth());
     StopIdleTimer();
     ResetDoorsWheelsPanelsLights();
     SetLandingGearDown(true);

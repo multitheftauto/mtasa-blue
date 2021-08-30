@@ -2235,14 +2235,18 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim(CClientEntity& Entity, unsigned 
 
 bool CStaticFunctionDefinitions::AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType)
 {
-    RUN_CHILDREN(AddPedClothes(**iter, szTexture, szModel, ucType))
-    // Is he a player?
-    if (IS_PED(&Entity))
+    if (ucType < PLAYER_CLOTHING_SLOTS)
     {
-        CClientPed& Ped = static_cast<CClientPed&>(Entity);
-        Ped.GetClothes()->AddClothes(szTexture, szModel, ucType, false);
-        Ped.RebuildModel(true);
-        return true;
+        RUN_CHILDREN(AddPedClothes(**iter, szTexture, szModel, ucType))
+
+        // Is he a player?
+        if (IS_PED(&Entity))
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            Ped.GetClothes()->AddClothes(szTexture, szModel, ucType, false);
+            Ped.RebuildModel(true);
+            return true;
+        }
     }
 
     return false;
@@ -2250,14 +2254,18 @@ bool CStaticFunctionDefinitions::AddPedClothes(CClientEntity& Entity, const char
 
 bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigned char ucType)
 {
-    RUN_CHILDREN(RemovePedClothes(**iter, ucType))
-    // Is he a player?
-    if (IS_PED(&Entity))
+    if (ucType < PLAYER_CLOTHING_SLOTS)
     {
-        CClientPed& Ped = static_cast<CClientPed&>(Entity);
-        Ped.GetClothes()->RemoveClothes(ucType, false);
-        Ped.RebuildModel(true);
-        return true;
+        RUN_CHILDREN(RemovePedClothes(**iter, ucType))
+
+        // Is he a player?
+        if (IS_PED(&Entity))
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            Ped.GetClothes()->RemoveClothes(ucType, false);
+            Ped.RebuildModel(true);
+            return true;
+        }
     }
 
     return false;
@@ -6285,9 +6293,9 @@ CClientWater* CStaticFunctionDefinitions::CreateWater(CResource& resource, CVect
     return pWater;
 }
 
-bool CStaticFunctionDefinitions::GetWaterLevel(CVector& vecPosition, float& fWaterLevel, bool bCheckWaves, CVector& vecUnknown)
+bool CStaticFunctionDefinitions::GetWaterLevel(CVector& vecPosition, float& fWaterLevel, bool ignoreDistanceToWaterThreshold, CVector& vecUnknown)
 {
-    return g_pGame->GetWaterManager()->GetWaterLevel(vecPosition, &fWaterLevel, bCheckWaves, &vecUnknown);
+    return g_pGame->GetWaterManager()->GetWaterLevel(vecPosition, &fWaterLevel, ignoreDistanceToWaterThreshold, &vecUnknown);
 }
 
 bool CStaticFunctionDefinitions::GetWaterLevel(CClientWater* pWater, float& fLevel)

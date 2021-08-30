@@ -74,6 +74,13 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
 }
 
+void CStreamingSA::RemoveModel(std::uint32_t model)
+{
+    using Signature = void(__cdecl*)(std::uint32_t);
+    const auto function = reinterpret_cast<Signature>(0x4089A0);
+    function(model);
+}
+
 void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();

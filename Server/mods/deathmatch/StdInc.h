@@ -158,7 +158,6 @@ struct SAclRequest;
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"
-#include "lua/CLuaFunctionDefs.h"
 #include "lua/CLuaModuleManager.h"
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
