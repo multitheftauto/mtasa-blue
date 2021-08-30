@@ -17,8 +17,12 @@ project "LuaJIT"
 
     files {
 		"luajit.premake5.lua",
+
 		"src/lj_*.c",
+		--"src/lj_*.h",
+
 		"src/lib_*.c",
+		--"src/lib_*.h",
 	}
 
     defines {

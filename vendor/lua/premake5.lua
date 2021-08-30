@@ -1,6 +1,7 @@
 -- Used in BuildVM
 GC64 = true -- Use 64 bit GC. Only available in x64 
 FFI  = true -- Enable FFI
+JIT  = true -- Use JIT?
 
 function getrootpath()
     return "%{wks.location}/../vendor/lua/"

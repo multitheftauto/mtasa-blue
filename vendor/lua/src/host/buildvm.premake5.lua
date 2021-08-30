@@ -12,19 +12,41 @@ local function get_dasc_filename(cfg)
     return cfg.platform == 'x64' and GC64 and 'vm_x64.dasc' or 'vm_x86.dasc'
 end
 
+-- Similar to table.concat, but adds a prefix instead of a suffix
+-- used to make an arg list from multiple args
+-- Eg.: t = {'a', 'b'}, prefix = '-D' => -D a -D b
+function table.prefixconcat(t, prefix) 
+    local s = ''
+    for k, v in ipairs(t) do
+        s = ("%s %s %s"):format(s, prefix, v)
+    end
+    return s:sub(2) -- Remove unnecessary whitespace at the beginning 
+end
+
 -- Produces a command to generate `buildvm_arch.h`
 function generate_buildvm_arch_h(cfg) 
-    --local cmd = cfg.buildtarget.abspath
-    local cmd = ''
-    cmd = cmd .. 'minilua "' .. DASM .. '" -LN -D WIN -D JIT '
+    -- All of these are guaranteed on x64/x86. 
+    -- We have an FPU in hard mode, and we are little endian.
+    local defs = {'FPU', 'HFABI', 'ENDIAN_LE'}
+    
+    if os.host() == "windows" then
+        table.insert(defs, 'WIN')
+    end
     if cfg.platform == 'x64' then
-        cmd = cmd .. '-D P64 '
+        table.insert(defs, 'P64')
+    end
+    if JIT then
+        table.insert(defs, 'JIT')
     end
     if FFI then
-        cmd = cmd .. '-D FFI '
+        table.insert(defs, 'FFI')
     end
-    cmd = cmd .. '-o host/buildvm_arch.h ' .. get_dasc_filename(cfg)
-    return cmd
+
+    -- Produce command
+    local defs_str  = table.prefixconcat(defs, '-D')
+    local dasc_path = get_dasc_filename(cfg)
+    print(('minilua "%s" -LN %s -o host/buildvm_arch.h %s'):format(DASM, defs_str, dasc_path))
+    return ('minilua "%s" -LN %s -o host/buildvm_arch.h %s'):format(DASM, defs_str, dasc_path)
 end
 
 project "BuildVM"
@@ -36,7 +58,7 @@ project "BuildVM"
 
     dependson "MiniLua"
 
-    defines {"_CRT_SECURE_NO_WARNINGS"}
+    defines "_CRT_SECURE_NO_WARNINGS"
     linkoptions { "/SAFESEH:NO" }
 
     includedirs {
@@ -58,10 +80,12 @@ project "BuildVM"
         "buildvm_peobj.c"
     }
 
-    if not GC64 then
-        filter "platforms:x64"
-            defines { "LUAJIT_DISABLE_GC64" }
-    end
+    filter "platforms:x64"
+        if not GC64 then
+            defines "LUAJIT_DISABLE_GC64"
+        end
+
+    filter {}
 
     -- Generate buildvm_arch.h
     prebuildcommands {'{CHDIR} "%{srcpath()}"', "%{generate_buildvm_arch_h(cfg)}"}
