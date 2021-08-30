@@ -15,31 +15,15 @@
 #include "lua.h"
 
 
-#if defined(LUA_COMPAT_GETN)
-LUALIB_API int (luaL_getn) (lua_State *L, int t);
-LUALIB_API void (luaL_setn) (lua_State *L, int t, int n);
-#else
-#define luaL_getn(L,i)          ((int)lua_objlen(L, i))
-#define luaL_setn(L,i,j)        ((void)0)  /* no op! */
-#endif
-
-#if defined(LUA_COMPAT_OPENLIB)
-#define luaI_openlib	luaL_openlib
-#endif
-
-
 /* extra error code for `luaL_load' */
 #define LUA_ERRFILE     (LUA_ERRERR+1)
-
 
 typedef struct luaL_Reg {
   const char *name;
   lua_CFunction func;
 } luaL_Reg;
 
-
-
-LUALIB_API void (luaI_openlib) (lua_State *L, const char *libname,
+LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
                                 const luaL_Reg *l, int nup);
 LUALIB_API void (luaL_register) (lua_State *L, const char *libname,
                                 const luaL_Reg *l);
@@ -71,6 +55,10 @@ LUALIB_API int (luaL_error) (lua_State *L, const char *fmt, ...);
 LUALIB_API int (luaL_checkoption) (lua_State *L, int narg, const char *def,
                                    const char *const lst[]);
 
+/* pre-defined references */
+#define LUA_NOREF       (-2)
+#define LUA_REFNIL      (-1)
+
 LUALIB_API int (luaL_ref) (lua_State *L, int t);
 LUALIB_API void (luaL_unref) (lua_State *L, int t, int ref);
 
@@ -79,7 +67,7 @@ LUALIB_API int (luaL_loadbuffer) (lua_State *L, const char *buff, size_t sz,
                                   const char *name);
 LUALIB_API int (luaL_loadstring) (lua_State *L, const char *s);
 
-LUALIB_API lua_State *(luaL_newstate) (void *mtasaowner);
+LUALIB_API lua_State *(luaL_newstate) (void* mtasaowner); /* MTASA */
 
 
 LUALIB_API const char *(luaL_gsub) (lua_State *L, const char *s, const char *p,
@@ -88,7 +76,20 @@ LUALIB_API const char *(luaL_gsub) (lua_State *L, const char *s, const char *p,
 LUALIB_API const char *(luaL_findtable) (lua_State *L, int idx,
                                          const char *fname, int szhint);
 
-
+/* From Lua 5.2. */
+LUALIB_API int luaL_fileresult(lua_State *L, int stat, const char *fname);
+LUALIB_API int luaL_execresult(lua_State *L, int stat);
+LUALIB_API int (luaL_loadfilex) (lua_State *L, const char *filename,
+				 const char *mode);
+LUALIB_API int (luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz,
+				   const char *name, const char *mode);
+LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,
+				int level);
+LUALIB_API void (luaL_setfuncs) (lua_State *L, const luaL_Reg *l, int nup);
+LUALIB_API void (luaL_pushmodule) (lua_State *L, const char *modname,
+				   int sizehint);
+LUALIB_API void *(luaL_testudata) (lua_State *L, int ud, const char *tname);
+LUALIB_API void (luaL_setmetatable) (lua_State *L, const char *tname);
 
 
 /*
@@ -117,6 +118,11 @@ LUALIB_API const char *(luaL_findtable) (lua_State *L, int idx,
 #define luaL_getmetatable(L,n)	(lua_getfield(L, LUA_REGISTRYINDEX, (n)))
 
 #define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
+
+/* From Lua 5.2. */
+#define luaL_newlibtable(L, l) \
+	lua_createtable(L, 0, sizeof(l)/sizeof((l)[0]) - 1)
+#define luaL_newlib(L, l)	(luaL_newlibtable(L, l), luaL_setfuncs(L, l, 0))
 
 /*
 ** {======================================================
@@ -152,8 +158,7 @@ LUALIB_API void (luaL_pushresult) (luaL_Buffer *B);
 
 /* }====================================================== */
 
-
-/* compatibility with ref system */
+/* compatibility with ref system (Copied from Lua 5.1 source) */
 
 /* pre-defined references */
 #define LUA_NOREF       (-2)
@@ -170,5 +175,3 @@ LUALIB_API void (luaL_pushresult) (luaL_Buffer *B);
 #define luaL_reg	luaL_Reg
 
 #endif
-
-

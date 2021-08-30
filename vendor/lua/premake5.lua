@@ -1,56 +1,17 @@
-project "Lua_Server"
-	language "C++"
-	targetname "lua5.1"
+-- Used in BuildVM
+GC64 = true -- Use 64 bit GC. Only available in x64 
+FFI  = true -- Enable FFI
 
-	vpaths { 
-		["Headers"] = "**.h",
-		["Sources"] = "**.c",
-		["*"] = "premake5.lua"
-	}
-	
-	files {
-		"premake5.lua",
-		"src/**.c",
-		"src/**.h",
-	}
-
-	defines { "LUA_BUILD_AS_DLL" }
-
-	filter "system:windows"
-		kind "SharedLib"
-		targetdir(buildpath("server/mods/deathmatch"))
-
-	filter "system:not windows"
-		kind "StaticLib"
-
-	filter {"system:windows", "platforms:x64"}
-		targetdir(buildpath("server/x64"))
-
-
-if os.target() == "windows" then
-	project "Lua_Client"
-		language "C++"
-		kind "SharedLib"
-		targetname "lua5.1c"
-		targetdir(buildpath("mods/deathmatch"))
-
-		vpaths { 
-			["Headers"] = "**.h",
-			["Sources"] = "**.c",
-			["*"] = "premake5.lua"
-		}
-	
-		files {
-			"premake5.lua",
-			"src/**.c",
-			"src/**.h",
-		}
-	
-		defines {
-			"LUA_USE_APICHECK",
-			"LUA_BUILD_AS_DLL"
-		}
-
-        filter "platforms:x64"
-            flags { "ExcludeFromBuild" } 
+function getrootpath()
+    return "%{wks.location}/../vendor/lua/"
 end
+
+function srcpath(p)
+    return "%{getrootpath()}/src/" .. (p or "")
+end
+
+--group "LuaYEET"
+staticruntime "On" -- /MD switch
+include "src/host/buildvm.premake5.lua"
+include "src/host/minilua.premake5.lua"
+include "luajit.premake5.lua"
