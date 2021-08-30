@@ -75,7 +75,7 @@ void CLuaMain::ResetInstructionCount()
 void CLuaMain::InitSecurity()
 {
     // Disable dangerous Lua Os library functions
-    static const luaL_reg osfuncs[] =
+    static const luaL_Reg osfuncs[] =
     {
         { "execute", CLuaUtilDefs::DisabledFunction },
         { "rename", CLuaUtilDefs::DisabledFunction },
@@ -155,7 +155,7 @@ void CLuaMain::InitVM()
     luaopen_string(m_luaVM);
     luaopen_table(m_luaVM);
     luaopen_debug(m_luaVM);
-    luaopen_utf8(m_luaVM);
+    //luaopen_utf8(m_luaVM);
     luaopen_os(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!

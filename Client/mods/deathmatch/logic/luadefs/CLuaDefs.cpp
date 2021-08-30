@@ -75,7 +75,7 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
         {
             OutputDebugLine("[Lua] Registering PostCallHook");
             ms_bRegisterdPostCallHook = true;
-            lua_registerPostCallHook(CLuaDefs::DidUseFunction);
+            //lua_registerPostCallHook(CLuaDefs::DidUseFunction);
         }
     }
 
@@ -115,7 +115,7 @@ void CLuaDefs::DidUseFunction(lua_CFunction f, lua_State* luaVM)
         OutputDebugLine("[Lua] Removing PostCallHook");
         assert(ms_bRegisterdPostCallHook);
         ms_bRegisterdPostCallHook = false;
-        lua_registerPostCallHook(NULL);
+        //lua_registerPostCallHook(NULL);
     }
 
     g_pClientGame->GetDebugHookManager()->OnPostFunction(f, luaVM);

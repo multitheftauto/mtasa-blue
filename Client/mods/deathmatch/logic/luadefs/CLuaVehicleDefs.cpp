@@ -3198,7 +3198,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentPosition(lua_State* luaVM)
         if (pVehicle->GetComponentPosition(strComponent, vecPosition, outputBase))
         {
             // If the caller expects three results, return 3 floats, otherwise a vector
-            int iExpected = lua_ncallresult(luaVM);
+            /*int iExpected = lua_ncallresult(luaVM);
             if (iExpected == 3)
             {
                 lua_pushnumber(luaVM, vecPosition.fX);
@@ -3210,7 +3210,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentPosition(lua_State* luaVM)
             {
                 lua_pushvector(luaVM, vecPosition);
                 return 1;
-            }
+            }*/
         }
     }
     else
@@ -3301,7 +3301,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentRotation(lua_State* luaVM)
             // Script uses degrees
             ConvertRadiansToDegrees(vecRotation);
             // If the caller expects three results, return 3 floats, otherwise a vector
-            int iExpected = lua_ncallresult(luaVM);
+            /*int iExpected = lua_ncallresult(luaVM);
             if (iExpected == 3)
             {
                 lua_pushnumber(luaVM, vecRotation.fX);
@@ -3313,7 +3313,7 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentRotation(lua_State* luaVM)
             {
                 lua_pushvector(luaVM, vecRotation);
                 return 1;
-            }
+            }*/
         }
     }
     else

@@ -31,12 +31,12 @@ CLuaManager::CLuaManager(CClientGame* pClientGame)
     #ifdef NDEBUG
         #error "NDEBUG should not be defined"
     #endif
-    assert(luaX_is_apicheck_enabled());
+    //assert(luaX_is_apicheck_enabled());
 
     // Load the C functions
     LoadCFunctions();
-    lua_registerPreCallHook(CLuaDefs::CanUseFunction);
-    lua_registerUndumpHook(CLuaMain::OnUndump);
+    //lua_registerPreCallHook(CLuaDefs::CanUseFunction);
+    //lua_registerUndumpHook(CLuaMain::OnUndump);
 }
 
 CLuaManager::~CLuaManager()

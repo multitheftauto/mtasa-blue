@@ -186,7 +186,7 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
         {
             OutputDebugLine("[Lua] Registering PostCallHook");
             ms_bRegisterdPostCallHook = true;
-            lua_registerPostCallHook(CLuaDefs::DidUseFunction);
+            //lua_registerPostCallHook(CLuaDefs::DidUseFunction);
         }
         // Start to time the function
         ms_TimingFunctionStack.push_back(STimingFunction(luaVM, f, GetTimeUs(), g_uiNetSentByteCounter));
@@ -235,7 +235,7 @@ void CLuaDefs::DidUseFunction(lua_CFunction f, lua_State* luaVM)
         OutputDebugLine("[Lua] Removing PostCallHook");
         assert(ms_bRegisterdPostCallHook);
         ms_bRegisterdPostCallHook = false;
-        lua_registerPostCallHook(NULL);
+        //lua_registerPostCallHook(NULL);
     }
 
     g_pGame->GetDebugHookManager()->OnPostFunction(f, luaVM);

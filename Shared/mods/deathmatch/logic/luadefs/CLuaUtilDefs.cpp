@@ -69,7 +69,7 @@ int CLuaUtilDefs::Dereference(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_getref(luaVM, iPointer);
+        //lua_getref(luaVM, iPointer);
         return 1;
     }
     else
@@ -85,9 +85,9 @@ int CLuaUtilDefs::Reference(lua_State* luaVM)
 
     if (!argStream.NextIsNil() && !argStream.NextIsNone())
     {
-        int iPointer = lua_ref(luaVM, 1);
-        lua_pushnumber(luaVM, iPointer);
-        return 1;
+        //int iPointer = lua_ref(luaVM, 1);
+        //lua_pushnumber(luaVM, iPointer);
+        //return 1;
     }
     lua_pushboolean(luaVM, false);
     return 1;

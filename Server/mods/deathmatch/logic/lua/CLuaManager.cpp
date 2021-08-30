@@ -33,8 +33,8 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
 
     // Load our C Functions into Lua and hook callback
     LoadCFunctions();
-    lua_registerPreCallHook(CLuaDefs::CanUseFunction);
-    lua_registerUndumpHook(CLuaMain::OnUndump);
+    //lua_registerPreCallHook(CLuaDefs::CanUseFunction);
+    //lua_registerUndumpHook(CLuaMain::OnUndump);
 
 #ifdef MTA_DEBUG
     // Check rounding in case json is updated

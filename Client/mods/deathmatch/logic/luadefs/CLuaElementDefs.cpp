@@ -1027,7 +1027,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
         if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
         {
             // If the caller expects six results, return six floats, otherwise two vectors
-            int iExpected = lua_ncallresult(luaVM);
+            /*int iExpected = lua_ncallresult(luaVM);
             if (iExpected == 6)
             {
                 lua_pushnumber(luaVM, vecMin.fX);
@@ -1043,7 +1043,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
                 lua_pushvector(luaVM, vecMin);
                 lua_pushvector(luaVM, vecMax);
                 return 2;
-            }
+            }*/
         }
     }
     else

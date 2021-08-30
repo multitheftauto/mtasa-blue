@@ -1124,12 +1124,12 @@ protected:
 
         // lua_next has a bug after it calling findindex internally
         // But we have to iterate sequentially right now. So luaL_getn is the solution.
-        for (int i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
+        for (int i = 1; i <= lua_objlen(m_luaVM, iIndex); ++i)
         {
             lua_pushnumber(m_luaVM, i);
             lua_gettable(m_luaVM, iIndex);
 
-            if (lua_type(m_luaVM, -1) == LUA_TTABLE && luaL_getn(m_luaVM, -1) >= 2)
+            if (lua_type(m_luaVM, -1) == LUA_TTABLE && lua_objlen(m_luaVM, -1) >= 2)
             {
                 lua_pushnumber(m_luaVM, 1);
                 lua_gettable(m_luaVM, -2);
