@@ -37,6 +37,9 @@ LUALIB_API int luaopen_string_buffer(lua_State *L);
 
 LUALIB_API void luaL_openlibs(lua_State *L);
 
+/* Additional luautf8 library */ 
+LUALIB_API int luaopen_utf8(lua_State* L); /* MTASA */
+
 #ifndef lua_assert
 #define lua_assert(x)	((void)0)
 #endif
