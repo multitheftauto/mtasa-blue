@@ -16,10 +16,10 @@
 
 struct SEvent
 {
-    class CLuaMain* pLuaMain;
-    std::string     strName;
-    std::string     strArguments;
-    bool            bAllowRemoteTrigger;
+    std::set<class CLuaMain*> pLuaMainSet;
+    std::string               strName;
+    std::string               strArguments;
+    bool                      bAllowRemoteTrigger;
 };
 
 class CEvents

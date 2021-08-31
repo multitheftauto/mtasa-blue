@@ -28,16 +28,27 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
     assert(szName);
     assert(szArguments);
 
-    // If it already exists, return
-    if (Get(szName))
-        return false;
+    // Get the event if it already exists
+    SEvent* pEvent = Get(szName);
 
-    // Create and add the event
-    SEvent* pEvent = new SEvent;
-    pEvent->strName = szName;
-    pEvent->strArguments = szArguments;
-    pEvent->pLuaMain = pLuaMain;
-    pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
+    if (pEvent)
+    {
+        // If bAllowRemoteTrigger has been altered, return
+        if (pEvent->bAllowRemoteTrigger != bAllowRemoteTrigger)
+            return false;
+        
+        // Add pLuaMain to the set, std::set guarantees unique elements
+        pEvent->pLuaMainSet.insert(pLuaMain);
+    }
+    else
+    {
+        // Create and add the event
+        pEvent = new SEvent;
+        pEvent->strName = szName;
+        pEvent->strArguments = szArguments;
+        pEvent->pLuaMainSet.insert(pLuaMain);
+        pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
+    }
 
     m_EventHashMap[szName] = pEvent;
 
@@ -80,14 +91,21 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
     while (iter != m_EventHashMap.end())
     {
         SEvent* pEvent = (*iter).second;
-        // If they match, delete it null it and set the bool
-        if (pEvent != NULL && pEvent->pLuaMain == pMain)
+        
+        // If they match, remove pMain from the set and check for deletion
+        if (pEvent->pLuaMainSet.find(pMain) != pEvent->pLuaMainSet.end())
         {
-            // Delete the object
-            delete pEvent;
+            pEvent->pLuaMainSet.erase(pMain);
 
-            // Remove from list
-            m_EventHashMap.erase(iter++);
+            // If no pMain is left, delete it null it and set the bool
+            if (pEvent->pLuaMainSet.size() == 0)
+            {
+                // Delete the object
+                delete pEvent;
+
+                // Remove from list
+                m_EventHashMap.erase(iter++);
+            }
         }
         else
             ++iter;
