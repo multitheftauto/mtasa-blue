@@ -91,7 +91,7 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
     while (iter != m_EventHashMap.end())
     {
         SEvent* pEvent = (*iter).second;
-        
+
         // If they match, remove pMain from the set and check for deletion
         if (pEvent->pLuaMainSet.find(pMain) != pEvent->pLuaMainSet.end())
         {
@@ -104,11 +104,11 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
                 delete pEvent;
 
                 // Remove from list
-                m_EventHashMap.erase(iter++);
+                m_EventHashMap.erase(iter);
             }
         }
-        else
-            ++iter;
+
+        ++iter;
     }
 }
 

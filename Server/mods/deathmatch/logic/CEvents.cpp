@@ -92,11 +92,11 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
                 delete pEvent;
 
                 // Remove from list
-                m_EventHashMap.erase(iter++);
+                m_EventHashMap.erase(iter);
             }
         }
-        else
-            ++iter;
+
+        ++iter;
     }
 }
 
