@@ -17,10 +17,10 @@
 
 struct SEvent
 {
-    std::unordered_set<class CLuaMain*> pLuaMainSet;
-    std::string                         strName;
-    std::string                         strArguments;
-    bool                                bAllowRemoteTrigger;
+    std::vector<class CLuaMain*> pLuaMainVector;
+    std::string                  strName;
+    std::string                  strArguments;
+    bool                         bAllowRemoteTrigger;
 };
 
 class CEvents

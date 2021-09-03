@@ -31,8 +31,9 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
         if (pEvent->bAllowRemoteTrigger != bAllowRemoteTrigger)
             return false;
         
-        // Add pLuaMain to the set, std::unordered_set guarantees unique elements
-        pEvent->pLuaMainSet.insert(pLuaMain);
+        // Add pLuaMain to the vector, in case it's not already there
+        if (std::find(pEvent->pLuaMainVector.begin(), pEvent->pLuaMainVector.end(), pLuaMain) == pEvent->pLuaMainVector.end())
+            pEvent->pLuaMainVector.push_back(pLuaMain);
     }
     else
     {
@@ -40,7 +41,7 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
         pEvent = new SEvent;
         pEvent->strName = szName;
         pEvent->strArguments = szArguments;
-        pEvent->pLuaMainSet.insert(pLuaMain);
+        pEvent->pLuaMainVector.push_back(pLuaMain);
         pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
     }
 
@@ -80,13 +81,14 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
     {
         SEvent* pEvent = (*iter).second;
 
-        // If they match, remove pMain from the set and check for deletion
-        if (pEvent->pLuaMainSet.find(pMain) != pEvent->pLuaMainSet.end())
+        // If they match, remove pMain from the vector and check for deletion
+        std::vector<class CLuaMain*>::const_iterator pLuaMainIter = std::find(pEvent->pLuaMainVector.begin(), pEvent->pLuaMainVector.end(), pMain);
+        if (pLuaMainIter != pEvent->pLuaMainVector.end())
         {
-            pEvent->pLuaMainSet.erase(pMain);
+            pEvent->pLuaMainVector.erase(pLuaMainIter);
 
             // If no pMain is left, delete it null it and set the bool
-            if (pEvent->pLuaMainSet.empty())
+            if (pEvent->pLuaMainVector.empty())
             {
                 // Delete the object
                 delete pEvent;
