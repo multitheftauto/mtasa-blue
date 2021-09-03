@@ -31,7 +31,7 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
         if (pEvent->bAllowRemoteTrigger != bAllowRemoteTrigger)
             return false;
         
-        // Add pLuaMain to the set, std::set guarantees unique elements
+        // Add pLuaMain to the set, std::unordered_set guarantees unique elements
         pEvent->pLuaMainSet.insert(pLuaMain);
     }
     else
@@ -86,7 +86,7 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
             pEvent->pLuaMainSet.erase(pMain);
 
             // If no pMain is left, delete it null it and set the bool
-            if (pEvent->pLuaMainSet.size() == 0)
+            if (pEvent->pLuaMainSet.empty())
             {
                 // Delete the object
                 delete pEvent;
