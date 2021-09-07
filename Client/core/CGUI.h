@@ -69,8 +69,9 @@ public:
     bool       IsMainMenuVisible();
 
     CChat* GetChat();
-    void   SetChatBoxVisible(bool bVisible);
+    void   SetChatBoxVisible(bool bVisible, bool bInputBlocked = true);
     bool   IsChatBoxVisible();
+    bool   IsChatBoxInputBlocked();
     void   SetChatBoxInputEnabled(bool bInputEnabled);
     bool   IsChatBoxInputEnabled();
     void   EchoChat(const char* szText, bool bColorCoded);
@@ -107,6 +108,7 @@ private:
 
     bool  m_bForceCursorVisible;
     bool  m_bChatboxVisible;
+    bool  m_bChatboxInputBlocked;
     bool  m_pDebugViewVisible;
     bool  m_bGUIHasInput;
     int   m_uiActiveCompositionSize;

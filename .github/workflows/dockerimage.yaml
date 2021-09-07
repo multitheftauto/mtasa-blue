@@ -6,6 +6,7 @@ on:
     - master
     paths: 
     - '.github/**'
+    - 'utils/compat/**'
     - 'Dockerfile'
 
 jobs:

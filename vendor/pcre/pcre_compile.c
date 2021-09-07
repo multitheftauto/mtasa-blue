@@ -6,7 +6,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2016 University of Cambridge
+           Copyright (c) 1997-2020 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ COMPILE_PCREx macro will already be appropriately set. */
 
 /* Macro for setting individual bits in class bitmaps. */
 
-#define SETBIT(a,b) a[(b)/8] |= (1 << ((b)&7))
+#define SETBIT(a,b) a[(b)/8] |= (1U << ((b)&7))
 
 /* Maximum length value to check against when making sure that the integer that
 holds the compiled pattern length does not overflow. We make it a bit less than
@@ -129,8 +129,8 @@ overrun before it actually does run off the end of the data block. */
 
 /* Private flags added to firstchar and reqchar. */
 
-#define REQ_CASELESS    (1 << 0)        /* Indicates caselessness */
-#define REQ_VARY        (1 << 1)        /* Reqchar followed non-literal item */
+#define REQ_CASELESS    (1U << 0)        /* Indicates caselessness */
+#define REQ_VARY        (1U << 1)        /* Reqchar followed non-literal item */
 /* Negative values for the firstchar and reqchar flags */
 #define REQ_UNSET       (-2)
 #define REQ_NONE        (-1)
@@ -3299,7 +3299,7 @@ for(;;)
       if ((*xclass_flags & XCL_MAP) == 0)
         {
         /* No bits are set for characters < 256. */
-        if (list[1] == 0) return TRUE;
+        if (list[1] == 0) return (*xclass_flags & XCL_NOT) == 0;
         /* Might be an empty repeat. */
         continue;
         }
@@ -3611,7 +3611,7 @@ for(;;)
       if (chr > 255) break;
       class_bitset = (pcre_uint8 *)
         ((list_ptr == list ? code : base_end) - list_ptr[2]);
-      if ((class_bitset[chr >> 3] & (1 << (chr & 7))) != 0) return FALSE;
+      if ((class_bitset[chr >> 3] & (1U << (chr & 7))) != 0) return FALSE;
       break;
 
 #if defined SUPPORT_UTF || !defined COMPILE_PCRE8
@@ -5579,6 +5579,34 @@ for (;; ptr++)
 #endif
 #if defined SUPPORT_UTF || !defined COMPILE_PCRE8
       {
+      /* For non-UCP wide characters, in a non-negative class containing \S or
+      similar (should_flip_negation is set), all characters greater than 255
+      must be in the class. */
+
+      if (
+#if defined COMPILE_PCRE8
+           utf &&
+#endif
+           should_flip_negation && !negate_class && (options & PCRE_UCP) == 0)
+        {
+        *class_uchardata++ = XCL_RANGE;
+        if (utf)   /* Will always be utf in the 8-bit library */
+          {
+          class_uchardata += PRIV(ord2utf)(0x100, class_uchardata);
+          class_uchardata += PRIV(ord2utf)(0x10ffff, class_uchardata);
+          }
+        else       /* Can only happen for the 16-bit & 32-bit libraries */
+          {
+#if defined COMPILE_PCRE16
+          *class_uchardata++ = 0x100;
+          *class_uchardata++ = 0xffffu;
+#elif defined COMPILE_PCRE32
+          *class_uchardata++ = 0x100;
+          *class_uchardata++ = 0xffffffffu;
+#endif
+          }
+        }
+
       *class_uchardata++ = XCL_END;    /* Marks the end of extra data */
       *code++ = OP_XCLASS;
       code += LINK_SIZE;
@@ -5709,6 +5737,21 @@ for (;; ptr++)
           }           /* Loop for comment characters */
         }             /* Loop for multiple comments */
       ptr = p - 1;    /* Character before the next significant one. */
+      }
+
+    /* We also need to skip over (?# comments, which are not dependent on
+    extended mode. */
+
+    if (ptr[1] == CHAR_LEFT_PARENTHESIS && ptr[2] == CHAR_QUESTION_MARK &&
+        ptr[3] == CHAR_NUMBER_SIGN)
+      {
+      ptr += 4;
+      while (*ptr != CHAR_NULL && *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
+      if (*ptr == CHAR_NULL)
+        {
+        *errorcodeptr = ERR18;
+        goto FAILED;
+        }
       }
 
     /* If the next character is '+', we have a possessive quantifier. This
@@ -6923,7 +6966,8 @@ for (;; ptr++)
         slot = cd->name_table;
         for (i = 0; i < cd->names_found; i++)
           {
-          if (STRNCMP_UC_UC(name, slot+IMM2_SIZE, namelen) == 0) break;
+          if (STRNCMP_UC_UC(name, slot+IMM2_SIZE, namelen) == 0 &&
+            slot[IMM2_SIZE+namelen] == 0) break;
           slot += cd->name_entry_size;
           }
 
@@ -7086,15 +7130,17 @@ for (;; ptr++)
           int n = 0;
           ptr++;
           while(IS_DIGIT(*ptr))
+            {
             n = n * 10 + *ptr++ - CHAR_0;
+            if (n > 255)
+              {
+              *errorcodeptr = ERR38;
+              goto FAILED;
+              }
+            }
           if (*ptr != CHAR_RIGHT_PARENTHESIS)
             {
             *errorcodeptr = ERR39;
-            goto FAILED;
-            }
-          if (n > 255)
-            {
-            *errorcodeptr = ERR38;
             goto FAILED;
             }
           *code++ = n;
@@ -7412,7 +7458,7 @@ for (;; ptr++)
               {
               open_capitem *oc;
               recno = GET2(slot, 0);
-              cd->backref_map |= (recno < 32)? (1 << recno) : 1;
+              cd->backref_map |= (recno < 32)? (1U << recno) : 1;
               if (recno > cd->top_backref) cd->top_backref = recno;
 
               /* Check to see if this back reference is recursive, that it, it
@@ -7598,6 +7644,8 @@ for (;; ptr++)
         /* Can't determine a first byte now */
 
         if (firstcharflags == REQ_UNSET) firstcharflags = REQ_NONE;
+        zerofirstchar = firstchar;
+        zerofirstcharflags = firstcharflags;
         continue;
 
 
@@ -7889,15 +7937,17 @@ for (;; ptr++)
         }
       }
 
-    /* For a forward assertion, we take the reqchar, if set. This can be
-    helpful if the pattern that follows the assertion doesn't set a different
-    char. For example, it's useful for /(?=abcde).+/. We can't set firstchar
-    for an assertion, however because it leads to incorrect effect for patterns
-    such as /(?=a)a.+/ when the "real" "a" would then become a reqchar instead
-    of a firstchar. This is overcome by a scan at the end if there's no
-    firstchar, looking for an asserted first char. */
+    /* For a forward assertion, we take the reqchar, if set, provided that the
+    group has also set a first char. This can be helpful if the pattern that
+    follows the assertion doesn't set a different char. For example, it's
+    useful for /(?=abcde).+/. We can't set firstchar for an assertion, however
+    because it leads to incorrect effect for patterns such as /(?=a)a.+/ when
+    the "real" "a" would then become a reqchar instead of a firstchar. This is
+    overcome by a scan at the end if there's no firstchar, looking for an
+    asserted first char. */
 
-    else if (bravalue == OP_ASSERT && subreqcharflags >= 0)
+    else if (bravalue == OP_ASSERT && subreqcharflags >= 0 &&
+             subfirstcharflags >= 0)
       {
       reqchar = subreqchar;
       reqcharflags = subreqcharflags;
@@ -8014,12 +8064,12 @@ for (;; ptr++)
         single group (i.e. not to a duplicated name. */
 
         HANDLE_REFERENCE:
-        if (firstcharflags == REQ_UNSET) firstcharflags = REQ_NONE;
+        if (firstcharflags == REQ_UNSET) zerofirstcharflags = firstcharflags = REQ_NONE;
         previous = code;
         item_hwm_offset = cd->hwm - cd->start_workspace;
         *code++ = ((options & PCRE_CASELESS) != 0)? OP_REFI : OP_REF;
         PUT2INC(code, 0, recno);
-        cd->backref_map |= (recno < 32)? (1 << recno) : 1;
+        cd->backref_map |= (recno < 32)? (1U << recno) : 1;
         if (recno > cd->top_backref) cd->top_backref = recno;
 
         /* Check to see if this back reference is recursive, that it, it
@@ -8179,7 +8229,6 @@ for (;; ptr++)
 
       if (mclength == 1 || req_caseopt == 0)
         {
-        firstchar = mcbuffer[0] | req_caseopt;
         firstchar = mcbuffer[0];
         firstcharflags = req_caseopt;
 
@@ -8633,14 +8682,22 @@ do {
             op == OP_SCBRA || op == OP_SCBRAPOS)
      {
      int n = GET2(scode, 1+LINK_SIZE);
-     int new_map = bracket_map | ((n < 32)? (1 << n) : 1);
+     int new_map = bracket_map | ((n < 32)? (1U << n) : 1);
      if (!is_anchored(scode, new_map, cd, atomcount)) return FALSE;
      }
 
-   /* Positive forward assertions and conditions */
+   /* Positive forward assertion */
 
-   else if (op == OP_ASSERT || op == OP_COND)
+   else if (op == OP_ASSERT)
      {
+     if (!is_anchored(scode, bracket_map, cd, atomcount)) return FALSE;
+     }
+
+   /* Condition; not anchored if no second branch */
+
+   else if (op == OP_COND)
+     {
+     if (scode[GET(scode,1)] != OP_ALT) return FALSE;
      if (!is_anchored(scode, bracket_map, cd, atomcount)) return FALSE;
      }
 
@@ -8686,8 +8743,8 @@ matching and for non-DOTALL patterns that start with .* (which must start at
 the beginning or after \n). As in the case of is_anchored() (see above), we
 have to take account of back references to capturing brackets that contain .*
 because in that case we can't make the assumption. Also, the appearance of .*
-inside atomic brackets or in a pattern that contains *PRUNE or *SKIP does not
-count, because once again the assumption no longer holds.
+inside atomic brackets or in an assertion, or in a pattern that contains *PRUNE
+or *SKIP does not count, because once again the assumption no longer holds.
 
 Arguments:
   code           points to start of expression (the bracket)
@@ -8696,13 +8753,14 @@ Arguments:
                   the less precise approach
   cd             points to the compile data
   atomcount      atomic group level
+  inassert       TRUE if in an assertion
 
 Returns:         TRUE or FALSE
 */
 
 static BOOL
 is_startline(const pcre_uchar *code, unsigned int bracket_map,
-  compile_data *cd, int atomcount)
+  compile_data *cd, int atomcount, BOOL inassert)
 {
 do {
    const pcre_uchar *scode = first_significant_code(
@@ -8729,7 +8787,7 @@ do {
        return FALSE;
 
        default:     /* Assertion */
-       if (!is_startline(scode, bracket_map, cd, atomcount)) return FALSE;
+       if (!is_startline(scode, bracket_map, cd, atomcount, TRUE)) return FALSE;
        do scode += GET(scode, 1); while (*scode == OP_ALT);
        scode += 1 + LINK_SIZE;
        break;
@@ -8743,7 +8801,7 @@ do {
    if (op == OP_BRA  || op == OP_BRAPOS ||
        op == OP_SBRA || op == OP_SBRAPOS)
      {
-     if (!is_startline(scode, bracket_map, cd, atomcount)) return FALSE;
+     if (!is_startline(scode, bracket_map, cd, atomcount, inassert)) return FALSE;
      }
 
    /* Capturing brackets */
@@ -8752,34 +8810,34 @@ do {
             op == OP_SCBRA || op == OP_SCBRAPOS)
      {
      int n = GET2(scode, 1+LINK_SIZE);
-     int new_map = bracket_map | ((n < 32)? (1 << n) : 1);
-     if (!is_startline(scode, new_map, cd, atomcount)) return FALSE;
+     int new_map = bracket_map | ((n < 32)? (1U << n) : 1);
+     if (!is_startline(scode, new_map, cd, atomcount, inassert)) return FALSE;
      }
 
    /* Positive forward assertions */
 
    else if (op == OP_ASSERT)
      {
-     if (!is_startline(scode, bracket_map, cd, atomcount)) return FALSE;
+     if (!is_startline(scode, bracket_map, cd, atomcount, TRUE)) return FALSE;
      }
 
    /* Atomic brackets */
 
    else if (op == OP_ONCE || op == OP_ONCE_NC)
      {
-     if (!is_startline(scode, bracket_map, cd, atomcount + 1)) return FALSE;
+     if (!is_startline(scode, bracket_map, cd, atomcount + 1, inassert)) return FALSE;
      }
 
    /* .* means "start at start or after \n" if it isn't in atomic brackets or
-   brackets that may be referenced, as long as the pattern does not contain
-   *PRUNE or *SKIP, because these break the feature. Consider, for example,
-   /.*?a(*PRUNE)b/ with the subject "aab", which matches "ab", i.e. not at the
-   start of a line. */
+   brackets that may be referenced or an assertion, as long as the pattern does
+   not contain *PRUNE or *SKIP, because these break the feature. Consider, for
+   example, /.*?a(*PRUNE)b/ with the subject "aab", which matches "ab", i.e.
+   not at the start of a line. */
 
    else if (op == OP_TYPESTAR || op == OP_TYPEMINSTAR || op == OP_TYPEPOSSTAR)
      {
      if (scode[1] != OP_ANY || (bracket_map & cd->backref_map) != 0 ||
-         atomcount > 0 || cd->had_pruneorskip)
+         atomcount > 0 || cd->had_pruneorskip || inassert)
        return FALSE;
      }
 
@@ -9634,7 +9692,7 @@ if ((re->options & PCRE_ANCHORED) == 0)
       re->flags |= PCRE_FIRSTSET;
       }
 
-    else if (is_startline(codestart, 0, cd, 0)) re->flags |= PCRE_STARTLINE;
+    else if (is_startline(codestart, 0, cd, 0, FALSE)) re->flags |= PCRE_STARTLINE;
     }
   }
 

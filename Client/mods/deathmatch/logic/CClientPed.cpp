@@ -142,6 +142,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_fCurrentRotation = 0.0f;
     m_fMoveSpeed = 0.0f;
     m_bCanBeKnockedOffBike = true;
+    m_bBleeding = false;
     RemoveAllWeapons();            // Set all our weapon values to unarmed
     m_bHasJetPack = false;
     m_FightingStyle = STYLE_GRAB_KICK;
@@ -565,7 +566,7 @@ void CClientPed::SetInterior(unsigned char ucInterior)
         }
     }
 
-    m_ucInterior = ucInterior;
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientPed::Teleport(const CVector& vecPosition)
@@ -1110,7 +1111,7 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle()
     return NULL;
 }
 
-CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
+CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                      bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
                                                      float fWithinRange)
 {
@@ -1144,6 +1145,10 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromCloses
     for (; iter != listEnd; iter++)
     {
         pTempVehicle = *iter;
+        // Skip clientside vehicles as they are not enterable
+        if (pTempVehicle->IsLocalEntity())
+            continue;
+
         CVehicle* pGameVehicle = pTempVehicle->GetGameVehicle();
 
         if (!pGameVehicle && bGetPositionFromClosestDoor)
@@ -5921,6 +5926,15 @@ bool CClientPed::IsFootBloodEnabled()
     return false;
 }
 
+void CClientPed::SetBleeding(bool bBleeding)
+{
+    if (m_pPlayerPed)
+    {
+        m_pPlayerPed->SetBleeding(bBleeding);
+    }
+    m_bBleeding = bBleeding;
+}
+
 bool CClientPed::IsOnFire()
 {
     if (m_pPlayerPed)
@@ -6470,7 +6484,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (!pVehicle)
     {
         // Find the closest vehicle and door
-        CClientVehicle* pClosestVehicle = GetClosestVehicleInRange(true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f);
+        CClientVehicle* pClosestVehicle = GetClosestEnterableVehicle(true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f);
         if (pClosestVehicle)
         {
             pVehicle = pClosestVehicle;

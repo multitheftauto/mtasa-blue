@@ -10,256 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionDefs.h"
+
 #define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_FORMFIELDS        "1.5.4-9.11413"
-
-int CLuaFunctionDefs::GetMaxPlayers(lua_State* luaVM)
-{
-    lua_pushnumber(luaVM, CStaticFunctionDefinitions::GetMaxPlayers());
-    return 1;
-}
-
-int CLuaFunctionDefs::SetMaxPlayers(lua_State* luaVM)
-{
-    unsigned int uiMaxPlayers;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(uiMaxPlayers);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetMaxPlayers(uiMaxPlayers));
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
-{
-    // bool outputChatBox ( string text [, element/table visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
-    SString               ssChat;
-    std::vector<CPlayer*> sendList;
-    CElement*             pElement = nullptr;
-    bool                  bColorCoded;
-    // Default
-    unsigned char ucRed = 231;
-    unsigned char ucGreen = 217;
-    unsigned char ucBlue = 176;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(ssChat);
-
-    if (argStream.NextIsTable())
-    {
-        argStream.ReadUserDataTable(sendList);
-    }
-    else
-    {
-        argStream.ReadUserData(pElement, m_pRootElement);
-    }
-
-    if (argStream.NextIsNumber() && argStream.NextIsNumber(1) && argStream.NextIsNumber(2))
-    {
-        argStream.ReadNumber(ucRed);
-        argStream.ReadNumber(ucGreen);
-        argStream.ReadNumber(ucBlue);
-    }
-    else
-        argStream.Skip(3);
-
-    argStream.ReadBool(bColorCoded, false);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (pElement)
-            {
-                if (IS_TEAM(pElement))
-                {
-                    CTeam* pTeam = static_cast<CTeam*>(pElement);
-                    for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
-                    {
-                        sendList.push_back(*iter);
-                    }
-                }
-                else
-                {
-                    CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-            }
-
-            if (sendList.size() > 0)
-            {
-                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::OOP_OutputChatBox(lua_State* luaVM)
-{
-    // bool Player:outputChat ( string text [, int r=231, int g=217, int b=176, bool colorCoded=false ] )
-    CElement* pElement;
-    SString   strText;
-    uchar     ucRed = 231;
-    uchar     ucGreen = 217;
-    uchar     ucBlue = 176;
-    bool      bColorCoded;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strText);
-
-    if (argStream.NextIsNumber(0) && argStream.NextIsNumber(1) && argStream.NextIsNumber(2))
-    {
-        argStream.ReadNumber(ucRed);
-        argStream.ReadNumber(ucGreen);
-        argStream.ReadNumber(ucBlue);
-    }
-    else
-        argStream.Skip(3);
-
-    argStream.ReadBool(bColorCoded, false);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CStaticFunctionDefinitions::OutputChatBox(strText, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::ClearChatBox(lua_State* luaVM)
-{
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadUserData(pElement, m_pRootElement);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::ClearChatBox(pElement))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::OutputConsole(lua_State* luaVM)
-{
-    SString   strMessage;
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadString(strMessage);
-    argStream.ReadUserData(pElement, m_pRootElement);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::OutputConsole(strMessage, pElement))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
-{
-    SString       strMessage;
-    unsigned int  uiLevel;
-    unsigned char ucR, ucG, ucB;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadAnyAsString(strMessage);
-    argStream.ReadNumber(uiLevel, 3);
-
-    if (uiLevel == 0 || uiLevel == 4)
-    {
-        argStream.ReadNumber(ucR, 255);
-        argStream.ReadNumber(ucG, 255);
-        argStream.ReadNumber(ucB, 255);
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (uiLevel > 4)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-4)", lua_tostring(luaVM, lua_upvalueindex(1)));
-
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        if (uiLevel == 1)
-        {
-            m_pScriptDebugging->LogError(luaVM, "%s", strMessage.c_str());
-        }
-        else if (uiLevel == 2)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "%s", strMessage.c_str());
-        }
-        else if (uiLevel == 3)
-        {
-            m_pScriptDebugging->LogInformation(luaVM, "%s", strMessage.c_str());
-        }
-        else if (uiLevel == 4)
-        {
-            m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
-        }
-        else if (uiLevel == 0)
-        {
-            m_pScriptDebugging->LogDebug(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
-        }
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
 
 int CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM)
 {
@@ -400,28 +157,6 @@ int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
         m_pRegisteredCommands->GetCommands(luaVM);
     }
 
-    return 1;
-}
-
-int CLuaFunctionDefs::OutputServerLog(lua_State* luaVM)
-{
-    SString strMessage;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strMessage);
-
-    if (!argStream.HasErrors())
-    {
-        // Print it
-        CLogger::LogPrintf(LOGLEVEL_MEDIUM, "%s\n", strMessage.c_str());
-        lua_pushboolean(luaVM, true);
-
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -569,96 +304,6 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetServerName(lua_State* luaVM)
-{
-    lua_pushstring(luaVM, g_pGame->GetConfig()->GetServerName().c_str());
-    return 1;
-}
-
-int CLuaFunctionDefs::GetServerHttpPort(lua_State* luaVM)
-{
-    lua_pushnumber(luaVM, g_pGame->GetConfig()->GetHTTPPort());
-    return 1;
-}
-
-int CLuaFunctionDefs::GetServerIP(lua_State* luaVM)
-{
-    lua_pushstring(luaVM, "moo");
-    return 1;
-}
-
-int CLuaFunctionDefs::GetServerPassword(lua_State* luaVM)
-{
-    // We have a password? Return it.
-    if (g_pGame->GetConfig()->HasPassword())
-    {
-        // Return it
-        lua_pushstring(luaVM, g_pGame->GetConfig()->GetPassword().c_str());
-        return 1;
-    }
-
-    // Otherwize return nil for no password
-    lua_pushnil(luaVM);
-    return 1;
-}
-
-int CLuaFunctionDefs::SetServerPassword(lua_State* luaVM)
-{
-    //  bool setServerPassword ( [ string password ] )
-    SString strPassword;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strPassword, "");
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetServerPassword(strPassword, true))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-            argStream.SetCustomError("password must be shorter than 32 chars and just contain visible characters");
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::GetServerConfigSetting(lua_State* luaVM)
-{
-    //  string getServerConfigSetting ( string name )
-    SString strName;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
-
-    if (!argStream.HasErrors())
-    {
-        SString strValue;
-        // Try as single setting
-        if (g_pGame->GetConfig()->GetSetting(strName, strValue))
-        {
-            lua_pushstring(luaVM, strValue);
-            return 1;
-        }
-        // Try as multiple setting
-        CLuaArguments result;
-        if (g_pGame->GetConfig()->GetSettingTable(strName, &result))
-        {
-            result.PushAsTable(luaVM);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFunctionDefs::SetServerConfigSetting(lua_State* luaVM)
 {
     //  bool setServerConfigSetting ( string name, string value [, bool save = false ] )
@@ -686,41 +331,21 @@ int CLuaFunctionDefs::SetServerConfigSetting(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::shutdown(lua_State* luaVM)
+bool CLuaFunctionDefs::Shutdown(lua_State* luaVM, std::optional<std::string_view> maybeReason, std::optional<int> maybeExitCode)
 {
-    SString strReason;
+    std::string_view reason = maybeReason.value_or("No reason specified");
+    CResource&       resource = lua_getownerresource(luaVM);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strReason, "No reason specified");
+    if (reason.empty() || reason.find_first_not_of("\x09\x0A\x0B\x0C\x0D\x20") == std::string_view::npos)
+        reason = "No reason specified";
 
-    if (!argStream.HasErrors())
-    {
-        // Get the VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Get the resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Log it
-                CLogger::LogPrintf("Server shutdown as requested by resource %s (%s)\n", pResource->GetName().c_str(), *strReason);
+    CLogger::LogPrintf("Server shutdown as requested by resource %s (%.*s)\n", resource.GetName().c_str(), reason.size(), reason.data());
 
-                // Shut it down
-                g_pGame->SetIsFinished(true);
+    if (maybeExitCode.has_value())
+        g_pServerInterface->GetModManager()->SetExitCode(maybeExitCode.value());
 
-                // Success
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Fail
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pGame->SetIsFinished(true);
+    return true;
 }
 
 int CLuaFunctionDefs::GetMapName(lua_State* luaVM)
