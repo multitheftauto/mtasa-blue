@@ -1521,6 +1521,10 @@ void CMultiplayerSA::InitHooks()
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
 
+    // Fix corona rain reflections aren't rendering (#2345)
+    // By using zBufferFar instead of zBufferNear for corona position
+    MemSet((void*)0x6FB9A0, 0x1C, 1);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
