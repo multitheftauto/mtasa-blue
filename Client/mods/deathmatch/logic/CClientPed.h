@@ -464,6 +464,9 @@ public:
 
     bool IsFootBloodEnabled();
     void SetFootBloodEnabled(bool bHasFootBlood);
+    
+    bool IsBleeding() const { return m_bBleeding; };
+    void SetBleeding(bool bBleeding);
 
     bool IsOnFire();
     void SetOnFire(bool bOnFire);
@@ -658,6 +661,7 @@ public:
     float                                    m_fCurrentRotation;
     float                                    m_fMoveSpeed;
     bool                                     m_bCanBeKnockedOffBike;
+    bool                                     m_bBleeding;
     CMatrix                                  m_Matrix;
     CVector                                  m_vecMoveSpeed;
     CVector                                  m_vecTurnSpeed;

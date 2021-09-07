@@ -1298,9 +1298,6 @@ unsigned char CClientEntity::GetInterior()
 
 void CClientEntity::SetInterior(unsigned char ucInterior)
 {
-    if (m_ucInterior == ucInterior)
-        return;
-
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
     {
@@ -1310,10 +1307,13 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
 
-    CLuaArguments Arguments;
-    Arguments.PushNumber(ucOldInterior);
-    Arguments.PushNumber(ucInterior);
-    CallEvent("onClientElementInteriorChange", Arguments, true);
+    if (ucOldInterior != ucInterior)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(ucOldInterior);
+        Arguments.PushNumber(ucInterior);
+        CallEvent("onClientElementInteriorChange", Arguments, true);
+    }
 }
 
 bool CClientEntity::IsOnScreen()
