@@ -11,10 +11,6 @@
 #include <variant>
 #include <array>
 
-#include <CVector2D.h>
-#include <CVector.h>
-#include <CVector4D.h>
-
 /*
     Basic Lua operations:
         void Push(L, T value)
