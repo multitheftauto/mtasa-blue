@@ -128,7 +128,10 @@ VOID CRegisteredCoronaSA::Init(DWORD Identifier)
     internalInterface->Intensity = 255;
     internalInterface->FadedIntensity = 255;
     internalInterface->FlareType = 0;
-    internalInterface->ReflectionType = 1;
+
+    // Disable corona rain reflection
+    internalInterface->ReflectionType = 0;
+
     internalInterface->JustCreated = 1;
     internalInterface->RegisteredThisFrame = 1;            // won't appear in-game without this
 }
