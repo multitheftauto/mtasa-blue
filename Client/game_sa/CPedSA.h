@@ -431,6 +431,9 @@ public:
     void         SetFootBlood(unsigned int uiFootBlood);
     unsigned int GetFootBlood();
 
+    bool IsBleeding();
+    void SetBleeding(bool bBleeding);
+
     bool IsOnFire();
     void SetOnFire(bool bOnFire);
 
