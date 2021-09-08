@@ -22,7 +22,6 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTCOL; }
 
-    bool LoadCol(const SString& strFile, bool bIsRawData);
     bool Load(bool isRaw, SString input);
 
     bool IsLoaded() { return m_pColModel != NULL; };

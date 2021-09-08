@@ -800,7 +800,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pZoneNames = new CZoneNames;
 
     CStaticFunctionDefinitions(this);
-    CLuaFunctionDefs::Initialize(m_pLuaManager, this);
     CLuaDefs::Initialize(this);
 
     m_pPlayerManager->SetScriptDebugging(m_pScriptDebugging);
@@ -2835,7 +2834,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                     }
                 }
 
-                // Check we have a valid ped & he is spawned
+                // Check we have a valid ped
                 if (bValidPed)
                 {
                     // Handle it depending on the action
@@ -2857,6 +2856,13 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 FAIL_ACTION,
                                 FAIL_TRAILER,
                             } failReason = FAIL_INVALID;
+
+                            // Is he spawned? (Fix for #2335)
+                            if (!pPed->IsSpawned()) {
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                                pPlayer->Send(Reply);
+                                break;
+                            }
 
                             // Is this vehicle enterable? (not a trailer)
                             unsigned short usVehicleModel = pVehicle->GetModel();

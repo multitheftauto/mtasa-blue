@@ -72,6 +72,7 @@ bool CWebCore::Initialise()
     CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\CEFLauncher_d.exe")));
 #endif
     CefString(&settings.resources_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF")));
+    CefString(&settings.cache_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cache")));
     CefString(&settings.locales_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\locales")));
     CefString(&settings.log_file).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cefdebug.txt")));
 #ifdef MTA_DEBUG
@@ -107,8 +108,8 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     if (pWebView)
     {
         // Ensure that no attached events or tasks are in the queue
-        RemoveWebViewEvents(pWebView);
-        RemoveWebViewTasks(pWebView);
+        RemoveWebViewEvents(pWebView.get());
+        RemoveWebViewTasks(pWebView.get());
 
         m_WebViews.remove(pWebView);
         // pWebView->Release(); // Do not release since other references get corrupted then

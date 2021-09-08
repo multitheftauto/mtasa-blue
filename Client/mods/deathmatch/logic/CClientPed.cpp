@@ -142,6 +142,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_fCurrentRotation = 0.0f;
     m_fMoveSpeed = 0.0f;
     m_bCanBeKnockedOffBike = true;
+    m_bBleeding = false;
     RemoveAllWeapons();            // Set all our weapon values to unarmed
     m_bHasJetPack = false;
     m_FightingStyle = STYLE_GRAB_KICK;
@@ -5923,6 +5924,15 @@ bool CClientPed::IsFootBloodEnabled()
         return (m_pPlayerPed->GetFootBlood() > 0);
     }
     return false;
+}
+
+void CClientPed::SetBleeding(bool bBleeding)
+{
+    if (m_pPlayerPed)
+    {
+        m_pPlayerPed->SetBleeding(bBleeding);
+    }
+    m_bBleeding = bBleeding;
 }
 
 bool CClientPed::IsOnFire()
