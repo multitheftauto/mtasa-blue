@@ -109,8 +109,8 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     if (pWebView)
     {
         // Ensure that no attached events or tasks are in the queue
-        RemoveWebViewEvents(pWebView);
-        RemoveWebViewTasks(pWebView);
+        RemoveWebViewEvents(pWebView.get());
+        RemoveWebViewTasks(pWebView.get());
 
         m_WebViews.remove(pWebView);
         // pWebView->Release(); // Do not release since other references get corrupted then
