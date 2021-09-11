@@ -69,7 +69,7 @@ public:
 
     // Element data
     LUA_DECLARE(GetElementData);
-    LUA_DECLARE(GetAllElementData);
+    static CLuaArguments GetAllElementData(CElement* pElement);
     LUA_DECLARE(HasElementData);
     LUA_DECLARE(setElementData);
     LUA_DECLARE(removeElementData);

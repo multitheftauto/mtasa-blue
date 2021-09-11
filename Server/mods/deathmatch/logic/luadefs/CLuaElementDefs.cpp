@@ -68,7 +68,7 @@ void CLuaElementDefs::LoadFunctions()
 
         // Element data
         {"getElementData", GetElementData},
-        {"getAllElementData", GetAllElementData},
+        {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
         {"hasElementData", HasElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},

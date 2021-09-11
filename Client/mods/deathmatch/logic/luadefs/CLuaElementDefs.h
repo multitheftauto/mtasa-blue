@@ -27,7 +27,7 @@ public:
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
     LUA_DECLARE(GetElementData);
-    LUA_DECLARE(GetAllElementData);
+    static CLuaArguments GetAllElementData(CClientEntity* pElement);
     LUA_DECLARE(HasElementData);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);

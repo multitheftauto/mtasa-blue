@@ -56,30 +56,11 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::GetAllElementData(lua_State* luaVM)
+CLuaArguments CLuaElementDefs::GetAllElementData(CElement* pElement)
 {
-    //  table getAllElementData ( element theElement )
-
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaArguments Args;
-        CLuaArguments* pVariable = pElement->GetAllCustomData(&Args);
-        if (pVariable)
-        {
-            pVariable->PushAsTable(luaVM);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CLuaArguments customData;
+    pElement->GetAllCustomData(&customData);
+    return customData;
 }
 
 int CLuaElementDefs::HasElementData(lua_State* luaVM)
