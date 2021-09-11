@@ -64,6 +64,7 @@ CServerImpl::CServerImpl()
     m_pNetwork = NULL;
     m_bRequestedQuit = false;
     m_bRequestedReset = false;
+    m_exitCode = ERROR_NO_ERROR;
     memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
     memset(&m_szTag, 0, sizeof(m_szTag) * sizeof(char));
     m_uiInputCount = 0;
