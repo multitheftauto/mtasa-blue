@@ -71,6 +71,10 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
         m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
     }
 
+    m_pOriginalSoundSettingsEntry = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(static_cast<eVehicleTypes>(m_usModel));
+    m_pSoundSettingsEntry = g_pGame->GetVehicleAudioSettingsManager()->CreateVehicleAudioSettingsData();
+    m_pSoundSettingsEntry->Assign(m_pOriginalSoundSettingsEntry);
+
     SetTypeName("vehicle");
 
     m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
@@ -2613,6 +2617,9 @@ void CClientVehicle::Create()
         // each vehicle spawned of this model type (i.e. after AddVehicle below)
         if (!m_strRegPlate.empty())
             m_pModelInfo->SetCustomCarPlateText(m_strRegPlate.c_str());
+
+        // Prepare audio settings
+        g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_pSoundSettingsEntry);
 
         // Create the vehicle
         if (CClientVehicleManager::IsTrainModel(m_usModel))
@@ -5234,4 +5241,13 @@ void CClientVehicle::ResetWheelScale()
         m_fWheelScale = 1.0f;
 
     m_bWheelScaleChanged = false;
+}
+
+void CClientVehicle::ApplyAudioSettings()
+{
+    if (m_pVehicle)
+    {
+        g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(GetAudioSettings());
+        m_pVehicle->ReinitAudio();
+    }
 }

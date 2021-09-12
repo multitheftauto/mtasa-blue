@@ -527,6 +527,9 @@ public:
     void  ResetWheelScale();
 
     bool OnVehicleFallThroughMap();
+    CVehicleAudioSettingsEntry* GetAudioSettings() { return m_pSoundSettingsEntry; };
+
+    void ApplyAudioSettings();
 
     bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
     bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
@@ -651,6 +654,8 @@ protected:
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
+    const CVehicleAudioSettingsEntry*      m_pOriginalSoundSettingsEntry;
+    CVehicleAudioSettingsEntry*            m_pSoundSettingsEntry;
 
     bool  m_bChainEngine;
     bool  m_bIsDerailed;

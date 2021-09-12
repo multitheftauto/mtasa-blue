@@ -46,6 +46,7 @@ typedef void(InRenderer)();
 #include "CFxManager.h"
 #include "CGarages.h"
 #include "CHandlingManager.h"
+#include "CVehicleAudioSettingsManager.h"
 #include "CHud.h"
 #include "CKeyGen.h"
 #include "CMenuManager.h"
@@ -167,6 +168,7 @@ public:
     virtual CWeaponStatManager*       GetWeaponStatManager() = 0;
     virtual CPointLights*             GetPointLights() = 0;
     virtual CColStore*                GetCollisionStore() = 0;
+    virtual CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;

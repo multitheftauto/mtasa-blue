@@ -20,6 +20,7 @@ class CVehicleSA;
 #include "CPhysicalSA.h"
 #include "CPoolsSA.h"
 #include "CHandlingManagerSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
@@ -758,6 +759,7 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    void                              ReinitAudio();
 
     void UpdateLandingGearPosition();
 

@@ -76,6 +76,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
 DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
+DECLARE_ENUM_CLASS(eVehicleAudioSettingProperty);
 
 class CRemoteCall;
 
@@ -484,6 +485,11 @@ inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
 inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
+}
+
+inline SString GetClassByTypeName(eVehicleAudioSettingProperty)
+{
+    return "vehicle-audio-setting";
 }
 
 //

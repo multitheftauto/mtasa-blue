@@ -88,6 +88,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
+        {"getVehicleModelAudioSetting", ArgumentParser<GetVehicleModelAudioSetting>},
+        {"getVehicleAudioSetting", ArgumentParser<GetVehicleAudioSetting>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -149,6 +151,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
+        {"setVehicleModelAudioSetting", ArgumentParser<SetVehicleModelAudioSetting>},
+        {"setVehicleAudioSetting", ArgumentParser<SetVehicleAudioSetting>},
     };
 
     // Add functions
@@ -4147,3 +4151,170 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
 {
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
+
+bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint uiModel, const eVehicleAudioSettingProperty eProperty, float varValue)
+{
+    CVehicleAudioSettingsEntry* pModelSettings = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData((eVehicleTypes)uiModel);
+
+    if (!pModelSettings)
+        return false;
+
+    switch (eProperty)
+    {
+        case eVehicleAudioSettingProperty::DOOR_SOUND:
+            pModelSettings->SetDoorSound((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+            pModelSettings->SetEngineOffSoundBankID((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+            pModelSettings->SetEngineOnSoundBankID((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::HORN_HIGH:
+            pModelSettings->SetHornHign(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_TON:
+            pModelSettings->SetHornTon((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
+            pModelSettings->SetHornVolumeDelta(varValue);
+            break;
+        case eVehicleAudioSettingProperty::RADIO_NUM:
+            pModelSettings->SetRadioNum((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::RADIO_TYPE:
+            pModelSettings->SetRadioType((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::SOUND_TYPE:
+            pModelSettings->SetSoundType((eVehicleSoundType)(int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::STEREO:
+            pModelSettings->SetStereo((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::UNK3:
+            pModelSettings->SetUnk3(varValue);
+            break;
+        case eVehicleAudioSettingProperty::UNK4:
+            pModelSettings->SetUnk4(varValue);
+            break;
+        case eVehicleAudioSettingProperty::UNK6:
+            pModelSettings->SetUnk6((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
+            pModelSettings->SetVehicleTypeForAudio((int)(varValue));
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVehicleAudioSettingProperty eProperty, float varValue)
+{
+    CVehicleAudioSettingsEntry* pModelSettings = pVehicle->GetAudioSettings();
+
+    if (!pModelSettings)
+        return false;
+
+    switch (eProperty)
+    {
+        case eVehicleAudioSettingProperty::DOOR_SOUND:
+            pModelSettings->SetDoorSound((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+            pModelSettings->SetEngineOffSoundBankID((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+            pModelSettings->SetEngineOnSoundBankID((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::HORN_HIGH:
+            pModelSettings->SetHornHign(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_TON:
+            pModelSettings->SetHornTon((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
+            pModelSettings->SetHornVolumeDelta(varValue);
+            break;
+        case eVehicleAudioSettingProperty::RADIO_NUM:
+            pModelSettings->SetRadioNum((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::RADIO_TYPE:
+            pModelSettings->SetRadioType((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::SOUND_TYPE:
+            pModelSettings->SetSoundType((eVehicleSoundType)(int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::STEREO:
+            pModelSettings->SetStereo((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::UNK3:
+            pModelSettings->SetUnk3(varValue);
+            break;
+        case eVehicleAudioSettingProperty::UNK4:
+            pModelSettings->SetUnk4(varValue);
+            break;
+        case eVehicleAudioSettingProperty::UNK6:
+            pModelSettings->SetUnk6((int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
+            pModelSettings->SetVehicleTypeForAudio((int)(varValue));
+            break;
+        default:
+            return false;
+    }
+
+    pVehicle->ApplyAudioSettings();
+
+    return true;
+}
+
+std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleModelAudioSetting(const uint uiModel)
+{
+    CVehicleAudioSettingsEntry* pEntry = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData((eVehicleTypes)uiModel);
+
+    std::unordered_map<std::string, float> output;
+
+    output["sound-type"] = (int)pEntry->GetSoundType();
+    output["engine-on-soundbank-id"] = pEntry->GetEngineOnSoundBankID();
+    output["engine-off-soundbank-id"] = pEntry->GetEngineOffSoundBankID();
+    output["stereo"] = pEntry->GetStereo();
+    output["unk3"] = pEntry->GetUnk3();
+    output["unk4"] = pEntry->GetUnk4();
+    output["horn-ton"] = pEntry->GetHornTon();
+    output["horn-high"] = pEntry->GetHornHign();
+    output["unk6"] = pEntry->GetUnk6();
+    output["door-sound"] = pEntry->GetDoorSound();
+    output["radio-num"] = pEntry->GetRadioNum();
+    output["radio-type"] = pEntry->GetRadioType();
+    output["vehicle-type-for-audio"] = pEntry->GetVehicleTypeForAudio();
+    output["horn-volume-delta"] = pEntry->GetHornVolumeDelta();
+
+    return output;
+}
+
+std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleAudioSetting(CClientVehicle* pVehicle)
+{
+    CVehicleAudioSettingsEntry* pEntry = pVehicle->GetAudioSettings();
+
+    std::unordered_map<std::string, float> output;
+
+    output["sound-type"] = (int)pEntry->GetSoundType();
+    output["engine-on-soundbank-id"] = pEntry->GetEngineOnSoundBankID();
+    output["engine-off-soundbank-id"] = pEntry->GetEngineOffSoundBankID();
+    output["stereo"] = pEntry->GetStereo();
+    output["unk3"] = pEntry->GetUnk3();
+    output["unk4"] = pEntry->GetUnk4();
+    output["horn-ton"] = pEntry->GetHornTon();
+    output["horn-high"] = pEntry->GetHornHign();
+    output["unk6"] = pEntry->GetUnk6();
+    output["door-sound"] = pEntry->GetDoorSound();
+    output["radio-num"] = pEntry->GetRadioNum();
+    output["radio-type"] = pEntry->GetRadioType();
+    output["vehicle-type-for-audio"] = pEntry->GetVehicleTypeForAudio();
+    output["horn-volume-delta"] = pEntry->GetHornVolumeDelta();
+
+    return output;
+}
+

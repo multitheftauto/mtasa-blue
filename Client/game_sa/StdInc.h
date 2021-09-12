@@ -48,6 +48,7 @@
 #include "CExplosionManagerSA.h"
 #include "CFireManagerSA.h"
 #include "CHandlingManagerSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 #include "CHudSA.h"
 #include "C3DMarkersSA.h"
 #include "CStatsSA.h"

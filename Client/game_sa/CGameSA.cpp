@@ -128,6 +128,7 @@ CGameSA::CGameSA()
     this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
     this->m_pPointLights = new CPointLightsSA();
     this->m_collisionStore = new CColStoreSA();
+    this->m_pVehicleAudioSettingsManager = new CVehicleAudioSettingsManagerSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -267,6 +268,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+    delete reinterpret_cast<CVehicleAudioSettingsManagerSA*>(m_pVehicleAudioSettingsManager);
     delete static_cast<CColStoreSA*>(m_collisionStore);
 
     delete[] ModelInfo;
