@@ -481,14 +481,24 @@ void CClientCamera::RestoreEntity(CClientEntity* pEntity)
     }
 }
 
-void CClientCamera::SetCameraViewMode(eVehicleCamMode eMode)
+void CClientCamera::SetCameraVehicleViewMode(eVehicleCamMode eMode)
 {
-    m_pCamera->SetCameraViewMode(eMode);
+    m_pCamera->SetCameraVehicleViewMode((unsigned short)eMode);
 }
 
-eVehicleCamMode CClientCamera::GetCameraViewMode()
+void CClientCamera::SetCameraPedViewMode(ePedCamMode eMode)
 {
-    return (eVehicleCamMode)m_pCamera->GetCameraViewMode();
+    m_pCamera->SetCameraPedViewMode((unsigned short)eMode);
+}
+
+eVehicleCamMode CClientCamera::GetCameraVehicleViewMode()
+{
+    return (eVehicleCamMode)m_pCamera->GetCameraVehicleViewMode();
+}
+
+ePedCamMode CClientCamera::GetCameraPedViewMode()
+{
+    return (ePedCamMode)m_pCamera->GetCameraPedViewMode();
 }
 
 void CClientCamera::SetCameraClip(bool bObjects, bool bVehicles)

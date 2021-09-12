@@ -16,6 +16,9 @@
 /* Default SSL backend */
 /* #undef CURL_DEFAULT_SSL_BACKEND */
 
+/* disable alt-svc */
+/* #undef CURL_DISABLE_ALTSVC */
+
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
 
@@ -34,8 +37,14 @@
 /* to disable FTP */
 /* #undef CURL_DISABLE_FTP */
 
+/* to disable curl_easy_options */
+/* #undef CURL_DISABLE_GETOPTIONS */
+
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
+
+/* disable alt-svc */
+#define CURL_DISABLE_HSTS 1
 
 /* to disable HTTP */
 /* #undef CURL_DISABLE_HTTP */
@@ -58,8 +67,14 @@
 /* disable mime API */
 /* #undef CURL_DISABLE_MIME */
 
+/* to disable MQTT */
+/* #undef CURL_DISABLE_MQTT */
+
 /* disable netrc parsing */
 /* #undef CURL_DISABLE_NETRC */
+
+/* to disable NTLM support */
+/* #undef CURL_DISABLE_NTLM */
 
 /* if the OpenSSL configuration won't be loaded automatically */
 /* #undef CURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG */
@@ -88,6 +103,9 @@
 /* to disable SMTP */
 /* #undef CURL_DISABLE_SMTP */
 
+/* to disable socketpair support */
+/* #undef CURL_DISABLE_SOCKETPAIR */
+
 /* to disable TELNET */
 /* #undef CURL_DISABLE_TELNET */
 
@@ -96,9 +114,6 @@
 
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
-
-/* to enable MQTT */
-/* #undef CURL_ENABLE_MQTT */
 
 /* Definition to make a library symbol externally visible. */
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
@@ -120,12 +135,6 @@
 
 /* Define to the type of arg 2 for gethostname. */
 #define GETHOSTNAME_TYPE_ARG2 size_t
-
-/* Specifies the number of arguments to getservbyport_r */
-/* #undef GETSERVBYPORT_R_ARGS */
-
-/* Specifies the size of the buffer to pass to getservbyport_r */
-/* #undef GETSERVBYPORT_R_BUFSIZE */
 
 /* Define to 1 if you have the alarm function. */
 #define HAVE_ALARM 1
@@ -206,9 +215,6 @@
 /* Define to 1 if you have the freeaddrinfo function. */
 #define HAVE_FREEADDRINFO 1
 
-/* Define to 1 if you have the freeifaddrs function. */
-#define HAVE_FREEIFADDRS 1
-
 /* Define to 1 if you have the fsetxattr function. */
 #define HAVE_FSETXATTR 1
 
@@ -221,9 +227,6 @@
 /* Define to 1 if you have the ftruncate function. */
 #define HAVE_FTRUNCATE 1
 
-/* Define to 1 if you have the gai_strerror function. */
-#define HAVE_GAI_STRERROR 1
-
 /* Define to 1 if you have a working getaddrinfo function. */
 #define HAVE_GETADDRINFO 1
 
@@ -232,21 +235,6 @@
 
 /* Define to 1 if you have the `geteuid' function. */
 #define HAVE_GETEUID 1
-
-/* Define to 1 if you have the gethostbyaddr function. */
-#define HAVE_GETHOSTBYADDR 1
-
-/* Define to 1 if you have the gethostbyaddr_r function. */
-/* #undef HAVE_GETHOSTBYADDR_R */
-
-/* gethostbyaddr_r() takes 5 args */
-/* #undef HAVE_GETHOSTBYADDR_R_5 */
-
-/* gethostbyaddr_r() takes 7 args */
-/* #undef HAVE_GETHOSTBYADDR_R_7 */
-
-/* gethostbyaddr_r() takes 8 args */
-/* #undef HAVE_GETHOSTBYADDR_R_8 */
 
 /* Define to 1 if you have the gethostbyname function. */
 #define HAVE_GETHOSTBYNAME 1
@@ -287,9 +275,6 @@
 /* Define to 1 if you have the `getrlimit' function. */
 #define HAVE_GETRLIMIT 1
 
-/* Define to 1 if you have the getservbyport_r function. */
-/* #undef HAVE_GETSERVBYPORT_R */
-
 /* Define to 1 if you have the getsockname function. */
 #define HAVE_GETSOCKNAME 1
 
@@ -326,6 +311,9 @@
 /* if you have MIT Kerberos */
 /* #undef HAVE_GSSMIT */
 
+/* Define to 1 if you have the <hyper.h> header file. */
+/* #undef HAVE_HYPER_H */
+
 /* Define to 1 if you have the <idn2.h> header file. */
 #define HAVE_IDN2_H 1
 
@@ -334,15 +322,6 @@
 
 /* Define to 1 if you have the `if_nametoindex' function. */
 #define HAVE_IF_NAMETOINDEX 1
-
-/* Define to 1 if you have the inet_ntoa_r function. */
-/* #undef HAVE_INET_NTOA_R */
-
-/* inet_ntoa_r() takes 2 args */
-/* #undef HAVE_INET_NTOA_R_2 */
-
-/* inet_ntoa_r() takes 3 args */
-/* #undef HAVE_INET_NTOA_R_3 */
 
 /* Define to 1 if you have a IPv6 capable working inet_ntop function. */
 #define HAVE_INET_NTOP 1
@@ -595,9 +574,6 @@
 /* Define to 1 if you have a working setsockopt SO_NONBLOCK function. */
 /* #undef HAVE_SETSOCKOPT_SO_NONBLOCK */
 
-/* Define to 1 if you have the <sgtty.h> header file. */
-#define HAVE_SGTTY_H 1
-
 /* Define to 1 if you have the sigaction function. */
 #define HAVE_SIGACTION 1
 
@@ -634,8 +610,8 @@
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
 
-/* Define to 1 if you have the `SSL_get_esni_status' function. */
-/* #undef HAVE_SSL_GET_ESNI_STATUS */
+/* Define to 1 if you have the `SSL_get_ech_status' function. */
+/* #undef HAVE_SSL_GET_ECH_STATUS */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -669,9 +645,6 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
-
-/* Define to 1 if you have the strncasecmp function. */
-#define HAVE_STRNCASECMP 1
 
 /* Define to 1 if you have the strncmpi function. */
 /* #undef HAVE_STRNCMPI */
@@ -754,9 +727,6 @@
 /* Define to 1 if you have the <termio.h> header file. */
 /* #undef HAVE_TERMIO_H */
 
-/* Define to 1 if you have the <time.h> header file. */
-#define HAVE_TIME_H 1
-
 /* Define this if time_t is unsigned */
 /* #undef HAVE_TIME_T_UNSIGNED */
 
@@ -784,6 +754,9 @@
 /* Define to 1 if you have the winber.h header file. */
 /* #undef HAVE_WINBER_H */
 
+/* Define to 1 if you have the wincrypt.h header file. */
+/* #undef HAVE_WINCRYPT_H */
+
 /* Define to 1 if you have the windows.h header file. */
 /* #undef HAVE_WINDOWS_H */
 
@@ -798,9 +771,6 @@
 
 /* Define to 1 if you have the <wolfssh/ssh.h> header file. */
 /* #undef HAVE_WOLFSSH_SSH_H */
-
-/* Define to 1 if you have the `wolfSSLv3_client_method' function. */
-/* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
 /* if you have wolfSSL_DES_ecb_encrypt */
 /* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
@@ -857,13 +827,13 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin19.6.0"
+#define OS "x86_64-apple-darwin20.6.0"
 
 /* Name of package */
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "a suitable curl mailing list: https://curl.haxx.se/mail/"
+#define PACKAGE_BUGREPORT "a suitable curl mailing list: https://curl.se/mail/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
@@ -897,9 +867,6 @@
 
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV ssize_t
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
 
 /* Define to the type qualifier of arg 5 for select. */
 #define SELECT_QUAL_ARG5 
@@ -964,12 +931,6 @@
 /* Define to the type of arg 3 for strerror_r. */
 #define STRERROR_R_TYPE_ARG3 size_t
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#define TIME_WITH_SYS_TIME 1
-
-/* to enable alt-svc */
-/* #undef USE_ALTSVC */
-
 /* if AmiSSL is in use */
 /* #undef USE_AMISSL */
 
@@ -979,14 +940,17 @@
 /* if BearSSL is enabled */
 /* #undef USE_BEARSSL */
 
-/* if ESNI support is available */
-/* #undef USE_ESNI */
+/* if ECH support is available */
+/* #undef USE_ECH */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
-/* if GnuTLS uses nettle as crypto backend */
-/* #undef USE_GNUTLS_NETTLE */
+/* GSASL support enabled */
+/* #undef USE_GSASL */
+
+/* if hyper is in use */
+/* #undef USE_HYPER */
 
 /* PSL support enabled */
 /* #undef USE_LIBPSL */
@@ -1008,9 +972,6 @@
 
 /* if MesaLink is enabled */
 /* #undef USE_MESALINK */
-
-/* Define to enable metalink support */
-/* #undef USE_METALINK */
 
 /* if nghttp2 is in use */
 /* #undef USE_NGHTTP2 */
@@ -1039,6 +1000,9 @@
 /* if quiche is in use */
 /* #undef USE_QUICHE */
 
+/* if rustls is enabled */
+/* #undef USE_RUSTLS */
+
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
 
@@ -1056,6 +1020,10 @@
 
 /* Use Unix domain sockets */
 #define USE_UNIX_SOCKETS 1
+
+/* Define to 1 if you are building a Windows target with crypto API support.
+   */
+/* #undef USE_WIN32_CRYPTO */
 
 /* Define to 1 if you have the `normaliz' (WinIDN) library (-lnormaliz). */
 /* #undef USE_WIN32_IDN */

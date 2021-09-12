@@ -474,14 +474,14 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     memStatsInfo.iStreamingMemoryUsed = *(int*)0x08E4CB4;
     memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
 
-    uint* pModelInfoArray = (uint*)*(void**)(0x403DA4 + 3);
+    char* pFileInfoArray = *(char**)(0x5B8B08 + 6);
     CGame* pGame = g_pCore->GetGame();
     unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
 
     for (uint i = 0; i < RRR_BASE_ID; i++)
     {
-        uint* pModelInfo = pModelInfoArray + 5 * i;
-        uint  uiLoadedFlag = pModelInfo[4];
+        char* pModelInfo = pFileInfoArray + 20 /* sizeof(CStreamingInfo) */ * i;
+        char uiLoadedFlag = pModelInfo[0x10];  // CStreamingInfo.uiLoadFlag
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;

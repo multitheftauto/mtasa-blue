@@ -800,7 +800,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pZoneNames = new CZoneNames;
 
     CStaticFunctionDefinitions(this);
-    CLuaFunctionDefs::Initialize(m_pLuaManager, this);
     CLuaDefs::Initialize(this);
 
     m_pPlayerManager->SetScriptDebugging(m_pScriptDebugging);
@@ -1273,6 +1272,9 @@ void CGame::InitialDataStream(CPlayer& Player)
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals(&Player);
 
+    // Tell client the transfer box visibility
+    CStaticFunctionDefinitions::SendClientTransferBoxVisibility(&Player);
+
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
 
@@ -1468,6 +1470,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
+    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
     // Blip events
 
@@ -1489,7 +1492,7 @@ void CGame::AddBuiltInEvents()
 
     // Player events
     m_Events.AddEvent("onPlayerConnect", "player", NULL, false);
-    m_Events.AddEvent("onPlayerChat", "text", NULL, false);
+    m_Events.AddEvent("onPlayerChat", "text, messageType", NULL, false);
     m_Events.AddEvent("onPlayerDamage", "attacker, weapon, bodypart, loss", NULL, false);
     m_Events.AddEvent("onPlayerVehicleEnter", "vehicle, seat, jacked", NULL, false);
     m_Events.AddEvent("onPlayerVehicleExit", "vehicle, reason, jacker", NULL, false);
@@ -1537,6 +1540,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
@@ -1924,8 +1928,14 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     {
         pPed->SetIsDead(true);
         pPed->SetPosition(Packet.m_vecPosition);
+
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPed->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -1977,8 +1987,13 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
+        // Reset his vehicle action, but only if not jacking
+        // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
+        // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
+        if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
+            pPlayer->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
         // Remove him from any occupied vehicle
-        pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
         if (pVehicle)
         {
@@ -2608,17 +2623,23 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                             case 7:             // EXP_TYPE_HELI
                             case 12:            // EXP_TYPE_TINY - RC Vehicles
                             {
-                                CVehicle* pVehicle = static_cast<CVehicle*>(pOrigin);
-                                // Is this vehicle not already blown?
-                                if (pVehicle->GetIsBlown() == false)
-                                {
-                                    pVehicle->SetIsBlown(true);
+                                CVehicle*        vehicle = static_cast<CVehicle*>(pOrigin);
+                                VehicleBlowState previousBlowState = vehicle->GetBlowState();
 
-                                    // Call the onVehicleExplode event
-                                    CLuaArguments Arguments;
-                                    pVehicle->CallEvent("onVehicleExplode", Arguments);
-                                    // Update our engine State
-                                    pVehicle->SetEngineOn(false);
+                                if (previousBlowState != VehicleBlowState::BLOWN)
+                                {
+                                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                    vehicle->SetEngineOn(false);
+
+                                    // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
+                                    if (previousBlowState == VehicleBlowState::INTACT)
+                                    {
+                                        CLuaArguments arguments;
+                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                        vehicle->CallEvent("onVehicleExplode", arguments);
+                                    }
+
+                                    bBroadcast = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
                                 }
                                 else
                                 {
@@ -2813,8 +2834,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                     }
                 }
 
-                // Check we have a valid ped & he is spawned
-                if (bValidPed && pPed->IsSpawned())
+                // Check we have a valid ped
+                if (bValidPed)
                 {
                     // Handle it depending on the action
                     switch (ucAction)
@@ -2835,6 +2856,13 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 FAIL_ACTION,
                                 FAIL_TRAILER,
                             } failReason = FAIL_INVALID;
+
+                            // Is he spawned? (Fix for #2335)
+                            if (!pPed->IsSpawned()) {
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                                pPlayer->Send(Reply);
+                                break;
+                            }
 
                             // Is this vehicle enterable? (not a trailer)
                             unsigned short usVehicleModel = pVehicle->GetModel();

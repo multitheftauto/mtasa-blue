@@ -4,7 +4,7 @@ class D3DTextureBuffer {
 public:
     unsigned int m_nFormat;
     unsigned int m_nWidth;
-    int          m_nLevels; 
+    int          m_nLevels;
     unsigned int m_nCapacity;
     unsigned int m_nNumTexturesInBuffer;
     unsigned int m_nSize;

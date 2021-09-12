@@ -15,7 +15,7 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->boundingBox.fRadius;
+    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
     pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;

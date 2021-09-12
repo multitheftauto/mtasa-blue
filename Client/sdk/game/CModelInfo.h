@@ -17,6 +17,7 @@
 
 #include <windows.h>
 #include "CColModel.h"
+#include "CColStore.h"
 class CPedModelInfo;
 
 class CBoundingBox
@@ -126,7 +127,7 @@ public:
     virtual BOOL  IsQuadBike() = 0;
     virtual BOOL  IsBmx() = 0;
     virtual BOOL  IsTrailer() = 0;
-    virtual BOOL  IsVehicle() = 0;
+    virtual bool  IsVehicle() const = 0;
 
     virtual char* GetNameIfVehicle() = 0;
 
@@ -167,7 +168,9 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
+    virtual CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) = 0;
     virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
+    virtual bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const = 0;
     virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
     virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;
@@ -188,6 +191,12 @@ public:
     virtual void RestoreOriginalModel() = 0;
     virtual void SetColModel(CColModel* pColModel) = 0;
     virtual void RestoreColModel() = 0;
+
+    // Increases the collision slot reference counter for this model
+    virtual void AddColRef() = 0;
+
+    // Decreases the collision slot reference counter for this model
+    virtual void RemoveColRef() = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;

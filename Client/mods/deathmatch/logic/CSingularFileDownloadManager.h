@@ -18,7 +18,7 @@
 #include <windows.h>
 #endif
 
-#include <bochs_internal/crc32.h>
+#include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
 #include "CSingularFileDownload.h"
 

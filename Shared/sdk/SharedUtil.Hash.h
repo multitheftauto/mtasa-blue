@@ -8,6 +8,10 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
+#include "SharedUtil.IntTypes.h"
+#include "SString.h"
 
 namespace EHashFunction
 {
@@ -30,7 +34,8 @@ enum class PasswordHashFunction
 
 enum class StringEncryptFunction
 {
-    TEA
+    TEA,
+    AES128,
 };
 
 namespace SharedUtil
