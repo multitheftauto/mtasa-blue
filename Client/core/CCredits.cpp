@@ -127,6 +127,7 @@ CCredits::CCredits()
         "Adrian \"AGraber\" Graber\n"
         "Kevin \"ciber96\" Gross\n"
         "Robin \"robhol\" Holm\n"
+        "Bob \"NanoBob\" van Hooff\n"
         "Sebastian \"CrosRoad95\" Jura\n"
         "Daniel \"arfni\" Keller\n"
         "Gabrielius \"Dezash\" Laurinavičius\n"
