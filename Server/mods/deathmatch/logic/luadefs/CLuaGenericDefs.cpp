@@ -91,7 +91,8 @@ std::string_view CLuaGenericDefs::GetServerName()
 
 bool CLuaGenericDefs::OutputServerLog(std::string_view message)
 {
-    CLogger::LogPrintf(LOGLEVEL_MEDIUM, "%.*s\n", message.length(), message.data());
+    CLogger::LogPrintf(LOGLEVEL_MEDIUM, "%.*s", message.length(), message.data());
+    CLogger::LogPrintNoStamp("\n");
     return true;
 }
 
