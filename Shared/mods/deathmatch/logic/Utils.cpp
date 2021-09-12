@@ -460,7 +460,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         }
 
         /* Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
-           remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
+           remotely allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
         hThread =
