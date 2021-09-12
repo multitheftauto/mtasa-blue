@@ -501,7 +501,7 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         HKL current_layout = ::GetKeyboardLayout(0);
         SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
-        if (((scan_res >> 8) & 0xFF) == (2 | 4))
+        if ((HIBYTE(scan_res) & (2 | 4)) == (2 | 4))
         {
             keyEvent.modifiers &= ~(EVENTFLAG_CONTROL_DOWN | EVENTFLAG_ALT_DOWN);
             keyEvent.modifiers |= EVENTFLAG_ALTGR_DOWN;
