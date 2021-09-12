@@ -4880,7 +4880,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             // Read out the arguments aswell
             CLuaArguments Arguments(bitStream);
 
-            // Grab the event. Does it exist and is it remotly triggerable?
+            // Grab the event. Does it exist and is it remotely triggerable?
             SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
             if (pEvent)
             {
@@ -4894,7 +4894,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                     }
                 }
                 else
-                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotly triggerable",
+                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
                                                                 szName);
             }
             else

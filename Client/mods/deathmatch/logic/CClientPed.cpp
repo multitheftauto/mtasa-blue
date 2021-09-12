@@ -3051,7 +3051,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     }
 
     // If we started crouching less than some time ago, make sure we can't jump or sprint.
-    // This fixes the exploit both locally and remotly that enables players to abort
+    // This fixes the exploit both locally and remotely that enables players to abort
     // the crouching animation and shoot quickly with slow shooting weapons. Also fixes
     // the exploit making you able to get crouched without being able to move and shoot
     // with infinite ammo for remote players.
@@ -3124,7 +3124,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         {
             // Don't allow the aiming key (RightShoulder1)
             // This fixes bug allowing you to run around in aim mode while
-            // entering a vehicle both locally and remotly.
+            // entering a vehicle both locally and remotely.
             Current.RightShoulder1 = 0;
         }
     }
