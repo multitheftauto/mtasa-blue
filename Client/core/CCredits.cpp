@@ -119,7 +119,7 @@ CCredits::CCredits()
         "Emiliano \"Sasu\" Castro\n"
         "Breno \"iDannz\" Danyel\n"
         "Callum \"Callum\" Dawson\n"
-        "Pieter Dewachter\n"
+        "Pieter \"pieT\" Dewachter\n"
         "Mateusz \"Allerek\" Domińczak\n"
         "Philip \"Fenix\" Farquharson\n"
         "Seweryn \"Neproify\" Figura\n"
