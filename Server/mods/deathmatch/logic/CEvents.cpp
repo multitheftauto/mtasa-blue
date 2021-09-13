@@ -32,7 +32,7 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
             return false;
         
         // Add pLuaMain to the vector, in case it's not already there
-        if (std::find(pEvent->pLuaMainVector.begin(), pEvent->pLuaMainVector.end(), pLuaMain) == pEvent->pLuaMainVector.end())
+        if (!ListContains(pEvent->pLuaMainVector, pLuaMain))
             pEvent->pLuaMainVector.push_back(pLuaMain);
     }
     else
@@ -80,22 +80,16 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
     while (iter != m_EventHashMap.end())
     {
         SEvent* pEvent = (*iter).second;
+        ListRemoveFirst(pEvent->pLuaMainVector, pMain);
 
-        // If they match, remove pMain from the vector and check for deletion
-        std::vector<class CLuaMain*>::const_iterator pLuaMainIter = std::find(pEvent->pLuaMainVector.begin(), pEvent->pLuaMainVector.end(), pMain);
-        if (pLuaMainIter != pEvent->pLuaMainVector.end())
+        // If no pMain is left, delete it null it and set the bool
+        if (pEvent->pLuaMainVector.empty())
         {
-            pEvent->pLuaMainVector.erase(pLuaMainIter);
+            // Delete the object
+            delete pEvent;
 
-            // If no pMain is left, delete it null it and set the bool
-            if (pEvent->pLuaMainVector.empty())
-            {
-                // Delete the object
-                delete pEvent;
-
-                // Remove from list
-                m_EventHashMap.erase(iter);
-            }
+            // Remove from list
+            m_EventHashMap.erase(iter);
         }
 
         ++iter;
