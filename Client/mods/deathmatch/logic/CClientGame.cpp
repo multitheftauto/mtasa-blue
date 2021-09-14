@@ -274,6 +274,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
     g_pMultiplayer->SetVehicleWeaponHitHandler(CClientGame::StaticVehicleWeaponHitHandler);
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler(CClientGame::StaticAudioZoneRadioSwitchHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -3584,6 +3585,11 @@ void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     g_pClientGame->VehicleWeaponHitHandler(event);
 }
 
+void CClientGame::StaticAudioZoneRadioSwitchHandler(DWORD dwStationID)
+{
+    g_pClientGame->AudioZoneRadioSwitchHandler(dwStationID);
+}
+
 void CClientGame::DrawRadarAreasHandler()
 {
     m_pRadarAreaManager->DoPulse();
@@ -6679,6 +6685,31 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     arguments.PushNumber(event.iModel);
     arguments.PushNumber(event.iColSurface);
     pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
+}
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::AudioZoneRadioSwitchHandler
+//
+// Called when player either enter or leave audio zone which has defined radio station.
+// We basically set player radio station here.
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
+{
+    if(m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    {
+        // Do not change radio station if player is inside vehicle
+        // because it is supposed to play own radio
+        return;
+    }
+
+    if(dwStationID == 0) {
+        g_pGame->GetAudioEngine()->StopRadio();
+    }
+    else {
+        g_pGame->GetAudioEngine()->StartRadio(dwStationID);
+    }
 }
 
 void CClientGame::UpdateDiscordState()
