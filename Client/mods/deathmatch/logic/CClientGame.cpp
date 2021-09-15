@@ -5358,7 +5358,7 @@ void CClientGame::ResetMapInfo()
     g_pGame->SetBlurLevel(DEFAULT_BLUR_LEVEL);
 #endif
 
-    g_pClientGame->SetCoronaReflectionsEnabled(CORONA_REFLECTIONS_ON);
+    SetCoronaReflectionsEnabled(CORONA_REFLECTIONS_ON);
 
     // Close all garages
     CGarage*  pGarage = NULL;
