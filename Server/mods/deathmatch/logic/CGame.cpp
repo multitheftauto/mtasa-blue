@@ -4020,7 +4020,7 @@ void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 
         if (pResource)
         {
-            Arguments.PushResource(Packet.GetResource());
+            Arguments.PushResource(pResource);
             pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
         }
     }
