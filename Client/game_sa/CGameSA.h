@@ -85,7 +85,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_CORONA_REFLECTIONS     "coronareflections"
 
 struct SCheatSA
 {
@@ -410,9 +409,6 @@ public:
     bool IsUnderWorldWarpEnabled();
     void SetUnderWorldWarpEnabled(bool bEnable);
 
-    bool IsCoronaReflectionsEnabled();
-    void SetCoronaReflectionsEnabled(bool bEnabled);
-
     bool VerifySADataFileNames();
     bool PerformChecks();
     int& GetCheckStatus() { return m_iCheckStatus; }
@@ -509,7 +505,6 @@ private:
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
-    bool         m_bCoronaReflections;
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;

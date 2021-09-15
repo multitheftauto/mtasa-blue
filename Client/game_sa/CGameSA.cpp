@@ -603,9 +603,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
 
-    if (!strcmp(szCheatName, PROP_CORONA_REFLECTIONS))
-        return IsCoronaReflectionsEnabled();
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -638,12 +635,6 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
-    if (!strcmp(szCheatName, PROP_CORONA_REFLECTIONS))
-    {
-        SetCoronaReflectionsEnabled(bEnable);
-        return true;
-    }
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -660,7 +651,6 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
-    SetCoronaReflectionsEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -715,25 +705,6 @@ void CGameSA::SetUnderWorldWarpEnabled(bool bEnable)
 bool CGameSA::IsUnderWorldWarpEnabled()
 {
     return !m_bUnderworldWarp;
-}
-
-void CGameSA::SetCoronaReflectionsEnabled(bool bEnabled)
-{
-    // Restore or disable calls to CCoronas::RenderReflections
-    if(bEnabled) {
-        MemCpy((void*)0x53DFD8, "\xE8\x53\xD6\x1B\x00", 5);
-        MemCpy((void*)0x53DCAC, "\xE8\x7F\xD9\x1B\x00", 5);
-    }
-    else {
-        MemSet((void*)0x53DFD8, 0x90, 5);
-        MemSet((void*)0x53DCAC, 0x90, 5);
-    }
-    m_bCoronaReflections = bEnabled;
-}
-
-bool CGameSA::IsCoronaReflectionsEnabled()
-{
-    return m_bCoronaReflections;
 }
 
 bool CGameSA::GetJetpackWeaponEnabled(eWeaponType weaponType)
