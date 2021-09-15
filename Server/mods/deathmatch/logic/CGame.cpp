@@ -1208,6 +1208,7 @@ bool CGame::ProcessPacket(CPacket& Packet)
         case PACKET_ID_PLAYER_RESOURCE_START:
         {
             Packet_PlayerResourceStart(static_cast<CPlayerResourceStartPacket&>(Packet));
+            return true;
         }
 
         default:
