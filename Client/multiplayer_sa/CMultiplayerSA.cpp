@@ -1523,7 +1523,7 @@ void CMultiplayerSA::InitHooks()
 
     // Fix corona rain reflections aren't rendering (#2345)
     // By using zBufferFar instead of zBufferNear for corona position
-    MemSet((void*)0x6FB9A0, 0x1C, 1);
+    MemPut<BYTE>(0x6FB9A0, 0x1C);
 
     InitHooks_CrashFixHacks();
 
@@ -2202,6 +2202,43 @@ void CMultiplayerSA::ResetWater()
     MemPut<BYTE>(0x7051A7, 184);
     MemPut<float>(0x872660, 184.0f);
     MemPut<BYTE>(0x7051D7, 184);
+}
+
+void CMultiplayerSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
+{
+    /*
+        ucEnabled:
+        0 - corona rain reflections disabled
+        1 - enabled
+        2 - force enabled (render even if there is no rain)
+    */
+
+    if(ucEnabled == 0) {
+        // Disable corona rain reflections
+        // Disable calls to CCoronas::RenderReflections
+        MemSet((void*)0x53DFD8, 0x90, 5);
+        MemSet((void*)0x53DCAC, 0x90, 5);
+    }
+    else {
+        // Enable corona rain reflections
+        // Restore calls to CCoronas::RenderReflections
+        MemCpy((void*)0x53DFD8, "\xE8\x53\xD6\x1B\x00", 5);
+        MemCpy((void*)0x53DCAC, "\xE8\x7F\xD9\x1B\x00", 5);
+    }
+
+    if(ucEnabled == 2) {
+        // Force enable corona reflections (render even if there is no rain)
+        // Disable fWetGripScale check
+        MemPut<BYTE>(0x6FB645, 0xEB);
+
+        // Patch "fld fWetGripScale" to "fld fOne"
+        MemCpy((void*)0x6FB906, "\x24\x86\x85\x00", 4);
+    }
+    else {
+        // Restore patched stuff
+        MemPut<BYTE>(0x6FB645, 0x7A);
+        MemCpy((void*)0x6FB906, "\x08\x13\xC8\x00", 4);
+    }
 }
 
 bool CMultiplayerSA::GetExplosionsDisabled()

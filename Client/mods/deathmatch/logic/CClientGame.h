@@ -193,6 +193,14 @@ public:
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
+
+    enum eCoronaReflectionsEnabled : uchar
+    {
+        CORONA_REFLECTIONS_OFF,
+        CORONA_REFLECTIONS_ON,
+        CORONA_REFLECTIONS_FORCED
+    };
+
     class CStoredWeaponSlot
     {
     public:
@@ -402,6 +410,9 @@ public:
 
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
+
+    bool SetCoronaReflectionsEnabled(uchar ucEnabled);
+    uchar GetCoronaReflectionsEnabled();
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 
@@ -751,6 +762,8 @@ private:
     bool m_bCloudsEnabled;
     // Birds Enabled
     bool m_bBirdsEnabled;
+
+    uchar m_ucCoronaReflectionsEnabled;
 
     unsigned long m_ulMinuteDuration;
 

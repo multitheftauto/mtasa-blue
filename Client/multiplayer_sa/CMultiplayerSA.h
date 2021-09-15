@@ -161,6 +161,7 @@ public:
     void  GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha);
     void  SetWaterColor(float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha);
     void  ResetWater();
+    void  SetCoronaReflectionsEnabled(unsigned char ucEnabled);
     void  SetCloudsEnabled(bool bDisabled);
     void  RebuildMultiplayerPlayer(CPed* player);
     bool  GetInteriorSoundsEnabled();

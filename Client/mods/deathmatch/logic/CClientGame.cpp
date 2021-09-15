@@ -5358,6 +5358,8 @@ void CClientGame::ResetMapInfo()
     g_pGame->SetBlurLevel(DEFAULT_BLUR_LEVEL);
 #endif
 
+    g_pClientGame->SetCoronaReflectionsEnabled(CORONA_REFLECTIONS_ON);
+
     // Close all garages
     CGarage*  pGarage = NULL;
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
@@ -5876,6 +5878,21 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
 bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
+}
+
+bool CClientGame::SetCoronaReflectionsEnabled(uchar ucEnabled)
+{
+    if(ucEnabled > 2) {
+        return false;
+    }
+    m_ucCoronaReflectionsEnabled = ucEnabled;
+    g_pMultiplayer->SetCoronaReflectionsEnabled(ucEnabled);
+    return true;
+}
+
+uchar CClientGame::GetCoronaReflectionsEnabled()
+{
+    return m_ucCoronaReflectionsEnabled;
 }
 
 #pragma code_seg(".text")

@@ -52,6 +52,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"getMoonSize", GetMoonSize},
         {"getFPSLimit", GetFPSLimit},
         {"getBirdsEnabled", GetBirdsEnabled},
+        {"getCoronaReflectionsEnabled", ArgumentParser<GetCoronaReflectionsEnabled>},
         
         // World set funcs
         {"setTime", SetTime},
@@ -89,6 +90,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
         {"setMoonSize", SetMoonSize},
         {"setFPSLimit", SetFPSLimit},
+        {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
         {"removeWorldModel", RemoveWorldBuilding},
         {"restoreAllWorldModels", RestoreWorldBuildings},
         {"restoreWorldModel", RestoreWorldBuilding},
@@ -1991,4 +1993,14 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
     return true;
+}
+
+bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
+{
+    return g_pClientGame->SetCoronaReflectionsEnabled(ucEnabled);
+}
+
+uchar CLuaWorldDefs::GetCoronaReflectionsEnabled()
+{
+    return g_pClientGame->GetCoronaReflectionsEnabled();
 }
