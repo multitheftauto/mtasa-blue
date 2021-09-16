@@ -17,7 +17,7 @@
 /* #undef CURL_DEFAULT_SSL_BACKEND */
 
 /* disable alt-svc */
-/* #undef CURL_DISABLE_ALTSVC */
+#define CURL_DISABLE_ALTSVC 1
 
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
@@ -56,10 +56,10 @@
 /* #undef CURL_DISABLE_IMAP */
 
 /* to disable LDAP */
-/* #undef CURL_DISABLE_LDAP */
+#define CURL_DISABLE_LDAP 1
 
 /* to disable LDAPS */
-/* #undef CURL_DISABLE_LDAPS */
+#define CURL_DISABLE_LDAPS 1
 
 /* to disable --libcurl C code generation option */
 /* #undef CURL_DISABLE_LIBCURL_OPTION */
@@ -92,7 +92,7 @@
 /* #undef CURL_DISABLE_PROXY */
 
 /* to disable RTSP */
-/* #undef CURL_DISABLE_RTSP */
+#define CURL_DISABLE_RTSP 1
 
 /* disable DNS shuffling */
 /* #undef CURL_DISABLE_SHUFFLE_DNS */
@@ -170,7 +170,7 @@
 #define HAVE_BUILTIN_AVAILABLE 1
 
 /* Define to 1 if you have the clock_gettime function and monotonic timer. */
-/* #undef HAVE_CLOCK_GETTIME_MONOTONIC */
+#define HAVE_CLOCK_GETTIME_MONOTONIC 1
 
 /* Define to 1 if you have the closesocket function. */
 /* #undef HAVE_CLOSESOCKET */
@@ -358,25 +358,25 @@
 /* #undef HAVE_IO_H */
 
 /* Define to 1 if you have the lber.h header file. */
-#define HAVE_LBER_H 1
+/* #undef HAVE_LBER_H */
 
 /* Define to 1 if you have the ldapssl.h header file. */
 /* #undef HAVE_LDAPSSL_H */
 
 /* Define to 1 if you have the ldap.h header file. */
-#define HAVE_LDAP_H 1
+/* #undef HAVE_LDAP_H */
 
 /* Define to 1 if you have the `ldap_init_fd' function. */
 /* #undef HAVE_LDAP_INIT_FD */
 
 /* Use LDAPS implementation */
-#define HAVE_LDAP_SSL 1
+/* #undef HAVE_LDAP_SSL */
 
 /* Define to 1 if you have the ldap_ssl.h header file. */
 /* #undef HAVE_LDAP_SSL_H */
 
 /* Define to 1 if you have the `ldap_url_parse' function. */
-#define HAVE_LDAP_URL_PARSE 1
+/* #undef HAVE_LDAP_URL_PARSE */
 
 /* Define to 1 if you have the `brotlidec' library (-lbrotlidec). */
 /* #undef HAVE_LIBBROTLIDEC */
@@ -412,7 +412,7 @@
 /* #undef HAVE_LIBWOLFSSH */
 
 /* if zlib is available */
-#define HAVE_LIBZ 1
+/* #undef HAVE_LIBZ */
 
 /* Define to 1 if you have the `zstd' library (-lzstd). */
 /* #undef HAVE_LIBZSTD */
@@ -439,13 +439,13 @@
 /* #undef HAVE_MALLOC_H */
 
 /* Define to 1 if you have the memory.h header file. */
-#define HAVE_MEMORY_H 1
+/* #undef HAVE_MEMORY_H */
 
 /* Define to 1 if you have the memrchr function or macro. */
 /* #undef HAVE_MEMRCHR */
 
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
-/* #undef HAVE_MSG_NOSIGNAL */
+#define HAVE_MSG_NOSIGNAL 1
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H 1
@@ -589,12 +589,6 @@
 /* Define to 1 if you have the sigsetjmp function or macro. */
 #define HAVE_SIGSETJMP 1
 
-/* Define to 1 if sig_atomic_t is an available typedef. */
-#define HAVE_SIG_ATOMIC_T 1
-
-/* Define to 1 if sig_atomic_t is already defined as volatile. */
-/* #undef HAVE_SIG_ATOMIC_T_VOLATILE */
-
 /* Define to 1 if struct sockaddr_in6 has the sin6_scope_id member */
 /* #undef HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID */
 
@@ -621,6 +615,9 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -794,7 +791,7 @@
 /* #undef HAVE_X509_H */
 
 /* if you have the zlib.h header file */
-#define HAVE_ZLIB_H 1
+/* #undef HAVE_ZLIB_H */
 
 /* if libzstd is in use */
 /* #undef HAVE_ZSTD */
@@ -925,7 +922,9 @@
 /* The number of bytes in type time_t */
 #define SIZEOF_TIME_T 8
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #define STDC_HEADERS 1
 
 /* Define to the type of arg 3 for strerror_r. */
@@ -965,7 +964,7 @@
 /* #undef USE_LIBSSH2 */
 
 /* If you want to build curl with the built-in manual */
-#define USE_MANUAL 1
+/* #undef USE_MANUAL */
 
 /* if mbedTLS is enabled */
 /* #undef USE_MBEDTLS */
@@ -1057,11 +1056,6 @@
 /* Define to 1 if OS is AIX. */
 #ifndef _ALL_SOURCE
 /* #  undef _ALL_SOURCE */
-#endif
-
-/* Enable large inode numbers on Mac OS X 10.5.  */
-#ifndef _DARWIN_USE_64_BIT_INODE
-# define _DARWIN_USE_64_BIT_INODE 1
 #endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
