@@ -228,6 +228,8 @@ public:
     virtual void SetCantBeKnockedOffBike(int iCantBeKnockedOffBike) = 0;
     virtual void QuitEnteringCar(CVehicle* vehicle, int iSeat, bool bUnknown) = 0;
 
+    virtual void SetBleeding(bool bBleeding) = 0;
+
     virtual bool IsWearingGoggles() = 0;
     virtual void SetGogglesState(bool bIsWearingThem) = 0;
 

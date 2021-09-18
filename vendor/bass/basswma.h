@@ -1,6 +1,6 @@
 /*
 	BASSWMA 2.4 C/C++ header file
-	Copyright (c) 2002-2018 Un4seen Developments Ltd.
+	Copyright (c) 2002-2021 Un4seen Developments Ltd.
 
 	See the BASSWMA.CHM file for more detailed documentation
 */
@@ -34,7 +34,6 @@ typedef DWORD HWMENCODE;	// WMA encoding handle
 
 // Additional BASS_SetConfig options
 #define BASS_CONFIG_WMA_PRECHECK	0x10100
-#define BASS_CONFIG_WMA_PREBUF		0x10101
 #define BASS_CONFIG_WMA_BASSFILE	0x10103
 #define BASS_CONFIG_WMA_NETSEEK		0x10104
 #define BASS_CONFIG_WMA_VIDEO		0x10105

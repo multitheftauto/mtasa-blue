@@ -9,9 +9,13 @@
  *
  *****************************************************************************/
 
+
 #include "StdInc.h"
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
+
+#include <SharedUtil.SysInfo.h>
+#include <SharedUtil.SysInfo.hpp>
 
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
@@ -326,6 +330,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     bool               bSubPixelPositioning;
     float              fRotation;
     CVector2D          vecRotationOrigin;
+    float              fLineHeight;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strText);
@@ -363,6 +368,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     argStream.ReadBool(bSubPixelPositioning, false);
     argStream.ReadNumber(fRotation, 0);
     argStream.ReadVector2D(vecRotationOrigin, CVector2D((vecTopLeft.fX + vecBottomRight.fX) * 0.5f, (vecTopLeft.fY + vecBottomRight.fY) * 0.5f));
+    argStream.ReadNumber(fLineHeight, 0);
 
     if (!argStream.HasErrors())
     {
@@ -378,7 +384,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
             ulFormat |= DT_NOCLIP;
 
         g_pCore->GetGraphics()->DrawStringQueued(vecTopLeft.fX, vecTopLeft.fY, vecBottomRight.fX, vecBottomRight.fY, color, strText, fScaleX, fScaleY, ulFormat,
-                                                 pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY);
+                                                 pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY, fLineHeight);
 
         lua_pushboolean(luaVM, true);
         return 1;
@@ -1705,6 +1711,11 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushstring(luaVM, "SettingHighDetailPeds");
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
         lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "TotalPhysicalMemory");
+        lua_pushnumber(luaVM, static_cast<lua_Number>(SharedUtil::GetWMITotalPhysicalMemory()) / 1024.0 / 1024.0);
+        lua_settable(luaVM, -3);
+
         return 1;
     }
     else

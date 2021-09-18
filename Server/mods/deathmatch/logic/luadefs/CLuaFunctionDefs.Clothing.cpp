@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionDefs.h"
 
 int CLuaFunctionDefs::GetBodyPartName(lua_State* luaVM)
 {
