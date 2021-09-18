@@ -119,7 +119,7 @@ jobs:
 
   linux-release:
     name: linux-release
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
@@ -129,7 +129,7 @@ jobs:
 
   linux-debug:
     name: linux-debug
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:

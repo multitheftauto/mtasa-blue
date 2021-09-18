@@ -145,9 +145,6 @@ namespace SharedUtil
 
     void CMD5Hasher::Update(unsigned char* input, unsigned int input_length)
     {
-        if (input_length == 0)
-            return;
-        
         // CRYPT_START
         unsigned int input_index, buffer_index;
         unsigned int buffer_space;            // how much space is left in buffer

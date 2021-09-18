@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionDefs.h"
+
 #define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
+
+extern CTimeUsMarker<20> markerLatentEvent;
 
 int CLuaFunctionDefs::AddEvent(lua_State* luaVM)
 {

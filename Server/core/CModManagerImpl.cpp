@@ -127,7 +127,7 @@ void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
                 Print("Press Q to shut down the server!\n");
                 WaitForKey('q');
             }
-            TerminateProcess(GetCurrentProcess(), 0);
+            TerminateProcess(GetCurrentProcess(), GetExitCode());
         }
 #endif
         // Unload the library
@@ -177,6 +177,16 @@ bool CModManagerImpl::GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, in
     }
 
     return false;
+}
+
+void CModManagerImpl::SetExitCode(int exitCode)
+{
+    m_pServer->SetExitCode(exitCode);
+}
+
+int CModManagerImpl::GetExitCode() const
+{
+    return m_pServer->GetExitCode();
 }
 
 void CModManagerImpl::GetTag(char* szInfoTag, int iInfoTag)

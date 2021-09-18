@@ -15,6 +15,7 @@
 #include "SharedUtil.MemAccess.hpp"
 #include "D3DResourceSystemSA.h"
 #include "CFileLoaderSA.h"
+#include "CColStoreSA.h"
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
@@ -126,6 +127,7 @@ CGameSA::CGameSA()
     this->m_pWaterManager = new CWaterManagerSA();
     this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
     this->m_pPointLights = new CPointLightsSA();
+    this->m_collisionStore = new CColStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -265,6 +267,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+    delete static_cast<CColStoreSA*>(m_collisionStore);
 
     delete[] ModelInfo;
     delete[] ObjectGroupsInfo;
