@@ -27,21 +27,24 @@ public:
     CResource* GetResource() const { return m_pResource; }
     void       SetResource(CResource* pResource) { m_pResource = pResource; }
 
-    eClientEntityType GetType() const { return CCLIENTVECTORGRAPHIC; }
+    bool LoadFromString(std::string strData);
 
-    bool LoadFromData(std::string strData);
-    bool IsDestroyed() const { return m_bIsDestroyed; }
-
-    lunasvg::Document*   GetSVGDocument() const { return m_pDocument.get(); }
+    eClientEntityType    GetType()       const { return CCLIENTVECTORGRAPHIC; }
     CVectorGraphicItem*  GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
-    CXMLNode*            GetSVGDocumentXML() const { return m_pXMLDocument; }
+
+    lunasvg::Document*   GetSVGDocument() const { return m_pSVGDocument.get(); }
+    CXMLNode*            GetXMLDocument() const { return m_pXMLDocument; }
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
+    bool IsDestroyed()      const { return m_bIsDestroyed; }
+
+    bool SetDocument(CXMLNode* node);
 private:
     CResource*                                     m_pResource = nullptr;
     CClientManager*                                m_pManager;
 
-    std::unique_ptr<lunasvg::Document>             m_pDocument = nullptr;
+    std::unique_ptr<lunasvg::Document>             m_pSVGDocument = nullptr;
+    std::unique_ptr<SXMLString>                    m_pXMLString   = nullptr;
     CXMLNode*                                      m_pXMLDocument = nullptr;
 
     std::unique_ptr<CClientVectorGraphicDisplay>   m_pVectorGraphicDisplay;
