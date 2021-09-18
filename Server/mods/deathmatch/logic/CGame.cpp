@@ -4016,11 +4016,10 @@ void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer)
     {
-        CLuaArguments Arguments;
-        CResource*    pResource = Packet.GetResource();
-
+        CResource* pResource = Packet.GetResource();
         if (pResource)
         {
+            CLuaArguments Arguments;
             Arguments.PushResource(pResource);
             pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
         }
