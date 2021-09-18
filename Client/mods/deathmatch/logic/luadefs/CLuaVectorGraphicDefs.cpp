@@ -46,7 +46,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
     if (!pVectorGraphic)
-        return;
+        return false;
 
     if (pathOrRawData.has_value())
     {
@@ -65,7 +65,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 delete pVectorGraphic;
 
                 m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
-                return;
+                return false;
             }
         }
         else
@@ -84,7 +84,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     delete pFile;
 
                     m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
-                    return;
+                    return false;
                 }
                 else
                 {
@@ -99,7 +99,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                         delete pVectorGraphic;
 
                         m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
-                        return;
+                        return false;
                     }
                 }
             }
