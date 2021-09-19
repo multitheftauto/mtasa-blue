@@ -103,10 +103,17 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     {
                         delete pVectorGraphic;
 
-                        m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
+                        m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG file (check for XML syntax errors)");
                         return false;
                     }
                 }
+            }
+            else
+            {
+                delete pVectorGraphic;
+
+                m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (invalid file path) [%s]", pathOrRawData.value().c_str()));
+                return false;
             }
         }
     }   
