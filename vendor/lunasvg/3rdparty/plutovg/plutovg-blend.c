@@ -207,36 +207,37 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
 
     double rx = gradient->matrix.m01 * (y + 0.5) + gradient->matrix.m02 + gradient->matrix.m00 * (x + 0.5);
     double ry = gradient->matrix.m11 * (y + 0.5) + gradient->matrix.m12 + gradient->matrix.m10 * (x + 0.5);
-    uint32_t* end = buffer + length;
+
     rx -= gradient->radial.fx;
     ry -= gradient->radial.fy;
 
     double inv_a = 1 / (2 * v->a);
-    const double delta_rx = gradient->matrix.m00;
-    const double delta_ry = gradient->matrix.m10;
+    double delta_rx = gradient->matrix.m00;
+    double delta_ry = gradient->matrix.m10;
 
     double b = 2 * (v->dr * gradient->radial.fr + rx * v->dx + ry * v->dy);
     double delta_b = 2 * (delta_rx * v->dx + delta_ry * v->dy);
-    const double b_delta_b = 2 * b * delta_b;
-    const double delta_b_delta_b = 2 * delta_b * delta_b;
+    double b_delta_b = 2 * b * delta_b;
+    double delta_b_delta_b = 2 * delta_b * delta_b;
 
-    const double bb = b * b;
-    const double delta_bb = delta_b * delta_b;
+    double bb = b * b;
+    double delta_bb = delta_b * delta_b;
 
     b *= inv_a;
     delta_b *= inv_a;
 
-    const double rxrxryry = rx * rx + ry * ry;
-    const double delta_rxrxryry = delta_rx * delta_rx + delta_ry * delta_ry;
-    const double rx_plus_ry = 2 * (rx * delta_rx + ry * delta_ry);
-    const double delta_rx_plus_ry = 2 * delta_rxrxryry;
+    double rxrxryry = rx * rx + ry * ry;
+    double delta_rxrxryry = delta_rx * delta_rx + delta_ry * delta_ry;
+    double rx_plus_ry = 2 * (rx * delta_rx + ry * delta_ry);
+    double delta_rx_plus_ry = 2 * delta_rxrxryry;
 
     inv_a *= inv_a;
 
     double det = (bb - 4 * v->a * (v->sqrfr - rxrxryry)) * inv_a;
     double delta_det = (b_delta_b + delta_bb + 4 * v->a * (rx_plus_ry + delta_rxrxryry)) * inv_a;
-    const double delta_delta_det = (delta_b_delta_b + 4 * v->a * delta_rx_plus_ry) * inv_a;
+    double delta_delta_det = (delta_b_delta_b + 4 * v->a * delta_rx_plus_ry) * inv_a;
 
+    const uint32_t* end = buffer + length;
     if(v->extended)
     {
         while(buffer < end)
@@ -720,23 +721,6 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
 {
     plutovg_state_t* state = pluto->state;
     gradient_data_t data;
-    if(gradient->type==plutovg_gradient_type_linear)
-    {
-        data.linear.x1 = gradient->values[0];
-        data.linear.y1 = gradient->values[1];
-        data.linear.x2 = gradient->values[2];
-        data.linear.y2 = gradient->values[3];
-    }
-    else
-    {
-        data.radial.cx = gradient->values[0];
-        data.radial.cy = gradient->values[1];
-        data.radial.cr = gradient->values[2];
-        data.radial.fx = gradient->values[3];
-        data.radial.fy = gradient->values[4];
-        data.radial.fr = gradient->values[5];
-    }
-
     int i, pos = 0, nstop = gradient->stops.size;
     const plutovg_gradient_stop_t *curr, *next, *start, *last;
     uint32_t curr_color, next_color, last_color;
@@ -747,14 +731,16 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
     start = gradient->stops.data;
     curr = start;
     curr_color = combine_opacity(&curr->color, opacity);
+
+    data.colortable[pos] = premultiply_pixel(curr_color);
+    ++pos;
     incr = 1.0 / COLOR_TABLE_SIZE;
     fpos = 1.5 * incr;
-    data.colortable[pos++] = premultiply_pixel(curr_color);
 
     while(fpos <= curr->offset)
     {
         data.colortable[pos] = data.colortable[pos - 1];
-        pos++;
+        ++pos;
         fpos += incr;
     }
 
@@ -788,9 +774,23 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
     plutovg_matrix_invert(&data.matrix);
 
     if(gradient->type==plutovg_gradient_type_linear)
+    {
+        data.linear.x1 = gradient->values[0];
+        data.linear.y1 = gradient->values[1];
+        data.linear.x2 = gradient->values[2];
+        data.linear.y2 = gradient->values[3];
         blend_linear_gradient(pluto->surface, state->op, rle, &data);
+    }
     else
+    {
+        data.radial.cx = gradient->values[0];
+        data.radial.cy = gradient->values[1];
+        data.radial.cr = gradient->values[2];
+        data.radial.fx = gradient->values[3];
+        data.radial.fy = gradient->values[4];
+        data.radial.fr = gradient->values[5];
         blend_radial_gradient(pluto->surface, state->op, rle, &data);
+    }
 }
 
 void plutovg_blend_texture(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_texture_t* texture)

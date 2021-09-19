@@ -13,14 +13,10 @@ using GradientStops = std::vector<GradientStop>;
 
 using DashArray = std::vector<double>;
 
-class DashData
+struct DashData
 {
-public:
-    DashData() = default;
-
-public:
     DashArray array;
-    double offset{1.0};
+    double offset{0.0};
 };
 
 enum class TextureType

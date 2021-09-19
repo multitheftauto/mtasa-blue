@@ -20,7 +20,7 @@ std::shared_ptr<Canvas> Canvas::create(unsigned char* data, unsigned int width, 
 
 std::shared_ptr<Canvas> Canvas::create(double x, double y, double width, double height)
 {
-    if(width <= 0 || height <= 0)
+    if(width <= 0.0 || height <= 0.0)
         return std::shared_ptr<Canvas>(new Canvas(0, 0, 1, 1));
 
     auto l = static_cast<int>(floor(x));
@@ -148,7 +148,7 @@ void Canvas::mask(const Rect& clip, const Transform& transform)
     plutovg_set_source_rgba(pluto, 0, 0, 0, 0);
     plutovg_set_fill_rule(pluto, plutovg_fill_rule_even_odd);
     plutovg_set_operator(pluto, plutovg_operator_src);
-    plutovg_set_opacity(pluto, 1.0);
+    plutovg_set_opacity(pluto, 0.0);
     plutovg_set_matrix(pluto, &translation);
     plutovg_fill(pluto);
 }
@@ -168,16 +168,16 @@ void Canvas::clear(unsigned int value)
 
 void Canvas::rgba()
 {
-    auto data = plutovg_surface_get_data(surface);
     auto width = plutovg_surface_get_width(surface);
     auto height = plutovg_surface_get_height(surface);
     auto stride = plutovg_surface_get_stride(surface);
+    auto data = plutovg_surface_get_data(surface);
     for(int y = 0;y < height;y++)
     {
-        auto row = reinterpret_cast<uint32_t*>(data + stride * y);
+        auto pixels = reinterpret_cast<uint32_t*>(data + stride * y);
         for(int x = 0;x < width;x++)
         {
-            auto pixel = row[x];
+            auto pixel = pixels[x];
             auto a = (pixel >> 24) & 0xFF;
             if(a == 0)
                 continue;
@@ -192,46 +192,46 @@ void Canvas::rgba()
                 b = (b * 255) / a;
             }
 
-            row[x] = (a << 24) | (b << 16) | (g << 8) | r;
+            pixels[x] = (a << 24) | (b << 16) | (g << 8) | r;
         }
     }
 }
 
 void Canvas::luminance()
 {
-    auto data = plutovg_surface_get_data(surface);
     auto width = plutovg_surface_get_width(surface);
     auto height = plutovg_surface_get_height(surface);
     auto stride = plutovg_surface_get_stride(surface);
+    auto data = plutovg_surface_get_data(surface);
     for(int y = 0;y < height;y++)
     {
-        auto row = reinterpret_cast<uint32_t*>(data + stride * y);
+        auto pixels = reinterpret_cast<uint32_t*>(data + stride * y);
         for(int x = 0;x < width;x++)
         {
-            auto pixel = row[x];
+            auto pixel = pixels[x];
             auto r = (pixel >> 16) & 0xFF;
             auto g = (pixel >> 8) & 0xFF;
             auto b = (pixel >> 0) & 0xFF;
             auto l = (2*r + 3*g + b) / 6;
 
-            row[x] = l << 24;
+            pixels[x] = l << 24;
         }
     }
 }
 
 unsigned int Canvas::width() const
 {
-    return static_cast<unsigned int>(plutovg_surface_get_width(surface));
+    return plutovg_surface_get_width(surface);
 }
 
 unsigned int Canvas::height() const
 {
-    return static_cast<unsigned int>(plutovg_surface_get_height(surface));
+    return plutovg_surface_get_height(surface);
 }
 
 unsigned int Canvas::stride() const
 {
-    return static_cast<unsigned int>(plutovg_surface_get_stride(surface));
+    return plutovg_surface_get_stride(surface);
 }
 
 unsigned char* Canvas::data() const
@@ -241,7 +241,7 @@ unsigned char* Canvas::data() const
 
 Rect Canvas::box() const
 {
-    return Rect{rect.x, rect.y, rect.w, rect.h};
+    return Rect(rect.x, rect.y, rect.w, rect.h);
 }
 
 plutovg_matrix_t to_plutovg_matrix(const Transform& transform)
@@ -278,7 +278,7 @@ static plutovg_spread_method_t to_plutovg_spread_methood(SpreadMethod spread)
 
 static void to_plutovg_stops(plutovg_gradient_t* gradient, const GradientStops& stops)
 {
-    for(auto& stop : stops)
+    for(const auto& stop : stops)
     {
         auto offset = std::get<0>(stop);
         auto& color = std::get<1>(stop);

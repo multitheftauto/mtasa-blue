@@ -9,7 +9,7 @@
 
 #include "StdInc.h"
 #include "CClientVectorGraphic.h"
-#include <document.h>
+#include <lunasvg.h>
 
 CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID ID, CVectorGraphicItem* pVectorGraphicItem)
     : ClassInit(this), CClientTexture(pManager, ID, pVectorGraphicItem)

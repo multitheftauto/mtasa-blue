@@ -163,6 +163,7 @@ public:
     Transform& invert();
 
     void map(double x, double y, double* _x, double* _y) const;
+    Point map(double x, double y) const;
     Point map(const Point& point) const;
     Rect map(const Rect& rect) const;
 

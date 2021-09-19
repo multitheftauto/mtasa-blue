@@ -338,7 +338,7 @@ public:
 
 public:
     std::shared_ptr<Canvas> canvas;
-    Transform matrix;
+    Transform transform;
 
 private:
     const LayoutObject* m_object;

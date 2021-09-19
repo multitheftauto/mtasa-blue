@@ -191,28 +191,31 @@ void Transform::map(double x, double y, double* _x, double* _y) const
     *_y = x * m10 + y * m11 + m12;
 }
 
+Point Transform::map(double x, double y) const
+{
+    map(x, y, &x, &y);
+    return Point{x, y};
+}
+
 Point Transform::map(const Point& point) const
 {
-    Point p;
-    map(point.x, point.y, &p.x, &p.y);
-    return p;
+    return map(point.x, point.y);
 }
 
 Rect Transform::map(const Rect& rect) const
 {
     if(!rect.valid())
-        return rect;
+        return Rect::Invalid;
 
-    auto left = rect.x;
-    auto top = rect.y;
-    auto right = rect.x + rect.w;
-    auto bottom = rect.y + rect.h;
+    auto x1 = rect.x;
+    auto y1 = rect.y;
+    auto x2 = rect.x + rect.w;
+    auto y2 = rect.y + rect.h;
 
-    Point p[4];
-    p[0] = map(Point{left, top});
-    p[1] = map(Point{right, top});
-    p[2] = map(Point{right, bottom});
-    p[3] = map(Point{left, bottom});
+    const Point p[] = {
+        map(x1, y1), map(x2, y1),
+        map(x2, y2), map(x1, y2)
+    };
 
     auto l = p[0].x;
     auto t = p[0].y;

@@ -4,8 +4,6 @@
 
 namespace lunasvg {
 
-static const std::string EmptyString;
-
 void PropertyList::set(PropertyId id, const std::string& value, int specificity)
 {
     auto property = get(id);
@@ -25,12 +23,13 @@ void PropertyList::set(PropertyId id, const std::string& value, int specificity)
 
 Property* PropertyList::get(PropertyId id) const
 {
-    auto size = m_properties.size();
-    for(std::size_t i = 0;i < size;i++)
+    auto data = m_properties.data();
+    auto end = data + m_properties.size();
+    while(data < end)
     {
-        auto& property = m_properties[i];
-        if(property.id == id)
-            return const_cast<Property*>(&property);
+        if(data->id == id)
+            return const_cast<Property*>(data);
+        ++data;
     }
 
     return nullptr;
@@ -70,6 +69,8 @@ void Element::set(PropertyId id, const std::string& value, int specificity)
     properties.set(id, value, specificity);
 }
 
+static const std::string EmptyString;
+
 const std::string& Element::get(PropertyId id) const
 {
     auto property = properties.get(id);
@@ -79,17 +80,17 @@ const std::string& Element::get(PropertyId id) const
     return property->value;
 }
 
+static const std::string InheritString{"inherit"};
+
 const std::string& Element::find(PropertyId id) const
 {
-    static const std::string InheritString{"inherit"};
     auto element = this;
-    while(element)
-    {
+    do {
         auto& value = element->get(id);
         if(!value.empty() && value != InheritString)
             return value;
         element = element->parent;
-    }
+    } while(element);
 
     return EmptyString;
 }

@@ -8,7 +8,7 @@ project "lunasvg"
 	rtti "Off"
 
 	defines { 
-		"LUNASVG_EXPORTS", 
+		"LUNASVG_EXPORT", 
 		"LUNASVG_SHARED", 
 		"_CRT_SECURE_NO_WARNINGS"
 	}

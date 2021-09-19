@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "CClientVectorGraphicDisplay.h"
 #include "CClientVectorGraphic.h"
-#include <document.h>
+#include <lunasvg.h>
 
 using namespace lunasvg;
 

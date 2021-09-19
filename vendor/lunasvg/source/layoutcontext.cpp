@@ -97,12 +97,12 @@ void LayoutClipPath::apply(RenderState& state) const
 {
     RenderState newState(this, RenderMode::Clipping);
     newState.canvas = Canvas::create(state.canvas->box());
-    newState.matrix = transform * state.matrix;
+    newState.transform = transform * state.transform;
     if(units == Units::ObjectBoundingBox)
     {
         const auto& box = state.objectBoundingBox();
-        newState.matrix.translate(box.x, box.y);
-        newState.matrix.scale(box.w, box.h);
+        newState.transform.translate(box.x, box.y);
+        newState.transform.scale(box.w, box.h);
     }
 
     renderChildren(newState);
@@ -129,22 +129,19 @@ void LayoutMask::apply(RenderState& state) const
 
     RenderState newState(this, state.mode());
     newState.canvas = Canvas::create(state.canvas->box());
-    newState.matrix = state.matrix;
+    newState.transform = state.transform;
     if(contentUnits == Units::ObjectBoundingBox)
     {
         const auto& box = state.objectBoundingBox();
-        newState.matrix.translate(box.x, box.y);
-        newState.matrix.scale(box.w, box.h);
+        newState.transform.translate(box.x, box.y);
+        newState.transform.scale(box.w, box.h);
     }
 
     renderChildren(newState);
-
     if(clipper) clipper->apply(newState);
     if(masker) masker->apply(newState);
-
-    newState.canvas->mask(rect, state.matrix);
+    newState.canvas->mask(rect, state.transform);
     newState.canvas->luminance();
-
     state.canvas->blend(newState.canvas.get(), BlendMode::Dst_In, opacity);
 }
 
@@ -157,7 +154,7 @@ void LayoutSymbol::render(RenderState& state) const
 {
     BlendInfo info{clipper, masker, opacity, clip};
     RenderState newState(this, state.mode());
-    newState.matrix = transform * state.matrix;
+    newState.transform = transform * state.transform;
     newState.beginGroup(state, info);
     renderChildren(newState);
     newState.endGroup(state, info);
@@ -177,7 +174,7 @@ void LayoutGroup::render(RenderState& state) const
 {
     BlendInfo info{clipper, masker, opacity, Rect::Invalid};
     RenderState newState(this, state.mode());
-    newState.matrix = transform * state.matrix;
+    newState.transform = transform * state.transform;
     newState.beginGroup(state, info);
     renderChildren(newState);
     newState.endGroup(state, info);
@@ -219,7 +216,7 @@ void LayoutMarker::renderMarker(RenderState& state, const Point& origin, double 
 {
     BlendInfo info{clipper, masker, opacity, clip};
     RenderState newState(this, state.mode());
-    newState.matrix = transform * markerTransform(origin, angle, strokeWidth) * state.matrix;
+    newState.transform = transform * markerTransform(origin, angle, strokeWidth) * state.transform;
     newState.beginGroup(state, info);
     renderChildren(newState);
     newState.endGroup(state, info);
@@ -242,7 +239,7 @@ void LayoutPattern::apply(RenderState& state) const
         rect.h = rect.h * box.h;
     }
 
-    auto ctm = state.matrix * transform;
+    auto ctm = state.transform * transform;
     auto scalex = std::sqrt(ctm.m00 * ctm.m00 + ctm.m01 * ctm.m01);
     auto scaley = std::sqrt(ctm.m10 * ctm.m10 + ctm.m11 * ctm.m11);
 
@@ -251,17 +248,17 @@ void LayoutPattern::apply(RenderState& state) const
 
     RenderState newState(this, RenderMode::Display);
     newState.canvas = Canvas::create(0, 0, width, height);
-    newState.matrix = Transform::scaled(scalex, scaley);
+    newState.transform = Transform::scaled(scalex, scaley);
 
     if(viewBox.valid())
     {
         auto viewTransform = preserveAspectRatio.getMatrix(rect.w, rect.h, viewBox);
-        newState.matrix.premultiply(viewTransform);
+        newState.transform.premultiply(viewTransform);
     }
     else if(contentUnits == Units::ObjectBoundingBox)
     {
         const auto& box = state.objectBoundingBox();
-        newState.matrix.scale(box.w, box.h);
+        newState.transform.scale(box.w, box.h);
     }
 
     auto transform = this->transform;
@@ -284,15 +281,14 @@ LayoutLinearGradient::LayoutLinearGradient()
 
 void LayoutLinearGradient::apply(RenderState& state) const
 {
-    Transform matrix;
+    auto transform = this->transform;
     if(units == Units::ObjectBoundingBox)
     {
         const auto& box = state.objectBoundingBox();
-        matrix.translate(box.x, box.y);
-        matrix.scale(box.w, box.h);
+        transform *= Transform(box.w, 0, 0, box.h, box.x, box.y);
     }
 
-    state.canvas->setLinearGradient(x1, y1, x2, y2, stops, spreadMethod, transform * matrix);
+    state.canvas->setLinearGradient(x1, y1, x2, y2, stops, spreadMethod, transform);
 }
 
 LayoutRadialGradient::LayoutRadialGradient()
@@ -302,15 +298,14 @@ LayoutRadialGradient::LayoutRadialGradient()
 
 void LayoutRadialGradient::apply(RenderState& state) const
 {
-    Transform matrix;
+    auto transform = this->transform;
     if(units == Units::ObjectBoundingBox)
     {
         const auto& box = state.objectBoundingBox();
-        matrix.translate(box.x, box.y);
-        matrix.scale(box.w, box.h);
+        transform *= Transform(box.w, 0, 0, box.h, box.x, box.y);
     }
 
-    state.canvas->setRadialGradient(cx, cy, r, fx, fy, stops, spreadMethod, transform * matrix);
+    state.canvas->setRadialGradient(cx, cy, r, fx, fy, stops, spreadMethod, transform);
 }
 
 LayoutSolidColor::LayoutSolidColor()
@@ -333,7 +328,7 @@ void FillData::fill(RenderState& state, const Path& path) const
     else
         painter->apply(state);
 
-    state.canvas->fill(path, state.matrix, fillRule, BlendMode::Src_Over, opacity);
+    state.canvas->fill(path, state.transform, fillRule, BlendMode::Src_Over, opacity);
 }
 
 void StrokeData::stroke(RenderState& state, const Path& path) const
@@ -346,7 +341,7 @@ void StrokeData::stroke(RenderState& state, const Path& path) const
     else
         painter->apply(state);
 
-    state.canvas->stroke(path, state.matrix, width, cap, join, miterlimit, dash, BlendMode::Src_Over, opacity);
+    state.canvas->stroke(path, state.transform, width, cap, join, miterlimit, dash, BlendMode::Src_Over, opacity);
 }
 
 static const double sqrt2 = 1.41421356237309504880;
@@ -405,7 +400,7 @@ void LayoutShape::render(RenderState& state) const
 
     BlendInfo info{clipper, masker, 1.0, Rect::Invalid};
     RenderState newState(this, state.mode());
-    newState.matrix = transform * state.matrix;
+    newState.transform = transform * state.transform;
     newState.beginGroup(state, info);
 
     if(newState.mode() == RenderMode::Display)
@@ -417,7 +412,7 @@ void LayoutShape::render(RenderState& state) const
     else
     {
         newState.canvas->setColor(Color::Black);
-        newState.canvas->fill(path, newState.matrix, clipRule, BlendMode::Src, 1.0);
+        newState.canvas->fill(path, newState.transform, clipRule, BlendMode::Src, 1.0);
     }
 
     newState.endGroup(state, info);
@@ -461,8 +456,8 @@ void RenderState::beginGroup(RenderState& state, const BlendInfo& info)
         return;
     }
 
-    auto box = matrix.map(m_object->strokeBoundingBox());
-    box.intersect(matrix.map(info.clip));
+    auto box = transform.map(m_object->strokeBoundingBox());
+    box.intersect(transform.map(info.clip));
     box.intersect(state.canvas->box());
     canvas = Canvas::create(box);
 }
@@ -479,7 +474,7 @@ void RenderState::endGroup(RenderState& state, const BlendInfo& info)
         info.masker->apply(*this);
 
     if(info.clip.valid())
-        canvas->mask(info.clip, matrix);
+        canvas->mask(info.clip, transform);
 
     state.canvas->blend(canvas.get(), BlendMode::Src_Over, m_mode == RenderMode::Display ? info.opacity : 1.0);
 }

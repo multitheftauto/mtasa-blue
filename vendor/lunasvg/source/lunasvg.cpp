@@ -1,4 +1,4 @@
-#include "document.h"
+#include "lunasvg.h"
 #include "layoutcontext.h"
 #include "parser.h"
 
@@ -11,14 +11,13 @@ namespace lunasvg {
 struct Bitmap::Impl
 {
     Impl(std::uint8_t* data, std::uint32_t width, std::uint32_t height, std::uint32_t stride);
-    Impl(std::uint32_t width, std::uint32_t height, ColorFormat colorFormat = ColorFormat::BGRA);
+    Impl(std::uint32_t width, std::uint32_t height);
 
     std::unique_ptr<std::uint8_t[]> ownData;
     std::uint8_t* data;
     std::uint32_t width;
     std::uint32_t height;
     std::uint32_t stride;
-    ColorFormat color_format = ColorFormat::BGRA;
 };
 
 Bitmap::Impl::Impl(std::uint8_t* data, std::uint32_t width, std::uint32_t height, std::uint32_t stride)
@@ -26,8 +25,8 @@ Bitmap::Impl::Impl(std::uint8_t* data, std::uint32_t width, std::uint32_t height
 {
 }
 
-Bitmap::Impl::Impl(std::uint32_t width, std::uint32_t height, ColorFormat colorFormat)
-    : ownData(new std::uint8_t[width*height*4]), data(nullptr), width(width), height(height), stride(width * 4), color_format(colorFormat)
+Bitmap::Impl::Impl(std::uint32_t width, std::uint32_t height)
+    : ownData(new std::uint8_t[width*height*4]), data(nullptr), width(width), height(height), stride(width * 4)
 {
 }
 
@@ -40,7 +39,7 @@ Bitmap::Bitmap(std::uint8_t* data, std::uint32_t width, std::uint32_t height, st
 {
 }
 
-Bitmap::Bitmap(std::uint32_t width, std::uint32_t height, ColorFormat colorFormat)
+Bitmap::Bitmap(std::uint32_t width, std::uint32_t height)
     : m_impl(new Impl(width, height))
 {
 }
@@ -73,10 +72,6 @@ std::uint32_t Bitmap::height() const
 std::uint32_t Bitmap::stride() const
 {
     return m_impl ? m_impl->stride : 0;
-}
-
-ColorFormat Bitmap::colorFormat() const {
-    return m_impl ? m_impl->color_format : ColorFormat::BGRA;
 }
 
 bool Bitmap::valid() const
@@ -193,19 +188,17 @@ double Document::height() const
     return root->height;
 }
 
-void Document::render(Bitmap bitmap, const Matrix& matrix, std::uint32_t bgColor) const
+void Document::render(Bitmap bitmap, const Matrix& matrix, std::uint32_t backgroundColor) const
 {
     RenderState state(nullptr, RenderMode::Display);
-    state.matrix = Transform{matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f};
     state.canvas = Canvas::create(bitmap.data(), bitmap.width(), bitmap.height(), bitmap.stride());
-    state.canvas->clear(bgColor);
+    state.transform = Transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
+    state.canvas->clear(backgroundColor);
     root->render(state);
-
-    if (bitmap.colorFormat() == ColorFormat::RGBA)
-        state.canvas->rgba();
+    state.canvas->rgba();
 }
 
-Bitmap Document::renderToBitmap(std::uint32_t width, std::uint32_t height, std::uint32_t bgColor) const
+Bitmap Document::renderToBitmap(std::uint32_t width, std::uint32_t height, std::uint32_t backgroundColor) const
 {
     if(root->width == 0.0 || root->height == 0.0)
         return Bitmap{};
@@ -226,7 +219,7 @@ Bitmap Document::renderToBitmap(std::uint32_t width, std::uint32_t height, std::
 
     Bitmap bitmap{width, height};
     Matrix matrix{width / root->width, 0, 0, height / root->height, 0, 0};
-    render(bitmap, matrix, bgColor);
+    render(bitmap, matrix, backgroundColor);
     return bitmap;
 }
 

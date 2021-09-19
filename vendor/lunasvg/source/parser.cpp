@@ -402,7 +402,7 @@ Rect Parser::parseViewBox(const std::string& string)
             || !Utils::parseNumber(ptr, end, w)
             || !Utils::skipWsComma(ptr, end)
             || !Utils::parseNumber(ptr, end, h))
-        return Rect{};
+        return Rect::Invalid;
 
     if(w < 0.0 || h < 0.0)
         return Rect::Invalid;
@@ -742,11 +742,13 @@ Paint Parser::parsePaint(const std::string& string, const StyledElement* element
     std::string ref;
     if(!Utils::readUntil(ptr, end, ')', ref))
         return defaultValue;
-    Utils::skipWsDelimiter(ptr, end, ')');
+
+    ++ptr;
+    Utils::skipWs(ptr, end);
 
     std::string fallback{ptr, end};
     if(fallback.empty())
-        return Paint{ref, defaultValue};
+        return Paint{ref, Color::Transparent};
     return Paint{ref, parseColor(fallback, element, defaultValue)};
 }
 
@@ -1780,8 +1782,7 @@ bool ParseDocument::parse(const char* data, std::size_t size)
 
     auto remove_comments = [](std::string& value) {
         auto start = value.find("/*");
-        while(start != std::string::npos)
-        {
+        while(start != std::string::npos) {
             auto end = value.find("*/", start + 2);
             value.erase(start, end - start + 2);
             start = value.find("/*");
