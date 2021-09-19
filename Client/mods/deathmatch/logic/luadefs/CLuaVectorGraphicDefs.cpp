@@ -17,6 +17,7 @@ void CLuaVectorGraphicDefs::LoadFunctions()
         {"svgCreate", ArgumentParser<SVGCreate>},
         {"svgGetDocumentXML", ArgumentParser<SVGGetDocumentXML>},
         {"svgSetDocumentXML", ArgumentParser<SVGSetDocumentXML>},
+        {"svgGetSize", ArgumentParser<SVGGetSize>},
     };
 
     // Add functions
@@ -29,8 +30,10 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "svgCreate");
+
     lua_classfunction(luaVM, "getDocumentXML", "svgGetDocumentXML");
     lua_classfunction(luaVM, "setDocumentXML", "svgSetDocumentXML");
+    lua_classfunction(luaVM, "getSize", "svgGetSize");
 
     lua_registerclass(luaVM, "SVG");
 }
@@ -123,4 +126,9 @@ CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(CClientVectorGraphic* pVector
 bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
 {
     return pVectorGraphic->SetDocument(pXMLNode);
+}
+
+CLuaMultiReturn<int, int> CLuaVectorGraphicDefs::SVGGetSize(CClientVectorGraphic* pVectorGraphic)
+{
+    return {(int)pVectorGraphic->GetRenderItem()->m_uiSizeX, (int)pVectorGraphic->GetRenderItem()->m_uiSizeY};
 }
