@@ -253,7 +253,10 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
         SW_FT_UInt contours;
         SW_FT_Stroker_GetCounts(stroker, &points, &contours);
 
-        if ((int)points > 32767)
+        int iPoints = (int)points;
+        int iContours = (int)contours;
+
+        if (iPoints > 32767 || iContours > 32767)
             return;
 
         SW_FT_Outline* strokeOutline = sw_ft_outline_create((int)points, (int)contours);
