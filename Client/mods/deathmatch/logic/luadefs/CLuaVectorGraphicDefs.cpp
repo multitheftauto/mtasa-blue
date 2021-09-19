@@ -137,6 +137,9 @@ CLuaMultiReturn<int, int> CLuaVectorGraphicDefs::SVGGetSize(CClientVectorGraphic
 
 bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int width, int height)
 {
+    if (width <= 0 || height <= 0)
+        throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
+
     CVectorGraphicItem* pVectorGraphicItem = pVectorGraphic->GetRenderItem();
 
     pVectorGraphicItem->Resize(*new CVector2D(width, height));
