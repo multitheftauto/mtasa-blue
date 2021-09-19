@@ -626,9 +626,10 @@ Fail:
 static void ft_stroke_border_export(SW_FT_StrokeBorder border,
                                     SW_FT_Outline*     outline)
 {
+    /** Changed by MTA (memcpy -> memmove) */
     /* copy point locations */
     memmove(outline->points + outline->n_points, border->points,
-           border->num_points * sizeof(SW_FT_Vector));
+           border->num_points * sizeof(SW_FT_Vector)); 
 
     /* copy tags */
     {
@@ -662,6 +663,10 @@ static void ft_stroke_border_export(SW_FT_StrokeBorder border,
     }
 
     outline->n_points = (short)(outline->n_points + border->num_points);
+
+    /* Removed by MTA
+    assert(SW_FT_Outline_Check(outline) == 0);
+    */
 }
 
 /*************************************************************************/
