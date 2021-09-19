@@ -18,6 +18,7 @@ void CLuaVectorGraphicDefs::LoadFunctions()
         {"svgGetDocumentXML", ArgumentParser<SVGGetDocumentXML>},
         {"svgSetDocumentXML", ArgumentParser<SVGSetDocumentXML>},
         {"svgGetSize", ArgumentParser<SVGGetSize>},
+        {"svgSetSize", ArgumentParser<SVGSetSize>},
     };
 
     // Add functions
@@ -34,6 +35,7 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getDocumentXML", "svgGetDocumentXML");
     lua_classfunction(luaVM, "setDocumentXML", "svgSetDocumentXML");
     lua_classfunction(luaVM, "getSize", "svgGetSize");
+    lua_classfunction(luaVM, "setSize", "svgSetSize");
 
     lua_registerclass(luaVM, "SVG");
 }
@@ -131,4 +133,18 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
 CLuaMultiReturn<int, int> CLuaVectorGraphicDefs::SVGGetSize(CClientVectorGraphic* pVectorGraphic)
 {
     return {(int)pVectorGraphic->GetRenderItem()->m_uiSizeX, (int)pVectorGraphic->GetRenderItem()->m_uiSizeY};
+}
+
+bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int width, int height)
+{
+    CVectorGraphicItem* pVectorGraphicItem = pVectorGraphic->GetRenderItem();
+
+    pVectorGraphicItem->Resize(*new CVector2D(width, height));
+
+    if ((int)pVectorGraphicItem->m_uiSizeX != width || (int)pVectorGraphicItem->m_uiSizeY != height)
+        return false; // failed to resize
+
+    pVectorGraphic->GetDisplay()->Update();
+
+    return true;
 }

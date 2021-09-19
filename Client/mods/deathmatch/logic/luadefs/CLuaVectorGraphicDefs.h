@@ -24,4 +24,5 @@ public:
     static bool      SVGSetDocumentXML(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode);
 
     static CLuaMultiReturn<int, int> SVGGetSize(CClientVectorGraphic* pVectorGraphic);
+    static bool                      SVGSetSize(CClientVectorGraphic* pVectorGraphic, int width, int height);
 };
