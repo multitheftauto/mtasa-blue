@@ -73,9 +73,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     [funcRef, pVectorGraphic, &pathOrRawData] {
 
                     lua_State* luaVM = funcRef.GetLuaVM();
-
                     CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                    CResource* pParentResource = pLuaMain->GetResource();
 
                     if (!pLuaMain || !pVectorGraphic)
                         return false;
@@ -236,9 +234,7 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
             [funcRef, pVectorGraphic, pXMLNode] {
 
             lua_State* luaVM = funcRef.GetLuaVM();
-
             CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            CResource* pParentResource = pLuaMain->GetResource();
 
             if (!pLuaMain || !pVectorGraphic)
                 return false;
@@ -282,9 +278,7 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
             [funcRef, pVectorGraphic, pVectorGraphicItem, width, height] {
 
             lua_State* luaVM = funcRef.GetLuaVM();
-
             CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            CResource* pParentResource = pLuaMain->GetResource();
 
             if (!pLuaMain || !pVectorGraphic)
                 return false;
