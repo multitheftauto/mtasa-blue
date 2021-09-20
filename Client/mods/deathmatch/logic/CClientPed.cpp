@@ -300,6 +300,7 @@ CClientPed::~CClientPed()
         m_pClothes->DefaultClothes(true);
         SetCanBeKnockedOffBike(true);
         SetHeadless(false);
+        SetBleeding(false);
     }
     else
     {
@@ -3674,6 +3675,7 @@ void CClientPed::_CreateModel()
         SetHeadless(m_bHeadless);
         SetOnFire(m_bIsOnFire);
         SetSpeechEnabled(m_bSpeechEnabled);
+        SetBleeding(m_bBleeding);
 
         // Rebuild the player if it's CJ. So we get the clothes.
         RebuildModel();
