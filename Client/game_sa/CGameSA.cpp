@@ -603,6 +603,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
 
+    if (!strcmp(szCheatName, PROP_BURN_FLIPPED_CARS))
+        return IsBurnFlippedCarsEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -635,6 +638,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_BURN_FLIPPED_CARS))
+    {
+        SetBurnFlippedCarsEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -651,6 +660,7 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    SetBurnFlippedCarsEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -705,6 +715,32 @@ void CGameSA::SetUnderWorldWarpEnabled(bool bEnable)
 bool CGameSA::IsUnderWorldWarpEnabled()
 {
     return !m_bUnderworldWarp;
+}
+
+void CGameSA::SetBurnFlippedCarsEnabled(bool bEnable)
+{
+    // CAutomobile::VehicleDamage
+    if (bEnable) {
+        BYTE originalCodes[6] = {0xD9, 0x9E, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x6A776B, &originalCodes, 6);
+    } else {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x6A776B, &newCodes, 6);
+    }
+
+    // CPlayerInfo::Process
+    if (bEnable) {
+        BYTE originalCodes[6] = {0xD9, 0x99, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x570E7F, &originalCodes, 6);
+    } else {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x570E7F, &newCodes, 6);
+    }
+}
+
+bool CGameSA::IsBurnFlippedCarsEnabled()
+{
+    return *(unsigned char*)0x6A776B == 0xD9;
 }
 
 bool CGameSA::GetJetpackWeaponEnabled(eWeaponType weaponType)
