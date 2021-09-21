@@ -45,6 +45,9 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     if (size.fX <= 0 || size.fY <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
+    if (size.fX > 4096 || size.fY > 4096)
+        throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
+
     CLuaMain&  pLuaMain = lua_getownercluamain(luaVM);
     CResource* pParentResource = pLuaMain.GetResource();
 
@@ -268,6 +271,9 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
 {
     if (width <= 0 || height <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
+
+   if (width > 4096 || height > 4096)
+        throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
 
     CVectorGraphicItem* pVectorGraphicItem = pVectorGraphic->GetRenderItem();
 
