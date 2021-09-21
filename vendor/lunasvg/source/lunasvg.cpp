@@ -195,7 +195,9 @@ void Document::render(Bitmap bitmap, const Matrix& matrix, std::uint32_t backgro
     state.transform = Transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
     state.canvas->clear(backgroundColor);
     root->render(state);
-    state.canvas->rgba();
+
+    /** Changed by MTA */
+    /* state.canvas->rgba(); // This actually makes it BGRA? */
 }
 
 Bitmap Document::renderToBitmap(std::uint32_t width, std::uint32_t height, std::uint32_t backgroundColor) const
