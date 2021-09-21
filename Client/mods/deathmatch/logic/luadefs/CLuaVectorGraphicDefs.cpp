@@ -143,7 +143,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                                 delete pVectorGraphic;
                                 delete pFile;
 
-                                m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", path));
+                                m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", path.c_str()));
                                 return false;
                             }
                             else
