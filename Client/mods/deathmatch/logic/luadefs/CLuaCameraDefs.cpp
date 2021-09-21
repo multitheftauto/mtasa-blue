@@ -63,7 +63,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getClip", "getCameraClip");
     lua_classfunction(luaVM, "getFarClipDistance", "getFarClipDistance");
     lua_classfunction(luaVM, "getNearClipDistance", "getNearClipDistance");
-    lua_classfunction(luaVM, "getType", GetElementType);
+    lua_classfunction(luaVM, "getType", ArgumentParser<GetElementType>);
 
     lua_classfunction(luaVM, "setPosition", OOP_SetCameraPosition);
     lua_classfunction(luaVM, "setRotation", OOP_SetCameraRotation);
@@ -87,7 +87,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "position", OOP_SetCameraPosition, OOP_GetCameraPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetCameraRotation, OOP_GetCameraRotation);
     lua_classvariable(luaVM, "matrix", NULL, OOP_GetCameraMatrix);
-    lua_classvariable(luaVM, "type", NULL, GetElementType);
+    lua_classvariable(luaVM, "type", NULL, ArgumentParser<GetElementType>);
 
     lua_registerstaticclass(luaVM, "Camera");
 }
@@ -593,9 +593,7 @@ int CLuaCameraDefs::OOP_SetCameraRotation(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::GetElementType(lua_State* luaVM)
+std::string CLuaCameraDefs::GetElementType()
 {
-    const char* szTypeName = m_pManager->GetCamera()->GetTypeName();
-    lua_pushstring(luaVM, szTypeName);
-    return 1;
+    return std::string(m_pManager->GetCamera()->GetTypeName());
 }

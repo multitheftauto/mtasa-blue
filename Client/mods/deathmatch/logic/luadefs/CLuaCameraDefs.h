@@ -30,7 +30,6 @@ public:
     LUA_DECLARE(GetCameraGoggleEffect);
     LUA_DECLARE(GetCameraShakeLevel);
     LUA_DECLARE(GetCameraFieldOfView);
-    LUA_DECLARE(GetElementType);
 
     // Cam set funcs
     LUA_DECLARE(SetCameraMatrix);
@@ -48,4 +47,6 @@ public:
     LUA_DECLARE(OOP_SetCameraPosition);
     LUA_DECLARE(OOP_GetCameraRotation);
     LUA_DECLARE(OOP_SetCameraRotation);
+
+    static std::string GetElementType();
 };
