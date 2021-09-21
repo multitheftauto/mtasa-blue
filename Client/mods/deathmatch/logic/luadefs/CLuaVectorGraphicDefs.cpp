@@ -70,7 +70,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 CLuaFunctionRef funcRef = luaFunctionRef.value();
 
                 CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                    [funcRef, pVectorGraphic, &pathOrRawData] {
+                    [funcRef, pVectorGraphic, strRawData] {
 
                     lua_State* luaVM = funcRef.GetLuaVM();
                     CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -78,7 +78,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     if (!pLuaMain || !pVectorGraphic)
                         return false;
 
-                    if (!pVectorGraphic->LoadFromString(pathOrRawData.value()))
+                    if (!pVectorGraphic->LoadFromString(strRawData))
                     {
                         delete pVectorGraphic;
 
@@ -123,9 +123,10 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
                 {
                     CLuaFunctionRef funcRef = luaFunctionRef.value();
+                    std::string     path = pathOrRawData.value();
 
                     CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                        [funcRef, pFile, pVectorGraphic, &pathOrRawData] {
+                        [funcRef, pFile, pVectorGraphic, path] {
                             lua_State* luaVM = funcRef.GetLuaVM();
 
                             CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -139,7 +140,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                                 delete pVectorGraphic;
                                 delete pFile;
 
-                                m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
+                                m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", path));
                                 return false;
                             }
                             else
