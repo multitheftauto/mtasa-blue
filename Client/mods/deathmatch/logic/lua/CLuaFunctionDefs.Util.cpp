@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <Psapi.h>
 
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
@@ -307,6 +308,18 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::GetProcessMemory(lua_State* luaVM)
+{
+    PROCESS_MEMORY_COUNTERS psmemCounters;
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &psmemCounters, sizeof(psmemCounters)))
+    {
+        lua_pushnumber(luaVM, psmemCounters.WorkingSetSize / 1024LL);
+        return 1;
+    }
     lua_pushboolean(luaVM, false);
     return 1;
 }

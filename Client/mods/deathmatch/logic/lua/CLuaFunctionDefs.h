@@ -105,6 +105,7 @@ public:
     LUA_DECLARE(GetNetworkUsageData);
     LUA_DECLARE(GetNetworkStats);
     LUA_DECLARE(GetPerformanceStats);
+    LUA_DECLARE(GetProcessMemory);
     LUA_DECLARE(AddDebugHook);
     LUA_DECLARE(RemoveDebugHook);
     LUA_DECLARE(GetVersion);

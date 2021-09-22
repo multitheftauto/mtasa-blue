@@ -223,6 +223,7 @@ void CLuaManager::LoadCFunctions()
         {"getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData},
         {"getNetworkStats", CLuaFunctionDefs::GetNetworkStats},
         {"getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats},
+        {"getProcessMemory", CLuaFunctionDefs::GetProcessMemory},
         {"setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode},
         {"getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode},
         {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
