@@ -321,6 +321,11 @@ void CClient::TriggerDiscordJoin(SString strSecret)
     g_pClientGame->TriggerDiscordJoin(strSecret);
 }
 
+void CClient::OnWindowFocusChange(bool state)
+{
+    g_pClientGame->OnWindowFocusChange(state);
+}
+
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
 {
     // Format: "nickname [password]"

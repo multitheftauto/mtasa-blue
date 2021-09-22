@@ -255,6 +255,8 @@ public:
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
+    bool IsWindowFocused() const { return m_bWasFocused; }
+
     // Accessors
 
     CVoiceRecorder*               GetVoiceRecorder() { return m_pVoiceRecorder; };
@@ -439,6 +441,8 @@ public:
     void RestreamWorld();
 
     void TriggerDiscordJoin(SString strSecret);
+
+    void OnWindowFocusChange(bool state);
 
 private:
     // CGUI Callbacks
@@ -772,6 +776,7 @@ private:
     bool m_bBeingDeleted;            // To enable speedy disconnect
 
     bool m_bWasMinimized;
+    bool m_bWasFocused;
 
     // Cache for speeding up collision processing
 public:

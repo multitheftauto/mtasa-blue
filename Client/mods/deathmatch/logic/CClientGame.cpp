@@ -92,6 +92,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
+    m_bWasFocused = g_pCore->IsFocused();
+
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
 
@@ -2563,6 +2565,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
     m_Events.AddEvent("onClientRestore", "", NULL, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "", NULL, false);
 
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
@@ -6541,6 +6544,18 @@ void CClientGame::TriggerDiscordJoin(SString strSecret)
     pBitStream->WriteString<uchar>(strSecret);
     g_pNet->SendPacket(PACKET_ID_DISCORD_JOIN, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT);
     g_pNet->DeallocateNetBitStream(pBitStream);
+}
+
+void CClientGame::OnWindowFocusChange(bool state)
+{
+    if (state == m_bWasFocused)
+        return;
+
+    m_bWasFocused = state;
+
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(state);
+    m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
 }
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)

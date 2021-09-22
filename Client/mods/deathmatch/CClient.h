@@ -34,6 +34,8 @@ public:
 
     void TriggerDiscordJoin(SString strSecret);
 
+    void OnWindowFocusChange(bool state);
+
 private:
     struct InitializeArguments
     {

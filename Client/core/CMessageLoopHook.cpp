@@ -124,15 +124,31 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
     // Alternate alt-tab system
     if (pThis && hwnd == pThis->GetHookedWindowHandle())
     {
-        if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_ACTIVE)
+        if (uMsg == WM_ACTIVATE)
         {
-            GetVideoModeManager()->OnGainFocus();
+            CModManager* pModManager = CModManager::GetSingletonPtr();
+
+            if (pModManager && pModManager->IsLoaded())
+            {
+                CClientBase* pBase = pModManager->GetCurrentMod();
+
+                if (pBase)
+                {
+                    pBase->OnWindowFocusChange(LOWORD(wParam) == WA_ACTIVE);
+                }
+            }
+
+            if (LOWORD(wParam) == WA_ACTIVE)
+            {
+                GetVideoModeManager()->OnGainFocus();
+            }
+            else if (LOWORD(wParam) == WA_INACTIVE)
+            {
+                GetVideoModeManager()->OnLoseFocus();
+                g_pCore->GetKeyBinds()->OnLoseFocus();
+            }
         }
-        if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE)
-        {
-            GetVideoModeManager()->OnLoseFocus();
-            g_pCore->GetKeyBinds()->OnLoseFocus();
-        }
+
         if (uMsg == WM_PAINT)
         {
             GetVideoModeManager()->OnPaint();
