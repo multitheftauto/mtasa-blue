@@ -124,7 +124,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
     // Alternate alt-tab system
     if (pThis && hwnd == pThis->GetHookedWindowHandle())
     {
-        if (uMsg == WM_ACTIVATE || uMsg == WM_USERCHANGED)
+        if (uMsg == WM_ACTIVATE)
         {
             CModManager* pModManager = CModManager::GetSingletonPtr();
 
