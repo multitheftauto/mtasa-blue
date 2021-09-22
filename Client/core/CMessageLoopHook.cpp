@@ -140,10 +140,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     pBase->OnWindowFocusChange(focus);
                 }
             }
-        }
 
-        if (uMsg == WM_ACTIVATE)
-        {
             if (LOWORD(wParam) == WA_ACTIVE)
             {
                 GetVideoModeManager()->OnGainFocus();
