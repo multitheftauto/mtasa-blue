@@ -2565,7 +2565,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
     m_Events.AddEvent("onClientRestore", "", NULL, false);
-    m_Events.AddEvent("onClientMTAFocusChange", "", NULL, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "focused", NULL, false);
 
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
