@@ -10,8 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-#include "CLuaFunctionDefs.h"
+#include "luadefs/CLuaFunctionDefs.h"
 #include <clocale>
 
 static CLuaManager* m_pLuaManager;
@@ -167,12 +166,12 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM()
+void CLuaMain::Initialize()
 {
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open();
+    m_luaVM = lua_open(this);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
@@ -207,11 +206,18 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceRootElement());
     lua_setglobal(m_luaVM, "resourceRoot");
+}
 
-    // Load pre-loaded lua scripts
+void CLuaMain::LoadEmbeddedScripts()
+{
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+}
+
+void CLuaMain::RegisterModuleFunctions()
+{
+    m_pLuaManager->GetLuaModuleManager()->RegisterFunctions(m_luaVM);
 }
 
 // Special function(s) that are only visible to HTMLD scripts

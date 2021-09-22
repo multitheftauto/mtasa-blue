@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaVector3Defs::AddClass(lua_State* luaVM)
 {
@@ -33,6 +34,7 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "normalize", Normalize);
     lua_classfunction(luaVM, "cross", Cross);
     lua_classfunction(luaVM, "dot", Dot);
+    lua_classfunction(luaVM, "intersectsSegmentTriangle", ArgumentParser<IntersectsSegmentTriangle>);
 
     lua_classfunction(luaVM, "getLength", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", GetLengthSquared);
@@ -58,6 +60,8 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "normalize", "", Normalize);
     lua_classfunction(luaVM, "cross", "", Cross);
     lua_classfunction(luaVM, "dot", "", Dot);
+    lua_classfunction(luaVM, "intersectsSegmentTriangle", "", ArgumentParser<IntersectsSegmentTriangle>);
+
 
     lua_classfunction(luaVM, "getLength", "", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", "", GetLengthSquared);
@@ -479,6 +483,15 @@ int CLuaVector3Defs::GetZ(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CVector, bool> CLuaVector3Defs::IntersectsSegmentTriangle(
+    CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2)
+{
+    CVector intersectionPoint;
+    if (origin.IntersectsSegmentTriangle(segmentDir, triVert0, triVert1, triVert2, &intersectionPoint))
+        return intersectionPoint;
+    return false;
 }
 
 int CLuaVector3Defs::Add(lua_State* luaVM)

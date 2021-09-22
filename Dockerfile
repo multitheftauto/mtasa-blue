@@ -14,8 +14,9 @@ USER root
 RUN dpkg --add-architecture i386 && apt-get update && \
     apt-get install -y software-properties-common wget ca-certificates git build-essential \
         gcc-multilib g++-multilib gcc-10-multilib g++-10-multilib curl subversion ncftp \
-        libncursesw5-dev libmysqlclient-dev \
-        lib32ncursesw5-dev libncursesw5-dev:i386 
+        libncurses-dev libncursesw5 \
+        libncurses-dev:i386 libncursesw5:i386 \
+        libmysqlclient-dev
 
 # Set build directory
 VOLUME /build
@@ -24,7 +25,7 @@ WORKDIR /build
 # Copy entrypoint script
 COPY utils/docker-entrypoint.sh /docker-entrypoint.sh
 
-# Add GLIB compat
+# Add GLIB compat 
 COPY utils/compat /compat
 
 # Set entrypoint

@@ -800,7 +800,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pZoneNames = new CZoneNames;
 
     CStaticFunctionDefinitions(this);
-    CLuaFunctionDefs::Initialize(m_pLuaManager, this);
     CLuaDefs::Initialize(this);
 
     m_pPlayerManager->SetScriptDebugging(m_pScriptDebugging);
@@ -1206,6 +1205,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_RESOURCE_START:
+        {
+            Packet_PlayerResourceStart(static_cast<CPlayerResourceStartPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1493,7 +1498,7 @@ void CGame::AddBuiltInEvents()
 
     // Player events
     m_Events.AddEvent("onPlayerConnect", "player", NULL, false);
-    m_Events.AddEvent("onPlayerChat", "text", NULL, false);
+    m_Events.AddEvent("onPlayerChat", "text, messageType", NULL, false);
     m_Events.AddEvent("onPlayerDamage", "attacker, weapon, bodypart, loss", NULL, false);
     m_Events.AddEvent("onPlayerVehicleEnter", "vehicle, seat, jacked", NULL, false);
     m_Events.AddEvent("onPlayerVehicleExit", "vehicle, reason, jacker", NULL, false);
@@ -1524,6 +1529,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
+    m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1541,6 +1547,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
@@ -2491,7 +2498,7 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 pElement->CallEvent(szName, *pArguments, pCaller);
             }
             else
-                m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotly triggerable",
+                m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotely triggerable",
                                              pCaller->GetNick(), szName);
         }
         else
@@ -2623,17 +2630,23 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                             case 7:             // EXP_TYPE_HELI
                             case 12:            // EXP_TYPE_TINY - RC Vehicles
                             {
-                                CVehicle* pVehicle = static_cast<CVehicle*>(pOrigin);
-                                // Is this vehicle not already blown?
-                                if (pVehicle->GetIsBlown() == false)
+                                CVehicle*        vehicle = static_cast<CVehicle*>(pOrigin);
+                                VehicleBlowState previousBlowState = vehicle->GetBlowState();
+
+                                if (previousBlowState != VehicleBlowState::BLOWN)
                                 {
-                                    pVehicle->SetIsBlown(true);
-                                    pVehicle->SetEngineOn(false);
+                                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                    vehicle->SetEngineOn(false);
 
-                                    CLuaArguments Arguments;
-                                    pVehicle->CallEvent("onVehicleExplode", Arguments);
+                                    // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
+                                    if (previousBlowState == VehicleBlowState::INTACT)
+                                    {
+                                        CLuaArguments arguments;
+                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                        vehicle->CallEvent("onVehicleExplode", arguments);
+                                    }
 
-                                    bBroadcast = pVehicle->GetIsBlown() && !pVehicle->IsBeingDeleted();
+                                    bBroadcast = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
                                 }
                                 else
                                 {
@@ -2828,7 +2841,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                     }
                 }
 
-                // Check we have a valid ped & he is spawned
+                // Check we have a valid ped
                 if (bValidPed)
                 {
                     // Handle it depending on the action
@@ -2850,6 +2863,13 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 FAIL_ACTION,
                                 FAIL_TRAILER,
                             } failReason = FAIL_INVALID;
+
+                            // Is he spawned? (Fix for #2335)
+                            if (!pPed->IsSpawned()) {
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                                pPlayer->Send(Reply);
+                                break;
+                            }
 
                             // Is this vehicle enterable? (not a trailer)
                             unsigned short usVehicleModel = pVehicle->GetModel();
@@ -3995,6 +4015,21 @@ void CGame::Packet_DiscordJoin(CDiscordJoinPacket& Packet)
         Arguments.PushBoolean(false);
         Arguments.PushString(Packet.GetSecret());
         pPlayer->CallEvent("onPlayerDiscordJoin", Arguments, NULL);
+    }
+}
+
+void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (pPlayer)
+    {
+        CResource* pResource = Packet.GetResource();
+        if (pResource)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushResource(pResource);
+            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
+        }
     }
 }
 

@@ -461,6 +461,18 @@ enum class eBitStreamVersion : unsigned short
     // 2021-01-16 0x72
     SetColPolygonHeight,
 
+    // Support for vehicle blow without explosion and blow state synchronisation
+    // 2021-02-26 0x73
+    VehicleBlowStateSupport,
+
+    // Implement messageType parameter to onClientChatMessage (#1020)
+    // 2021-05-15 0x74
+    OnClientChatMessage_MessageType,
+    
+    // Add serverside event "onPlayerResourceStart" (#2150)
+    // 2021-08-30 0x75
+    OnPlayerResourceStart,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

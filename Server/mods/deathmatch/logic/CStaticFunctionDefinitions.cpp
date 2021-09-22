@@ -11,7 +11,8 @@
 
 #include "StdInc.h"
 
-extern CGame* g_pGame;
+extern CGame*            g_pGame;
+extern CTimeUsMarker<20> markerLatentEvent;
 
 static CLuaManager*          m_pLuaManager;
 static CColManager*          m_pColManager;
@@ -5255,9 +5256,9 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
         pVehicle->GenerateSyncTimeContext();
 
         // Repair it
+        pVehicle->SetBlowState(VehicleBlowState::INTACT);
         pVehicle->SetHealth(DEFAULT_VEHICLE_HEALTH);
         pVehicle->ResetDoorsWheelsPanelsLights();
-        pVehicle->SetIsBlown(false);
 
         // Tell everyone
         CBitStream BitStream;
@@ -5270,25 +5271,27 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
+bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<bool> withExplosion)
 {
-    RUN_CHILDREN(BlowVehicle(*iter))
+    RUN_CHILDREN(BlowVehicle(*iter, withExplosion))
 
     if (!IS_VEHICLE(pElement))
         return false;
 
     CVehicle* vehicle = static_cast<CVehicle*>(pElement);
 
-    if (vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+    if (vehicle->IsBlown() || vehicle->IsBeingDeleted())
         return false;
 
-    vehicle->SetIsBlown(true);
+    bool createExplosion = withExplosion.value_or(true);
+    vehicle->SetBlowState(createExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
 
-    CLuaArguments Arguments;
-    vehicle->CallEvent("onVehicleExplode", Arguments);
+    CLuaArguments arguments;
+    arguments.PushBoolean(createExplosion);            // withExplosion
+    vehicle->CallEvent("onVehicleExplode", arguments);
 
     // Abort if vehicle got fixed or destroyed
-    if (!vehicle->GetIsBlown() || vehicle->IsBeingDeleted())
+    if (!vehicle->IsBlown() || vehicle->IsBeingDeleted())
         return true;
 
     vehicle->SetHealth(0.0f);
@@ -5296,6 +5299,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
+    BitStream.pBitStream->WriteBit(createExplosion);            // only consumed by clients with at least eBitStreamVersion::VehicleBlowStateSupport
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
     return true;
 }
@@ -6761,9 +6765,8 @@ bool CStaticFunctionDefinitions::ResetVehicleExplosionTime(CElement* pElement)
 
     if (IS_VEHICLE(pElement))
     {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-        pVehicle->SetIsBlown(false);
-
+        CVehicle* vehicle = static_cast<CVehicle*>(pElement);
+        vehicle->ResetExplosionTimer();
         return true;
     }
 
@@ -10062,22 +10065,19 @@ void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::ve
     CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
-bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+void CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
 {
     assert(pElement);
-
     RUN_CHILDREN(ClearChatBox(*iter))
 
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CChatClearPacket());
-        return true;
     }
-    return false;
 }
 
-bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
+void CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
 {
     assert(pElement);
     assert(szText);
@@ -10087,10 +10087,7 @@ bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pEl
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CConsoleEchoPacket(szText));
-        return true;
     }
-
-    return false;
 }
 
 bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, bool bSave)
@@ -10101,6 +10098,7 @@ bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, b
             CLogger::LogPrintf("Server password set to '%s'\n", *strPassword);
         else
             CLogger::LogPrintf("Server password cleared\n");
+
         return true;
     }
 
@@ -11895,10 +11893,10 @@ bool CStaticFunctionDefinitions::ShowCursor(CElement* pElement, CLuaMain* pLuaMa
     return false;
 }
 
-bool CStaticFunctionDefinitions::ShowChat(CElement* pElement, bool bShow)
+bool CStaticFunctionDefinitions::ShowChat(CElement* pElement, bool bShow, bool bInputBlocked)
 {
     assert(pElement);
-    RUN_CHILDREN(ShowChat(*iter, bShow))
+    RUN_CHILDREN(ShowChat(*iter, bShow, bInputBlocked))
 
     if (IS_PLAYER(pElement))
     {
@@ -11907,6 +11905,7 @@ bool CStaticFunctionDefinitions::ShowChat(CElement* pElement, bool bShow)
         // Get him to show/hide the cursor
         CBitStream BitStream;
         BitStream.pBitStream->Write(static_cast<unsigned char>((bShow) ? 1 : 0));
+        BitStream.pBitStream->Write(static_cast<unsigned char>((bInputBlocked) ? 1 : 0));
         pPlayer->Send(CLuaPacket(SHOW_CHAT, *BitStream.pBitStream));
 
         return true;

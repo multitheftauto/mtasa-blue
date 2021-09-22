@@ -111,7 +111,7 @@ tcpkeepalive(struct Curl_easy *data,
   /* only set IDLE and INTVL if setting KEEPALIVE is successful */
   if(setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE,
         (void *)&optval, sizeof(optval)) < 0) {
-    infof(data, "Failed to set SO_KEEPALIVE on fd %d\n", sockfd);
+    infof(data, "Failed to set SO_KEEPALIVE on fd %d", sockfd);
   }
   else {
 #if defined(SIO_KEEPALIVE_VALS)
@@ -126,7 +126,7 @@ tcpkeepalive(struct Curl_easy *data,
     vals.keepaliveinterval = optval;
     if(WSAIoctl(sockfd, SIO_KEEPALIVE_VALS, (LPVOID) &vals, sizeof(vals),
                 NULL, 0, &dummy, NULL, NULL) != 0) {
-      infof(data, "Failed to set SIO_KEEPALIVE_VALS on fd %d: %d\n",
+      infof(data, "Failed to set SIO_KEEPALIVE_VALS on fd %d: %d",
             (int)sockfd, WSAGetLastError());
     }
 #else
@@ -135,7 +135,7 @@ tcpkeepalive(struct Curl_easy *data,
     KEEPALIVE_FACTOR(optval);
     if(setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPIDLE,
           (void *)&optval, sizeof(optval)) < 0) {
-      infof(data, "Failed to set TCP_KEEPIDLE on fd %d\n", sockfd);
+      infof(data, "Failed to set TCP_KEEPIDLE on fd %d", sockfd);
     }
 #endif
 #ifdef TCP_KEEPINTVL
@@ -143,7 +143,7 @@ tcpkeepalive(struct Curl_easy *data,
     KEEPALIVE_FACTOR(optval);
     if(setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPINTVL,
           (void *)&optval, sizeof(optval)) < 0) {
-      infof(data, "Failed to set TCP_KEEPINTVL on fd %d\n", sockfd);
+      infof(data, "Failed to set TCP_KEEPINTVL on fd %d", sockfd);
     }
 #endif
 #ifdef TCP_KEEPALIVE
@@ -152,7 +152,7 @@ tcpkeepalive(struct Curl_easy *data,
     KEEPALIVE_FACTOR(optval);
     if(setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPALIVE,
           (void *)&optval, sizeof(optval)) < 0) {
-      infof(data, "Failed to set TCP_KEEPALIVE on fd %d\n", sockfd);
+      infof(data, "Failed to set TCP_KEEPALIVE on fd %d", sockfd);
     }
 #endif
 #endif
@@ -171,65 +171,63 @@ singleipconnect(struct Curl_easy *data,
  * infinite time left). If the value is negative, the timeout time has already
  * elapsed.
  *
- * The start time is stored in progress.t_startsingle - as set with
- * Curl_pgrsTime(..., TIMER_STARTSINGLE);
- *
  * If 'nowp' is non-NULL, it points to the current time.
  * 'duringconnect' is FALSE if not during a connect, as then of course the
  * connect timeout is not taken into account!
  *
  * @unittest: 1303
  */
+
+#define TIMEOUT_CONNECT 1
+#define TIMEOUT_MAXTIME 2
+
 timediff_t Curl_timeleft(struct Curl_easy *data,
                          struct curltime *nowp,
                          bool duringconnect)
 {
-  int timeout_set = 0;
-  timediff_t timeout_ms = duringconnect?DEFAULT_CONNECT_TIMEOUT:0;
+  unsigned int timeout_set = 0;
+  timediff_t connect_timeout_ms = 0;
+  timediff_t maxtime_timeout_ms = 0;
+  timediff_t timeout_ms = 0;
   struct curltime now;
 
-  /* if a timeout is set, use the most restrictive one */
+  /* The duration of a connect and the total transfer are calculated from two
+     different time-stamps. It can end up with the total timeout being reached
+     before the connect timeout expires and we must acknowledge whichever
+     timeout that is reached first. The total timeout is set per entire
+     operation, while the connect timeout is set per connect. */
 
-  if(data->set.timeout > 0)
-    timeout_set |= 1;
-  if(duringconnect && (data->set.connecttimeout > 0))
-    timeout_set |= 2;
-
-  switch(timeout_set) {
-  case 1:
-    timeout_ms = data->set.timeout;
-    break;
-  case 2:
-    timeout_ms = data->set.connecttimeout;
-    break;
-  case 3:
-    if(data->set.timeout < data->set.connecttimeout)
-      timeout_ms = data->set.timeout;
-    else
-      timeout_ms = data->set.connecttimeout;
-    break;
-  default:
-    /* use the default */
-    if(!duringconnect)
-      /* if we're not during connect, there's no default timeout so if we're
-         at zero we better just return zero and not make it a negative number
-         by the math below */
-      return 0;
-    break;
+  if(data->set.timeout > 0) {
+    timeout_set = TIMEOUT_MAXTIME;
+    maxtime_timeout_ms = data->set.timeout;
   }
+  if(duringconnect) {
+    timeout_set |= TIMEOUT_CONNECT;
+    connect_timeout_ms = (data->set.connecttimeout > 0) ?
+      data->set.connecttimeout : DEFAULT_CONNECT_TIMEOUT;
+  }
+  if(!timeout_set)
+    /* no timeout  */
+    return 0;
 
   if(!nowp) {
     now = Curl_now();
     nowp = &now;
   }
 
-  /* subtract elapsed time */
-  if(duringconnect)
-    /* since this most recent connect started */
-    timeout_ms -= Curl_timediff(*nowp, data->progress.t_startsingle);
-  else
-    /* since the entire operation started */
-    timeout_ms -= Curl_timediff(*nowp, data->progress.t_startop);
+  if(timeout_set & TIMEOUT_MAXTIME) {
+    maxtime_timeout_ms -= Curl_timediff(*nowp, data->progress.t_startop);
+    timeout_ms = maxtime_timeout_ms;
+  }
+
+  if(timeout_set & TIMEOUT_CONNECT) {
+    connect_timeout_ms -= Curl_timediff(*nowp, data->progress.t_startsingle);
+
+    if(!(timeout_set & TIMEOUT_MAXTIME) ||
+       (connect_timeout_ms < maxtime_timeout_ms))
+      timeout_ms = connect_timeout_ms;
+  }
+
   if(!timeout_ms)
     /* avoid returning 0 as that means no timeout! */
     return -1;
@@ -333,7 +331,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
           /*
            * We now have the numerical IP address in the 'myhost' buffer
            */
-          infof(data, "Local Interface %s is ip %s using address family %i\n",
+          infof(data, "Local Interface %s is ip %s using address family %i",
                 dev, myhost, af);
           done = 1;
           break;
@@ -366,7 +364,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
       if(h) {
         /* convert the resolved address, sizeof myhost >= INET_ADDRSTRLEN */
         Curl_printable_address(h->addr, myhost, sizeof(myhost));
-        infof(data, "Name '%s' family %i resolved to '%s' family %i\n",
+        infof(data, "Name '%s' family %i resolved to '%s' family %i",
               dev, af, myhost, h->addr->ai_family);
         Curl_resolv_unlock(data, h);
         if(af != h->addr->ai_family) {
@@ -460,13 +458,13 @@ static CURLcode bindlocal(struct Curl_easy *data,
               error, Curl_strerror(error, buffer, sizeof(buffer)));
         return CURLE_INTERFACE_FAILED;
       }
-      infof(data, "Local port: %hu\n", port);
+      infof(data, "Local port: %hu", port);
       conn->bits.bound = TRUE;
       return CURLE_OK;
     }
 
     if(--portnum > 0) {
-      infof(data, "Bind to local port %hu failed, trying next\n", port);
+      infof(data, "Bind to local port %hu failed, trying next", port);
       port++; /* try next port */
       /* We re-use/clobber the port variable here below */
       if(sock->sa_family == AF_INET)
@@ -591,12 +589,10 @@ static CURLcode trynextip(struct Curl_easy *data,
     struct Curl_addrinfo *ai = conn->tempaddr[tempindex];
 
     while(ai) {
-      if(ai) {
-        result = singleipconnect(data, conn, ai, tempindex);
-        if(result == CURLE_COULDNT_CONNECT) {
-          ai = ainext(conn, tempindex, TRUE);
-          continue;
-        }
+      result = singleipconnect(data, conn, ai, tempindex);
+      if(result == CURLE_COULDNT_CONNECT) {
+        ai = ainext(conn, tempindex, TRUE);
+        continue;
       }
       break;
     }
@@ -611,7 +607,7 @@ static CURLcode trynextip(struct Curl_easy *data,
 /* Copies connection info into the transfer handle to make it available when
    the transfer handle is no longer associated with the connection. */
 void Curl_persistconninfo(struct Curl_easy *data, struct connectdata *conn,
-                          char *local_ip, long local_port)
+                          char *local_ip, int local_port)
 {
   memcpy(data->info.conn_primary_ip, conn->primary_ip, MAX_IPADR_LEN);
   if(local_ip && local_ip[0])
@@ -627,7 +623,7 @@ void Curl_persistconninfo(struct Curl_easy *data, struct connectdata *conn,
 /* retrieves ip address and port from a sockaddr structure.
    note it calls Curl_inet_ntop which sets errno on fail, not SOCKERRNO. */
 bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
-                      char *addr, long *port)
+                      char *addr, int *port)
 {
   struct sockaddr_in *si = NULL;
 #ifdef ENABLE_IPV6
@@ -662,7 +658,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
 #endif
 #if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
     case AF_UNIX:
-      if(salen > (curl_socklen_t)sizeof(sa_family_t)) {
+      if(salen > (curl_socklen_t)sizeof(CURL_SA_FAMILY_T)) {
         su = (struct sockaddr_un*)sa;
         msnprintf(addr, MAX_IPADR_LEN, "%s", su->sun_path);
       }
@@ -690,7 +686,7 @@ void Curl_conninfo_remote(struct Curl_easy *data,
   char buffer[STRERROR_LEN];
   struct Curl_sockaddr_storage ssrem;
   curl_socklen_t plen;
-  long port;
+  int port;
   plen = sizeof(struct Curl_sockaddr_storage);
   memset(&ssrem, 0, sizeof(ssrem));
   if(getpeername(sockfd, (struct sockaddr*) &ssrem, &plen)) {
@@ -715,7 +711,7 @@ void Curl_conninfo_remote(struct Curl_easy *data,
 /* retrieves the start/end point information of a socket of an established
    connection */
 void Curl_conninfo_local(struct Curl_easy *data, curl_socket_t sockfd,
-                         char *local_ip, long *local_port)
+                         char *local_ip, int *local_port)
 {
 #ifdef HAVE_GETSOCKNAME
   char buffer[STRERROR_LEN];
@@ -752,13 +748,12 @@ void Curl_updateconninfo(struct Curl_easy *data, struct connectdata *conn,
      ip address and port number whenever an outgoing connection is
      **established** from the primary socket to a remote address. */
   char local_ip[MAX_IPADR_LEN] = "";
-  long local_port = -1;
+  int local_port = -1;
 
   if(conn->transport == TRNSPRT_TCP) {
-    if(!conn->bits.reuse && !conn->bits.tcp_fastopen) {
+    if(!conn->bits.reuse && !conn->bits.tcp_fastopen)
       Curl_conninfo_remote(data, conn, sockfd);
-      Curl_conninfo_local(data, sockfd, local_ip, &local_port);
-    }
+    Curl_conninfo_local(data, sockfd, local_ip, &local_port);
   } /* end of TCP-only section */
 
   /* persist connection info in session handle */
@@ -874,15 +869,6 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
 
   now = Curl_now();
 
-  /* figure out how long time we have left to connect */
-  allow = Curl_timeleft(data, &now, TRUE);
-
-  if(allow < 0) {
-    /* time-out, bail out, go home */
-    failf(data, "Connection time-out");
-    return CURLE_OPERATION_TIMEDOUT;
-  }
-
   if(SOCKS_STATE(conn->cnnct.state)) {
     /* still doing SOCKS */
     result = connect_SOCKS(data, sockindex, connected);
@@ -908,8 +894,10 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
         connkeep(conn, "HTTP/3 default");
         return CURLE_OK;
       }
-      if(result)
+      if(result) {
+        conn->tempsock[i] = CURL_SOCKET_BAD;
         error = SOCKERRNO;
+      }
     }
     else
 #endif
@@ -930,7 +918,7 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
       if(Curl_timediff(now, conn->connecttime) >=
          conn->timeoutms_per_addr[i]) {
         infof(data, "After %" CURL_FORMAT_TIMEDIFF_T
-              "ms connect time, move on!\n", conn->timeoutms_per_addr[i]);
+              "ms connect time, move on!", conn->timeoutms_per_addr[i]);
         error = ETIMEDOUT;
       }
 
@@ -989,11 +977,12 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
         char buffer[STRERROR_LEN];
         Curl_printable_address(conn->tempaddr[i], ipaddress,
                                sizeof(ipaddress));
-        infof(data, "connect to %s port %ld failed: %s\n",
+        infof(data, "connect to %s port %u failed: %s",
               ipaddress, conn->port,
               Curl_strerror(error, buffer, sizeof(buffer)));
 #endif
 
+        allow = Curl_timeleft(data, &now, TRUE);
         conn->timeoutms_per_addr[i] = conn->tempaddr[i]->ai_next == NULL ?
           allow : allow / 2;
         ainext(conn, i, TRUE);
@@ -1004,6 +993,21 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
           result = status;
       }
     }
+  }
+
+  /*
+   * Now that we've checked whether we are connected, check whether we've
+   * already timed out.
+   *
+   * First figure out how long time we have left to connect */
+
+  allow = Curl_timeleft(data, &now, TRUE);
+
+  if(allow < 0) {
+    /* time-out, bail out, go home */
+    failf(data, "Connection timeout after %ld ms",
+          Curl_timediff(now, data->progress.t_startsingle));
+    return CURLE_OPERATION_TIMEDOUT;
   }
 
   if(result &&
@@ -1031,9 +1035,11 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
     else
       hostname = conn->host.name;
 
-    failf(data, "Failed to connect to %s port %ld: %s",
-          hostname, conn->port,
-          Curl_strerror(error, buffer, sizeof(buffer)));
+    failf(data, "Failed to connect to %s port %u after "
+                "%" CURL_FORMAT_TIMEDIFF_T " ms: %s",
+        hostname, conn->port,
+        Curl_timediff(now, data->progress.t_startsingle),
+        Curl_strerror(error, buffer, sizeof(buffer)));
 
     Curl_quic_disconnect(data, conn, 0);
     Curl_quic_disconnect(data, conn, 1);
@@ -1065,7 +1071,7 @@ static void tcpnodelay(struct Curl_easy *data, curl_socket_t sockfd)
 
   if(setsockopt(sockfd, level, TCP_NODELAY, (void *)&onoff,
                 sizeof(onoff)) < 0)
-    infof(data, "Could not set TCP_NODELAY: %s\n",
+    infof(data, "Could not set TCP_NODELAY: %s",
           Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
 #else
   (void)data;
@@ -1084,9 +1090,11 @@ static void nosigpipe(struct Curl_easy *data,
   int onoff = 1;
   if(setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&onoff,
                 sizeof(onoff)) < 0) {
+#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
     char buffer[STRERROR_LEN];
-    infof(data, "Could not set SO_NOSIGPIPE: %s\n",
+    infof(data, "Could not set SO_NOSIGPIPE: %s",
           Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
+#endif
   }
 }
 #else
@@ -1158,7 +1166,7 @@ static CURLcode singleipconnect(struct Curl_easy *data,
   curl_socket_t sockfd;
   CURLcode result;
   char ipaddress[MAX_IPADR_LEN];
-  long port;
+  int port;
   bool is_tcp;
 #ifdef TCP_FASTOPEN_CONNECT
   int optval = 1;
@@ -1180,7 +1188,7 @@ static CURLcode singleipconnect(struct Curl_easy *data,
     Curl_closesocket(data, conn, sockfd);
     return CURLE_OK;
   }
-  infof(data, "  Trying %s:%ld...\n", ipaddress, port);
+  infof(data, "  Trying %s:%d...", ipaddress, port);
 
 #ifdef ENABLE_IPV6
   is_tcp = (addr.family == AF_INET || addr.family == AF_INET6) &&
@@ -1271,7 +1279,7 @@ static CURLcode singleipconnect(struct Curl_easy *data,
 #elif defined(TCP_FASTOPEN_CONNECT) /* Linux >= 4.11 */
       if(setsockopt(sockfd, IPPROTO_TCP, TCP_FASTOPEN_CONNECT,
                     (void *)&optval, sizeof(optval)) < 0)
-        infof(data, "Failed to enable TCP Fast Open on fd %d\n", sockfd);
+        infof(data, "Failed to enable TCP Fast Open on fd %d", sockfd);
 
       rc = connect(sockfd, &addr.sa_addr, addr.addrlen);
 #elif defined(MSG_FASTOPEN) /* old Linux */
@@ -1321,7 +1329,7 @@ static CURLcode singleipconnect(struct Curl_easy *data,
 
     default:
       /* unknown error, fallthrough and try another address! */
-      infof(data, "Immediate connect fail for %s: %s\n",
+      infof(data, "Immediate connect fail for %s: %s",
             ipaddress, Curl_strerror(error, buffer, sizeof(buffer)));
       data->state.os_errno = error;
 
@@ -1367,17 +1375,34 @@ CURLcode Curl_connecthost(struct Curl_easy *data,
   conn->timeoutms_per_addr[1] =
     conn->tempaddr[1]->ai_next == NULL ? timeout_ms : timeout_ms / 2;
 
-  conn->tempfamily[0] = conn->tempaddr[0]?
-    conn->tempaddr[0]->ai_family:0;
+  if(conn->ip_version == CURL_IPRESOLVE_WHATEVER) {
+    /* any IP version is allowed */
+    conn->tempfamily[0] = conn->tempaddr[0]?
+      conn->tempaddr[0]->ai_family:0;
 #ifdef ENABLE_IPV6
-  conn->tempfamily[1] = conn->tempfamily[0] == AF_INET6 ?
-    AF_INET : AF_INET6;
+    conn->tempfamily[1] = conn->tempfamily[0] == AF_INET6 ?
+      AF_INET : AF_INET6;
 #else
-  conn->tempfamily[1] = AF_UNSPEC;
+    conn->tempfamily[1] = AF_UNSPEC;
 #endif
+  }
+  else {
+    /* only one IP version is allowed */
+    conn->tempfamily[0] = (conn->ip_version == CURL_IPRESOLVE_V4) ?
+      AF_INET :
+#ifdef ENABLE_IPV6
+      AF_INET6;
+#else
+      AF_UNSPEC;
+#endif
+    conn->tempfamily[1] = AF_UNSPEC;
+
+    ainext(conn, 0, FALSE); /* find first address of the right type */
+  }
+
   ainext(conn, 1, FALSE); /* assigns conn->tempaddr[1] accordingly */
 
-  DEBUGF(infof(data, "family0 == %s, family1 == %s\n",
+  DEBUGF(infof(data, "family0 == %s, family1 == %s",
                conn->tempfamily[0] == AF_INET ? "v4" : "v6",
                conn->tempfamily[1] == AF_INET ? "v4" : "v6"));
 
@@ -1448,11 +1473,9 @@ curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
     }
 
     c = find.found;
-    if(connp) {
+    if(connp)
       /* only store this if the caller cares for it */
       *connp = c;
-      c->data = data;
-    }
     return c->sock[FIRSTSOCKET];
   }
   return CURL_SOCKET_BAD;

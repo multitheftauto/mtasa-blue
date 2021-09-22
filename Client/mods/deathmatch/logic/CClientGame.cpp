@@ -2465,6 +2465,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
+    m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2550,7 +2551,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
 
     // Chat events
-    m_Events.AddEvent("onClientChatMessage", "test, r, g, b", NULL, false);
+    m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", NULL, false);
 
     // Debug events
     m_Events.AddEvent("onClientDebugMessage", "message, level, file, line", NULL, false);
@@ -5079,6 +5080,22 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
             pBitStream->WriteBit(true);
             pBitStream->Write(pOrigin->GetID());
 
+            // Because we use this packet to notify the server of blown vehicles,
+            // we include a bit, whether the vehicle was blown without an explosion
+            if (pBitStream->Can(eBitStreamVersion::VehicleBlowStateSupport))
+            {
+                if (pOrigin->GetType() == CCLIENTVEHICLE)
+                {
+                    auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
+                    pBitStream->WriteBit(1);
+                    pBitStream->WriteBit(vehicle->GetBlowState() == VehicleBlowState::BLOWN);
+                }
+                else
+                {
+                    pBitStream->WriteBit(0);
+                }
+            }
+            
             // Convert position
             CVector vecTemp;
             pOrigin->GetPosition(vecTemp);

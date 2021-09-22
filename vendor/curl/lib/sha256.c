@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2017, Florin Petriuc, <petriuc.florin@gmail.com>
- * Copyright (C) 2018 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2018 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -42,19 +42,19 @@
 #ifdef USE_MBEDTLS
 #include <mbedtls/version.h>
 
-#if(MBEDTLS_VERSION_NUMBER >= 0x02070000)
-  #define HAS_RESULT_CODE_BASED_FUNCTIONS
+#if(MBEDTLS_VERSION_NUMBER >= 0x02070000) && \
+   (MBEDTLS_VERSION_NUMBER < 0x03000000)
+  #define HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
 #endif
 #endif /* USE_MBEDTLS */
 
 /* Please keep the SSL backend-specific #if branches in this order:
  *
  * 1. USE_OPENSSL
- * 2. USE_GNUTLS_NETTLE
- * 3. USE_GNUTLS
- * 4. USE_MBEDTLS
- * 5. USE_COMMON_CRYPTO
- * 6. USE_WIN32_CRYPTO
+ * 2. USE_GNUTLS
+ * 3. USE_MBEDTLS
+ * 4. USE_COMMON_CRYPTO
+ * 5. USE_WIN32_CRYPTO
  *
  * This ensures that the same SSL branch gets activated throughout this source
  * file even if multiple backends are enabled at the same time.
@@ -65,7 +65,7 @@
 /* When OpenSSL is available we use the SHA256-function from OpenSSL */
 #include <openssl/sha.h>
 
-#elif defined(USE_GNUTLS_NETTLE)
+#elif defined(USE_GNUTLS)
 
 #include <nettle/sha.h>
 
@@ -93,35 +93,6 @@ static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
   sha256_digest(ctx, SHA256_DIGEST_SIZE, digest);
 }
 
-#elif defined(USE_GNUTLS)
-
-#include <gcrypt.h>
-
-#include "curl_memory.h"
-
-/* The last #include file should be: */
-#include "memdebug.h"
-
-typedef gcry_md_hd_t SHA256_CTX;
-
-static void SHA256_Init(SHA256_CTX *ctx)
-{
-  gcry_md_open(ctx, GCRY_MD_SHA256, 0);
-}
-
-static void SHA256_Update(SHA256_CTX *ctx,
-                          const unsigned char *data,
-                          unsigned int length)
-{
-  gcry_md_write(*ctx, data, length);
-}
-
-static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
-{
-  memcpy(digest, gcry_md_read(*ctx, 0), SHA256_DIGEST_LENGTH);
-  gcry_md_close(*ctx);
-}
-
 #elif defined(USE_MBEDTLS)
 
 #include <mbedtls/sha256.h>
@@ -135,8 +106,8 @@ typedef mbedtls_sha256_context SHA256_CTX;
 
 static void SHA256_Init(SHA256_CTX *ctx)
 {
-#if !defined(HAS_RESULT_CODE_BASED_FUNCTIONS)
-  mbedtls_sha256_starts(ctx, 0);
+#if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
+  (void) mbedtls_sha256_starts(ctx, 0);
 #else
   (void) mbedtls_sha256_starts_ret(ctx, 0);
 #endif
@@ -146,8 +117,8 @@ static void SHA256_Update(SHA256_CTX *ctx,
                           const unsigned char *data,
                           unsigned int length)
 {
-#if !defined(HAS_RESULT_CODE_BASED_FUNCTIONS)
-  mbedtls_sha256_update(ctx, data, length);
+#if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
+  (void) mbedtls_sha256_update(ctx, data, length);
 #else
   (void) mbedtls_sha256_update_ret(ctx, data, length);
 #endif
@@ -155,8 +126,8 @@ static void SHA256_Update(SHA256_CTX *ctx,
 
 static void SHA256_Final(unsigned char *digest, SHA256_CTX *ctx)
 {
-#if !defined(HAS_RESULT_CODE_BASED_FUNCTIONS)
-  mbedtls_sha256_finish(ctx, digest);
+#if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
+  (void) mbedtls_sha256_finish(ctx, digest);
 #else
   (void) mbedtls_sha256_finish_ret(ctx, digest);
 #endif

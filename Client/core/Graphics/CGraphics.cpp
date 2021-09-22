@@ -844,7 +844,7 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
 }
 
 void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
-                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bUseFaceToward, const CVector& vecFaceToward,
+                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward, const CVector& vecFaceToward,
                                          bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
@@ -858,10 +858,10 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
 
     // Add it to the queue
     if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
-        m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward,
+        m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                    vecFaceToward);
     else
-        m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward,
+        m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                   vecFaceToward);
 }
 
@@ -1098,7 +1098,7 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
 
 void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY,
                                  unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation,
-                                 float fRotationCenterX, float fRotationCenterY)
+                                 float fRotationCenterX, float fRotationCenterY, float fLineHeight)
 {
     if (!szText || !m_pDXSprite)
         return;
@@ -1179,7 +1179,8 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
         CSplitStringW splitLines(wstrText, L"\n");
         int           iNumLines = splitLines.size();
 
-        float fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
+        if (fLineHeight == 0.0f)
+            fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
         float fTotalHeight = iNumLines * fLineHeight;
 
         // Y position of text

@@ -235,13 +235,26 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
         const CVector vecA1 = item.vecFrom - vecShift;
         const CVector vecB1 = item.vecTo - vecShift;
 
-        WRITE_PDT_VERTEX(pBuffer, vecA1.fX, vecA1.fY, vecA1.fZ, ulColor, item.fU1, item.fV1);
-        WRITE_PDT_VERTEX(pBuffer, vecA2.fX, vecA2.fY, vecA2.fZ, ulColor, item.fU2, item.fV1);
-        WRITE_PDT_VERTEX(pBuffer, vecB1.fX, vecB1.fY, vecB1.fZ, ulColor, item.fU1, item.fV2);
+        if (item.bFlipUV)
+        {
+            WRITE_PDT_VERTEX(pBuffer, vecA1.fX, vecA1.fY, vecA1.fZ, ulColor, item.fU1, item.fV2);
+            WRITE_PDT_VERTEX(pBuffer, vecA2.fX, vecA2.fY, vecA2.fZ, ulColor, item.fU1, item.fV1);
+            WRITE_PDT_VERTEX(pBuffer, vecB1.fX, vecB1.fY, vecB1.fZ, ulColor, item.fU2, item.fV2);
 
-        WRITE_PDT_VERTEX(pBuffer, vecA2.fX, vecA2.fY, vecA2.fZ, ulColor, item.fU2, item.fV1);
-        WRITE_PDT_VERTEX(pBuffer, vecB2.fX, vecB2.fY, vecB2.fZ, ulColor, item.fU2, item.fV2);
-        WRITE_PDT_VERTEX(pBuffer, vecB1.fX, vecB1.fY, vecB1.fZ, ulColor, item.fU1, item.fV2);
+            WRITE_PDT_VERTEX(pBuffer, vecA2.fX, vecA2.fY, vecA2.fZ, ulColor, item.fU1, item.fV1);
+            WRITE_PDT_VERTEX(pBuffer, vecB2.fX, vecB2.fY, vecB2.fZ, ulColor, item.fU2, item.fV1);
+            WRITE_PDT_VERTEX(pBuffer, vecB1.fX, vecB1.fY, vecB1.fZ, ulColor, item.fU2, item.fV2);
+        }
+        else
+        {
+            WRITE_PDT_VERTEX(pBuffer, vecA1.fX, vecA1.fY, vecA1.fZ, ulColor, item.fU1, item.fV1);
+            WRITE_PDT_VERTEX(pBuffer, vecA2.fX, vecA2.fY, vecA2.fZ, ulColor, item.fU2, item.fV1);
+            WRITE_PDT_VERTEX(pBuffer, vecB1.fX, vecB1.fY, vecB1.fZ, ulColor, item.fU1, item.fV2);
+
+            WRITE_PDT_VERTEX(pBuffer, vecA2.fX, vecA2.fY, vecA2.fZ, ulColor, item.fU2, item.fV1);
+            WRITE_PDT_VERTEX(pBuffer, vecB2.fX, vecB2.fY, vecB2.fZ, ulColor, item.fU2, item.fV2);
+            WRITE_PDT_VERTEX(pBuffer, vecB1.fX, vecB1.fY, vecB1.fZ, ulColor, item.fU1, item.fV2);
+        }
     }
 
     // Set vertex stream
@@ -310,7 +323,7 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
 //
 ////////////////////////////////////////////////////////////////
 void CMaterialLine3DBatcher::AddLine3D(const CVector& vecFrom, const CVector& vecTo, float fWidth, ulong ulColor, CMaterialItem* pMaterial, float fU, float fV,
-                                       float fSizeU, float fSizeV, bool bRelativeUV, bool bUseFaceToward, const CVector& vecFaceToward)
+                                       float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward, const CVector& vecFaceToward)
 {
     if (!pMaterial)
         return;
@@ -330,6 +343,7 @@ void CMaterialLine3DBatcher::AddLine3D(const CVector& vecFrom, const CVector& ve
     item.fV1 = fV;
     item.fU2 = fU + fSizeU;
     item.fV2 = fV + fSizeV;
+    item.bFlipUV = bFlipUV;
     if (!bRelativeUV)
     {
         // If UV's are absolute pixels, then scale the range to 0.0f - 1.0f.
