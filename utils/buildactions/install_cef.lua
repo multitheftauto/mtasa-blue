@@ -97,26 +97,24 @@ newaction {
 			return
 		end
 
-		if not os.isdir(CEF_PATH) then
-			if not os.mkdir(CEF_PATH) then
-				errormsg("ERROR: Could not create cef folder")
-				os.exit(1)
-				return
-			end
-		end
+		local has_cef_dir = os.isdir(CEF_PATH)
 
 		-- Check file hash
 		local archive_path = CEF_TEMP_PATH.."temp.tar.bz2"
-		if os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_HASH then
+		local hash_passed = os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_HASH
+		if hash_passed then
 			print("CEF consistency checks succeeded")
-			return
-		end
 
-		-- Download CEF
-		print("Downloading CEF " .. CEF_VERSION ..  "...")
-		if not http.download_print_errors(make_cef_download_url(), archive_path) then
-			os.exit(1)
-			return
+			if has_cef_dir then
+				return
+			end
+		else
+			-- Download CEF
+			print("Downloading CEF " .. CEF_VERSION ..  "...")
+			if not http.download_print_errors(make_cef_download_url(), archive_path) then
+				os.exit(1)
+				return
+			end
 		end
 
 		local downloaded_hash = os.sha256_file(archive_path)
@@ -145,7 +143,7 @@ newaction {
 		end
 
 		-- Delete old CEF files
-		if os.isdir(CEF_PATH) then
+		if has_cef_dir then
 			if not os.rmdir(CEF_PATH) then
 				errormsg("ERROR: Could not delete cef folder")
 				os.exit(1)
