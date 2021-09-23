@@ -145,10 +145,12 @@ newaction {
 		end
 
 		-- Delete old CEF files
-		if not os.rmdir(CEF_PATH) then
-			errormsg("ERROR: Could not delete cef folder")
-			os.exit(1)
-			return
+		if os.isdir(CEF_PATH) then
+			if not os.rmdir(CEF_PATH) then
+				errormsg("ERROR: Could not delete cef folder")
+				os.exit(1)
+				return
+			end
 		end
 
 		if not os.mkdir(CEF_PATH) then

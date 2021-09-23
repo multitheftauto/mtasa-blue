@@ -84,7 +84,7 @@ function os.expanddir_wildcard(from, to)
 		os.exit(1)
 		return
 	end
-	
+
 	if not os.rmdir(dir) then
 		errormsg("ERROR: Couldn't remove directory", ("\nTried to remove %s"):format(dir))
 		os.exit(1)
