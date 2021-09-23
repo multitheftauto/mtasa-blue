@@ -6,6 +6,171 @@
 
                                   Changelog
 
+Version 7.79.1 (22 Sep 2021)
+
+Daniel Stenberg (22 Sep 2021)
+- RELEASE-NOTES: synced
+  
+  curl 7.79.1 release
+
+- THANKS: added names from the 7.79.1 release
+
+- test897: verify delivery of IMAP post-body header content
+  
+  The "content" is delivered as "body" by curl, but the envelope continues
+  after the body and the rest of it should be delivered as header.
+  
+  The IMAP server can now get 'POSTFETCH' set to include more data to
+  include after the body and test 897 is done to verify that such "extra"
+  header data is in fact delivered by curl as header.
+  
+  Ref: #7284 but fails to reproduce the issue
+  
+  Closes #7748
+
+- KNOWN_BUGS: connection migration doesn't work
+  
+  Closes #7695
+
+- RELEASE-NOTES: synced
+
+- http: fix the broken >3 digit response code detection
+  
+  When the "reason phrase" in the HTTP status line starts with a digit,
+  that was treated as the forth response code digit and curl would claim
+  the response to be non-compliant.
+  
+  Added test 1466 to verify this case.
+  
+  Regression brought by 5dc594e44f73b17
+  Reported-by: Glenn de boer
+  Fixes #7738
+  Closes #7739
+
+Jay Satiro (17 Sep 2021)
+- strerror: use sys_errlist instead of strerror on Windows
+  
+  - Change Curl_strerror to use sys_errlist[errnum] instead of strerror to
+    retrieve the error message on Windows.
+  
+  Windows' strerror writes to a static buffer and is not thread-safe.
+  
+  Follow-up to 2f0bb86 which removed most instances of strerror in favor
+  of calling Curl_strerror (which calls strerror_r for other platforms).
+  
+  Ref: https://github.com/curl/curl/pull/7685
+  Ref: https://github.com/curl/curl/commit/2f0bb86
+  
+  Closes https://github.com/curl/curl/pull/7735
+
+Daniel Stenberg (16 Sep 2021)
+- dist: provide lib/.checksrc in the tarball
+  
+  So that debug builds work (checksrc really)
+  
+  Reported-by: Marcel Raad
+  Reported-by: tawmoto on github
+  Fixes #7733
+  Closes #7734
+
+- TODO: Improve documentation about fork safety
+  
+  Closes #6968
+
+- hsts: CURLSTS_FAIL from hsts read callback should fail transfer
+  
+  ... and have CURLE_ABORTED_BY_CALLBACK returned.
+  
+  Extended test 1915 to verify.
+  
+  Reported-by: Jonathan Cardoso
+  Fixes #7726
+  Closes #7729
+
+- test1184: disable
+  
+  The test should be fine and it works for me repeated when run manually,
+  but clearly it causes CI failures and it needs more research.
+  
+  Reported-by: RiderALT on github
+  Fixes #7725
+  Closes #7732
+
+- Curl_http2_setup: don't change connection data on repeat invokes
+  
+  Regression from 3cb8a748670ab88c (releasde in 7.79.0). That change moved
+  transfer oriented inits to before the check but also erroneously moved a
+  few connection oriented ones, which causes problems.
+  
+  Reported-by: Evangelos Foutras
+  Fixes #7730
+  Closes #7731
+
+- RELEASE-NOTES: synced
+  
+  and bump to 7.79.1
+
+Kamil Dudka (16 Sep 2021)
+- tests/sshserver.pl: make it work with openssh-8.7p1
+  
+  ... by not using options with no argument where an argument is required:
+  
+  === Start of file tests/log/ssh_server.log
+  curl_sshd_config line 6: no argument after keyword "DenyGroups"
+  curl_sshd_config line 7: no argument after keyword "AllowGroups"
+  curl_sshd_config line 10: Deprecated option AuthorizedKeysFile2
+  curl_sshd_config line 29: Deprecated option KeyRegenerationInterval
+  curl_sshd_config line 39: Deprecated option RhostsRSAAuthentication
+  curl_sshd_config line 40: Deprecated option RSAAuthentication
+  curl_sshd_config line 41: Deprecated option ServerKeyBits
+  curl_sshd_config line 45: Deprecated option UseLogin
+  curl_sshd_config line 56: no argument after keyword "AcceptEnv"
+  curl_sshd_config: terminating, 3 bad configuration options
+  === End of file tests/log/ssh_server.log
+  
+  === Start of file log/sftp_server.log
+  curl_sftp_config line 33: Unsupported option "rhostsrsaauthentication"
+  curl_sftp_config line 34: Unsupported option "rsaauthentication"
+  curl_sftp_config line 52: no argument after keyword "sendenv"
+  curl_sftp_config: terminating, 1 bad configuration options
+  Connection closed.
+  Connection closed
+  === End of file log/sftp_server.log
+  
+  Closes #7724
+
+Daniel Stenberg (15 Sep 2021)
+- hsts: handle unlimited expiry
+  
+  When setting a blank expire string, meaning unlimited, curl would pass
+  TIME_T_MAX to getime_r() when creating the output, while on 64 bit
+  systems such a large value cannot be convetered to a tm struct making
+  curl to exit the loop with an error instead. It can't be converted
+  because the year it would represent doesn't fit in the 'int tm_year'
+  field!
+  
+  Starting now, unlimited expiry is instead handled differently by using a
+  human readable expiry date spelled out as "unlimited" instead of trying
+  to use a distant actual date.
+  
+  Test 1660 and 1915 have been updated to help verify this change.
+  
+  Reported-by: Jonathan Cardoso
+  Fixes #7720
+  Closes #7721
+
+- curl_multi_fdset: make FD_SET() not operate on sockets out of range
+  
+  The VALID_SOCK() macro was made to only check for FD_SETSIZE if curl was
+  built to use select(), even though the curl_multi_fdset() function
+  always and unconditionally uses FD_SET and needs the check.
+  
+  Reported-by: 0xee on github
+  Fixes #7718
+  Closes #7719
+
+- FAQ: add GOPHERS + curl works on data, not files
+
 Version 7.79.0 (14 Sep 2021)
 
 Daniel Stenberg (14 Sep 2021)
@@ -8109,174 +8274,3 @@ Daniel Stenberg (20 Jan 2021)
   Closes #6473
 
 - gopher: remove accidental conn->data leftover
-
-- libssh: avoid plain free() of libssh-memory
-  
-  Since curl's own memory debugging system redefines free() calls to track
-  and fiddle with memory, it cannot be used on memory allocated by 3rd
-  party libraries.
-  
-  Third party libraries SHOULD NOT require free() to release allocated
-  resources for this reason - and libs can use separate healp allocators
-  on some systems (like Windows) so free() doesn't necessarily work
-  anyway.
-  
-  Filed as an issue with libssh: https://bugs.libssh.org/T268
-  
-  Closes #6481
-
-- send: assert that Curl_write_plain() has a ->conn when called
-  
-  To help catch bad invokes.
-  
-  Closes #6476
-
-- test410: verify HTTPS GET with a 49K request header
-  
-  skip test 410 for mesalink in the CI as it otherwise hangs "forever"
-
-- lib: pass in 'struct Curl_easy *' to most functions
-  
-  ... in most cases instead of 'struct connectdata *' but in some cases in
-  addition to.
-  
-  - We mostly operate on transfers and not connections.
-  
-  - We need the transfer handle to log, store data and more. Everything in
-    libcurl is driven by a transfer (the CURL * in the public API).
-  
-  - This work clarifies and separates the transfers from the connections
-    better.
-  
-  - We should avoid "conn->data". Since individual connections can be used
-    by many transfers when multiplexing, making sure that conn->data
-    points to the current and correct transfer at all times is difficult
-    and has been notoriously error-prone over the years. The goal is to
-    ultimately remove the conn->data pointer for this reason.
-  
-  Closes #6425
-
-Emil Engler (17 Jan 2021)
-- docs: fix typos in NEW-PROTOCOL.md
-  
-  This fixes a misspelled "it" and a grammatically wrong "-ing" suffix.
-  
-  Closes #6471
-
-Daniel Stenberg (16 Jan 2021)
-- RELEASE-NOTES: synced
-
-Jay Satiro (16 Jan 2021)
-- [Razvan Cojocaru brought this change]
-
-  cmake: expose CURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG
-  
-  This does for cmake builds what --disable-openssl-auto-load-config
-  does for autoconf builds.
-  
-  Closes https://github.com/curl/curl/pull/6435
-
-Daniel Stenberg (15 Jan 2021)
-- test1918: verify curl_easy_option_by_name() and curl_easy_option_by_id()
-  
-  ... and as a practical side-effect, make sure that the
-  Curl_easyopts_check() function is asserted in debug builds, which we
-  want to detect mismatches between the options list in easyoptions.c and
-  the options in curl.h
-  
-  Found-by: Gisle Vanem
-  Bug: https://github.com/curl/curl/commit/08e8455dddc5e48e58a12ade3815c01ae3da3b64#commitcomment-45991815
-  
-  Closes #6461
-
-- [Gisle Vanem brought this change]
-
-  easyoptions: add the missing AWS_SIGV4
-  
-  Follow-up from AWS_SIGV4
-
-- schannel_verify: fix safefree call typo
-  
-  Follow-up from e87ad71d1ba00519
-  
-  Closes #6459
-
-- mime: make sure setting MIMEPOST to NULL resets properly
-  
-  ... so that a function can first use MIMEPOST and then set it to NULL to
-  reset it back to a blank POST.
-  
-  Added test 584 to verify the fix.
-  
-  Reported-by: Christoph M. Becker
-  
-  Fixes #6455
-  Closes #6456
-
-- multi: set the PRETRANSFER time-stamp when we switch to PERFORM
-  
-  ... instead of at end of the DO state. This makes the timer more
-  accurate for the protocols that use the DOING state (such as FTP), and
-  simplifies how the function (now called init_perform) is called.
-  
-  The timer will then include the entire procedure up to PERFORM -
-  including all instructions for getting the transfer started.
-  
-  Closes #6454
-
-- CURLINFO_PRETRANSFER_TIME.3: clarify
-  
-  ... the timer *does* include the instructions for getting the remote
-  file.
-  
-  Ref: #6452
-  Closes #6453
-
-- [Gisle Vanem brought this change]
-
-  schannel: plug a memory-leak
-  
-  ... when built without -DUNICODE.
-  
-  Closes #6457
-
-Jay Satiro (14 Jan 2021)
-- gitattributes: Set batch files to CRLF line endings on checkout
-  
-  If a batch file is run without CRLF line endings (ie LF-only) then
-  arbitrary behavior may occur. I consider that a bug in Windows, however
-  the effects can be serious enough (eg unintended code executed) that
-  we're fixing it in the repo by requiring CRLF line endings for batch
-  files on checkout.
-  
-  Prior to this change the checked-out line endings of batch files were
-  dependent on a user's git preferences. On Windows it is common for git
-  users to have automatic CRLF conversion enabled (core.autocrlf true),
-  but those users that don't would run into this behavior.
-  
-  For example a user has reported running the Visual Studio project
-  generator batch file (projects/generate.bat) and it looped forever.
-  Output showed that the Windows OS interpreter was occasionally jumping
-  to arbitrary points in the batch file and executing commands. This
-  resulted in unintended files being removed (a removal sequence called)
-  and looping forever.
-  
-  Ref: https://serverfault.com/q/429594
-  Ref: https://stackoverflow.com/q/232651
-  Ref: https://www.dostips.com/forum/viewtopic.php?t=8988
-  Ref: https://git-scm.com/docs/gitattributes#_checking_out_and_checking_in
-  Ref: https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration#_core_autocrlf
-  
-  Bug: https://github.com/curl/curl/discussions/6427
-  Reported-by: Ganesh Kamath
-  
-  Closes https://github.com/curl/curl/pull/6442
-
-Daniel Stenberg (14 Jan 2021)
-- tool_operate: spellfix a comment
-
-- ROADMAP: refreshed
-  
-  o removed HSTS - already implemented
-  o added HTTPS RR records
-  o mention HTTP/3 completion
