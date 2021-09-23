@@ -99,7 +99,7 @@ newaction {
 
 		if not os.isdir(CEF_PATH) then
 			if not os.mkdir(CEF_PATH) then
-				errmsg("ERROR: Could not create cef folder")
+				errormsg("ERROR: Could not create cef folder")
 				os.exit(1)
 				return
 			end
@@ -146,26 +146,26 @@ newaction {
 
 		-- Delete old CEF files
 		if not os.rmdir(CEF_PATH) then
-			errmsg("ERROR: Could not delete cef folder")
+			errormsg("ERROR: Could not delete cef folder")
 			os.exit(1)
 			return
 		end
 
 		if not os.mkdir(CEF_PATH) then
-			errmsg("ERROR: Could not create cef folder (2)")
+			errormsg("ERROR: Could not create cef folder (2)")
 			os.exit(1)
 			return
 		end
 
 		-- Extract first bz2 and then tar
 		if not os.extract_archive(archive_path, CEF_PATH, true) then -- Extract .tar.bz2 to .tar
-			errmsg("ERROR: Could not extract .tar.bz2")
+			errormsg("ERROR: Could not extract .tar.bz2")
 			os.exit(1)
 			return
 		end
 
 		if not os.extract_archive(CEF_PATH.."temp.tar", CEF_PATH, true) then -- Extract .tar
-			errmsg("ERROR: Could not extract .tar")
+			errormsg("ERROR: Could not extract .tar")
 			os.exit(1)
 			return
 		end
@@ -175,7 +175,7 @@ newaction {
 
 		-- Delete .tar archive, but keep .tar.bz2 for checksumming
 		if not os.remove(CEF_PATH.."temp.tar") then
-			errmsg("ERROR: Could not remove temp.tar")
+			errormsg("ERROR: Could not remove temp.tar")
 			os.exit(1)
 			return
 		end

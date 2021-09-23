@@ -23,7 +23,7 @@ newaction {
 		-- Make Bin directory if not exists
 		local success, message = os.mkdir(BIN_DIR)
 		if not success then
-			errmsg("ERROR: Couldn't create Bin directory", "\n"..message)
+			errormsg("ERROR: Couldn't create Bin directory", "\n"..message)
 			os.exit(1)
 			return
 		end
@@ -32,7 +32,7 @@ newaction {
 		if os.host() == "windows" then
 			local success, message = os.copydir(DATA_DIR, BIN_DIR)
 			if not success then
-				errmsg("ERROR: Couldn't create copy data directory", "\n"..message)
+				errormsg("ERROR: Couldn't create copy data directory", "\n"..message)
 				os.exit(1)
 				return
 			end
@@ -41,14 +41,14 @@ newaction {
 		-- Copy configs if they don't already exist
 		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.conf", false, true)
 		if not success then
-			errmsg("ERROR: Couldn't copy server config files", "\n"..message)
+			errormsg("ERROR: Couldn't copy server config files", "\n"..message)
 			os.exit(1)
 			return
 		end
 
 		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.xml", false, true)
 		if not success then
-			errmsg("ERROR: Couldn't copy server xml files", "\n"..message)
+			errormsg("ERROR: Couldn't copy server xml files", "\n"..message)
 			os.exit(1)
 			return
 		end
@@ -56,7 +56,7 @@ newaction {
 		-- Make sure server/x64 directory exists
 		local success, message = os.mkdir(BIN_DIR.."/server/x64")
 		if not success then
-			errmsg("ERROR: Couldn't create server/x64 directory", "\n"..message)
+			errormsg("ERROR: Couldn't create server/x64 directory", "\n"..message)
 			os.exit(1)
 			return
 		end
@@ -73,19 +73,19 @@ newaction {
 			end
 
 			if not os.copyfile(BIN_DIR.."/MTA/netc.dll", BIN_DIR.."/MTA/netc_d.dll") then
-				errmsg("ERROR: Could not copy netc.dll")
+				errormsg("ERROR: Could not copy netc.dll")
 				os.exit(1)
 				return
 			end
 
 			if not os.copyfile(BIN_DIR.."/server/net.dll", BIN_DIR.."/server/net_d.dll") then
-				errmsg("ERROR: Could not copy server/net.dll")
+				errormsg("ERROR: Could not copy server/net.dll")
 				os.exit(1)
 				return
 			end
 
 			if not os.copyfile(BIN_DIR.."/server/x64/net.dll", BIN_DIR.."/server/x64/net_d.dll") then
-				errmsg("ERROR: Could not copy server/x64/net.dll")
+				errormsg("ERROR: Could not copy server/x64/net.dll")
 				os.exit(1)
 				return
 			end
@@ -100,7 +100,7 @@ newaction {
 			end
 
 			if not os.copyfile(BIN_DIR.."/server/x64/net.dylib", BIN_DIR.."/server/x64/net_d.dylib") then
-				errmsg("ERROR: Could not copy server/x64/net.dylib")
+				errormsg("ERROR: Could not copy server/x64/net.dylib")
 				os.exit(1)
 				return
 			end
@@ -115,13 +115,13 @@ newaction {
 			end
 
 			if not os.copyfile(BIN_DIR.."/server/net.so", BIN_DIR.."/server/net_d.so") then
-				errmsg("ERROR: Could not copy server/net.so")
+				errormsg("ERROR: Could not copy server/net.so")
 				os.exit(1)
 				return
 			end
 
 			if not os.copyfile(BIN_DIR.."/server/x64/net.so", BIN_DIR.."/server/x64/net_d.so") then
-				errmsg("ERROR: Could not copy server/x64/net.so")
+				errormsg("ERROR: Could not copy server/x64/net.so")
 				os.exit(1)
 				return
 			end

@@ -80,13 +80,13 @@ function os.expanddir_wildcard(from, to)
 
 	-- TODO: Optimize this
 	if not os.copydir(dir, to) then
-		errmsg("ERROR: Couldn't copy directory", ("\nTried to copy %s to %s"):format(dir, to))
+		errormsg("ERROR: Couldn't copy directory", ("\nTried to copy %s to %s"):format(dir, to))
 		os.exit(1)
 		return
 	end
 	
 	if not os.rmdir(dir) then
-		errmsg("ERROR: Couldn't remove directory", ("\nTried to remove %s"):format(dir))
+		errormsg("ERROR: Couldn't remove directory", ("\nTried to remove %s"):format(dir))
 		os.exit(1)
 		return
 	end

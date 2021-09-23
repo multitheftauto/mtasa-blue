@@ -19,14 +19,14 @@ newaction {
 		
 		-- Extract resources
 		if not os.extract_archive("temp_resources.zip", EXTRACT_DIR, true) then
-			errmsg("ERROR: Couldn't unzip resources")
+			errormsg("ERROR: Couldn't unzip resources")
 			os.exit(1)
 			return
 		end
 
 		-- Cleanup
 		if not os.remove("temp_resources.zip") then
-			errmsg("ERROR: Couldn't delete downloaded resources zip file")
+			errormsg("ERROR: Couldn't delete downloaded resources zip file")
 			os.exit(1)
 			return
 		end
