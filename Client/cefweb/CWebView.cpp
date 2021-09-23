@@ -10,8 +10,8 @@
 #include "StdInc.h"
 #include "CWebView.h"
 #include "CAjaxResourceHandler.h"
-#include <cef3/include/cef_parser.h>
-#include <cef3/include/cef_task.h>
+#include <cef3/cef/include/cef_parser.h>
+#include <cef3/cef/include/cef_task.h>
 #include "CWebDevTools.h"
 
 CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)

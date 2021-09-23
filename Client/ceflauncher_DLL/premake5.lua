@@ -4,8 +4,8 @@ project "CEFLauncher DLL"
 	targetname "CEFLauncher_DLL"
 	targetdir(buildpath("mta/cef"))
 
-	includedirs { "../../vendor/cef3" }
-	libdirs { "../../vendor/cef3/Release" }
+	includedirs { "../../vendor/cef3/cef" }
+	libdirs { "../../vendor/cef3/cef/Release" }
 
 	defines { "UNICODE", "PSAPI_VERSION=1" }
 

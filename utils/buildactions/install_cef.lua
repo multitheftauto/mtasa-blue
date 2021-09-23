@@ -3,7 +3,8 @@ require 'utils'
 premake.modules.install_cef = {}
 
 -- Config variables
-local CEF_PATH = "vendor/cef3/"
+local CEF_PATH = "vendor/cef3/cef/"
+local CEF_TEMP_PATH = "vendor/cef3/"
 local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
@@ -69,7 +70,7 @@ newaction {
 			CEF_HASH = ""
 		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
-			resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
+			local resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
 			if result_str ~= "OK" or result_code ~= 200 then
 				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
 				return
@@ -106,8 +107,12 @@ newaction {
 			return
 		end
 
+		if not os.isdir(CEF_PATH) then
+			os.mkdir(CEF_PATH)
+		end
+
 		-- Check file hash
-		local archive_path = CEF_PATH.."temp.tar.bz2"
+		local archive_path = CEF_TEMP_PATH.."temp.tar.bz2"
 		if os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_HASH then
 			print("CEF consistency checks succeeded")
 			return
@@ -147,13 +152,8 @@ newaction {
 		end
 
 		-- Delete old CEF files
-		-- TODO: It might be better to download the files into a new folder and delete this folder at once
-		os.rmdir(CEF_PATH.."cmake")
-		os.rmdir(CEF_PATH.."include")
-		os.rmdir(CEF_PATH.."libcef_dll")
-		os.rmdir(CEF_PATH.."Release")
-		os.rmdir(CEF_PATH.."Resources")
-		os.remove_wildcard(CEF_PATH.."*.txt")
+		os.rmdir(CEF_PATH)
+		os.mkdir(CEF_PATH)
 
 		-- Extract first bz2 and then tar
 		os.extract_archive(archive_path, CEF_PATH, true) -- Extract .tar.bz2 to .tar
