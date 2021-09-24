@@ -11,10 +11,12 @@
 
 #define WEBSITEREQUESTS_WINDOW_DEFAULTWIDTH 476
 #define WEBSITEREQUESTS_WINDOW_DEFAULTHEIGHT 297
-class CGUIWindow;
-class CGUILabel;
-class CGUIMemo;
-class CGUIButton;
+
+/* TODO AFTER CEGUI API REWRITE */
+//class CGUIWindow;
+//class CGUILabel;
+//class CGUIMemo;
+//class CGUIButton;
 
 class CWebsiteRequests
 {
@@ -30,17 +32,20 @@ public:
     void Clear();
 
 protected:
-    CGUIWindow*                   m_pWindow;
-    CGUILabel*                    m_pLabel1;
-    CGUILabel*                    m_pLabel2;
-    CGUIMemo*                     m_pAddressMemo;
-    CGUICheckBox*                 m_pCheckRemember;
-    CGUIButton*                   m_pButtonAllow;
-    CGUIButton*                   m_pButtonDeny;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow*                   m_pWindow;
+    //CGUILabel*                    m_pLabel1;
+    //CGUILabel*                    m_pLabel2;
+    //CGUIMemo*                     m_pAddressMemo;
+    //CGUICheckBox*                 m_pCheckRemember;
+    //CGUIButton*                   m_pButtonAllow;
+    //CGUIButton*                   m_pButtonDeny;
     std::list<WebRequestCallback> m_Callbacks;
 
 private:
     void Callback(bool bAllow, const std::unordered_set<SString>& requests);
-    bool OnAllowButtonClick(CGUIElement* pElement);
-    bool OnDenyButtonClick(CGUIElement* pElement);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnAllowButtonClick();
+    //bool OnDenyButtonClick();
 };

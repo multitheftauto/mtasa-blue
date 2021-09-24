@@ -78,7 +78,7 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
         return false;
 
     // Let's calculate our mouse movement directions
-    CVector2D resolution = g_pCore->GetGUI()->GetResolution();
+    CVector2D resolution = CVector2D(1920, 1080); //g_pCore->GetGUI()->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
     int       iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
     float     fX = (iX - resolution.fX * 0.5f) / resolution.fX;
 

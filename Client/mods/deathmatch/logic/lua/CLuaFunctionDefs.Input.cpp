@@ -31,34 +31,35 @@ int CLuaFunctionDefs::GetCursorPosition(lua_State* luaVM)
 
 int CLuaFunctionDefs::SetCursorPosition(lua_State* luaVM)
 {
-    CVector2D        vecPosition;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(vecPosition);
+    /* TODO AFTER CEGUI API REWRITE */
+    //CVector2D        vecPosition;
+    //CScriptArgReader argStream(luaVM);
+    //argStream.ReadVector2D(vecPosition);
 
-    if (!argStream.HasErrors())
-    {
-        HWND hookedWindow = g_pCore->GetHookedWindow();
+    //if (!argStream.HasErrors())
+    //{
+    //    HWND hookedWindow = g_pCore->GetHookedWindow();
 
-        tagPOINT windowPos = {0};
-        ClientToScreen(hookedWindow, &windowPos);
+    //    tagPOINT windowPos = {0};
+    //    ClientToScreen(hookedWindow, &windowPos);
 
-        CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
+    //    CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
-        if (vecPosition.fX < 0)
-            vecPosition.fX = 0.0f;
-        else if (vecPosition.fX > vecResolution.fX)
-            vecPosition.fX = vecResolution.fX;
-        if (vecPosition.fY < 0)
-            vecPosition.fY = 0.0f;
-        else if (vecPosition.fY > vecResolution.fY)
-            vecPosition.fY = vecResolution.fY;
+    //    if (vecPosition.fX < 0)
+    //        vecPosition.fX = 0.0f;
+    //    else if (vecPosition.fX > vecResolution.fX)
+    //        vecPosition.fX = vecResolution.fX;
+    //    if (vecPosition.fY < 0)
+    //        vecPosition.fY = 0.0f;
+    //    else if (vecPosition.fY > vecResolution.fY)
+    //        vecPosition.fY = vecResolution.fY;
 
-        g_pCore->CallSetCursorPos((int)vecPosition.fX + (int)windowPos.x, (int)vecPosition.fY + (int)windowPos.y);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    //    g_pCore->CallSetCursorPos((int)vecPosition.fX + (int)windowPos.x, (int)vecPosition.fY + (int)windowPos.y);
+    //    lua_pushboolean(luaVM, true);
+    //    return 1;
+    //}
+    //else
+    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -79,13 +80,13 @@ int CLuaFunctionDefs::IsCursorShowing(lua_State* luaVM)
 int CLuaFunctionDefs::GetCursorAlpha(lua_State* luaVM)
 {
     //  float getCursorAlpha ()
-    float fAlpha;
+    //float fAlpha;
 
-    if (CStaticFunctionDefinitions::GetCursorAlpha(fAlpha))
-    {
-        lua_pushnumber(luaVM, Round(fAlpha * 255.f));
-        return 1;
-    }
+    //if (CStaticFunctionDefinitions::GetCursorAlpha(fAlpha))
+    //{
+    //    lua_pushnumber(luaVM, Round(fAlpha * 255.f));
+    //    return 1;
+    //}
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -93,21 +94,21 @@ int CLuaFunctionDefs::GetCursorAlpha(lua_State* luaVM)
 int CLuaFunctionDefs::SetCursorAlpha(lua_State* luaVM)
 {
     //  bool setCursorAlpha ( float alpha )
-    float fAlpha;
+    //float fAlpha;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(fAlpha);
+    //CScriptArgReader argStream(luaVM);
+    //argStream.ReadNumber(fAlpha);
 
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetCursorAlpha(fAlpha / 255.f))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    //if (!argStream.HasErrors())
+    //{
+    //    if (CStaticFunctionDefinitions::SetCursorAlpha(fAlpha / 255.f))
+    //    {
+    //        lua_pushboolean(luaVM, true);
+    //        return 1;
+    //    }
+    //}
+    //else
+    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

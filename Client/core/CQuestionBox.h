@@ -32,7 +32,7 @@ public:
     void         SetMessage(const SString& strMsg);
     void         AppendMessage(const SString& strMsg);
     void         SetButton(unsigned int uiButton, const SString& strText);
-    CGUIEdit*    SetEditbox(unsigned int uiEditbox, const SString& strText);
+    //CGUIEdit*    SetEditbox(unsigned int uiEditbox, const SString& strText); /* TODO AFTER CEGUI API REWRITE */
     void         SetCallback(pfnQuestionCallback callback, void* ptr = NULL);
     void         SetCallbackEdit(pfnQuestionEditCallback callback, void* ptr = NULL);
     void         SetOnLineHelpOption(const SString& strTroubleType);
@@ -42,12 +42,13 @@ public:
     void         OnConnect();
 
 private:
-    bool OnButtonClick(CGUIElement* pElement);
+    //bool OnButtonClick(CGUIElement* pElement); /* TODO AFTER CEGUI API REWRITE */
 
-    CGUIWindow*              m_pWindow;
-    CGUILabel*               m_pMessage;
-    std::vector<CGUIButton*> m_ButtonList;
-    std::vector<CGUIEdit*>   m_EditList;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow*              m_pWindow;
+    //CGUILabel*               m_pMessage;
+    //std::vector<CGUIButton*> m_ButtonList;
+    //std::vector<CGUIEdit*>   m_EditList;
     unsigned int             m_uiLastButton;
     unsigned int             m_uiActiveButtons;
     unsigned int             m_uiActiveEditboxes;

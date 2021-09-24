@@ -45,7 +45,7 @@ void CClientTextDisplay::Render()
     if (m_bVisible && !m_strCaption.empty())
     {
         // Render
-        CVector2D    vecResolution = g_pCore->GetGUI()->GetResolution();
+        CVector2D    vecResolution = CVector2D(1920, 1080); //g_pCore->GetGUI()->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
         unsigned int uiX = unsigned int(m_vecPosition.fX * vecResolution.fX);
         unsigned int uiY = unsigned int(m_vecPosition.fY * vecResolution.fY);
         if (m_ulFormat & DT_BOTTOM)

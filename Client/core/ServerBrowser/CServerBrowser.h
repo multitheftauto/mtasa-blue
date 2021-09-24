@@ -112,8 +112,9 @@ public:
     void SetSelectedIndex(unsigned int uiIndex);
 
 protected:
-    bool OnMouseClick(CGUIMouseEventArgs Args);
-    bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnMouseClick(CGUIMouseEventArgs Args);
+    //bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
 
     void CreateHistoryList();
     bool CanBrowseVersion(const SString& strVersion);
@@ -121,73 +122,76 @@ protected:
     int m_iSelectedServer[SERVER_BROWSER_TYPE_COUNT];
 
     const char*      m_szSearchTypePath[SearchTypes::MAX_SEARCH_TYPES];
-    CGUIStaticImage* m_pSearchIcons[SearchTypes::MAX_SEARCH_TYPES];
+    //CGUIStaticImage* m_pSearchIcons[SearchTypes::MAX_SEARCH_TYPES]; /* TODO AFTER CEGUI API REWRITE */
 
     CVector2D m_WidgetSize;
 
     // Window widgets
-    CGUIWindow*      m_pFrame;
-    CGUIElement*     m_pTopWindow;
-    CGUITabPanel*    m_pPanel;
-    CGUIStaticImage* m_pLockedIcon;
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow*      m_pFrame;
+    //CGUIElement*     m_pTopWindow;
+    //CGUITabPanel*    m_pPanel;
+    //CGUIStaticImage* m_pLockedIcon;
 
     // Tab controls
-    CGUITab* m_pTab[SERVER_BROWSER_TYPE_COUNT];
+    //CGUITab* m_pTab[SERVER_BROWSER_TYPE_COUNT]; /* TODO AFTER CEGUI API REWRITE */
 
-    CGUIGridList* m_pServerList[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIGridList* m_pServerList[SERVER_BROWSER_TYPE_COUNT]; /* TODO AFTER CEGUI API REWRITE */
     int           m_pServerListRevision[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUILabel*    m_pServerPlayerListLabel[SERVER_BROWSER_TYPE_COUNT];
-    CGUIGridList* m_pServerPlayerList[SERVER_BROWSER_TYPE_COUNT];
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUILabel*    m_pServerPlayerListLabel[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIGridList* m_pServerPlayerList[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUIEdit*        m_pEditServerSearch[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pServerSearchIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIEdit*        m_pEditServerSearch[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pServerSearchIcon[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUILabel*    m_pLabelInclude[SERVER_BROWSER_TYPE_COUNT];
-    CGUICheckBox* m_pIncludeEmpty[SERVER_BROWSER_TYPE_COUNT];
-    CGUICheckBox* m_pIncludeFull[SERVER_BROWSER_TYPE_COUNT];
-    CGUICheckBox* m_pIncludeLocked[SERVER_BROWSER_TYPE_COUNT];
-    CGUICheckBox* m_pIncludeOffline[SERVER_BROWSER_TYPE_COUNT];
-    CGUICheckBox* m_pIncludeOtherVersions[SERVER_BROWSER_TYPE_COUNT];
+    //CGUILabel*    m_pLabelInclude[SERVER_BROWSER_TYPE_COUNT];
+    //CGUICheckBox* m_pIncludeEmpty[SERVER_BROWSER_TYPE_COUNT];
+    //CGUICheckBox* m_pIncludeFull[SERVER_BROWSER_TYPE_COUNT];
+    //CGUICheckBox* m_pIncludeLocked[SERVER_BROWSER_TYPE_COUNT];
+    //CGUICheckBox* m_pIncludeOffline[SERVER_BROWSER_TYPE_COUNT];
+    //CGUICheckBox* m_pIncludeOtherVersions[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUIButton*      m_pButtonConnect[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pButtonConnectIcon[SERVER_BROWSER_TYPE_COUNT];
-    CGUIButton*      m_pButtonRefresh[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pButtonRefreshIcon[SERVER_BROWSER_TYPE_COUNT];
-    CGUIButton*      m_pButtonInfo[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pButtonInfoIcon[SERVER_BROWSER_TYPE_COUNT];
-    CGUIButton*      m_pButtonFavourites[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIButton*      m_pButtonConnect[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pButtonConnectIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIButton*      m_pButtonRefresh[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pButtonRefreshIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIButton*      m_pButtonInfo[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pButtonInfoIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIButton*      m_pButtonFavourites[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUIEdit*        m_pEditAddress[SERVER_BROWSER_TYPE_COUNT];
-    CGUILabel*       m_pLabelAddressDescription[SERVER_BROWSER_TYPE_COUNT];
-    CGUIComboBox*    m_pComboAddressHistory[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pSearchTypeIcon[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pAddressFavoriteIcon[SERVER_BROWSER_TYPE_COUNT];
-    CGUIStaticImage* m_pRemoveFromRecentIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIEdit*        m_pEditAddress[SERVER_BROWSER_TYPE_COUNT];
+    //CGUILabel*       m_pLabelAddressDescription[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIComboBox*    m_pComboAddressHistory[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pSearchTypeIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pAddressFavoriteIcon[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIStaticImage* m_pRemoveFromRecentIcon[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUIComboBox* m_pComboSearchType[SERVER_BROWSER_TYPE_COUNT];
-    CGUIEdit*     m_pEditSearch[SERVER_BROWSER_TYPE_COUNT];
-    CGUILabel*    m_pLabelSearchDescription[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIComboBox* m_pComboSearchType[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIEdit*     m_pEditSearch[SERVER_BROWSER_TYPE_COUNT];
+    //CGUILabel*    m_pLabelSearchDescription[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUILabel* m_pLabelPassword[SERVER_BROWSER_TYPE_COUNT];
-    CGUIEdit*  m_pEditPassword[SERVER_BROWSER_TYPE_COUNT];
+    //CGUILabel* m_pLabelPassword[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIEdit*  m_pEditPassword[SERVER_BROWSER_TYPE_COUNT];
 
-    CGUILabel*  m_pServerListStatus[SERVER_BROWSER_TYPE_COUNT];
-    CGUIButton* m_pButtonBack[SERVER_BROWSER_TYPE_COUNT];
-    CGUIButton* m_pButtonGeneralHelp[SERVER_BROWSER_TYPE_COUNT];
+    //CGUILabel*  m_pServerListStatus[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIButton* m_pButtonBack[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIButton* m_pButtonGeneralHelp[SERVER_BROWSER_TYPE_COUNT];
 
-    // Server list columns
-    CGUIHandle m_hVersion[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hLocked[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hName[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hPing[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hPlayers[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hHost[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hGame[SERVER_BROWSER_TYPE_COUNT];
-    CGUIHandle m_hMap[SERVER_BROWSER_TYPE_COUNT];
+    //// Server list columns
+    //CGUIHandle m_hVersion[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hLocked[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hName[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hPing[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hPlayers[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hHost[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hGame[SERVER_BROWSER_TYPE_COUNT];
+    //CGUIHandle m_hMap[SERVER_BROWSER_TYPE_COUNT];
 
-    // Player list columns
-    CGUIHandle m_hPlayerName[SERVER_BROWSER_TYPE_COUNT];
+    //// Player list columns
+    //CGUIHandle m_hPlayerName[SERVER_BROWSER_TYPE_COUNT];
 
     // Flash searchbox
     struct
@@ -211,31 +215,32 @@ private:
     void         AddServerToList(CServerListItem* pServer, const ServerBrowserType Type);
     bool         RemoveSelectedServerFromRecentlyPlayedList();
 
-    bool OnClick(CGUIElement* pElement);
-    bool OnDoubleClick(CGUIElement* pElement);
-    bool OnConnectClick(CGUIElement* pElement);
-    bool OnRefreshClick(CGUIElement* pElement);
-    bool OnInfoClick(CGUIElement* pElement);
-    bool OnFavouritesClick(CGUIElement* pElement);
-    bool OnRemoveFromRecentClick(CGUIElement* pElement);
-    bool OnBackClick(CGUIElement* pElement);
-    bool OnGeneralHelpClick(CGUIElement* pElement);
-    bool OnGeneralHelpDeactivate(CGUIElement* pElement);
-    bool OnAddressChanged(CGUIElement* pElement);
-    bool OnFilterChanged(CGUIElement* pElement);
-    bool OnTabChanged(CGUIElement* pElement);
-    bool OnHistorySelected(CGUIElement* pElement);
-    bool OnHistoryDropListRemove(CGUIElement* pElement);
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnClick(CGUIElement* pElement);
+    //bool OnDoubleClick(CGUIElement* pElement);
+    //bool OnConnectClick(CGUIElement* pElement);
+    //bool OnRefreshClick(CGUIElement* pElement);
+    //bool OnInfoClick(CGUIElement* pElement);
+    //bool OnFavouritesClick(CGUIElement* pElement);
+    //bool OnRemoveFromRecentClick(CGUIElement* pElement);
+    //bool OnBackClick(CGUIElement* pElement);
+    //bool OnGeneralHelpClick(CGUIElement* pElement);
+    //bool OnGeneralHelpDeactivate(CGUIElement* pElement);
+    //bool OnAddressChanged(CGUIElement* pElement);
+    //bool OnFilterChanged(CGUIElement* pElement);
+    //bool OnTabChanged(CGUIElement* pElement);
+    //bool OnHistorySelected(CGUIElement* pElement);
+    //bool OnHistoryDropListRemove(CGUIElement* pElement);
 
-    bool OnSearchTypeSelected(CGUIElement* pElement);
+    //bool OnSearchTypeSelected(CGUIElement* pElement);
 
-    bool OnSearchFocused(CGUIElement* pElement);
-    bool OnSearchDefocused(CGUIElement* pElement);
-    bool OnAddressFocused(CGUIElement* pElement);
-    bool OnAddressDefocused(CGUIElement* pElement);
+    //bool OnSearchFocused(CGUIElement* pElement);
+    //bool OnSearchDefocused(CGUIElement* pElement);
+    //bool OnAddressFocused(CGUIElement* pElement);
+    //bool OnAddressDefocused(CGUIElement* pElement);
 
-    bool OnServerListChangeRow(CGUIKeyEventArgs Args);
-    bool OnServerListKeyDown(CGUIKeyEventArgs Args);
+    //bool OnServerListChangeRow(CGUIKeyEventArgs Args);
+    //bool OnServerListKeyDown(CGUIKeyEventArgs Args);
 
     ServerBrowserType GetCurrentServerBrowserType();
     ServerBrowserType GetCurrentServerBrowserTypeForSave();
@@ -254,12 +259,12 @@ private:
     std::map<SString, int> m_blockedVersionMap;
     std::map<SString, int> m_allowedVersionMap;
 
-    CGUIWindow* m_pQuickConnectHelpWindow;
+    //CGUIWindow* m_pQuickConnectHelpWindow; /* TODO AFTER CEGUI API REWRITE */
     bool        m_bFocusTextEdit;
 
     uint              m_uiShownQuickConnectHelpCount;
     uint              m_uiIsUsingTempTab;
     ServerBrowserType m_BeforeTempServerBrowserType;
-    CGUIWindow*       m_pGeneralHelpWindow;
+    //CGUIWindow*       m_pGeneralHelpWindow; /* TODO AFTER CEGUI API REWRITE */
     long long         m_llLastGeneralHelpTime;
 };

@@ -28,7 +28,7 @@ CConnectManager::CConnectManager()
     m_bSave = true;
     m_tConnectStarted = 0;
 
-    m_pOnCancelClick = new GUI_CALLBACK(&CConnectManager::Event_OnCancelClick, this);
+    //m_pOnCancelClick = new GUI_CALLBACK(&CConnectManager::Event_OnCancelClick, this); /* TODO AFTER CEGUI API REWRITE */
 
     m_pServerItem = NULL;
     m_bNotifyServerBrowser = false;
@@ -36,11 +36,12 @@ CConnectManager::CConnectManager()
 
 CConnectManager::~CConnectManager()
 {
-    if (m_pOnCancelClick)
-    {
-        delete m_pOnCancelClick;
-        m_pOnCancelClick = NULL;
-    }
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pOnCancelClick)
+    //{
+    //    delete m_pOnCancelClick;
+    //    m_pOnCancelClick = NULL;
+    //}
 
     SAFE_DELETE(m_pServerItem);
     g_pConnectManager = NULL;
@@ -77,7 +78,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (!CheckNickProvided((char*)szNick))
     {
         SString strBuffer = _("Connecting failed. Invalid nick provided!");
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid nick provided
+        //CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid nick provided /* TODO AFTER CEGUI API REWRITE */
         return false;
     }
 
@@ -113,7 +114,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (!CServerListItem::Parse(m_strHost.c_str(), m_Address))
     {
         SString strBuffer = _("Connecting failed. Invalid host provided!");
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid host provided
+        //CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid host provided /* TODO AFTER CEGUI API REWRITE */
         return false;
     }
 
@@ -129,7 +130,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (m_usPort && !pNet->StartNetwork(strAddress, m_usPort, CVARS_GET_VALUE<bool>("packet_tag")))
     {
         SString strBuffer(_("Connecting to %s at port %u failed!"), m_strHost.c_str(), m_usPort);
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Failed to connect
+        //CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Failed to connect /* TODO AFTER CEGUI API REWRITE */
         return false;
     }
 
@@ -146,11 +147,11 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     m_pServerItem = new CServerListItem(m_Address, m_usPort);
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
-    OpenServerFirewall(m_Address, CServerBrowser::GetSingletonPtr()->FindServerHttpPort(m_strHost, m_usPort), true);
+    //OpenServerFirewall(m_Address, CServerBrowser::GetSingletonPtr()->FindServerHttpPort(m_strHost, m_usPort), true); /* TODO AFTER CEGUI API REWRITE */
 
     // Display the status box
     SString strBuffer(_("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort);
-    CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
+    //CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick); /* TODO AFTER CEGUI API REWRITE */
     WriteDebugEvent(SString("Connecting to %s:%u ...", m_strHost.c_str(), m_usPort));
 
     return true;
@@ -191,15 +192,16 @@ bool CConnectManager::Reconnect(const char* szHost, unsigned short usPort, const
     return true;
 }
 
-bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
-{
-    // The user clicked cancel, so abort connecting
-    Abort();
-    // Remove the message box next frame
-    g_pCore->RemoveMessageBox(true);
-
-    return true;
-}
+/* TODO AFTER CEGUI API REWRITE */
+//bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
+//{
+//    // The user clicked cancel, so abort connecting
+//    Abort();
+//    // Remove the message box next frame
+//    g_pCore->RemoveMessageBox(true);
+//
+//    return true;
+//}
 
 bool CConnectManager::Abort()
 {
@@ -406,7 +408,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 {
                     // Failed loading the mod
                     strArguments.Format(_("No such mod installed (%s)"), strModName.c_str());
-                    CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR);            // Mod loading failed
+                    //CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR);            // Mod loading failed /* TODO AFTER CEGUI API REWRITE */
                     g_pConnectManager->Abort();
                 }
             }

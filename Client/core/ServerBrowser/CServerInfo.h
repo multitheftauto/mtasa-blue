@@ -59,33 +59,34 @@ public:
     void DoPulse();
 
 protected:
-    CGUIWindow* m_pWindow;
-    CGUILabel*  m_pServerNameLabel;
-    CGUILabel*  m_pServerAddressLabel;
-    CGUILabel*  m_pGamemodeLabel;
-    CGUILabel*  m_pMapLabel;
-    CGUILabel*  m_pPlayersLabel;
-    CGUILabel*  m_pPasswordedLabel;
-    CGUILabel*  m_pLatencyLabel;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow* m_pWindow;
+    //CGUILabel*  m_pServerNameLabel;
+    //CGUILabel*  m_pServerAddressLabel;
+    //CGUILabel*  m_pGamemodeLabel;
+    //CGUILabel*  m_pMapLabel;
+    //CGUILabel*  m_pPlayersLabel;
+    //CGUILabel*  m_pPasswordedLabel;
+    //CGUILabel*  m_pLatencyLabel;
 
-    CGUILabel* m_pServerNameLabelTitle;
-    CGUILabel* m_pServerAddressLabelTitle;
-    CGUILabel* m_pGamemodeLabelTitle;
-    CGUILabel* m_pMapLabelTitle;
-    CGUILabel* m_pPlayersLabelTitle;
-    CGUILabel* m_pPasswordedLabelTitle;
-    CGUILabel* m_pLatencyLabelTitle;
+    //CGUILabel* m_pServerNameLabelTitle;
+    //CGUILabel* m_pServerAddressLabelTitle;
+    //CGUILabel* m_pGamemodeLabelTitle;
+    //CGUILabel* m_pMapLabelTitle;
+    //CGUILabel* m_pPlayersLabelTitle;
+    //CGUILabel* m_pPasswordedLabelTitle;
+    //CGUILabel* m_pLatencyLabelTitle;
 
-    CGUIGridList* m_pServerPlayerList;
-    CGUIHandle    m_hPlayerName;
+    //CGUIGridList* m_pServerPlayerList;
+    //CGUIHandle    m_hPlayerName;
 
-    CGUICheckBox* m_pCheckboxAutojoin;
+    //CGUICheckBox* m_pCheckboxAutojoin;
 
-    CGUILabel* m_pEnterPasswordLabel;
-    CGUIEdit*  m_pEnterPasswordEdit;
+    //CGUILabel* m_pEnterPasswordLabel;
+    //CGUIEdit*  m_pEnterPasswordEdit;
 
-    CGUIButton* m_pButtonJoinGame;
-    CGUIButton* m_pButtonClose;
+    //CGUIButton* m_pButtonJoinGame;
+    //CGUIButton* m_pButtonClose;
 
 private:
     unsigned long   m_ulLastUpdateTime;
@@ -102,6 +103,7 @@ private:
     void Reset();
     void ResetServerGUI(CServerListItem* pServer);
 
-    bool OnCloseClicked(CGUIElement* pElement);
-    bool OnJoinGameClicked(CGUIElement* pElement);
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnCloseClicked(CGUIElement* pElement);
+    //bool OnJoinGameClicked(CGUIElement* pElement);
 };

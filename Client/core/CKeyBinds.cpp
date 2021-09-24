@@ -361,18 +361,21 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     // any already pressed */
     static bool bInputGoesToGUI = false;
     static bool bIsCursorForced = false;
-    if (m_pCore->IsMenuVisible() ||
-        (m_pCore->GetConsole()->IsVisible() || m_pCore->IsChatInputEnabled() || m_pCore->GetGUI()->GetGUIInputEnabled()) && !pKey->bIgnoredByGUI)
-    {
-        if (!bInputGoesToGUI)
-        {
-            SetAllBindStates(false, KEY_BIND_COMMAND);
-            SetAllBindStates(false, KEY_BIND_FUNCTION);
-            bInputGoesToGUI = true;
-        }
-    }
-    else
-        bInputGoesToGUI = false;
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pCore->IsMenuVisible() ||
+    //    (m_pCore->GetConsole()->IsVisible() || m_pCore->IsChatInputEnabled() || m_pCore->GetGUI()->GetGUIInputEnabled()) && !pKey->bIgnoredByGUI)
+    //    (m_pCore->GetConsole()->IsVisible() || m_pCore->IsChatInputEnabled()))
+    //{
+    //    if (!bInputGoesToGUI)
+    //    {
+    //        SetAllBindStates(false, KEY_BIND_COMMAND);
+    //        SetAllBindStates(false, KEY_BIND_FUNCTION);
+    //        bInputGoesToGUI = true;
+    //    }
+    //}
+    //else
+    //    bInputGoesToGUI = false;
 
     if (m_pCore->IsCursorForcedVisible())
     {

@@ -621,7 +621,7 @@ void CVersionUpdater::InitiateManualCheck()
 
     if (IsBusy())
     {
-        CCore::GetSingleton().ShowMessageBox(_("Busy"), _("Can't check for updates right now"), MB_BUTTON_OK | MB_ICON_ERROR);
+        //CCore::GetSingleton().ShowMessageBox(_("Busy"), _("Can't check for updates right now"), MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
         return;
     }
 
@@ -3396,7 +3396,7 @@ void CVersionUpdater::OnMainMenuFullyVisible()
         {
             CVARS_SET("update_build_type", 0);
             std::string message = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
-            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO);
+            //g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO); /* TODO AFTER CEGUI API REWRITE */
         }
     }
 }

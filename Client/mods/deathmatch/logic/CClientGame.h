@@ -234,7 +234,7 @@ public:
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
     bool IsLocalGame() const { return m_bLocalPlay; }
-    bool OnCancelLocalGameClick(CGUIElement* pElement);
+    //bool OnCancelLocalGameClick(CGUIElement* pElement); /* TODO AFTER CEGUI API REWRITE */
 
     void DoPulsePreFrame();
     void DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets);
@@ -442,19 +442,21 @@ public:
 
 private:
     // CGUI Callbacks
-    bool OnKeyDown(CGUIKeyEventArgs Args);
-    bool OnMouseClick(CGUIMouseEventArgs Args);
-    bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
-    bool OnMouseButtonDown(CGUIMouseEventArgs Args);
-    bool OnMouseButtonUp(CGUIMouseEventArgs Args);
-    bool OnMouseMove(CGUIMouseEventArgs Args);
-    bool OnMouseEnter(CGUIMouseEventArgs Args);
-    bool OnMouseLeave(CGUIMouseEventArgs Args);
-    bool OnMouseWheel(CGUIMouseEventArgs Args);
-    bool OnMove(CGUIElement* pElement);
-    bool OnSize(CGUIElement* pElement);
-    bool OnFocusGain(CGUIFocusEventArgs Args);
-    bool OnFocusLoss(CGUIFocusEventArgs Args);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnKeyDown(CGUIKeyEventArgs Args);
+    //bool OnMouseClick(CGUIMouseEventArgs Args);
+    //bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
+    //bool OnMouseButtonDown(CGUIMouseEventArgs Args);
+    //bool OnMouseButtonUp(CGUIMouseEventArgs Args);
+    //bool OnMouseMove(CGUIMouseEventArgs Args);
+    //bool OnMouseEnter(CGUIMouseEventArgs Args);
+    //bool OnMouseLeave(CGUIMouseEventArgs Args);
+    //bool OnMouseWheel(CGUIMouseEventArgs Args);
+    //bool OnMove(CGUIElement* pElement);
+    //bool OnSize(CGUIElement* pElement);
+    //bool OnFocusGain(CGUIFocusEventArgs Args);
+    //bool OnFocusLoss(CGUIFocusEventArgs Args);
 
     // Network update functions
     void DoVehicleInKeyCheck();
@@ -816,7 +818,7 @@ private:
     CElapsedTime                                m_LastClearTime;
     SString                                     m_strServerVersionSortable;
     std::set<eWeaponType>                       m_weaponTypesUsingBulletSync;
-    GUI_CALLBACK                                m_OnCancelLocalGameClick;
+    //GUI_CALLBACK                                m_OnCancelLocalGameClick; /* TODO AFTER CEGUI API REWRITE */
 
     SVehExtrapolateSettings m_VehExtrapolateSettings;
     SMiscGameSettings       m_MiscGameSettings;

@@ -74,7 +74,7 @@ CClientManager::~CClientManager()
 
     // We need to call this after deleting resources but before deleting entities
     g_pClientGame->GetElementDeleter()->DoDeleteAll();
-    g_pCore->GetGUI()->CleanDeadPool();
+    //g_pCore->GetGUI()->CleanDeadPool(); /* TODO AFTER CEGUI API REWRITE */
 
     delete m_pExplosionManager;
     m_pExplosionManager = NULL;

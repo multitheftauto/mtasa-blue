@@ -121,11 +121,6 @@ workspace "MTASA"
 		include "Client/multiplayer_sa"
 		include "Client/mods/deathmatch"
 
-		group "Client/CEGUI"
-		include "vendor/cegui-0.4.0-custom/src/renderers/directx9GUIRenderer"
-		include "vendor/cegui-0.4.0-custom/WidgetSets/Falagard"
-		include "vendor/cegui-0.4.0-custom"
-
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"
@@ -137,6 +132,7 @@ workspace "MTASA"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
 		include "vendor/detours"
+		include "vendor/imgui"
 	end
 
 	filter {}

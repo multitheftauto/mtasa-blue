@@ -21,7 +21,8 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
 
     m_pManager = pManager;
 
-    CVector2D vecResolution = m_pManager->GetResolution();
+    //CVector2D vecResolution = m_pManager->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
+    CVector2D vecResolution = CVector2D(1920, 1080);
     m_vecScale = CVector2D(vecResolution.fX / 800.0f, vecResolution.fY / 600.0f);
     m_vecBackgroundPosition = vecPosition * vecResolution;
 
@@ -40,7 +41,7 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
     m_fSmoothAllowAfter = 0;
     m_fSmoothScrollResetTime = 0;
     m_fSmoothRepeatTimer = 0;
-    m_pFont = m_pManager->GetBoldFont();
+    //m_pFont = m_pManager->GetBoldFont(); /* TODO AFTER CEGUI API REWRITE */
     m_pDXFont = NULL;
     SetDxFont(g_pCore->GetGraphics()->GetFont());
     m_fNativeWidth = DEBUGVIEW_WIDTH;
@@ -57,19 +58,22 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
     m_TextColor = DEBUGVIEW_TEXT_COLOR;
     unsigned long ulBackgroundColor = COLOR_ARGB(m_Color.A, m_Color.R, m_Color.G, m_Color.B);
 
-    m_pBackground = m_pManager->CreateStaticImage();
-    m_pBackgroundTexture = m_pManager->CreateTexture();
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pBackground = m_pManager->CreateStaticImage();
+    //m_pBackgroundTexture = m_pManager->CreateTexture();
 
-    m_pBackgroundTexture->LoadFromMemory(&ulBackgroundColor, 1, 1);
-    m_pBackground->LoadFromTexture(m_pBackgroundTexture);
-    m_pBackground->MoveToBack();
-    m_pBackground->SetPosition(m_vecBackgroundPosition);
-    m_pBackground->SetSize(m_vecBackgroundSize);
-    m_pBackground->SetEnabled(false);
-    m_pBackground->SetVisible(false);
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pBackgroundTexture->LoadFromMemory(&ulBackgroundColor, 1, 1);
+    //m_pBackground->LoadFromTexture(m_pBackgroundTexture);
+    //m_pBackground->MoveToBack();
+    //m_pBackground->SetPosition(m_vecBackgroundPosition);
+    //m_pBackground->SetSize(m_vecBackgroundSize);
+    //m_pBackground->SetEnabled(false);
+    //m_pBackground->SetVisible(false);
 
-    m_pInput = NULL;
-    m_pInputTexture = NULL;
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pInput = NULL;
+    //m_pInputTexture = NULL;
 
     g_pChat = pChat;
 
@@ -86,16 +90,17 @@ void CDebugView::Draw(bool bUseCacheTexture, bool bAllowOutline)
     CChat* pChat = g_pChat;
     g_pChat = this;
 
+    /* TODO AFTER CEGUI API REWRITE */
     // Force the window on screen
-    CVector2D vecPosition(0.23f, 0.985f);
-    CVector2D vecResolution = m_pManager->GetResolution();
-    float     height = m_uiNumLines * GetFontHeight(1) * m_vecScale.fY;
-    m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D(0, height);
-    m_vecBackgroundPosition.fX = Round(m_vecBackgroundPosition.fX);
-    m_vecBackgroundPosition.fY = Round(m_vecBackgroundPosition.fY);
-    m_pBackground->SetPosition(m_vecBackgroundPosition);
+    //CVector2D vecPosition(0.23f, 0.985f);
+    //CVector2D vecResolution = m_pManager->GetResolution();
+    //float     height = m_uiNumLines * GetFontHeight(1) * m_vecScale.fY;
+    //m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D(0, height);
+    //m_vecBackgroundPosition.fX = Round(m_vecBackgroundPosition.fX);
+    //m_vecBackgroundPosition.fY = Round(m_vecBackgroundPosition.fY);
+    //m_pBackground->SetPosition(m_vecBackgroundPosition);
 
-    CChat::Draw(bUseCacheTexture, bAllowOutline);
+    //CChat::Draw(bUseCacheTexture, bAllowOutline); /* TODO AFTER CEGUI API REWRITE */
     g_pChat = pChat;
 }
 

@@ -24,7 +24,10 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_pManager = pManager;
 
     // Calculate relative position (assuming a 800x600 native resolution for our defined CCHAT_* values)
-    CVector2D vecResolution = m_pManager->GetResolution();
+
+    // CVector2D vecResolution = m_pManager->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
+    CVector2D vecResolution = CVector2D(1920, 1080); /* TODO AFTER CEGUI API REWRITE */
+
     m_vecScale = CVector2D(vecResolution.fX / 800.0f, vecResolution.fY / 600.0f);
     m_vecBackgroundPosition = vecPosition * vecResolution;
 
@@ -43,7 +46,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_bVisible = false;
     m_bInputBlocked = false;
     m_bInputVisible = false;
-    m_pFont = m_pManager->GetClearFont();
+    // m_pFont = m_pManager->GetClearFont(); /* TODO AFTER CEGUI API REWRITE */
     m_pDXFont = NULL;
     SetDxFont(g_pCore->GetGraphics()->GetFont());
     m_fNativeWidth = CHAT_WIDTH;
@@ -64,24 +67,29 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_iSelectedInputHistoryEntry = -1;
 
     // Background area
-    m_pBackground = m_pManager->CreateStaticImage();
-    m_pBackgroundTexture = m_pManager->CreateTexture();
-    m_pBackground->LoadFromTexture(m_pBackgroundTexture);
-    m_pBackground->MoveToBack();
-    m_pBackground->SetPosition(m_vecBackgroundPosition);
-    m_pBackground->SetSize(m_vecBackgroundSize);
-    m_pBackground->SetEnabled(false);
-    m_pBackground->SetVisible(false);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pBackground = m_pManager->CreateStaticImage();
+    //m_pBackgroundTexture = m_pManager->CreateTexture();
+    //m_pBackground->LoadFromTexture(m_pBackgroundTexture);
+    //m_pBackground->MoveToBack();
+    //m_pBackground->SetPosition(m_vecBackgroundPosition);
+    //m_pBackground->SetSize(m_vecBackgroundSize);
+    //m_pBackground->SetEnabled(false);
+    //m_pBackground->SetVisible(false);
 
     // Input area
-    m_pInput = m_pManager->CreateStaticImage();
-    m_pInputTexture = m_pManager->CreateTexture();
-    m_pInput->LoadFromTexture(m_pInputTexture);
-    m_pInput->MoveToBack();
-    m_pInput->SetPosition(m_vecInputPosition);
-    m_pInput->SetSize(m_vecInputSize);
-    m_pInput->SetEnabled(false);
-    m_pInput->SetVisible(false);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pInput = m_pManager->CreateStaticImage();
+    //m_pInputTexture = m_pManager->CreateTexture();
+    //m_pInput->LoadFromTexture(m_pInputTexture);
+    //m_pInput->MoveToBack();
+    //m_pInput->SetPosition(m_vecInputPosition);
+    //m_pInput->SetSize(m_vecInputSize);
+    //m_pInput->SetEnabled(false);
+    //m_pInput->SetVisible(false);
+
     SetInputPrefix("Say: ");
 
     // Load cvars and position the GUI
@@ -95,10 +103,13 @@ CChat::~CChat()
     ClearInput();
 
     SetDxFont(NULL);
-    SAFE_DELETE(m_pBackground);
-    SAFE_DELETE(m_pBackgroundTexture);
-    SAFE_DELETE(m_pInput);
-    SAFE_DELETE(m_pInputTexture);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //SAFE_DELETE(m_pBackground);
+    //SAFE_DELETE(m_pBackgroundTexture);
+    //SAFE_DELETE(m_pInput);
+    //SAFE_DELETE(m_pInputTexture);
+
     SAFE_DELETE(m_pInputHistory);
 
     if (g_pChat == this)
@@ -108,7 +119,7 @@ CChat::~CChat()
 void CChat::OnModLoad()
 {
     // Set handlers
-    m_pManager->SetCharacterKeyHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::CharacterKeyHandler, this));
+    // m_pManager->SetCharacterKeyHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::CharacterKeyHandler, this)); /* TODO AFTER CEGUI API REWRITE */
 }
 
 void CChat::LoadCVars()
@@ -292,19 +303,23 @@ void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
     if (m_Color.A * m_fBackgroundAlpha > 0.f)
     {
         // Hack to draw the background behind the text.
-        m_pBackground->SetAlpha(m_fBackgroundAlpha);
-        m_pBackground->SetVisible(true);
-        m_pBackground->Render();
-        m_pBackground->SetVisible(false);
+
+        /* TODO AFTER CEGUI API REWRITE */
+        //m_pBackground->SetAlpha(m_fBackgroundAlpha);
+        //m_pBackground->SetVisible(true);
+        //m_pBackground->Render();
+        //m_pBackground->SetVisible(false);
     }
 
     if (m_bInputVisible)
     {
         // ChrML: Hack so chatbox input always works. It might get unfocused..
-        if (!m_pBackground->IsActive())
-        {
-            m_pBackground->Activate();
-        }
+
+        /* TODO AFTER CEGUI API REWRITE */
+        //if (!m_pBackground->IsActive())
+        //{
+        //    m_pBackground->Activate();
+        //}
     }
 
     // Used for render clipping in CChat::DrawTextString
@@ -369,14 +384,15 @@ void CChat::DrawInputLine(bool bUsingOutline)
 {
     if (m_InputColor.A * m_fInputBackgroundAlpha > 0.f)
     {
-        if (m_pInput)
-        {
-            // Hack to draw the input background behind the text.
-            m_pInput->SetAlpha(m_fInputBackgroundAlpha);
-            m_pInput->SetVisible(true);
-            m_pInput->Render();
-            m_pInput->SetVisible(false);
-        }
+        /* TODO AFTER CEGUI API REWRITE */
+        //if (m_pInput)
+        //{
+        //    // Hack to draw the input background behind the text.
+        //    m_pInput->SetAlpha(m_fInputBackgroundAlpha);
+        //    m_pInput->SetVisible(true);
+        //    m_pInput->Render();
+        //    m_pInput->SetVisible(false);
+        //}
     }
 
     if (m_bInputVisible)
@@ -520,11 +536,12 @@ void CChat::ClearInput()
     m_InputLine.Clear();
     m_vecInputSize = CalcInputSize();
 
-    if (m_pInput)
-    {
-        m_pInput->SetSize(m_vecInputSize);
-        UpdatePosition();
-    }
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pInput)
+    //{
+    //    m_pInput->SetSize(m_vecInputSize);
+    //    UpdatePosition();
+    //}
 }
 
 void CChat::ScrollUp()
@@ -620,161 +637,162 @@ bool CChat::SetPreviousHistoryText()
     return true;
 }
 
-bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
-{
-    if (!CanTakeInput())
-        return false;
-
-    // Check if it's a special key like enter and backspace, if not, add it as a character to the message
-    switch (KeyboardArgs.codepoint)
-    {
-        case VK_BACK:
-        {
-            if (m_strInputText.size() > 0)
-            {
-                // Convert our string to UTF8 before resizing, then back to ANSI.
-                std::wstring strText = MbUTF8ToUTF16(m_strInputText);
-                strText.resize(strText.size() - 1);
-                SetInputText(UTF16ToMbUTF8(strText).c_str());
-            }
-            break;
-        }
-
-        case VK_RETURN:
-        {
-            // Empty the chat and hide the input stuff
-            // If theres a command to call, call it
-            if (!m_strCommand.empty() && !m_strInputText.empty())
-                CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
-
-            // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
-            if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
-                m_pInputHistory->Add(m_strInputText);
-
-            SetInputVisible(false);
-
-            m_fSmoothScrollResetTime = GetSecondCount();
-
-            ResetHistoryChanges();
-            break;
-        }
-
-        case VK_TAB:
-        {
-            if (m_bNickCompletion && m_strInputText.size() > 0)
-            {
-                bool bSuccess = false;
-
-                SString strCurrentInput = GetInputText();
-                size_t  iFound;
-                iFound = strCurrentInput.find_last_of(" ");
-                if (iFound == std::string::npos)
-                    iFound = 0;
-                else
-                    ++iFound;
-
-                SString strPlayerNamePart = strCurrentInput.substr(iFound);
-
-                CModManager* pModManager = CModManager::GetSingletonPtr();
-                if (pModManager && pModManager->GetCurrentMod())
-                {
-                    // Create vector and get playernames from deathmatch module
-                    std::vector<SString> vPlayerNames;
-                    pModManager->GetCurrentMod()->GetPlayerNames(vPlayerNames);
-
-                    for (std::vector<SString>::iterator iter = vPlayerNames.begin(); iter != vPlayerNames.end(); ++iter)
-                    {
-                        SString strPlayerName = *iter;
-
-                        // Check if there is another player after our last result
-                        if (m_strLastPlayerName.size() != 0)
-                        {
-                            if (strPlayerName.CompareI(m_strLastPlayerName))
-                            {
-                                m_strLastPlayerName.clear();
-                                if (*iter == vPlayerNames.back())
-                                {
-                                    CharacterKeyHandler(KeyboardArgs);
-                                    return true;
-                                }
-                            }
-                            continue;
-                        }
-
-                        // Already a part?
-                        if (m_strLastPlayerNamePart.size() != 0)
-                        {
-                            strPlayerNamePart = m_strLastPlayerNamePart;
-                        }
-
-                        // Check namepart
-                        if (!RemoveColorCodes(strPlayerName).BeginsWith(strPlayerNamePart))
-                            continue;
-                        else
-                        {
-                            // Check size if it's ok, then output
-                            SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
-                            if (MbUTF8ToUTF16(strOutput).size() < CHAT_MAX_CHAT_LENGTH)
-                            {
-                                bSuccess = true;
-                                m_strLastPlayerNamePart = strPlayerNamePart;
-                                m_strLastPlayerName = strPlayerName;
-                                SetInputText(strOutput);
-                            }
-
-                            break;
-                        }
-                    }
-
-                    // No success? Try again!
-                    if (!bSuccess)
-                        m_strLastPlayerName.clear();
-                }
-            }
-            break;
-        }
-
-        default:
-        {
-            // Clear last namepart when pressing letter
-            if (m_strLastPlayerNamePart.size() != 0)
-                m_strLastPlayerNamePart.clear();
-
-            // Clear last name when pressing letter
-            if (m_strLastPlayerName.size() != 0)
-                m_strLastPlayerName.clear();
-
-            // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-            if (MbUTF8ToUTF16(m_strInputText).size() < CHAT_MAX_CHAT_LENGTH)
-            {
-                if (KeyboardArgs.codepoint >= 32)
-                {
-                    unsigned int uiCharacter = KeyboardArgs.codepoint;
-                    if (uiCharacter < 127)            // we have any char from ASCII
-                    {
-                        // injecting as is
-                        m_strInputText += static_cast<char>(KeyboardArgs.codepoint);
-                        SetInputText(m_strInputText.c_str());
-                    }
-                    else            // we have any char from Extended ASCII, any ANSI code page or UNICODE range
-                    {
-                        // Generate a null-terminating string for our character
-                        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiCharacter), '\0'};
-
-                        // Convert our UTF character into an ANSI string
-                        std::string strANSI = UTF16ToMbUTF8(wUNICODE);
-
-                        // Append the ANSI string, and update
-                        m_strInputText.append(strANSI);
-                        SetInputText(m_strInputText.c_str());
-                    }
-                }
-            }
-            break;
-        }
-    }
-    return true;
-}
+/* TODO AFTER CEGUI API REWRITE */
+//bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
+//{
+//    if (!CanTakeInput())
+//        return false;
+//
+//    // Check if it's a special key like enter and backspace, if not, add it as a character to the message
+//    switch (KeyboardArgs.codepoint)
+//    {
+//        case VK_BACK:
+//        {
+//            if (m_strInputText.size() > 0)
+//            {
+//                // Convert our string to UTF8 before resizing, then back to ANSI.
+//                std::wstring strText = MbUTF8ToUTF16(m_strInputText);
+//                strText.resize(strText.size() - 1);
+//                SetInputText(UTF16ToMbUTF8(strText).c_str());
+//            }
+//            break;
+//        }
+//
+//        case VK_RETURN:
+//        {
+//            // Empty the chat and hide the input stuff
+//            // If theres a command to call, call it
+//            if (!m_strCommand.empty() && !m_strInputText.empty())
+//                CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
+//
+//            // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
+//            if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
+//                m_pInputHistory->Add(m_strInputText);
+//
+//            SetInputVisible(false);
+//
+//            m_fSmoothScrollResetTime = GetSecondCount();
+//
+//            ResetHistoryChanges();
+//            break;
+//        }
+//
+//        case VK_TAB:
+//        {
+//            if (m_bNickCompletion && m_strInputText.size() > 0)
+//            {
+//                bool bSuccess = false;
+//
+//                SString strCurrentInput = GetInputText();
+//                size_t  iFound;
+//                iFound = strCurrentInput.find_last_of(" ");
+//                if (iFound == std::string::npos)
+//                    iFound = 0;
+//                else
+//                    ++iFound;
+//
+//                SString strPlayerNamePart = strCurrentInput.substr(iFound);
+//
+//                CModManager* pModManager = CModManager::GetSingletonPtr();
+//                if (pModManager && pModManager->GetCurrentMod())
+//                {
+//                    // Create vector and get playernames from deathmatch module
+//                    std::vector<SString> vPlayerNames;
+//                    pModManager->GetCurrentMod()->GetPlayerNames(vPlayerNames);
+//
+//                    for (std::vector<SString>::iterator iter = vPlayerNames.begin(); iter != vPlayerNames.end(); ++iter)
+//                    {
+//                        SString strPlayerName = *iter;
+//
+//                        // Check if there is another player after our last result
+//                        if (m_strLastPlayerName.size() != 0)
+//                        {
+//                            if (strPlayerName.CompareI(m_strLastPlayerName))
+//                            {
+//                                m_strLastPlayerName.clear();
+//                                if (*iter == vPlayerNames.back())
+//                                {
+//                                    CharacterKeyHandler(KeyboardArgs);
+//                                    return true;
+//                                }
+//                            }
+//                            continue;
+//                        }
+//
+//                        // Already a part?
+//                        if (m_strLastPlayerNamePart.size() != 0)
+//                        {
+//                            strPlayerNamePart = m_strLastPlayerNamePart;
+//                        }
+//
+//                        // Check namepart
+//                        if (!RemoveColorCodes(strPlayerName).BeginsWith(strPlayerNamePart))
+//                            continue;
+//                        else
+//                        {
+//                            // Check size if it's ok, then output
+//                            SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
+//                            if (MbUTF8ToUTF16(strOutput).size() < CHAT_MAX_CHAT_LENGTH)
+//                            {
+//                                bSuccess = true;
+//                                m_strLastPlayerNamePart = strPlayerNamePart;
+//                                m_strLastPlayerName = strPlayerName;
+//                                SetInputText(strOutput);
+//                            }
+//
+//                            break;
+//                        }
+//                    }
+//
+//                    // No success? Try again!
+//                    if (!bSuccess)
+//                        m_strLastPlayerName.clear();
+//                }
+//            }
+//            break;
+//        }
+//
+//        default:
+//        {
+//            // Clear last namepart when pressing letter
+//            if (m_strLastPlayerNamePart.size() != 0)
+//                m_strLastPlayerNamePart.clear();
+//
+//            // Clear last name when pressing letter
+//            if (m_strLastPlayerName.size() != 0)
+//                m_strLastPlayerName.clear();
+//
+//            // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
+//            if (MbUTF8ToUTF16(m_strInputText).size() < CHAT_MAX_CHAT_LENGTH)
+//            {
+//                if (KeyboardArgs.codepoint >= 32)
+//                {
+//                    unsigned int uiCharacter = KeyboardArgs.codepoint;
+//                    if (uiCharacter < 127)            // we have any char from ASCII
+//                    {
+//                        // injecting as is
+//                        m_strInputText += static_cast<char>(KeyboardArgs.codepoint);
+//                        SetInputText(m_strInputText.c_str());
+//                    }
+//                    else            // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+//                    {
+//                        // Generate a null-terminating string for our character
+//                        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiCharacter), '\0'};
+//
+//                        // Convert our UTF character into an ANSI string
+//                        std::string strANSI = UTF16ToMbUTF8(wUNICODE);
+//
+//                        // Append the ANSI string, and update
+//                        m_strInputText.append(strANSI);
+//                        SetInputText(m_strInputText.c_str());
+//                    }
+//                }
+//            }
+//            break;
+//        }
+//    }
+//    return true;
+//}
 
 void CChat::SetVisible(bool bVisible, bool bInputBlocked)
 {
@@ -810,22 +828,22 @@ void CChat::SetNumLines(unsigned int uiNumLines)
 
 void CChat::SetChatFont(eChatFont Font)
 {
-    CGUIFont*  pFont = g_pCore->GetGUI()->GetDefaultFont();
+    //CGUIFont*  pFont = g_pCore->GetGUI()->GetDefaultFont(); /* TODO AFTER CEGUI API REWRITE */
     ID3DXFont* pDXFont = g_pCore->GetGraphics()->GetFont();
     float      fUsingDxFontScale = 1;
     float      fReqestedDxFontScale = std::max(m_vecScale.fX, m_vecScale.fY);
     switch (Font)
     {
         case Chat::Font::DEFAULT:
-            pFont = g_pCore->GetGUI()->GetDefaultFont();
+            //pFont = g_pCore->GetGUI()->GetDefaultFont(); /* TODO AFTER CEGUI API REWRITE */
             pDXFont = g_pCore->GetGraphics()->GetFont(FONT_DEFAULT, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
         case Chat::Font::CLEAR:
-            pFont = g_pCore->GetGUI()->GetClearFont();
+            //pFont = g_pCore->GetGUI()->GetClearFont(); /* TODO AFTER CEGUI API REWRITE */
             pDXFont = g_pCore->GetGraphics()->GetFont(FONT_CLEAR, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
         case Chat::Font::BOLD:
-            pFont = g_pCore->GetGUI()->GetBoldFont();
+            //pFont = g_pCore->GetGUI()->GetBoldFont(); /* TODO AFTER CEGUI API REWRITE */
             pDXFont = g_pCore->GetGraphics()->GetFont(FONT_DEFAULT_BOLD, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
         case Chat::Font::ARIAL:
@@ -837,7 +855,7 @@ void CChat::SetChatFont(eChatFont Font)
     SAFE_RELEASE(m_pCacheTexture);
 
     // Set fonts
-    m_pFont = pFont;
+    //m_pFont = pFont; /* TODO AFTER CEGUI API REWRITE */
     SetDxFont(pDXFont);
 }
 
@@ -862,7 +880,7 @@ void CChat::UpdateGUI()
     m_vecBackgroundSize.fY = Round(m_vecBackgroundSize.fY);
     m_vecBackgroundPosition.fX = Round(m_vecBackgroundPosition.fX);
     m_vecBackgroundPosition.fY = Round(m_vecBackgroundPosition.fY);
-    m_pBackground->SetSize(m_vecBackgroundSize);
+    //m_pBackground->SetSize(m_vecBackgroundSize); /* TODO AFTER CEGUI API REWRITE */
 
     // Make sure there is enough room for all the lines
     uint uiMaxNumLines = g_pCore->GetGraphics()->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - 3;
@@ -870,17 +888,20 @@ void CChat::UpdateGUI()
         SetNumLines(uiMaxNumLines);
 
     m_vecInputSize = CalcInputSize();
-    if (m_pInput)
-    {
-        m_pInput->SetSize(m_vecInputSize);
-    }
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pInput)
+    //{
+    //    m_pInput->SetSize(m_vecInputSize);
+    //}
 
     UpdatePosition();
 }
 
 void CChat::UpdatePosition()
 {
-    CVector2D vecResolution = m_pManager->GetResolution();
+    //CVector2D vecResolution = m_pManager->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
+    CVector2D vecResolution = CVector2D(1920, 1080);
 
     float fRelativeWidth = (m_vecBackgroundSize.fX / vecResolution.fX), fRelativeHeight = ((m_vecBackgroundSize.fY + m_vecInputSize.fY) / vecResolution.fY),
           fPosX, fPosY;
@@ -916,31 +937,34 @@ void CChat::UpdatePosition()
     m_vecBackgroundPosition = CVector2D(std::floor(fPosX * vecResolution.fX), std::floor(fPosY * vecResolution.fY));
     m_vecInputPosition = CVector2D(m_vecBackgroundPosition.fX, m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY);
 
-    m_pBackground->SetPosition(m_vecBackgroundPosition);
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pBackground->SetPosition(m_vecBackgroundPosition);
 
-    if (m_pInput)
-    {
-        m_pInput->SetPosition(m_vecInputPosition);
-    }
+    //if (m_pInput)
+    //{
+    //    m_pInput->SetPosition(m_vecInputPosition);
+    //}
 }
 
 void CChat::SetColor(const CColor& Color)
 {
     unsigned long ulBackgroundColor = COLOR_ARGB(Color.A, Color.R, Color.G, Color.B);
 
-    m_pBackgroundTexture->LoadFromMemory(&ulBackgroundColor, 1, 1);
-    m_pBackground->LoadFromTexture(m_pBackgroundTexture);
+    /* TODO AFTER CEGUI API REWRITE */
+    //m_pBackgroundTexture->LoadFromMemory(&ulBackgroundColor, 1, 1);
+    //m_pBackground->LoadFromTexture(m_pBackgroundTexture);
 }
 
 void CChat::SetInputColor(const CColor& Color)
 {
     unsigned long ulInputColor = COLOR_ARGB(Color.A, Color.R, Color.G, Color.B);
 
-    if (m_pInputTexture)
-        m_pInputTexture->LoadFromMemory(&ulInputColor, 1, 1);
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pInputTexture)
+    //    m_pInputTexture->LoadFromMemory(&ulInputColor, 1, 1);
 
-    if (m_pInput)
-        m_pInput->LoadFromTexture(m_pInputTexture);
+    //if (m_pInput)
+    //    m_pInput->LoadFromTexture(m_pInputTexture);
 }
 
 const char* CChat::GetInputPrefix()
@@ -982,11 +1006,12 @@ void CChat::SetInputText(const char* szText)
 
     m_vecInputSize = CalcInputSize();
 
-    if (m_pInput)
-    {
-        m_pInput->SetSize(m_vecInputSize);
-        UpdatePosition();
-    }
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pInput)
+    //{
+    //    m_pInput->SetSize(m_vecInputSize);
+    //    UpdatePosition();
+    //}
 }
 
 void CChat::SetCommand(const char* szCommand)
@@ -1013,10 +1038,11 @@ float CChat::GetFontHeight(float fScale)
     if (!g_pChat)
         return 0.0f;
 
-    if (g_pChat->m_bUseCEGUI)
-    {
-        return g_pChat->m_pFont->GetFontHeight(fScale);
-    }
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (g_pChat->m_bUseCEGUI)
+    //{
+    //    return g_pChat->m_pFont->GetFontHeight(fScale);
+    //}
 
     fScale *= g_pChat->m_fRcpUsingDxFontScale;
 
@@ -1028,10 +1054,11 @@ float CChat::GetTextExtent(const char* szText, float fScale)
     if (!g_pChat)
         return 0.0f;
 
-    if (g_pChat->m_bUseCEGUI)
-    {
-        return g_pChat->m_pFont->GetTextExtent(szText, fScale);
-    }
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (g_pChat->m_bUseCEGUI)
+    //{
+    //    return g_pChat->m_pFont->GetTextExtent(szText, fScale);
+    //}
 
     fScale *= g_pChat->m_fRcpUsingDxFontScale;
 
@@ -1046,7 +1073,7 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
 
     if (g_pChat->m_bUseCEGUI)
     {
-        g_pChat->m_pFont->DrawTextString(szText, DrawArea, fZ, ClipRect, ulFormat, ulColor, fScaleX, fScaleY);
+        //g_pChat->m_pFont->DrawTextString(szText, DrawArea, fZ, ClipRect, ulFormat, ulColor, fScaleX, fScaleY); /* TODO AFTER CEGUI API REWRITE */
     }
     else
     {

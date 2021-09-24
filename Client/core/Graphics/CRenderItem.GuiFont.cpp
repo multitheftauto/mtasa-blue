@@ -82,38 +82,39 @@ void CGuiFontItem::OnResetDevice()
 ////////////////////////////////////////////////////////////////
 void CGuiFontItem::CreateUnderlyingData(const SString& strFullFilePath, const SString& strFontName, uint uiSize)
 {
-    assert(!m_pFntCEGUI);
+    /* TODO AFTER CEGUI API REWRITE */
+    //assert(!m_pFntCEGUI);
 
-    uiSize = (uiSize < 5) ? 5 : ((uiSize > 150) ? 150 : uiSize);
+    //uiSize = (uiSize < 5) ? 5 : ((uiSize > 150) ? 150 : uiSize);
 
-    // Find unused font name
-    int iCounter = 0;
-    do
-        m_strCEGUIFontName = SString("%s*%d*%d", *strFontName, uiSize, iCounter++);
-    while (CCore::GetSingleton().GetGUI()->IsFontPresent(m_strCEGUIFontName));
+    //// Find unused font name
+    //int iCounter = 0;
+    //do
+    //    m_strCEGUIFontName = SString("%s*%d*%d", *strFontName, uiSize, iCounter++);
+    //while (CCore::GetSingleton().GetGUI()->IsFontPresent(m_strCEGUIFontName));
 
-    // Create the CEGUI font
-    try
-    {
-        m_pFntCEGUI = CCore::GetSingleton().GetGUI()->CreateFnt(m_strCEGUIFontName, strFullFilePath, uiSize);
-    }
-    catch (...)
-    {
-        // Catch any font creation problems
-        // TODO - Cleanup open file handle
-    }
+    //// Create the CEGUI font
+    //try
+    //{
+    //    m_pFntCEGUI = CCore::GetSingleton().GetGUI()->CreateFnt(m_strCEGUIFontName, strFullFilePath, uiSize);
+    //}
+    //catch (...)
+    //{
+    //    // Catch any font creation problems
+    //    // TODO - Cleanup open file handle
+    //}
 
-    if (!m_pFntCEGUI)
-        return;
+    //if (!m_pFntCEGUI)
+    //    return;
 
-    // Memory usage - complete guess
-    int iCharHeight = m_pFntCEGUI->GetFontHeight(1);
-    int iCharWidth = m_pFntCEGUI->GetTextExtent("A", 1);
-    int iNumChars = 256;
-    int iBodgeFactor = 4;
-    int iBPP = 32;
-    int iMemoryUsed = iCharHeight * iCharWidth * iBPP / 8 * iNumChars * iBodgeFactor;
-    m_iMemoryKBUsed = iMemoryUsed / 1024;
+    //// Memory usage - complete guess
+    //int iCharHeight = m_pFntCEGUI->GetFontHeight(1);
+    //int iCharWidth = m_pFntCEGUI->GetTextExtent("A", 1);
+    //int iNumChars = 256;
+    //int iBodgeFactor = 4;
+    //int iBPP = 32;
+    //int iMemoryUsed = iCharHeight * iCharWidth * iBPP / 8 * iNumChars * iBodgeFactor;
+    //m_iMemoryKBUsed = iMemoryUsed / 1024;
 }
 
 ////////////////////////////////////////////////////////////////

@@ -32,7 +32,7 @@ struct sMenuItem
     int              drawPositionY;
     int              nativeSizeX;
     int              nativeSizeY;
-    CGUIStaticImage* image;
+    //CGUIStaticImage* image; /* TODO AFTER CEGUI API REWRITE */
 };
 
 class CMainMenu
@@ -79,34 +79,37 @@ private:
     sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);
     bool       SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering);
 
-    bool OnMenuEnter(CGUIElement* pElement);
-    bool OnMenuExit(CGUIElement* pElement);
-    bool OnMenuClick(CGUIMouseEventArgs Args);
-    bool OnQuickConnectButtonClick(CGUIElement* pElement, bool left);
-    bool OnResumeButtonClick(CGUIElement* pElement);
-    bool OnBrowseServersButtonClick(CGUIElement* pElement);
-    bool OnHostGameButtonClick();
-    bool OnDisconnectButtonClick(CGUIElement* pElement);
-    bool OnEditorButtonClick();
-    bool OnSettingsButtonClick(CGUIElement* pElement);
-    bool OnAboutButtonClick(CGUIElement* pElement);
-    bool OnQuitButtonClick(CGUIElement* pElement);
-    bool OnNewsButtonClick(CGUIElement* pElement);
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnMenuEnter(CGUIElement* pElement);
+    //bool OnMenuExit(CGUIElement* pElement);
+    //bool OnMenuClick(CGUIMouseEventArgs Args);
+    //bool OnQuickConnectButtonClick(CGUIElement* pElement, bool left);
+    //bool OnResumeButtonClick(CGUIElement* pElement);
+    //bool OnBrowseServersButtonClick(CGUIElement* pElement);
+    //bool OnHostGameButtonClick();
+    //bool OnDisconnectButtonClick(CGUIElement* pElement);
+    //bool OnEditorButtonClick();
+    //bool OnSettingsButtonClick(CGUIElement* pElement);
+    //bool OnAboutButtonClick(CGUIElement* pElement);
+    //bool OnQuitButtonClick(CGUIElement* pElement);
+    //bool OnNewsButtonClick(CGUIElement* pElement);
 
     void HideServerInfo();
 
     CGUI* m_pManager;
 
     // Images
-    CGUIStaticImage* m_pBackground;
-    CGUIStaticImage* m_pLogo;
-    CGUIStaticImage* m_pLatestNews;
-    CGUIStaticImage* m_pFiller;
-    CGUIStaticImage* m_pFiller2;
-    CGUIStaticImage* m_pVersion;
-    CGUIStaticImage* m_pMenuArea;
 
-    CGUIScrollPane* m_pCanvas;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIStaticImage* m_pBackground;
+    //CGUIStaticImage* m_pLogo;
+    //CGUIStaticImage* m_pLatestNews;
+    //CGUIStaticImage* m_pFiller;
+    //CGUIStaticImage* m_pFiller2;
+    //CGUIStaticImage* m_pVersion;
+    //CGUIStaticImage* m_pMenuArea;
+
+    //CGUIScrollPane* m_pCanvas; /* TODO AFTER CEGUI API REWRITE */
 
     std::deque<sMenuItem*> m_menuItems;
     std::set<sMenuItem*>   m_unhoveredItems;
@@ -157,22 +160,24 @@ private:
     int           m_iMoveTargetPos;
     unsigned long m_ulMoveStartTick;
 
-    CGUILabel* m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
-    CGUILabel* m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
-    CGUILabel* m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
-    CGUILabel* m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUILabel* m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
+    //CGUILabel* m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
+    //CGUILabel* m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
+    //CGUILabel* m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
 
-#ifdef CI_BUILD
-    std::unique_ptr<CGUITexture>     m_pFeatureBranchAlertTexture;
-    std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
-    std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
-#endif
-
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-    std::unique_ptr<CGUITexture> m_pAlertTexture;
-    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
-    std::unique_ptr<CGUILabel> m_pAlertLabel;
-#endif
+    /* TODO AFTER CEGUI API REWRITE */
+//#ifdef CI_BUILD
+//    std::unique_ptr<CGUITexture>     m_pFeatureBranchAlertTexture;
+//    std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
+//    std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
+//#endif
+//
+//#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+//    std::unique_ptr<CGUITexture> m_pAlertTexture;
+//    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
+//    std::unique_ptr<CGUILabel> m_pAlertLabel;
+//#endif
 
     // Fade states
     enum eFadeStates

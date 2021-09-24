@@ -731,7 +731,7 @@ SString CInstallManager::_ProcessLayoutChecks()
         for (uint i = 0; i < NUMELMS(migrateConfigs); i++)
             MigrateFile(PathJoin(strOldDir, migrateConfigs[i]), PathJoin(strNewConfigDir, migrateConfigs[i]));
 
-        const char* migrateLogs[] = {"CEGUI.log", "console-input.log", "clientscript.log", "logfile.txt"};
+        const char* migrateLogs[] = {"console-input.log", "clientscript.log", "logfile.txt"};
         for (uint i = 0; i < NUMELMS(migrateLogs); i++)
             MigrateFile(PathJoin(strOldDir, migrateLogs[i]), PathJoin(strNewLogDir, migrateLogs[i]));
 

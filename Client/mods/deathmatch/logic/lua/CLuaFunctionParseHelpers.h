@@ -11,22 +11,25 @@
 #pragma once
 
 // Forward declare enum reflection stuff
-#include <gui/CGUIEnumDefs.h>
+//#include <gui/CGUIEnumDefs.h> /* TODO AFTER CEGUI API REWRITE */
 
 enum eLuaType
 {
 };
 
 DECLARE_ENUM(eLuaType);
-DECLARE_ENUM(CGUIVerticalAlign);
-DECLARE_ENUM(CGUIHorizontalAlign);
-DECLARE_ENUM(eInputMode);
+
+/* TODO AFTER CEGUI API REWRITE */
+//DECLARE_ENUM(CGUIVerticalAlign);
+//DECLARE_ENUM(CGUIHorizontalAlign);
+//DECLARE_ENUM(eInputMode);
+
 DECLARE_ENUM(eAccessType);
 DECLARE_ENUM(TrafficLight::EColor);
 DECLARE_ENUM(TrafficLight::EState);
 DECLARE_ENUM(CEasingCurve::eType);
 DECLARE_ENUM(eAmbientSoundType)
-DECLARE_ENUM(eCGUIType);
+//DECLARE_ENUM(eCGUIType); /* TODO AFTER CEGUI API REWRITE */
 DECLARE_ENUM(eDxTestMode)
 DECLARE_ENUM(eWeaponType)
 DECLARE_ENUM(eWeaponProperty)
@@ -54,7 +57,7 @@ DECLARE_ENUM(eRadioStreamIndex);
 DECLARE_ENUM(EComponentBase::EComponentBaseType);
 DECLARE_ENUM(eWebBrowserMouseButton);
 DECLARE_ENUM(eTrayIconType)
-DECLARE_ENUM(eCursorType)
+//DECLARE_ENUM(eCursorType) /* TODO AFTER CEGUI API REWRITE */
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
@@ -116,71 +119,72 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
+/* TODO AFTER CEGUI API REWRITE */
 // class -> class type
-inline eCGUIType GetClassType(CGUIButton*)
-{
-    return CGUI_BUTTON;
-}
-inline eCGUIType GetClassType(CGUICheckBox*)
-{
-    return CGUI_CHECKBOX;
-}
-inline eCGUIType GetClassType(CGUIEdit*)
-{
-    return CGUI_EDIT;
-}
-inline eCGUIType GetClassType(CGUIGridList*)
-{
-    return CGUI_GRIDLIST;
-}
-inline eCGUIType GetClassType(CGUILabel*)
-{
-    return CGUI_LABEL;
-}
-inline eCGUIType GetClassType(CGUIMemo*)
-{
-    return CGUI_MEMO;
-}
-inline eCGUIType GetClassType(CGUIProgressBar*)
-{
-    return CGUI_PROGRESSBAR;
-}
-inline eCGUIType GetClassType(CGUIRadioButton*)
-{
-    return CGUI_RADIOBUTTON;
-}
-inline eCGUIType GetClassType(CGUIStaticImage*)
-{
-    return CGUI_STATICIMAGE;
-}
-inline eCGUIType GetClassType(CGUITab*)
-{
-    return CGUI_TAB;
-}
-inline eCGUIType GetClassType(CGUITabPanel*)
-{
-    return CGUI_TABPANEL;
-}
-inline eCGUIType GetClassType(CGUIWindow*)
-{
-    return CGUI_WINDOW;
-}
-inline eCGUIType GetClassType(CGUIScrollPane*)
-{
-    return CGUI_SCROLLPANE;
-}
-inline eCGUIType GetClassType(CGUIScrollBar*)
-{
-    return CGUI_SCROLLBAR;
-}
-inline eCGUIType GetClassType(CGUIComboBox*)
-{
-    return CGUI_COMBOBOX;
-}
-inline eCGUIType GetClassType(CGUIWebBrowser*)
-{
-    return CGUI_WEBBROWSER;
-}
+//inline eCGUIType GetClassType(CGUIButton*)
+//{
+//    return CGUI_BUTTON;
+//}
+//inline eCGUIType GetClassType(CGUICheckBox*)
+//{
+//    return CGUI_CHECKBOX;
+//}
+//inline eCGUIType GetClassType(CGUIEdit*)
+//{
+//    return CGUI_EDIT;
+//}
+//inline eCGUIType GetClassType(CGUIGridList*)
+//{
+//    return CGUI_GRIDLIST;
+//}
+//inline eCGUIType GetClassType(CGUILabel*)
+//{
+//    return CGUI_LABEL;
+//}
+//inline eCGUIType GetClassType(CGUIMemo*)
+//{
+//    return CGUI_MEMO;
+//}
+//inline eCGUIType GetClassType(CGUIProgressBar*)
+//{
+//    return CGUI_PROGRESSBAR;
+//}
+//inline eCGUIType GetClassType(CGUIRadioButton*)
+//{
+//    return CGUI_RADIOBUTTON;
+//}
+//inline eCGUIType GetClassType(CGUIStaticImage*)
+//{
+//    return CGUI_STATICIMAGE;
+//}
+//inline eCGUIType GetClassType(CGUITab*)
+//{
+//    return CGUI_TAB;
+//}
+//inline eCGUIType GetClassType(CGUITabPanel*)
+//{
+//    return CGUI_TABPANEL;
+//}
+//inline eCGUIType GetClassType(CGUIWindow*)
+//{
+//    return CGUI_WINDOW;
+//}
+//inline eCGUIType GetClassType(CGUIScrollPane*)
+//{
+//    return CGUI_SCROLLPANE;
+//}
+//inline eCGUIType GetClassType(CGUIScrollBar*)
+//{
+//    return CGUI_SCROLLBAR;
+//}
+//inline eCGUIType GetClassType(CGUIComboBox*)
+//{
+//    return CGUI_COMBOBOX;
+//}
+//inline eCGUIType GetClassType(CGUIWebBrowser*)
+//{
+//    return CGUI_WEBBROWSER;
+//}
 
 // class -> class name
 inline SString GetClassTypeName(CClientEntity*)
@@ -316,70 +320,71 @@ inline SString GetClassTypeName(CClientPointLights*)
     return "light";
 }
 
-inline SString GetClassTypeName(CGUIButton*)
-{
-    return "gui-button";
-}
-inline SString GetClassTypeName(CGUICheckBox*)
-{
-    return "gui-checkbox";
-}
-inline SString GetClassTypeName(CGUIEdit*)
-{
-    return "gui-edit";
-}
-inline SString GetClassTypeName(CGUIGridList*)
-{
-    return "gui-gridlist";
-}
-inline SString GetClassTypeName(CGUILabel*)
-{
-    return "gui-label";
-}
-inline SString GetClassTypeName(CGUIMemo*)
-{
-    return "gui-memo";
-}
-inline SString GetClassTypeName(CGUIProgressBar*)
-{
-    return "gui-progressbar";
-}
-inline SString GetClassTypeName(CGUIRadioButton*)
-{
-    return "gui-radiobutton";
-}
-inline SString GetClassTypeName(CGUIStaticImage*)
-{
-    return "gui-staticimage";
-}
-inline SString GetClassTypeName(CGUITab*)
-{
-    return "gui-tab";
-}
-inline SString GetClassTypeName(CGUITabPanel*)
-{
-    return "gui-tabpanel";
-}
-inline SString GetClassTypeName(CGUIWindow*)
-{
-    return "gui-window";
-}
-inline SString GetClassTypeName(CGUIScrollPane*)
-{
-    return "gui-scrollpane";
-}
-inline SString GetClassTypeName(CGUIScrollBar*)
-{
-    return "gui-scrollbar";
-}
-inline SString GetClassTypeName(CGUIComboBox*)
-{
-    return "gui-combobox";
-}
-inline SString GetClassTypeName(CGUIWebBrowser*)
-{
-    return "gui-browser";
-}
+/* TODO AFTER CEGUI API REWRITE */
+//inline SString GetClassTypeName(CGUIButton*)
+//{
+//    return "gui-button";
+//}
+//inline SString GetClassTypeName(CGUICheckBox*)
+//{
+//    return "gui-checkbox";
+//}
+//inline SString GetClassTypeName(CGUIEdit*)
+//{
+//    return "gui-edit";
+//}
+//inline SString GetClassTypeName(CGUIGridList*)
+//{
+//    return "gui-gridlist";
+//}
+//inline SString GetClassTypeName(CGUILabel*)
+//{
+//    return "gui-label";
+//}
+//inline SString GetClassTypeName(CGUIMemo*)
+//{
+//    return "gui-memo";
+//}
+//inline SString GetClassTypeName(CGUIProgressBar*)
+//{
+//    return "gui-progressbar";
+//}
+//inline SString GetClassTypeName(CGUIRadioButton*)
+//{
+//    return "gui-radiobutton";
+//}
+//inline SString GetClassTypeName(CGUIStaticImage*)
+//{
+//    return "gui-staticimage";
+//}
+//inline SString GetClassTypeName(CGUITab*)
+//{
+//    return "gui-tab";
+//}
+//inline SString GetClassTypeName(CGUITabPanel*)
+//{
+//    return "gui-tabpanel";
+//}
+//inline SString GetClassTypeName(CGUIWindow*)
+//{
+//    return "gui-window";
+//}
+//inline SString GetClassTypeName(CGUIScrollPane*)
+//{
+//    return "gui-scrollpane";
+//}
+//inline SString GetClassTypeName(CGUIScrollBar*)
+//{
+//    return "gui-scrollbar";
+//}
+//inline SString GetClassTypeName(CGUIComboBox*)
+//{
+//    return "gui-combobox";
+//}
+//inline SString GetClassTypeName(CGUIWebBrowser*)
+//{
+//    return "gui-browser";
+//}
 
 inline SString GetClassTypeName(CResource*)
 {

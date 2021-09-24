@@ -52,10 +52,13 @@ private:
     uint64_t    m_downloadTotalSize = 0;
 
     CGUI*                                            m_GUI;
-    std::unique_ptr<CGUIWindow>                      m_window;
-    std::unique_ptr<CGUIProgressBar>                 m_progressBar;
-    std::unique_ptr<CGUILabel>                       m_infoLabel;
-    std::array<std::unique_ptr<CGUIStaticImage>, 10> m_iconImages;
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //std::unique_ptr<CGUIWindow>                      m_window;
+    //std::unique_ptr<CGUIProgressBar>                 m_progressBar;
+    //std::unique_ptr<CGUILabel>                       m_infoLabel;
+    //std::array<std::unique_ptr<CGUIStaticImage>, 10> m_iconImages;
+
     size_t                                           m_iconIndex;
     CElapsedTime                                     m_iconTimer;
 

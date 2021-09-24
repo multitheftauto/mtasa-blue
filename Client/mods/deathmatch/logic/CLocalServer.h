@@ -21,10 +21,11 @@ public:
     ~CLocalServer();
 
 protected:
-    bool OnStartButtonClick(CGUIElement* pElement);
-    bool OnCancelButtonClick(CGUIElement* pElement);
-    bool OnAddButtonClick(CGUIElement* pElement);
-    bool OnDelButtonClick(CGUIElement* pElement);
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnStartButtonClick(CGUIElement* pElement);
+    //bool OnCancelButtonClick(CGUIElement* pElement);
+    //bool OnAddButtonClick(CGUIElement* pElement);
+    //bool OnDelButtonClick(CGUIElement* pElement);
 
     // Server config
     bool Load();
@@ -43,34 +44,35 @@ private:
 
     CGUI* m_pGUI;
 
-    CGUIWindow* m_pWindow;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow* m_pWindow;
 
-    CGUITabPanel* m_pTabs;
+    //CGUITabPanel* m_pTabs;
 
-    CGUITab* m_pTabGeneral;
-    CGUITab* m_pTabResources;
+    //CGUITab* m_pTabGeneral;
+    //CGUITab* m_pTabResources;
 
-    CGUILabel* m_pLabelName;
-    CGUILabel* m_pLabelPass;
-    CGUILabel* m_pLabelPlayers;
-    CGUILabel* m_pLabelBroadcast;
+    //CGUILabel* m_pLabelName;
+    //CGUILabel* m_pLabelPass;
+    //CGUILabel* m_pLabelPlayers;
+    //CGUILabel* m_pLabelBroadcast;
 
-    CGUIEdit* m_pEditName;
-    CGUIEdit* m_pEditPass;
-    CGUIEdit* m_pEditPlayers;
+    //CGUIEdit* m_pEditName;
+    //CGUIEdit* m_pEditPass;
+    //CGUIEdit* m_pEditPlayers;
 
-    CGUICheckBox* m_pBroadcastLan;
-    CGUICheckBox* m_pBroadcastInternet;
+    //CGUICheckBox* m_pBroadcastLan;
+    //CGUICheckBox* m_pBroadcastInternet;
 
-    CGUIGridList* m_pResourcesAll;
-    CGUIGridList* m_pResourcesCur;
+    //CGUIGridList* m_pResourcesAll;
+    //CGUIGridList* m_pResourcesCur;
 
-    CGUIHandle m_hResourcesAll;
-    CGUIHandle m_hResourcesCur;
+    //CGUIHandle m_hResourcesAll;
+    //CGUIHandle m_hResourcesCur;
 
-    CGUIButton* m_pResourceAdd;
-    CGUIButton* m_pResourceDel;
+    //CGUIButton* m_pResourceAdd;
+    //CGUIButton* m_pResourceDel;
 
-    CGUIButton* m_pButtonStart;
-    CGUIButton* m_pButtonCancel;
+    //CGUIButton* m_pButtonStart;
+    //CGUIButton* m_pButtonCancel;
 };

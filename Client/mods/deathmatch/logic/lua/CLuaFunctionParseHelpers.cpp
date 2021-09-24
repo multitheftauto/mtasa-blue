@@ -27,23 +27,24 @@ ADD_ENUM(LUA_TUSERDATA, "userdata")
 ADD_ENUM(LUA_TTHREAD, "thread")
 IMPLEMENT_ENUM_END("lua-type")
 
-IMPLEMENT_ENUM_BEGIN(CGUIVerticalAlign)
-ADD_ENUM(CGUI_ALIGN_TOP, "top")
-ADD_ENUM(CGUI_ALIGN_BOTTOM, "bottom")
-ADD_ENUM(CGUI_ALIGN_VERTICALCENTER, "center")
-IMPLEMENT_ENUM_END("vertical-align")
-
-IMPLEMENT_ENUM_BEGIN(CGUIHorizontalAlign)
-ADD_ENUM(CGUI_ALIGN_LEFT, "left")
-ADD_ENUM(CGUI_ALIGN_RIGHT, "right")
-ADD_ENUM(CGUI_ALIGN_HORIZONTALCENTER, "center")
-IMPLEMENT_ENUM_END("horizontal-align")
-
-IMPLEMENT_ENUM_BEGIN(eInputMode)
-ADD_ENUM(INPUTMODE_ALLOW_BINDS, "allow_binds")
-ADD_ENUM(INPUTMODE_NO_BINDS, "no_binds")
-ADD_ENUM(INPUTMODE_NO_BINDS_ON_EDIT, "no_binds_when_editing")
-IMPLEMENT_ENUM_END("input-mode")
+/* TODO AFTER CEGUI API REWRITE */
+//IMPLEMENT_ENUM_BEGIN(CGUIVerticalAlign)
+//ADD_ENUM(CGUI_ALIGN_TOP, "top")
+//ADD_ENUM(CGUI_ALIGN_BOTTOM, "bottom")
+//ADD_ENUM(CGUI_ALIGN_VERTICALCENTER, "center")
+//IMPLEMENT_ENUM_END("vertical-align")
+//
+//IMPLEMENT_ENUM_BEGIN(CGUIHorizontalAlign)
+//ADD_ENUM(CGUI_ALIGN_LEFT, "left")
+//ADD_ENUM(CGUI_ALIGN_RIGHT, "right")
+//ADD_ENUM(CGUI_ALIGN_HORIZONTALCENTER, "center")
+//IMPLEMENT_ENUM_END("horizontal-align")
+//
+//IMPLEMENT_ENUM_BEGIN(eInputMode)
+//ADD_ENUM(INPUTMODE_ALLOW_BINDS, "allow_binds")
+//ADD_ENUM(INPUTMODE_NO_BINDS, "no_binds")
+//ADD_ENUM(INPUTMODE_NO_BINDS_ON_EDIT, "no_binds_when_editing")
+//IMPLEMENT_ENUM_END("input-mode")
 
 IMPLEMENT_ENUM_BEGIN(eAccessType)
 ADD_ENUM(ACCESS_PUBLIC, "public")
@@ -117,24 +118,25 @@ ADD_ENUM(AMBIENT_SOUND_GENERAL, "general")
 ADD_ENUM(AMBIENT_SOUND_GUNFIRE, "gunfire")
 IMPLEMENT_ENUM_END("ambient-sound-type")
 
-IMPLEMENT_ENUM_BEGIN(eCGUIType)
-ADD_ENUM(CGUI_BUTTON, "gui-button")
-ADD_ENUM(CGUI_CHECKBOX, "gui-checkbox")
-ADD_ENUM(CGUI_EDIT, "gui-edit")
-ADD_ENUM(CGUI_GRIDLIST, "gui-gridlist")
-ADD_ENUM(CGUI_LABEL, "gui-label")
-ADD_ENUM(CGUI_MEMO, "gui-memo")
-ADD_ENUM(CGUI_PROGRESSBAR, "gui-progressbar")
-ADD_ENUM(CGUI_RADIOBUTTON, "gui-radiobutton")
-ADD_ENUM(CGUI_STATICIMAGE, "gui-staticimage")
-ADD_ENUM(CGUI_TAB, "gui-tab")
-ADD_ENUM(CGUI_TABPANEL, "gui-tabpanel")
-ADD_ENUM(CGUI_WINDOW, "gui-window")
-ADD_ENUM(CGUI_SCROLLPANE, "gui-scrollpane")
-ADD_ENUM(CGUI_SCROLLBAR, "gui-scrollbar")
-ADD_ENUM(CGUI_COMBOBOX, "gui-combobox")
-ADD_ENUM(CGUI_WEBBROWSER, "gui-browser")
-IMPLEMENT_ENUM_END("gui-type")
+/* TODO AFTER CEGUI API REWRITE */
+//IMPLEMENT_ENUM_BEGIN(eCGUIType)
+//ADD_ENUM(CGUI_BUTTON, "gui-button")
+//ADD_ENUM(CGUI_CHECKBOX, "gui-checkbox")
+//ADD_ENUM(CGUI_EDIT, "gui-edit")
+//ADD_ENUM(CGUI_GRIDLIST, "gui-gridlist")
+//ADD_ENUM(CGUI_LABEL, "gui-label")
+//ADD_ENUM(CGUI_MEMO, "gui-memo")
+//ADD_ENUM(CGUI_PROGRESSBAR, "gui-progressbar")
+//ADD_ENUM(CGUI_RADIOBUTTON, "gui-radiobutton")
+//ADD_ENUM(CGUI_STATICIMAGE, "gui-staticimage")
+//ADD_ENUM(CGUI_TAB, "gui-tab")
+//ADD_ENUM(CGUI_TABPANEL, "gui-tabpanel")
+//ADD_ENUM(CGUI_WINDOW, "gui-window")
+//ADD_ENUM(CGUI_SCROLLPANE, "gui-scrollpane")
+//ADD_ENUM(CGUI_SCROLLBAR, "gui-scrollbar")
+//ADD_ENUM(CGUI_COMBOBOX, "gui-combobox")
+//ADD_ENUM(CGUI_WEBBROWSER, "gui-browser")
+//IMPLEMENT_ENUM_END("gui-type")
 
 IMPLEMENT_ENUM_BEGIN(eDxTestMode)
 ADD_ENUM(DX_TEST_MODE_NONE, "none")
@@ -535,19 +537,20 @@ ADD_ENUM(JSONPRETTY_NONE, "none")
 ADD_ENUM(JSONPRETTY_TABS, "tabs")
 IMPLEMENT_ENUM_END("json-pretty-type")
 
-IMPLEMENT_ENUM_BEGIN(eCursorType)
-ADD_ENUM(CURSORTYPE_NONE, "none")                            // cursor has no image
-ADD_ENUM(CURSORTYPE_DEFAULT, "arrow")                        // default cursor
-ADD_ENUM(CURSORTYPE_SIZING_NS, "sizing_ns")                  // N-S (up-down) sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_EW, "sizing_ew")                  // E-W (left-right) sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_NWSE, "sizing_nwse")              // NW-SE diagonal sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_NESW, "sizing_nesw")              // NE-SW diagonal sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_ESWE, "sizing_eswe")              // ES-WE horizontal sizing cursor
-ADD_ENUM(CURSORTYPE_MOVE, "move")                            // move cursor
-ADD_ENUM(CURSORTYPE_DRAG, "container_drag")                  // drag container cursor (note: not in use)
-ADD_ENUM(CURSORTYPE_SEG_MOVING, "segment_moving")            // segment moving cursor (note: not in use)
-ADD_ENUM(CURSORTYPE_SEG_SIZING, "segment_sizing")            // segment sizing cursor (note: not in use)
-IMPLEMENT_ENUM_END("cursor-type")
+/* TODO AFTER CEGUI API REWRITE */
+//IMPLEMENT_ENUM_BEGIN(eCursorType)
+//ADD_ENUM(CURSORTYPE_NONE, "none")                            // cursor has no image
+//ADD_ENUM(CURSORTYPE_DEFAULT, "arrow")                        // default cursor
+//ADD_ENUM(CURSORTYPE_SIZING_NS, "sizing_ns")                  // N-S (up-down) sizing cursor
+//ADD_ENUM(CURSORTYPE_SIZING_EW, "sizing_ew")                  // E-W (left-right) sizing cursor
+//ADD_ENUM(CURSORTYPE_SIZING_NWSE, "sizing_nwse")              // NW-SE diagonal sizing cursor
+//ADD_ENUM(CURSORTYPE_SIZING_NESW, "sizing_nesw")              // NE-SW diagonal sizing cursor
+//ADD_ENUM(CURSORTYPE_SIZING_ESWE, "sizing_eswe")              // ES-WE horizontal sizing cursor
+//ADD_ENUM(CURSORTYPE_MOVE, "move")                            // move cursor
+//ADD_ENUM(CURSORTYPE_DRAG, "container_drag")                  // drag container cursor (note: not in use)
+//ADD_ENUM(CURSORTYPE_SEG_MOVING, "segment_moving")            // segment moving cursor (note: not in use)
+//ADD_ENUM(CURSORTYPE_SEG_SIZING, "segment_sizing")            // segment sizing cursor (note: not in use)
+//IMPLEMENT_ENUM_END("cursor-type")
 
 IMPLEMENT_ENUM_BEGIN(eWheelPosition)
 ADD_ENUM(FRONT_LEFT_WHEEL, "front_left")
@@ -767,10 +770,11 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (CClientEntity* pClientElement = UserDataCast<CClientEntity>((CClientEntity*)NULL, ptr, NULL))
     {
         if (bFindElementType)
-            // Try gui element first
-            if (CClientGUIElement* pGuiElement = DynamicCast<CClientGUIElement>(pClientElement))
-                return EnumToString(pGuiElement->GetCGUIElement()->GetType());
-            else
+            /* TODO AFTER CEGUI API REWRITE */
+            //// Try gui element first
+            //if (CClientGUIElement* pGuiElement = DynamicCast<CClientGUIElement>(pClientElement))
+            //    return EnumToString(pGuiElement->GetCGUIElement()->GetType());
+            //else
                 return pClientElement->GetTypeName();
         else
             return GetClassTypeName(pClientElement);

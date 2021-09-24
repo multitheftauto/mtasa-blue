@@ -24,8 +24,10 @@
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
 #include "CDiscordManagerInterface.h"
-#include "xml/CXML.h"
-#include <gui/CGUI.h>
+#include "../Shared/sdk/xml/CXML.h"
+#include "../Client/sdk/gui/CGUI.h"
+
+class GUI_CALLBACK; /* TODO AFTER CEGUI API REWRITE (ADDED TEMPORARILY) */
 
 typedef bool (*pfnProcessMessage)(HWND, UINT, WPARAM, LPARAM);
 

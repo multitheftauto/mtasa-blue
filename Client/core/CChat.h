@@ -16,6 +16,8 @@
 
 class CChatLineSection;
 
+class CGUIKeyEventArgs; /* TODO AFTER CEGUI API REWRITE */
+
 #define CHAT_WIDTH 320                                   // Chatbox default width
 #define CHAT_TEXT_COLOR CColor(235, 221, 178)            // Chatbox default text color
 #define CHAT_MAX_LINES 100                               // Chatbox maximum chat lines
@@ -162,7 +164,7 @@ public:
     virtual void Output(const char* szText, bool bColorCoded = true);
     void         Clear();
     void         ClearInput();
-    bool         CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs);
+    //bool         CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs); /* TODO AFTER CEGUI API REWRITE */
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
@@ -243,10 +245,11 @@ protected:
     CVector2D m_vecInputPosition;
     CVector2D m_vecInputSize;
 
-    CGUITexture*     m_pBackgroundTexture;
-    CGUITexture*     m_pInputTexture;
-    CGUIStaticImage* m_pBackground;
-    CGUIStaticImage* m_pInput;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUITexture*     m_pBackgroundTexture;
+    //CGUITexture*     m_pInputTexture;
+    //CGUIStaticImage* m_pBackground;
+    //CGUIStaticImage* m_pInput;
 
     std::string m_strInputText;
     std::string m_strCommand;

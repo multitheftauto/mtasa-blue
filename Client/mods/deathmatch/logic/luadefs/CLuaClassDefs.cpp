@@ -307,41 +307,42 @@ const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
             CClientGUIElement* pGUIElement = reinterpret_cast<CClientGUIElement*>(pEntity);
             if (pGUIElement)
             {
-                switch (pGUIElement->GetCGUIType())
-                {
-                    case CGUI_BUTTON:
-                        return "GuiButton";
-                    case CGUI_CHECKBOX:
-                        return "GuiCheckBox";
-                    case CGUI_EDIT:
-                        return "GuiEdit";
-                    case CGUI_GRIDLIST:
-                        return "GuiGridList";
-                    case CGUI_LABEL:
-                        return "GuiLabel";
-                    case CGUI_MEMO:
-                        return "GuiMemo";
-                    case CGUI_PROGRESSBAR:
-                        return "GuiProgressBar";
-                    case CGUI_RADIOBUTTON:
-                        return "GuiRadioButton";
-                    case CGUI_STATICIMAGE:
-                        return "GuiStaticImage";
-                    case CGUI_TAB:
-                        return "GuiTab";
-                    case CGUI_TABPANEL:
-                        return "GuiTabPanel";
-                    case CGUI_WINDOW:
-                        return "GuiWindow";
-                    case CGUI_SCROLLPANE:
-                        return "GuiScrollPane";
-                    case CGUI_SCROLLBAR:
-                        return "GuiScrollBar";
-                    case CGUI_COMBOBOX:
-                        return "GuiComboBox";
-                    case CGUI_WEBBROWSER:
-                        return "GuiBrowser";
-                }
+                /* TODO AFTER CEGUI API REWRITE */
+                //switch (pGUIElement->GetCGUIType())
+                //{
+                //    case CGUI_BUTTON:
+                //        return "GuiButton";
+                //    case CGUI_CHECKBOX:
+                //        return "GuiCheckBox";
+                //    case CGUI_EDIT:
+                //        return "GuiEdit";
+                //    case CGUI_GRIDLIST:
+                //        return "GuiGridList";
+                //    case CGUI_LABEL:
+                //        return "GuiLabel";
+                //    case CGUI_MEMO:
+                //        return "GuiMemo";
+                //    case CGUI_PROGRESSBAR:
+                //        return "GuiProgressBar";
+                //    case CGUI_RADIOBUTTON:
+                //        return "GuiRadioButton";
+                //    case CGUI_STATICIMAGE:
+                //        return "GuiStaticImage";
+                //    case CGUI_TAB:
+                //        return "GuiTab";
+                //    case CGUI_TABPANEL:
+                //        return "GuiTabPanel";
+                //    case CGUI_WINDOW:
+                //        return "GuiWindow";
+                //    case CGUI_SCROLLPANE:
+                //        return "GuiScrollPane";
+                //    case CGUI_SCROLLBAR:
+                //        return "GuiScrollBar";
+                //    case CGUI_COMBOBOX:
+                //        return "GuiComboBox";
+                //    case CGUI_WEBBROWSER:
+                //        return "GuiBrowser";
+                //}
                 return "GuiElement";
             }
             break;

@@ -56,47 +56,49 @@ CLocalGUI::~CLocalGUI()
 
 void CLocalGUI::SetSkin(const char* szName)
 {
-    bool guiWasLoaded = m_pMainMenu != NULL;
-    if (guiWasLoaded)
-        DestroyWindows();
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool guiWasLoaded = m_pMainMenu != NULL;
+    //if (guiWasLoaded)
+    //    DestroyWindows();
 
-    std::string error;
+    //std::string error;
 
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    //CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    try
-    {
-        pGUI->SetSkin(szName);
-        m_LastSkinName = szName;
-    }
-    catch (...)
-    {
-        try
-        {
-            pGUI->SetSkin(DEFAULT_SKIN_NAME);
+    //try
+    //{
+    //    pGUI->SetSkin(szName);
+    //    m_LastSkinName = szName;
+    //}
+    //catch (...)
+    //{
+    //    try
+    //    {
+    //        const char* defaultSkinName = pGUI->GetDefaultSkinName();
+    //        pGUI->SetSkin(defaultSkinName);
 
-            error = "The skin '" + std::string(szName) + "' that you have selected could not be loaded. MTA is now using the default skin instead.";
+    //        error = "The skin '" + std::string(szName) + "' that you have selected could not be loaded. MTA is now using the default skin instead.";
 
-            CVARS_SET("current_skin", std::string(DEFAULT_SKIN_NAME));
-            m_LastSkinName = DEFAULT_SKIN_NAME;
-        }
-        catch (...)
-        {
-            // Even the default skin doesn't work, so give up
-            MessageBoxUTF8(0, _("The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."),
-                           _("Error") + _E("CC51"), MB_OK | MB_ICONERROR | MB_TOPMOST);
-            TerminateProcess(GetCurrentProcess(), 9);
-        }
-    }
+    //        CVARS_SET("current_skin", std::string(defaultSkinName));
+    //        m_LastSkinName = defaultSkinName;
+    //    }
+    //    catch (...)
+    //    {
+    //        // Even the default skin doesn't work, so give up
+    //        MessageBoxUTF8(0, _("The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."),
+    //                       _("Error") + _E("CC51"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+    //        TerminateProcess(GetCurrentProcess(), 9);
+    //    }
+    //}
 
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
-    m_LastSettingsRevision = cvars->GetRevision();
+    //CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    //m_LastSettingsRevision = cvars->GetRevision();
 
-    if (guiWasLoaded)
-        CreateWindows(guiWasLoaded);
+    //if (guiWasLoaded)
+    //    CreateWindows(guiWasLoaded);
 
-    if (CCore::GetSingleton().GetConsole() && !error.empty())
-        CCore::GetSingleton().GetConsole()->Echo(error.c_str());
+    //if (CCore::GetSingleton().GetConsole() && !error.empty())
+    //    CCore::GetSingleton().GetConsole()->Echo(error.c_str());
 }
 
 void CLocalGUI::ChangeLocale(const char* szName)
@@ -130,66 +132,69 @@ void CLocalGUI::ChangeLocale(const char* szName)
 
 void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
 {
+    /* TODO AFTER CEGUI API REWRITE */
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    // Create chatbox
+    //// Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
-    m_pChat->SetVisible(false, true);
+    //m_pChat->SetVisible(false, true);
 
-    // Create the debug view
+    //// Create the debug view
     m_pDebugView = new CDebugView(pGUI, CVector2D(0.23f, 0.785f));
-    m_pDebugView->SetVisible(false, true);
+    //m_pDebugView->SetVisible(false, true);
 
-    // Create the overlayed version labels
-    CVector2D ScreenSize = pGUI->GetResolution();
-    SString   strText = "MTA:SA " MTA_DM_BUILDTAG_SHORT;
-    if (_NETCODE_VERSION_BRANCH_ID != 0x04)
-        strText += SString(" (%X)", _NETCODE_VERSION_BRANCH_ID);
-    m_pLabelVersionTag = reinterpret_cast<CGUILabel*>(pGUI->CreateLabel(strText));
-    m_pLabelVersionTag->SetSize(CVector2D(m_pLabelVersionTag->GetTextExtent() + 5, 18));
-    m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15));
-    m_pLabelVersionTag->SetAlpha(0.5f);
-    m_pLabelVersionTag->SetTextColor(255, 255, 255);
-    m_pLabelVersionTag->SetZOrderingEnabled(false);
-    m_pLabelVersionTag->MoveToBack();
-    m_pLabelVersionTag->SetVisible(false);
+    //// Create the overlayed version labels
+    //CVector2D ScreenSize = pGUI->GetResolution();
+    //SString   strText = "MTA:SA " MTA_DM_BUILDTAG_SHORT;
+    //if (_NETCODE_VERSION_BRANCH_ID != 0x04)
+    //    strText += SString(" (%X)", _NETCODE_VERSION_BRANCH_ID);
+    //m_pLabelVersionTag = reinterpret_cast<CGUILabel*>(pGUI->CreateLabel(strText));
+    //m_pLabelVersionTag->SetSize(CVector2D(m_pLabelVersionTag->GetTextExtent() + 5, 18));
+    //m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15));
+    //m_pLabelVersionTag->SetAlpha(0.5f);
+    //m_pLabelVersionTag->SetTextColor(255, 255, 255);
+    //m_pLabelVersionTag->SetZOrderingEnabled(false);
+    //m_pLabelVersionTag->MoveToBack();
+    //m_pLabelVersionTag->SetVisible(false);
 
-    // Create mainmenu
+    //// Create mainmenu
     m_pMainMenu = new CMainMenu(pGUI);
-    m_pMainMenu->SetVisible(bGameIsAlreadyLoaded, !bGameIsAlreadyLoaded, false);
+    //m_pMainMenu->SetVisible(bGameIsAlreadyLoaded, !bGameIsAlreadyLoaded, false);
 
-    // Create console
+    //// Create console
     m_pConsole = new CConsole(pGUI);
-    m_pConsole->SetVisible(false);
+    //m_pConsole->SetVisible(false);
 
-    // Create our news headlines if we're already ingame
-    if (bGameIsAlreadyLoaded)
-        m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
+    //// Create our news headlines if we're already ingame
+    //if (bGameIsAlreadyLoaded)
+    //    m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
 }
 
 void CLocalGUI::CreateObjects(IUnknown* pDevice)
 {
-    // Store the GUI manager pointer and create the GUI classes
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    /* TODO AFTER CEGUI API REWRITE */
+    //// Store the GUI manager pointer and create the GUI classes
+    //CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    // Set the CEGUI skin to whatever the user has selected
-    SString           currentSkinName;
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
-    cvars->Get("current_skin", currentSkinName);
-    if (currentSkinName.empty())
-    {
-        currentSkinName = DEFAULT_SKIN_NAME;
-        CVARS_SET("current_skin", currentSkinName);
-    }
+    //// Set the CEGUI skin to whatever the user has selected
+    //SString           currentSkinName;
+    //CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    //cvars->Get("current_skin", currentSkinName);
 
-    SetSkin(currentSkinName);
+    //if (currentSkinName.empty())
+    //{
+    //    currentSkinName = pGUI->GetDefaultSkinName();
+    //    CVARS_SET("current_skin", currentSkinName);
+    //}
+
+    //SetSkin(currentSkinName);
 
     CreateWindows(false);
 }
 
 void CLocalGUI::DestroyWindows()
 {
-    SAFE_DELETE(m_pLabelVersionTag);
+    //SAFE_DELETE(m_pLabelVersionTag); /* TODO AFTER CEGUI API REWRITE */
     SAFE_DELETE(m_pConsole);
     SAFE_DELETE(m_pMainMenu);
     SAFE_DELETE(m_pChat);
@@ -201,7 +206,7 @@ void CLocalGUI::DestroyObjects()
     DestroyWindows();
 
     // Destroy and NULL all elements
-    SAFE_DELETE(m_pLabelVersionTag);
+    //SAFE_DELETE(m_pLabelVersionTag); /* TODO AFTER CEGUI API REWRITE */
 }
 
 void CLocalGUI::DoPulse()
@@ -249,8 +254,9 @@ void CLocalGUI::DoPulse()
                 // Force pulse next time
                 m_LastSettingsRevision = cvars->GetRevision() - 1;
 
-                if (m_LocaleChangeCounter == 2)
-                    CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
+                /* TODO AFTER CEGUI API REWRITE */
+                //if (m_LocaleChangeCounter == 2)
+                    //CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO); 
             }
             else
             {
@@ -272,6 +278,7 @@ void CLocalGUI::DoPulse()
 
 void CLocalGUI::Draw()
 {
+    /* TODO AFTER CEGUI API REWRITE */
     // Get the game interface
     CGame*       pGame = CCore::GetSingleton().GetGame();
     eSystemState SystemState = pGame->GetSystemState();
@@ -295,9 +302,10 @@ void CLocalGUI::Draw()
         }
         else
         {
-            m_pLabelVersionTag->SetVisible(true);
-            if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
-                m_pLabelVersionTag->SetAlwaysOnTop(true);
+            /* TODO AFTER CEGUI API REWRITE */
+            //m_pLabelVersionTag->SetVisible(true);
+            //if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
+            //    m_pLabelVersionTag->SetAlwaysOnTop(true);
         }
     }
 
@@ -314,6 +322,7 @@ void CLocalGUI::Draw()
 
     // Draw the chat
     m_pChat->Draw(true, true);
+
     // Draw the debugger
     m_pDebugView->Draw(true, false);
 
@@ -324,7 +333,7 @@ void CLocalGUI::Draw()
         // If we have a GUI manager, draw the GUI
         if (pGUI)
         {
-            pGUI->Draw();
+            pGUI->Draw(); /* TODO AFTER CEGUI API REWRITE */
         }
 
         // If the system state was 8, make sure we don't do another delayed frame
@@ -339,7 +348,6 @@ void CLocalGUI::Invalidate()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    // Invalidate the GUI
     if (pGUI)
     {
         pGUI->Invalidate();
@@ -352,7 +360,6 @@ void CLocalGUI::Restore()
 
     if (pGUI)
     {
-        // Restore the GUI
         pGUI->Restore();
     }
 }
@@ -361,7 +368,7 @@ void CLocalGUI::DrawMouseCursor()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    pGUI->DrawMouseCursor();
+    //pGUI->DrawMouseCursor(); /* TODO AFTER CEGUI API REWRITE */
 }
 
 CConsole* CLocalGUI::GetConsole()
@@ -380,11 +387,12 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
         // Set the visible state
         m_pConsole->SetVisible(bVisible);
 
-        CGUI* pGUI = CCore::GetSingleton().GetGUI();
-        if (bVisible)
-            pGUI->SetCursorAlpha(1.0f);
-        else
-            pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+        /* TODO AFTER CEGUI API REWRITE */
+        //CGUI* pGUI = CCore::GetSingleton().GetGUI();
+        //if (bVisible)
+        //    pGUI->SetCursorAlpha(1.0f);
+        //else
+        //    pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
     }
 }
 
@@ -420,20 +428,21 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
 
         m_pMainMenu->SetVisible(bVisible);
 
-        CGUI* pGUI = CCore::GetSingleton().GetGUI();
-        if (bVisible)
-        {
-            pGUI->SelectInputHandlers(INPUT_CORE);
-        }
-        else
-        {
-            pGUI->SelectInputHandlers(INPUT_MOD);
-        }
+        /* TODO AFTER CEGUI API REWRITE */
+        //CGUI* pGUI = CCore::GetSingleton().GetGUI();
+        //if (bVisible)
+        //{
+        //    pGUI->SelectInputHandlers(INPUT_CORE);
+        //}
+        //else
+        //{
+        //    pGUI->SelectInputHandlers(INPUT_MOD);
+        //}
 
-        if (bVisible)
-            pGUI->SetCursorAlpha(1.0f);
-        else
-            pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+        //if (bVisible)
+        //    pGUI->SetCursorAlpha(1.0f);
+        //else
+        //    pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
     }
 }
 
@@ -550,156 +559,157 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
+    /* TODO AFTER CEGUI API REWRITE */
     // If we have the focus, we handle the message
-    if (InputGoesToGUI())
-    {
-        // Pass the message to the GUI manager
-        // ACHTUNG: fix the CEGUI ones!
-        switch (uMsg)
-        {
-            case WM_MOUSEWHEEL:
-                if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
-                    pGUI->ProcessMouseInput(CGUI_MI_MOUSEWHEEL, 1, NULL);
-                else
-                    pGUI->ProcessMouseInput(CGUI_MI_MOUSEWHEEL, 0, NULL);
-                return true;
-
-            case WM_MOUSEMOVE:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-                return true;
-
-            case WM_LBUTTONDOWN:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, LeftButton);
-                return true;
-
-            case WM_RBUTTONDOWN:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, RightButton);
-                return true;
-
-            case WM_MBUTTONDOWN:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, MiddleButton);
-                return true;
-
-            case WM_LBUTTONUP:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, LeftButton);
-                return true;
-
-            case WM_RBUTTONUP:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, RightButton);
-                return true;
-
-            case WM_MBUTTONUP:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, MiddleButton);
-                return true;
-#ifdef WM_XBUTTONDOWN
-            case WM_XBUTTONDOWN:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, X1Button);
-                return true;
-
-            case WM_XBUTTONUP:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, X1Button);
-                return true;
-#endif
-            case WM_KEYDOWN:
-            {
-                DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
-                if (dwTemp > 0)
-                {
-                    pGUI->ProcessKeyboardInput(dwTemp, true);
-                    return true;
-                }
-
-                return true;
-            }
-
-            case WM_KEYUP:
-            {
-                DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
-                if (dwTemp > 0)
-                {
-                    pGUI->ProcessKeyboardInput(dwTemp, false);
-                }
-
-                return false;
-            }
-
-            case WM_IME_COMPOSITION:
-            {
-                if (lParam & GCS_RESULTSTR)
-                {
-                    HIMC himc = ImmGetContext(hwnd);
-
-                    // Get composition result
-                    ushort buffer[256];
-                    LONG   numBytes = ImmGetCompositionStringW(himc, GCS_RESULTSTR, buffer, sizeof(buffer) - 2);
-                    int    iNumCharacters = numBytes / sizeof(ushort);
-
-                    // Erase output from previous composition state
-                    for (int i = 0; i < m_uiActiveCompositionSize; i++)
-                    {
-                        pGUI->ProcessCharacter('\x08');
-                        pGUI->ProcessKeyboardInput(14, true);
-                    }
-
-                    // Output composition result
-                    for (int i = 0; i < iNumCharacters; i++)
-                        if (buffer[i])
-                            pGUI->ProcessCharacter(buffer[i]);
-
-                    ImmReleaseContext(hwnd, himc);
-
-                    m_uiActiveCompositionSize = 0;
-                }
-                else if (lParam & GCS_COMPSTR)
-                {
-                    HIMC himc = ImmGetContext(hwnd);
-
-                    // Get composition state
-                    ushort buffer[256];
-                    LONG   numBytes = ImmGetCompositionStringW(himc, GCS_COMPSTR, buffer, sizeof(buffer) - 2);
-                    int    iNumCharacters = numBytes / sizeof(ushort);
-
-                    // Erase output from previous composition state
-                    for (int i = 0; i < m_uiActiveCompositionSize; i++)
-                    {
-                        pGUI->ProcessCharacter('\x08');
-                        pGUI->ProcessKeyboardInput(14, true);
-                    }
-
-                    // Output new composition state
-                    for (int i = 0; i < iNumCharacters; i++)
-                        if (buffer[i])
-                            pGUI->ProcessCharacter(buffer[i]);
-
-                    ImmReleaseContext(hwnd, himc);
-
-                    m_uiActiveCompositionSize = iNumCharacters;
-                }
-            }
-            break;
-
-            case WM_IME_CHAR:
-                return true;
-            case WM_IME_KEYDOWN:
-            {
-                // Handle space/return seperately in this case
-                if (wParam == VK_SPACE)
-                    pGUI->ProcessCharacter(MapVirtualKey(wParam, MAPVK_VK_TO_CHAR));
-
-                DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
-                if (dwTemp > 0)
-                    pGUI->ProcessKeyboardInput(dwTemp, true);
-            }
-            break;
-
-            case WM_CHAR:
-            {
-                pGUI->ProcessCharacter(wParam);
-                return true;
-            }
-            break;
-        }
-    }
+//    if (InputGoesToGUI())
+//    {
+//        // Pass the message to the GUI manager
+//        // ACHTUNG: fix the CEGUI ones!
+//        switch (uMsg)
+//        {
+//            case WM_MOUSEWHEEL:
+//                if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
+//                    pGUI->ProcessMouseInput(CGUI_MI_MOUSEWHEEL, 1, NULL);
+//                else
+//                    pGUI->ProcessMouseInput(CGUI_MI_MOUSEWHEEL, 0, NULL);
+//                return true;
+//
+//            case WM_MOUSEMOVE:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+//                return true;
+//
+//            case WM_LBUTTONDOWN:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, LeftButton);
+//                return true;
+//
+//            case WM_RBUTTONDOWN:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, RightButton);
+//                return true;
+//
+//            case WM_MBUTTONDOWN:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, MiddleButton);
+//                return true;
+//
+//            case WM_LBUTTONUP:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, LeftButton);
+//                return true;
+//
+//            case WM_RBUTTONUP:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, RightButton);
+//                return true;
+//
+//            case WM_MBUTTONUP:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, MiddleButton);
+//                return true;
+//#ifdef WM_XBUTTONDOWN
+//            case WM_XBUTTONDOWN:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEDOWN, 0, 0, X1Button);
+//                return true;
+//
+//            case WM_XBUTTONUP:
+//                pGUI->ProcessMouseInput(CGUI_MI_MOUSEUP, 0, 0, X1Button);
+//                return true;
+//#endif
+//            case WM_KEYDOWN:
+//            {
+//                DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
+//                if (dwTemp > 0)
+//                {
+//                    pGUI->ProcessKeyboardInput(dwTemp, true);
+//                    return true;
+//                }
+//
+//                return true;
+//            }
+//
+//            case WM_KEYUP:
+//            {
+//                DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
+//                if (dwTemp > 0)
+//                {
+//                    pGUI->ProcessKeyboardInput(dwTemp, false);
+//                }
+//
+//                return false;
+//            }
+//
+//            case WM_IME_COMPOSITION:
+//            {
+//                if (lParam & GCS_RESULTSTR)
+//                {
+//                    HIMC himc = ImmGetContext(hwnd);
+//
+//                    // Get composition result
+//                    ushort buffer[256];
+//                    LONG   numBytes = ImmGetCompositionStringW(himc, GCS_RESULTSTR, buffer, sizeof(buffer) - 2);
+//                    int    iNumCharacters = numBytes / sizeof(ushort);
+//
+//                    // Erase output from previous composition state
+//                    for (int i = 0; i < m_uiActiveCompositionSize; i++)
+//                    {
+//                        pGUI->ProcessCharacter('\x08');
+//                        pGUI->ProcessKeyboardInput(14, true);
+//                    }
+//
+//                    // Output composition result
+//                    for (int i = 0; i < iNumCharacters; i++)
+//                        if (buffer[i])
+//                            pGUI->ProcessCharacter(buffer[i]);
+//
+//                    ImmReleaseContext(hwnd, himc);
+//
+//                    m_uiActiveCompositionSize = 0;
+//                }
+//                else if (lParam & GCS_COMPSTR)
+//                {
+//                    HIMC himc = ImmGetContext(hwnd);
+//
+//                    // Get composition state
+//                    ushort buffer[256];
+//                    LONG   numBytes = ImmGetCompositionStringW(himc, GCS_COMPSTR, buffer, sizeof(buffer) - 2);
+//                    int    iNumCharacters = numBytes / sizeof(ushort);
+//
+//                    // Erase output from previous composition state
+//                    for (int i = 0; i < m_uiActiveCompositionSize; i++)
+//                    {
+//                        pGUI->ProcessCharacter('\x08');
+//                        pGUI->ProcessKeyboardInput(14, true);
+//                    }
+//
+//                    // Output new composition state
+//                    for (int i = 0; i < iNumCharacters; i++)
+//                        if (buffer[i])
+//                            pGUI->ProcessCharacter(buffer[i]);
+//
+//                    ImmReleaseContext(hwnd, himc);
+//
+//                    m_uiActiveCompositionSize = iNumCharacters;
+//                }
+//            }
+//            break;
+//
+//            case WM_IME_CHAR:
+//                return true;
+//            case WM_IME_KEYDOWN:
+//            {
+//                // Handle space/return seperately in this case
+//                if (wParam == VK_SPACE)
+//                    pGUI->ProcessCharacter(MapVirtualKey(wParam, MAPVK_VK_TO_CHAR));
+//
+//                DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
+//                if (dwTemp > 0)
+//                    pGUI->ProcessKeyboardInput(dwTemp, true);
+//            }
+//            break;
+//
+//            case WM_CHAR:
+//            {
+//                pGUI->ProcessCharacter(wParam);
+//                return true;
+//            }
+//            break;
+//        }
+//    }
 
     // The event wasn't handled
     return false;
@@ -713,8 +723,12 @@ bool CLocalGUI::InputGoesToGUI()
 
     // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
     // If the console is visible OR the chat is expecting input OR the mainmenu is visible
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
-            !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
+    //        !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
+
+    return false;
 }
 
 void CLocalGUI::ForceCursorVisible(bool bVisible)
@@ -752,7 +766,7 @@ void CLocalGUI::UpdateCursor()
 
             // Enable our mouse cursor
             CSetCursorPosHook::GetSingleton().DisableSetCursorPos();
-            pGUI->SetCursorEnabled(true);
+            //pGUI->SetCursorEnabled(true); /* TODO AFTER CEGUI API REWRITE */
 
             m_bGUIHasInput = true;
         }
@@ -778,10 +792,10 @@ void CLocalGUI::UpdateCursor()
 
             // Disable our mouse cursor
             CSetCursorPosHook::GetSingleton().EnableSetCursorPos();
-            pGUI->SetCursorEnabled(false);
+            //pGUI->SetCursorEnabled(false); /* TODO AFTER CEGUI API REWRITE */
 
             // Clear any held system keys
-            pGUI->ClearSystemKeys();
+            //pGUI->ClearSystemKeys(); /* TODO AFTER CEGUI API REWRITE */
 
             m_bGUIHasInput = false;
         }

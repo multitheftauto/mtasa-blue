@@ -90,7 +90,7 @@ CCore::CCore() : m_DiscordManager(new CDiscordManager())
     CCrashDumpWriter::SetHandlers();
 
     m_pfnMessageProcessor = NULL;
-    m_pMessageBox = NULL;
+    //m_pMessageBox = NULL; /* TODO AFTER CEGUI API REWRITE */
 
     m_bFirstFrame = true;
     m_bIsOfflineMod = false;
@@ -158,7 +158,7 @@ CCore::~CCore()
 
     // Delete the mod manager
     delete m_pModManager;
-    SAFE_DELETE(m_pMessageBox);
+    //SAFE_DELETE(m_pMessageBox); /* TODO AFTER CEGUI API REWRITE */
 
     // Destroy early subsystems
     m_bModulesLoaded = false;
@@ -167,7 +167,7 @@ CCore::~CCore()
     DestroyGame();
 
     // Remove global events
-    g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE);
+    //g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE); /* TODO AFTER CEGUI API REWRITE */
 
     // Store core variables to cvars
     CVARS_SET("console_pos", m_pLocalGUI->GetConsole()->GetPosition());
@@ -626,33 +626,36 @@ void CCore::SetMessageProcessor(pfnProcessMessage pfnMessageProcessor)
     m_pfnMessageProcessor = pfnMessageProcessor;
 }
 
+
 void CCore::ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler)
 {
-    RemoveMessageBox();
+    /* TODO AFTER CEGUI API REWRITE */
+    //RemoveMessageBox();
 
-    // Create the message box
-    m_pMessageBox = m_pGUI->CreateMessageBox(szTitle, szText, uiFlags);
-    if (ResponseHandler)
-        m_pMessageBox->SetClickHandler(*ResponseHandler);
+    //// Create the message box
+    //m_pMessageBox = m_pGUI->CreateMessageBox(szTitle, szText, uiFlags);
+    //if (ResponseHandler)
+    //    m_pMessageBox->SetClickHandler(*ResponseHandler);
 
-    // Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
-    m_pMessageBox->SetAutoDestroy(false);
+    //// Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
+    //m_pMessageBox->SetAutoDestroy(false);
 }
 
 void CCore::RemoveMessageBox(bool bNextFrame)
 {
-    if (bNextFrame)
-    {
-        m_bDestroyMessageBox = true;
-    }
-    else
-    {
-        if (m_pMessageBox)
-        {
-            delete m_pMessageBox;
-            m_pMessageBox = NULL;
-        }
-    }
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (bNextFrame)
+    //{
+    //    m_bDestroyMessageBox = true;
+    //}
+    //else
+    //{
+    //    if (m_pMessageBox)
+    //    {
+    //        delete m_pMessageBox;
+    //        m_pMessageBox = NULL;
+    //    }
+    //}
 }
 
 //
@@ -662,7 +665,7 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
 {
     if (strTroubleLink.empty())
     {
-        CCore::GetSingleton().ShowMessageBox(strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR);
+        //CCore::GetSingleton().ShowMessageBox(strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
     }
     else
     {
@@ -935,6 +938,7 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+    m_pGUI->SetHookedWindow(GetHookedWindow());
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath("screenshots");
@@ -1152,7 +1156,7 @@ void CCore::DoPostFramePulse()
         ApplyConsoleSettings();
         ApplyGameSettings();
 
-        m_pGUI->SelectInputHandlers(INPUT_CORE);
+        //m_pGUI->SelectInputHandlers(INPUT_CORE); /* TODO AFTER CEGUI API REWRITE */
 
         // Change the main thread affinity to first core
         SetThreadAffinityMask(GetCurrentThread(), 0x1);
@@ -1195,7 +1199,7 @@ void CCore::DoPostFramePulse()
                     // Run the connect command
                     if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
                     {
-                        ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR);
+                        //ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
                     }
                 }
                 else
@@ -1208,7 +1212,7 @@ void CCore::DoPostFramePulse()
                         if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
                         {
                             SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
-                            ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
+                            //ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed /* TODO AFTER CEGUI API REWRITE */
                         }
                     }
                     // We want to connect to a server?
@@ -1268,10 +1272,11 @@ void CCore::DoPostFramePulse()
 // Called after MOD is unloaded
 void CCore::OnModUnload()
 {
-    // reattach the global event
-    m_pGUI->SelectInputHandlers(INPUT_CORE);
-    // remove unused events
-    m_pGUI->ClearInputHandlers(INPUT_MOD);
+    /* TODO AFTER CEGUI API REWRITE */
+    //// reattach the global event
+    //m_pGUI->SelectInputHandlers(INPUT_CORE);
+    //// remove unused events
+    //m_pGUI->ClearInputHandlers(INPUT_MOD);
 
     // Ensure all these have been removed
     m_pKeyBinds->RemoveAllFunctions();

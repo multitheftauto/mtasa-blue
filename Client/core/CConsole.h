@@ -22,7 +22,9 @@ class CConsole;
 class CConsole : public CConsoleInterface
 {
 public:
-    CConsole(CGUI* pManager, CGUIElement* pParent = NULL);
+    //CConsole(CGUI* pManager, CGUIElement* pParent = NULL); /* TODO AFTER CEGUI API REWRITE */
+    CConsole(CGUI* pManager);
+
     ~CConsole();
 
     void Echo(const char* szText);
@@ -59,18 +61,21 @@ public:
     void      SetSize(CVector2D& vecSize);
 
 protected:
-    bool OnCloseButtonClick(CGUIElement* pElement);
-    bool Edit_OnTextAccepted(CGUIElement* pElement);
-    bool History_OnTextChanged(CGUIElement* pElement);
+    /* TODO AFTER CEGUI API REWRITE */
+    //bool OnCloseButtonClick(CGUIElement* pElement);
+    //bool Edit_OnTextAccepted(CGUIElement* pElement);
+    //bool History_OnTextChanged(CGUIElement* pElement);
+
     void FlushPendingAdd();
     void GracefullySetEditboxText(const char* szText);
-    bool GracefullyMoveEditboxCaret(CGUIElement* pElement);
+
+    //bool GracefullyMoveEditboxCaret(CGUIElement* pElement); /* TODO AFTER CEGUI API REWRITE */
 
 private:
-    void CreateElements(CGUIElement* pParent = NULL);
-    void DestroyElements();
-
-    bool OnWindowSize(CGUIElement* pElement);
+     /* TODO AFTER CEGUI API REWRITE */
+    //void CreateElements(CGUIElement* pParent = NULL);
+    //void DestroyElements();
+    //bool OnWindowSize(CGUIElement* pElement);
 
     CGUI* m_pManager;
 
@@ -79,9 +84,10 @@ private:
     std::vector<int> m_AutoCompleteList;
     int              m_iAutoCompleteIndex;
 
-    CGUIWindow* m_pWindow;
-    CGUIEdit*   m_pInput;
-    CGUIMemo*   m_pHistory;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow* m_pWindow;
+    //CGUIEdit*   m_pInput;
+    //CGUIMemo*   m_pHistory;
 
     bool m_bIsEnabled;
 

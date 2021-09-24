@@ -130,20 +130,22 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     SetFileCacheRoot();
 
     // Override CGUI's global events
-    g_pCore->GetGUI()->SetKeyDownHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CClientGame::OnKeyDown, this));
-    g_pCore->GetGUI()->SetMouseClickHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseClick, this));
-    g_pCore->GetGUI()->SetMouseDoubleClickHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseDoubleClick, this));
-    g_pCore->GetGUI()->SetMouseButtonDownHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseButtonDown, this));
-    g_pCore->GetGUI()->SetMouseButtonUpHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseButtonUp, this));
-    g_pCore->GetGUI()->SetMouseMoveHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseMove, this));
-    g_pCore->GetGUI()->SetMouseEnterHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseEnter, this));
-    g_pCore->GetGUI()->SetMouseLeaveHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseLeave, this));
-    g_pCore->GetGUI()->SetMouseWheelHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseWheel, this));
-    g_pCore->GetGUI()->SetMovedHandler(INPUT_MOD, GUI_CALLBACK(&CClientGame::OnMove, this));
-    g_pCore->GetGUI()->SetSizedHandler(INPUT_MOD, GUI_CALLBACK(&CClientGame::OnSize, this));
-    g_pCore->GetGUI()->SetFocusGainedHandler(INPUT_MOD, GUI_CALLBACK_FOCUS(&CClientGame::OnFocusGain, this));
-    g_pCore->GetGUI()->SetFocusLostHandler(INPUT_MOD, GUI_CALLBACK_FOCUS(&CClientGame::OnFocusLoss, this));
-    g_pCore->GetGUI()->SelectInputHandlers(INPUT_MOD);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //g_pCore->GetGUI()->SetKeyDownHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CClientGame::OnKeyDown, this));
+    //g_pCore->GetGUI()->SetMouseClickHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseClick, this));
+    //g_pCore->GetGUI()->SetMouseDoubleClickHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseDoubleClick, this));
+    //g_pCore->GetGUI()->SetMouseButtonDownHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseButtonDown, this));
+    //g_pCore->GetGUI()->SetMouseButtonUpHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseButtonUp, this));
+    //g_pCore->GetGUI()->SetMouseMoveHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseMove, this));
+    //g_pCore->GetGUI()->SetMouseEnterHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseEnter, this));
+    //g_pCore->GetGUI()->SetMouseLeaveHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseLeave, this));
+    //g_pCore->GetGUI()->SetMouseWheelHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CClientGame::OnMouseWheel, this));
+    //g_pCore->GetGUI()->SetMovedHandler(INPUT_MOD, GUI_CALLBACK(&CClientGame::OnMove, this));
+    //g_pCore->GetGUI()->SetSizedHandler(INPUT_MOD, GUI_CALLBACK(&CClientGame::OnSize, this));
+    //g_pCore->GetGUI()->SetFocusGainedHandler(INPUT_MOD, GUI_CALLBACK_FOCUS(&CClientGame::OnFocusGain, this));
+    //g_pCore->GetGUI()->SetFocusLostHandler(INPUT_MOD, GUI_CALLBACK_FOCUS(&CClientGame::OnFocusLoss, this));
+    //g_pCore->GetGUI()->SelectInputHandlers(INPUT_MOD);
 
     // Startup "entities from root" optimization for getElementsByType
     CClientEntity::StartupEntitiesFromRoot();
@@ -362,11 +364,12 @@ CClientGame::~CClientGame()
         g_pGame->GetAudioEngine()->PlayFrontEndSound(48);
     }
 
-    // Reset the GUI input mode
-    g_pCore->GetGUI()->SetGUIInputMode(INPUTMODE_NO_BINDS_ON_EDIT);
+    /* TODO AFTER CEGUI API REWRITE */
+    //// Reset the GUI input mode
+    //g_pCore->GetGUI()->SetGUIInputMode(INPUTMODE_NO_BINDS_ON_EDIT);
 
-    // Reset CGUI's global events
-    g_pCore->GetGUI()->ClearInputHandlers(INPUT_MOD);
+    //// Reset CGUI's global events
+    //g_pCore->GetGUI()->ClearInputHandlers(INPUT_MOD);
 
     // Destroy mimics
     #ifdef MTA_DEBUG
@@ -564,7 +567,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
     // Verify that the nickname is valid
     if (!IsNickValid(szNick))
     {
-        g_pCore->ShowMessageBox(_("Error") + _E("CD01"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR);
+        //g_pCore->ShowMessageBox(_("Error") + _E("CD01"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
         g_pCore->GetModManager()->RequestUnload();
         return false;
     }
@@ -580,7 +583,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             g_pCore->GetConsole()->SetVisible(false);
 
         // Display the status box
-        g_pCore->ShowMessageBox(_("CONNECTING"), _("Entering the game ..."), MB_ICON_INFO);
+        //g_pCore->ShowMessageBox(_("CONNECTING"), _("Entering the game ..."), MB_ICON_INFO); /* TODO AFTER CEGUI API REWRITE */
 
         // Send the initial data to the server
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -638,8 +641,8 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
     }
     else
     {
-        g_pCore->ShowMessageBox(_("Error") + _E("CD02"), _("Not connected; please use Quick Connect or the 'connect' command to connect to a server."),
-                                MB_BUTTON_OK | MB_ICON_ERROR);
+        //g_pCore->ShowMessageBox(_("Error") + _E("CD02"), _("Not connected; please use Quick Connect or the 'connect' command to connect to a server."),
+                               // MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
         g_pCore->GetModManager()->RequestUnload();
     }
 
@@ -662,7 +665,7 @@ bool CClientGame::StartLocalGame(eServerType Type, const char* szPassword)
 
     if (!IsNickValid(strNick.c_str()))
     {
-        g_pCore->ShowMessageBox(_("Error") + _E("CD03"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR);
+        //g_pCore->ShowMessageBox(_("Error") + _E("CD03"), _("Invalid nickname! Please go to Settings and set a new one!"), MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
         g_pCore->GetModManager()->RequestUnload();
         return false;
     }
@@ -684,7 +687,7 @@ bool CClientGame::StartLocalGame(eServerType Type, const char* szPassword)
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
-            g_pCore->ShowMessageBox(_("Error") + _E("CD04"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK);
+            //g_pCore->ShowMessageBox(_("Error") + _E("CD04"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK); /* TODO AFTER CEGUI API REWRITE */
             g_pCore->GetModManager()->RequestUnload();
             return false;
         }
@@ -693,8 +696,8 @@ bool CClientGame::StartLocalGame(eServerType Type, const char* szPassword)
             m_Server.SetPassword(szPassword);
 
         // Display the status box<<<<<
-        m_OnCancelLocalGameClick = GUI_CALLBACK(&CClientGame::OnCancelLocalGameClick, this);
-        g_pCore->ShowMessageBox(_("Local Server"), _("Starting local server ..."), MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick);
+        //m_OnCancelLocalGameClick = GUI_CALLBACK(&CClientGame::OnCancelLocalGameClick, this); /* TODO AFTER CEGUI API REWRITE */
+        //g_pCore->ShowMessageBox(_("Local Server"), _("Starting local server ..."), MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick); /* TODO AFTER CEGUI API REWRITE */
     }
     else
     {
@@ -707,16 +710,17 @@ bool CClientGame::StartLocalGame(eServerType Type, const char* szPassword)
     return true;
 }
 
-bool CClientGame::OnCancelLocalGameClick(CGUIElement* pElement)
-{
-    if (m_bLocalPlay && m_bWaitingForLocalConnect)
-    {
-        g_pCore->RemoveMessageBox();
-        g_pCore->GetModManager()->RequestUnload();
-        return true;
-    }
-    return false;
-}
+/* TODO AFTER CEGUI API REWRITE */
+//bool CClientGame::OnCancelLocalGameClick(CGUIElement* pElement)
+//{
+//    if (m_bLocalPlay && m_bWaitingForLocalConnect)
+//    {
+//        g_pCore->RemoveMessageBox();
+//        g_pCore->GetModManager()->RequestUnload();
+//        return true;
+//    }
+//    return false;
+//}
 
 void CClientGame::DoPulsePreFrame()
 {
@@ -1000,8 +1004,8 @@ void CClientGame::DoPulses()
             {
                 // Otherwise, disconnect here
                 AddReportLog(7105, SString("Core - Kicked (%s)", *strMessageCombo));
-                g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( %s )"), *strMessageCombo),
-                                        MB_BUTTON_OK | MB_ICON_ERROR);
+                //g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( %s )"), *strMessageCombo),
+                                        // MB_BUTTON_OK | MB_ICON_ERROR); /* TODO AFTER CEGUI API REWRITE */
                 g_pCore->GetModManager()->RequestUnload();
                 return;
             }
@@ -1069,7 +1073,7 @@ void CClientGame::DoPulses()
             // and we haven't started the connecting.
             if (m_Server.IsReady() && m_iLocalConnectAttempts == 0)
             {
-                g_pCore->ShowMessageBox(_("Local Server"), _("Connecting to local server..."), MB_ICON_INFO);
+                //g_pCore->ShowMessageBox(_("Local Server"), _("Connecting to local server..."), MB_ICON_INFO); /* TODO AFTER CEGUI API REWRITE */
 
                 // Connect
                 if (g_pNet->StartNetwork("localhost", 22010))
@@ -1124,8 +1128,8 @@ void CClientGame::DoPulses()
         m_ElementDeleter.DoDeleteAll();
         m_pLuaManager->ProcessPendingDeleteList();
 
-        // Get rid of deleted GUI elements
-        g_pCore->GetGUI()->CleanDeadPool();
+        // Get rid of deleted GUI elements 
+        //g_pCore->GetGUI()->CleanDeadPool(); /* TODO AFTER CEGUI API REWRITE */
 
         // Allow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
@@ -2200,7 +2204,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                     int iX = GET_X_LPARAM(lParam);
                     int iY = GET_Y_LPARAM(lParam);
 
-                    CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
+                    CVector2D vecResolution = CVector2D(1920, 1080); //g_pCore->GetGUI()->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
 
                     /*
                     // (IJs) why are these relative? it doesn't make sense
@@ -2373,7 +2377,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
             {
                 iPreviousX = iX, iPreviousY = iY;
 
-                CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
+                CVector2D vecResolution = CVector2D(1920, 1080); //g_pCore->GetGUI()->GetResolution(); /* TODO AFTER CEGUI API REWRITE */
                 CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
 
                 CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
@@ -5504,309 +5508,310 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
     }
 }
 
-bool CClientGame::OnKeyDown(CGUIKeyEventArgs Args)
-{
-    return true;
-}
-
-bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    const char* szButton = NULL;
-    const char* szState = NULL;
-    switch (Args.button)
-    {
-        case CGUIMouse::LeftButton:
-            szButton = "left";
-            szState = "up";
-            break;
-        case CGUIMouse::MiddleButton:
-            szButton = "middle";
-            szState = "up";
-            break;
-        case CGUIMouse::RightButton:
-            szButton = "right";
-            szState = "up";
-            break;
-    }
-
-    if (szButton)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szButton);
-        Arguments.PushString(szState);
-        Arguments.PushNumber(Args.position.fX);
-        Arguments.PushNumber(Args.position.fY);
-
-        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-        if (GetGUIManager()->Exists(pGUIElement))
-        {
-            pGUIElement->CallEvent("onClientGUIClick", Arguments, true);
-        }
-    }
-
-    return true;
-}
-
-bool CClientGame::OnMouseDoubleClick(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    const char* szButton = NULL;
-    const char* szState = NULL;
-    switch (Args.button)
-    {
-        case CGUIMouse::LeftButton:
-            szButton = "left";
-            szState = "up";
-            break;
-        case CGUIMouse::MiddleButton:
-            szButton = "middle";
-            szState = "up";
-            break;
-        case CGUIMouse::RightButton:
-            szButton = "right";
-            szState = "up";
-            break;
-    }
-
-    if (szButton)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szButton);
-        Arguments.PushString(szState);
-        Arguments.PushNumber(Args.position.fX);
-        Arguments.PushNumber(Args.position.fY);
-
-        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-        if (GetGUIManager()->Exists(pGUIElement))
-        {
-            pGUIElement->CallEvent("onClientGUIDoubleClick", Arguments, true);
-        }
-    }
-
-    return true;
-}
-
-bool CClientGame::OnMouseButtonDown(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    const char* szButton = NULL;
-    switch (Args.button)
-    {
-        case CGUIMouse::LeftButton:
-            szButton = "left";
-            break;
-        case CGUIMouse::MiddleButton:
-            szButton = "middle";
-            break;
-        case CGUIMouse::RightButton:
-            szButton = "right";
-            break;
-    }
-
-    if (szButton)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szButton);
-        Arguments.PushNumber(Args.position.fX);
-        Arguments.PushNumber(Args.position.fY);
-
-        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-        if (GetGUIManager()->Exists(pGUIElement))
-        {
-            pGUIElement->CallEvent("onClientGUIMouseDown", Arguments, true);
-        }
-    }
-
-    return true;
-}
-
-bool CClientGame::OnMouseButtonUp(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    const char* szButton = NULL;
-    switch (Args.button)
-    {
-        case CGUIMouse::LeftButton:
-            szButton = "left";
-            break;
-        case CGUIMouse::MiddleButton:
-            szButton = "middle";
-            break;
-        case CGUIMouse::RightButton:
-            szButton = "right";
-            break;
-    }
-
-    if (szButton)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szButton);
-        Arguments.PushNumber(Args.position.fX);
-        Arguments.PushNumber(Args.position.fY);
-
-        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-        if (GetGUIManager()->Exists(pGUIElement))
-        {
-            pGUIElement->CallEvent("onClientGUIMouseUp", Arguments, true);
-        }
-    }
-
-    return true;
-}
-
-bool CClientGame::OnMouseMove(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    CLuaArguments Arguments;
-    Arguments.PushNumber(Args.position.fX);
-    Arguments.PushNumber(Args.position.fY);
-
-    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-    if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseMove", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnMouseEnter(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    CLuaArguments Arguments;
-    Arguments.PushNumber(Args.position.fX);
-    Arguments.PushNumber(Args.position.fY);
-    if (Args.pSwitchedWindow)
-    {
-        CClientGUIElement* pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pSwitchedWindow);
-        if (GetGUIManager()->Exists(pGUISwitchedElement))
-            Arguments.PushElement(pGUISwitchedElement);
-    }
-
-    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-    if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseEnter", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnMouseLeave(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    CLuaArguments Arguments;
-    Arguments.PushNumber(Args.position.fX);
-    Arguments.PushNumber(Args.position.fY);
-    if (Args.pSwitchedWindow)
-    {
-        CClientGUIElement* pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pSwitchedWindow);
-        if (GetGUIManager()->Exists(pGUISwitchedElement))
-            Arguments.PushElement(pGUISwitchedElement);
-    }
-
-    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-    if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseLeave", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnMouseWheel(CGUIMouseEventArgs Args)
-{
-    if (!Args.pWindow)
-        return false;
-
-    CLuaArguments Arguments;
-    Arguments.PushNumber(Args.wheelChange);
-
-    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
-    if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientMouseWheel", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnMove(CGUIElement* pElement)
-{
-    if (!pElement)
-        return false;
-
-    CLuaArguments Arguments;
-
-    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(pElement);
-    if (pGUIElement && GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientGUIMove", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnSize(CGUIElement* pElement)
-{
-    if (!pElement)
-        return false;
-
-    CLuaArguments Arguments;
-
-    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(pElement);
-    if (GetGUIManager()->Exists(pGUIElement))
-        pGUIElement->CallEvent("onClientGUISize", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnFocusGain(CGUIFocusEventArgs Args)
-{
-    if (!Args.pActivatedWindow)
-        return false;
-
-    CLuaArguments Arguments;
-
-    CClientGUIElement* pActivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pActivatedWindow);
-
-    if (Args.pDeactivatedWindow)
-    {
-        CClientGUIElement* pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pDeactivatedWindow);
-        if (GetGUIManager()->Exists(pDeactivatedGUIElement))
-            pDeactivatedGUIElement->CallEvent("onClientGUIBlur", Arguments, true);
-    }
-
-    if (GetGUIManager()->Exists(pActivatedGUIElement))
-        pActivatedGUIElement->CallEvent("onClientGUIFocus", Arguments, true);
-
-    return true;
-}
-
-bool CClientGame::OnFocusLoss(CGUIFocusEventArgs Args)
-{
-    if (!Args.pDeactivatedWindow)
-        return false;
-
-    CLuaArguments Arguments;
-
-    if (Args.pActivatedWindow)
-    {
-        // pDeactivatedWindow looses focus but an other window is now gaining it so we let CClientGame::OnFocusGain trigger both events in the right order
-        return true;
-    }
-
-    CClientGUIElement* pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pDeactivatedWindow);
-    if (GetGUIManager()->Exists(pDeactivatedGUIElement))
-        pDeactivatedGUIElement->CallEvent("onClientGUIBlur", Arguments, true);
-
-    return true;
-}
+/* TODO AFTER CEGUI API REWRITE */
+//bool CClientGame::OnKeyDown(CGUIKeyEventArgs Args)
+//{
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    const char* szButton = NULL;
+//    const char* szState = NULL;
+//    switch (Args.button)
+//    {
+//        case CGUIMouse::LeftButton:
+//            szButton = "left";
+//            szState = "up";
+//            break;
+//        case CGUIMouse::MiddleButton:
+//            szButton = "middle";
+//            szState = "up";
+//            break;
+//        case CGUIMouse::RightButton:
+//            szButton = "right";
+//            szState = "up";
+//            break;
+//    }
+//
+//    if (szButton)
+//    {
+//        CLuaArguments Arguments;
+//        Arguments.PushString(szButton);
+//        Arguments.PushString(szState);
+//        Arguments.PushNumber(Args.position.fX);
+//        Arguments.PushNumber(Args.position.fY);
+//
+//        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//        if (GetGUIManager()->Exists(pGUIElement))
+//        {
+//            pGUIElement->CallEvent("onClientGUIClick", Arguments, true);
+//        }
+//    }
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseDoubleClick(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    const char* szButton = NULL;
+//    const char* szState = NULL;
+//    switch (Args.button)
+//    {
+//        case CGUIMouse::LeftButton:
+//            szButton = "left";
+//            szState = "up";
+//            break;
+//        case CGUIMouse::MiddleButton:
+//            szButton = "middle";
+//            szState = "up";
+//            break;
+//        case CGUIMouse::RightButton:
+//            szButton = "right";
+//            szState = "up";
+//            break;
+//    }
+//
+//    if (szButton)
+//    {
+//        CLuaArguments Arguments;
+//        Arguments.PushString(szButton);
+//        Arguments.PushString(szState);
+//        Arguments.PushNumber(Args.position.fX);
+//        Arguments.PushNumber(Args.position.fY);
+//
+//        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//        if (GetGUIManager()->Exists(pGUIElement))
+//        {
+//            pGUIElement->CallEvent("onClientGUIDoubleClick", Arguments, true);
+//        }
+//    }
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseButtonDown(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    const char* szButton = NULL;
+//    switch (Args.button)
+//    {
+//        case CGUIMouse::LeftButton:
+//            szButton = "left";
+//            break;
+//        case CGUIMouse::MiddleButton:
+//            szButton = "middle";
+//            break;
+//        case CGUIMouse::RightButton:
+//            szButton = "right";
+//            break;
+//    }
+//
+//    if (szButton)
+//    {
+//        CLuaArguments Arguments;
+//        Arguments.PushString(szButton);
+//        Arguments.PushNumber(Args.position.fX);
+//        Arguments.PushNumber(Args.position.fY);
+//
+//        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//        if (GetGUIManager()->Exists(pGUIElement))
+//        {
+//            pGUIElement->CallEvent("onClientGUIMouseDown", Arguments, true);
+//        }
+//    }
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseButtonUp(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    const char* szButton = NULL;
+//    switch (Args.button)
+//    {
+//        case CGUIMouse::LeftButton:
+//            szButton = "left";
+//            break;
+//        case CGUIMouse::MiddleButton:
+//            szButton = "middle";
+//            break;
+//        case CGUIMouse::RightButton:
+//            szButton = "right";
+//            break;
+//    }
+//
+//    if (szButton)
+//    {
+//        CLuaArguments Arguments;
+//        Arguments.PushString(szButton);
+//        Arguments.PushNumber(Args.position.fX);
+//        Arguments.PushNumber(Args.position.fY);
+//
+//        CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//        if (GetGUIManager()->Exists(pGUIElement))
+//        {
+//            pGUIElement->CallEvent("onClientGUIMouseUp", Arguments, true);
+//        }
+//    }
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseMove(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//    Arguments.PushNumber(Args.position.fX);
+//    Arguments.PushNumber(Args.position.fY);
+//
+//    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//    if (GetGUIManager()->Exists(pGUIElement))
+//        pGUIElement->CallEvent("onClientMouseMove", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseEnter(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//    Arguments.PushNumber(Args.position.fX);
+//    Arguments.PushNumber(Args.position.fY);
+//    if (Args.pSwitchedWindow)
+//    {
+//        CClientGUIElement* pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pSwitchedWindow);
+//        if (GetGUIManager()->Exists(pGUISwitchedElement))
+//            Arguments.PushElement(pGUISwitchedElement);
+//    }
+//
+//    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//    if (GetGUIManager()->Exists(pGUIElement))
+//        pGUIElement->CallEvent("onClientMouseEnter", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseLeave(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//    Arguments.PushNumber(Args.position.fX);
+//    Arguments.PushNumber(Args.position.fY);
+//    if (Args.pSwitchedWindow)
+//    {
+//        CClientGUIElement* pGUISwitchedElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pSwitchedWindow);
+//        if (GetGUIManager()->Exists(pGUISwitchedElement))
+//            Arguments.PushElement(pGUISwitchedElement);
+//    }
+//
+//    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//    if (GetGUIManager()->Exists(pGUIElement))
+//        pGUIElement->CallEvent("onClientMouseLeave", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMouseWheel(CGUIMouseEventArgs Args)
+//{
+//    if (!Args.pWindow)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//    Arguments.PushNumber(Args.wheelChange);
+//
+//    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
+//    if (GetGUIManager()->Exists(pGUIElement))
+//        pGUIElement->CallEvent("onClientMouseWheel", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnMove(CGUIElement* pElement)
+//{
+//    if (!pElement)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//
+//    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(pElement);
+//    if (pGUIElement && GetGUIManager()->Exists(pGUIElement))
+//        pGUIElement->CallEvent("onClientGUIMove", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnSize(CGUIElement* pElement)
+//{
+//    if (!pElement)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//
+//    CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(pElement);
+//    if (GetGUIManager()->Exists(pGUIElement))
+//        pGUIElement->CallEvent("onClientGUISize", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnFocusGain(CGUIFocusEventArgs Args)
+//{
+//    if (!Args.pActivatedWindow)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//
+//    CClientGUIElement* pActivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pActivatedWindow);
+//
+//    if (Args.pDeactivatedWindow)
+//    {
+//        CClientGUIElement* pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pDeactivatedWindow);
+//        if (GetGUIManager()->Exists(pDeactivatedGUIElement))
+//            pDeactivatedGUIElement->CallEvent("onClientGUIBlur", Arguments, true);
+//    }
+//
+//    if (GetGUIManager()->Exists(pActivatedGUIElement))
+//        pActivatedGUIElement->CallEvent("onClientGUIFocus", Arguments, true);
+//
+//    return true;
+//}
+//
+//bool CClientGame::OnFocusLoss(CGUIFocusEventArgs Args)
+//{
+//    if (!Args.pDeactivatedWindow)
+//        return false;
+//
+//    CLuaArguments Arguments;
+//
+//    if (Args.pActivatedWindow)
+//    {
+//        // pDeactivatedWindow looses focus but an other window is now gaining it so we let CClientGame::OnFocusGain trigger both events in the right order
+//        return true;
+//    }
+//
+//    CClientGUIElement* pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pDeactivatedWindow);
+//    if (GetGUIManager()->Exists(pDeactivatedGUIElement))
+//        pDeactivatedGUIElement->CallEvent("onClientGUIBlur", Arguments, true);
+//
+//    return true;
+//}
 
 //
 // Display a progress dialog if a big packet is coming in

@@ -41,7 +41,7 @@ public:
     std::string    m_strLastPassword;
 
 private:
-    bool Event_OnCancelClick(CGUIElement* pElement);
+    //bool Event_OnCancelClick(CGUIElement* pElement); /* TODO AFTER CEGUI API REWRITE */
 
     in_addr        m_Address;
     std::string    m_strHost;
@@ -56,7 +56,7 @@ private:
     bool           m_bHasTriedSecondConnect;
     SString        m_strDiscordSecretJoin;
 
-    GUI_CALLBACK* m_pOnCancelClick;
+    //GUI_CALLBACK* m_pOnCancelClick; /* TODO AFTER CEGUI API REWRITE */
 
     CServerListItem* m_pServerItem;
     bool             m_bNotifyServerBrowser;

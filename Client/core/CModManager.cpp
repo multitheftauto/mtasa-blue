@@ -216,7 +216,7 @@ void CModManager::Unload()
         CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
 
         // Reset cursor alpha
-        CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true);
+        //CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true); /* TODO AFTER CEGUI API REWRITE */
 
         // Reset the modules
         CCore::GetSingleton().GetGame()->Reset();

@@ -43,6 +43,8 @@ class CClientGUIElement;
 
 #define IS_CGUIELEMENT_VALID_PARENT(entity)     (IS_CGUIELEMENT_SCROLLPANE(entity) || IS_CGUIELEMENT_WINDOW(entity) || IS_CGUIELEMENT_TAB(entity) )
 
+class CGUIElement; /* TODO AFTER CEGUI API REWRITE */
+
 class CClientGUIElement : public CClientEntity
 {
     DECLARE_CLASS(CClientGUIElement, CClientEntity)
@@ -55,11 +57,12 @@ public:
     void Unlink();
 
     eClientEntityType GetType() const { return CCLIENTGUI; };
-    eCGUIType         GetCGUIType() const { return m_pCGUIElement->GetType(); };
+    //eCGUIType         GetCGUIType() const { return m_pCGUIElement->GetType(); }; /* TODO AFTER CEGUI API REWRITE */
     const char*       GetCGUITypeName() const { return m_strCGUITypeName; };
 
-    GUI_CALLBACK GetCallback1() { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent1, this); };
-    GUI_CALLBACK GetCallback2() { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent2, this); };
+    /* TODO AFTER CEGUI API REWRITE */
+    //GUI_CALLBACK GetCallback1() { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent1, this); };
+    //GUI_CALLBACK GetCallback2() { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent2, this); };
 
     void SetEvents(const char* szFunc1, const char* szFunc2 = NULL);
 

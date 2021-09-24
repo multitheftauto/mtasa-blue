@@ -22,64 +22,65 @@ CClientGUIElement::CClientGUIElement(CClientManager* pManager, CLuaMain* pLuaMai
     m_pLuaMain = pLuaMain;
     m_pFontElement = NULL;
 
-    // Store the this-pointer in the userdata variable
-    CGUI_SET_CCLIENTGUIELEMENT(pCGUIElement, this);
+    /* TODO AFTER CEGUI API REWRITE */
+    //// Store the this-pointer in the userdata variable
+    //CGUI_SET_CCLIENTGUIELEMENT(pCGUIElement, this);
 
-    // Generate the CGUI type name variable
-    switch (m_pCGUIElement->GetType())
-    {
-        case CGUI_BUTTON:
-            m_strCGUITypeName = "button";
-            break;
-        case CGUI_CHECKBOX:
-            m_strCGUITypeName = "checkbox";
-            break;
-        case CGUI_EDIT:
-            m_strCGUITypeName = "edit";
-            break;
-        case CGUI_GRIDLIST:
-            m_strCGUITypeName = "gridlist";
-            break;
-        case CGUI_LABEL:
-            m_strCGUITypeName = "label";
-            break;
-        case CGUI_MEMO:
-            m_strCGUITypeName = "memo";
-            break;
-        case CGUI_PROGRESSBAR:
-            m_strCGUITypeName = "progressbar";
-            break;
-        case CGUI_RADIOBUTTON:
-            m_strCGUITypeName = "radiobutton";
-            break;
-        case CGUI_STATICIMAGE:
-            m_strCGUITypeName = "staticimage";
-            break;
-        case CGUI_TAB:
-            m_strCGUITypeName = "tab";
-            break;
-        case CGUI_TABPANEL:
-            m_strCGUITypeName = "tabpanel";
-            break;
-        case CGUI_WINDOW:
-            m_strCGUITypeName = "window";
-            break;
-        case CGUI_SCROLLPANE:
-            m_strCGUITypeName = "scrollpane";
-            break;
-        case CGUI_SCROLLBAR:
-            m_strCGUITypeName = "scrollbar";
-            break;
-        case CGUI_COMBOBOX:
-            m_strCGUITypeName = "combobox";
-            break;
-        case CGUI_WEBBROWSER:
-            m_strCGUITypeName = "browser";
-            break;
-        default:
-            m_strCGUITypeName = "unknown";
-            break;
-    }
+    //// Generate the CGUI type name variable
+    //switch (m_pCGUIElement->GetType())
+    //{
+    //    case CGUI_BUTTON:
+    //        m_strCGUITypeName = "button";
+    //        break;
+    //    case CGUI_CHECKBOX:
+    //        m_strCGUITypeName = "checkbox";
+    //        break;
+    //    case CGUI_EDIT:
+    //        m_strCGUITypeName = "edit";
+    //        break;
+    //    case CGUI_GRIDLIST:
+    //        m_strCGUITypeName = "gridlist";
+    //        break;
+    //    case CGUI_LABEL:
+    //        m_strCGUITypeName = "label";
+    //        break;
+    //    case CGUI_MEMO:
+    //        m_strCGUITypeName = "memo";
+    //        break;
+    //    case CGUI_PROGRESSBAR:
+    //        m_strCGUITypeName = "progressbar";
+    //        break;
+    //    case CGUI_RADIOBUTTON:
+    //        m_strCGUITypeName = "radiobutton";
+    //        break;
+    //    case CGUI_STATICIMAGE:
+    //        m_strCGUITypeName = "staticimage";
+    //        break;
+    //    case CGUI_TAB:
+    //        m_strCGUITypeName = "tab";
+    //        break;
+    //    case CGUI_TABPANEL:
+    //        m_strCGUITypeName = "tabpanel";
+    //        break;
+    //    case CGUI_WINDOW:
+    //        m_strCGUITypeName = "window";
+    //        break;
+    //    case CGUI_SCROLLPANE:
+    //        m_strCGUITypeName = "scrollpane";
+    //        break;
+    //    case CGUI_SCROLLBAR:
+    //        m_strCGUITypeName = "scrollbar";
+    //        break;
+    //    case CGUI_COMBOBOX:
+    //        m_strCGUITypeName = "combobox";
+    //        break;
+    //    case CGUI_WEBBROWSER:
+    //        m_strCGUITypeName = "browser";
+    //        break;
+    //    default:
+    //        m_strCGUITypeName = "unknown";
+    //        break;
+    //}
     SetTypeName(SString("gui-%s", *m_strCGUITypeName));
 
     // Add us to the list in the manager
@@ -150,8 +151,10 @@ bool CClientGUIElement::_CallbackEvent2(CGUIElement* pCGUIElement)
 //
 SString CClientGUIElement::GetFont(CClientGuiFont** ppFontElement)
 {
-    *ppFontElement = m_pFontElement;
-    return GetCGUIElement()->GetFont();
+    /* TODO AFTER CEGUI API REWRITE */
+    //*ppFontElement = m_pFontElement;
+    //return GetCGUIElement()->GetFont();
+    return {};
 }
 
 //
@@ -159,22 +162,23 @@ SString CClientGUIElement::GetFont(CClientGuiFont** ppFontElement)
 //
 bool CClientGUIElement::SetFont(const SString& strInFontName, CClientGuiFont* pFontElement)
 {
-    SString strFontName = strInFontName;
+    /* TODO AFTER CEGUI API REWRITE */
+    //SString strFontName = strInFontName;
 
-    if (pFontElement)
-        strFontName = pFontElement->GetCEGUIFontName();
-    else if (strFontName.empty())
-        strFontName = "default-normal";
+    //if (pFontElement)
+    //    strFontName = pFontElement->GetCEGUIFontName();
+    //else if (strFontName.empty())
+    //    strFontName = "default-normal";
 
-    if (GetCGUIElement()->SetFont(strFontName))
-    {
-        if (m_pFontElement)
-            m_pFontElement->NotifyGUIElementDetach(this);
-        m_pFontElement = pFontElement;
-        if (m_pFontElement)
-            m_pFontElement->NotifyGUIElementAttach(this);
-        return true;
-    }
+    //if (GetCGUIElement()->SetFont(strFontName))
+    //{
+    //    if (m_pFontElement)
+    //        m_pFontElement->NotifyGUIElementDetach(this);
+    //    m_pFontElement = pFontElement;
+    //    if (m_pFontElement)
+    //        m_pFontElement->NotifyGUIElementAttach(this);
+    //    return true;
+    //}
     return false;
 }
 
@@ -182,14 +186,15 @@ bool CClientGUIElement::SetFont(const SString& strInFontName, CClientGuiFont* pF
 // Change call propagation behaviour (overrides CClientEntity::SetCallPropagationEnabled)
 void CClientGUIElement::SetCallPropagationEnabled(bool bEnabled)
 {
-    CClientEntity::SetCallPropagationEnabled(bEnabled);
+    /* TODO AFTER CEGUI API REWRITE */
+    //CClientEntity::SetCallPropagationEnabled(bEnabled);
 
-    for (CFastList<CClientEntity*>::iterator iter = m_Children.begin(); iter != m_Children.end(); ++iter)
-    {
-        if ((*iter)->GetType() == CCLIENTGUI)
-        {
-            CClientGUIElement* pGUIElement = static_cast<CClientGUIElement*>(*iter);
-            pGUIElement->GetCGUIElement()->SetInheritsAlpha(bEnabled);
-        }
-    }
+    //for (CFastList<CClientEntity*>::iterator iter = m_Children.begin(); iter != m_Children.end(); ++iter)
+    //{
+    //    if ((*iter)->GetType() == CCLIENTGUI)
+    //    {
+    //        CClientGUIElement* pGUIElement = static_cast<CClientGUIElement*>(*iter);
+    //        pGUIElement->GetCGUIElement()->SetInheritsAlpha(bEnabled);
+    //    }
+    //}
 }

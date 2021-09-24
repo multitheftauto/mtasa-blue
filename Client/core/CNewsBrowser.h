@@ -35,17 +35,21 @@ public:
 protected:
     void        InitNewsItemList();
     void        AddNewsTab(const SNewsItem& newsItem);
-    CGUIWindow* LoadLayoutAndImages(CGUIElement* pParent, const SNewsItem& newsItem);
+    //CGUIWindow* LoadLayoutAndImages(CGUIElement* pParent, const SNewsItem& newsItem); /* TODO AFTER CEGUI API REWRITE */
     void        CreateGUI();
     void        DestroyGUI();
-    bool        OnOKButtonClick(CGUIElement* pElement);
-    bool        OnNewsLinkButtonClick(CGUIElement* pElement);
+
+    /* TODO AFTER CEGUI API REWRITE */
+    /*bool        OnOKButtonClick(CGUIElement* pElement);
+    bool        OnNewsLinkButtonClick(CGUIElement* pElement);*/
 
     std::vector<SNewsItem>   m_NewsitemList;
-    CGUIWindow*              m_pWindow;
-    CGUITabPanel*            m_pTabPanel;
-    CGUIButton*              m_pButtonOK;
-    CGUIButton*              m_pButtonNewsLink;
-    std::vector<CGUITab*>    m_TabList;
-    std::vector<CGUIWindow*> m_TabContentList;
+
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow*              m_pWindow;
+    //CGUITabPanel*            m_pTabPanel;
+    //CGUIButton*              m_pButtonOK;
+    //CGUIButton*              m_pButtonNewsLink;
+    //std::vector<CGUITab*>    m_TabList;
+    //std::vector<CGUIWindow*> m_TabContentList;
 };

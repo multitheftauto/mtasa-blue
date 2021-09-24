@@ -181,7 +181,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CVARS_GET("anisotropic", iAnisotropic);
     ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
     ms_DiagnosticDebug = CCore::GetSingleton().GetDiagnosticDebug();
-    CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
+    //CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778); /* TODO AFTER CEGUI API REWRITE */
 
     // Make a screenshot if needed
     CheckForScreenShot();

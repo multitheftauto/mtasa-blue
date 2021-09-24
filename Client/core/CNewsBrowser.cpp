@@ -23,9 +23,9 @@ extern CCore* g_pCore;
 ////////////////////////////////////////////////////
 CNewsBrowser::CNewsBrowser()
 {
-    m_pWindow = NULL;
-    m_pTabPanel = NULL;
-    m_pButtonOK = NULL;
+    //m_pWindow = NULL;
+    //m_pTabPanel = NULL;
+    //m_pButtonOK = NULL;
 }
 
 ////////////////////////////////////////////////////
@@ -146,47 +146,48 @@ void CNewsBrowser::CreateHeadlines()
 ////////////////////////////////////////////////////
 void CNewsBrowser::CreateGUI()
 {
-    CreateHeadlines();
-    CGUI* pManager = g_pCore->GetGUI();
+    /* TODO AFTER CEGUI API REWRITE */
+    //CreateHeadlines();
+    //CGUI* pManager = g_pCore->GetGUI();
 
-    // Create the window
-    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, "NEWS"));
-    m_pWindow->SetCloseButtonEnabled(true);
-    m_pWindow->SetMovable(true);
+    //// Create the window
+    //m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, "NEWS"));
+    //m_pWindow->SetCloseButtonEnabled(true);
+    //m_pWindow->SetMovable(true);
 
-    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
-    float     yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
-    m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - 640.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff), false);
-    m_pWindow->SetSize(CVector2D(640.0f, 480.0f));
-    m_pWindow->SetSizingEnabled(false);
-    m_pWindow->SetAlwaysOnTop(true);
+    //CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    //float     yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
+    //m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - 640.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff), false);
+    //m_pWindow->SetSize(CVector2D(640.0f, 480.0f));
+    //m_pWindow->SetSizingEnabled(false);
+    //m_pWindow->SetAlwaysOnTop(true);
 
-    // Create buttons
-    //  OK button
-    m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, "OK"));
-    m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
-    m_pButtonOK->SetZOrderingEnabled(false);
+    //// Create buttons
+    ////  OK button
+    //m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, "OK"));
+    //m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
+    //m_pButtonOK->SetZOrderingEnabled(false);
 
-    // News link
-    m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
-    m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
-    m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
-    m_pButtonNewsLink->SetZOrderingEnabled(false);
+    //// News link
+    //m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
+    //m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
+    //m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
+    //m_pButtonNewsLink->SetZOrderingEnabled(false);
 
-    // Set up the events
-    m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
-    m_pButtonOK->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
-    m_pButtonNewsLink->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnNewsLinkButtonClick, this));
+    //// Set up the events
+    //m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
+    //m_pButtonOK->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
+    //m_pButtonNewsLink->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnNewsLinkButtonClick, this));
 
-    // Create the tab panel and necessary tabs
-    m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
-    m_pTabPanel->SetPosition(CVector2D(0, 20.0f));
-    m_pTabPanel->SetSize(CVector2D(640.0f, 480.0f - 60));
+    //// Create the tab panel and necessary tabs
+    //m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
+    //m_pTabPanel->SetPosition(CVector2D(0, 20.0f));
+    //m_pTabPanel->SetSize(CVector2D(640.0f, 480.0f - 60));
 
-    for (uint i = 0; i < m_NewsitemList.size(); i++)
-    {
-        AddNewsTab(m_NewsitemList[i]);
-    }
+    //for (uint i = 0; i < m_NewsitemList.size(); i++)
+    //{
+    //    AddNewsTab(m_NewsitemList[i]);
+    //}
 }
 
 ////////////////////////////////////////////////////
@@ -198,31 +199,32 @@ void CNewsBrowser::CreateGUI()
 ////////////////////////////////////////////////////
 void CNewsBrowser::DestroyGUI()
 {
-    // Destroy
-    for (uint i = 0; i < m_TabList.size(); i++)
-    {
-        CGUITab* pTab = m_TabList[i];
-        if (pTab)
-            delete pTab;
-    }
-    m_TabList.clear();
-    for (uint i = 0; i < m_TabContentList.size(); i++)
-    {
-        CGUIWindow* pWindow = m_TabContentList[i];
-        if (pWindow)
-        {
-            CGUIElement* m_pScrollPane = pWindow->GetParent();
-            if (m_pScrollPane)
-            {
-                delete m_pScrollPane;
-            }
-            delete pWindow;
-        }
-    }
-    m_TabContentList.clear();
-    SAFE_DELETE(m_pTabPanel);
-    SAFE_DELETE(m_pButtonOK);
-    SAFE_DELETE(m_pWindow);
+    /* TODO AFTER CEGUI API REWRITE */
+    //// Destroy
+    //for (uint i = 0; i < m_TabList.size(); i++)
+    //{
+    //    CGUITab* pTab = m_TabList[i];
+    //    if (pTab)
+    //        delete pTab;
+    //}
+    //m_TabList.clear();
+    //for (uint i = 0; i < m_TabContentList.size(); i++)
+    //{
+    //    CGUIWindow* pWindow = m_TabContentList[i];
+    //    if (pWindow)
+    //    {
+    //        CGUIElement* m_pScrollPane = pWindow->GetParent();
+    //        if (m_pScrollPane)
+    //        {
+    //            delete m_pScrollPane;
+    //        }
+    //        delete pWindow;
+    //    }
+    //}
+    //m_TabContentList.clear();
+    //SAFE_DELETE(m_pTabPanel);
+    //SAFE_DELETE(m_pButtonOK);
+    //SAFE_DELETE(m_pWindow);
 }
 
 ////////////////////////////////////////////////////
@@ -234,36 +236,36 @@ void CNewsBrowser::DestroyGUI()
 ////////////////////////////////////////////////////
 void CNewsBrowser::AddNewsTab(const SNewsItem& newsItem)
 {
-    CGUI* pManager = g_pCore->GetGUI();
+    //CGUI* pManager = g_pCore->GetGUI();
 
-    CGUITab* pTab = m_pTabPanel->CreateTab("News");
-    m_TabList.push_back(pTab);
+    //CGUITab* pTab = m_pTabPanel->CreateTab("News");
+    //m_TabList.push_back(pTab);
 
-    // Create everything under a scrollpane
-    CGUIScrollPane* m_pScrollPane = reinterpret_cast<CGUIScrollPane*>(pManager->CreateScrollPane(pTab));
-    m_pScrollPane->SetProperty("ContentPaneAutoSized", "True");
-    m_pScrollPane->SetPosition(CVector2D(3, 3), 0);
-    m_pScrollPane->SetSize(CVector2D(618.0f, 390.0f));
-    m_pScrollPane->SetVerticalScrollStepSize(0.15f);
-    m_pScrollPane->SetVerticalScrollBar(true);
+    //// Create everything under a scrollpane
+    //CGUIScrollPane* m_pScrollPane = reinterpret_cast<CGUIScrollPane*>(pManager->CreateScrollPane(pTab));
+    //m_pScrollPane->SetProperty("ContentPaneAutoSized", "True");
+    //m_pScrollPane->SetPosition(CVector2D(3, 3), 0);
+    //m_pScrollPane->SetSize(CVector2D(618.0f, 390.0f));
+    //m_pScrollPane->SetVerticalScrollStepSize(0.15f);
+    //m_pScrollPane->SetVerticalScrollBar(true);
 
-    // Switch cwd
-    pManager->PushGuiWorkingDirectory(newsItem.strContentFullDir);
+    //// Switch cwd
+    //pManager->PushGuiWorkingDirectory(newsItem.strContentFullDir);
 
-    // Load files
-    CGUIWindow* pWindow = LoadLayoutAndImages(m_pScrollPane, newsItem);
-    m_TabContentList.push_back(pWindow);
+    //// Load files
+    //CGUIWindow* pWindow = LoadLayoutAndImages(m_pScrollPane, newsItem);
+    //m_TabContentList.push_back(pWindow);
 
-    // Set tab name from content window title
-    if (pWindow)
-    {
-        SString strTitle = pWindow->GetText();
-        if (!strTitle.empty())
-            pTab->SetText(strTitle);
-    }
+    //// Set tab name from content window title
+    //if (pWindow)
+    //{
+    //    SString strTitle = pWindow->GetText();
+    //    if (!strTitle.empty())
+    //        pTab->SetText(strTitle);
+    //}
 
-    // Restore cwd
-    pManager->PopGuiWorkingDirectory(newsItem.strContentFullDir);
+    //// Restore cwd
+    //pManager->PopGuiWorkingDirectory(newsItem.strContentFullDir);
 }
 
 ////////////////////////////////////////////////////
@@ -273,37 +275,38 @@ void CNewsBrowser::AddNewsTab(const SNewsItem& newsItem)
 //
 //
 ////////////////////////////////////////////////////
-CGUIWindow* CNewsBrowser::LoadLayoutAndImages(CGUIElement* pParent, const SNewsItem& newsItem)
-{
-    CGUI* pManager = g_pCore->GetGUI();
-
-    // Make sure we have the layout filename
-    if (newsItem.strLayoutFilename.empty())
-    {
-        AddReportLog(3302, SString("CNewsBrowser::LoadLayout: Problem loading %s", *newsItem.strContentFullDir));
-        return NULL;
-    }
-
-    // Load any imagesets
-    for (uint i = 0; i < newsItem.imagesetFilenameList.size(); i++)
-    {
-        if (!pManager->LoadImageset(newsItem.imagesetFilenameList[i]))
-        {
-            AddReportLog(
-                3303, SString("CNewsBrowser::LoadLayout: Problem with LoadImageset [%s] %s", *newsItem.strContentFullDir, *newsItem.imagesetFilenameList[i]));
-            return NULL;
-        }
-    }
-
-    // Load layout
-    CGUIWindow* pWindow = pManager->LoadLayout(pParent, newsItem.strLayoutFilename);
-    if (!pWindow)
-    {
-        AddReportLog(3304, SString("CNewsBrowser::LoadLayout: Problem with LoadLayout [%s] %s", *newsItem.strContentFullDir, *newsItem.strLayoutFilename));
-        return NULL;
-    }
-    return pWindow;
-}
+// /* TODO AFTER CEGUI API REWRITE */
+//CGUIWindow* CNewsBrowser::LoadLayoutAndImages(CGUIElement* pParent, const SNewsItem& newsItem)
+//{
+//    CGUI* pManager = g_pCore->GetGUI();
+//
+//    // Make sure we have the layout filename
+//    if (newsItem.strLayoutFilename.empty())
+//    {
+//        AddReportLog(3302, SString("CNewsBrowser::LoadLayout: Problem loading %s", *newsItem.strContentFullDir));
+//        return NULL;
+//    }
+//
+//    // Load any imagesets
+//    for (uint i = 0; i < newsItem.imagesetFilenameList.size(); i++)
+//    {
+//        if (!pManager->LoadImageset(newsItem.imagesetFilenameList[i]))
+//        {
+//            AddReportLog(
+//                3303, SString("CNewsBrowser::LoadLayout: Problem with LoadImageset [%s] %s", *newsItem.strContentFullDir, *newsItem.imagesetFilenameList[i]));
+//            return NULL;
+//        }
+//    }
+//
+//    // Load layout
+//    CGUIWindow* pWindow = pManager->LoadLayout(pParent, newsItem.strLayoutFilename);
+//    if (!pWindow)
+//    {
+//        AddReportLog(3304, SString("CNewsBrowser::LoadLayout: Problem with LoadLayout [%s] %s", *newsItem.strContentFullDir, *newsItem.strLayoutFilename));
+//        return NULL;
+//    }
+//    return pWindow;
+//}
 
 ////////////////////////////////////////////////////
 //
@@ -314,8 +317,9 @@ CGUIWindow* CNewsBrowser::LoadLayoutAndImages(CGUIElement* pParent, const SNewsI
 ////////////////////////////////////////////////////
 void CNewsBrowser::SwitchToTab(int iIndex)
 {
-    if (iIndex >= 0 && iIndex < (int)m_TabList.size())
-        m_pTabPanel->SetSelectedTab(m_TabList[iIndex]);
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (iIndex >= 0 && iIndex < (int)m_TabList.size())
+    //    m_pTabPanel->SetSelectedTab(m_TabList[iIndex]);
 }
 
 ////////////////////////////////////////////////////
@@ -327,34 +331,35 @@ void CNewsBrowser::SwitchToTab(int iIndex)
 ////////////////////////////////////////////////////
 void CNewsBrowser::SetVisible(bool bVisible)
 {
-    if (!bVisible && !m_pWindow)
-        return;
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (!bVisible && !m_pWindow)
+    //    return;
 
-    // HACK: Recreate GUI if left shift held (for editing)
-    if ((GetAsyncKeyState(VK_LSHIFT) & 0x8000) != 0)
-    {
-        DestroyGUI();
-        CreateGUI();
-    }
+    //// HACK: Recreate GUI if left shift held (for editing)
+    //if ((GetAsyncKeyState(VK_LSHIFT) & 0x8000) != 0)
+    //{
+    //    DestroyGUI();
+    //    CreateGUI();
+    //}
 
-    if (!m_pWindow)
-        CreateGUI();
+    //if (!m_pWindow)
+    //    CreateGUI();
 
-    // Hide / show the form
-    m_pWindow->SetVisible(bVisible);
+    //// Hide / show the form
+    //m_pWindow->SetVisible(bVisible);
 
-    if (bVisible)
-    {
-        // Bring it all forward
-        m_pWindow->Activate();
-        m_pWindow->SetAlwaysOnTop(true);
-        m_pWindow->BringToFront();
-        if (GetApplicationSettingInt("news-updated") == 1)
-        {
-            SetApplicationSettingInt("news-updated", 0);
-            CreateHeadlines();
-        }
-    }
+    //if (bVisible)
+    //{
+    //    // Bring it all forward
+    //    m_pWindow->Activate();
+    //    m_pWindow->SetAlwaysOnTop(true);
+    //    m_pWindow->BringToFront();
+    //    if (GetApplicationSettingInt("news-updated") == 1)
+    //    {
+    //        SetApplicationSettingInt("news-updated", 0);
+    //        CreateHeadlines();
+    //    }
+    //}
 }
 
 ////////////////////////////////////////////////////
@@ -366,7 +371,8 @@ void CNewsBrowser::SetVisible(bool bVisible)
 ////////////////////////////////////////////////////
 bool CNewsBrowser::IsVisible()
 {
-    return m_pWindow && m_pWindow->IsVisible();
+    //return m_pWindow && m_pWindow->IsVisible(); /* TODO AFTER CEGUI API REWRITE */
+    return false;
 }
 
 ////////////////////////////////////////////////////
@@ -376,19 +382,19 @@ bool CNewsBrowser::IsVisible()
 //
 //
 ////////////////////////////////////////////////////
-bool CNewsBrowser::OnOKButtonClick(CGUIElement* pElement)
-{
-    // Close the window
-    m_pWindow->SetVisible(false);
-    return true;
-}
+//bool CNewsBrowser::OnOKButtonClick(CGUIElement* pElement)
+//{
+//    // Close the window
+//    m_pWindow->SetVisible(false);
+//    return true;
+//}
 
-bool CNewsBrowser::OnNewsLinkButtonClick(CGUIElement* pElement)
-{
-    // Visit the website
-    ShellExecuteNonBlocking("open", "https://mtasa.com/news");
-
-    // Close the window
-    m_pWindow->SetVisible(false);
-    return true;
-}
+//bool CNewsBrowser::OnNewsLinkButtonClick(CGUIElement* pElement)
+//{
+//    // Visit the website
+//    ShellExecuteNonBlocking("open", "https://mtasa.com/news");
+//
+//    // Close the window
+//    m_pWindow->SetVisible(false);
+//    return true;
+//}

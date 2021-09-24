@@ -4903,35 +4903,36 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
 
 bool CStaticFunctionDefinitions::GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld)
 {
-    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled())
-    {
-        tagPOINT point;
-        GetCursorPos(&point);
+    /* TODO AFTER CEGUI API REWRITE */
+    //if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled())
+    //{
+    //    tagPOINT point;
+    //    GetCursorPos(&point);
 
-        HWND hookedWindow = g_pCore->GetHookedWindow();
+    //    HWND hookedWindow = g_pCore->GetHookedWindow();
 
-        tagPOINT windowPos = {0};
-        ClientToScreen(hookedWindow, &windowPos);
+    //    tagPOINT windowPos = {0};
+    //    ClientToScreen(hookedWindow, &windowPos);
 
-        CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
-        point.x -= windowPos.x;
-        point.y -= windowPos.y;
-        if (point.x < 0)
-            point.x = 0;
-        else if (point.x > (long)vecResolution.fX)
-            point.x = (long)vecResolution.fX;
-        if (point.y < 0)
-            point.y = 0;
-        else if (point.y > (long)vecResolution.fY)
-            point.y = (long)vecResolution.fY;
+    //    CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
+    //    point.x -= windowPos.x;
+    //    point.y -= windowPos.y;
+    //    if (point.x < 0)
+    //        point.x = 0;
+    //    else if (point.x > (long)vecResolution.fX)
+    //        point.x = (long)vecResolution.fX;
+    //    if (point.y < 0)
+    //        point.y = 0;
+    //    else if (point.y > (long)vecResolution.fY)
+    //        point.y = (long)vecResolution.fY;
 
-        vecCursor = CVector2D(((float)point.x) / vecResolution.fX, ((float)point.y) / vecResolution.fY);
+    //    vecCursor = CVector2D(((float)point.x) / vecResolution.fX, ((float)point.y) / vecResolution.fY);
 
-        CVector vecScreen((float)((int)point.x), (float)((int)point.y), 300.0f);
-        g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecWorld);
+    //    CVector vecScreen((float)((int)point.x), (float)((int)point.y), 300.0f);
+    //    g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecWorld);
 
-        return true;
-    }
+    //    return true;
+    //}
     return false;
 }
 
@@ -4950,1281 +4951,1282 @@ bool CStaticFunctionDefinitions::IsCursorShowing(bool& bShowing)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetCursorAlpha(float& fAlpha)
-{
-    fAlpha = m_pGUI->GetCurrentServerCursorAlpha();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetCursorAlpha(float fAlpha)
-{
-    if (fAlpha >= 0.0f && fAlpha <= 1.0f)
-    {
-        m_pGUI->SetCursorAlpha(fAlpha, true);
-        return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIGetInputEnabled()
-{            // can't inline because statics are defined in .cpp not .h
-    return m_pGUI->GetGUIInputEnabled();
-}
-
-void CStaticFunctionDefinitions::GUISetInputMode(eInputMode inputMode)
-{
-    m_pGUI->SetGUIInputMode(inputMode);
-}
-
-eInputMode CStaticFunctionDefinitions::GUIGetInputMode()
-{
-    return m_pGUI->GetGUIInputMode();
-}
-
-eCursorType CStaticFunctionDefinitions::GUIGetCursorType()
-{
-    return m_pGUI->GetCursorType();
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                               bool bRelative)
-{
-    CGUIElement* pElement = m_pGUI->CreateWnd(NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIClose", "onClientGUIKeyDown");
-    static_cast<CGUIWindow*>(pElement)->SetCloseClickHandler(pGUIElement->GetCallback1());
-    static_cast<CGUIWindow*>(pElement)->SetKeyDownHandler(pGUIElement->GetCallback2());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strPath,
-                                                                    bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateStaticImage(pParent ? pParent->GetCGUIElement() : NULL);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // Register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // Check for a valid (and sane) file path
-    if (strPath)
-    {
-        // Load the image
-        if (!static_cast<CGUIStaticImage*>(pElement)->LoadFromFile(strPath))
-        {
-            // If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
-            // So delete it and reset the pointer, so we return NULL
-            delete pGUIElement;
-            pGUIElement = NULL;
-        }
-    }
-
-    if (pGUIElement && pParent && !pParent->IsCallPropagationEnabled())
-    {
-        pElement->SetInheritsAlpha(false);
-    }
-
-    return pGUIElement;
-}
-
-bool CStaticFunctionDefinitions::GUIStaticImageLoadImage(CClientEntity& Entity, const SString& strDir)
-{
-    RUN_CHILDREN(GUIStaticImageLoadImage(**iter, strDir))
-
-    // Is this a gui element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a static image?
-        if (IS_CGUIELEMENT_STATICIMAGE(&GUIElement))
-        {
-            CGUIElement* pCGUIElement = GUIElement.GetCGUIElement();
-
-            if (strDir)
-            {
-                // load the image, if any
-                return static_cast<CGUIStaticImage*>(pCGUIElement)->LoadFromFile(strDir);
-            }
-        }
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(CClientEntity& Entity, CVector2D& vecSize)
-{
-    // Is this a gui element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a static image?
-        if (IS_CGUIELEMENT_STATICIMAGE(&GUIElement))
-        {
-            CGUIElement* pCGUIElement = GUIElement.GetCGUIElement();
-            return static_cast<CGUIStaticImage*>(pCGUIElement)->GetNativeSize(vecSize);
-        }
-    }
-
-    return false;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                              bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateLabel(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                               bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateButton(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIClicked");
-    static_cast<CGUIButton*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                                    CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateProgressBar(pParent ? pParent->GetCGUIElement() : NULL);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal,
-                                                                  bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateScrollBar(bHorizontal, pParent ? pParent->GetCGUIElement() : NULL);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIScroll");
-    static_cast<CGUIScrollBar*>(pElement)->SetOnScrollHandler(pGUIElement->GetCallback1());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                                 bool bChecked, bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateCheckBox(pParent ? pParent->GetCGUIElement() : NULL, szCaption, bChecked);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIStateChanged");
-    static_cast<CGUICheckBox*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                                    bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateRadioButton(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIStateChanged");
-    static_cast<CGUIRadioButton*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                             bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateEdit(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-    pElement->SetText(szCaption);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIAccepted", "onClientGUIChanged");
-    static_cast<CGUIEdit*>(pElement)->SetTextAcceptedHandler(pGUIElement->GetCallback1());
-    static_cast<CGUIEdit*>(pElement)->SetTextChangedHandler(pGUIElement->GetCallback2());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                             bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateMemo(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-    pElement->SetText(szCaption);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIAccepted", "onClientGUIChanged");
-    static_cast<CGUIMemo*>(pElement)->SetTextChangedHandler(pGUIElement->GetCallback2());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                                 CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateGridList(pParent ? pParent->GetCGUIElement() : NULL, true);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                                 CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateTabPanel(pParent ? pParent->GetCGUIElement() : NULL);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUITabSwitched");
-    static_cast<CGUITabPanel*>(pElement)->SetSelectionHandler(pGUIElement->GetCallback1());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollPane(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                                   CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateScrollPane(pParent ? pParent->GetCGUIElement() : NULL);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateTab(CLuaMain& LuaMain, const char* szCaption, CClientGUIElement* pParent)
-{
-    if (!pParent)
-        return NULL;
-
-    CGUIElement* pGUIParent = pParent->GetCGUIElement();
-
-    // Make sure the parent element is a TabPanel
-    if (pGUIParent->GetType() != CGUI_TABPANEL)
-        return NULL;
-
-    CGUIElement*       pTab = static_cast<CGUITabPanel*>(pGUIParent)->CreateTab(szCaption);
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pTab);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    return pGUIElement;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUIGetSelectedTab(CClientEntity& Element)
-{
-    if (IS_GUI(&Element))
-    {
-        CClientGUIElement& GUIPanel = static_cast<CClientGUIElement&>(Element);
-        if (IS_CGUIELEMENT_TABPANEL(&GUIPanel))
-        {
-            CGUITab* pTab = static_cast<CGUITabPanel*>(GUIPanel.GetCGUIElement())->GetSelectedTab();
-            if (pTab)
-            {
-                return m_pGUIManager->Get(static_cast<CGUIElement*>(pTab));
-            }
-        }
-    }
-
-    return NULL;
-}
-
-bool CStaticFunctionDefinitions::GUISetSelectedTab(CClientEntity& Element, CClientEntity& Tab)
-{
-    if (IS_GUI(&Element) && IS_GUI(&Tab))
-    {
-        CClientGUIElement& GUIPanel = static_cast<CClientGUIElement&>(Element);
-        CClientGUIElement& GUITab = static_cast<CClientGUIElement&>(Tab);
-        if (IS_CGUIELEMENT_TABPANEL(&GUIPanel) && IS_CGUIELEMENT_TAB(&GUITab))
-        {
-            static_cast<CGUITabPanel*>(GUIPanel.GetCGUIElement())->SetSelectedTab(static_cast<CGUITab*>(GUITab.GetCGUIElement()));
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIDeleteTab(CLuaMain& LuaMain, CClientGUIElement* pTab, CClientGUIElement* pParent)
-{
-    if (!pParent || !pTab)
-        return false;
-
-    CGUIElement* pGUIParent = pParent->GetCGUIElement();
-    static_cast<CGUITabPanel*>(pGUIParent)->DeleteTab(reinterpret_cast<CGUITab*>(pTab->GetCGUIElement()));
-    g_pClientGame->GetElementDeleter()->Delete(pTab);
-
-    return true;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
-                                                                 bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIElement* pElement = m_pGUI->CreateComboBox(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // Disable editing of the box...
-    // CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( pElement );
-    static_cast<CGUIComboBox*>(pElement)->SetReadOnly(true);
-
-    // register to the gui manager
-    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // set events
-    pGUIElement->SetEvents("onClientGUIComboBoxAccepted");
-    static_cast<CGUIComboBox*>(pElement)->SetSelectionHandler(pGUIElement->GetCallback1());
-
-    return pGUIElement;
-}
-
-int CStaticFunctionDefinitions::GUIComboBoxAddItem(CClientEntity& Entity, const char* szText)
-{
-    RUN_CHILDREN(GUIComboBoxAddItem(**iter, szText))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Add a new item.
-            CGUIListItem* item = static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->AddItem(szText);
-            // Return it's id + 1 so indexes start at 1.
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemIndex(item);
-        }
-    }
-
-    return 0;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxRemoveItem(CClientEntity& Entity, int index)
-{
-    RUN_CHILDREN(GUIComboBoxRemoveItem(**iter, index))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Call RemoveItem with index - 1 so indexes are compatible internally ...
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->RemoveItem(index);
-        }
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxClear(CClientEntity& Entity)
-{
-    RUN_CHILDREN(GUIComboBoxClear(**iter))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Clear the combobox
-            static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->Clear();
-            return true;
-        }
-    }
-
-    return false;
-}
-
-int CStaticFunctionDefinitions::GUIComboBoxGetSelected(CClientEntity& Entity)
-{
-    RUN_CHILDREN(GUIComboBoxGetSelected(**iter))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // return the selected + 1 so indexes start at 1...
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetSelectedItemIndex();
-        }
-    }
-
-    return 0;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxSetSelected(CClientEntity& Entity, int index)
-{
-    RUN_CHILDREN(GUIComboBoxSetSelected(**iter, index))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Call SetSelectedItem with index - 1 so indexes are compatible internally ...
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->SetSelectedItemByIndex(index);
-        }
-    }
-
-    return false;
-}
-
-std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText(CClientEntity& Entity, int index)
-{
-    RUN_CHILDREN(GUIComboBoxGetItemText(**iter, index))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Call GetItemText with index - 1 so indexes are compatible internally ...
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemText(index);
-        }
-    }
-
-    return "";
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText)
-{
-    RUN_CHILDREN(GUIComboBoxSetItemText(**iter, index, szText))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Call SetItemText with index - 1 so indexes are compatible internally ...
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->SetItemText(index, szText);
-        }
-    }
-
-    return false;
-}
-
-int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
-{
-    // Are we a CGUI Element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            // Call getItemCount
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
-        }
-    }
-
-    return 0;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool state)
-{
-    RUN_CHILDREN(GUIComboBoxSetOpen(**iter, state))
-
-    // Are we a CGUI Element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            if (state)
-            {
-                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
-            }
-            else if (!state)
-            {
-                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
-            }
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
-{
-    // Are we a CGUI Element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a combobox?
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-        {
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
-        }
-    }
-
-    return false;
-}
-
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal,
-                                                                bool bIsTransparent, bool bRelative, CClientGUIElement* pParent)
-{
-    CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser(pParent ? pParent->GetCGUIElement() : nullptr);
-    pElement->SetPosition(position, bRelative);
-    pElement->SetSize(size, bRelative);
-
-    // Register to the gui manager
-    CVector2D absoluteSize;
-    pElement->GetSize(absoluteSize, false);
-    auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
-
-    if (!pGUIElement->GetBrowser())
-    {
-        delete pGUIElement;
-        return nullptr;
-    }
-
-    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
-
-    // Load CEGUI element texture from webview
-    pElement->LoadFromWebView(pGUIElement->GetBrowser()->GetWebView());
-
-    if (pParent && !pParent->IsCallPropagationEnabled())
-    {
-        pGUIElement->GetCGUIElement()->SetInheritsAlpha(false);
-    }
-
-    return pGUIElement;
-}
-
-void CStaticFunctionDefinitions::GUISetText(CClientEntity& Entity, const char* szText)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Set the text
-        GUIElement.GetCGUIElement()->SetText(szText);
-    }
-}
-
-void CStaticFunctionDefinitions::GUISetSize(CClientEntity& Entity, const CVector2D& vecSize, bool bRelative)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Set the size
-        GUIElement.GetCGUIElement()->SetSize(vecSize, bRelative);
-    }
-}
-
-void CStaticFunctionDefinitions::GUISetPosition(CClientEntity& Entity, const CVector2D& vecPosition, bool bRelative)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Set the positin
-        GUIElement.GetCGUIElement()->SetPosition(vecPosition, bRelative);
-
-        // Adjust for aspect ratio if needed
-        if (g_pCore->GetGraphics()->IsAspectRatioAdjustmentEnabled())
-        {
-            CVector2D vecNewPosition = GUIElement.GetCGUIElement()->GetPosition(false);
-            CVector2D vecSize = GUIElement.GetCGUIElement()->GetSize(false);
-            float     fY = vecNewPosition.fY + vecSize.fY * 0.5f;
-            fY = g_pCore->GetGraphics()->ConvertPositionForAspectRatio(fY);
-            vecNewPosition.fY = fY - vecSize.fY * 0.5f;
-            GUIElement.GetCGUIElement()->SetPosition(vecNewPosition, false);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUISetVisible(CClientEntity& Entity, bool bFlag)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Set the visibility
-        GUIElement.GetCGUIElement()->SetVisible(bFlag);
-    }
-}
-
-void CStaticFunctionDefinitions::GUISetEnabled(CClientEntity& Entity, bool bFlag)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Set the visibility
-        GUIElement.GetCGUIElement()->SetEnabled(bFlag);
-    }
-}
-
-void CStaticFunctionDefinitions::GUISetProperty(CClientEntity& Entity, const char* szProperty, const char* szValue)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
-
-        // Set the property
-        GUIElement.GetCGUIElement()->SetProperty(szProperty, szValue);
-
-        // HACK: If the property being set is AlwaysOnTop, move it to the back so it's not in front of the main menu
-        if ((stricmp(szProperty, "AlwaysOnTop") == 0) && (stricmp(szValue, "True") == 0))
-        {
-            GUIElement.GetCGUIElement()->MoveToBack();
-
-            // Restore input focus to the console if required
-            if (bConsoleHadInputFocus)
-                g_pCore->GetConsole()->ActivateInput();
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUISetAlpha(CClientEntity& Entity, float fAlpha)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Set the alpha level
-        GUIElement.GetCGUIElement()->SetAlpha(fAlpha);
-    }
-}
-
-bool CStaticFunctionDefinitions::GUIBringToFront(CClientEntity& Entity)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        // We don't allow AlwaysOnTop GUI to be brought to the front (so it doesn't appear on top of the main menu)
-        std::string strValue = GUIElement.GetCGUIElement()->GetProperty("AlwaysOnTop");
-        if (strValue.compare("True") != 0)
-        {
-            bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
-
-            // Bring it to the front
-            GUIElement.GetCGUIElement()->BringToFront();
-
-            // Restore input focus to the console if required
-            if (bConsoleHadInputFocus)
-                g_pCore->GetConsole()->ActivateInput();
-            return true;
-        }
-    }
-    return false;
-}
-
-void CStaticFunctionDefinitions::GUIMoveToBack(CClientEntity& Entity)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
-
-        // Move it to the back
-        GUIElement.GetCGUIElement()->MoveToBack();
-
-        // Restore input focus to the console if required
-        if (bConsoleHadInputFocus)
-            g_pCore->GetConsole()->ActivateInput();
-    }
-}
-
-bool CStaticFunctionDefinitions::GUIBlur(CClientEntity& Entity)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        GUIElement.GetCGUIElement()->Deactivate();
-        return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIFocus(CClientEntity& Entity)
-{
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        GUIElement.GetCGUIElement()->Activate();
-        return true;
-    }
-    return false;
-}
-
-void CStaticFunctionDefinitions::GUICheckBoxSetSelected(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUICheckBoxSetSelected(**iter, bFlag))
-
-    // Are we a CGUI element and checkpox?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a checkbox?
-        if (IS_CGUIELEMENT_CHECKBOX(&GUIElement))
-        {
-            // Set its selected state
-            static_cast<CGUICheckBox*>(GUIElement.GetCGUIElement())->SetSelected(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIRadioButtonSetSelected(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUIRadioButtonSetSelected(**iter, bFlag))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a radiobutton?
-        if (IS_CGUIELEMENT_RADIOBUTTON(&GUIElement))
-        {
-            // Set its selected state
-            static_cast<CGUIRadioButton*>(GUIElement.GetCGUIElement())->SetSelected(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIProgressBarSetProgress(CClientEntity& Entity, int iProgress)
-{
-    RUN_CHILDREN(GUIProgressBarSetProgress(**iter, iProgress))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a progressbar?
-        if (IS_CGUIELEMENT_PROGRESSBAR(&GUIElement))
-        {
-            // Set the progress
-            static_cast<CGUIProgressBar*>(GUIElement.GetCGUIElement())->SetProgress((float)(iProgress / 100.0f));
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition(CClientEntity& Entity, int iProgress)
-{
-    RUN_CHILDREN(GUIScrollBarSetScrollPosition(**iter, iProgress))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a progressbar?
-        if (IS_CGUIELEMENT_SCROLLBAR(&GUIElement))
-        {
-            // Set the progress
-            static_cast<CGUIScrollBar*>(GUIElement.GetCGUIElement())->SetScrollPosition((float)(iProgress / 100.0f));
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition(CClientEntity& Entity, float fProgress)
-{
-    RUN_CHILDREN(GUIScrollPaneSetHorizontalScrollPosition(**iter, fProgress))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a progressbar?
-        if (IS_CGUIELEMENT_SCROLLPANE(&GUIElement))
-        {
-            // Set the progress
-            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetHorizontalScrollPosition(fProgress / 100.0f);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIScrollPaneSetScrollBars(CClientEntity& Entity, bool bH, bool bV)
-{
-    RUN_CHILDREN(GUIScrollPaneSetScrollBars(**iter, bH, bV))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_SCROLLPANE(&GUIElement))
-        {
-            // Set the scrollbars
-            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetHorizontalScrollBar(bH);
-            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetVerticalScrollBar(bV);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition(CClientEntity& Entity, float fProgress)
-{
-    RUN_CHILDREN(GUIScrollPaneSetVerticalScrollPosition(**iter, fProgress))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a progressbar?
-        if (IS_CGUIELEMENT_SCROLLPANE(&GUIElement))
-        {
-            // Set the progress
-            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetVerticalScrollPosition(fProgress / 100.0f);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIEditSetReadOnly(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUIEditSetReadOnly(**iter, bFlag))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a editbox?
-        if (IS_CGUIELEMENT_EDIT(&GUIElement))
-        {
-            // Set its read only state
-            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetReadOnly(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIMemoSetReadOnly(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUIMemoSetReadOnly(**iter, bFlag))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a editbox?
-        if (IS_CGUIELEMENT_MEMO(&GUIElement))
-        {
-            // Set its read only state
-            static_cast<CGUIMemo*>(GUIElement.GetCGUIElement())->SetReadOnly(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIEditSetMasked(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUIEditSetMasked(**iter, bFlag))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Is this an edit?
-        if (IS_CGUIELEMENT_EDIT(&GUIElement))
-        {
-            // Set its masked flag
-            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetMasked(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIEditSetMaxLength(CClientEntity& Entity, unsigned int iLength)
-{
-    RUN_CHILDREN(GUIEditSetMaxLength(**iter, iLength))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we an editbox element?
-        if (IS_CGUIELEMENT_EDIT(&GUIElement))
-        {
-            // Set its max length
-            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetMaxLength(iLength);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIEditSetCaretIndex(CClientEntity& Entity, unsigned int iCaret)
-{
-    RUN_CHILDREN(GUIEditSetCaretIndex(**iter, iCaret))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we an edit?
-        if (IS_CGUIELEMENT_EDIT(&GUIElement))
-        {
-            // Set its carat index
-            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetCaretIndex(iCaret);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIMemoSetCaretIndex(CClientEntity& Entity, unsigned int iCaret)
-{
-    RUN_CHILDREN(GUIMemoSetCaretIndex(**iter, iCaret))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we an edit?
-        if (IS_CGUIELEMENT_MEMO(&GUIElement))
-        {
-            // Set its carat index
-            static_cast<CGUIMemo*>(GUIElement.GetCGUIElement())->SetCaretIndex(iCaret);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
-{
-    RUN_CHILDREN(GUIMemoSetVerticalScrollPosition(**iter, fPosition))
-
-    // Are we a GUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a memo?
-        if (IS_CGUIELEMENT_MEMO(&GUIElement))
-        {
-            CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
-            guiMemo->SetVerticalScrollPosition(fPosition / 100.0f * guiMemo->GetMaxVerticalScrollPosition());
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Entity, bool bEnabled)
-{
-    RUN_CHILDREN(GUIGridListSetSortingEnabled(**iter, bEnabled))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
-        {
-            // Set sorting is enabled
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetScrollBars(CClientEntity& Entity, bool bH, bool bV)
-{
-    RUN_CHILDREN(GUIGridListSetScrollBars(**iter, bH, bV))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
-        {
-            // Set the scrollbars
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetHorizontalScrollBar(bH);
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetVerticalScrollBar(bV);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIGridListClear(CClientEntity& Entity)
-{
-    RUN_CHILDREN(GUIGridListClear(**iter))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
-        {
-            // Clear the gridlist
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->Clear();
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetItemData(CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable)
-{
-    // Delete any old data we might have
-    CLuaArgument* pVariable = reinterpret_cast<CLuaArgument*>(static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->GetItemData(iRow, iColumn));
-    if (pVariable)
-        delete pVariable;
-
-    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())
-        ->SetItemData(iRow, iColumn, (void*)Variable, CGUICallback<void, void*>(&CStaticFunctionDefinitions::GUIItemDataDestroyCallback));
-}
-
-void CStaticFunctionDefinitions::GUIItemDataDestroyCallback(void* data)
-{
-    delete (CLuaArgument*)(data);
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetSelectionMode(CClientEntity& Entity, unsigned int uiMode)
-{
-    RUN_CHILDREN(GUIGridListSetSelectionMode(**iter, uiMode))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
-        {
-            // Set the selection mode
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSelectionMode((SelectionMode)uiMode);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition(CClientEntity& Entity, float fPosition)
-{
-    RUN_CHILDREN(GUIGridListSetHorizontalScrollPosition(**iter, fPosition))
-
-    // Are we a GUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
-        {
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetHorizontalScrollPosition(fPosition / 100.0f);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
-{
-    RUN_CHILDREN(GUIGridListSetHorizontalScrollPosition(**iter, fPosition))
-
-    // Are we a GUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a gridlist?
-        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
-        {
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetVerticalScrollPosition(fPosition / 100.0f);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIWindowSetMovable(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUIWindowSetMovable(**iter, bFlag))
-
-    // Are we a GUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a window?
-        if (IS_CGUIELEMENT_WINDOW(&GUIElement))
-        {
-            // Set the windows movability
-            static_cast<CGUIWindow*>(GUIElement.GetCGUIElement())->SetMovable(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUIWindowSetSizable(CClientEntity& Entity, bool bFlag)
-{
-    RUN_CHILDREN(GUIWindowSetSizable(**iter, bFlag))
-
-    // Are we a GUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a window?
-        if (IS_CGUIELEMENT_WINDOW(&GUIElement))
-        {
-            // Set the windows sizability
-            static_cast<CGUIWindow*>(GUIElement.GetCGUIElement())->SetSizingEnabled(bFlag);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUILabelSetColor(CClientEntity& Entity, int iR, int iG, int iB)
-{
-    RUN_CHILDREN(GUILabelSetColor(**iter, iR, iG, iB))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a CGUI label?
-        if (IS_CGUIELEMENT_LABEL(&GUIElement))
-        {
-            // Set the label color
-            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(iR, iG, iB);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUILabelSetVerticalAlign(CClientEntity& Entity, CGUIVerticalAlign eAlign)
-{
-    RUN_CHILDREN(GUILabelSetVerticalAlign(**iter, eAlign))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a CGUI label?
-        if (IS_CGUIELEMENT_LABEL(&GUIElement))
-        {
-            // Set the vertical align
-            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetVerticalAlign(eAlign);
-        }
-    }
-}
-
-void CStaticFunctionDefinitions::GUILabelSetHorizontalAlign(CClientEntity& Entity, CGUIHorizontalAlign eAlign)
-{
-    RUN_CHILDREN(GUILabelSetHorizontalAlign(**iter, eAlign))
-
-    // Are we a CGUI element?
-    if (IS_GUI(&Entity))
-    {
-        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-        // Are we a CGUI label?
-        if (IS_CGUIELEMENT_LABEL(&GUIElement))
-        {
-            // Set the horizontal align
-            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetHorizontalAlign(eAlign);
-        }
-    }
-}
+/* TODO AFTER CEGUI API REWRITE */
+//bool CStaticFunctionDefinitions::GetCursorAlpha(float& fAlpha)
+//{
+//    fAlpha = m_pGUI->GetCurrentServerCursorAlpha();
+//    return true;
+//}
+//
+//bool CStaticFunctionDefinitions::SetCursorAlpha(float fAlpha)
+//{
+//    if (fAlpha >= 0.0f && fAlpha <= 1.0f)
+//    {
+//        m_pGUI->SetCursorAlpha(fAlpha, true);
+//        return true;
+//    }
+//    return false;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIGetInputEnabled()
+//{            // can't inline because statics are defined in .cpp not .h
+//    return m_pGUI->GetGUIInputEnabled();
+//}
+//
+//void CStaticFunctionDefinitions::GUISetInputMode(eInputMode inputMode)
+//{
+//    m_pGUI->SetGUIInputMode(inputMode);
+//}
+//
+//eInputMode CStaticFunctionDefinitions::GUIGetInputMode()
+//{
+//    return m_pGUI->GetGUIInputMode();
+//}
+//
+//eCursorType CStaticFunctionDefinitions::GUIGetCursorType()
+//{
+//    return m_pGUI->GetCursorType();
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                               bool bRelative)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateWnd(NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIClose", "onClientGUIKeyDown");
+//    static_cast<CGUIWindow*>(pElement)->SetCloseClickHandler(pGUIElement->GetCallback1());
+//    static_cast<CGUIWindow*>(pElement)->SetKeyDownHandler(pGUIElement->GetCallback2());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strPath,
+//                                                                    bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateStaticImage(pParent ? pParent->GetCGUIElement() : NULL);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // Register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // Check for a valid (and sane) file path
+//    if (strPath)
+//    {
+//        // Load the image
+//        if (!static_cast<CGUIStaticImage*>(pElement)->LoadFromFile(strPath, "absolute"))
+//        {
+//            // If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
+//            // So delete it and reset the pointer, so we return NULL
+//            delete pGUIElement;
+//            pGUIElement = NULL;
+//        }
+//    }
+//
+//    if (pGUIElement && pParent && !pParent->IsCallPropagationEnabled())
+//    {
+//        pElement->SetInheritsAlpha(false);
+//    }
+//
+//    return pGUIElement;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIStaticImageLoadImage(CClientEntity& Entity, const SString& strDir)
+//{
+//    RUN_CHILDREN(GUIStaticImageLoadImage(**iter, strDir))
+//
+//    // Is this a gui element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a static image?
+//        if (IS_CGUIELEMENT_STATICIMAGE(&GUIElement))
+//        {
+//            CGUIElement* pCGUIElement = GUIElement.GetCGUIElement();
+//
+//            if (strDir)
+//            {
+//                // load the image, if any
+//                return static_cast<CGUIStaticImage*>(pCGUIElement)->LoadFromFile(strDir);
+//            }
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(CClientEntity& Entity, CVector2D& vecSize)
+//{
+//    // Is this a gui element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a static image?
+//        if (IS_CGUIELEMENT_STATICIMAGE(&GUIElement))
+//        {
+//            CGUIElement* pCGUIElement = GUIElement.GetCGUIElement();
+//            return static_cast<CGUIStaticImage*>(pCGUIElement)->GetNativeSize(vecSize);
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                              bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateLabel(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                               bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateButton(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIClicked");
+//    static_cast<CGUIButton*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+//                                                                    CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateProgressBar(pParent ? pParent->GetCGUIElement() : NULL);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal,
+//                                                                  bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateScrollBar(bHorizontal, pParent ? pParent->GetCGUIElement() : NULL);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIScroll");
+//    static_cast<CGUIScrollBar*>(pElement)->SetOnScrollHandler(pGUIElement->GetCallback1());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                                 bool bChecked, bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateCheckBox(pParent ? pParent->GetCGUIElement() : NULL, szCaption, bChecked);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIStateChanged");
+//    static_cast<CGUICheckBox*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                                    bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateRadioButton(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIStateChanged");
+//    static_cast<CGUIRadioButton*>(pElement)->SetClickHandler(pGUIElement->GetCallback1());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                             bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateEdit(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//    pElement->SetText(szCaption);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIAccepted", "onClientGUIChanged");
+//    static_cast<CGUIEdit*>(pElement)->SetTextAcceptedHandler(pGUIElement->GetCallback1());
+//    static_cast<CGUIEdit*>(pElement)->SetTextChangedHandler(pGUIElement->GetCallback2());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                             bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateMemo(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//    pElement->SetText(szCaption);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIAccepted", "onClientGUIChanged");
+//    static_cast<CGUIMemo*>(pElement)->SetTextChangedHandler(pGUIElement->GetCallback2());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+//                                                                 CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateGridList(pParent ? pParent->GetCGUIElement() : NULL, true);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+//                                                                 CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateTabPanel(pParent ? pParent->GetCGUIElement() : NULL);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUITabSwitched");
+//    static_cast<CGUITabPanel*>(pElement)->SetSelectionHandler(pGUIElement->GetCallback1());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollPane(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+//                                                                   CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateScrollPane(pParent ? pParent->GetCGUIElement() : NULL);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateTab(CLuaMain& LuaMain, const char* szCaption, CClientGUIElement* pParent)
+//{
+//    if (!pParent)
+//        return NULL;
+//
+//    CGUIElement* pGUIParent = pParent->GetCGUIElement();
+//
+//    // Make sure the parent element is a TabPanel
+//    if (pGUIParent->GetType() != CGUI_TABPANEL)
+//        return NULL;
+//
+//    CGUIElement*       pTab = static_cast<CGUITabPanel*>(pGUIParent)->CreateTab(szCaption);
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pTab);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    return pGUIElement;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUIGetSelectedTab(CClientEntity& Element)
+//{
+//    if (IS_GUI(&Element))
+//    {
+//        CClientGUIElement& GUIPanel = static_cast<CClientGUIElement&>(Element);
+//        if (IS_CGUIELEMENT_TABPANEL(&GUIPanel))
+//        {
+//            CGUITab* pTab = static_cast<CGUITabPanel*>(GUIPanel.GetCGUIElement())->GetSelectedTab();
+//            if (pTab)
+//            {
+//                return m_pGUIManager->Get(static_cast<CGUIElement*>(pTab));
+//            }
+//        }
+//    }
+//
+//    return NULL;
+//}
+//
+//bool CStaticFunctionDefinitions::GUISetSelectedTab(CClientEntity& Element, CClientEntity& Tab)
+//{
+//    if (IS_GUI(&Element) && IS_GUI(&Tab))
+//    {
+//        CClientGUIElement& GUIPanel = static_cast<CClientGUIElement&>(Element);
+//        CClientGUIElement& GUITab = static_cast<CClientGUIElement&>(Tab);
+//        if (IS_CGUIELEMENT_TABPANEL(&GUIPanel) && IS_CGUIELEMENT_TAB(&GUITab))
+//        {
+//            static_cast<CGUITabPanel*>(GUIPanel.GetCGUIElement())->SetSelectedTab(static_cast<CGUITab*>(GUITab.GetCGUIElement()));
+//            return true;
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIDeleteTab(CLuaMain& LuaMain, CClientGUIElement* pTab, CClientGUIElement* pParent)
+//{
+//    if (!pParent || !pTab)
+//        return false;
+//
+//    CGUIElement* pGUIParent = pParent->GetCGUIElement();
+//    static_cast<CGUITabPanel*>(pGUIParent)->DeleteTab(reinterpret_cast<CGUITab*>(pTab->GetCGUIElement()));
+//    g_pClientGame->GetElementDeleter()->Delete(pTab);
+//
+//    return true;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
+//                                                                 bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIElement* pElement = m_pGUI->CreateComboBox(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // Disable editing of the box...
+//    // CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( pElement );
+//    static_cast<CGUIComboBox*>(pElement)->SetReadOnly(true);
+//
+//    // register to the gui manager
+//    CClientGUIElement* pGUIElement = new CClientGUIElement(m_pManager, &LuaMain, pElement);
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // set events
+//    pGUIElement->SetEvents("onClientGUIComboBoxAccepted");
+//    static_cast<CGUIComboBox*>(pElement)->SetSelectionHandler(pGUIElement->GetCallback1());
+//
+//    return pGUIElement;
+//}
+//
+//int CStaticFunctionDefinitions::GUIComboBoxAddItem(CClientEntity& Entity, const char* szText)
+//{
+//    RUN_CHILDREN(GUIComboBoxAddItem(**iter, szText))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Add a new item.
+//            CGUIListItem* item = static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->AddItem(szText);
+//            // Return it's id + 1 so indexes start at 1.
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemIndex(item);
+//        }
+//    }
+//
+//    return 0;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIComboBoxRemoveItem(CClientEntity& Entity, int index)
+//{
+//    RUN_CHILDREN(GUIComboBoxRemoveItem(**iter, index))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Call RemoveItem with index - 1 so indexes are compatible internally ...
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->RemoveItem(index);
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIComboBoxClear(CClientEntity& Entity)
+//{
+//    RUN_CHILDREN(GUIComboBoxClear(**iter))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Clear the combobox
+//            static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->Clear();
+//            return true;
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//int CStaticFunctionDefinitions::GUIComboBoxGetSelected(CClientEntity& Entity)
+//{
+//    RUN_CHILDREN(GUIComboBoxGetSelected(**iter))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // return the selected + 1 so indexes start at 1...
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetSelectedItemIndex();
+//        }
+//    }
+//
+//    return 0;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIComboBoxSetSelected(CClientEntity& Entity, int index)
+//{
+//    RUN_CHILDREN(GUIComboBoxSetSelected(**iter, index))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Call SetSelectedItem with index - 1 so indexes are compatible internally ...
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->SetSelectedItemByIndex(index);
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText(CClientEntity& Entity, int index)
+//{
+//    RUN_CHILDREN(GUIComboBoxGetItemText(**iter, index))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Call GetItemText with index - 1 so indexes are compatible internally ...
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemText(index);
+//        }
+//    }
+//
+//    return "";
+//}
+//
+//bool CStaticFunctionDefinitions::GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText)
+//{
+//    RUN_CHILDREN(GUIComboBoxSetItemText(**iter, index, szText))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Call SetItemText with index - 1 so indexes are compatible internally ...
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->SetItemText(index, szText);
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
+//{
+//    // Are we a CGUI Element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            // Call getItemCount
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
+//        }
+//    }
+//
+//    return 0;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool state)
+//{
+//    RUN_CHILDREN(GUIComboBoxSetOpen(**iter, state))
+//
+//    // Are we a CGUI Element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            if (state)
+//            {
+//                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
+//            }
+//            else if (!state)
+//            {
+//                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
+//            }
+//            return true;
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
+//{
+//    // Are we a CGUI Element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a combobox?
+//        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+//        {
+//            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
+//        }
+//    }
+//
+//    return false;
+//}
+//
+//CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal,
+//                                                                bool bIsTransparent, bool bRelative, CClientGUIElement* pParent)
+//{
+//    CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser(pParent ? pParent->GetCGUIElement() : nullptr);
+//    pElement->SetPosition(position, bRelative);
+//    pElement->SetSize(size, bRelative);
+//
+//    // Register to the gui manager
+//    CVector2D absoluteSize;
+//    pElement->GetSize(absoluteSize, false);
+//    auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
+//
+//    if (!pGUIElement->GetBrowser())
+//    {
+//        delete pGUIElement;
+//        return nullptr;
+//    }
+//
+//    pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
+//
+//    // Load CEGUI element texture from webview
+//    pElement->LoadFromWebView(pGUIElement->GetBrowser()->GetWebView());
+//
+//    if (pParent && !pParent->IsCallPropagationEnabled())
+//    {
+//        pGUIElement->GetCGUIElement()->SetInheritsAlpha(false);
+//    }
+//
+//    return pGUIElement;
+//}
+//
+//void CStaticFunctionDefinitions::GUISetText(CClientEntity& Entity, const char* szText)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Set the text
+//        GUIElement.GetCGUIElement()->SetText(szText);
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUISetSize(CClientEntity& Entity, const CVector2D& vecSize, bool bRelative)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Set the size
+//        GUIElement.GetCGUIElement()->SetSize(vecSize, bRelative);
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUISetPosition(CClientEntity& Entity, const CVector2D& vecPosition, bool bRelative)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Set the positin
+//        GUIElement.GetCGUIElement()->SetPosition(vecPosition, bRelative);
+//
+//        // Adjust for aspect ratio if needed
+//        if (g_pCore->GetGraphics()->IsAspectRatioAdjustmentEnabled())
+//        {
+//            CVector2D vecNewPosition = GUIElement.GetCGUIElement()->GetPosition(false);
+//            CVector2D vecSize = GUIElement.GetCGUIElement()->GetSize(false);
+//            float     fY = vecNewPosition.fY + vecSize.fY * 0.5f;
+//            fY = g_pCore->GetGraphics()->ConvertPositionForAspectRatio(fY);
+//            vecNewPosition.fY = fY - vecSize.fY * 0.5f;
+//            GUIElement.GetCGUIElement()->SetPosition(vecNewPosition, false);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUISetVisible(CClientEntity& Entity, bool bFlag)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Set the visibility
+//        GUIElement.GetCGUIElement()->SetVisible(bFlag);
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUISetEnabled(CClientEntity& Entity, bool bFlag)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Set the visibility
+//        GUIElement.GetCGUIElement()->SetEnabled(bFlag);
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUISetProperty(CClientEntity& Entity, const char* szProperty, const char* szValue)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
+//
+//        // Set the property
+//        GUIElement.GetCGUIElement()->SetProperty(szProperty, szValue);
+//
+//        // HACK: If the property being set is AlwaysOnTop, move it to the back so it's not in front of the main menu
+//        if ((stricmp(szProperty, "AlwaysOnTop") == 0) && (stricmp(szValue, "True") == 0))
+//        {
+//            GUIElement.GetCGUIElement()->MoveToBack();
+//
+//            // Restore input focus to the console if required
+//            if (bConsoleHadInputFocus)
+//                g_pCore->GetConsole()->ActivateInput();
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUISetAlpha(CClientEntity& Entity, float fAlpha)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Set the alpha level
+//        GUIElement.GetCGUIElement()->SetAlpha(fAlpha);
+//    }
+//}
+//
+//bool CStaticFunctionDefinitions::GUIBringToFront(CClientEntity& Entity)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//        // We don't allow AlwaysOnTop GUI to be brought to the front (so it doesn't appear on top of the main menu)
+//        std::string strValue = GUIElement.GetCGUIElement()->GetProperty("AlwaysOnTop");
+//        if (strValue.compare("True") != 0)
+//        {
+//            bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
+//
+//            // Bring it to the front
+//            GUIElement.GetCGUIElement()->BringToFront();
+//
+//            // Restore input focus to the console if required
+//            if (bConsoleHadInputFocus)
+//                g_pCore->GetConsole()->ActivateInput();
+//            return true;
+//        }
+//    }
+//    return false;
+//}
+//
+//void CStaticFunctionDefinitions::GUIMoveToBack(CClientEntity& Entity)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
+//
+//        // Move it to the back
+//        GUIElement.GetCGUIElement()->MoveToBack();
+//
+//        // Restore input focus to the console if required
+//        if (bConsoleHadInputFocus)
+//            g_pCore->GetConsole()->ActivateInput();
+//    }
+//}
+//
+//bool CStaticFunctionDefinitions::GUIBlur(CClientEntity& Entity)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//        GUIElement.GetCGUIElement()->Deactivate();
+//        return true;
+//    }
+//    return false;
+//}
+//
+//bool CStaticFunctionDefinitions::GUIFocus(CClientEntity& Entity)
+//{
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//        GUIElement.GetCGUIElement()->Activate();
+//        return true;
+//    }
+//    return false;
+//}
+//
+//void CStaticFunctionDefinitions::GUICheckBoxSetSelected(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUICheckBoxSetSelected(**iter, bFlag))
+//
+//    // Are we a CGUI element and checkpox?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a checkbox?
+//        if (IS_CGUIELEMENT_CHECKBOX(&GUIElement))
+//        {
+//            // Set its selected state
+//            static_cast<CGUICheckBox*>(GUIElement.GetCGUIElement())->SetSelected(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIRadioButtonSetSelected(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUIRadioButtonSetSelected(**iter, bFlag))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a radiobutton?
+//        if (IS_CGUIELEMENT_RADIOBUTTON(&GUIElement))
+//        {
+//            // Set its selected state
+//            static_cast<CGUIRadioButton*>(GUIElement.GetCGUIElement())->SetSelected(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIProgressBarSetProgress(CClientEntity& Entity, int iProgress)
+//{
+//    RUN_CHILDREN(GUIProgressBarSetProgress(**iter, iProgress))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a progressbar?
+//        if (IS_CGUIELEMENT_PROGRESSBAR(&GUIElement))
+//        {
+//            // Set the progress
+//            static_cast<CGUIProgressBar*>(GUIElement.GetCGUIElement())->SetProgress((float)(iProgress / 100.0f));
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition(CClientEntity& Entity, int iProgress)
+//{
+//    RUN_CHILDREN(GUIScrollBarSetScrollPosition(**iter, iProgress))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a progressbar?
+//        if (IS_CGUIELEMENT_SCROLLBAR(&GUIElement))
+//        {
+//            // Set the progress
+//            static_cast<CGUIScrollBar*>(GUIElement.GetCGUIElement())->SetScrollPosition((float)(iProgress / 100.0f));
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIScrollPaneSetHorizontalScrollPosition(CClientEntity& Entity, float fProgress)
+//{
+//    RUN_CHILDREN(GUIScrollPaneSetHorizontalScrollPosition(**iter, fProgress))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a progressbar?
+//        if (IS_CGUIELEMENT_SCROLLPANE(&GUIElement))
+//        {
+//            // Set the progress
+//            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetHorizontalScrollPosition(fProgress / 100.0f);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIScrollPaneSetScrollBars(CClientEntity& Entity, bool bH, bool bV)
+//{
+//    RUN_CHILDREN(GUIScrollPaneSetScrollBars(**iter, bH, bV))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_SCROLLPANE(&GUIElement))
+//        {
+//            // Set the scrollbars
+//            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetHorizontalScrollBar(bH);
+//            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetVerticalScrollBar(bV);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIScrollPaneSetVerticalScrollPosition(CClientEntity& Entity, float fProgress)
+//{
+//    RUN_CHILDREN(GUIScrollPaneSetVerticalScrollPosition(**iter, fProgress))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a progressbar?
+//        if (IS_CGUIELEMENT_SCROLLPANE(&GUIElement))
+//        {
+//            // Set the progress
+//            static_cast<CGUIScrollPane*>(GUIElement.GetCGUIElement())->SetVerticalScrollPosition(fProgress / 100.0f);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIEditSetReadOnly(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUIEditSetReadOnly(**iter, bFlag))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a editbox?
+//        if (IS_CGUIELEMENT_EDIT(&GUIElement))
+//        {
+//            // Set its read only state
+//            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetReadOnly(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIMemoSetReadOnly(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUIMemoSetReadOnly(**iter, bFlag))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a editbox?
+//        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+//        {
+//            // Set its read only state
+//            static_cast<CGUIMemo*>(GUIElement.GetCGUIElement())->SetReadOnly(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIEditSetMasked(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUIEditSetMasked(**iter, bFlag))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Is this an edit?
+//        if (IS_CGUIELEMENT_EDIT(&GUIElement))
+//        {
+//            // Set its masked flag
+//            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetMasked(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIEditSetMaxLength(CClientEntity& Entity, unsigned int iLength)
+//{
+//    RUN_CHILDREN(GUIEditSetMaxLength(**iter, iLength))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we an editbox element?
+//        if (IS_CGUIELEMENT_EDIT(&GUIElement))
+//        {
+//            // Set its max length
+//            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetMaxLength(iLength);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIEditSetCaretIndex(CClientEntity& Entity, unsigned int iCaret)
+//{
+//    RUN_CHILDREN(GUIEditSetCaretIndex(**iter, iCaret))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we an edit?
+//        if (IS_CGUIELEMENT_EDIT(&GUIElement))
+//        {
+//            // Set its carat index
+//            static_cast<CGUIEdit*>(GUIElement.GetCGUIElement())->SetCaretIndex(iCaret);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIMemoSetCaretIndex(CClientEntity& Entity, unsigned int iCaret)
+//{
+//    RUN_CHILDREN(GUIMemoSetCaretIndex(**iter, iCaret))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we an edit?
+//        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+//        {
+//            // Set its carat index
+//            static_cast<CGUIMemo*>(GUIElement.GetCGUIElement())->SetCaretIndex(iCaret);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
+//{
+//    RUN_CHILDREN(GUIMemoSetVerticalScrollPosition(**iter, fPosition))
+//
+//    // Are we a GUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a memo?
+//        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+//        {
+//            CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
+//            guiMemo->SetVerticalScrollPosition(fPosition / 100.0f * guiMemo->GetMaxVerticalScrollPosition());
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Entity, bool bEnabled)
+//{
+//    RUN_CHILDREN(GUIGridListSetSortingEnabled(**iter, bEnabled))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
+//        {
+//            // Set sorting is enabled
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListSetScrollBars(CClientEntity& Entity, bool bH, bool bV)
+//{
+//    RUN_CHILDREN(GUIGridListSetScrollBars(**iter, bH, bV))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
+//        {
+//            // Set the scrollbars
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetHorizontalScrollBar(bH);
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetVerticalScrollBar(bV);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListClear(CClientEntity& Entity)
+//{
+//    RUN_CHILDREN(GUIGridListClear(**iter))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
+//        {
+//            // Clear the gridlist
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->Clear();
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListSetItemData(CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable)
+//{
+//    // Delete any old data we might have
+//    CLuaArgument* pVariable = reinterpret_cast<CLuaArgument*>(static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->GetItemData(iRow, iColumn));
+//    if (pVariable)
+//        delete pVariable;
+//
+//    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())
+//        ->SetItemData(iRow, iColumn, (void*)Variable, CGUICallback<void, void*>(&CStaticFunctionDefinitions::GUIItemDataDestroyCallback));
+//}
+//
+//void CStaticFunctionDefinitions::GUIItemDataDestroyCallback(void* data)
+//{
+//    delete (CLuaArgument*)(data);
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListSetSelectionMode(CClientEntity& Entity, unsigned int uiMode)
+//{
+//    RUN_CHILDREN(GUIGridListSetSelectionMode(**iter, uiMode))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
+//        {
+//            // Set the selection mode
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSelectionMode((SelectionMode)uiMode);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition(CClientEntity& Entity, float fPosition)
+//{
+//    RUN_CHILDREN(GUIGridListSetHorizontalScrollPosition(**iter, fPosition))
+//
+//    // Are we a GUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
+//        {
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetHorizontalScrollPosition(fPosition / 100.0f);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIGridListSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
+//{
+//    RUN_CHILDREN(GUIGridListSetHorizontalScrollPosition(**iter, fPosition))
+//
+//    // Are we a GUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a gridlist?
+//        if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
+//        {
+//            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetVerticalScrollPosition(fPosition / 100.0f);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIWindowSetMovable(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUIWindowSetMovable(**iter, bFlag))
+//
+//    // Are we a GUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a window?
+//        if (IS_CGUIELEMENT_WINDOW(&GUIElement))
+//        {
+//            // Set the windows movability
+//            static_cast<CGUIWindow*>(GUIElement.GetCGUIElement())->SetMovable(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUIWindowSetSizable(CClientEntity& Entity, bool bFlag)
+//{
+//    RUN_CHILDREN(GUIWindowSetSizable(**iter, bFlag))
+//
+//    // Are we a GUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a window?
+//        if (IS_CGUIELEMENT_WINDOW(&GUIElement))
+//        {
+//            // Set the windows sizability
+//            static_cast<CGUIWindow*>(GUIElement.GetCGUIElement())->SetSizingEnabled(bFlag);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUILabelSetColor(CClientEntity& Entity, int iR, int iG, int iB)
+//{
+//    RUN_CHILDREN(GUILabelSetColor(**iter, iR, iG, iB))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a CGUI label?
+//        if (IS_CGUIELEMENT_LABEL(&GUIElement))
+//        {
+//            // Set the label color
+//            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(iR, iG, iB);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUILabelSetVerticalAlign(CClientEntity& Entity, CGUIVerticalAlign eAlign)
+//{
+//    RUN_CHILDREN(GUILabelSetVerticalAlign(**iter, eAlign))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a CGUI label?
+//        if (IS_CGUIELEMENT_LABEL(&GUIElement))
+//        {
+//            // Set the vertical align
+//            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetVerticalAlign(eAlign);
+//        }
+//    }
+//}
+//
+//void CStaticFunctionDefinitions::GUILabelSetHorizontalAlign(CClientEntity& Entity, CGUIHorizontalAlign eAlign)
+//{
+//    RUN_CHILDREN(GUILabelSetHorizontalAlign(**iter, eAlign))
+//
+//    // Are we a CGUI element?
+//    if (IS_GUI(&Entity))
+//    {
+//        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+//
+//        // Are we a CGUI label?
+//        if (IS_CGUIELEMENT_LABEL(&GUIElement))
+//        {
+//            // Set the horizontal align
+//            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetHorizontalAlign(eAlign);
+//        }
+//    }
+//}
 
 bool CStaticFunctionDefinitions::GetTime(unsigned char& ucHour, unsigned char& ucMin)
 {

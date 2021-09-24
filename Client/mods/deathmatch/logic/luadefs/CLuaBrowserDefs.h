@@ -49,6 +49,6 @@ public:
     LUA_DECLARE(ReloadBrowserPage);
     LUA_DECLARE(ToggleBrowserDevTools);
     LUA_DECLARE(ResizeBrowser);
-    LUA_DECLARE(GUICreateBrowser);
-    LUA_DECLARE(GUIGetBrowser);
+    //LUA_DECLARE(GUICreateBrowser);
+    //LUA_DECLARE(GUIGetBrowser);
 };

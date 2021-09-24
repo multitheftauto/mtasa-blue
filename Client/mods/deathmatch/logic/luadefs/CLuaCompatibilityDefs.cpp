@@ -65,8 +65,9 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild},
         {"xmlNodeFindChild", CLuaXMLDefs::xmlNodeFindChild},
         {"isPlayerDead", CLuaPedDefs::IsPedDead},
-        {"guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex},
-        {"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
+        /* TODO AFTER CEGUI API REWRITE */
+        //{"guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex},
+        //{"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
         {"setControlState", CLuaPedDefs::SetPedControlState},
         {"getControlState", CLuaPedDefs::GetPedControlState},
     };

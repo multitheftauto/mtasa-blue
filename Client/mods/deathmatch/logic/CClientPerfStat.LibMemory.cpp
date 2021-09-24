@@ -211,7 +211,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
                 bool        bModDir;
                 const char* szName;
             } libs[] = {
-                {false, "cgui"}, {false, "core"}, {true, "client"}, {false, "game_sa"}, {false, "multiplayer_sa"}, {false, "netc"}, {false, "xmll"},
+                {false, "cgui"}, {false, "cgui_new"}, {false, "core"}, {true, "client"}, {false, "game_sa"}, {false, "multiplayer_sa"}, {false, "netc"}, {false, "xmll"},
             };
 
             for (unsigned int i = 0; i < NUMELMS(libs); i++)

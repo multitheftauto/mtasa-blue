@@ -104,7 +104,7 @@ private:
 
     CVersionUpdaterInterface* m_pVersionUpdater;
 
-    CGUILabel* m_pLabelVersionTag;
+    //CGUILabel* m_pLabelVersionTag; /* TODO AFTER CEGUI API REWRITE */
 
     bool  m_bForceCursorVisible;
     bool  m_bChatboxVisible;

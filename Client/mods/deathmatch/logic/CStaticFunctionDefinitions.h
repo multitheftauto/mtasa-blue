@@ -14,7 +14,7 @@ class CStaticFunctionDefinitions;
 #pragma once
 
 #include <gui/CGUI.h>
-#include <gui/CGUIElement.h>
+//#include <gui/CGUIElement.h> /* TODO AFTER CEGUI API REWRITE */
 
 class CStaticFunctionDefinitions
 {
@@ -406,156 +406,157 @@ public:
         return std::get<CClientDxFont*>(variant)->GetD3DXFont();
     };
 
+    /* TODO AFTER CEGUI API REWRITE */
     // GUI funcs
-    static bool        GUIGetInputEnabled();
-    static eInputMode  GUIGetInputMode();
-    static void        GUISetInputMode(eInputMode inputMode);
-    static eCursorType GUIGetCursorType();
+    //static bool        GUIGetInputEnabled();
+    //static eInputMode  GUIGetInputMode();
+    //static void        GUISetInputMode(eInputMode inputMode);
+    //static eCursorType GUIGetCursorType();
 
-    static CClientGUIElement* GUICreateWindow(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative);
-    static CClientGUIElement* GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
-                                             CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
-                                              CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateEdit(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
-                                            CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateMemo(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
-                                            CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateGridList(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateTabPanel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateScrollPane(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                  CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateTab(CLuaMain& LuaMain, const char* szCaption, CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateProgressBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
-                                                   CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateScrollBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal, bool bRelative,
-                                                 CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateCheckBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bChecked,
-                                                bool bRelative, CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateRadioButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
-                                                   CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateStaticImage(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strFile, bool bRelative,
-                                                   CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateComboBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
-                                                CClientGUIElement* pParent);
-    static CClientGUIElement* GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal, bool bIsTransparent,
-                                               bool bRelative, CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateWindow(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative);
+    //static CClientGUIElement* GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
+    //                                         CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
+    //                                          CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateEdit(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
+    //                                        CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateMemo(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
+    //                                        CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateGridList(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+    //                                            CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateTabPanel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+    //                                            CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateScrollPane(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+    //                                              CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateTab(CLuaMain& LuaMain, const char* szCaption, CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateProgressBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
+    //                                               CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateScrollBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal, bool bRelative,
+    //                                             CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateCheckBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bChecked,
+    //                                            bool bRelative, CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateRadioButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
+    //                                               CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateStaticImage(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strFile, bool bRelative,
+    //                                               CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateComboBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
+    //                                            CClientGUIElement* pParent);
+    //static CClientGUIElement* GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal, bool bIsTransparent,
+    //                                           bool bRelative, CClientGUIElement* pParent);
 
-    static bool GUIStaticImageLoadImage(CClientEntity& Element, const SString& strDir);
-    static bool GUIStaticImageGetNativeSize(CClientEntity& Entity, CVector2D& vecSize);
+    //static bool GUIStaticImageLoadImage(CClientEntity& Element, const SString& strDir);
+    //static bool GUIStaticImageGetNativeSize(CClientEntity& Entity, CVector2D& vecSize);
 
-    static bool               GUISetSelectedTab(CClientEntity& Element, CClientEntity& Tab);
-    static CClientGUIElement* GUIGetSelectedTab(CClientEntity& Element);
-    static bool               GUIDeleteTab(CLuaMain& LuaMain, CClientGUIElement* pTab, CClientGUIElement* pParent);
+    //static bool               GUISetSelectedTab(CClientEntity& Element, CClientEntity& Tab);
+    //static CClientGUIElement* GUIGetSelectedTab(CClientEntity& Element);
+    //static bool               GUIDeleteTab(CLuaMain& LuaMain, CClientGUIElement* pTab, CClientGUIElement* pParent);
 
-    static void GUISetEnabled(CClientEntity& Element, bool bFlag);
-    static void GUISetProperty(CClientEntity& Element, const char* szProperty, const char* szValue);
-    static void GUISetText(CClientEntity& Element, const char* szText);
-    static void GUISetSize(CClientEntity& Element, const CVector2D& vecSize, bool bRelative);
-    static void GUISetPosition(CClientEntity& Element, const CVector2D& vecPosition, bool bRelative);
-    static void GUISetVisible(CClientEntity& Element, bool bFlag);
-    static void GUISetAlpha(CClientEntity& Element, float fAlpha);
-    static bool GUIBringToFront(CClientEntity& Element);
-    static void GUIMoveToBack(CClientEntity& Element);
-    static bool GUIBlur(CClientEntity& Element);
-    static bool GUIFocus(CClientEntity& Element);
+    //static void GUISetEnabled(CClientEntity& Element, bool bFlag);
+    //static void GUISetProperty(CClientEntity& Element, const char* szProperty, const char* szValue);
+    //static void GUISetText(CClientEntity& Element, const char* szText);
+    //static void GUISetSize(CClientEntity& Element, const CVector2D& vecSize, bool bRelative);
+    //static void GUISetPosition(CClientEntity& Element, const CVector2D& vecPosition, bool bRelative);
+    //static void GUISetVisible(CClientEntity& Element, bool bFlag);
+    //static void GUISetAlpha(CClientEntity& Element, float fAlpha);
+    //static bool GUIBringToFront(CClientEntity& Element);
+    //static void GUIMoveToBack(CClientEntity& Element);
+    //static bool GUIBlur(CClientEntity& Element);
+    //static bool GUIFocus(CClientEntity& Element);
 
-    static void GUICheckBoxSetSelected(CClientEntity& Element, bool bFlag);
-    static void GUIRadioButtonSetSelected(CClientEntity& Element, bool bFlag);
+    //static void GUICheckBoxSetSelected(CClientEntity& Element, bool bFlag);
+    //static void GUIRadioButtonSetSelected(CClientEntity& Element, bool bFlag);
 
-    static void GUIProgressBarSetProgress(CClientEntity& Element, int iProgress);
+    //static void GUIProgressBarSetProgress(CClientEntity& Element, int iProgress);
 
-    static void GUIScrollPaneSetScrollBars(CClientEntity& Element, bool bH, bool bV);
+    //static void GUIScrollPaneSetScrollBars(CClientEntity& Element, bool bH, bool bV);
 
-    static void GUIScrollBarSetScrollPosition(CClientEntity& Element, int iProgress);
+    //static void GUIScrollBarSetScrollPosition(CClientEntity& Element, int iProgress);
 
-    static void GUIScrollPaneSetHorizontalScrollPosition(CClientEntity& Element, float fProgress);
-    static void GUIScrollPaneSetVerticalScrollPosition(CClientEntity& Element, float fProgress);
+    //static void GUIScrollPaneSetHorizontalScrollPosition(CClientEntity& Element, float fProgress);
+    //static void GUIScrollPaneSetVerticalScrollPosition(CClientEntity& Element, float fProgress);
 
-    static inline const CVector2D GUIGetScreenSize() { return g_pCore->GetGUI()->GetResolution(); };
+    //static inline const CVector2D GUIGetScreenSize() { return g_pCore->GetGUI()->GetResolution(); };
 
-    static void GUIEditSetReadOnly(CClientEntity& Element, bool bFlag);
-    static void GUIEditSetMasked(CClientEntity& Element, bool bFlag);
-    static void GUIEditSetMaxLength(CClientEntity& Element, unsigned int iLength);
-    static void GUIEditSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    //static void GUIEditSetReadOnly(CClientEntity& Element, bool bFlag);
+    //static void GUIEditSetMasked(CClientEntity& Element, bool bFlag);
+    //static void GUIEditSetMaxLength(CClientEntity& Element, unsigned int iLength);
+    //static void GUIEditSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
 
-    static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
-    static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
-    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
+    //static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
+    //static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    //static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
-    static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
-    static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)
-    {
-        return static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AddColumn(szTitle, fWidth);
-    };
-    static inline void GUIGridListRemoveColumn(CClientGUIElement& GUIElement, unsigned int uiColumn)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->RemoveColumn(uiColumn);
-    };
-    static inline void GUIGridListSetColumnWidth(CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetColumnWidth(uiColumn, fWidth, bRelative);
-    };
-    static inline void GUIGridListSetColumnTitle(CClientGUIElement& GUIElement, unsigned int uiColumn, const char* szTitle)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetColumnTitle(uiColumn, szTitle);
-    };
-    static void       GUIGridListSetScrollBars(CClientEntity& Element, bool bH, bool bV);
-    static inline int GUIGridListAddRow(CClientGUIElement& GUIElement, bool bFast, std::vector<std::pair<SString, bool> >* m_items = NULL)
-    {
-        return static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AddRow(bFast, m_items);
-    };
-    static inline int GUIGridListInsertRowAfter(CClientGUIElement& GUIElement, int iRow, std::vector<std::pair<SString, bool> >* m_items = NULL)
-    {
-        return static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->InsertRowAfter(iRow, m_items);
-    };
-    static inline void GUIGridListRemoveRow(CClientGUIElement& GUIElement, int iRow)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->RemoveRow(iRow);
-    };
-    static inline void GUIGridListAutoSizeColumn(CClientGUIElement& GUIElement, unsigned int uiColumn)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AutoSizeColumn(uiColumn);
-    };
-    static void        GUIGridListClear(CClientEntity& Element);
-    static inline void GUIGridListSetItemText(CClientGUIElement& GUIElement, int iRow, int iColumn, const char* szText, bool bSection, bool bNumber, bool bFast)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemText(iRow, iColumn, szText, bNumber, bSection, bFast);
-    };
-    static void        GUIGridListSetItemData(CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable);
-    static void        GUIItemDataDestroyCallback(void* m_data);
-    static void        GUIGridListSetSelectionMode(CClientEntity& Element, unsigned int uiMode);
-    static inline void GUIGridListSetSelectedItem(CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSelectedItem(iRow, iColumn, bReset);
-    };
-    static inline void GUIGridListSetItemColor(CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha)
-    {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemColor(iRow, iColumn, iRed, iGreen, iBlue, iAlpha);
-    };
-    static void GUIGridListSetHorizontalScrollPosition(CClientEntity& Element, float fPosition);
-    static void GUIGridListSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
+    //static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
+    //static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)
+    //{
+    //    return static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AddColumn(szTitle, fWidth);
+    //};
+    //static inline void GUIGridListRemoveColumn(CClientGUIElement& GUIElement, unsigned int uiColumn)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->RemoveColumn(uiColumn);
+    //};
+    //static inline void GUIGridListSetColumnWidth(CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetColumnWidth(uiColumn, fWidth, bRelative);
+    //};
+    //static inline void GUIGridListSetColumnTitle(CClientGUIElement& GUIElement, unsigned int uiColumn, const char* szTitle)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetColumnTitle(uiColumn, szTitle);
+    //};
+    //static void       GUIGridListSetScrollBars(CClientEntity& Element, bool bH, bool bV);
+    //static inline int GUIGridListAddRow(CClientGUIElement& GUIElement, bool bFast, std::vector<std::pair<SString, bool> >* m_items = NULL)
+    //{
+    //    return static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AddRow(bFast, m_items);
+    //};
+    //static inline int GUIGridListInsertRowAfter(CClientGUIElement& GUIElement, int iRow, std::vector<std::pair<SString, bool> >* m_items = NULL)
+    //{
+    //    return static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->InsertRowAfter(iRow, m_items);
+    //};
+    //static inline void GUIGridListRemoveRow(CClientGUIElement& GUIElement, int iRow)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->RemoveRow(iRow);
+    //};
+    //static inline void GUIGridListAutoSizeColumn(CClientGUIElement& GUIElement, unsigned int uiColumn)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AutoSizeColumn(uiColumn);
+    //};
+    //static void        GUIGridListClear(CClientEntity& Element);
+    //static inline void GUIGridListSetItemText(CClientGUIElement& GUIElement, int iRow, int iColumn, const char* szText, bool bSection, bool bNumber, bool bFast)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemText(iRow, iColumn, szText, bNumber, bSection, bFast);
+    //};
+    //static void        GUIGridListSetItemData(CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable);
+    //static void        GUIItemDataDestroyCallback(void* m_data);
+    //static void        GUIGridListSetSelectionMode(CClientEntity& Element, unsigned int uiMode);
+    //static inline void GUIGridListSetSelectedItem(CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSelectedItem(iRow, iColumn, bReset);
+    //};
+    //static inline void GUIGridListSetItemColor(CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha)
+    //{
+    //    static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemColor(iRow, iColumn, iRed, iGreen, iBlue, iAlpha);
+    //};
+    //static void GUIGridListSetHorizontalScrollPosition(CClientEntity& Element, float fPosition);
+    //static void GUIGridListSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
-    static void GUIWindowSetMovable(CClientEntity& Element, bool bFlag);
-    static void GUIWindowSetSizable(CClientEntity& Element, bool bFlag);
+    //static void GUIWindowSetMovable(CClientEntity& Element, bool bFlag);
+    //static void GUIWindowSetSizable(CClientEntity& Element, bool bFlag);
 
-    static void GUILabelSetColor(CClientEntity& Element, int iR, int iG, int iB);
-    static void GUILabelSetVerticalAlign(CClientEntity& Element, CGUIVerticalAlign eAlign);
-    static void GUILabelSetHorizontalAlign(CClientEntity& Element, CGUIHorizontalAlign eAlign);
+    //static void GUILabelSetColor(CClientEntity& Element, int iR, int iG, int iB);
+    //static void GUILabelSetVerticalAlign(CClientEntity& Element, CGUIVerticalAlign eAlign);
+    //static void GUILabelSetHorizontalAlign(CClientEntity& Element, CGUIHorizontalAlign eAlign);
 
-    static int  GUIComboBoxAddItem(CClientEntity& Entity, const char* szText);
-    static bool GUIComboBoxRemoveItem(CClientEntity& Entity, int index);
-    static bool GUIComboBoxClear(CClientEntity& Entity);
+    //static int  GUIComboBoxAddItem(CClientEntity& Entity, const char* szText);
+    //static bool GUIComboBoxRemoveItem(CClientEntity& Entity, int index);
+    //static bool GUIComboBoxClear(CClientEntity& Entity);
 
-    static int         GUIComboBoxGetSelected(CClientEntity& Entity);
-    static bool        GUIComboBoxSetSelected(CClientEntity& Entity, int index);
-    static std::string GUIComboBoxGetItemText(CClientEntity& Entity, int index);
-    static bool        GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText);
-    static int         GUIComboBoxGetItemCount(CClientEntity& Entity);
-    static bool        GUIComboBoxSetOpen(CClientEntity& Entity, bool state);
-    static bool        GUIComboBoxIsOpen(CClientEntity& Entity);
+    //static int         GUIComboBoxGetSelected(CClientEntity& Entity);
+    //static bool        GUIComboBoxSetSelected(CClientEntity& Entity, int index);
+    //static std::string GUIComboBoxGetItemText(CClientEntity& Entity, int index);
+    //static bool        GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText);
+    //static int         GUIComboBoxGetItemCount(CClientEntity& Entity);
+    //static bool        GUIComboBoxSetOpen(CClientEntity& Entity, bool state);
+    //static bool        GUIComboBoxIsOpen(CClientEntity& Entity);
 
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);

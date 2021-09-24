@@ -46,8 +46,8 @@ void CLuaBrowserDefs::LoadFunctions()
         {"reloadBrowserPage", ReloadBrowserPage},
         {"toggleBrowserDevTools", ToggleBrowserDevTools},
         {"resizeBrowser", ResizeBrowser},
-        {"guiCreateBrowser", GUICreateBrowser},
-        {"guiGetBrowser", GUIGetBrowser},
+        //{"guiCreateBrowser", GUICreateBrowser},
+        //{"guiGetBrowser", GUIGetBrowser},
     };
 
     // Add browser functions
@@ -100,11 +100,11 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Browser", "DxTexture");
 
     // Add GUI browser class
-    lua_newclass(luaVM);
-    lua_classfunction(luaVM, "create", "guiCreateBrowser");
-    lua_classfunction(luaVM, "getBrowser", "guiGetBrowser");
-    lua_classvariable(luaVM, "browser", nullptr, "guiGetBrowser");
-    lua_registerclass(luaVM, "GuiBrowser", "GuiElement");
+    //lua_newclass(luaVM);
+    //lua_classfunction(luaVM, "create", "guiCreateBrowser");
+    //lua_classfunction(luaVM, "getBrowser", "guiGetBrowser");
+    //lua_classvariable(luaVM, "browser", nullptr, "guiGetBrowser");
+    //lua_registerclass(luaVM, "GuiBrowser", "GuiElement");
 }
 
 int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
@@ -887,96 +887,99 @@ int CLuaBrowserDefs::ReloadBrowserPage(lua_State* luaVM)
     return 1;
 }
 
-int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
-{
-    //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
-    CVector2D          position;
-    CVector2D          size;
-    bool               bIsLocal;
-    bool               bIsTransparent;
-    bool               bIsRelative;
-    CClientGUIElement* parent;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(position);
-    argStream.ReadVector2D(size);
-    argStream.ReadBool(bIsLocal);
-    argStream.ReadBool(bIsTransparent);
-    argStream.ReadBool(bIsRelative);
-    argStream.ReadUserData(parent, nullptr);
-
-    if (!argStream.HasErrors())
-    {
-        if (size.fX < 0)
-        {
-            argStream.SetCustomError("Browser width is smaller than 0", "Invalid parameter");
-        }
-        else if (size.fY < 0)
-        {
-            argStream.SetCustomError("Browser height is smaller than 0", "Invalid parameter");
-        }
-        else if (size.fX == 0 || size.fY == 0)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
-        }
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CClientGUIElement* pGUIElement =
-                CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
-
-            if (pGUIElement)
-            {
-                lua_pushelement(luaVM, pGUIElement);
-                return 1;
-            }
-            else
-            {
-                argStream.SetCustomError("Failed to create browser element", "Create browser");
-            }
-        }
-    }
-
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaBrowserDefs::GUIGetBrowser(lua_State* luaVM)            // Or rather guiGetBrowserBrowser?
-{
-    //  webbrowser guiGetBrowser ( gui-webbrowser browser )
-    CClientGUIElement* pGUIElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData<CGUIWebBrowser>(pGUIElement);
-
-    if (!argStream.HasErrors())
-    {
-        if (IS_GUI(pGUIElement) && pGUIElement->GetCGUIType() == CGUI_WEBBROWSER)
-        {
-            CClientGUIWebBrowser* pGUIBrowser = static_cast<CClientGUIWebBrowser*>(pGUIElement);
-            lua_pushelement(luaVM, pGUIBrowser->GetBrowser());
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
+/* TODO AFTER CEGUI API REWRITE */
+//int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
+//{
+//    
+//    //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
+//    CVector2D          position;
+//    CVector2D          size;
+//    bool               bIsLocal;
+//    bool               bIsTransparent;
+//    bool               bIsRelative;
+//    CClientGUIElement* parent;
+//
+//    CScriptArgReader argStream(luaVM);
+//    argStream.ReadVector2D(position);
+//    argStream.ReadVector2D(size);
+//    argStream.ReadBool(bIsLocal);
+//    argStream.ReadBool(bIsTransparent);
+//    argStream.ReadBool(bIsRelative);
+//    argStream.ReadUserData(parent, nullptr);
+//
+//    if (!argStream.HasErrors())
+//    {
+//        if (size.fX < 0)
+//        {
+//            argStream.SetCustomError("Browser width is smaller than 0", "Invalid parameter");
+//        }
+//        else if (size.fY < 0)
+//        {
+//            argStream.SetCustomError("Browser height is smaller than 0", "Invalid parameter");
+//        }
+//        else if (size.fX == 0 || size.fY == 0)
+//        {
+//            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+//        }
+//    }
+//
+//    if (!argStream.HasErrors())
+//    {
+//        if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
+//        {
+//            lua_pushboolean(luaVM, false);
+//            return 1;
+//        }
+//
+//        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+//        if (pLuaMain)
+//        {
+//            CClientGUIElement* pGUIElement =
+//                CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
+//
+//            if (pGUIElement)
+//            {
+//                lua_pushelement(luaVM, pGUIElement);
+//                return 1;
+//            }
+//            else
+//            {
+//                argStream.SetCustomError("Failed to create browser element", "Create browser");
+//            }
+//        }
+//    }
+//
+//    if (argStream.HasErrors())
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
+//
+//int CLuaBrowserDefs::GUIGetBrowser(lua_State* luaVM)            // Or rather guiGetBrowserBrowser?
+//{
+//    // webbrowser guiGetBrowser ( gui-webbrowser browser )
+//    CClientGUIElement* pGUIElement;
+//
+//    /* TODO AFTER CEGUI API REWRITE */
+//    CScriptArgReader argStream(luaVM);
+//    argStream.ReadUserData<CGUIWebBrowser>(pGUIElement);
+//
+//    if (!argStream.HasErrors())
+//    {
+//        if (IS_GUI(pGUIElement) && pGUIElement->GetCGUIType() == CGUI_WEBBROWSER)
+//        {
+//            CClientGUIWebBrowser* pGUIBrowser = static_cast<CClientGUIWebBrowser*>(pGUIElement);
+//            lua_pushelement(luaVM, pGUIBrowser->GetBrowser());
+//            return 1;
+//        }
+//    }
+//    else
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
 
 int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
 {

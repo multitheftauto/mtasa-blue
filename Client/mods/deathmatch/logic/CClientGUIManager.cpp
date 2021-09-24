@@ -111,19 +111,20 @@ void CClientGUIManager::QueueGridListUpdate(CClientGUIElement* pGUIElement)
 
 void CClientGUIManager::FlushQueuedUpdates()
 {
-    map<ElementID, bool>::iterator iter = m_QueuedGridListUpdates.begin();
-    for (; iter != m_QueuedGridListUpdates.end(); ++iter)
-    {
-        CClientEntity* pEntity = CElementIDs::GetElement(iter->first);
-        if (pEntity && !pEntity->IsBeingDeleted() && pEntity->GetType() == CCLIENTGUI)
-        {
-            CClientGUIElement* pGUIElement = static_cast<CClientGUIElement*>(pEntity);
-            if (pGUIElement && IS_CGUIELEMENT_GRIDLIST(pGUIElement))
-            {
-                CGUIGridList* pGUIGridList = static_cast<CGUIGridList*>(pGUIElement->GetCGUIElement());
-                pGUIGridList->ForceUpdate();
-            }
-        }
-    }
-    m_QueuedGridListUpdates.clear();
+    /* TODO AFTER CEGUI API REWRITE */
+    //map<ElementID, bool>::iterator iter = m_QueuedGridListUpdates.begin();
+    //for (; iter != m_QueuedGridListUpdates.end(); ++iter)
+    //{
+    //    CClientEntity* pEntity = CElementIDs::GetElement(iter->first);
+    //    if (pEntity && !pEntity->IsBeingDeleted() && pEntity->GetType() == CCLIENTGUI)
+    //    {
+    //        CClientGUIElement* pGUIElement = static_cast<CClientGUIElement*>(pEntity);
+    //        if (pGUIElement && IS_CGUIELEMENT_GRIDLIST(pGUIElement))
+    //        {
+    //            CGUIGridList* pGUIGridList = static_cast<CGUIGridList*>(pGUIElement->GetCGUIElement());
+    //            pGUIGridList->ForceUpdate();
+    //        }
+    //    }
+    //}
+    //m_QueuedGridListUpdates.clear();
 }

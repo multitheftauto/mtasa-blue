@@ -30,6 +30,14 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
         WriteDebugEvent(SString("DLL_PROCESS_ATTACH %08x", pvNothing));
         if (IsGTAProcess())
         {
+            /* [GUINew] Custom Error Logging */
+            if (AllocConsole())
+            {
+                freopen("CONIN$", "r", stdin);
+                freopen("CONOUT$", "w", stdout);
+                freopen("CONOUT$", "w", stderr);
+            }
+
             WriteDebugEvent(SString("ModuleFileName: %s", *GetLaunchPathFilename()));
 
             AddUtf8FileHooks();

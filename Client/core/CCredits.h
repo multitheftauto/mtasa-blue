@@ -27,12 +27,14 @@ public:
 
     void Update();
 
-    bool OnOKButtonClick(CGUIElement* pElement);
+    //bool OnOKButtonClick(CGUIElement* pElement); /* TODO AFTER CEGUI API REWRITE */
 
 private:
-    CGUIWindow* m_pWindow;
-    CGUILabel*  m_pLabels[30];
-    CGUIButton* m_pButtonOK;
+    /* TODO AFTER CEGUI API REWRITE */
+    //CGUIWindow* m_pWindow;
+    //CGUILabel*  m_pLabels[30];
+    //CGUIButton* m_pButtonOK;
+
     SString     m_strCredits;
 
     clock_t m_clkStart;
